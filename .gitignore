@@ -1,0 +1,15 @@
+target/
+.settings/
+.DS_Store
+.classpath
+.project
+.idea
+*.iml
+.springBeans
+doc/
+data/
+logs/
+plugin/
+APP_NAME_IS_UNDEFINED/
+DATA_HOME_IS_UNDEFINED/
+

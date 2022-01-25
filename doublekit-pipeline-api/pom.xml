@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.doublekit</groupId>
+        <artifactId>doublekit-pipeline</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>doublekit-pipeline-api</artifactId>
+    <name>${project.artifactId}</name>
+
+    <dependencies>
+        <!--common-->
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+        </dependency>
+        <!--doublekit-->
+        <dependency>
+            <groupId>com.doublekit</groupId>
+            <artifactId>doublekit-framework-common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.doublekit</groupId>
+            <artifactId>doublekit-beans-annotation</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.doublekit</groupId>
+            <artifactId>doublekit-dsl-join-annotation</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.doublekit</groupId>
+            <artifactId>doublekit-dal-jpa-annotation</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.doublekit</groupId>
+            <artifactId>doublekit-dfs-common</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.doublekit</groupId>
+            <artifactId>doublekit-dss-annotation</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.doublekit</groupId>
+            <artifactId>doublekit-pcs-user-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.doublekit</groupId>
+            <artifactId>doublekit-pcs-form-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.doublekit</groupId>
+            <artifactId>doublekit-pcs-flow-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.doublekit</groupId>
+            <artifactId>doublekit-apibox-annotation</artifactId>
+        </dependency>
+    </dependencies>
+
+</project>
