@@ -8,8 +8,8 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@DataFly(modules = "wiki")
-@ComponentScan({"com.doublekit.wiki"})
+@DataFly(modules = "pipeline")
+@ComponentScan({"com.doublekit.pipeline"})
 public class PipelineServerAutoConfiguration {
 
     private static Logger logger = LoggerFactory.getLogger(PipelineServerAutoConfiguration.class);
