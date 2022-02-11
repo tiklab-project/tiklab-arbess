@@ -9,9 +9,9 @@ import com.doublekit.pipeline.definition.model.PipelineConfigure;
 import com.doublekit.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+
 
 @Service
 @Exporter
@@ -53,29 +53,12 @@ public class PipelineConfigureServiceImpl implements PipelineConfigureService{
     @Override
     public PipelineConfigure updateListPipelineConfig() {
 
-        List<PipelineConfigure> pipelineConfigureList = selectAllPipelineConfigure();
-
-        //判断是否更改过配置
-        List<String> createTime = new ArrayList<>();
-
-        if (pipelineConfigureList.size() != 0){
-            for (int i = pipelineConfigureList.size() - 1; i >= 0; i--) {
-
-                String configureCreateTime = pipelineConfigureList.get(i).getConfigureCreateTime();
-
-                createTime.add(configureCreateTime);
-
-            }
-            //排序
-            Collections.sort(createTime);
-
-            String id = selectTimeId(createTime.get(createTime.size() - 1));
-
-            return selectPipelineConfigure(id);
-
+        String selectTimeId = selectTimeId();
+        if (selectTimeId == null){
+            return null;
         }
 
-        return null;
+        return selectPipelineConfigure(selectTimeId);
     }
 
     //查询
@@ -97,23 +80,62 @@ public class PipelineConfigureServiceImpl implements PipelineConfigureService{
 
         List<PipelineConfigureEntity> pipelineConfigureEntityList = pipelineConfigureDao.selectAllPipelineConfigure();
 
-        return BeanMapper.mapList(pipelineConfigureEntityList,PipelineConfigure.class);
+        List<PipelineConfigure> pipelineConfigureList = BeanMapper.mapList(pipelineConfigureEntityList, PipelineConfigure.class);
+
+        joinTemplate.joinQuery(pipelineConfigureList);
+
+        return pipelineConfigureList;
+    }
+
+    @Override
+    public List<PipelineConfigure> selectAllPipelineConfigureList(List<String> idList) {
+
+        List<PipelineConfigureEntity> pipelineConfigureList = pipelineConfigureDao.selectAllPipelineConfigureList(idList);
+
+        return BeanMapper.mapList(pipelineConfigureList, PipelineConfigure.class);
     }
 
 
-
     //根据时间查询id
-    public String selectTimeId(String time) {
+    public String selectTimeId() {
 
         List<PipelineConfigure> pipelineConfigureList = selectAllPipelineConfigure();
 
-        for (PipelineConfigure pipelineConfigure : pipelineConfigureList) {
+        pipelineConfigureList.sort(new Comparator<PipelineConfigure>() {
+            @Override
+            public int compare(PipelineConfigure pipelineConfigure1, PipelineConfigure pipelineConfigure2) {
 
-            if (pipelineConfigure.getConfigureCreateTime().equals(time)){
-
-                return pipelineConfigure.getConfigureId();
+                return pipelineConfigure1.getConfigureCreateTime().compareTo(pipelineConfigure2.getConfigureCreateTime());
             }
-        }
-        return null;
+        });
+
+        String configureId = pipelineConfigureList.get(pipelineConfigureList.size() - 1).getConfigureId();
+
+        // //获取配置中的时间
+        // List<String> createTime = new ArrayList<>();
+        //
+        // if (pipelineConfigureList.size() != 0) {
+        //     for (int i = pipelineConfigureList.size() - 1; i >= 0; i--) {
+        //
+        //         String configureCreateTime = pipelineConfigureList.get(i).getConfigureCreateTime();
+        //
+        //         createTime.add(configureCreateTime);
+        //     }
+        //     //对时间进行排序获得最近的修改
+        //     Collections.sort(createTime);
+        //
+        //     String time = createTime.get(createTime.size()-1);
+        //
+        //     //获取对应时间的id
+        //     for (PipelineConfigure pipelineConfigure : pipelineConfigureList) {
+        //
+        //         if (pipelineConfigure.getConfigureCreateTime().equals(time)){
+        //
+        //             return pipelineConfigure.getConfigureId();
+        //         }
+        //     }
+        // }
+
+        return configureId;
     }
 }

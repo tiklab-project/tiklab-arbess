@@ -1,52 +1,50 @@
-package com.doublekit.pipeline.implement.entity;
+package com.doublekit.pipeline.implement.model;
 
+import com.doublekit.apibox.annotation.ApiModel;
+import com.doublekit.apibox.annotation.ApiProperty;
+import com.doublekit.join.annotation.Join;
 
-import com.doublekit.dal.jpa.mapper.annotation.*;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
-/**
- * 流水线日志
- */
-
-@Entity
-@Table(name="pipeline_log")
-public class PipelineLogEntity {
+@ApiModel
+@Join
+public class PipelineLog {
 
     //日志id
-    @Id
-    @GeneratorValue
-    @Column(name = "log_id")
+    @ApiProperty(name="logId",desc="日志id")
     private String logId;
 
     //创建时间
-    @Column(name = "log_create_time",notNull = true)
-    private String logCreateTime;
+    @ApiProperty(name="logCreateTime",desc="创建时间")
+    private String logCreateTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());;
 
     //日志地址
-    @Column(name = "log_address",notNull = true)
+    @ApiProperty(name="logAddress",desc="日志地址")
     private String logAddress;
 
     //拉取时间
-    @Column(name = "log_code_time",notNull = true)
+    @ApiProperty(name="logCodeTime",desc="拉取时间")
     private String logCodeTime;
 
     //拉取状态
-    @Column(name = "log_code_state",notNull = true)
+    @ApiProperty(name="logCodeState",desc="拉取状态")
     private int  logCodeState;
 
     //打包时间
-    @Column(name = "log_pack_time",notNull = true)
+    @ApiProperty(name="logPackTime",desc="打包时间")
     private String logPackTime;
 
     //打包状态
-    @Column(name = "log_pack_state",notNull = true)
+    @ApiProperty(name="logPackState",desc="打包状态")
     private int  logPackState;
 
     //部署时间
-    @Column(name = "log_deploy_time",notNull = true)
+    @ApiProperty(name="logDeployTime",desc="部署时间")
     private String logDeployTime;
 
     //部署状态
-    @Column(name = "log_deploy_state",notNull = true)
+    @ApiProperty(name="logDeployState",desc="部署状态")
     private int logDeployState;
 
     public String getLogId() {

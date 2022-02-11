@@ -20,25 +20,9 @@ public class PipelineHistoryEntity {
     @Column(name = "history_create_time",notNull = true)
     private String historyCreateTime;
 
-    //构建执行时间
-    @Column(name = "history_implement_time",notNull = true)
-    private String historyImplementTime;
-
     //构建方式
     @Column(name = "history_way",notNull = true)
     private int historyWay;
-
-    //运行状态
-    @Column(name = "history_run_state",notNull = true)
-    private int historyRunState;
-
-    //上次运行时间
-    @Column(name = "history_last_time",notNull = true)
-    private String historyLastTime;
-
-    //上次成功时间
-    @Column(name = "history_last_success_time")
-    private String historyLastSuccessTime;
 
     //分支
     @Column(name = "history_branch",notNull = true)
@@ -46,11 +30,15 @@ public class PipelineHistoryEntity {
 
     //流水线id
     @Column(name = "pipeline_id",notNull = true)
-    private int pipelineId;
+    private String pipelineId;
 
     //凭证id
     @Column(name = "proof_id",notNull = true)
-    private int proofId;
+    private String proofId;
+
+    //日志id
+    @Column(name = "log_id",notNull = true)
+    private String logId;
 
     public String getHistoryId() {
         return historyId;
@@ -68,44 +56,12 @@ public class PipelineHistoryEntity {
         this.historyCreateTime = historyCreateTime;
     }
 
-    public String getHistoryImplementTime() {
-        return historyImplementTime;
-    }
-
-    public void setHistoryImplementTime(String historyImplementTime) {
-        this.historyImplementTime = historyImplementTime;
-    }
-
     public int getHistoryWay() {
         return historyWay;
     }
 
     public void setHistoryWay(int historyWay) {
         this.historyWay = historyWay;
-    }
-
-    public int getHistoryRunState() {
-        return historyRunState;
-    }
-
-    public void setHistoryRunState(int historyRunState) {
-        this.historyRunState = historyRunState;
-    }
-
-    public String getHistoryLastTime() {
-        return historyLastTime;
-    }
-
-    public void setHistoryLastTime(String historyLastTime) {
-        this.historyLastTime = historyLastTime;
-    }
-
-    public String getHistoryLastSuccessTime() {
-        return historyLastSuccessTime;
-    }
-
-    public void setHistoryLastSuccessTime(String historyLastSuccessTime) {
-        this.historyLastSuccessTime = historyLastSuccessTime;
     }
 
     public String getHistoryBranch() {
@@ -116,19 +72,27 @@ public class PipelineHistoryEntity {
         this.historyBranch = historyBranch;
     }
 
-    public int getPipelineId() {
+    public String getPipelineId() {
         return pipelineId;
     }
 
-    public void setPipelineId(int pipelineId) {
+    public void setPipelineId(String pipelineId) {
         this.pipelineId = pipelineId;
     }
 
-    public int getProofId() {
+    public String getProofId() {
         return proofId;
     }
 
-    public void setProofId(int proofId) {
+    public void setProofId(String proofId) {
         this.proofId = proofId;
+    }
+
+    public String getLogId() {
+        return logId;
+    }
+
+    public void setLogId(String logId) {
+        this.logId = logId;
     }
 }

@@ -5,6 +5,8 @@ import com.doublekit.join.JoinTemplate;
 import com.doublekit.pipeline.definition.dao.PipelineDao;
 import com.doublekit.pipeline.definition.entity.PipelineEntity;
 import com.doublekit.pipeline.definition.model.Pipeline;
+import com.doublekit.pipeline.implement.entity.PipelineHistoryEntity;
+import com.doublekit.pipeline.implement.model.PipelineHistory;
 import com.doublekit.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -62,8 +64,21 @@ public class PipelineServiceImpl implements PipelineService{
 
     @Override
     public List<Pipeline> selectAllPipeline() {
+
         List<PipelineEntity> pipelineEntityList = pipelineDao.selectAllPipeline();
 
-        return BeanMapper.mapList(pipelineEntityList,Pipeline.class);
+        List<Pipeline> pipelineList = BeanMapper.mapList(pipelineEntityList, Pipeline.class);
+
+        joinTemplate.joinQuery(pipelineList);
+
+        return pipelineList;
+    }
+
+    @Override
+    public List<Pipeline> selectAllPipelineList(List<String> idList) {
+
+        List<PipelineEntity> pipelineEntityList = pipelineDao.selectAllPipelineList(idList);
+
+        return BeanMapper.mapList(pipelineEntityList, Pipeline.class);
     }
 }

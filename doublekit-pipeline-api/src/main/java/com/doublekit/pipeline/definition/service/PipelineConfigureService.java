@@ -1,8 +1,13 @@
 package com.doublekit.pipeline.definition.service;
 
 
+import com.doublekit.join.annotation.FindAll;
+import com.doublekit.join.annotation.FindList;
+import com.doublekit.join.annotation.FindOne;
 import com.doublekit.join.annotation.JoinProvider;
 import com.doublekit.pipeline.definition.model.PipelineConfigure;
+import com.doublekit.pipeline.implement.model.PipelineHistory;
+
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.List;
@@ -40,11 +45,16 @@ public interface PipelineConfigureService {
      * @param id 流水线配置id
      * @return 配置信息
      */
+    @FindOne
     PipelineConfigure selectPipelineConfigure(String id);
 
     /**
      * 查询所有配置文件
      * @return 配置文件列表
      */
+    @FindAll
     List<PipelineConfigure> selectAllPipelineConfigure();
+
+    @FindList
+    List<PipelineConfigure> selectAllPipelineConfigureList(List<String> idList);
 }

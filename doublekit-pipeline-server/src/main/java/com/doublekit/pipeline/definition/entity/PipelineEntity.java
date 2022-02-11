@@ -3,7 +3,6 @@ package com.doublekit.pipeline.definition.entity;
 
 import com.doublekit.dal.jpa.mapper.annotation.*;
 
-import java.util.Date;
 
 /**
  * 流水线
@@ -34,10 +33,6 @@ public class PipelineEntity {
     //流水线类型
     @Column(name = "pipeline_create_type")
     private int pipelineType;
-
-
-
-
 
     public String getPipelineId() {
         return pipelineId;

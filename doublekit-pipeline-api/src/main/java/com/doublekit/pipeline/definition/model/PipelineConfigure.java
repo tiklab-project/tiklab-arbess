@@ -6,6 +6,7 @@ import com.doublekit.beans.annotation.Mapping;
 import com.doublekit.beans.annotation.Mappings;
 import com.doublekit.join.annotation.Join;
 import com.doublekit.join.annotation.JoinQuery;
+import com.doublekit.pipeline.systemSettings.securitySetting.proof.model.Proof;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -52,8 +53,12 @@ public class PipelineConfigure {
     private Pipeline pipeline;
 
     //凭证id
-    @ApiProperty(name="proofId",desc="凭证id")
-    private String proofId;
+    @ApiProperty(name="proof",desc="凭证id",eg="@selectOne")
+    @Mappings({
+            @Mapping(source = "proof.proofId",target = "proofId")
+    })
+    @JoinQuery(key = "proofId")
+    private Proof proof;
 
 
     public String getConfigureCodeSource() {
@@ -112,12 +117,12 @@ public class PipelineConfigure {
         this.configureCreateTime = configureCreateTime;
     }
 
-    public String getProofId() {
-        return proofId;
+    public Proof getProof() {
+        return proof;
     }
 
-    public void setProofId(String proofId) {
-        this.proofId = proofId;
+    public void setProof(Proof proof) {
+        this.proof = proof;
     }
 
     public String getConfigureId() {

@@ -3,6 +3,7 @@ package com.doublekit.pipeline.definition.dao;
 
 import com.doublekit.dal.jpa.JpaTemplate;
 import com.doublekit.pipeline.definition.entity.PipelineConfigureEntity;
+import com.doublekit.pipeline.implement.entity.PipelineLogEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,5 +59,12 @@ public class PipelineConfigureDao {
      */
     public List<PipelineConfigureEntity> selectAllPipelineConfigure(){
         return jpaTemplate.findAll(PipelineConfigureEntity.class);
+    }
+
+
+
+    public List<PipelineConfigureEntity> selectAllPipelineConfigureList(List<String> idList){
+
+        return jpaTemplate.findList(PipelineConfigureEntity.class,idList);
     }
 }

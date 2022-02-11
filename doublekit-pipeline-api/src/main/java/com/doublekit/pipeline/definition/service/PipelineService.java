@@ -1,10 +1,12 @@
 package com.doublekit.pipeline.definition.service;
 
 
+import com.doublekit.join.annotation.FindAll;
 import com.doublekit.join.annotation.FindList;
 import com.doublekit.join.annotation.FindOne;
 import com.doublekit.join.annotation.JoinProvider;
 import com.doublekit.pipeline.definition.model.Pipeline;
+import com.doublekit.pipeline.definition.model.PipelineConfigure;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -44,10 +46,11 @@ public interface PipelineService {
      * 查询所有流水线
      * @return 流水线列表
      */
-    @FindList
+    @FindAll
     List<Pipeline> selectAllPipeline();
 
-
+    @FindList
+    List<Pipeline> selectAllPipelineList(List<String> idList);
 
 
 

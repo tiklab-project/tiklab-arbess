@@ -13,9 +13,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 @RestController
 @RequestMapping("/pipelineConfigure")
@@ -32,8 +32,6 @@ public class PipelineConfigureController {
     @ApiMethod(name = "createPipelineConfigure",desc = "创建流水线配置")
     @ApiParam(name = "PipelineConfigure",desc = "pipelineConfigure",required = true)
     public Result<String> createPipelineConfigure(@RequestBody @NotNull @Valid PipelineConfigure pipelineConfigure){
-
-        System.out.println(pipelineConfigure.toString());
 
         String pipelineConfigureId = pipelineConfigureService.createPipelineConfigure(pipelineConfigure);
 
@@ -75,7 +73,7 @@ public class PipelineConfigureController {
 
     //查询
     @RequestMapping(path="/selectPipelineConfig",method = RequestMethod.POST)
-    @ApiMethod(name = "selectPipelineConfig",desc = "更新流水线配置")
+    @ApiMethod(name = "selectPipelineConfig",desc = "查询流水线配置")
     @ApiParam(name = "PipelineConfigure",desc = "pipelineConfigure",required = true)
     public Result<PipelineConfigure> selectPipelineConfig(String id){
 
@@ -83,4 +81,18 @@ public class PipelineConfigureController {
 
         return Result.ok(pipelineConfigure);
     }
+
+    //查询所有
+        @RequestMapping(path="/selectAllPipelineConfig",method = RequestMethod.POST)
+    @ApiMethod(name = "selectAllPipelineConfig",desc = "查询所有流水线配置")
+    @ApiParam(name = "PipelineConfigure",desc = "pipelineConfigure",required = true)
+    public Result<PipelineConfigure> selectAllPipelineConfig(){
+
+        List<PipelineConfigure> pipelineConfigureList = pipelineConfigureService.selectAllPipelineConfigure();
+
+        return Result.ok(pipelineConfigureList);
+    }
+
+
+
 }

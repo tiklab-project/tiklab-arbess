@@ -7,6 +7,9 @@ import com.doublekit.beans.annotation.Mappings;
 import com.doublekit.join.annotation.Join;
 import com.doublekit.join.annotation.JoinQuery;
 import com.doublekit.pipeline.definition.model.Pipeline;
+import com.doublekit.pipeline.systemSettings.securitySetting.proof.model.Proof;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 
 @ApiModel
@@ -17,44 +20,96 @@ public class PipelineHistory {
     @ApiProperty(name="historyId",desc="构建历史id")
     private String historyId;
 
-    //创建构建时间
+    //创建时间
     @ApiProperty(name="pipelineName",desc="创建构建时间",required = true)
-    private String historyCreateTime;
-
-    //构建执行时间
-    @ApiProperty(name="pipelineName",desc="构建执行时间",required = true)
-    private String historyImplementTime;
+    private String historyCreateTime=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
 
     //构建方式
     @ApiProperty(name="pipelineName",desc="构建方式",required = true)
     private int historyWay;
 
-    //运行状态
-    @ApiProperty(name="pipelineName",desc="运行状态",required = true)
-    private int historyRunState;
-
-    //上次运行时间
-    @ApiProperty(name="pipelineName",desc="上次运行时间",required = true)
-    private String historyLastTime;
-
-    //上次成功时间
-    @ApiProperty(name="pipelineName",desc="上次成功时间",required = true)
-    private String historyLastSuccessTime;
-
     //分支
     @ApiProperty(name="pipelineName",desc="分支",required = true)
-    private String historyBranch;
+        private String historyBranch;
 
-
-    @ApiProperty(name="pipeline",desc="流水线",eg="@selectOne")
+    //流水线
+    @ApiProperty(name="pipeline",desc="流水线id",eg="@selectOne")
     @Mappings({
-            @Mapping(source = "pipeline.id",target = "pipelineId")
+            @Mapping(source = "pipeline.pipelineId",target = "pipelineId")
     })
-    @JoinQuery(key = "id")
+    @JoinQuery(key = "pipelineId")
     private Pipeline pipeline;
 
-    //凭证id
-    @ApiProperty(name="pipelineName",desc="凭证id",required = true)
-    private int proofId;
+    //凭证
+    @ApiProperty(name="proof",desc="凭证id",eg="@selectOne")
+    @Mappings({
+            @Mapping(source = "proof.proofId",target = "proofId")
+    })
+    @JoinQuery(key = "proofId")
+    private Proof proof;
 
+    //日志
+    @ApiProperty(name="pipelineLog",desc="日志id",eg="@selectOne")
+    @Mappings({
+            @Mapping(source = "pipelineLog.logId",target = "logId")
+    })
+    @JoinQuery(key = "logId")
+    private PipelineLog pipelineLog;
+
+
+    public String getHistoryId() {
+        return historyId;
+    }
+
+    public void setHistoryId(String historyId) {
+        this.historyId = historyId;
+    }
+
+    public String getHistoryCreateTime() {
+        return historyCreateTime;
+    }
+
+    public void setHistoryCreateTime(String historyCreateTime) {
+        this.historyCreateTime = historyCreateTime;
+    }
+
+    public int getHistoryWay() {
+        return historyWay;
+    }
+
+    public void setHistoryWay(int historyWay) {
+        this.historyWay = historyWay;
+    }
+
+    public String getHistoryBranch() {
+        return historyBranch;
+    }
+
+    public void setHistoryBranch(String historyBranch) {
+        this.historyBranch = historyBranch;
+    }
+
+    public Pipeline getPipeline() {
+        return pipeline;
+    }
+
+    public void setPipeline(Pipeline pipeline) {
+        this.pipeline = pipeline;
+    }
+
+    public Proof getProof() {
+        return proof;
+    }
+
+    public void setProof(Proof proof) {
+        this.proof = proof;
+    }
+
+    public PipelineLog getPipelineLog() {
+        return pipelineLog;
+    }
+
+    public void setPipelineLog(PipelineLog pipelineLog) {
+        this.pipelineLog = pipelineLog;
+    }
 }

@@ -3,11 +3,11 @@ package com.doublekit.pipeline.definition.dao;
 
 import com.doublekit.dal.jpa.JpaTemplate;
 import com.doublekit.pipeline.definition.entity.PipelineEntity;
+import com.doublekit.pipeline.implement.entity.PipelineLogEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-
 import java.util.List;
 
 /**
@@ -21,7 +21,6 @@ public class PipelineDao {
 
     @Autowired
     JpaTemplate jpaTemplate;
-
 
     /**
      * 创建流水线
@@ -63,6 +62,12 @@ public class PipelineDao {
      */
     public List<PipelineEntity> selectAllPipeline(){
         return jpaTemplate.findAll(PipelineEntity.class);
+    }
+
+
+    public List<PipelineEntity> selectAllPipelineList(List<String> idList){
+
+        return jpaTemplate.findList(PipelineEntity.class,idList);
     }
 
 }
