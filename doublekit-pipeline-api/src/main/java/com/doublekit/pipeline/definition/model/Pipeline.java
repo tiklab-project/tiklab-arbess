@@ -3,7 +3,6 @@ package com.doublekit.pipeline.definition.model;
 import com.doublekit.apibox.annotation.ApiModel;
 import com.doublekit.apibox.annotation.ApiProperty;
 import com.doublekit.join.annotation.Join;
-
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -25,7 +24,7 @@ public class Pipeline {
 
     //流水线创建时间
     @ApiProperty(name="pipelineCreateTime",desc="流水线创建时间",required = true)
-    private String pipelineCreateTime=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+    private String pipelineCreateTime;
 
     //流水线类型
     @ApiProperty(name="pipelineType",desc="流水线类型",required = true)

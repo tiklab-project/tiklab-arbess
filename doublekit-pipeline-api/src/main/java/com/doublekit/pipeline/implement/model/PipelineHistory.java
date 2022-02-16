@@ -7,9 +7,8 @@ import com.doublekit.beans.annotation.Mappings;
 import com.doublekit.join.annotation.Join;
 import com.doublekit.join.annotation.JoinQuery;
 import com.doublekit.pipeline.definition.model.Pipeline;
+import com.doublekit.pipeline.definition.model.PipelineConfigure;
 import com.doublekit.pipeline.systemSettings.securitySetting.proof.model.Proof;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 
 @ApiModel
@@ -22,7 +21,7 @@ public class PipelineHistory {
 
     //创建时间
     @ApiProperty(name="pipelineName",desc="创建构建时间",required = true)
-    private String historyCreateTime=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+    private String historyCreateTime;
 
     //构建方式
     @ApiProperty(name="pipelineName",desc="构建方式",required = true)
@@ -55,6 +54,14 @@ public class PipelineHistory {
     })
     @JoinQuery(key = "logId")
     private PipelineLog pipelineLog;
+
+    //凭证id
+    @ApiProperty(name="PipelineConfigure",desc="凭证id",eg="@selectOne")
+    @Mappings({
+            @Mapping(source = "PipelineConfigure.configureId",target = "configureId")
+    })
+    @JoinQuery(key = "configureId")
+    private PipelineConfigure PipelineConfigure;
 
 
     public String getHistoryId() {
@@ -111,5 +118,13 @@ public class PipelineHistory {
 
     public void setPipelineLog(PipelineLog pipelineLog) {
         this.pipelineLog = pipelineLog;
+    }
+
+    public com.doublekit.pipeline.definition.model.PipelineConfigure getPipelineConfigure() {
+        return PipelineConfigure;
+    }
+
+    public void setPipelineConfigure(com.doublekit.pipeline.definition.model.PipelineConfigure pipelineConfigure) {
+        PipelineConfigure = pipelineConfigure;
     }
 }

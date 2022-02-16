@@ -31,7 +31,7 @@ public class PipelineLogController {
     //添加
     @RequestMapping(path="/createPipelineLog",method = RequestMethod.POST)
     @ApiMethod(name = "createPipelineHistory",desc = "创建流水线日志")
-    @ApiParam(name = "PipelineLog",desc = "PipelineLog",required = true)
+    @ApiParam(name = "pipelineLog",desc = "pipelineLog",required = true)
     public Result<String> createPipelineLog(@RequestBody @NotNull @Valid PipelineLog pipelineLog){
 
         String pipelineLogId = pipelineLogService.createPipelineLog(pipelineLog);
@@ -42,7 +42,7 @@ public class PipelineLogController {
     //删除
     @RequestMapping(path="/deletePipelineLog",method = RequestMethod.POST)
     @ApiMethod(name = "deletePipelineLog",desc = "删除流水线日志")
-    @ApiParam(name = "PipelineLog",desc = "PipelineLog",required = true)
+    @ApiParam(name = "id",desc = "id",required = true)
     public Result<Void> deletePipelineLog(@NotNull String id){
 
         pipelineLogService.deletePipelineLog(id);
@@ -53,7 +53,7 @@ public class PipelineLogController {
     //修改
     @RequestMapping(path="/updatePipelineLog",method = RequestMethod.POST)
     @ApiMethod(name = "updatePipelineLog",desc = "修改流水线日志")
-    @ApiParam(name = "PipelineLog",desc = "PipelineLog",required = true)
+    @ApiParam(name = "pipelineLog",desc = "pipelineLog",required = true)
     public Result<Void> updatePipelineLog(@RequestBody @NotNull @Valid PipelineLog pipelineLog){
 
         pipelineLogService.updatePipelineLog(pipelineLog);
@@ -64,7 +64,7 @@ public class PipelineLogController {
     //查询
     @RequestMapping(path="/selectPipelineLog",method = RequestMethod.POST)
     @ApiMethod(name = "selectPipelineLog",desc = "查询流水线日志")
-    @ApiParam(name = "PipelineLog",desc = "PipelineLog",required = true)
+    @ApiParam(name = "id",desc = "id",required = true)
     public Result<PipelineLog> selectPipelineLog(@NotNull String  id){
 
         PipelineLog pipelineLog = pipelineLogService.selectPipelineLog(id);
@@ -75,7 +75,6 @@ public class PipelineLogController {
     //查询所有
     @RequestMapping(path="/selectAllPipelineLog",method = RequestMethod.POST)
     @ApiMethod(name = "selectAllPipelineLog",desc = "查询所有流水线日志")
-    @ApiParam(name = "PipelineLog",desc = "PipelineLog",required = true)
     public Result<List<PipelineLog>> selectAllPipelineLog(){
 
         List<PipelineLog> pipelineLogList = pipelineLogService.selectAllPipelineLog();

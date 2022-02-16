@@ -25,6 +25,10 @@ public class PipelineConfigureEntity {
     @Column(name = "configure_code_source_address",notNull = true)
     private String configureCodeSourceAddress;
 
+    //构建源
+    @Column(name = "configure_code_structure",notNull = true)
+    private String configureCodeStructure;
+
     //构建文件地址
     @Column(name = "configure_structure_address",notNull = true)
     private String configureStructureAddress;
@@ -80,6 +84,14 @@ public class PipelineConfigureEntity {
 
     public void setConfigureStructureAddress(String configureStructureAddress) {
         this.configureStructureAddress = configureStructureAddress;
+    }
+
+    public String getConfigureCodeStructure() {
+        return configureCodeStructure;
+    }
+
+    public void setConfigureCodeStructure(String configureCodeStructure) {
+        this.configureCodeStructure = configureCodeStructure;
     }
 
     public String getConfigureStructureOrder() {

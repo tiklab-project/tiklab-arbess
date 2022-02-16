@@ -5,6 +5,7 @@ import com.doublekit.join.annotation.FindList;
 import com.doublekit.join.annotation.FindOne;
 import com.doublekit.join.annotation.JoinProvider;
 import com.doublekit.pipeline.implement.model.PipelineHistory;
+import com.doublekit.pipeline.implement.model.PipelineHistoryDetails;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -47,7 +48,23 @@ public interface PipelineHistoryService {
     @FindAll
     List<PipelineHistory> selectAllPipelineHistory();
 
+    /**
+     * 获取最近一次的构建
+     * @return 构建历史
+     */
+    @FindOne
+    PipelineHistory selectLastPipelineHistory(String pipelineId);
+
+    /**
+     * 根据流水线id查询所有构建信息
+     * @param pipelineId 流水线id
+     * @return 配置信息集合
+     */
+    List<PipelineHistoryDetails> selectAll(String pipelineId);
+
     @FindList
     List<PipelineHistory> selectPipelineHistoryList(List<String> idList);
+
+
 
 }

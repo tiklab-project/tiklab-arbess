@@ -2,15 +2,7 @@ package com.doublekit.pipeline.definition.model;
 
 import com.doublekit.apibox.annotation.ApiModel;
 import com.doublekit.apibox.annotation.ApiProperty;
-import com.doublekit.beans.annotation.Mapping;
-import com.doublekit.beans.annotation.Mappings;
 import com.doublekit.join.annotation.Join;
-import com.doublekit.join.annotation.JoinQuery;
-import com.doublekit.pipeline.systemSettings.securitySetting.proof.model.Proof;
-
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 
 @ApiModel
 @Join
@@ -28,6 +20,10 @@ public class PipelineConfigure {
     @ApiProperty(name="configureCodeSourceAddress",desc="代码源地址")
     private String configureCodeSourceAddress;
 
+    //构建源
+    @ApiProperty(name = "configureCodeStructure",desc="构建源")
+    private String configureCodeStructure;
+
     //构建文件地址
     @ApiProperty(name="configureStructureAddress",desc="构建文件地址")
     private String configureStructureAddress;
@@ -41,24 +37,16 @@ public class PipelineConfigure {
     private String configureDeployAddress;
 
     //创建配置时间
-    @ApiProperty(name="configureDeployAddress",desc="部署地址")
-    private String configureCreateTime=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+    @ApiProperty(name="configureCreateTime",desc="创建时间")
+    private String configureCreateTime;
 
     //流水线id
-    @ApiProperty(name="pipeline",desc="流水线id",eg="@selectOne")
-    @Mappings({
-            @Mapping(source = "pipeline.pipelineId",target = "pipelineId")
-    })
-    @JoinQuery(key = "pipelineId")
-    private Pipeline pipeline;
+    @ApiProperty(name="pipelineId",desc="流水线id",eg="流水线id")
+    private String pipelineId;
 
     //凭证id
-    @ApiProperty(name="proof",desc="凭证id",eg="@selectOne")
-    @Mappings({
-            @Mapping(source = "proof.proofId",target = "proofId")
-    })
-    @JoinQuery(key = "proofId")
-    private Proof proof;
+    @ApiProperty(name="proofId",desc="凭证id",eg="凭证id")
+    private String proofId;
 
 
     public String getConfigureCodeSource() {
@@ -101,14 +89,6 @@ public class PipelineConfigure {
         this.configureDeployAddress = configureDeployAddress;
     }
 
-    public Pipeline getPipeline() {
-        return pipeline;
-    }
-
-    public void setPipeline(Pipeline pipeline) {
-        this.pipeline = pipeline;
-    }
-
     public String getConfigureCreateTime() {
         return configureCreateTime;
     }
@@ -117,12 +97,20 @@ public class PipelineConfigure {
         this.configureCreateTime = configureCreateTime;
     }
 
-    public Proof getProof() {
-        return proof;
+    public String getPipelineId() {
+        return pipelineId;
     }
 
-    public void setProof(Proof proof) {
-        this.proof = proof;
+    public void setPipelineId(String pipelineId) {
+        this.pipelineId = pipelineId;
+    }
+
+    public String getProofId() {
+        return proofId;
+    }
+
+    public void setProofId(String proofId) {
+        this.proofId = proofId;
     }
 
     public String getConfigureId() {
@@ -131,5 +119,13 @@ public class PipelineConfigure {
 
     public void setConfigureId(String configureId) {
         this.configureId = configureId;
+    }
+
+    public String getConfigureCodeStructure() {
+        return configureCodeStructure;
+    }
+
+    public void setConfigureCodeStructure(String configureCodeStructure) {
+        this.configureCodeStructure = configureCodeStructure;
     }
 }

@@ -3,7 +3,7 @@ package com.doublekit.pipeline.definition.dao;
 
 import com.doublekit.dal.jpa.JpaTemplate;
 import com.doublekit.pipeline.definition.entity.PipelineEntity;
-import com.doublekit.pipeline.implement.entity.PipelineLogEntity;
+import com.doublekit.pipeline.definition.model.PipelineQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +44,9 @@ public class PipelineDao {
      * @param pipelineEntity 更新后流水线信息
      */
     public void updatePipeline(PipelineEntity pipelineEntity){
+
         jpaTemplate.update(pipelineEntity);
+
     }
 
     /**
@@ -68,6 +70,16 @@ public class PipelineDao {
     public List<PipelineEntity> selectAllPipelineList(List<String> idList){
 
         return jpaTemplate.findList(PipelineEntity.class,idList);
+    }
+
+    /**
+     * 根据名称模糊查询
+     * @param pipelineQuery 查询条件
+     * @return 流水线集合
+     */
+    public List<PipelineEntity> selectName(PipelineQuery pipelineQuery){
+
+        return jpaTemplate.findList(pipelineQuery,PipelineEntity.class);
     }
 
 }

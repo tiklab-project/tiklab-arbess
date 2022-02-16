@@ -6,7 +6,8 @@ import com.doublekit.join.annotation.FindList;
 import com.doublekit.join.annotation.FindOne;
 import com.doublekit.join.annotation.JoinProvider;
 import com.doublekit.pipeline.definition.model.Pipeline;
-import com.doublekit.pipeline.definition.model.PipelineConfigure;
+import com.doublekit.pipeline.definition.model.PipelineQuery;
+import com.doublekit.pipeline.definition.model.PipelineStatus;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -32,7 +33,7 @@ public interface PipelineService {
      * 更新流水线
      * @param pipeline 更新后流水线信息
      */
-    void updatePipeline(@NotNull @Valid Pipeline pipeline);
+    String updatePipeline(@NotNull @Valid Pipeline pipeline);
 
     /**
      * 查询单个流水线
@@ -52,7 +53,19 @@ public interface PipelineService {
     @FindList
     List<Pipeline> selectAllPipelineList(List<String> idList);
 
+    /**
+     * 根据名称模糊查询
+     * @param pipelineQuery 查询条件
+     * @return 查询到的集合
+     */
+    List<Pipeline> selectName(PipelineQuery pipelineQuery);
 
+
+    /**
+     *查询流水线状态
+     * @return 状态集合
+     */
+    List<PipelineStatus> selectAll();
 
 
 }

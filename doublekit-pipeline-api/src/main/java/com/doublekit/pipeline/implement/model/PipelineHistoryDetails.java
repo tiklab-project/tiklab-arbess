@@ -1,0 +1,118 @@
+package com.doublekit.pipeline.implement.model;
+
+import com.doublekit.apibox.annotation.ApiModel;
+import com.doublekit.apibox.annotation.ApiProperty;
+import com.doublekit.join.annotation.Join;
+
+@ApiModel
+@Join
+public class PipelineHistoryDetails {
+
+    //id
+    @ApiProperty(name="id",desc="状态")
+    private String id;
+
+    //状态
+    @ApiProperty(name="status",desc="状态")
+    private int status;
+
+    //创建构建时间
+    @ApiProperty(name="createStructureTime",desc="创建构建时间")
+    private String createStructureTime;
+
+    //构建方式
+    @ApiProperty(name="structureWay",desc="构建方式")
+    private int structureWay;
+
+    //执行人
+    @ApiProperty(name="implementor",desc="执行人")
+    private String implementor;
+
+    //执行时长
+    @ApiProperty(name="implementTime",desc="执行时长")
+    private int implementTime;
+
+    //代码源
+    @ApiProperty(name="codeSource",desc="代码源")
+    private String codeSource;
+
+    //凭证
+    @ApiProperty(name="proof",desc="凭证")
+    private String proof;
+
+    //分支
+    @ApiProperty(name="branch",desc="分支")
+    private String branch;
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
+    public String getCreateStructureTime() {
+        return createStructureTime;
+    }
+
+    public void setCreateStructureTime(String createStructureTime) {
+        this.createStructureTime = createStructureTime;
+    }
+
+    public int getStructureWay() {
+        return structureWay;
+    }
+
+    public void setStructureWay(int structureWay) {
+        this.structureWay = structureWay;
+    }
+
+    public String getImplementor() {
+        return implementor;
+    }
+
+    public void setImplementor(String implementor) {
+        this.implementor = implementor;
+    }
+
+    public int getImplementTime() {
+        return implementTime;
+    }
+
+    public void setImplementTime(int implementTime) {
+        this.implementTime = implementTime;
+    }
+
+    public String getCodeSource() {
+        return codeSource;
+    }
+
+    public void setCodeSource(String codeSource) {
+        this.codeSource = codeSource;
+    }
+
+    public String getProof() {
+        return proof;
+    }
+
+    public void setProof(String proof) {
+        this.proof = proof;
+    }
+
+    public String getBranch() {
+        return branch;
+    }
+
+    public void setBranch(String branch) {
+        this.branch = branch;
+    }
+}

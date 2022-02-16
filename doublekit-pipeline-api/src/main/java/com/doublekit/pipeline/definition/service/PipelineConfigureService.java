@@ -6,8 +6,6 @@ import com.doublekit.join.annotation.FindList;
 import com.doublekit.join.annotation.FindOne;
 import com.doublekit.join.annotation.JoinProvider;
 import com.doublekit.pipeline.definition.model.PipelineConfigure;
-import com.doublekit.pipeline.implement.model.PipelineHistory;
-
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.List;
@@ -32,13 +30,7 @@ public interface PipelineConfigureService {
      * 更新配置信息
      * @param pipelineConfigure 配置信息
      */
-    void updatePipelineConfigure(@NotNull @Valid PipelineConfigure pipelineConfigure);
-
-    /**
-     * 查询配置信息
-     */
-    PipelineConfigure updateListPipelineConfig() ;
-
+    String updatePipelineConfigure(@NotNull @Valid PipelineConfigure pipelineConfigure);
 
     /**
      * 查询流水线配置信息
@@ -54,6 +46,8 @@ public interface PipelineConfigureService {
      */
     @FindAll
     List<PipelineConfigure> selectAllPipelineConfigure();
+
+    PipelineConfigure selectTimeId(String pipelineId);
 
     @FindList
     List<PipelineConfigure> selectAllPipelineConfigureList(List<String> idList);

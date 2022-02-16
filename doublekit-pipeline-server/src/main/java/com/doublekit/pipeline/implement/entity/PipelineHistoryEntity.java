@@ -40,6 +40,10 @@ public class PipelineHistoryEntity {
     @Column(name = "log_id",notNull = true)
     private String logId;
 
+    //配置id
+    @Column(name = "configure_id",notNull = true)
+    private String configureId;
+
     public String getHistoryId() {
         return historyId;
     }
@@ -94,5 +98,13 @@ public class PipelineHistoryEntity {
 
     public void setLogId(String logId) {
         this.logId = logId;
+    }
+
+    public String getConfigureId() {
+        return configureId;
+    }
+
+    public void setConfigureId(String configureId) {
+        this.configureId = configureId;
     }
 }

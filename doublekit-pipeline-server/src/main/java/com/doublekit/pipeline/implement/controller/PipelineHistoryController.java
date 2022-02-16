@@ -31,7 +31,7 @@ public class PipelineHistoryController {
     //添加
     @RequestMapping(path="/createPipelineHistory",method = RequestMethod.POST)
     @ApiMethod(name = "createPipelineHistory",desc = "创建流水线历史")
-    @ApiParam(name = "PipelineHistory",desc = "PipelineHistory",required = true)
+    @ApiParam(name = "pipelineHistory",desc = "pipelineHistory",required = true)
     public Result<String> createPipelineHistory(@RequestBody @NotNull @Valid PipelineHistory pipelineHistory){
 
         String pipelineHistoryId = pipelineHistoryService.createPipelineHistory(pipelineHistory);
@@ -42,7 +42,7 @@ public class PipelineHistoryController {
     //删除
     @RequestMapping(path="/deletePipelineHistory",method = RequestMethod.POST)
     @ApiMethod(name = "deletePipelineHistory",desc = "删除流水线历史")
-    @ApiParam(name = "PipelineHistory",desc = "PipelineHistory",required = true)
+    @ApiParam(name = "id",desc = "id",required = true)
     public Result<Void> deletePipelineHistory(@NotNull String  id){
 
          pipelineHistoryService.deletePipelineHistory(id);
@@ -53,7 +53,7 @@ public class PipelineHistoryController {
     //修改
     @RequestMapping(path="/updatePipelineHistory",method = RequestMethod.POST)
     @ApiMethod(name = "updatePipelineHistory",desc = "修改流水线历史")
-    @ApiParam(name = "PipelineHistory",desc = "PipelineHistory",required = true)
+    @ApiParam(name = "pipelineHistory",desc = "pipelineHistory",required = true)
     public Result<Void> updatePipelineHistory(@RequestBody @NotNull @Valid PipelineHistory pipelineHistory){
 
         pipelineHistoryService.updatePipelineHistory(pipelineHistory);
@@ -64,7 +64,7 @@ public class PipelineHistoryController {
     //查询
     @RequestMapping(path="/selectPipelineHistory",method = RequestMethod.POST)
     @ApiMethod(name = "selectPipelineHistory",desc = "查询流水线历史")
-    @ApiParam(name = "PipelineHistory",desc = "PipelineHistory",required = true)
+    @ApiParam(name = "id",desc = "id",required = true)
     public Result<PipelineHistory> selectPipelineHistory(@NotNull String  id){
 
         PipelineHistory pipelineHistory = pipelineHistoryService.selectPipelineHistory(id);
@@ -75,7 +75,6 @@ public class PipelineHistoryController {
     //查询所有
     @RequestMapping(path="/selectAllPipelineHistory",method = RequestMethod.POST)
     @ApiMethod(name = "selectAllPipelineHistory",desc = "查询所有流水线历史")
-    @ApiParam(name = "PipelineHistory",desc = "PipelineHistory",required = true)
     public Result<List<PipelineHistory>> selectAllPipelineHistory(){
 
         List<PipelineHistory> pipelineHistoryList = pipelineHistoryService.selectAllPipelineHistory();

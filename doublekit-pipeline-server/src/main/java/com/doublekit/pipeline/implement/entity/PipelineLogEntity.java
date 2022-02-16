@@ -49,6 +49,15 @@ public class PipelineLogEntity {
     @Column(name = "log_deploy_state",notNull = true)
     private int logDeployState;
 
+    //流水线id
+    @Column(name = "pipeline_id",notNull = true)
+    private String pipelineId;
+
+    //运行状态（30 ：成功  3：失败   其他）
+    @Column(name = "log_run_status",notNull = true)
+    private int logRunStatus = getLogCodeState() + getLogPackState()+ getLogCodeState();
+
+
     public String getLogId() {
         return logId;
     }
@@ -119,5 +128,21 @@ public class PipelineLogEntity {
 
     public void setLogDeployState(int logDeployState) {
         this.logDeployState = logDeployState;
+    }
+
+    public String getPipelineId() {
+        return pipelineId;
+    }
+
+    public void setPipelineId(String pipelineId) {
+        this.pipelineId = pipelineId;
+    }
+
+    public int getLogRunStatus() {
+        return logRunStatus;
+    }
+
+    public void setLogRunStatus(int logRunStatus) {
+        this.logRunStatus = logRunStatus;
     }
 }

@@ -4,6 +4,8 @@ import com.doublekit.beans.BeanMapper;
 import com.doublekit.pipeline.definition.dao.PipelineDao;
 import com.doublekit.pipeline.definition.entity.PipelineEntity;
 import com.doublekit.pipeline.definition.model.Pipeline;
+import com.doublekit.pipeline.definition.model.PipelineQuery;
+import com.doublekit.pipeline.definition.model.PipelineStatus;
 import com.doublekit.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -34,17 +36,18 @@ public class PipelineServiceImpl implements PipelineService{
     }
 
     @Override
-    public void updatePipeline(Pipeline pipeline) {
+    public String updatePipeline(Pipeline pipeline) {
         PipelineEntity pipelineEntity = BeanMapper.map(pipeline, PipelineEntity.class);
 
         pipelineDao.updatePipeline(pipelineEntity);
+
+        return pipelineEntity.getPipelineName();
     }
 
-    @Override
-    public Pipeline selectAllPipeline(String id) {
-        PipelineEntity pipelineEntity = pipelineDao.selectAllPipeline(id);
-        return BeanMapper.map(pipelineEntity, Pipeline.class);
-    }
+    // public Pipeline selectAllPipeline(String id) {
+    //     PipelineEntity pipelineEntity = pipelineDao.selectAllPipeline();
+    //     return BeanMapper.map(pipelineEntity, Pipeline.class);
+    // }
 
     @Override
     public List<Pipeline> selectAllPipeline() {
@@ -52,4 +55,25 @@ public class PipelineServiceImpl implements PipelineService{
 
         return BeanMapper.mapList(pipelineEntityList,Pipeline.class);
     }
+
+    @Override
+    public Pipeline selectPipeline(String id) {
+        return null;
+    }
+
+    @Override
+    public List<Pipeline> selectAllPipelineList(List<String> idList) {
+        return null;
+    }
+
+    @Override
+    public List<Pipeline> selectName(PipelineQuery pipelineQuery) {
+        return null;
+    }
+
+    @Override
+    public List<PipelineStatus> selectAll() {
+        return null;
+    }
+
 }

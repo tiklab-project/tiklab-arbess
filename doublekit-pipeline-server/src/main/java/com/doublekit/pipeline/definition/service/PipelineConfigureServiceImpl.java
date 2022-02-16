@@ -9,6 +9,8 @@ import com.doublekit.pipeline.definition.model.PipelineConfigure;
 import com.doublekit.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
@@ -42,23 +44,29 @@ public class PipelineConfigureServiceImpl implements PipelineConfigureService{
 
     //更新
     @Override
-    public void updatePipelineConfigure(PipelineConfigure pipelineConfigure) {
+    public String updatePipelineConfigure(PipelineConfigure pipelineConfigure) {
 
-        PipelineConfigureEntity pipelineConfigureEntity = BeanMapper.map(pipelineConfigure, PipelineConfigureEntity.class);
+        String pipelineId = pipelineConfigure.getPipelineId();
 
-        pipelineConfigureDao.updatePipelineConfigure(pipelineConfigureEntity);
-    }
+        PipelineConfigure configure = selectTimeId(pipelineId);
 
-    //查询配置
-    @Override
-    public PipelineConfigure updateListPipelineConfig() {
+        //判断是否有过流水线配置
 
-        String selectTimeId = selectTimeId();
-        if (selectTimeId == null){
-            return null;
+        if (configure == null){
+
+            return createPipelineConfigure(pipelineConfigure);
+
         }
 
-        return selectPipelineConfigure(selectTimeId);
+            //把配置id添加到最新的配置信息中
+            pipelineConfigure.setConfigureId(configure.getConfigureId());
+
+            PipelineConfigureEntity pipelineConfigureEntity = BeanMapper.map(pipelineConfigure, PipelineConfigureEntity.class);
+
+            pipelineConfigureDao.updatePipelineConfigure(pipelineConfigureEntity);
+
+            return pipelineConfigureEntity.getConfigureId();
+
     }
 
     //查询
@@ -87,6 +95,7 @@ public class PipelineConfigureServiceImpl implements PipelineConfigureService{
         return pipelineConfigureList;
     }
 
+
     @Override
     public List<PipelineConfigure> selectAllPipelineConfigureList(List<String> idList) {
 
@@ -96,46 +105,55 @@ public class PipelineConfigureServiceImpl implements PipelineConfigureService{
     }
 
 
-    //根据时间查询id
-    public String selectTimeId() {
+
+
+    /**
+     * 根据最近配置信息
+     * @param pipelineId 流水线id
+     * @return 最近配置信息id
+     */
+    public PipelineConfigure selectTimeId(String pipelineId) {
+
+        List<PipelineConfigure> pipelineConfigureList = selectAllPipelineConfigure(pipelineId);
+
+        if (pipelineConfigureList.size() != 0){
+
+            pipelineConfigureList.sort(new Comparator<PipelineConfigure>() {
+                @Override
+                public int compare(PipelineConfigure pipelineConfigure1, PipelineConfigure pipelineConfigure2) {
+
+                    return pipelineConfigure1.getConfigureCreateTime().compareTo(pipelineConfigure2.getConfigureCreateTime());
+                }
+            });
+            String configureId = pipelineConfigureList.get(pipelineConfigureList.size() - 1).getConfigureId();
+
+           return selectPipelineConfigure(configureId);
+        }
+
+        return null;
+    }
+
+
+    /**
+     * 根据流水线id查询配置
+     * @param pipelineId 流水线id
+     * @return 配置集合
+     */
+    public List<PipelineConfigure> selectAllPipelineConfigure(String pipelineId) {
 
         List<PipelineConfigure> pipelineConfigureList = selectAllPipelineConfigure();
 
-        pipelineConfigureList.sort(new Comparator<PipelineConfigure>() {
-            @Override
-            public int compare(PipelineConfigure pipelineConfigure1, PipelineConfigure pipelineConfigure2) {
+        List<PipelineConfigure> pipelineConfigures = new ArrayList<>();
 
-                return pipelineConfigure1.getConfigureCreateTime().compareTo(pipelineConfigure2.getConfigureCreateTime());
+        for (PipelineConfigure pipelineConfigure : pipelineConfigureList) {
+
+            if (pipelineConfigure.getPipelineId().equals(pipelineId) ){
+
+                pipelineConfigures.add(pipelineConfigure);
+
             }
-        });
+        }
 
-        String configureId = pipelineConfigureList.get(pipelineConfigureList.size() - 1).getConfigureId();
-
-        // //获取配置中的时间
-        // List<String> createTime = new ArrayList<>();
-        //
-        // if (pipelineConfigureList.size() != 0) {
-        //     for (int i = pipelineConfigureList.size() - 1; i >= 0; i--) {
-        //
-        //         String configureCreateTime = pipelineConfigureList.get(i).getConfigureCreateTime();
-        //
-        //         createTime.add(configureCreateTime);
-        //     }
-        //     //对时间进行排序获得最近的修改
-        //     Collections.sort(createTime);
-        //
-        //     String time = createTime.get(createTime.size()-1);
-        //
-        //     //获取对应时间的id
-        //     for (PipelineConfigure pipelineConfigure : pipelineConfigureList) {
-        //
-        //         if (pipelineConfigure.getConfigureCreateTime().equals(time)){
-        //
-        //             return pipelineConfigure.getConfigureId();
-        //         }
-        //     }
-        // }
-
-        return configureId;
+        return pipelineConfigures;
     }
 }

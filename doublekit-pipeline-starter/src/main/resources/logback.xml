@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-    <contextListener class="com.doublekit.web.logging.LogbackInitListener" />
+    <contextListener class="com.doublekit.web.context.LogHomeConfiguration" />
     <!-- 应用名称：和统一配置中的项目代码保持一致（小写） -->
     <property name="app.name" value="doublekit-pipeline" />
-    <property name="LOG_HOME" value="${LOG_BASE_HOME}/doublekit/${app.name}/logs" />
-    <!--在没有定义${LOG_HOME}系统变量的时候，可以设置此本地变量。提交测试、上线时，要将其注释掉，使用系统变量。-->
+    <property name="LOG_PATH" value="${LOG_PATH}/doublekit/${app.name}/logs" />
+    <!--在没有定义${LOG_PATH}系统变量的时候，可以设置此本地变量。提交测试、上线时，要将其注释掉，使用系统变量。-->
     <!--
     <property name="user.home" value="/usr" />
     -->
     <!--
-    <springProperty scope="context" name="LOG_HOME" source="/User/zhangzhihua"/>
+    <springProperty scope="context" name="LOG_PATH" source="/User/zhangzhihua"/>
     -->
 
     <!--日志文件保留天数-->
@@ -24,56 +24,56 @@
     </appender>
 
     <appender name="app" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${LOG_HOME}/app.log</file>
+        <file>${LOG_PATH}/app.log</file>
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
             <!--格式化输出：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度%msg：日志消息，%n是换行符-->
             <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n</pattern>
         </encoder>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!--日志文件输出的文件名-->
-            <FileNamePattern>${LOG_HOME}/app.log.%d{yyyy-MM-dd}.log</FileNamePattern>
+            <FileNamePattern>${LOG_PATH}/app.log.%d{yyyy-MM-dd}.log</FileNamePattern>
             <!--日志文件保留天数-->
             <MaxHistory>${LOG_MAX_HISTORY}</MaxHistory>
         </rollingPolicy>
     </appender>
 
     <appender name="app.tracer" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${LOG_HOME}/app-tracer.log</file>
+        <file>${LOG_PATH}/app-tracer.log</file>
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
             <!-- 格式化输出：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度%msg：日志消息，%n是换行符 -->
             <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n</pattern>
         </encoder>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!--日志文件输出的文件名-->
-            <FileNamePattern>${LOG_HOME}/app-tracer.log.%d{yyyy-MM-dd}</FileNamePattern>
+            <FileNamePattern>${LOG_PATH}/app-tracer.log.%d{yyyy-MM-dd}</FileNamePattern>
             <!--日志文件保留天数-->
             <MaxHistory>${LOG_MAX_HISTORY}</MaxHistory>
         </rollingPolicy>
     </appender>
 
     <appender name="app.error" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${LOG_HOME}/app-error.log</file>
+        <file>${LOG_PATH}/app-error.log</file>
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
             <!-- 格式化输出：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度%msg：日志消息，%n是换行符 -->
             <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n</pattern>
         </encoder>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!--日志文件输出的文件名-->
-            <FileNamePattern>${LOG_HOME}/app-error.log.%d{yyyy-MM-dd}</FileNamePattern>
+            <FileNamePattern>${LOG_PATH}/app-error.log.%d{yyyy-MM-dd}</FileNamePattern>
             <!--日志文件保留天数-->
             <MaxHistory>${LOG_MAX_HISTORY}</MaxHistory>
         </rollingPolicy>
     </appender>
 
     <appender name="app.slow" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${LOG_HOME}/app-slow.log</file>
+        <file>${LOG_PATH}/app-slow.log</file>
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
             <!-- 格式化输出：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度%msg：日志消息，%n是换行符 -->
             <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n</pattern>
         </encoder>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!--日志文件输出的文件名-->
-            <FileNamePattern>${LOG_HOME}/app-slow.log.%d{yyyy-MM-dd}</FileNamePattern>
+            <FileNamePattern>${LOG_PATH}/app-slow.log.%d{yyyy-MM-dd}</FileNamePattern>
             <!--日志文件保留天数-->
             <MaxHistory>${LOG_MAX_HISTORY}</MaxHistory>
         </rollingPolicy>

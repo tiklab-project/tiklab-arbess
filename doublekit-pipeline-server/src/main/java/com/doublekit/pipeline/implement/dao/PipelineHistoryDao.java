@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Repository
@@ -70,4 +71,30 @@ public class PipelineHistoryDao {
 
         return jpaTemplate.findAll(PipelineHistoryEntity.class);
     }
+
+    /**
+     * 根据流水线id查询所有流水线历史
+     * @param pipelineId 流水线id
+     * @return 流水线历史列表
+     */
+    public List<PipelineHistoryEntity> selectAllPipelineHistory(String pipelineId){
+
+        List<PipelineHistoryEntity> pipelineHistoryEntityList = selectAllPipelineHistory();
+
+        List<PipelineHistoryEntity> HistoryList = new ArrayList<>();
+
+        for (PipelineHistoryEntity pipelineHistoryEntity : pipelineHistoryEntityList) {
+
+            if (pipelineHistoryEntity.getPipelineId().equals(pipelineId)){
+
+                HistoryList.add(pipelineHistoryEntity);
+
+            }
+        }
+
+        return HistoryList;
+    }
+
+
+
 }

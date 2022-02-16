@@ -31,7 +31,7 @@ public class ProofController {
     //添加
     @RequestMapping(path="/createProof",method = RequestMethod.POST)
     @ApiMethod(name = "createProof",desc = "添加凭证")
-    @ApiParam(name = "proof",desc = "proofController",required = true)
+    @ApiParam(name = "proof",desc = "proof",required = true)
     public Result<String> createProof(@RequestBody @NotNull @Valid Proof proof){
 
         String proofId = proofService.createProof(proof);
@@ -42,7 +42,7 @@ public class ProofController {
     //删除
     @RequestMapping(path="/deleteProof",method = RequestMethod.POST)
     @ApiMethod(name = "deleteProof",desc = "删除凭证")
-    @ApiParam(name = "proof",desc = "proofController",required = true)
+    @ApiParam(name = "id",desc = "id",required = true)
     public Result<Void> deleteProof(String id){
 
         proofService.deleteProof(id);
@@ -53,7 +53,7 @@ public class ProofController {
     //修改
     @RequestMapping(path="/updateProof",method = RequestMethod.POST)
     @ApiMethod(name = "updateProof",desc = "修改凭证")
-    @ApiParam(name = "proof",desc = "proofController",required = true)
+    @ApiParam(name = "proof",desc = "proof",required = true)
     public Result<Void> updateProof(@RequestBody @NotNull @Valid Proof proof){
 
         proofService.updateProof(proof);
@@ -64,7 +64,7 @@ public class ProofController {
     //查询
     @RequestMapping(path="/selectProof",method = RequestMethod.POST)
     @ApiMethod(name = "selectProof",desc = "查询凭证")
-    @ApiParam(name = "proof",desc = "proofController",required = true)
+    @ApiParam(name = "id",desc = "id",required = true)
     public Result<Proof> selectProof(String id){
 
         Proof proof = proofService.selectProof(id);
@@ -75,7 +75,6 @@ public class ProofController {
     //查询所有
     @RequestMapping(path="/selectAllProof",method = RequestMethod.POST)
     @ApiMethod(name = "selectAllProof",desc = "查询所有凭证")
-    @ApiParam(name = "proof",desc = "proofController",required = true)
     public Result<List<Proof>> selectAllProof(){
 
         List<Proof> proofList = proofService.selectAllProof();
