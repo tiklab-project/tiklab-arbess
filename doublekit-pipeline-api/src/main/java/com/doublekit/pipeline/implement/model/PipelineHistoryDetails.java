@@ -9,8 +9,8 @@ import com.doublekit.join.annotation.Join;
 public class PipelineHistoryDetails {
 
     //id
-    @ApiProperty(name="id",desc="状态")
-    private String id;
+    @ApiProperty(name="historyId",desc="状态")
+    private String historyId;
 
     //状态
     @ApiProperty(name="status",desc="状态")
@@ -44,12 +44,12 @@ public class PipelineHistoryDetails {
     @ApiProperty(name="branch",desc="分支")
     private String branch;
 
-    public String getId() {
-        return id;
+    public String getHistoryId() {
+        return historyId;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setHistoryId(String historyId) {
+        this.historyId = historyId;
     }
 
     public int getStatus() {

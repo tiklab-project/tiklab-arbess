@@ -3,13 +3,10 @@ package com.doublekit.pipeline.implement.dao;
 import com.doublekit.dal.jpa.JpaTemplate;
 import com.doublekit.pipeline.definition.dao.PipelineDao;
 import com.doublekit.pipeline.implement.entity.PipelineLogEntity;
-import jdk.nashorn.internal.ir.annotations.Ignore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-
-import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -72,76 +69,73 @@ public class PipelineLogDao {
     }
 
 
+//     /**
+//      * 获取最近一次的日志信息
+//      * @param pipelineId 流水线id
+//      * @return 构建日志
+//      */
+//     public PipelineLogEntity selectLastLog(String pipelineId){
+//
+//         List<PipelineLogEntity> pipelineLogEntityList = selectNameLog(pipelineId);
+//
+//         if (pipelineLogEntityList.size() != 0){
+//
+//             //将同一任务构建历史通过时间排序
+//             pipelineLogEntityList.sort(new Comparator<PipelineLogEntity>() {
+//                 @Override
+//                 public int compare(PipelineLogEntity pipelineLogEntity1, PipelineLogEntity pipelineLogEntity2) {
+//
+//                     return pipelineLogEntity1.getLogCreateTime().compareTo(pipelineLogEntity2.getLogCreateTime());
+//                 }
+//             });
+//             String LogId = pipelineLogEntityList.get(pipelineLogEntityList.size() - 1).getLogId();
+//
+//             return selectPipelineLog(LogId);
+//         }
+//
+//         return null;
+//     }
+//
+//     /**
+//      * 根据流水线id获取所有日志
+//      * @param pipelineId 流水线id
+//      * @return 日志集合
+//      */
+//     public List<PipelineLogEntity> selectNameLog(String pipelineId){
+//
+//         List<PipelineLogEntity> pipelineLogEntityList = selectAllPipelineLog();
+//
+//         List<PipelineLogEntity> pipelineLogEntities = new ArrayList<>();
+//
+//         for (PipelineLogEntity pipelineLogEntity : pipelineLogEntityList) {
+//
+//             if (pipelineLogEntity.getPipelineId().equals(pipelineId)){
+//
+//                 pipelineLogEntities.add(pipelineLogEntity);
+//
+//             }
+//
+//         }
+//         return pipelineLogEntities;
+//
+//     }
+//
+
     /**
-     * 获取最近一次的日志信息
-     * @param pipelineId 流水线id
-     * @return 构建日志
+     * 获取上次成功的日志id (30 : 成功   3:失败)
+     * @return 日志id
      */
-    public PipelineLogEntity selectLastLog(String pipelineId){
-
-        List<PipelineLogEntity> pipelineLogEntityList = selectNameLog(pipelineId);
-
-        if (pipelineLogEntityList.size() != 0){
-
-            //将同一任务构建历史通过时间排序
-            pipelineLogEntityList.sort(new Comparator<PipelineLogEntity>() {
-                @Override
-                public int compare(PipelineLogEntity pipelineLogEntity1, PipelineLogEntity pipelineLogEntity2) {
-
-                    return pipelineLogEntity1.getLogCreateTime().compareTo(pipelineLogEntity2.getLogCreateTime());
-                }
-            });
-            String LogId = pipelineLogEntityList.get(pipelineLogEntityList.size() - 1).getLogId();
-
-            return selectPipelineLog(LogId);
-        }
-
-        return null;
-    }
-
-    /**
-     * 根据流水线id获取所有日志
-     * @param pipelineId 流水线id
-     * @return 日志集合
-     */
-    public List<PipelineLogEntity> selectNameLog(String pipelineId){
+    public String selectLastSuccess(){
 
         List<PipelineLogEntity> pipelineLogEntityList = selectAllPipelineLog();
 
-        List<PipelineLogEntity> pipelineLogEntities = new ArrayList<>();
-
         for (PipelineLogEntity pipelineLogEntity : pipelineLogEntityList) {
 
-            if (pipelineLogEntity.getPipelineId().equals(pipelineId)){
+            if (pipelineLogEntity.getLogRunStatus() == 30){
 
-                pipelineLogEntities.add(pipelineLogEntity);
-
+                return pipelineLogEntity.getLogId();
             }
 
-        }
-        return pipelineLogEntities;
-
-    }
-
-    /**
-     * 获取上次成功日志
-     * @param pipelineId 流水线id
-     * @return 成功日志
-     */
-    public PipelineLogEntity selectLastSuccess(String pipelineId){
-
-        List<PipelineLogEntity> pipelineLogEntityList = selectNameLog(pipelineId);
-
-        if (pipelineLogEntityList.size() != 0){
-
-            for (PipelineLogEntity pipelineLogEntity : pipelineLogEntityList) {
-
-                if (pipelineLogEntity.getLogRunStatus() == 30){
-
-                    return pipelineLogEntity;
-
-                }
-            }
         }
         return null;
 }

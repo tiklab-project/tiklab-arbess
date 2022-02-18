@@ -17,10 +17,6 @@ public class PipelineLogEntity {
     @Column(name = "log_id")
     private String logId;
 
-    //创建时间
-    @Column(name = "log_create_time",notNull = true)
-    private String logCreateTime;
-
     //日志地址
     @Column(name = "log_address",notNull = true)
     private String logAddress;
@@ -49,10 +45,6 @@ public class PipelineLogEntity {
     @Column(name = "log_deploy_state",notNull = true)
     private int logDeployState;
 
-    //流水线id
-    @Column(name = "pipeline_id",notNull = true)
-    private String pipelineId;
-
     //运行状态（30 ：成功  3：失败   其他）
     @Column(name = "log_run_status",notNull = true)
     private int logRunStatus = getLogCodeState() + getLogPackState()+ getLogCodeState();
@@ -64,14 +56,6 @@ public class PipelineLogEntity {
 
     public void setLogId(String logId) {
         this.logId = logId;
-    }
-
-    public String getLogCreateTime() {
-        return logCreateTime;
-    }
-
-    public void setLogCreateTime(String logCreateTime) {
-        this.logCreateTime = logCreateTime;
     }
 
     public String getLogAddress() {
@@ -128,14 +112,6 @@ public class PipelineLogEntity {
 
     public void setLogDeployState(int logDeployState) {
         this.logDeployState = logDeployState;
-    }
-
-    public String getPipelineId() {
-        return pipelineId;
-    }
-
-    public void setPipelineId(String pipelineId) {
-        this.pipelineId = pipelineId;
     }
 
     public int getLogRunStatus() {

@@ -55,7 +55,7 @@ public class PipelineHistory {
     @JoinQuery(key = "logId")
     private PipelineLog pipelineLog;
 
-    //凭证id
+    //凭证
     @ApiProperty(name="PipelineConfigure",desc="凭证id",eg="@selectOne")
     @Mappings({
             @Mapping(source = "PipelineConfigure.configureId",target = "configureId")

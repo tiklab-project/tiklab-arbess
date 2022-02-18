@@ -17,7 +17,7 @@ public class PipelineHistoryEntity {
     private String historyId;
 
     //创建构建时间
-    @Column(name = "history_create_time",notNull = true)
+    @Column(name = "history_time",notNull = true)
     private String historyCreateTime;
 
     //构建方式

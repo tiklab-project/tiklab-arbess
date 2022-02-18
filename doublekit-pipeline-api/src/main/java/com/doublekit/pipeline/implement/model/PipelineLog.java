@@ -2,11 +2,7 @@ package com.doublekit.pipeline.implement.model;
 
 import com.doublekit.apibox.annotation.ApiModel;
 import com.doublekit.apibox.annotation.ApiProperty;
-import com.doublekit.beans.annotation.Mapping;
-import com.doublekit.beans.annotation.Mappings;
 import com.doublekit.join.annotation.Join;
-import com.doublekit.join.annotation.JoinQuery;
-import com.doublekit.pipeline.definition.model.Pipeline;
 
 @ApiModel
 @Join
@@ -15,10 +11,6 @@ public class PipelineLog {
     //日志id
     @ApiProperty(name="logId",desc="日志id")
     private String logId;
-
-    //创建时间
-    @ApiProperty(name="logCreateTime",desc="创建时间")
-    private String logCreateTime ;
 
     //日志地址
     @ApiProperty(name="logAddress",desc="日志地址")
@@ -48,15 +40,6 @@ public class PipelineLog {
     @ApiProperty(name="logDeployState",desc="部署状态")
     private int logDeployState;
 
-    //流水线
-    @ApiProperty(name="pipeline",desc="流水线id",eg="@selectOne")
-    @Mappings({
-            @Mapping(source = "pipeline.pipelineId",target = "pipelineId")
-    })
-    @JoinQuery(key = "pipelineId")
-    private Pipeline pipeline;
-
-    //运行状态（0 ：成功  1：其他  2：失败）
     @ApiProperty(name="logRunStatus",desc="部署状态")
     private int logRunStatus = getLogRunStatus() + getLogPackState()+ getLogCodeState();
 
@@ -66,14 +49,6 @@ public class PipelineLog {
 
     public void setLogId(String logId) {
         this.logId = logId;
-    }
-
-    public String getLogCreateTime() {
-        return logCreateTime;
-    }
-
-    public void setLogCreateTime(String logCreateTime) {
-        this.logCreateTime = logCreateTime;
     }
 
     public String getLogAddress() {
@@ -132,13 +107,6 @@ public class PipelineLog {
         this.logDeployState = logDeployState;
     }
 
-    public Pipeline getPipeline() {
-        return pipeline;
-    }
-
-    public void setPipeline(Pipeline pipeline) {
-        this.pipeline = pipeline;
-    }
 
     public int getLogRunStatus() {
         return logRunStatus;

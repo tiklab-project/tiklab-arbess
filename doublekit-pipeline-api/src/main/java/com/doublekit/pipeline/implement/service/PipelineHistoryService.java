@@ -23,9 +23,9 @@ public interface PipelineHistoryService {
 
     /**
      * 删除流水线历史
-     * @param id 流水线历史id
+     * @param historyId 流水线历史id
      */
-    void deletePipelineHistory(@NotNull String  id);
+    void deletePipelineHistory(@NotNull String  historyId);
 
     /**
      * 更新流水线历史
@@ -35,11 +35,11 @@ public interface PipelineHistoryService {
 
     /**
      * 查询单个流水线历史
-     * @param id 流水线历史id
+     * @param historyId 流水线历史id
      * @return 流水线历史信息
      */
     @FindOne
-    PipelineHistory selectPipelineHistory(@NotNull String id);
+    PipelineHistory selectPipelineHistory(@NotNull String historyId);
 
     /**
      * 查询所有流水线历史
@@ -61,6 +61,14 @@ public interface PipelineHistoryService {
      * @return 配置信息集合
      */
     List<PipelineHistoryDetails> selectAll(String pipelineId);
+
+    /**
+     * 根据流水线id获取历史记录
+     * @param pipelineId 流水线id
+     * @return 历史记录集合
+     */
+    List<PipelineHistory> selectAllPipelineNameList(String pipelineId);
+
 
     @FindList
     List<PipelineHistory> selectPipelineHistoryList(List<String> idList);

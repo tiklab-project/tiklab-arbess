@@ -9,7 +9,6 @@ import com.doublekit.pipeline.definition.model.PipelineConfigure;
 import com.doublekit.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -36,10 +35,20 @@ public class PipelineConfigureServiceImpl implements PipelineConfigureService{
 
     //删除
     @Override
-    public void deletePipelineConfigure(String id) {
+    public void deletePipelineConfigure(String pipelineId) {
 
-        pipelineConfigureDao.deletePipelineConfigure(id);
+        //获取流水线id下的所有配置信息
+        List<PipelineConfigure> pipelineConfigureList = selectAllPipelineConfigure(pipelineId);
 
+        if (pipelineConfigureList != null){
+
+            for (PipelineConfigure pipelineConfigure : pipelineConfigureList) {
+
+                //删除配置信息
+                pipelineConfigureDao.deletePipelineConfigure(pipelineConfigure.getConfigureId());
+
+            }
+        }
     }
 
     //更新
@@ -48,10 +57,10 @@ public class PipelineConfigureServiceImpl implements PipelineConfigureService{
 
         String pipelineId = pipelineConfigure.getPipelineId();
 
+        //获取最近一次的配置id
         PipelineConfigure configure = selectTimeId(pipelineId);
 
         //判断是否有过流水线配置
-
         if (configure == null){
 
             return createPipelineConfigure(pipelineConfigure);
@@ -112,6 +121,7 @@ public class PipelineConfigureServiceImpl implements PipelineConfigureService{
      * @param pipelineId 流水线id
      * @return 最近配置信息id
      */
+    @Override
     public PipelineConfigure selectTimeId(String pipelineId) {
 
         List<PipelineConfigure> pipelineConfigureList = selectAllPipelineConfigure(pipelineId);

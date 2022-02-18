@@ -47,6 +47,11 @@ public interface PipelineConfigureService {
     @FindAll
     List<PipelineConfigure> selectAllPipelineConfigure();
 
+    /**
+     * 获取最近一次的配置信息
+     * @param pipelineId 流水线id
+     * @return 配置信息
+     */
     PipelineConfigure selectTimeId(String pipelineId);
 
     @FindList
