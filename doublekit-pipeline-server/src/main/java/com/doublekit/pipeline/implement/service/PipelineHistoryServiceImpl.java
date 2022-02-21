@@ -2,8 +2,6 @@ package com.doublekit.pipeline.implement.service;
 
 import com.doublekit.beans.BeanMapper;
 import com.doublekit.join.JoinTemplate;
-import com.doublekit.pipeline.definition.dao.PipelineConfigureDao;
-import com.doublekit.pipeline.definition.entity.PipelineConfigureEntity;
 import com.doublekit.pipeline.implement.dao.PipelineHistoryDao;
 import com.doublekit.pipeline.implement.entity.PipelineHistoryEntity;
 import com.doublekit.pipeline.implement.model.PipelineHistory;
@@ -42,15 +40,35 @@ public class PipelineHistoryServiceImpl implements PipelineHistoryService{
     @Override
     public void deletePipelineHistory(String historyId) {
 
-        pipelineHistoryDao.deletePipelineHistory(historyId);
+        if (historyId != null){
 
-        String logId = selectPipelineHistory(historyId).getPipelineLog().getLogId();
+            PipelineHistory pipelineHistory = selectPipelineHistory(historyId);
 
-        if (logId != null){
-            //删除对应的日志
-            pipelineLogService.deletePipelineLog(logId);
+            if (pipelineHistory !=null){
+                // 删除对应的日志
+                pipelineLogService.deletePipelineLog(pipelineHistory.getPipelineLog().getLogId());
+            }
+
+            //删除对应的历史
+            pipelineHistoryDao.deletePipelineHistory(historyId);
         }
 
+    }
+
+    //根据流水线id删除全部历史
+    @Override
+    public void deleteAllPipelineHistory(String pipelineId) {
+
+        List<PipelineHistory> pipelineHistoryList = selectAllPipelineNameList(pipelineId);
+
+        if (pipelineHistoryList != null){
+
+            for (PipelineHistory pipelineHistory : pipelineHistoryList) {
+
+                deletePipelineHistory(pipelineHistory.getHistoryId());
+
+            }
+        }
     }
 
     //修改
@@ -98,9 +116,9 @@ public class PipelineHistoryServiceImpl implements PipelineHistoryService{
     }
 
     /**
-     * 查询对应流水线id下的所有构建信息
+     * 查询对应流水线id下的所有信息
      * @param pipelineId 流水线id
-     * @return 构建信息集合
+     * @return 信息集合
      */
     @Override
     public List<PipelineHistoryDetails> selectAll(String pipelineId) {
@@ -109,6 +127,7 @@ public class PipelineHistoryServiceImpl implements PipelineHistoryService{
 
         List<PipelineHistoryDetails> pipelineHistoryDetailsList = new ArrayList<>();
 
+        //获取PipelineHistoryDetails对应的数据
         for (PipelineHistory pipelineHistory : pipelineHistories) {
 
             PipelineHistoryDetails pipelineHistoryDetails = new PipelineHistoryDetails();
@@ -185,17 +204,18 @@ public class PipelineHistoryServiceImpl implements PipelineHistoryService{
 
         List<PipelineHistory> pipelineHistories = selectAllPipelineHistory();
 
-        //遍历出属于同一任务的历史记录
-        for (PipelineHistory pipelineHistory : pipelineHistories) {
+            //遍历出属于同一任务的历史记录
+            for (PipelineHistory pipelineHistory : pipelineHistories) {
 
-            if (pipelineHistory.getPipeline().getPipelineId().equals(pipelineId)){
+                if (pipelineHistory.getPipeline().getPipelineId().equals(pipelineId)){
 
-                pipelineHistoryList.add(pipelineHistory);
+                    pipelineHistoryList.add(pipelineHistory);
 
+                }
             }
-        }
 
-        return pipelineHistoryList;
+            return pipelineHistoryList;
+
     }
 
     /**
@@ -210,13 +230,7 @@ public class PipelineHistoryServiceImpl implements PipelineHistoryService{
 
         if (pipelineHistoryList.size() != 0){
             //将同一任务构建历史通过时间排序
-            pipelineHistoryList.sort(new Comparator<PipelineHistory>() {
-                @Override
-                public int compare(PipelineHistory pipelineHistory1, PipelineHistory pipelineHistory2) {
-
-                    return pipelineHistory1.getHistoryCreateTime().compareTo(pipelineHistory2.getHistoryCreateTime());
-                }
-            });
+            pipelineHistoryList.sort(Comparator.comparing(PipelineHistory::getHistoryCreateTime));
 
             String historyId = pipelineHistoryList.get(pipelineHistoryList.size() - 1).getHistoryId();
 
@@ -224,6 +238,5 @@ public class PipelineHistoryServiceImpl implements PipelineHistoryService{
         }
 
         return null;
-
     }
 }

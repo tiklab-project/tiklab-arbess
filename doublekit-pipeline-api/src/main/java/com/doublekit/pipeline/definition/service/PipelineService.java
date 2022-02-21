@@ -25,9 +25,9 @@ public interface PipelineService {
 
     /**
      * 删除流水线
-     * @param id 流水线id
+     * @param pipelineId 流水线id
      */
-    void deletePipeline(@NotNull String id);
+    void deletePipeline(@NotNull String pipelineId);
 
     /**
      * 更新流水线

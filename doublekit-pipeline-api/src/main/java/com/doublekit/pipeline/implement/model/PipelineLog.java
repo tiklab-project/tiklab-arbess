@@ -40,7 +40,7 @@ public class PipelineLog {
     @ApiProperty(name="logDeployState",desc="部署状态")
     private int logDeployState;
 
-    @ApiProperty(name="logRunStatus",desc="部署状态")
+    @ApiProperty(name="logRunStatus",desc="运行状态")
     private int logRunStatus = getLogRunStatus() + getLogPackState()+ getLogCodeState();
 
     public String getLogId() {
@@ -106,7 +106,6 @@ public class PipelineLog {
     public void setLogDeployState(int logDeployState) {
         this.logDeployState = logDeployState;
     }
-
 
     public int getLogRunStatus() {
         return logRunStatus;

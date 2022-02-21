@@ -13,11 +13,19 @@ public class ProofEntity {
     @Column(name = "proof_id")
     private String proofId;
 
+    //凭证名
+    @Column(name = "proof_name")
+    private String proofName;
+
+    //作用域
+    @Column(name = "proof_scope")
+    private int proofScope;
+
     //凭证类型
     @Column(name = "proof_type")
     private String proofType;
 
-    //凭证名
+    //用户名
     @Column(name = "proof_username")
     private String proofUsername;
 
@@ -67,5 +75,21 @@ public class ProofEntity {
 
     public void setProofDescribe(String proofDescribe) {
         this.proofDescribe = proofDescribe;
+    }
+
+    public String getProofName() {
+        return proofName;
+    }
+
+    public void setProofName(String proofName) {
+        this.proofName = proofName;
+    }
+
+    public int getProofScope() {
+        return proofScope;
+    }
+
+    public void setProofScope(int proofScope) {
+        this.proofScope = proofScope;
     }
 }

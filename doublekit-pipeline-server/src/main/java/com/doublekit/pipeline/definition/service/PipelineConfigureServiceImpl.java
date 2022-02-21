@@ -40,6 +40,7 @@ public class PipelineConfigureServiceImpl implements PipelineConfigureService{
         //获取流水线id下的所有配置信息
         List<PipelineConfigure> pipelineConfigureList = selectAllPipelineConfigure(pipelineId);
 
+        //判断是否有配置信息
         if (pipelineConfigureList != null){
 
             for (PipelineConfigure pipelineConfigure : pipelineConfigureList) {
@@ -67,14 +68,24 @@ public class PipelineConfigureServiceImpl implements PipelineConfigureService{
 
         }
 
-            //把配置id添加到最新的配置信息中
-            pipelineConfigure.setConfigureId(configure.getConfigureId());
+        //把配置id添加到最新的配置信息中
+        pipelineConfigure.setConfigureId(configure.getConfigureId());
 
-            PipelineConfigureEntity pipelineConfigureEntity = BeanMapper.map(pipelineConfigure, PipelineConfigureEntity.class);
+        // //获取表中相同id的配置
+        // PipelineConfigure configure1 = selectPipelineConfigure(configure.getConfigureId());
+        //
+        // //判断配置是否更新
+        // if (!configure1.equals(pipelineConfigure)){
+        //
+        //     return createPipelineConfigure(pipelineConfigure);
+        //
+        // }
 
-            pipelineConfigureDao.updatePipelineConfigure(pipelineConfigureEntity);
+        PipelineConfigureEntity pipelineConfigureEntity = BeanMapper.map(pipelineConfigure, PipelineConfigureEntity.class);
 
-            return pipelineConfigureEntity.getConfigureId();
+        pipelineConfigureDao.updatePipelineConfigure(pipelineConfigureEntity);
+
+        return pipelineConfigureEntity.getConfigureId();
 
     }
 
@@ -114,8 +125,6 @@ public class PipelineConfigureServiceImpl implements PipelineConfigureService{
     }
 
 
-
-
     /**
      * 根据最近配置信息
      * @param pipelineId 流水线id
@@ -128,13 +137,10 @@ public class PipelineConfigureServiceImpl implements PipelineConfigureService{
 
         if (pipelineConfigureList.size() != 0){
 
-            pipelineConfigureList.sort(new Comparator<PipelineConfigure>() {
-                @Override
-                public int compare(PipelineConfigure pipelineConfigure1, PipelineConfigure pipelineConfigure2) {
+            //根据时间排序
+            pipelineConfigureList.sort(Comparator.comparing(PipelineConfigure::getConfigureCreateTime));
 
-                    return pipelineConfigure1.getConfigureCreateTime().compareTo(pipelineConfigure2.getConfigureCreateTime());
-                }
-            });
+            //获取最近一次的配置id
             String configureId = pipelineConfigureList.get(pipelineConfigureList.size() - 1).getConfigureId();
 
            return selectPipelineConfigure(configureId);
@@ -155,6 +161,7 @@ public class PipelineConfigureServiceImpl implements PipelineConfigureService{
 
         List<PipelineConfigure> pipelineConfigures = new ArrayList<>();
 
+        //获取统一id下所有配置
         for (PipelineConfigure pipelineConfigure : pipelineConfigureList) {
 
             if (pipelineConfigure.getPipelineId().equals(pipelineId) ){

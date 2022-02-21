@@ -28,6 +28,12 @@ public interface PipelineHistoryService {
     void deletePipelineHistory(@NotNull String  historyId);
 
     /**
+     * 根据流水线id删除全部历史
+     * @param pipelineId 流水线id
+     */
+    void deleteAllPipelineHistory(@NotNull String  pipelineId);
+
+    /**
      * 更新流水线历史
      * @param pipelineHistory 更新后流水线历史信息
      */

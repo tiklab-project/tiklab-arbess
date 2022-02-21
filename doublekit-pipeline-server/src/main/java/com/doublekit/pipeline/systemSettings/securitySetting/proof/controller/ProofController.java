@@ -43,7 +43,7 @@ public class ProofController {
     @RequestMapping(path="/deleteProof",method = RequestMethod.POST)
     @ApiMethod(name = "deleteProof",desc = "删除凭证")
     @ApiParam(name = "id",desc = "id",required = true)
-    public Result<Void> deleteProof(String id){
+    public Result<Void> deleteProof(@NotNull String id){
 
         proofService.deleteProof(id);
 
@@ -61,17 +61,6 @@ public class ProofController {
         return Result.ok();
     }
 
-    //查询
-    @RequestMapping(path="/selectProof",method = RequestMethod.POST)
-    @ApiMethod(name = "selectProof",desc = "查询凭证")
-    @ApiParam(name = "id",desc = "id",required = true)
-    public Result<Proof> selectProof(String id){
-
-        Proof proof = proofService.selectProof(id);
-
-        return Result.ok(proof);
-    }
-
     //查询所有
     @RequestMapping(path="/selectAllProof",method = RequestMethod.POST)
     @ApiMethod(name = "selectAllProof",desc = "查询所有凭证")
@@ -81,4 +70,16 @@ public class ProofController {
 
         return Result.ok(proofList);
     }
+
+    //查询
+    @RequestMapping(path="/selectProofName",method = RequestMethod.POST)
+    @ApiMethod(name = "selectProofName",desc = "查询凭证名称")
+    @ApiParam(name = "proofId",desc = "凭证id",required = true)
+    public Result<String> selectProofName(@NotNull String proofId){
+
+        String proofName = proofService.selectProofName(proofId);
+
+        return Result.ok(proofName);
+    }
+
 }

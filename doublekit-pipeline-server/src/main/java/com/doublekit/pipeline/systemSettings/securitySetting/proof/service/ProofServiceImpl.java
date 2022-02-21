@@ -9,6 +9,7 @@ import com.doublekit.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.PseudoColumnUsage;
 import java.util.List;
 
 @Service
@@ -24,6 +25,16 @@ public class ProofServiceImpl implements ProofService{
     //创建
     @Override
     public String createProof(Proof proof) {
+
+        List<Proof> proofs = selectAllProof();
+
+        for (Proof proof1 : proofs) {
+
+            if (proof.getProofName().equals(proof1.getProofName())){
+
+                return null;
+            }
+        }
 
         ProofEntity proofEntity = BeanMapper.map(proof, ProofEntity.class);
 
@@ -70,6 +81,23 @@ public class ProofServiceImpl implements ProofService{
         joinTemplate.joinQuery(proofList);
 
         return proofList;
+    }
+
+    //根据id查询名称
+    @Override
+    public String selectProofName(String proofId) {
+
+        List<Proof> proofs = selectAllProof();
+        if (proofs != null){
+            for (Proof proof : proofs) {
+                if (proof.getProofId().equals(proofId)){
+
+                    return proof.getProofName();
+
+                }
+            }
+        }
+        return null;
     }
 
     @Override

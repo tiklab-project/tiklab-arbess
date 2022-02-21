@@ -26,21 +26,21 @@ alter table pipeline_configure comment '流水线配置表';
 
 create table pipeline_history
 (
-    structure_message_id varchar(256) not null comment '构建信息id',
-    structure_create_time datetime not null comment '创建构建时间',
-    structure_way        int comment '构建方式',
-    structure_branch     varchar(256) not null comment '分支',
+    history_id varchar(256) not null comment '历史id',
+    history_time datetime not null comment '创建构建时间',
+    history_way          int comment '构建方式',
+    history_branch       varchar(256) not null comment '分支',
     proof_id             varchar(256) comment '凭证id',
     pipeline_id          varchar(256) comment '流水线id',
     log_id               varchar(256) comment '日志id',
-    primary key (structure_message_id)
+    configure_id         varchar(256) comment '配置id',
+    primary key (history_id)
 );
 alter table pipeline_history comment '构建历史表';
 
 create table pipeline_log
 (
     log_id               varchar(256) not null comment '执行信息id',
-    log_create_time      datetime not null comment '创建时间',
     log_address          varchar(256) not null comment '日志地址',
     log_code_time        varchar(256) not null comment '拉取时间',
     log_code_state       int comment '拉取状态',
@@ -48,6 +48,7 @@ create table pipeline_log
     log_pack_state       int comment '打包状态',
     log_deploy_time      varchar(256) comment '部署时间',
     log_deploy_state     int comment '部署状态',
+    log_run_status       int comment '运行状态',
     primary key (log_id)
 );
 alter table pipeline_log comment '日志表';

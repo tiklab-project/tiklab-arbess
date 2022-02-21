@@ -47,6 +47,13 @@ public interface ProofService {
     @FindAll
      List<Proof> selectAllProof();
 
+    /**
+     * 根据凭证id查询名称
+     * @param proofId
+     * @return 凭证名称
+     */
+    String selectProofName(String  proofId);
+
     @FindList
     List<Proof> selectProofList(List<String> idList);
 }

@@ -2,6 +2,7 @@ package com.doublekit.pipeline.systemSettings.securitySetting.proof.model;
 
 import com.doublekit.apibox.annotation.ApiModel;
 import com.doublekit.apibox.annotation.ApiProperty;
+import com.doublekit.dal.jpa.mapper.annotation.Column;
 import com.doublekit.join.annotation.Join;
 
 @ApiModel
@@ -12,20 +13,28 @@ public class Proof {
     @ApiProperty(name="pipelineId",desc="凭证id")
     private String proofId;
 
+    //凭证名
+    @ApiProperty(name="proofName",desc="凭证名")
+    private String proofName;
+
+    //作用域
+    @ApiProperty(name="proofScope",desc="作用域")
+    private int proofScope;
+
     //凭证类型
-    @ApiProperty(name="pipelineId",desc="凭证类型")
+    @ApiProperty(name="proofType",desc="凭证类型")
     private String proofType;
 
-    //凭证名
-    @ApiProperty(name="pipelineId",desc="凭证名")
+    //账户
+    @ApiProperty(name="proofUsername",desc="账户")
     private String proofUsername;
 
-    //凭证密码
-    @ApiProperty(name="pipelineId",desc="凭证密码")
+    //密码
+    @ApiProperty(name="proofPassword",desc="密码")
     private String proofPassword;
 
     //描述
-    @ApiProperty(name="pipelineId",desc="描述")
+    @ApiProperty(name="proofDescribe",desc="描述")
     private String proofDescribe;
 
 
@@ -67,5 +76,21 @@ public class Proof {
 
     public void setProofDescribe(String proofDescribe) {
         this.proofDescribe = proofDescribe;
+    }
+
+    public String getProofName() {
+        return proofName;
+    }
+
+    public void setProofName(String proofName) {
+        this.proofName = proofName;
+    }
+
+    public int getProofScope() {
+        return proofScope;
+    }
+
+    public void setProofScope(int proofScope) {
+        this.proofScope = proofScope;
     }
 }
