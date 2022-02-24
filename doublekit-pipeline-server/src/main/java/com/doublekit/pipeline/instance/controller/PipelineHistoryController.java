@@ -1,13 +1,13 @@
-package com.doublekit.pipeline.implement.controller;
+package com.doublekit.pipeline.instance.controller;
 
 import com.doublekit.apibox.annotation.Api;
 import com.doublekit.apibox.annotation.ApiMethod;
 import com.doublekit.apibox.annotation.ApiParam;
 import com.doublekit.common.Result;
 import com.doublekit.pipeline.definition.controller.PipelineController;
-import com.doublekit.pipeline.implement.model.PipelineHistory;
-import com.doublekit.pipeline.implement.model.PipelineHistoryDetails;
-import com.doublekit.pipeline.implement.service.PipelineHistoryService;
+import com.doublekit.pipeline.instance.model.PipelineHistory;
+import com.doublekit.pipeline.instance.model.PipelineHistoryDetails;
+import com.doublekit.pipeline.instance.service.PipelineHistoryService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

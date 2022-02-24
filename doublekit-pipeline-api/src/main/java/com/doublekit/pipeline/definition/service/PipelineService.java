@@ -8,7 +8,6 @@ import com.doublekit.join.annotation.JoinProvider;
 import com.doublekit.pipeline.definition.model.Pipeline;
 import com.doublekit.pipeline.definition.model.PipelineQuery;
 import com.doublekit.pipeline.definition.model.PipelineStatus;
-
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.List;

@@ -1,4 +1,4 @@
-package com.doublekit.pipeline.implement.model;
+package com.doublekit.pipeline.instance.model;
 
 import com.doublekit.apibox.annotation.ApiModel;
 import com.doublekit.apibox.annotation.ApiProperty;

@@ -1,4 +1,4 @@
-package com.doublekit.pipeline.implement.entity;
+package com.doublekit.pipeline.instance.entity;
 
 import com.doublekit.dal.jpa.mapper.annotation.*;
 

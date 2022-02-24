@@ -1,10 +1,10 @@
-package com.doublekit.pipeline.implement.service;
+package com.doublekit.pipeline.instance.service;
 
 import com.doublekit.join.annotation.FindAll;
 import com.doublekit.join.annotation.FindList;
 import com.doublekit.join.annotation.FindOne;
 import com.doublekit.join.annotation.JoinProvider;
-import com.doublekit.pipeline.implement.model.PipelineLog;
+import com.doublekit.pipeline.instance.model.PipelineLog;
 import java.util.List;
 
 @JoinProvider(model = PipelineLog.class)

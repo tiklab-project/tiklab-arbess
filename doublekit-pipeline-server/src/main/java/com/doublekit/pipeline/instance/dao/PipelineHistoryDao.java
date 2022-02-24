@@ -1,8 +1,8 @@
-package com.doublekit.pipeline.implement.dao;
+package com.doublekit.pipeline.instance.dao;
 
 import com.doublekit.dal.jpa.JpaTemplate;
 import com.doublekit.pipeline.definition.dao.PipelineDao;
-import com.doublekit.pipeline.implement.entity.PipelineHistoryEntity;
+import com.doublekit.pipeline.instance.entity.PipelineHistoryEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

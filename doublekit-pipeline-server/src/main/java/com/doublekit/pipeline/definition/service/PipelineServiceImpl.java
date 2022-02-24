@@ -6,8 +6,8 @@ import com.doublekit.pipeline.definition.entity.PipelineEntity;
 import com.doublekit.pipeline.definition.model.Pipeline;
 import com.doublekit.pipeline.definition.model.PipelineQuery;
 import com.doublekit.pipeline.definition.model.PipelineStatus;
-import com.doublekit.pipeline.implement.model.PipelineHistory;
-import com.doublekit.pipeline.implement.service.PipelineHistoryService;
+import com.doublekit.pipeline.instance.model.PipelineHistory;
+import com.doublekit.pipeline.instance.service.PipelineHistoryService;
 import com.doublekit.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -55,8 +55,6 @@ public class PipelineServiceImpl implements PipelineService{
     @Override
     public void deletePipeline(String pipelineId) {
 
-        System.out.println(pipelineId);
-
          pipelineDao.deletePipeline(pipelineId);
 
         if (pipelineId != null){
@@ -78,13 +76,11 @@ public class PipelineServiceImpl implements PipelineService{
 
         List<Pipeline> pipelineList = selectAllPipeline();
 
-        //判断是否有此用户
         for (Pipeline pipeline1 : pipelineList) {
-
+        //判断是否有此用户
             if (pipelineName.equals(pipeline1.getPipelineName())){
 
                 return "0";
-
             }
         }
         PipelineEntity pipelineEntity = BeanMapper.map(pipeline, PipelineEntity.class);
@@ -153,11 +149,11 @@ public class PipelineServiceImpl implements PipelineService{
             //获取名称
             pipelineStatus.setPipelineName(pipelineEntity.getPipelineName());
 
-            //获取上次构建时间
+            //获取最近一次的构建
             PipelineHistory pipelineHistory = pipelineHistoryService.selectLastPipelineHistory(pipelineEntity.getPipelineId());
 
             if (pipelineHistory != null){
-
+                //获取上次构建时间
                 pipelineStatus.setLastStructureTime(pipelineHistory.getHistoryCreateTime());
 
             }
@@ -177,7 +173,6 @@ public class PipelineServiceImpl implements PipelineService{
                 }
             }
             pipelineAllList.add(pipelineStatus);
-
         }
 
         return pipelineAllList;
