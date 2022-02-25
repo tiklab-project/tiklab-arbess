@@ -13,8 +13,8 @@ public class PipelineLog {
     private String logId;
 
     //日志地址
-    @ApiProperty(name="logAddress",desc="日志地址")
-    private String logAddress;
+    @ApiProperty(name="logRunLog",desc="运行日志")
+    private String logRunLog;
 
     //拉取时间
     @ApiProperty(name="logCodeTime",desc="拉取时间")
@@ -51,12 +51,12 @@ public class PipelineLog {
         this.logId = logId;
     }
 
-    public String getLogAddress() {
-        return logAddress;
+    public String getLogRunLog() {
+        return logRunLog;
     }
 
-    public void setLogAddress(String logAddress) {
-        this.logAddress = logAddress;
+    public void setLogRunLog(String logRunLog) {
+        this.logRunLog = logRunLog;
     }
 
     public int getLogCodeTime() {

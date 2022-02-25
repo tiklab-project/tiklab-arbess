@@ -65,6 +65,12 @@
             <groupId>com.doublekit</groupId>
             <artifactId>doublekit-apibox-annotation</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.eclipse.jgit</groupId>
+            <artifactId>org.eclipse.jgit</artifactId>
+            <version>6.0.0.202111291000-r</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 
 </project>

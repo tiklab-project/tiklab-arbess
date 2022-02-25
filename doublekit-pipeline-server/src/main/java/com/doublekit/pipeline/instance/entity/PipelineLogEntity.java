@@ -17,9 +17,9 @@ public class PipelineLogEntity {
     @Column(name = "log_id")
     private String logId;
 
-    //日志地址
-    @Column(name = "log_address",notNull = true)
-    private String logAddress;
+    //运行日志
+    @Column(name = "log_run_log",notNull = true)
+    private String logRunLog;
 
     //拉取时间
     @Column(name = "log_code_time",notNull = true)
@@ -58,12 +58,12 @@ public class PipelineLogEntity {
         this.logId = logId;
     }
 
-    public String getLogAddress() {
-        return logAddress;
+    public String getLogRunLog() {
+        return logRunLog;
     }
 
-    public void setLogAddress(String logAddress) {
-        this.logAddress = logAddress;
+    public void setLogRunLog(String logRunLog) {
+        this.logRunLog = logRunLog;
     }
 
     public String getLogCodeTime() {

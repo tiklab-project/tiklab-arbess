@@ -5,7 +5,8 @@ import com.doublekit.apibox.annotation.Api;
 import com.doublekit.apibox.annotation.ApiMethod;
 import com.doublekit.apibox.annotation.ApiParam;
 import com.doublekit.common.Result;
-import com.doublekit.pipeline.instance.service.PipelineCloneService;
+import com.doublekit.pipeline.instance.service.GitCloneService;
+import com.doublekit.pipeline.instance.service.PipelineLogService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,24 +16,24 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.validation.constraints.NotNull;
 
 @RestController
-@RequestMapping("/pipelineClone")
-@Api(name = "PipelineCloneController",desc = "流水线历史")
-public class PipelineCloneController {
+@RequestMapping("/pipelineLog")
+@Api(name = "PipelineLogController",desc = "流水线日志")
+public class PipelineLogController {
 
     @Autowired
-    PipelineCloneService pipelineCloneService;
+    PipelineLogService PipelineLogService;
 
 
-    private static Logger logger = LoggerFactory.getLogger(PipelineCloneController.class);
+    private static Logger logger = LoggerFactory.getLogger(PipelineLogController.class);
 
     //查询所有
-    @RequestMapping(path="/gitClone",method = RequestMethod.POST)
-    @ApiMethod(name = "gitClone",desc = "克隆代码")
+    @RequestMapping(path="/findLog",method = RequestMethod.POST)
+    @ApiMethod(name = "findLog",desc = "克隆代码")
     @ApiParam(name = "pipelineId",desc = "流水线id",required = true)
-    public Result<Void> gitClone(@NotNull String pipelineId) throws Exception {
+    public Result<String> findLog(@NotNull String pipelineId) throws Exception {
 
-      pipelineCloneService.gitClone(pipelineId);
+        String structure = PipelineLogService.structure(pipelineId);
 
-        return Result.ok();
+        return Result.ok(structure);
     }
 }
