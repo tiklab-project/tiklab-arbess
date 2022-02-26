@@ -27,10 +27,7 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
 
         PipelineHistory history = new PipelineHistory();
 
-        int i = gitCloneService.gitClone(pipelineHistory.getPipeline().getPipelineId());
-        if (i == 1){
 
-        }
 
     }
 }

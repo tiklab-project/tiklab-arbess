@@ -50,7 +50,7 @@ public interface PipelineLogService {
      * @return 日志信息
      * @throws Exception 日志转换异常
      */
-     String structure(String pipelineId) throws Exception;
+     String foundPipelineLog(String pipelineId) throws Exception;
 
     @FindList
     List<PipelineLog> selectAllPipelineLogList(List<String> idList);

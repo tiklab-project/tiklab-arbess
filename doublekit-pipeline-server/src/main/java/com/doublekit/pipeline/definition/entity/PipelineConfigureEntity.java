@@ -25,6 +25,10 @@ public class PipelineConfigureEntity {
     @Column(name = "configure_code_source_address",notNull = true)
     private String configureCodeSourceAddress;
 
+    //分支
+    @Column(name = "configure_branch",notNull = true)
+    private String configureBranch;
+
     //构建源
     @Column(name = "configure_code_structure",notNull = true)
     private String configureCodeStructure;
@@ -132,5 +136,13 @@ public class PipelineConfigureEntity {
 
     public void setProofId(String proofId) {
         this.proofId = proofId;
+    }
+
+    public String getConfigureBranch() {
+        return configureBranch;
+    }
+
+    public void setConfigureBranch(String configureBranch) {
+        this.configureBranch = configureBranch;
     }
 }

@@ -2,6 +2,7 @@ package com.doublekit.pipeline.definition.model;
 
 import com.doublekit.apibox.annotation.ApiModel;
 import com.doublekit.apibox.annotation.ApiProperty;
+import com.doublekit.dal.jpa.mapper.annotation.Column;
 import com.doublekit.join.annotation.Join;
 
 @ApiModel
@@ -19,6 +20,10 @@ public class PipelineConfigure {
     //代码源地址
     @ApiProperty(name="configureCodeSourceAddress",desc="代码源地址")
     private String configureCodeSourceAddress;
+
+    //分支
+    @ApiProperty(name="configureBranch",desc="分支")
+    private String configureBranch;
 
     //构建源
     @ApiProperty(name = "configureCodeStructure",desc="构建源")
@@ -87,6 +92,14 @@ public class PipelineConfigure {
 
     public void setConfigureDeployAddress(String configureDeployAddress) {
         this.configureDeployAddress = configureDeployAddress;
+    }
+
+    public String getConfigureBranch() {
+        return configureBranch;
+    }
+
+    public void setConfigureBranch(String configureBranch) {
+        this.configureBranch = configureBranch;
     }
 
     public String getConfigureCreateTime() {

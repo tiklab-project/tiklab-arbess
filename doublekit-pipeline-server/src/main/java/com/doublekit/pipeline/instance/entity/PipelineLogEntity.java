@@ -47,7 +47,7 @@ public class PipelineLogEntity {
 
     //运行状态（30 ：成功  3：失败   其他）
     @Column(name = "log_run_status",notNull = true)
-    private int logRunStatus = getLogCodeState() + getLogPackState()+ getLogCodeState();
+    private int logRunStatus ;
 
 
     public String getLogId() {

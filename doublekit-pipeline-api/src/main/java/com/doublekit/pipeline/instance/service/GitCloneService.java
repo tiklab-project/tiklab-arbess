@@ -1,5 +1,7 @@
 package com.doublekit.pipeline.instance.service;
 
+import com.doublekit.pipeline.instance.model.PipelineLog;
+
 import java.io.IOException;
 
 public interface GitCloneService {
@@ -8,11 +10,16 @@ public interface GitCloneService {
      * 克隆
      * @param pipelineId 流水线id
      */
-    int gitClone(String pipelineId) throws Exception;
+    int gitClone(String pipelineId,String logId) throws Exception;
 
 
-    String write(String pipelineId) throws Exception;
+    String write(String pipelineId ,String logId) throws Exception;
 
-    int deploy(String pipelineId) throws Exception;
+    int deploy(String pipelineId,String logId) throws Exception;
+
+
+
+
+    String aaaa(String pipelineId) throws Exception;
 
 }

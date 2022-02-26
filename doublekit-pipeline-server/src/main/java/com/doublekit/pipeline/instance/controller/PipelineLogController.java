@@ -5,6 +5,7 @@ import com.doublekit.apibox.annotation.Api;
 import com.doublekit.apibox.annotation.ApiMethod;
 import com.doublekit.apibox.annotation.ApiParam;
 import com.doublekit.common.Result;
+import com.doublekit.pipeline.instance.model.PipelineLog;
 import com.doublekit.pipeline.instance.service.GitCloneService;
 import com.doublekit.pipeline.instance.service.PipelineLogService;
 import org.slf4j.Logger;
@@ -23,17 +24,42 @@ public class PipelineLogController {
     @Autowired
     PipelineLogService PipelineLogService;
 
+    @Autowired
+    GitCloneService gitCloneService;
+
 
     private static Logger logger = LoggerFactory.getLogger(PipelineLogController.class);
 
     //查询所有
-    @RequestMapping(path="/findLog",method = RequestMethod.POST)
-    @ApiMethod(name = "findLog",desc = "克隆代码")
+    @RequestMapping(path="/foundPipelineLog",method = RequestMethod.POST)
+    @ApiMethod(name = "foundPipelineLog",desc = "克隆代码")
     @ApiParam(name = "pipelineId",desc = "流水线id",required = true)
-    public Result<String> findLog(@NotNull String pipelineId) throws Exception {
+    public Result<String> foundPipelineLog(@NotNull String pipelineId) throws Exception {
 
-        String structure = PipelineLogService.structure(pipelineId);
+        String structure = PipelineLogService.foundPipelineLog(pipelineId);
 
         return Result.ok(structure);
+    }
+
+    //查询所有
+    @RequestMapping(path="/selectPipelineLog",method = RequestMethod.POST)
+    @ApiMethod(name = "selectPipelineLog",desc = "查询日志")
+    @ApiParam(name = "pipelineId",desc = "流水线id",required = true)
+    public Result<String> selectPipelineLog(@NotNull String pipelineId ) throws Exception {
+
+        String aaaa = gitCloneService.aaaa(pipelineId);
+
+        return Result.ok(aaaa);
+    }
+
+    //查询所有
+    @RequestMapping(path="/aaaaa",method = RequestMethod.POST)
+    @ApiMethod(name = "aaaaa",desc = "查询日志")
+    @ApiParam(name = "logId",desc = "流水线id",required = true)
+    public Result<PipelineLog> aaaaa(@NotNull String logId ){
+
+        PipelineLog pipelineLog = PipelineLogService.selectPipelineLog(logId);
+
+        return Result.ok(pipelineLog);
     }
 }
