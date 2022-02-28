@@ -244,18 +244,22 @@ public class PipelineHistoryServiceImpl implements PipelineHistoryService{
      * 创建历史表
      * @param pipelineHistory 历史信息
      * @return 流水线历史id
-     * @throws Exception 日志创建异常
      */
-    public String foundPipelineHistory(PipelineHistory pipelineHistory) throws Exception {
+    public String foundPipelineHistory(PipelineHistory pipelineHistory) {
 
-        String logId = pipelineLogService.foundPipelineLog(pipelineHistory.getPipeline().getPipelineId());
+        String logId = pipelineHistory.getPipelineLog().getLogId();
 
         if (logId != null){
             //获取日志id
             pipelineHistory.setPipelineLog(pipelineLogService.selectPipelineLog(logId));
         }
         //获取分支
-        pipelineHistory.setHistoryBranch(pipelineHistory.getPipelineConfigure().getConfigureBranch());
+        String configureBranch = pipelineHistory.getPipelineConfigure().getConfigureBranch();
+
+        if (configureBranch == null){
+            configureBranch="master";
+        }
+        pipelineHistory.setHistoryBranch(configureBranch);
 
         //设置构建方式（1：自动  2：手动）
         pipelineHistory.setHistoryWay(1);

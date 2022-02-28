@@ -44,13 +44,6 @@ public interface PipelineLogService {
     @FindAll
      List<PipelineLog> selectAllPipelineLog();
 
-    /**
-     * 创建日志表
-     * @param pipelineId 流水线id
-     * @return 日志信息
-     * @throws Exception 日志转换异常
-     */
-     String foundPipelineLog(String pipelineId) throws Exception;
 
     @FindList
     List<PipelineLog> selectAllPipelineLogList(List<String> idList);

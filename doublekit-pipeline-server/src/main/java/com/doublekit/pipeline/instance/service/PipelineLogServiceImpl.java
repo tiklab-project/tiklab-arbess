@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 
 @Service
@@ -71,66 +70,6 @@ public class PipelineLogServiceImpl implements PipelineLogService {
     }
 
 
-    public String foundPipelineLog(String pipelineId) throws Exception {
-
-
-        PipelineLog pipelineLog = new PipelineLog();
-
-        //开始运行时间
-        String last = dateFormat.format(new Date());
-
-        //拉取代码
-        // int  i = gitCloneService.gitClone(pipelineId);
-
-        // if (i == 1){
-        //     pipelineLog.setLogCodeState(10);
-        // }
-        //结束运行时间
-        String now = dateFormat.format(new Date());
-
-        //获取拉取代码所用时长
-        pipelineLog.setLogCodeTime((int) time(now, last));
-
-        // //调用构建方法
-        // String write = gitCloneService.write(pipelineId);
-        //
-        // //获取构建日志
-        // if (write != null){
-        //     pipelineLog.setLogRunLog(write);
-        //
-        // }
-        String time =dateFormat.format(new Date());
-
-        //获取构建所用时长
-        pipelineLog.setLogPackTime((int)time(time, now));
-
-        //设置构建状态
-        pipelineLog.setLogPackState(10);
-
-        // //调用部署方法
-        // int j = gitCloneService.deploy(pipelineId);
-
-        // if (j == 1){
-        //     pipelineLog.setLogDeployState(10);
-        // }
-        //获取部署时间
-        pipelineLog.setLogDeployTime((int)time(dateFormat.format(new Date()), now));
-
-        //获取运行状态
-        pipelineLog.setLogRunStatus(pipelineLog.getLogCodeState() +pipelineLog. getLogPackState()+ pipelineLog.getLogCodeState());
-
-        return createPipelineLog(pipelineLog);
-    }
-
-
-
-
-    private PipelineLog update(){
-
-
-
-        return  null;
-    }
 
     /**
      * 获取时间差

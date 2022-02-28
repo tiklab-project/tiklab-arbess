@@ -13,13 +13,12 @@ public interface GitCloneService {
     int gitClone(String pipelineId,String logId) throws Exception;
 
 
-    String write(String pipelineId ,String logId) throws Exception;
+    int write(String pipelineId ,String logId) throws Exception;
 
     int deploy(String pipelineId,String logId) throws Exception;
 
+    PipelineLog selectStructureState() throws InterruptedException;
 
-
-
-    String aaaa(String pipelineId) throws Exception;
+    String pipelineStructure(String pipelineId) throws Exception;
 
 }

@@ -71,16 +71,6 @@ public class PipelineConfigureServiceImpl implements PipelineConfigureService{
         //把配置id添加到最新的配置信息中
         pipelineConfigure.setConfigureId(configure.getConfigureId());
 
-        // //获取表中相同id的配置
-        // PipelineConfigure configure1 = selectPipelineConfigure(configure.getConfigureId());
-        //
-        // //判断配置是否更新
-        // if (!configure1.equals(pipelineConfigure)){
-        //
-        //     return createPipelineConfigure(pipelineConfigure);
-        //
-        // }
-
         PipelineConfigureEntity pipelineConfigureEntity = BeanMapper.map(pipelineConfigure, PipelineConfigureEntity.class);
 
         pipelineConfigureDao.updatePipelineConfigure(pipelineConfigureEntity);

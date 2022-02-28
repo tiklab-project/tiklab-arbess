@@ -75,7 +75,7 @@ public interface PipelineHistoryService {
      */
     List<PipelineHistory> selectAllPipelineNameList(String pipelineId);
 
-    String foundPipelineHistory(PipelineHistory pipelineHistory) throws Exception;
+     String foundPipelineHistory(PipelineHistory pipelineHistory);
 
     @FindList
     List<PipelineHistory> selectPipelineHistoryList(List<String> idList);

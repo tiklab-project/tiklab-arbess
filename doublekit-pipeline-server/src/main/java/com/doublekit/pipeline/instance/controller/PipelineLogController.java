@@ -27,36 +27,34 @@ public class PipelineLogController {
     @Autowired
     GitCloneService gitCloneService;
 
-
     private static Logger logger = LoggerFactory.getLogger(PipelineLogController.class);
 
-    //查询所有
-    @RequestMapping(path="/foundPipelineLog",method = RequestMethod.POST)
-    @ApiMethod(name = "foundPipelineLog",desc = "克隆代码")
+    //开始构建
+    @RequestMapping(path="/pipelineStructure",method = RequestMethod.POST)
+    @ApiMethod(name = "pipelineStructure",desc = "开始构建")
     @ApiParam(name = "pipelineId",desc = "流水线id",required = true)
-    public Result<String> foundPipelineLog(@NotNull String pipelineId) throws Exception {
+    public Result<String> pipelineStructure(@NotNull String pipelineId ) throws Exception {
 
-        String structure = PipelineLogService.foundPipelineLog(pipelineId);
+        String logId = gitCloneService.pipelineStructure(pipelineId);
 
-        return Result.ok(structure);
+        return Result.ok(logId);
     }
 
-    //查询所有
+    //查询构建状态
+    @RequestMapping(path="/selectStructureState",method = RequestMethod.POST)
+    @ApiMethod(name = "selectStructureState",desc = "查询构建状态")
+    public Result<PipelineLog> selectStructureState() throws InterruptedException {
+
+        PipelineLog pipelineLog = gitCloneService.selectStructureState();
+
+        return Result.ok(pipelineLog);
+    }
+
+    //查询单个流水线
     @RequestMapping(path="/selectPipelineLog",method = RequestMethod.POST)
     @ApiMethod(name = "selectPipelineLog",desc = "查询日志")
-    @ApiParam(name = "pipelineId",desc = "流水线id",required = true)
-    public Result<String> selectPipelineLog(@NotNull String pipelineId ) throws Exception {
-
-        String aaaa = gitCloneService.aaaa(pipelineId);
-
-        return Result.ok(aaaa);
-    }
-
-    //查询所有
-    @RequestMapping(path="/aaaaa",method = RequestMethod.POST)
-    @ApiMethod(name = "aaaaa",desc = "查询日志")
-    @ApiParam(name = "logId",desc = "流水线id",required = true)
-    public Result<PipelineLog> aaaaa(@NotNull String logId ){
+    @ApiParam(name = "logId",desc = "日志id",required = true)
+    public Result<PipelineLog> selectPipelineLog(@NotNull String logId ){
 
         PipelineLog pipelineLog = PipelineLogService.selectPipelineLog(logId);
 
