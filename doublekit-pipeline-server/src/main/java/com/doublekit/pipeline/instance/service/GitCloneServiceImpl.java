@@ -7,14 +7,12 @@ import com.doublekit.pipeline.definition.service.PipelineService;
 import com.doublekit.pipeline.instance.model.PipelineHistory;
 import com.doublekit.pipeline.instance.model.PipelineLog;
 import com.doublekit.pipeline.systemSettings.securitySetting.proof.model.Proof;
-import com.doublekit.pipeline.systemSettings.securitySetting.proof.service.ProofService;
 import com.doublekit.rpc.annotation.Exporter;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.transport.CredentialsProvider;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
-import org.eclipse.jgit.util.io.StreamCopyThread;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.io.*;
@@ -23,7 +21,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -40,12 +37,6 @@ public class GitCloneServiceImpl implements GitCloneService {
     @Autowired
     PipelineLogService pipelineLogService;
 
-    @Autowired
-    ProofService proofService;
-
-    @Autowired
-    PipelineHistoryService pipelineHistoryService;
-
     //格式化时间
     SimpleDateFormat dateFormat= new SimpleDateFormat("yyyy-MM-dd :hh:mm:ss");
 
@@ -56,74 +47,93 @@ public class GitCloneServiceImpl implements GitCloneService {
 
     //开始构建
     @Override
-    public String  pipelineStructure(String pipelineId) throws Exception{
+    public String  pipelineStructure(String pipelineId) throws InterruptedException {
 
         ExecutorService executorService = Executors.newCachedThreadPool();
 
-        executorService.submit(new Callable<String>() {
+        //执行构建
+        executorService.submit(() -> {
+            //清除缓存
+            pipelineLogList.clear();
 
-            @Override
-            public String call() throws Exception {
-                return null;
+            String logId = pipelineLogService.createPipelineLog(pipelineLog);
+
+            //调用克隆方法
+            int gitClone = gitClone(pipelineId, logId);
+
+            if (gitClone == 1){
+
+                pipelineLog.setLogCodeState(10);
+
+                pipelineLogList.add(pipelineLog);
             }
+
+            //调用构建方法
+            write(pipelineId, logId);
+
+            //调用部署方法
+            int deploy = deploy(pipelineId, logId);
+
+            if (deploy == 1){
+
+                pipelineLog.setLogDeployState(10);
+
+                pipelineLog.setLogRunStatus(pipelineLog.getLogCodeState()+pipelineLog.getLogPackState()+pipelineLog.getLogDeployState());
+
+                pipelineLogList.add(pipelineLog);
+            }
+            return pipelineLogService.pipelineHistoryThree(pipelineId, logId);
         });
 
-        executorService.submit(new Callable<String>() {
-            @Override
-            public String call() throws Exception {
-                //清除缓存
-                pipelineLogList.clear();
+        Thread.sleep(2000);
 
-                String logId = pipelineLogService.createPipelineLog(pipelineLog);
-
-                //调用克隆方法
-                int gitClone = gitClone(pipelineId, logId);
-
-                if (gitClone == 1){
-                    pipelineLog.setLogCodeState(10);
-                    pipelineLogList.add(pipelineLog);
-                }
-
-                //调用构建方法
-                write(pipelineId, logId);
-
-                //调用部署方法
-                int deploy = deploy(pipelineId, logId);
-                if (deploy == 1){
-
-                    pipelineLog.setLogDeployState(10);
-
-                    pipelineLog.setLogRunStatus(pipelineLog.getLogCodeState()+pipelineLog.getLogPackState()+pipelineLog.getLogDeployState());
-
-                    pipelineLogList.add(pipelineLog);
-                }
-                return createPipelineHistory(pipelineId, logId);
-            }
-        });
-
-        return null;
+        return "1";
     }
 
     //查询构建状态
     @Override
-    public PipelineLog selectStructureState() throws InterruptedException {
-
-        Thread.sleep(2000);
+    public PipelineLog selectStructureState() {
 
         if (pipelineLogList != null){
 
             PipelineLog pipelineLog = pipelineLogList.get(pipelineLogList.size() - 1);
 
-            pipelineLogService.updatePipelineLog(pipelineLog);
+                pipelineLogService.updatePipelineLog(pipelineLog);
 
-            return pipelineLog;
+                return pipelineLog;
         }
         return null;
     }
 
-    //克隆代码
+    //历史表添加信息
     @Override
-    public int  gitClone(String pipelineId,String logId) throws Exception {
+    public PipelineHistory pipelineHistoryTwo(String pipelineId){
+
+        PipelineHistory pipelineHistory = new PipelineHistory();
+
+        PipelineHistory History = pipelineConfigureService.pipelineHistoryOne(pipelineId, pipelineHistory);
+
+        Pipeline pipeline = pipelineService.selectPipeline(pipelineId);
+        //添加信息
+        pipelineHistory.setPipelineConfigure(History.getPipelineConfigure());
+
+        pipelineHistory.setProof(History.getProof());
+
+        pipelineHistory.setPipeline(pipeline);
+
+        pipelineHistory.setHistoryCreateTime(dateFormat.format(new Date()));
+
+        return  pipelineHistory;
+    }
+
+    /**
+     * 克隆
+     * @param pipelineId 流水线id
+     * @param logId 日志id
+     * @return 克隆状态
+     * @throws Exception 克隆信息异常
+     */
+    private int  gitClone(String pipelineId,String logId) throws Exception {
 
         PipelineConfigure pipelineConfigure = pipelineConfigureService.selectTimeId(pipelineId);
 
@@ -145,7 +155,7 @@ public class GitCloneServiceImpl implements GitCloneService {
                 delete(pipelineId);
 
                 //获取凭证信息
-                Proof proof = proofService.selectProof(pipelineConfigure.getProofId());
+                Proof proof = pipelineConfigureService.getProof(pipelineId);
 
                 if (proof != null) {
 
@@ -171,9 +181,14 @@ public class GitCloneServiceImpl implements GitCloneService {
         return 0 ;
     }
 
-    //执行命令
-    @Override
-    public int write(String pipelineId,String logId) throws Exception {
+    /**
+     * 构建
+     * @param pipelineId 流水线id
+     * @param logId 日志id
+     * @return 构建状态
+     * @throws Exception 执行异常
+     */
+    private int write(String pipelineId,String logId) throws Exception {
 
         //开始运行时间
         String last = dateFormat.format(new Date());
@@ -209,25 +224,25 @@ public class GitCloneServiceImpl implements GitCloneService {
 
                      bufferedReader = new BufferedReader(inputStreamReader);
 
-                    pipelineLog.setLogPackState(10);
                         while ((s = bufferedReader.readLine()) != null){
 
-                            log = log + s ;
+                            log = log + s+"\n" ;
 
                             pipelineLog.setLogId(logId);
 
+                            pipelineLog.setLogPackState(0);
+
                             pipelineLog.setLogRunLog(log);
-
-                            pipelineLog.setLogPackState(10);
-
-                            if (!log.equals(pipelineLog.getLogRunLog())){
-                                pipelineLog.setLogPackState(0);
-                            }
 
                             //获取构建所用时长
                             pipelineLog.setLogPackTime((int)time(dateFormat.format(new Date()), last));
+
+                            pipelineLogList.add(pipelineLog);
                     }
-                        pipelineLogList.add(pipelineLog);
+
+                    pipelineLog.setLogPackState(10);
+
+                    pipelineLogList.add(pipelineLog);
 
                     return 0;
 
@@ -244,9 +259,14 @@ public class GitCloneServiceImpl implements GitCloneService {
         return 0;
     }
 
-    //开始部署
-    @Override
-    public int deploy(String pipelineId,String logId) throws Exception {
+    /**
+     * 部署
+     * @param pipelineId 流水线id
+     * @param logId 日志id
+     * @return 部署状态
+     * @throws Exception 执行异常
+     */
+    private int deploy(String pipelineId,String logId) throws Exception {
 
         //开始运行时间
         String last = dateFormat.format(new Date());
@@ -306,24 +326,18 @@ public class GitCloneServiceImpl implements GitCloneService {
      * @throws GitAPIException 拉取异常
      */
     private  int gitClone(File gitAddress, String gitUrl, CredentialsProvider credentialsProvider, String branch) throws Exception {
-        Git call =null ;
-        try {
-            call = Git.cloneRepository().setURI(gitUrl)
-                    .setCredentialsProvider(credentialsProvider)
-                    .setDirectory(gitAddress)
-                    .setBranch(branch)
-                    .call();
+        try (Git call = Git.cloneRepository().setURI(gitUrl)
+                .setCredentialsProvider(credentialsProvider)
+                .setDirectory(gitAddress)
+                .setBranch(branch)
+                .call()) {
 
-            if (call != null){
+            if (call != null) {
                 return 1;
             }
             return 0;
         } catch (GitAPIException e) {
             throw new Exception("clone命令错误" + e);
-        }finally {
-            if (call != null) {
-                call.close();
-            }
         }
     }
 
@@ -420,7 +434,7 @@ public class GitCloneServiceImpl implements GitCloneService {
      */
     private long time(String now ,String last) throws Exception {
 
-        long l= 0;
+        long l;
 
         try {
             l = dateFormat.parse(now).getTime()-dateFormat.parse(last).getTime();
@@ -440,37 +454,6 @@ public class GitCloneServiceImpl implements GitCloneService {
             return min*60 + s;
         }
         return s;
-    }
-
-    /**
-     * 创建历史表
-     * @param pipelineId 流水线id
-     * @param logId 日志id
-     * @return 历史id
-     */
-    private String createPipelineHistory(String pipelineId,String logId){
-
-        PipelineConfigure pipelineConfigure = pipelineConfigureService.selectTimeId(pipelineId);
-
-        Pipeline pipeline = pipelineService.selectPipeline(pipelineId);
-
-        Proof proof = proofService.selectProof(pipelineConfigure.getProofId());
-
-        PipelineLog pipelineLog = pipelineLogService.selectPipelineLog(logId);
-
-        PipelineHistory pipelineHistory = new PipelineHistory();
-
-        pipelineHistory.setPipeline(pipeline);
-
-        pipelineHistory.setPipelineLog(pipelineLog);
-
-        pipelineHistory.setPipelineConfigure(pipelineConfigure);
-
-        pipelineHistory.setProof(proof);
-
-        pipelineHistory.setHistoryCreateTime(dateFormat.format(new Date()));
-
-        return  pipelineHistoryService.foundPipelineHistory(pipelineHistory);
     }
 
 }

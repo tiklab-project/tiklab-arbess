@@ -6,6 +6,9 @@ import com.doublekit.join.annotation.FindList;
 import com.doublekit.join.annotation.FindOne;
 import com.doublekit.join.annotation.JoinProvider;
 import com.doublekit.pipeline.definition.model.PipelineConfigure;
+import com.doublekit.pipeline.instance.model.PipelineHistory;
+import com.doublekit.pipeline.systemSettings.securitySetting.proof.model.Proof;
+
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.List;
@@ -53,6 +56,10 @@ public interface PipelineConfigureService {
      * @return 配置信息
      */
     PipelineConfigure selectTimeId(String pipelineId);
+
+    PipelineHistory pipelineHistoryOne(String pipelineId, PipelineHistory pipelineHistory);
+
+    Proof getProof(String pipelineId);
 
     @FindList
     List<PipelineConfigure> selectAllPipelineConfigureList(List<String> idList);

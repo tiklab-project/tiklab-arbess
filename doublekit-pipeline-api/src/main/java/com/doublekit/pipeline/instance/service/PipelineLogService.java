@@ -44,6 +44,7 @@ public interface PipelineLogService {
     @FindAll
      List<PipelineLog> selectAllPipelineLog();
 
+    String pipelineHistoryThree(String pipelineId ,String logId);
 
     @FindList
     List<PipelineLog> selectAllPipelineLogList(List<String> idList);

@@ -4,11 +4,11 @@ import com.doublekit.beans.BeanMapper;
 import com.doublekit.join.JoinTemplate;
 import com.doublekit.pipeline.instance.dao.PipelineLogDao;
 import com.doublekit.pipeline.instance.entity.PipelineLogEntity;
+import com.doublekit.pipeline.instance.model.PipelineHistory;
 import com.doublekit.pipeline.instance.model.PipelineLog;
 import com.doublekit.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -21,7 +21,11 @@ public class PipelineLogServiceImpl implements PipelineLogService {
     GitCloneService gitCloneService;
 
     @Autowired
+    PipelineHistoryService pipelineHistoryService;
+
+    @Autowired
     PipelineLogDao pipelineLogDao;
+
 
     SimpleDateFormat dateFormat= new SimpleDateFormat("yyyy-MM-dd :hh:mm:ss");
 
@@ -69,36 +73,16 @@ public class PipelineLogServiceImpl implements PipelineLogService {
         return BeanMapper.mapList(pipelineLogList, PipelineLog.class);
     }
 
+    @Override
+    public String pipelineHistoryThree(String pipelineId ,String logId)  {
 
+        PipelineHistory pipelineHistory = gitCloneService.pipelineHistoryTwo(pipelineId);
 
-    /**
-     * 获取时间差
-     * @param now 现在
-     * @param last 过去
-     * @return 时间差
-     * @throws ParseException 时间转换异常
-     */
-    private long time(String now ,String last) throws Exception {
+        PipelineLog pipelineLog = selectPipelineLog(logId);
 
-        long l= 0;
-        try {
-            l = dateFormat.parse(now).getTime()-dateFormat.parse(last).getTime();
+        pipelineHistory.setPipelineLog(pipelineLog);
 
-        } catch (Exception e) {
-             throw new Exception("时间转换异常"+e);
-        }
-        long day=l/(24*60*60*1000);
-
-        long hour=(l/(60*60*1000)-day*24);
-
-        long min=((l/(60*1000))-day*24*60-hour*60);
-
-        long s = (l/1000-day*24*60*60-hour*60*60-min*60);
-
-        if (min>0){
-            return min*60 + s;
-        }
-        return s;
+        return pipelineHistoryService.createPipelineHistory(pipelineHistory);
     }
 
 }

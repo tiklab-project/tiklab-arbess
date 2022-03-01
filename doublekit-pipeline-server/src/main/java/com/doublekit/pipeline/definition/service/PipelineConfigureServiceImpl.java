@@ -6,6 +6,9 @@ import com.doublekit.join.JoinTemplate;
 import com.doublekit.pipeline.definition.dao.PipelineConfigureDao;
 import com.doublekit.pipeline.definition.entity.PipelineConfigureEntity;
 import com.doublekit.pipeline.definition.model.PipelineConfigure;
+import com.doublekit.pipeline.instance.model.PipelineHistory;
+import com.doublekit.pipeline.systemSettings.securitySetting.proof.model.Proof;
+import com.doublekit.pipeline.systemSettings.securitySetting.proof.service.ProofService;
 import com.doublekit.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,6 +23,9 @@ public class PipelineConfigureServiceImpl implements PipelineConfigureService{
 
     @Autowired
     PipelineConfigureDao pipelineConfigureDao;
+
+    @Autowired
+    ProofService proofService;
 
     @Autowired
     JoinTemplate joinTemplate;
@@ -163,4 +169,26 @@ public class PipelineConfigureServiceImpl implements PipelineConfigureService{
 
         return pipelineConfigures;
     }
+
+
+    public PipelineHistory pipelineHistoryOne(String pipelineId,PipelineHistory pipelineHistory){
+
+        PipelineConfigure pipelineConfigure = selectTimeId(pipelineId);
+
+        Proof proof = proofService.selectProof(pipelineConfigure.getProofId());
+
+        pipelineHistory.setPipelineConfigure(pipelineConfigure);
+
+        pipelineHistory.setProof(proof);
+
+        return pipelineHistory;
+    }
+
+    public Proof getProof(String pipelineId){
+
+        return proofService.selectProof(selectTimeId(pipelineId).getProofId());
+
+    }
+
+
 }
