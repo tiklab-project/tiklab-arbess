@@ -6,6 +6,7 @@ import com.doublekit.join.annotation.FindOne;
 import com.doublekit.join.annotation.JoinProvider;
 import com.doublekit.pipeline.instance.model.PipelineHistory;
 import com.doublekit.pipeline.instance.model.PipelineHistoryDetails;
+import com.doublekit.pipeline.instance.model.PipelineLog;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -75,11 +76,22 @@ public interface PipelineHistoryService {
      */
     List<PipelineHistory> selectAllPipelineNameList(String pipelineId);
 
-     String foundPipelineHistory(PipelineHistory pipelineHistory);
+    /**
+     * 完善历史信息
+     * @param pipelineHistory 历史信息
+     * @return 历史id
+     */
+    String foundPipelineHistory(PipelineHistory pipelineHistory);
+
+    /**
+     * 根据历史查询日志信息
+     * @param historyId 历史id
+     * @return 日志信息
+     */
+    PipelineLog selectHistoryLog(String historyId);
 
     @FindList
     List<PipelineHistory> selectPipelineHistoryList(List<String> idList);
-
 
 
 }

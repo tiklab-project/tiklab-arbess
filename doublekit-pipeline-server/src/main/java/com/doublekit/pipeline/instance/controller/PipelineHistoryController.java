@@ -7,6 +7,7 @@ import com.doublekit.common.Result;
 import com.doublekit.pipeline.definition.controller.PipelineController;
 import com.doublekit.pipeline.instance.model.PipelineHistory;
 import com.doublekit.pipeline.instance.model.PipelineHistoryDetails;
+import com.doublekit.pipeline.instance.model.PipelineLog;
 import com.doublekit.pipeline.instance.service.PipelineHistoryService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +38,7 @@ public class PipelineHistoryController {
         return Result.ok(pipelineHistories);
     }
 
-    //查询
+    //查询所有历史详情
     @RequestMapping(path="/selectPipelineHistoryDetails",method = RequestMethod.POST)
     @ApiMethod(name = "selectPipelineHistoryDetails",desc = "流水线历史详情")
     @ApiParam(name = "pipelineId",desc = "流水线id",required = true)
@@ -46,5 +47,16 @@ public class PipelineHistoryController {
         List<PipelineHistoryDetails> pipelineHistoryDetailsList = pipelineHistoryService.selectAll(pipelineId);
 
         return Result.ok(pipelineHistoryDetailsList);
+    }
+
+    //查询所有历史详情
+    @RequestMapping(path="/selectPipelineHistoryLog",method = RequestMethod.POST)
+    @ApiMethod(name = "selectPipelineHistoryLog",desc = "查询日志")
+    @ApiParam(name = "pipelineHistoryId",desc = "历史id",required = true)
+    public Result<PipelineLog> selectPipelineHistoryLog(@NotNull String pipelineHistoryId){
+
+        PipelineLog pipelineLog = pipelineHistoryService.selectHistoryLog(pipelineHistoryId);
+
+        return Result.ok(pipelineLog);
     }
 }

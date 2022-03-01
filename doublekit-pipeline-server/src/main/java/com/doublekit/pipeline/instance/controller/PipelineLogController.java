@@ -1,13 +1,12 @@
 package com.doublekit.pipeline.instance.controller;
 
 import com.doublekit.apibox.annotation.Api;
-
 import com.doublekit.apibox.annotation.ApiMethod;
 import com.doublekit.apibox.annotation.ApiParam;
 import com.doublekit.common.Result;
 import com.doublekit.pipeline.instance.model.PipelineLog;
-import com.doublekit.pipeline.instance.service.GitCloneService;
 import com.doublekit.pipeline.instance.service.PipelineLogService;
+import com.doublekit.pipeline.instance.service.PipelineStructureService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +24,7 @@ public class PipelineLogController {
     PipelineLogService PipelineLogService;
 
     @Autowired
-    GitCloneService gitCloneService;
+    PipelineStructureService pipelineStructureService;
 
     private static Logger logger = LoggerFactory.getLogger(PipelineLogController.class);
 
@@ -35,7 +34,7 @@ public class PipelineLogController {
     @ApiParam(name = "pipelineId",desc = "流水线id",required = true)
     public Result<String> pipelineStructure(@NotNull String pipelineId ) throws Exception {
 
-        String logId = gitCloneService.pipelineStructure(pipelineId);
+        String logId = pipelineStructureService.pipelineStructure(pipelineId);
 
         return Result.ok(logId);
     }
@@ -43,9 +42,9 @@ public class PipelineLogController {
     //查询构建状态
     @RequestMapping(path="/selectStructureState",method = RequestMethod.POST)
     @ApiMethod(name = "selectStructureState",desc = "查询构建状态")
-    public Result<PipelineLog> selectStructureState() throws InterruptedException {
+    public Result<PipelineLog> selectStructureState(){
 
-        PipelineLog pipelineLog = gitCloneService.selectStructureState();
+        PipelineLog pipelineLog = pipelineStructureService.selectStructureState();
 
         return Result.ok(pipelineLog);
     }

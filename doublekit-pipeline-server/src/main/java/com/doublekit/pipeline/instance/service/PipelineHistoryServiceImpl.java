@@ -6,6 +6,7 @@ import com.doublekit.pipeline.instance.dao.PipelineHistoryDao;
 import com.doublekit.pipeline.instance.entity.PipelineHistoryEntity;
 import com.doublekit.pipeline.instance.model.PipelineHistory;
 import com.doublekit.pipeline.instance.model.PipelineHistoryDetails;
+import com.doublekit.pipeline.instance.model.PipelineLog;
 import com.doublekit.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -155,7 +156,7 @@ public class PipelineHistoryServiceImpl implements PipelineHistoryService{
             //获取执行人
             if (pipelineHistory.getPipeline().getPipelineName() != null){
 
-                pipelineHistoryDetails.setImplementor(pipelineHistory.getPipeline().getPipelineName());
+                pipelineHistoryDetails.setImplementor(pipelineHistory.getPipeline().getPipelineCreateUser());
 
             }
 
@@ -188,6 +189,9 @@ public class PipelineHistoryServiceImpl implements PipelineHistoryService{
             pipelineHistoryDetailsList.add(pipelineHistoryDetails);
 
         }
+
+        //将同一任务历史详情通过时间降序排序
+        pipelineHistoryDetailsList.sort(Comparator.comparing(PipelineHistoryDetails::getCreateStructureTime,Comparator.reverseOrder()));
 
         return pipelineHistoryDetailsList;
     }
@@ -229,6 +233,7 @@ public class PipelineHistoryServiceImpl implements PipelineHistoryService{
         List<PipelineHistory> pipelineHistoryList = selectAllPipelineNameList(pipelineId);
 
         if (pipelineHistoryList.size() != 0){
+
             //将同一任务构建历史通过时间排序
             pipelineHistoryList.sort(Comparator.comparing(PipelineHistory::getHistoryCreateTime));
 
@@ -245,6 +250,7 @@ public class PipelineHistoryServiceImpl implements PipelineHistoryService{
      * @param pipelineHistory 历史信息
      * @return 流水线历史id
      */
+    @Override
     public String foundPipelineHistory(PipelineHistory pipelineHistory) {
 
         String logId = pipelineHistory.getPipelineLog().getLogId();
@@ -266,5 +272,17 @@ public class PipelineHistoryServiceImpl implements PipelineHistoryService{
 
         return createPipelineHistory(pipelineHistory);
     }
+
+    //查询日志
+    @Override
+    public PipelineLog selectHistoryLog(String historyId) {
+
+        PipelineHistory pipelineHistory = selectPipelineHistory(historyId);
+
+        String logId = pipelineHistory.getPipelineLog().getLogId();
+
+        return  pipelineLogService.selectPipelineLog(logId);
+    }
+
 
 }

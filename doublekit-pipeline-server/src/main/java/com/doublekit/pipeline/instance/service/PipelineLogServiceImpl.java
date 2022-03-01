@@ -1,7 +1,6 @@
 package com.doublekit.pipeline.instance.service;
 
 import com.doublekit.beans.BeanMapper;
-import com.doublekit.join.JoinTemplate;
 import com.doublekit.pipeline.instance.dao.PipelineLogDao;
 import com.doublekit.pipeline.instance.entity.PipelineLogEntity;
 import com.doublekit.pipeline.instance.model.PipelineHistory;
@@ -9,7 +8,6 @@ import com.doublekit.pipeline.instance.model.PipelineLog;
 import com.doublekit.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
@@ -18,7 +16,7 @@ import java.util.List;
 public class PipelineLogServiceImpl implements PipelineLogService {
 
     @Autowired
-    GitCloneService gitCloneService;
+    PipelineStructureService pipelineStructureService;
 
     @Autowired
     PipelineHistoryService pipelineHistoryService;
@@ -76,13 +74,13 @@ public class PipelineLogServiceImpl implements PipelineLogService {
     @Override
     public String pipelineHistoryThree(String pipelineId ,String logId)  {
 
-        PipelineHistory pipelineHistory = gitCloneService.pipelineHistoryTwo(pipelineId);
+        PipelineHistory pipelineHistory = pipelineStructureService.pipelineHistoryTwo(pipelineId);
 
         PipelineLog pipelineLog = selectPipelineLog(logId);
 
         pipelineHistory.setPipelineLog(pipelineLog);
 
-        return pipelineHistoryService.createPipelineHistory(pipelineHistory);
+        return pipelineHistoryService.foundPipelineHistory(pipelineHistory);
     }
 
 }

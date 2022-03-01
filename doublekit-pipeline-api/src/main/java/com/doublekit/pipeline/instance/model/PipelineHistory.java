@@ -56,7 +56,7 @@ public class PipelineHistory {
     private PipelineLog pipelineLog;
 
     //凭证
-    @ApiProperty(name="PipelineConfigure",desc="凭证id",eg="@selectOne")
+    @ApiProperty(name="PipelineConfigure",desc="配置id",eg="@selectOne")
     @Mappings({
             @Mapping(source = "PipelineConfigure.configureId",target = "configureId")
     })
