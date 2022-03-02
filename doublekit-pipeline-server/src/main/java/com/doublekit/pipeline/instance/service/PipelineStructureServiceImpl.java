@@ -37,7 +37,7 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
     PipelineLogService pipelineLogService;
 
     //格式化时间
-    SimpleDateFormat dateFormat= new SimpleDateFormat("yyyy-MM-dd :hh:mm:ss");
+    SimpleDateFormat dateFormat= new SimpleDateFormat("yyyy-MM-dd :HH:mm:ss");
 
     //存放过程状态
     List<PipelineLog> pipelineLogList = new ArrayList<>();
@@ -67,18 +67,13 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
         //创建线程池
         ExecutorService executorService = Executors.newCachedThreadPool();
         //执行构建
-        executorService.submit(new Callable<String>() {
-            @Override
-            public String call() throws Exception {
-
-                return structure(pipelineId);
-            }
-        });
+        executorService.submit(() -> structure(pipelineId));
 
         Thread.sleep(4000);
 
         return "1";
     }
+
     //构建
     private String  structure(String pipelineId) throws Exception {
 
@@ -94,53 +89,42 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
         String logId = pipelineLogService.createPipelineLog(pipelineLog);
 
         pipelineLog.setLogId(logId);
-        //调用克隆方法
-        int gitClone = gitClone(pipeline, pipelineConfigure, pipelineLog);
 
-        if (gitClone == 1) {
+        //无配置信息
+        if (pipelineConfigure.getConfigureCodeSource().equals("a") && pipelineConfigure.getConfigureCodeStructure().equals("b")){
 
-            pipelineLog.setLogCodeState(10);
-            //调用构建方法
-            int write = write(pipeline, pipelineConfigure, pipelineLog);
+            allEmpty(pipelineLog);
 
-            if (write == 1) {
+        //构建配置为空
+        }else if (pipelineConfigure.getConfigureCodeSource().equals("b") && pipelineConfigure.getConfigureCodeStructure().equals("b")){
 
-                pipelineLog.setLogPackState(10);
+            structureNull(pipeline, pipelineConfigure, pipelineLog);
 
-                //调用部署方法
-                int deploy = deploy(pipeline, pipelineConfigure, pipelineLog);
+        //配置都有
+        }else if (pipelineConfigure.getConfigureCodeSource().equals("b") && pipelineConfigure.getConfigureCodeStructure().equals("a")){
 
-                if (deploy == 1) {
+            noNull(pipeline, pipelineConfigure, pipelineLog);
 
-                    pipelineLog.setLogDeployState(10);
+        // 克隆配置为空
+        }else if (pipelineConfigure.getConfigureCodeSource().equals("a") && pipelineConfigure.getConfigureCodeStructure().equals("a")){
 
-                    pipelineLog.setLogRunStatus(30);
-                } else {
-                    //部署失败
-                    pipelineLog.setLogDeployState(0);
+            cloneNull(pipeline, pipelineConfigure, pipelineLog);
 
-                    pipelineLog.setLogRunStatus(1);
-                }
-            } else {
-                //构建失败
-                pipelineLog.setLogPackState(1);
-            }
-        } else {
-            //克隆失败
-            pipelineLog.setLogCodeState(1);
         }
 
         pipelineLogList.add(pipelineLog);
 
+        //更新数据库
         pipelineLogService.updatePipelineLog(pipelineLog);
 
         //执行完成移除构建id
-        if (pipelineIdList != null){
+        if (pipelineIdList != null) {
             pipelineIdList.removeIf(id -> id.equals(pipelineId));
         }
 
         //创建历史表
-       return pipelineLogService.pipelineHistoryThree(pipelineId, logId);
+        return pipelineLogService.pipelineHistoryThree(pipelineId, logId);
+
     }
 
     //查询构建状态
@@ -152,8 +136,6 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
             for (PipelineLog log : pipelineLogList) {
 
                     if (log.getLogRunStatus() == 30 || log.getLogRunStatus() == 1){
-
-                        System.out.println(pipelineLogList.size());
 
                         pipelineLogList.clear();
                     }
@@ -188,11 +170,11 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
      * 克隆
      * @param pipeline 流水线信息
      * @param pipelineConfigure 配置信息
-     * @param pipelineLog 日志id
+     * @param pipelineLog 日志
      * @return 构建状态
      * @throws Exception 执行克隆异常
      */
-    private int  gitClone(Pipeline pipeline,PipelineConfigure pipelineConfigure,PipelineLog pipelineLog) throws Exception {
+    private int   gitClone(Pipeline pipeline,PipelineConfigure pipelineConfigure,PipelineLog pipelineLog) throws Exception {
         String logId =pipelineLog.getLogId();
         // 判断是否存在配置
         if (pipelineConfigure != null) {
@@ -220,7 +202,7 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
                     UsernamePasswordCredentialsProvider credentialsProvider = usernamePassword(proof.getProofUsername(), proof.getProofPassword());
 
                     //克隆代码
-                    int master = gitClone(new File(path), pipelineConfigure.getConfigureCodeSourceAddress(), credentialsProvider, pipelineConfigure.getConfigureBranch());
+                    gitClone(new File(path), pipelineConfigure.getConfigureCodeSourceAddress(), credentialsProvider, pipelineConfigure.getConfigureBranch());
 
                     pipelineLog.setLogId(logId);
 
@@ -228,22 +210,23 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
 
                     pipelineLogList.add(pipelineLog);
 
-                    return master;
+                    return 1;
                 }
             }
         }
-        return 0 ;
+        return 0;
     }
 
     /**
      * 构建
      * @param pipeline 流水线信息
      * @param pipelineConfigure 配置信息
-     * @param pipelineLog 日志id
+     * @param pipelineLog 日志
      * @return 构建状态
      * @throws Exception 执行构建异常
      */
     private int write(Pipeline pipeline,PipelineConfigure pipelineConfigure,PipelineLog pipelineLog) throws Exception {
+
         String logId =pipelineLog.getLogId();
         //开始运行时间
         String last = dateFormat.format(new Date());
@@ -286,12 +269,7 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
                         pipelineLogList.add(pipelineLog);
                     }
 
-                    //关闭缓冲区
-                    inputStreamReader.close();
-                    bufferedReader.close();
-
-                    return 1;
-
+                    return  1;
                 }
             }
         }
@@ -302,7 +280,7 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
      * 部署
      * @param pipeline 流水线信息
      * @param pipelineConfigure 配置信息
-     * @param pipelineLog 日志id
+     * @param pipelineLog 日志
      * @return 构建状态
      * @throws Exception 执行部署异常
      */
@@ -328,6 +306,7 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
             pipelineLogList.add(pipelineLog);
 
             return 1;
+
         }
         return 0;
     }
@@ -361,19 +340,16 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
      * @param branch 分支
      * @throws GitAPIException 拉取异常
      */
-    private  int gitClone(File gitAddress, String gitUrl, CredentialsProvider credentialsProvider, String branch) throws Exception {
+    private void gitClone(File gitAddress, String gitUrl, CredentialsProvider credentialsProvider, String branch) throws Exception {
 
-        try (Git call = Git.cloneRepository().setURI(gitUrl)
-                .setCredentialsProvider(credentialsProvider)
-                .setDirectory(gitAddress)
-                .setBranch(branch)
-                .call()) {
-
-            if (call != null) {
-                return 1;
-            }
-            return 0;
+        try {
+             Git.cloneRepository().setURI(gitUrl)
+                    .setCredentialsProvider(credentialsProvider)
+                    .setDirectory(gitAddress)
+                    .setBranch(branch)
+                    .call().close();
         } catch (GitAPIException e) {
+
             throw new Exception("clone命令错误" + e);
         }
     }
@@ -491,6 +467,138 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
             return min*60 + s;
         }
         return s;
+    }
+
+    /**
+     * 没有配置
+     * @param pipelineLog 日志
+     */
+    private void allEmpty(PipelineLog pipelineLog){
+
+        pipelineLog.setLogCodeState(10);
+
+        pipelineLog.setLogCodeTime(1);
+
+        pipelineLog.setLogPackState(10);
+
+        pipelineLog.setLogPackTime(1);
+
+        pipelineLog.setLogDeployState(10);
+
+        pipelineLog.setLogDeployTime(1);
+
+        pipelineLog.setLogRunStatus(30);
+
+    }
+
+    /**
+     * 克隆配置为空
+     * @param pipeline 流水线信息
+     * @param pipelineConfigure 配置信息
+     * @param pipelineLog 日志
+     * @throws Exception 执行克隆异常
+     */
+    private void cloneNull(Pipeline pipeline,PipelineConfigure pipelineConfigure,PipelineLog pipelineLog) throws Exception {
+
+        //调用构建方法
+        int write = write(pipeline, pipelineConfigure, pipelineLog);
+
+        pipelineLog.setLogPackState(10);
+
+        if (write == 0){
+            pipelineLog.setLogPackState(0);
+        }
+
+        //调用部署方法
+        int deploy = deploy(pipeline, pipelineConfigure, pipelineLog);
+
+        pipelineLog.setLogDeployState(10);
+
+        pipelineLog.setLogRunStatus(30);
+
+        if (deploy == 0){
+
+            pipelineLog.setLogDeployState(1);
+
+            pipelineLog.setLogRunStatus(1);
+        }
+
+    }
+
+    /**
+     * 配置都有
+     * @param pipeline 流水线信息
+     * @param pipelineConfigure 配置信息
+     * @param pipelineLog 日志
+     * @throws Exception 执行克隆异常
+     */
+    private void noNull(Pipeline pipeline,PipelineConfigure pipelineConfigure,PipelineLog pipelineLog) throws Exception {
+
+        //调用克隆方法
+        int gitClone = gitClone(pipeline, pipelineConfigure, pipelineLog);
+
+        pipelineLog.setLogCodeState(10);
+
+        if (gitClone == 0){
+            pipelineLog.setLogCodeState(1);
+        }
+
+        //调用构建方法
+        int write = write(pipeline, pipelineConfigure, pipelineLog);
+
+        pipelineLog.setLogPackState(10);
+
+        if (write == 0){
+            pipelineLog.setLogPackState(1);
+        }
+
+        //调用部署方法
+        int deploy = deploy(pipeline, pipelineConfigure, pipelineLog);
+
+        pipelineLog.setLogDeployState(10);
+
+        pipelineLog.setLogRunStatus(30);
+
+        if (deploy == 0){
+
+            pipelineLog.setLogDeployState(1);
+
+            pipelineLog.setLogRunStatus(1);
+        }
+    }
+
+    /**
+     * 构建配置为空
+     * @param pipeline 流水线信息
+     * @param pipelineConfigure 配置信息
+     * @param pipelineLog 日志
+     * @throws Exception 执行克隆异常
+     */
+    private void structureNull(Pipeline pipeline,PipelineConfigure pipelineConfigure,PipelineLog pipelineLog) throws Exception {
+
+        //调用克隆方法
+        int gitClone = gitClone(pipeline, pipelineConfigure, pipelineLog);
+
+        pipelineLog.setLogCodeState(10);
+
+        if (gitClone == 0){
+            pipelineLog.setLogCodeState(1);
+        }
+
+        //调用部署方法
+        int deploy = deploy(pipeline, pipelineConfigure, pipelineLog);
+
+        pipelineLog.setLogDeployState(10);
+
+        pipelineLog.setLogRunStatus(30);
+
+        if (deploy == 0){
+
+            pipelineLog.setLogDeployState(1);
+
+            pipelineLog.setLogRunStatus(1);
+        }
+
     }
 
 }

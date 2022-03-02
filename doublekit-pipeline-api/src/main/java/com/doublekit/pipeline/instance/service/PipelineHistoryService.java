@@ -90,6 +90,12 @@ public interface PipelineHistoryService {
      */
     PipelineLog selectHistoryLog(String historyId);
 
+    /**
+     * 删除历史以及日志
+     * @param HistoryId 历史id
+     */
+    void deleteHistoryLog(String HistoryId);
+
     @FindList
     List<PipelineHistory> selectPipelineHistoryList(List<String> idList);
 

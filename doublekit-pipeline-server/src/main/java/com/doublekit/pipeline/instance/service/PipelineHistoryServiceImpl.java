@@ -7,6 +7,7 @@ import com.doublekit.pipeline.instance.entity.PipelineHistoryEntity;
 import com.doublekit.pipeline.instance.model.PipelineHistory;
 import com.doublekit.pipeline.instance.model.PipelineHistoryDetails;
 import com.doublekit.pipeline.instance.model.PipelineLog;
+import com.doublekit.pipeline.systemSettings.securitySetting.proof.model.Proof;
 import com.doublekit.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -175,19 +176,18 @@ public class PipelineHistoryServiceImpl implements PipelineHistoryService{
             }
 
             // 获取凭证
-            if (pipelineHistory.getProof().getProofType() != null)
-
-                pipelineHistoryDetails.setProof(pipelineHistory.getProof().getProofType());
+            Proof proof = pipelineHistory.getProof();
+            if (proof != null){
+                pipelineHistoryDetails.setProof(proof.getProofType());
+            }
 
             // 获取分支
             if (pipelineHistory.getHistoryBranch() != null){
 
                 pipelineHistoryDetails.setBranch(pipelineHistory.getHistoryBranch());
-
             }
 
             pipelineHistoryDetailsList.add(pipelineHistoryDetails);
-
         }
 
         //将同一任务历史详情通过时间降序排序
@@ -286,5 +286,23 @@ public class PipelineHistoryServiceImpl implements PipelineHistoryService{
             return  pipelineLogService.selectPipelineLog(logId);
         }
         return null;
+    }
+
+    //删除历史以及日志
+    public void deleteHistoryLog(String HistoryId){
+
+        PipelineHistory pipelineHistory = selectPipelineHistory(HistoryId);
+
+        //
+        if (pipelineHistory != null){
+
+            String logId = pipelineHistory.getPipelineLog().getLogId();
+
+            if (logId != null){
+                pipelineLogService.deletePipelineLog(logId);
+            }
+        }
+
+       deletePipelineHistory(HistoryId);
     }
 }

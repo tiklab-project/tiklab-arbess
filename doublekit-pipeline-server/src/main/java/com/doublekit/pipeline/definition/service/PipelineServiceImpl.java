@@ -162,14 +162,14 @@ public class PipelineServiceImpl implements PipelineService{
 
             if (pipelineHistoryList != null){
 
-                for (PipelineHistory history : pipelineHistoryList) {
+                for (int i = pipelineHistoryList.size() - 1; i >= 0; i--) {
 
-                    if (history.getPipelineLog().getLogRunStatus() == 30){
+                    if (pipelineHistoryList.get(i).getPipelineLog().getLogRunStatus() == 30){
                         //获取上次成功时间
-                        pipelineStatus.setLastSuccessTime(history.getHistoryCreateTime());
+                        pipelineStatus.setLastSuccessTime(pipelineHistoryList.get(i).getHistoryCreateTime());
                     }
                     //获取状态
-                    pipelineStatus.setStructureStatus(history.getPipelineLog().getLogRunStatus());
+                    pipelineStatus.setStructureStatus(pipelineHistoryList.get(i).getPipelineLog().getLogRunStatus());
                 }
             }
             pipelineAllList.add(pipelineStatus);
