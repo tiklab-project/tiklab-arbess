@@ -279,10 +279,12 @@ public class PipelineHistoryServiceImpl implements PipelineHistoryService{
 
         PipelineHistory pipelineHistory = selectPipelineHistory(historyId);
 
-        String logId = pipelineHistory.getPipelineLog().getLogId();
+        if (pipelineHistory != null){
 
-        return  pipelineLogService.selectPipelineLog(logId);
+            String logId = pipelineHistory.getPipelineLog().getLogId();
+
+            return  pipelineLogService.selectPipelineLog(logId);
+        }
+        return null;
     }
-
-
 }

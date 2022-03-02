@@ -11,13 +11,13 @@ public interface PipelineStructureService {
      * @return 构建开始
      * @throws InterruptedException 等待超时
      */
-    String  pipelineStructure(String pipelineId) throws InterruptedException;
+    String  pipelineStructure(String pipelineId) throws Exception;
 
     /**
      * 查询构建状态
      * @return 状态信息
      */
-    PipelineLog selectStructureState();
+    PipelineLog selectStructureState() ;
 
     /**
      * 添加历史信息
