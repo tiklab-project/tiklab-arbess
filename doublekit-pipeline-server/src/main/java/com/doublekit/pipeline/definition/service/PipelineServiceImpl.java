@@ -158,7 +158,7 @@ public class PipelineServiceImpl implements PipelineService{
 
             }
             //获取同一id下的所有历史记录
-            List<PipelineHistory> pipelineHistoryList = pipelineHistoryService.selectAllPipelineNameList(pipelineEntity.getPipelineId());
+            List<PipelineHistory> pipelineHistoryList = pipelineHistoryService.selectAllPipelineIdList(pipelineEntity.getPipelineId());
 
             if (pipelineHistoryList != null){
 

@@ -55,8 +55,6 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
 
             for (String id : pipelineIdList) {
 
-                System.out.println(id);
-
                 if (id .equals(pipelineId)){
 
                     return "100";
@@ -175,7 +173,9 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
      * @throws Exception 执行克隆异常
      */
     private int   gitClone(Pipeline pipeline,PipelineConfigure pipelineConfigure,PipelineLog pipelineLog) throws Exception {
+
         String logId =pipelineLog.getLogId();
+
         // 判断是否存在配置
         if (pipelineConfigure != null) {
 
@@ -202,9 +202,17 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
                     UsernamePasswordCredentialsProvider credentialsProvider = usernamePassword(proof.getProofUsername(), proof.getProofPassword());
 
                     //克隆代码
-                    gitClone(new File(path), pipelineConfigure.getConfigureCodeSourceAddress(), credentialsProvider, pipelineConfigure.getConfigureBranch());
+                    String s = gitClone(new File(path), pipelineConfigure.getConfigureCodeSourceAddress(), credentialsProvider, pipelineConfigure.getConfigureBranch());
+
+                    String proofType = "proofType : " +proof.getProofType() + "\n";
+
+                    String success = "拉取成功。。。。。。。。。。。。。。。" + "\n";
+
+                    String log = s + proofType + success;
 
                     pipelineLog.setLogId(logId);
+
+                    pipelineLog.setLogRunLog(log);
 
                     pipelineLog.setLogCodeTime((int)time(dateFormat.format(new Date()), last));
 
@@ -242,8 +250,6 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
 
             if (pipelineConfigure.getConfigureStructureOrder() != null) {
 
-                String log = "";
-
                 String s;
                 //调用构建和输出日志方法
                 Process process = structure(path, order);
@@ -251,23 +257,29 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
                 try (InputStreamReader inputStreamReader = new InputStreamReader(process.getInputStream());
 
                      BufferedReader bufferedReader = new BufferedReader(inputStreamReader)) {
-                    //字节流转化为字符流
+
+                    String a = "开始执行 : " + " ' "+pipelineConfigure.getConfigureStructureOrder()+ " ' "+ " 命令" + "\n";
+
+                    pipelineLog.setLogRunLog(pipelineLog.getLogRunLog() + a);
+
+                    String logRunLog = pipelineLog.getLogRunLog();
 
                     while ((s = bufferedReader.readLine()) != null) {
 
-                        log = log + s + "\n";
+                        logRunLog = logRunLog  + s + "\n";
 
                         pipelineLog.setLogId(logId);
 
                         pipelineLog.setLogPackState(0);
 
-                        pipelineLog.setLogRunLog(log);
+                        pipelineLog.setLogRunLog(logRunLog);
 
                         //获取构建所用时长
                         pipelineLog.setLogPackTime((int) time(dateFormat.format(new Date()), last));
 
-                        pipelineLogList.add(pipelineLog);
                     }
+
+                    pipelineLogList.add(pipelineLog);
 
                     return  1;
                 }
@@ -340,7 +352,17 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
      * @param branch 分支
      * @throws GitAPIException 拉取异常
      */
-    private void gitClone(File gitAddress, String gitUrl, CredentialsProvider credentialsProvider, String branch) throws Exception {
+    private String gitClone(File gitAddress, String gitUrl, CredentialsProvider credentialsProvider, String branch) throws Exception {
+
+        String clone =  "开始拉取代码 : " + "\n" ;
+
+        String cloneFile =  "FileAddress : " + gitAddress + "\n" ;
+
+        String cloneUri =  "Uri : " + gitUrl + "\n"  ;
+
+        String cloneBranch =  "Branch : " + branch + "\n"  ;
+
+        String s =clone + cloneFile + cloneUri + cloneBranch;
 
         try {
              Git.cloneRepository().setURI(gitUrl)
@@ -348,6 +370,7 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
                     .setDirectory(gitAddress)
                     .setBranch(branch)
                     .call().close();
+             return s;
         } catch (GitAPIException e) {
 
             throw new Exception("clone命令错误" + e);
@@ -559,11 +582,18 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
 
         pipelineLog.setLogRunStatus(30);
 
+        String logRunLog = pipelineLog.getLogRunLog();
+
+        pipelineLog.setLogRunLog(logRunLog+"\n" + "Implement Result : SUCCESS");
+
         if (deploy == 0){
 
             pipelineLog.setLogDeployState(1);
 
+            pipelineLog.setLogRunLog(logRunLog+"\n" + "Implement Result : FAIL");
+
             pipelineLog.setLogRunStatus(1);
+
         }
     }
 

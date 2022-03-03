@@ -4,6 +4,7 @@ import com.doublekit.apibox.annotation.ApiModel;
 import com.doublekit.apibox.annotation.ApiProperty;
 import com.doublekit.beans.annotation.Mapping;
 import com.doublekit.beans.annotation.Mappings;
+import com.doublekit.dal.jpa.mapper.annotation.Column;
 import com.doublekit.join.annotation.Join;
 import com.doublekit.join.annotation.JoinQuery;
 import com.doublekit.pipeline.definition.model.Pipeline;
@@ -18,6 +19,10 @@ public class PipelineHistory {
     //构建历史id
     @ApiProperty(name="historyId",desc="构建历史id")
     private String historyId;
+
+    //构建次数
+    @ApiProperty(name = "historyNumber",desc="构建次数")
+    private String historyNumber;
 
     //创建时间
     @ApiProperty(name="pipelineName",desc="创建构建时间",required = true)
@@ -70,6 +75,14 @@ public class PipelineHistory {
 
     public void setHistoryId(String historyId) {
         this.historyId = historyId;
+    }
+
+    public String getHistoryNumber() {
+        return historyNumber;
+    }
+
+    public void setHistoryNumber(String historyNumber) {
+        this.historyNumber = historyNumber;
     }
 
     public String getHistoryCreateTime() {

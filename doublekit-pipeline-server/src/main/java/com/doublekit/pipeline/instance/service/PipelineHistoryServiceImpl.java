@@ -61,7 +61,7 @@ public class PipelineHistoryServiceImpl implements PipelineHistoryService{
     @Override
     public void deleteAllPipelineHistory(String pipelineId) {
 
-        List<PipelineHistory> pipelineHistoryList = selectAllPipelineNameList(pipelineId);
+        List<PipelineHistory> pipelineHistoryList = selectAllPipelineIdList(pipelineId);
 
         if (pipelineHistoryList != null){
 
@@ -125,7 +125,7 @@ public class PipelineHistoryServiceImpl implements PipelineHistoryService{
     @Override
     public List<PipelineHistoryDetails> selectAll(String pipelineId) {
 
-        List<PipelineHistory> pipelineHistories = selectAllPipelineNameList(pipelineId);
+        List<PipelineHistory> pipelineHistories = selectAllPipelineIdList(pipelineId);
 
         List<PipelineHistoryDetails> pipelineHistoryDetailsList = new ArrayList<>();
 
@@ -140,6 +140,9 @@ public class PipelineHistoryServiceImpl implements PipelineHistoryService{
                 pipelineHistoryDetails.setHistoryId(pipelineHistory.getHistoryId());
 
             }
+
+            pipelineHistoryDetails.setHistoryNumber(pipelineHistory.getHistoryNumber());
+
 
             //获取状态
             pipelineHistoryDetails.setStatus(pipelineHistory.getPipelineLog().getLogRunStatus());
@@ -175,7 +178,7 @@ public class PipelineHistoryServiceImpl implements PipelineHistoryService{
 
             }
 
-            // 获取凭证
+            // 获取凭证类型
             Proof proof = pipelineHistory.getProof();
             if (proof != null){
                 pipelineHistoryDetails.setProof(proof.getProofType());
@@ -202,7 +205,7 @@ public class PipelineHistoryServiceImpl implements PipelineHistoryService{
      * @return 历史记录集合
      */
     @Override
-    public List<PipelineHistory> selectAllPipelineNameList(String pipelineId) {
+    public List<PipelineHistory> selectAllPipelineIdList(String pipelineId) {
 
         List<PipelineHistory> pipelineHistoryList = new ArrayList<>();
 
@@ -230,7 +233,7 @@ public class PipelineHistoryServiceImpl implements PipelineHistoryService{
     @Override
     public PipelineHistory selectLastPipelineHistory(String pipelineId) {
 
-        List<PipelineHistory> pipelineHistoryList = selectAllPipelineNameList(pipelineId);
+        List<PipelineHistory> pipelineHistoryList = selectAllPipelineIdList(pipelineId);
 
         if (pipelineHistoryList.size() != 0){
 
@@ -282,6 +285,8 @@ public class PipelineHistoryServiceImpl implements PipelineHistoryService{
         if (pipelineHistory != null){
 
             String logId = pipelineHistory.getPipelineLog().getLogId();
+
+            pipelineLogService.selectPipelineLog(logId);
 
             return  pipelineLogService.selectPipelineLog(logId);
         }

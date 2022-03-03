@@ -20,6 +20,10 @@ public class PipelineHistoryEntity {
     @Column(name = "history_time",notNull = true)
     private String historyCreateTime;
 
+    //构建次数
+    @Column(name = "history_number",notNull = true)
+    private String historyNumber;
+
     //构建方式
     @Column(name = "history_way",notNull = true)
     private int historyWay;
@@ -106,5 +110,13 @@ public class PipelineHistoryEntity {
 
     public void setConfigureId(String configureId) {
         this.configureId = configureId;
+    }
+
+    public String getHistoryNumber() {
+        return historyNumber;
+    }
+
+    public void setHistoryNumber(String historyNumber) {
+        this.historyNumber = historyNumber;
     }
 }

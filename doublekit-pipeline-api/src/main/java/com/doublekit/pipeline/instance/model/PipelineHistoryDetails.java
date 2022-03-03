@@ -9,12 +9,16 @@ import com.doublekit.join.annotation.Join;
 public class PipelineHistoryDetails {
 
     //id
-    @ApiProperty(name="historyId",desc="状态")
+    @ApiProperty(name="historyId",desc="历史id")
     private String historyId;
 
     //状态
     @ApiProperty(name="status",desc="状态")
     private int status;
+
+    //构建次数
+    @ApiProperty(name = "historyNumber",desc="构建次数")
+    private String historyNumber;
 
     //创建构建时间
     @ApiProperty(name="createStructureTime",desc="创建构建时间")
@@ -46,6 +50,14 @@ public class PipelineHistoryDetails {
 
     public String getHistoryId() {
         return historyId;
+    }
+
+    public String getHistoryNumber() {
+        return historyNumber;
+    }
+
+    public void setHistoryNumber(String historyNumber) {
+        this.historyNumber = historyNumber;
     }
 
     public void setHistoryId(String historyId) {

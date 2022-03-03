@@ -8,7 +8,6 @@ import com.doublekit.pipeline.instance.model.PipelineLog;
 import com.doublekit.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import java.text.SimpleDateFormat;
 import java.util.List;
 
 @Service
@@ -23,9 +22,6 @@ public class PipelineLogServiceImpl implements PipelineLogService {
 
     @Autowired
     PipelineLogDao pipelineLogDao;
-
-
-    SimpleDateFormat dateFormat= new SimpleDateFormat("yyyy-MM-dd :hh:mm:ss");
 
     @Override
     public String createPipelineLog(PipelineLog pipelineLog) {
@@ -74,11 +70,23 @@ public class PipelineLogServiceImpl implements PipelineLogService {
     @Override
     public String pipelineHistoryThree(String pipelineId ,String logId)  {
 
+        List<PipelineHistory> pipelineHistories = pipelineHistoryService.selectAllPipelineIdList(pipelineId);
+
+        int i = 1 ;
+
+        if (pipelineHistories != null){
+            i =  pipelineHistories.size() + 1  ;
+        }
+
+        String number = "构建" + i;
+
         PipelineHistory pipelineHistory = pipelineStructureService.pipelineHistoryTwo(pipelineId);
 
         PipelineLog pipelineLog = selectPipelineLog(logId);
 
         pipelineHistory.setPipelineLog(pipelineLog);
+
+        pipelineHistory.setHistoryNumber(number);
 
         return pipelineHistoryService.foundPipelineHistory(pipelineHistory);
     }

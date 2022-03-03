@@ -74,7 +74,7 @@ public interface PipelineHistoryService {
      * @param pipelineId 流水线id
      * @return 历史记录集合
      */
-    List<PipelineHistory> selectAllPipelineNameList(String pipelineId);
+    List<PipelineHistory> selectAllPipelineIdList(String pipelineId);
 
     /**
      * 完善历史信息
