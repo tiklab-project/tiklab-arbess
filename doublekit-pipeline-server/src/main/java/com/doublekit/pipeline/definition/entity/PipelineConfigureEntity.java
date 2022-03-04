@@ -1,6 +1,8 @@
 package com.doublekit.pipeline.definition.entity;
 
+import com.doublekit.beans.annotation.Mapper;
 import com.doublekit.dal.jpa.mapper.annotation.*;
+import org.apache.lucene.queryparser.surround.query.SrndPrefixQuery;
 
 
 /**
@@ -53,9 +55,22 @@ public class PipelineConfigureEntity {
     @Column(name = "pipeline_id",notNull = true)
     private String pipelineId;
 
-    //凭证id
-    @Column(name = "proof_id",notNull = true)
-    private String proofId;
+    //凭证构建id
+    @Column(name = "proof_id_structure",notNull = true)
+    private String proofIdStructure;
+
+    //凭证部署id
+    @Column(name = "proof_id_deploy",notNull = true)
+    private String proofIdDeploy;
+
+    //ip地址
+    @Column(name = "configure_deploy_ip",notNull = true)
+    private String configureDeployIp;
+
+    //打包文件地址
+    @Column(name = "configure_target_address" ,notNull = true)
+    private String configureTargetAddress;
+
 
 
     public String getConfigureId() {
@@ -130,12 +145,12 @@ public class PipelineConfigureEntity {
         this.pipelineId = pipelineId;
     }
 
-    public String getProofId() {
-        return proofId;
+    public String getProofIdStructure() {
+        return proofIdStructure;
     }
 
-    public void setProofId(String proofId) {
-        this.proofId = proofId;
+    public void setProofIdStructure(String proofIdStructure) {
+        this.proofIdStructure = proofIdStructure;
     }
 
     public String getConfigureBranch() {
@@ -144,5 +159,29 @@ public class PipelineConfigureEntity {
 
     public void setConfigureBranch(String configureBranch) {
         this.configureBranch = configureBranch;
+    }
+
+    public String getConfigureDeployIp() {
+        return configureDeployIp;
+    }
+
+    public void setConfigureDeployIp(String configureDeployIp) {
+        this.configureDeployIp = configureDeployIp;
+    }
+
+    public String getConfigureTargetAddress() {
+        return configureTargetAddress;
+    }
+
+    public void setConfigureTargetAddress(String configureTargetAddress) {
+        this.configureTargetAddress = configureTargetAddress;
+    }
+
+    public String getProofIdDeploy() {
+        return proofIdDeploy;
+    }
+
+    public void setProofIdDeploy(String proofIdDeploy) {
+        this.proofIdDeploy = proofIdDeploy;
     }
 }

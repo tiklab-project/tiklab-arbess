@@ -175,7 +175,7 @@ public class PipelineConfigureServiceImpl implements PipelineConfigureService{
 
         PipelineConfigure pipelineConfigure = selectTimeId(pipelineId);
 
-        Proof proof = proofService.selectProof(pipelineConfigure.getProofId());
+        Proof proof = proofService.selectProof(pipelineConfigure.getProofIdStructure());
 
         pipelineHistory.setPipelineConfigure(pipelineConfigure);
 
@@ -184,11 +184,16 @@ public class PipelineConfigureServiceImpl implements PipelineConfigureService{
         return pipelineHistory;
     }
 
-    public Proof getProof(String pipelineId){
+    public Proof getProofIdStructure(String pipelineId){
 
-        return proofService.selectProof(selectTimeId(pipelineId).getProofId());
+        return proofService.selectProof(selectTimeId(pipelineId).getProofIdStructure());
 
     }
 
+    public Proof getProofIdDeploy(String pipelineId){
+
+        return proofService.selectProof(selectTimeId(pipelineId).getProofIdDeploy());
+
+    }
 
 }

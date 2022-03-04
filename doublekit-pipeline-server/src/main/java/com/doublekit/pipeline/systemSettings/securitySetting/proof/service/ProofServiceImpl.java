@@ -28,13 +28,13 @@ public class ProofServiceImpl implements ProofService{
 
         List<Proof> proofs = selectAllProof();
 
-        for (Proof proof1 : proofs) {
-
-            if (proof.getProofName().equals(proof1.getProofName())){
-
-                return null;
-            }
-        }
+        // for (Proof proof1 : proofs) {
+        //
+        //     if (proof.getProofName().equals(proof1.getProofName())){
+        //
+        //         return null;
+        //     }
+        // }
 
         ProofEntity proofEntity = BeanMapper.map(proof, ProofEntity.class);
 

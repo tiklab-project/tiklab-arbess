@@ -49,9 +49,21 @@ public class PipelineConfigure {
     @ApiProperty(name="pipelineId",desc="流水线id",eg="流水线id")
     private String pipelineId;
 
-    //凭证id
-    @ApiProperty(name="proofId",desc="凭证id",eg="凭证id")
-    private String proofId;
+    //凭证构建id
+    @ApiProperty(name = "proofIdStructure",desc = "凭证构建id")
+    private String proofIdStructure;
+
+    //凭证部署id
+    @ApiProperty(name = "proofIdDeploy",desc = "凭证部署id")
+    private String proofIdDeploy;
+
+    //ip地址
+    @ApiProperty(name = "configureDeployIp",desc = "部署ip地址")
+    private String configureDeployIp;
+
+    //打包文件地址
+    @ApiProperty(name = "configureTargetAddress" , desc = "部署ip地址")
+    private String configureTargetAddress;
 
 
     public String getConfigureCodeSource() {
@@ -118,12 +130,20 @@ public class PipelineConfigure {
         this.pipelineId = pipelineId;
     }
 
-    public String getProofId() {
-        return proofId;
+    public String getProofIdDeploy() {
+        return proofIdDeploy;
     }
 
-    public void setProofId(String proofId) {
-        this.proofId = proofId;
+    public void setProofIdDeploy(String proofIdDeploy) {
+        this.proofIdDeploy = proofIdDeploy;
+    }
+
+    public String getProofIdStructure() {
+        return proofIdStructure;
+    }
+
+    public void setProofIdStructure(String proofIdStructure) {
+        this.proofIdStructure = proofIdStructure;
     }
 
     public String getConfigureId() {
@@ -140,5 +160,21 @@ public class PipelineConfigure {
 
     public void setConfigureCodeStructure(String configureCodeStructure) {
         this.configureCodeStructure = configureCodeStructure;
+    }
+
+    public String getConfigureDeployIp() {
+        return configureDeployIp;
+    }
+
+    public void setConfigureDeployIp(String configureDeployIp) {
+        this.configureDeployIp = configureDeployIp;
+    }
+
+    public String getConfigureTargetAddress() {
+        return configureTargetAddress;
+    }
+
+    public void setConfigureTargetAddress(String configureTargetAddress) {
+        this.configureTargetAddress = configureTargetAddress;
     }
 }

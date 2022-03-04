@@ -17,7 +17,7 @@ public class ProofEntity {
     @Column(name = "proof_name")
     private String proofName;
 
-    //作用域
+    //作用域 (1 : gitlab  2 : ssh 认证)
     @Column(name = "proof_scope")
     private int proofScope;
 
@@ -36,6 +36,11 @@ public class ProofEntity {
     //描述
     @Column(name = "proof_describe")
     private String proofDescribe;
+
+    //端口号
+    @Column(name = "proof_port")
+    private int proofPort;
+
 
     public String getProofId() {
         return proofId;
@@ -91,5 +96,13 @@ public class ProofEntity {
 
     public void setProofScope(int proofScope) {
         this.proofScope = proofScope;
+    }
+
+    public int getProofPort() {
+        return proofPort;
+    }
+
+    public void setProofPort(int proofPort) {
+        this.proofPort = proofPort;
     }
 }

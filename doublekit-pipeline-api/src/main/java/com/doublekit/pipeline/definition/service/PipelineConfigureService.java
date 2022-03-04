@@ -59,7 +59,9 @@ public interface PipelineConfigureService {
 
     PipelineHistory pipelineHistoryOne(String pipelineId, PipelineHistory pipelineHistory);
 
-    Proof getProof(String pipelineId);
+    Proof getProofIdStructure(String pipelineId);
+
+    Proof getProofIdDeploy(String pipelineId);
 
     @FindList
     List<PipelineConfigure> selectAllPipelineConfigureList(List<String> idList);
