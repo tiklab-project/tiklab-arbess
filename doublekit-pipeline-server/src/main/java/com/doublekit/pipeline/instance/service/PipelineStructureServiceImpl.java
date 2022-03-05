@@ -88,10 +88,10 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
 
             for (PipelineLog log : pipelineLogList) {
 
-                    if (log.getLogRunStatus() == 30 || log.getLogRunStatus() == 1){
+                if (log.getLogRunStatus() == 30 || log.getLogRunStatus() == 1){
 
-                        pipelineLogList.clear();
-                    }
+                    pipelineLogList.clear();
+                }
                 return log;
             }
         }
@@ -166,7 +166,6 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
         if (pipelineIdList != null) {
             pipelineIdList.removeIf(id -> id.equals(pipelineId));
         }
-
         //创建历史表
         return pipelineLogService.pipelineHistoryThree(pipelineId, logId);
 
@@ -309,16 +308,16 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
 
                     bufferedReader = new BufferedReader(inputStreamReader);
 
-                    String a = "开始执行 : " + " ' "+pipelineConfigure.getConfigureStructureOrder()+ " ' "+ " 命令" + "\n";
+                    String a = "开始执行 : " + " ' " + pipelineConfigure.getConfigureStructureOrder() + " ' " + " 命令" + "\n";
 
                     pipelineLog.setLogRunLog(pipelineLog.getLogRunLog() + a);
 
                     String logRunLog = pipelineLog.getLogRunLog();
 
                     try {
-                        while ((s = bufferedReader.readLine())!= null) {
+                        while ((s = bufferedReader.readLine()) != null) {
 
-                            logRunLog = logRunLog  + s + "\n";
+                            logRunLog = logRunLog + s + "\n";
 
                             pipelineLog.setLogId(logId);
 
@@ -334,28 +333,46 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
 
                                 pipelineLog.setLogPackState(1);
 
-                                error(pipelineLog,e.toString());
+                                error(pipelineLog, e.toString());
 
                                 return 0;
                             }
 
                             pipelineLogList.add(pipelineLog);
 
-                            //关闭
-                            inputStreamReader.close();
-
-                            bufferedReader.close();
                         }
                     } catch (IOException e) {
 
                         pipelineLog.setLogPackState(1);
 
-                        error(pipelineLog,e.toString());
+                        error(pipelineLog, e.toString());
 
                         return 0;
                     }
 
-                    return  1;
+                    try {
+                        inputStreamReader.close();
+
+                        bufferedReader.close();
+
+                    } catch (IOException e) {
+                        pipelineLog.setLogPackState(1);
+
+                        error(pipelineLog, e.toString());
+
+                        return 0;
+                    }
+
+
+                    return 1;
+                }
+                else {
+
+                    pipelineLog.setLogPackState(1);
+
+                    error(pipelineLog,"构建命令错误");
+
+                    return 0;
                 }
             }
         }
@@ -372,6 +389,10 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
     private int deploy(Pipeline pipeline,PipelineConfigure pipelineConfigure,PipelineLog pipelineLog) {
 
         String logId =pipelineLog.getLogId();
+
+        pipelineLog.setLogDeployTime(1);
+
+        pipelineLogList.add(pipelineLog);
 
         Proof proof = pipelineConfigureService.getProofIdDeploy(pipeline.getPipelineId());
 
@@ -682,7 +703,7 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
         //如果服务器连接不上，则抛出异常
         if (session == null) {
 
-            throw new JSchException("连接异常。。。。");
+            throw new JSchException(ip + "连接异常。。。。");
         }
 
         //设置第一次登陆的时候提示，可选值：(ask | yes | no)
@@ -811,7 +832,7 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
 
         if (pipelineLog.getLogRunLog() != null){
 
-            pipelineLog.setLogRunLog(pipelineLog+ "\n" + e + "\n" + " RUN RESULT : FAIL");
+            pipelineLog.setLogRunLog(pipelineLog.getLogRunLog()+ "\n" + e + "\n" + " RUN RESULT : FAIL");
         }
 
         pipelineLog.setLogRunStatus(1);
