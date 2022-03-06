@@ -2,9 +2,9 @@ package com.doublekit.pipeline.definition.model;
 
 import com.doublekit.apibox.annotation.ApiModel;
 import com.doublekit.apibox.annotation.ApiProperty;
-import com.doublekit.dal.jpa.criteria.annotation.CriteriaQuery;
-import com.doublekit.dal.jpa.criteria.annotation.QueryField;
-import com.doublekit.dal.jpa.criteria.annotation.QueryTypeEnum;
+import com.doublekit.dal.jpa.annotation.criteria.CriteriaQuery;
+import com.doublekit.dal.jpa.annotation.criteria.QueryField;
+import com.doublekit.dal.jpa.annotation.criteria.QueryTypeEnum;
 
 @ApiModel
 @CriteriaQuery(entityAlias = "PipelineEntity")

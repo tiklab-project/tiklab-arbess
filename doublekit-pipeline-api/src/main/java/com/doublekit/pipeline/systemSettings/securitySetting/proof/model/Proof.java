@@ -2,7 +2,6 @@ package com.doublekit.pipeline.systemSettings.securitySetting.proof.model;
 
 import com.doublekit.apibox.annotation.ApiModel;
 import com.doublekit.apibox.annotation.ApiProperty;
-import com.doublekit.dal.jpa.mapper.annotation.Column;
 import com.doublekit.join.annotation.Join;
 
 @ApiModel

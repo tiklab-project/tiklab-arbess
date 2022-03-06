@@ -1,7 +1,7 @@
 package com.doublekit.pipeline.definition.entity;
 
 
-import com.doublekit.dal.jpa.mapper.annotation.*;
+import com.doublekit.dal.jpa.annotation.*;
 
 
 /**

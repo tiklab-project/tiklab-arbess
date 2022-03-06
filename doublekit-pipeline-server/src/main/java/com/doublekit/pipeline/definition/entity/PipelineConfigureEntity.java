@@ -1,8 +1,6 @@
 package com.doublekit.pipeline.definition.entity;
 
-import com.doublekit.beans.annotation.Mapper;
-import com.doublekit.dal.jpa.mapper.annotation.*;
-import org.apache.lucene.queryparser.surround.query.SrndPrefixQuery;
+import com.doublekit.dal.jpa.annotation.*;
 
 
 /**
