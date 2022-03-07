@@ -66,12 +66,8 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
         //创建线程池
         ExecutorService executorService = Executors.newCachedThreadPool();
         //执行构建
-        executorService.submit(new Callable<String>() {
-            @Override
-            public String call() {
-                return structure(pipelineId);
-            }
-        });
+        executorService.submit(() -> structure(pipelineId));
+
         Thread.sleep(4000);
 
         return "1";
@@ -285,6 +281,8 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
                     error(pipelineLog,"构建命令错误");
                     return 0;
                 }
+
+
             }
         }
         return 0;
@@ -670,5 +668,9 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
 
         pipelineLogList.add(pipelineLog);
         pipelineLogService.updatePipelineLog(pipelineLog);
+    }
+
+    private void outStream(){
+
     }
 }

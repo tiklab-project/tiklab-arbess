@@ -99,6 +99,7 @@ public class ProofServiceImpl implements ProofService{
 
         List<ProofEntity> proofs = new ArrayList<>();
         for (ProofEntity proofEntity : proofEntityList) {
+            //判断凭证类型
             if (proofEntity.getProofScope() == 2){
                 proofs.add(proofEntity);
             }
