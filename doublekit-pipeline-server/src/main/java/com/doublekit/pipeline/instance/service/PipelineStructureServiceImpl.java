@@ -237,6 +237,7 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
                 }
 
                 InputStreamReader inputStreamReader;
+
                 BufferedReader bufferedReader;
                 if (process != null) {
                     inputStreamReader = new InputStreamReader(process.getInputStream());
