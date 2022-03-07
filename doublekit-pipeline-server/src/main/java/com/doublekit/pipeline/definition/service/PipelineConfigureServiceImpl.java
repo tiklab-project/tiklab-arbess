@@ -66,19 +66,14 @@ public class PipelineConfigureServiceImpl implements PipelineConfigureService{
 
         //获取最近一次的配置id
         PipelineConfigure configure = selectTimeId(pipelineId);
-
         //判断是否有过流水线配置
         if (configure == null){
-
             return createPipelineConfigure(pipelineConfigure);
-
         }
 
         //把配置id添加到最新的配置信息中
         pipelineConfigure.setConfigureId(configure.getConfigureId());
-
         PipelineConfigureEntity pipelineConfigureEntity = BeanMapper.map(pipelineConfigure, PipelineConfigureEntity.class);
-
         pipelineConfigureDao.updatePipelineConfigure(pipelineConfigureEntity);
 
         return pipelineConfigureEntity.getConfigureId();
@@ -132,10 +127,8 @@ public class PipelineConfigureServiceImpl implements PipelineConfigureService{
         List<PipelineConfigure> pipelineConfigureList = selectAllPipelineConfigure(pipelineId);
 
         if (pipelineConfigureList.size() != 0){
-
             //根据时间排序
             pipelineConfigureList.sort(Comparator.comparing(PipelineConfigure::getConfigureCreateTime));
-
             //获取最近一次的配置id
             String configureId = pipelineConfigureList.get(pipelineConfigureList.size() - 1).getConfigureId();
 
@@ -154,14 +147,11 @@ public class PipelineConfigureServiceImpl implements PipelineConfigureService{
     public List<PipelineConfigure> selectAllPipelineConfigure(String pipelineId) {
 
         List<PipelineConfigure> pipelineConfigureList = selectAllPipelineConfigure();
-
         List<PipelineConfigure> pipelineConfigures = new ArrayList<>();
 
         //获取统一id下所有配置
         for (PipelineConfigure pipelineConfigure : pipelineConfigureList) {
-
             if (pipelineConfigure.getPipelineId().equals(pipelineId) ){
-
                 pipelineConfigures.add(pipelineConfigure);
 
             }
@@ -175,10 +165,8 @@ public class PipelineConfigureServiceImpl implements PipelineConfigureService{
 
         PipelineConfigure pipelineConfigure = selectTimeId(pipelineId);
 
-        Proof proof = proofService.selectProof(pipelineConfigure.getProofIdStructure());
-
+        Proof proof = proofService.selectProof(pipelineConfigure.getGitProofId());
         pipelineHistory.setPipelineConfigure(pipelineConfigure);
-
         pipelineHistory.setProof(proof);
 
         return pipelineHistory;
@@ -186,13 +174,13 @@ public class PipelineConfigureServiceImpl implements PipelineConfigureService{
 
     public Proof getProofIdStructure(String pipelineId){
 
-        return proofService.selectProof(selectTimeId(pipelineId).getProofIdStructure());
+        return proofService.selectProof(selectTimeId(pipelineId).getGitProofId());
 
     }
 
     public Proof getProofIdDeploy(String pipelineId){
 
-        return proofService.selectProof(selectTimeId(pipelineId).getProofIdDeploy());
+        return proofService.selectProof(selectTimeId(pipelineId).getDeployProofId());
 
     }
 

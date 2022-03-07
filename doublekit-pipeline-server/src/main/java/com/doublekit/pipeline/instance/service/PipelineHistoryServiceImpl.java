@@ -88,9 +88,7 @@ public class PipelineHistoryServiceImpl implements PipelineHistoryService{
     public PipelineHistory selectPipelineHistory(String historyId) {
 
         PipelineHistoryEntity pipelineHistoryEntity = pipelineHistoryDao.selectPipelineHistory(historyId);
-
         PipelineHistory pipelineHistory = BeanMapper.map(pipelineHistoryEntity, PipelineHistory.class);
-
         joinTemplate.joinQuery(pipelineHistory);
 
         return pipelineHistory;
@@ -101,9 +99,7 @@ public class PipelineHistoryServiceImpl implements PipelineHistoryService{
     public List<PipelineHistory> selectAllPipelineHistory() {
 
         List<PipelineHistoryEntity> pipelineHistoryEntityList = pipelineHistoryDao.selectAllPipelineHistory();
-
         List<PipelineHistory> pipelineHistoryList = BeanMapper.mapList(pipelineHistoryEntityList, PipelineHistory.class);
-
         joinTemplate.joinQuery(pipelineHistoryList);
 
         return pipelineHistoryList;
@@ -210,14 +206,10 @@ public class PipelineHistoryServiceImpl implements PipelineHistoryService{
         List<PipelineHistory> pipelineHistoryList = new ArrayList<>();
 
         List<PipelineHistory> pipelineHistories = selectAllPipelineHistory();
-
             //遍历出属于同一任务的历史记录
             for (PipelineHistory pipelineHistory : pipelineHistories) {
-
                 if (pipelineHistory.getPipeline().getPipelineId().equals(pipelineId)){
-
                     pipelineHistoryList.add(pipelineHistory);
-
                 }
             }
 
@@ -236,10 +228,8 @@ public class PipelineHistoryServiceImpl implements PipelineHistoryService{
         List<PipelineHistory> pipelineHistoryList = selectAllPipelineIdList(pipelineId);
 
         if (pipelineHistoryList.size() != 0){
-
             //将同一任务构建历史通过时间排序
             pipelineHistoryList.sort(Comparator.comparing(PipelineHistory::getHistoryCreateTime));
-
             String historyId = pipelineHistoryList.get(pipelineHistoryList.size() - 1).getHistoryId();
 
             return selectPipelineHistory(historyId);
@@ -264,12 +254,10 @@ public class PipelineHistoryServiceImpl implements PipelineHistoryService{
         }
         //获取分支
         String configureBranch = pipelineHistory.getPipelineConfigure().getConfigureBranch();
-
         if (configureBranch == null){
             configureBranch="master";
         }
         pipelineHistory.setHistoryBranch(configureBranch);
-
         //设置构建方式（1：自动  2：手动）
         pipelineHistory.setHistoryWay(1);
 
@@ -283,9 +271,7 @@ public class PipelineHistoryServiceImpl implements PipelineHistoryService{
         PipelineHistory pipelineHistory = selectPipelineHistory(historyId);
 
         if (pipelineHistory != null){
-
             String logId = pipelineHistory.getPipelineLog().getLogId();
-
             pipelineLogService.selectPipelineLog(logId);
 
             return  pipelineLogService.selectPipelineLog(logId);
@@ -297,12 +283,9 @@ public class PipelineHistoryServiceImpl implements PipelineHistoryService{
     public void deleteHistoryLog(String HistoryId){
 
         PipelineHistory pipelineHistory = selectPipelineHistory(HistoryId);
-
-        //
+        //判断是否存在历史
         if (pipelineHistory != null){
-
             String logId = pipelineHistory.getPipelineLog().getLogId();
-
             if (logId != null){
                 pipelineLogService.deletePipelineLog(logId);
             }

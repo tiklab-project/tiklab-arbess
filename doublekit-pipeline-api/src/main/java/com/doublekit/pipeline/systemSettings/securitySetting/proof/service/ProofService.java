@@ -39,16 +39,15 @@ public interface ProofService {
     @FindOne
      Proof selectProof(String id);
 
-    /**
-     * 查询所有凭证
-     * @return 凭证列表
-     */
-    @FindAll
-     List<Proof> selectAllProof();
+    //获取构建凭证
+    List<Proof> findAllGitProof();
+
+    //获取部署凭证
+    List<Proof> findAllDeployProof();
 
     /**
      * 根据凭证id查询名称
-     * @param proofId
+     * @param proofId 凭证id
      * @return 凭证名称
      */
     String selectProofName(String  proofId);

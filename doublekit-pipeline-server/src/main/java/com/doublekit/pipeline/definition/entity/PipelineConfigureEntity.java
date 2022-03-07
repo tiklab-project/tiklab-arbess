@@ -1,9 +1,7 @@
 package com.doublekit.pipeline.definition.entity;
 
-import com.doublekit.beans.annotation.Mapper;
-import com.doublekit.dal.jpa.mapper.annotation.*;
-import org.apache.lucene.queryparser.surround.query.SrndPrefixQuery;
 
+import com.doublekit.dal.jpa.annotation.*;
 
 /**
  * 流水线配置
@@ -56,12 +54,12 @@ public class PipelineConfigureEntity {
     private String pipelineId;
 
     //凭证构建id
-    @Column(name = "proof_id_structure",notNull = true)
-    private String proofIdStructure;
+    @Column(name = "proof_id_git",notNull = true)
+    private String gitProofId;
 
     //凭证部署id
     @Column(name = "proof_id_deploy",notNull = true)
-    private String proofIdDeploy;
+    private String deployProofId;
 
     //ip地址
     @Column(name = "configure_deploy_ip",notNull = true)
@@ -145,13 +143,6 @@ public class PipelineConfigureEntity {
         this.pipelineId = pipelineId;
     }
 
-    public String getProofIdStructure() {
-        return proofIdStructure;
-    }
-
-    public void setProofIdStructure(String proofIdStructure) {
-        this.proofIdStructure = proofIdStructure;
-    }
 
     public String getConfigureBranch() {
         return configureBranch;
@@ -177,11 +168,19 @@ public class PipelineConfigureEntity {
         this.configureTargetAddress = configureTargetAddress;
     }
 
-    public String getProofIdDeploy() {
-        return proofIdDeploy;
+    public String getGitProofId() {
+        return gitProofId;
     }
 
-    public void setProofIdDeploy(String proofIdDeploy) {
-        this.proofIdDeploy = proofIdDeploy;
+    public void setGitProofId(String gitProofId) {
+        this.gitProofId = gitProofId;
+    }
+
+    public String getDeployProofId() {
+        return deployProofId;
+    }
+
+    public void setDeployProofId(String deployProofId) {
+        this.deployProofId = deployProofId;
     }
 }

@@ -6,7 +6,6 @@ import com.doublekit.join.annotation.FindList;
 import com.doublekit.join.annotation.FindOne;
 import com.doublekit.join.annotation.JoinProvider;
 import com.doublekit.pipeline.definition.model.Pipeline;
-import com.doublekit.pipeline.definition.model.PipelineQuery;
 import com.doublekit.pipeline.definition.model.PipelineStatus;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -54,10 +53,10 @@ public interface PipelineService {
 
     /**
      * 根据名称模糊查询
-     * @param pipelineQuery 查询条件
+     * @param pipelineName 查询条件
      * @return 查询到的集合
      */
-    List<Pipeline> selectName(PipelineQuery pipelineQuery);
+    List<Pipeline> selectName(String pipelineName);
 
 
     /**

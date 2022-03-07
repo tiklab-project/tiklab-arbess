@@ -61,12 +61,22 @@ public class ProofController {
         return Result.ok();
     }
 
-    //查询所有
-    @RequestMapping(path="/selectAllProof",method = RequestMethod.POST)
-    @ApiMethod(name = "selectAllProof",desc = "查询所有凭证")
-    public Result<List<Proof>> selectAllProof(){
+    //查询所有git凭证
+    @RequestMapping(path="/findAllGitProof",method = RequestMethod.POST)
+    @ApiMethod(name = "findAllStructureProof",desc = "查询所有构建凭证")
+    public Result<List<Proof>> findAllGitProof(){
 
-        List<Proof> proofList = proofService.selectAllProof();
+        List<Proof> proofList = proofService.findAllGitProof();
+
+        return Result.ok(proofList);
+    }
+
+    //查询所有部署凭证
+    @RequestMapping(path="/findAllDeployProof",method = RequestMethod.POST)
+    @ApiMethod(name = "findAllDeployProof",desc = "查询所有部署凭证")
+    public Result<List<Proof>> findAllDeployProof(){
+
+        List<Proof> proofList = proofService.findAllDeployProof();
 
         return Result.ok(proofList);
     }

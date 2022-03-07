@@ -6,7 +6,6 @@ import com.doublekit.apibox.annotation.ApiMethod;
 import com.doublekit.apibox.annotation.ApiParam;
 import com.doublekit.common.Result;
 import com.doublekit.pipeline.definition.model.Pipeline;
-import com.doublekit.pipeline.definition.model.PipelineQuery;
 import com.doublekit.pipeline.definition.model.PipelineStatus;
 import com.doublekit.pipeline.definition.service.PipelineService;
 import org.slf4j.Logger;
@@ -87,10 +86,10 @@ public class PipelineController {
     //模糊查询
     @RequestMapping(path="/selectName",method = RequestMethod.POST)
     @ApiMethod(name = "selectName",desc = "模糊查询")
-    @ApiParam(name = "pipelineQuery",desc = "模糊查询条件",required = true)
-    public Result<Pipeline> selectName(@RequestBody @NotNull @Valid PipelineQuery pipelineQuery){
+    @ApiParam(name = "pipelineName",desc = "模糊查询条件",required = true)
+    public Result<Pipeline> selectName( @NotNull String pipelineName){
 
-        List<Pipeline> pipelineQueryList = pipelineService.selectName(pipelineQuery);
+        List<Pipeline> pipelineQueryList = pipelineService.selectName(pipelineName);
 
         return Result.ok(pipelineQueryList);
     }

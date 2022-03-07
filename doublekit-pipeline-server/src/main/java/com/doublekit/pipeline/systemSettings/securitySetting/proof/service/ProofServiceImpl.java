@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.PseudoColumnUsage;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -25,16 +26,6 @@ public class ProofServiceImpl implements ProofService{
     //创建
     @Override
     public String createProof(Proof proof) {
-
-        List<Proof> proofs = selectAllProof();
-
-        // for (Proof proof1 : proofs) {
-        //
-        //     if (proof.getProofName().equals(proof1.getProofName())){
-        //
-        //         return null;
-        //     }
-        // }
 
         ProofEntity proofEntity = BeanMapper.map(proof, ProofEntity.class);
 
@@ -71,7 +62,6 @@ public class ProofServiceImpl implements ProofService{
     }
 
     //查询所有
-    @Override
     public List<Proof> selectAllProof() {
 
         List<ProofEntity> proofEntityList = ProofDao.selectAllProof();
@@ -83,6 +73,42 @@ public class ProofServiceImpl implements ProofService{
         return proofList;
     }
 
+    //获取构建凭证
+    public List<Proof> findAllGitProof(){
+
+        List<ProofEntity> proofEntityList = ProofDao.selectAllProof();
+
+        List<ProofEntity> proofs = new ArrayList<>();
+
+        for (ProofEntity proofEntity : proofEntityList) {
+            if (proofEntity.getProofScope() == 1){
+                proofs.add(proofEntity);
+            }
+        }
+        List<Proof> proofList = BeanMapper.mapList(proofs, Proof.class);
+
+        joinTemplate.joinQuery(proofList);
+
+        return proofList;
+    }
+
+    //获取部署凭证
+    public List<Proof> findAllDeployProof(){
+
+        List<ProofEntity> proofEntityList = ProofDao.selectAllProof();
+
+        List<ProofEntity> proofs = new ArrayList<>();
+        for (ProofEntity proofEntity : proofEntityList) {
+            if (proofEntity.getProofScope() == 2){
+                proofs.add(proofEntity);
+            }
+        }
+        List<Proof> proofList = BeanMapper.mapList(proofs, Proof.class);
+
+        joinTemplate.joinQuery(proofList);
+
+        return proofList;
+    }
     //根据id查询名称
     @Override
     public String selectProofName(String proofId) {
@@ -93,7 +119,6 @@ public class ProofServiceImpl implements ProofService{
                 if (proof.getProofId().equals(proofId)){
 
                     return proof.getProofName();
-
                 }
             }
         }

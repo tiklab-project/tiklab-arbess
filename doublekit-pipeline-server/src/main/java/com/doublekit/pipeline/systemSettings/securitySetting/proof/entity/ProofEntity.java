@@ -1,7 +1,7 @@
 package com.doublekit.pipeline.systemSettings.securitySetting.proof.entity;
 
 
-import com.doublekit.dal.jpa.mapper.annotation.*;
+import com.doublekit.dal.jpa.annotation.*;
 
 @Entity
 @Table(name="pipeline_proof")

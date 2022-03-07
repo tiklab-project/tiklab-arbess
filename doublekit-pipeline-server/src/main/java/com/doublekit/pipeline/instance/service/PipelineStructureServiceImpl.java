@@ -63,18 +63,15 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
                 }
             }
         }
-
         //创建线程池
         ExecutorService executorService = Executors.newCachedThreadPool();
         //执行构建
-
         executorService.submit(new Callable<String>() {
             @Override
             public String call() {
                 return structure(pipelineId);
             }
         });
-
         Thread.sleep(4000);
 
         return "1";
@@ -85,11 +82,8 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
     public PipelineLog selectStructureState(){
 
         if (pipelineLogList != null){
-
             for (PipelineLog log : pipelineLogList) {
-
                 if (log.getLogRunStatus() == 30 || log.getLogRunStatus() == 1){
-
                     pipelineLogList.clear();
                 }
                 return log;
@@ -103,19 +97,13 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
     public PipelineHistory pipelineHistoryTwo(String pipelineId){
 
         PipelineHistory pipelineHistory = new PipelineHistory();
-
         PipelineHistory History = pipelineConfigureService.pipelineHistoryOne(pipelineId, pipelineHistory);
-
         Pipeline pipeline = pipelineService.selectPipeline(pipelineId);
         //添加信息
         pipelineHistory.setPipelineConfigure(History.getPipelineConfigure());
-
         pipelineHistory.setProof(History.getProof());
-
         pipelineHistory.setPipeline(pipeline);
-
         pipelineHistory.setHistoryCreateTime(dateFormat.format(new Date()));
-
         return  pipelineHistory;
     }
 
@@ -123,45 +111,30 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
     private String  structure(String pipelineId){
 
         PipelineLog pipelineLog =new PipelineLog();
-
         //把执行构建的流水线加入进来
         pipelineIdList.add(pipelineId);
-
         PipelineConfigure pipelineConfigure = pipelineConfigureService.selectTimeId(pipelineId);
-
         Pipeline pipeline = pipelineService.selectPipeline(pipelineId);
-
         String logId = pipelineLogService.createPipelineLog(pipelineLog);
-
         pipelineLog.setLogId(logId);
 
         //无配置信息
         if (pipelineConfigure.getConfigureCodeSource().equals("a") && pipelineConfigure.getConfigureCodeStructure().equals("b")){
-
             allEmpty(pipelineLog);
-
         //构建配置为空
         }else if (pipelineConfigure.getConfigureCodeSource().equals("b") && pipelineConfigure.getConfigureCodeStructure().equals("b")){
-
             structureNull(pipeline, pipelineConfigure, pipelineLog);
-
         //配置都有
         }else if (pipelineConfigure.getConfigureCodeSource().equals("b") && pipelineConfigure.getConfigureCodeStructure().equals("a")){
-
             noNull(pipeline, pipelineConfigure, pipelineLog);
-
         // 克隆配置为空
         }else if (pipelineConfigure.getConfigureCodeSource().equals("a") && pipelineConfigure.getConfigureCodeStructure().equals("a")){
-
             cloneNull(pipeline, pipelineConfigure, pipelineLog);
-
         }
 
         pipelineLogList.add(pipelineLog);
-
         //更新数据库
         pipelineLogService.updatePipelineLog(pipelineLog);
-
         //执行完成移除构建id
         if (pipelineIdList != null) {
             pipelineIdList.removeIf(id -> id.equals(pipelineId));
@@ -183,7 +156,6 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
         String logId =pipelineLog.getLogId();
 
             String pipelineId = pipeline.getPipelineId();
-
             //开始运行时间
             String last = dateFormat.format(new Date());
 
@@ -192,19 +164,14 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
 
             //判断是否从git拉取代码
             if (pipelineConfigure.getConfigureCodeSource().equals("b")) {
-
                 File file = new File(path);
-
                 //调用删除方法删除旧的代码
                 delete(file);
-
                 //获取凭证信息
                 Proof proof = pipelineConfigureService.getProofIdStructure(pipelineId);
-
                 if (proof != null) {
                     //获取凭证
                     UsernamePasswordCredentialsProvider credentialsProvider = usernamePassword(proof.getProofUsername(), proof.getProofPassword());
-
                     String s = "开始拉取代码 : " + "\n"  + "FileAddress : " + file + "\n"  + "Uri : " + pipelineConfigure.getConfigureCodeSourceAddress() + "\n"   +  "Branch : " + pipelineConfigure.getConfigureBranch() + "\n"  ;
 
                     //克隆代码
@@ -212,40 +179,27 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
                         gitClone(file, pipelineConfigure.getConfigureCodeSourceAddress(), credentialsProvider, pipelineConfigure.getConfigureBranch());
 
                     } catch (GitAPIException e) {
-
                         pipelineLog.setLogCodeState(1);
-
                         error(pipelineLog, e.toString());
-
                         return 0;
 
                     }
 
                     String proofType = "proofType : " +proof.getProofType() + "\n";
-
                     String success = "拉取成功。。。。。。。。。。。。。。。" + "\n";
-
                     String log = s + proofType + success;
-
                     pipelineLog.setLogId(logId);
-
                     pipelineLog.setLogRunLog(log);
 
                     try {
-
                         pipelineLog.setLogCodeTime((int)time(dateFormat.format(new Date()), last));
 
                     } catch (ParseException e) {
-
                         pipelineLog.setLogCodeState(1);
-
                         error(pipelineLog, e.toString());
-
                         return 0;
                     }
-
                     pipelineLogList.add(pipelineLog);
-
                     return 1;
                 }
         }
@@ -266,112 +220,69 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
 
         //开始运行时间
         String last = dateFormat.format(new Date());
-
         //设置拉取地址
         String path = "D:\\clone\\"+pipeline.getPipelineName();
-
         String sourceAddress = pipelineConfigure.getConfigureStructureAddress();
 
         //获取构建命令
         String order = "mvn"+" " + pipelineConfigure.getConfigureStructureOrder();
-
         //判断是否从git拉取代码
         if (pipelineConfigure.getConfigureCodeSource().equals("b")) {
-
             if (pipelineConfigure.getConfigureStructureOrder() != null) {
-
                 String s;
-
                 //调用构建和输出日志方法
                 Process process ;
-
                 try {
-
                     process = structure(path, order,sourceAddress);
-
                 } catch (IOException e) {
-
                     pipelineLog.setLogPackState(1);
-
                     error(pipelineLog,e.toString());
-
                     return 0;
                 }
 
                 InputStreamReader inputStreamReader;
-
                 BufferedReader bufferedReader;
-
                 if (process != null) {
-
                     inputStreamReader = new InputStreamReader(process.getInputStream());
-
                     bufferedReader = new BufferedReader(inputStreamReader);
-
                     String a = "开始执行 : " + " ' " + pipelineConfigure.getConfigureStructureOrder() + " ' " + " 命令" + "\n";
-
                     pipelineLog.setLogRunLog(pipelineLog.getLogRunLog() + a);
-
                     String logRunLog = pipelineLog.getLogRunLog();
-
                     try {
+                        //更新日志信息
                         while ((s = bufferedReader.readLine()) != null) {
-
                             logRunLog = logRunLog + s + "\n";
-
                             pipelineLog.setLogId(logId);
-
                             pipelineLog.setLogPackState(0);
-
                             pipelineLog.setLogRunLog(logRunLog);
-
                             //获取构建所用时长
                             try {
                                 pipelineLog.setLogPackTime((int) time(dateFormat.format(new Date()), last));
-
                             } catch (ParseException e) {
-
                                 pipelineLog.setLogPackState(1);
-
                                 error(pipelineLog, e.toString());
-
                                 return 0;
                             }
-
                             pipelineLogList.add(pipelineLog);
-
                         }
                     } catch (IOException e) {
-
                         pipelineLog.setLogPackState(1);
-
                         error(pipelineLog, e.toString());
-
                         return 0;
                     }
-
                     try {
                         inputStreamReader.close();
-
                         bufferedReader.close();
-
                     } catch (IOException e) {
                         pipelineLog.setLogPackState(1);
-
                         error(pipelineLog, e.toString());
-
                         return 0;
                     }
-
-
                     return 1;
                 }
                 else {
-
                     pipelineLog.setLogPackState(1);
-
                     error(pipelineLog,"构建命令错误");
-
                     return 0;
                 }
             }
@@ -389,40 +300,31 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
     private int deploy(Pipeline pipeline,PipelineConfigure pipelineConfigure,PipelineLog pipelineLog) {
 
         String logId =pipelineLog.getLogId();
-
         pipelineLog.setLogDeployTime(1);
-
         pipelineLogList.add(pipelineLog);
-
         Proof proof = pipelineConfigureService.getProofIdDeploy(pipeline.getPipelineId());
 
         //开始运行时间
         String last = dateFormat.format(new Date());
 
-        //
+        //文件地址
         String[] split = split(pipelineConfigure.getConfigureTargetAddress());
-
         String path = "D:\\clone\\" + pipeline.getPipelineName()+"\\"+split[0]+"\\"+"target";
 
         //发送文件名
         String address = address(path,split[1]);
-
         path  = path + "\\" +address ;
 
         //发送文件位置
         String configureDeployAddress = pipelineConfigure.getConfigureDeployAddress();
-
         configureDeployAddress = configureDeployAddress +"/"+ address;
 
         //调用发送方法
         try {
             sshSftp(pipelineConfigure.getConfigureDeployIp(),proof,configureDeployAddress,path);
         } catch (JSchException | SftpException | IOException e) {
-
             pipelineLog.setLogDeployState(1);
-
             error(pipelineLog,e.toString());
-
             return 0;
         }
 
@@ -430,18 +332,13 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
 
         //获取构建所用时长
         String format = dateFormat.format(new Date());
-
         try {
             pipelineLog.setLogDeployTime((int) time(format, last));
         } catch (ParseException e) {
-
             pipelineLog.setLogDeployState(1);
-
             error(pipelineLog,e.toString());
-
             return 0;
         }
-
         pipelineLogList.add(pipelineLog);
 
         return 1;
@@ -458,13 +355,9 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
     private Process structure(String path,String order,String sourceAddress) throws IOException {
 
         Runtime runtime=Runtime.getRuntime();
-
         Process process;
-
         if (sourceAddress != null){
-
             process = runtime.exec("cmd.exe /c cd " + path + "\\"+sourceAddress + " &&" + " " + order);
-
             return process;
         }
         //执行命令
@@ -499,9 +392,7 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
     private static UsernamePasswordCredentialsProvider usernamePassword(String gitUser, String gitPasswd) {
 
         UsernamePasswordCredentialsProvider credentialsProvider = null;
-
         if (StringUtils.isNotEmpty(gitUser) && StringUtils.isNotEmpty(gitPasswd)) {
-
             credentialsProvider = new UsernamePasswordCredentialsProvider(gitUser, gitPasswd);
         }
         return credentialsProvider;
@@ -514,16 +405,11 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
     private boolean delete(File dir){
 
             if (dir.isDirectory()) {
-
                 String[] children = dir.list();
-
                 //递归删除目录中的子目录下
                 if (children != null) {
-
                     for (String child : children) {
-
                         boolean success = delete(new File(dir, child));
-
                         if (!success) {
                             return false;
                         }
@@ -544,15 +430,10 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
     private long time(String now ,String last) throws ParseException {
 
         long    l = dateFormat.parse(now).getTime()-dateFormat.parse(last).getTime();
-
         long day=l/(24*60*60*1000);
-
         long hour=(l/(60*60*1000)-day*24);
-
         long min=((l/(60*1000))-day*24*60-hour*60);
-
         long s = (l/1000-day*24*60*60-hour*60*60-min*60);
-
         if (min>0){
             return min*60 + s;
         }
@@ -566,17 +447,11 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
     private void allEmpty(PipelineLog pipelineLog){
 
         pipelineLog.setLogCodeState(10);
-
         pipelineLog.setLogCodeTime(1);
-
         pipelineLog.setLogPackState(10);
-
         pipelineLog.setLogPackTime(1);
-
         pipelineLog.setLogDeployState(10);
-
         pipelineLog.setLogDeployTime(1);
-
         pipelineLog.setLogRunStatus(30);
 
     }
@@ -591,24 +466,17 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
 
         //调用构建方法
         int write = write(pipeline, pipelineConfigure, pipelineLog);
-
         pipelineLog.setLogPackState(10);
-
         if (write == 0){
             pipelineLog.setLogPackState(0);
         }
 
         //调用部署方法
         int deploy = deploy(pipeline, pipelineConfigure, pipelineLog);
-
         pipelineLog.setLogDeployState(10);
-
         pipelineLog.setLogRunStatus(30);
-
         if (deploy == 0){
-
             pipelineLog.setLogDeployState(1);
-
             pipelineLog.setLogRunStatus(1);
         }
 
@@ -624,7 +492,6 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
 
         //调用克隆方法
         int gitClone = gitClone(pipeline, pipelineConfigure, pipelineLog);
-
         if (gitClone == 0){
             return;
         }
@@ -632,7 +499,6 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
         pipelineLog.setLogCodeState(10);
         //调用构建方法
         int write = write(pipeline, pipelineConfigure, pipelineLog);
-
         if (write == 0){
             return;
         }
@@ -640,15 +506,10 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
 
         //调用部署方法
         int deploy = deploy(pipeline, pipelineConfigure, pipelineLog);
-
         if (deploy != 0){
-
             pipelineLog.setLogDeployState(10);
-
             pipelineLog.setLogRunStatus(30);
-
             String logRunLog = pipelineLog.getLogRunLog();
-
             pipelineLog.setLogRunLog(logRunLog+"\n" + "Implement Result : SUCCESS");
 
         }
@@ -664,24 +525,18 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
 
         //调用克隆方法
         int gitClone = gitClone(pipeline, pipelineConfigure, pipelineLog);
-
         pipelineLog.setLogCodeState(10);
-
         if (gitClone == 0){
             pipelineLog.setLogCodeState(1);
         }
 
         //调用部署方法
         int deploy = deploy(pipeline, pipelineConfigure, pipelineLog);
-
         pipelineLog.setLogDeployState(10);
-
         pipelineLog.setLogRunStatus(30);
 
         if (deploy == 0){
-
             pipelineLog.setLogDeployState(1);
-
             pipelineLog.setLogRunStatus(1);
         }
 
@@ -699,22 +554,17 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
 
         //采用指定的端口连接服务器
         Session  session = new JSch().getSession(proof.getProofUsername(), ip ,proof.getProofPort());
-
         //如果服务器连接不上，则抛出异常
         if (session == null) {
-
             throw new JSchException(ip + "连接异常。。。。");
         }
 
         //设置第一次登陆的时候提示，可选值：(ask | yes | no)
         session.setConfig("StrictHostKeyChecking", "no");
-
         //设置登陆主机的密码
         session.setPassword(proof.getProofPassword());//设置密码
-
         //设置登陆超时时间 10s
         session.connect(10000);
-
         //调用发送方法
         sshSending(session,nowPath,lastPath);
 
@@ -731,32 +581,23 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
     private static void sshSending(Session session,String nowPath,String lastPath) throws JSchException, IOException, SftpException {
 
         ChannelSftp channel;
-
         //创建sftp通信通道
         channel = (ChannelSftp) session.openChannel("sftp");
-
         channel.connect();
-
         ChannelSftp sftp = channel;
 
         //发送
         OutputStream outputStream  = sftp.put(nowPath);
-
         InputStream inputStream =  new FileInputStream(new File(lastPath));
 
         byte[] b = new byte[1024];
-
         int n;
-
         while ((n = inputStream.read(b)) != -1) {
-
             outputStream.write(b, 0, n);
-
         }
+
         outputStream.flush();
-
         outputStream.close();
-
         inputStream.close();
     }
 
@@ -768,7 +609,6 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
     private static boolean matche(String path,String s){
 
         String regex = ".*."+s;
-
         return path.matches(regex);
 
     }
@@ -781,7 +621,6 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
     private static String[] split(String path){
 
         if (path != null){
-
             return path.split(" ");
         }
         return null;
@@ -795,20 +634,14 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
     private static String address(String path,String s) {
 
         File f = new File(path);
-
         List<String> list = new ArrayList<>();
-
         File[] fa = f.listFiles();
 
         if (fa != null){
-
             for (File fs : fa) {
-
                 //判断符合条件的文件
                 if (matche(fs.getName(),s)) {
-
                     if (!fs.isDirectory()) {
-
                         list.add(fs.getName());
                     }
                 }
@@ -831,14 +664,11 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
         pipelineLog.setLogRunLog("\n" + e + "\n"+ " RUN RESULT : FAIL");
 
         if (pipelineLog.getLogRunLog() != null){
-
             pipelineLog.setLogRunLog(pipelineLog.getLogRunLog()+ "\n" + e + "\n" + " RUN RESULT : FAIL");
         }
-
         pipelineLog.setLogRunStatus(1);
 
         pipelineLogList.add(pipelineLog);
-
         pipelineLogService.updatePipelineLog(pipelineLog);
     }
 }

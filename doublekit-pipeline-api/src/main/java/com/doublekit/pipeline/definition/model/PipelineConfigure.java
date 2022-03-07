@@ -2,11 +2,12 @@ package com.doublekit.pipeline.definition.model;
 
 import com.doublekit.apibox.annotation.ApiModel;
 import com.doublekit.apibox.annotation.ApiProperty;
-import com.doublekit.dal.jpa.mapper.annotation.Column;
+import com.doublekit.beans.annotation.Mapper;
 import com.doublekit.join.annotation.Join;
 
 @ApiModel
 @Join
+@Mapper(targetAlias = "PipelineConfigureEntity")
 public class PipelineConfigure {
 
     //流水线配置id
@@ -49,13 +50,13 @@ public class PipelineConfigure {
     @ApiProperty(name="pipelineId",desc="流水线id",eg="流水线id")
     private String pipelineId;
 
-    //凭证构建id
-    @ApiProperty(name = "proofIdStructure",desc = "凭证构建id")
-    private String proofIdStructure;
+    //git凭证id
+    @ApiProperty(name = "gitProofId",desc = "凭证构建id")
+    private String gitProofId;
 
     //凭证部署id
-    @ApiProperty(name = "proofIdDeploy",desc = "凭证部署id")
-    private String proofIdDeploy;
+    @ApiProperty(name = "deployProofId",desc = "凭证部署id")
+    private String deployProofId;
 
     //ip地址
     @ApiProperty(name = "configureDeployIp",desc = "部署ip地址")
@@ -130,20 +131,20 @@ public class PipelineConfigure {
         this.pipelineId = pipelineId;
     }
 
-    public String getProofIdDeploy() {
-        return proofIdDeploy;
+    public String getGitProofId() {
+        return gitProofId;
     }
 
-    public void setProofIdDeploy(String proofIdDeploy) {
-        this.proofIdDeploy = proofIdDeploy;
+    public void setGitProofId(String gitProofId) {
+        this.gitProofId = gitProofId;
     }
 
-    public String getProofIdStructure() {
-        return proofIdStructure;
+    public String getDeployProofId() {
+        return deployProofId;
     }
 
-    public void setProofIdStructure(String proofIdStructure) {
-        this.proofIdStructure = proofIdStructure;
+    public void setDeployProofId(String deployProofId) {
+        this.deployProofId = deployProofId;
     }
 
     public String getConfigureId() {

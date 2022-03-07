@@ -81,11 +81,8 @@ public class PipelineLogServiceImpl implements PipelineLogService {
         String number = "构建" + i;
 
         PipelineHistory pipelineHistory = pipelineStructureService.pipelineHistoryTwo(pipelineId);
-
         PipelineLog pipelineLog = selectPipelineLog(logId);
-
         pipelineHistory.setPipelineLog(pipelineLog);
-
         pipelineHistory.setHistoryNumber(number);
 
         return pipelineHistoryService.foundPipelineHistory(pipelineHistory);

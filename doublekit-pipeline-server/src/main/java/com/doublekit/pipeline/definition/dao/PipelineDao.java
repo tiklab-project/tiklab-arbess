@@ -2,8 +2,9 @@ package com.doublekit.pipeline.definition.dao;
 
 
 import com.doublekit.dal.jpa.JpaTemplate;
+import com.doublekit.dal.jpa.criterial.condition.QueryCondition;
+import com.doublekit.dal.jpa.criterial.conditionbuilder.QueryBuilders;
 import com.doublekit.pipeline.definition.entity.PipelineEntity;
-import com.doublekit.pipeline.definition.model.PipelineQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,12 +75,15 @@ public class PipelineDao {
 
     /**
      * 根据名称模糊查询
-     * @param pipelineQuery 查询条件
+     * @param pipelineName 查询条件
      * @return 流水线集合
      */
-    public List<PipelineEntity> selectName(PipelineQuery pipelineQuery){
+    public List<PipelineEntity> selectName(String pipelineName){
 
-        return jpaTemplate.findList(pipelineQuery,PipelineEntity.class);
+        QueryCondition queryCondition = QueryBuilders.createQuery(PipelineEntity.class).like("pipelineName", pipelineName).get();
+
+
+        return jpaTemplate.findList(queryCondition,PipelineEntity.class);
     }
 
 }

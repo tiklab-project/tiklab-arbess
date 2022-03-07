@@ -4,7 +4,6 @@ import com.doublekit.beans.BeanMapper;
 import com.doublekit.pipeline.definition.dao.PipelineDao;
 import com.doublekit.pipeline.definition.entity.PipelineEntity;
 import com.doublekit.pipeline.definition.model.Pipeline;
-import com.doublekit.pipeline.definition.model.PipelineQuery;
 import com.doublekit.pipeline.definition.model.PipelineStatus;
 import com.doublekit.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,7 +66,7 @@ public class PipelineServiceImpl implements PipelineService{
     }
 
     @Override
-    public List<Pipeline> selectName(PipelineQuery pipelineQuery) {
+    public List<Pipeline> selectName(String pipelineName) {
         return null;
     }
 
