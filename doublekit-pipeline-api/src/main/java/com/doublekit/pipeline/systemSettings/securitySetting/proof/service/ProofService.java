@@ -37,7 +37,7 @@ public interface ProofService {
      * @return 凭证信息
      */
     @FindOne
-     Proof selectProof(String id);
+     Proof findOneProof(String id);
 
     //获取构建凭证
     List<Proof> findAllGitProof();
@@ -45,12 +45,6 @@ public interface ProofService {
     //获取部署凭证
     List<Proof> findAllDeployProof();
 
-    /**
-     * 根据凭证id查询名称
-     * @param proofId 凭证id
-     * @return 凭证名称
-     */
-    String selectProofName(String  proofId);
 
     @FindList
     List<Proof> selectProofList(List<String> idList);

@@ -82,14 +82,14 @@ public class ProofController {
     }
 
     //查询
-    @RequestMapping(path="/selectProofName",method = RequestMethod.POST)
-    @ApiMethod(name = "selectProofName",desc = "查询凭证名称")
+    @RequestMapping(path="/findOneProof",method = RequestMethod.POST)
+    @ApiMethod(name = "findOneProof",desc = "查询凭证信息")
     @ApiParam(name = "proofId",desc = "凭证id",required = true)
-    public Result<String> selectProofName(@NotNull String proofId){
+    public Result<Proof> findOneProof(@NotNull String proofId){
 
-        String proofName = proofService.selectProofName(proofId);
+        Proof proof = proofService.findOneProof(proofId);
 
-        return Result.ok(proofName);
+        return Result.ok(proof);
     }
 
 }

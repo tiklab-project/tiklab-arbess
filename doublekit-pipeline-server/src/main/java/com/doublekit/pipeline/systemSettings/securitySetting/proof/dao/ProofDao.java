@@ -48,7 +48,7 @@ public class ProofDao {
      * @param id 凭证id
      * @return 凭证信息
      */
-    public ProofEntity selectProof(String id){
+    public ProofEntity findOneProof(String id){
         return jpaTemplate.findOne(ProofEntity.class, id);
     }
 

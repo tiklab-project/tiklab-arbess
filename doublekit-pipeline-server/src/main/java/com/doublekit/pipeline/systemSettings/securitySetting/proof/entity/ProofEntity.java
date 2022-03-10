@@ -41,6 +41,9 @@ public class ProofEntity {
     @Column(name = "proof_port")
     private int proofPort;
 
+    //ip地址
+    @Column(name = "proof_ip")
+    private String proofIp;
 
     public String getProofId() {
         return proofId;
@@ -104,5 +107,13 @@ public class ProofEntity {
 
     public void setProofPort(int proofPort) {
         this.proofPort = proofPort;
+    }
+
+    public String getProofIp() {
+        return proofIp;
+    }
+
+    public void setProofIp(String proofIp) {
+        this.proofIp = proofIp;
     }
 }

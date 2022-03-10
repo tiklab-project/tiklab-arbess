@@ -18,7 +18,7 @@ public class PipelineHistoryDetails {
 
     //构建次数
     @ApiProperty(name = "historyNumber",desc="构建次数")
-    private String historyNumber;
+    private int historyNumber;
 
     //创建构建时间
     @ApiProperty(name="createStructureTime",desc="创建构建时间")
@@ -38,7 +38,7 @@ public class PipelineHistoryDetails {
 
     //代码源
     @ApiProperty(name="codeSource",desc="代码源")
-    private String codeSource;
+    private int codeSource;
 
     //凭证
     @ApiProperty(name="proof",desc="凭证")
@@ -52,11 +52,11 @@ public class PipelineHistoryDetails {
         return historyId;
     }
 
-    public String getHistoryNumber() {
+    public int getHistoryNumber() {
         return historyNumber;
     }
 
-    public void setHistoryNumber(String historyNumber) {
+    public void setHistoryNumber(int historyNumber) {
         this.historyNumber = historyNumber;
     }
 
@@ -104,11 +104,11 @@ public class PipelineHistoryDetails {
         this.implementTime = implementTime;
     }
 
-    public String getCodeSource() {
+    public int getCodeSource() {
         return codeSource;
     }
 
-    public void setCodeSource(String codeSource) {
+    public void setCodeSource(int codeSource) {
         this.codeSource = codeSource;
     }
 

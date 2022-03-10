@@ -166,9 +166,9 @@ public class PipelineHistoryServiceImpl implements PipelineHistoryService{
             pipelineHistoryDetails.setImplementTime(ImplementTime);
 
             // 获取代码源
-            String configureCodeSource = pipelineHistory.getPipelineConfigure().getConfigureCodeSource();
+            int configureCodeSource = pipelineHistory.getPipelineConfigure().getConfigureCodeSource();
 
-            if (configureCodeSource != null){
+            if (configureCodeSource != 0){
 
                 pipelineHistoryDetails.setCodeSource(configureCodeSource);
 

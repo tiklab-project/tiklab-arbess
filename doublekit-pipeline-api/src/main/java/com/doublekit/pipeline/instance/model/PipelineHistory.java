@@ -23,7 +23,7 @@ public class PipelineHistory {
 
     //构建次数
     @ApiProperty(name = "historyNumber",desc="构建次数")
-    private String historyNumber;
+    private int historyNumber;
 
     //创建时间
     @ApiProperty(name="pipelineName",desc="创建构建时间",required = true)
@@ -78,11 +78,11 @@ public class PipelineHistory {
         this.historyId = historyId;
     }
 
-    public String getHistoryNumber() {
+    public int getHistoryNumber() {
         return historyNumber;
     }
 
-    public void setHistoryNumber(String historyNumber) {
+    public void setHistoryNumber(int historyNumber) {
         this.historyNumber = historyNumber;
     }
 

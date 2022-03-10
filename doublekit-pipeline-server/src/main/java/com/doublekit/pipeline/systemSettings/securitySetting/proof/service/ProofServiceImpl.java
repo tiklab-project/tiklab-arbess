@@ -50,9 +50,9 @@ public class ProofServiceImpl implements ProofService{
 
     //查询
     @Override
-    public Proof selectProof(String id) {
+    public Proof findOneProof(String id) {
 
-        ProofEntity proofEntity = ProofDao.selectProof(id);
+        ProofEntity proofEntity = ProofDao.findOneProof(id);
 
         Proof proof = BeanMapper.map(proofEntity, Proof.class);
 
@@ -109,21 +109,6 @@ public class ProofServiceImpl implements ProofService{
         joinTemplate.joinQuery(proofList);
 
         return proofList;
-    }
-    //根据id查询名称
-    @Override
-    public String selectProofName(String proofId) {
-
-        List<Proof> proofs = selectAllProof();
-        if (proofs != null){
-            for (Proof proof : proofs) {
-                if (proof.getProofId().equals(proofId)){
-
-                    return proof.getProofName();
-                }
-            }
-        }
-        return null;
     }
 
     @Override

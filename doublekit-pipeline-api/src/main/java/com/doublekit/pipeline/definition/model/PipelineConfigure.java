@@ -16,7 +16,7 @@ public class PipelineConfigure {
 
     //代码源
     @ApiProperty(name="configureCodeSource",desc="代码源")
-    private String configureCodeSource;
+    private int configureCodeSource;
 
     //代码源地址
     @ApiProperty(name="configureCodeSourceAddress",desc="代码源地址")
@@ -28,7 +28,7 @@ public class PipelineConfigure {
 
     //构建源
     @ApiProperty(name = "configureCodeStructure",desc="构建源")
-    private String configureCodeStructure;
+    private int configureCodeStructure;
 
     //构建文件地址
     @ApiProperty(name="configureStructureAddress",desc="构建文件地址")
@@ -58,22 +58,9 @@ public class PipelineConfigure {
     @ApiProperty(name = "deployProofId",desc = "凭证部署id")
     private String deployProofId;
 
-    //ip地址
-    @ApiProperty(name = "configureDeployIp",desc = "部署ip地址")
-    private String configureDeployIp;
-
     //打包文件地址
-    @ApiProperty(name = "configureTargetAddress" , desc = "部署ip地址")
+    @ApiProperty(name = "configureTargetAddress" , desc = "打包文件地址")
     private String configureTargetAddress;
-
-
-    public String getConfigureCodeSource() {
-        return configureCodeSource;
-    }
-
-    public void setConfigureCodeSource(String configureCodeSource) {
-        this.configureCodeSource = configureCodeSource;
-    }
 
     public String getConfigureCodeSourceAddress() {
         return configureCodeSourceAddress;
@@ -155,27 +142,27 @@ public class PipelineConfigure {
         this.configureId = configureId;
     }
 
-    public String getConfigureCodeStructure() {
-        return configureCodeStructure;
-    }
-
-    public void setConfigureCodeStructure(String configureCodeStructure) {
-        this.configureCodeStructure = configureCodeStructure;
-    }
-
-    public String getConfigureDeployIp() {
-        return configureDeployIp;
-    }
-
-    public void setConfigureDeployIp(String configureDeployIp) {
-        this.configureDeployIp = configureDeployIp;
-    }
-
     public String getConfigureTargetAddress() {
         return configureTargetAddress;
     }
 
     public void setConfigureTargetAddress(String configureTargetAddress) {
         this.configureTargetAddress = configureTargetAddress;
+    }
+
+    public int getConfigureCodeSource() {
+        return configureCodeSource;
+    }
+
+    public void setConfigureCodeSource(int configureCodeSource) {
+        this.configureCodeSource = configureCodeSource;
+    }
+
+    public int getConfigureCodeStructure() {
+        return configureCodeStructure;
+    }
+
+    public void setConfigureCodeStructure(int configureCodeStructure) {
+        this.configureCodeStructure = configureCodeStructure;
     }
 }

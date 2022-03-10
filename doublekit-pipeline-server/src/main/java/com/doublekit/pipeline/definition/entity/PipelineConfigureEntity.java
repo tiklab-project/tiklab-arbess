@@ -19,7 +19,7 @@ public class PipelineConfigureEntity {
 
     //代码源
     @Column(name = "configure_code_source",notNull = true)
-    private String configureCodeSource;
+    private int configureCodeSource;
 
     //代码源地址
     @Column(name = "configure_code_source_address",notNull = true)
@@ -31,7 +31,7 @@ public class PipelineConfigureEntity {
 
     //构建源
     @Column(name = "configure_code_structure",notNull = true)
-    private String configureCodeStructure;
+    private int configureCodeStructure;
 
     //构建文件地址
     @Column(name = "configure_structure_address",notNull = true)
@@ -61,9 +61,6 @@ public class PipelineConfigureEntity {
     @Column(name = "proof_id_deploy",notNull = true)
     private String deployProofId;
 
-    //ip地址
-    @Column(name = "configure_deploy_ip",notNull = true)
-    private String configureDeployIp;
 
     //打包文件地址
     @Column(name = "configure_target_address" ,notNull = true)
@@ -79,13 +76,6 @@ public class PipelineConfigureEntity {
         this.configureId = configureId;
     }
 
-    public String getConfigureCodeSource() {
-        return configureCodeSource;
-    }
-
-    public void setConfigureCodeSource(String configureCodeSource) {
-        this.configureCodeSource = configureCodeSource;
-    }
 
     public String getConfigureCodeSourceAddress() {
         return configureCodeSourceAddress;
@@ -103,11 +93,19 @@ public class PipelineConfigureEntity {
         this.configureStructureAddress = configureStructureAddress;
     }
 
-    public String getConfigureCodeStructure() {
+    public int getConfigureCodeSource() {
+        return configureCodeSource;
+    }
+
+    public void setConfigureCodeSource(int configureCodeSource) {
+        this.configureCodeSource = configureCodeSource;
+    }
+
+    public int getConfigureCodeStructure() {
         return configureCodeStructure;
     }
 
-    public void setConfigureCodeStructure(String configureCodeStructure) {
+    public void setConfigureCodeStructure(int configureCodeStructure) {
         this.configureCodeStructure = configureCodeStructure;
     }
 
@@ -152,13 +150,6 @@ public class PipelineConfigureEntity {
         this.configureBranch = configureBranch;
     }
 
-    public String getConfigureDeployIp() {
-        return configureDeployIp;
-    }
-
-    public void setConfigureDeployIp(String configureDeployIp) {
-        this.configureDeployIp = configureDeployIp;
-    }
 
     public String getConfigureTargetAddress() {
         return configureTargetAddress;

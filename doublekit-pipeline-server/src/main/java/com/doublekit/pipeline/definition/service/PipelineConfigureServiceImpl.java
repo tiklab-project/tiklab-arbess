@@ -160,28 +160,22 @@ public class PipelineConfigureServiceImpl implements PipelineConfigureService{
         return pipelineConfigures;
     }
 
-
+    //向历史表添加凭证信息
     public PipelineHistory pipelineHistoryOne(String pipelineId,PipelineHistory pipelineHistory){
 
         PipelineConfigure pipelineConfigure = selectTimeId(pipelineId);
 
-        Proof proof = proofService.selectProof(pipelineConfigure.getGitProofId());
+        Proof proof = proofService.findOneProof(pipelineConfigure.getGitProofId());
         pipelineHistory.setPipelineConfigure(pipelineConfigure);
         pipelineHistory.setProof(proof);
 
         return pipelineHistory;
     }
 
-    public Proof getProofIdStructure(String pipelineId){
+    //获取克隆凭证信息
+    public Proof getProofIdStructure(String pipelineId){ return proofService.findOneProof(selectTimeId(pipelineId).getGitProofId()); }
 
-        return proofService.selectProof(selectTimeId(pipelineId).getGitProofId());
-
-    }
-
-    public Proof getProofIdDeploy(String pipelineId){
-
-        return proofService.selectProof(selectTimeId(pipelineId).getDeployProofId());
-
-    }
+    //获取部署凭证信息
+    public Proof getProofIdDeploy(String pipelineId){ return proofService.findOneProof(selectTimeId(pipelineId).getDeployProofId()); }
 
 }
