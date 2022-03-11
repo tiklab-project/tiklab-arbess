@@ -79,9 +79,8 @@ public interface PipelineHistoryService {
     /**
      * 完善历史信息
      * @param pipelineHistory 历史信息
-     * @return 历史id
      */
-    String foundPipelineHistory(PipelineHistory pipelineHistory);
+    void foundPipelineHistory(PipelineHistory pipelineHistory);
 
     /**
      * 根据历史查询日志信息

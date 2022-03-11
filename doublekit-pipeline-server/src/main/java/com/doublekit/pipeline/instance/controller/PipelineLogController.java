@@ -42,9 +42,10 @@ public class PipelineLogController {
     //查询构建状态
     @RequestMapping(path="/selectStructureState",method = RequestMethod.POST)
     @ApiMethod(name = "selectStructureState",desc = "查询构建状态")
-    public Result<PipelineLog> selectStructureState() {
+    @ApiParam(name = "pipelineId",desc = "流水线id",required = true)
+    public Result<PipelineLog> selectStructureState(String pipelineId) {
 
-        PipelineLog pipelineLog = pipelineStructureService.selectStructureState();
+        PipelineLog pipelineLog = pipelineStructureService.selectStructureState(pipelineId);
 
         return Result.ok(pipelineLog);
     }

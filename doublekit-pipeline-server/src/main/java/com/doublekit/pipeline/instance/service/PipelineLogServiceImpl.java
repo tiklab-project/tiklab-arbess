@@ -8,6 +8,8 @@ import com.doublekit.pipeline.instance.model.PipelineLog;
 import com.doublekit.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import sun.plugin.services.PlatformService;
+
 import java.util.List;
 
 @Service
@@ -67,25 +69,29 @@ public class PipelineLogServiceImpl implements PipelineLogService {
         return BeanMapper.mapList(pipelineLogList, PipelineLog.class);
     }
 
+    //创建历史表
+    public String createHistory(String logId){
+        PipelineHistory pipelineHistory = new PipelineHistory();
+        pipelineHistory.getPipelineLog().setLogId(logId);
+        return pipelineHistoryService.createPipelineHistory(pipelineHistory);
+    }
+
     @Override
-    public String pipelineHistoryThree(String pipelineId ,String logId)  {
+    public void pipelineHistoryThree(String pipelineId ,String logId )  {
 
         List<PipelineHistory> pipelineHistories = pipelineHistoryService.selectAllPipelineIdList(pipelineId);
-
         int i = 1 ;
-
         if (pipelineHistories != null){
             i =  pipelineHistories.size() + 1  ;
         }
 
         int number =  i;
-
         PipelineHistory pipelineHistory = pipelineStructureService.pipelineHistoryTwo(pipelineId);
         PipelineLog pipelineLog = selectPipelineLog(logId);
         pipelineHistory.setPipelineLog(pipelineLog);
         pipelineHistory.setHistoryNumber(number);
 
-        return pipelineHistoryService.foundPipelineHistory(pipelineHistory);
+         pipelineHistoryService.foundPipelineHistory(pipelineHistory);
     }
 
 }

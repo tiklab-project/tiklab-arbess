@@ -45,6 +45,9 @@ public class PipelineLog {
     @ApiProperty(name="logRunStatus",desc="运行状态")
     private int logRunStatus = getLogRunStatus() + getLogPackState()+ getLogCodeState();
 
+    @ApiProperty(name="pipelineId",desc="流水线id")
+    private String pipelineId;
+
     public String getLogId() {
         return logId;
     }
@@ -115,5 +118,13 @@ public class PipelineLog {
 
     public void setLogRunStatus(int logRunStatus) {
         this.logRunStatus = logRunStatus;
+    }
+
+    public String getPipelineId() {
+        return pipelineId;
+    }
+
+    public void setPipelineId(String pipelineId) {
+        this.pipelineId = pipelineId;
     }
 }

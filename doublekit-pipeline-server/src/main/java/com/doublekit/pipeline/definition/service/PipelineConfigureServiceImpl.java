@@ -48,9 +48,7 @@ public class PipelineConfigureServiceImpl implements PipelineConfigureService{
 
         //判断是否有配置信息
         if (pipelineConfigureList != null){
-
             for (PipelineConfigure pipelineConfigure : pipelineConfigureList) {
-
                 //删除配置信息
                 pipelineConfigureDao.deletePipelineConfigure(pipelineConfigure.getConfigureId());
 
@@ -147,13 +145,16 @@ public class PipelineConfigureServiceImpl implements PipelineConfigureService{
     public List<PipelineConfigure> selectAllPipelineConfigure(String pipelineId) {
 
         List<PipelineConfigure> pipelineConfigureList = selectAllPipelineConfigure();
+
         List<PipelineConfigure> pipelineConfigures = new ArrayList<>();
 
+        if (pipelineConfigureList == null){
+            return null;
+        }
         //获取统一id下所有配置
         for (PipelineConfigure pipelineConfigure : pipelineConfigureList) {
             if (pipelineConfigure.getPipelineId().equals(pipelineId) ){
                 pipelineConfigures.add(pipelineConfigure);
-
             }
         }
 

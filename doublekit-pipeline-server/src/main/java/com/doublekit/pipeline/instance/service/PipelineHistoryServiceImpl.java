@@ -241,10 +241,9 @@ public class PipelineHistoryServiceImpl implements PipelineHistoryService{
     /**
      * 创建历史表
      * @param pipelineHistory 历史信息
-     * @return 流水线历史id
      */
     @Override
-    public String foundPipelineHistory(PipelineHistory pipelineHistory) {
+    public void foundPipelineHistory(PipelineHistory pipelineHistory) {
 
         String logId = pipelineHistory.getPipelineLog().getLogId();
 
@@ -261,7 +260,7 @@ public class PipelineHistoryServiceImpl implements PipelineHistoryService{
         //设置构建方式（1：自动  2：手动）
         pipelineHistory.setHistoryWay(1);
 
-        return createPipelineHistory(pipelineHistory);
+        createPipelineHistory(pipelineHistory);
     }
 
     //查询日志

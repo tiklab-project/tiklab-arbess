@@ -48,6 +48,10 @@ public class PipelineLogEntity {
     @Column(name = "log_run_status",notNull = true)
     private int logRunStatus ;
 
+    //部署时间
+    @Column(name = "pipeline_id",notNull = true)
+    private String pipelineId;
+
 
     public String getLogId() {
         return logId;
@@ -119,5 +123,13 @@ public class PipelineLogEntity {
 
     public void setLogRunStatus(int logRunStatus) {
         this.logRunStatus = logRunStatus;
+    }
+
+    public String getPipelineId() {
+        return pipelineId;
+    }
+
+    public void setPipelineId(String pipelineId) {
+        this.pipelineId = pipelineId;
     }
 }

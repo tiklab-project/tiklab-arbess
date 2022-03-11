@@ -66,6 +66,10 @@ public class PipelineConfigureEntity {
     @Column(name = "configure_target_address" ,notNull = true)
     private String configureTargetAddress;
 
+    //打包文件地址
+    @Column(name = "configure_shell" ,notNull = true)
+    private String configureShell;
+
 
 
     public String getConfigureId() {
@@ -173,5 +177,13 @@ public class PipelineConfigureEntity {
 
     public void setDeployProofId(String deployProofId) {
         this.deployProofId = deployProofId;
+    }
+
+    public String getConfigureShell() {
+        return configureShell;
+    }
+
+    public void setConfigureShell(String configureShell) {
+        this.configureShell = configureShell;
     }
 }

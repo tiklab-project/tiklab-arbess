@@ -17,7 +17,7 @@ public interface PipelineStructureService {
      * 查询构建状态
      * @return 状态信息
      */
-    PipelineLog selectStructureState() ;
+    PipelineLog selectStructureState(String pipelineId) ;
 
     /**
      * 添加历史信息

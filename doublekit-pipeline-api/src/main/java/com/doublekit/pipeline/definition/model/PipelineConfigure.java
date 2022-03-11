@@ -62,6 +62,10 @@ public class PipelineConfigure {
     @ApiProperty(name = "configureTargetAddress" , desc = "打包文件地址")
     private String configureTargetAddress;
 
+    //shell脚本
+    @ApiProperty(name = "configureShell" , desc = "shell脚本")
+    private String configureShell;
+
     public String getConfigureCodeSourceAddress() {
         return configureCodeSourceAddress;
     }
@@ -164,5 +168,13 @@ public class PipelineConfigure {
 
     public void setConfigureCodeStructure(int configureCodeStructure) {
         this.configureCodeStructure = configureCodeStructure;
+    }
+
+    public String getConfigureShell() {
+        return configureShell;
+    }
+
+    public void setConfigureShell(String configureShell) {
+        this.configureShell = configureShell;
     }
 }
