@@ -66,6 +66,17 @@ public class PipelineConfigure {
     @ApiProperty(name = "configureShell" , desc = "shell脚本")
     private String configureShell;
 
+    //测试类型
+    @ApiProperty(name = "configureTestType" , desc = "测试类型")
+    private int configureTestType;
+
+    //测试内容
+    @ApiProperty(name = "configureTestText" , desc = "测试内容")
+    private String configureTestText;
+
+
+
+
     public String getConfigureCodeSourceAddress() {
         return configureCodeSourceAddress;
     }
@@ -176,5 +187,21 @@ public class PipelineConfigure {
 
     public void setConfigureShell(String configureShell) {
         this.configureShell = configureShell;
+    }
+
+    public int getConfigureTestType() {
+        return configureTestType;
+    }
+
+    public void setConfigureTestType(int configureTestType) {
+        this.configureTestType = configureTestType;
+    }
+
+    public String getConfigureTestText() {
+        return configureTestText;
+    }
+
+    public void setConfigureTestText(String configureTestText) {
+        this.configureTestText = configureTestText;
     }
 }

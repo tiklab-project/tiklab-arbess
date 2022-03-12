@@ -17,6 +17,7 @@ import org.eclipse.jgit.transport.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.io.*;
+import java.lang.management.PlatformLoggingMXBean;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -47,22 +48,20 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
 
     //开始构建
     @Override
-    public String  pipelineStructure(String pipelineId) throws IOException {
+    public String  pipelineStructure(String pipelineId){
 
         //创建线程池
         ExecutorService executorService = Executors.newCachedThreadPool();
-
         //判断同一任务是否在运行
         if (pipelineIdList != null){
             for (String id : pipelineIdList) {
                 if (id .equals(pipelineId)){
                     return "100";
-                }else {
-                    //执行构建
-                  executorService.submit(() -> structure(pipelineId));
                 }
             }
         }
+        //执行构建
+        executorService.submit(() -> start(pipelineId));
         return "1";
     }
 
@@ -97,7 +96,7 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
     }
 
     //构建
-    private String structure(String pipelineId) throws IOException{
+    private String start(String pipelineId) throws IOException{
 
         PipelineLog pipelineLog =new PipelineLog();
         //把执行构建的流水线加入进来
@@ -107,6 +106,7 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
         String logId = pipelineLogService.createPipelineLog(pipelineLog);
         pipelineLog.setLogId(logId);
         pipelineLog.setPipelineId(pipelineId);
+        pipelineLogList.add(pipelineLog);
 
         //判断配置信息
         whetherNull(pipeline,pipelineConfigure,pipelineLog);
@@ -169,82 +169,52 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
         return 1;
     }
 
-    /**
-     * 构建
-     * @param pipeline 流水线信息
-     * @param pipelineConfigure 配置信息
-     * @param pipelineLog 日志
-     */
-    private int write(Pipeline pipeline,PipelineConfigure pipelineConfigure,PipelineLog pipelineLog) throws IOException {
-
-        String logId =pipelineLog.getLogId();
-
-        //开始运行时间
-        long beginTime = new Timestamp(System.currentTimeMillis()).getTime();
-
-        //设置拉取地址
+    //单元测试
+    private int unitTesting(Pipeline pipeline,PipelineConfigure pipelineConfigure,PipelineLog pipelineLog) {
         String path = "D:\\clone\\"+pipeline.getPipelineName();
-        String sourceAddress = pipelineConfigure.getConfigureStructureAddress();
-
-        //获取构建命令
-        String order = "mvn"+" " + pipelineConfigure.getConfigureStructureOrder();
-
-        if (pipelineConfigure.getConfigureStructureOrder() != null) {
-                String s;
-                //调用构建和输出日志方法
-                Process process ;
-                try {
-                    process = structure(path, order,sourceAddress);
-                } catch (IOException e) {
-                    pipelineLog.setLogPackState(1);
-                    error(pipelineLog,"构建命令错误"+e.toString(),pipeline.getPipelineId());
-                    return 0;
-                }
-                if (process != null) {
-                    InputStreamReader  inputStreamReader = new InputStreamReader(process.getInputStream());
-                    BufferedReader  bufferedReader = new BufferedReader(inputStreamReader);
-                    String a = "开始执行 : " + " ' " + pipelineConfigure.getConfigureStructureOrder() + " ' " + " 命令" + "\n";
-                    pipelineLog.setLogRunLog(pipelineLog.getLogRunLog() + a);
-                    String logRunLog = pipelineLog.getLogRunLog();
-                    try {
-                        //更新日志信息
-                        while ((s = bufferedReader.readLine()) != null) {
-                            logRunLog = logRunLog + s + "\n";
-                            pipelineLog.setLogId(logId);
-                            pipelineLog.setLogPackState(0);
-                            pipelineLog.setLogRunLog(logRunLog);
-                            long overTime = new Timestamp(System.currentTimeMillis()).getTime();
-                            //获取构建所用时长
-                            pipelineLog.setLogPackTime((int) (overTime-beginTime)/1000);
-                            pipelineLogList.add(pipelineLog);
-                        }
-                    } catch (IOException e) {
-                        pipelineLog.setLogPackState(1);
-                        error(pipelineLog, "日志打印异常"+e.toString(),pipeline.getPipelineId());
-                        return 0;
-                    }finally {
-                        inputStreamReader.close();
-                        bufferedReader.close();
-                    }
-                }
-                else {
-                    pipelineLog.setLogPackState(1);
-                    error(pipelineLog,"执行构建命令错误",pipeline.getPipelineId());
-                    return 0;
-                }
+        String[] split = pipelineConfigure.getConfigureTestText().split("\n");
+        for (String s : split) {
+            try {
+                Process process = process(path, s, pipelineConfigure.getConfigureStructureAddress());
+                String a = "执行 : " + " ' " + s + " ' " + "\n";
+                pipelineLog.setLogRunLog(pipelineLog.getLogRunLog() + a);
+                log(process,pipelineLog);
+                pipelineLog.setLogTestState(10);
+                pipelineLogList.add(pipelineLog);
+            } catch (IOException e) {
+                pipelineLog.setLogTestState(1);
+                pipelineLogList.add(pipelineLog);
+                error(pipelineLog,"构建异常："+ e,pipelineConfigure.getPipelineId());
+                return 0;
             }
-
-        pipelineLog.setLogPackState(10);
-        pipelineLogList.add(pipelineLog);
+        }
         return 1;
     }
 
-    /**
-     * 部署
-     * @param pipeline 流水线信息
-     * @param pipelineConfigure 配置信息
-     * @param pipelineLog 日志
-     */
+    //构建
+    private int  structure(Pipeline pipeline, PipelineConfigure pipelineConfigure,PipelineLog pipelineLog)  {
+        //设置拉取地址
+        String path = "D:\\clone\\"+pipeline.getPipelineName();
+        String[] split = pipelineConfigure.getConfigureStructureOrder().split("\n");
+        for (String s : split) {
+            try {
+                Process process = process(path, s, pipelineConfigure.getConfigureStructureAddress());
+                String a = "执行 : " + " ' " + s + " ' " + "\n";
+                pipelineLog.setLogRunLog(pipelineLog.getLogRunLog() + a);
+                log(process,pipelineLog);
+                pipelineLog.setLogPackState(10);
+                pipelineLogList.add(pipelineLog);
+            } catch (IOException e) {
+                pipelineLog.setLogPackState(1);
+                pipelineLogList.add(pipelineLog);
+                error(pipelineLog,"构建异常："+ e,pipelineConfigure.getPipelineId());
+                return 0;
+            }
+        }
+        return 1;
+    }
+
+     //部署
     private int deploy(Pipeline pipeline,PipelineConfigure pipelineConfigure,PipelineLog pipelineLog) throws IOException {
 
         String logId =pipelineLog.getLogId();
@@ -254,10 +224,9 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
 
         //开始运行时间
         long beginTime = new Timestamp(System.currentTimeMillis()).getTime();
-
         pipelineLog.setLogRunLog(pipelineLog.getLogRunLog()+"\n"+"部署到服务器"+proof.getProofIp()+"。。。。。。。。");
         //文件地址
-        String[] split = split(pipelineConfigure.getConfigureTargetAddress());
+        String[] split = pipelineConfigure.getConfigureTargetAddress().split(" ");
         String path = "D:\\clone\\" + pipeline.getPipelineName()+"\\"+split[0]+"\\"+"target";
 
         //发送文件名
@@ -300,7 +269,7 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
      * @return 构建信息
      * @throws IOException 构建命令执行异常
      */
-    private Process structure(String path,String order,String sourceAddress) throws IOException {
+    private Process process(String path,String order,String sourceAddress) throws IOException {
 
         Runtime runtime=Runtime.getRuntime();
         Process process;
@@ -310,10 +279,40 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
         }
         //执行命令
         process = runtime.exec("cmd.exe /c cd " + path + " &&" + " " + order);
-
         return process;
-
     }
+
+    /**
+     * 执行产生的日志
+     * @param process 执行对象
+     * @param pipelineLog 日志信息
+     * @throws IOException 字符流装换异常
+     */
+    private void log(Process process ,PipelineLog pipelineLog) throws IOException {
+        long beginTime = new Timestamp(System.currentTimeMillis()).getTime();
+        String s;
+        InputStreamReader  inputStreamReader = new InputStreamReader(process.getInputStream());
+        BufferedReader  bufferedReader = new BufferedReader(inputStreamReader);
+        String logId =pipelineLog.getLogId();
+        String logRunLog = pipelineLog.getLogRunLog();
+        //更新日志信息
+        while ((s = bufferedReader.readLine()) != null) {
+            logRunLog = logRunLog + s + "\n";
+            pipelineLog.setLogId(logId);
+            pipelineLog.setLogRunLog(logRunLog);
+            long overTime = new Timestamp(System.currentTimeMillis()).getTime();
+            //获取构建所用时长
+            if (pipelineLog.getLogTestState() == 0){
+                pipelineLog.setLogTestTime((int) (overTime-beginTime)/1000);
+            }else {
+                pipelineLog.setLogPackTime((int) (overTime-beginTime)/1000);
+            }
+            pipelineLogList.add(pipelineLog);
+        }
+        inputStreamReader.close();
+        bufferedReader.close();
+    }
+
 
     /**
      * git代码拉取
@@ -330,7 +329,6 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
             .setBranch(branch)
             .call().close();
     }
-
 
     /**
      * 凭证信息（UsernamePassword）方式
@@ -420,7 +418,7 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
         while ((n = inputStream.read(b)) != -1) {
             outputStream.write(b, 0, n);
         }
-
+        //关闭流
         outputStream.flush();
         outputStream.close();
         inputStream.close();
@@ -476,19 +474,6 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
         }
 
         return 1;
-    }
-
-    /**
-     * 拆分支付串获取需要发送的文件模块以及后缀
-     * @param path 地址
-     * @return 模块名
-     */
-    private static String[] split(String path){
-
-        if (path != null){
-            return path.split(" ");
-        }
-        return null;
     }
 
     /**
@@ -575,16 +560,17 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
         } catch (InterruptedException s) {
             Thread.currentThread().interrupt();
         }
-
-        pipelineLogList.clear();
+        //清除集合缓存
+        pipelineLogList.removeIf(log -> log.getPipelineId().equals(pipelineId));
     }
 
     //判断配置信息
     private void whetherNull(Pipeline pipeline,PipelineConfigure pipelineConfigure,PipelineLog pipelineLog) throws  IOException {
 
+        int  a= pipelineConfigure.getConfigureCodeSource()+pipelineConfigure.getConfigureTestType()+pipelineConfigure.getConfigureCodeStructure() ;
         //所有配置都为空
-        if (pipelineConfigure.getConfigureCodeSource() == 1 && pipelineConfigure.getConfigureCodeStructure() ==1 && pipelineConfigure.getDeployProofId() == null){
-
+        if (a == 0){
+            pipelineLog.setLogTestState(10);
             pipelineLog.setLogDeployState(10);
             pipelineLog.setLogCodeState(10);
             pipelineLog.setLogPackState(10);
@@ -592,76 +578,79 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
             return;
         }
 
-        //只有git
-        if (pipelineConfigure.getConfigureCodeSource() == 2 &&pipelineConfigure.getConfigureCodeStructure() ==1 && pipelineConfigure.getDeployProofId() == null){
-            int gitClone = gitClone(pipeline, pipelineConfigure, pipelineLog);
-
-            if (gitClone == 1){
-                success(pipelineLog,pipeline.getPipelineId());
-            }
-
-            return;
-        }
-
-        //只有构建
-        if(pipelineConfigure.getConfigureCodeSource() == 1 && pipelineConfigure.getConfigureCodeStructure() ==2 && pipelineConfigure.getDeployProofId() == null){
-            pipelineLog.setLogCodeState(10);
-            int write = write(pipeline, pipelineConfigure, pipelineLog);
-
-            if (write ==1){
-                success(pipelineLog,pipeline.getPipelineId());
-            }
-        }
-
-        //只有部署
-        if(pipelineConfigure.getConfigureCodeSource() == 1 && pipelineConfigure.getConfigureCodeStructure() ==1 && pipelineConfigure.getDeployProofId() != null){
-            pipelineLog.setLogCodeState(10);
-            pipelineLog.setLogPackState(10);
-            int deploy = deploy(pipeline, pipelineConfigure, pipelineLog);
-            if (deploy == 1){
-                success(pipelineLog,pipeline.getPipelineId());
-            }
-        }
-
-        //git部署
-        if(pipelineConfigure.getConfigureCodeSource() == 2 && pipelineConfigure.getConfigureCodeStructure() ==1 && pipelineConfigure.getDeployProofId() != null){
-            pipelineLog.setLogPackState(10);
-            int gitClone = gitClone(pipeline, pipelineConfigure, pipelineLog);
-            int deploy = deploy(pipeline, pipelineConfigure, pipelineLog);
-            if (gitClone + deploy == 2){
-                success(pipelineLog,pipeline.getPipelineId());
-            }
-        }
-
-        //git构建
-        if(pipelineConfigure.getConfigureCodeSource() == 2 && pipelineConfigure.getConfigureCodeStructure() ==1 && pipelineConfigure.getDeployProofId() == null){
-            pipelineLog.setLogDeployState(10);
-            int gitClone = gitClone(pipeline, pipelineConfigure, pipelineLog);
-            int write = write(pipeline, pipelineConfigure, pipelineLog);
-            if (gitClone + write == 2){
-                success(pipelineLog,pipeline.getPipelineId());
-            }
-        }
-
-        // 构建部署
-        if (pipelineConfigure.getConfigureCodeSource() == 1 && pipelineConfigure.getConfigureCodeStructure() ==2 && pipelineConfigure.getDeployProofId() != null){
-            pipelineLog.setLogCodeState(10);
-            int write = write(pipeline, pipelineConfigure, pipelineLog);
-            int deploy = deploy(pipeline, pipelineConfigure, pipelineLog);
-            if (write + deploy == 2){
-                success(pipelineLog,pipeline.getPipelineId());
-            }
-        }
+        // //只有git
+        // if (pipelineConfigure.getConfigureCodeSource() == 2 &&pipelineConfigure.getConfigureCodeStructure() ==1 && pipelineConfigure.getDeployProofId() == null){
+        //     int gitClone = gitClone(pipeline, pipelineConfigure, pipelineLog);
+        //     if (gitClone == 1){
+        //         success(pipelineLog,pipeline.getPipelineId());
+        //     }
+        //     return;
+        // }
+        //
+        // //只有构建
+        // if(pipelineConfigure.getConfigureCodeSource() == 1 && pipelineConfigure.getConfigureCodeStructure() ==2 && pipelineConfigure.getDeployProofId() == null){
+        //     pipelineLog.setLogCodeState(10);
+        //     int structure = structure(pipeline, pipelineConfigure, pipelineLog);
+        //     if (structure ==1){
+        //         success(pipelineLog,pipeline.getPipelineId());
+        //     }
+        // }
+        //
+        // //只有部署
+        // if(pipelineConfigure.getConfigureCodeSource() == 1 && pipelineConfigure.getConfigureCodeStructure() ==1 && pipelineConfigure.getDeployProofId() != null){
+        //     pipelineLog.setLogCodeState(10);
+        //     pipelineLog.setLogPackState(10);
+        //     int deploy = deploy(pipeline, pipelineConfigure, pipelineLog);
+        //     if (deploy == 1){
+        //         success(pipelineLog,pipeline.getPipelineId());
+        //     }
+        // }
+        //
+        // //git部署
+        // if(pipelineConfigure.getConfigureCodeSource() == 2 && pipelineConfigure.getConfigureCodeStructure() ==1 && pipelineConfigure.getDeployProofId() != null){
+        //     pipelineLog.setLogPackState(10);
+        //     int gitClone = gitClone(pipeline, pipelineConfigure, pipelineLog);
+        //     int deploy = deploy(pipeline, pipelineConfigure, pipelineLog);
+        //     if (gitClone + deploy == 2){
+        //         success(pipelineLog,pipeline.getPipelineId());
+        //     }
+        // }
+        //
+        // //git构建
+        // if(pipelineConfigure.getConfigureCodeSource() == 2 && pipelineConfigure.getConfigureCodeStructure() ==1 && pipelineConfigure.getDeployProofId() == null){
+        //     pipelineLog.setLogDeployState(10);
+        //     int gitClone = gitClone(pipeline, pipelineConfigure, pipelineLog);
+        //     int structure = structure(pipeline, pipelineConfigure, pipelineLog);
+        //     if (gitClone + structure == 2){
+        //         success(pipelineLog,pipeline.getPipelineId());
+        //     }
+        // }
+        //
+        // // 构建部署
+        // if (pipelineConfigure.getConfigureCodeSource() == 1 && pipelineConfigure.getConfigureCodeStructure() ==2 && pipelineConfigure.getDeployProofId() != null){
+        //     pipelineLog.setLogCodeState(10);
+        //     int structure = structure(pipeline, pipelineConfigure, pipelineLog);
+        //     int deploy = deploy(pipeline, pipelineConfigure, pipelineLog);
+        //     if (structure + deploy == 2){
+        //         success(pipelineLog,pipeline.getPipelineId());
+        //     }
+        // }
 
         //配置都有
-        if (pipelineConfigure.getConfigureCodeSource() == 2 &&pipelineConfigure.getConfigureCodeStructure() ==2 && pipelineConfigure.getDeployProofId() != null){
+
+        if (a==6){
             int gitClone = gitClone(pipeline, pipelineConfigure, pipelineLog);
-            int write = write(pipeline, pipelineConfigure, pipelineLog);
+            int unitTesting = unitTesting(pipeline, pipelineConfigure, pipelineLog);
+            int structure = structure(pipeline, pipelineConfigure, pipelineLog);
             int deploy = deploy(pipeline, pipelineConfigure, pipelineLog);
-            if (gitClone+write+deploy ==3){
+            if (gitClone+unitTesting+structure+deploy == 4){
                 success(pipelineLog,pipeline.getPipelineId());
             }
         }
 
     }
+
+
+
+
 }

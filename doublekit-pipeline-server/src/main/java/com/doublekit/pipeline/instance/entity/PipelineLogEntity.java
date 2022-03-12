@@ -52,6 +52,14 @@ public class PipelineLogEntity {
     @Column(name = "pipeline_id",notNull = true)
     private String pipelineId;
 
+    //测试时间
+    @Column(name = "log_test_time",notNull = true)
+    private int logTestTime;
+
+    //测试状态
+    @Column(name = "log_test_state",notNull = true)
+    private int logTestState;
+
 
     public String getLogId() {
         return logId;
@@ -131,5 +139,21 @@ public class PipelineLogEntity {
 
     public void setPipelineId(String pipelineId) {
         this.pipelineId = pipelineId;
+    }
+
+    public int getLogTestTime() {
+        return logTestTime;
+    }
+
+    public void setLogTestTime(int logTestTime) {
+        this.logTestTime = logTestTime;
+    }
+
+    public int getLogTestState() {
+        return logTestState;
+    }
+
+    public void setLogTestState(int logTestState) {
+        this.logTestState = logTestState;
     }
 }

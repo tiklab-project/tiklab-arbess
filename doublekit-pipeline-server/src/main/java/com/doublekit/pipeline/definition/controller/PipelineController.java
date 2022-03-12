@@ -87,7 +87,7 @@ public class PipelineController {
     @RequestMapping(path="/selectName",method = RequestMethod.POST)
     @ApiMethod(name = "selectName",desc = "模糊查询")
     @ApiParam(name = "pipelineName",desc = "模糊查询条件",required = true)
-    public Result<Pipeline> selectName( @NotNull String pipelineName){
+    public Result<List<Pipeline>> selectName(@NotNull String pipelineName){
 
         List<Pipeline> pipelineQueryList = pipelineService.selectName(pipelineName);
 

@@ -42,11 +42,21 @@ public class PipelineLog {
     @ApiProperty(name="logDeployState",desc="部署状态")
     private int logDeployState;
 
+    //运行状态
     @ApiProperty(name="logRunStatus",desc="运行状态")
     private int logRunStatus = getLogRunStatus() + getLogPackState()+ getLogCodeState();
 
+    //流水线id
     @ApiProperty(name="pipelineId",desc="流水线id")
     private String pipelineId;
+
+    //测试时间
+    @ApiProperty(name="logTestTime",desc="测试时间")
+    private int logTestTime;
+
+    //测试状态
+    @ApiProperty(name="logTestState",desc="测试状态")
+    private int logTestState;
 
     public String getLogId() {
         return logId;
@@ -126,5 +136,21 @@ public class PipelineLog {
 
     public void setPipelineId(String pipelineId) {
         this.pipelineId = pipelineId;
+    }
+
+    public int getLogTestTime() {
+        return logTestTime;
+    }
+
+    public void setLogTestTime(int logTestTime) {
+        this.logTestTime = logTestTime;
+    }
+
+    public int getLogTestState() {
+        return logTestState;
+    }
+
+    public void setLogTestState(int logTestState) {
+        this.logTestState = logTestState;
     }
 }

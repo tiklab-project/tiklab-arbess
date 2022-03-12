@@ -129,49 +129,37 @@ public class PipelineHistoryServiceImpl implements PipelineHistoryService{
         for (PipelineHistory pipelineHistory : pipelineHistories) {
 
             PipelineHistoryDetails pipelineHistoryDetails = new PipelineHistoryDetails();
-
             //获取id
             if (pipelineHistory.getHistoryId() != null) {
-
                 pipelineHistoryDetails.setHistoryId(pipelineHistory.getHistoryId());
-
             }
 
             pipelineHistoryDetails.setHistoryNumber(pipelineHistory.getHistoryNumber());
-
-
             //获取状态
             pipelineHistoryDetails.setStatus(pipelineHistory.getPipelineLog().getLogRunStatus());
-
             //获取创建构建时间
             if (pipelineHistory.getHistoryCreateTime() != null){
-
                 pipelineHistoryDetails.setCreateStructureTime(pipelineHistory.getHistoryCreateTime());
-
             }
 
             //获取构建方式 (1:自动 2：手动)
             pipelineHistoryDetails.setStructureWay(pipelineHistory.getHistoryWay());
-
             //获取执行人
             if (pipelineHistory.getPipeline().getPipelineName() != null){
-
                 pipelineHistoryDetails.setImplementor(pipelineHistory.getPipeline().getPipelineCreateUser());
-
             }
 
             //获取执行时长
-            int ImplementTime = pipelineHistory.getPipelineLog().getLogCodeTime() + pipelineHistory.getPipelineLog().getLogDeployTime() + pipelineHistory.getPipelineLog().getLogPackTime();
-
+            int ImplementTime = pipelineHistory.getPipelineLog().getLogCodeTime()
+                    + pipelineHistory.getPipelineLog().getLogDeployTime()
+                    + pipelineHistory.getPipelineLog().getLogPackTime()
+                    + pipelineHistory.getPipelineLog().getLogTestTime();
             pipelineHistoryDetails.setImplementTime(ImplementTime);
 
             // 获取代码源
             int configureCodeSource = pipelineHistory.getPipelineConfigure().getConfigureCodeSource();
-
             if (configureCodeSource != 0){
-
                 pipelineHistoryDetails.setCodeSource(configureCodeSource);
-
             }
 
             // 获取凭证类型
@@ -182,10 +170,8 @@ public class PipelineHistoryServiceImpl implements PipelineHistoryService{
 
             // 获取分支
             if (pipelineHistory.getHistoryBranch() != null){
-
                 pipelineHistoryDetails.setBranch(pipelineHistory.getHistoryBranch());
             }
-
             pipelineHistoryDetailsList.add(pipelineHistoryDetails);
         }
 

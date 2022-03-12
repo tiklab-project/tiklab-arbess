@@ -78,7 +78,6 @@ public class PipelineServiceImpl implements PipelineService{
         for (Pipeline pipeline1 : pipelineList) {
         //判断是否有此用户
             if (pipelineName.equals(pipeline1.getPipelineName())){
-
                 return "0";
             }
         }

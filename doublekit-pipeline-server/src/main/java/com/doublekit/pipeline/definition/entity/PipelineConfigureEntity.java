@@ -61,7 +61,6 @@ public class PipelineConfigureEntity {
     @Column(name = "proof_id_deploy",notNull = true)
     private String deployProofId;
 
-
     //打包文件地址
     @Column(name = "configure_target_address" ,notNull = true)
     private String configureTargetAddress;
@@ -69,6 +68,14 @@ public class PipelineConfigureEntity {
     //打包文件地址
     @Column(name = "configure_shell" ,notNull = true)
     private String configureShell;
+
+    //测试类型
+    @Column(name = "configure_test_type" ,notNull = true)
+    private int configureTestType;
+
+    //测试内容
+    @Column(name = "configure_test_text" ,notNull = true)
+    private String configureTestText;
 
 
 
@@ -79,7 +86,6 @@ public class PipelineConfigureEntity {
     public void setConfigureId(String configureId) {
         this.configureId = configureId;
     }
-
 
     public String getConfigureCodeSourceAddress() {
         return configureCodeSourceAddress;
@@ -145,7 +151,6 @@ public class PipelineConfigureEntity {
         this.pipelineId = pipelineId;
     }
 
-
     public String getConfigureBranch() {
         return configureBranch;
     }
@@ -153,7 +158,6 @@ public class PipelineConfigureEntity {
     public void setConfigureBranch(String configureBranch) {
         this.configureBranch = configureBranch;
     }
-
 
     public String getConfigureTargetAddress() {
         return configureTargetAddress;
@@ -185,5 +189,21 @@ public class PipelineConfigureEntity {
 
     public void setConfigureShell(String configureShell) {
         this.configureShell = configureShell;
+    }
+
+    public int getConfigureTestType() {
+        return configureTestType;
+    }
+
+    public void setConfigureTestType(int configureTestType) {
+        this.configureTestType = configureTestType;
+    }
+
+    public String getConfigureTestText() {
+        return configureTestText;
+    }
+
+    public void setConfigureTestText(String configureTestText) {
+        this.configureTestText = configureTestText;
     }
 }
