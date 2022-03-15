@@ -9,7 +9,6 @@ import com.doublekit.pipeline.instance.model.PipelineLog;
 import com.doublekit.pipeline.systemSettings.securitySetting.proof.model.Proof;
 import com.doublekit.rpc.annotation.Exporter;
 import com.jcraft.jsch.*;
-import com.sun.xml.bind.v2.model.core.ID;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -17,7 +16,6 @@ import org.eclipse.jgit.transport.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.io.*;
-import java.lang.management.PlatformLoggingMXBean;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -115,12 +113,7 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
 
     }
 
-    /**
-     * 克隆
-     * @param pipeline 流水线信息
-     * @param pipelineConfigure 配置信息
-     * @param pipelineLog 日志
-     */
+    //git克隆
     private int gitClone(Pipeline pipeline,PipelineConfigure pipelineConfigure,PipelineLog pipelineLog){
 
         String logId =pipelineLog.getLogId();
@@ -138,12 +131,13 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
         //调用删除方法删除旧的代码
         delete(file);
         //获取凭证信息
-        Proof proof = pipelineConfigureService.getProofIdStructure(pipelineId);
+        Proof proof = pipelineConfigureService.getProofIdGit(pipelineId);
         if (proof != null) {
             //获取凭证
             UsernamePasswordCredentialsProvider credentialsProvider = usernamePassword(proof.getProofUsername(), proof.getProofPassword());
             String s = "开始拉取代码 : " + "\n"  + "FileAddress : " + file + "\n"  + "Uri : " + pipelineConfigure.getConfigureCodeSourceAddress() + "\n"   +  "Branch : " + pipelineConfigure.getConfigureBranch() + "\n"  ;
-
+            pipelineLog.setLogRunLog(s);
+            pipelineLogList.add(pipelineLog);
             //克隆代码
             try {
                 gitClone(file, pipelineConfigure.getConfigureCodeSourceAddress(), credentialsProvider, pipelineConfigure.getConfigureBranch());
@@ -192,7 +186,7 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
     }
 
     //构建
-    private int  structure(Pipeline pipeline, PipelineConfigure pipelineConfigure,PipelineLog pipelineLog)  {
+    private int structure(Pipeline pipeline, PipelineConfigure pipelineConfigure,PipelineLog pipelineLog)  {
         //设置拉取地址
         String path = "D:\\clone\\"+pipeline.getPipelineName();
         String[] split = pipelineConfigure.getConfigureStructureOrder().split("\n");
@@ -312,7 +306,6 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
         inputStreamReader.close();
         bufferedReader.close();
     }
-
 
     /**
      * git代码拉取
@@ -556,7 +549,7 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
 
         //恢复中断状态
         try {
-            Thread.sleep(100);
+            Thread.sleep(1000);
         } catch (InterruptedException s) {
             Thread.currentThread().interrupt();
         }
@@ -578,66 +571,21 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
             return;
         }
 
-        // //只有git
-        // if (pipelineConfigure.getConfigureCodeSource() == 2 &&pipelineConfigure.getConfigureCodeStructure() ==1 && pipelineConfigure.getDeployProofId() == null){
-        //     int gitClone = gitClone(pipeline, pipelineConfigure, pipelineLog);
-        //     if (gitClone == 1){
-        //         success(pipelineLog,pipeline.getPipelineId());
-        //     }
-        //     return;
-        // }
-        //
-        // //只有构建
-        // if(pipelineConfigure.getConfigureCodeSource() == 1 && pipelineConfigure.getConfigureCodeStructure() ==2 && pipelineConfigure.getDeployProofId() == null){
-        //     pipelineLog.setLogCodeState(10);
-        //     int structure = structure(pipeline, pipelineConfigure, pipelineLog);
-        //     if (structure ==1){
-        //         success(pipelineLog,pipeline.getPipelineId());
-        //     }
-        // }
-        //
-        // //只有部署
-        // if(pipelineConfigure.getConfigureCodeSource() == 1 && pipelineConfigure.getConfigureCodeStructure() ==1 && pipelineConfigure.getDeployProofId() != null){
-        //     pipelineLog.setLogCodeState(10);
-        //     pipelineLog.setLogPackState(10);
-        //     int deploy = deploy(pipeline, pipelineConfigure, pipelineLog);
-        //     if (deploy == 1){
-        //         success(pipelineLog,pipeline.getPipelineId());
-        //     }
-        // }
-        //
-        // //git部署
-        // if(pipelineConfigure.getConfigureCodeSource() == 2 && pipelineConfigure.getConfigureCodeStructure() ==1 && pipelineConfigure.getDeployProofId() != null){
-        //     pipelineLog.setLogPackState(10);
-        //     int gitClone = gitClone(pipeline, pipelineConfigure, pipelineLog);
-        //     int deploy = deploy(pipeline, pipelineConfigure, pipelineLog);
-        //     if (gitClone + deploy == 2){
-        //         success(pipelineLog,pipeline.getPipelineId());
-        //     }
-        // }
-        //
-        // //git构建
-        // if(pipelineConfigure.getConfigureCodeSource() == 2 && pipelineConfigure.getConfigureCodeStructure() ==1 && pipelineConfigure.getDeployProofId() == null){
-        //     pipelineLog.setLogDeployState(10);
-        //     int gitClone = gitClone(pipeline, pipelineConfigure, pipelineLog);
-        //     int structure = structure(pipeline, pipelineConfigure, pipelineLog);
-        //     if (gitClone + structure == 2){
-        //         success(pipelineLog,pipeline.getPipelineId());
-        //     }
-        // }
-        //
-        // // 构建部署
-        // if (pipelineConfigure.getConfigureCodeSource() == 1 && pipelineConfigure.getConfigureCodeStructure() ==2 && pipelineConfigure.getDeployProofId() != null){
-        //     pipelineLog.setLogCodeState(10);
-        //     int structure = structure(pipeline, pipelineConfigure, pipelineLog);
-        //     int deploy = deploy(pipeline, pipelineConfigure, pipelineLog);
-        //     if (structure + deploy == 2){
-        //         success(pipelineLog,pipeline.getPipelineId());
-        //     }
-        // }
+        if (pipelineConfigure.getConfigureCodeSource()+pipelineConfigure.getConfigureCodeStructure() == 5){
 
-        //配置都有
+            int gitClone = gitClone(pipeline, pipelineConfigure, pipelineLog);
+            pipelineLog.setLogTestState(10);
+            pipelineLogList.add(pipelineLog);
+            int structure = structure(pipeline, pipelineConfigure, pipelineLog);
+            pipelineLog.setLogDeployState(10);
+            pipelineLogList.add(pipelineLog);
+            if (gitClone+structure ==2){
+                success(pipelineLog,pipeline.getPipelineId());
+            }
+            return;
+        }
 
+        //配置都存在
         if (a==6){
             int gitClone = gitClone(pipeline, pipelineConfigure, pipelineLog);
             int unitTesting = unitTesting(pipeline, pipelineConfigure, pipelineLog);
@@ -647,10 +595,5 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
                 success(pipelineLog,pipeline.getPipelineId());
             }
         }
-
     }
-
-
-
-
 }

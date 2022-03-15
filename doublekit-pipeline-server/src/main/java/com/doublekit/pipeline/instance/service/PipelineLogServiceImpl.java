@@ -8,7 +8,6 @@ import com.doublekit.pipeline.instance.model.PipelineLog;
 import com.doublekit.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import sun.plugin.services.PlatformService;
 
 import java.util.List;
 

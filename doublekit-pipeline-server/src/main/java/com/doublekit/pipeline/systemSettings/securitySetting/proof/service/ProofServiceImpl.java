@@ -50,9 +50,9 @@ public class ProofServiceImpl implements ProofService{
 
     //查询
     @Override
-    public Proof findOneProof(String id) {
+    public Proof findOneProof(String proofId) {
 
-        ProofEntity proofEntity = ProofDao.findOneProof(id);
+        ProofEntity proofEntity = ProofDao.findOneProof(proofId);
 
         Proof proof = BeanMapper.map(proofEntity, Proof.class);
 

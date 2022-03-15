@@ -33,11 +33,11 @@ public interface ProofService {
 
     /**
      * 查询凭证
-     * @param id 凭证id
+     * @param proofId 凭证id
      * @return 凭证信息
      */
     @FindOne
-     Proof findOneProof(String id);
+     Proof findOneProof(String proofId);
 
     //获取构建凭证
     List<Proof> findAllGitProof();

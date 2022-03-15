@@ -56,6 +56,11 @@ public class PipelineConfigureServiceImpl implements PipelineConfigureService{
         }
     }
 
+    //删除配置信息
+    public void deleteConfigure(String configureId) {
+        pipelineConfigureDao.deletePipelineConfigure(configureId);
+    }
+
     //更新
     @Override
     public String updatePipelineConfigure(PipelineConfigure pipelineConfigure) {
@@ -124,7 +129,7 @@ public class PipelineConfigureServiceImpl implements PipelineConfigureService{
 
         List<PipelineConfigure> pipelineConfigureList = selectAllPipelineConfigure(pipelineId);
 
-        if (pipelineConfigureList.size() != 0){
+        if (pipelineConfigureList  != null){
             //根据时间排序
             pipelineConfigureList.sort(Comparator.comparing(PipelineConfigure::getConfigureCreateTime));
             //获取最近一次的配置id
@@ -153,11 +158,16 @@ public class PipelineConfigureServiceImpl implements PipelineConfigureService{
         }
         //获取统一id下所有配置
         for (PipelineConfigure pipelineConfigure : pipelineConfigureList) {
+
+            if (pipelineConfigure.getPipelineId() == null){
+                deleteConfigure(pipelineConfigure.getConfigureId());
+                continue;
+            }
+
             if (pipelineConfigure.getPipelineId().equals(pipelineId) ){
                 pipelineConfigures.add(pipelineConfigure);
             }
         }
-
         return pipelineConfigures;
     }
 
@@ -172,10 +182,11 @@ public class PipelineConfigureServiceImpl implements PipelineConfigureService{
 
         return pipelineHistory;
     }
-
+    @Override
     //获取克隆凭证信息
-    public Proof getProofIdStructure(String pipelineId){ return proofService.findOneProof(selectTimeId(pipelineId).getGitProofId()); }
+    public Proof getProofIdGit(String pipelineId){ return proofService.findOneProof(selectTimeId(pipelineId).getGitProofId()); }
 
+    @Override
     //获取部署凭证信息
     public Proof getProofIdDeploy(String pipelineId){ return proofService.findOneProof(selectTimeId(pipelineId).getDeployProofId()); }
 

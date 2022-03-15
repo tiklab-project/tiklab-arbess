@@ -57,10 +57,26 @@ public interface PipelineConfigureService {
      */
     PipelineConfigure selectTimeId(String pipelineId);
 
+    /**
+     * 历史表添加信息
+     * @param pipelineId 流水线id
+     * @param pipelineHistory 历史信息
+     * @return 历史信息
+     */
     PipelineHistory pipelineHistoryOne(String pipelineId, PipelineHistory pipelineHistory);
 
-    Proof getProofIdStructure(String pipelineId);
+    /**
+     * 获取克隆凭证信息
+     * @param pipelineId 流水线id
+     * @return 凭证信息
+     */
+    Proof getProofIdGit(String pipelineId);
 
+    /**
+     * 获取部署凭证信息
+     * @param pipelineId 流水线id
+     * @return 凭证信息
+     */
     Proof getProofIdDeploy(String pipelineId);
 
     @FindList
