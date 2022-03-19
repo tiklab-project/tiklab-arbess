@@ -60,4 +60,7 @@ public class PipelineLogController {
 
         return Result.ok(pipelineLog);
     }
+
+
+
 }

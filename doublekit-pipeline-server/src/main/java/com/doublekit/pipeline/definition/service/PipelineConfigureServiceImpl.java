@@ -45,13 +45,11 @@ public class PipelineConfigureServiceImpl implements PipelineConfigureService{
 
         //获取流水线id下的所有配置信息
         List<PipelineConfigure> pipelineConfigureList = selectAllPipelineConfigure(pipelineId);
-
         //判断是否有配置信息
         if (pipelineConfigureList != null){
             for (PipelineConfigure pipelineConfigure : pipelineConfigureList) {
                 //删除配置信息
                 pipelineConfigureDao.deletePipelineConfigure(pipelineConfigure.getConfigureId());
-
             }
         }
     }

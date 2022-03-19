@@ -43,14 +43,11 @@ public class PipelineHistoryServiceImpl implements PipelineHistoryService{
     public void deletePipelineHistory(String historyId) {
 
         if (historyId != null){
-
             PipelineHistory pipelineHistory = selectPipelineHistory(historyId);
-
             if (pipelineHistory !=null){
                 // 删除对应的日志
                 pipelineLogService.deletePipelineLog(pipelineHistory.getPipelineLog().getLogId());
             }
-
             //删除对应的历史
             pipelineHistoryDao.deletePipelineHistory(historyId);
         }
@@ -60,15 +57,10 @@ public class PipelineHistoryServiceImpl implements PipelineHistoryService{
     //根据流水线id删除全部历史
     @Override
     public void deleteAllPipelineHistory(String pipelineId) {
-
         List<PipelineHistory> pipelineHistoryList = selectAllPipelineIdList(pipelineId);
-
         if (pipelineHistoryList != null){
-
             for (PipelineHistory pipelineHistory : pipelineHistoryList) {
-
                 deletePipelineHistory(pipelineHistory.getHistoryId());
-
             }
         }
     }
