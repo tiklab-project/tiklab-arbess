@@ -5,10 +5,10 @@ import com.doublekit.join.JoinTemplate;
 import com.doublekit.pipeline.definition.dao.PipelineDao;
 import com.doublekit.pipeline.definition.entity.PipelineEntity;
 import com.doublekit.pipeline.definition.model.Pipeline;
-import com.doublekit.pipeline.definition.model.Configure;
+import com.doublekit.pipeline.definition.model.PipelineConfigure;
 import com.doublekit.pipeline.definition.model.PipelineStatus;
-import com.doublekit.pipeline.instance.model.History;
-import com.doublekit.pipeline.instance.service.HistoryService;
+import com.doublekit.pipeline.instance.model.PipelineExecHistory;
+import com.doublekit.pipeline.instance.service.PipelineExecHistoryService;
 import com.doublekit.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -32,10 +32,10 @@ public class PipelineServiceImpl implements PipelineService{
     JoinTemplate joinTemplate;
 
     @Autowired
-    HistoryService historyService;
+    PipelineExecHistoryService pipelineExecHistoryService;
 
     @Autowired
-    ConfigureService configureService;
+    PipelineConfigureService pipelineConfigureService;
 
     //创建
     @Override
@@ -43,7 +43,7 @@ public class PipelineServiceImpl implements PipelineService{
 
         Map<String, String> map = new HashMap<>();
         PipelineEntity pipelineEntity = BeanMapper.map(pipeline, PipelineEntity.class);
-        Configure configure = new Configure();
+        PipelineConfigure pipelineConfigure = new PipelineConfigure();
         List<Pipeline> pipelineList = findAllPipeline();
         //判断是否存在相同名称
         for (Pipeline pipeline1 : pipelineList) {
@@ -53,8 +53,8 @@ public class PipelineServiceImpl implements PipelineService{
         }
         String pipelineId = pipelineDao.createPipeline(pipelineEntity);
         pipeline.setPipelineId(pipelineId);
-        configure.setPipeline(pipeline);
-        String pipelineConfigureId = configureService.createConfigure(configure);
+        pipelineConfigure.setPipeline(pipeline);
+        String pipelineConfigureId = pipelineConfigureService.createConfigure(pipelineConfigure);
         map.put("pipelineId",pipelineId);
         map.put("pipelineConfigureId",pipelineConfigureId);
 
@@ -67,9 +67,9 @@ public class PipelineServiceImpl implements PipelineService{
         if (pipelineId != null){
             pipelineDao.deletePipeline(pipelineId);
             //删除对应的流水线历史
-            historyService.deleteAllHistory(pipelineId);
+            pipelineExecHistoryService.deleteAllHistory(pipelineId);
             //删除对应的流水线配置
-            configureService.deleteConfig(pipelineId);
+            pipelineConfigureService.deleteConfig(pipelineId);
         }
     }
 
@@ -138,20 +138,20 @@ public class PipelineServiceImpl implements PipelineService{
             PipelineStatus pipelineStatus = new PipelineStatus();
             pipelineStatus.setPipelineId(pipelineEntity.getPipelineId());
             pipelineStatus.setPipelineName(pipelineEntity.getPipelineName());
-            History history = historyService.findLastPipelineHistory(pipelineEntity.getPipelineId());
-            if (history != null){
-                pipelineStatus.setLastStructureTime(history.getHistoryCreateTime());
+            PipelineExecHistory pipelineExecHistory = pipelineExecHistoryService.findLastPipelineHistory(pipelineEntity.getPipelineId());
+            if (pipelineExecHistory != null){
+                pipelineStatus.setLastStructureTime(pipelineExecHistory.getHistoryCreateTime());
             }
 
             //获取同一id下的所有历史记录
-            List<History> historyList = historyService.findAllPipelineIdList(pipelineEntity.getPipelineId());
-            if (historyList != null){
-                for (int i = historyList.size() - 1; i >= 0; i--) {
-                    if (historyList.get(i).getPipelineLog().getLogRunStatus() == 30){
+            List<PipelineExecHistory> pipelineExecHistoryList = pipelineExecHistoryService.findAllPipelineIdList(pipelineEntity.getPipelineId());
+            if (pipelineExecHistoryList != null){
+                for (int i = pipelineExecHistoryList.size() - 1; i >= 0; i--) {
+                    if (pipelineExecHistoryList.get(i).getPipelineLog().getLogRunStatus() == 30){
                         //获取上次成功时间
-                        pipelineStatus.setLastSuccessTime(historyList.get(i).getHistoryCreateTime());
+                        pipelineStatus.setLastSuccessTime(pipelineExecHistoryList.get(i).getHistoryCreateTime());
                     }
-                    pipelineStatus.setStructureStatus(historyList.get(i).getPipelineLog().getLogRunStatus());
+                    pipelineStatus.setStructureStatus(pipelineExecHistoryList.get(i).getPipelineLog().getLogRunStatus());
                 }
             }
             pipelineAllList.add(pipelineStatus);

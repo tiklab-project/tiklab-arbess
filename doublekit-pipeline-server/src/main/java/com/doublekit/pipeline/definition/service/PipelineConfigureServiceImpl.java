@@ -1,0 +1,166 @@
+package com.doublekit.pipeline.definition.service;
+
+
+import com.doublekit.beans.BeanMapper;
+import com.doublekit.join.JoinTemplate;
+import com.doublekit.pipeline.definition.dao.PipelineConfigureDao;
+import com.doublekit.pipeline.definition.entity.PipelineConfigureEntity;
+import com.doublekit.pipeline.definition.model.PipelineConfigure;
+import com.doublekit.pipeline.instance.model.PipelineExecHistory;
+import com.doublekit.pipeline.instance.service.git.GiteeApiService;
+import com.doublekit.pipeline.setting.proof.model.Proof;
+import com.doublekit.pipeline.setting.proof.service.ProofService;
+import com.doublekit.rpc.annotation.Exporter;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+
+
+@Service
+@Exporter
+public class PipelineConfigureServiceImpl implements PipelineConfigureService {
+
+    @Autowired
+    JoinTemplate joinTemplate;
+
+    @Autowired
+    ProofService proofService;
+
+    @Autowired
+    GiteeApiService giteeApiService;
+
+    @Autowired
+    PipelineConfigureDao pipelineConfigureDao;
+
+    //创建
+    @Override
+    public String createConfigure(PipelineConfigure pipelineConfigure) {
+        PipelineConfigureEntity pipelineConfigureEntity = BeanMapper.map(pipelineConfigure, PipelineConfigureEntity.class);
+        return pipelineConfigureDao.createConfigure(pipelineConfigureEntity);
+    }
+
+    //删除
+    @Override
+    public void deleteConfig(String pipelineId) {
+        //获取流水线id下的所有配置信息
+        List<PipelineConfigure> pipelineConfigureList = findAllConfigure(pipelineId);
+        //判断是否有配置信息
+        if (pipelineConfigureList != null){
+            for (PipelineConfigure pipelineConfigure : pipelineConfigureList) {
+                //删除配置信息
+                pipelineConfigureDao.deleteConfigure(pipelineConfigure.getConfigureId());
+            }
+        }
+    }
+
+    //删除配置信息
+    public void deleteConfigure(String configureId) {
+        pipelineConfigureDao.deleteConfigure(configureId);
+    }
+
+    //更新
+    @Override
+    public String updateConfigure(PipelineConfigure pipelineConfigure) {
+        if (pipelineConfigure.getConfigureCodeSource() == 3){
+            String giteeUrl = giteeApiService.getGiteeUrl(pipelineConfigure.getConfigureCodeSourceAddress());
+            pipelineConfigure.setConfigureCodeName(giteeUrl);
+        }
+        PipelineConfigureEntity pipelineConfigureEntity = BeanMapper.map(pipelineConfigure, PipelineConfigureEntity.class);
+        pipelineConfigureDao.updateConfigure(pipelineConfigureEntity);
+
+        return pipelineConfigureEntity.getConfigureId();
+
+    }
+
+    //查询
+    @Override
+    public PipelineConfigure findConfigure(String configureId) {
+        PipelineConfigureEntity pipelineConfigureEntity = pipelineConfigureDao.findConfigure(configureId);
+        PipelineConfigure pipelineConfigure = BeanMapper.map(pipelineConfigureEntity, PipelineConfigure.class);
+        joinTemplate.joinQuery(pipelineConfigure);
+
+        return pipelineConfigure;
+    }
+
+    //查询所有配置
+    @Override
+    public List<PipelineConfigure> findAllConfigure() {
+        List<PipelineConfigureEntity> pipelineConfigureEntityList = pipelineConfigureDao.findAllConfigure();
+        List<PipelineConfigure> pipelineConfigureList = BeanMapper.mapList(pipelineConfigureEntityList, PipelineConfigure.class);
+        joinTemplate.joinQuery(pipelineConfigureList);
+
+        return pipelineConfigureList;
+    }
+
+
+    @Override
+    public List<PipelineConfigure> findAllConfigureList(List<String> idList) {
+        List<PipelineConfigureEntity> pipelineConfigureList = pipelineConfigureDao.findAllConfigureList(idList);
+        return BeanMapper.mapList(pipelineConfigureList, PipelineConfigure.class);
+    }
+
+
+    /**
+     * 根据最近配置信息
+     * @param pipelineId 流水线id
+     * @return 最近配置信息id
+     */
+    @Override
+    public PipelineConfigure findTimeId(String pipelineId) {
+        List<PipelineConfigure> pipelineConfigureList = findAllConfigure(pipelineId);
+        if (pipelineConfigureList != null){
+            //根据时间排序
+            pipelineConfigureList.sort(Comparator.comparing(PipelineConfigure::getConfigureCreateTime));
+            //获取最近一次的配置id
+            String configureId = pipelineConfigureList.get(pipelineConfigureList.size() - 1).getConfigureId();
+           return findConfigure(configureId);
+        }
+        return null;
+    }
+
+
+    /**
+     * 根据流水线id查询配置
+     * @param pipelineId 流水线id
+     * @return 配置集合
+     */
+    public List<PipelineConfigure> findAllConfigure(String pipelineId) {
+        List<PipelineConfigure> pipelineConfigureList = findAllConfigure();
+        List<PipelineConfigure> pipelineConfigures = new ArrayList<>();
+        if (pipelineConfigureList == null){
+            return null;
+        }
+        //获取统一id下所有配置
+        for (PipelineConfigure pipelineConfigure : pipelineConfigureList) {
+            if (pipelineConfigure.getPipeline().getPipelineId() == null){
+                deleteConfigure(pipelineConfigure.getConfigureId());
+                continue;
+            }
+            if (pipelineConfigure.getPipeline().getPipelineId().equals(pipelineId) ){
+                pipelineConfigures.add(pipelineConfigure);
+            }
+        }
+        return pipelineConfigures;
+    }
+
+    //向历史表添加凭证信息
+    public PipelineExecHistory addHistoryOne(String pipelineId, PipelineExecHistory pipelineExecHistory){
+        PipelineConfigure pipelineConfigure = findTimeId(pipelineId);
+        Proof proof = proofService.findOneProof(pipelineConfigure.getGitProof().getProofId());
+        pipelineExecHistory.setConfigure(pipelineConfigure);
+        pipelineExecHistory.setProof(proof);
+
+        return pipelineExecHistory;
+    }
+    @Override
+    //获取克隆凭证信息
+    public Proof getProofIdGit(String pipelineId){ return proofService.findOneProof(findTimeId(pipelineId).getGitProof().getProofId()); }
+
+    @Override
+    //获取部署凭证信息
+    public Proof getProofIdDeploy(String pipelineId){ return proofService.findOneProof(findTimeId(pipelineId).getDeployProof().getProofId()); }
+
+
+}
