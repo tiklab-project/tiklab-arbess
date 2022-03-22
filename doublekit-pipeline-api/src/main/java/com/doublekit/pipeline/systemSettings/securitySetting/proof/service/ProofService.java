@@ -1,6 +1,6 @@
 package com.doublekit.pipeline.systemSettings.securitySetting.proof.service;
 
-import com.doublekit.join.annotation.FindAll;
+
 import com.doublekit.join.annotation.FindList;
 import com.doublekit.join.annotation.FindOne;
 import com.doublekit.join.annotation.JoinProvider;
@@ -8,6 +8,9 @@ import com.doublekit.pipeline.systemSettings.securitySetting.proof.model.Proof;
 
 import java.util.List;
 
+/**
+ * 流水线凭证
+ */
 @JoinProvider(model = Proof.class)
 public interface ProofService {
 

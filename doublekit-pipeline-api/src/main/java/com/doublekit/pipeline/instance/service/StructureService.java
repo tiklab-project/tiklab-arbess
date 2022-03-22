@@ -1,9 +1,12 @@
 package com.doublekit.pipeline.instance.service;
 
-import com.doublekit.pipeline.instance.model.PipelineHistory;
-import com.doublekit.pipeline.instance.model.PipelineLog;
+import com.doublekit.pipeline.instance.model.History;
+import com.doublekit.pipeline.instance.model.Log;
 
-public interface PipelineStructureService {
+/**
+ * 流水线构建
+ */
+public interface StructureService {
 
     /**
      * 开始构建
@@ -11,18 +14,18 @@ public interface PipelineStructureService {
      * @return 构建开始
      * @throws InterruptedException 等待超时
      */
-    String  pipelineStructure(String pipelineId) throws Exception;
+    String  Structure(String pipelineId) throws Exception;
 
     /**
      * 查询构建状态
      * @return 状态信息
      */
-    PipelineLog selectStructureState(String pipelineId) ;
+    Log findStructureState(String pipelineId) ;
 
     /**
      * 添加历史信息
      * @param pipelineId 流水线id
      * @return 历史部分信息
      */
-    PipelineHistory pipelineHistoryTwo(String pipelineId);
+    History addHistoryTwo(String pipelineId);
 }

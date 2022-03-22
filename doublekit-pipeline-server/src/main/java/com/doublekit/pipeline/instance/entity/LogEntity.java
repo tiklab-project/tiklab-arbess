@@ -8,7 +8,7 @@ import com.doublekit.dal.jpa.annotation.*;
 
 @Entity
 @Table(name="pipeline_log")
-public class PipelineLogEntity {
+public class LogEntity {
 
     //日志id
     @Id

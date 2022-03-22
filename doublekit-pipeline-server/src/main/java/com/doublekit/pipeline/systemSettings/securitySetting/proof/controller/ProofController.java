@@ -23,8 +23,6 @@ import java.util.List;
 @Api(name = "proofController",desc = "凭证")
 public class ProofController {
 
-    private static Logger logger = LoggerFactory.getLogger(PipelineController.class);
-
     @Autowired
     ProofService proofService;
 
@@ -42,10 +40,10 @@ public class ProofController {
     //删除
     @RequestMapping(path="/deleteProof",method = RequestMethod.POST)
     @ApiMethod(name = "deleteProof",desc = "删除凭证")
-    @ApiParam(name = "id",desc = "id",required = true)
-    public Result<Void> deleteProof(@NotNull String id){
+    @ApiParam(name = "proofId",desc = "proofId",required = true)
+    public Result<Void> deleteProof(@NotNull String proofId){
 
-        proofService.deleteProof(id);
+        proofService.deleteProof(proofId);
 
         return Result.ok();
     }

@@ -11,7 +11,7 @@ import com.doublekit.join.annotation.Join;
 public class Proof {
 
     //凭证id
-    @ApiProperty(name="pipelineId",desc="凭证id")
+    @ApiProperty(name="proofId",desc="凭证id")
     private String proofId;
 
     //凭证名

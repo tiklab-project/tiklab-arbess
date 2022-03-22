@@ -7,8 +7,8 @@ import com.doublekit.join.annotation.Join;
 
 @ApiModel
 @Join
-@Mapper(targetAlias = "PipelineLogEntity")
-public class PipelineLog {
+@Mapper(targetAlias = "LogEntity")
+public class Log {
 
     //日志id
     @ApiProperty(name="logId",desc="日志id")

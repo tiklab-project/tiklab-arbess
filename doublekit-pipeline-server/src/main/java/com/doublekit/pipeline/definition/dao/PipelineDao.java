@@ -18,8 +18,6 @@ import java.util.List;
 @Repository
 public class PipelineDao {
 
-    private static Logger logger = LoggerFactory.getLogger(PipelineDao.class);
-
     @Autowired
     JpaTemplate jpaTemplate;
 
@@ -55,7 +53,7 @@ public class PipelineDao {
      * @param id 流水线id
      * @return 流水线信息
      */
-    public PipelineEntity selectPipeline(String id){
+    public PipelineEntity findPipeline(String id){
         return jpaTemplate.findOne(PipelineEntity.class,id);
     }
 
@@ -63,12 +61,12 @@ public class PipelineDao {
      * 查询所有流水线
      * @return 流水线列表
      */
-    public List<PipelineEntity> selectAllPipeline(){
+    public List<PipelineEntity> findAllPipeline(){
         return jpaTemplate.findAll(PipelineEntity.class);
     }
 
 
-    public List<PipelineEntity> selectAllPipelineList(List<String> idList){
+    public List<PipelineEntity> findAllPipelineList(List<String> idList){
 
         return jpaTemplate.findList(PipelineEntity.class,idList);
     }
@@ -78,7 +76,7 @@ public class PipelineDao {
      * @param pipelineName 查询条件
      * @return 流水线集合
      */
-    public List<PipelineEntity> selectName(String pipelineName){
+    public List<PipelineEntity> findName(String pipelineName){
 
         QueryCondition queryCondition = QueryBuilders.createQuery(PipelineEntity.class).like("pipelineName", pipelineName).get();
 

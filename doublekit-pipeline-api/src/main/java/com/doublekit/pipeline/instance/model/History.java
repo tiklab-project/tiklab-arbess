@@ -8,14 +8,14 @@ import com.doublekit.beans.annotation.Mappings;
 import com.doublekit.join.annotation.Join;
 import com.doublekit.join.annotation.JoinQuery;
 import com.doublekit.pipeline.definition.model.Pipeline;
-import com.doublekit.pipeline.definition.model.PipelineConfigure;
+import com.doublekit.pipeline.definition.model.Configure;
 import com.doublekit.pipeline.systemSettings.securitySetting.proof.model.Proof;
 
 
 @ApiModel
 @Join
-@Mapper(targetAlias = "PipelineHistoryEntity")
-public class PipelineHistory {
+@Mapper(targetAlias = "HistoryEntity")
+public class History {
 
     //构建历史id
     @ApiProperty(name="historyId",desc="构建历史id")
@@ -54,20 +54,20 @@ public class PipelineHistory {
     private Proof proof;
 
     //日志
-    @ApiProperty(name="pipelineLog",desc="日志id",eg="@selectOne")
+    @ApiProperty(name="log",desc="日志id",eg="@selectOne")
     @Mappings({
-            @Mapping(source = "pipelineLog.logId",target = "logId")
+            @Mapping(source = "log.logId",target = "logId")
     })
     @JoinQuery(key = "logId")
-    private PipelineLog pipelineLog;
+    private Log log;
 
     //凭证
-    @ApiProperty(name="PipelineConfigure",desc="配置id",eg="@selectOne")
+    @ApiProperty(name="configure",desc="配置id",eg="@selectOne")
     @Mappings({
-            @Mapping(source = "PipelineConfigure.configureId",target = "configureId")
+            @Mapping(source = "configure.configureId",target = "configureId")
     })
     @JoinQuery(key = "configureId")
-    private PipelineConfigure PipelineConfigure;
+    private Configure configure;
 
 
     public String getHistoryId() {
@@ -126,19 +126,27 @@ public class PipelineHistory {
         this.proof = proof;
     }
 
-    public PipelineLog getPipelineLog() {
-        return pipelineLog;
+    public Log getPipelineLog() {
+        return log;
     }
 
-    public void setPipelineLog(PipelineLog pipelineLog) {
-        this.pipelineLog = pipelineLog;
+    public void setPipelineLog(Log log) {
+        this.log = log;
     }
 
-    public com.doublekit.pipeline.definition.model.PipelineConfigure getPipelineConfigure() {
-        return PipelineConfigure;
+    public Log getLog() {
+        return log;
     }
 
-    public void setPipelineConfigure(com.doublekit.pipeline.definition.model.PipelineConfigure pipelineConfigure) {
-        PipelineConfigure = pipelineConfigure;
+    public void setLog(Log log) {
+        this.log = log;
+    }
+
+    public Configure getConfigure() {
+        return configure;
+    }
+
+    public void setConfigure(Configure configure) {
+        this.configure = configure;
     }
 }

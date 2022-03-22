@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/pipeline")
@@ -33,11 +34,11 @@ public class PipelineController {
     @RequestMapping(path="/createPipeline",method = RequestMethod.POST)
     @ApiMethod(name = "createPipeline",desc = "创建流水线")
     @ApiParam(name = "pipeline",desc = "pipeline",required = true)
-    public Result<String> createPipeline(@RequestBody @NotNull @Valid Pipeline pipeline){
+    public Result<Map<String, String>> createPipeline(@RequestBody @NotNull @Valid Pipeline pipeline){
 
-        String id = pipelineService.createPipeline(pipeline);
+        Map<String, String> map = pipelineService.createPipeline(pipeline);
 
-        return Result.ok(id);
+        return Result.ok(map);
     }
 
     //查询所有
@@ -45,7 +46,7 @@ public class PipelineController {
     @ApiMethod(name = "selectAllPipeline",desc = "查询所有流水线")
     public Result<List<Pipeline>> selectAllPipeline(){
 
-        List<Pipeline> selectAllPipeline = pipelineService.selectAllPipeline();
+        List<Pipeline> selectAllPipeline = pipelineService.findAllPipeline();
 
         return Result.ok(selectAllPipeline);
     }
@@ -67,7 +68,7 @@ public class PipelineController {
     @ApiParam(name = "pipelineId",desc = "流水线id",required = true)
     public Result<Pipeline> selectPipeline(@NotNull String pipelineId){
 
-        Pipeline pipeline = pipelineService.selectPipeline(pipelineId);
+        Pipeline pipeline = pipelineService.findPipeline(pipelineId);
 
         return Result.ok(pipeline);
     }
@@ -89,7 +90,7 @@ public class PipelineController {
     @ApiParam(name = "pipelineName",desc = "模糊查询条件",required = true)
     public Result<List<Pipeline>> selectName(@NotNull String pipelineName){
 
-        List<Pipeline> pipelineQueryList = pipelineService.selectName(pipelineName);
+        List<Pipeline> pipelineQueryList = pipelineService.findName(pipelineName);
 
         return Result.ok(pipelineQueryList);
     }
@@ -98,7 +99,7 @@ public class PipelineController {
     @ApiMethod(name = "selectPipelineStatus",desc = "查询所有流水线状态")
     public Result<List<PipelineStatus>> selectPipelineStatus(){
 
-        List<PipelineStatus> pipelineStatusList = pipelineService.selectAll();
+        List<PipelineStatus> pipelineStatusList = pipelineService.findAll();
 
         return Result.ok(pipelineStatusList);
     }

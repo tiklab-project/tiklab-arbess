@@ -1,6 +1,7 @@
 package com.doublekit.pipeline.systemSettings.securitySetting.proof.dao;
 
 import com.doublekit.dal.jpa.JpaTemplate;
+import com.doublekit.join.JoinTemplate;
 import com.doublekit.pipeline.definition.dao.PipelineDao;
 import com.doublekit.pipeline.systemSettings.securitySetting.proof.entity.ProofEntity;
 import org.slf4j.Logger;
@@ -13,10 +14,11 @@ import java.util.List;
 @Repository
 public class ProofDao {
 
-    private static Logger logger = LoggerFactory.getLogger(PipelineDao.class);
+    private static final Logger logger = LoggerFactory.getLogger(PipelineDao.class);
 
     @Autowired
     JpaTemplate jpaTemplate;
+
 
     /**
      * 添加凭证
@@ -29,10 +31,10 @@ public class ProofDao {
 
     /**
      * 删除凭证
-     * @param id 凭证id
+     * @param proofId 凭证id
      */
-    public void deleteProof(String id){
-        jpaTemplate.delete(ProofEntity.class,id);
+    public void deleteProof(String proofId){
+        jpaTemplate.delete(ProofEntity.class,proofId);
     }
 
     /**
@@ -45,11 +47,11 @@ public class ProofDao {
 
     /**
      * 查询凭证
-     * @param id 凭证id
+     * @param proofId 凭证id
      * @return 凭证信息
      */
-    public ProofEntity findOneProof(String id){
-        return jpaTemplate.findOne(ProofEntity.class, id);
+    public ProofEntity findOneProof(String proofId){
+        return jpaTemplate.findOne(ProofEntity.class, proofId);
     }
 
     /**
@@ -57,6 +59,7 @@ public class ProofDao {
      * @return 凭证列表
      */
     public List<ProofEntity> selectAllProof(){
+
         return jpaTemplate.findAll(ProofEntity.class);
     }
 

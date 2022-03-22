@@ -6,7 +6,7 @@ import com.doublekit.join.annotation.Join;
 
 @ApiModel
 @Join
-public class PipelineHistoryDetails {
+public class HistoryDetails {
 
     //id
     @ApiProperty(name="historyId",desc="历史id")

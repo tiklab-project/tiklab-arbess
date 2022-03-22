@@ -10,7 +10,11 @@ import com.doublekit.pipeline.definition.model.PipelineStatus;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.Map;
 
+/**
+ * 流水线
+ */
 @JoinProvider(model = Pipeline.class)
 public interface PipelineService {
 
@@ -19,7 +23,7 @@ public interface PipelineService {
      * @param pipeline 流水线信息
      * @return 流水线id
      */
-    String createPipeline(@NotNull @Valid Pipeline pipeline);
+    Map<String, String> createPipeline(@NotNull @Valid Pipeline pipeline);
 
     /**
      * 删除流水线
@@ -39,31 +43,31 @@ public interface PipelineService {
      * @return 流水线信息
      */
     @FindOne
-    Pipeline selectPipeline(@NotNull String id);
+    Pipeline findPipeline(@NotNull String id);
 
     /**
      * 查询所有流水线
      * @return 流水线列表
      */
     @FindAll
-    List<Pipeline> selectAllPipeline();
+    List<Pipeline> findAllPipeline();
 
     @FindList
-    List<Pipeline> selectAllPipelineList(List<String> idList);
+    List<Pipeline> findAllPipelineList(List<String> idList);
 
     /**
      * 根据名称模糊查询
      * @param pipelineName 查询条件
      * @return 查询到的集合
      */
-    List<Pipeline> selectName(String pipelineName);
+    List<Pipeline> findName(String pipelineName);
 
 
     /**
      *查询流水线状态
      * @return 状态集合
      */
-    List<PipelineStatus> selectAll();
+    List<PipelineStatus> findAll();
 
 
 }

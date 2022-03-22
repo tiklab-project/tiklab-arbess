@@ -1,81 +1,95 @@
-package com.doublekit.pipeline.definition.model;
+package com.doublekit.pipeline.definition.entity;
 
-import com.doublekit.apibox.annotation.ApiModel;
-import com.doublekit.apibox.annotation.ApiProperty;
-import com.doublekit.beans.annotation.Mapper;
-import com.doublekit.join.annotation.Join;
 
-@ApiModel
-@Join
-@Mapper(targetAlias = "PipelineConfigureEntity")
-public class PipelineConfigure {
+import com.doublekit.dal.jpa.annotation.*;
 
-    //流水线配置id
-    @ApiProperty(name="configureId",desc="配置id")
+/**
+ * 流水线配置
+ */
+
+@Entity
+@Table(name="pipeline_configure")
+public class ConfigureEntity {
+
+    //id
+    @Id
+    @GeneratorValue
+    @Column(name = "configure_id")
     private String configureId;
 
     //代码源
-    @ApiProperty(name="configureCodeSource",desc="代码源")
+    @Column(name = "configure_code_source",notNull = true)
     private int configureCodeSource;
 
     //代码源地址
-    @ApiProperty(name="configureCodeSourceAddress",desc="代码源地址")
+    @Column(name = "configure_code_source_address",notNull = true)
     private String configureCodeSourceAddress;
 
     //分支
-    @ApiProperty(name="configureBranch",desc="分支")
+    @Column(name = "configure_branch",notNull = true)
     private String configureBranch;
 
     //构建源
-    @ApiProperty(name = "configureCodeStructure",desc="构建源")
+    @Column(name = "configure_code_structure",notNull = true)
     private int configureCodeStructure;
 
     //构建文件地址
-    @ApiProperty(name="configureStructureAddress",desc="构建文件地址")
+    @Column(name = "configure_structure_address",notNull = true)
     private String configureStructureAddress;
 
     //构建命令
-    @ApiProperty(name="configureStructureOrder",desc="构建命令")
+    @Column(name = "configure_structure_order",notNull = true)
     private String configureStructureOrder;
 
     //部署地址
-    @ApiProperty(name="configureDeployAddress",desc="部署地址")
+    @Column(name = "configure_deploy_address",notNull = true)
     private String configureDeployAddress;
 
-    //创建配置时间
-    @ApiProperty(name="configureCreateTime",desc="创建时间")
+    //配置创建时间
+    @Column(name = "configure_create_time",notNull = true)
     private String configureCreateTime;
 
     //流水线id
-    @ApiProperty(name="pipelineId",desc="流水线id",eg="流水线id")
+    @Column(name = "pipeline_id",notNull = true)
     private String pipelineId;
 
-    //git凭证id
-    @ApiProperty(name = "gitProofId",desc = "凭证构建id")
+    //凭证构建id
+    @Column(name = "proof_id_git",notNull = true)
     private String gitProofId;
 
     //凭证部署id
-    @ApiProperty(name = "deployProofId",desc = "凭证部署id")
+    @Column(name = "proof_id_deploy",notNull = true)
     private String deployProofId;
 
     //打包文件地址
-    @ApiProperty(name = "configureTargetAddress" , desc = "打包文件地址")
+    @Column(name = "configure_target_address" ,notNull = true)
     private String configureTargetAddress;
 
-    //shell脚本
-    @ApiProperty(name = "configureShell" , desc = "shell脚本")
+    //打包文件地址
+    @Column(name = "configure_shell" ,notNull = true)
     private String configureShell;
 
     //测试类型
-    @ApiProperty(name = "configureTestType" , desc = "测试类型")
+    @Column(name = "configure_test_type" ,notNull = true)
     private int configureTestType;
 
     //测试内容
-    @ApiProperty(name = "configureTestText" , desc = "测试内容")
+    @Column(name = "configure_test_text" ,notNull = true)
     private String configureTestText;
 
+    @Column(name = "configure_code_name" ,notNull = true)
+    private String configureCodeName;
 
 
+
+
+    public String getConfigureId() {
+        return configureId;
+    }
+
+    public void setConfigureId(String configureId) {
+        this.configureId = configureId;
+    }
 
     public String getConfigureCodeSourceAddress() {
         return configureCodeSourceAddress;
@@ -91,6 +105,22 @@ public class PipelineConfigure {
 
     public void setConfigureStructureAddress(String configureStructureAddress) {
         this.configureStructureAddress = configureStructureAddress;
+    }
+
+    public int getConfigureCodeSource() {
+        return configureCodeSource;
+    }
+
+    public void setConfigureCodeSource(int configureCodeSource) {
+        this.configureCodeSource = configureCodeSource;
+    }
+
+    public int getConfigureCodeStructure() {
+        return configureCodeStructure;
+    }
+
+    public void setConfigureCodeStructure(int configureCodeStructure) {
+        this.configureCodeStructure = configureCodeStructure;
     }
 
     public String getConfigureStructureOrder() {
@@ -109,14 +139,6 @@ public class PipelineConfigure {
         this.configureDeployAddress = configureDeployAddress;
     }
 
-    public String getConfigureBranch() {
-        return configureBranch;
-    }
-
-    public void setConfigureBranch(String configureBranch) {
-        this.configureBranch = configureBranch;
-    }
-
     public String getConfigureCreateTime() {
         return configureCreateTime;
     }
@@ -133,6 +155,22 @@ public class PipelineConfigure {
         this.pipelineId = pipelineId;
     }
 
+    public String getConfigureBranch() {
+        return configureBranch;
+    }
+
+    public void setConfigureBranch(String configureBranch) {
+        this.configureBranch = configureBranch;
+    }
+
+    public String getConfigureTargetAddress() {
+        return configureTargetAddress;
+    }
+
+    public void setConfigureTargetAddress(String configureTargetAddress) {
+        this.configureTargetAddress = configureTargetAddress;
+    }
+
     public String getGitProofId() {
         return gitProofId;
     }
@@ -147,38 +185,6 @@ public class PipelineConfigure {
 
     public void setDeployProofId(String deployProofId) {
         this.deployProofId = deployProofId;
-    }
-
-    public String getConfigureId() {
-        return configureId;
-    }
-
-    public void setConfigureId(String configureId) {
-        this.configureId = configureId;
-    }
-
-    public String getConfigureTargetAddress() {
-        return configureTargetAddress;
-    }
-
-    public void setConfigureTargetAddress(String configureTargetAddress) {
-        this.configureTargetAddress = configureTargetAddress;
-    }
-
-    public int getConfigureCodeSource() {
-        return configureCodeSource;
-    }
-
-    public void setConfigureCodeSource(int configureCodeSource) {
-        this.configureCodeSource = configureCodeSource;
-    }
-
-    public int getConfigureCodeStructure() {
-        return configureCodeStructure;
-    }
-
-    public void setConfigureCodeStructure(int configureCodeStructure) {
-        this.configureCodeStructure = configureCodeStructure;
     }
 
     public String getConfigureShell() {
@@ -203,5 +209,13 @@ public class PipelineConfigure {
 
     public void setConfigureTestText(String configureTestText) {
         this.configureTestText = configureTestText;
+    }
+
+    public String getConfigureCodeName() {
+        return configureCodeName;
+    }
+
+    public void setConfigureCodeName(String configureCodeName) {
+        this.configureCodeName = configureCodeName;
     }
 }

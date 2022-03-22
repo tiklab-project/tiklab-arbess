@@ -9,7 +9,7 @@ import com.doublekit.dal.jpa.annotation.*;
 
 @Entity
 @Table(name="pipeline_history")
-public class PipelineHistoryEntity {
+public class HistoryEntity {
 
     //id
     @Id

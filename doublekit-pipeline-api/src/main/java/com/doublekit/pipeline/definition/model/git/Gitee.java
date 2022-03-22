@@ -1,4 +1,4 @@
-package com.doublekit.pipeline.definition.model;
+package com.doublekit.pipeline.definition.model.git;
 
 import java.util.List;
 
@@ -16,6 +16,8 @@ public class Gitee {
      //accessToken
      private  String accessToken;
 
+     //refreshToken
+     private  String refreshToken;
 
 
     public String getClient_id() {
@@ -48,13 +50,20 @@ public class Gitee {
         //获取所有仓库
         return "https://gitee.com/api/v5/user/repos?access_token="+accessToken+"&sort=full_name&page=1&per_page=20";
     }
-
-
-    public String getWarehouseBranch(String projectName,String accessToken) {
-        //获取分支
-        return "https://gitee.com/api/v5/repos/"+getName()+"/"+projectName+"/branches?access_token="+accessToken;
+    public String getOneStorehouse(String projectName) {
+        //获取某个仓库
+        return "https://gitee.com/api/v5/repos/"+getName()+"/"+projectName+"?access_token="+getAccessToken();
     }
 
+    public String getWarehouseBranch(String projectName) {
+        //获取分支
+        return "https://gitee.com/api/v5/repos/"+getName()+"/"+projectName+"/branches?access_token="+getAccessToken();
+    }
+
+    public String getToken() {
+        //获取新的token
+        return "https://gitee.com/oauth/token?grant_type=refresh_token&refresh_token="+getRefreshToken();
+    }
 
 
     public String getName() {
@@ -89,4 +98,11 @@ public class Gitee {
         this.accessToken = accessToken;
     }
 
+    public String getRefreshToken() {
+        return refreshToken;
+    }
+
+    public void setRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
+    }
 }

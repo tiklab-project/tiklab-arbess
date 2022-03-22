@@ -4,51 +4,54 @@ import com.doublekit.join.annotation.FindAll;
 import com.doublekit.join.annotation.FindList;
 import com.doublekit.join.annotation.FindOne;
 import com.doublekit.join.annotation.JoinProvider;
-import com.doublekit.pipeline.instance.model.PipelineLog;
-import java.util.List;
+import com.doublekit.pipeline.instance.model.Log;
 
-@JoinProvider(model = PipelineLog.class)
-public interface PipelineLogService {
+import java.util.List;
+/**
+ * 流水线日志
+ */
+@JoinProvider(model = Log.class)
+public interface LogService {
 
     /**
      * 创建流水线日志
-     * @param pipelineLog 流水线历史日志
+     * @param log 流水线历史日志
      * @return 流水线日志id
      */
-     String createPipelineLog(PipelineLog pipelineLog);
+     String createLog(Log log);
 
     /**
      * 删除流水线日志
      * @param id 流水线日志id
      */
-     void deletePipelineLog(String id);
+     void deleteLog(String id);
 
     /**
      * 更新流水线日志
-     * @param pipelineLog 更新后流水线日志信息
+     * @param log 更新后流水线日志信息
      */
-     void updatePipelineLog(PipelineLog pipelineLog);
+     void updateLog(Log log);
 
     /**
      * 查询流水线日志
-     * @param id 查询id
+     * @param logId 查询id
      * @return 流水线日志信息
      */
     @FindOne
-     PipelineLog selectPipelineLog(String id);
+    Log findOneLog(String logId);
 
     /**
      * 查询所有流水线日志
      * @return 流水线日志列表
      */
     @FindAll
-     List<PipelineLog> selectAllPipelineLog();
+     List<Log> findAllLog();
 
-    void pipelineHistoryThree(String pipelineId ,String logId );
+    void addHistoryThree(String pipelineId ,String logId );
 
      //创建历史表
     String createHistory(String logId);
 
     @FindList
-    List<PipelineLog> selectAllPipelineLogList(List<String> idList);
+    List<Log> findAllLogList(List<String> idList);
 }

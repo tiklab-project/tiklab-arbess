@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * PipelineServiceImpl
@@ -22,11 +23,11 @@ public class PipelineServiceImpl implements PipelineService{
     PipelineDao pipelineDao;
 
     @Override
-    public String createPipeline(Pipeline pipeline) {
+    public Map<String, String> createPipeline(Pipeline pipeline) {
         //把模型转化成对应实体
         PipelineEntity pipelineEntity = BeanMapper.map(pipeline, PipelineEntity.class);
-
-        return pipelineDao.createPipeline(pipelineEntity);
+        pipelineDao.createPipeline(pipelineEntity);
+        return null;
     }
 
     @Override
@@ -49,29 +50,29 @@ public class PipelineServiceImpl implements PipelineService{
     // }
 
     @Override
-    public List<Pipeline> selectAllPipeline() {
-        List<PipelineEntity> pipelineEntityList = pipelineDao.selectAllPipeline();
+    public List<Pipeline> findAllPipeline() {
+        List<PipelineEntity> pipelineEntityList = pipelineDao.findAllPipeline();
 
         return BeanMapper.mapList(pipelineEntityList,Pipeline.class);
     }
 
     @Override
-    public Pipeline selectPipeline(String id) {
+    public Pipeline findPipeline(String id) {
         return null;
     }
 
     @Override
-    public List<Pipeline> selectAllPipelineList(List<String> idList) {
+    public List<Pipeline> findAllPipelineList(List<String> idList) {
         return null;
     }
 
     @Override
-    public List<Pipeline> selectName(String pipelineName) {
+    public List<Pipeline> findName(String pipelineName) {
         return null;
     }
 
     @Override
-    public List<PipelineStatus> selectAll() {
+    public List<PipelineStatus> findAll() {
         return null;
     }
 

@@ -4,7 +4,7 @@ import com.doublekit.apibox.annotation.Api;
 import com.doublekit.apibox.annotation.ApiMethod;
 import com.doublekit.apibox.annotation.ApiParam;
 import com.doublekit.common.Result;
-import com.doublekit.pipeline.instance.service.GiteeService;
+import com.doublekit.pipeline.instance.service.git.GiteeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,11 +23,9 @@ public class GiteeController {
     @Autowired
     GiteeService giteeService;
 
-    private static Logger logger = LoggerFactory.getLogger(PipelineLogController.class);
-
     @RequestMapping(path="/url",method = RequestMethod.POST)
     @ApiMethod(name = "getCode",desc = "返回获取code的地址")
-    public Result<String> getCode() throws IOException {
+    public Result<String> getCode(){
 
         String git = giteeService.getCode();
 
@@ -42,6 +40,16 @@ public class GiteeController {
         String accessToken = giteeService.getAccessToken(code);
 
         return Result.ok(accessToken);
+    }
+
+    @RequestMapping(path="/getProof",method = RequestMethod.POST)
+    @ApiMethod(name = "getProof",desc = "获取proofId")
+    @ApiParam(name = "configureId",desc = "configureId",required = true)
+    public Result<String> getProof(@NotNull String configureId){
+
+        String proofId = giteeService.getProof(configureId);
+
+        return Result.ok(proofId);
     }
 
     @RequestMapping(path="/getAllStorehouse",method = RequestMethod.POST)

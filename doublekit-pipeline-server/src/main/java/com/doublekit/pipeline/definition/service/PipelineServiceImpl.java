@@ -1,17 +1,21 @@
 package com.doublekit.pipeline.definition.service;
 
 import com.doublekit.beans.BeanMapper;
+import com.doublekit.join.JoinTemplate;
 import com.doublekit.pipeline.definition.dao.PipelineDao;
 import com.doublekit.pipeline.definition.entity.PipelineEntity;
 import com.doublekit.pipeline.definition.model.Pipeline;
+import com.doublekit.pipeline.definition.model.Configure;
 import com.doublekit.pipeline.definition.model.PipelineStatus;
-import com.doublekit.pipeline.instance.model.PipelineHistory;
-import com.doublekit.pipeline.instance.service.PipelineHistoryService;
+import com.doublekit.pipeline.instance.model.History;
+import com.doublekit.pipeline.instance.service.HistoryService;
 import com.doublekit.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * PipelineServiceImpl
@@ -25,25 +29,36 @@ public class PipelineServiceImpl implements PipelineService{
     PipelineDao pipelineDao;
 
     @Autowired
-    PipelineHistoryService pipelineHistoryService;
+    JoinTemplate joinTemplate;
 
     @Autowired
-    PipelineConfigureService pipelineConfigureService;
+    HistoryService historyService;
+
+    @Autowired
+    ConfigureService configureService;
 
     //创建
     @Override
-    public String createPipeline(Pipeline pipeline) {
-        //把模型转化成对应实体
-        PipelineEntity pipelineEntity = BeanMapper.map(pipeline, PipelineEntity.class);
+    public Map<String, String> createPipeline(Pipeline pipeline) {
 
-        List<Pipeline> pipelineList = selectAllPipeline();
+        Map<String, String> map = new HashMap<>();
+        PipelineEntity pipelineEntity = BeanMapper.map(pipeline, PipelineEntity.class);
+        Configure configure = new Configure();
+        List<Pipeline> pipelineList = findAllPipeline();
         //判断是否存在相同名称
         for (Pipeline pipeline1 : pipelineList) {
             if (pipeline1.getPipelineName().equals(pipeline.getPipelineName())){
-                return "0";
+                return null;
             }
         }
-        return pipelineDao.createPipeline(pipelineEntity);
+        String pipelineId = pipelineDao.createPipeline(pipelineEntity);
+        pipeline.setPipelineId(pipelineId);
+        configure.setPipeline(pipeline);
+        String pipelineConfigureId = configureService.createConfigure(configure);
+        map.put("pipelineId",pipelineId);
+        map.put("pipelineConfigureId",pipelineConfigureId);
+
+        return map;
     }
 
     //删除
@@ -52,9 +67,9 @@ public class PipelineServiceImpl implements PipelineService{
         if (pipelineId != null){
             pipelineDao.deletePipeline(pipelineId);
             //删除对应的流水线历史
-            pipelineHistoryService.deleteAllPipelineHistory(pipelineId);
+            historyService.deleteAllHistory(pipelineId);
             //删除对应的流水线配置
-            pipelineConfigureService.deletePipelineConfigure(pipelineId);
+            configureService.deleteConfig(pipelineId);
         }
     }
 
@@ -63,7 +78,7 @@ public class PipelineServiceImpl implements PipelineService{
     public String updatePipeline(Pipeline pipeline) {
 
         String pipelineName = pipeline.getPipelineName();
-        List<Pipeline> pipelineList = selectAllPipeline();
+        List<Pipeline> pipelineList = findAllPipeline();
         for (Pipeline pipeline1 : pipelineList) {
         //判断是否有此用户
             if (pipelineName.equals(pipeline1.getPipelineName())){
@@ -79,68 +94,64 @@ public class PipelineServiceImpl implements PipelineService{
 
     //查询
     @Override
-    public Pipeline selectPipeline(String id) {
+    public Pipeline findPipeline(String id) {
 
-        PipelineEntity pipelineEntity = pipelineDao.selectPipeline(id);
-        // joinTemplate.joinQuery(pipeline);
-        return BeanMapper.map(pipelineEntity, Pipeline.class);
+        PipelineEntity pipelineEntity = pipelineDao.findPipeline(id);
+        Pipeline pipeline = BeanMapper.map(pipelineEntity, Pipeline.class);
+        joinTemplate.joinQuery(pipeline);
+        return pipeline;
     }
 
     //查询所有
     @Override
-    public List<Pipeline> selectAllPipeline() {
+    public List<Pipeline> findAllPipeline() {
 
-        List<PipelineEntity> pipelineEntityList = pipelineDao.selectAllPipeline();
-       // joinTemplate.joinQuery(pipelineList);
+        List<PipelineEntity> pipelineEntityList = pipelineDao.findAllPipeline();
+        List<Pipeline> pipelineList = BeanMapper.mapList(pipelineEntityList, Pipeline.class);
+        joinTemplate.joinQuery(pipelineList);
+        return pipelineList;
+    }
+
+    @Override
+    public List<Pipeline> findAllPipelineList(List<String> idList) {
+
+        List<PipelineEntity> pipelineEntityList = pipelineDao.findAllPipelineList(idList);
         return BeanMapper.mapList(pipelineEntityList, Pipeline.class);
     }
 
     @Override
-    public List<Pipeline> selectAllPipelineList(List<String> idList) {
+    public List<Pipeline> findName(String pipelineName) {
 
-        List<PipelineEntity> pipelineEntityList = pipelineDao.selectAllPipelineList(idList);
-        return BeanMapper.mapList(pipelineEntityList, Pipeline.class);
-    }
-
-    @Override
-    public List<Pipeline> selectName(String pipelineName) {
-
-        List<PipelineEntity> pipelineEntityList = pipelineDao.selectName(pipelineName);
+        List<PipelineEntity> pipelineEntityList = pipelineDao.findName(pipelineName);
         return BeanMapper.mapList(pipelineEntityList, Pipeline.class);
     }
 
     //查询所有流水线状态
     @Override
-    public List<PipelineStatus> selectAll() {
+    public List<PipelineStatus> findAll() {
 
-        List<PipelineEntity> pipelineEntityList = pipelineDao.selectAllPipeline();
+        List<PipelineEntity> pipelineEntityList = pipelineDao.findAllPipeline();
         List<PipelineStatus> pipelineAllList =new ArrayList<>();
 
         //把数据添加到pipelineAllList对象中
-
         for (PipelineEntity pipelineEntity : pipelineEntityList) {
-
             PipelineStatus pipelineStatus = new PipelineStatus();
-            //获取id
             pipelineStatus.setPipelineId(pipelineEntity.getPipelineId());
-            //获取名称
             pipelineStatus.setPipelineName(pipelineEntity.getPipelineName());
-            //获取最近一次的构建
-            PipelineHistory pipelineHistory = pipelineHistoryService.selectLastPipelineHistory(pipelineEntity.getPipelineId());
-            if (pipelineHistory != null){
-                //获取上次构建时间
-                pipelineStatus.setLastStructureTime(pipelineHistory.getHistoryCreateTime());
+            History history = historyService.findLastPipelineHistory(pipelineEntity.getPipelineId());
+            if (history != null){
+                pipelineStatus.setLastStructureTime(history.getHistoryCreateTime());
             }
 
             //获取同一id下的所有历史记录
-            List<PipelineHistory> pipelineHistoryList = pipelineHistoryService.selectAllPipelineIdList(pipelineEntity.getPipelineId());
-            if (pipelineHistoryList != null){
-                for (int i = pipelineHistoryList.size() - 1; i >= 0; i--) {
-                    if (pipelineHistoryList.get(i).getPipelineLog().getLogRunStatus() == 30){
+            List<History> historyList = historyService.findAllPipelineIdList(pipelineEntity.getPipelineId());
+            if (historyList != null){
+                for (int i = historyList.size() - 1; i >= 0; i--) {
+                    if (historyList.get(i).getPipelineLog().getLogRunStatus() == 30){
                         //获取上次成功时间
-                        pipelineStatus.setLastSuccessTime(pipelineHistoryList.get(i).getHistoryCreateTime());
+                        pipelineStatus.setLastSuccessTime(historyList.get(i).getHistoryCreateTime());
                     }
-                    pipelineStatus.setStructureStatus(pipelineHistoryList.get(i).getPipelineLog().getLogRunStatus());
+                    pipelineStatus.setStructureStatus(historyList.get(i).getPipelineLog().getLogRunStatus());
                 }
             }
             pipelineAllList.add(pipelineStatus);

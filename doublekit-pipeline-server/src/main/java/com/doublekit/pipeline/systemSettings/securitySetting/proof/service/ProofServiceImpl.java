@@ -23,6 +23,7 @@ public class ProofServiceImpl implements ProofService{
     @Autowired
     JoinTemplate joinTemplate;
 
+
     //创建
     @Override
     public String createProof(Proof proof) {
@@ -53,11 +54,8 @@ public class ProofServiceImpl implements ProofService{
     public Proof findOneProof(String proofId) {
 
         ProofEntity proofEntity = ProofDao.findOneProof(proofId);
-
         Proof proof = BeanMapper.map(proofEntity, Proof.class);
-
         joinTemplate.joinQuery(proof);
-
         return proof;
     }
 
@@ -65,11 +63,8 @@ public class ProofServiceImpl implements ProofService{
     public List<Proof> selectAllProof() {
 
         List<ProofEntity> proofEntityList = ProofDao.selectAllProof();
-
         List<Proof> proofList = BeanMapper.mapList(proofEntityList, Proof.class);
-
         joinTemplate.joinQuery(proofList);
-
         return proofList;
     }
 
@@ -77,16 +72,13 @@ public class ProofServiceImpl implements ProofService{
     public List<Proof> findAllGitProof(){
 
         List<ProofEntity> proofEntityList = ProofDao.selectAllProof();
-
         List<ProofEntity> proofs = new ArrayList<>();
-
         for (ProofEntity proofEntity : proofEntityList) {
             if (proofEntity.getProofScope() == 1){
                 proofs.add(proofEntity);
             }
         }
         List<Proof> proofList = BeanMapper.mapList(proofs, Proof.class);
-
         joinTemplate.joinQuery(proofList);
 
         return proofList;
@@ -96,7 +88,6 @@ public class ProofServiceImpl implements ProofService{
     public List<Proof> findAllDeployProof(){
 
         List<ProofEntity> proofEntityList = ProofDao.selectAllProof();
-
         List<ProofEntity> proofs = new ArrayList<>();
         for (ProofEntity proofEntity : proofEntityList) {
             //判断凭证类型
@@ -105,7 +96,6 @@ public class ProofServiceImpl implements ProofService{
             }
         }
         List<Proof> proofList = BeanMapper.mapList(proofs, Proof.class);
-
         joinTemplate.joinQuery(proofList);
 
         return proofList;
@@ -113,7 +103,6 @@ public class ProofServiceImpl implements ProofService{
 
     @Override
     public List<Proof> selectProofList(List<String> idList) {
-
         List<ProofEntity> proofEntityList = ProofDao.selectAllProofList(idList);
 
         return BeanMapper.mapList(proofEntityList, Proof.class);

@@ -4,9 +4,9 @@ import com.doublekit.apibox.annotation.Api;
 import com.doublekit.apibox.annotation.ApiMethod;
 import com.doublekit.apibox.annotation.ApiParam;
 import com.doublekit.common.Result;
-import com.doublekit.pipeline.instance.model.PipelineLog;
-import com.doublekit.pipeline.instance.service.PipelineLogService;
-import com.doublekit.pipeline.instance.service.PipelineStructureService;
+import com.doublekit.pipeline.instance.model.Log;
+import com.doublekit.pipeline.instance.service.LogService;
+import com.doublekit.pipeline.instance.service.StructureService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,16 +17,15 @@ import javax.validation.constraints.NotNull;
 
 @RestController
 @RequestMapping("/pipelineLog")
-@Api(name = "PipelineLogController",desc = "流水线日志")
-public class PipelineLogController {
+@Api(name = "LogController",desc = "流水线日志")
+public class LogController {
 
     @Autowired
-    PipelineLogService PipelineLogService;
+    LogService LogService;
 
     @Autowired
-    PipelineStructureService pipelineStructureService;
+    StructureService structureService;
 
-    private static Logger logger = LoggerFactory.getLogger(PipelineLogController.class);
 
     //开始构建
     @RequestMapping(path="/pipelineStructure",method = RequestMethod.POST)
@@ -34,7 +33,7 @@ public class PipelineLogController {
     @ApiParam(name = "pipelineId",desc = "流水线id",required = true)
     public Result<String> pipelineStructure(@NotNull String pipelineId ) throws Exception {
 
-        String logId = pipelineStructureService.pipelineStructure(pipelineId);
+        String logId = structureService.Structure(pipelineId);
 
         return Result.ok(logId);
     }
@@ -43,22 +42,22 @@ public class PipelineLogController {
     @RequestMapping(path="/selectStructureState",method = RequestMethod.POST)
     @ApiMethod(name = "selectStructureState",desc = "查询构建状态")
     @ApiParam(name = "pipelineId",desc = "流水线id",required = true)
-    public Result<PipelineLog> selectStructureState(String pipelineId) {
+    public Result<Log> selectStructureState(String pipelineId) {
 
-        PipelineLog pipelineLog = pipelineStructureService.selectStructureState(pipelineId);
+        Log log = structureService.findStructureState(pipelineId);
 
-        return Result.ok(pipelineLog);
+        return Result.ok(log);
     }
 
     //查询单个流水线
     @RequestMapping(path="/selectPipelineLog",method = RequestMethod.POST)
     @ApiMethod(name = "selectPipelineLog",desc = "查询日志")
     @ApiParam(name = "logId",desc = "日志id",required = true)
-    public Result<PipelineLog> selectPipelineLog(@NotNull String logId ){
+    public Result<Log> selectPipelineLog(@NotNull String logId ){
 
-        PipelineLog pipelineLog = PipelineLogService.selectPipelineLog(logId);
+        Log log = LogService.findOneLog(logId);
 
-        return Result.ok(pipelineLog);
+        return Result.ok(log);
     }
 
 

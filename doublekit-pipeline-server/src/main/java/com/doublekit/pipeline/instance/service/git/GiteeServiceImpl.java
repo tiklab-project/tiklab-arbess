@@ -1,10 +1,13 @@
-package com.doublekit.pipeline.instance.service;
+package com.doublekit.pipeline.instance.service.git;
 
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.doublekit.beans.annotation.Mapper;
-import com.doublekit.pipeline.definition.model.Gitee;
+import com.doublekit.pipeline.definition.model.git.Gitee;
+import com.doublekit.pipeline.definition.model.Configure;
+import com.doublekit.pipeline.definition.service.ConfigureService;
+import com.doublekit.pipeline.systemSettings.securitySetting.proof.model.Proof;
+import com.doublekit.pipeline.systemSettings.securitySetting.proof.service.ProofService;
 import com.doublekit.rpc.annotation.Exporter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,30 +15,34 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.lang.management.PlatformLoggingMXBean;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 
 @Service
 @Exporter
-public class GiteeServiceImpl implements GiteeService{
+public class GiteeServiceImpl implements GiteeService {
 
     @Autowired
     RestTemplate restTemplate;
 
-    Gitee gitee = new Gitee();
+    @Autowired
+    ProofService proofService;
 
+    @Autowired
+    ConfigureService configureService;
+
+    Gitee gitee = new Gitee();
+    Proof proof = new Proof();
     private static final Logger logger = LoggerFactory.getLogger(GiteeServiceImpl.class);
 
 
@@ -46,11 +53,9 @@ public class GiteeServiceImpl implements GiteeService{
 
     @Override
     public String  getAccessToken(String code) throws IOException {
-
         logger.info("code凭证 ：" +code);
         logger.info("开始获取token。。。。。。。" );
         String url = gitee.getAccessToken(code);
-        logger.info("url :  "+url);
         // Map<String, String> hashMap = new HashMap<>();
         // hashMap.put("grant_type","authorization_code");
         // hashMap.put("code",code);
@@ -67,23 +72,34 @@ public class GiteeServiceImpl implements GiteeService{
         // // }
         // logger.info(body);
         // return null;
-
         String post = request(url, "POST");
-        JSONObject jsonObject = JSONObject.parseObject(post);
-        String access_token = jsonObject.getString("access_token");
-        gitee.setAccessToken(access_token);
-        logger.info("token凭证 :  "+access_token);
-        return access_token;
+        if (post != null){
+            JSONObject jsonObject = JSONObject.parseObject(post);
+            String access_token = jsonObject.getString("access_token");
+            String refresh_token = jsonObject.getString("refresh_token");
+            gitee.setAccessToken(access_token);
+            gitee.setRefreshToken(refresh_token);
+            logger.info("token凭证 :  "+access_token);
+            return access_token;
+        }
+        return null;
+    }
+
+    public String getProof(String configureId){
+        String proofId = proofService.createProof(proof);
+        proof.setProofId(proofId);
+        proof.setProofPassword(gitee.getAccessToken());
+        Configure configure = configureService.findConfigure(configureId);
+        proof.setProofId(configure.getPipeline().getPipelineId());
+        return proofId;
     }
 
     //列出授权用户的所有仓库
     @Override
     public List<String> getAllStorehouse() {
-
         ArrayList<String> strings = new ArrayList<>();
         String allStorehouseAddress = gitee.getAllStorehouse(gitee.getAccessToken());
         logger.info("token凭证 :"+gitee.getAccessToken());
-        logger.info("仓库url :  "+allStorehouseAddress);
         //消息转换器列表
         List<HttpMessageConverter<?>> messageConverters = restTemplate.getMessageConverters();
         //配置消息转换器StringHttpMessageConverter，并设置utf-8
@@ -94,19 +110,24 @@ public class GiteeServiceImpl implements GiteeService{
         JSONArray allStorehouseJson = JSONArray.parseArray(body);
         for (int i = 0; i < allStorehouseJson.size(); i++) {
             JSONObject storehouse=allStorehouseJson.getJSONObject(i);
-            String human_name = storehouse.getString("human_name");
-            strings.add(human_name);
+            strings.add(storehouse.getString("human_name"));
             gitee.setName(storehouse.getString("project_creator"));
         }
         logger.info("登录名称 ："+gitee.getName());
+        proof.setProofName(gitee.getName());
+        proof.setProofType("gitee");
+        proof.setProofScope(3);
+        proof.setProofUsername(gitee.getName());
+
         return strings;
     }
 
     //获取一个仓库的所有分支
     public List<String> getBranch(String projectName) {
         String[] split = projectName.split("/");
+        String name = split[1];
         ArrayList<String> branchList = new ArrayList<>();
-        String branchAddress = gitee.getWarehouseBranch(split[1], gitee.getAccessToken());
+        String branchAddress = gitee.getWarehouseBranch(name);
         ResponseEntity<String> forEntity = restTemplate.getForEntity(branchAddress, String.class, JSONObject.class);
         JSONArray branchS = JSONArray.parseArray(forEntity.getBody());
         for (int i = 0; i < branchS.size(); i++) {
@@ -116,6 +137,16 @@ public class GiteeServiceImpl implements GiteeService{
         return branchList;
     }
 
+
+    public String getGiteeUrl(String projectName){
+        String[] split = projectName.split("/");
+        String name = split[1];
+        //获取仓库URl
+        String oneStorehouse = gitee.getOneStorehouse(name);
+        ResponseEntity<String> forEntity1 = restTemplate.getForEntity(oneStorehouse, String.class, JSONObject.class);
+        JSONObject jsonObject = JSONObject.parseObject(forEntity1.getBody());
+        return jsonObject.getString("html_url");
+    }
     /**
      * 访问url
      * @param url 访问地址
@@ -139,8 +170,17 @@ public class GiteeServiceImpl implements GiteeService{
             result.append(line);
         }
         in.close();
-
         return result.toString();
     }
 
+    @Scheduled(cron = "0 0 0/23 1/1 * ? ")
+    public void time() throws IOException {
+        String token = gitee.getToken();
+        String post = request(token, "POST");
+        JSONObject jsonObject = JSONObject.parseObject(post);
+        String access_token = jsonObject.getString("access_token");
+        String refresh_token = jsonObject.getString("refresh_token");
+        gitee.setAccessToken(access_token);
+        gitee.setRefreshToken(refresh_token);
     }
+}
