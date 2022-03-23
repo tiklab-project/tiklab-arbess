@@ -71,7 +71,7 @@ public class PipelineExecLogServiceImpl implements PipelineExecLogService {
     //创建历史表
     public String createHistory(String logId){
         PipelineExecHistory pipelineExecHistory = new PipelineExecHistory();
-        pipelineExecHistory.getPipelineLog().setLogId(logId);
+        pipelineExecHistory.getPipelineExecLog().setLogId(logId);
         return pipelineExecHistoryService.createHistory(pipelineExecHistory);
     }
 
@@ -87,7 +87,7 @@ public class PipelineExecLogServiceImpl implements PipelineExecLogService {
         int number =  i;
         PipelineExecHistory pipelineExecHistory = pipelineExecService.addHistoryTwo(pipelineId);
         PipelineExecLog pipelineExecLog = findOneLog(logId);
-        pipelineExecHistory.setPipelineLog(pipelineExecLog);
+        pipelineExecHistory.setPipelineExecLog(pipelineExecLog);
         pipelineExecHistory.setHistoryNumber(number);
 
          pipelineExecHistoryService.perfectHistory(pipelineExecHistory);

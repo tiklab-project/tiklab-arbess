@@ -86,7 +86,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         PipelineExecHistory PipelineExecHistory = pipelineConfigureService.addHistoryOne(pipelineId, pipelineExecHistory);
         Pipeline pipeline = pipelineService.findPipeline(pipelineId);
         //添加信息
-        pipelineExecHistory.setConfigure(PipelineExecHistory.getConfigure());
+        pipelineExecHistory.setPipelineConfigure(PipelineExecHistory.getPipelineConfigure());
         pipelineExecHistory.setProof(PipelineExecHistory.getProof());
         pipelineExecHistory.setPipeline(pipeline);
         pipelineExecHistory.setHistoryCreateTime(dateFormat.format(new Date()));

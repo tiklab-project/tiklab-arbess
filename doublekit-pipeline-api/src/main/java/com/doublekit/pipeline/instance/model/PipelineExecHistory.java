@@ -14,7 +14,7 @@ import com.doublekit.pipeline.setting.proof.model.Proof;
 
 @ApiModel
 @Join
-@Mapper(targetAlias = "HistoryEntity")
+@Mapper(targetAlias = "PipelineExecHistoryEntity")
 public class PipelineExecHistory {
 
     //构建历史id
@@ -54,21 +54,21 @@ public class PipelineExecHistory {
     private Proof proof;
 
     //日志
-    @ApiProperty(name="log",desc="日志id",eg="@selectOne")
+    @ApiProperty(name="pipelineExecLog",desc="日志id",eg="@selectOne")
     @Mappings({
-            @Mapping(source = "log.logId",target = "logId")
+            @Mapping(source = "pipelineExecLog.logId",target = "logId")
     })
     @JoinQuery(key = "logId")
     private PipelineExecLog pipelineExecLog;
 
     //凭证
-    @ApiProperty(name="configure",desc="配置id",eg="@selectOne")
+    @ApiProperty(name="pipelineConfigure",desc="配置id",eg="@selectOne")
     @Mappings({
-            @Mapping(source = "configure.configureId",target = "configureId")
+
+            @Mapping(source = "pipelineConfigure.configureId",target = "configureId")
     })
     @JoinQuery(key = "configureId")
     private PipelineConfigure pipelineConfigure;
-
 
     public String getHistoryId() {
         return historyId;
@@ -126,27 +126,20 @@ public class PipelineExecHistory {
         this.proof = proof;
     }
 
-    public PipelineExecLog getPipelineLog() {
+    public PipelineExecLog getPipelineExecLog() {
         return pipelineExecLog;
     }
 
-    public void setPipelineLog(PipelineExecLog pipelineExecLog) {
+    public void setPipelineExecLog(PipelineExecLog pipelineExecLog) {
         this.pipelineExecLog = pipelineExecLog;
     }
 
-    public PipelineExecLog getLog() {
-        return pipelineExecLog;
-    }
-
-    public void setLog(PipelineExecLog pipelineExecLog) {
-        this.pipelineExecLog = pipelineExecLog;
-    }
-
-    public PipelineConfigure getConfigure() {
+    public PipelineConfigure getPipelineConfigure() {
         return pipelineConfigure;
     }
 
-    public void setConfigure(PipelineConfigure pipelineConfigure) {
+    public void setPipelineConfigure(PipelineConfigure pipelineConfigure) {
         this.pipelineConfigure = pipelineConfigure;
     }
+
 }

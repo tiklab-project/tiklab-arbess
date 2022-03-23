@@ -50,15 +50,15 @@ public class PipelineConfigureEntity {
     private String configureCreateTime;
 
     //流水线id
-    @Column(name = "pipeline_id",notNull = true)
+    @Column(name = "pipeline_id")
     private String pipelineId;
 
     //凭证构建id
-    @Column(name = "proof_id_git",notNull = true)
+    @Column(name = "proof_id_git")
     private String gitProofId;
 
     //凭证部署id
-    @Column(name = "proof_id_deploy",notNull = true)
+    @Column(name = "proof_id_deploy")
     private String deployProofId;
 
     //打包文件地址
@@ -79,8 +79,6 @@ public class PipelineConfigureEntity {
 
     @Column(name = "configure_code_name" ,notNull = true)
     private String configureCodeName;
-
-
 
 
     public String getConfigureId() {

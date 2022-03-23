@@ -11,6 +11,8 @@ import com.doublekit.pipeline.instance.service.git.GiteeApiService;
 import com.doublekit.pipeline.setting.proof.model.Proof;
 import com.doublekit.pipeline.setting.proof.service.ProofService;
 import com.doublekit.rpc.annotation.Exporter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
@@ -33,6 +35,9 @@ public class PipelineConfigureServiceImpl implements PipelineConfigureService {
 
     @Autowired
     PipelineConfigureDao pipelineConfigureDao;
+
+    private static final Logger logger = LoggerFactory.getLogger(PipelineConfigureServiceImpl.class);
+
 
     //创建
     @Override
@@ -67,6 +72,7 @@ public class PipelineConfigureServiceImpl implements PipelineConfigureService {
             String giteeUrl = giteeApiService.getGiteeUrl(pipelineConfigure.getConfigureCodeSourceAddress());
             pipelineConfigure.setConfigureCodeName(giteeUrl);
         }
+        joinTemplate.joinQuery(pipelineConfigure);
         PipelineConfigureEntity pipelineConfigureEntity = BeanMapper.map(pipelineConfigure, PipelineConfigureEntity.class);
         pipelineConfigureDao.updateConfigure(pipelineConfigureEntity);
 
@@ -149,7 +155,7 @@ public class PipelineConfigureServiceImpl implements PipelineConfigureService {
     public PipelineExecHistory addHistoryOne(String pipelineId, PipelineExecHistory pipelineExecHistory){
         PipelineConfigure pipelineConfigure = findTimeId(pipelineId);
         Proof proof = proofService.findOneProof(pipelineConfigure.getGitProof().getProofId());
-        pipelineExecHistory.setConfigure(pipelineConfigure);
+        pipelineExecHistory.setPipelineConfigure(pipelineConfigure);
         pipelineExecHistory.setProof(proof);
 
         return pipelineExecHistory;

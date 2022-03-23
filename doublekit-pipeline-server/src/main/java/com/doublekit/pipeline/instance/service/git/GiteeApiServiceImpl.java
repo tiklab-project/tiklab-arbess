@@ -69,6 +69,7 @@ public class GiteeApiServiceImpl implements GiteeApiService {
         return null;
     }
 
+    @Override
     public String getProof(String configureId){
         PipelineConfigure pipelineConfigure = pipelineConfigureService.findConfigure(configureId);
         if (pipelineConfigure.getGitProof() == null){
@@ -79,6 +80,7 @@ public class GiteeApiServiceImpl implements GiteeApiService {
         String proofId = pipelineConfigure.getGitProof().getProofId();
         proof.setProofPassword(giteeApi.getAccessToken());
         proof.setProofId(pipelineConfigure.getPipeline().getPipelineId());
+        proofService.updateProof(proof);
         return proofId;
     }
 
@@ -106,7 +108,6 @@ public class GiteeApiServiceImpl implements GiteeApiService {
         proof.setProofType("gitee");
         proof.setProofScope(3);
         proof.setProofUsername(giteeApi.getName());
-        proofService.updateProof(proof);
 
         return strings;
     }

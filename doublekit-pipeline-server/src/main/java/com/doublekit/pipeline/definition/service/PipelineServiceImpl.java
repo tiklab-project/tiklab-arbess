@@ -2,6 +2,7 @@ package com.doublekit.pipeline.definition.service;
 
 import com.doublekit.beans.BeanMapper;
 import com.doublekit.join.JoinTemplate;
+import com.doublekit.pipeline.definition.controller.PipelineController;
 import com.doublekit.pipeline.definition.dao.PipelineDao;
 import com.doublekit.pipeline.definition.entity.PipelineEntity;
 import com.doublekit.pipeline.definition.model.Pipeline;
@@ -10,6 +11,8 @@ import com.doublekit.pipeline.definition.model.PipelineStatus;
 import com.doublekit.pipeline.instance.model.PipelineExecHistory;
 import com.doublekit.pipeline.instance.service.PipelineExecHistoryService;
 import com.doublekit.rpc.annotation.Exporter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
@@ -37,6 +40,8 @@ public class PipelineServiceImpl implements PipelineService{
     @Autowired
     PipelineConfigureService pipelineConfigureService;
 
+    private static final Logger logger = LoggerFactory.getLogger(PipelineServiceImpl.class);
+
     //创建
     @Override
     public Map<String, String> createPipeline(Pipeline pipeline) {
@@ -54,6 +59,7 @@ public class PipelineServiceImpl implements PipelineService{
         String pipelineId = pipelineDao.createPipeline(pipelineEntity);
         pipeline.setPipelineId(pipelineId);
         pipelineConfigure.setPipeline(pipeline);
+        logger.info("pipelineConfigure ........."+pipelineConfigure.toString());
         String pipelineConfigureId = pipelineConfigureService.createConfigure(pipelineConfigure);
         map.put("pipelineId",pipelineId);
         map.put("pipelineConfigureId",pipelineConfigureId);
@@ -147,11 +153,11 @@ public class PipelineServiceImpl implements PipelineService{
             List<PipelineExecHistory> pipelineExecHistoryList = pipelineExecHistoryService.findAllPipelineIdList(pipelineEntity.getPipelineId());
             if (pipelineExecHistoryList != null){
                 for (int i = pipelineExecHistoryList.size() - 1; i >= 0; i--) {
-                    if (pipelineExecHistoryList.get(i).getPipelineLog().getLogRunStatus() == 30){
+                    if (pipelineExecHistoryList.get(i).getPipelineExecLog().getLogRunStatus() == 30){
                         //获取上次成功时间
                         pipelineStatus.setLastSuccessTime(pipelineExecHistoryList.get(i).getHistoryCreateTime());
                     }
-                    pipelineStatus.setStructureStatus(pipelineExecHistoryList.get(i).getPipelineLog().getLogRunStatus());
+                    pipelineStatus.setStructureStatus(pipelineExecHistoryList.get(i).getPipelineExecLog().getLogRunStatus());
                 }
             }
             pipelineAllList.add(pipelineStatus);

@@ -7,7 +7,7 @@ import com.doublekit.join.annotation.Join;
 
 @ApiModel
 @Join
-@Mapper(targetAlias = "LogEntity")
+@Mapper(targetAlias = "PipelineExecLogEntity")
 public class PipelineExecLog {
 
     //日志id

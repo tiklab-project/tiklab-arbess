@@ -6,6 +6,9 @@ import com.doublekit.apibox.annotation.ApiParam;
 import com.doublekit.common.Result;
 import com.doublekit.pipeline.definition.model.PipelineConfigure;
 import com.doublekit.pipeline.definition.service.PipelineConfigureService;
+import com.doublekit.pipeline.definition.service.PipelineConfigureServiceImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,6 +25,9 @@ public class PipelineConfigureController {
 
     @Autowired
     PipelineConfigureService pipelineConfigureService;
+
+
+    private static final Logger logger = LoggerFactory.getLogger(PipelineConfigureController.class);
 
     //添加
     @RequestMapping(path="/createPipelineConfigure",method = RequestMethod.POST)

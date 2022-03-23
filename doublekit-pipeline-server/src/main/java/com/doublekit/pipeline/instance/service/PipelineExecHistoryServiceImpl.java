@@ -46,7 +46,7 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
             PipelineExecHistory pipelineExecHistory = findOneHistory(historyId);
             if (pipelineExecHistory !=null){
                 // 删除对应的日志
-                pipelineExecLogService.deleteLog(pipelineExecHistory.getPipelineLog().getLogId());
+                pipelineExecLogService.deleteLog(pipelineExecHistory.getPipelineExecLog().getLogId());
             }
             //删除对应的历史
             pipelineExecHistoryDao.deleteHistory(historyId);
@@ -128,7 +128,7 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
 
             pipelineExecHistoryDetails.setHistoryNumber(pipelineExecHistory.getHistoryNumber());
             //获取状态
-            pipelineExecHistoryDetails.setStatus(pipelineExecHistory.getPipelineLog().getLogRunStatus());
+            pipelineExecHistoryDetails.setStatus(pipelineExecHistory.getPipelineExecLog().getLogRunStatus());
             //获取创建构建时间
             if (pipelineExecHistory.getHistoryCreateTime() != null){
                 pipelineExecHistoryDetails.setCreateStructureTime(pipelineExecHistory.getHistoryCreateTime());
@@ -141,13 +141,13 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
                 pipelineExecHistoryDetails.setImplementor(pipelineExecHistory.getPipeline().getPipelineCreateUser());
             }
             //获取执行时长
-            int ImplementTime = pipelineExecHistory.getPipelineLog().getLogCodeTime()
-                    + pipelineExecHistory.getPipelineLog().getLogDeployTime()
-                    + pipelineExecHistory.getPipelineLog().getLogPackTime()
-                    + pipelineExecHistory.getPipelineLog().getLogTestTime();
+            int ImplementTime = pipelineExecHistory.getPipelineExecLog().getLogCodeTime()
+                    + pipelineExecHistory.getPipelineExecLog().getLogDeployTime()
+                    + pipelineExecHistory.getPipelineExecLog().getLogPackTime()
+                    + pipelineExecHistory.getPipelineExecLog().getLogTestTime();
             pipelineExecHistoryDetails.setImplementTime(ImplementTime);
             // 获取代码源
-            int configureCodeSource = pipelineExecHistory.getConfigure().getConfigureCodeSource();
+            int configureCodeSource = pipelineExecHistory.getPipelineConfigure().getConfigureCodeSource();
             if (configureCodeSource != 0){
                 pipelineExecHistoryDetails.setCodeSource(configureCodeSource);
             }
@@ -217,14 +217,14 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
     @Override
     public void perfectHistory(PipelineExecHistory pipelineExecHistory) {
 
-        String logId = pipelineExecHistory.getPipelineLog().getLogId();
+        String logId = pipelineExecHistory.getPipelineExecLog().getLogId();
 
         if (logId != null){
             //获取日志id
-            pipelineExecHistory.setPipelineLog(pipelineExecLogService.findOneLog(logId));
+            pipelineExecHistory.setPipelineExecLog(pipelineExecLogService.findOneLog(logId));
         }
         //获取分支
-        String configureBranch = pipelineExecHistory.getConfigure().getConfigureBranch();
+        String configureBranch = pipelineExecHistory.getPipelineConfigure().getConfigureBranch();
         if (configureBranch == null){
             configureBranch="master";
         }
@@ -242,7 +242,7 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
         PipelineExecHistory pipelineExecHistory = findOneHistory(historyId);
 
         if (pipelineExecHistory != null){
-            String logId = pipelineExecHistory.getPipelineLog().getLogId();
+            String logId = pipelineExecHistory.getPipelineExecLog().getLogId();
             return  pipelineExecLogService.findOneLog(logId);
         }
         return null;
@@ -254,7 +254,7 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
         PipelineExecHistory pipelineExecHistory = findOneHistory(HistoryId);
         //判断是否存在历史
         if (pipelineExecHistory != null){
-            String logId = pipelineExecHistory.getPipelineLog().getLogId();
+            String logId = pipelineExecHistory.getPipelineExecLog().getLogId();
             if (logId != null){
                 pipelineExecLogService.deleteLog(logId);
             }

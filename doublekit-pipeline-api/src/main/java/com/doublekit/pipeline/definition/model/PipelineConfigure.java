@@ -11,7 +11,7 @@ import com.doublekit.pipeline.setting.proof.model.Proof;
 
 @ApiModel
 @Join
-@Mapper(targetAlias = "ConfigureEntity")
+@Mapper(targetAlias = "PipelineConfigureEntity")
 public class PipelineConfigure {
 
     //流水线配置id
@@ -70,7 +70,6 @@ public class PipelineConfigure {
     @ApiProperty(name="configureCodeName",desc="仓库名称")
     private String configureCodeName;
 
-
     //凭证
     @ApiProperty(name="deployProof",desc="凭证id",eg="@selectOne")
     @Mappings({
@@ -95,8 +94,6 @@ public class PipelineConfigure {
     //测试内容
     @ApiProperty(name = "configureTestText" , desc = "测试内容")
     private String configureTestText;
-
-
 
 
     public String getConfigureCodeSourceAddress() {
