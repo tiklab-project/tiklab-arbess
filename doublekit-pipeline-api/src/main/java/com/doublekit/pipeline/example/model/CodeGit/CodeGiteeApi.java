@@ -1,8 +1,8 @@
-package com.doublekit.pipeline.definition.model.git;
+package com.doublekit.pipeline.example.model.CodeGit;
 
 import java.util.List;
 
-public class GiteeApi {
+public class CodeGiteeApi {
 
     //应用名
      private String name;
@@ -63,6 +63,11 @@ public class GiteeApi {
     public String getToken() {
         //获取新的token
         return "https://gitee.com/oauth/token?grant_type=refresh_token&refresh_token="+getRefreshToken();
+    }
+
+    public String getUserMessage() {
+        //获取授权用户的资料
+        return "https://gitee.com/api/v5/user?access_token="+getAccessToken();
     }
 
 

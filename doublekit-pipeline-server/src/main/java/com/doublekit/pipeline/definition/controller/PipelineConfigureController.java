@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/pipelineConfigure")
@@ -33,50 +34,48 @@ public class PipelineConfigureController {
     @RequestMapping(path="/createPipelineConfigure",method = RequestMethod.POST)
     @ApiMethod(name = "createPipelineConfigure",desc = "创建流水线配置")
     @ApiParam(name = "pipelineConfigure",desc = "配置信息",required = true)
-    public Result<String> createPipelineConfigure(@RequestBody @NotNull @Valid PipelineConfigure pipelineConfigure){
+    public Result<Map<String, String>> createPipelineConfigure(@RequestBody @NotNull @Valid PipelineConfigure pipelineConfigure){
 
-        String configureId = pipelineConfigureService.createConfigure(pipelineConfigure);
+        Map<String, String> map = pipelineConfigureService.createConfigure(pipelineConfigure);
 
-        return Result.ok(configureId);
+        return Result.ok(map);
     }
 
     //删除
-    @RequestMapping(path="/deletePipelineConfig",method = RequestMethod.POST)
+    @RequestMapping(path="/deletePipelineConfigure",method = RequestMethod.POST)
     @ApiMethod(name = "deletePipelineConfig",desc = "删除流水线配置")
-    @ApiParam(name = "id",desc = "id",required = true)
-    public Result deletePipelineConfig(@NotNull String id){
+    @ApiParam(name = "pipelineId",desc = "pipelineId",required = true)
+    public Result deletePipelineConfig(@NotNull String pipelineId){
 
-        pipelineConfigureService.deleteConfig(id);
+        pipelineConfigureService.deletePipelineIdConfigure(pipelineId);
 
         return Result.ok();
     }
 
     //根据流水线id查询配置信息
-    @RequestMapping(path="/selectPipelineConfig",method = RequestMethod.POST)
-    @ApiMethod(name = "selectPipelineConfig",desc = "根据流水线id查询配置信息")
+    @RequestMapping(path="/findOnePipelineConfigure",method = RequestMethod.POST)
+    @ApiMethod(name = "findPipelineConfigure",desc = "根据流水线id查询配置信息")
     @ApiParam(name = "pipelineId",desc = "流水线id",required = true)
-    public Result<PipelineConfigure> selectPipelineConfig(@NotNull String pipelineId) {
+    public Result<PipelineConfigure> findPipelineConfigure(@NotNull String pipelineId) {
 
-        PipelineConfigure selectPipelineConfig = pipelineConfigureService.findTimeId(pipelineId);
+        PipelineConfigure selectPipelineConfig = pipelineConfigureService.findPipelineIdConfigure(pipelineId);
 
         return Result.ok(selectPipelineConfig);
     }
 
     //更新信息
-    @RequestMapping(path="/updatePipelineConfig",method = RequestMethod.POST)
-    @ApiMethod(name = "updatePipelineConfig",desc = "更新流水线配置")
+    @RequestMapping(path="/updatePipelineConfigure",method = RequestMethod.POST)
+    @ApiMethod(name = "updatePipelineConfigure",desc = "更新流水线配置")
     @ApiParam(name = "pipelineConfigure",desc = "配置信息",required = true)
-    public Result<String> updatePipelineConfig(@RequestBody @NotNull @Valid PipelineConfigure pipelineConfigure){
-
-        String configureId = pipelineConfigureService.updateConfigure(pipelineConfigure);
-
-        return Result.ok(configureId);
+    public Result<Void> updatePipelineConfigure(@RequestBody @Valid PipelineConfigure pipelineConfigure){
+        pipelineConfigureService.updateConfigure(pipelineConfigure);
+        return Result.ok();
     }
 
     //查询所有
-    @RequestMapping(path="/selectAllPipelineConfig",method = RequestMethod.POST)
-    @ApiMethod(name = "selectAllPipelineConfig",desc = "查询所有流水线配置")
-    public Result<PipelineConfigure> selectAllPipelineConfig(){
+    @RequestMapping(path="/findAllPipelineConfigure",method = RequestMethod.POST)
+    @ApiMethod(name = "findAllPipelineConfigure",desc = "查询所有流水线配置")
+    public Result<PipelineConfigure> findAllPipelineConfigure(){
 
         List<PipelineConfigure> pipelineConfigureList = pipelineConfigureService.findAllConfigure();
 

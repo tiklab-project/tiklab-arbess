@@ -2,7 +2,10 @@ package com.doublekit.pipeline.definition.dao;
 
 
 import com.doublekit.dal.jpa.JpaTemplate;
+import com.doublekit.pipeline.definition.controller.PipelineConfigureController;
 import com.doublekit.pipeline.definition.entity.PipelineConfigureEntity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -17,6 +20,8 @@ public class PipelineConfigureDao {
 
     @Autowired
     JpaTemplate jpaTemplate;
+
+    private static final Logger logger = LoggerFactory.getLogger(PipelineConfigureDao.class);
 
     /**
      * 添加流水线配置信息
@@ -45,11 +50,11 @@ public class PipelineConfigureDao {
 
     /**
      * 查询配置信息
-     * @param id 查询id
+     * @param configureId 查询id
      * @return 配置信息
      */
-    public PipelineConfigureEntity findConfigure(String id){
-        return jpaTemplate.findOne(PipelineConfigureEntity.class, id);
+    public PipelineConfigureEntity findOneConfigure(String configureId){
+        return jpaTemplate.findOne(PipelineConfigureEntity.class, configureId);
     }
 
     /**
@@ -61,7 +66,6 @@ public class PipelineConfigureDao {
     }
 
     public List<PipelineConfigureEntity> findAllConfigureList(List<String> idList){
-
         return jpaTemplate.findList(PipelineConfigureEntity.class,idList);
     }
 }

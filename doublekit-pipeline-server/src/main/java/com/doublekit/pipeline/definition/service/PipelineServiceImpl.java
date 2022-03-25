@@ -46,7 +46,6 @@ public class PipelineServiceImpl implements PipelineService{
     @Override
     public Map<String, String> createPipeline(Pipeline pipeline) {
 
-        Map<String, String> map = new HashMap<>();
         PipelineEntity pipelineEntity = BeanMapper.map(pipeline, PipelineEntity.class);
         PipelineConfigure pipelineConfigure = new PipelineConfigure();
         List<Pipeline> pipelineList = findAllPipeline();
@@ -59,11 +58,8 @@ public class PipelineServiceImpl implements PipelineService{
         String pipelineId = pipelineDao.createPipeline(pipelineEntity);
         pipeline.setPipelineId(pipelineId);
         pipelineConfigure.setPipeline(pipeline);
-        logger.info("pipelineConfigure ........."+pipelineConfigure.toString());
-        String pipelineConfigureId = pipelineConfigureService.createConfigure(pipelineConfigure);
+        Map<String, String> map = pipelineConfigureService.createConfigure(pipelineConfigure);
         map.put("pipelineId",pipelineId);
-        map.put("pipelineConfigureId",pipelineConfigureId);
-
         return map;
     }
 
@@ -75,7 +71,7 @@ public class PipelineServiceImpl implements PipelineService{
             //删除对应的流水线历史
             pipelineExecHistoryService.deleteAllHistory(pipelineId);
             //删除对应的流水线配置
-            pipelineConfigureService.deleteConfig(pipelineId);
+            pipelineConfigureService.deletePipelineIdConfigure(pipelineId);
         }
     }
 

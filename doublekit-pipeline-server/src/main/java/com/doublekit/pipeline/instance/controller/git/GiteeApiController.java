@@ -4,7 +4,7 @@ import com.doublekit.apibox.annotation.Api;
 import com.doublekit.apibox.annotation.ApiMethod;
 import com.doublekit.apibox.annotation.ApiParam;
 import com.doublekit.common.Result;
-import com.doublekit.pipeline.instance.service.git.GiteeApiService;
+import com.doublekit.pipeline.example.service.codeGit.CodeGiteeApiService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -19,13 +19,13 @@ import java.util.List;
 public class GiteeApiController {
 
     @Autowired
-    GiteeApiService giteeApiService;
+    CodeGiteeApiService codeGiteeApiService;
 
     @RequestMapping(path="/url",method = RequestMethod.POST)
     @ApiMethod(name = "getCode",desc = "返回获取code的地址")
     public Result<String> getCode(){
 
-        String git = giteeApiService.getCode();
+        String git = codeGiteeApiService.getCode();
 
         return Result.ok(git);
     }
@@ -35,26 +35,24 @@ public class GiteeApiController {
     @ApiParam(name = "code",desc = "code",required = true)
     public Result<String> getAccessToken(@NotNull String code) throws IOException {
 
-        String accessToken = giteeApiService.getAccessToken(code);
+        String accessToken = codeGiteeApiService.getAccessToken(code);
 
         return Result.ok(accessToken);
     }
 
-    @RequestMapping(path="/getProof",method = RequestMethod.POST)
-    @ApiMethod(name = "getProof",desc = "获取proofId")
-    @ApiParam(name = "configureId",desc = "configureId",required = true)
-    public Result<String> getProof(@NotNull String configureId){
+    @RequestMapping(path="/getUserMessage",method = RequestMethod.POST)
+    @ApiMethod(name = "getUserMessage",desc = "获取proofId")
+    public Result<String> getUserMessage(){
+        String userMessage = codeGiteeApiService.getUserMessage();
 
-        String proofId = giteeApiService.getProof(configureId);
-
-        return Result.ok(proofId);
+        return Result.ok(userMessage);
     }
 
     @RequestMapping(path="/getAllStorehouse",method = RequestMethod.POST)
     @ApiMethod(name = "getAllStorehouse",desc = "获取所有仓库")
     public Result<List<String>> getAllStorehouse() {
 
-        List<String> allStorehouse = giteeApiService.getAllStorehouse();
+        List<String> allStorehouse = codeGiteeApiService.getAllStorehouse();
 
         return Result.ok(allStorehouse);
     }
@@ -65,7 +63,7 @@ public class GiteeApiController {
     @ApiParam(name = "projectName",desc = "projectName",required = true)
     public Result<List<String>> getBranch(@NotNull String projectName){
 
-        List<String> branch = giteeApiService.getBranch(projectName);
+        List<String> branch = codeGiteeApiService.getBranch(projectName);
 
         return Result.ok(branch);
     }

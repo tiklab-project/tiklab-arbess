@@ -3,7 +3,10 @@ package com.doublekit.pipeline.instance.model;
 import com.doublekit.apibox.annotation.ApiModel;
 import com.doublekit.apibox.annotation.ApiProperty;
 import com.doublekit.beans.annotation.Mapper;
+import com.doublekit.beans.annotation.Mapping;
+import com.doublekit.beans.annotation.Mappings;
 import com.doublekit.join.annotation.Join;
+import com.doublekit.join.annotation.JoinQuery;
 
 @ApiModel
 @Join
@@ -11,52 +14,53 @@ import com.doublekit.join.annotation.Join;
 public class PipelineExecLog {
 
     //日志id
-    @ApiProperty(name="logId",desc="日志id")
+    @ApiProperty(name="logTestState",desc="日志id")
     private String logId;
 
-    //日志地址
-    @ApiProperty(name="logRunLog",desc="运行日志")
+    //运行日志
+    @ApiProperty(name="logTestState",desc="运行日志")
     private String logRunLog;
 
-    //拉取时间
-    @ApiProperty(name="logCodeTime",desc="拉取时间")
-    private int logCodeTime;
+    //运行状态（30 ：成功  1：失败   0 :其他）
+    @ApiProperty(name="logTestState",desc="运行状态")
+    private int logRunStatus ;
 
-    //拉取状态
-    @ApiProperty(name="logCodeState",desc="拉取状态")
-    private int  logCodeState;
+    //运行时间
+    @ApiProperty(name="logTestState",desc="运行时间")
+    private int logRunTime;
 
-    //打包时间
-    @ApiProperty(name="logPackTime",desc="打包时间")
-    private int logPackTime;
+    //codeId
+    @ApiProperty(name="codeLog",desc="id",eg="@selectOne")
+    @Mappings({
+            @Mapping(source = "codeLog.logCodeId",target = "logCodeId")
+    })
+    @JoinQuery(key = "codeId")
+    private PipelineCodeLog codeLog;
 
-    //打包状态
-    @ApiProperty(name="logPackState",desc="打包状态")
-    private int  logPackState;
+    //testId
+    @ApiProperty(name="testLog",desc="测试id",eg="@selectOne")
+    @Mappings({
+            @Mapping(source = "testLog.logTestId",target = "logTestId")
+    })
+    @JoinQuery(key = "logTestId")
+    private PipelineTestLog testLog;
 
-    //部署时间
-    @ApiProperty(name="logDeployTime",desc="部署时间")
-    private int logDeployTime;
+    //structureId
+    @ApiProperty(name="structureLog",desc="id",eg="@selectOne")
+    @Mappings({
+            @Mapping(source = "structureLog.logStructureId",target = "logStructureId")
+    })
+    @JoinQuery(key = "logStructureId")
+    private PipelineStructureLog structureLog;
 
-    //部署状态
-    @ApiProperty(name="logDeployState",desc="部署状态")
-    private int logDeployState;
+    //deployId
+    @ApiProperty(name="deployLog",desc="id",eg="@selectOne")
+    @Mappings({
+            @Mapping(source = "deployLog.logDeployId",target = "logDeployId")
+    })
+    @JoinQuery(key = "logDeployId")
+    private PipelineDeployLog deployLog;
 
-    //运行状态
-    @ApiProperty(name="logRunStatus",desc="运行状态")
-    private int logRunStatus = getLogRunStatus() + getLogPackState()+ getLogCodeState();
-
-    //流水线id
-    @ApiProperty(name="pipelineId",desc="流水线id")
-    private String pipelineId;
-
-    //测试时间
-    @ApiProperty(name="logTestTime",desc="测试时间")
-    private int logTestTime;
-
-    //测试状态
-    @ApiProperty(name="logTestState",desc="测试状态")
-    private int logTestState;
 
     public String getLogId() {
         return logId;
@@ -74,54 +78,6 @@ public class PipelineExecLog {
         this.logRunLog = logRunLog;
     }
 
-    public int getLogCodeTime() {
-        return logCodeTime;
-    }
-
-    public void setLogCodeTime(int logCodeTime) {
-        this.logCodeTime = logCodeTime;
-    }
-
-    public int getLogCodeState() {
-        return logCodeState;
-    }
-
-    public void setLogCodeState(int logCodeState) {
-        this.logCodeState = logCodeState;
-    }
-
-    public int getLogPackTime() {
-        return logPackTime;
-    }
-
-    public void setLogPackTime(int logPackTime) {
-        this.logPackTime = logPackTime;
-    }
-
-    public int getLogPackState() {
-        return logPackState;
-    }
-
-    public void setLogPackState(int logPackState) {
-        this.logPackState = logPackState;
-    }
-
-    public int getLogDeployTime() {
-        return logDeployTime;
-    }
-
-    public void setLogDeployTime(int logDeployTime) {
-        this.logDeployTime = logDeployTime;
-    }
-
-    public int getLogDeployState() {
-        return logDeployState;
-    }
-
-    public void setLogDeployState(int logDeployState) {
-        this.logDeployState = logDeployState;
-    }
-
     public int getLogRunStatus() {
         return logRunStatus;
     }
@@ -130,27 +86,43 @@ public class PipelineExecLog {
         this.logRunStatus = logRunStatus;
     }
 
-    public String getPipelineId() {
-        return pipelineId;
+    public int getLogRunTime() {
+        return logRunTime;
     }
 
-    public void setPipelineId(String pipelineId) {
-        this.pipelineId = pipelineId;
+    public void setLogRunTime(int logRunTime) {
+        this.logRunTime = logRunTime;
     }
 
-    public int getLogTestTime() {
-        return logTestTime;
+    public PipelineCodeLog getCodeLog() {
+        return codeLog;
     }
 
-    public void setLogTestTime(int logTestTime) {
-        this.logTestTime = logTestTime;
+    public void setCodeLog(PipelineCodeLog codeLog) {
+        this.codeLog = codeLog;
     }
 
-    public int getLogTestState() {
-        return logTestState;
+    public PipelineTestLog getTestLog() {
+        return testLog;
     }
 
-    public void setLogTestState(int logTestState) {
-        this.logTestState = logTestState;
+    public void setTestLog(PipelineTestLog testLog) {
+        this.testLog = testLog;
+    }
+
+    public PipelineStructureLog getStructureLog() {
+        return structureLog;
+    }
+
+    public void setStructureLog(PipelineStructureLog structureLog) {
+        this.structureLog = structureLog;
+    }
+
+    public PipelineDeployLog getDeployLog() {
+        return deployLog;
+    }
+
+    public void setDeployLog(PipelineDeployLog deployLog) {
+        this.deployLog = deployLog;
     }
 }

@@ -1,6 +1,7 @@
 package com.doublekit.pipeline.setting.proof.service;
 
 
+import com.doublekit.join.annotation.FindAll;
 import com.doublekit.join.annotation.FindList;
 import com.doublekit.join.annotation.FindOne;
 import com.doublekit.join.annotation.JoinProvider;
@@ -42,10 +43,13 @@ public interface ProofService {
     @FindOne
      Proof findOneProof(String proofId);
 
+    Proof fondOneName(String proofName);
+
     //获取构建凭证
     List<Proof> findAllGitProof();
 
     //获取部署凭证
+    @FindAll
     List<Proof> findAllDeployProof();
 
 

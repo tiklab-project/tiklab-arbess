@@ -6,18 +6,23 @@ import com.doublekit.join.JoinTemplate;
 import com.doublekit.pipeline.definition.dao.PipelineConfigureDao;
 import com.doublekit.pipeline.definition.entity.PipelineConfigureEntity;
 import com.doublekit.pipeline.definition.model.PipelineConfigure;
+import com.doublekit.pipeline.definition.model.PipelineStatus;
+import com.doublekit.pipeline.example.model.PipelineCode;
+import com.doublekit.pipeline.example.model.PipelineDeploy;
+import com.doublekit.pipeline.example.model.PipelineStructure;
+import com.doublekit.pipeline.example.model.PipelineTest;
+import com.doublekit.pipeline.example.service.PipelineCodeService;
+import com.doublekit.pipeline.example.service.PipelineDeployService;
 import com.doublekit.pipeline.instance.model.PipelineExecHistory;
-import com.doublekit.pipeline.instance.service.git.GiteeApiService;
 import com.doublekit.pipeline.setting.proof.model.Proof;
-import com.doublekit.pipeline.setting.proof.service.ProofService;
 import com.doublekit.rpc.annotation.Exporter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import java.util.ArrayList;
-import java.util.Comparator;
+
 import java.util.List;
+import java.util.Map;
 
 
 @Service
@@ -28,145 +33,107 @@ public class PipelineConfigureServiceImpl implements PipelineConfigureService {
     JoinTemplate joinTemplate;
 
     @Autowired
-    ProofService proofService;
-
-    @Autowired
-    GiteeApiService giteeApiService;
-
-    @Autowired
     PipelineConfigureDao pipelineConfigureDao;
+
+    @Autowired
+    PipelineCodeService pipelineCodeService;
+
+    @Autowired
+    PipelineDeployService pipelineDeployService;
 
     private static final Logger logger = LoggerFactory.getLogger(PipelineConfigureServiceImpl.class);
 
-
     //创建
     @Override
-    public String createConfigure(PipelineConfigure pipelineConfigure) {
-        PipelineConfigureEntity pipelineConfigureEntity = BeanMapper.map(pipelineConfigure, PipelineConfigureEntity.class);
-        return pipelineConfigureDao.createConfigure(pipelineConfigureEntity);
+    public  Map<String, String> createConfigure(PipelineConfigure pipelineConfigure) {
+        Map<String, String> map = pipelineCodeService.createTest(pipelineConfigure);
+        pipelineConfigure.setCreateTime(pipelineConfigure.getPipeline().getPipelineCreateTime());
+        PipelineCode pipelineCode = new PipelineCode();
+        pipelineCode.setCodeId(map.get("codeId"));
+        pipelineConfigure.setPipelineCode(pipelineCode);
+        PipelineTest pipelineTest = new PipelineTest();
+        pipelineTest.setTestId(map.get("testId"));
+        pipelineConfigure.setPipelineTest(pipelineTest);
+        PipelineStructure pipelineStructure = new PipelineStructure();
+        pipelineStructure.setStructureId(map.get("structureId"));
+        pipelineConfigure.setPipelineStructure(pipelineStructure);
+        PipelineDeploy pipelineDeploy = new PipelineDeploy();
+        pipelineDeploy.setDeployId(map.get("deployId"));
+        pipelineConfigure.setPipelineDeploy(pipelineDeploy);
+        String configure = pipelineConfigureDao.createConfigure(BeanMapper.map(pipelineConfigure, PipelineConfigureEntity.class));
+        map.put("configureId",configure);
+        return map;
     }
 
     //删除
     @Override
-    public void deleteConfig(String pipelineId) {
-        //获取流水线id下的所有配置信息
-        List<PipelineConfigure> pipelineConfigureList = findAllConfigure(pipelineId);
-        //判断是否有配置信息
-        if (pipelineConfigureList != null){
-            for (PipelineConfigure pipelineConfigure : pipelineConfigureList) {
-                //删除配置信息
+    public void deletePipelineIdConfigure(String pipelineId) {
+        List<PipelineConfigure> allConfigure = findAllConfigure();
+        for (PipelineConfigure pipelineConfigure : allConfigure) {
+            if (pipelineConfigure.getPipeline().getPipelineId().equals(pipelineId)){
+                PipelineConfigure oneConfigure = findOneConfigure(pipelineConfigure.getConfigureId());
+                pipelineCodeService.deleteTest(oneConfigure);
                 pipelineConfigureDao.deleteConfigure(pipelineConfigure.getConfigureId());
             }
         }
     }
 
-    //删除配置信息
-    public void deleteConfigure(String configureId) {
-        pipelineConfigureDao.deleteConfigure(configureId);
-    }
-
     //更新
     @Override
-    public String updateConfigure(PipelineConfigure pipelineConfigure) {
-        if (pipelineConfigure.getConfigureCodeSource() == 3){
-            String giteeUrl = giteeApiService.getGiteeUrl(pipelineConfigure.getConfigureCodeSourceAddress());
-            pipelineConfigure.setConfigureCodeName(giteeUrl);
-        }
-        joinTemplate.joinQuery(pipelineConfigure);
-        PipelineConfigureEntity pipelineConfigureEntity = BeanMapper.map(pipelineConfigure, PipelineConfigureEntity.class);
-        pipelineConfigureDao.updateConfigure(pipelineConfigureEntity);
-
-        return pipelineConfigureEntity.getConfigureId();
-
+    public void updateConfigure(PipelineConfigure pipelineConfigure) {
+        pipelineCodeService.updateTest(pipelineConfigure);
+        pipelineConfigureDao.updateConfigure(BeanMapper.map(pipelineConfigure,PipelineConfigureEntity.class));
     }
 
     //查询
     @Override
-    public PipelineConfigure findConfigure(String configureId) {
-        PipelineConfigureEntity pipelineConfigureEntity = pipelineConfigureDao.findConfigure(configureId);
-        PipelineConfigure pipelineConfigure = BeanMapper.map(pipelineConfigureEntity, PipelineConfigure.class);
-        joinTemplate.joinQuery(pipelineConfigure);
-
-        return pipelineConfigure;
+    public PipelineConfigure findOneConfigure(String configureId) {
+        PipelineConfigureEntity oneConfigure = pipelineConfigureDao.findOneConfigure(configureId);
+        joinTemplate.joinQuery(oneConfigure);
+        return BeanMapper.map(oneConfigure,PipelineConfigure.class);
     }
 
-    //查询所有配置
+    //根据流水线id查询配置
     @Override
-    public List<PipelineConfigure> findAllConfigure() {
-        List<PipelineConfigureEntity> pipelineConfigureEntityList = pipelineConfigureDao.findAllConfigure();
-        List<PipelineConfigure> pipelineConfigureList = BeanMapper.mapList(pipelineConfigureEntityList, PipelineConfigure.class);
-        joinTemplate.joinQuery(pipelineConfigureList);
-
-        return pipelineConfigureList;
-    }
-
-
-    @Override
-    public List<PipelineConfigure> findAllConfigureList(List<String> idList) {
-        List<PipelineConfigureEntity> pipelineConfigureList = pipelineConfigureDao.findAllConfigureList(idList);
-        return BeanMapper.mapList(pipelineConfigureList, PipelineConfigure.class);
-    }
-
-
-    /**
-     * 根据最近配置信息
-     * @param pipelineId 流水线id
-     * @return 最近配置信息id
-     */
-    @Override
-    public PipelineConfigure findTimeId(String pipelineId) {
-        List<PipelineConfigure> pipelineConfigureList = findAllConfigure(pipelineId);
-        if (pipelineConfigureList != null){
-            //根据时间排序
-            pipelineConfigureList.sort(Comparator.comparing(PipelineConfigure::getConfigureCreateTime));
-            //获取最近一次的配置id
-            String configureId = pipelineConfigureList.get(pipelineConfigureList.size() - 1).getConfigureId();
-           return findConfigure(configureId);
+    public PipelineConfigure findPipelineIdConfigure(String pipelineId) {
+        List<PipelineConfigure> allConfigure = findAllConfigure();
+        for (PipelineConfigure pipelineConfigure : allConfigure) {
+            if (pipelineConfigure.getPipeline().getPipelineId().equals(pipelineId)){
+                return pipelineConfigure;
+            }
         }
         return null;
     }
 
-
-    /**
-     * 根据流水线id查询配置
-     * @param pipelineId 流水线id
-     * @return 配置集合
-     */
-    public List<PipelineConfigure> findAllConfigure(String pipelineId) {
-        List<PipelineConfigure> pipelineConfigureList = findAllConfigure();
-        List<PipelineConfigure> pipelineConfigures = new ArrayList<>();
-        if (pipelineConfigureList == null){
-            return null;
-        }
-        //获取统一id下所有配置
-        for (PipelineConfigure pipelineConfigure : pipelineConfigureList) {
-            if (pipelineConfigure.getPipeline().getPipelineId() == null){
-                deleteConfigure(pipelineConfigure.getConfigureId());
-                continue;
-            }
-            if (pipelineConfigure.getPipeline().getPipelineId().equals(pipelineId) ){
-                pipelineConfigures.add(pipelineConfigure);
-            }
-        }
-        return pipelineConfigures;
+    @Override
+    public Proof findCodeProof(PipelineConfigure pipelineConfigure) {
+        return pipelineCodeService.findOneProof(pipelineConfigure);
     }
 
-    //向历史表添加凭证信息
-    public PipelineExecHistory addHistoryOne(String pipelineId, PipelineExecHistory pipelineExecHistory){
-        PipelineConfigure pipelineConfigure = findTimeId(pipelineId);
-        Proof proof = proofService.findOneProof(pipelineConfigure.getGitProof().getProofId());
-        pipelineExecHistory.setPipelineConfigure(pipelineConfigure);
-        pipelineExecHistory.setProof(proof);
-
-        return pipelineExecHistory;
+    @Override
+    public Proof findDeployProof(PipelineConfigure pipelineConfigure) {
+        return pipelineDeployService.findOneProof(pipelineConfigure);
     }
-    @Override
-    //获取克隆凭证信息
-    public Proof getProofIdGit(String pipelineId){ return proofService.findOneProof(findTimeId(pipelineId).getGitProof().getProofId()); }
 
     @Override
-    //获取部署凭证信息
-    public Proof getProofIdDeploy(String pipelineId){ return proofService.findOneProof(findTimeId(pipelineId).getDeployProof().getProofId()); }
+    public PipelineExecHistory addHistoryOne(String pipelineId, PipelineExecHistory pipelineExecHistory) {
+        return null;
+    }
+
+    //查询所有
+    @Override
+    public List<PipelineConfigure> findAllConfigure() {
+        List<PipelineConfigureEntity> allConfigure = pipelineConfigureDao.findAllConfigure();
+        List<PipelineConfigure> pipelineConfigureList = BeanMapper.mapList(allConfigure, PipelineConfigure.class);
+        joinTemplate.joinQuery(pipelineConfigureList);
+        return pipelineConfigureList;
+    }
+
+    @Override
+    public List<PipelineConfigure> findAllConfigureList(List<String> idList) {
+        List<PipelineConfigureEntity> pipelineConfigureEntityList = pipelineConfigureDao.findAllConfigureList(idList);
+        return BeanMapper.mapList(pipelineConfigureEntityList, PipelineConfigure.class);
+    }
 
 
 }

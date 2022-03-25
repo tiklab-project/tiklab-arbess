@@ -42,9 +42,9 @@ public class PipelineController {
     }
 
     //查询所有
-    @RequestMapping(path="/selectAllPipeline",method = RequestMethod.POST)
-    @ApiMethod(name = "selectAllPipeline",desc = "查询所有流水线")
-    public Result<List<Pipeline>> selectAllPipeline(){
+    @RequestMapping(path="/findAllPipeline",method = RequestMethod.POST)
+    @ApiMethod(name = "findAllPipeline",desc = "查询所有流水线")
+    public Result<List<Pipeline>> findAllPipeline(){
 
         List<Pipeline> selectAllPipeline = pipelineService.findAllPipeline();
 
@@ -63,10 +63,10 @@ public class PipelineController {
     }
 
     //查询
-    @RequestMapping(path="/selectPipeline",method = RequestMethod.POST)
+    @RequestMapping(path="/findOnePipeline",method = RequestMethod.POST)
     @ApiMethod(name = "selectPipeline",desc = "查询单个流水线")
     @ApiParam(name = "pipelineId",desc = "流水线id",required = true)
-    public Result<Pipeline> selectPipeline(@NotNull String pipelineId){
+    public Result<Pipeline> findOnePipeline(@NotNull String pipelineId){
 
         Pipeline pipeline = pipelineService.findPipeline(pipelineId);
 
@@ -85,19 +85,19 @@ public class PipelineController {
     }
 
     //模糊查询
-    @RequestMapping(path="/selectName",method = RequestMethod.POST)
-    @ApiMethod(name = "selectName",desc = "模糊查询")
+    @RequestMapping(path="/findOneName",method = RequestMethod.POST)
+    @ApiMethod(name = "findOneName",desc = "模糊查询")
     @ApiParam(name = "pipelineName",desc = "模糊查询条件",required = true)
-    public Result<List<Pipeline>> selectName(@NotNull String pipelineName){
+    public Result<List<Pipeline>> findOneName(@NotNull String pipelineName){
 
         List<Pipeline> pipelineQueryList = pipelineService.findName(pipelineName);
 
         return Result.ok(pipelineQueryList);
     }
-    //添加
-    @RequestMapping(path="/selectPipelineStatus",method = RequestMethod.POST)
-    @ApiMethod(name = "selectPipelineStatus",desc = "查询所有流水线状态")
-    public Result<List<PipelineStatus>> selectPipelineStatus(){
+    //查询所有
+    @RequestMapping(path="/findAllPipelineStatus",method = RequestMethod.POST)
+    @ApiMethod(name = "findOnePipelineStatus",desc = "查询所有流水线状态")
+    public Result<List<PipelineStatus>> findOnePipelineStatus(){
 
         List<PipelineStatus> pipelineStatusList = pipelineService.findAll();
 

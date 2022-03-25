@@ -61,7 +61,7 @@ public class PipelineExecHistory {
     @JoinQuery(key = "logId")
     private PipelineExecLog pipelineExecLog;
 
-    //凭证
+    //配置
     @ApiProperty(name="pipelineConfigure",desc="配置id",eg="@selectOne")
     @Mappings({
 

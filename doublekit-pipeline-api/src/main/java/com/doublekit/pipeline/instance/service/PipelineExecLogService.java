@@ -22,9 +22,9 @@ public interface PipelineExecLogService {
 
     /**
      * 删除流水线日志
-     * @param id 流水线日志id
+     * @param pipelineLogId 流水线日志id
      */
-     void deleteLog(String id);
+     void deleteLog(String pipelineLogId);
 
     /**
      * 更新流水线日志
@@ -34,11 +34,11 @@ public interface PipelineExecLogService {
 
     /**
      * 查询流水线日志
-     * @param logId 查询id
+     * @param pipelineLogId 查询id
      * @return 流水线日志信息
      */
     @FindOne
-    PipelineExecLog findOneLog(String logId);
+    PipelineExecLog findOneLog(String pipelineLogId);
 
     /**
      * 查询所有流水线日志
@@ -46,11 +46,6 @@ public interface PipelineExecLogService {
      */
     @FindAll
      List<PipelineExecLog> findAllLog();
-
-    void addHistoryThree(String pipelineId ,String logId );
-
-     //创建历史表
-    String createHistory(String logId);
 
     @FindList
     List<PipelineExecLog> findAllLogList(List<String> idList);

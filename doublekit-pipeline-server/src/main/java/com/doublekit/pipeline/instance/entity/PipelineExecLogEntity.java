@@ -20,45 +20,29 @@ public class PipelineExecLogEntity {
     @Column(name = "log_run_log",notNull = true)
     private String logRunLog;
 
-    //拉取时间
-    @Column(name = "log_code_time",notNull = true)
-    private String logCodeTime;
-
-    //拉取状态
-    @Column(name = "log_code_state",notNull = true)
-    private int  logCodeState;
-
-    //打包时间
-    @Column(name = "log_pack_time",notNull = true)
-    private String logPackTime;
-
-    //打包状态
-    @Column(name = "log_pack_state",notNull = true)
-    private int  logPackState;
-
-    //部署时间
-    @Column(name = "log_deploy_time",notNull = true)
-    private String logDeployTime;
-
-    //部署状态
-    @Column(name = "log_deploy_state",notNull = true)
-    private int logDeployState;
-
-    //运行状态（30 ：成功  3：失败   其他）
+    //运行状态（30 ：成功  1：失败   0 :其他）
     @Column(name = "log_run_status",notNull = true)
     private int logRunStatus ;
 
-    //部署时间
-    @Column(name = "pipeline_id",notNull = true)
-    private String pipelineId;
+    //运行时间
+    @Column(name = "log_run_time",notNull = true)
+    private int logRunTime;
 
-    //测试时间
-    @Column(name = "log_test_time",notNull = true)
-    private int logTestTime;
+    //codeId
+    @Column(name = "log_code_id",notNull = true)
+    private String logCodeId;
 
-    //测试状态
-    @Column(name = "log_test_state",notNull = true)
-    private int logTestState;
+    //testId
+    @Column(name = "log_test_id",notNull = true)
+    private String logTestId;
+
+    //structureId
+    @Column(name = "log_structure_id",notNull = true)
+    private String logStructureId;
+
+    //deployId
+    @Column(name = "log_deploy_id",notNull = true)
+    private String logDeployId;
 
 
     public String getLogId() {
@@ -77,54 +61,6 @@ public class PipelineExecLogEntity {
         this.logRunLog = logRunLog;
     }
 
-    public String getLogCodeTime() {
-        return logCodeTime;
-    }
-
-    public void setLogCodeTime(String logCodeTime) {
-        this.logCodeTime = logCodeTime;
-    }
-
-    public int getLogCodeState() {
-        return logCodeState;
-    }
-
-    public void setLogCodeState(int logCodeState) {
-        this.logCodeState = logCodeState;
-    }
-
-    public String getLogPackTime() {
-        return logPackTime;
-    }
-
-    public void setLogPackTime(String logPackTime) {
-        this.logPackTime = logPackTime;
-    }
-
-    public int getLogPackState() {
-        return logPackState;
-    }
-
-    public void setLogPackState(int logPackState) {
-        this.logPackState = logPackState;
-    }
-
-    public String getLogDeployTime() {
-        return logDeployTime;
-    }
-
-    public void setLogDeployTime(String logDeployTime) {
-        this.logDeployTime = logDeployTime;
-    }
-
-    public int getLogDeployState() {
-        return logDeployState;
-    }
-
-    public void setLogDeployState(int logDeployState) {
-        this.logDeployState = logDeployState;
-    }
-
     public int getLogRunStatus() {
         return logRunStatus;
     }
@@ -133,27 +69,43 @@ public class PipelineExecLogEntity {
         this.logRunStatus = logRunStatus;
     }
 
-    public String getPipelineId() {
-        return pipelineId;
+    public int getLogRunTime() {
+        return logRunTime;
     }
 
-    public void setPipelineId(String pipelineId) {
-        this.pipelineId = pipelineId;
+    public void setLogRunTime(int logRunTime) {
+        this.logRunTime = logRunTime;
     }
 
-    public int getLogTestTime() {
-        return logTestTime;
+    public String getLogCodeId() {
+        return logCodeId;
     }
 
-    public void setLogTestTime(int logTestTime) {
-        this.logTestTime = logTestTime;
+    public void setLogCodeId(String logCodeId) {
+        this.logCodeId = logCodeId;
     }
 
-    public int getLogTestState() {
-        return logTestState;
+    public String getLogTestId() {
+        return logTestId;
     }
 
-    public void setLogTestState(int logTestState) {
-        this.logTestState = logTestState;
+    public void setLogTestId(String logTestId) {
+        this.logTestId = logTestId;
+    }
+
+    public String getLogStructureId() {
+        return logStructureId;
+    }
+
+    public void setLogStructureId(String logStructureId) {
+        this.logStructureId = logStructureId;
+    }
+
+    public String getLogDeployId() {
+        return logDeployId;
+    }
+
+    public void setLogDeployId(String logDeployId) {
+        this.logDeployId = logDeployId;
     }
 }

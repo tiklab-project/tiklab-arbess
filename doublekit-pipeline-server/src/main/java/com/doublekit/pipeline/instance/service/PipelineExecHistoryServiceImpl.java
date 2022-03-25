@@ -141,13 +141,13 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
                 pipelineExecHistoryDetails.setImplementor(pipelineExecHistory.getPipeline().getPipelineCreateUser());
             }
             //获取执行时长
-            int ImplementTime = pipelineExecHistory.getPipelineExecLog().getLogCodeTime()
-                    + pipelineExecHistory.getPipelineExecLog().getLogDeployTime()
-                    + pipelineExecHistory.getPipelineExecLog().getLogPackTime()
-                    + pipelineExecHistory.getPipelineExecLog().getLogTestTime();
-            pipelineExecHistoryDetails.setImplementTime(ImplementTime);
+            // int ImplementTime = pipelineExecHistory.getPipelineExecLog().getLogCodeTime()
+            //         + pipelineExecHistory.getPipelineExecLog().getLogDeployTime()
+            //         + pipelineExecHistory.getPipelineExecLog().getLogPackTime()
+            //         + pipelineExecHistory.getPipelineExecLog().getLogTestTime();
+            // pipelineExecHistoryDetails.setImplementTime(ImplementTime);
             // 获取代码源
-            int configureCodeSource = pipelineExecHistory.getPipelineConfigure().getConfigureCodeSource();
+            int configureCodeSource = pipelineExecHistory.getPipelineConfigure().getPipelineCode().getCodeType();
             if (configureCodeSource != 0){
                 pipelineExecHistoryDetails.setCodeSource(configureCodeSource);
             }
@@ -224,7 +224,7 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
             pipelineExecHistory.setPipelineExecLog(pipelineExecLogService.findOneLog(logId));
         }
         //获取分支
-        String configureBranch = pipelineExecHistory.getPipelineConfigure().getConfigureBranch();
+        String configureBranch = pipelineExecHistory.getPipelineConfigure().getPipelineCode().getCodeBranch();
         if (configureBranch == null){
             configureBranch="master";
         }

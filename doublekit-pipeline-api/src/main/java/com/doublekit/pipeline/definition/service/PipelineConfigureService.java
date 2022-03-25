@@ -12,6 +12,8 @@ import com.doublekit.pipeline.setting.proof.model.Proof;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.Map;
+
 /**
  * 流水线配置
  */
@@ -23,19 +25,19 @@ public interface PipelineConfigureService {
      * @param pipelineConfigure 流水线配置信息
      * @return 流水线配置id
      */
-    String createConfigure(@NotNull @Valid PipelineConfigure pipelineConfigure);
+    Map<String, String> createConfigure(@NotNull @Valid PipelineConfigure pipelineConfigure);
 
     /**
      * 删除流水线配置
-     * @param id 流水线配置id
+     * @param pipelineId 流水线id
      */
-    void deleteConfig(String id);
+    void deletePipelineIdConfigure(String pipelineId);
 
     /**
      * 更新配置信息
      * @param pipelineConfigure 配置信息
      */
-    String updateConfigure(@NotNull @Valid PipelineConfigure pipelineConfigure);
+    void updateConfigure(@NotNull @Valid PipelineConfigure pipelineConfigure);
 
     /**
      * 查询流水线配置信息
@@ -43,7 +45,31 @@ public interface PipelineConfigureService {
      * @return 配置信息
      */
     @FindOne
-    PipelineConfigure findConfigure(String configureId);
+    PipelineConfigure findOneConfigure(String configureId);
+
+    /**
+     * 根据流水线id获取配置信息
+     * @param pipelineId 流水线id
+     * @return 配置信息
+     */
+    PipelineConfigure findPipelineIdConfigure(String pipelineId);
+
+    /**
+     * 查询code凭证
+     * @param pipelineConfigure 配置信息
+     * @return 凭证
+     */
+    Proof findCodeProof(PipelineConfigure pipelineConfigure);
+
+    /**
+     * 查询Deploy凭证
+     * @param pipelineConfigure 配置信息
+     * @return 凭证
+     */
+    Proof findDeployProof(PipelineConfigure pipelineConfigure);
+
+    //
+    PipelineExecHistory addHistoryOne(String pipelineId,PipelineExecHistory pipelineExecHistory);
 
     /**
      * 查询所有配置文件
@@ -51,35 +77,6 @@ public interface PipelineConfigureService {
      */
     @FindAll
     List<PipelineConfigure> findAllConfigure();
-
-    /**
-     * 获取最近一次的配置信息
-     * @param pipelineId 流水线id
-     * @return 配置信息
-     */
-    PipelineConfigure findTimeId(String pipelineId);
-
-    /**
-     * 历史表添加信息
-     * @param pipelineId 流水线id
-     * @param pipelineExecHistory 历史信息
-     * @return 历史信息
-     */
-    PipelineExecHistory addHistoryOne(String pipelineId, PipelineExecHistory pipelineExecHistory);
-
-    /**
-     * 获取克隆凭证信息
-     * @param pipelineId 流水线id
-     * @return 凭证信息
-     */
-    Proof getProofIdGit(String pipelineId);
-
-    /**
-     * 获取部署凭证信息
-     * @param pipelineId 流水线id
-     * @return 凭证信息
-     */
-    Proof getProofIdDeploy(String pipelineId);
 
     @FindList
     List<PipelineConfigure> findAllConfigureList(List<String> idList);

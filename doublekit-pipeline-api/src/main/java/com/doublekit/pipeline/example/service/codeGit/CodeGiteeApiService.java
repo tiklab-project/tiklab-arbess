@@ -1,12 +1,13 @@
-package com.doublekit.pipeline.instance.service.git;
+package com.doublekit.pipeline.example.service.codeGit;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 码云API
  */
-public interface GiteeApiService {
+public interface CodeGiteeApiService {
 
     /**
      * 拼装code地址
@@ -21,8 +22,14 @@ public interface GiteeApiService {
      */
     String getAccessToken(String code) throws IOException;
 
+    /**
+     * 获取登录名
+     * @return 登录名
+     */
+    String getUserMessage();
 
-    String getProof(String configureId);
+
+    String getProof();
 
     /**
      * 获取对应code下所有的仓库
