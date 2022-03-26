@@ -56,7 +56,6 @@ public class PipelineExecLogDao {
 
 
     public List<PipelineExecLogEntity> findAllLogList(List<String> idList){
-
         return jpaTemplate.findList(PipelineExecLogEntity.class,idList);
     }
 

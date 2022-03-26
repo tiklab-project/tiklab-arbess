@@ -11,20 +11,20 @@ import com.doublekit.join.annotation.Join;
 public class PipelineCodeLog {
 
     //日志id
-    @ApiProperty(name="logCodeId",desc="构建历史id")
+    @ApiProperty(name="logCodeId",desc="日志id")
     private String logCodeId;
 
-    //运行日志
-    @ApiProperty(name="codeRunTime",desc="构建历史id")
-    private String codeRunTime;
+    //运行时间
+    @ApiProperty(name="codeRunTime",desc="运行时间")
+    private int codeRunTime;
 
     //运行状态（10 ：成功  1：失败   0 :其他）
-    @ApiProperty(name="codeRunStatus",desc="构建历史id")
+    @ApiProperty(name="codeRunStatus",desc="运行状态")
     private int codeRunStatus ;
 
     //运行时间
-    @ApiProperty(name="codeRunLog",desc="构建历史id")
-    private int codeRunLog;
+    @ApiProperty(name="codeRunLog",desc="运行时间")
+    private String codeRunLog;
 
 
     public String getLogCodeId() {
@@ -35,11 +35,11 @@ public class PipelineCodeLog {
         this.logCodeId = logCodeId;
     }
 
-    public String getCodeRunTime() {
+    public int getCodeRunTime() {
         return codeRunTime;
     }
 
-    public void setCodeRunTime(String codeRunTime) {
+    public void setCodeRunTime(int codeRunTime) {
         this.codeRunTime = codeRunTime;
     }
 
@@ -51,11 +51,11 @@ public class PipelineCodeLog {
         this.codeRunStatus = codeRunStatus;
     }
 
-    public int getCodeRunLog() {
+    public String getCodeRunLog() {
         return codeRunLog;
     }
 
-    public void setCodeRunLog(int codeRunLog) {
+    public void setCodeRunLog(String codeRunLog) {
         this.codeRunLog = codeRunLog;
     }
 }

@@ -32,9 +32,6 @@ public class PipelineServiceImpl implements PipelineService{
     PipelineDao pipelineDao;
 
     @Autowired
-    JoinTemplate joinTemplate;
-
-    @Autowired
     PipelineExecHistoryService pipelineExecHistoryService;
 
     @Autowired
@@ -68,8 +65,6 @@ public class PipelineServiceImpl implements PipelineService{
     public void deletePipeline(String pipelineId) {
         if (pipelineId != null){
             pipelineDao.deletePipeline(pipelineId);
-            //删除对应的流水线历史
-            pipelineExecHistoryService.deleteAllHistory(pipelineId);
             //删除对应的流水线配置
             pipelineConfigureService.deletePipelineIdConfigure(pipelineId);
         }
@@ -90,40 +85,29 @@ public class PipelineServiceImpl implements PipelineService{
         PipelineEntity pipelineEntity = BeanMapper.map(pipeline, PipelineEntity.class);
         //更新用户信息
         pipelineDao.updatePipeline(pipelineEntity);
-
         return pipelineEntity.getPipelineName();
     }
 
     //查询
     @Override
     public Pipeline findPipeline(String id) {
-
-        PipelineEntity pipelineEntity = pipelineDao.findPipeline(id);
-        Pipeline pipeline = BeanMapper.map(pipelineEntity, Pipeline.class);
-        joinTemplate.joinQuery(pipeline);
-        return pipeline;
+        return BeanMapper.map(pipelineDao.findPipeline(id), Pipeline.class);
     }
 
     //查询所有
     @Override
     public List<Pipeline> findAllPipeline() {
-
-        List<PipelineEntity> pipelineEntityList = pipelineDao.findAllPipeline();
-        List<Pipeline> pipelineList = BeanMapper.mapList(pipelineEntityList, Pipeline.class);
-        joinTemplate.joinQuery(pipelineList);
-        return pipelineList;
+        return BeanMapper.mapList(pipelineDao.findAllPipeline(), Pipeline.class);
     }
 
     @Override
     public List<Pipeline> findAllPipelineList(List<String> idList) {
-
         List<PipelineEntity> pipelineEntityList = pipelineDao.findAllPipelineList(idList);
         return BeanMapper.mapList(pipelineEntityList, Pipeline.class);
     }
 
     @Override
     public List<Pipeline> findName(String pipelineName) {
-
         List<PipelineEntity> pipelineEntityList = pipelineDao.findName(pipelineName);
         return BeanMapper.mapList(pipelineEntityList, Pipeline.class);
     }
@@ -131,35 +115,9 @@ public class PipelineServiceImpl implements PipelineService{
     //查询所有流水线状态
     @Override
     public List<PipelineStatus> findAll() {
-
-        List<PipelineEntity> pipelineEntityList = pipelineDao.findAllPipeline();
-        List<PipelineStatus> pipelineAllList =new ArrayList<>();
-
-        //把数据添加到pipelineAllList对象中
-        for (PipelineEntity pipelineEntity : pipelineEntityList) {
-            PipelineStatus pipelineStatus = new PipelineStatus();
-            pipelineStatus.setPipelineId(pipelineEntity.getPipelineId());
-            pipelineStatus.setPipelineName(pipelineEntity.getPipelineName());
-            PipelineExecHistory pipelineExecHistory = pipelineExecHistoryService.findLastPipelineHistory(pipelineEntity.getPipelineId());
-            if (pipelineExecHistory != null){
-                pipelineStatus.setLastStructureTime(pipelineExecHistory.getHistoryCreateTime());
-            }
-
-            //获取同一id下的所有历史记录
-            List<PipelineExecHistory> pipelineExecHistoryList = pipelineExecHistoryService.findAllPipelineIdList(pipelineEntity.getPipelineId());
-            if (pipelineExecHistoryList != null){
-                for (int i = pipelineExecHistoryList.size() - 1; i >= 0; i--) {
-                    if (pipelineExecHistoryList.get(i).getPipelineExecLog().getLogRunStatus() == 30){
-                        //获取上次成功时间
-                        pipelineStatus.setLastSuccessTime(pipelineExecHistoryList.get(i).getHistoryCreateTime());
-                    }
-                    pipelineStatus.setStructureStatus(pipelineExecHistoryList.get(i).getPipelineExecLog().getLogRunStatus());
-                }
-            }
-            pipelineAllList.add(pipelineStatus);
-        }
-
-        return pipelineAllList;
-
+        return null;
     }
+
+
+
 }

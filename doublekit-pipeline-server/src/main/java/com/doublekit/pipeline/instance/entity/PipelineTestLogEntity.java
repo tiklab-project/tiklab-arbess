@@ -12,17 +12,17 @@ public class PipelineTestLogEntity {
     @Column(name = "test_id")
     private String logTestId;
 
-    //运行日志
+    //运行时间
     @Column(name = "test_run_time",notNull = true)
-    private String testRunTime;
+    private int testRunTime;
 
     //运行状态（10 ：成功  1：失败   0 :其他）
     @Column(name = "test_run_state",notNull = true)
     private int testRunStatus ;
 
-    //运行时间
+    //运行日志
     @Column(name = "test_run_log",notNull = true)
-    private int testRunLog;
+    private String testRunLog;
 
 
     public String getLogTestId() {
@@ -33,11 +33,11 @@ public class PipelineTestLogEntity {
         this.logTestId = logTestId;
     }
 
-    public String getTestRunTime() {
+    public int getTestRunTime() {
         return testRunTime;
     }
 
-    public void setTestRunTime(String testRunTime) {
+    public void setTestRunTime(int testRunTime) {
         this.testRunTime = testRunTime;
     }
 
@@ -49,11 +49,11 @@ public class PipelineTestLogEntity {
         this.testRunStatus = testRunStatus;
     }
 
-    public int getTestRunLog() {
+    public String getTestRunLog() {
         return testRunLog;
     }
 
-    public void setTestRunLog(int testRunLog) {
+    public void setTestRunLog(String testRunLog) {
         this.testRunLog = testRunLog;
     }
 }

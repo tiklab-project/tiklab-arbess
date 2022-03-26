@@ -9,21 +9,22 @@ import com.doublekit.join.annotation.Join;
 @Join
 @Mapper(targetAlias = "PipelineStructureLogEntity")
 public class PipelineStructureLog {
+
     //日志id
-    @ApiProperty(name="logStructureId",desc="构建历史id")
+    @ApiProperty(name="logStructureId",desc="日志id")
     private String logStructureId;
 
     //运行日志
-    @ApiProperty(name="structureRunTime",desc="构建历史id")
-    private String structureRunTime;
+    @ApiProperty(name="structureRunTime",desc="运行日志")
+    private int structureRunTime;
 
     //运行状态（10 ：成功  1：失败   0 :其他）
-    @ApiProperty(name="structureRunStatus",desc="构建历史id")
+    @ApiProperty(name="structureRunStatus",desc="运行状态")
     private int structureRunStatus ;
 
-    //运行时间
-    @ApiProperty(name="structureRunLog",desc="构建历史id")
-    private int structureRunLog;
+    //运行日志
+    @ApiProperty(name="structureRunLog",desc="运行日志")
+    private String structureRunLog;
 
 
     public String getLogStructureId() {
@@ -34,11 +35,11 @@ public class PipelineStructureLog {
         this.logStructureId = logStructureId;
     }
 
-    public String getStructureRunTime() {
+    public int getStructureRunTime() {
         return structureRunTime;
     }
 
-    public void setStructureRunTime(String structureRunTime) {
+    public void setStructureRunTime(int structureRunTime) {
         this.structureRunTime = structureRunTime;
     }
 
@@ -50,11 +51,11 @@ public class PipelineStructureLog {
         this.structureRunStatus = structureRunStatus;
     }
 
-    public int getStructureRunLog() {
+    public String getStructureRunLog() {
         return structureRunLog;
     }
 
-    public void setStructureRunLog(int structureRunLog) {
+    public void setStructureRunLog(String structureRunLog) {
         this.structureRunLog = structureRunLog;
     }
 }

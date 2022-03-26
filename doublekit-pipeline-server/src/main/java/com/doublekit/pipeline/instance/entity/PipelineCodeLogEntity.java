@@ -10,34 +10,34 @@ public class PipelineCodeLogEntity {
     @Id
     @GeneratorValue
     @Column(name = "code_id")
-    private String codeId;
+    private String logCodeId;
 
-    //运行日志
+    //运行时间
     @Column(name = "code_run_time",notNull = true)
-    private String codeRunTime;
+    private int codeRunTime;
 
     //运行状态（10 ：成功  1：失败   0 :其他）
     @Column(name = "code_run_state",notNull = true)
     private int codeRunStatus ;
 
-    //运行时间
+    //运行日志
     @Column(name = "code_run_log",notNull = true)
-    private int codeRunLog;
+    private String codeRunLog;
 
 
-    public String getCodeId() {
-        return codeId;
+    public String getLogCodeId() {
+        return logCodeId;
     }
 
-    public void setCodeId(String codeId) {
-        this.codeId = codeId;
+    public void setLogCodeId(String logCodeId) {
+        this.logCodeId = logCodeId;
     }
 
-    public String getCodeRunTime() {
+    public int getCodeRunTime() {
         return codeRunTime;
     }
 
-    public void setCodeRunTime(String codeRunTime) {
+    public void setCodeRunTime(int codeRunTime) {
         this.codeRunTime = codeRunTime;
     }
 
@@ -49,11 +49,11 @@ public class PipelineCodeLogEntity {
         this.codeRunStatus = codeRunStatus;
     }
 
-    public int getCodeRunLog() {
+    public String getCodeRunLog() {
         return codeRunLog;
     }
 
-    public void setCodeRunLog(int codeRunLog) {
+    public void setCodeRunLog(String codeRunLog) {
         this.codeRunLog = codeRunLog;
     }
 }

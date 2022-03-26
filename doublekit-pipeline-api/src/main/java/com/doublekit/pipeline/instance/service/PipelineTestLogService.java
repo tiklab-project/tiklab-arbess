@@ -3,11 +3,13 @@ package com.doublekit.pipeline.instance.service;
 import com.doublekit.join.annotation.FindAll;
 import com.doublekit.join.annotation.FindList;
 import com.doublekit.join.annotation.FindOne;
+import com.doublekit.join.annotation.JoinProvider;
 import com.doublekit.pipeline.instance.model.PipelineExecLog;
 import com.doublekit.pipeline.instance.model.PipelineTestLog;
 import java.util.List;
+import java.util.Map;
 
-
+@JoinProvider(model = PipelineTestLog.class)
 public interface PipelineTestLogService {
 
     /**
@@ -15,7 +17,9 @@ public interface PipelineTestLogService {
      * @param PipelineTestLog testLog信息
      * @return testLogId
      */
-    String createTestLog(PipelineTestLog PipelineTestLog);
+    String createTestLog(PipelineTestLog pipelineTestLog);
+
+    Map<String, String> createTestLog();
 
     /**
      * 删除
@@ -29,7 +33,9 @@ public interface PipelineTestLogService {
      * 更新
      * @param PipelineTestLog 更新信息
      */
-    void updateTestLog(PipelineTestLog PipelineTestLog);
+    void updateTestLog(PipelineTestLog pipelineTestLog);
+
+    void updateTestLog(PipelineExecLog pipelineExecLog);
 
     /**
      * 查询单个信息

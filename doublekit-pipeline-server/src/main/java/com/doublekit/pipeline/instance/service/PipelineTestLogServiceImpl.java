@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Exporter
@@ -27,6 +28,16 @@ public class PipelineTestLogServiceImpl implements PipelineTestLogService {
         return pipelineTestLogDao.createTestLog(BeanMapper.map(pipelineTestLog, PipelineTestLogEntity.class));
     }
 
+    //创建
+    @Override
+    public  Map<String, String> createTestLog(){
+        Map<String, String> map = pipelineStructureLogService.createStructureLog();
+        PipelineTestLog pipelineTestLog = new PipelineTestLog();
+        String testLogId = createTestLog(pipelineTestLog);
+        map.put("testLogId",testLogId);
+        return map;
+    }
+
     //删除
     @Override
     public void deleteTestLog(String testLogId) {
@@ -37,13 +48,25 @@ public class PipelineTestLogServiceImpl implements PipelineTestLogService {
     @Override
     public void deleteTestLog(PipelineExecLog pipelineExecLog) {
         pipelineStructureLogService.deleteStructureLog(pipelineExecLog);
-        deleteTestLog(pipelineExecLog.getTestLog().getLogTestId());
+        PipelineTestLog testLog = pipelineExecLog.getTestLog();
+        if (testLog != null){
+            deleteTestLog(testLog.getLogTestId());
+        }
     }
 
     //修改
     @Override
     public void updateTestLog(PipelineTestLog pipelineTestLog) {
         pipelineTestLogDao.updateTestLog(BeanMapper.map(pipelineTestLog,PipelineTestLogEntity.class));
+    }
+
+    //修改
+    @Override
+    public void updateTestLog(PipelineExecLog pipelineExecLog) {
+        if (pipelineExecLog.getTestLog() != null){
+            updateTestLog(pipelineExecLog.getTestLog());
+        }
+        pipelineStructureLogService.updateStructureLog(pipelineExecLog);
     }
 
     //查询单个

@@ -13,17 +13,12 @@ public class PipelineExecHistoryEntity {
 
     //id
     @Id
-    @GeneratorValue
     @Column(name = "history_id")
-    private String historyId;
+    private int historyId;
 
     //创建构建时间
     @Column(name = "history_time",notNull = true)
     private String historyCreateTime;
-
-    //构建次数
-    @Column(name = "history_number",notNull = true)
-    private String historyNumber;
 
     //构建方式
     @Column(name = "history_way",notNull = true)
@@ -37,23 +32,16 @@ public class PipelineExecHistoryEntity {
     @Column(name = "pipeline_id",notNull = true)
     private String pipelineId;
 
-    //凭证id
-    @Column(name = "proof_id",notNull = true)
-    private String proofId;
-
     //日志id
     @Column(name = "log_id",notNull = true)
     private String logId;
 
-    //配置id
-    @Column(name = "configure_id",notNull = true)
-    private String configureId;
 
-    public String getHistoryId() {
+    public int getHistoryId() {
         return historyId;
     }
 
-    public void setHistoryId(String historyId) {
+    public void setHistoryId(int historyId) {
         this.historyId = historyId;
     }
 
@@ -89,14 +77,6 @@ public class PipelineExecHistoryEntity {
         this.pipelineId = pipelineId;
     }
 
-    public String getProofId() {
-        return proofId;
-    }
-
-    public void setProofId(String proofId) {
-        this.proofId = proofId;
-    }
-
     public String getLogId() {
         return logId;
     }
@@ -105,19 +85,4 @@ public class PipelineExecHistoryEntity {
         this.logId = logId;
     }
 
-    public String getConfigureId() {
-        return configureId;
-    }
-
-    public void setConfigureId(String configureId) {
-        this.configureId = configureId;
-    }
-
-    public String getHistoryNumber() {
-        return historyNumber;
-    }
-
-    public void setHistoryNumber(String historyNumber) {
-        this.historyNumber = historyNumber;
-    }
 }

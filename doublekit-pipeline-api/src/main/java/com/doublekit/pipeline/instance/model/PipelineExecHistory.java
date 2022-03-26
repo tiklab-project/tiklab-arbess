@@ -19,11 +19,7 @@ public class PipelineExecHistory {
 
     //构建历史id
     @ApiProperty(name="historyId",desc="构建历史id")
-    private String historyId;
-
-    //构建次数
-    @ApiProperty(name = "historyNumber",desc="构建次数")
-    private int historyNumber;
+    private int historyId;
 
     //创建时间
     @ApiProperty(name="pipelineName",desc="创建构建时间",required = true)
@@ -45,13 +41,6 @@ public class PipelineExecHistory {
     @JoinQuery(key = "pipelineId")
     private Pipeline pipeline;
 
-    //凭证
-    @ApiProperty(name="proof",desc="凭证id",eg="@selectOne")
-    @Mappings({
-            @Mapping(source = "proof.proofId",target = "proofId")
-    })
-    @JoinQuery(key = "proofId")
-    private Proof proof;
 
     //日志
     @ApiProperty(name="pipelineExecLog",desc="日志id",eg="@selectOne")
@@ -61,29 +50,12 @@ public class PipelineExecHistory {
     @JoinQuery(key = "logId")
     private PipelineExecLog pipelineExecLog;
 
-    //配置
-    @ApiProperty(name="pipelineConfigure",desc="配置id",eg="@selectOne")
-    @Mappings({
-
-            @Mapping(source = "pipelineConfigure.configureId",target = "configureId")
-    })
-    @JoinQuery(key = "configureId")
-    private PipelineConfigure pipelineConfigure;
-
-    public String getHistoryId() {
+    public int getHistoryId() {
         return historyId;
     }
 
-    public void setHistoryId(String historyId) {
+    public void setHistoryId(int historyId) {
         this.historyId = historyId;
-    }
-
-    public int getHistoryNumber() {
-        return historyNumber;
-    }
-
-    public void setHistoryNumber(int historyNumber) {
-        this.historyNumber = historyNumber;
     }
 
     public String getHistoryCreateTime() {
@@ -118,14 +90,6 @@ public class PipelineExecHistory {
         this.pipeline = pipeline;
     }
 
-    public Proof getProof() {
-        return proof;
-    }
-
-    public void setProof(Proof proof) {
-        this.proof = proof;
-    }
-
     public PipelineExecLog getPipelineExecLog() {
         return pipelineExecLog;
     }
@@ -134,12 +98,5 @@ public class PipelineExecHistory {
         this.pipelineExecLog = pipelineExecLog;
     }
 
-    public PipelineConfigure getPipelineConfigure() {
-        return pipelineConfigure;
-    }
-
-    public void setPipelineConfigure(PipelineConfigure pipelineConfigure) {
-        this.pipelineConfigure = pipelineConfigure;
-    }
 
 }

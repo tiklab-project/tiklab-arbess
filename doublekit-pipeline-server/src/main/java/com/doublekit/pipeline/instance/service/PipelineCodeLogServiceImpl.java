@@ -1,15 +1,17 @@
 package com.doublekit.pipeline.instance.service;
 
 import com.doublekit.beans.BeanMapper;
-import com.doublekit.pipeline.example.model.PipelineTest;
 import com.doublekit.pipeline.instance.dao.PipelineCodeLogDao;
 import com.doublekit.pipeline.instance.entity.PipelineCodeLogEntity;
 import com.doublekit.pipeline.instance.model.PipelineCodeLog;
 import com.doublekit.pipeline.instance.model.PipelineExecLog;
 import com.doublekit.rpc.annotation.Exporter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Exporter
@@ -21,12 +23,23 @@ public class PipelineCodeLogServiceImpl implements  PipelineCodeLogService{
     @Autowired
     PipelineTestLogService pipelineTestLogService;
 
+    private static final Logger logger = LoggerFactory.getLogger(PipelineExecServiceImpl.class);
+
     //创建
     @Override
-    public String createCodeLog(PipelineCodeLog PipelineCodeLog) {
-        return pipelineCodeLogDao.createCodeLog(BeanMapper.map(PipelineCodeLog, PipelineCodeLogEntity.class));
+    public String createCodeLog(PipelineCodeLog pipelineCodeLog) {
+        return pipelineCodeLogDao.createCodeLog(BeanMapper.map(pipelineCodeLog, PipelineCodeLogEntity.class));
     }
 
+    //创建
+    @Override
+    public Map<String, String> createCodeLog(){
+        Map<String, String> map = pipelineTestLogService.createTestLog();
+        PipelineCodeLog pipelineCodeLog = new PipelineCodeLog();
+        String codeLogId = createCodeLog(pipelineCodeLog);
+        map.put("codeLogId",codeLogId);
+        return map;
+    }
     //删除
     @Override
     public void deleteCodeLog(String codeLogId) {
@@ -37,25 +50,35 @@ public class PipelineCodeLogServiceImpl implements  PipelineCodeLogService{
     @Override
     public void deleteCodeLog(PipelineExecLog pipelineExecLog) {
         pipelineTestLogService.deleteTestLog(pipelineExecLog);
-        deleteCodeLog(pipelineExecLog.getCodeLog().getLogCodeId());
+        PipelineCodeLog codeLog = pipelineExecLog.getCodeLog();
+        if (codeLog != null){
+            deleteCodeLog(codeLog.getLogCodeId());
+        }
     }
 
     //修改
     @Override
-    public void updateCodeLog(PipelineCodeLog PipelineCodeLog) {
+    public void updateCodeLog(PipelineCodeLog pipelineCodeLog) {
+        pipelineCodeLogDao.updateCodeLog(BeanMapper.map(pipelineCodeLog,PipelineCodeLogEntity.class));
+    }
 
+    //修改
+    @Override
+    public void updateCodeLog(PipelineExecLog pipelineExecLog){
+        pipelineTestLogService.updateTestLog(pipelineExecLog);
+        updateCodeLog(pipelineExecLog.getCodeLog());
     }
 
     //查询单个
     @Override
     public PipelineCodeLog findOneCodeLog(String codeLogId) {
-        return null;
+        return BeanMapper.map(pipelineCodeLogDao.findOneCodeLog(codeLogId),PipelineCodeLog.class);
     }
 
     //查询所有
     @Override
     public List<PipelineCodeLog> findAllCodeLog() {
-        return null;
+        return BeanMapper.mapList(pipelineCodeLogDao.findAllCodeLog(),PipelineCodeLog.class);
     }
 
     @Override

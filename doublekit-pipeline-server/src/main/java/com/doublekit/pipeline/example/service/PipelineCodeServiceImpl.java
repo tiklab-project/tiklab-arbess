@@ -82,10 +82,11 @@ public class PipelineCodeServiceImpl implements PipelineCodeService {
         return  BeanMapper.map(oneCode, PipelineCode.class);
     }
 
+    //获取code凭证
     @Override
     public Proof findOneProof(PipelineConfigure pipelineConfigure){
-        String proofName = pipelineConfigure.getPipelineCode().getProofName();
-        return proofService.fondOneName(proofName);
+        String proofId = pipelineConfigure.getPipelineCode().getProofId();
+        return proofService.fondOneName(proofId);
     }
 
     //查询所有

@@ -10,20 +10,22 @@ import com.doublekit.join.annotation.Join;
 @Mapper(targetAlias = "PipelineDeployLogEntity")
 public class PipelineDeployLog {
     //日志id
-    @ApiProperty(name = "logDeployId", desc = "构建历史id")
+    @ApiProperty(name = "logDeployId", desc = "日志id")
     private String logDeployId;
 
-    //运行日志
-    @ApiProperty(name = "deployRunTime", desc = "构建历史id")
-    private String deployRunTime;
+    //运行时间
+    @ApiProperty(name = "deployRunTime", desc = "运行时间")
+    private int deployRunTime;
 
     //运行状态（10 ：成功  1：失败   0 :其他）
-    @ApiProperty(name = "deployRunStatus", desc = "构建历史id")
+    @ApiProperty(name = "deployRunStatus", desc = "运行状态")
     private int deployRunStatus;
 
-    //运行时间
-    @ApiProperty(name = "deployRunLog", desc = "构建历史id")
-    private int deployRunLog;
+    //运行日志
+    @ApiProperty(name = "deployRunLog", desc = "运行日志")
+    private String deployRunLog;
+
+
 
     public String getLogDeployId() {
         return logDeployId;
@@ -33,11 +35,11 @@ public class PipelineDeployLog {
         this.logDeployId = logDeployId;
     }
 
-    public String getDeployRunTime() {
+    public int getDeployRunTime() {
         return deployRunTime;
     }
 
-    public void setDeployRunTime(String deployRunTime) {
+    public void setDeployRunTime(int deployRunTime) {
         this.deployRunTime = deployRunTime;
     }
 
@@ -49,11 +51,11 @@ public class PipelineDeployLog {
         this.deployRunStatus = deployRunStatus;
     }
 
-    public int getDeployRunLog() {
+    public String getDeployRunLog() {
         return deployRunLog;
     }
 
-    public void setDeployRunLog(int deployRunLog) {
+    public void setDeployRunLog(String deployRunLog) {
         this.deployRunLog = deployRunLog;
     }
 }

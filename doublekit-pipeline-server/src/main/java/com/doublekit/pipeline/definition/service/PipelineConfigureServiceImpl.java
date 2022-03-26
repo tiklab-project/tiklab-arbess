@@ -105,6 +105,7 @@ public class PipelineConfigureServiceImpl implements PipelineConfigureService {
         return null;
     }
 
+    //获取code凭证
     @Override
     public Proof findCodeProof(PipelineConfigure pipelineConfigure) {
         return pipelineCodeService.findOneProof(pipelineConfigure);

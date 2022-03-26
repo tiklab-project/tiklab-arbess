@@ -12,17 +12,17 @@ public class PipelineStructureLogEntity {
     @Column(name = "structure_id")
     private String logStructureId;
 
-    //运行日志
+    //运行时间
     @Column(name = "structure_run_time",notNull = true)
-    private String structureRunTime;
+    private int structureRunTime;
 
     //运行状态（10 ：成功  1：失败   0 :其他）
     @Column(name = "structure_run_state",notNull = true)
     private int structureRunStatus ;
 
-    //运行时间
+    //运行日志
     @Column(name = "structure_run_log",notNull = true)
-    private int structureRunLog;
+    private String structureRunLog;
 
 
     public String getLogStructureId() {
@@ -33,11 +33,11 @@ public class PipelineStructureLogEntity {
         this.logStructureId = logStructureId;
     }
 
-    public String getStructureRunTime() {
+    public int getStructureRunTime() {
         return structureRunTime;
     }
 
-    public void setStructureRunTime(String structureRunTime) {
+    public void setStructureRunTime(int structureRunTime) {
         this.structureRunTime = structureRunTime;
     }
 
@@ -49,11 +49,11 @@ public class PipelineStructureLogEntity {
         this.structureRunStatus = structureRunStatus;
     }
 
-    public int getStructureRunLog() {
+    public String getStructureRunLog() {
         return structureRunLog;
     }
 
-    public void setStructureRunLog(int structureRunLog) {
+    public void setStructureRunLog(String structureRunLog) {
         this.structureRunLog = structureRunLog;
     }
 }

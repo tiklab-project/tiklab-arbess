@@ -6,24 +6,23 @@ import com.doublekit.dal.jpa.annotation.*;
 @Table(name="pipeline_deploy_log")
 public class PipelineDeployLogEntity {
 
-
     //日志id
     @Id
     @GeneratorValue
     @Column(name = "deploy_id")
     private String logDeployId;
 
-    //运行日志
+    //运行时间
     @Column(name = "deploy_run_time",notNull = true)
-    private String deployRunTime;
+    private int deployRunTime;
 
     //运行状态（10 ：成功  1：失败   0 :其他）
     @Column(name = "deploy_run_state",notNull = true)
     private int deployRunStatus ;
 
-    //运行时间
+    //运行日志
     @Column(name = "deploy_run_log",notNull = true)
-    private int deployRunLog;
+    private String deployRunLog;
 
 
     public String getLogDeployId() {
@@ -34,11 +33,11 @@ public class PipelineDeployLogEntity {
         this.logDeployId = logDeployId;
     }
 
-    public String getDeployRunTime() {
+    public int getDeployRunTime() {
         return deployRunTime;
     }
 
-    public void setDeployRunTime(String deployRunTime) {
+    public void setDeployRunTime(int deployRunTime) {
         this.deployRunTime = deployRunTime;
     }
 
@@ -50,11 +49,11 @@ public class PipelineDeployLogEntity {
         this.deployRunStatus = deployRunStatus;
     }
 
-    public int getDeployRunLog() {
+    public String getDeployRunLog() {
         return deployRunLog;
     }
 
-    public void setDeployRunLog(int deployRunLog) {
+    public void setDeployRunLog(String deployRunLog) {
         this.deployRunLog = deployRunLog;
     }
 }

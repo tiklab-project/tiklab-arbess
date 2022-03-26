@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 @RestController
 @RequestMapping("/pipelineLog")
@@ -25,16 +26,28 @@ public class PipelineExecLogController {
     PipelineExecService pipelineExecService;
 
 
-    //开始构建
-    @RequestMapping(path="/pipelineStructure",method = RequestMethod.POST)
-    @ApiMethod(name = "pipelineStructure",desc = "开始构建")
-    @ApiParam(name = "pipelineId",desc = "流水线id",required = true)
-    public Result<String> pipelineStructure(@NotNull String pipelineId ) throws Exception {
+    //查询所有日志
+    @RequestMapping(path="/findAllLog",method = RequestMethod.POST)
+    @ApiMethod(name = "findAllLog",desc = "查询所有日志")
+    public Result< List<PipelineExecLog>> findAllLog() {
 
-        String logId = pipelineExecService.Structure(pipelineId);
+        List<PipelineExecLog> allLog = PipelineExecLogService.findAllLog();
 
-        return Result.ok(logId);
+        return Result.ok(allLog);
     }
+
+
+
+    //删除日志
+    @RequestMapping(path="/deleteLog",method = RequestMethod.POST)
+    @ApiMethod(name = "deleteLog",desc = "删除日志")
+    public Result<Void> deleteLog(String logId) {
+
+       PipelineExecLogService.deleteLog(logId);
+
+        return Result.ok();
+    }
+
 
     //查询构建状态
     @RequestMapping(path="/selectStructureState",method = RequestMethod.POST)

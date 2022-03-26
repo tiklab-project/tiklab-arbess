@@ -3,12 +3,12 @@ package com.doublekit.pipeline.instance.service;
 import com.doublekit.join.annotation.FindAll;
 import com.doublekit.join.annotation.FindList;
 import com.doublekit.join.annotation.FindOne;
-import com.doublekit.pipeline.definition.model.PipelineConfigure;
+import com.doublekit.join.annotation.JoinProvider;
 import com.doublekit.pipeline.instance.model.PipelineDeployLog;
-
 import java.util.List;
-import java.util.Map;
 
+
+@JoinProvider(model = PipelineDeployLog.class)
 public interface PipelineDeployLogService {
 
     /**

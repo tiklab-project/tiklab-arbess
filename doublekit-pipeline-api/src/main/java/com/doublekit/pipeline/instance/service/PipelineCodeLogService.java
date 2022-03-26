@@ -4,21 +4,27 @@ package com.doublekit.pipeline.instance.service;
 import com.doublekit.join.annotation.FindAll;
 import com.doublekit.join.annotation.FindList;
 import com.doublekit.join.annotation.FindOne;
-import com.doublekit.pipeline.definition.model.PipelineConfigure;
+import com.doublekit.join.annotation.JoinProvider;
 import com.doublekit.pipeline.instance.model.PipelineCodeLog;
 import com.doublekit.pipeline.instance.model.PipelineExecLog;
-
 import java.util.List;
 import java.util.Map;
 
+@JoinProvider(model = PipelineCodeLog.class)
 public interface PipelineCodeLogService {
 
     /**
      * 创建
-     * @param PipelineCodeLog codeLog信息
+     * @param pipelineCodeLog codeLog信息
      * @return codeLogId
      */
-    String createCodeLog(PipelineCodeLog PipelineCodeLog);
+    String createCodeLog(PipelineCodeLog pipelineCodeLog);
+
+    /**
+     * 创建所有日志表
+     * @return 日志id
+     */
+    Map<String, String> createCodeLog();
 
     /**
      * 删除
@@ -30,10 +36,11 @@ public interface PipelineCodeLogService {
 
     /**
      * 更新
-     * @param PipelineCodeLog 更新信息
+     * @param pipelineCodeLog 更新信息
      */
-    void updateCodeLog(PipelineCodeLog PipelineCodeLog);
+    void updateCodeLog(PipelineCodeLog pipelineCodeLog);
 
+    void updateCodeLog(PipelineExecLog pipelineExecLog);
     /**
      * 查询单个信息
      * @param codeLogId codeLogId

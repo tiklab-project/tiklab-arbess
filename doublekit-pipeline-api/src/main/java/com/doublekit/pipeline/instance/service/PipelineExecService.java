@@ -14,7 +14,7 @@ public interface PipelineExecService {
      * @return 构建开始
      * @throws InterruptedException 等待超时
      */
-    String  Structure(String pipelineId) throws Exception;
+    int  start(String pipelineId) throws Exception;
 
     /**
      * 查询构建状态

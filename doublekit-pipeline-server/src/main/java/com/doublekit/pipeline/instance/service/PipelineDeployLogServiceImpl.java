@@ -3,7 +3,6 @@ package com.doublekit.pipeline.instance.service;
 import com.doublekit.beans.BeanMapper;
 import com.doublekit.pipeline.instance.dao.PipelineDeployLogDao;
 import com.doublekit.pipeline.instance.entity.PipelineDeployLogEntity;
-import com.doublekit.pipeline.instance.model.PipelineCodeLog;
 import com.doublekit.pipeline.instance.model.PipelineDeployLog;
 import com.doublekit.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;

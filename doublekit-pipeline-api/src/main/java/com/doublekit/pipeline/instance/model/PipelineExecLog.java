@@ -34,7 +34,7 @@ public class PipelineExecLog {
     @Mappings({
             @Mapping(source = "codeLog.logCodeId",target = "logCodeId")
     })
-    @JoinQuery(key = "codeId")
+    @JoinQuery(key = "logCodeId")
     private PipelineCodeLog codeLog;
 
     //testId

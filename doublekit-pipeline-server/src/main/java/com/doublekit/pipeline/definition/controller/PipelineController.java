@@ -99,8 +99,8 @@ public class PipelineController {
     @ApiMethod(name = "findOnePipelineStatus",desc = "查询所有流水线状态")
     public Result<List<PipelineStatus>> findOnePipelineStatus(){
 
-        List<PipelineStatus> pipelineStatusList = pipelineService.findAll();
+        List<Pipeline> allPipeline = pipelineService.findAllPipeline();
 
-        return Result.ok(pipelineStatusList);
+        return Result.ok(allPipeline);
     }
 }

@@ -3,13 +3,13 @@ package com.doublekit.pipeline.instance.service;
 import com.doublekit.join.annotation.FindAll;
 import com.doublekit.join.annotation.FindList;
 import com.doublekit.join.annotation.FindOne;
-import com.doublekit.pipeline.definition.model.PipelineConfigure;
+import com.doublekit.join.annotation.JoinProvider;
 import com.doublekit.pipeline.instance.model.PipelineExecLog;
 import com.doublekit.pipeline.instance.model.PipelineStructureLog;
-
 import java.util.List;
 import java.util.Map;
 
+@JoinProvider(model =PipelineStructureLog.class)
 public interface PipelineStructureLogService {
 
     /**
@@ -19,13 +19,14 @@ public interface PipelineStructureLogService {
      */
     String createStructureLog(PipelineStructureLog pipelineStructureLog);
 
+    Map<String ,String> createStructureLog();
+
     /**
      * 删除
      * @param structureLogId structureLogId
      */
     void deleteStructureLog(String structureLogId);
 
-    //删除
     void deleteStructureLog(PipelineExecLog pipelineExecLog);
 
     /**
@@ -33,6 +34,8 @@ public interface PipelineStructureLogService {
      * @param pipelineStructureLog 更新信息
      */
     void updateStructureLog(PipelineStructureLog pipelineStructureLog);
+
+    void updateStructureLog(PipelineExecLog pipelineExecLog);
 
     /**
      * 查询单个信息

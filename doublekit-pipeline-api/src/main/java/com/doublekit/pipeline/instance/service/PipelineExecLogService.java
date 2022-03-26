@@ -21,10 +21,15 @@ public interface PipelineExecLogService {
      String createLog(PipelineExecLog pipelineExecLog);
 
     /**
-     * 删除流水线日志
-     * @param pipelineLogId 流水线日志id
+     * 创建日志以及关联表
+     * @return 日志信息
      */
-     void deleteLog(String pipelineLogId);
+     PipelineExecLog createLog();
+    /**
+     * 删除流水线日志
+     * @param logId 流水线日志id
+     */
+     void deleteLog(String logId);
 
     /**
      * 更新流水线日志
@@ -34,11 +39,11 @@ public interface PipelineExecLogService {
 
     /**
      * 查询流水线日志
-     * @param pipelineLogId 查询id
+     * @param logId 查询id
      * @return 流水线日志信息
      */
     @FindOne
-    PipelineExecLog findOneLog(String pipelineLogId);
+    PipelineExecLog findOneLog(String logId);
 
     /**
      * 查询所有流水线日志

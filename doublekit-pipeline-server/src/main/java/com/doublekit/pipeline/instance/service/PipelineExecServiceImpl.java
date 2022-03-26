@@ -3,9 +3,10 @@ package com.doublekit.pipeline.instance.service;
 import com.doublekit.pipeline.definition.model.PipelineConfigure;
 import com.doublekit.pipeline.definition.model.Pipeline;
 import com.doublekit.pipeline.definition.service.PipelineConfigureService;
+import com.doublekit.pipeline.definition.service.PipelineConfigureServiceImpl;
 import com.doublekit.pipeline.definition.service.PipelineService;
-import com.doublekit.pipeline.instance.model.PipelineExecHistory;
-import com.doublekit.pipeline.instance.model.PipelineExecLog;
+import com.doublekit.pipeline.example.model.PipelineTest;
+import com.doublekit.pipeline.instance.model.*;
 import com.doublekit.pipeline.setting.proof.model.Proof;
 import com.doublekit.rpc.annotation.Exporter;
 import com.jcraft.jsch.*;
@@ -13,14 +14,14 @@ import org.apache.commons.lang.StringUtils;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.transport.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.io.*;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.*;
 import ch.ethz.ssh2.Connection;
 
@@ -43,23 +44,30 @@ public class PipelineExecServiceImpl implements PipelineExecService {
     //存放构建流水线id
     List<String> pipelineIdList = new ArrayList<>();
 
+    private static final Logger logger = LoggerFactory.getLogger(PipelineExecServiceImpl.class);
 
     //开始构建
     @Override
-    public String  Structure(String pipelineId){
-        //创建线程池
-        ExecutorService executorService = Executors.newCachedThreadPool();
-        //判断同一任务是否在运行
-        if (pipelineIdList != null){
-            for (String id : pipelineIdList) {
-                if (id .equals(pipelineId)){
-                    return "100";
-                }
-            }
+    public int  start(String pipelineId){
+
+        try {
+            begin(pipelineId);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        //执行构建
-        executorService.submit(() -> start(pipelineId));
-        return "1";
+        // //创建线程池
+        // ExecutorService executorService = Executors.newCachedThreadPool();
+        // //判断同一任务是否在运行
+        // if (pipelineIdList != null){
+        //     for (String id : pipelineIdList) {
+        //         if (id .equals(pipelineId)){
+        //             return 100;
+        //         }
+        //     }
+        // }
+        // //执行构建
+        // executorService.submit(() -> begin(pipelineId));
+        return 1;
     }
 
     //查询构建状态
@@ -92,79 +100,80 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         return pipelineExecHistory;
     }
 
-    //构建
-    private String start(String pipelineId) throws IOException{
-
-        PipelineExecLog pipelineExecLog =new PipelineExecLog();
+    // 构建
+    private String begin(String pipelineId) throws IOException{
         //把执行构建的流水线加入进来
         pipelineIdList.add(pipelineId);
         PipelineConfigure pipelineConfigure = pipelineConfigureService.findPipelineIdConfigure(pipelineId);
-        Pipeline pipeline = pipelineService.findPipeline(pipelineId);
-        String logId = pipelineExecLogService.createLog(pipelineExecLog);
-        pipelineExecLog.setLogId(logId);
-        // pipelineExecLog.setPipelineId(pipelineId);
+        //创建日志
+        PipelineExecLog pipelineExecLog = pipelineExecLogService.createLog();
         pipelineExecLogList.add(pipelineExecLog);
-
         // 判断配置信息
-        whetherNull(pipeline, pipelineConfigure, pipelineExecLog);
-
+        whetherNull(pipelineConfigure, pipelineExecLog);
         return "1";
 
     }
 
 
     // git克隆
-    private int gitClone(Pipeline pipeline, PipelineConfigure pipelineConfigure, PipelineExecLog pipelineExecLog){
-
-        String logId = pipelineExecLog.getLogId();
-        // pipelineExecLog.setLogCodeState(2);
+    private int gitClone(PipelineConfigure pipelineConfigure, PipelineExecLog pipelineExecLog){
+        //设置状态
         pipelineExecLogList.add(pipelineExecLog);
-        String pipelineId = pipelineConfigure.getPipeline().getPipelineId();
-
-        //开始时间
+        Pipeline pipeline = pipelineConfigure.getPipeline();
+        PipelineCodeLog codeLog = pipelineExecLog.getCodeLog();
         long beginTime = new Timestamp(System.currentTimeMillis()).getTime();
+
         //设置代码路径
         String path = "D:\\clone\\" + pipeline.getPipelineName();
         File file = new File(path);
         //调用删除方法删除旧的代码
-        delete(file);
+        deleteFile(file);
         //获取凭证信息
         Proof proof = pipelineConfigureService.findCodeProof(pipelineConfigure);
         if (proof != null) {
             String codeAddress = pipelineConfigure.getPipelineCode().getCodeAddress();
             String codeBranch = pipelineConfigure.getPipelineCode().getCodeBranch();
-            //获取凭证
             UsernamePasswordCredentialsProvider credentialsProvider = usernamePassword(proof.getProofUsername(), proof.getProofPassword());
-            String s = "开始拉取代码 : " + "\n"  + "FileAddress : " + file + "\n"  +
-                    "Uri : " + codeAddress + "\n"   +
-                    "Branch : " + codeBranch + "\n"  ;
+
+            //更新日志
+            String s = "开始拉取代码 : " + "\n"  + "FileAddress : " + file + "\n"  + "Uri : " + codeAddress + "\n"  + "Branch : " + codeBranch + "\n"  ;
+            codeLog.setCodeRunLog(s);
             pipelineExecLog.setLogRunLog(s);
             pipelineExecLogList.add(pipelineExecLog);
+
             //克隆代码
             try {
-                gitClone(file, codeAddress, credentialsProvider, codeBranch);
+                clone(file, codeAddress, credentialsProvider, codeBranch);
             } catch (GitAPIException e) {
-                // pipelineExecLog.setLogCodeState(1);
-                error(pipelineExecLog, "拉取代码异常"+e.toString(),pipelineId);
+                codeLog.setCodeRunStatus(1);
+                codeLog.setCodeRunLog(codeLog.getCodeRunLog()+"\n拉取代码异常"+e.toString());
+                pipelineExecLog.setCodeLog(codeLog);
+                pipelineExecLogService.updateLog(pipelineExecLog);
+                error(pipelineExecLog, "拉取代码异常"+e.toString(),pipeline.getPipelineId());
                 return 0;
             }
 
-            //更新状态
-            String proofType = "proofType : " +proof.getProofType() + "\n";
-            String success = "拉取成功。。。。。。。。。。。。。。。" + "\n";
-            String log = s + proofType + success;
-            pipelineExecLog.setLogId(logId);
+            //更新状态以及日志
+            String log = s + "proofType : " +proof.getProofType() + "\n" + "clone成功。。。。。。。。。。。。。。。" + "\n";
+            codeLog.setCodeRunLog(log);
             pipelineExecLog.setLogRunLog(log);
             long overTime = new Timestamp(System.currentTimeMillis()).getTime();
-            // pipelineExecLog.setLogCodeTime((int)(overTime-beginTime)/1000);
+            int time = (int) (overTime - beginTime) / 1000;
+            codeLog.setCodeRunTime(time);
+            pipelineExecLog.setLogRunTime(pipelineExecLog.getLogRunTime()+time);
         }
-        // pipelineExecLog.setLogCodeState(10);
+        codeLog.setCodeRunStatus(10);
+        pipelineExecLog.setCodeLog(codeLog);
+        pipelineExecLogService.updateLog(pipelineExecLog);
         pipelineExecLogList.add(pipelineExecLog);
         return 1;
     }
 
     // 单元测试
-    private int unitTesting(Pipeline pipeline, PipelineConfigure pipelineConfigure, PipelineExecLog pipelineExecLog) {
+    private int unitTesting(PipelineConfigure pipelineConfigure, PipelineExecLog pipelineExecLog) {
+        long beginTime = new Timestamp(System.currentTimeMillis()).getTime();
+        Pipeline pipeline = pipelineConfigure.getPipeline();
+        PipelineTestLog testLog = pipelineExecLog.getTestLog();
         String testOrder = pipelineConfigure.getPipelineTest().getTestOrder();
         String path = "D:\\clone\\"+pipeline.getPipelineName();
         String[] split = testOrder.split("\n");
@@ -173,17 +182,35 @@ public class PipelineExecServiceImpl implements PipelineExecService {
                 Process process = process(path, s, null);
                 String a = "执行 : " + " ' " + s + " ' " + "\n";
                 pipelineExecLog.setLogRunLog(pipelineExecLog.getLogRunLog() + a);
-                int log = log(process, pipelineExecLog);
-                if (log == 0){
-                    // pipelineExecLog.setLogTestState(1);
-                    pipelineExecLogList.add(pipelineExecLog);
-                    error(pipelineExecLog,"测试失败：", pipelineConfigure.getPipeline().getPipelineId());
+
+                //测试执行失败
+                Map<String, String> map = log(process, pipelineExecLog);
+                if (map.get("state").equals("0")){
+                    long overTime = new Timestamp(System.currentTimeMillis()).getTime();
+                    testLog.setTestRunLog(testLog.getTestRunLog()+map.get("log"));
+                    int time = (int) (overTime - beginTime) / 1000;
+                    testLog.setTestRunTime(time);
+                    testLog.setTestRunStatus(1);
+                    testLog.setTestRunLog(testLog.getTestRunLog()+map.get("log")+"测试失败。");
+                    pipelineExecLog.setTestLog(testLog);
+                    pipelineExecLogService.updateLog(pipelineExecLog);
+                    error(pipelineExecLog,"测试执行失败。", pipelineConfigure.getPipeline().getPipelineId());
                     return 0;
                 }
-                // pipelineExecLog.setLogTestState(10);
+                //成功
+                long overTime = new Timestamp(System.currentTimeMillis()).getTime();
+                int time = (int) (overTime - beginTime) / 1000;
+                testLog.setTestRunLog(a+testLog.getTestRunLog()+map.get("log"));
+                testLog.setTestRunTime(time);
+                testLog.setTestRunStatus(10);
+                pipelineExecLog.setTestLog(testLog);
+                pipelineExecLogService.updateLog(pipelineExecLog);
                 pipelineExecLogList.add(pipelineExecLog);
             } catch (IOException e) {
-                // pipelineExecLog.setLogTestState(1);
+                long overTime = new Timestamp(System.currentTimeMillis()).getTime();
+                int time = (int) (overTime - beginTime) / 1000;
+                testLog.setTestRunTime(time);
+                testLog.setTestRunStatus(1);
                 pipelineExecLogList.add(pipelineExecLog);
                 error(pipelineExecLog,"测试失败。。。。。"+ e, pipelineConfigure.getPipeline().getPipelineId());
                 return 0;
@@ -192,9 +219,12 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         return 1;
     }
 
-    // 构建
-    private int structure(Pipeline pipeline, PipelineConfigure pipelineConfigure, PipelineExecLog pipelineExecLog)  {
 
+    // 构建
+    private int structure(PipelineConfigure pipelineConfigure, PipelineExecLog pipelineExecLog)  {
+        long beginTime = new Timestamp(System.currentTimeMillis()).getTime();
+        Pipeline pipeline = pipelineConfigure.getPipeline();
+        PipelineStructureLog structureLog = pipelineExecLog.getStructureLog();
         String structureOrder = pipelineConfigure.getPipelineStructure().getStructureOrder();
         String structureAddress = pipelineConfigure.getPipelineStructure().getStructureAddress();
         //设置拉取地址
@@ -205,18 +235,24 @@ public class PipelineExecServiceImpl implements PipelineExecService {
                 Process process = process(path, s, structureAddress);
                 String a = "执行 : " + " ' " + s + " ' " + "\n";
                 pipelineExecLog.setLogRunLog(pipelineExecLog.getLogRunLog() + a);
-                int log = log(process, pipelineExecLog);
-                if (log == 0){
-                    // pipelineExecLog.setLogTestState(1);
-                    pipelineExecLogList.add(pipelineExecLog);
+                //构建失败
+                Map<String, String> map = log(process, pipelineExecLog);
+                if (map.get("state").equals("0")){
+                    structureError(pipelineExecLog,beginTime);
                     error(pipelineExecLog,"构建失败。。。。", pipelineConfigure.getPipeline().getPipelineId());
                     return 0;
                 }
-                // pipelineExecLog.setLogPackState(10);
+
+                long overTime = new Timestamp(System.currentTimeMillis()).getTime();
+                int time = (int) (overTime - beginTime) / 1000;
+                structureLog.setStructureRunStatus(10);
+                structureLog.setStructureRunLog(a+map.get("log"));
+                structureLog.setStructureRunTime(time);
+                pipelineExecLog.setStructureLog(structureLog);
+                pipelineExecLogService.updateLog(pipelineExecLog);
                 pipelineExecLogList.add(pipelineExecLog);
             } catch (IOException e) {
-                // pipelineExecLog.setLogPackState(1);
-                pipelineExecLogList.add(pipelineExecLog);
+                structureError(pipelineExecLog,beginTime);
                 error(pipelineExecLog,"构建异常："+ e, pipelineConfigure.getPipeline().getPipelineId());
                 return 0;
             }
@@ -224,13 +260,24 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         return 1;
     }
 
-     // 部署
-    private int deploy(Pipeline pipeline, PipelineConfigure pipelineConfigure, PipelineExecLog pipelineExecLog) throws IOException {
+    //构建错误
+    private void structureError(PipelineExecLog pipelineExecLog,long beginTime){
+        PipelineStructureLog structureLog = pipelineExecLog.getStructureLog();
+        long overTime = new Timestamp(System.currentTimeMillis()).getTime();
+        int time = (int) (overTime - beginTime) / 1000;
+        structureLog.setStructureRunStatus(1);
+        structureLog.setStructureRunTime(time);
+        pipelineExecLog.setStructureLog(structureLog);
+        pipelineExecLogService.updateLog(pipelineExecLog);
+        pipelineExecLogList.add(pipelineExecLog);
+    }
 
+     // 部署
+    private int deploy(PipelineConfigure pipelineConfigure, PipelineExecLog pipelineExecLog) throws IOException {
+        Pipeline pipeline = pipelineConfigure.getPipeline();
         String deployTargetAddress = pipelineConfigure.getPipelineDeploy().getDeployTargetAddress();
         String deployAddress = pipelineConfigure.getPipelineDeploy().getDeployAddress();
         String logId = pipelineExecLog.getLogId();
-        // pipelineExecLog.setLogDeployTime(1);
         pipelineExecLogList.add(pipelineExecLog);
         Proof proof = pipelineConfigureService.findDeployProof(pipelineConfigure);
 
@@ -269,7 +316,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         long overTime = new Timestamp(System.currentTimeMillis()).getTime();
         // pipelineExecLog.setLogDeployTime((int) (overTime-beginTime)/1000);
         // pipelineExecLog.setLogDeployState(10);
-        // pipelineExecLog.setLogRunLog(pipelineExecLog.getLogRunLog()+"\n"+"服务器部署:"+proof.getProofIp()+"成功!");
+        pipelineExecLog.setLogRunLog(pipelineExecLog.getLogRunLog()+"\n"+"服务器部署:"+proof.getProofIp()+"成功!");
         pipelineExecLogList.add(pipelineExecLog);
         return 1;
     }
@@ -282,7 +329,6 @@ public class PipelineExecServiceImpl implements PipelineExecService {
      * @throws IOException 构建命令执行异常
      */
     private Process process(String path,String order,String sourceAddress) throws IOException {
-
         Runtime runtime=Runtime.getRuntime();
         Process process;
         if (sourceAddress != null){
@@ -300,35 +346,29 @@ public class PipelineExecServiceImpl implements PipelineExecService {
      * @param pipelineExecLog 日志信息
      * @throws IOException 字符流装换异常
      */
-    private int log(Process process , PipelineExecLog pipelineExecLog) throws IOException {
-        long beginTime = new Timestamp(System.currentTimeMillis()).getTime();
+    private Map<String, String> log(Process process , PipelineExecLog pipelineExecLog) throws IOException {
+        Map<String, String> map = new HashMap<>();
         String s;
         InputStreamReader  inputStreamReader = new InputStreamReader(process.getInputStream());
         BufferedReader  bufferedReader = new BufferedReader(inputStreamReader);
-        String logId = pipelineExecLog.getLogId();
-        String logRunLog = pipelineExecLog.getLogRunLog();
+        String logRunLog = "";
         //更新日志信息
         while ((s = bufferedReader.readLine()) != null) {
             logRunLog = logRunLog + s + "\n";
-            pipelineExecLog.setLogId(logId);
-            pipelineExecLog.setLogRunLog(logRunLog);
-
-            if (logRunLog.contains("BUILD FAILURE")){
-                return 0;
-            }
-
-            long overTime = new Timestamp(System.currentTimeMillis()).getTime();
-            //获取构建所用时长
-            // if (pipelineExecLog.getLogTestState() == 0){
-            //     pipelineExecLog.setLogTestTime((int) (overTime-beginTime)/1000);
-            // }else {
-            //     pipelineExecLog.setLogPackTime((int) (overTime-beginTime)/1000);
-            }
+            pipelineExecLog.setLogRunLog(pipelineExecLog.getLogRunLog()+s);
             pipelineExecLogList.add(pipelineExecLog);
-        // }
-        // inputStreamReader.close();
-        // bufferedReader.close();
-        return 1;
+            if (logRunLog.contains("BUILD FAILURE")){
+                pipelineExecLogList.add(pipelineExecLog);
+                map.put("state","0");
+                map.put("log",logRunLog);
+                return map;
+            }
+        }
+        map.put("state","1");
+        map.put("log",logRunLog);
+        inputStreamReader.close();
+        bufferedReader.close();
+        return map;
     }
 
     /**
@@ -339,7 +379,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
      * @param branch 分支
      * @throws RuntimeException 拉取异常
      */
-    private void gitClone(File gitAddress, String gitUrl, CredentialsProvider credentialsProvider, String branch) throws GitAPIException {
+    private void clone(File gitAddress, String gitUrl, CredentialsProvider credentialsProvider, String branch) throws GitAPIException {
         Git.cloneRepository().setURI(gitUrl)
             .setCredentialsProvider(credentialsProvider)
             .setDirectory(gitAddress)
@@ -366,13 +406,13 @@ public class PipelineExecServiceImpl implements PipelineExecService {
      * 删除旧的代码
      * @param dir 文件地址
      */
-    private boolean delete(File dir){
+    private boolean deleteFile(File dir){
         if (dir.isDirectory()) {
             String[] children = dir.list();
             //递归删除目录中的子目录下
             if (children != null) {
                 for (String child : children) {
-                    boolean success = delete(new File(dir, child));
+                    boolean success = deleteFile(new File(dir, child));
                     if (!success) {
                         return false;
                     }
@@ -533,7 +573,6 @@ public class PipelineExecServiceImpl implements PipelineExecService {
             pipelineExecLog.setLogRunLog("\n" + e + "\n"+ " RUN RESULT : FAIL");
         }
         pipelineExecLog.setLogRunStatus(1);
-
         // 清空缓存
         clean(pipelineExecLog,pipelineId);
     }
@@ -578,21 +617,17 @@ public class PipelineExecServiceImpl implements PipelineExecService {
     }
 
     // 判断配置信息
-    private void whetherNull(Pipeline pipeline, PipelineConfigure pipelineConfigure, PipelineExecLog pipelineExecLog) throws  IOException {
+    private void whetherNull(PipelineConfigure pipelineConfigure, PipelineExecLog pipelineExecLog){
+
     //配置都存在
-        int gitClone = gitClone(pipeline, pipelineConfigure, pipelineExecLog);
-        if (gitClone != 0){
-            int unitTesting = unitTesting(pipeline, pipelineConfigure, pipelineExecLog);
-            if (unitTesting != 0){
-                int structure = structure(pipeline, pipelineConfigure, pipelineExecLog);
-                if (structure != 0){
-                    int deploy = deploy(pipeline, pipelineConfigure, pipelineExecLog);
-                    if (deploy != 0){
-                        success(pipelineExecLog,pipeline.getPipelineId());
-                    }
-                }
+        int gitClone = gitClone(pipelineConfigure, pipelineExecLog);
+        if (gitClone == 1){
+            int i = unitTesting(pipelineConfigure, pipelineExecLog);
+            if (i == 1){
+                int structure = structure(pipelineConfigure, pipelineExecLog);
             }
         }
+
     }
 
 

@@ -10,20 +10,22 @@ import com.doublekit.join.annotation.Join;
 @Mapper(targetAlias = "PipelineTestLogEntity")
 public class PipelineTestLog {
     //日志id
-    @ApiProperty(name="logTestId",desc="构建历史id")
+    @ApiProperty(name="logTestId",desc="日志id")
     private String logTestId;
 
-    //运行日志
-    @ApiProperty(name="testRunTime",desc="构建历史id")
-    private String testRunTime;
+    //运行时间
+    @ApiProperty(name="testRunTime",desc="运行时间")
+    private int testRunTime;
 
     //运行状态（10 ：成功  1：失败   0 :其他）
-    @ApiProperty(name="testRunStatus",desc="构建历史id")
+    @ApiProperty(name="testRunStatus",desc="运行状态")
     private int testRunStatus ;
 
-    //运行时间
-    @ApiProperty(name="testRunLog",desc="构建历史id")
-    private int testRunLog;
+    //运行日志
+    @ApiProperty(name="testRunLog",desc="运行日志")
+    private String testRunLog;
+
+
 
     public String getLogTestId() {
         return logTestId;
@@ -33,11 +35,11 @@ public class PipelineTestLog {
         this.logTestId = logTestId;
     }
 
-    public String getTestRunTime() {
+    public int getTestRunTime() {
         return testRunTime;
     }
 
-    public void setTestRunTime(String testRunTime) {
+    public void setTestRunTime(int testRunTime) {
         this.testRunTime = testRunTime;
     }
 
@@ -49,11 +51,11 @@ public class PipelineTestLog {
         this.testRunStatus = testRunStatus;
     }
 
-    public int getTestRunLog() {
+    public String getTestRunLog() {
         return testRunLog;
     }
 
-    public void setTestRunLog(int testRunLog) {
+    public void setTestRunLog(String testRunLog) {
         this.testRunLog = testRunLog;
     }
 }
