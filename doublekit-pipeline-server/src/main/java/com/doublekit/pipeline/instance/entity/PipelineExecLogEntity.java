@@ -44,6 +44,10 @@ public class PipelineExecLogEntity {
     @Column(name = "log_deploy_id",notNull = true)
     private String logDeployId;
 
+    //pipelineId
+    @Column(name = "pipeline_id",notNull = true)
+    private String pipelineId;
+
 
     public String getLogId() {
         return logId;
@@ -107,5 +111,13 @@ public class PipelineExecLogEntity {
 
     public void setLogDeployId(String logDeployId) {
         this.logDeployId = logDeployId;
+    }
+
+    public String getPipelineId() {
+        return pipelineId;
+    }
+
+    public void setPipelineId(String pipelineId) {
+        this.pipelineId = pipelineId;
     }
 }

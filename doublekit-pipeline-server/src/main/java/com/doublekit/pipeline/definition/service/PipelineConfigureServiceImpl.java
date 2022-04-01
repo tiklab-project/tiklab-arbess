@@ -116,11 +116,6 @@ public class PipelineConfigureServiceImpl implements PipelineConfigureService {
         return pipelineDeployService.findOneProof(pipelineConfigure);
     }
 
-    @Override
-    public PipelineExecHistory addHistoryOne(String pipelineId, PipelineExecHistory pipelineExecHistory) {
-        return null;
-    }
-
     //查询所有
     @Override
     public List<PipelineConfigure> findAllConfigure() {

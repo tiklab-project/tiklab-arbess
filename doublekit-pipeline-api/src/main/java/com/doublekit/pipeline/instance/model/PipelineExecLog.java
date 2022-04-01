@@ -61,6 +61,10 @@ public class PipelineExecLog {
     @JoinQuery(key = "logDeployId")
     private PipelineDeployLog deployLog;
 
+    //pipelineId
+    @ApiProperty(name = "pipelineId",desc="pipelineId")
+    private String pipelineId;
+
 
     public String getLogId() {
         return logId;
@@ -124,5 +128,13 @@ public class PipelineExecLog {
 
     public void setDeployLog(PipelineDeployLog deployLog) {
         this.deployLog = deployLog;
+    }
+
+    public String getPipelineId() {
+        return pipelineId;
+    }
+
+    public void setPipelineId(String pipelineId) {
+        this.pipelineId = pipelineId;
     }
 }

@@ -32,11 +32,6 @@ public class PipelineCodeEntity {
     @Column(name = "proof_Name")
     private String proofName;
 
-    //凭证id
-    @Column(name = "proof_Name")
-    private String proofId;
-
-
 
     public String getCodeId() {
         return codeId;
@@ -84,13 +79,5 @@ public class PipelineCodeEntity {
 
     public void setProofName(String proofName) {
         this.proofName = proofName;
-    }
-
-    public String getProofId() {
-        return proofId;
-    }
-
-    public void setProofId(String proofId) {
-        this.proofId = proofId;
     }
 }

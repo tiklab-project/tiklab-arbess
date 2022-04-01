@@ -34,19 +34,6 @@ public class PipelineDeploy {
     @ApiProperty(name="proofName",desc="凭证信息")
     private String proofName;
 
-    //凭证id
-    @ApiProperty(name="proofId",desc="凭证id",eg="@selectOne")
-    private String proofId;
-
-
-    public String getProofId() {
-        return proofId;
-    }
-
-    public void setProofId(String proofId) {
-        this.proofId = proofId;
-    }
-
     public String getDeployId() {
         return deployId;
     }

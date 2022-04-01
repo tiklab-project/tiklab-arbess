@@ -4,8 +4,11 @@ import com.doublekit.join.annotation.FindAll;
 import com.doublekit.join.annotation.FindList;
 import com.doublekit.join.annotation.FindOne;
 import com.doublekit.join.annotation.JoinProvider;
+import com.doublekit.pipeline.instance.model.PipelineExecHistory;
 import com.doublekit.pipeline.instance.model.PipelineExecLog;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 /**
  * 流水线日志
@@ -18,7 +21,7 @@ public interface PipelineExecLogService {
      * @param pipelineExecLog 流水线历史日志
      * @return 流水线日志id
      */
-     String createLog(PipelineExecLog pipelineExecLog);
+     String createLog(@NotNull @Valid PipelineExecLog pipelineExecLog);
 
     /**
      * 创建日志以及关联表
@@ -35,7 +38,7 @@ public interface PipelineExecLogService {
      * 更新流水线日志
      * @param pipelineExecLog 更新后流水线日志信息
      */
-     void updateLog(PipelineExecLog pipelineExecLog);
+     void updateLog(@NotNull @Valid  PipelineExecLog pipelineExecLog);
 
     /**
      * 查询流水线日志
@@ -51,6 +54,12 @@ public interface PipelineExecLogService {
      */
     @FindAll
      List<PipelineExecLog> findAllLog();
+
+    /**
+     * 创建历史表
+     * @param pipelineExecHistory 信息
+     */
+    void createHistory(PipelineExecHistory pipelineExecHistory);
 
     @FindList
     List<PipelineExecLog> findAllLogList(List<String> idList);

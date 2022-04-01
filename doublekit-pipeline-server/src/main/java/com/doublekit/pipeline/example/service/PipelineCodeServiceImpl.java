@@ -7,10 +7,13 @@ import com.doublekit.pipeline.definition.model.PipelineConfigure;
 import com.doublekit.pipeline.example.dao.PipelineCodeDao;
 import com.doublekit.pipeline.example.entity.PipelineCodeEntity;
 import com.doublekit.pipeline.example.model.PipelineCode;
+import com.doublekit.pipeline.example.service.codeGit.CodeGiteeApiService;
+import com.doublekit.pipeline.instance.service.PipelineExecServiceImpl;
 import com.doublekit.pipeline.setting.proof.model.Proof;
 import com.doublekit.pipeline.setting.proof.service.ProofService;
 import com.doublekit.rpc.annotation.Exporter;
-import com.sun.xml.bind.v2.model.core.ID;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
@@ -29,6 +32,12 @@ public class PipelineCodeServiceImpl implements PipelineCodeService {
     @Autowired
     PipelineTestService pipelineTestService;
 
+    @Autowired
+    CodeGiteeApiService codeGiteeApiService;
+
+    private static final Logger logger = LoggerFactory.getLogger(PipelineCodeServiceImpl.class);
+
+
 
     //创建
     @Override
@@ -43,6 +52,12 @@ public class PipelineCodeServiceImpl implements PipelineCodeService {
         PipelineCode pipelineCode = new PipelineCode();
         if (pipelineConfigure.getPipelineCode() != null){
             pipelineCode = pipelineConfigure.getPipelineCode();
+        }
+        if (pipelineCode.getCodeName() != null || pipelineCode.getCodeType() == 3){
+            pipelineCode.setProofName(null);
+            pipelineCode.setCodeAddress(codeGiteeApiService.getCloneUrl(pipelineCode.getCodeName()));
+        }else {
+            pipelineCode.setCodeAddress(pipelineCode.getCodeName());
         }
         String code = createCode(pipelineCode);
         map.put("codeId",code);
@@ -71,7 +86,15 @@ public class PipelineCodeServiceImpl implements PipelineCodeService {
     //修改测试表
     @Override
     public void updateTest(PipelineConfigure pipelineConfigure){
-        updateCode(pipelineConfigure.getPipelineCode());
+        PipelineCode pipelineCode = pipelineConfigure.getPipelineCode();
+        if (pipelineCode.getCodeName() != null && pipelineCode.getCodeType() == 3){
+            pipelineCode.setProofName(null);
+            pipelineCode.setCodeAddress(codeGiteeApiService.getCloneUrl(pipelineCode.getCodeName()));
+        }else {
+            pipelineCode.setCodeAddress(pipelineCode.getCodeName());
+        }
+
+        updateCode(pipelineCode);
         pipelineTestService.updateStructure(pipelineConfigure);
     }
 
@@ -85,8 +108,8 @@ public class PipelineCodeServiceImpl implements PipelineCodeService {
     //获取code凭证
     @Override
     public Proof findOneProof(PipelineConfigure pipelineConfigure){
-        String proofId = pipelineConfigure.getPipelineCode().getProofId();
-        return proofService.fondOneName(proofId);
+        String proofName = pipelineConfigure.getPipelineCode().getProofName();
+        return proofService.fondOneName(proofName);
     }
 
     //查询所有

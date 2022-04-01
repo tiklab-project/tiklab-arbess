@@ -29,7 +29,7 @@ public class PipelineExecHistoryDao {
      *
      * @param id 流水线历史id
      */
-    public void deleteHistory(String id) {
+    public void deleteHistory(int id) {
         jpaTemplate.delete(PipelineExecHistoryEntity.class, id);
     }
 
@@ -50,7 +50,7 @@ public class PipelineExecHistoryDao {
      * @param id 查询id
      * @return 流水线历史信息
      */
-    public PipelineExecHistoryEntity findOneHistory(String id) {
+    public PipelineExecHistoryEntity findOneHistory(int id) {
 
         return jpaTemplate.findOne(PipelineExecHistoryEntity.class, id);
     }

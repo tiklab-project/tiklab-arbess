@@ -1,6 +1,8 @@
 package com.doublekit.pipeline.definition.service;
 
 import com.doublekit.beans.BeanMapper;
+import com.doublekit.dal.jpa.criterial.condition.QueryCondition;
+import com.doublekit.dal.jpa.criterial.conditionbuilder.QueryBuilders;
 import com.doublekit.join.JoinTemplate;
 import com.doublekit.pipeline.definition.controller.PipelineController;
 import com.doublekit.pipeline.definition.dao.PipelineDao;
@@ -67,13 +69,14 @@ public class PipelineServiceImpl implements PipelineService{
             pipelineDao.deletePipeline(pipelineId);
             //删除对应的流水线配置
             pipelineConfigureService.deletePipelineIdConfigure(pipelineId);
+            //删除对应的历史
+            pipelineExecHistoryService.deleteHistory(pipelineId);
         }
     }
 
     //更新
     @Override
     public String updatePipeline(Pipeline pipeline) {
-
         String pipelineName = pipeline.getPipelineName();
         List<Pipeline> pipelineList = findAllPipeline();
         for (Pipeline pipeline1 : pipelineList) {
@@ -106,16 +109,34 @@ public class PipelineServiceImpl implements PipelineService{
         return BeanMapper.mapList(pipelineEntityList, Pipeline.class);
     }
 
+    //模糊查询
     @Override
-    public List<Pipeline> findName(String pipelineName) {
+    public List<Pipeline> findLike(String pipelineName) {
         List<PipelineEntity> pipelineEntityList = pipelineDao.findName(pipelineName);
         return BeanMapper.mapList(pipelineEntityList, Pipeline.class);
     }
 
     //查询所有流水线状态
     @Override
-    public List<PipelineStatus> findAll() {
-        return null;
+    public List<PipelineStatus> findAllStatus() {
+        List<PipelineStatus> pipelineStatusList= new ArrayList<>();
+        List<Pipeline> allPipeline = findAllPipeline();
+        for (Pipeline pipeline : allPipeline) {
+            PipelineStatus pipelineStatus = new PipelineStatus();
+            PipelineExecHistory latelyHistory = pipelineExecHistoryService.findLatelyHistory(pipeline.getPipelineId());
+            PipelineExecHistory latelySuccess = pipelineExecHistoryService.findLatelySuccess(pipeline.getPipelineId());
+            pipelineStatus.setPipelineId(pipeline.getPipelineId());
+            pipelineStatus.setPipelineName(pipeline.getPipelineName());
+            if (latelyHistory != null){
+                pipelineStatus.setLastStructureTime(latelyHistory.getHistoryCreateTime());
+                pipelineStatus.setStructureStatus(latelyHistory.getHistoryStatus());
+            }
+            if (latelySuccess != null){
+                pipelineStatus.setLastSuccessTime(latelySuccess.getHistoryCreateTime());
+            }
+            pipelineStatusList.add(pipelineStatus);
+        }
+        return pipelineStatusList;
     }
 
 

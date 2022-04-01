@@ -9,6 +9,7 @@ import com.doublekit.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -25,6 +26,9 @@ public class PipelineExecLogServiceImpl implements PipelineExecLogService {
     @Autowired
     PipelineCodeLogService pipelineCodeLogService;
 
+    @Autowired
+    PipelineExecHistoryService pipelineExecHistoryService;
+
     //创建
     @Override
     public String createLog(PipelineExecLog pipelineExecLog) {
@@ -37,23 +41,18 @@ public class PipelineExecLogServiceImpl implements PipelineExecLogService {
     public PipelineExecLog createLog(){
         PipelineExecLog pipelineExecLog = new PipelineExecLog();
         Map<String, String> map = pipelineCodeLogService.createCodeLog();
-
         PipelineCodeLog pipelineCodeLog = new PipelineCodeLog();
         pipelineCodeLog.setLogCodeId(map.get("codeLogId"));
         pipelineExecLog.setCodeLog(pipelineCodeLog);
-
         PipelineTestLog pipelineTestLog = new PipelineTestLog();
         pipelineTestLog.setLogTestId(map.get("testLogId"));
         pipelineExecLog.setTestLog(pipelineTestLog);
-
         PipelineStructureLog pipelineStructureLog = new PipelineStructureLog();
         pipelineStructureLog.setLogStructureId(map.get("structureLogId"));
         pipelineExecLog.setStructureLog(pipelineStructureLog);
-
         PipelineDeployLog pipelineDeployLog = new PipelineDeployLog();
         pipelineDeployLog.setLogDeployId(map.get("deployLogId"));
         pipelineExecLog.setDeployLog(pipelineDeployLog);
-
         String logId = createLog(pipelineExecLog);
         pipelineExecLog.setLogId(logId);
         return pipelineExecLog;
@@ -81,7 +80,8 @@ public class PipelineExecLogServiceImpl implements PipelineExecLogService {
     //查询单个
     @Override
     public PipelineExecLog findOneLog(String logId) {
-        PipelineExecLog pipelineExecLog = BeanMapper.map(pipelineExecLogDao.findOne(logId), PipelineExecLog.class);
+        PipelineExecLogEntity oneLog = pipelineExecLogDao.findOne(logId);
+        PipelineExecLog pipelineExecLog = BeanMapper.map(oneLog, PipelineExecLog.class);
         joinTemplate.joinQuery(pipelineExecLog);
         return pipelineExecLog;
     }
@@ -93,6 +93,12 @@ public class PipelineExecLogServiceImpl implements PipelineExecLogService {
         List<PipelineExecLog> pipelineExecLogList = BeanMapper.mapList(allLog, PipelineExecLog.class);
         joinTemplate.joinQuery(pipelineExecLogList);
         return pipelineExecLogList;
+    }
+
+    //创建历史表
+    @Override
+    public void createHistory(PipelineExecHistory pipelineExecHistory){
+        pipelineExecHistoryService.createHistory(pipelineExecHistory);
     }
 
     @Override

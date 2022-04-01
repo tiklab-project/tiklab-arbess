@@ -90,7 +90,7 @@ public class PipelineController {
     @ApiParam(name = "pipelineName",desc = "模糊查询条件",required = true)
     public Result<List<Pipeline>> findOneName(@NotNull String pipelineName){
 
-        List<Pipeline> pipelineQueryList = pipelineService.findName(pipelineName);
+        List<Pipeline> pipelineQueryList = pipelineService.findLike(pipelineName);
 
         return Result.ok(pipelineQueryList);
     }
@@ -99,8 +99,8 @@ public class PipelineController {
     @ApiMethod(name = "findOnePipelineStatus",desc = "查询所有流水线状态")
     public Result<List<PipelineStatus>> findOnePipelineStatus(){
 
-        List<Pipeline> allPipeline = pipelineService.findAllPipeline();
+        List<PipelineStatus> allStatus = pipelineService.findAllStatus();
 
-        return Result.ok(allPipeline);
+        return Result.ok(allStatus);
     }
 }

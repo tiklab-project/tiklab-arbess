@@ -23,13 +23,20 @@ public interface CodeGiteeApiService {
     String getAccessToken(String code) throws IOException;
 
     /**
-     * 获取登录名
-     * @return 登录名
+     * 获取用户登录名
+     * @return 名称
      */
     String getUserMessage();
 
+    /**
+     * 创建凭证
+     * @param configureId 配置id
+     * @param proofName 凭证名
+     * @return 状态
+     */
+    String getProof(String configureId,String proofName);
 
-    String getProof();
+    String getCloneUrl(String projectName);
 
     /**
      * 获取对应code下所有的仓库
@@ -43,8 +50,4 @@ public interface CodeGiteeApiService {
      * @return 分支信息
      */
     List<String> getBranch(String projectName);
-
-
-    String getGiteeUrl(String projectName);
-
 }

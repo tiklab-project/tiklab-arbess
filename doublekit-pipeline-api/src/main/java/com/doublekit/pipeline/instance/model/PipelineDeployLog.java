@@ -9,6 +9,7 @@ import com.doublekit.join.annotation.Join;
 @Join
 @Mapper(targetAlias = "PipelineDeployLogEntity")
 public class PipelineDeployLog {
+
     //日志id
     @ApiProperty(name = "logDeployId", desc = "日志id")
     private String logDeployId;

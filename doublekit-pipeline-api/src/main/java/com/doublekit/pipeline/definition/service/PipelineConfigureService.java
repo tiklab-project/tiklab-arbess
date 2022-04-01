@@ -68,9 +68,6 @@ public interface PipelineConfigureService {
      */
     Proof findDeployProof(PipelineConfigure pipelineConfigure);
 
-    //
-    PipelineExecHistory addHistoryOne(String pipelineId,PipelineExecHistory pipelineExecHistory);
-
     /**
      * 查询所有配置文件
      * @return 配置文件列表

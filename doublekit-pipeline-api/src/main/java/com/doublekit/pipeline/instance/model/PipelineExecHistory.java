@@ -33,22 +33,26 @@ public class PipelineExecHistory {
     @ApiProperty(name="pipelineName",desc="分支",required = true)
         private String historyBranch;
 
-    //流水线
-    @ApiProperty(name="pipeline",desc="流水线id",eg="@selectOne")
-    @Mappings({
-            @Mapping(source = "pipeline.pipelineId",target = "pipelineId")
-    })
-    @JoinQuery(key = "pipelineId")
-    private Pipeline pipeline;
+    //执行人
+    @ApiProperty(name="pipelineName",desc="执行人")
+    private String pipelineName;
 
+    //状态
+    @ApiProperty(name="pipelineName",desc="执行人")
+    private int historyStatus;
 
-    //日志
-    @ApiProperty(name="pipelineExecLog",desc="日志id",eg="@selectOne")
-    @Mappings({
-            @Mapping(source = "pipelineExecLog.logId",target = "logId")
-    })
-    @JoinQuery(key = "logId")
-    private PipelineExecLog pipelineExecLog;
+    //日志id
+    @ApiProperty(name="logId",desc="日志id")
+    private String logId;
+
+    //流水线id
+    @ApiProperty(name="pipelineId",desc="日志id")
+    private String pipelineId;
+
+    //执行时间
+    @ApiProperty(name="historyTime",desc="日志id")
+    private int historyTime;
+
 
     public int getHistoryId() {
         return historyId;
@@ -82,21 +86,43 @@ public class PipelineExecHistory {
         this.historyBranch = historyBranch;
     }
 
-    public Pipeline getPipeline() {
-        return pipeline;
+    public String getPipelineName() {
+        return pipelineName;
     }
 
-    public void setPipeline(Pipeline pipeline) {
-        this.pipeline = pipeline;
+    public void setPipelineName(String pipelineName) {
+        this.pipelineName = pipelineName;
     }
 
-    public PipelineExecLog getPipelineExecLog() {
-        return pipelineExecLog;
+    public String getLogId() {
+        return logId;
     }
 
-    public void setPipelineExecLog(PipelineExecLog pipelineExecLog) {
-        this.pipelineExecLog = pipelineExecLog;
+    public void setLogId(String logId) {
+        this.logId = logId;
     }
 
+    public int getHistoryStatus() {
+        return historyStatus;
+    }
 
+    public void setHistoryStatus(int historyStatus) {
+        this.historyStatus = historyStatus;
+    }
+
+    public int getHistoryTime() {
+        return historyTime;
+    }
+
+    public void setHistoryTime(int historyTime) {
+        this.historyTime = historyTime;
+    }
+
+    public String getPipelineId() {
+        return pipelineId;
+    }
+
+    public void setPipelineId(String pipelineId) {
+        this.pipelineId = pipelineId;
+    }
 }

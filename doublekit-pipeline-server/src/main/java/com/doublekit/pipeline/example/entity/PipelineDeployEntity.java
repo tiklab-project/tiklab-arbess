@@ -32,10 +32,6 @@ public class PipelineDeployEntity {
     @Column(name = "proof_name")
     private String proofName;
 
-    //凭证id
-    @Column(name = "proof_Name")
-    private String proofId;
-
     public String getDeployId() {
         return deployId;
     }
@@ -82,13 +78,5 @@ public class PipelineDeployEntity {
 
     public void setProofName(String proofName) {
         this.proofName = proofName;
-    }
-
-    public String getProofId() {
-        return proofId;
-    }
-
-    public void setProofId(String proofId) {
-        this.proofId = proofId;
     }
 }

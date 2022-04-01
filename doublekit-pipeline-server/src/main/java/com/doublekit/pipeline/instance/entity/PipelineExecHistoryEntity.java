@@ -17,7 +17,7 @@ public class PipelineExecHistoryEntity {
     private int historyId;
 
     //创建构建时间
-    @Column(name = "history_time",notNull = true)
+    @Column(name = "history_create_time",notNull = true)
     private String historyCreateTime;
 
     //构建方式
@@ -28,13 +28,26 @@ public class PipelineExecHistoryEntity {
     @Column(name = "history_branch",notNull = true)
     private String historyBranch;
 
-    //流水线id
-    @Column(name = "pipeline_id",notNull = true)
-    private String pipelineId;
+    //执行人
+    @Column(name = "pipeline_name",notNull = true)
+    private String pipelineName;
 
     //日志id
     @Column(name = "log_id",notNull = true)
     private String logId;
+
+    //状态
+    @Column(name = "history_status",notNull = true)
+    private int historyStatus;
+
+    //执行时间
+    @Column(name = "history_time",notNull = true)
+    private int historyTime;
+
+    //流水线id
+    @Column(name = "pipeline_id",notNull = true)
+    private String pipelineId;
+
 
 
     public int getHistoryId() {
@@ -69,12 +82,20 @@ public class PipelineExecHistoryEntity {
         this.historyBranch = historyBranch;
     }
 
-    public String getPipelineId() {
-        return pipelineId;
+    public String getPipelineName() {
+        return pipelineName;
     }
 
-    public void setPipelineId(String pipelineId) {
-        this.pipelineId = pipelineId;
+    public void setPipelineName(String pipelineName) {
+        this.pipelineName = pipelineName;
+    }
+
+    public int getHistoryStatus() {
+        return historyStatus;
+    }
+
+    public void setHistoryStatus(int historyStatus) {
+        this.historyStatus = historyStatus;
     }
 
     public String getLogId() {
@@ -85,4 +106,19 @@ public class PipelineExecHistoryEntity {
         this.logId = logId;
     }
 
+    public int getHistoryTime() {
+        return historyTime;
+    }
+
+    public void setHistoryTime(int historyTime) {
+        this.historyTime = historyTime;
+    }
+
+    public String getPipelineId() {
+        return pipelineId;
+    }
+
+    public void setPipelineId(String pipelineId) {
+        this.pipelineId = pipelineId;
+    }
 }

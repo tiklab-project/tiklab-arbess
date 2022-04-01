@@ -1,4 +1,4 @@
-package com.doublekit.pipeline.instance.controller.git;
+package com.doublekit.pipeline.example.controller.git;
 
 import com.doublekit.apibox.annotation.Api;
 import com.doublekit.apibox.annotation.ApiMethod;
@@ -41,11 +41,21 @@ public class GiteeApiController {
     }
 
     @RequestMapping(path="/getUserMessage",method = RequestMethod.POST)
-    @ApiMethod(name = "getUserMessage",desc = "获取proofId")
+    @ApiMethod(name = "getUserMessage",desc = "获取用户信息")
     public Result<String> getUserMessage(){
         String userMessage = codeGiteeApiService.getUserMessage();
 
         return Result.ok(userMessage);
+    }
+
+
+    @RequestMapping(path="/getProof",method = RequestMethod.POST)
+    @ApiMethod(name = "getProof",desc = "获取用户信息")
+    @ApiParam(name = "configureId",desc = "配置id",required = true)
+    public Result<String> getProof(String configureId,String proofName){
+        String i = codeGiteeApiService.getProof(configureId,proofName);
+
+        return Result.ok(i);
     }
 
     @RequestMapping(path="/getAllStorehouse",method = RequestMethod.POST)

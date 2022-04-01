@@ -30,17 +30,17 @@ public class ProofServiceImpl implements ProofService{
     //创建
     @Override
     public String createProof(Proof proof) {
-        List<Proof> proofList = findAllProof();
-            if (proof.getProofScope() == 3){
-                proof.setProofPassword(codeGiteeApiService.getProof());
-                for (Proof proofs : proofList) {
-                    if (proof.getProofName().equals(proofs.getProofName())){
-                        proof.setProofId(proofs.getProofId());
-                        updateProof(proof);
-                        return proof.getProofId();
-                }
-            }
-        }
+        // List<Proof> proofList = findAllProof();
+        //     if (proof.getProofScope() == 3){
+        //         proof.setProofPassword(codeGiteeApiService.getProof());
+        //         for (Proof proofs : proofList) {
+        //             if (proof.getProofName().equals(proofs.getProofName())){
+        //                 proof.setProofId(proofs.getProofId());
+        //                 updateProof(proof);
+        //                 return proof.getProofId();
+        //         }
+        //     }
+        // }
         ProofEntity proofEntity = BeanMapper.map(proof, ProofEntity.class);
         return ProofDao.createProof(proofEntity);
     }

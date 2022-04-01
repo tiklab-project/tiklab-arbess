@@ -51,7 +51,7 @@ public class PipelineDeployServiceImpl implements PipelineDeployService {
 
     @Override
     public Proof findOneProof(PipelineConfigure pipelineConfigure){
-        String proofName = pipelineConfigure.getPipelineCode().getProofName();
+        String proofName = pipelineConfigure.getPipelineDeploy().getProofName();
         return proofService.fondOneName(proofName);
     }
 

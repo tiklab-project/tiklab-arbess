@@ -20,12 +20,6 @@ public interface PipelineExecService {
      * 查询构建状态
      * @return 状态信息
      */
-    PipelineExecLog findStructureState(String pipelineId) ;
+    PipelineExecLog findInstanceState(String pipelineId) ;
 
-    /**
-     * 添加历史信息
-     * @param pipelineId 流水线id
-     * @return 历史部分信息
-     */
-    PipelineExecHistory addHistoryTwo(String pipelineId);
 }

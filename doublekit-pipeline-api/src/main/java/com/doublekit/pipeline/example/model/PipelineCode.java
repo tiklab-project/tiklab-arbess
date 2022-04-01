@@ -35,9 +35,6 @@ public class PipelineCode {
     @ApiProperty(name="proofName",desc="凭证名称",eg="@selectOne")
     private String proofName;
 
-    //凭证id
-    @ApiProperty(name="proofId",desc="凭证id",eg="@selectOne")
-    private String proofId;
 
     public String getCodeId() {
         return codeId;
@@ -87,11 +84,4 @@ public class PipelineCode {
         this.proofName = proofName;
     }
 
-    public String getProofId() {
-        return proofId;
-    }
-
-    public void setProofId(String proofId) {
-        this.proofId = proofId;
-    }
 }

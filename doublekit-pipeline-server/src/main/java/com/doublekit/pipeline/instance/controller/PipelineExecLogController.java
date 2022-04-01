@@ -30,9 +30,7 @@ public class PipelineExecLogController {
     @RequestMapping(path="/findAllLog",method = RequestMethod.POST)
     @ApiMethod(name = "findAllLog",desc = "查询所有日志")
     public Result< List<PipelineExecLog>> findAllLog() {
-
         List<PipelineExecLog> allLog = PipelineExecLogService.findAllLog();
-
         return Result.ok(allLog);
     }
 
@@ -41,33 +39,19 @@ public class PipelineExecLogController {
     //删除日志
     @RequestMapping(path="/deleteLog",method = RequestMethod.POST)
     @ApiMethod(name = "deleteLog",desc = "删除日志")
+    @ApiParam(name = "logId",desc = "日志id",required = true)
     public Result<Void> deleteLog(String logId) {
-
        PipelineExecLogService.deleteLog(logId);
-
         return Result.ok();
     }
 
 
-    //查询构建状态
-    @RequestMapping(path="/selectStructureState",method = RequestMethod.POST)
-    @ApiMethod(name = "selectStructureState",desc = "查询构建状态")
-    @ApiParam(name = "pipelineId",desc = "流水线id",required = true)
-    public Result<PipelineExecLog> selectStructureState(String pipelineId) {
-
-        PipelineExecLog pipelineExecLog = pipelineExecService.findStructureState(pipelineId);
-
-        return Result.ok(pipelineExecLog);
-    }
-
-    //查询单个流水线
-    @RequestMapping(path="/selectPipelineLog",method = RequestMethod.POST)
-    @ApiMethod(name = "selectPipelineLog",desc = "查询日志")
+    //查询单个日志
+    @RequestMapping(path="/findOneLog",method = RequestMethod.POST)
+    @ApiMethod(name = "findOneLog",desc = "查询日志")
     @ApiParam(name = "logId",desc = "日志id",required = true)
-    public Result<PipelineExecLog> selectPipelineLog(@NotNull String logId ){
-
+    public Result<PipelineExecLog> findOneLog(@NotNull String logId){
         PipelineExecLog pipelineExecLog = PipelineExecLogService.findOneLog(logId);
-
         return Result.ok(pipelineExecLog);
     }
 

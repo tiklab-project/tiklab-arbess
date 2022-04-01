@@ -28,6 +28,7 @@ public class PipelineStatus {
     @ApiProperty(name="listSuccessStatus",desc="上次构建时间")
     private String lastSuccessTime;
 
+
     public String getPipelineId() {
         return pipelineId;
     }

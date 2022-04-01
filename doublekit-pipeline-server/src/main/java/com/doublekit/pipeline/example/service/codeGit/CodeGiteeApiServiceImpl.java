@@ -3,8 +3,12 @@ package com.doublekit.pipeline.example.service.codeGit;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.doublekit.pipeline.definition.model.PipelineConfigure;
 import com.doublekit.pipeline.example.model.CodeGit.CodeGiteeApi;
 import com.doublekit.pipeline.definition.service.PipelineConfigureService;
+import com.doublekit.pipeline.example.model.PipelineCode;
+import com.doublekit.pipeline.example.service.PipelineCodeService;
+import com.doublekit.pipeline.setting.proof.model.Proof;
 import com.doublekit.pipeline.setting.proof.service.ProofService;
 import com.doublekit.rpc.annotation.Exporter;
 import org.slf4j.Logger;
@@ -23,7 +27,9 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 @Service
@@ -38,6 +44,9 @@ public class CodeGiteeApiServiceImpl implements CodeGiteeApiService {
 
     @Autowired
     PipelineConfigureService pipelineConfigureService;
+
+    @Autowired
+    PipelineCodeService pipelineCodeService;
 
     CodeGiteeApi codeGiteeApi = new CodeGiteeApi();
 
@@ -66,22 +75,52 @@ public class CodeGiteeApiServiceImpl implements CodeGiteeApiService {
         return null;
     }
 
-    //获取登录名
-    public  String getUserMessage(){
-        if (codeGiteeApi.getAccessToken() == null){
-            return null;
+    //获取登录信息
+    @Override
+    public String getUserMessage(){
+        if (codeGiteeApi.getAccessToken() != null){
+            String userMessage = codeGiteeApi.getUserMessage();
+            ResponseEntity<JSONObject> jsonObject = restTemplate.getForEntity(userMessage, JSONObject.class, String.class);
+            JSONObject body = jsonObject.getBody();
+            if (body != null) {
+                codeGiteeApi.setName(body.getString("login"));
+                return body.getString("login");
+            }
         }
-        String userMessage = codeGiteeApi.getUserMessage();
-        ResponseEntity<JSONObject> jsonObject = restTemplate.getForEntity(userMessage, JSONObject.class, String.class);
-        JSONObject body = jsonObject.getBody();
-        String login = body.getString("login");
-        codeGiteeApi.setName(login);
-        return login;
+
+        return null;
     }
 
+    //凭证信息
     @Override
-    public String getProof(){
-        return  codeGiteeApi.getAccessToken();
+    public String getProof(String configureId,String proofName) {
+        PipelineConfigure oneConfigure = pipelineConfigureService.findOneConfigure(configureId);
+        PipelineCode pipelineCode = oneConfigure.getPipelineCode();
+        PipelineCode oneCode = pipelineCodeService.findOneCode(pipelineCode.getCodeId());
+        if (oneCode.getProofName() != null){
+            if (oneCode.getProofName().equals(proofName+" (gitee)")){
+                return null;
+            }
+        }
+
+        String accessToken = codeGiteeApi.getAccessToken();
+        if (accessToken != null){
+            Proof proof = new Proof();
+            String login = getUserMessage();
+            logger.info("login : "+login);
+            proof.setProofName(proofName);
+            proof.setProofPassword(codeGiteeApi.getAccessToken());
+            proof.setProofUsername(login);
+            proof.setProofType("gitee");
+            proof.setProofScope(3);
+            proof.setProofDescribe("gitee授权登录");
+            pipelineCode.setProofName(proofName+" (gitee)");
+            oneConfigure.setPipelineCode(pipelineCode);
+            pipelineConfigureService.updateConfigure(oneConfigure);
+            proofService.createProof(proof);
+            return  "1";
+        }
+        return  null;
     }
 
     //列出授权用户的所有仓库
@@ -96,44 +135,58 @@ public class CodeGiteeApiServiceImpl implements CodeGiteeApiService {
         messageConverters.set(1, new StringHttpMessageConverter(StandardCharsets.UTF_8));
         ResponseEntity<String> returnBody = restTemplate.getForEntity(allStorehouseAddress, String.class, JSONObject.class);
         String body = returnBody.getBody();
-        logger.info("仓库信息 ： "+body);
-        JSONArray allStorehouseJson = JSONArray.parseArray(body);
-        for (int i = 0; i < allStorehouseJson.size(); i++) {
-            JSONObject storehouse=allStorehouseJson.getJSONObject(i);
-            strings.add(storehouse.getString("human_name"));
+        if (body != null){
+            logger.info("仓库信息 ： "+body);
+            JSONArray allStorehouseJson = JSONArray.parseArray(body);
+            for (int i = 0; i < allStorehouseJson.size(); i++) {
+                JSONObject storehouse=allStorehouseJson.getJSONObject(i);
+                strings.add(storehouse.getString("human_name"));
+            }
         }
+
         return strings;
     }
 
     //获取一个仓库的所有分支
+    @Override
     public List<String> getBranch(String projectName) {
+        logger.info("projectName:"+projectName);
         String[] split = projectName.split("/");
         String name = split[1];
+        if (split.length != 2){
+            return null;
+        }
         ArrayList<String> branchList = new ArrayList<>();
         String branchAddress = codeGiteeApi.getWarehouseBranch(name);
         ResponseEntity<String> forEntity = restTemplate.getForEntity(branchAddress, String.class, JSONObject.class);
         JSONArray branchS = JSONArray.parseArray(forEntity.getBody());
-        for (int i = 0; i < branchS.size(); i++) {
-            JSONObject jsonArray = branchS.getJSONObject(i);
-            branchList.add(jsonArray.getString("name"));
+        if (branchS != null) {
+            for (int i = 0; i < branchS.size(); i++) {
+                JSONObject jsonArray = branchS.getJSONObject(i);
+                branchList.add(jsonArray.getString("name"));
+            }
         }
         return branchList;
     }
 
-
-    public String getGiteeUrl(String projectName){
-        if (!projectName.equals(" ")){
+    //获取仓库的url
+    @Override
+    public String getCloneUrl(String projectName){
+        if (projectName != null){
             String[] split = projectName.split("/");
-            String name = split[1];
-            //获取仓库URl
-            String oneStorehouse = codeGiteeApi.getOneStorehouse(name);
-            ResponseEntity<String> forEntity1 = restTemplate.getForEntity(oneStorehouse, String.class, JSONObject.class);
-            JSONObject jsonObject = JSONObject.parseObject(forEntity1.getBody());
-            return jsonObject.getString("html_url");
+            if (split.length == 2){
+                String name = split[1];
+                //获取仓库URl
+                String oneStorehouse = codeGiteeApi.getOneStorehouse(name);
+                ResponseEntity<String> forEntity1 = restTemplate.getForEntity(oneStorehouse, String.class, JSONObject.class);
+                JSONObject jsonObject = JSONObject.parseObject(forEntity1.getBody());
+                return jsonObject.getString("html_url");
+            }
         }
 
         return null;
     }
+
     /**
      * 访问url
      * @param url 访问地址
@@ -160,14 +213,17 @@ public class CodeGiteeApiServiceImpl implements CodeGiteeApiService {
         return result.toString();
     }
 
+    //定时任务
     @Scheduled(cron = "0 0 0/23 1/1 * ? ")
     public void time() {
         String token = codeGiteeApi.getToken();
         ResponseEntity<JSONObject> postForEntity = restTemplate.postForEntity(token, String.class, JSONObject.class);
         JSONObject body = postForEntity.getBody();
-        String access_token = body.getString("access_token");
-        String refresh_token = body.getString("refresh_token");
-        codeGiteeApi.setAccessToken(access_token);
-        codeGiteeApi.setRefreshToken(refresh_token);
+        if (body != null){
+            String access_token = body.getString("access_token");
+            String refresh_token = body.getString("refresh_token");
+            codeGiteeApi.setAccessToken(access_token);
+            codeGiteeApi.setRefreshToken(refresh_token);
+        }
     }
 }

@@ -60,14 +60,14 @@ public interface PipelineService {
      * @param pipelineName 查询条件
      * @return 查询到的集合
      */
-    List<Pipeline> findName(String pipelineName);
+    List<Pipeline> findLike(String pipelineName);
 
 
     /**
      *查询流水线状态
      * @return 状态集合
      */
-    List<PipelineStatus> findAll();
+    List<PipelineStatus> findAllStatus();
 
 
 }
