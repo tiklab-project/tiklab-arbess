@@ -7,12 +7,14 @@ import com.doublekit.pipeline.definition.service.PipelineConfigureServiceImpl;
 import com.doublekit.pipeline.definition.service.PipelineService;
 import com.doublekit.pipeline.example.model.CodeGit.CodeGiteeApi;
 import com.doublekit.pipeline.example.model.PipelineCode;
+import com.doublekit.pipeline.example.model.PipelineDeploy;
 import com.doublekit.pipeline.example.model.PipelineTest;
 import com.doublekit.pipeline.example.service.codeGit.CodeGiteeApiService;
 import com.doublekit.pipeline.instance.model.*;
 import com.doublekit.pipeline.setting.proof.model.Proof;
 import com.doublekit.rpc.annotation.Exporter;
 import com.jcraft.jsch.*;
+import com.taobao.api.internal.spi.SpiUtils;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -184,9 +186,9 @@ public class PipelineExecServiceImpl implements PipelineExecService {
                 Process process = process(path, s, null);
                 String a = "执行 : " + " ' " + s + " ' " + "\n";
                 pipelineExecLog.setLogRunLog(pipelineExecLog.getLogRunLog() + a);
-
+                InputStreamReader  inputStreamReader = new InputStreamReader(process.getInputStream());
                 //测试执行失败
-                Map<String, String> map = log(process, pipelineExecLog);
+                Map<String, String> map = log(inputStreamReader, pipelineExecLog);
                 if (map.get("state").equals("0")){
                     long overTime = new Timestamp(System.currentTimeMillis()).getTime();
                     testLog.setTestRunLog(testLog.getTestRunLog()+map.get("log"));
@@ -238,7 +240,8 @@ public class PipelineExecServiceImpl implements PipelineExecService {
                 String a = "执行 : " + " ' " + s + " ' " + "\n";
                 pipelineExecLog.setLogRunLog(pipelineExecLog.getLogRunLog() + a);
                 //构建失败
-                Map<String, String> map = log(process, pipelineExecLog);
+                InputStreamReader  inputStreamReader = new InputStreamReader(process.getInputStream());
+                Map<String, String> map = log(inputStreamReader, pipelineExecLog);
                 if (map.get("state").equals("0")){
                     structureError(pipelineExecLog,beginTime);
                     error(pipelineExecLog,"构建失败。。。。", pipelineConfigure.getPipeline().getPipelineId());
@@ -308,10 +311,14 @@ public class PipelineExecServiceImpl implements PipelineExecService {
             pipelineExecLog.setLogRunLog(pipelineExecLog.getLogRunLog()+"\n"+"文件:"+address+"发送成功！");
             deployLog.setDeployRunLog(deployLog.getDeployRunLog()+"\n"+"文件:"+address+"发送成功！");
             //执行shell
-            int shell = shell(proof, pipelineConfigure, pipelineExecLog);
-            if (shell == 0){
-                return 0;
+            String shell = pipelineConfigure.getPipelineDeploy().getDeployShell();
+            if (shell != null){
+                String[] s1 = shell.split("\n");
+                for (String value : s1) {
+                     sshOrder(proof, value, pipelineExecLog);
+                }
             }
+
         } catch (JSchException | SftpException | IOException e) {
             long overTime = new Timestamp(System.currentTimeMillis()).getTime();
             deployLog.setDeployRunTime((int) (overTime - beginTime) / 1000);
@@ -353,36 +360,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         return process;
     }
 
-    /**
-     * 执行产生的日志
-     * @param process 执行对象
-     * @param pipelineExecLog 日志信息
-     * @throws IOException 字符流装换异常
-     */
-    private Map<String, String> log(Process process , PipelineExecLog pipelineExecLog) throws IOException {
-        Map<String, String> map = new HashMap<>();
-        String s;
-        InputStreamReader  inputStreamReader = new InputStreamReader(process.getInputStream());
-        BufferedReader  bufferedReader = new BufferedReader(inputStreamReader);
-        String logRunLog = "";
-        //更新日志信息
-        while ((s = bufferedReader.readLine()) != null) {
-            logRunLog = logRunLog + s + "\n";
-            pipelineExecLog.setLogRunLog(pipelineExecLog.getLogRunLog()+s+"\n");
-            pipelineExecLogList.add(pipelineExecLog);
-            if (logRunLog.contains("BUILD FAILURE")){
-                pipelineExecLogList.add(pipelineExecLog);
-                map.put("state","0");
-                map.put("log",logRunLog);
-                return map;
-            }
-        }
-        map.put("state","1");
-        map.put("log",logRunLog);
-        inputStreamReader.close();
-        bufferedReader.close();
-        return map;
-    }
+
 
     /**
      * git代码拉取
@@ -493,57 +471,94 @@ public class PipelineExecServiceImpl implements PipelineExecService {
     }
 
     /**
-     *  执行shell脚本
+         *  执行ssh命令
      * @param proof 凭证信息
-     * @param pipelineConfigure 配置信息
+     * @param order 执行命令
      * @param pipelineExecLog 日志信息
      * @return 执行状态
      * @throws IOException 日志读写异常
      */
-    private int shell(Proof proof, PipelineConfigure pipelineConfigure, PipelineExecLog pipelineExecLog) throws IOException {
-        PipelineDeployLog deployLog = pipelineExecLog.getDeployLog();
-        String s ;
-        String shell = pipelineConfigure.getPipelineDeploy().getDeployShell();
-        if (shell != null){
-            InputStreamReader inputStreamReader = null;
-            BufferedReader bufferedReader = null;
-            String[] s1 = shell.split("\n");
-            pipelineExecLog.setLogRunLog(pipelineExecLog.getLogRunLog()+ "\n"+"执行shell命令" );
-            ch.ethz.ssh2.Session session = null;
-            for (String value : s1) {
-                Connection  conn = new Connection(proof.getProofIp(),proof.getProofPort());
-                conn.connect();
-                conn.authenticateWithPassword(proof.getProofUsername(), proof.getProofPassword());
-                session = conn.openSession();
-                pipelineExecLog.setLogRunLog(pipelineExecLog.getLogRunLog() + "\n" + value);
-                deployLog.setDeployRunLog(deployLog.getDeployRunLog()+"\n"+value);
-                try {
-                    session.execCommand(value);
-                } catch (IOException e) {
-                    deployLog.setDeployRunStatus(1);
-                    deployLog.setDeployRunLog(deployLog.getDeployRunLog()+"\n"+value+" 命令错误"+"\n" +e);
-                    error(pipelineExecLog,value+" 命令错误"+"\n" +e, pipelineConfigure.getPipeline().getPipelineId());
-                    return 0;
-                }
-                InputStream  stderr = session.getStdout();
-                inputStreamReader = new InputStreamReader(stderr);
-                bufferedReader = new BufferedReader(inputStreamReader);
-                while ((s = bufferedReader.readLine()) != null) {
-                   pipelineExecLog.setLogRunLog(pipelineExecLog.getLogRunLog()+"\n"+s);
-                   deployLog.setDeployRunLog(deployLog.getDeployRunLog()+"\n"+s);
-                }
-            }
-            if (session != null) {
-                session.close();
-            }
-            if (inputStreamReader != null ) {
-                inputStreamReader.close();
-            }
-            if (bufferedReader != null) {
-                bufferedReader.close();
+    private  Map<String, String> sshOrder(Proof proof,String order, PipelineExecLog pipelineExecLog) throws IOException {
+        Connection  conn = new Connection(proof.getProofIp(),proof.getProofPort());
+        conn.connect();
+        conn.authenticateWithPassword(proof.getProofUsername(), proof.getProofPassword());
+        ch.ethz.ssh2.Session session = conn.openSession();
+        pipelineExecLog.setLogRunLog(pipelineExecLog.getLogRunLog() + "\n" + order);
+        session.execCommand(order);
+        InputStreamReader inputStreamReader = new InputStreamReader(session.getStdout());
+        Map<String, String> map = log(inputStreamReader, pipelineExecLog);
+        session.close();
+        inputStreamReader.close();
+        return map;
+    }
+    
+    private int docker(PipelineConfigure pipelineConfigure,PipelineExecLog pipelineExecLog) throws JSchException, SftpException, IOException {
+        Pipeline pipeline = pipelineConfigure.getPipeline();
+        PipelineDeploy pipelineDeploy = pipelineConfigure.getPipelineDeploy();
+        Proof proof = pipelineConfigureService.findDeployProof(pipelineConfigure);
+
+        //文件地址
+        String[] split = pipelineDeploy.getDeployTargetAddress().split(" ");
+        //String path = "D:\\clone\\" + pipeline.getPipelineName()+"\\"+split[0]+"\\"+"target";
+        String path = "D:\\clone";
+        //发送文件名
+        //String fileName = address(path,split[1]);
+        String fileName = "doublekit-pipeline-1.0.0-SNAPSHOT-distribution.zip";
+        //本机文件地址
+        String fileAddress  = path + "\\" +fileName ;
+        logger.info("地址 ： " +fileAddress);
+        //发送文件位置
+        String deployAddress = pipelineConfigure.getPipelineDeploy().getDeployAddress()+ "/" +fileName ;
+        logger.info("文件地址 ： " +deployAddress);
+        //发送文件
+        sshSftp(proof,deployAddress,fileAddress);
+        //生成容器
+        String vessel = "docker image build -t aaa .";
+        HashMap<Integer, String> map = new HashMap<>();
+        map.put(1,"unzip"+" "+deployAddress);
+        map.put(2,"cd doublekit-pipeline-1.0.0-SNAPSHOT;"+"docker image build -t aaa .");
+        map.put(3,"docker container run  -p 8080:8080 -it aaa");
+        for (int i = 1; i <= 3; i++) {
+            System.out.println("第"+i+"步 ："+ map.get(i));
+            Map<String, String> log = sshOrder(proof, map.get(i), pipelineExecLog);
+            if (!log.get("state").equals("0")){
+                System.out.println(log.get("log"));
             }
         }
-        return 1;
+        //启动
+        String start = "docker container run  -p 8080:8080 -it"+pipeline.getPipelineName();
+        return 0;
+    }
+
+    /**
+     * 执行产生的日志
+     * @param inputStreamReader 执行信息
+     * @param pipelineExecLog 日志信息
+     * @throws IOException 字符流装换异常
+     */
+    private Map<String, String> log(InputStreamReader inputStreamReader , PipelineExecLog pipelineExecLog) throws IOException {
+        Map<String, String> map = new HashMap<>();
+        String s;
+        //InputStreamReader  inputStreamReader = new InputStreamReader(process.getInputStream());
+        BufferedReader  bufferedReader = new BufferedReader(inputStreamReader);
+        String logRunLog = "";
+        //更新日志信息
+        while ((s = bufferedReader.readLine()) != null) {
+            logRunLog = logRunLog + s + "\n";
+            pipelineExecLog.setLogRunLog(pipelineExecLog.getLogRunLog()+s+"\n");
+            pipelineExecLogList.add(pipelineExecLog);
+            if (logRunLog.contains("BUILD FAILURE")){
+                pipelineExecLogList.add(pipelineExecLog);
+                map.put("state","0");
+                map.put("log",logRunLog);
+                return map;
+            }
+        }
+        map.put("state","1");
+        map.put("log",logRunLog);
+        inputStreamReader.close();
+        bufferedReader.close();
+        return map;
     }
 
     /**
@@ -630,19 +645,26 @@ public class PipelineExecServiceImpl implements PipelineExecService {
 
     // 判断配置信息
     private void whetherNull(PipelineConfigure pipelineConfigure, PipelineExecLog pipelineExecLog){
-        int gitClone = gitClone(pipelineConfigure, pipelineExecLog);
-        if (gitClone == 1){
-            int i = unitTesting(pipelineConfigure, pipelineExecLog);
-            if (i == 1){
-                int structure = structure(pipelineConfigure, pipelineExecLog);
-                if (structure == 1 ){
-                    int deploy = deploy(pipelineConfigure, pipelineExecLog);
-                    if (deploy == 1 ){
-                        success(pipelineExecLog,pipelineConfigure.getPipeline().getPipelineId());
-                    }
-                }
-            }
+
+        try {
+            docker(pipelineConfigure, pipelineExecLog);
+        } catch (JSchException | SftpException | IOException e) {
+            logger.info("异常");
+            e.printStackTrace();
         }
+        //int gitClone = gitClone(pipelineConfigure, pipelineExecLog);
+        //if (gitClone == 1){
+        //    int i = unitTesting(pipelineConfigure, pipelineExecLog);
+        //    if (i == 1){
+        //        int structure = structure(pipelineConfigure, pipelineExecLog);
+        //        if (structure == 1 ){
+        //            int deploy = deploy(pipelineConfigure, pipelineExecLog);
+        //            if (deploy == 1 ){
+        //                success(pipelineExecLog,pipelineConfigure.getPipeline().getPipelineId());
+        //            }
+        //        }
+        //    }
+        //}
 
     }
 

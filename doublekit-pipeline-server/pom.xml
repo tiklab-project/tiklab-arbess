@@ -41,12 +41,8 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
         </dependency>
-        <!--doublekit-->
-        <dependency>
-            <groupId>com.doublekit</groupId>
-            <artifactId>doublekit-beans-spring-boot-starter</artifactId>
-            <version>${project.version}</version>
-        </dependency>
+
+
         <dependency>
             <groupId>com.doublekit</groupId>
             <artifactId>doublekit-web-spring-boot-starter</artifactId>
@@ -67,11 +63,20 @@
             <groupId>com.doublekit</groupId>
             <artifactId>doublekit-dss-spring-boot-starter</artifactId>
         </dependency>
+
+        <!--doublekit-->
+        <dependency>
+            <groupId>com.doublekit</groupId>
+            <artifactId>doublekit-beans-spring-boot-starter</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
         <dependency>
             <groupId>com.doublekit</groupId>
             <artifactId>doublekit-join-spring-boot-starter</artifactId>
             <version>1.0.0-SNAPSHOT</version>
         </dependency>
+
         <dependency>
             <groupId>com.doublekit</groupId>
             <artifactId>doublekit-codegen-core</artifactId>

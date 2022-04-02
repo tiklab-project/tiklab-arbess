@@ -20,8 +20,16 @@
 			<includes>
 				<include>*.properties</include>
 				<include>*.xml</include>
+				<include>Dockerfile</include>
 			</includes>
 			<outputDirectory>/conf</outputDirectory>
+		</fileSet>
+		<fileSet>
+			<directory>${basedir}/src/main/resources</directory>
+			<includes>
+				<include>Dockerfile</include>
+			</includes>
+			<outputDirectory>/</outputDirectory>
 		</fileSet>
 		<fileSet>
 			<directory>${basedir}/bin</directory>
