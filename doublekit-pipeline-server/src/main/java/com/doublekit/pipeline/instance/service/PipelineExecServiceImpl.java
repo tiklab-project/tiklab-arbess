@@ -58,14 +58,14 @@ public class PipelineExecServiceImpl implements PipelineExecService {
     public int  start(String pipelineId){
         //创建线程池
         ExecutorService executorService = Executors.newCachedThreadPool();
-        //判断同一任务是否在运行
-        if (pipelineIdList != null){
-            for (String id : pipelineIdList) {
-                if (id .equals(pipelineId)){
-                    return 100;
-                }
-            }
-        }
+        ////判断同一任务是否在运行
+        //if (pipelineIdList != null){
+        //    for (String id : pipelineIdList) {
+        //        if (id .equals(pipelineId)){
+        //            return 100;
+        //        }
+        //    }
+        //}
         //执行构建
         executorService.submit(() -> begin(pipelineId));
         return 1;
@@ -360,8 +360,6 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         return process;
     }
 
-
-
     /**
      * git代码拉取
      * @param gitAddress 本地文件地址
@@ -497,37 +495,45 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         PipelineDeploy pipelineDeploy = pipelineConfigure.getPipelineDeploy();
         Proof proof = pipelineConfigureService.findDeployProof(pipelineConfigure);
 
-        //文件地址
+        //模块名
         String[] split = pipelineDeploy.getDeployTargetAddress().split(" ");
-        //String path = "D:\\clone\\" + pipeline.getPipelineName()+"\\"+split[0]+"\\"+"target";
-        String path = "D:\\clone";
-        //发送文件名
-        //String fileName = address(path,split[1]);
-        String fileName = "doublekit-pipeline-1.0.0-SNAPSHOT-distribution.zip";
+        String path = "D:\\clone\\" + pipeline.getPipelineName()+"\\"+split[0]+"\\"+"target";
+        pipelineExecLog.setLogRunLog(pipelineExecLog.getLogRunLog()+"\n"+"模块地址path: "+path);
+        pipelineExecLog.setLogRunLog(pipelineExecLog.getLogRunLog()+"\n"+"文件后缀："+split[1]);
+        //文件名称
+        String zipName = address(path,split[1]);
+        pipelineExecLog.setLogRunLog(pipelineExecLog.getLogRunLog()+"\n"+"压缩包文件名为fileName： "+zipName);
         //本机文件地址
-        String fileAddress  = path + "\\" +fileName ;
-        logger.info("地址 ： " +fileAddress);
+        String fileAddress  = path + "\\" +zipName ;
+        String  fileName = null;
+        logger.info("压缩包文件地址 ： " +fileAddress);
+        if (zipName != null) {
+            String[] split1 = zipName.split(".zip");
+            String[] split2 = split1[0].split("-distribution");
+            fileName = split2[0];
+            pipelineExecLog.setLogRunLog(pipelineExecLog.getLogRunLog()+"\n"+"解压文件名称"+split2[0]);
+        }
+
         //发送文件位置
-        String deployAddress = pipelineConfigure.getPipelineDeploy().getDeployAddress()+ "/" +fileName ;
-        logger.info("文件地址 ： " +deployAddress);
+        String deployAddress = pipelineConfigure.getPipelineDeploy().getDeployAddress()+ "/" +zipName ;
+        logger.info("部署到Liunx文件地址 ： " +deployAddress);
+        pipelineExecLog.setLogRunLog(pipelineExecLog.getLogRunLog()+"\n"+"部署到Liunx文件地址 ： " +deployAddress);
         //发送文件
         sshSftp(proof,deployAddress,fileAddress);
         //生成容器
-        String vessel = "docker image build -t aaa .";
+        String vessel = "docker image build -t"+" "+pipeline.getPipelineName()+"  .";
         HashMap<Integer, String> map = new HashMap<>();
         map.put(1,"unzip"+" "+deployAddress);
-        map.put(2,"cd doublekit-pipeline-1.0.0-SNAPSHOT;"+"docker image build -t aaa .");
-        map.put(3,"docker container run  -p 8080:8080 -it aaa");
+        map.put(2,"cd"+" "+fileName+";"+vessel);
+        map.put(3,"docker container run  -p 8080:8080 -it "+" "+pipeline.getPipelineName());
         for (int i = 1; i <= 3; i++) {
-            System.out.println("第"+i+"步 ："+ map.get(i));
+            pipelineExecLog.setLogRunLog(pipelineExecLog.getLogRunLog()+"\n"+"第"+i+"步 ："+ map.get(i));
             Map<String, String> log = sshOrder(proof, map.get(i), pipelineExecLog);
             if (!log.get("state").equals("0")){
                 System.out.println(log.get("log"));
             }
         }
-        //启动
-        String start = "docker container run  -p 8080:8080 -it"+pipeline.getPipelineName();
-        return 0;
+        return 1;
     }
 
     /**
@@ -564,6 +570,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
     /**
      * 获取符合条件的文件名
      * @param path 文件地址
+     * @param s 文件后缀名
      * @return 文件名
      */
     private static String address(String path,String s) {
@@ -596,7 +603,6 @@ public class PipelineExecServiceImpl implements PipelineExecService {
      * @param e 错误信息
      */
     private  void  error(PipelineExecLog pipelineExecLog, String e, String pipelineId){
-
         if (pipelineExecLog.getLogRunLog() != null){
             pipelineExecLog.setLogRunLog(pipelineExecLog.getLogRunLog()+ "\n" + e + "\n" + " RUN RESULT : FAIL");
         }else {
@@ -646,25 +652,25 @@ public class PipelineExecServiceImpl implements PipelineExecService {
     // 判断配置信息
     private void whetherNull(PipelineConfigure pipelineConfigure, PipelineExecLog pipelineExecLog){
 
-        try {
-            docker(pipelineConfigure, pipelineExecLog);
-        } catch (JSchException | SftpException | IOException e) {
-            logger.info("异常");
-            e.printStackTrace();
+
+        int gitClone = gitClone(pipelineConfigure, pipelineExecLog);
+        if (gitClone == 1){
+            int i = unitTesting(pipelineConfigure, pipelineExecLog);
+            if (i == 1){
+                int structure = structure(pipelineConfigure, pipelineExecLog);
+                if (structure == 1 ){
+                    int deploy = 0;
+                    try {
+                        deploy = docker(pipelineConfigure, pipelineExecLog);
+                    } catch (JSchException | SftpException | IOException e) {
+                        e.printStackTrace();
+                    }
+                    if (deploy == 1 ){
+                        success(pipelineExecLog,pipelineConfigure.getPipeline().getPipelineId());
+                    }
+                }
+            }
         }
-        //int gitClone = gitClone(pipelineConfigure, pipelineExecLog);
-        //if (gitClone == 1){
-        //    int i = unitTesting(pipelineConfigure, pipelineExecLog);
-        //    if (i == 1){
-        //        int structure = structure(pipelineConfigure, pipelineExecLog);
-        //        if (structure == 1 ){
-        //            int deploy = deploy(pipelineConfigure, pipelineExecLog);
-        //            if (deploy == 1 ){
-        //                success(pipelineExecLog,pipelineConfigure.getPipeline().getPipelineId());
-        //            }
-        //        }
-        //    }
-        //}
 
     }
 
