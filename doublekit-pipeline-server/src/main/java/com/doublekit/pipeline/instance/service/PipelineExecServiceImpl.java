@@ -527,7 +527,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         map.put(2,"rm - rf "+" "+liunxAddress+ "/" +fileName);
         map.put(3,"cd"+" "+fileName+";"+vessel);
         map.put(4,"docker container run  -p 8080:8080 -it "+" "+pipeline.getPipelineName());
-        for (int i = 1; i <= 3; i++) {
+        for (int i = 1; i <= 4; i++) {
             pipelineExecLog.setLogRunLog(pipelineExecLog.getLogRunLog()+"\n"+"第"+i+"步 ："+ map.get(i));
             Map<String, String> log = sshOrder(proof, map.get(i), pipelineExecLog);
             if (!log.get("state").equals("0")){
