@@ -513,9 +513,9 @@ public class PipelineExecServiceImpl implements PipelineExecService {
             fileName = split2[0];
             pipelineExecLog.setLogRunLog(pipelineExecLog.getLogRunLog()+"\n"+"解压文件名称"+split2[0]);
         }
-
+        String liunxAddress = pipelineConfigure.getPipelineDeploy().getDeployAddress();
         //发送文件位置
-        String deployAddress = pipelineConfigure.getPipelineDeploy().getDeployAddress()+ "/" +zipName ;
+        String deployAddress = liunxAddress+ "/" +zipName ;
         logger.info("部署到Liunx文件地址 ： " +deployAddress);
         pipelineExecLog.setLogRunLog(pipelineExecLog.getLogRunLog()+"\n"+"部署到Liunx文件地址 ： " +deployAddress);
         //发送文件
@@ -524,8 +524,9 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         String vessel = "docker image build -t"+" "+pipeline.getPipelineName()+"  .";
         HashMap<Integer, String> map = new HashMap<>();
         map.put(1,"unzip"+" "+deployAddress);
-        map.put(2,"cd"+" "+fileName+";"+vessel);
-        map.put(3,"docker container run  -p 8080:8080 -it "+" "+pipeline.getPipelineName());
+        map.put(2,"rm - rf "+" "+liunxAddress+ "/" +fileName);
+        map.put(3,"cd"+" "+fileName+";"+vessel);
+        map.put(4,"docker container run  -p 8080:8080 -it "+" "+pipeline.getPipelineName());
         for (int i = 1; i <= 3; i++) {
             pipelineExecLog.setLogRunLog(pipelineExecLog.getLogRunLog()+"\n"+"第"+i+"步 ："+ map.get(i));
             Map<String, String> log = sshOrder(proof, map.get(i), pipelineExecLog);
