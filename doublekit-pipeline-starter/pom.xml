@@ -24,7 +24,7 @@
         </dependency>
         <dependency>
             <groupId>com.doublekit</groupId>
-            <artifactId>doublekit-pcs-eam-spring-boot-starter</artifactId>
+            <artifactId>doublekit-eam-spring-boot-starter</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -62,7 +62,7 @@
                     <artifactItems>
                         <artifactItem>
                             <groupId>com.doublekit</groupId>
-                            <artifactId>doublekit-pcs-user-language-en-plugin</artifactId>
+                            <artifactId>doublekit-user-language-en-plugin</artifactId>
                             <version>${project.version}</version>
                         </artifactItem>
                         <artifactItem>
