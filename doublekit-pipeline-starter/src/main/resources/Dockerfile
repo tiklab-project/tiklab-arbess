@@ -1,4 +1,4 @@
-FROM jdk
+FROM openjdk:8
 FROM mysql:8.0
 COPY . /app
 WORKDIR /app

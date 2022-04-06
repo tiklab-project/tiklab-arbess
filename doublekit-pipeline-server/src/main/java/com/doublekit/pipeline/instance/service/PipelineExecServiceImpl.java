@@ -531,9 +531,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         for (int i = 1; i <= 5; i++) {
             pipelineExecLog.setLogRunLog(pipelineExecLog.getLogRunLog()+"\n"+"第"+i+"步 ："+ map.get(i));
             Map<String, String> log = sshOrder(proof, map.get(i), pipelineExecLog);
-            if (!log.get("state").equals("0")){
-                System.out.println(log.get("log"));
-            }
+            System.out.println(log.get("log"));
         }
         return 1;
     }
