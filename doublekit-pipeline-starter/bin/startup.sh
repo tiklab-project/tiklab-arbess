@@ -18,7 +18,7 @@ APP_CONFIG=${APP_HOME}/conf/application.properties
 APP_LOG=${APP_HOME}/logs
 
 export APP_HOME
-export app.home=$APP_HOME
+#export app.home=$APP_HOME
 
 JAVA_OPTS="$JAVA_OPTS -server -Xms512m -Xmx512m -Xmn128m -XX:ParallelGCThreads=20 -XX:+UseParallelGC -XX:MaxGCPauseMillis=850 -Xloggc:$APP_LOG/gc.log -Dfile.encoding=UTF-8"
 JAVA_OPTS="$JAVA_OPTS -DlogPath=$APP_LOG"
