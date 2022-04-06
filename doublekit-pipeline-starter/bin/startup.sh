@@ -63,7 +63,7 @@ startup(){
             mkdir "$APP_LOG"
         fi
 
-        nohup $JAVA_HOME/bin/java $JAVA_OPTS -classpath $CLASSPATH $APP_MAIN &
+        nohup $JAVA_HOME/bin/java --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.sql/java.sql=ALL-UNNAMED $JAVA_OPTS -classpath $CLASSPATH $APP_MAIN &
 
         for i in $(seq 5)
         do
