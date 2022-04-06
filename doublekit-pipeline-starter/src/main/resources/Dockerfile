@@ -1,4 +1,3 @@
-FROM java
 FROM jdk
 FROM mysql:8.0
 COPY . /app

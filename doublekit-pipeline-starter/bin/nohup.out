@@ -1,0 +1,127 @@
+Unrecognized VM option 'UseConcMarkSweepGC'
+Error: Could not create the Java Virtual Machine.
+Error: A fatal exception has occurred. Program will exit.
+Unrecognized VM option 'UseConcMarkSweepGC'
+Error: Could not create the Java Virtual Machine.
+Error: A fatal exception has occurred. Program will exit.
+Unrecognized VM option 'UseConcMarkSweepGC'
+Error: Could not create the Java Virtual Machine.
+Error: A fatal exception has occurred. Program will exit.
+Unrecognized VM option 'UseConcMarkSweepGC'
+Error: Could not create the Java Virtual Machine.
+Error: A fatal exception has occurred. Program will exit.
+Unrecognized VM option 'UseConcMarkSweepGC'
+Error: Could not create the Java Virtual Machine.
+Error: A fatal exception has occurred. Program will exit.
+Unrecognized VM option 'UseConcMarkSweepGC'
+Error: Could not create the Java Virtual Machine.
+Error: A fatal exception has occurred. Program will exit.
+Unrecognized VM option 'UseConcMarkSweepGC'
+Error: Could not create the Java Virtual Machine.
+Error: A fatal exception has occurred. Program will exit.
+Unrecognized VM option 'UseConcMarkSweepGC'
+Error: Could not create the Java Virtual Machine.
+Error: A fatal exception has occurred. Program will exit.
+Unrecognized VM option 'UseConcMarkSweepGC'
+Error: Could not create the Java Virtual Machine.
+Error: A fatal exception has occurred. Program will exit.
+Unrecognized VM option 'UseConcMarkSweepGC'
+Error: Could not create the Java Virtual Machine.
+Error: A fatal exception has occurred. Program will exit.
+Unrecognized VM option 'UseConcMarkSweepGC'
+Error: Could not create the Java Virtual Machine.
+Error: A fatal exception has occurred. Program will exit.
+Unrecognized VM option 'UseConcMarkSweepGC'
+Error: Could not create the Java Virtual Machine.
+Error: A fatal exception has occurred. Program will exit.
+Unrecognized VM option 'UseConcMarkSweepGC'
+Error: Could not create the Java Virtual Machine.
+Error: A fatal exception has occurred. Program will exit.
+Unrecognized VM option 'UseConcMarkSweepGC'
+Error: Could not create the Java Virtual Machine.
+Error: A fatal exception has occurred. Program will exit.
+Unrecognized VM option 'UseConcMarkSweepGC'
+Error: Could not create the Java Virtual Machine.
+Error: A fatal exception has occurred. Program will exit.
+Unrecognized VM option 'UseConcMarkSweepGC'
+Error: Could not create the Java Virtual Machine.
+Error: A fatal exception has occurred. Program will exit.
+Unrecognized VM option 'UseConcMarkSweepGC'
+Error: Could not create the Java Virtual Machine.
+Error: A fatal exception has occurred. Program will exit.
+Unrecognized VM option 'UseConcMarkSweepGC'
+Error: Could not create the Java Virtual Machine.
+Error: A fatal exception has occurred. Program will exit.
+[0.004s][warning][gc] -Xloggc is deprecated. Will use -Xlog:gc:D:/IDEA/doublekit-pipeline/doublekit-pipeline-starter/bin/../logs/gc.log instead.
+[0.004s][warning][gc] -XX:+PrintGCDetails is deprecated. Will use -Xlog:gc* instead.
+错误: 找不到或无法加载主类 com.doublekit.pipeline.PipelineApplication
+原因: java.lang.ClassNotFoundException: com.doublekit.pipeline.PipelineApplication
+[0.005s][warning][gc] -Xloggc is deprecated. Will use -Xlog:gc:D:/IDEA/doublekit-pipeline/doublekit-pipeline-starter/bin/../logs/gc.log instead.
+错误: 找不到或无法加载主类 com.doublekit.pipeline.PipelineApplication
+原因: java.lang.ClassNotFoundException: com.doublekit.pipeline.PipelineApplication
+错误: 找不到或无法加载主类 com.doublekit.pipeline.PipelineApplication
+原因: java.lang.ClassNotFoundException: com.doublekit.pipeline.PipelineApplication
+Unrecognized option: -XX��+
+Error: Could not create the Java Virtual Machine.
+Error: A fatal exception has occurred. Program will exit.
+Unrecognized VM option 'UseParNewGC'
+Error: Could not create the Java Virtual Machine.
+Error: A fatal exception has occurred. Program will exit.
+Unrecognized VM option ''
+Error: Could not create the Java Virtual Machine.
+Error: A fatal exception has occurred. Program will exit.
+Unrecognized VM option 'UseParNewGC'
+Error: Could not create the Java Virtual Machine.
+Error: A fatal exception has occurred. Program will exit.
+[0.004s][warning][gc] -Xloggc is deprecated. Will use -Xlog:gc:D:/IDEA/doublekit-pipeline/doublekit-pipeline-starter/bin/../logs/gc.log instead.
+[0.004s][warning][gc] -XX:+PrintGCDetails is deprecated. Will use -Xlog:gc* instead.
+错误: 找不到或无法加载主类 com.doublekit.pipeline.PipelineApplication
+原因: java.lang.ClassNotFoundException: com.doublekit.pipeline.PipelineApplication
+Unrecognized VM option 'UseConcMarkSweepGC'
+Error: Could not create the Java Virtual Machine.
+Error: A fatal exception has occurred. Program will exit.
+Unrecognized VM option 'UseConcMarkSweepGC'
+Error: Could not create the Java Virtual Machine.
+Error: A fatal exception has occurred. Program will exit.
+
+Unrecognized VM option 'CMSClassUnloadingEnabled'
+Error: Could not create the Java Virtual Machine.
+Error: A fatal exception has occurred. Program will exit.
+Unrecognized VM option 'UseParNewGC'
+Error: Could not create the Java Virtual Machine.
+Error: A fatal exception has occurred. Program will exit.
+Unrecognized VM option 'UseConcMarkSweepGC'
+Error: Could not create the Java Virtual Machine.
+Error: A fatal exception has occurred. Program will exit.
+Unrecognized VM option 'UseConcMarkSweepGC'
+Error: Could not create the Java Virtual Machine.
+Error: A fatal exception has occurred. Program will exit.
+Unrecognized VM option 'UseConcMarkSweepGC'
+Error: Could not create the Java Virtual Machine.
+Error: A fatal exception has occurred. Program will exit.
+Unrecognized VM option 'UseConcMarkSweepGC'
+Error: Could not create the Java Virtual Machine.
+Error: A fatal exception has occurred. Program will exit.
+Unrecognized VM option 'UseConcMarkSweepGC'
+Error: Could not create the Java Virtual Machine.
+Error: A fatal exception has occurred. Program will exit.
+Unrecognized VM option 'UseConcMarkSweepGC'
+Error: Could not create the Java Virtual Machine.
+Error: A fatal exception has occurred. Program will exit.
+Unrecognized VM option 'UseConcMarkSweepGC'
+Error: Could not create the Java Virtual Machine.
+Error: A fatal exception has occurred. Program will exit.
+[0.007s][warning][gc] -Xloggc is deprecated. Will use -Xlog:gc:D:/IDEA/doublekit-pipeline/doublekit-pipeline-starter/bin/../logs/gc.log instead.
+[0.007s][warning][gc] -XX:+PrintGCDetails is deprecated. Will use -Xlog:gc* instead.
+错误: 找不到或无法加载主类 com.doublekit.pipeline.PipelineApplication
+原因: java.lang.ClassNotFoundException: com.doublekit.pipeline.PipelineApplication
+[0.004s][warning][gc] -Xloggc is deprecated. Will use -Xlog:gc:D:/IDEA/doublekit-pipeline/doublekit-pipeline-starter/bin/../logs/gc.log instead.
+[0.004s][warning][gc] -XX:+PrintGCDetails is deprecated. Will use -Xlog:gc* instead.
+错误: 找不到或无法加载主类 com.doublekit.pipeline.PipelineApplication
+原因: java.lang.ClassNotFoundException: com.doublekit.pipeline.PipelineApplication
+[0.005s][warning][gc] -Xloggc is deprecated. Will use -Xlog:gc:D:/IDEA/doublekit-pipeline/doublekit-pipeline-starter/bin/../logs/gc.log instead.
+错误: 找不到或无法加载主类 com.doublekit.pipeline.PipelineApplication
+原因: java.lang.ClassNotFoundException: com.doublekit.pipeline.PipelineApplication
+[0.004s][warning][gc] -Xloggc is deprecated. Will use -Xlog:gc:D:/IDEA/doublekit-pipeline/doublekit-pipeline-starter/bin/../logs/gc.log instead.
+错误: 找不到或无法加载主类 com.doublekit.pipeline.PipelineApplication
+原因: java.lang.ClassNotFoundException: com.doublekit.pipeline.PipelineApplication

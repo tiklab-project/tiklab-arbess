@@ -4,7 +4,7 @@
 #该脚本可在服务器上的任意目录下执行,不会影响到日志的输出位置等
 #-------------------------------------------------------------------------------------------------------------
 if [ ! -n "$JAVA_HOME" ]; then
-    export JAVA_HOME="/export/server/jdk1.8.0_141"
+    export JAVA_HOME="/export/server/jdk-16.0.2"
 fi
 
 #-------------------------------------------------------------------------------------------------------------
@@ -20,7 +20,7 @@ APP_LOG=${APP_HOME}/logs
 export APP_HOME
 export app.home=$APP_HOME
 
-JAVA_OPTS="$JAVA_OPTS -server -Xms512m -Xmx512m -Xmn128m -XX:ParallelGCThreads=20 -XX:+UseConcMarkSweepGC -XX:MaxGCPauseMillis=850 -XX:+PrintGCDetails -Xloggc:$APP_LOG/gc.log -Dfile.encoding=UTF-8"
+JAVA_OPTS="$JAVA_OPTS -server -Xms512m -Xmx512m -Xmn128m -XX:ParallelGCThreads=20 -XX:+UseParallelGC -XX:MaxGCPauseMillis=850 -Xloggc:$APP_LOG/gc.log -Dfile.encoding=UTF-8"
 JAVA_OPTS="$JAVA_OPTS -DlogPath=$APP_LOG"
 JAVA_OPTS="$JAVA_OPTS -Dconf.config=file:${APP_CONFIG}"
 
