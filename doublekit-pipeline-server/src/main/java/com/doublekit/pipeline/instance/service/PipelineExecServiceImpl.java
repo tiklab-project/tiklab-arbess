@@ -518,15 +518,15 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         String deployAddress = liunxAddress+ "/" +zipName ;
         logger.info("部署到Liunx文件地址 ： " +deployAddress);
         pipelineExecLog.setLogRunLog(pipelineExecLog.getLogRunLog()+"\n"+"部署到Liunx文件地址 ： " +deployAddress);
+        pipelineExecLog.setLogRunLog(pipelineExecLog.getLogRunLog()+"\n"+"发送文件中。。。。。");
         sshSftp(proof,deployAddress,fileAddress);
-        pipelineExecLog.setLogRunLog(pipelineExecLog.getLogRunLog()+"\n"+"发生文件中。。。。。");
         HashMap<Integer, String> map = new HashMap<>();
         map.put(1,"rm -rf "+" "+liunxAddress+ "/" +fileName);
         map.put(2,"unzip"+" "+deployAddress);
         map.put(3,"docker stop $(docker ps -a | grep '"+pipeline.getPipelineName()+"' | awk '{print $1 }')");
         map.put(4,"docker rm $(docker ps -a | grep '"+pipeline.getPipelineName()+"' | awk '{print $1 }')");
         map.put(5,"docker image rm"+" "+pipeline.getPipelineName());
-        map.put(6,"sudo find /"+liunxAddress+"/"+fileName+" "+ "-name '*.*' | xargs dos2unix");
+        map.put(6,"sudo find"+" "+liunxAddress+"/"+fileName+" "+ "-name '*.*' | xargs dos2unix");
         map.put(7,"cd"+" "+fileName+";"+"docker image build -t"+" "+pipeline.getPipelineName()+"  .");
         map.put(8,"docker run -itd -p 8080:8080"+" "+pipeline.getPipelineName());
         for (int i = 1; i <= 8; i++) {
