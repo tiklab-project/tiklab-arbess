@@ -526,7 +526,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         map.put(3,"docker stop $(docker ps -a | grep '"+pipeline.getPipelineName()+"' | awk '{print $1 }')");
         map.put(4,"docker rm $(docker ps -a | grep '"+pipeline.getPipelineName()+"' | awk '{print $1 }')");
         map.put(5,"docker image rm"+" "+pipeline.getPipelineName());
-        map.put(6,"find"+" "+liunxAddress+"/"+fileName+" "+ "-name '*' | xargs dos2unix");
+        map.put(6,"find"+" "+liunxAddress+"/"+fileName+" "+ "-name '*.sh' | xargs dos2unix");
         map.put(7,"cd"+" "+fileName+";"+"docker image build -t"+" "+pipeline.getPipelineName()+"  .");
         map.put(8,"docker run -itd -p 8080:8080"+" "+pipeline.getPipelineName());
         for (int i = 1; i <= 8; i++) {
