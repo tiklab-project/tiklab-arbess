@@ -518,21 +518,18 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         String deployAddress = liunxAddress+ "/" +zipName ;
         logger.info("部署到Liunx文件地址 ： " +deployAddress);
         pipelineExecLog.setLogRunLog(pipelineExecLog.getLogRunLog()+"\n"+"部署到Liunx文件地址 ： " +deployAddress);
-
-        //生成容器
-        String vessel = "docker image build -t"+" "+pipeline.getPipelineName()+"  .";
+        sshSftp(proof,deployAddress,fileAddress);
         HashMap<Integer, String> map = new HashMap<>();
+        map.put(1,"rm -rf "+" "+liunxAddress+ "/" +fileName);
         map.put(2,"unzip"+" "+deployAddress);
-        map.put(1,"rm - rf "+" "+liunxAddress+ "/" +fileName);
-        map.put(3,"dos2unix /root/doublekit-pipeline-1.0.0-SNAPSHOT/bin/*.*");
-        map.put(4,"cd"+" "+fileName+";"+vessel);
-        map.put(5,"docker run -itd -p 8080:8080"+" "+pipeline.getPipelineName());
+        map.put(3,"docker stop $(docker ps -a | grep '"+pipeline.getPipelineName()+"' | awk '{print $1 }')");
+        map.put(4,"docker rm $(docker ps -a | grep '"+pipeline.getPipelineName()+"' | awk '{print $1 }')");
+        map.put(5,"docker image rm"+" "+pipeline.getPipelineName());
+        map.put(6,"sudo find /"+liunxAddress+"/"+fileName+" "+ "-name '*.*' | xargs dos2unix");
+        map.put(7,"cd"+" "+fileName+";"+"docker image build -t"+" "+pipeline.getPipelineName()+"  .");
+        map.put(8,"docker run -itd -p 8080:8080"+" "+pipeline.getPipelineName());
         for (int i = 1; i <= 5; i++) {
             pipelineExecLog.setLogRunLog(pipelineExecLog.getLogRunLog()+"\n"+"第"+i+"步 ："+ map.get(i));
-            if (i > 1){
-                //发送文件
-                sshSftp(proof,deployAddress,fileAddress);
-            }
             Map<String, String> log = sshOrder(proof, map.get(i), pipelineExecLog);
             System.out.println(log.get("log"));
         }
