@@ -518,8 +518,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         String deployAddress = liunxAddress+ "/" +zipName ;
         logger.info("部署到Liunx文件地址 ： " +deployAddress);
         pipelineExecLog.setLogRunLog(pipelineExecLog.getLogRunLog()+"\n"+"部署到Liunx文件地址 ： " +deployAddress);
-        //发送文件
-        sshSftp(proof,deployAddress,fileAddress);
+
         //生成容器
         String vessel = "docker image build -t"+" "+pipeline.getPipelineName()+"  .";
         HashMap<Integer, String> map = new HashMap<>();
@@ -527,9 +526,13 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         map.put(1,"rm - rf "+" "+liunxAddress+ "/" +fileName);
         map.put(3,"dos2unix /root/doublekit-pipeline-1.0.0-SNAPSHOT/bin/*.*");
         map.put(4,"cd"+" "+fileName+";"+vessel);
-        map.put(5,"docker container run  -p 8080:8080 -it "+" "+pipeline.getPipelineName());
+        map.put(5,"docker run -itd -p 8080:8080"+" "+pipeline.getPipelineName());
         for (int i = 1; i <= 5; i++) {
             pipelineExecLog.setLogRunLog(pipelineExecLog.getLogRunLog()+"\n"+"第"+i+"步 ："+ map.get(i));
+            if (i > 1){
+                //发送文件
+                sshSftp(proof,deployAddress,fileAddress);
+            }
             Map<String, String> log = sshOrder(proof, map.get(i), pipelineExecLog);
             System.out.println(log.get("log"));
         }
