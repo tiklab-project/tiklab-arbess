@@ -490,11 +490,11 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         return map;
     }
     
-    private int docker(PipelineConfigure pipelineConfigure,PipelineExecLog pipelineExecLog) throws JSchException, SftpException, IOException {
+    private int docker(PipelineConfigure pipelineConfigure,PipelineExecLog pipelineExecLog) {
         Pipeline pipeline = pipelineConfigure.getPipeline();
         PipelineDeploy pipelineDeploy = pipelineConfigure.getPipelineDeploy();
         Proof proof = pipelineConfigureService.findDeployProof(pipelineConfigure);
-
+        PipelineDeployLog deployLog = pipelineExecLog.getDeployLog();
         //模块名
         String[] split = pipelineDeploy.getDeployTargetAddress().split(" ");
         String path = "D:\\clone\\" + pipeline.getPipelineName()+"\\"+split[0]+"\\"+"target";
@@ -519,7 +519,12 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         logger.info("部署到Liunx文件地址 ： " +deployAddress);
         pipelineExecLog.setLogRunLog(pipelineExecLog.getLogRunLog()+"\n"+"部署到Liunx文件地址 ： " +deployAddress);
         pipelineExecLog.setLogRunLog(pipelineExecLog.getLogRunLog()+"\n"+"发送文件中。。。。。");
-        sshSftp(proof,deployAddress,fileAddress);
+        try {
+            sshSftp(proof,deployAddress,fileAddress);
+        } catch (JSchException | SftpException | IOException e) {
+            deployLog.setDeployRunLog("文件发送错误"+e);
+            error(pipelineExecLog,"发送文件错误："+e,pipeline.getPipelineId());
+        }
         HashMap<Integer, String> map = new HashMap<>();
         map.put(1,"rm -rf "+" "+liunxAddress+ "/" +fileName);
         map.put(2,"unzip"+" "+deployAddress);
@@ -531,8 +536,8 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         map.put(8,"docker run -itd -p 8080:8080"+" "+pipeline.getPipelineName());
         for (int i = 1; i <= 8; i++) {
             pipelineExecLog.setLogRunLog(pipelineExecLog.getLogRunLog()+"\n"+"第"+i+"步 ："+ map.get(i));
-            Map<String, String> log = sshOrder(proof, map.get(i), pipelineExecLog);
-            System.out.println(log.get("log"));
+//            Map<String, String> log = sshOrder(proof, map.get(i), pipelineExecLog);
+
         }
         return 1;
     }
@@ -661,11 +666,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
                 int structure = structure(pipelineConfigure, pipelineExecLog);
                 if (structure == 1 ){
                     int deploy = 0;
-                    try {
-                        deploy = docker(pipelineConfigure, pipelineExecLog);
-                    } catch (JSchException | SftpException | IOException e) {
-                        e.printStackTrace();
-                    }
+                     deploy = docker(pipelineConfigure, pipelineExecLog);
                     if (deploy == 1 ){
                         success(pipelineExecLog,pipelineConfigure.getPipeline().getPipelineId());
                     }
