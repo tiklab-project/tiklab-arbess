@@ -37,9 +37,6 @@ import javax.print.attribute.standard.PrinterLocation;
 public class PipelineExecServiceImpl implements PipelineExecService {
 
     @Autowired
-    CodeGiteeApiService codeGiteeApiService;
-
-    @Autowired
     PipelineConfigureService pipelineConfigureService;
 
     @Autowired
@@ -58,15 +55,15 @@ public class PipelineExecServiceImpl implements PipelineExecService {
     public int  start(String pipelineId){
         //创建线程池
         ExecutorService executorService = Executors.newCachedThreadPool();
-        ////判断同一任务是否在运行
-        //if (pipelineIdList != null){
-        //    for (String id : pipelineIdList) {
-        //        if (id .equals(pipelineId)){
-        //            return 100;
-        //        }
-        //    }
-        //}
-        //执行构建
+        //判断同一任务是否在运行
+        if (pipelineIdList != null){
+            for (String id : pipelineIdList) {
+                if (id .equals(pipelineId)){
+                    return 100;
+                }
+            }
+        }
+        // 执行构建
         executorService.submit(() -> begin(pipelineId));
         return 1;
     }
@@ -280,7 +277,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
     }
 
      // 部署
-    private int deploy(PipelineConfigure pipelineConfigure, PipelineExecLog pipelineExecLog) {
+    private int liunx(PipelineConfigure pipelineConfigure, PipelineExecLog pipelineExecLog) {
         Pipeline pipeline = pipelineConfigure.getPipeline();
         PipelineDeployLog deployLog = pipelineExecLog.getDeployLog();
         String deployTargetAddress = pipelineConfigure.getPipelineDeploy().getDeployTargetAddress();
@@ -298,18 +295,18 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         String path = "D:\\clone\\" + pipeline.getPipelineName()+"\\"+split[0]+"\\"+"target";
 
         //发送文件名
-        String address = address(path,split[1]);
-        path  = path + "\\" +address ;
+        String zipName = zipName(path,split[1]);
+        path  = path + "\\" +zipName ;
 
         //发送文件位置
-        deployAddress = deployAddress +"/"+ address;
+        deployAddress = deployAddress +"/"+ zipName;
         try {
             pipelineExecLog.setLogRunLog(pipelineExecLog.getLogRunLog()+"\n"+"开始发送文件:"+path);
             deployLog.setDeployRunLog(deployLog.getDeployRunLog()+"\n"+"开始发送文件:"+path);
             //发送文件
             sshSftp(proof,deployAddress,path);
-            pipelineExecLog.setLogRunLog(pipelineExecLog.getLogRunLog()+"\n"+"文件:"+address+"发送成功！");
-            deployLog.setDeployRunLog(deployLog.getDeployRunLog()+"\n"+"文件:"+address+"发送成功！");
+            pipelineExecLog.setLogRunLog(pipelineExecLog.getLogRunLog()+"\n"+"文件:"+zipName+"发送成功！");
+            deployLog.setDeployRunLog(deployLog.getDeployRunLog()+"\n"+"文件:"+zipName+"发送成功！");
             //执行shell
             String shell = pipelineConfigure.getPipelineDeploy().getDeployShell();
             if (shell != null){
@@ -320,29 +317,69 @@ public class PipelineExecServiceImpl implements PipelineExecService {
             }
 
         } catch (JSchException | SftpException | IOException e) {
-            long overTime = new Timestamp(System.currentTimeMillis()).getTime();
-            deployLog.setDeployRunTime((int) (overTime - beginTime) / 1000);
-            deployLog.setDeployRunStatus(1);
-            pipelineExecLog.setLogRunLog(pipelineExecLog.getLogRunLog()+"\n"+"文件:"+address+"发送失败！");
-            deployLog.setDeployRunLog(deployLog.getDeployRunLog()+"\n"+"文件:"+address+"发送失败！" + e);
-            error(pipelineExecLog,e.toString(),pipeline.getPipelineId());
+            deployState(pipelineExecLog,proof,e.toString(),beginTime);
             return 0;
         }
         //更新状态
-        long overTime = new Timestamp(System.currentTimeMillis()).getTime();
-        int time = (int) (overTime - beginTime) / 1000;
-        deployLog.setDeployRunTime(time);
-        deployLog.setDeployRunStatus(10);
-        pipelineExecLog.setDeployLog(deployLog);
-        pipelineExecLog.setLogRunTime(pipelineExecLog.getLogRunTime()+time);
-        pipelineExecLogService.updateLog(pipelineExecLog);
-        pipelineExecLog.setLogRunLog(pipelineExecLog.getLogRunLog()+"\n"+"服务器部署:"+proof.getProofIp()+"成功!");
-        pipelineExecLogList.add(pipelineExecLog);
+        deployState(pipelineExecLog,proof,null,beginTime);
+        return 1;
+    }
+
+
+    // docker部署
+    private int docker(PipelineConfigure pipelineConfigure,PipelineExecLog pipelineExecLog) {
+        //开始运行时间
+        long beginTime = new Timestamp(System.currentTimeMillis()).getTime();
+        Pipeline pipeline = pipelineConfigure.getPipeline();
+        PipelineDeploy pipelineDeploy = pipelineConfigure.getPipelineDeploy();
+        Proof proof = pipelineConfigureService.findDeployProof(pipelineConfigure);
+        PipelineDeployLog deployLog = pipelineExecLog.getDeployLog();
+        //模块名
+        String[] split = pipelineDeploy.getDeployTargetAddress().split(" ");
+        String path = "D:\\clone\\" + pipeline.getPipelineName()+"\\"+split[0]+"\\"+"target";
+        //文件名称
+        String zipName = zipName(path,split[1]);
+        //本机文件地址
+        String fileAddress  = path + "\\" +zipName ;
+        String  fileName = null;
+        if (zipName != null) {
+            String[] split1 = zipName.split("."+split[1]);
+            String[] split2 = split1[0].split("-distribution");
+            fileName = split2[0];
+        }
+        String liunxAddress = pipelineConfigure.getPipelineDeploy().getDeployAddress();
+        //发送文件位置
+        String deployAddress = liunxAddress+ "/" +zipName ;
+        pipelineExecLog.setLogRunLog(pipelineExecLog.getLogRunLog()+"\n"+"压缩包文件名为： "+zipName+"\n"+"解压文件名称："+fileName+"\n"+"部署到docker地址 ： " +deployAddress);
+        pipelineExecLog.setLogRunLog(pipelineExecLog.getLogRunLog()+"\n"+"发送文件中。。。。。");
+        deployLog.setDeployRunLog("压缩包文件名为： "+zipName+"\n"+"解压文件名称："+fileName+"\n"+"部署到docker文件地址 ： " +deployAddress);
+        try {
+            sshSftp(proof,deployAddress,fileAddress);
+            HashMap<Integer, String> map = new HashMap<>();
+            map.put(1,"rm -rf "+" "+liunxAddress+ "/" +fileName);
+            map.put(2,"unzip"+" "+deployAddress);
+            map.put(3,"docker stop $(docker ps -a | grep '"+pipeline.getPipelineName()+"' | awk '{print $1 }')");
+            map.put(4,"docker rm $(docker ps -a | grep '"+pipeline.getPipelineName()+"' | awk '{print $1 }')");
+            map.put(5,"docker image rm"+" "+pipeline.getPipelineName());
+            map.put(6,"find"+" "+liunxAddress+"/"+fileName+" "+ "-name '*.sh' | xargs dos2unix");
+            map.put(7,"cd"+" "+fileName+";"+"docker image build -t"+" "+pipeline.getPipelineName()+"  .");
+            map.put(8,"docker run -itd -p"+" "+pipelineDeploy.getMappingPort()+":"+pipelineDeploy.getDockerPort()+" "+pipeline.getPipelineName());
+            for (int i = 1; i <= 8; i++) {
+                pipelineExecLog.setLogRunLog(pipelineExecLog.getLogRunLog()+"\n"+"执行 ："+ map.get(i));
+                deployLog.setDeployRunLog(deployLog.getDeployRunLog()+"\n第"+i+"步 ："+ map.get(i));
+                Map<String, String> log = sshOrder(proof, map.get(i), pipelineExecLog);
+                deployLog.setDeployRunLog(deployLog.getDeployRunLog()+"\n"+log.get("log"));
+            }
+        } catch (JSchException | SftpException |IOException   e) {
+            deployState(pipelineExecLog,proof,e.toString(),beginTime);
+            return  0;
+        }
+        deployState(pipelineExecLog,proof,null,beginTime);
         return 1;
     }
 
     /**
-     * 调用cmd执行构建命令
+     * 调用cmd执行命令
      * @param path 构建地址
      * @param order 构建命令
      * @return 构建信息
@@ -489,57 +526,34 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         inputStreamReader.close();
         return map;
     }
-    
-    private int docker(PipelineConfigure pipelineConfigure,PipelineExecLog pipelineExecLog) {
-        Pipeline pipeline = pipelineConfigure.getPipeline();
-        PipelineDeploy pipelineDeploy = pipelineConfigure.getPipelineDeploy();
-        Proof proof = pipelineConfigureService.findDeployProof(pipelineConfigure);
-        PipelineDeployLog deployLog = pipelineExecLog.getDeployLog();
-        //模块名
-        String[] split = pipelineDeploy.getDeployTargetAddress().split(" ");
-        String path = "D:\\clone\\" + pipeline.getPipelineName()+"\\"+split[0]+"\\"+"target";
-        pipelineExecLog.setLogRunLog(pipelineExecLog.getLogRunLog()+"\n"+"模块地址path: "+path);
-        pipelineExecLog.setLogRunLog(pipelineExecLog.getLogRunLog()+"\n"+"文件后缀："+split[1]);
-        //文件名称
-        String zipName = address(path,split[1]);
-        pipelineExecLog.setLogRunLog(pipelineExecLog.getLogRunLog()+"\n"+"压缩包文件名为fileName： "+zipName);
-        //本机文件地址
-        String fileAddress  = path + "\\" +zipName ;
-        String  fileName = null;
-        logger.info("压缩包文件地址 ： " +fileAddress);
-        if (zipName != null) {
-            String[] split1 = zipName.split(".zip");
-            String[] split2 = split1[0].split("-distribution");
-            fileName = split2[0];
-            pipelineExecLog.setLogRunLog(pipelineExecLog.getLogRunLog()+"\n"+"解压文件名称"+split2[0]);
-        }
-        String liunxAddress = pipelineConfigure.getPipelineDeploy().getDeployAddress();
-        //发送文件位置
-        String deployAddress = liunxAddress+ "/" +zipName ;
-        logger.info("部署到Liunx文件地址 ： " +deployAddress);
-        pipelineExecLog.setLogRunLog(pipelineExecLog.getLogRunLog()+"\n"+"部署到Liunx文件地址 ： " +deployAddress);
-        pipelineExecLog.setLogRunLog(pipelineExecLog.getLogRunLog()+"\n"+"发送文件中。。。。。");
-        try {
-            sshSftp(proof,deployAddress,fileAddress);
-        } catch (JSchException | SftpException | IOException e) {
-            deployLog.setDeployRunLog("文件发送错误"+e);
-            error(pipelineExecLog,"发送文件错误："+e,pipeline.getPipelineId());
-        }
-        HashMap<Integer, String> map = new HashMap<>();
-        map.put(1,"rm -rf "+" "+liunxAddress+ "/" +fileName);
-        map.put(2,"unzip"+" "+deployAddress);
-        map.put(3,"docker stop $(docker ps -a | grep '"+pipeline.getPipelineName()+"' | awk '{print $1 }')");
-        map.put(4,"docker rm $(docker ps -a | grep '"+pipeline.getPipelineName()+"' | awk '{print $1 }')");
-        map.put(5,"docker image rm"+" "+pipeline.getPipelineName());
-        map.put(6,"find"+" "+liunxAddress+"/"+fileName+" "+ "-name '*.sh' | xargs dos2unix");
-        map.put(7,"cd"+" "+fileName+";"+"docker image build -t"+" "+pipeline.getPipelineName()+"  .");
-        map.put(8,"docker run -itd -p 8080:8080"+" "+pipeline.getPipelineName());
-        for (int i = 1; i <= 8; i++) {
-            pipelineExecLog.setLogRunLog(pipelineExecLog.getLogRunLog()+"\n"+"第"+i+"步 ："+ map.get(i));
-//            Map<String, String> log = sshOrder(proof, map.get(i), pipelineExecLog);
 
+    /**
+     * 更新部署状态
+     * @param pipelineExecLog 日志
+     * @param proof 凭证
+     * @param e 异常
+     * @param beginTime 开始时间
+     */
+    public  void deployState(PipelineExecLog pipelineExecLog,Proof proof,String e, long beginTime){
+        PipelineDeployLog deployLog = pipelineExecLog.getDeployLog();
+        long overTime = new Timestamp(System.currentTimeMillis()).getTime();
+        if (e == null){
+            //更新状态
+            int time = (int) (overTime - beginTime) / 1000;
+            deployLog.setDeployRunTime(time);
+            deployLog.setDeployRunStatus(10);
+            pipelineExecLog.setDeployLog(deployLog);
+            pipelineExecLog.setLogRunTime(pipelineExecLog.getLogRunTime()+time);
+            pipelineExecLogService.updateLog(pipelineExecLog);
+            pipelineExecLog.setLogRunLog(pipelineExecLog.getLogRunLog()+"\n"+"服务器部署:"+proof.getProofIp()+"成功!");
+            pipelineExecLogList.add(pipelineExecLog);
+        }else {
+            deployLog.setDeployRunTime((int) (overTime - beginTime) / 1000);
+            deployLog.setDeployRunStatus(1);
+            pipelineExecLog.setLogRunLog(pipelineExecLog.getLogRunLog()+"\n部署失败! \n"+e );
+            deployLog.setDeployRunLog(deployLog.getDeployRunLog()+"\n部署失败! \n" + e);
+            error(pipelineExecLog,e,pipelineExecLog.getPipelineId());
         }
-        return 1;
     }
 
     /**
@@ -579,7 +593,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
      * @param s 文件后缀名
      * @return 文件名
      */
-    private static String address(String path,String s) {
+    private static String zipName(String path,String s) {
 
         File f = new File(path);
         List<String> list = new ArrayList<>();
@@ -657,8 +671,6 @@ public class PipelineExecServiceImpl implements PipelineExecService {
 
     // 判断配置信息
     private void whetherNull(PipelineConfigure pipelineConfigure, PipelineExecLog pipelineExecLog){
-
-
         int gitClone = gitClone(pipelineConfigure, pipelineExecLog);
         if (gitClone == 1){
             int i = unitTesting(pipelineConfigure, pipelineExecLog);
@@ -673,7 +685,6 @@ public class PipelineExecServiceImpl implements PipelineExecService {
                 }
             }
         }
-
     }
 
 

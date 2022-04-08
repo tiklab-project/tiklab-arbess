@@ -20,7 +20,6 @@
 			<includes>
 				<include>*.properties</include>
 				<include>*.xml</include>
-				<include>Dockerfile</include>
 			</includes>
 			<outputDirectory>/conf</outputDirectory>
 		</fileSet>

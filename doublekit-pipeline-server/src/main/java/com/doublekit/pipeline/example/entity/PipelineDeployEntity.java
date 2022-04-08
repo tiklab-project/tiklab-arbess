@@ -32,6 +32,14 @@ public class PipelineDeployEntity {
     @Column(name = "proof_name")
     private String proofName;
 
+    //启动端口
+    @Column(name = "deploy_docker_port")
+    private int dockerPort;
+
+    //映射端口
+    @Column(name = "deploy_mapping_port")
+    private int mappingPort;
+
     public String getDeployId() {
         return deployId;
     }
@@ -78,5 +86,21 @@ public class PipelineDeployEntity {
 
     public void setProofName(String proofName) {
         this.proofName = proofName;
+    }
+
+    public int getDockerPort() {
+        return dockerPort;
+    }
+
+    public void setDockerPort(int dockerPort) {
+        this.dockerPort = dockerPort;
+    }
+
+    public int getMappingPort() {
+        return mappingPort;
+    }
+
+    public void setMappingPort(int mappingPort) {
+        this.mappingPort = mappingPort;
     }
 }

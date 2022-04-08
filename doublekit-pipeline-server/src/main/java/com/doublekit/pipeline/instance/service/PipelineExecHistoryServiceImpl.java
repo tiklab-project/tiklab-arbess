@@ -100,6 +100,7 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
                 }
             }
         }
+        historyList.sort(Comparator.comparing(PipelineExecHistory::getHistoryCreateTime,Comparator.reverseOrder()));
         return historyList;
     }
 

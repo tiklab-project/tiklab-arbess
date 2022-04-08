@@ -28,7 +28,7 @@ import org.springframework.context.annotation.Configuration;
 // })
 // @EnableMessage
 //@EnableDataFly
-@EnableRpc
+//@EnableRpc
 //pcs
 // @EnableUserServer
 // @EnableEamServer

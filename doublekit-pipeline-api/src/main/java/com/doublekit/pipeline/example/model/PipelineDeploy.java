@@ -34,6 +34,15 @@ public class PipelineDeploy {
     @ApiProperty(name="proofName",desc="凭证信息")
     private String proofName;
 
+    //启动端口
+    @ApiProperty(name = "dockerPort",desc="启动端口")
+    private int dockerPort;
+
+    //映射端口
+    @ApiProperty(name = "mappingPort",desc="映射端口")
+    private int mappingPort;
+
+
     public String getDeployId() {
         return deployId;
     }
@@ -81,5 +90,21 @@ public class PipelineDeploy {
 
     public void setProofName(String proofName) {
         this.proofName = proofName;
+    }
+
+    public int getDockerPort() {
+        return dockerPort;
+    }
+
+    public void setDockerPort(int dockerPort) {
+        this.dockerPort = dockerPort;
+    }
+
+    public int getMappingPort() {
+        return mappingPort;
+    }
+
+    public void setMappingPort(int mappingPort) {
+        this.mappingPort = mappingPort;
     }
 }
