@@ -12,6 +12,10 @@ public class PipelineStatus {
     @ApiProperty(name="pipelineId",desc="流水线id")
     private String pipelineId;
 
+    //流水线状态
+    @ApiProperty(name="pipelineCollect",desc="流水线状态",required = true)
+    private int pipelineCollect;
+
     //构建状态
     @ApiProperty(name="logCreateTime",desc="构建状态")
     private int structureStatus;
@@ -67,5 +71,13 @@ public class PipelineStatus {
 
     public void setLastSuccessTime(String lastSuccessTime) {
         this.lastSuccessTime = lastSuccessTime;
+    }
+
+    public int getPipelineCollect() {
+        return pipelineCollect;
+    }
+
+    public void setPipelineCollect(int pipelineCollect) {
+        this.pipelineCollect = pipelineCollect;
     }
 }

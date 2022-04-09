@@ -79,9 +79,9 @@ public class PipelineController {
     @ApiParam(name = "pipeline",desc = "pipeline",required = true)
     public Result<String> updatePipeline(@RequestBody @NotNull @Valid Pipeline pipeline){
 
-        String pipelineName = pipelineService.updatePipeline(pipeline);
+        int i = pipelineService.updatePipeline(pipeline);
 
-        return Result.ok(pipelineName);
+        return Result.ok(i);
     }
 
     //模糊查询

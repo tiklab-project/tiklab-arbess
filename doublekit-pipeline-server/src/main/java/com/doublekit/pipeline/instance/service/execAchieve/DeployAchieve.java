@@ -159,23 +159,20 @@ public class DeployAchieve {
      */
     public  void deployState(PipelineExecLog pipelineExecLog,Proof proof,String e, long beginTime){
         PipelineDeployLog deployLog = pipelineExecLog.getDeployLog();
-        long overTime = new Timestamp(System.currentTimeMillis()).getTime();
-        if (e == null){
-            //更新状态
-            int time = (int) (overTime - beginTime) / 1000;
-            deployLog.setDeployRunTime(time);
-            deployLog.setDeployRunStatus(10);
-            pipelineExecLog.setDeployLog(deployLog);
-            pipelineExecLog.setLogRunTime(pipelineExecLog.getLogRunTime()+time);
-            pipelineExecLogService.updateLog(pipelineExecLog);
-            pipelineExecLog.setLogRunLog(pipelineExecLog.getLogRunLog()+"\n"+"服务器部署:"+proof.getProofIp()+"成功!");
-            pipelineExecLogList.add(pipelineExecLog);
-        }else {
-            deployLog.setDeployRunTime((int) (overTime - beginTime) / 1000);
+        deployLog.setDeployRunStatus(10);
+        if (e != null){
             deployLog.setDeployRunStatus(1);
             pipelineExecLog.setLogRunLog(pipelineExecLog.getLogRunLog()+"\n部署失败! \n"+e );
             deployLog.setDeployRunLog(deployLog.getDeployRunLog()+"\n部署失败! \n" + e);
             commonAchieve.error(pipelineExecLog,e,pipelineExecLog.getPipelineId());
         }
+        long overTime = new Timestamp(System.currentTimeMillis()).getTime();
+        int time = (int) (overTime - beginTime) / 1000;
+        deployLog.setDeployRunTime(time);
+        pipelineExecLog.setLogRunTime(pipelineExecLog.getLogRunTime()+time);
+        pipelineExecLog.setDeployLog(deployLog);
+        pipelineExecLogService.updateLog(pipelineExecLog);
+        pipelineExecLog.setLogRunLog(pipelineExecLog.getLogRunLog()+"\n"+"服务器部署:"+proof.getProofIp()+"成功!");
+        pipelineExecLogList.add(pipelineExecLog);
     }
 }

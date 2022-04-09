@@ -56,7 +56,7 @@ public class CommonAchieve {
      * 执行产生的日志
      * @param inputStreamReader 执行信息
      * @param pipelineExecLog 日志信息
-     * @throws IOException 字符流装换异常
+     * @throws IOException 字符流转换异常
      */
     public Map<String, String> log(InputStreamReader inputStreamReader , PipelineExecLog pipelineExecLog) throws IOException {
         Map<String, String> map = new HashMap<>();

@@ -10,11 +10,9 @@ import com.doublekit.pipeline.instance.service.PipelineExecLogService;
 import com.doublekit.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -45,7 +43,6 @@ public class TestAchieve {
                 String a = "执行 : " + " ' " + s + " ' " + "\n";
                 pipelineExecLog.setLogRunLog(pipelineExecLog.getLogRunLog() + a);
                 InputStreamReader inputStreamReader = new InputStreamReader(process.getInputStream());
-                //测试执行失败
                 Map<String, String> map = commonAchieve.log(inputStreamReader, pipelineExecLog);
                 if (map.get("state").equals("0")){
                     testLog.setTestRunLog(testLog.getTestRunLog()+map.get("log"));
@@ -64,9 +61,8 @@ public class TestAchieve {
 
     private  void testState(PipelineExecLog pipelineExecLog,long beginTime,String e,List<PipelineExecLog> pipelineExecLogList){
         PipelineTestLog testLog = pipelineExecLog.getTestLog();
-        if (e == null){
-            testLog.setTestRunStatus(10);
-        }else {
+        testLog.setTestRunStatus(10);
+        if (e != null){
             testLog.setTestRunStatus(1);
             commonAchieve.error(pipelineExecLog,"测试执行失败。", pipelineExecLog.getPipelineId());
         }

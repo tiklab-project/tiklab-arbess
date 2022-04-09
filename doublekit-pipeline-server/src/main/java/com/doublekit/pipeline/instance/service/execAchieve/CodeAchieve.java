@@ -90,17 +90,17 @@ public class CodeAchieve {
                 .call().close();
     }
 
+
     private void codeState(PipelineExecLog pipelineExecLog,long beginTime,String e,List<PipelineExecLog> pipelineExecLogList){
         PipelineCodeLog codeLog = pipelineExecLog.getCodeLog();
-        long overTime = new Timestamp(System.currentTimeMillis()).getTime();
-        int time = (int) (overTime - beginTime) / 1000;
-        if (e == null){
-            codeLog.setCodeRunStatus(10);
-        }else {
+        codeLog.setCodeRunStatus(10);
+        if (e != null){
             codeLog.setCodeRunStatus(1);
             codeLog.setCodeRunLog(codeLog.getCodeRunLog()+"\n拉取代码异常\n"+e);
             commonAchieve.error(pipelineExecLog, "拉取代码异常\n"+e,pipelineExecLog.getPipelineId());
         }
+        long overTime = new Timestamp(System.currentTimeMillis()).getTime();
+        int time = (int) (overTime - beginTime) / 1000;
         codeLog.setCodeRunTime(time);
         pipelineExecLog.setLogRunTime(pipelineExecLog.getLogRunTime()+time);
         pipelineExecLog.setCodeLog(codeLog);

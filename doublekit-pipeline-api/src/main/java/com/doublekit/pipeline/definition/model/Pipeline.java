@@ -30,6 +30,10 @@ public class Pipeline {
     @ApiProperty(name="pipelineType",desc="流水线类型",required = true)
     private int pipelineType;
 
+    //流水线状态
+    @ApiProperty(name="pipelineCollect",desc="流水线状态",required = true)
+    private int pipelineCollect;
+
 
     public String getPipelineId() {
         return pipelineId;
@@ -69,5 +73,13 @@ public class Pipeline {
 
     public void setPipelineType(int pipelineType) {
         this.pipelineType = pipelineType;
+    }
+
+    public int getPipelineCollect() {
+        return pipelineCollect;
+    }
+
+    public void setPipelineCollect(int pipelineCollect) {
+        this.pipelineCollect = pipelineCollect;
     }
 }

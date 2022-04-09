@@ -35,7 +35,7 @@ public interface PipelineService {
      * 更新流水线
      * @param pipeline 更新后流水线信息
      */
-    String updatePipeline(@NotNull @Valid Pipeline pipeline);
+    int updatePipeline(@NotNull @Valid Pipeline pipeline);
 
     /**
      * 查询单个流水线

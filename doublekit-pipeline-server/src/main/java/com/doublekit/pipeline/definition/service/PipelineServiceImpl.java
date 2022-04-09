@@ -76,19 +76,11 @@ public class PipelineServiceImpl implements PipelineService{
 
     //更新
     @Override
-    public String updatePipeline(Pipeline pipeline) {
-        String pipelineName = pipeline.getPipelineName();
-        List<Pipeline> pipelineList = findAllPipeline();
-        for (Pipeline pipeline1 : pipelineList) {
-        //判断是否有此用户
-            if (pipelineName.equals(pipeline1.getPipelineName())){
-                return "0";
-            }
-        }
+    public int updatePipeline(Pipeline pipeline) {
         PipelineEntity pipelineEntity = BeanMapper.map(pipeline, PipelineEntity.class);
         //更新用户信息
         pipelineDao.updatePipeline(pipelineEntity);
-        return pipelineEntity.getPipelineName();
+        return 1;
     }
 
     //查询
@@ -126,6 +118,7 @@ public class PipelineServiceImpl implements PipelineService{
             PipelineExecHistory latelyHistory = pipelineExecHistoryService.findLatelyHistory(pipeline.getPipelineId());
             PipelineExecHistory latelySuccess = pipelineExecHistoryService.findLatelySuccess(pipeline.getPipelineId());
             pipelineStatus.setPipelineId(pipeline.getPipelineId());
+            pipelineStatus.setPipelineCollect(pipeline.getPipelineCollect());
             pipelineStatus.setPipelineName(pipeline.getPipelineName());
             if (latelyHistory != null){
                 pipelineStatus.setLastStructureTime(latelyHistory.getHistoryCreateTime());
