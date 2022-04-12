@@ -30,6 +30,8 @@ public class CommonAchieve {
     //存放构建流水线id
     List<String> pipelineIdList = new ArrayList<>();
 
+
+
     /**
      *  执行ssh命令
      * @param proof 凭证信息

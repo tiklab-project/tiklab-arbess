@@ -4,6 +4,7 @@ import com.doublekit.pipeline.definition.model.Pipeline;
 import com.doublekit.pipeline.definition.model.PipelineConfigure;
 import com.doublekit.pipeline.definition.service.PipelineConfigureService;
 import com.doublekit.pipeline.example.model.PipelineDeploy;
+import com.doublekit.pipeline.example.service.PipelineDeployService;
 import com.doublekit.pipeline.instance.model.PipelineDeployLog;
 import com.doublekit.pipeline.instance.model.PipelineExecLog;
 import com.doublekit.pipeline.instance.service.PipelineExecLogService;
@@ -32,6 +33,9 @@ public class DeployAchieve {
     @Autowired
     PipelineExecLogService pipelineExecLogService;
 
+    @Autowired
+    PipelineDeployService pipelineDeployService;
+
     //存放过程状态
     List<PipelineExecLog> pipelineExecLogList = new ArrayList<>();
 
@@ -46,8 +50,9 @@ public class DeployAchieve {
     public int liunx(PipelineConfigure pipelineConfigure, PipelineExecLog pipelineExecLog) {
         Pipeline pipeline = pipelineConfigure.getPipeline();
         PipelineDeployLog deployLog = pipelineExecLog.getDeployLog();
-        String deployTargetAddress = pipelineConfigure.getPipelineDeploy().getDeployTargetAddress();
-        String deployAddress = pipelineConfigure.getPipelineDeploy().getDeployAddress();
+        PipelineDeploy pipelineDeploy = pipelineDeployService.findOneDeploy(pipelineConfigure.getTaskId());
+        String deployTargetAddress = pipelineDeploy.getDeployTargetAddress();
+        String deployAddress = pipelineDeploy.getDeployAddress();
         pipelineExecLogList.add(pipelineExecLog);
         Proof proof = pipelineConfigureService.findDeployProof(pipelineConfigure);
 
@@ -74,7 +79,7 @@ public class DeployAchieve {
             pipelineExecLog.setLogRunLog(pipelineExecLog.getLogRunLog()+"\n"+"文件:"+zipName+"发送成功！");
             deployLog.setDeployRunLog(deployLog.getDeployRunLog()+"\n"+"文件:"+zipName+"发送成功！");
             //执行shell
-            String shell = pipelineConfigure.getPipelineDeploy().getDeployShell();
+            String shell = pipelineDeploy.getDeployShell();
             if (shell != null){
                 String[] s1 = shell.split("\n");
                 for (String value : s1) {
@@ -100,9 +105,9 @@ public class DeployAchieve {
      */
     private int docker(PipelineConfigure pipelineConfigure,PipelineExecLog pipelineExecLog) {
         //开始运行时间
+        PipelineDeploy pipelineDeploy = pipelineDeployService.findOneDeploy(pipelineConfigure.getTaskId());
         long beginTime = new Timestamp(System.currentTimeMillis()).getTime();
         Pipeline pipeline = pipelineConfigure.getPipeline();
-        PipelineDeploy pipelineDeploy = pipelineConfigure.getPipelineDeploy();
         Proof proof = pipelineConfigureService.findDeployProof(pipelineConfigure);
         PipelineDeployLog deployLog = pipelineExecLog.getDeployLog();
         //模块名
@@ -118,7 +123,7 @@ public class DeployAchieve {
             String[] split2 = split1[0].split("-distribution");
             fileName = split2[0];
         }
-        String liunxAddress = pipelineConfigure.getPipelineDeploy().getDeployAddress();
+        String liunxAddress = pipelineDeploy.getDeployAddress();
         //发送文件位置
         String deployAddress = liunxAddress+ "/" +zipName ;
         pipelineExecLog.setLogRunLog(pipelineExecLog.getLogRunLog()+"\n"+"压缩包文件名为： "+zipName+"\n"+"解压文件名称："+fileName+"\n"+"部署到docker地址 ： " +deployAddress);

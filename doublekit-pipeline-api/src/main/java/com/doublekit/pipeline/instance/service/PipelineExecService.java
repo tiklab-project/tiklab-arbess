@@ -18,6 +18,7 @@ public interface PipelineExecService {
 
     /**
      * 查询构建状态
+     * @param pipelineId 流水线id
      * @return 状态信息
      */
     PipelineExecLog findInstanceState(String pipelineId) ;

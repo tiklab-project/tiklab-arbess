@@ -46,23 +46,11 @@ public class PipelineConfigureServiceImpl implements PipelineConfigureService {
     //创建
     @Override
     public  Map<String, String> createConfigure(PipelineConfigure pipelineConfigure) {
-        Map<String, String> map = pipelineCodeService.createTest(pipelineConfigure);
-        pipelineConfigure.setCreateTime(pipelineConfigure.getPipeline().getPipelineCreateTime());
-        PipelineCode pipelineCode = new PipelineCode();
-        pipelineCode.setCodeId(map.get("codeId"));
-        pipelineConfigure.setPipelineCode(pipelineCode);
-        PipelineTest pipelineTest = new PipelineTest();
-        pipelineTest.setTestId(map.get("testId"));
-        pipelineConfigure.setPipelineTest(pipelineTest);
-        PipelineStructure pipelineStructure = new PipelineStructure();
-        pipelineStructure.setStructureId(map.get("structureId"));
-        pipelineConfigure.setPipelineStructure(pipelineStructure);
-        PipelineDeploy pipelineDeploy = new PipelineDeploy();
-        pipelineDeploy.setDeployId(map.get("deployId"));
-        pipelineConfigure.setPipelineDeploy(pipelineDeploy);
-        String configure = pipelineConfigureDao.createConfigure(BeanMapper.map(pipelineConfigure, PipelineConfigureEntity.class));
-        map.put("configureId",configure);
-        return map;
+
+        pipelineConfigureDao.createConfigure(BeanMapper.map(pipelineConfigure, PipelineConfigureEntity.class));
+
+
+        return null;
     }
 
     //删除

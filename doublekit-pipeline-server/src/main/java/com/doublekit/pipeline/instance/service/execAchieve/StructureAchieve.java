@@ -2,19 +2,17 @@ package com.doublekit.pipeline.instance.service.execAchieve;
 
 import com.doublekit.pipeline.definition.model.Pipeline;
 import com.doublekit.pipeline.definition.model.PipelineConfigure;
-import com.doublekit.pipeline.definition.service.PipelineConfigureService;
-import com.doublekit.pipeline.example.service.codeGit.CodeGiteeApiService;
+import com.doublekit.pipeline.example.model.PipelineStructure;
+import com.doublekit.pipeline.example.service.PipelineStructureService;
 import com.doublekit.pipeline.instance.model.PipelineExecLog;
 import com.doublekit.pipeline.instance.model.PipelineStructureLog;
 import com.doublekit.pipeline.instance.service.PipelineExecLogService;
 import com.doublekit.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -25,6 +23,9 @@ public class StructureAchieve {
     @Autowired
     PipelineExecLogService pipelineExecLogService;
 
+    @Autowired
+    PipelineStructureService pipelineStructureService;
+
 
     CommonAchieve commonAchieve = new CommonAchieve();
 
@@ -33,8 +34,9 @@ public class StructureAchieve {
         long beginTime = new Timestamp(System.currentTimeMillis()).getTime();
         Pipeline pipeline = pipelineConfigure.getPipeline();
         PipelineStructureLog structureLog = pipelineExecLog.getStructureLog();
-        String structureOrder = pipelineConfigure.getPipelineStructure().getStructureOrder();
-        String structureAddress = pipelineConfigure.getPipelineStructure().getStructureAddress();
+        PipelineStructure pipelineStructure = pipelineStructureService.findOneStructure(pipelineConfigure.getTaskId());
+        String structureOrder = pipelineStructure.getStructureOrder();
+        String structureAddress = pipelineStructure.getStructureAddress();
         //设置拉取地址
         String path = "D:\\clone\\"+pipeline.getPipelineName();
         String[] split = structureOrder.split("\n");

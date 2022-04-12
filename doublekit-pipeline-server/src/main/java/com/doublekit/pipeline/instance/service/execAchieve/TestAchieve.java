@@ -3,7 +3,8 @@ package com.doublekit.pipeline.instance.service.execAchieve;
 import com.doublekit.pipeline.definition.model.Pipeline;
 import com.doublekit.pipeline.definition.model.PipelineConfigure;
 import com.doublekit.pipeline.definition.service.PipelineConfigureService;
-import com.doublekit.pipeline.example.service.codeGit.CodeGiteeApiService;
+import com.doublekit.pipeline.example.model.PipelineTest;
+import com.doublekit.pipeline.example.service.PipelineTestService;
 import com.doublekit.pipeline.instance.model.PipelineExecLog;
 import com.doublekit.pipeline.instance.model.PipelineTestLog;
 import com.doublekit.pipeline.instance.service.PipelineExecLogService;
@@ -26,6 +27,9 @@ public class TestAchieve {
     @Autowired
     PipelineExecLogService pipelineExecLogService;
 
+    @Autowired
+    PipelineTestService pipelineTestService;
+
     CommonAchieve commonAchieve = new CommonAchieve();
 
 
@@ -34,7 +38,8 @@ public class TestAchieve {
         long beginTime = new Timestamp(System.currentTimeMillis()).getTime();
         Pipeline pipeline = pipelineConfigure.getPipeline();
         PipelineTestLog testLog = pipelineExecLog.getTestLog();
-        String testOrder = pipelineConfigure.getPipelineTest().getTestOrder();
+        PipelineTest pipelineTest = pipelineTestService.findOneTest(pipelineConfigure.getTaskId());
+        String testOrder = pipelineTest.getTestOrder();
         String path = "D:\\clone\\"+pipeline.getPipelineName();
         String[] split = testOrder.split("\n");
         for (String s : split) {
