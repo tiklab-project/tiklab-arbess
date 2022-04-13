@@ -4,6 +4,7 @@ import com.doublekit.pipeline.definition.model.Pipeline;
 import com.doublekit.pipeline.definition.model.PipelineConfigure;
 import com.doublekit.pipeline.definition.service.PipelineConfigureService;
 import com.doublekit.pipeline.example.model.PipelineCode;
+import com.doublekit.pipeline.example.service.PipelineCodeService;
 import com.doublekit.pipeline.instance.model.PipelineCodeLog;
 import com.doublekit.pipeline.instance.model.PipelineExecLog;
 import com.doublekit.pipeline.instance.service.PipelineExecLogService;
@@ -30,6 +31,9 @@ public class CodeAchieve {
     @Autowired
     PipelineExecLogService pipelineExecLogService;
 
+    @Autowired
+    PipelineCodeService pipelineCodeService;
+
     CommonAchieve commonAchieve = new CommonAchieve();
 
     // git克隆
@@ -46,30 +50,27 @@ public class CodeAchieve {
         File file = new File(path);
         //调用删除方法删除旧的代码
         commonAchieve.deleteFile(file);
-        //获取凭证信息
-        PipelineCode pipelineCode = pipelineConfigure.getPipelineCode();
-        if (pipelineCode != null){
-            Proof proof = pipelineConfigureService.findCodeProof(pipelineConfigure);
-            String codeAddress = pipelineConfigure.getPipelineCode().getCodeAddress();
-            String codeBranch = pipelineConfigure.getPipelineCode().getCodeBranch();
-            UsernamePasswordCredentialsProvider credentialsProvider = commonAchieve.usernamePassword(proof.getProofUsername(), proof.getProofPassword());
+        PipelineCode pipelineCode = pipelineCodeService.findOneCode(pipelineConfigure.getTaskId());
+        Proof proof = pipelineConfigureService.findCodeProof(pipelineConfigure);
+        String codeAddress =pipelineCode.getCodeAddress();
+        String codeBranch = pipelineCode.getCodeBranch();
+        UsernamePasswordCredentialsProvider credentialsProvider = commonAchieve.usernamePassword(proof.getProofUsername(), proof.getProofPassword());
 
-            //更新日志
-            String s = "开始拉取代码 : " + "\n"  + "FileAddress : " + file + "\n"  + "Uri : " + codeAddress + "\n"  + "Branch : " + codeBranch + "\n"  ;
-            pipelineExecLog.setLogRunLog(s);
-            codeLog.setCodeRunLog(codeLog.getCodeRunLog()+s);
-            pipelineExecLogList.add(pipelineExecLog);
+        //更新日志
+        String s = "开始拉取代码 : " + "\n"  + "FileAddress : " + file + "\n"  + "Uri : " + codeAddress + "\n"  + "Branch : " + codeBranch + "\n"  ;
+        pipelineExecLog.setLogRunLog(s);
+        codeLog.setCodeRunLog(codeLog.getCodeRunLog()+s);
+        pipelineExecLogList.add(pipelineExecLog);
 
-            //克隆代码
-            try {
-                clone(file, codeAddress, credentialsProvider, codeBranch);
-            } catch (GitAPIException e) {
-                codeState(pipelineExecLog,beginTime,e.toString(),pipelineExecLogList);
-                return 0;
-            }
-            String log = s + "proofType : " +proof.getProofType() + "\n" + "clone成功。。。。。。。。。。。。。。。" + "\n";
-            codeLog.setCodeRunLog(codeLog.getCodeRunLog()+log);
+        //克隆代码
+        try {
+            clone(file, codeAddress, credentialsProvider, codeBranch);
+        } catch (GitAPIException e) {
+            codeState(pipelineExecLog,beginTime,e.toString(),pipelineExecLogList);
+            return 0;
         }
+        String log = s + "proofType : " +proof.getProofType() + "\n" + "clone成功。。。。。。。。。。。。。。。" + "\n";
+        codeLog.setCodeRunLog(codeLog.getCodeRunLog()+log);
         codeState(pipelineExecLog,beginTime,null,pipelineExecLogList);
         return 1;
     }
