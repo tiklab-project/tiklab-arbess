@@ -38,7 +38,7 @@ public class TestAchieve {
         long beginTime = new Timestamp(System.currentTimeMillis()).getTime();
         Pipeline pipeline = pipelineConfigure.getPipeline();
         PipelineTestLog testLog = pipelineExecLog.getTestLog();
-        PipelineTest pipelineTest = pipelineTestService.findOneTest(pipelineConfigure.getTaskId());
+        PipelineTest pipelineTest = pipelineTestService.findOneTest(pipelineConfigure.getPipelineTest().getTestId());
         String testOrder = pipelineTest.getTestOrder();
         String path = "D:\\clone\\"+pipeline.getPipelineName();
         String[] split = testOrder.split("\n");

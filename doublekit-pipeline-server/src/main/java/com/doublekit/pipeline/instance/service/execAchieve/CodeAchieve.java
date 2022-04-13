@@ -50,7 +50,7 @@ public class CodeAchieve {
         File file = new File(path);
         //调用删除方法删除旧的代码
         commonAchieve.deleteFile(file);
-        PipelineCode pipelineCode = pipelineCodeService.findOneCode(pipelineConfigure.getTaskId());
+        PipelineCode pipelineCode = pipelineCodeService.findOneCode(pipelineConfigure.getPipelineCode().getCodeId());
         Proof proof = pipelineConfigureService.findCodeProof(pipelineConfigure);
         String codeAddress =pipelineCode.getCodeAddress();
         String codeBranch = pipelineCode.getCodeBranch();

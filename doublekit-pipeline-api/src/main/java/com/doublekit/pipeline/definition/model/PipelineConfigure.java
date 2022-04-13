@@ -8,6 +8,9 @@ import com.doublekit.beans.annotation.Mappings;
 import com.doublekit.join.annotation.Join;
 import com.doublekit.join.annotation.JoinQuery;
 import com.doublekit.pipeline.example.model.PipelineCode;
+import com.doublekit.pipeline.example.model.PipelineDeploy;
+import com.doublekit.pipeline.example.model.PipelineStructure;
+import com.doublekit.pipeline.example.model.PipelineTest;
 
 
 @ApiModel
@@ -32,17 +35,37 @@ public class PipelineConfigure {
     private Pipeline pipeline;
 
     //源码
-    @ApiProperty(name="taskId",desc="创建时间")
-    private String taskId;
+    @ApiProperty(name="pipelineCode",desc="源码id",eg="@selectOne")
+    @Mappings({
+            @Mapping(source = "pipelineCode.codeId",target = "codeId")
+    })
+    @JoinQuery(key = "codeId")
+    private PipelineCode pipelineCode;
 
     //类型
-    @ApiProperty(name="taskType",desc="创建时间")
-    private String taskType;
+    @ApiProperty(name="pipelineStructure",desc="构建id",eg="@selectOne")
+    @Mappings({
+            @Mapping(source = "pipelineStructure.structureId",target = "structureId")
+    })
+    @JoinQuery(key = "structureId")
+    private PipelineStructure pipelineStructure;
 
     //顺序
-    @ApiProperty(name="sort",desc="创建时间")
-    private String sort;
+    @ApiProperty(name="pipelineTest",desc="测试id",eg="@selectOne")
+    @Mappings({
+            @Mapping(source = "pipelineTest.testId",target = "testId")
+    })
+    @JoinQuery(key = "testId")
+    private PipelineTest pipelineTest;
 
+
+    //顺序
+    @ApiProperty(name="pipelineDeploy",desc="部署id",eg="@selectOne")
+    @Mappings({
+            @Mapping(source = "pipelineDeploy.deployId",target = "deployId")
+    })
+    @JoinQuery(key = "deployId")
+    private PipelineDeploy pipelineDeploy;
 
     public String getConfigureId() {
         return configureId;
@@ -68,27 +91,35 @@ public class PipelineConfigure {
         this.pipeline = pipeline;
     }
 
-    public String getTaskId() {
-        return taskId;
+    public PipelineCode getPipelineCode() {
+        return pipelineCode;
     }
 
-    public void setTaskId(String taskId) {
-        this.taskId = taskId;
+    public void setPipelineCode(PipelineCode pipelineCode) {
+        this.pipelineCode = pipelineCode;
     }
 
-    public String getTaskType() {
-        return taskType;
+    public PipelineStructure getPipelineStructure() {
+        return pipelineStructure;
     }
 
-    public void setTaskType(String taskType) {
-        this.taskType = taskType;
+    public void setPipelineStructure(PipelineStructure pipelineStructure) {
+        this.pipelineStructure = pipelineStructure;
     }
 
-    public String getSort() {
-        return sort;
+    public PipelineTest getPipelineTest() {
+        return pipelineTest;
     }
 
-    public void setSort(String sort) {
-        this.sort = sort;
+    public void setPipelineTest(PipelineTest pipelineTest) {
+        this.pipelineTest = pipelineTest;
+    }
+
+    public PipelineDeploy getPipelineDeploy() {
+        return pipelineDeploy;
+    }
+
+    public void setPipelineDeploy(PipelineDeploy pipelineDeploy) {
+        this.pipelineDeploy = pipelineDeploy;
     }
 }

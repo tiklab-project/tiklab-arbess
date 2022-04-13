@@ -50,7 +50,7 @@ public class DeployAchieve {
     public int liunx(PipelineConfigure pipelineConfigure, PipelineExecLog pipelineExecLog) {
         Pipeline pipeline = pipelineConfigure.getPipeline();
         PipelineDeployLog deployLog = pipelineExecLog.getDeployLog();
-        PipelineDeploy pipelineDeploy = pipelineDeployService.findOneDeploy(pipelineConfigure.getTaskId());
+        PipelineDeploy pipelineDeploy = pipelineDeployService.findOneDeploy(pipelineConfigure.getPipelineDeploy().getDeployId());
         String deployTargetAddress = pipelineDeploy.getDeployTargetAddress();
         String deployAddress = pipelineDeploy.getDeployAddress();
         pipelineExecLogList.add(pipelineExecLog);
@@ -105,7 +105,7 @@ public class DeployAchieve {
      */
     private int docker(PipelineConfigure pipelineConfigure,PipelineExecLog pipelineExecLog) {
         //开始运行时间
-        PipelineDeploy pipelineDeploy = pipelineDeployService.findOneDeploy(pipelineConfigure.getTaskId());
+        PipelineDeploy pipelineDeploy = pipelineDeployService.findOneDeploy(pipelineConfigure.getPipelineDeploy().getDeployId());
         long beginTime = new Timestamp(System.currentTimeMillis()).getTime();
         Pipeline pipeline = pipelineConfigure.getPipeline();
         Proof proof = pipelineConfigureService.findDeployProof(pipelineConfigure);

@@ -34,7 +34,7 @@ public class StructureAchieve {
         long beginTime = new Timestamp(System.currentTimeMillis()).getTime();
         Pipeline pipeline = pipelineConfigure.getPipeline();
         PipelineStructureLog structureLog = pipelineExecLog.getStructureLog();
-        PipelineStructure pipelineStructure = pipelineStructureService.findOneStructure(pipelineConfigure.getTaskId());
+        PipelineStructure pipelineStructure = pipelineStructureService.findOneStructure(pipelineConfigure.getPipelineStructure().getStructureId());
         String structureOrder = pipelineStructure.getStructureOrder();
         String structureAddress = pipelineStructure.getStructureAddress();
         //设置拉取地址
