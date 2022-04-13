@@ -27,7 +27,7 @@ public class PipelineConfigureEntity {
     private String pipelineId;
 
     //源码
-    @Column(name = "taskId",notNull = true)
+    @Column(name = "code_id",notNull = true)
     private String codeId;
 
     //测试
