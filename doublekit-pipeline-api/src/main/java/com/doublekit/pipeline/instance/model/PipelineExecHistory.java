@@ -21,37 +21,33 @@ public class PipelineExecHistory {
     @ApiProperty(name="historyId",desc="构建历史id")
     private int historyId;
 
+    //日志id
+    @ApiProperty(name="logId",desc="日志id")
+    private String logId;
+
     //创建时间
-    @ApiProperty(name="pipelineName",desc="创建构建时间",required = true)
-    private String historyCreateTime;
+    @ApiProperty(name="createTime",desc="创建时间")
+    private String createTime;
 
     //构建方式
-    @ApiProperty(name="pipelineName",desc="构建方式",required = true)
-    private int historyWay;
+    @ApiProperty(name="runWay",desc="运行方式")
+    private int runWay;
 
-    //分支
-    @ApiProperty(name="pipelineName",desc="分支",required = true)
-        private String historyBranch;
+    //运行日志
+    @ApiProperty(name="runLog",desc="运行日志")
+    private String runLog;
 
     //执行人
     @ApiProperty(name="pipelineName",desc="执行人")
     private String pipelineName;
 
     //状态
-    @ApiProperty(name="pipelineName",desc="执行人")
-    private int historyStatus;
-
-    //日志id
-    @ApiProperty(name="logId",desc="日志id")
-    private String logId;
-
-    //流水线id
-    @ApiProperty(name="pipelineId",desc="日志id")
-    private String pipelineId;
+    @ApiProperty(name="runStatus",desc="运行状态")
+    private int runStatus;
 
     //执行时间
-    @ApiProperty(name="historyTime",desc="日志id")
-    private int historyTime;
+    @ApiProperty(name="runTime",desc="运行时间")
+    private int runTime;
 
 
     public int getHistoryId() {
@@ -62,28 +58,36 @@ public class PipelineExecHistory {
         this.historyId = historyId;
     }
 
-    public String getHistoryCreateTime() {
-        return historyCreateTime;
+    public String getLogId() {
+        return logId;
     }
 
-    public void setHistoryCreateTime(String historyCreateTime) {
-        this.historyCreateTime = historyCreateTime;
+    public void setLogId(String logId) {
+        this.logId = logId;
     }
 
-    public int getHistoryWay() {
-        return historyWay;
+    public String getCreateTime() {
+        return createTime;
     }
 
-    public void setHistoryWay(int historyWay) {
-        this.historyWay = historyWay;
+    public void setCreateTime(String createTime) {
+        this.createTime = createTime;
     }
 
-    public String getHistoryBranch() {
-        return historyBranch;
+    public int getRunWay() {
+        return runWay;
     }
 
-    public void setHistoryBranch(String historyBranch) {
-        this.historyBranch = historyBranch;
+    public void setRunWay(int runWay) {
+        this.runWay = runWay;
+    }
+
+    public String getRunLog() {
+        return runLog;
+    }
+
+    public void setRunLog(String runLog) {
+        this.runLog = runLog;
     }
 
     public String getPipelineName() {
@@ -94,35 +98,19 @@ public class PipelineExecHistory {
         this.pipelineName = pipelineName;
     }
 
-    public String getLogId() {
-        return logId;
+    public int getRunStatus() {
+        return runStatus;
     }
 
-    public void setLogId(String logId) {
-        this.logId = logId;
+    public void setRunStatus(int runStatus) {
+        this.runStatus = runStatus;
     }
 
-    public int getHistoryStatus() {
-        return historyStatus;
+    public int getRunTime() {
+        return runTime;
     }
 
-    public void setHistoryStatus(int historyStatus) {
-        this.historyStatus = historyStatus;
-    }
-
-    public int getHistoryTime() {
-        return historyTime;
-    }
-
-    public void setHistoryTime(int historyTime) {
-        this.historyTime = historyTime;
-    }
-
-    public String getPipelineId() {
-        return pipelineId;
-    }
-
-    public void setPipelineId(String pipelineId) {
-        this.pipelineId = pipelineId;
+    public void setRunTime(int runTime) {
+        this.runTime = runTime;
     }
 }

@@ -16,8 +16,8 @@ public class PipelineCode {
     private String codeId;
 
     //代码类型
-    @ApiProperty(name="codeType",desc="代码类型")
-    private int codeType;
+    @ApiProperty(name="type",desc="代码类型")
+    private int type;
 
     //地址名
     @ApiProperty(name="codeName",desc="地址名")
@@ -44,12 +44,12 @@ public class PipelineCode {
         this.codeId = codeId;
     }
 
-    public int getCodeType() {
-        return codeType;
+    public int getType() {
+        return type;
     }
 
-    public void setCodeType(int codeType) {
-        this.codeType = codeType;
+    public void setType(int type) {
+        this.type = type;
     }
 
     public String getCodeName() {

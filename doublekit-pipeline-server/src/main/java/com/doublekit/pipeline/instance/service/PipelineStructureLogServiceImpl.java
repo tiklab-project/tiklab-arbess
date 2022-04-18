@@ -53,14 +53,14 @@ public class PipelineStructureLogServiceImpl  implements PipelineStructureLogSer
     //删除
     @Override
     public void deleteStructureLog(PipelineExecLog pipelineExecLog) {
-        PipelineStructureLog structureLog = pipelineExecLog.getStructureLog();
-        PipelineDeployLog deployLog = pipelineExecLog.getDeployLog();
-        if (structureLog != null){
-            deleteStructureLog(structureLog.getLogStructureId());
-        }
-        if (deployLog != null){
-            pipelineDeployLogService.deleteDeployLog(deployLog.getLogDeployId());
-        }
+        // PipelineStructureLog structureLog = pipelineExecLog.getStructureLog();
+        // PipelineDeployLog deployLog = pipelineExecLog.getDeployLog();
+        // if (structureLog != null){
+        //     deleteStructureLog(structureLog.getLogStructureId());
+        // }
+        // if (deployLog != null){
+        //     pipelineDeployLogService.deleteDeployLog(deployLog.getLogDeployId());
+        // }
     }
 
     //修改
@@ -72,12 +72,12 @@ public class PipelineStructureLogServiceImpl  implements PipelineStructureLogSer
     //修改
     @Override
     public void updateStructureLog(PipelineExecLog pipelineExecLog) {
-        if (pipelineExecLog.getStructureLog() != null){
-            updateStructureLog(pipelineExecLog.getStructureLog());
-        }
-        if (pipelineExecLog.getDeployLog() != null){
-            pipelineDeployLogService.updateDeployLog(pipelineExecLog.getDeployLog());
-        }
+        // if (pipelineExecLog.getStructureLog() != null){
+        //     updateStructureLog(pipelineExecLog.getStructureLog());
+        // }
+        // if (pipelineExecLog.getDeployLog() != null){
+        //     pipelineDeployLogService.updateDeployLog(pipelineExecLog.getDeployLog());
+        // }
     }
 
     //查询单个

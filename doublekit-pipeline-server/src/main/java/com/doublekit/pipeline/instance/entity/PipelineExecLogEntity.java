@@ -16,38 +16,28 @@ public class PipelineExecLogEntity {
     @Column(name = "log_id")
     private String logId;
 
+    //historyId
+    @Column(name = "history_id",notNull = true)
+    private String historyId;
+
+    //运行类型
+    @Column(name = "task_log_type",notNull = true)
+    private int taskLogType ;
+
+    @Column(name = "task_sort",notNull = true)
+    private int taskLogSort ;
+
     //运行日志
     @Column(name = "log_run_log",notNull = true)
     private String logRunLog;
-
-    //运行状态（30 ：成功  1：失败   0 :其他）
-    @Column(name = "log_run_status",notNull = true)
-    private int logRunStatus ;
 
     //运行时间
     @Column(name = "log_run_time",notNull = true)
     private int logRunTime;
 
-    //codeId
-    @Column(name = "log_code_id",notNull = true)
-    private String logCodeId;
-
-    //testId
-    @Column(name = "log_test_id",notNull = true)
-    private String logTestId;
-
-    //structureId
-    @Column(name = "log_structure_id",notNull = true)
-    private String logStructureId;
-
-    //deployId
-    @Column(name = "log_deploy_id",notNull = true)
-    private String logDeployId;
-
-    //pipelineId
-    @Column(name = "pipeline_id",notNull = true)
-    private String pipelineId;
-
+    //运行状态
+    @Column(name = "log_run_state",notNull = true)
+    private int logRunState;
 
     public String getLogId() {
         return logId;
@@ -55,6 +45,30 @@ public class PipelineExecLogEntity {
 
     public void setLogId(String logId) {
         this.logId = logId;
+    }
+
+    public String getHistoryId() {
+        return historyId;
+    }
+
+    public void setHistoryId(String historyId) {
+        this.historyId = historyId;
+    }
+
+    public int getTaskLogType() {
+        return taskLogType;
+    }
+
+    public void setTaskLogType(int taskLogType) {
+        this.taskLogType = taskLogType;
+    }
+
+    public int getTaskLogSort() {
+        return taskLogSort;
+    }
+
+    public void setTaskLogSort(int taskLogSort) {
+        this.taskLogSort = taskLogSort;
     }
 
     public String getLogRunLog() {
@@ -65,14 +79,6 @@ public class PipelineExecLogEntity {
         this.logRunLog = logRunLog;
     }
 
-    public int getLogRunStatus() {
-        return logRunStatus;
-    }
-
-    public void setLogRunStatus(int logRunStatus) {
-        this.logRunStatus = logRunStatus;
-    }
-
     public int getLogRunTime() {
         return logRunTime;
     }
@@ -81,43 +87,11 @@ public class PipelineExecLogEntity {
         this.logRunTime = logRunTime;
     }
 
-    public String getLogCodeId() {
-        return logCodeId;
+    public int getLogRunState() {
+        return logRunState;
     }
 
-    public void setLogCodeId(String logCodeId) {
-        this.logCodeId = logCodeId;
-    }
-
-    public String getLogTestId() {
-        return logTestId;
-    }
-
-    public void setLogTestId(String logTestId) {
-        this.logTestId = logTestId;
-    }
-
-    public String getLogStructureId() {
-        return logStructureId;
-    }
-
-    public void setLogStructureId(String logStructureId) {
-        this.logStructureId = logStructureId;
-    }
-
-    public String getLogDeployId() {
-        return logDeployId;
-    }
-
-    public void setLogDeployId(String logDeployId) {
-        this.logDeployId = logDeployId;
-    }
-
-    public String getPipelineId() {
-        return pipelineId;
-    }
-
-    public void setPipelineId(String pipelineId) {
-        this.pipelineId = pipelineId;
+    public void setLogRunState(int logRunState) {
+        this.logRunState = logRunState;
     }
 }

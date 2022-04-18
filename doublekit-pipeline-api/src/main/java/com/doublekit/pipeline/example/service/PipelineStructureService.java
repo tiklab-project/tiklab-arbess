@@ -21,7 +21,12 @@ public interface PipelineStructureService {
      */
     String createStructure(PipelineStructure PipelineStructure);
 
-    Map<String ,String> createDeploy(PipelineConfigure pipelineConfigure);
+    /**
+     * 创建配置信息
+     * @param pipelineId 流水线id
+     * @return 配置id
+     */
+    String createConfigure(String pipelineId,int taskType);
 
     /**
      * 删除
@@ -29,8 +34,12 @@ public interface PipelineStructureService {
      */
     void deleteStructure(String structureId);
 
-    //删除部署表
-    void deleteDeploy(PipelineConfigure pipelineConfigure);
+    /**
+     * 删除关联配置
+     * @param taskId 任务id
+     * @param taskType 任务类型
+     */
+    void deleteTask(String taskId,int taskType);
 
     /**
      * 更新
@@ -38,8 +47,11 @@ public interface PipelineStructureService {
      */
     void updateStructure(PipelineStructure PipelineStructure);
 
-    //更新部署表
-    void updateDeploy(PipelineConfigure pipelineConfigure);
+    /**
+     * 更新任务
+     * @param map 更新信息
+     */
+    void updateTask(Map<String,Object> map);
 
     /**
      * 查询单个信息
@@ -48,6 +60,13 @@ public interface PipelineStructureService {
      */
     @FindOne
     PipelineStructure findOneStructure(String structureId);
+
+    /**
+     * 查询信息
+     * @param pipelineConfigure 配置信息
+     * @return 配置
+     */
+    List<Object>  findOneTask(PipelineConfigure pipelineConfigure,List<Object> list);
 
     /**
      * 查询所有信息

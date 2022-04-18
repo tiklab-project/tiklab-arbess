@@ -15,8 +15,8 @@ public class PipelineStructure {
     private String structureId;
 
     //构建类型
-    @ApiProperty(name = "structureType",desc="构建类型")
-    private int structureType;
+    @ApiProperty(name = "type",desc="构建类型")
+    private int type;
 
     //构建文件地址
     @ApiProperty(name="structureAddress",desc="构建文件地址")
@@ -35,12 +35,12 @@ public class PipelineStructure {
         this.structureId = structureId;
     }
 
-    public int getStructureType() {
-        return structureType;
+    public int getType() {
+        return type;
     }
 
-    public void setStructureType(int structureType) {
-        this.structureType = structureType;
+    public void setType(int type) {
+        this.type = type;
     }
 
     public String getStructureAddress() {
@@ -58,4 +58,7 @@ public class PipelineStructure {
     public void setStructureOrder(String structureOrder) {
         this.structureOrder = structureOrder;
     }
+
+
+
 }

@@ -20,9 +20,13 @@ public interface PipelineTestService {
      */
     String createTest(PipelineTest pipelineTest);
 
-    Map<String,String> createStructure(PipelineConfigure pipelineConfigure);
+    /**
+     * 创建配置
+     * @param pipelineId 流水线id
+     * @return 配置id
+     */
+    String createConfigure(String pipelineId,int taskType);
 
-    void deleteStructure(PipelineConfigure pipelineConfigure);
 
     /**
      * 删除
@@ -31,12 +35,23 @@ public interface PipelineTestService {
     void deleteTest(String testId);
 
     /**
+     * 删除关联配置
+     * @param taskId 任务id
+     * @param taskType 任务类型
+     */
+    void deleteTask(String taskId,int taskType);
+
+    /**
      * 更新
      * @param pipelineTest 更新信息
      */
     void updateTest(PipelineTest pipelineTest);
 
-    void updateStructure(PipelineConfigure pipelineConfigure);
+    /**
+     * 更新任务
+     * @param map 更新信息
+     */
+    void updateTask(Map<String,Object> map);
 
     /**
      * 查询单个信息
@@ -45,6 +60,13 @@ public interface PipelineTestService {
      */
     @FindOne
     PipelineTest findOneTest(String testId);
+
+    /**
+     * 查询信息
+     * @param pipelineConfigure 配置信息
+     * @return 配置
+     */
+    List<Object>  findOneTask(PipelineConfigure pipelineConfigure,List<Object> list);
 
     /**
      * 查询所有信息

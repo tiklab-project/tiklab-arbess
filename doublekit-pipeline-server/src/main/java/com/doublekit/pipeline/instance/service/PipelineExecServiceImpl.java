@@ -64,7 +64,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
             }
         }
         // 执行构建
-        executorService.submit(() -> begin(pipelineId));
+        // executorService.submit(() -> begin(pipelineId));
         return 1;
     }
 
@@ -74,9 +74,9 @@ public class PipelineExecServiceImpl implements PipelineExecService {
 
         if (pipelineExecLogList != null){
             for (PipelineExecLog pipelineExecLog : pipelineExecLogList) {
-                if (pipelineExecLog.getPipelineId().equals(pipelineId)){
-                    return  pipelineExecLog;
-                }
+                // if (pipelineExecLog.getPipelineId().equals(pipelineId)){
+                //     return  pipelineExecLog;
+                // }
             }
         }
         return null;
@@ -84,17 +84,15 @@ public class PipelineExecServiceImpl implements PipelineExecService {
 
 
     // 构建开始
-    private String begin(String pipelineId) {
-        String time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
-        //把执行构建的流水线加入进来
-        pipelineIdList.add(pipelineId);
-        PipelineConfigure pipelineConfigure = pipelineConfigureService.findPipelineIdConfigure(pipelineId);
-        //创建日志
-        PipelineExecLog pipelineExecLog = pipelineExecLogService.createLog();
-        pipelineExecLog.setPipelineId(pipelineId);
-        pipelineExecLogList.add(pipelineExecLog);
-
-
-        return "1";
-    }
+    // private String begin(String pipelineId) {
+    //     String time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+    //     //把执行构建的流水线加入进来
+    //     pipelineIdList.add(pipelineId);
+    //     //创建日志
+    //     PipelineExecLog pipelineExecLog = pipelineExecLogService.createLog();
+    //     pipelineExecLog.setPipelineId(pipelineId);
+    //     pipelineExecLogList.add(pipelineExecLog);
+    //
+    //     return "1";
+    // }
 }

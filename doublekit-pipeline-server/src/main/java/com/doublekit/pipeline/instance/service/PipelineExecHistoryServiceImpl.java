@@ -1,22 +1,16 @@
 package com.doublekit.pipeline.instance.service;
 
 import com.doublekit.beans.BeanMapper;
-import com.doublekit.join.JoinTemplate;
 import com.doublekit.pipeline.definition.model.Pipeline;
-import com.doublekit.pipeline.definition.service.PipelineConfigureServiceImpl;
 import com.doublekit.pipeline.definition.service.PipelineService;
-import com.doublekit.pipeline.example.model.PipelineStructure;
 import com.doublekit.pipeline.instance.dao.PipelineExecHistoryDao;
 import com.doublekit.pipeline.instance.entity.PipelineExecHistoryEntity;
 import com.doublekit.pipeline.instance.model.PipelineExecHistory;
-import com.doublekit.pipeline.instance.model.PipelineExecLog;
 import com.doublekit.rpc.annotation.Exporter;
-import com.sun.xml.bind.v2.model.core.ID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -95,12 +89,13 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
         List<PipelineExecHistory> historyList = new ArrayList<>();
         if (allHistory != null){
             for (PipelineExecHistory pipelineExecHistory : allHistory) {
-                if (pipelineExecHistory.getPipelineId().equals(pipelineId)){
+                Pipeline pipeline = pipelineService.findOnePipeline(pipelineExecHistory.getPipelineName());
+                if (pipeline.getPipelineId().equals(pipelineId)){
                     historyList.add(pipelineExecHistory);
                 }
             }
         }
-        historyList.sort(Comparator.comparing(PipelineExecHistory::getHistoryCreateTime,Comparator.reverseOrder()));
+        historyList.sort(Comparator.comparing(PipelineExecHistory::getCreateTime,Comparator.reverseOrder()));
         return historyList;
     }
 
@@ -108,12 +103,13 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
     @Override
     public PipelineExecHistory findLatelyHistory(String pipelineId){
         List<PipelineExecHistory> allHistory = findAllHistory(pipelineId);
-        // allHistory.sort(Comparator.comparing(PipelineExecHistory::getHistoryCreateTime)); 升序排列
+        //升序排列
+        // allHistory.sort(Comparator.comparing(PipelineExecHistory::getHistoryCreateTime));
         //根据时间降序排列
         if (allHistory.size() == 0){
             return null;
         }
-        allHistory.sort(Comparator.comparing(PipelineExecHistory::getHistoryCreateTime,Comparator.reverseOrder()));
+        allHistory.sort(Comparator.comparing(PipelineExecHistory::getCreateTime,Comparator.reverseOrder()));
         return allHistory.get(0);
     }
 
@@ -122,9 +118,9 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
     public PipelineExecHistory findLatelySuccess(String pipelineId){
         List<PipelineExecHistory> allHistory = findAllHistory(pipelineId);
         if (allHistory != null){
-            allHistory.sort(Comparator.comparing(PipelineExecHistory::getHistoryCreateTime,Comparator.reverseOrder()));
+            allHistory.sort(Comparator.comparing(PipelineExecHistory::getRunTime,Comparator.reverseOrder()));
             for (PipelineExecHistory pipelineExecHistory : allHistory) {
-                if (pipelineExecHistory.getHistoryStatus() ==30){
+                if (pipelineExecHistory.getRunStatus() ==30){
                     return pipelineExecHistory;
                 }
             }

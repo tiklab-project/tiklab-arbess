@@ -22,7 +22,12 @@ public interface PipelineCodeService {
      */
      String createCode(PipelineCode pipelineCode);
 
-    Map<String, String> createTest(PipelineConfigure pipelineConfigure);
+    /**
+     * 创建配置
+     * @param pipelineId 流水线id
+     * @return 配置id
+     */
+    String createConfigure(String pipelineId,int taskType);
 
     /**
      * 删除
@@ -30,7 +35,12 @@ public interface PipelineCodeService {
      */
      void deleteCode(String codeId);
 
-    void deleteTest(PipelineConfigure pipelineConfigure);
+    /**
+     * 删除关联配置
+     * @param taskId 任务id
+     * @param taskType 任务类型
+     */
+    void deleteTask(String taskId,int taskType);
 
     /**
      * 更新
@@ -38,7 +48,18 @@ public interface PipelineCodeService {
      */
      void updateCode(PipelineCode pipelineCode);
 
-    void updateTest(PipelineConfigure pipelineConfigure);
+    /**
+     * 更新任务
+     * @param map 更新信息
+     */
+     void updateTask(Map<String,Object> map);
+
+    /**
+     * 获取凭证
+     * @param codeId codeId
+     * @return 凭证信息
+     */
+     Proof CodeProof(String codeId);
 
     /**
      * 查询单个信息
@@ -49,11 +70,12 @@ public interface PipelineCodeService {
     PipelineCode findOneCode(String codeId);
 
     /**
-     * 查询凭证
+     * 查询信息
      * @param pipelineConfigure 配置信息
-     * @return 凭证
+     * @return 配置
      */
-    Proof findOneProof(PipelineConfigure pipelineConfigure);
+    List<Object> findOneTask( PipelineConfigure pipelineConfigure ,List<Object> list);
+
 
     /**
      * 查询所有信息

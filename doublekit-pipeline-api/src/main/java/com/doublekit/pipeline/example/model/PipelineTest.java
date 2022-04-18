@@ -15,8 +15,8 @@ public class PipelineTest {
     private String testId;
 
     //测试类型
-    @ApiProperty(name="testType",desc="测试类型",required = true)
-    private int testType;
+    @ApiProperty(name="type",desc="测试类型",required = true)
+    private int type;
 
     //测试内容
     @ApiProperty(name="testOrder",desc="测试内容",required = true)
@@ -32,12 +32,12 @@ public class PipelineTest {
         this.testId = testId;
     }
 
-    public int getTestType() {
-        return testType;
+    public int getType() {
+        return type;
     }
 
-    public void setTestType(int testType) {
-        this.testType = testType;
+    public void setType(int type) {
+        this.type = type;
     }
 
     public String getTestOrder() {
@@ -47,4 +47,5 @@ public class PipelineTest {
     public void setTestOrder(String testOrder) {
         this.testOrder = testOrder;
     }
+
 }

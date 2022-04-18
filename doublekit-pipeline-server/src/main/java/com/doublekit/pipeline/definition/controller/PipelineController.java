@@ -34,11 +34,11 @@ public class PipelineController {
     @RequestMapping(path="/createPipeline",method = RequestMethod.POST)
     @ApiMethod(name = "createPipeline",desc = "创建流水线")
     @ApiParam(name = "pipeline",desc = "pipeline",required = true)
-    public Result<Map<String, String>> createPipeline(@RequestBody @NotNull @Valid Pipeline pipeline){
+    public Result<String> createPipeline(@RequestBody @NotNull @Valid Pipeline pipeline){
 
-        Map<String, String> map = pipelineService.createPipeline(pipeline);
+        String pipelineId = pipelineService.createPipeline(pipeline);
 
-        return Result.ok(map);
+        return Result.ok(pipelineId);
     }
 
     //查询所有

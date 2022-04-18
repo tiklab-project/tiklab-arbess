@@ -47,11 +47,11 @@ public class PipelineTestLogServiceImpl implements PipelineTestLogService {
     //删除
     @Override
     public void deleteTestLog(PipelineExecLog pipelineExecLog) {
-        pipelineStructureLogService.deleteStructureLog(pipelineExecLog);
-        PipelineTestLog testLog = pipelineExecLog.getTestLog();
-        if (testLog != null){
-            deleteTestLog(testLog.getLogTestId());
-        }
+        // pipelineStructureLogService.deleteStructureLog(pipelineExecLog);
+        // PipelineTestLog testLog = pipelineExecLog.getTestLog();
+        // if (testLog != null){
+        //     deleteTestLog(testLog.getLogTestId());
+        // }
     }
 
     //修改
@@ -63,10 +63,10 @@ public class PipelineTestLogServiceImpl implements PipelineTestLogService {
     //修改
     @Override
     public void updateTestLog(PipelineExecLog pipelineExecLog) {
-        if (pipelineExecLog.getTestLog() != null){
-            updateTestLog(pipelineExecLog.getTestLog());
-        }
-        pipelineStructureLogService.updateStructureLog(pipelineExecLog);
+        // if (pipelineExecLog.getTestLog() != null){
+        //     updateTestLog(pipelineExecLog.getTestLog());
+        // }
+        // pipelineStructureLogService.updateStructureLog(pipelineExecLog);
     }
 
     //查询单个

@@ -13,8 +13,8 @@ public class PipelineDeployEntity {
     private String deployId;
 
     //类型
-    @Column(name = "deploy_type",notNull = true)
-    private String deployType;
+    @Column(name = "type",notNull = true)
+    private String type;
 
     //地址
     @Column(name = "deploy_address",notNull = true)
@@ -48,12 +48,12 @@ public class PipelineDeployEntity {
         this.deployId = deployId;
     }
 
-    public String getDeployType() {
-        return deployType;
+    public String getType() {
+        return type;
     }
 
-    public void setDeployType(String deployType) {
-        this.deployType = deployType;
+    public void setType(String type) {
+        this.type = type;
     }
 
     public String getDeployAddress() {

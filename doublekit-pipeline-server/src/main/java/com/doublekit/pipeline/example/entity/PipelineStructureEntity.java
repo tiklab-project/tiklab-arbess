@@ -12,8 +12,8 @@ public class PipelineStructureEntity {
     @Column(name = "structure_id")
     private String structureId;
 
-    @Column(name = "structure_type",notNull = true)
-    private String structureType;
+    @Column(name = "type",notNull = true)
+    private String type;
 
     //地址
     @Column(name = "structure_address",notNull = true)
@@ -33,12 +33,12 @@ public class PipelineStructureEntity {
         this.structureId = structureId;
     }
 
-    public String getStructureType() {
-        return structureType;
+    public String getType() {
+        return type;
     }
 
-    public void setStructureType(String structureType) {
-        this.structureType = structureType;
+    public void setType(String type) {
+        this.type = type;
     }
 
     public String getStructureAddress() {

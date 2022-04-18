@@ -25,19 +25,48 @@ public interface PipelineConfigureService {
      * @param pipelineConfigure 流水线配置信息
      * @return 流水线配置id
      */
-    Map<String, String> createConfigure(@NotNull @Valid PipelineConfigure pipelineConfigure);
+    String createConfigure(@NotNull @Valid PipelineConfigure pipelineConfigure);
 
     /**
-     * 删除流水线配置
+     * 创建任务
+     * @param pipelineConfigure 配置信息
      * @param pipelineId 流水线id
      */
-    void deletePipelineIdConfigure(String pipelineId);
+    void createTask(PipelineConfigure pipelineConfigure,String pipelineId);
 
     /**
-     * 更新配置信息
+     * 根据流水线id删除流水线配置
+     * @param configureId 流水线id
+     */
+    void deleteConfigure(String configureId);
+
+    /**
+     * 删除单个任务
+     * @param taskId 任务id
+     * @param pipelineId 流水线id
+     */
+    void deleteTask(String taskId,String pipelineId);
+
+    /**
+     * 删除所有任务
+     * @param pipelineId 流水线id
+     */
+    void deleteAllTask(String pipelineId);
+
+    /**
+     * 更新流水线配置
      * @param pipelineConfigure 配置信息
      */
-    void updateConfigure(@NotNull @Valid PipelineConfigure pipelineConfigure);
+    void updateConfigure(PipelineConfigure pipelineConfigure);
+
+    /**
+     * 更新任务信息
+     * @param pipelineId 流水线id
+     * @param params 更新信息
+     */
+    void updateTask(String pipelineId , String params);
+
+
 
     /**
      * 查询流水线配置信息
@@ -47,26 +76,6 @@ public interface PipelineConfigureService {
     @FindOne
     PipelineConfigure findOneConfigure(String configureId);
 
-    /**
-     * 根据流水线id获取配置信息
-     * @param pipelineId 流水线id
-     * @return 配置信息
-     */
-    PipelineConfigure findPipelineIdConfigure(String pipelineId);
-
-    /**
-     * 查询code凭证
-     * @param pipelineConfigure 配置信息
-     * @return 凭证
-     */
-    Proof findCodeProof(PipelineConfigure pipelineConfigure);
-
-    /**
-     * 查询Deploy凭证
-     * @param pipelineConfigure 配置信息
-     * @return 凭证
-     */
-    Proof findDeployProof(PipelineConfigure pipelineConfigure);
 
     /**
      * 查询所有配置文件
@@ -74,6 +83,20 @@ public interface PipelineConfigureService {
      */
     @FindAll
     List<PipelineConfigure> findAllConfigure();
+
+    /**
+     * 根据流水线id查询所有配置
+     * @param pipelineId 流水线id
+     * @return 配置集合
+     */
+    List<PipelineConfigure> findAllConfigure(String pipelineId);
+
+    /**
+     * 查询所有配置
+     * @param pipelineId 流水线id
+     * @return 配置信息
+     */
+    List<Object> findAll(String pipelineId);
 
     @FindList
     List<PipelineConfigure> findAllConfigureList(List<String> idList);

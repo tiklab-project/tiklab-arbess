@@ -9,6 +9,7 @@ import com.doublekit.pipeline.example.model.PipelineDeploy;
 import com.doublekit.pipeline.setting.proof.model.Proof;
 
 import java.util.List;
+import java.util.Map;
 
 
 @JoinProvider(model = PipelineDeploy.class)
@@ -22,16 +23,40 @@ public interface PipelineDeployService {
      String createDeploy(PipelineDeploy pipelineDeploy) ;
 
     /**
+     * 创建配置信息
+     * @param pipelineId 流水线id
+     * @return 配置id
+     */
+    String createConfigure(String pipelineId,int taskType);
+
+    /**
      * 删除
      * @param deployId deployId
      */
      void deleteDeploy(String deployId) ;
+
+
+    /**
+     * 删除关联配置
+     * @param taskId 任务id
+     * @param taskType 任务类型
+     */
+    void deleteTask(String taskId,int taskType);
+
 
     /**
      * 更新
      * @param pipelineDeploy 更新信息
      */
      void updateDeploy(PipelineDeploy pipelineDeploy) ;
+
+    /**
+     * 获取部署凭证
+     * @param deployId 部署id
+     * @return 凭证信息
+     */
+     Proof deployProof(String deployId);
+
 
     /**
      * 查询单个信息
@@ -47,6 +72,8 @@ public interface PipelineDeployService {
      * @return 凭证信息
      */
     Proof findOneProof(PipelineConfigure pipelineConfigure);
+
+
 
     /**
      * 查询所有信息

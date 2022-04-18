@@ -13,8 +13,8 @@ public class PipelineCodeEntity {
     private String codeId;
 
     //类型
-    @Column(name = "code_type",notNull = true)
-    private String codeType;
+    @Column(name = "type",notNull = true)
+    private String type;
 
     //地址名
     @Column(name = "code_name",notNull = true)
@@ -41,12 +41,12 @@ public class PipelineCodeEntity {
         this.codeId = codeId;
     }
 
-    public String getCodeType() {
-        return codeType;
+    public String getType() {
+        return type;
     }
 
-    public void setCodeType(String codeType) {
-        this.codeType = codeType;
+    public void setType(String type) {
+        this.type = type;
     }
 
     public String getCodeName() {

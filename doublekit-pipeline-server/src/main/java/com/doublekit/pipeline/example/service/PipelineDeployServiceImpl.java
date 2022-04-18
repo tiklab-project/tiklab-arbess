@@ -1,7 +1,9 @@
 package com.doublekit.pipeline.example.service;
 
 import com.doublekit.beans.BeanMapper;
+import com.doublekit.pipeline.definition.model.Pipeline;
 import com.doublekit.pipeline.definition.model.PipelineConfigure;
+import com.doublekit.pipeline.definition.service.PipelineConfigureService;
 import com.doublekit.pipeline.example.dao.PipelineDeployDao;
 import com.doublekit.pipeline.example.entity.PipelineDeployEntity;
 import com.doublekit.pipeline.example.model.PipelineDeploy;
@@ -12,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Exporter
@@ -24,11 +27,28 @@ public class PipelineDeployServiceImpl implements PipelineDeployService {
     @Autowired
     ProofService proofService;
 
+    @Autowired
+    PipelineConfigureService pipelineConfigureService;
+
 
     //创建
     @Override
     public String createDeploy(PipelineDeploy pipelineDeploy) {
         return pipelineDeployDao.createDeploy(BeanMapper.map(pipelineDeploy, PipelineDeployEntity.class));
+    }
+
+    //创建配置
+    @Override
+    public String createConfigure(String pipelineId,int taskType) {
+        PipelineDeploy pipelineDeploy = new PipelineDeploy();
+        pipelineDeploy.setType(taskType);
+        PipelineConfigure pipelineConfigure = new PipelineConfigure();
+        pipelineDeploy.setType(taskType);
+        String deployId = createDeploy(pipelineDeploy);
+        pipelineConfigure.setTaskId(deployId);
+        pipelineConfigure.setTaskType(taskType);
+        pipelineConfigureService.createTask(pipelineConfigure,pipelineId);
+        return deployId;
     }
 
     //删除
@@ -37,10 +57,23 @@ public class PipelineDeployServiceImpl implements PipelineDeployService {
         pipelineDeployDao.deleteDeploy(deployId);
     }
 
+    @Override
+    public void deleteTask(String taskId, int taskType) {
+        if (taskType >30 && taskType < 40){
+            deleteDeploy(taskId);
+        }
+    }
+
     //修改
     @Override
     public void updateDeploy(PipelineDeploy pipelineDeploy) {
         pipelineDeployDao.updateDeploy(BeanMapper.map(pipelineDeploy,PipelineDeployEntity.class));
+    }
+
+    @Override
+    public Proof deployProof(String deployId) {
+        PipelineDeploy oneDeploy = findOneDeploy(deployId);
+        return proofService.fondOneName(oneDeploy.getProofName());
     }
 
     //查询单个
@@ -51,9 +84,11 @@ public class PipelineDeployServiceImpl implements PipelineDeployService {
 
     @Override
     public Proof findOneProof(PipelineConfigure pipelineConfigure){
-        String proofName = pipelineConfigure.getPipelineDeploy().getProofName();
+        PipelineDeploy pipelineDeploy = findOneDeploy(pipelineConfigure.getTaskId());
+        String proofName = pipelineDeploy.getProofName();
         return proofService.fondOneName(proofName);
     }
+
 
     //查询所有
     @Override

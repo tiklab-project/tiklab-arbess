@@ -23,7 +23,7 @@ public interface PipelineService {
      * @param pipeline 流水线信息
      * @return 流水线id
      */
-    Map<String, String> createPipeline(@NotNull @Valid Pipeline pipeline);
+    String createPipeline(@NotNull @Valid Pipeline pipeline);
 
     /**
      * 删除流水线
@@ -39,11 +39,19 @@ public interface PipelineService {
 
     /**
      * 查询单个流水线
-     * @param id 流水线id
+     * @param pipelineId 流水线id
      * @return 流水线信息
      */
     @FindOne
-    Pipeline findPipeline(@NotNull String id);
+    Pipeline findPipeline(@NotNull String pipelineId);
+
+    /**
+     * 根据名称查询流水线
+     * @param pipelineName 流水线名称
+     * @return 流水线信息
+     */
+    @FindOne
+    Pipeline findOnePipeline(@NotNull String pipelineName);
 
     /**
      * 查询所有流水线

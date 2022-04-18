@@ -15,8 +15,8 @@ public class PipelineDeploy {
     private String deployId;
 
     //部署类型
-    @ApiProperty(name = "deployType" , desc = "部署类型")
-    private int deployType;
+    @ApiProperty(name = "type" , desc = "部署类型")
+    private int type;
 
     //打包文件地址
     @ApiProperty(name = "deployTargetAddress" , desc = "打包文件地址")
@@ -51,12 +51,12 @@ public class PipelineDeploy {
         this.deployId = deployId;
     }
 
-    public int getDeployType() {
-        return deployType;
+    public int getType() {
+        return type;
     }
 
-    public void setDeployType(int deployType) {
-        this.deployType = deployType;
+    public void setType(int type) {
+        this.type = type;
     }
 
     public String getDeployTargetAddress() {
@@ -107,4 +107,6 @@ public class PipelineDeploy {
     public void setMappingPort(int mappingPort) {
         this.mappingPort = mappingPort;
     }
+
+
 }

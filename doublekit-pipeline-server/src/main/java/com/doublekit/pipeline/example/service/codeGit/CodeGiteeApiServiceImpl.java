@@ -94,32 +94,32 @@ public class CodeGiteeApiServiceImpl implements CodeGiteeApiService {
     //凭证信息
     @Override
     public String getProof(String configureId,String proofName) {
-        PipelineConfigure oneConfigure = pipelineConfigureService.findOneConfigure(configureId);
-        PipelineCode pipelineCode = oneConfigure.getPipelineCode();
-        PipelineCode oneCode = pipelineCodeService.findOneCode(pipelineCode.getCodeId());
-        if (oneCode.getProofName() != null){
-            if (oneCode.getProofName().equals(proofName+" (gitee)")){
-                return null;
-            }
-        }
-
-        String accessToken = codeGiteeApi.getAccessToken();
-        if (accessToken != null){
-            Proof proof = new Proof();
-            String login = getUserMessage();
-            logger.info("login : "+login);
-            proof.setProofName(proofName);
-            proof.setProofPassword(codeGiteeApi.getAccessToken());
-            proof.setProofUsername(login);
-            proof.setProofType("gitee");
-            proof.setProofScope(3);
-            proof.setProofDescribe("gitee授权登录");
-            pipelineCode.setProofName(proofName+" (gitee)");
-            oneConfigure.setPipelineCode(pipelineCode);
-            pipelineConfigureService.updateConfigure(oneConfigure);
-            proofService.createProof(proof);
-            return  "1";
-        }
+        // PipelineConfigure oneConfigure = pipelineConfigureService.findOneConfigure(configureId);
+        // // PipelineCode pipelineCode = oneConfigure.getPipelineCode();
+        // // PipelineCode oneCode = pipelineCodeService.findOneCode(pipelineCode.getCodeId());
+        // if (oneCode.getProofName() != null){
+        //     if (oneCode.getProofName().equals(proofName+" (gitee)")){
+        //         return null;
+        //     }
+        // }
+        //
+        // String accessToken = codeGiteeApi.getAccessToken();
+        // if (accessToken != null){
+        //     Proof proof = new Proof();
+        //     String login = getUserMessage();
+        //     logger.info("login : "+login);
+        //     proof.setProofName(proofName);
+        //     proof.setProofPassword(codeGiteeApi.getAccessToken());
+        //     proof.setProofUsername(login);
+        //     proof.setProofType("gitee");
+        //     proof.setProofScope(3);
+        //     proof.setProofDescribe("gitee授权登录");
+        //     pipelineCode.setProofName(proofName+" (gitee)");
+        //     // oneConfigure.setPipelineCode(pipelineCode);
+        //     pipelineConfigureService.updateConfigure(oneConfigure);
+        //     proofService.createProof(proof);
+        //     return  "1";
+        // }
         return  null;
     }
 

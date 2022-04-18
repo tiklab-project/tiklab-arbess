@@ -17,53 +17,28 @@ public class PipelineExecLog {
     @ApiProperty(name="logTestState",desc="日志id")
     private String logId;
 
+    //historyId
+    @ApiProperty(name = "history_id",desc = "")
+    private String historyId;
+
+    //运行类型
+    @ApiProperty(name = "task_log_type",desc = "")
+    private int taskLogType ;
+
+    @ApiProperty(name = "task_sort",desc = "")
+    private int taskLogSort ;
+
     //运行日志
-    @ApiProperty(name="logTestState",desc="运行日志")
+    @ApiProperty(name = "log_run_log",desc = "")
     private String logRunLog;
 
-    //运行状态（30 ：成功  1：失败   0 :其他）
-    @ApiProperty(name="logTestState",desc="运行状态")
-    private int logRunStatus ;
-
     //运行时间
-    @ApiProperty(name="logTestState",desc="运行时间")
+    @ApiProperty(name = "log_run_time",desc = "")
     private int logRunTime;
 
-    //codeId
-    @ApiProperty(name="codeLog",desc="id",eg="@selectOne")
-    @Mappings({
-            @Mapping(source = "codeLog.logCodeId",target = "logCodeId")
-    })
-    @JoinQuery(key = "logCodeId")
-    private PipelineCodeLog codeLog;
-
-    //testId
-    @ApiProperty(name="testLog",desc="测试id",eg="@selectOne")
-    @Mappings({
-            @Mapping(source = "testLog.logTestId",target = "logTestId")
-    })
-    @JoinQuery(key = "logTestId")
-    private PipelineTestLog testLog;
-
-    //structureId
-    @ApiProperty(name="structureLog",desc="id",eg="@selectOne")
-    @Mappings({
-            @Mapping(source = "structureLog.logStructureId",target = "logStructureId")
-    })
-    @JoinQuery(key = "logStructureId")
-    private PipelineStructureLog structureLog;
-
-    //deployId
-    @ApiProperty(name="deployLog",desc="id",eg="@selectOne")
-    @Mappings({
-            @Mapping(source = "deployLog.logDeployId",target = "logDeployId")
-    })
-    @JoinQuery(key = "logDeployId")
-    private PipelineDeployLog deployLog;
-
-    //pipelineId
-    @ApiProperty(name = "pipelineId",desc="pipelineId")
-    private String pipelineId;
+    //运行状态
+    @ApiProperty(name = "log_run_state",desc = "")
+    private int logRunState;
 
 
     public String getLogId() {
@@ -74,20 +49,36 @@ public class PipelineExecLog {
         this.logId = logId;
     }
 
+    public String getHistoryId() {
+        return historyId;
+    }
+
+    public void setHistoryId(String historyId) {
+        this.historyId = historyId;
+    }
+
+    public int getTaskLogType() {
+        return taskLogType;
+    }
+
+    public void setTaskLogType(int taskLogType) {
+        this.taskLogType = taskLogType;
+    }
+
+    public int getTaskLogSort() {
+        return taskLogSort;
+    }
+
+    public void setTaskLogSort(int taskLogSort) {
+        this.taskLogSort = taskLogSort;
+    }
+
     public String getLogRunLog() {
         return logRunLog;
     }
 
     public void setLogRunLog(String logRunLog) {
         this.logRunLog = logRunLog;
-    }
-
-    public int getLogRunStatus() {
-        return logRunStatus;
-    }
-
-    public void setLogRunStatus(int logRunStatus) {
-        this.logRunStatus = logRunStatus;
     }
 
     public int getLogRunTime() {
@@ -98,43 +89,11 @@ public class PipelineExecLog {
         this.logRunTime = logRunTime;
     }
 
-    public PipelineCodeLog getCodeLog() {
-        return codeLog;
+    public int getLogRunState() {
+        return logRunState;
     }
 
-    public void setCodeLog(PipelineCodeLog codeLog) {
-        this.codeLog = codeLog;
-    }
-
-    public PipelineTestLog getTestLog() {
-        return testLog;
-    }
-
-    public void setTestLog(PipelineTestLog testLog) {
-        this.testLog = testLog;
-    }
-
-    public PipelineStructureLog getStructureLog() {
-        return structureLog;
-    }
-
-    public void setStructureLog(PipelineStructureLog structureLog) {
-        this.structureLog = structureLog;
-    }
-
-    public PipelineDeployLog getDeployLog() {
-        return deployLog;
-    }
-
-    public void setDeployLog(PipelineDeployLog deployLog) {
-        this.deployLog = deployLog;
-    }
-
-    public String getPipelineId() {
-        return pipelineId;
-    }
-
-    public void setPipelineId(String pipelineId) {
-        this.pipelineId = pipelineId;
+    public void setLogRunState(int logRunState) {
+        this.logRunState = logRunState;
     }
 }

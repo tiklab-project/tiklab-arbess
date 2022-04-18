@@ -235,52 +235,52 @@ public class CommonAchieve {
      * @param pipelineId 流水线id
      * @param e 错误信息
      */
-    public  void  error(PipelineExecLog pipelineExecLog, String e, String pipelineId){
-        if (pipelineExecLog.getLogRunLog() != null){
-            pipelineExecLog.setLogRunLog(pipelineExecLog.getLogRunLog()+ "\n" + e + "\n" + " RUN RESULT : FAIL");
-        }else {
-            pipelineExecLog.setLogRunLog("\n" + e + "\n"+ " RUN RESULT : FAIL");
-        }
-        pipelineExecLog.setLogRunStatus(1);
-        // 清空缓存
-        clean(pipelineExecLog,pipelineId);
-    }
+    // public  void  error(PipelineExecLog pipelineExecLog, String e, String pipelineId){
+    //     if (pipelineExecLog.getLogRunLog() != null){
+    //         pipelineExecLog.setLogRunLog(pipelineExecLog.getLogRunLog()+ "\n" + e + "\n" + " RUN RESULT : FAIL");
+    //     }else {
+    //         pipelineExecLog.setLogRunLog("\n" + e + "\n"+ " RUN RESULT : FAIL");
+    //     }
+    //     pipelineExecLog.setLogRunStatus(1);
+    //     // 清空缓存
+    //     clean(pipelineExecLog,pipelineId);
+    // }
 
     /**
      * 输出成功信息
      * @param pipelineExecLog 日志
      * @param pipelineId 流水线id
      */
-    public  void  success(PipelineExecLog pipelineExecLog, String pipelineId) {
-        if (pipelineExecLog.getLogRunLog() != null){
-            pipelineExecLog.setLogRunLog(pipelineExecLog.getLogRunLog()+ "\n"  + "\n" + " RUN RESULT : SUCCESS");
-        }else {
-            pipelineExecLog.setLogRunLog( "\n"+ " RUN RESULT : SUCCESS");
-        }
-        pipelineExecLog.setLogRunStatus(30);
-        //清空缓存
-        clean(pipelineExecLog,pipelineId);
-
-    }
+    // public  void  success(PipelineExecLog pipelineExecLog, String pipelineId) {
+    //     if (pipelineExecLog.getLogRunLog() != null){
+    //         pipelineExecLog.setLogRunLog(pipelineExecLog.getLogRunLog()+ "\n"  + "\n" + " RUN RESULT : SUCCESS");
+    //     }else {
+    //         pipelineExecLog.setLogRunLog( "\n"+ " RUN RESULT : SUCCESS");
+    //     }
+    //     pipelineExecLog.setLogRunStatus(30);
+    //     //清空缓存
+    //     clean(pipelineExecLog,pipelineId);
+    //
+    // }
 
 
     //清空缓存
-    public  void clean(PipelineExecLog pipelineExecLog, String pipelineId){
-        pipelineExecLogList.add(pipelineExecLog);
-
-        //执行完成移除构建id
-        if (pipelineIdList != null) {
-            pipelineIdList.removeIf(id -> id.equals(pipelineId));
-        }
-        pipelineExecLogService.updateLog(pipelineExecLog);
-        //恢复中断状态
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException s) {
-            Thread.currentThread().interrupt();
-        }
-        // 清除集合缓存
-        pipelineExecLogList.removeIf(log -> log.getPipelineId().equals(pipelineId));
-    }
+    // public  void clean(PipelineExecLog pipelineExecLog, String pipelineId){
+    //     pipelineExecLogList.add(pipelineExecLog);
+    //
+    //     //执行完成移除构建id
+    //     if (pipelineIdList != null) {
+    //         pipelineIdList.removeIf(id -> id.equals(pipelineId));
+    //     }
+    //     pipelineExecLogService.updateLog(pipelineExecLog);
+    //     //恢复中断状态
+    //     try {
+    //         Thread.sleep(1000);
+    //     } catch (InterruptedException s) {
+    //         Thread.currentThread().interrupt();
+    //     }
+    //     // 清除集合缓存
+    //     pipelineExecLogList.removeIf(log -> log.getPipelineId().equals(pipelineId));
+    // }
 
 }

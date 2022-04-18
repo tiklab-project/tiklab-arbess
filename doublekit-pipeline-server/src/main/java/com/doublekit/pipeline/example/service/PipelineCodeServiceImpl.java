@@ -3,7 +3,9 @@ package com.doublekit.pipeline.example.service;
 
 import com.doublekit.beans.BeanMapper;
 
+import com.doublekit.pipeline.definition.model.Pipeline;
 import com.doublekit.pipeline.definition.model.PipelineConfigure;
+import com.doublekit.pipeline.definition.service.PipelineConfigureService;
 import com.doublekit.pipeline.example.dao.PipelineCodeDao;
 import com.doublekit.pipeline.example.entity.PipelineCodeEntity;
 import com.doublekit.pipeline.example.model.PipelineCode;
@@ -27,17 +29,15 @@ public class PipelineCodeServiceImpl implements PipelineCodeService {
     PipelineCodeDao pipelineCodeDao;
 
     @Autowired
-    ProofService proofService;
-
-    @Autowired
     PipelineTestService pipelineTestService;
 
     @Autowired
-    CodeGiteeApiService codeGiteeApiService;
+    ProofService proofService;
+
+    @Autowired
+    PipelineConfigureService pipelineConfigureService;
 
     private static final Logger logger = LoggerFactory.getLogger(PipelineCodeServiceImpl.class);
-
-
 
     //创建
     @Override
@@ -45,23 +45,18 @@ public class PipelineCodeServiceImpl implements PipelineCodeService {
         return pipelineCodeDao.createCode(BeanMapper.map(pipelineCode, PipelineCodeEntity.class));
     }
 
-    //创建test表
+    //创建配置
     @Override
-    public Map<String, String> createTest(PipelineConfigure pipelineConfigure){
-        Map<String, String> map = pipelineTestService.createStructure(pipelineConfigure);
+    public String createConfigure(String pipelineId,int taskType){
         PipelineCode pipelineCode = new PipelineCode();
-        if (pipelineConfigure.getPipelineCode() != null){
-            pipelineCode = pipelineConfigure.getPipelineCode();
-        }
-        if (pipelineCode.getCodeName() != null || pipelineCode.getCodeType() == 3){
-            pipelineCode.setProofName(null);
-            pipelineCode.setCodeAddress(codeGiteeApiService.getCloneUrl(pipelineCode.getCodeName()));
-        }else {
-            pipelineCode.setCodeAddress(pipelineCode.getCodeName());
-        }
-        String code = createCode(pipelineCode);
-        map.put("codeId",code);
-        return map;
+        pipelineCode.setType(taskType);
+        PipelineConfigure pipelineConfigure = new PipelineConfigure();
+        pipelineCode.setType(taskType);
+        String codeId = createCode(pipelineCode);
+        pipelineConfigure.setTaskId(codeId);
+        pipelineConfigure.setTaskType(taskType);
+        pipelineConfigureService.createTask(pipelineConfigure,pipelineId);
+        return codeId;
     }
 
     //删除
@@ -70,11 +65,13 @@ public class PipelineCodeServiceImpl implements PipelineCodeService {
         pipelineCodeDao.deleteCode(codeId);
     }
 
-    //删除测试表
     @Override
-    public void deleteTest(PipelineConfigure pipelineConfigure){
-        deleteCode(pipelineConfigure.getPipelineCode().getCodeId());
-        pipelineTestService.deleteStructure(pipelineConfigure);
+    public void deleteTask(String taskId, int taskType) {
+        if (taskType <= 10){
+            deleteCode(taskId);
+            return;
+        }
+        pipelineTestService.deleteTask(taskId,taskType);
     }
 
     //修改
@@ -83,19 +80,32 @@ public class PipelineCodeServiceImpl implements PipelineCodeService {
         pipelineCodeDao.updateCode(BeanMapper.map(pipelineCode,PipelineCodeEntity.class));
     }
 
-    //修改测试表
+    //修改任务
     @Override
-    public void updateTest(PipelineConfigure pipelineConfigure){
-        PipelineCode pipelineCode = pipelineConfigure.getPipelineCode();
-        if (pipelineCode.getCodeName() != null && pipelineCode.getCodeType() == 3){
-            pipelineCode.setProofName(null);
-            pipelineCode.setCodeAddress(codeGiteeApiService.getCloneUrl(pipelineCode.getCodeName()));
-        }else {
-            pipelineCode.setCodeAddress(pipelineCode.getCodeName());
+    public void updateTask(Map<String,Object> map) {
+        PipelineCode pipelineCode =(PipelineCode) map.get("pipelineCode");
+        if (pipelineCode.getCodeId() != null){
+            updateCode(pipelineCode);
         }
+        if (pipelineCode.getType() == 0){
+            List<PipelineConfigure> configureList = pipelineConfigureService.findAllConfigure(map.get("pipelineId").toString());
+            if (configureList != null){
+                for (PipelineConfigure pipelineConfigure : configureList) {
+                    if (pipelineConfigure.getTaskType() < 10){
+                        pipelineConfigureService.deleteConfigure(pipelineConfigure.getConfigureId());
+                        deleteCode(pipelineConfigure.getTaskId());
+                    }
+                }
+            }
+        }
+        pipelineTestService.updateTask(map);
+    }
 
-        updateCode(pipelineCode);
-        pipelineTestService.updateStructure(pipelineConfigure);
+    //获取凭证
+    @Override
+    public Proof CodeProof(String codeId) {
+        PipelineCode oneCode = findOneCode(codeId);
+        return proofService.fondOneName(oneCode.getProofName());
     }
 
     //查询单个
@@ -105,12 +115,15 @@ public class PipelineCodeServiceImpl implements PipelineCodeService {
         return  BeanMapper.map(oneCode, PipelineCode.class);
     }
 
-    //获取code凭证
     @Override
-    public Proof findOneProof(PipelineConfigure pipelineConfigure){
-        String proofName = pipelineConfigure.getPipelineCode().getProofName();
-        return proofService.fondOneName(proofName);
+    public List<Object>  findOneTask(PipelineConfigure pipelineConfigure ,List<Object> list) {
+            if (pipelineConfigure.getTaskType() < 10){
+                PipelineCode oneCode = findOneCode(pipelineConfigure.getTaskId());
+                list.add(oneCode);
+            }
+        return pipelineTestService.findOneTask(pipelineConfigure,list);
     }
+
 
     //查询所有
     @Override

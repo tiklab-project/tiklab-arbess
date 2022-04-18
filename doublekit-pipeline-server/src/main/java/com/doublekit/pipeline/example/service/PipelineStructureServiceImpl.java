@@ -2,6 +2,8 @@ package com.doublekit.pipeline.example.service;
 
 import com.doublekit.beans.BeanMapper;
 import com.doublekit.pipeline.definition.model.PipelineConfigure;
+import com.doublekit.pipeline.definition.service.PipelineConfigureService;
+import com.doublekit.pipeline.example.controller.PipelineStructureController;
 import com.doublekit.pipeline.example.dao.PipelineStructureDao;
 import com.doublekit.pipeline.example.entity.PipelineStructureEntity;
 import com.doublekit.pipeline.example.model.PipelineDeploy;
@@ -25,6 +27,9 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
     @Autowired
     PipelineDeployService pipelineDeployService;
 
+    @Autowired
+    PipelineConfigureService pipelineConfigureService;
+
 
     //创建
     @Override
@@ -32,21 +37,17 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
         return pipelineStructureDao.createStructure(BeanMapper.map(pipelineStructure, PipelineStructureEntity.class));
     }
 
-    public Map<String ,String> createDeploy(PipelineConfigure pipelineConfigure){
-        Map<String, String> map = new HashMap<>();
+    @Override
+    public String createConfigure( String pipelineId,int taskType){
         PipelineStructure pipelineStructure = new PipelineStructure();
-        if (pipelineConfigure.getPipelineStructure() != null){
-            pipelineStructure = pipelineConfigure.getPipelineStructure();
-        }
-        String structure = createStructure(pipelineStructure);
-        PipelineDeploy pipelineDeploy = new PipelineDeploy();
-        if (pipelineConfigure.getPipelineDeploy() != null){
-            pipelineDeploy = pipelineConfigure.getPipelineDeploy();
-        }
-        String deploy = pipelineDeployService.createDeploy(pipelineDeploy);
-        map.put("structureId",structure);
-        map.put("deployId",deploy);
-        return map;
+        pipelineStructure.setType(taskType);
+        pipelineStructure.setType(taskType);
+        PipelineConfigure pipelineConfigure = new PipelineConfigure();
+        String structureId = createStructure(pipelineStructure);
+        pipelineConfigure.setTaskId(structureId);
+        pipelineConfigure.setTaskType(taskType);
+        pipelineConfigureService.createTask(pipelineConfigure,pipelineId);
+        return structureId;
     }
 
     //删除
@@ -55,11 +56,15 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
         pipelineStructureDao.deleteStructure(structureId);
     }
 
-    //删除部署信息
-    public void deleteDeploy(PipelineConfigure pipelineConfigure){
-        deleteStructure(pipelineConfigure.getPipelineStructure().getStructureId());
-        pipelineDeployService.deleteDeploy(pipelineConfigure.getPipelineDeploy().getDeployId());
+    @Override
+    public void deleteTask(String taskId, int taskType) {
+        if (taskType > 20 && taskType < 30){
+            deleteStructure(taskId);
+            return;
+        }
+        pipelineDeployService.deleteTask(taskId,taskType);
     }
+
 
     //修改
     @Override
@@ -67,17 +72,59 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
         pipelineStructureDao.updateStructure(BeanMapper.map(pipelineStructure,PipelineStructureEntity.class));
     }
 
-    //更新部署表
+    //更改构建信息
     @Override
-    public void updateDeploy(PipelineConfigure pipelineConfigure){
-        updateStructure(pipelineConfigure.getPipelineStructure());
-        pipelineDeployService.updateDeploy(pipelineConfigure.getPipelineDeploy());
+    public void updateTask(Map<String,Object> map) {
+        PipelineStructure pipelineStructure = (PipelineStructure) map.get("pipelineStructure");
+        if (pipelineStructure.getStructureId() != null){
+            updateStructure(pipelineStructure);
+        }
+        if (pipelineStructure.getType() == 0){
+            List<PipelineConfigure> configureList = pipelineConfigureService.findAllConfigure(map.get("pipelineId").toString());
+            if (configureList != null){
+                for (PipelineConfigure pipelineConfigure : configureList) {
+                    if (pipelineConfigure.getTaskType() > 20 && pipelineConfigure.getTaskType() < 30){
+                        pipelineConfigureService.deleteConfigure(pipelineConfigure.getConfigureId());
+                        deleteStructure(pipelineConfigure.getTaskId());
+                    }
+                }
+            }
+        }
+        PipelineDeploy pipelineDeploy = (PipelineDeploy) map.get("pipelineDeploy");
+        if (pipelineDeploy.getDeployId() != null){
+            pipelineDeployService.updateDeploy((PipelineDeploy) map.get("pipelineDeploy"));
+        }
+        if (pipelineDeploy.getType() == 0){
+            List<PipelineConfigure> configureList = pipelineConfigureService.findAllConfigure(map.get("pipelineId").toString());
+            if (configureList != null){
+                for (PipelineConfigure pipelineConfigure : configureList) {
+                    if (pipelineConfigure.getTaskType() >30){
+                        pipelineConfigureService.deleteConfigure(pipelineConfigure.getConfigureId());
+                        pipelineDeployService.deleteDeploy(pipelineConfigure.getTaskId());
+                    }
+                }
+            }
+        }
     }
+
 
     //查询单个
     @Override
     public PipelineStructure findOneStructure(String structureId) {
         return BeanMapper.map(pipelineStructureDao.findOneStructure(structureId),PipelineStructure.class);
+    }
+
+    @Override
+    public List<Object>  findOneTask(PipelineConfigure pipelineConfigure, List<Object> list) {
+        if (pipelineConfigure.getTaskType() > 20 && pipelineConfigure.getTaskType() < 30){
+            PipelineStructure oneStructure = findOneStructure(pipelineConfigure.getTaskId());
+            list.add(oneStructure);
+        }
+        if (pipelineConfigure.getTaskType() > 30){
+            PipelineDeploy oneDeploy = pipelineDeployService.findOneDeploy(pipelineConfigure.getTaskId());
+            list.add(oneDeploy);
+        }
+        return list;
     }
 
     //查询所有

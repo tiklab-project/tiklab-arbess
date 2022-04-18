@@ -27,21 +27,16 @@ public class PipelineConfigureEntity {
     private String pipelineId;
 
     //源码
-    @Column(name = "code_id",notNull = true)
-    private String codeId;
+    @Column(name = "task_id",notNull = true)
+    private String taskId;
 
-    //测试
-    @Column(name = "structure_id",notNull = true)
-    private String structureId;
+    //源码类型
+    @Column(name = "task_type",notNull = true)
+    private int taskType;
 
-
-    //构建
-    @Column(name = "test_id",notNull = true)
-    private String testId;
-
-    //构建
-    @Column(name = "deploy_id",notNull = true)
-    private String deployId;
+    //顺序
+    @Column(name = "task_sort",notNull = true)
+    private int taskSort;
 
     public String getConfigureId() {
         return configureId;
@@ -67,35 +62,27 @@ public class PipelineConfigureEntity {
         this.pipelineId = pipelineId;
     }
 
-    public String getCodeId() {
-        return codeId;
+    public String getTaskId() {
+        return taskId;
     }
 
-    public void setCodeId(String codeId) {
-        this.codeId = codeId;
+    public void setTaskId(String taskId) {
+        this.taskId = taskId;
     }
 
-    public String getStructureId() {
-        return structureId;
+    public int getTaskType() {
+        return taskType;
     }
 
-    public void setStructureId(String structureId) {
-        this.structureId = structureId;
+    public void setTaskType(int taskType) {
+        this.taskType = taskType;
     }
 
-    public String getTestId() {
-        return testId;
+    public int getTaskSort() {
+        return taskSort;
     }
 
-    public void setTestId(String testId) {
-        this.testId = testId;
-    }
-
-    public String getDeployId() {
-        return deployId;
-    }
-
-    public void setDeployId(String deployId) {
-        this.deployId = deployId;
+    public void setTaskSort(int taskSort) {
+        this.taskSort = taskSort;
     }
 }

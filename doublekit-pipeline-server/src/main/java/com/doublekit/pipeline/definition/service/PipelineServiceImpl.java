@@ -43,10 +43,8 @@ public class PipelineServiceImpl implements PipelineService{
 
     //创建
     @Override
-    public Map<String, String> createPipeline(Pipeline pipeline) {
-
+    public String createPipeline(Pipeline pipeline) {
         PipelineEntity pipelineEntity = BeanMapper.map(pipeline, PipelineEntity.class);
-        PipelineConfigure pipelineConfigure = new PipelineConfigure();
         List<Pipeline> pipelineList = findAllPipeline();
         //判断是否存在相同名称
         for (Pipeline pipeline1 : pipelineList) {
@@ -54,12 +52,7 @@ public class PipelineServiceImpl implements PipelineService{
                 return null;
             }
         }
-        String pipelineId = pipelineDao.createPipeline(pipelineEntity);
-        pipeline.setPipelineId(pipelineId);
-        pipelineConfigure.setPipeline(pipeline);
-        Map<String, String> map = pipelineConfigureService.createConfigure(pipelineConfigure);
-        map.put("pipelineId",pipelineId);
-        return map;
+        return  pipelineDao.createPipeline(pipelineEntity);
     }
 
     //删除
@@ -68,7 +61,7 @@ public class PipelineServiceImpl implements PipelineService{
         if (pipelineId != null){
             pipelineDao.deletePipeline(pipelineId);
             //删除对应的流水线配置
-            pipelineConfigureService.deletePipelineIdConfigure(pipelineId);
+            pipelineConfigureService.deleteAllTask(pipelineId);
             //删除对应的历史
             pipelineExecHistoryService.deleteHistory(pipelineId);
         }
@@ -87,6 +80,20 @@ public class PipelineServiceImpl implements PipelineService{
     @Override
     public Pipeline findPipeline(String id) {
         return BeanMapper.map(pipelineDao.findPipeline(id), Pipeline.class);
+    }
+
+    //查询
+    @Override
+    public Pipeline findOnePipeline(String pipelineName) {
+        List<Pipeline> allPipeline = findAllPipeline();
+        if (allPipeline != null){
+            for (Pipeline pipeline : allPipeline) {
+                if (pipeline.getPipelineName().equals(pipelineName)){
+                    return pipeline;
+                }
+            }
+        }
+        return null;
     }
 
     //查询所有
@@ -121,11 +128,11 @@ public class PipelineServiceImpl implements PipelineService{
             pipelineStatus.setPipelineCollect(pipeline.getPipelineCollect());
             pipelineStatus.setPipelineName(pipeline.getPipelineName());
             if (latelyHistory != null){
-                pipelineStatus.setLastStructureTime(latelyHistory.getHistoryCreateTime());
-                pipelineStatus.setStructureStatus(latelyHistory.getHistoryStatus());
+                pipelineStatus.setLastStructureTime(latelyHistory.getCreateTime());
+                pipelineStatus.setStructureStatus(latelyHistory.getRunStatus());
             }
             if (latelySuccess != null){
-                pipelineStatus.setLastSuccessTime(latelySuccess.getHistoryCreateTime());
+                pipelineStatus.setLastSuccessTime(latelySuccess.getCreateTime());
             }
             pipelineStatusList.add(pipelineStatus);
         }

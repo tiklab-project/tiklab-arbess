@@ -50,10 +50,10 @@ public class PipelineCodeLogServiceImpl implements  PipelineCodeLogService{
     @Override
     public void deleteCodeLog(PipelineExecLog pipelineExecLog) {
         pipelineTestLogService.deleteTestLog(pipelineExecLog);
-        PipelineCodeLog codeLog = pipelineExecLog.getCodeLog();
-        if (codeLog != null){
-            deleteCodeLog(codeLog.getLogCodeId());
-        }
+        // PipelineCodeLog codeLog = pipelineExecLog.getCodeLog();
+        // if (codeLog != null){
+        //     deleteCodeLog(codeLog.getLogCodeId());
+        // }
     }
 
     //修改
@@ -66,7 +66,7 @@ public class PipelineCodeLogServiceImpl implements  PipelineCodeLogService{
     @Override
     public void updateCodeLog(PipelineExecLog pipelineExecLog){
         pipelineTestLogService.updateTestLog(pipelineExecLog);
-        updateCodeLog(pipelineExecLog.getCodeLog());
+        // updateCodeLog(pipelineExecLog.getCodeLog());
     }
 
     //查询单个

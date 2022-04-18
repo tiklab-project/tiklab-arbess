@@ -5,20 +5,19 @@ import com.doublekit.dal.jpa.annotation.*;
 @Entity
 @Table(name="pipeline_test")
 public class PipelineTestEntity {
+
     //gitId
     @Id
     @GeneratorValue
     @Column(name = "test_id")
     private String testId;
 
-    @Column(name = "test_type",notNull = true)
-    private String testType;
+    @Column(name = "type",notNull = true)
+    private String type;
 
     //地址
     @Column(name = "test_order",notNull = true)
     private String testOrder;
-
-
 
     public String getTestId() {
         return testId;
@@ -28,12 +27,12 @@ public class PipelineTestEntity {
         this.testId = testId;
     }
 
-    public String getTestType() {
-        return testType;
+    public String getType() {
+        return type;
     }
 
-    public void setTestType(String testType) {
-        this.testType = testType;
+    public void setType(String type) {
+        this.type = type;
     }
 
     public String getTestOrder() {
