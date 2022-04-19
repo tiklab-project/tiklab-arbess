@@ -30,17 +30,14 @@ public class ProofServiceImpl implements ProofService{
     //创建
     @Override
     public String createProof(Proof proof) {
-        // List<Proof> proofList = findAllProof();
-        //     if (proof.getProofScope() == 3){
-        //         proof.setProofPassword(codeGiteeApiService.getProof());
-        //         for (Proof proofs : proofList) {
-        //             if (proof.getProofName().equals(proofs.getProofName())){
-        //                 proof.setProofId(proofs.getProofId());
-        //                 updateProof(proof);
-        //                 return proof.getProofId();
-        //         }
-        //     }
-        // }
+        List<Proof> allProof = findAllProof();
+        if (allProof != null){
+            for (Proof proof1 : allProof) {
+                if (proof.getProofName().equals(proof1.getProofName())){
+                    return null;
+                }
+            }
+        }
         ProofEntity proofEntity = BeanMapper.map(proof, ProofEntity.class);
         return ProofDao.createProof(proofEntity);
     }
@@ -68,7 +65,6 @@ public class ProofServiceImpl implements ProofService{
     }
 
     //根据名称获取凭证
-    @Override
     public Proof fondOneName(String proofName){
         String[] s = proofName.split(" ");
         if (s.length ==2){

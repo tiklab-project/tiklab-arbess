@@ -39,8 +39,7 @@ public class PipelineDeployServiceImpl implements PipelineDeployService {
 
     //创建配置
     @Override
-    public String createConfigure(String pipelineId,int taskType) {
-        PipelineDeploy pipelineDeploy = new PipelineDeploy();
+    public String createConfigure(String pipelineId,int taskType, PipelineDeploy pipelineDeploy) {
         pipelineDeploy.setType(taskType);
         PipelineConfigure pipelineConfigure = new PipelineConfigure();
         pipelineDeploy.setType(taskType);
@@ -83,14 +82,8 @@ public class PipelineDeployServiceImpl implements PipelineDeployService {
             }
         }
         if (oneConfigure == null && pipelineDeploy.getType() != 0){
-            createConfigure(pipelineId,pipelineDeploy.getType());
+            createConfigure(pipelineId,pipelineDeploy.getType(),pipelineDeploy);
         }
-    }
-
-    @Override
-    public Proof deployProof(String deployId) {
-        PipelineDeploy oneDeploy = findOneDeploy(deployId);
-        return proofService.fondOneName(oneDeploy.getProof().getProofName());
     }
 
     //查询单个
@@ -100,10 +93,16 @@ public class PipelineDeployServiceImpl implements PipelineDeployService {
     }
 
     @Override
-    public Proof findOneProof(PipelineConfigure pipelineConfigure){
-        PipelineDeploy pipelineDeploy = findOneDeploy(pipelineConfigure.getTaskId());
-        String proofName = pipelineDeploy.getProof().getProofName();
-        return proofService.fondOneName(proofName);
+    public List<Object> findOneTask(PipelineConfigure pipelineConfigure, List<Object> list) {
+        if (pipelineConfigure.getTaskType() > 30){
+            PipelineDeploy oneDeploy =findOneDeploy(pipelineConfigure.getTaskId());
+            if (oneDeploy.getProof() != null){
+                Proof proof = proofService.findOneProof(oneDeploy.getProof().getProofId());
+                oneDeploy.setProof(proof);
+            }
+            list.add(oneDeploy);
+        }
+        return list;
     }
 
 

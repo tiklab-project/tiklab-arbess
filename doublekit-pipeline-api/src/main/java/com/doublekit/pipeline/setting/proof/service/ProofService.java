@@ -43,13 +43,6 @@ public interface ProofService {
     @FindOne
      Proof findOneProof(String proofId);
 
-    /**
-     * 获取code凭证
-     * @param proofName 凭证名
-     * @return 凭证信息
-     */
-    Proof fondOneName(String proofName);
-
     //获取构建凭证
     List<Proof> findAllGitProof();
 

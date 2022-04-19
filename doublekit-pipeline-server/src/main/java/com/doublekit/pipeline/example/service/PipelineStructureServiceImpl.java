@@ -3,17 +3,14 @@ package com.doublekit.pipeline.example.service;
 import com.doublekit.beans.BeanMapper;
 import com.doublekit.pipeline.definition.model.PipelineConfigure;
 import com.doublekit.pipeline.definition.service.PipelineConfigureService;
-import com.doublekit.pipeline.example.controller.PipelineStructureController;
 import com.doublekit.pipeline.example.dao.PipelineStructureDao;
 import com.doublekit.pipeline.example.entity.PipelineStructureEntity;
 import com.doublekit.pipeline.example.model.PipelineDeploy;
 import com.doublekit.pipeline.example.model.PipelineStructure;
 import com.doublekit.rpc.annotation.Exporter;
-import com.sun.xml.bind.v2.model.core.ID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -38,8 +35,7 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
     }
 
     @Override
-    public String createConfigure( String pipelineId,int taskType){
-        PipelineStructure pipelineStructure = new PipelineStructure();
+    public String createConfigure( String pipelineId,int taskType,PipelineStructure pipelineStructure ){
         pipelineStructure.setType(taskType);
         pipelineStructure.setType(taskType);
         PipelineConfigure pipelineConfigure = new PipelineConfigure();
@@ -86,7 +82,7 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
             }
         }
         if (oneConfigure == null && pipelineStructure.getType() != 0){
-            createConfigure(pipelineId,pipelineStructure.getType());
+            createConfigure(pipelineId,pipelineStructure.getType(),pipelineStructure);
         }
         pipelineDeployService.updateTask(map);
     }
@@ -99,16 +95,12 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
     }
 
     @Override
-    public List<Object>  findOneTask(PipelineConfigure pipelineConfigure, List<Object> list) {
+    public List<Object> findOneTask(PipelineConfigure pipelineConfigure, List<Object> list) {
         if (pipelineConfigure.getTaskType() > 20 && pipelineConfigure.getTaskType() < 30){
             PipelineStructure oneStructure = findOneStructure(pipelineConfigure.getTaskId());
             list.add(oneStructure);
         }
-        if (pipelineConfigure.getTaskType() > 30){
-            PipelineDeploy oneDeploy = pipelineDeployService.findOneDeploy(pipelineConfigure.getTaskId());
-            list.add(oneDeploy);
-        }
-        return list;
+        return pipelineDeployService.findOneTask(pipelineConfigure,list);
     }
 
     //查询所有

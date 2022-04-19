@@ -34,7 +34,7 @@ public class TestAchieve {
 
 
     // 单元测试
-    private int unitTesting(PipelineConfigure pipelineConfigure, PipelineExecHistory pipelineExecHistory,List<PipelineExecHistory> pipelineExecHistoryList) {
+    public int unitTesting(PipelineConfigure pipelineConfigure, PipelineExecHistory pipelineExecHistory,List<PipelineExecHistory> pipelineExecHistoryList) {
         long beginTime = new Timestamp(System.currentTimeMillis()).getTime();
         PipelineExecLog pipelineExecLog = new PipelineExecLog();
         Pipeline pipeline = pipelineConfigure.getPipeline();

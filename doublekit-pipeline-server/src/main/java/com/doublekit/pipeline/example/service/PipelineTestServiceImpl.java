@@ -39,8 +39,7 @@ public class PipelineTestServiceImpl implements PipelineTestService {
 
     //创建构建表
     @Override
-    public  String createConfigure(String pipelineId,int taskType){
-        PipelineTest pipelineTest = new PipelineTest();
+    public  String createConfigure(String pipelineId,int taskType, PipelineTest pipelineTest){
         pipelineTest.setType(taskType);
         pipelineTest.setType(taskType);
         PipelineConfigure pipelineConfigure = new PipelineConfigure();
@@ -86,7 +85,7 @@ public class PipelineTestServiceImpl implements PipelineTestService {
             }
         }
         if (oneConfigure == null && pipelineTest.getType() != 0){
-            createConfigure(pipelineId,pipelineTest.getType());
+            createConfigure(pipelineId,pipelineTest.getType(),pipelineTest);
         }
         pipelineStructureService.updateTask(map);
     }

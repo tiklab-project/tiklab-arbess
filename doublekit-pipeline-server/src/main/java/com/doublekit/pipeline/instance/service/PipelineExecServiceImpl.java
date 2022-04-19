@@ -1,9 +1,12 @@
 package com.doublekit.pipeline.instance.service;
 
 
+import com.doublekit.pipeline.definition.model.PipelineConfigure;
 import com.doublekit.pipeline.definition.service.PipelineConfigureService;
 import com.doublekit.pipeline.instance.model.*;
+import com.doublekit.pipeline.instance.service.execAchieve.*;
 import com.doublekit.rpc.annotation.Exporter;
+import com.ibm.icu.text.SimpleDateFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,13 +23,15 @@ public class PipelineExecServiceImpl implements PipelineExecService {
     PipelineConfigureService pipelineConfigureService;
 
     @Autowired
-    PipelineExecLogService pipelineExecLogService;
+    PipelineExecHistoryService pipelineExecHistoryService;
 
     //存放过程状态
     List<PipelineExecHistory> pipelineExecHistoryList = new ArrayList<>();
 
     //存放构建流水线id
     List<String> pipelineIdList = new ArrayList<>();
+
+    CommonAchieve commonAchieve = new CommonAchieve();
 
     private static final Logger logger = LoggerFactory.getLogger(PipelineExecServiceImpl.class);
 
@@ -44,7 +49,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
             }
         }
         // 执行构建
-        // executorService.submit(() -> begin(pipelineId));
+        executorService.submit(() -> begin(pipelineId));
         return 1;
     }
 
@@ -64,15 +69,51 @@ public class PipelineExecServiceImpl implements PipelineExecService {
 
 
     // 构建开始
-    // private String begin(String pipelineId) {
-    //     String time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
-    //     //把执行构建的流水线加入进来
-    //     pipelineIdList.add(pipelineId);
-    //     //创建日志
-    //     PipelineExecLog pipelineExecLog = pipelineExecLogService.createLog();
-    //     pipelineExecLog.setPipelineId(pipelineId);
-    //     pipelineExecLogList.add(pipelineExecLog);
-    //
-    //     return "1";
-    // }
+    private void begin(String pipelineId) {
+        // String time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+        //把执行构建的流水线加入进来
+        pipelineIdList.add(pipelineId);
+        String historyId = pipelineExecHistoryService.createHistory(new PipelineExecHistory());
+        PipelineExecHistory pipelineExecHistory = new PipelineExecHistory();
+        pipelineExecHistory.setHistoryId(historyId);
+        List<PipelineConfigure> allConfigure = pipelineConfigureService.findAllConfigure(pipelineId);
+        if (allConfigure != null){
+            allConfigure.sort(Comparator.comparing(PipelineConfigure::getTaskSort));
+            for (PipelineConfigure pipelineConfigure : allConfigure) {
+                switch (pipelineConfigure.getTaskType()) {
+                    case 1, 2 -> {
+                        int code = new CodeAchieve().gitClone(pipelineConfigure, pipelineExecHistory, pipelineExecHistoryList);
+                        if (code == 0) {
+                            return ;
+                        }
+                    }
+                    case 11 -> {
+                        int test = new TestAchieve().unitTesting(pipelineConfigure, pipelineExecHistory, pipelineExecHistoryList);
+                        if (test == 0) {
+                            return ;
+                        }
+                    }
+                    case 21, 22 -> {
+                        int structure = new StructureAchieve().structure(pipelineConfigure, pipelineExecHistory, pipelineExecHistoryList);
+                        if (structure == 0) {
+                            return ;
+                        }
+                    }
+                    case 31 -> {
+                        int liunx = new DeployAchieve().liunx(pipelineConfigure, pipelineExecHistory, pipelineExecHistoryList);
+                        if (liunx == 0) {
+                            return ;
+                        }
+                    }
+                    case 32 -> {
+                        int docker = new DeployAchieve().docker(pipelineConfigure, pipelineExecHistory, pipelineExecHistoryList);
+                        if (docker == 0) {
+                            return ;
+                        }
+                    }
+                }
+            }
+        }
+        commonAchieve.success(pipelineExecHistory,pipelineId);
+    }
 }

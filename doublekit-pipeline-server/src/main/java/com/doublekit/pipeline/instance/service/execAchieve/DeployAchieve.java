@@ -99,7 +99,7 @@ public class DeployAchieve {
      * @param pipelineExecHistory 日志
      * @return 部署状态
      */
-    private int docker(PipelineConfigure pipelineConfigure,PipelineExecHistory pipelineExecHistory,List<PipelineExecHistory> pipelineExecHistoryList) {
+    public int docker(PipelineConfigure pipelineConfigure,PipelineExecHistory pipelineExecHistory,List<PipelineExecHistory> pipelineExecHistoryList) {
         //开始运行时间
         PipelineDeploy pipelineDeploy = pipelineDeployService.findOneDeploy(pipelineConfigure.getTaskId());
         long beginTime = new Timestamp(System.currentTimeMillis()).getTime();

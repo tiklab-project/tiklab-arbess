@@ -37,8 +37,8 @@ public class CodeAchieve {
     CommonAchieve commonAchieve = new CommonAchieve();
 
     // git克隆
-    private int gitClone(PipelineConfigure pipelineConfigure, PipelineExecHistory pipelineExecHistory, List<PipelineExecHistory> pipelineExecHistoryList){
-        String codeId = pipelineConfigure.getTaskId();
+    public int gitClone(PipelineConfigure pipelineConfigure, PipelineExecHistory pipelineExecHistory, List<PipelineExecHistory> pipelineExecHistoryList){
+        PipelineCode pipelineCode = pipelineCodeService.findOneCode(pipelineConfigure.getTaskId());
         Pipeline pipeline = pipelineConfigure.getPipeline();
         long beginTime = new Timestamp(System.currentTimeMillis()).getTime();
 
@@ -47,8 +47,7 @@ public class CodeAchieve {
         File file = new File(path);
         //调用删除方法删除旧的代码
         commonAchieve.deleteFile(file);
-        PipelineCode pipelineCode = pipelineCodeService.findOneCode(codeId);
-        Proof proof = pipelineCodeService.CodeProof(codeId);
+        Proof proof = pipelineCode.getProof();
         String codeAddress =pipelineCode.getCodeAddress();
         String codeBranch = pipelineCode.getCodeBranch();
         UsernamePasswordCredentialsProvider credentialsProvider = commonAchieve.usernamePassword(proof.getProofUsername(), proof.getProofPassword());

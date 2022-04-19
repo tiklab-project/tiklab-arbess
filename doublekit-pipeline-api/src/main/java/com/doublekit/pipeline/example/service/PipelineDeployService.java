@@ -27,7 +27,7 @@ public interface PipelineDeployService {
      * @param pipelineId 流水线id
      * @return 配置id
      */
-    String createConfigure(String pipelineId,int taskType);
+    String createConfigure(String pipelineId,int taskType, PipelineDeploy pipelineDeploy);
 
     /**
      * 删除
@@ -35,14 +35,12 @@ public interface PipelineDeployService {
      */
      void deleteDeploy(String deployId) ;
 
-
     /**
      * 删除关联配置
      * @param taskId 任务id
      * @param taskType 任务类型
      */
     void deleteTask(String taskId,int taskType);
-
 
     /**
      * 更新
@@ -57,14 +55,6 @@ public interface PipelineDeployService {
     void updateTask(Map<String,Object> map);
 
     /**
-     * 获取部署凭证
-     * @param deployId 部署id
-     * @return 凭证信息
-     */
-     Proof deployProof(String deployId);
-
-
-    /**
      * 查询单个信息
      * @param deployId pipelineDeployId
      * @return deploy信息
@@ -73,13 +63,11 @@ public interface PipelineDeployService {
     PipelineDeploy findOneDeploy(String deployId) ;
 
     /**
-     * 查询凭证
+     * 查询信息
      * @param pipelineConfigure 配置信息
-     * @return 凭证信息
+     * @return 配置
      */
-    Proof findOneProof(PipelineConfigure pipelineConfigure);
-
-
+    List<Object> findOneTask( PipelineConfigure pipelineConfigure ,List<Object> list);
 
     /**
      * 查询所有信息

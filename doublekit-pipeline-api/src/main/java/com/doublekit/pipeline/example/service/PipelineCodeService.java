@@ -27,7 +27,7 @@ public interface PipelineCodeService {
      * @param pipelineId 流水线id
      * @return 配置id
      */
-    String createConfigure(String pipelineId,int taskType);
+    String createConfigure(String pipelineId,int taskType,PipelineCode pipelineCode);
 
     /**
      * 删除
@@ -55,13 +55,6 @@ public interface PipelineCodeService {
      void updateTask(Map<String,Object> map);
 
     /**
-     * 获取凭证
-     * @param codeId codeId
-     * @return 凭证信息
-     */
-     Proof CodeProof(String codeId);
-
-    /**
      * 查询单个信息
      * @param codeId codeId
      * @return code信息
@@ -76,15 +69,12 @@ public interface PipelineCodeService {
      */
     List<Object> findOneTask( PipelineConfigure pipelineConfigure ,List<Object> list);
 
-
     /**
      * 查询所有信息
      * @return code信息集合
      */
     @FindAll
      List<PipelineCode> findAllCode();
-
-
 
     @FindList
     List<PipelineCode> findAllCodeList(List<String> idList);

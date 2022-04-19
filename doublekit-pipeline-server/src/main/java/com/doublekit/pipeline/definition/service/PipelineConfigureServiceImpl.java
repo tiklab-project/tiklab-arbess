@@ -126,18 +126,6 @@ public class PipelineConfigureServiceImpl implements PipelineConfigureService {
         pipelineCodeService.updateTask(map);
     }
 
-    public void updateTask(String taskId ,int sort){
-        List<PipelineConfigure> allConfigure = findAllConfigure();
-        if (allConfigure != null){
-            for (PipelineConfigure pipelineConfigure : allConfigure) {
-                if (pipelineConfigure.getTaskId().equals(taskId)){
-                    pipelineConfigure.setTaskSort(sort);
-                    updateConfigure(pipelineConfigure);
-                }
-            }
-        }
-    }
-
     //查询
     @Override
     public PipelineConfigure findOneConfigure(String configureId) {

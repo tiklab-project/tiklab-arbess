@@ -34,7 +34,7 @@ public class StructureAchieve {
     CommonAchieve commonAchieve = new CommonAchieve();
 
     // 构建
-    private int structure(PipelineConfigure pipelineConfigure, PipelineExecHistory pipelineExecHistory,List<PipelineExecHistory> pipelineExecHistoryList)  {
+    public int structure(PipelineConfigure pipelineConfigure, PipelineExecHistory pipelineExecHistory,List<PipelineExecHistory> pipelineExecHistoryList)  {
         long beginTime = new Timestamp(System.currentTimeMillis()).getTime();
         Pipeline pipeline = pipelineConfigure.getPipeline();
         PipelineExecLog pipelineExecLog = new PipelineExecLog();

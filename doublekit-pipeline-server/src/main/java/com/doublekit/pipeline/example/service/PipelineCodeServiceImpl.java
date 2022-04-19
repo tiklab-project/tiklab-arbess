@@ -29,10 +29,10 @@ public class PipelineCodeServiceImpl implements PipelineCodeService {
     PipelineCodeDao pipelineCodeDao;
 
     @Autowired
-    PipelineTestService pipelineTestService;
+    ProofService proofService;
 
     @Autowired
-    ProofService proofService;
+    PipelineTestService pipelineTestService;
 
     @Autowired
     PipelineConfigureService pipelineConfigureService;
@@ -47,9 +47,7 @@ public class PipelineCodeServiceImpl implements PipelineCodeService {
 
     //创建配置
     @Override
-    public String createConfigure(String pipelineId,int taskType){
-        PipelineCode pipelineCode = new PipelineCode();
-        pipelineCode.setType(taskType);
+    public String createConfigure(String pipelineId,int taskType,PipelineCode pipelineCode){
         PipelineConfigure pipelineConfigure = new PipelineConfigure();
         pipelineCode.setType(taskType);
         String codeId = createCode(pipelineCode);
@@ -94,16 +92,9 @@ public class PipelineCodeServiceImpl implements PipelineCodeService {
             }
         }
         if (oneConfigure == null && pipelineCode.getType() != 0){
-            createConfigure(pipelineId,pipelineCode.getType());
+            createConfigure(pipelineId, pipelineCode.getType(),pipelineCode);
         }
         pipelineTestService.updateTask(map);
-    }
-
-    //获取凭证
-    @Override
-    public Proof CodeProof(String codeId) {
-        PipelineCode oneCode = findOneCode(codeId);
-        return proofService.fondOneName(oneCode.getProof().getProofName());
     }
 
     //查询单个
@@ -117,6 +108,10 @@ public class PipelineCodeServiceImpl implements PipelineCodeService {
     public List<Object>  findOneTask(PipelineConfigure pipelineConfigure ,List<Object> list) {
             if (pipelineConfigure.getTaskType() < 10){
                 PipelineCode oneCode = findOneCode(pipelineConfigure.getTaskId());
+                if (oneCode.getProof() != null){
+                    Proof proof = proofService.findOneProof(oneCode.getProof().getProofId());
+                    oneCode.setProof(proof);
+                }
                 list.add(oneCode);
             }
         return pipelineTestService.findOneTask(pipelineConfigure,list);
