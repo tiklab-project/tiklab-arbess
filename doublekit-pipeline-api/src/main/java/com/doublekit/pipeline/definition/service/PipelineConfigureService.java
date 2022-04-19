@@ -41,6 +41,14 @@ public interface PipelineConfigureService {
     void deleteConfigure(String configureId);
 
     /**
+     * 根据类型查询配置信息
+     * @param pipelineId 流水线id
+     * @param type 类型
+     * @return 配置信息
+     */
+    PipelineConfigure findOneConfigure(String pipelineId , int type);
+
+    /**
      * 删除单个任务
      * @param taskId 任务id
      * @param pipelineId 流水线id

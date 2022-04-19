@@ -32,12 +32,6 @@ public class PipelineDeployController {
         return Result.ok(configureId);
     }
     
-    @RequestMapping(path="/deleteDeploy",method = RequestMethod.POST)
-    @ApiMethod(name = "deleteDeploy",desc = "创建源码配置")
-    @ApiParam(name = "deployId",desc = "deployId",required = true)
-    public Result<String> deleteDeploy(String deployId){
-        pipelineDeployService.deleteDeploy(deployId);
-        return Result.ok();
-    }
+
 
 }

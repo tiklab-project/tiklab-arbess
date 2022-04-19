@@ -3,7 +3,11 @@ package com.doublekit.pipeline.example.model;
 import com.doublekit.apibox.annotation.ApiModel;
 import com.doublekit.apibox.annotation.ApiProperty;
 import com.doublekit.beans.annotation.Mapper;
+import com.doublekit.beans.annotation.Mapping;
+import com.doublekit.beans.annotation.Mappings;
 import com.doublekit.join.annotation.Join;
+import com.doublekit.join.annotation.JoinQuery;
+import com.doublekit.pipeline.setting.proof.model.Proof;
 
 
 @ApiModel
@@ -31,9 +35,13 @@ public class PipelineCode {
     @ApiProperty(name="codeBranch",desc="分支")
     private String codeBranch;
 
-    //凭证名称
-    @ApiProperty(name="proofName",desc="凭证名称",eg="@selectOne")
-    private String proofName;
+    //凭证id
+    @ApiProperty(name="proof",desc="凭证id",eg="@selectOne")
+    @Mappings({
+            @Mapping(source = "proof.proofId",target = "proofId")
+    })
+    @JoinQuery(key = "proofId")
+    private Proof proof;
 
 
     public String getCodeId() {
@@ -76,12 +84,11 @@ public class PipelineCode {
         this.codeBranch = codeBranch;
     }
 
-    public String getProofName() {
-        return proofName;
+    public Proof getProof() {
+        return proof;
     }
 
-    public void setProofName(String proofName) {
-        this.proofName = proofName;
+    public void setProof(Proof proof) {
+        this.proof = proof;
     }
-
 }

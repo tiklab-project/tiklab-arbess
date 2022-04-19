@@ -1,36 +1,16 @@
 package com.doublekit.pipeline.instance.service;
 
-import com.doublekit.pipeline.definition.model.PipelineConfigure;
-import com.doublekit.pipeline.definition.model.Pipeline;
+
 import com.doublekit.pipeline.definition.service.PipelineConfigureService;
-import com.doublekit.pipeline.definition.service.PipelineConfigureServiceImpl;
-import com.doublekit.pipeline.definition.service.PipelineService;
-import com.doublekit.pipeline.example.model.CodeGit.CodeGiteeApi;
-import com.doublekit.pipeline.example.model.PipelineCode;
-import com.doublekit.pipeline.example.model.PipelineDeploy;
-import com.doublekit.pipeline.example.model.PipelineTest;
-import com.doublekit.pipeline.example.service.codeGit.CodeGiteeApiService;
 import com.doublekit.pipeline.instance.model.*;
-import com.doublekit.pipeline.setting.proof.model.Proof;
 import com.doublekit.rpc.annotation.Exporter;
-import com.jcraft.jsch.*;
-import com.taobao.api.internal.spi.SpiUtils;
-import org.apache.commons.lang.StringUtils;
-import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.transport.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import java.io.*;
-import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.*;
-import ch.ethz.ssh2.Connection;
 
-import javax.print.attribute.standard.PrinterLocation;
 
 @Service
 @Exporter
@@ -43,7 +23,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
     PipelineExecLogService pipelineExecLogService;
 
     //存放过程状态
-    List<PipelineExecLog> pipelineExecLogList = new ArrayList<>();
+    List<PipelineExecHistory> pipelineExecHistoryList = new ArrayList<>();
 
     //存放构建流水线id
     List<String> pipelineIdList = new ArrayList<>();
@@ -70,13 +50,13 @@ public class PipelineExecServiceImpl implements PipelineExecService {
 
     //查询构建状态
     @Override
-    public PipelineExecLog findInstanceState(String pipelineId){
+    public PipelineExecHistory findInstanceState(String pipelineId){
 
-        if (pipelineExecLogList != null){
-            for (PipelineExecLog pipelineExecLog : pipelineExecLogList) {
-                // if (pipelineExecLog.getPipelineId().equals(pipelineId)){
-                //     return  pipelineExecLog;
-                // }
+        if (pipelineExecHistoryList != null){
+            for (PipelineExecHistory pipelineExecHistory : pipelineExecHistoryList) {
+                if (pipelineExecHistory.getPipeline().getPipelineId().equals(pipelineId)){
+                    return  pipelineExecHistory;
+                }
             }
         }
         return null;

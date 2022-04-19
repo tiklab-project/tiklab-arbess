@@ -1,11 +1,11 @@
 package com.doublekit.pipeline.instance.service;
 
 import com.doublekit.beans.BeanMapper;
-import com.doublekit.pipeline.definition.model.Pipeline;
 import com.doublekit.pipeline.definition.service.PipelineService;
 import com.doublekit.pipeline.instance.dao.PipelineExecHistoryDao;
 import com.doublekit.pipeline.instance.entity.PipelineExecHistoryEntity;
 import com.doublekit.pipeline.instance.model.PipelineExecHistory;
+import com.doublekit.pipeline.instance.model.PipelineExecLog;
 import com.doublekit.rpc.annotation.Exporter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,17 +49,18 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
     //删除
     @Override
     public void deleteHistory(String pipelineId) {
-        Pipeline pipeline = pipelineService.findPipeline(pipelineId);
-        String pipelineName = pipeline.getPipelineName();
-        List<PipelineExecHistory> allHistory = findAllHistory();
+        List<PipelineExecHistory> allHistory = findAllHistory(pipelineId);
         if (allHistory != null){
             for (PipelineExecHistory pipelineExecHistory : allHistory) {
-                if (pipelineName.equals(pipelineExecHistory.getPipelineName())){
-                    deleteHistory(pipelineExecHistory.getLogId());
-                }
+                    deleteHistory(pipelineExecHistory.getHistoryId());
             }
         }
     }
+
+    @Override
+    public String createLog(PipelineExecLog pipelineExecLog){
+       return pipelineExecLogService.createLog(pipelineExecLog);
+   }
 
     //修改
     @Override
@@ -89,8 +90,7 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
         List<PipelineExecHistory> historyList = new ArrayList<>();
         if (allHistory != null){
             for (PipelineExecHistory pipelineExecHistory : allHistory) {
-                Pipeline pipeline = pipelineService.findOnePipeline(pipelineExecHistory.getPipelineName());
-                if (pipeline.getPipelineId().equals(pipelineId)){
+                if (pipelineExecHistory.getPipeline().getPipelineId().equals(pipelineId)){
                     historyList.add(pipelineExecHistory);
                 }
             }

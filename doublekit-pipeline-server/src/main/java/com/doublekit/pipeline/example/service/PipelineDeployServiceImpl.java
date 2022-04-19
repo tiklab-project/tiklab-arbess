@@ -71,9 +71,26 @@ public class PipelineDeployServiceImpl implements PipelineDeployService {
     }
 
     @Override
+    public void updateTask(Map<String, Object> map) {
+        String pipelineId = map.get("pipelineId").toString();
+        PipelineDeploy pipelineDeploy = (PipelineDeploy) map.get("pipelineDeploy");
+        PipelineConfigure oneConfigure = pipelineConfigureService.findOneConfigure(pipelineId, 40);
+        if (oneConfigure != null){
+            if (pipelineDeploy.getType() != 0){
+                updateDeploy(pipelineDeploy);
+            }else {
+                pipelineConfigureService.deleteTask(oneConfigure.getTaskId(),pipelineId);
+            }
+        }
+        if (oneConfigure == null && pipelineDeploy.getType() != 0){
+            createConfigure(pipelineId,pipelineDeploy.getType());
+        }
+    }
+
+    @Override
     public Proof deployProof(String deployId) {
         PipelineDeploy oneDeploy = findOneDeploy(deployId);
-        return proofService.fondOneName(oneDeploy.getProofName());
+        return proofService.fondOneName(oneDeploy.getProof().getProofName());
     }
 
     //查询单个
@@ -85,7 +102,7 @@ public class PipelineDeployServiceImpl implements PipelineDeployService {
     @Override
     public Proof findOneProof(PipelineConfigure pipelineConfigure){
         PipelineDeploy pipelineDeploy = findOneDeploy(pipelineConfigure.getTaskId());
-        String proofName = pipelineDeploy.getProofName();
+        String proofName = pipelineDeploy.getProof().getProofName();
         return proofService.fondOneName(proofName);
     }
 

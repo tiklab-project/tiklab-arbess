@@ -5,6 +5,7 @@ import com.doublekit.join.annotation.FindList;
 import com.doublekit.join.annotation.FindOne;
 import com.doublekit.join.annotation.JoinProvider;
 import com.doublekit.pipeline.instance.model.PipelineExecHistory;
+import com.doublekit.pipeline.instance.model.PipelineExecLog;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -24,11 +25,22 @@ public interface PipelineExecHistoryService {
     String createHistory(@NotNull @Valid PipelineExecHistory pipelineExecHistory);
 
     /**
+     * 创建日志表
+     * @param pipelineExecLog 日志信息
+     * @return 日志id
+     */
+    String createLog(PipelineExecLog pipelineExecLog);
+
+    /**
      * 删除流水线历史
      * @param historyId 流水线历史id
      */
     void deleteHistory(@NotNull int  historyId);
 
+    /**
+     * 删除历史
+     * @param pipelineId 流水线id
+     */
     void deleteHistory(String pipelineId);
 
     /**

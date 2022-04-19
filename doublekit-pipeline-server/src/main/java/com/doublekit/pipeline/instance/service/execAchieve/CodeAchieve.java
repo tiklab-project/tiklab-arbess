@@ -5,10 +5,9 @@ import com.doublekit.pipeline.definition.model.PipelineConfigure;
 import com.doublekit.pipeline.definition.service.PipelineConfigureService;
 import com.doublekit.pipeline.example.model.PipelineCode;
 import com.doublekit.pipeline.example.service.PipelineCodeService;
-import com.doublekit.pipeline.instance.model.PipelineCodeLog;
 import com.doublekit.pipeline.instance.model.PipelineExecHistory;
 import com.doublekit.pipeline.instance.model.PipelineExecLog;
-import com.doublekit.pipeline.instance.service.PipelineExecLogService;
+import com.doublekit.pipeline.instance.service.PipelineExecHistoryService;
 import com.doublekit.pipeline.setting.proof.model.Proof;
 import com.doublekit.rpc.annotation.Exporter;
 import org.eclipse.jgit.api.Git;
@@ -30,7 +29,7 @@ public class CodeAchieve {
     PipelineConfigureService pipelineConfigureService;
 
     @Autowired
-    PipelineExecLogService pipelineExecLogService;
+    PipelineExecHistoryService pipelineExecHistoryService;
 
     @Autowired
     PipelineCodeService pipelineCodeService;
@@ -39,10 +38,8 @@ public class CodeAchieve {
 
     // git克隆
     private int gitClone(PipelineConfigure pipelineConfigure, PipelineExecHistory pipelineExecHistory, List<PipelineExecHistory> pipelineExecHistoryList){
-
         String codeId = pipelineConfigure.getTaskId();
         Pipeline pipeline = pipelineConfigure.getPipeline();
-
         long beginTime = new Timestamp(System.currentTimeMillis()).getTime();
 
         //设置代码路径
@@ -57,17 +54,20 @@ public class CodeAchieve {
         UsernamePasswordCredentialsProvider credentialsProvider = commonAchieve.usernamePassword(proof.getProofUsername(), proof.getProofPassword());
 
         //更新日志
-        String s = "开始拉取代码 : " + "\n"  + "FileAddress : " + file + "\n"  + "Uri : " + codeAddress + "\n"  + "Branch : " + codeBranch + "\n"  ;
-
+        String s = "开始拉取代码 : " + "\n" + "FileAddress : " + file + "\n"  + "Uri : " + codeAddress + "\n"  + "Branch : " + codeBranch + "\n"   ;
+        pipelineExecHistory.setRunLog(s);
+        pipelineExecHistoryList.add(pipelineExecHistory);
         //克隆代码
         try {
             clone(file, codeAddress, credentialsProvider, codeBranch);
         } catch (GitAPIException e) {
-
+            codeState(pipelineExecHistory,beginTime,e.toString(),pipelineExecHistoryList);
             return 0;
         }
         String log = s + "proofType : " +proof.getProofType() + "\n" + "clone成功。。。。。。。。。。。。。。。" + "\n";
-
+        pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+"\n"+log);
+        pipelineExecHistoryList.add(pipelineExecHistory);
+        codeState(pipelineExecHistory,beginTime,null,pipelineExecHistoryList);
         return 1;
     }
 
@@ -87,22 +87,29 @@ public class CodeAchieve {
                 .call().close();
     }
 
-    // //执行状态
-    // private void codeState(PipelineExecLog pipelineExecLog,long beginTime,String e,List<PipelineExecLog> pipelineExecLogList){
-    //     PipelineCodeLog codeLog = pipelineExecLog.getCodeLog();
-    //     codeLog.setCodeRunStatus(10);
-    //     if (e != null){
-    //         codeLog.setCodeRunStatus(1);
-    //         codeLog.setCodeRunLog(codeLog.getCodeRunLog()+"\n拉取代码异常\n"+e);
-    //         commonAchieve.error(pipelineExecLog, "拉取代码异常\n"+e,pipelineExecLog.getPipelineId());
-    //     }
-    //     long overTime = new Timestamp(System.currentTimeMillis()).getTime();
-    //     int time = (int) (overTime - beginTime) / 1000;
-    //     codeLog.setCodeRunTime(time);
-    //     pipelineExecLog.setLogRunTime(pipelineExecLog.getLogRunTime()+time);
-    //     pipelineExecLog.setCodeLog(codeLog);
-    //     pipelineExecLogService.updateLog(pipelineExecLog);
-    //     pipelineExecLogList.add(pipelineExecLog);
-    // }
+
+    //执行状态
+    private void codeState(PipelineExecHistory pipelineExecHistory,long beginTime,String e,List<PipelineExecHistory> pipelineExecHistoryList){
+        Pipeline pipeline = pipelineExecHistory.getPipeline();
+        PipelineConfigure pipelineConfigure = pipelineConfigureService.findOneConfigure(pipeline.getPipelineId(), 10);
+        PipelineExecLog pipelineExecLog = new PipelineExecLog();
+        pipelineExecLog.setLogRunState(10);
+        if (e != null){
+            pipelineExecLog.setLogRunState(1);
+            pipelineExecLog.setLogRunLog(pipelineExecLog.getLogRunLog()+"\n拉取代码异常\n"+e);
+            commonAchieve.error(pipelineExecHistory, "拉取代码异常\n"+e,pipeline.getPipelineId());
+        }
+        long overTime = new Timestamp(System.currentTimeMillis()).getTime();
+        int time = (int) (overTime - beginTime) / 1000;
+
+        pipelineExecLog.setLogRunTime(time);
+        pipelineExecHistory.setRunTime(pipelineExecHistory.getRunTime()+time);
+        pipelineExecLog.setHistoryId(pipelineExecHistory.getHistoryId());
+        pipelineExecLog.setTaskLogType(pipelineConfigure.getTaskType());
+
+        pipelineExecHistoryService.createLog(pipelineExecLog);
+        pipelineExecHistoryService.updateHistory(pipelineExecHistory);
+        pipelineExecHistoryList.add(pipelineExecHistory);
+    }
 
 }

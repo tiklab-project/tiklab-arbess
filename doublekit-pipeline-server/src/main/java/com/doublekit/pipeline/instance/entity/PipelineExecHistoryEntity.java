@@ -13,8 +13,9 @@ public class PipelineExecHistoryEntity {
 
     //id
     @Id
+    @GeneratorValue
     @Column(name = "history_id")
-    private int historyId;
+    private String historyId;
 
     //创建构建时间
     @Column(name = "create_time",notNull = true)
@@ -29,8 +30,8 @@ public class PipelineExecHistoryEntity {
     private String runLog;
 
     //执行人
-    @Column(name = "pipeline_name",notNull = true)
-    private String pipelineName;
+    @Column(name = "pipeline_id",notNull = true)
+    private String pipelineId;
 
     //日志id
     @Column(name = "log_id",notNull = true)
@@ -45,11 +46,11 @@ public class PipelineExecHistoryEntity {
     private int runTime;
 
 
-    public int getHistoryId() {
+    public String getHistoryId() {
         return historyId;
     }
 
-    public void setHistoryId(int historyId) {
+    public void setHistoryId(String historyId) {
         this.historyId = historyId;
     }
 
@@ -77,12 +78,12 @@ public class PipelineExecHistoryEntity {
         this.runLog = runLog;
     }
 
-    public String getPipelineName() {
-        return pipelineName;
+    public String getPipelineId() {
+        return pipelineId;
     }
 
-    public void setPipelineName(String pipelineName) {
-        this.pipelineName = pipelineName;
+    public void setPipelineId(String pipelineId) {
+        this.pipelineId = pipelineId;
     }
 
     public String getLogId() {

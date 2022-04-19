@@ -29,8 +29,8 @@ public class PipelineCodeEntity {
     private String codeBranch;
 
     //凭证名称
-    @Column(name = "proof_Name")
-    private String proofName;
+    @Column(name = "proof_id")
+    private String proofId;
 
 
     public String getCodeId() {
@@ -73,11 +73,11 @@ public class PipelineCodeEntity {
         this.codeBranch = codeBranch;
     }
 
-    public String getProofName() {
-        return proofName;
+    public String getProofId() {
+        return proofId;
     }
 
-    public void setProofName(String proofName) {
-        this.proofName = proofName;
+    public void setProofId(String proofId) {
+        this.proofId = proofId;
     }
 }

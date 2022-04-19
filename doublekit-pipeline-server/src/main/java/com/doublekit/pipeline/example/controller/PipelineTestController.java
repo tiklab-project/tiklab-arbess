@@ -31,13 +31,7 @@ public class PipelineTestController {
         return Result.ok(configureId);
     }
 
-    @RequestMapping(path="/deleteTest",method = RequestMethod.POST)
-    @ApiMethod(name = "deleteTest",desc = "创建源码配置")
-    @ApiParam(name = "testId",desc = "testId",required = true)
-    public Result<String> deleteTest(String testId){
-        pipelineTestService.deleteTest(testId);
-        return Result.ok();
-    }
+
 
 
 }

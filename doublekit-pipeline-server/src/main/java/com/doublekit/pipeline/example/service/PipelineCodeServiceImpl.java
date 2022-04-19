@@ -84,19 +84,17 @@ public class PipelineCodeServiceImpl implements PipelineCodeService {
     @Override
     public void updateTask(Map<String,Object> map) {
         PipelineCode pipelineCode =(PipelineCode) map.get("pipelineCode");
-        if (pipelineCode.getCodeId() != null){
-            updateCode(pipelineCode);
-        }
-        if (pipelineCode.getType() == 0){
-            List<PipelineConfigure> configureList = pipelineConfigureService.findAllConfigure(map.get("pipelineId").toString());
-            if (configureList != null){
-                for (PipelineConfigure pipelineConfigure : configureList) {
-                    if (pipelineConfigure.getTaskType() < 10){
-                        pipelineConfigureService.deleteConfigure(pipelineConfigure.getConfigureId());
-                        deleteCode(pipelineConfigure.getTaskId());
-                    }
-                }
+        String pipelineId = map.get("pipelineId").toString();
+        PipelineConfigure oneConfigure = pipelineConfigureService.findOneConfigure(pipelineId, 10);
+        if (oneConfigure != null){
+            if (pipelineCode.getType() != 0){
+                    updateCode(pipelineCode);
+            }else {
+                pipelineConfigureService.deleteTask(oneConfigure.getTaskId(),pipelineId);
             }
+        }
+        if (oneConfigure == null && pipelineCode.getType() != 0){
+            createConfigure(pipelineId,pipelineCode.getType());
         }
         pipelineTestService.updateTask(map);
     }
@@ -105,7 +103,7 @@ public class PipelineCodeServiceImpl implements PipelineCodeService {
     @Override
     public Proof CodeProof(String codeId) {
         PipelineCode oneCode = findOneCode(codeId);
-        return proofService.fondOneName(oneCode.getProofName());
+        return proofService.fondOneName(oneCode.getProof().getProofName());
     }
 
     //查询单个

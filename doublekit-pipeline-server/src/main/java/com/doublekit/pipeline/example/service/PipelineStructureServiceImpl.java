@@ -76,35 +76,19 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
     @Override
     public void updateTask(Map<String,Object> map) {
         PipelineStructure pipelineStructure = (PipelineStructure) map.get("pipelineStructure");
-        if (pipelineStructure.getStructureId() != null){
-            updateStructure(pipelineStructure);
-        }
-        if (pipelineStructure.getType() == 0){
-            List<PipelineConfigure> configureList = pipelineConfigureService.findAllConfigure(map.get("pipelineId").toString());
-            if (configureList != null){
-                for (PipelineConfigure pipelineConfigure : configureList) {
-                    if (pipelineConfigure.getTaskType() > 20 && pipelineConfigure.getTaskType() < 30){
-                        pipelineConfigureService.deleteConfigure(pipelineConfigure.getConfigureId());
-                        deleteStructure(pipelineConfigure.getTaskId());
-                    }
-                }
+        String pipelineId = map.get("pipelineId").toString();
+        PipelineConfigure oneConfigure = pipelineConfigureService.findOneConfigure(pipelineId, 30);
+        if (oneConfigure != null){
+            if (pipelineStructure.getType() != 0){
+                updateStructure(pipelineStructure);
+            }else {
+                pipelineConfigureService.deleteTask(oneConfigure.getTaskId(),pipelineId);
             }
         }
-        PipelineDeploy pipelineDeploy = (PipelineDeploy) map.get("pipelineDeploy");
-        if (pipelineDeploy.getDeployId() != null){
-            pipelineDeployService.updateDeploy((PipelineDeploy) map.get("pipelineDeploy"));
+        if (oneConfigure == null && pipelineStructure.getType() != 0){
+            createConfigure(pipelineId,pipelineStructure.getType());
         }
-        if (pipelineDeploy.getType() == 0){
-            List<PipelineConfigure> configureList = pipelineConfigureService.findAllConfigure(map.get("pipelineId").toString());
-            if (configureList != null){
-                for (PipelineConfigure pipelineConfigure : configureList) {
-                    if (pipelineConfigure.getTaskType() >30){
-                        pipelineConfigureService.deleteConfigure(pipelineConfigure.getConfigureId());
-                        pipelineDeployService.deleteDeploy(pipelineConfigure.getTaskId());
-                    }
-                }
-            }
-        }
+        pipelineDeployService.updateTask(map);
     }
 
 

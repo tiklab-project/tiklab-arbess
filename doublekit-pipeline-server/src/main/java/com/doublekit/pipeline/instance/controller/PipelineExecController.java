@@ -5,6 +5,7 @@ import com.doublekit.apibox.annotation.ApiMethod;
 import com.doublekit.apibox.annotation.ApiParam;
 import com.doublekit.common.Result;
 
+import com.doublekit.pipeline.instance.model.PipelineExecHistory;
 import com.doublekit.pipeline.instance.model.PipelineExecLog;
 import com.doublekit.pipeline.instance.service.PipelineExecService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,8 +35,8 @@ public class PipelineExecController {
     @RequestMapping(path="/findState",method = RequestMethod.POST)
     @ApiMethod(name = "findState",desc = "执行")
     @ApiParam(name = "pipelineId",desc = "流水线id",required = true)
-    public Result<PipelineExecLog> findState(@NotNull String pipelineId) throws Exception {
-        PipelineExecLog instanceState = pipelineExecService.findInstanceState(pipelineId);
+    public Result<PipelineExecHistory> findState(@NotNull String pipelineId) throws Exception {
+        PipelineExecHistory instanceState = pipelineExecService.findInstanceState(pipelineId);
         return Result.ok(instanceState);
     }
 

@@ -19,7 +19,7 @@ public class PipelineExecHistory {
 
     //构建历史id
     @ApiProperty(name="historyId",desc="构建历史id")
-    private int historyId;
+    private String historyId;
 
     //日志id
     @ApiProperty(name="logId",desc="日志id")
@@ -37,9 +37,13 @@ public class PipelineExecHistory {
     @ApiProperty(name="runLog",desc="运行日志")
     private String runLog;
 
-    //执行人
-    @ApiProperty(name="pipelineName",desc="执行人")
-    private String pipelineName;
+    //流水线
+    @ApiProperty(name="pipeline",desc="流水线id",eg="@selectOne")
+    @Mappings({
+            @Mapping(source = "pipeline.pipelineId",target = "pipelineId")
+    })
+    @JoinQuery(key = "pipelineId")
+    private Pipeline pipeline;
 
     //状态
     @ApiProperty(name="runStatus",desc="运行状态")
@@ -49,12 +53,11 @@ public class PipelineExecHistory {
     @ApiProperty(name="runTime",desc="运行时间")
     private int runTime;
 
-
-    public int getHistoryId() {
+    public String getHistoryId() {
         return historyId;
     }
 
-    public void setHistoryId(int historyId) {
+    public void setHistoryId(String historyId) {
         this.historyId = historyId;
     }
 
@@ -90,12 +93,12 @@ public class PipelineExecHistory {
         this.runLog = runLog;
     }
 
-    public String getPipelineName() {
-        return pipelineName;
+    public Pipeline getPipeline() {
+        return pipeline;
     }
 
-    public void setPipelineName(String pipelineName) {
-        this.pipelineName = pipelineName;
+    public void setPipeline(Pipeline pipeline) {
+        this.pipeline = pipeline;
     }
 
     public int getRunStatus() {

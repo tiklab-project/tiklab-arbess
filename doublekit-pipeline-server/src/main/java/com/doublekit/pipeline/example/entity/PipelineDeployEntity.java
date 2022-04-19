@@ -29,8 +29,8 @@ public class PipelineDeployEntity {
     private String deployShell;
 
     //凭证id
-    @Column(name = "proof_name")
-    private String proofName;
+    @Column(name = "proof_id")
+    private String proofId;
 
     //启动端口
     @Column(name = "deploy_docker_port")
@@ -80,12 +80,12 @@ public class PipelineDeployEntity {
         this.deployShell = deployShell;
     }
 
-    public String getProofName() {
-        return proofName;
+    public String getProofId() {
+        return proofId;
     }
 
-    public void setProofName(String proofName) {
-        this.proofName = proofName;
+    public void setProofId(String proofId) {
+        this.proofId = proofId;
     }
 
     public int getDockerPort() {

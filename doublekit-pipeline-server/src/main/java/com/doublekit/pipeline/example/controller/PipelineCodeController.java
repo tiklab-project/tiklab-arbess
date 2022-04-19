@@ -32,11 +32,4 @@ public class PipelineCodeController {
         return Result.ok(configureId);
     }
 
-    @RequestMapping(path="/deleteCode",method = RequestMethod.POST)
-    @ApiMethod(name = "deleteCode",desc = "创建源码配置")
-    @ApiParam(name = "codeId",desc = "codeId",required = true)
-    public Result<String> deleteCode(String codeId){
-        pipelineCodeService.deleteCode(codeId);
-        return Result.ok();
-    }
 }

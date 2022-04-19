@@ -1,8 +1,11 @@
 package com.doublekit.pipeline.instance.service.execAchieve;
 
 import ch.ethz.ssh2.Connection;
+import com.doublekit.pipeline.definition.model.PipelineConfigure;
+import com.doublekit.pipeline.definition.service.PipelineConfigureService;
+import com.doublekit.pipeline.instance.model.PipelineExecHistory;
 import com.doublekit.pipeline.instance.model.PipelineExecLog;
-import com.doublekit.pipeline.instance.service.PipelineExecLogService;
+import com.doublekit.pipeline.instance.service.PipelineExecHistoryService;
 import com.doublekit.pipeline.setting.proof.model.Proof;
 import com.doublekit.rpc.annotation.Exporter;
 import com.jcraft.jsch.*;
@@ -12,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -22,10 +26,13 @@ import java.util.Map;
 public class CommonAchieve {
 
     @Autowired
-    PipelineExecLogService pipelineExecLogService;
+    PipelineExecHistoryService pipelineExecHistoryService;
+
+    @Autowired
+    PipelineConfigureService pipelineConfigureService;
 
     //存放过程状态
-    List<PipelineExecLog> pipelineExecLogList = new ArrayList<>();
+    List<PipelineExecHistory> pipelineExecHistoryList = new ArrayList<>();
 
     //存放构建流水线id
     List<String> pipelineIdList = new ArrayList<>();
@@ -36,43 +43,44 @@ public class CommonAchieve {
      *  执行ssh命令
      * @param proof 凭证信息
      * @param order 执行命令
-     * @param pipelineExecLog 日志信息
+     * @param pipelineExecHistory 日志信息
      * @return 执行状态
      * @throws IOException 日志读写异常
      */
-    public Map<String, String> sshOrder(Proof proof, String order, PipelineExecLog pipelineExecLog) throws IOException {
+    public Map<String, String> sshOrder(Proof proof, String order, PipelineExecHistory pipelineExecHistory) throws IOException {
         Connection conn = new Connection(proof.getProofIp(),proof.getProofPort());
         conn.connect();
         conn.authenticateWithPassword(proof.getProofUsername(), proof.getProofPassword());
         ch.ethz.ssh2.Session session = conn.openSession();
-        pipelineExecLog.setLogRunLog(pipelineExecLog.getLogRunLog() + "\n" + order);
+        pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog() + "\n" + order);
         session.execCommand(order);
         InputStreamReader inputStreamReader = new InputStreamReader(session.getStdout());
-        Map<String, String> map = log(inputStreamReader, pipelineExecLog);
+        Map<String, String> map = log(inputStreamReader, pipelineExecHistory);
         session.close();
         inputStreamReader.close();
         return map;
     }
 
     /**
-     * 执行产生的日志
+     * 执行日志
      * @param inputStreamReader 执行信息
-     * @param pipelineExecLog 日志信息
+     * @param pipelineExecHistory 历史
      * @throws IOException 字符流转换异常
+     * @return map 执行状态
      */
-    public Map<String, String> log(InputStreamReader inputStreamReader , PipelineExecLog pipelineExecLog) throws IOException {
+    public Map<String, String> log(InputStreamReader inputStreamReader , PipelineExecHistory pipelineExecHistory) throws IOException {
         Map<String, String> map = new HashMap<>();
         String s;
-        //InputStreamReader  inputStreamReader = new InputStreamReader(process.getInputStream());
+        // InputStreamReader  inputStreamReader = new InputStreamReader(process.getInputStream());
         BufferedReader  bufferedReader = new BufferedReader(inputStreamReader);
         String logRunLog = "";
         //更新日志信息
         while ((s = bufferedReader.readLine()) != null) {
             logRunLog = logRunLog + s + "\n";
-            pipelineExecLog.setLogRunLog(pipelineExecLog.getLogRunLog()+s+"\n");
-            pipelineExecLogList.add(pipelineExecLog);
+            pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+s+"\n");
+            pipelineExecHistoryList.add(pipelineExecHistory);
             if (logRunLog.contains("BUILD FAILURE")){
-                pipelineExecLogList.add(pipelineExecLog);
+                pipelineExecHistoryList.add(pipelineExecHistory);
                 map.put("state","0");
                 map.put("log",logRunLog);
                 return map;
@@ -231,56 +239,97 @@ public class CommonAchieve {
 
     /**
      * 输出错误信息
-     * @param pipelineExecLog 日志
+     * @param pipelineExecHistory 历史
      * @param pipelineId 流水线id
      * @param e 错误信息
      */
-    // public  void  error(PipelineExecLog pipelineExecLog, String e, String pipelineId){
-    //     if (pipelineExecLog.getLogRunLog() != null){
-    //         pipelineExecLog.setLogRunLog(pipelineExecLog.getLogRunLog()+ "\n" + e + "\n" + " RUN RESULT : FAIL");
-    //     }else {
-    //         pipelineExecLog.setLogRunLog("\n" + e + "\n"+ " RUN RESULT : FAIL");
-    //     }
-    //     pipelineExecLog.setLogRunStatus(1);
-    //     // 清空缓存
-    //     clean(pipelineExecLog,pipelineId);
-    // }
+    public  void  error(PipelineExecHistory pipelineExecHistory, String e, String pipelineId){
+        if (pipelineExecHistory.getRunLog() != null){
+            pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+ "\n" + e + "\n" + " RUN RESULT : FAIL");
+        }else {
+            pipelineExecHistory.setRunLog("\n" + e + "\n"+ " RUN RESULT : FAIL");
+        }
+        pipelineExecHistory.setRunStatus(1);
+        // 清空缓存
+        clean(pipelineExecHistory,pipelineId);
+    }
 
     /**
      * 输出成功信息
-     * @param pipelineExecLog 日志
+     * @param pipelineExecHistory 历史
      * @param pipelineId 流水线id
      */
-    // public  void  success(PipelineExecLog pipelineExecLog, String pipelineId) {
-    //     if (pipelineExecLog.getLogRunLog() != null){
-    //         pipelineExecLog.setLogRunLog(pipelineExecLog.getLogRunLog()+ "\n"  + "\n" + " RUN RESULT : SUCCESS");
-    //     }else {
-    //         pipelineExecLog.setLogRunLog( "\n"+ " RUN RESULT : SUCCESS");
-    //     }
-    //     pipelineExecLog.setLogRunStatus(30);
-    //     //清空缓存
-    //     clean(pipelineExecLog,pipelineId);
-    //
-    // }
+    public  void  success(PipelineExecHistory pipelineExecHistory, String pipelineId) {
+        if (pipelineExecHistory.getRunLog() != null){
+            pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+ "\n"  + "\n" + " RUN RESULT : SUCCESS");
+        }else {
+            pipelineExecHistory.setRunLog( "\n"+ " RUN RESULT : SUCCESS");
+        }
+        pipelineExecHistory.setRunStatus(30);
+        //清空缓存
+        clean(pipelineExecHistory,pipelineId);
+    }
 
 
-    //清空缓存
-    // public  void clean(PipelineExecLog pipelineExecLog, String pipelineId){
-    //     pipelineExecLogList.add(pipelineExecLog);
-    //
-    //     //执行完成移除构建id
-    //     if (pipelineIdList != null) {
-    //         pipelineIdList.removeIf(id -> id.equals(pipelineId));
-    //     }
-    //     pipelineExecLogService.updateLog(pipelineExecLog);
-    //     //恢复中断状态
-    //     try {
-    //         Thread.sleep(1000);
-    //     } catch (InterruptedException s) {
-    //         Thread.currentThread().interrupt();
-    //     }
-    //     // 清除集合缓存
-    //     pipelineExecLogList.removeIf(log -> log.getPipelineId().equals(pipelineId));
-    // }
+    /**
+     * 清空缓存
+     * @param pipelineExecHistory 历史
+     * @param pipelineId 流水线id
+     */
+    public  void clean(PipelineExecHistory pipelineExecHistory, String pipelineId){
+        pipelineExecHistoryList.add(pipelineExecHistory);
+
+        //执行完成移除构建id
+        if (pipelineIdList != null) {
+            pipelineIdList.removeIf(id -> id.equals(pipelineId));
+        }
+        pipelineExecHistoryService.updateHistory(pipelineExecHistory);
+        //恢复中断状态
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException s) {
+            Thread.currentThread().interrupt();
+        }
+        // 清除集合缓存
+        pipelineExecHistoryList.removeIf(history -> history.getPipeline().getPipelineId().equals(pipelineId));
+    }
+
+
+    /**
+     * 更新执行时间
+     * @param pipelineExecHistory 历史
+     * @param pipelineExecLog 日志
+     * @param beginTime 开始时间
+     */
+    public void updateTime(PipelineExecHistory pipelineExecHistory, PipelineExecLog pipelineExecLog, long beginTime){
+        long overTime = new Timestamp(System.currentTimeMillis()).getTime();
+        int time = (int) (overTime - beginTime) / 1000;
+        pipelineExecLog.setLogRunTime(time);
+        pipelineExecHistory.setRunTime(pipelineExecHistory.getRunTime()+time);
+    }
+
+
+    /**
+     * 更新状态
+     * @param pipelineExecHistory 历史
+     * @param pipelineExecLog 日志
+     * @param e 异常
+     * @param pipelineExecHistoryList 状态集合
+     */
+    public  void updateState(PipelineExecHistory pipelineExecHistory,PipelineExecLog pipelineExecLog,String e,List<PipelineExecHistory> pipelineExecHistoryList){
+        pipelineExecLog.setLogRunState(10);
+        PipelineConfigure pipelineConfigure = pipelineConfigureService.findOneConfigure(pipelineExecHistory.getPipeline().getPipelineId(), 20);
+
+        if (e != null){
+            pipelineExecLog.setLogRunState(1);
+            error(pipelineExecHistory,e, pipelineExecHistory.getPipeline().getPipelineId());
+        }
+        pipelineExecLog.setTaskLogSort(pipelineConfigure.getTaskSort());
+        pipelineExecLog.setTaskLogType(pipelineConfigure.getTaskType());
+        pipelineExecLog.setHistoryId(pipelineExecHistory.getHistoryId());
+        pipelineExecHistoryService.createLog(pipelineExecLog);
+        pipelineExecHistoryService.updateHistory(pipelineExecHistory);
+        pipelineExecHistoryList.add(pipelineExecHistory);
+    }
 
 }

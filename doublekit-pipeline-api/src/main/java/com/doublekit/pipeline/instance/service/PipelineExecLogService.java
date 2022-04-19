@@ -6,7 +6,6 @@ import com.doublekit.join.annotation.FindOne;
 import com.doublekit.join.annotation.JoinProvider;
 import com.doublekit.pipeline.instance.model.PipelineExecHistory;
 import com.doublekit.pipeline.instance.model.PipelineExecLog;
-
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.List;
@@ -23,11 +22,6 @@ public interface PipelineExecLogService {
      */
      String createLog(@NotNull @Valid PipelineExecLog pipelineExecLog);
 
-    /**
-     * 创建日志以及关联表
-     * @return 日志信息
-     */
-     PipelineExecLog createLog();
     /**
      * 删除流水线日志
      * @param logId 流水线日志id

@@ -21,6 +21,6 @@ public interface PipelineExecService {
      * @param pipelineId 流水线id
      * @return 状态信息
      */
-    PipelineExecLog findInstanceState(String pipelineId) ;
+    PipelineExecHistory findInstanceState(String pipelineId) ;
 
 }

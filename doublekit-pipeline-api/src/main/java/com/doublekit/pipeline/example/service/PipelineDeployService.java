@@ -51,6 +51,12 @@ public interface PipelineDeployService {
      void updateDeploy(PipelineDeploy pipelineDeploy) ;
 
     /**
+     * 更新任务
+     * @param map 更新信息
+     */
+    void updateTask(Map<String,Object> map);
+
+    /**
      * 获取部署凭证
      * @param deployId 部署id
      * @return 凭证信息

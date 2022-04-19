@@ -32,7 +32,6 @@ public class PipelineConfigureServiceImpl implements PipelineConfigureService {
     @Autowired
     PipelineCodeService pipelineCodeService;
 
-
     private static final Logger logger = LoggerFactory.getLogger(PipelineConfigureServiceImpl.class);
 
     //创建
@@ -45,6 +44,20 @@ public class PipelineConfigureServiceImpl implements PipelineConfigureService {
     @Override
     public void deleteConfigure(String configureId) {
         pipelineConfigureDao.deleteConfigure(configureId);
+    }
+
+    @Override
+    public PipelineConfigure findOneConfigure(String pipelineId, int type) {
+        List<PipelineConfigure> allConfigure = findAllConfigure(pipelineId);
+        if (allConfigure != null){
+            for (PipelineConfigure pipelineConfigure : allConfigure) {
+                int taskType = pipelineConfigure.getTaskType();
+                if (taskType < type && taskType > type - 10){
+                    return pipelineConfigure;
+                }
+            }
+        }
+        return null;
     }
 
     //更新配置
@@ -89,7 +102,6 @@ public class PipelineConfigureServiceImpl implements PipelineConfigureService {
         }
     }
 
-
     //删除所有任务
     @Override
     public void deleteAllTask(String pipelineId) {
@@ -104,7 +116,6 @@ public class PipelineConfigureServiceImpl implements PipelineConfigureService {
     //更新任务
     @Override
     public void updateTask(String pipelineId , String params){
-        logger.info("params ： "+params);
         HashMap<String, Object> map = new HashMap<>();
         JSONObject jsonObject = JSONObject.parseObject(params);
         map.put("pipelineCode",jsonObject.getObject("pipelineCode", PipelineCode.class));

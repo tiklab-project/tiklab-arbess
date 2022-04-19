@@ -43,16 +43,4 @@ public class PipelineConfigureController {
         return Result.ok();
     }
 
-
-    //更新信息
-    @RequestMapping(path="/deleteTask",method = RequestMethod.POST)
-    @ApiMethod(name = "deleteTask",desc = "删除任务")
-    @ApiParam(name = "taskId",desc = "任务",required = true)
-    public Result<Void> deleteTask(@NotNull String taskId,String pipelineId){
-        pipelineConfigureService.deleteTask(taskId,pipelineId);
-        return Result.ok();
-    }
-
-
-
 }

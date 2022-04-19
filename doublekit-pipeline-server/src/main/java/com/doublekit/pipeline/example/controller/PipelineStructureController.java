@@ -33,12 +33,6 @@ public class PipelineStructureController {
     }
     
 
-    @RequestMapping(path="/deleteStructure",method = RequestMethod.POST)
-    @ApiMethod(name = "deleteStructure",desc = "创建源码配置")
-    @ApiParam(name = "structureId",desc = "structureId",required = true)
-    public Result<String> deleteStructure(String structureId){
-        pipelineStructureService.deleteStructure(structureId);
-        return Result.ok();
-    }
+
 
 }

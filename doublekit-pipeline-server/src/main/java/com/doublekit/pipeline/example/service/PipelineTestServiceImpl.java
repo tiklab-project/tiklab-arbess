@@ -76,19 +76,17 @@ public class PipelineTestServiceImpl implements PipelineTestService {
     @Override
     public void updateTask(Map<String,Object> map) {
         PipelineTest pipelineTest = (PipelineTest) map.get("pipelineTest");
-        if (pipelineTest.getTestId() != null){
-            updateTest(pipelineTest);
-        }
-        if (pipelineTest.getType() == 0){
-            List<PipelineConfigure> configureList = pipelineConfigureService.findAllConfigure(map.get("pipelineId").toString());
-            if (configureList != null){
-                for (PipelineConfigure pipelineConfigure : configureList) {
-                    if (pipelineConfigure.getTaskType() > 10 && pipelineConfigure.getTaskType() < 20){
-                        pipelineConfigureService.deleteConfigure(pipelineConfigure.getConfigureId());
-                        deleteTest(pipelineConfigure.getTaskId());
-                    }
-                }
+        String pipelineId = map.get("pipelineId").toString();
+        PipelineConfigure oneConfigure = pipelineConfigureService.findOneConfigure(pipelineId, 20);
+        if (oneConfigure != null){
+            if (pipelineTest.getType() != 0){
+                updateTest(pipelineTest);
+            }else {
+                pipelineConfigureService.deleteTask(oneConfigure.getTaskId(),pipelineId);
             }
+        }
+        if (oneConfigure == null && pipelineTest.getType() != 0){
+            createConfigure(pipelineId,pipelineTest.getType());
         }
         pipelineStructureService.updateTask(map);
     }

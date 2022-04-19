@@ -3,7 +3,11 @@ package com.doublekit.pipeline.example.model;
 import com.doublekit.apibox.annotation.ApiModel;
 import com.doublekit.apibox.annotation.ApiProperty;
 import com.doublekit.beans.annotation.Mapper;
+import com.doublekit.beans.annotation.Mapping;
+import com.doublekit.beans.annotation.Mappings;
 import com.doublekit.join.annotation.Join;
+import com.doublekit.join.annotation.JoinQuery;
+import com.doublekit.pipeline.setting.proof.model.Proof;
 
 @ApiModel
 @Join
@@ -30,9 +34,13 @@ public class PipelineDeploy {
     @ApiProperty(name = "deployShell" , desc = "部署脚本")
     private String deployShell;
 
-    //凭证信息
-    @ApiProperty(name="proofName",desc="凭证信息")
-    private String proofName;
+    //凭证id
+    @ApiProperty(name="proof",desc="凭证id",eg="@selectOne")
+    @Mappings({
+            @Mapping(source = "proof.proofId",target = "proofId")
+    })
+    @JoinQuery(key = "proofId")
+    private Proof proof;
 
     //启动端口
     @ApiProperty(name = "dockerPort",desc="启动端口")
@@ -84,12 +92,12 @@ public class PipelineDeploy {
         this.deployShell = deployShell;
     }
 
-    public String getProofName() {
-        return proofName;
+    public Proof getProof() {
+        return proof;
     }
 
-    public void setProofName(String proofName) {
-        this.proofName = proofName;
+    public void setProof(Proof proof) {
+        this.proof = proof;
     }
 
     public int getDockerPort() {
