@@ -26,6 +26,13 @@ public class PipelineStructure {
     @ApiProperty(name="structureOrder",desc="构建命令")
     private String structureOrder;
 
+    //顺序
+    @ApiProperty(name = "sort",desc="顺序")
+    private int sort;
+
+    //别名
+    @ApiProperty(name = "structureAlias",desc="别名")
+    private String structureAlias;
 
     public String getStructureId() {
         return structureId;
@@ -59,6 +66,19 @@ public class PipelineStructure {
         this.structureOrder = structureOrder;
     }
 
+    public int getSort() {
+        return sort;
+    }
 
+    public void setSort(int sort) {
+        this.sort = sort;
+    }
 
+    public String getStructureAlias() {
+        return structureAlias;
+    }
+
+    public void setStructureAlias(String structureAlias) {
+        this.structureAlias = structureAlias;
+    }
 }

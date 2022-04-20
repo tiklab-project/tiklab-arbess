@@ -43,6 +43,14 @@ public class PipelineCode {
     @JoinQuery(key = "proofId")
     private Proof proof;
 
+    //顺序
+    @ApiProperty(name = "sort",desc="顺序")
+    private int sort;
+
+    //别名
+    @ApiProperty(name = "codeAlias",desc="别名")
+    private String codeAlias;
+
 
     public String getCodeId() {
         return codeId;
@@ -90,5 +98,22 @@ public class PipelineCode {
 
     public void setProof(Proof proof) {
         this.proof = proof;
+    }
+
+    public int getSort() {
+        return sort;
+    }
+
+    public void setSort(int sort) {
+        this.sort = sort;
+    }
+
+
+    public String getCodeAlias() {
+        return codeAlias;
+    }
+
+    public void setCodeAlias(String codeAlias) {
+        this.codeAlias = codeAlias;
     }
 }

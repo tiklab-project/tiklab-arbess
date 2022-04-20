@@ -53,6 +53,7 @@ public class PipelineCodeServiceImpl implements PipelineCodeService {
         String codeId = createCode(pipelineCode);
         pipelineConfigure.setTaskId(codeId);
         pipelineConfigure.setTaskType(taskType);
+        pipelineConfigure.setTaskSort(pipelineCode.getSort());
         pipelineConfigureService.createTask(pipelineConfigure,pipelineId);
         return codeId;
     }
@@ -87,6 +88,8 @@ public class PipelineCodeServiceImpl implements PipelineCodeService {
         if (oneConfigure != null){
             if (pipelineCode.getType() != 0){
                     updateCode(pipelineCode);
+                    oneConfigure.setTaskSort(1);
+                    pipelineConfigureService.updateConfigure(oneConfigure);
             }else {
                 pipelineConfigureService.deleteTask(oneConfigure.getTaskId(),pipelineId);
             }

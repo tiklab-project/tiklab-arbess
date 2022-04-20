@@ -50,6 +50,13 @@ public class PipelineDeploy {
     @ApiProperty(name = "mappingPort",desc="映射端口")
     private int mappingPort;
 
+    //顺序
+    @ApiProperty(name = "sort",desc="顺序")
+    private int sort;
+
+    //别名
+    @ApiProperty(name = "deployAlias",desc="别名")
+    private String deployAlias;
 
     public String getDeployId() {
         return deployId;
@@ -116,5 +123,19 @@ public class PipelineDeploy {
         this.mappingPort = mappingPort;
     }
 
+    public int getSort() {
+        return sort;
+    }
 
+    public void setSort(int sort) {
+        this.sort = sort;
+    }
+
+    public String getDeployAlias() {
+        return deployAlias;
+    }
+
+    public void setDeployAlias(String deployAlias) {
+        this.deployAlias = deployAlias;
+    }
 }

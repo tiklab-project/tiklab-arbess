@@ -40,6 +40,15 @@ public class PipelineDeployEntity {
     @Column(name = "deploy_mapping_port")
     private int mappingPort;
 
+    //顺序
+    @Column(name = "sort",notNull = true)
+    private int sort;
+
+    //别名
+    @Column(name = "deploy_alias",notNull = true)
+    private String deployAlias;
+
+
     public String getDeployId() {
         return deployId;
     }
@@ -102,5 +111,21 @@ public class PipelineDeployEntity {
 
     public void setMappingPort(int mappingPort) {
         this.mappingPort = mappingPort;
+    }
+
+    public int getSort() {
+        return sort;
+    }
+
+    public void setSort(int sort) {
+        this.sort = sort;
+    }
+
+    public String getDeployAlias() {
+        return deployAlias;
+    }
+
+    public void setDeployAlias(String deployAlias) {
+        this.deployAlias = deployAlias;
     }
 }

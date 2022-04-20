@@ -22,7 +22,13 @@ public class PipelineTest {
     @ApiProperty(name="testOrder",desc="测试内容",required = true)
     private String testOrder;
 
+    //顺序
+    @ApiProperty(name = "sort",desc="顺序")
+    private int sort;
 
+    //别名
+    @ApiProperty(name = "testAlias",desc="别名")
+    private String testAlias;
 
     public String getTestId() {
         return testId;
@@ -48,4 +54,19 @@ public class PipelineTest {
         this.testOrder = testOrder;
     }
 
+    public int getSort() {
+        return sort;
+    }
+
+    public void setSort(int sort) {
+        this.sort = sort;
+    }
+
+    public String getTestAlias() {
+        return testAlias;
+    }
+
+    public void setTestAlias(String testAlias) {
+        this.testAlias = testAlias;
+    }
 }

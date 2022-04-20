@@ -6,7 +6,6 @@ import com.doublekit.dal.jpa.annotation.*;
 @Table(name="pipeline_test")
 public class PipelineTestEntity {
 
-    //gitId
     @Id
     @GeneratorValue
     @Column(name = "test_id")
@@ -18,6 +17,14 @@ public class PipelineTestEntity {
     //地址
     @Column(name = "test_order",notNull = true)
     private String testOrder;
+
+    //顺序
+    @Column(name = "sort",notNull = true)
+    private int sort;
+    
+    //别名
+    @Column(name = "test_alias",notNull = true)
+    private String testAlias;
 
     public String getTestId() {
         return testId;
@@ -41,5 +48,21 @@ public class PipelineTestEntity {
 
     public void setTestOrder(String testOrder) {
         this.testOrder = testOrder;
+    }
+
+    public int getSort() {
+        return sort;
+    }
+
+    public void setSort(int sort) {
+        this.sort = sort;
+    }
+
+    public String getTestAlias() {
+        return testAlias;
+    }
+
+    public void setTestAlias(String testAlias) {
+        this.testAlias = testAlias;
     }
 }

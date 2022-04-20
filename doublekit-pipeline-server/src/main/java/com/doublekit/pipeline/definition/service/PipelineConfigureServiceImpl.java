@@ -74,16 +74,6 @@ public class PipelineConfigureServiceImpl implements PipelineConfigureService {
         pipelineConfigure.setPipeline(pipeline);
         String time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
         pipelineConfigure.setCreateTime(time);
-        List<PipelineConfigure> allConfigure = findAllConfigure(pipelineId);
-        pipelineConfigure.setTaskSort(2);
-        if (allConfigure != null){
-            allConfigure.sort(Comparator.comparing(PipelineConfigure::getTaskSort));
-            PipelineConfigure configure = allConfigure.get(allConfigure.size() - 1);
-            pipelineConfigure.setTaskSort(configure.getTaskSort()+1);
-        }
-        if (pipelineConfigure.getTaskType() < 10){
-            pipelineConfigure.setTaskSort(1);
-        }
         createConfigure(pipelineConfigure);
     }
 

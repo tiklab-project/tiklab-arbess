@@ -23,6 +23,13 @@ public class PipelineStructureEntity {
     @Column(name = "structure_order",notNull = true)
     private String structureOrder;
 
+    //顺序
+    @Column(name = "sort",notNull = true)
+    private int sort;
+
+    //别名
+    @Column(name = "structure_alias",notNull = true)
+    private String structureAlias;
 
 
     public String getStructureId() {
@@ -55,5 +62,21 @@ public class PipelineStructureEntity {
 
     public void setStructureOrder(String structureOrder) {
         this.structureOrder = structureOrder;
+    }
+
+    public int getSort() {
+        return sort;
+    }
+
+    public void setSort(int sort) {
+        this.sort = sort;
+    }
+
+    public String getStructureAlias() {
+        return structureAlias;
+    }
+
+    public void setStructureAlias(String structureAlias) {
+        this.structureAlias = structureAlias;
     }
 }

@@ -46,6 +46,7 @@ public class PipelineTestServiceImpl implements PipelineTestService {
         pipelineConfigure.setTaskType(taskType);
         String testId = createTest(pipelineTest);
         pipelineConfigure.setTaskId(testId);
+        pipelineConfigure.setTaskSort(pipelineTest.getSort());
         pipelineConfigureService.createTask(pipelineConfigure,pipelineId);
         return testId;
     }
@@ -80,6 +81,8 @@ public class PipelineTestServiceImpl implements PipelineTestService {
         if (oneConfigure != null){
             if (pipelineTest.getType() != 0){
                 updateTest(pipelineTest);
+                oneConfigure.setTaskSort(pipelineTest.getSort());
+                pipelineConfigureService.updateConfigure(oneConfigure);
             }else {
                 pipelineConfigureService.deleteTask(oneConfigure.getTaskId(),pipelineId);
             }
@@ -97,7 +100,7 @@ public class PipelineTestServiceImpl implements PipelineTestService {
     }
 
     @Override
-    public List<Object>  findOneTask( PipelineConfigure pipelineConfigure,List<Object> list) {
+    public List<Object> findOneTask( PipelineConfigure pipelineConfigure,List<Object> list) {
             if (pipelineConfigure.getTaskType() < 20 && pipelineConfigure.getTaskType() >10 ){
                 PipelineTest oneTest = findOneTest(pipelineConfigure.getTaskId());
                 list.add(oneTest);

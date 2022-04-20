@@ -42,6 +42,7 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
         String structureId = createStructure(pipelineStructure);
         pipelineConfigure.setTaskId(structureId);
         pipelineConfigure.setTaskType(taskType);
+        pipelineConfigure.setTaskSort(pipelineStructure.getSort());
         pipelineConfigureService.createTask(pipelineConfigure,pipelineId);
         return structureId;
     }
@@ -77,6 +78,8 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
         if (oneConfigure != null){
             if (pipelineStructure.getType() != 0){
                 updateStructure(pipelineStructure);
+                oneConfigure.setTaskSort(pipelineStructure.getSort());
+                pipelineConfigureService.updateConfigure(oneConfigure);
             }else {
                 pipelineConfigureService.deleteTask(oneConfigure.getTaskId(),pipelineId);
             }

@@ -2,11 +2,14 @@ package com.doublekit.pipeline.setting.proof.service;
 
 import com.doublekit.beans.BeanMapper;
 import com.doublekit.join.JoinTemplate;
+import com.doublekit.pipeline.example.service.PipelineCodeServiceImpl;
 import com.doublekit.pipeline.example.service.codeGit.CodeGiteeApiService;
 import com.doublekit.pipeline.setting.proof.dao.ProofDao;
 import com.doublekit.pipeline.setting.proof.entity.ProofEntity;
 import com.doublekit.pipeline.setting.proof.model.Proof;
 import com.doublekit.rpc.annotation.Exporter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +29,7 @@ public class ProofServiceImpl implements ProofService{
    @Autowired
    CodeGiteeApiService codeGiteeApiService;
 
+    private static final Logger logger = LoggerFactory.getLogger(PipelineCodeServiceImpl.class);
 
     //创建
     @Override
@@ -34,7 +38,7 @@ public class ProofServiceImpl implements ProofService{
         if (allProof != null){
             for (Proof proof1 : allProof) {
                 if (proof.getProofName().equals(proof1.getProofName())){
-                    return null;
+                    return "1";
                 }
             }
         }
@@ -62,20 +66,6 @@ public class ProofServiceImpl implements ProofService{
         Proof proof = BeanMapper.map(proofEntity, Proof.class);
         joinTemplate.joinQuery(proof);
         return proof;
-    }
-
-    //根据名称获取凭证
-    public Proof fondOneName(String proofName){
-        String[] s = proofName.split(" ");
-        if (s.length ==2){
-            List<Proof> allProof = findAllProof();
-            for (Proof proof : allProof) {
-                if (proof.getProofName().equals(s[0])){
-                    return proof;
-                }
-            }
-        }
-        return null;
     }
 
     //查询所有

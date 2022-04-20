@@ -29,8 +29,16 @@ public class PipelineCodeEntity {
     private String codeBranch;
 
     //凭证名称
-    @Column(name = "proof_id")
+    @Column(name = "proof_id",notNull = true)
     private String proofId;
+
+    //顺序
+    @Column(name = "sort",notNull = true)
+    private int sort;
+
+    //别名
+    @Column(name = "code_alias",notNull = true)
+    private String codeAlias;
 
 
     public String getCodeId() {
@@ -79,5 +87,21 @@ public class PipelineCodeEntity {
 
     public void setProofId(String proofId) {
         this.proofId = proofId;
+    }
+
+    public int getSort() {
+        return sort;
+    }
+
+    public void setSort(int sort) {
+        this.sort = sort;
+    }
+
+    public String getCodeAlias() {
+        return codeAlias;
+    }
+
+    public void setCodeAlias(String codeAlias) {
+        this.codeAlias = codeAlias;
     }
 }
