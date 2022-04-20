@@ -2,6 +2,7 @@ package com.doublekit.pipeline.example.service;
 
 import com.doublekit.beans.BeanMapper;
 import com.doublekit.pipeline.definition.model.PipelineConfigure;
+import com.doublekit.pipeline.definition.model.PipelineExecConfigure;
 import com.doublekit.pipeline.definition.service.PipelineConfigureService;
 import com.doublekit.pipeline.example.dao.PipelineStructureDao;
 import com.doublekit.pipeline.example.entity.PipelineStructureEntity;
@@ -71,9 +72,9 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
 
     //更改构建信息
     @Override
-    public void updateTask(Map<String,Object> map) {
-        PipelineStructure pipelineStructure = (PipelineStructure) map.get("pipelineStructure");
-        String pipelineId = map.get("pipelineId").toString();
+    public void updateTask(PipelineExecConfigure pipelineExecConfigure) {
+        PipelineStructure pipelineStructure = pipelineExecConfigure.getPipelineStructure();
+        String pipelineId = pipelineExecConfigure.getPipelineId();
         PipelineConfigure oneConfigure = pipelineConfigureService.findOneConfigure(pipelineId, 30);
         if (oneConfigure != null){
             if (pipelineStructure.getType() != 0){
@@ -87,7 +88,7 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
         if (oneConfigure == null && pipelineStructure.getType() != 0){
             createConfigure(pipelineId,pipelineStructure.getType(),pipelineStructure);
         }
-        pipelineDeployService.updateTask(map);
+        pipelineDeployService.updateTask(pipelineExecConfigure);
     }
 
 

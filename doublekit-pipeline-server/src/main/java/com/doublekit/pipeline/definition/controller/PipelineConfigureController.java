@@ -1,16 +1,21 @@
 package com.doublekit.pipeline.definition.controller;
 
+import com.alibaba.fastjson.JSONObject;
 import com.doublekit.apibox.annotation.Api;
 import com.doublekit.apibox.annotation.ApiMethod;
 import com.doublekit.apibox.annotation.ApiParam;
 import com.doublekit.common.Result;
+import com.doublekit.pipeline.definition.model.PipelineExecConfigure;
 import com.doublekit.pipeline.definition.service.PipelineConfigureService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
@@ -37,9 +42,9 @@ public class PipelineConfigureController {
     //更新信息
     @RequestMapping(path="/updateConfigure",method = RequestMethod.POST)
     @ApiMethod(name = "updateConfigure",desc = "更新流水线配置")
-    @ApiParam(name = "pipelineId",desc = "流水线id",required = true)
-    public Result<Void> updateConfigure( @NotNull String pipelineId, @NotNull String params){
-        pipelineConfigureService.updateTask(pipelineId,params);
+    @ApiParam(name = "pipelineExecConfigure",desc = "pipelineExecConfigure",required = true)
+    public Result<Void> updateConfigure(@RequestBody @NotNull @Valid PipelineExecConfigure pipelineExecConfigure){
+        pipelineConfigureService.updateTask(pipelineExecConfigure);
         return Result.ok();
     }
 

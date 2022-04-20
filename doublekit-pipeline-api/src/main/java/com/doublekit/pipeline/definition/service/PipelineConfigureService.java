@@ -6,6 +6,7 @@ import com.doublekit.join.annotation.FindList;
 import com.doublekit.join.annotation.FindOne;
 import com.doublekit.join.annotation.JoinProvider;
 import com.doublekit.pipeline.definition.model.PipelineConfigure;
+import com.doublekit.pipeline.definition.model.PipelineExecConfigure;
 import com.doublekit.pipeline.instance.model.PipelineExecHistory;
 import com.doublekit.pipeline.setting.proof.model.Proof;
 
@@ -69,11 +70,9 @@ public interface PipelineConfigureService {
 
     /**
      * 更新任务信息
-     * @param pipelineId 流水线id
-     * @param params 更新信息
+     * @param pipelineExecConfigure 更新信息
      */
-    void updateTask(String pipelineId , String params);
-
+    void updateTask(PipelineExecConfigure pipelineExecConfigure);
 
 
     /**

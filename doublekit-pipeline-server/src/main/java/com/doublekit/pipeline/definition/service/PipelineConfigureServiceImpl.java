@@ -8,6 +8,7 @@ import com.doublekit.pipeline.definition.dao.PipelineConfigureDao;
 import com.doublekit.pipeline.definition.entity.PipelineConfigureEntity;
 import com.doublekit.pipeline.definition.model.Pipeline;
 import com.doublekit.pipeline.definition.model.PipelineConfigure;
+import com.doublekit.pipeline.definition.model.PipelineExecConfigure;
 import com.doublekit.pipeline.example.model.*;
 import com.doublekit.pipeline.example.service.PipelineCodeService;
 import com.doublekit.rpc.annotation.Exporter;
@@ -105,15 +106,17 @@ public class PipelineConfigureServiceImpl implements PipelineConfigureService {
 
     //更新任务
     @Override
-    public void updateTask(String pipelineId , String params){
-        HashMap<String, Object> map = new HashMap<>();
-        JSONObject jsonObject = JSONObject.parseObject(params);
-        map.put("pipelineCode",jsonObject.getObject("pipelineCode", PipelineCode.class));
-        map.put("pipelineTest",jsonObject.getObject("pipelineTest", PipelineTest.class));
-        map.put("pipelineStructure",jsonObject.getObject("pipelineStructure", PipelineStructure.class));
-        map.put("pipelineDeploy",jsonObject.getObject("pipelineDeploy", PipelineDeploy.class));
-        map.put("pipelineId",pipelineId);
-        pipelineCodeService.updateTask(map);
+    public void updateTask(PipelineExecConfigure pipelineExecConfigure){
+
+        // HashMap<String, Object> map = new HashMap<>();
+        // JSONObject jsonObject = JSONObject.parseObject(params);
+        // map.put("pipelineCode",jsonObject.getObject("pipelineCode", PipelineCode.class));
+        // map.put("pipelineTest",jsonObject.getObject("pipelineTest", PipelineTest.class));
+        // map.put("pipelineStructure",jsonObject.getObject("pipelineStructure", PipelineStructure.class));
+        // map.put("pipelineDeploy",jsonObject.getObject("pipelineDeploy", PipelineDeploy.class));
+        // map.put("pipelineId",jsonObject.getObject("pipelineId", String.class));
+        // // map.put("pipelineId",pipelineId);
+        pipelineCodeService.updateTask(pipelineExecConfigure);
     }
 
     //查询

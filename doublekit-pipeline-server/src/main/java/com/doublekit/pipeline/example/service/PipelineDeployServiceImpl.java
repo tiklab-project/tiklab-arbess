@@ -3,6 +3,7 @@ package com.doublekit.pipeline.example.service;
 import com.doublekit.beans.BeanMapper;
 import com.doublekit.pipeline.definition.model.Pipeline;
 import com.doublekit.pipeline.definition.model.PipelineConfigure;
+import com.doublekit.pipeline.definition.model.PipelineExecConfigure;
 import com.doublekit.pipeline.definition.service.PipelineConfigureService;
 import com.doublekit.pipeline.example.dao.PipelineDeployDao;
 import com.doublekit.pipeline.example.entity.PipelineDeployEntity;
@@ -71,9 +72,9 @@ public class PipelineDeployServiceImpl implements PipelineDeployService {
     }
 
     @Override
-    public void updateTask(Map<String, Object> map) {
-        String pipelineId = map.get("pipelineId").toString();
-        PipelineDeploy pipelineDeploy = (PipelineDeploy) map.get("pipelineDeploy");
+    public void updateTask(PipelineExecConfigure pipelineExecConfigure) {
+        String pipelineId = pipelineExecConfigure.getPipelineId();
+        PipelineDeploy pipelineDeploy = pipelineExecConfigure.getPipelineDeploy();
         PipelineConfigure oneConfigure = pipelineConfigureService.findOneConfigure(pipelineId, 40);
         if (oneConfigure != null){
             if (pipelineDeploy.getType() != 0){

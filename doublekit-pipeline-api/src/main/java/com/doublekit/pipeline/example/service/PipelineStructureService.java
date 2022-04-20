@@ -5,6 +5,7 @@ import com.doublekit.join.annotation.FindList;
 import com.doublekit.join.annotation.FindOne;
 import com.doublekit.join.annotation.JoinProvider;
 import com.doublekit.pipeline.definition.model.PipelineConfigure;
+import com.doublekit.pipeline.definition.model.PipelineExecConfigure;
 import com.doublekit.pipeline.example.model.PipelineStructure;
 import com.doublekit.pipeline.example.model.PipelineTest;
 
@@ -51,7 +52,7 @@ public interface PipelineStructureService {
      * 更新任务
      * @param map 更新信息
      */
-    void updateTask(Map<String,Object> map);
+    void updateTask(PipelineExecConfigure pipelineExecConfigure);
 
     /**
      * 查询单个信息

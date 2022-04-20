@@ -3,6 +3,7 @@ package com.doublekit.pipeline.example.service;
 import com.doublekit.beans.BeanMapper;
 import com.doublekit.join.JoinTemplate;
 import com.doublekit.pipeline.definition.model.PipelineConfigure;
+import com.doublekit.pipeline.definition.model.PipelineExecConfigure;
 import com.doublekit.pipeline.definition.service.PipelineConfigureService;
 import com.doublekit.pipeline.example.dao.PipelineTestDao;
 import com.doublekit.pipeline.example.entity.PipelineTestEntity;
@@ -74,9 +75,9 @@ public class PipelineTestServiceImpl implements PipelineTestService {
     }
 
     @Override
-    public void updateTask(Map<String,Object> map) {
-        PipelineTest pipelineTest = (PipelineTest) map.get("pipelineTest");
-        String pipelineId = map.get("pipelineId").toString();
+    public void updateTask(PipelineExecConfigure pipelineExecConfigure) {
+        PipelineTest pipelineTest = pipelineExecConfigure.getPipelineTest();
+        String pipelineId = pipelineExecConfigure.getPipelineId();
         PipelineConfigure oneConfigure = pipelineConfigureService.findOneConfigure(pipelineId, 20);
         if (oneConfigure != null){
             if (pipelineTest.getType() != 0){
@@ -90,7 +91,7 @@ public class PipelineTestServiceImpl implements PipelineTestService {
         if (oneConfigure == null && pipelineTest.getType() != 0){
             createConfigure(pipelineId,pipelineTest.getType(),pipelineTest);
         }
-        pipelineStructureService.updateTask(map);
+        pipelineStructureService.updateTask(pipelineExecConfigure);
     }
 
     //查询单个

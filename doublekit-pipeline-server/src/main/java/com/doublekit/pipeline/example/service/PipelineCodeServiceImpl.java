@@ -5,6 +5,7 @@ import com.doublekit.beans.BeanMapper;
 
 import com.doublekit.pipeline.definition.model.Pipeline;
 import com.doublekit.pipeline.definition.model.PipelineConfigure;
+import com.doublekit.pipeline.definition.model.PipelineExecConfigure;
 import com.doublekit.pipeline.definition.service.PipelineConfigureService;
 import com.doublekit.pipeline.example.dao.PipelineCodeDao;
 import com.doublekit.pipeline.example.entity.PipelineCodeEntity;
@@ -81,9 +82,9 @@ public class PipelineCodeServiceImpl implements PipelineCodeService {
 
     //修改任务
     @Override
-    public void updateTask(Map<String,Object> map) {
-        PipelineCode pipelineCode =(PipelineCode) map.get("pipelineCode");
-        String pipelineId = map.get("pipelineId").toString();
+    public void updateTask(PipelineExecConfigure pipelineExecConfigure) {
+        String pipelineId = pipelineExecConfigure.getPipelineId();
+        PipelineCode pipelineCode =pipelineExecConfigure.getPipelineCode();
         PipelineConfigure oneConfigure = pipelineConfigureService.findOneConfigure(pipelineId, 10);
         if (oneConfigure != null){
             if (pipelineCode.getType() != 0){
@@ -97,7 +98,7 @@ public class PipelineCodeServiceImpl implements PipelineCodeService {
         if (oneConfigure == null && pipelineCode.getType() != 0){
             createConfigure(pipelineId, pipelineCode.getType(),pipelineCode);
         }
-        pipelineTestService.updateTask(map);
+        pipelineTestService.updateTask(pipelineExecConfigure);
     }
 
     //查询单个
