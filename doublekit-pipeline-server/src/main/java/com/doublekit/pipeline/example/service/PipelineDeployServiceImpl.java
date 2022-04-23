@@ -43,6 +43,10 @@ public class PipelineDeployServiceImpl implements PipelineDeployService {
     public String createConfigure(String pipelineId,int taskType, PipelineDeploy pipelineDeploy) {
         pipelineDeploy.setType(taskType);
         PipelineConfigure pipelineConfigure = new PipelineConfigure();
+        pipelineConfigure.setTaskAlias("部署");
+        if (pipelineDeploy.getDeployAlias() != null){
+            pipelineConfigure.setTaskAlias(pipelineDeploy.getDeployAlias());
+        }
         pipelineDeploy.setType(taskType);
         String deployId = createDeploy(pipelineDeploy);
         pipelineConfigure.setTaskId(deployId);
@@ -80,6 +84,7 @@ public class PipelineDeployServiceImpl implements PipelineDeployService {
             if (pipelineDeploy.getType() != 0){
                 updateDeploy(pipelineDeploy);
                 oneConfigure.setTaskSort(pipelineDeploy.getSort());
+                oneConfigure.setTaskAlias(pipelineDeploy.getDeployAlias());
                 pipelineConfigureService.updateConfigure(oneConfigure);
             }else {
                 pipelineConfigureService.deleteTask(oneConfigure.getTaskId(),pipelineId);
@@ -93,7 +98,13 @@ public class PipelineDeployServiceImpl implements PipelineDeployService {
     //查询单个
     @Override
     public PipelineDeploy findOneDeploy(String deployId) {
-        return BeanMapper.map(pipelineDeployDao.findOneDeploy(deployId),PipelineDeploy.class);
+        PipelineDeployEntity oneDeploy = pipelineDeployDao.findOneDeploy(deployId);
+        PipelineDeploy pipelineDeploy = BeanMapper.map(pipelineDeployDao.findOneDeploy(deployId), PipelineDeploy.class);
+        if (oneDeploy.getProofId() != null){
+            Proof oneProof = proofService.findOneProof(oneDeploy.getProofId());
+            pipelineDeploy.setProof(oneProof);
+        }
+        return pipelineDeploy;
     }
 
     @Override

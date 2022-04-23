@@ -2,16 +2,12 @@ package com.doublekit.pipeline.example.service;
 
 
 import com.doublekit.beans.BeanMapper;
-
-import com.doublekit.pipeline.definition.model.Pipeline;
 import com.doublekit.pipeline.definition.model.PipelineConfigure;
 import com.doublekit.pipeline.definition.model.PipelineExecConfigure;
 import com.doublekit.pipeline.definition.service.PipelineConfigureService;
 import com.doublekit.pipeline.example.dao.PipelineCodeDao;
 import com.doublekit.pipeline.example.entity.PipelineCodeEntity;
 import com.doublekit.pipeline.example.model.PipelineCode;
-import com.doublekit.pipeline.example.service.codeGit.CodeGiteeApiService;
-import com.doublekit.pipeline.instance.service.PipelineExecServiceImpl;
 import com.doublekit.pipeline.setting.proof.model.Proof;
 import com.doublekit.pipeline.setting.proof.service.ProofService;
 import com.doublekit.rpc.annotation.Exporter;
@@ -43,6 +39,9 @@ public class PipelineCodeServiceImpl implements PipelineCodeService {
     //创建
     @Override
     public String createCode(PipelineCode pipelineCode) {
+        if (pipelineCode.getType() == 1){
+            pipelineCode.setCodeAddress(pipelineCode.getCodeName());
+        }
         return pipelineCodeDao.createCode(BeanMapper.map(pipelineCode, PipelineCodeEntity.class));
     }
 
@@ -50,7 +49,12 @@ public class PipelineCodeServiceImpl implements PipelineCodeService {
     @Override
     public String createConfigure(String pipelineId,int taskType,PipelineCode pipelineCode){
         PipelineConfigure pipelineConfigure = new PipelineConfigure();
+        pipelineConfigure.setTaskAlias("源码管理");
+        if (pipelineCode.getCodeAlias() != null){
+            pipelineConfigure.setTaskAlias(pipelineCode.getCodeAlias());
+        }
         pipelineCode.setType(taskType);
+        pipelineConfigure.setTaskSort(1);
         String codeId = createCode(pipelineCode);
         pipelineConfigure.setTaskId(codeId);
         pipelineConfigure.setTaskType(taskType);
@@ -90,6 +94,7 @@ public class PipelineCodeServiceImpl implements PipelineCodeService {
             if (pipelineCode.getType() != 0){
                     updateCode(pipelineCode);
                     oneConfigure.setTaskSort(1);
+                    oneConfigure.setTaskAlias(pipelineCode.getCodeAlias());
                     pipelineConfigureService.updateConfigure(oneConfigure);
             }else {
                 pipelineConfigureService.deleteTask(oneConfigure.getTaskId(),pipelineId);
@@ -105,11 +110,16 @@ public class PipelineCodeServiceImpl implements PipelineCodeService {
     @Override
     public PipelineCode findOneCode(String codeId) {
         PipelineCodeEntity oneCode = pipelineCodeDao.findOneCode(codeId);
-        return  BeanMapper.map(oneCode, PipelineCode.class);
+        PipelineCode pipelineCode = BeanMapper.map(oneCode, PipelineCode.class);
+        if (oneCode.getProofId() != null){
+            Proof proof = proofService.findOneProof(oneCode.getProofId());
+            pipelineCode.setProof(proof);
+        }
+        return  pipelineCode;
     }
 
     @Override
-    public List<Object>  findOneTask(PipelineConfigure pipelineConfigure ,List<Object> list) {
+    public List<Object> findOneTask(PipelineConfigure pipelineConfigure ,List<Object> list) {
             if (pipelineConfigure.getTaskType() < 10){
                 PipelineCode oneCode = findOneCode(pipelineConfigure.getTaskId());
                 if (oneCode.getProof() != null){

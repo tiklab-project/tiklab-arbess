@@ -42,8 +42,11 @@ public class PipelineTestServiceImpl implements PipelineTestService {
     @Override
     public  String createConfigure(String pipelineId,int taskType, PipelineTest pipelineTest){
         pipelineTest.setType(taskType);
-        pipelineTest.setType(taskType);
         PipelineConfigure pipelineConfigure = new PipelineConfigure();
+        pipelineConfigure.setTaskAlias("测试");
+        if (pipelineTest.getTestAlias() != null){
+            pipelineConfigure.setTaskAlias(pipelineTest.getTestAlias());
+        }
         pipelineConfigure.setTaskType(taskType);
         String testId = createTest(pipelineTest);
         pipelineConfigure.setTaskId(testId);
@@ -83,6 +86,7 @@ public class PipelineTestServiceImpl implements PipelineTestService {
             if (pipelineTest.getType() != 0){
                 updateTest(pipelineTest);
                 oneConfigure.setTaskSort(pipelineTest.getSort());
+                oneConfigure.setTaskAlias(pipelineTest.getTestAlias());
                 pipelineConfigureService.updateConfigure(oneConfigure);
             }else {
                 pipelineConfigureService.deleteTask(oneConfigure.getTaskId(),pipelineId);

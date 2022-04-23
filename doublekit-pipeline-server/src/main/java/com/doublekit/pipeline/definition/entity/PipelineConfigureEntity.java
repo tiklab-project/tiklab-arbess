@@ -38,6 +38,10 @@ public class PipelineConfigureEntity {
     @Column(name = "task_sort",notNull = true)
     private int taskSort;
 
+    //别名
+    @Column(name = "task_alias",notNull = true)
+    private String taskAlias;
+
     public String getConfigureId() {
         return configureId;
     }
@@ -84,5 +88,13 @@ public class PipelineConfigureEntity {
 
     public void setTaskSort(int taskSort) {
         this.taskSort = taskSort;
+    }
+
+    public String getTaskAlias() {
+        return taskAlias;
+    }
+
+    public void setTaskAlias(String taskAlias) {
+        this.taskAlias = taskAlias;
     }
 }

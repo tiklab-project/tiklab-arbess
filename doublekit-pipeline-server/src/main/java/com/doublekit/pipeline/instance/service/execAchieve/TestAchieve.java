@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
@@ -30,13 +31,21 @@ public class TestAchieve {
     @Autowired
     PipelineTestService pipelineTestService;
 
-    CommonAchieve commonAchieve = new CommonAchieve();
+    @Autowired
+    CommonAchieve commonAchieve;
 
+
+    public int testStart(PipelineConfigure pipelineConfigure, PipelineExecHistory pipelineExecHistory, List<PipelineExecHistory> pipelineExecHistoryList){
+       return unitTesting(pipelineConfigure,pipelineExecHistory,pipelineExecHistoryList);
+    }
 
     // 单元测试
-    public int unitTesting(PipelineConfigure pipelineConfigure, PipelineExecHistory pipelineExecHistory,List<PipelineExecHistory> pipelineExecHistoryList) {
+    private int unitTesting(PipelineConfigure pipelineConfigure, PipelineExecHistory pipelineExecHistory,List<PipelineExecHistory> pipelineExecHistoryList) {
         long beginTime = new Timestamp(System.currentTimeMillis()).getTime();
         PipelineExecLog pipelineExecLog = new PipelineExecLog();
+        pipelineExecLog.setTaskAlias(pipelineConfigure.getTaskAlias());
+        pipelineExecLog.setTaskSort(pipelineConfigure.getTaskSort());
+        pipelineExecLog.setTaskType(pipelineConfigure.getTaskType());
         Pipeline pipeline = pipelineConfigure.getPipeline();
         PipelineTest pipelineTest = pipelineTestService.findOneTest(pipelineConfigure.getTaskId());
         String testOrder = pipelineTest.getTestOrder();
@@ -47,15 +56,15 @@ public class TestAchieve {
                 Process process = commonAchieve.process(path, s, null);
                 String a = "执行 : " + " ' " + s + " ' " + "\n";
                 pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog() + a);
-                InputStreamReader inputStreamReader = new InputStreamReader(process.getInputStream());
-                Map<String, String> map = commonAchieve.log(inputStreamReader, pipelineExecHistory);
+                InputStreamReader inputStreamReader = new InputStreamReader(process.getInputStream(), Charset.forName("GBK"));
+                Map<String, String> map = commonAchieve.log(inputStreamReader, pipelineExecHistory,pipelineExecHistoryList);
                 if (map.get("state").equals("0")){
                     commonAchieve.updateTime(pipelineExecHistory,pipelineExecLog,beginTime);
-                    pipelineExecLog.setLogRunLog(pipelineExecLog.getLogRunLog()+map.get("log"));
+                    pipelineExecLog.setRunLog(pipelineExecLog.getRunLog()+map.get("log"));
                     commonAchieve.updateState(pipelineExecHistory,pipelineExecLog,"测试执行失败。",pipelineExecHistoryList);
                     return 0;
                 }
-                pipelineExecLog.setLogRunLog(a+map.get("log"));
+                pipelineExecLog.setRunLog(a+map.get("log"));
             } catch (IOException e) {
                 commonAchieve.updateTime(pipelineExecHistory,pipelineExecLog,beginTime);
                 commonAchieve.updateState(pipelineExecHistory,pipelineExecLog,e.toString(),pipelineExecHistoryList);

@@ -1,8 +1,10 @@
 package com.doublekit.pipeline.instance.service;
 
 
+import com.doublekit.pipeline.definition.model.Pipeline;
 import com.doublekit.pipeline.definition.model.PipelineConfigure;
 import com.doublekit.pipeline.definition.service.PipelineConfigureService;
+import com.doublekit.pipeline.definition.service.PipelineService;
 import com.doublekit.pipeline.instance.model.*;
 import com.doublekit.pipeline.instance.service.execAchieve.*;
 import com.doublekit.rpc.annotation.Exporter;
@@ -25,13 +27,29 @@ public class PipelineExecServiceImpl implements PipelineExecService {
     @Autowired
     PipelineExecHistoryService pipelineExecHistoryService;
 
+    @Autowired
+    PipelineService pipelineService;
+
+    @Autowired
+    CodeAchieve codeAchieve;
+
+    @Autowired
+    StructureAchieve structureAchieve;
+
+    @Autowired
+    TestAchieve testAchieve;
+
+    @Autowired
+    DeployAchieve deployAchieve;
+
     //存放过程状态
     List<PipelineExecHistory> pipelineExecHistoryList = new ArrayList<>();
 
     //存放构建流水线id
     List<String> pipelineIdList = new ArrayList<>();
 
-    CommonAchieve commonAchieve = new CommonAchieve();
+    @Autowired
+    CommonAchieve commonAchieve;
 
     private static final Logger logger = LoggerFactory.getLogger(PipelineExecServiceImpl.class);
 
@@ -40,7 +58,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
     public int  start(String pipelineId){
         //创建线程池
         ExecutorService executorService = Executors.newCachedThreadPool();
-        //判断同一任务是否在运行
+        // 判断同一任务是否在运行
         if (pipelineIdList != null){
             for (String id : pipelineIdList) {
                 if (id .equals(pipelineId)){
@@ -56,7 +74,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
     //查询构建状态
     @Override
     public PipelineExecHistory findInstanceState(String pipelineId){
-
+        Pipeline pipeline = pipelineService.findPipeline(pipelineId);
         if (pipelineExecHistoryList != null){
             for (PipelineExecHistory pipelineExecHistory : pipelineExecHistoryList) {
                 if (pipelineExecHistory.getPipeline().getPipelineId().equals(pipelineId)){
@@ -67,53 +85,79 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         return null;
     }
 
-
     // 构建开始
     private void begin(String pipelineId) {
-        // String time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
-        //把执行构建的流水线加入进来
+        String time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
         pipelineIdList.add(pipelineId);
         String historyId = pipelineExecHistoryService.createHistory(new PipelineExecHistory());
         PipelineExecHistory pipelineExecHistory = new PipelineExecHistory();
+        pipelineExecHistory.setCreateTime(time);
+        pipelineExecHistory.setRunWay(1);
         pipelineExecHistory.setHistoryId(historyId);
         List<PipelineConfigure> allConfigure = pipelineConfigureService.findAllConfigure(pipelineId);
         if (allConfigure != null){
-            allConfigure.sort(Comparator.comparing(PipelineConfigure::getTaskSort));
+            int i= 1;
+            // allConfigure.sort(Comparator.comparing(PipelineConfigure::getTaskSort));
             for (PipelineConfigure pipelineConfigure : allConfigure) {
+                Pipeline pipeline = pipelineConfigure.getPipeline();
+                pipelineExecHistory.setStatus(i);
+                pipelineExecHistory.setPipeline(pipeline);
+                pipelineExecHistory.setSort(i);
+                pipelineExecHistory.setExecName(pipeline.getPipelineCreateUser());
+                pipelineExecHistoryService.updateHistory(pipelineExecHistory);
+                pipelineExecHistoryList.add(pipelineExecHistory);
                 switch (pipelineConfigure.getTaskType()) {
                     case 1, 2 -> {
-                        int code = new CodeAchieve().gitClone(pipelineConfigure, pipelineExecHistory, pipelineExecHistoryList);
+                        int code = codeAchieve.codeStart(pipelineConfigure, pipelineExecHistory, pipelineExecHistoryList);
                         if (code == 0) {
+                            clear(pipelineExecHistory,pipelineId);
                             return ;
                         }
                     }
                     case 11 -> {
-                        int test = new TestAchieve().unitTesting(pipelineConfigure, pipelineExecHistory, pipelineExecHistoryList);
+                        int test = testAchieve.testStart(pipelineConfigure, pipelineExecHistory, pipelineExecHistoryList);
                         if (test == 0) {
+                            clear(pipelineExecHistory,pipelineId);
                             return ;
                         }
                     }
                     case 21, 22 -> {
-                        int structure = new StructureAchieve().structure(pipelineConfigure, pipelineExecHistory, pipelineExecHistoryList);
+                        int structure = structureAchieve.structureStart(pipelineConfigure, pipelineExecHistory, pipelineExecHistoryList);
                         if (structure == 0) {
+                            clear(pipelineExecHistory,pipelineId);
                             return ;
                         }
                     }
-                    case 31 -> {
-                        int liunx = new DeployAchieve().liunx(pipelineConfigure, pipelineExecHistory, pipelineExecHistoryList);
-                        if (liunx == 0) {
-                            return ;
-                        }
-                    }
-                    case 32 -> {
-                        int docker = new DeployAchieve().docker(pipelineConfigure, pipelineExecHistory, pipelineExecHistoryList);
-                        if (docker == 0) {
+                    case 31, 32-> {
+                        int deploy = deployAchieve.deployStart(pipelineConfigure, pipelineExecHistory, pipelineExecHistoryList);
+                        if (deploy == 0) {
+                            clear(pipelineExecHistory,pipelineId);
                             return ;
                         }
                     }
                 }
+                i++;
             }
         }
-        commonAchieve.success(pipelineExecHistory,pipelineId);
+        pipelineExecHistory.setStatus(1);
+        commonAchieve.success(pipelineExecHistory,pipelineId,pipelineExecHistoryList);
+        pipelineExecHistoryList.add(pipelineExecHistory);
+        //执行完成移除构建id
+        if (pipelineIdList != null) {
+            pipelineIdList.removeIf(id -> id.equals(pipelineId));
+        }
     }
+
+    private void clear(PipelineExecHistory pipelineExecHistory,String pipelineId){
+        pipelineExecHistory.setStatus(100);
+        pipelineExecHistoryList.add(pipelineExecHistory);
+        pipelineExecHistoryList.add(pipelineExecHistory);
+        //执行完成移除构建id
+        if (pipelineIdList != null) {
+            pipelineIdList.removeIf(id -> id.equals(pipelineId));
+        }
+    }
+
+
+
 }

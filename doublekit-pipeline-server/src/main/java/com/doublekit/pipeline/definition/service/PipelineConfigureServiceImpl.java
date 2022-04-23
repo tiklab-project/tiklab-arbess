@@ -1,7 +1,6 @@
 package com.doublekit.pipeline.definition.service;
 
 
-import com.alibaba.fastjson.JSONObject;
 import com.doublekit.beans.BeanMapper;
 import com.doublekit.join.JoinTemplate;
 import com.doublekit.pipeline.definition.dao.PipelineConfigureDao;
@@ -9,7 +8,6 @@ import com.doublekit.pipeline.definition.entity.PipelineConfigureEntity;
 import com.doublekit.pipeline.definition.model.Pipeline;
 import com.doublekit.pipeline.definition.model.PipelineConfigure;
 import com.doublekit.pipeline.definition.model.PipelineExecConfigure;
-import com.doublekit.pipeline.example.model.*;
 import com.doublekit.pipeline.example.service.PipelineCodeService;
 import com.doublekit.rpc.annotation.Exporter;
 import com.ibm.icu.text.SimpleDateFormat;
@@ -54,6 +52,19 @@ public class PipelineConfigureServiceImpl implements PipelineConfigureService {
             for (PipelineConfigure pipelineConfigure : allConfigure) {
                 int taskType = pipelineConfigure.getTaskType();
                 if (taskType < type && taskType > type - 10){
+                    return pipelineConfigure;
+                }
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public PipelineConfigure findOneTask(String pipelineId,String taskId) {
+        List<PipelineConfigure> allConfigure = findAllConfigure(pipelineId);
+        if (allConfigure != null){
+            for (PipelineConfigure pipelineConfigure : allConfigure) {
+                if (pipelineConfigure.getTaskId().equals(taskId)){
                     return pipelineConfigure;
                 }
             }
@@ -107,15 +118,6 @@ public class PipelineConfigureServiceImpl implements PipelineConfigureService {
     //更新任务
     @Override
     public void updateTask(PipelineExecConfigure pipelineExecConfigure){
-
-        // HashMap<String, Object> map = new HashMap<>();
-        // JSONObject jsonObject = JSONObject.parseObject(params);
-        // map.put("pipelineCode",jsonObject.getObject("pipelineCode", PipelineCode.class));
-        // map.put("pipelineTest",jsonObject.getObject("pipelineTest", PipelineTest.class));
-        // map.put("pipelineStructure",jsonObject.getObject("pipelineStructure", PipelineStructure.class));
-        // map.put("pipelineDeploy",jsonObject.getObject("pipelineDeploy", PipelineDeploy.class));
-        // map.put("pipelineId",jsonObject.getObject("pipelineId", String.class));
-        // // map.put("pipelineId",pipelineId);
         pipelineCodeService.updateTask(pipelineExecConfigure);
     }
 
@@ -125,6 +127,11 @@ public class PipelineConfigureServiceImpl implements PipelineConfigureService {
         PipelineConfigureEntity oneConfigure = pipelineConfigureDao.findOneConfigure(configureId);
         joinTemplate.joinQuery(oneConfigure);
         return BeanMapper.map(oneConfigure,PipelineConfigure.class);
+    }
+
+    @Override
+    public Pipeline findOnePipeline(String pipelineId) {
+        return null;
     }
 
     //查询所有
@@ -162,6 +169,9 @@ public class PipelineConfigureServiceImpl implements PipelineConfigureService {
             if (pipelineConfigure.getPipeline().getPipelineId().equals(pipelineId)){
                 pipelineConfigures.add(pipelineConfigure);
             }
+        }
+        if (pipelineConfigures .size() != 0){
+            allConfigure.sort(Comparator.comparing(PipelineConfigure::getTaskSort));
         }
         return pipelineConfigures;
     }

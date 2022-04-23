@@ -5,6 +5,7 @@ import com.doublekit.pipeline.definition.model.PipelineConfigure;
 import com.doublekit.pipeline.definition.service.PipelineConfigureService;
 import com.doublekit.pipeline.example.model.PipelineCode;
 import com.doublekit.pipeline.example.service.PipelineCodeService;
+import com.doublekit.pipeline.example.service.PipelineCodeServiceImpl;
 import com.doublekit.pipeline.instance.model.PipelineExecHistory;
 import com.doublekit.pipeline.instance.model.PipelineExecLog;
 import com.doublekit.pipeline.instance.service.PipelineExecHistoryService;
@@ -14,6 +15,8 @@ import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.transport.CredentialsProvider;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.io.File;
@@ -24,21 +27,28 @@ import java.util.List;
 @Exporter
 public class CodeAchieve {
 
-
     @Autowired
-    PipelineConfigureService pipelineConfigureService;
+    PipelineCodeService pipelineCodeService;
 
     @Autowired
     PipelineExecHistoryService pipelineExecHistoryService;
 
     @Autowired
-    PipelineCodeService pipelineCodeService;
+    CommonAchieve commonAchieve;
 
-    CommonAchieve commonAchieve = new CommonAchieve();
+    private static final Logger logger = LoggerFactory.getLogger(PipelineCodeServiceImpl.class);
+
+    public int codeStart(PipelineConfigure pipelineConfigure, PipelineExecHistory pipelineExecHistory, List<PipelineExecHistory> pipelineExecHistoryList){
+        return gitClone(pipelineConfigure, pipelineExecHistory, pipelineExecHistoryList);
+    }
 
     // git克隆
-    public int gitClone(PipelineConfigure pipelineConfigure, PipelineExecHistory pipelineExecHistory, List<PipelineExecHistory> pipelineExecHistoryList){
+    private int gitClone(PipelineConfigure pipelineConfigure, PipelineExecHistory pipelineExecHistory, List<PipelineExecHistory> pipelineExecHistoryList){
+        pipelineExecHistory.setRunLog("任务开始执行。。。。。。。");
+        pipelineExecHistoryList.add(pipelineExecHistory);
         PipelineCode pipelineCode = pipelineCodeService.findOneCode(pipelineConfigure.getTaskId());
+        PipelineExecLog pipelineExecLog = new PipelineExecLog();
+        pipelineExecLog.setTaskAlias(pipelineConfigure.getTaskAlias());
         Pipeline pipeline = pipelineConfigure.getPipeline();
         long beginTime = new Timestamp(System.currentTimeMillis()).getTime();
 
@@ -48,25 +58,35 @@ public class CodeAchieve {
         //调用删除方法删除旧的代码
         commonAchieve.deleteFile(file);
         Proof proof = pipelineCode.getProof();
+        if (proof == null){
+            commonAchieve.updateTime(pipelineExecHistory,pipelineExecLog,beginTime);
+            commonAchieve.updateState(pipelineExecHistory,pipelineExecLog,"凭证为空。。。。",pipelineExecHistoryList);
+            return 0;
+        }
         String codeAddress =pipelineCode.getCodeAddress();
         String codeBranch = pipelineCode.getCodeBranch();
         UsernamePasswordCredentialsProvider credentialsProvider = commonAchieve.usernamePassword(proof.getProofUsername(), proof.getProofPassword());
 
         //更新日志
         String s = "开始拉取代码 : " + "\n" + "FileAddress : " + file + "\n"  + "Uri : " + codeAddress + "\n"  + "Branch : " + codeBranch + "\n"   ;
-        pipelineExecHistory.setRunLog(s);
+        pipelineExecLog.setTaskSort(pipelineConfigure.getTaskSort());
+        pipelineExecLog.setTaskType(pipelineConfigure.getTaskType());
         pipelineExecHistoryList.add(pipelineExecHistory);
+
         //克隆代码
         try {
             clone(file, codeAddress, credentialsProvider, codeBranch);
         } catch (GitAPIException e) {
-            codeState(pipelineExecHistory,beginTime,e.toString(),pipelineExecHistoryList);
+            commonAchieve.updateTime(pipelineExecHistory,pipelineExecLog,beginTime);
+            commonAchieve.updateState(pipelineExecHistory,pipelineExecLog,e.toString(),pipelineExecHistoryList);
             return 0;
         }
         String log = s + "proofType : " +proof.getProofType() + "\n" + "clone成功。。。。。。。。。。。。。。。" + "\n";
+        pipelineExecLog.setRunLog(log);
         pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+"\n"+log);
         pipelineExecHistoryList.add(pipelineExecHistory);
-        codeState(pipelineExecHistory,beginTime,null,pipelineExecHistoryList);
+        commonAchieve.updateTime(pipelineExecHistory,pipelineExecLog,beginTime);
+        commonAchieve.updateState(pipelineExecHistory,pipelineExecLog,null,pipelineExecHistoryList);
         return 1;
     }
 
@@ -84,31 +104,6 @@ public class CodeAchieve {
                 .setDirectory(gitAddress)
                 .setBranch(branch)
                 .call().close();
-    }
-
-
-    //执行状态
-    private void codeState(PipelineExecHistory pipelineExecHistory,long beginTime,String e,List<PipelineExecHistory> pipelineExecHistoryList){
-        Pipeline pipeline = pipelineExecHistory.getPipeline();
-        PipelineConfigure pipelineConfigure = pipelineConfigureService.findOneConfigure(pipeline.getPipelineId(), 10);
-        PipelineExecLog pipelineExecLog = new PipelineExecLog();
-        pipelineExecLog.setLogRunState(10);
-        if (e != null){
-            pipelineExecLog.setLogRunState(1);
-            pipelineExecLog.setLogRunLog(pipelineExecLog.getLogRunLog()+"\n拉取代码异常\n"+e);
-            commonAchieve.error(pipelineExecHistory, "拉取代码异常\n"+e,pipeline.getPipelineId());
-        }
-        long overTime = new Timestamp(System.currentTimeMillis()).getTime();
-        int time = (int) (overTime - beginTime) / 1000;
-
-        pipelineExecLog.setLogRunTime(time);
-        pipelineExecHistory.setRunTime(pipelineExecHistory.getRunTime()+time);
-        pipelineExecLog.setHistoryId(pipelineExecHistory.getHistoryId());
-        pipelineExecLog.setTaskLogType(pipelineConfigure.getTaskType());
-
-        pipelineExecHistoryService.createLog(pipelineExecLog);
-        pipelineExecHistoryService.updateHistory(pipelineExecHistory);
-        pipelineExecHistoryList.add(pipelineExecHistory);
     }
 
 }

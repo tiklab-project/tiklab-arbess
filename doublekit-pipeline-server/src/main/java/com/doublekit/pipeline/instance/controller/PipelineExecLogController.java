@@ -26,33 +26,13 @@ public class PipelineExecLogController {
     PipelineExecService pipelineExecService;
 
 
-    //查询所有日志
+    //查询日志
     @RequestMapping(path="/findAllLog",method = RequestMethod.POST)
-    @ApiMethod(name = "findAllLog",desc = "查询所有日志")
-    public Result< List<PipelineExecLog>> findAllLog() {
-        List<PipelineExecLog> allLog = PipelineExecLogService.findAllLog();
+    @ApiMethod(name = "findAllLog",desc = "查询日志")
+    @ApiParam(name = "historyId",desc = "历史id",required = true)
+    public Result<List<PipelineExecLog>> findAllLog(@NotNull String historyId){
+        List<PipelineExecLog> allLog = PipelineExecLogService.findAllLog(historyId);
         return Result.ok(allLog);
-    }
-
-
-
-    //删除日志
-    @RequestMapping(path="/deleteLog",method = RequestMethod.POST)
-    @ApiMethod(name = "deleteLog",desc = "删除日志")
-    @ApiParam(name = "logId",desc = "日志id",required = true)
-    public Result<Void> deleteLog(String logId) {
-       PipelineExecLogService.deleteLog(logId);
-        return Result.ok();
-    }
-
-
-    //查询单个日志
-    @RequestMapping(path="/findOneLog",method = RequestMethod.POST)
-    @ApiMethod(name = "findOneLog",desc = "查询日志")
-    @ApiParam(name = "logId",desc = "日志id",required = true)
-    public Result<PipelineExecLog> findOneLog(@NotNull String logId){
-        PipelineExecLog pipelineExecLog = PipelineExecLogService.findOneLog(logId);
-        return Result.ok(pipelineExecLog);
     }
 
 

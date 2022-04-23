@@ -1,6 +1,7 @@
 package com.doublekit.pipeline.instance.service;
 
 import com.doublekit.beans.BeanMapper;
+import com.doublekit.pipeline.definition.model.Pipeline;
 import com.doublekit.pipeline.definition.service.PipelineService;
 import com.doublekit.pipeline.instance.dao.PipelineExecHistoryDao;
 import com.doublekit.pipeline.instance.entity.PipelineExecHistoryEntity;
@@ -38,23 +39,10 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
 
     //删除
     @Override
-    public void deleteHistory(int historyId) {
+    public void deleteHistory(String historyId) {
         PipelineExecHistory oneHistory = findOneHistory(historyId);
-        if (oneHistory.getLogId() != null){
-            pipelineExecLogService.deleteLog(oneHistory.getLogId());
-        }
+        pipelineExecLogService.deleteHistoryLog(oneHistory.getHistoryId());
         pipelineExecHistoryDao.deleteHistory(historyId);
-    }
-
-    //删除
-    @Override
-    public void deleteHistory(String pipelineId) {
-        List<PipelineExecHistory> allHistory = findAllHistory(pipelineId);
-        if (allHistory != null){
-            for (PipelineExecHistory pipelineExecHistory : allHistory) {
-                    deleteHistory(pipelineExecHistory.getHistoryId());
-            }
-        }
     }
 
     @Override
@@ -70,7 +58,7 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
 
     //查询单个
     @Override
-    public PipelineExecHistory findOneHistory(int historyId) {
+    public PipelineExecHistory findOneHistory(String historyId) {
         PipelineExecHistoryEntity pipelineExecHistoryEntity = pipelineExecHistoryDao.findOneHistory(historyId);
         // joinTemplate.joinQuery(pipelineExecHistory);
         return BeanMapper.map(pipelineExecHistoryEntity, PipelineExecHistory.class);
@@ -87,10 +75,12 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
     @Override
     public List<PipelineExecHistory> findAllHistory(String pipelineId) {
         List<PipelineExecHistory> allHistory = findAllHistory();
+        Pipeline pipeline = pipelineService.findPipeline(pipelineId);
         List<PipelineExecHistory> historyList = new ArrayList<>();
         if (allHistory != null){
             for (PipelineExecHistory pipelineExecHistory : allHistory) {
-                if (pipelineExecHistory.getPipeline().getPipelineId().equals(pipelineId)){
+                if (pipelineExecHistory.getPipeline().getPipelineId().equals(pipeline.getPipelineId())){
+                    pipelineExecHistory.setExecTime(formatDateTime(pipelineExecHistory.getRunTime()));
                     historyList.add(pipelineExecHistory);
                 }
             }
@@ -132,5 +122,25 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
     public List<PipelineExecHistory> findHistoryList(List<String> idList) {
         List<PipelineExecHistoryEntity> pipelineExecHistoryEntityList = pipelineExecHistoryDao.findHistoryList(idList);
         return BeanMapper.mapList(pipelineExecHistoryEntityList, PipelineExecHistory.class);
+    }
+
+
+
+    public static String formatDateTime(long time) {
+        String DateTimes ;
+        long days = time / ( 60 * 60 * 24);
+        long hours = (time % ( 60 * 60 * 24)) / (60 * 60);
+        long minutes = (time % ( 60 * 60)) /60;
+        long seconds = time % 60;
+        if(days>0){
+            DateTimes= days + "天" + hours + "小时" + minutes + "分钟" + seconds + "秒";
+        }else if(hours>0){
+            DateTimes=hours + "小时" + minutes + "分钟" + seconds + "秒";
+        }else if(minutes>0){
+            DateTimes=minutes + "分钟" + seconds + "秒";
+        }else{
+            DateTimes=seconds + "秒";
+        }
+        return DateTimes;
     }
 }

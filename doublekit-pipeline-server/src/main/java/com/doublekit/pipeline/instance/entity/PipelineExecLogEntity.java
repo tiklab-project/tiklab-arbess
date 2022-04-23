@@ -14,37 +14,41 @@ public class PipelineExecLogEntity {
     @Id
     @GeneratorValue
     @Column(name = "log_id")
-    private String logId;
+    private String pipelineLogId;
 
     //historyId
-    @Column(name = "history_id",notNull = true)
+    @Column(name = "history_id")
     private String historyId;
 
     //运行类型
-    @Column(name = "task_log_type",notNull = true)
-    private int taskLogType ;
+    @Column(name = "task_type")
+    private int taskType ;
 
-    @Column(name = "task_sort",notNull = true)
-    private int taskLogSort ;
+    @Column(name = "task_sort")
+    private int taskSort ;
 
     //运行日志
-    @Column(name = "log_run_log",notNull = true)
-    private String logRunLog;
+    @Column(name = "run_log")
+    private String runLog;
 
     //运行时间
-    @Column(name = "log_run_time",notNull = true)
-    private int logRunTime;
+    @Column(name = "run_time")
+    private int runTime;
 
     //运行状态
-    @Column(name = "log_run_state",notNull = true)
-    private int logRunState;
+    @Column(name = "run_state")
+    private int runState;
 
-    public String getLogId() {
-        return logId;
+    @Column(name = "task_alias")
+    private String taskAlias;
+
+
+    public String getPipelineLogId() {
+        return pipelineLogId;
     }
 
-    public void setLogId(String logId) {
-        this.logId = logId;
+    public void setPipelineLogId(String pipelineLogId) {
+        this.pipelineLogId = pipelineLogId;
     }
 
     public String getHistoryId() {
@@ -55,43 +59,51 @@ public class PipelineExecLogEntity {
         this.historyId = historyId;
     }
 
-    public int getTaskLogType() {
-        return taskLogType;
+    public int getTaskType() {
+        return taskType;
     }
 
-    public void setTaskLogType(int taskLogType) {
-        this.taskLogType = taskLogType;
+    public void setTaskType(int taskType) {
+        this.taskType = taskType;
     }
 
-    public int getTaskLogSort() {
-        return taskLogSort;
+    public int getTaskSort() {
+        return taskSort;
     }
 
-    public void setTaskLogSort(int taskLogSort) {
-        this.taskLogSort = taskLogSort;
+    public void setTaskSort(int taskSort) {
+        this.taskSort = taskSort;
     }
 
-    public String getLogRunLog() {
-        return logRunLog;
+    public String getRunLog() {
+        return runLog;
     }
 
-    public void setLogRunLog(String logRunLog) {
-        this.logRunLog = logRunLog;
+    public void setRunLog(String runLog) {
+        this.runLog = runLog;
     }
 
-    public int getLogRunTime() {
-        return logRunTime;
+    public int getRunTime() {
+        return runTime;
     }
 
-    public void setLogRunTime(int logRunTime) {
-        this.logRunTime = logRunTime;
+    public void setRunTime(int runTime) {
+        this.runTime = runTime;
     }
 
-    public int getLogRunState() {
-        return logRunState;
+    public int getRunState() {
+        return runState;
     }
 
-    public void setLogRunState(int logRunState) {
-        this.logRunState = logRunState;
+    public void setRunState(int runState) {
+        this.runState = runState;
+    }
+
+    public String getTaskAlias() {
+        return taskAlias;
+    }
+
+    public void setTaskAlias(String taskAlias) {
+        this.taskAlias = taskAlias;
     }
 }

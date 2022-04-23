@@ -22,8 +22,8 @@ public class PipelineExecHistory {
     private String historyId;
 
     //日志id
-    @ApiProperty(name="logId",desc="日志id")
-    private String logId;
+    @ApiProperty(name="status",desc="日志id")
+    private int status;
 
     //创建时间
     @ApiProperty(name="createTime",desc="创建时间")
@@ -37,13 +37,9 @@ public class PipelineExecHistory {
     @ApiProperty(name="runLog",desc="运行日志")
     private String runLog;
 
-    //流水线
-    @ApiProperty(name="pipeline",desc="流水线id",eg="@selectOne")
-    @Mappings({
-            @Mapping(source = "pipeline.pipelineId",target = "pipelineId")
-    })
-    @JoinQuery(key = "pipelineId")
-    private Pipeline pipeline;
+    //执行人
+    @ApiProperty(name="execName",desc="执行人")
+    private String execName;
 
     //状态
     @ApiProperty(name="runStatus",desc="运行状态")
@@ -53,6 +49,18 @@ public class PipelineExecHistory {
     @ApiProperty(name="runTime",desc="运行时间")
     private int runTime;
 
+   //流水线id
+   @ApiProperty(name="pipeline",desc="流水线id",eg="@selectOne")
+   @Mappings({
+           @Mapping(source = "pipeline.pipelineId",target = "pipelineId")
+   })
+   @JoinQuery(key = "pipelineId")
+    private Pipeline pipeline;
+
+    private String execTime;
+
+    private int sort;
+
     public String getHistoryId() {
         return historyId;
     }
@@ -61,12 +69,12 @@ public class PipelineExecHistory {
         this.historyId = historyId;
     }
 
-    public String getLogId() {
-        return logId;
+    public int getStatus() {
+        return status;
     }
 
-    public void setLogId(String logId) {
-        this.logId = logId;
+    public void setStatus(int status) {
+        this.status = status;
     }
 
     public String getCreateTime() {
@@ -93,6 +101,14 @@ public class PipelineExecHistory {
         this.runLog = runLog;
     }
 
+    public String getExecName() {
+        return execName;
+    }
+
+    public void setExecName(String execName) {
+        this.execName = execName;
+    }
+
     public Pipeline getPipeline() {
         return pipeline;
     }
@@ -115,5 +131,21 @@ public class PipelineExecHistory {
 
     public void setRunTime(int runTime) {
         this.runTime = runTime;
+    }
+
+    public String getExecTime() {
+        return execTime;
+    }
+
+    public void setExecTime(String execTime) {
+        this.execTime = execTime;
+    }
+
+    public int getSort() {
+        return sort;
+    }
+
+    public void setSort(int sort) {
+        this.sort = sort;
     }
 }

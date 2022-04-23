@@ -50,7 +50,7 @@ public interface PipelineTestService {
 
     /**
      * 更新任务
-     * @param map 更新信息
+     * @param pipelineExecConfigure 更新信息
      */
     void updateTask(PipelineExecConfigure pipelineExecConfigure);
 

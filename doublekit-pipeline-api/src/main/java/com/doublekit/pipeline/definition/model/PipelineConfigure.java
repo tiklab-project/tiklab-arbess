@@ -42,6 +42,10 @@ public class PipelineConfigure {
     @ApiProperty(name = "taskSort",desc = "顺序")
     private int taskSort;
 
+    //别名
+    @ApiProperty(name = "taskAlias",desc = "别名")
+    private String taskAlias;
+
 
     public String getConfigureId() {
         return configureId;
@@ -89,5 +93,13 @@ public class PipelineConfigure {
 
     public void setTaskSort(int taskSort) {
         this.taskSort = taskSort;
+    }
+
+    public String getTaskAlias() {
+        return taskAlias;
+    }
+
+    public void setTaskAlias(String taskAlias) {
+        this.taskAlias = taskAlias;
     }
 }

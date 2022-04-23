@@ -35,26 +35,39 @@ public class DeployAchieve {
     @Autowired
     PipelineDeployService pipelineDeployService;
 
-    CommonAchieve commonAchieve = new CommonAchieve();
+    @Autowired
+    CommonAchieve commonAchieve;
 
+
+
+    public int deployStart(PipelineConfigure pipelineConfigure, PipelineExecHistory pipelineExecHistory ,List<PipelineExecHistory> pipelineExecHistoryList){
+        return switch (pipelineConfigure.getTaskType()) {
+            case 31 -> linux(pipelineConfigure, pipelineExecHistory, pipelineExecHistoryList);
+            case 32 -> docker(pipelineConfigure, pipelineExecHistory, pipelineExecHistoryList);
+            default -> 0;
+        };
+    }
     /**
      * 部署到liunx
      * @param pipelineConfigure 配置信息
      * @param pipelineExecHistory 日志
-     * @return
+     * @return 状态
      */
-    public int liunx(PipelineConfigure pipelineConfigure, PipelineExecHistory pipelineExecHistory ,List<PipelineExecHistory> pipelineExecHistoryList) {
+    private int linux(PipelineConfigure pipelineConfigure, PipelineExecHistory pipelineExecHistory ,List<PipelineExecHistory> pipelineExecHistoryList) {
         Pipeline pipeline = pipelineConfigure.getPipeline();
         PipelineExecLog pipelineExecLog = new PipelineExecLog();
+        pipelineExecLog.setTaskAlias(pipelineConfigure.getTaskAlias());
         PipelineDeploy pipelineDeploy = pipelineDeployService.findOneDeploy(pipelineConfigure.getTaskId());
         String deployTargetAddress = pipelineDeploy.getDeployTargetAddress();
         String deployAddress = pipelineDeploy.getDeployAddress();
         pipelineExecHistoryList.add(pipelineExecHistory);
+        pipelineExecLog.setTaskSort(pipelineConfigure.getTaskSort());
+        pipelineExecLog.setTaskType(pipelineConfigure.getTaskType());
         Proof proof = pipelineDeploy.getProof();
         //开始运行时间
         long beginTime = new Timestamp(System.currentTimeMillis()).getTime();
         String s = "部署到服务器" + proof.getProofIp() + "。。。。。。。。";
-        pipelineExecLog.setLogRunLog(s);
+        pipelineExecLog.setRunLog(s);
         pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+"\n"+s);
         //文件地址
         String[] split = deployTargetAddress.split(" ");
@@ -68,17 +81,17 @@ public class DeployAchieve {
         deployAddress = deployAddress +"/"+ zipName;
         try {
             pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+"\n"+"开始发送文件:"+path);
-            pipelineExecLog.setLogRunLog(pipelineExecLog.getLogRunLog()+"\n"+"开始发送文件:"+path);
+            pipelineExecLog.setRunLog(pipelineExecLog.getRunLog()+"\n"+"开始发送文件:"+path);
             //发送文件
             commonAchieve.sshSftp(proof,deployAddress,path);
             pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+"\n"+"文件:"+zipName+"发送成功！");
-            pipelineExecLog.setLogRunLog(pipelineExecLog.getLogRunLog()+"\n"+"文件:"+zipName+"发送成功！");
+            pipelineExecLog.setRunLog(pipelineExecLog.getRunLog()+"\n"+"文件:"+zipName+"发送成功！");
             //执行shell
             String shell = pipelineDeploy.getDeployShell();
             if (shell != null){
                 String[] s1 = shell.split("\n");
                 for (String value : s1) {
-                    commonAchieve.sshOrder(proof, value, pipelineExecHistory);
+                    commonAchieve.sshOrder(proof, value, pipelineExecHistory,pipelineExecHistoryList);
                 }
             }
         } catch (JSchException | SftpException | IOException e) {
@@ -99,13 +112,16 @@ public class DeployAchieve {
      * @param pipelineExecHistory 日志
      * @return 部署状态
      */
-    public int docker(PipelineConfigure pipelineConfigure,PipelineExecHistory pipelineExecHistory,List<PipelineExecHistory> pipelineExecHistoryList) {
+    private int docker(PipelineConfigure pipelineConfigure,PipelineExecHistory pipelineExecHistory,List<PipelineExecHistory> pipelineExecHistoryList) {
         //开始运行时间
         PipelineDeploy pipelineDeploy = pipelineDeployService.findOneDeploy(pipelineConfigure.getTaskId());
         long beginTime = new Timestamp(System.currentTimeMillis()).getTime();
         Pipeline pipeline = pipelineConfigure.getPipeline();
         Proof proof = pipelineDeploy.getProof();
         PipelineExecLog pipelineExecLog = new PipelineExecLog();
+        pipelineExecLog.setTaskAlias(pipelineConfigure.getTaskAlias());
+        pipelineExecLog.setTaskSort(pipelineConfigure.getTaskSort());
+        pipelineExecLog.setTaskType(pipelineConfigure.getTaskType());
         //模块名
         String[] split = pipelineDeploy.getDeployTargetAddress().split(" ");
         String path = "D:\\clone\\" + pipeline.getPipelineName()+"\\"+split[0]+"\\"+"target";
@@ -124,7 +140,7 @@ public class DeployAchieve {
         String deployAddress = liunxAddress+ "/" +zipName ;
         pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+"\n"+"压缩包文件名为： "+zipName+"\n"+"解压文件名称："+fileName+"\n"+"部署到docker地址 ： " +deployAddress);
         pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+"\n"+"发送文件中。。。。。");
-        pipelineExecLog.setLogRunLog("压缩包文件名为： "+zipName+"\n"+"解压文件名称："+fileName+"\n"+"部署到docker文件地址 ： " +deployAddress);
+        pipelineExecLog.setRunLog("压缩包文件名为： "+zipName+"\n"+"解压文件名称："+fileName+"\n"+"部署到docker文件地址 ： " +deployAddress);
         try {
             commonAchieve.sshSftp(proof,deployAddress,fileAddress);
             HashMap<Integer, String> map = new HashMap<>();
@@ -136,11 +152,11 @@ public class DeployAchieve {
             map.put(6,"find"+" "+liunxAddress+"/"+fileName+" "+ "-name '*.sh' | xargs dos2unix");
             map.put(7,"cd"+" "+fileName+";"+"docker image build -t"+" "+pipeline.getPipelineName()+"  .");
             map.put(8,"docker run -itd -p"+" "+pipelineDeploy.getMappingPort()+":"+pipelineDeploy.getDockerPort()+" "+pipeline.getPipelineName());
-            for (int i = 1; i <= 8; i++) {
+            for (int i = 1; i <= map.size(); i++) {
                 pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+"\n"+"第"+i+"步 ："+ map.get(i));
-                pipelineExecLog.setLogRunLog(pipelineExecLog.getLogRunLog()+"\n第"+i+"步 ："+ map.get(i));
-                Map<String, String> log = commonAchieve.sshOrder(proof, map.get(i), pipelineExecHistory);
-                pipelineExecLog.setLogRunLog(pipelineExecLog.getLogRunLog()+"\n"+log.get("log"));
+                pipelineExecLog.setRunLog(pipelineExecLog.getRunLog()+"\n第"+i+"步 ："+ map.get(i));
+                Map<String, String> log = commonAchieve.sshOrder(proof, map.get(i), pipelineExecHistory,pipelineExecHistoryList);
+                pipelineExecLog.setRunLog(pipelineExecLog.getRunLog()+"\n"+log.get("log"));
             }
         } catch (JSchException | SftpException |IOException   e) {
             commonAchieve.updateTime(pipelineExecHistory,pipelineExecLog,beginTime);

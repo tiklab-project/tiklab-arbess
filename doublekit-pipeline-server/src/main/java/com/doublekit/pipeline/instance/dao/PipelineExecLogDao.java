@@ -18,8 +18,7 @@ public class PipelineExecLogDao {
      * @return 流水线日志id
      */
     public String createLog(PipelineExecLogEntity pipelineExecLogEntity){
-
-        return jpaTemplate.save(pipelineExecLogEntity,String.class);
+        return jpaTemplate.save(pipelineExecLogEntity, String.class);
 
     }
 

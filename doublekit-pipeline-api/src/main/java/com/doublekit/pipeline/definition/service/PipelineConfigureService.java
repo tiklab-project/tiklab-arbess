@@ -5,6 +5,7 @@ import com.doublekit.join.annotation.FindAll;
 import com.doublekit.join.annotation.FindList;
 import com.doublekit.join.annotation.FindOne;
 import com.doublekit.join.annotation.JoinProvider;
+import com.doublekit.pipeline.definition.model.Pipeline;
 import com.doublekit.pipeline.definition.model.PipelineConfigure;
 import com.doublekit.pipeline.definition.model.PipelineExecConfigure;
 import com.doublekit.pipeline.instance.model.PipelineExecHistory;
@@ -49,6 +50,15 @@ public interface PipelineConfigureService {
      */
     PipelineConfigure findOneConfigure(String pipelineId , int type);
 
+
+    /**
+     * 根据任务id查询配置信息
+     * @param pipelineId 流水线id
+     * @param taskId 任务id
+     * @return 任务信息
+     */
+    PipelineConfigure findOneTask(String pipelineId,String taskId);
+
     /**
      * 删除单个任务
      * @param taskId 任务id
@@ -83,6 +93,12 @@ public interface PipelineConfigureService {
     @FindOne
     PipelineConfigure findOneConfigure(String configureId);
 
+    /**
+     * 查询流水线信息
+     * @param pipelineId 流水线id
+     * @return 流水线信息
+     */
+    Pipeline findOnePipeline(String pipelineId);
 
     /**
      * 查询所有配置文件

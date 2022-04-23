@@ -36,7 +36,7 @@ public class PipelineExecHistoryController {
     @RequestMapping(path="/deleteHistory",method = RequestMethod.POST)
     @ApiMethod(name = "deleteHistory",desc = "删除历史")
     @ApiParam(name = "historyId",desc = "流水线id",required = true)
-    public Result<Void> deleteHistory(@NotNull int historyId){
+    public Result<Void> deleteHistory(@NotNull String historyId){
        pipelineExecHistoryService.deleteHistory(historyId);
         return Result.ok();
     }

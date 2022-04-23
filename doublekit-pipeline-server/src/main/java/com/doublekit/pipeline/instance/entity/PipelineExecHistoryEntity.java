@@ -30,12 +30,12 @@ public class PipelineExecHistoryEntity {
     private String runLog;
 
     //执行人
-    @Column(name = "pipeline_id",notNull = true)
-    private String pipelineId;
+    @Column(name = "exec_name",notNull = true)
+    private String execName;
 
     //日志id
-    @Column(name = "log_id",notNull = true)
-    private String logId;
+    @Column(name = "status",notNull = true)
+    private int status;
 
     //状态
     @Column(name = "run_status",notNull = true)
@@ -44,6 +44,10 @@ public class PipelineExecHistoryEntity {
     //执行时间
     @Column(name = "run_time",notNull = true)
     private int runTime;
+
+    //执行时间
+    @Column(name = "pipeline_id",notNull = true)
+    private String pipelineId;
 
 
     public String getHistoryId() {
@@ -78,6 +82,14 @@ public class PipelineExecHistoryEntity {
         this.runLog = runLog;
     }
 
+    public String getExecName() {
+        return execName;
+    }
+
+    public void setExecName(String execName) {
+        this.execName = execName;
+    }
+
     public String getPipelineId() {
         return pipelineId;
     }
@@ -86,12 +98,12 @@ public class PipelineExecHistoryEntity {
         this.pipelineId = pipelineId;
     }
 
-    public String getLogId() {
-        return logId;
+    public int getStatus() {
+        return status;
     }
 
-    public void setLogId(String logId) {
-        this.logId = logId;
+    public void setStatus(int status) {
+        this.status = status;
     }
 
     public int getRunStatus() {

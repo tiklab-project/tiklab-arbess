@@ -5,6 +5,7 @@ import com.doublekit.apibox.annotation.Api;
 import com.doublekit.apibox.annotation.ApiMethod;
 import com.doublekit.apibox.annotation.ApiParam;
 import com.doublekit.common.Result;
+import com.doublekit.pipeline.definition.model.PipelineConfigure;
 import com.doublekit.pipeline.definition.model.PipelineExecConfigure;
 import com.doublekit.pipeline.definition.service.PipelineConfigureService;
 import org.slf4j.Logger;
@@ -32,9 +33,9 @@ public class PipelineConfigureController {
 
     //根据流水线id查询配置信息
     @RequestMapping(path="/findAllConfigure",method = RequestMethod.POST)
-    @ApiMethod(name = "findAllConfigure",desc = "根据流水线id查询配置信息")
+    @ApiMethod(name = "findAll",desc = "根据流水线id查询配置信息")
     @ApiParam(name = "pipelineId",desc = "流水线id",required = true)
-    public Result<List<Object>> findAllConfigure(@NotNull String pipelineId) {
+    public Result<List<Object>> findAll(@NotNull String pipelineId) {
         List<Object> list = pipelineConfigureService.findAll(pipelineId);
         return Result.ok(list);
     }
@@ -47,5 +48,15 @@ public class PipelineConfigureController {
         pipelineConfigureService.updateTask(pipelineExecConfigure);
         return Result.ok();
     }
+
+    //根据流水线id查询配置
+    @RequestMapping(path="/findAll",method = RequestMethod.POST)
+    @ApiMethod(name = "findAllConfigure",desc = "根据流水线id查询配置信息")
+    @ApiParam(name = "pipelineId",desc = "流水线id",required = true)
+    public Result<List<Object>> findAllConfigure(@NotNull String pipelineId) {
+        List<PipelineConfigure> list = pipelineConfigureService.findAllConfigure(pipelineId);
+        return Result.ok(list);
+    }
+
 
 }

@@ -35,13 +35,7 @@ public interface PipelineExecHistoryService {
      * 删除流水线历史
      * @param historyId 流水线历史id
      */
-    void deleteHistory(@NotNull int  historyId);
-
-    /**
-     * 删除历史
-     * @param pipelineId 流水线id
-     */
-    void deleteHistory(String pipelineId);
+    void deleteHistory(@NotNull String  historyId);
 
     /**
      * 更新流水线历史
@@ -55,7 +49,7 @@ public interface PipelineExecHistoryService {
      * @return 流水线历史信息
      */
     @FindOne
-    PipelineExecHistory findOneHistory(@NotNull int historyId);
+    PipelineExecHistory findOneHistory(String historyId);
 
     /**
      * 查询最近一次历史

@@ -38,8 +38,11 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
     @Override
     public String createConfigure( String pipelineId,int taskType,PipelineStructure pipelineStructure ){
         pipelineStructure.setType(taskType);
-        pipelineStructure.setType(taskType);
         PipelineConfigure pipelineConfigure = new PipelineConfigure();
+        pipelineConfigure.setTaskAlias("构建");
+        if (pipelineStructure.getStructureAlias() != null){
+            pipelineConfigure.setTaskAlias(pipelineStructure.getStructureAlias());
+        }
         String structureId = createStructure(pipelineStructure);
         pipelineConfigure.setTaskId(structureId);
         pipelineConfigure.setTaskType(taskType);
@@ -80,6 +83,7 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
             if (pipelineStructure.getType() != 0){
                 updateStructure(pipelineStructure);
                 oneConfigure.setTaskSort(pipelineStructure.getSort());
+                oneConfigure.setTaskAlias(pipelineStructure.getStructureAlias());
                 pipelineConfigureService.updateConfigure(oneConfigure);
             }else {
                 pipelineConfigureService.deleteTask(oneConfigure.getTaskId(),pipelineId);

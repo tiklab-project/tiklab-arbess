@@ -9,75 +9,71 @@ import com.doublekit.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import javax.lang.model.element.PackageElement;
+import java.util.*;
 
 @Service
 @Exporter
 public class PipelineExecLogServiceImpl implements PipelineExecLogService {
 
     @Autowired
-    JoinTemplate joinTemplate;
-
-    @Autowired
     PipelineExecLogDao pipelineExecLogDao;
-
-    @Autowired
-    PipelineCodeLogService pipelineCodeLogService;
-
-    @Autowired
-    PipelineExecHistoryService pipelineExecHistoryService;
 
     //创建
     @Override
     public String createLog(PipelineExecLog pipelineExecLog) {
-        PipelineExecLogEntity pipelineExecLogEntity = BeanMapper.map(pipelineExecLog, PipelineExecLogEntity.class);
-        return pipelineExecLogDao.createLog(pipelineExecLogEntity);
+        return pipelineExecLogDao.createLog(BeanMapper.map(pipelineExecLog, PipelineExecLogEntity.class));
     }
 
 
     //删除
-    @Override
     public void deleteLog(String logId) {
-        PipelineExecLog oneLog = findOneLog(logId);
-        if (oneLog != null){
-            pipelineCodeLogService.deleteCodeLog(oneLog);
-        }
         pipelineExecLogDao.deleteLog(logId);
+    }
+
+    @Override
+    public void deleteHistoryLog(String historyId) {
+        List<PipelineExecLog> allLog = findAllLog();
+        if (allLog != null){
+            for (PipelineExecLog pipelineExecLog : allLog) {
+                if (pipelineExecLog.getHistoryId().equals(historyId)){
+                    deleteLog(pipelineExecLog.getPipelineLogId());
+                }
+            }
+        }
     }
 
     //更新
     @Override
     public void updateLog(PipelineExecLog pipelineExecLog) {
-        PipelineExecLogEntity pipelineExecLogEntity = BeanMapper.map(pipelineExecLog, PipelineExecLogEntity.class);
-        pipelineCodeLogService.updateCodeLog(pipelineExecLog);
-        pipelineExecLogDao.updateLog(pipelineExecLogEntity);
+        pipelineExecLogDao.updateLog(BeanMapper.map(pipelineExecLog, PipelineExecLogEntity.class));
     }
 
-    //查询单个
     @Override
-    public PipelineExecLog findOneLog(String logId) {
-        PipelineExecLogEntity oneLog = pipelineExecLogDao.findOne(logId);
-        PipelineExecLog pipelineExecLog = BeanMapper.map(oneLog, PipelineExecLog.class);
-        joinTemplate.joinQuery(pipelineExecLog);
-        return pipelineExecLog;
-    }
+    public List<PipelineExecLog> findAllLog(String historyId){
+        List<PipelineExecLog> allLog = findAllLog();
+        List<PipelineExecLog> pipelineExecLogList = new ArrayList<>();
+        if (allLog != null){
+            for (PipelineExecLog pipelineExecLog : allLog) {
+                if (pipelineExecLog.getHistoryId().equals(historyId)){
+                    pipelineExecLogList.add(pipelineExecLog);
 
+                }
+            }
+            if (pipelineExecLogList.size() != 0){
+                pipelineExecLogList.sort(Comparator.comparing(PipelineExecLog::getTaskSort));
+            }
+            return pipelineExecLogList;
+        }
+    return null;
+    }
     //查询所有
     @Override
     public List<PipelineExecLog> findAllLog() {
         List<PipelineExecLogEntity> allLog = pipelineExecLogDao.findAllLog();
-        List<PipelineExecLog> pipelineExecLogList = BeanMapper.mapList(allLog, PipelineExecLog.class);
-        joinTemplate.joinQuery(pipelineExecLogList);
-        return pipelineExecLogList;
+        return BeanMapper.mapList(allLog, PipelineExecLog.class);
     }
 
-    //创建历史表
-    @Override
-    public void createHistory(PipelineExecHistory pipelineExecHistory){
-        pipelineExecHistoryService.createHistory(pipelineExecHistory);
-    }
 
     @Override
     public List<PipelineExecLog> findAllLogList(List<String> idList) {

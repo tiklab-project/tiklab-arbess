@@ -3,10 +3,8 @@ package com.doublekit.pipeline.instance.model;
 import com.doublekit.apibox.annotation.ApiModel;
 import com.doublekit.apibox.annotation.ApiProperty;
 import com.doublekit.beans.annotation.Mapper;
-import com.doublekit.beans.annotation.Mapping;
-import com.doublekit.beans.annotation.Mappings;
 import com.doublekit.join.annotation.Join;
-import com.doublekit.join.annotation.JoinQuery;
+
 
 @ApiModel
 @Join
@@ -14,39 +12,44 @@ import com.doublekit.join.annotation.JoinQuery;
 public class PipelineExecLog {
 
     //日志id
-    @ApiProperty(name="logTestState",desc="日志id")
-    private String logId;
+    @ApiProperty(name="pipelineLogId",desc="日志id")
+    private String pipelineLogId;
 
     //historyId
-    @ApiProperty(name = "history_id",desc = "")
+    @ApiProperty(name = "historyId",desc = "历史Id")
     private String historyId;
 
     //运行类型
-    @ApiProperty(name = "task_log_type",desc = "")
-    private int taskLogType ;
+    @ApiProperty(name = "taskType",desc = "运行类型")
+    private int taskType ;
 
-    @ApiProperty(name = "task_sort",desc = "")
-    private int taskLogSort ;
+    //执行顺序
+    @ApiProperty(name = "taskSort",desc = "执行顺序")
+    private int taskSort ;
+
+    //执行名称
+    @ApiProperty(name = "taskSort",desc = "执行顺序")
+    private String taskAlias;
 
     //运行日志
-    @ApiProperty(name = "log_run_log",desc = "")
-    private String logRunLog;
+    @ApiProperty(name = "runLog",desc = "运行日志")
+    private String runLog;
 
     //运行时间
-    @ApiProperty(name = "log_run_time",desc = "")
-    private int logRunTime;
+    @ApiProperty(name = "runTime",desc = "运行时间")
+    private int runTime;
 
     //运行状态
-    @ApiProperty(name = "log_run_state",desc = "")
-    private int logRunState;
+    @ApiProperty(name = "runState",desc = "运行状态")
+    private int runState;
 
 
-    public String getLogId() {
-        return logId;
+    public String getPipelineLogId() {
+        return pipelineLogId;
     }
 
-    public void setLogId(String logId) {
-        this.logId = logId;
+    public void setPipelineLogId(String pipelineLogId) {
+        this.pipelineLogId = pipelineLogId;
     }
 
     public String getHistoryId() {
@@ -57,43 +60,51 @@ public class PipelineExecLog {
         this.historyId = historyId;
     }
 
-    public int getTaskLogType() {
-        return taskLogType;
+    public int getTaskType() {
+        return taskType;
     }
 
-    public void setTaskLogType(int taskLogType) {
-        this.taskLogType = taskLogType;
+    public void setTaskType(int taskType) {
+        this.taskType = taskType;
     }
 
-    public int getTaskLogSort() {
-        return taskLogSort;
+    public int getTaskSort() {
+        return taskSort;
     }
 
-    public void setTaskLogSort(int taskLogSort) {
-        this.taskLogSort = taskLogSort;
+    public void setTaskSort(int taskSort) {
+        this.taskSort = taskSort;
     }
 
-    public String getLogRunLog() {
-        return logRunLog;
+    public String getRunLog() {
+        return runLog;
     }
 
-    public void setLogRunLog(String logRunLog) {
-        this.logRunLog = logRunLog;
+    public void setRunLog(String runLog) {
+        this.runLog = runLog;
     }
 
-    public int getLogRunTime() {
-        return logRunTime;
+    public int getRunTime() {
+        return runTime;
     }
 
-    public void setLogRunTime(int logRunTime) {
-        this.logRunTime = logRunTime;
+    public void setRunTime(int runTime) {
+        this.runTime = runTime;
     }
 
-    public int getLogRunState() {
-        return logRunState;
+    public int getRunState() {
+        return runState;
     }
 
-    public void setLogRunState(int logRunState) {
-        this.logRunState = logRunState;
+    public void setRunState(int runState) {
+        this.runState = runState;
+    }
+
+    public String getTaskAlias() {
+        return taskAlias;
+    }
+
+    public void setTaskAlias(String taskAlias) {
+        this.taskAlias = taskAlias;
     }
 }
