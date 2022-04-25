@@ -21,8 +21,8 @@ public class PipelineExecHistory {
     @ApiProperty(name="historyId",desc="构建历史id")
     private String historyId;
 
-    //日志id
-    @ApiProperty(name="status",desc="日志id")
+    //执行状态
+    @ApiProperty(name="status",desc="状态")
     private int status;
 
     //创建时间
@@ -57,8 +57,10 @@ public class PipelineExecHistory {
    @JoinQuery(key = "pipelineId")
     private Pipeline pipeline;
 
+    //运行时间（转换为天，月，日 ，时，分，秒格式）
     private String execTime;
 
+    //执行位置
     private int sort;
 
     public String getHistoryId() {

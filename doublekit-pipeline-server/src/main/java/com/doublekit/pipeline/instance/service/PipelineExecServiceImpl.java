@@ -28,9 +28,6 @@ public class PipelineExecServiceImpl implements PipelineExecService {
     PipelineExecHistoryService pipelineExecHistoryService;
 
     @Autowired
-    PipelineService pipelineService;
-
-    @Autowired
     CodeAchieve codeAchieve;
 
     @Autowired
@@ -74,7 +71,6 @@ public class PipelineExecServiceImpl implements PipelineExecService {
     //查询构建状态
     @Override
     public PipelineExecHistory findInstanceState(String pipelineId){
-        Pipeline pipeline = pipelineService.findPipeline(pipelineId);
         if (pipelineExecHistoryList != null){
             for (PipelineExecHistory pipelineExecHistory : pipelineExecHistoryList) {
                 if (pipelineExecHistory.getPipeline().getPipelineId().equals(pipelineId)){
@@ -95,14 +91,13 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         pipelineExecHistory.setRunWay(1);
         pipelineExecHistory.setHistoryId(historyId);
         List<PipelineConfigure> allConfigure = pipelineConfigureService.findAllConfigure(pipelineId);
+        pipelineExecHistory.setSort(1);
+        pipelineExecHistory.setStatus(0);
         if (allConfigure != null){
-            int i= 1;
             // allConfigure.sort(Comparator.comparing(PipelineConfigure::getTaskSort));
             for (PipelineConfigure pipelineConfigure : allConfigure) {
                 Pipeline pipeline = pipelineConfigure.getPipeline();
-                pipelineExecHistory.setStatus(i);
                 pipelineExecHistory.setPipeline(pipeline);
-                pipelineExecHistory.setSort(i);
                 pipelineExecHistory.setExecName(pipeline.getPipelineCreateUser());
                 pipelineExecHistoryService.updateHistory(pipelineExecHistory);
                 pipelineExecHistoryList.add(pipelineExecHistory);
@@ -136,12 +131,12 @@ public class PipelineExecServiceImpl implements PipelineExecService {
                         }
                     }
                 }
-                i++;
+                pipelineExecHistory.setSort(pipelineExecHistory.getSort() +1);
+                pipelineExecHistory.setStatus(pipelineExecHistory.getStatus() +1);
             }
         }
-        pipelineExecHistory.setStatus(1);
+        pipelineExecHistory.setRunStatus(1);
         commonAchieve.success(pipelineExecHistory,pipelineId,pipelineExecHistoryList);
-        pipelineExecHistoryList.add(pipelineExecHistory);
         //执行完成移除构建id
         if (pipelineIdList != null) {
             pipelineIdList.removeIf(id -> id.equals(pipelineId));
@@ -149,8 +144,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
     }
 
     private void clear(PipelineExecHistory pipelineExecHistory,String pipelineId){
-        pipelineExecHistory.setStatus(100);
-        pipelineExecHistoryList.add(pipelineExecHistory);
+        pipelineExecHistory.setStatus(pipelineExecHistory.getStatus()+2);
         pipelineExecHistoryList.add(pipelineExecHistory);
         //执行完成移除构建id
         if (pipelineIdList != null) {

@@ -54,6 +54,8 @@ public class DeployAchieve {
      * @return 状态
      */
     private int linux(PipelineConfigure pipelineConfigure, PipelineExecHistory pipelineExecHistory ,List<PipelineExecHistory> pipelineExecHistoryList) {
+        //开始运行时间
+        long beginTime = new Timestamp(System.currentTimeMillis()).getTime();
         Pipeline pipeline = pipelineConfigure.getPipeline();
         PipelineExecLog pipelineExecLog = new PipelineExecLog();
         pipelineExecLog.setTaskAlias(pipelineConfigure.getTaskAlias());
@@ -64,8 +66,11 @@ public class DeployAchieve {
         pipelineExecLog.setTaskSort(pipelineConfigure.getTaskSort());
         pipelineExecLog.setTaskType(pipelineConfigure.getTaskType());
         Proof proof = pipelineDeploy.getProof();
-        //开始运行时间
-        long beginTime = new Timestamp(System.currentTimeMillis()).getTime();
+        if (proof == null){
+            commonAchieve.updateTime(pipelineExecHistory,pipelineExecLog,beginTime);
+            commonAchieve.updateState(pipelineExecHistory,pipelineExecLog,"凭证为空",pipelineExecHistoryList);
+            return 0;
+        }
         String s = "部署到服务器" + proof.getProofIp() + "。。。。。。。。";
         pipelineExecLog.setRunLog(s);
         pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+"\n"+s);
