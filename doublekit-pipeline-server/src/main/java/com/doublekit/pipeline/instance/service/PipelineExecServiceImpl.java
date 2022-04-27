@@ -103,30 +103,42 @@ public class PipelineExecServiceImpl implements PipelineExecService {
                 pipelineExecHistoryList.add(pipelineExecHistory);
                 switch (pipelineConfigure.getTaskType()) {
                     case 1, 2 -> {
-                        int code = codeAchieve.codeStart(pipelineConfigure, pipelineExecHistory, pipelineExecHistoryList);
-                        if (code == 0) {
-                            clear(pipelineExecHistory,pipelineId);
+                        String e = codeAchieve.codeStart(pipelineConfigure, pipelineExecHistory, pipelineExecHistoryList);
+                        if (e != null) {
+                            if (pipelineIdList != null) {
+                                pipelineIdList.removeIf(id -> id.equals(pipelineId));
+                            }
+                            commonAchieve.error(pipelineExecHistory,e,pipelineId,pipelineExecHistoryList);
                             return ;
                         }
                     }
                     case 11 -> {
-                        int test = testAchieve.testStart(pipelineConfigure, pipelineExecHistory, pipelineExecHistoryList);
-                        if (test == 0) {
-                            clear(pipelineExecHistory,pipelineId);
+                        String e = testAchieve.testStart(pipelineConfigure, pipelineExecHistory, pipelineExecHistoryList);
+                        if (e != null) {
+                            if (pipelineIdList != null) {
+                                pipelineIdList.removeIf(id -> id.equals(pipelineId));
+                            }
+                            commonAchieve.error(pipelineExecHistory,e,pipelineId,pipelineExecHistoryList);
                             return ;
                         }
                     }
                     case 21, 22 -> {
-                        int structure = structureAchieve.structureStart(pipelineConfigure, pipelineExecHistory, pipelineExecHistoryList);
-                        if (structure == 0) {
-                            clear(pipelineExecHistory,pipelineId);
+                        String e  = structureAchieve.structureStart(pipelineConfigure, pipelineExecHistory, pipelineExecHistoryList);
+                        if (e != null) {
+                            if (pipelineIdList != null) {
+                                pipelineIdList.removeIf(id -> id.equals(pipelineId));
+                            }
+                            commonAchieve.error(pipelineExecHistory,e,pipelineId,pipelineExecHistoryList);
                             return ;
                         }
                     }
                     case 31, 32-> {
-                        int deploy = deployAchieve.deployStart(pipelineConfigure, pipelineExecHistory, pipelineExecHistoryList);
-                        if (deploy == 0) {
-                            clear(pipelineExecHistory,pipelineId);
+                        String e  = deployAchieve.deployStart(pipelineConfigure, pipelineExecHistory, pipelineExecHistoryList);
+                        if (e != null) {
+                            if (pipelineIdList != null) {
+                                pipelineIdList.removeIf(id -> id.equals(pipelineId));
+                            }
+                            commonAchieve.error(pipelineExecHistory,e,pipelineId,pipelineExecHistoryList);
                             return ;
                         }
                     }
@@ -135,23 +147,11 @@ public class PipelineExecServiceImpl implements PipelineExecService {
                 pipelineExecHistory.setStatus(pipelineExecHistory.getStatus() +1);
             }
         }
-        pipelineExecHistory.setRunStatus(1);
-        commonAchieve.success(pipelineExecHistory,pipelineId,pipelineExecHistoryList);
-        //执行完成移除构建id
-        if (pipelineIdList != null) {
-            pipelineIdList.removeIf(id -> id.equals(pipelineId));
-        }
-    }
-
-    private void clear(PipelineExecHistory pipelineExecHistory,String pipelineId){
-        pipelineExecHistory.setStatus(pipelineExecHistory.getStatus()+2);
         pipelineExecHistoryList.add(pipelineExecHistory);
-        //执行完成移除构建id
+        pipelineExecHistoryService.updateHistory(pipelineExecHistory);
+        commonAchieve.success(pipelineExecHistory,pipelineId,pipelineExecHistoryList);
         if (pipelineIdList != null) {
             pipelineIdList.removeIf(id -> id.equals(pipelineId));
         }
     }
-
-
-
 }

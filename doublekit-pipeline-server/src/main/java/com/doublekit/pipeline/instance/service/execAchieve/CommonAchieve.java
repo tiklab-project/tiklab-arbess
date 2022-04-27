@@ -245,6 +245,45 @@ public class CommonAchieve {
     }
 
 
+
+
+
+    /**
+     * 更新执行时间
+     * @param pipelineExecHistory 历史
+     * @param pipelineExecLog 日志
+     * @param beginTime 开始时间
+     */
+    public void updateTime(PipelineExecHistory pipelineExecHistory, PipelineExecLog pipelineExecLog, long beginTime){
+        long overTime = new Timestamp(System.currentTimeMillis()).getTime();
+        int time = (int) (overTime - beginTime) / 1000;
+        pipelineExecLog.setRunTime(time);
+        pipelineExecHistory.setRunTime(pipelineExecHistory.getRunTime()+time);
+    }
+
+    /**
+     * 更新状态
+     * @param pipelineExecHistory 历史
+     * @param pipelineExecLog 日志
+     * @param e 异常
+     * @param pipelineExecHistoryList 状态集合
+     */
+    public  void updateState(PipelineExecHistory pipelineExecHistory,PipelineExecLog pipelineExecLog,String e,List<PipelineExecHistory> pipelineExecHistoryList){
+        pipelineExecLog.setRunState(10);
+        Pipeline onePipeline = pipelineExecHistory.getPipeline();
+        if (e != null){
+            pipelineExecLog.setRunLog(pipelineExecLog.getRunLog() +"\n"+e);
+            pipelineExecLog.setRunState(1);
+            error(pipelineExecHistory,e, onePipeline.getPipelineId(),pipelineExecHistoryList);
+        }
+        pipelineExecLog.setHistoryId(pipelineExecHistory.getHistoryId());
+        pipelineExecLogService.createLog(pipelineExecLog);
+        pipelineExecLog.setHistoryId(pipelineExecHistory.getHistoryId());
+        pipelineExecHistoryService.updateHistory(pipelineExecHistory);
+        pipelineExecHistoryList.add(pipelineExecHistory);
+    }
+
+
     /**
      * 输出错误信息
      * @param pipelineExecHistory 历史
@@ -252,13 +291,15 @@ public class CommonAchieve {
      * @param e 错误信息
      */
     public  void  error(PipelineExecHistory pipelineExecHistory, String e, String pipelineId,List<PipelineExecHistory> pipelineExecHistoryList){
-
+        pipelineExecHistory.setStatus(pipelineExecHistory.getStatus()+2);
+        pipelineExecHistoryList.add(pipelineExecHistory);
         if (pipelineExecHistory.getRunLog() != null){
             pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+ "\n" + e + "\n" + " RUN RESULT : FAIL");
         }else {
             pipelineExecHistory.setRunLog("\n" + e + "\n"+ " RUN RESULT : FAIL");
         }
         pipelineExecHistory.setRunStatus(1);
+        pipelineExecHistoryList.add(pipelineExecHistory);
         // 清空缓存
         clean(pipelineExecHistory,pipelineId,pipelineExecHistoryList);
     }
@@ -275,47 +316,11 @@ public class CommonAchieve {
             pipelineExecHistory.setRunLog( "\n"+ " RUN RESULT : SUCCESS");
         }
         pipelineExecHistory.setRunStatus(30);
+        pipelineExecHistoryList.add(pipelineExecHistory);
+        pipelineExecHistoryService.updateHistory(pipelineExecHistory);
         //清空缓存
         clean(pipelineExecHistory,pipelineId,pipelineExecHistoryList);
     }
-
-
-    /**
-     * 更新执行时间
-     * @param pipelineExecHistory 历史
-     * @param pipelineExecLog 日志
-     * @param beginTime 开始时间
-     */
-    public void updateTime(PipelineExecHistory pipelineExecHistory, PipelineExecLog pipelineExecLog, long beginTime){
-        long overTime = new Timestamp(System.currentTimeMillis()).getTime();
-        int time = (int) (overTime - beginTime) / 1000;
-        pipelineExecLog.setRunTime(time);
-        pipelineExecHistory.setRunTime(pipelineExecHistory.getRunTime()+time);
-    }
-
-
-    /**
-     * 更新状态
-     * @param pipelineExecHistory 历史
-     * @param pipelineExecLog 日志
-     * @param e 异常
-     * @param pipelineExecHistoryList 状态集合
-     */
-    public  void updateState(PipelineExecHistory pipelineExecHistory,PipelineExecLog pipelineExecLog,String e,List<PipelineExecHistory> pipelineExecHistoryList){
-        pipelineExecLog.setRunState(10);
-        Pipeline onePipeline = pipelineExecHistory.getPipeline();
-        if (e != null){
-            pipelineExecLog.setRunState(1);
-            error(pipelineExecHistory,e, onePipeline.getPipelineId(),pipelineExecHistoryList);
-        }
-        pipelineExecLog.setHistoryId(pipelineExecHistory.getHistoryId());
-        pipelineExecLogService.createLog(pipelineExecLog);
-        pipelineExecLog.setHistoryId(pipelineExecHistory.getHistoryId());
-        pipelineExecHistoryService.updateHistory(pipelineExecHistory);
-
-        pipelineExecHistoryList.add(pipelineExecHistory);
-    }
-
 
     /**
      * 清空缓存
@@ -323,9 +328,6 @@ public class CommonAchieve {
      * @param pipelineId 流水线id
      */
     public  void clean(PipelineExecHistory pipelineExecHistory, String pipelineId,List<PipelineExecHistory> pipelineExecHistoryList){
-        pipelineExecHistoryList.add(pipelineExecHistory);
-
-        pipelineExecHistoryService.updateHistory(pipelineExecHistory);
         //恢复中断状态
         try {
             Thread.sleep(1000);

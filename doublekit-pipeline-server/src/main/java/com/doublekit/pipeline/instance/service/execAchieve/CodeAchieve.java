@@ -38,19 +38,20 @@ public class CodeAchieve {
 
     private static final Logger logger = LoggerFactory.getLogger(PipelineCodeServiceImpl.class);
 
-    public int codeStart(PipelineConfigure pipelineConfigure, PipelineExecHistory pipelineExecHistory, List<PipelineExecHistory> pipelineExecHistoryList){
+    public String codeStart(PipelineConfigure pipelineConfigure, PipelineExecHistory pipelineExecHistory, List<PipelineExecHistory> pipelineExecHistoryList){
         return gitClone(pipelineConfigure, pipelineExecHistory, pipelineExecHistoryList);
     }
 
     // git克隆
-    private int gitClone(PipelineConfigure pipelineConfigure, PipelineExecHistory pipelineExecHistory, List<PipelineExecHistory> pipelineExecHistoryList){
-        pipelineExecHistory.setRunLog("任务开始执行。。。。。。。");
+    private String gitClone(PipelineConfigure pipelineConfigure, PipelineExecHistory pipelineExecHistory, List<PipelineExecHistory> pipelineExecHistoryList){
+        long beginTime = new Timestamp(System.currentTimeMillis()).getTime();
+        pipelineExecHistory.setRunLog("流水线正在执行。。。。。。。");
         pipelineExecHistoryList.add(pipelineExecHistory);
         PipelineCode pipelineCode = pipelineCodeService.findOneCode(pipelineConfigure.getTaskId());
         PipelineExecLog pipelineExecLog = new PipelineExecLog();
         pipelineExecLog.setTaskAlias(pipelineConfigure.getTaskAlias());
+        pipelineExecLog.setRunLog("");
         Pipeline pipeline = pipelineConfigure.getPipeline();
-        long beginTime = new Timestamp(System.currentTimeMillis()).getTime();
 
         //设置代码路径
         String path = "D:\\clone\\" + pipeline.getPipelineName();
@@ -60,8 +61,7 @@ public class CodeAchieve {
         Proof proof = pipelineCode.getProof();
         if (proof == null){
             commonAchieve.updateTime(pipelineExecHistory,pipelineExecLog,beginTime);
-            commonAchieve.updateState(pipelineExecHistory,pipelineExecLog,"凭证为空。。。。",pipelineExecHistoryList);
-            return 0;
+            return "凭证为空。。。。";
         }
         String codeAddress =pipelineCode.getCodeAddress();
         String codeBranch = pipelineCode.getCodeBranch();
@@ -78,16 +78,15 @@ public class CodeAchieve {
             clone(file, codeAddress, credentialsProvider, codeBranch);
         } catch (GitAPIException e) {
             commonAchieve.updateTime(pipelineExecHistory,pipelineExecLog,beginTime);
-            commonAchieve.updateState(pipelineExecHistory,pipelineExecLog,e.toString(),pipelineExecHistoryList);
-            return 0;
+            return e.toString();
         }
         String log = s + "proofType : " +proof.getProofType() + "\n" + "clone成功。。。。。。。。。。。。。。。" + "\n";
-        pipelineExecLog.setRunLog(log);
+        pipelineExecLog.setRunLog(pipelineExecLog.getRunLog()+log);
         pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+"\n"+log);
         pipelineExecHistoryList.add(pipelineExecHistory);
         commonAchieve.updateTime(pipelineExecHistory,pipelineExecLog,beginTime);
         commonAchieve.updateState(pipelineExecHistory,pipelineExecLog,null,pipelineExecHistoryList);
-        return 1;
+        return null;
     }
 
     /**

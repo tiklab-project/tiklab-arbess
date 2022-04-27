@@ -35,12 +35,12 @@ public class StructureAchieve {
     CommonAchieve commonAchieve;
 
 
-    public int structureStart(PipelineConfigure pipelineConfigure, PipelineExecHistory pipelineExecHistory,List<PipelineExecHistory> pipelineExecHistoryList){
+    public String structureStart(PipelineConfigure pipelineConfigure, PipelineExecHistory pipelineExecHistory,List<PipelineExecHistory> pipelineExecHistoryList){
       return structure(pipelineConfigure,pipelineExecHistory,pipelineExecHistoryList);
     }
 
     // 构建
-    private int structure(PipelineConfigure pipelineConfigure, PipelineExecHistory pipelineExecHistory,List<PipelineExecHistory> pipelineExecHistoryList)  {
+    private String structure(PipelineConfigure pipelineConfigure, PipelineExecHistory pipelineExecHistory,List<PipelineExecHistory> pipelineExecHistoryList)  {
         long beginTime = new Timestamp(System.currentTimeMillis()).getTime();
         Pipeline pipeline = pipelineConfigure.getPipeline();
         PipelineExecLog pipelineExecLog = new PipelineExecLog();
@@ -66,18 +66,16 @@ public class StructureAchieve {
                 if (map.get("state").equals("0")){
                     pipelineExecLog.setRunLog(pipelineExecLog.getRunLog()+map.get("log"));
                     commonAchieve.updateTime(pipelineExecHistory,pipelineExecLog,beginTime);
-                    commonAchieve.updateState(pipelineExecHistory,pipelineExecLog,"测试执行失败。",pipelineExecHistoryList);
-                    return 0;
+                    return "测试执行失败。";
                 }
                 pipelineExecLog.setRunLog(a+map.get("log"));
             } catch (IOException e) {
                 commonAchieve.updateTime(pipelineExecHistory,pipelineExecLog,beginTime);
-                commonAchieve.updateState(pipelineExecHistory,pipelineExecLog,e.toString(),pipelineExecHistoryList);
-                return 0;
+                return e.toString();
             }
         }
         commonAchieve.updateTime(pipelineExecHistory,pipelineExecLog,beginTime);
         commonAchieve.updateState(pipelineExecHistory,pipelineExecLog,null,pipelineExecHistoryList);
-        return 1;
+        return null;
     }
 }

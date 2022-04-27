@@ -41,6 +41,9 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
     @Override
     public void deleteHistory(String historyId) {
         PipelineExecHistory oneHistory = findOneHistory(historyId);
+        if (oneHistory == null){
+            return;
+        }
         pipelineExecLogService.deleteHistoryLog(oneHistory.getHistoryId());
         pipelineExecHistoryDao.deleteHistory(historyId);
     }
@@ -79,6 +82,9 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
         List<PipelineExecHistory> historyList = new ArrayList<>();
         if (allHistory != null){
             for (PipelineExecHistory pipelineExecHistory : allHistory) {
+                if (pipelineExecHistory.getPipeline() ==null){
+                    continue;
+                }
                 if (pipelineExecHistory.getPipeline().getPipelineId().equals(pipeline.getPipelineId())){
                     pipelineExecHistory.setExecTime(formatDateTime(pipelineExecHistory.getRunTime()));
                     historyList.add(pipelineExecHistory);

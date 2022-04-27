@@ -35,12 +35,12 @@ public class TestAchieve {
     CommonAchieve commonAchieve;
 
 
-    public int testStart(PipelineConfigure pipelineConfigure, PipelineExecHistory pipelineExecHistory, List<PipelineExecHistory> pipelineExecHistoryList){
+    public String testStart(PipelineConfigure pipelineConfigure, PipelineExecHistory pipelineExecHistory, List<PipelineExecHistory> pipelineExecHistoryList){
        return unitTesting(pipelineConfigure,pipelineExecHistory,pipelineExecHistoryList);
     }
 
     // 单元测试
-    private int unitTesting(PipelineConfigure pipelineConfigure, PipelineExecHistory pipelineExecHistory,List<PipelineExecHistory> pipelineExecHistoryList) {
+    private String unitTesting(PipelineConfigure pipelineConfigure, PipelineExecHistory pipelineExecHistory,List<PipelineExecHistory> pipelineExecHistoryList) {
         long beginTime = new Timestamp(System.currentTimeMillis()).getTime();
         PipelineExecLog pipelineExecLog = new PipelineExecLog();
         pipelineExecLog.setTaskAlias(pipelineConfigure.getTaskAlias());
@@ -59,21 +59,19 @@ public class TestAchieve {
                 InputStreamReader inputStreamReader = new InputStreamReader(process.getInputStream(), Charset.forName("GBK"));
                 Map<String, String> map = commonAchieve.log(inputStreamReader, pipelineExecHistory,pipelineExecHistoryList);
                 if (map.get("state").equals("0")){
-                    commonAchieve.updateTime(pipelineExecHistory,pipelineExecLog,beginTime);
                     pipelineExecLog.setRunLog(pipelineExecLog.getRunLog()+map.get("log"));
-                    commonAchieve.updateState(pipelineExecHistory,pipelineExecLog,"测试执行失败。",pipelineExecHistoryList);
-                    return 0;
+                    commonAchieve.updateTime(pipelineExecHistory,pipelineExecLog,beginTime);
+                    return "测试执行失败。";
                 }
                 pipelineExecLog.setRunLog(a+map.get("log"));
             } catch (IOException e) {
                 commonAchieve.updateTime(pipelineExecHistory,pipelineExecLog,beginTime);
-                commonAchieve.updateState(pipelineExecHistory,pipelineExecLog,e.toString(),pipelineExecHistoryList);
-                return 0;
+                return e.toString();
             }
         }
         commonAchieve.updateTime(pipelineExecHistory,pipelineExecLog,beginTime);
         commonAchieve.updateState(pipelineExecHistory,pipelineExecLog,null,pipelineExecHistoryList);
-        return 1;
+        return null;
     }
 
 

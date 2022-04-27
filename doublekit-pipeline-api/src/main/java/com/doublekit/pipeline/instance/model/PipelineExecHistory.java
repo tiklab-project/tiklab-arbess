@@ -21,10 +21,6 @@ public class PipelineExecHistory {
     @ApiProperty(name="historyId",desc="构建历史id")
     private String historyId;
 
-    //执行状态
-    @ApiProperty(name="status",desc="状态")
-    private int status;
-
     //创建时间
     @ApiProperty(name="createTime",desc="创建时间")
     private String createTime;
@@ -62,6 +58,9 @@ public class PipelineExecHistory {
 
     //执行位置
     private int sort;
+
+    //执行状态
+    private int status;
 
     public String getHistoryId() {
         return historyId;

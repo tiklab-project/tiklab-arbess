@@ -33,10 +33,6 @@ public class PipelineExecHistoryEntity {
     @Column(name = "exec_name",notNull = true)
     private String execName;
 
-    //日志id
-    @Column(name = "status",notNull = true)
-    private int status;
-
     //状态
     @Column(name = "run_status",notNull = true)
     private int runStatus;
@@ -96,14 +92,6 @@ public class PipelineExecHistoryEntity {
 
     public void setPipelineId(String pipelineId) {
         this.pipelineId = pipelineId;
-    }
-
-    public int getStatus() {
-        return status;
-    }
-
-    public void setStatus(int status) {
-        this.status = status;
     }
 
     public int getRunStatus() {

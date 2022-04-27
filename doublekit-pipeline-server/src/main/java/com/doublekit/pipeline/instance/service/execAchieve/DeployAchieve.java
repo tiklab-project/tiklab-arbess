@@ -40,11 +40,11 @@ public class DeployAchieve {
 
 
 
-    public int deployStart(PipelineConfigure pipelineConfigure, PipelineExecHistory pipelineExecHistory ,List<PipelineExecHistory> pipelineExecHistoryList){
+    public String deployStart(PipelineConfigure pipelineConfigure, PipelineExecHistory pipelineExecHistory ,List<PipelineExecHistory> pipelineExecHistoryList){
         return switch (pipelineConfigure.getTaskType()) {
             case 31 -> linux(pipelineConfigure, pipelineExecHistory, pipelineExecHistoryList);
             case 32 -> docker(pipelineConfigure, pipelineExecHistory, pipelineExecHistoryList);
-            default -> 0;
+            default -> null;
         };
     }
     /**
@@ -53,7 +53,7 @@ public class DeployAchieve {
      * @param pipelineExecHistory 日志
      * @return 状态
      */
-    private int linux(PipelineConfigure pipelineConfigure, PipelineExecHistory pipelineExecHistory ,List<PipelineExecHistory> pipelineExecHistoryList) {
+    private String linux(PipelineConfigure pipelineConfigure, PipelineExecHistory pipelineExecHistory ,List<PipelineExecHistory> pipelineExecHistoryList) {
         //开始运行时间
         long beginTime = new Timestamp(System.currentTimeMillis()).getTime();
         Pipeline pipeline = pipelineConfigure.getPipeline();
@@ -68,8 +68,7 @@ public class DeployAchieve {
         Proof proof = pipelineDeploy.getProof();
         if (proof == null){
             commonAchieve.updateTime(pipelineExecHistory,pipelineExecLog,beginTime);
-            commonAchieve.updateState(pipelineExecHistory,pipelineExecLog,"凭证为空",pipelineExecHistoryList);
-            return 0;
+            return "凭证为空";
         }
         String s = "部署到服务器" + proof.getProofIp() + "。。。。。。。。";
         pipelineExecLog.setRunLog(s);
@@ -101,13 +100,12 @@ public class DeployAchieve {
             }
         } catch (JSchException | SftpException | IOException e) {
             commonAchieve.updateTime(pipelineExecHistory,pipelineExecLog,beginTime);
-            commonAchieve.updateState(pipelineExecHistory,pipelineExecLog,e.toString(),pipelineExecHistoryList);
-            return 0;
+            return e.toString();
         }
         //更新状态
         commonAchieve.updateTime(pipelineExecHistory,pipelineExecLog,beginTime);
         commonAchieve.updateState(pipelineExecHistory,pipelineExecLog,null,pipelineExecHistoryList);
-        return 1;
+        return null;
     }
 
 
@@ -117,7 +115,7 @@ public class DeployAchieve {
      * @param pipelineExecHistory 日志
      * @return 部署状态
      */
-    private int docker(PipelineConfigure pipelineConfigure,PipelineExecHistory pipelineExecHistory,List<PipelineExecHistory> pipelineExecHistoryList) {
+    private String docker(PipelineConfigure pipelineConfigure,PipelineExecHistory pipelineExecHistory,List<PipelineExecHistory> pipelineExecHistoryList) {
         //开始运行时间
         PipelineDeploy pipelineDeploy = pipelineDeployService.findOneDeploy(pipelineConfigure.getTaskId());
         long beginTime = new Timestamp(System.currentTimeMillis()).getTime();
@@ -165,11 +163,10 @@ public class DeployAchieve {
             }
         } catch (JSchException | SftpException |IOException   e) {
             commonAchieve.updateTime(pipelineExecHistory,pipelineExecLog,beginTime);
-            commonAchieve.updateState(pipelineExecHistory,pipelineExecLog,e.toString(),pipelineExecHistoryList);
-            return  0;
+            return  e.toString();
         }
         commonAchieve.updateTime(pipelineExecHistory,pipelineExecLog,beginTime);
         commonAchieve.updateState(pipelineExecHistory,pipelineExecLog,null,pipelineExecHistoryList);
-        return 1;
+        return null;
     }
 }
