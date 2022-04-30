@@ -15,8 +15,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
-import java.util.Map;
 
 @Service
 @Exporter
@@ -111,6 +111,9 @@ public class PipelineCodeServiceImpl implements PipelineCodeService {
     public PipelineCode findOneCode(String codeId) {
         PipelineCodeEntity oneCode = pipelineCodeDao.findOneCode(codeId);
         PipelineCode pipelineCode = BeanMapper.map(oneCode, PipelineCode.class);
+        if (oneCode == null){
+            return null;
+        }
         if (oneCode.getProofId() != null){
             Proof proof = proofService.findOneProof(oneCode.getProofId());
             pipelineCode.setProof(proof);

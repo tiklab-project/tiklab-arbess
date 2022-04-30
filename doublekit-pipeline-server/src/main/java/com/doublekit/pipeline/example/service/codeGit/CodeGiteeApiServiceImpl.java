@@ -3,10 +3,7 @@ package com.doublekit.pipeline.example.service.codeGit;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.doublekit.pipeline.definition.model.PipelineConfigure;
 import com.doublekit.pipeline.example.model.CodeGit.CodeGiteeApi;
-import com.doublekit.pipeline.definition.service.PipelineConfigureService;
-import com.doublekit.pipeline.example.model.PipelineCode;
 import com.doublekit.pipeline.example.service.PipelineCodeService;
 import com.doublekit.pipeline.setting.proof.model.Proof;
 import com.doublekit.pipeline.setting.proof.service.ProofService;
@@ -14,12 +11,13 @@ import com.doublekit.rpc.annotation.Exporter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.*;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -27,9 +25,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 
 @Service
@@ -40,13 +36,10 @@ public class CodeGiteeApiServiceImpl implements CodeGiteeApiService {
     RestTemplate restTemplate;
 
     @Autowired
-    ProofService proofService;
-
-    @Autowired
-    PipelineConfigureService pipelineConfigureService;
-
-    @Autowired
     PipelineCodeService pipelineCodeService;
+
+    @Autowired
+    ProofService proofService;
 
     CodeGiteeApi codeGiteeApi = new CodeGiteeApi();
 
@@ -60,9 +53,9 @@ public class CodeGiteeApiServiceImpl implements CodeGiteeApiService {
 
     @Override
     public String  getAccessToken(String code) throws IOException {
-        logger.info("code凭证 ：" +code);
+        logger.info("获取code凭证 ：" +code);
         String url = codeGiteeApi.getAccessToken(code);
-        logger.info("token。。。。。。。" + url );
+        logger.info("获取token地址 ：" + url );
         String post = request(url, "POST");
         if (post != null){
             JSONObject jsonObject = JSONObject.parseObject(post);
@@ -70,6 +63,7 @@ public class CodeGiteeApiServiceImpl implements CodeGiteeApiService {
             String refresh_token = jsonObject.getString("refresh_token");
             codeGiteeApi.setAccessToken(access_token);
             codeGiteeApi.setRefreshToken(refresh_token);
+            logger.info("Gitee的token值 : "+ access_token);
             return access_token;
         }
         return null;
@@ -87,39 +81,23 @@ public class CodeGiteeApiServiceImpl implements CodeGiteeApiService {
                 return body.getString("login");
             }
         }
-
         return null;
     }
 
     //凭证信息
     @Override
-    public String getProof(String configureId,String proofName) {
-        // PipelineConfigure oneConfigure = pipelineConfigureService.findOneConfigure(configureId);
-        // // PipelineCode pipelineCode = oneConfigure.getPipelineCode();
-        // // PipelineCode oneCode = pipelineCodeService.findOneCode(pipelineCode.getCodeId());
-        // if (oneCode.getProofName() != null){
-        //     if (oneCode.getProofName().equals(proofName+" (gitee)")){
-        //         return null;
-        //     }
-        // }
-        //
-        // String accessToken = codeGiteeApi.getAccessToken();
-        // if (accessToken != null){
-        //     Proof proof = new Proof();
-        //     String login = getUserMessage();
-        //     logger.info("login : "+login);
-        //     proof.setProofName(proofName);
-        //     proof.setProofPassword(codeGiteeApi.getAccessToken());
-        //     proof.setProofUsername(login);
-        //     proof.setProofType("gitee");
-        //     proof.setProofScope(3);
-        //     proof.setProofDescribe("gitee授权登录");
-        //     pipelineCode.setProofName(proofName+" (gitee)");
-        //     // oneConfigure.setPipelineCode(pipelineCode);
-        //     pipelineConfigureService.updateConfigure(oneConfigure);
-        //     proofService.createProof(proof);
-        //     return  "1";
-        // }
+    public String getProof(String proofName) {
+        Proof proof = new Proof();
+        String accessToken = codeGiteeApi.getAccessToken();
+         if (accessToken != null){
+             proof.setProofName(proofName);
+             proof.setProofPassword(accessToken);
+             proof.setProofUsername(getUserMessage());
+             proof.setProofType("gitee");
+             proof.setProofScope(3);
+             proof.setProofDescribe("gitee授权登录");
+             return proofService.createProof(proof);
+         }
         return  null;
     }
 
@@ -157,6 +135,7 @@ public class CodeGiteeApiServiceImpl implements CodeGiteeApiService {
             return null;
         }
         ArrayList<String> branchList = new ArrayList<>();
+        logger.info("name : "+name);
         String branchAddress = codeGiteeApi.getWarehouseBranch(name);
         ResponseEntity<String> forEntity = restTemplate.getForEntity(branchAddress, String.class, JSONObject.class);
         JSONArray branchS = JSONArray.parseArray(forEntity.getBody());

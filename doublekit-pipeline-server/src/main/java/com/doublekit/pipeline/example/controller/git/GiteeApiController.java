@@ -34,9 +34,7 @@ public class GiteeApiController {
     @ApiMethod(name = "getAccessToken",desc = "获取accessToken")
     @ApiParam(name = "code",desc = "code",required = true)
     public Result<String> getAccessToken(@NotNull String code) throws IOException {
-
         String accessToken = codeGiteeApiService.getAccessToken(code);
-
         return Result.ok(accessToken);
     }
 
@@ -51,9 +49,9 @@ public class GiteeApiController {
 
     @RequestMapping(path="/getProof",method = RequestMethod.POST)
     @ApiMethod(name = "getProof",desc = "获取用户信息")
-    @ApiParam(name = "configureId",desc = "配置id",required = true)
-    public Result<String> getProof(String configureId,String proofName){
-        String i = codeGiteeApiService.getProof(configureId,proofName);
+    @ApiParam(name = "proofName",desc = "凭证名称",required = true)
+    public Result<String> getProof(@NotNull String proofName){
+        String i = codeGiteeApiService.getProof(proofName);
 
         return Result.ok(i);
     }

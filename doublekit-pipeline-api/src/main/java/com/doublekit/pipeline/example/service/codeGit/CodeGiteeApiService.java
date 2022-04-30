@@ -2,7 +2,6 @@ package com.doublekit.pipeline.example.service.codeGit;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 码云API
@@ -30,11 +29,10 @@ public interface CodeGiteeApiService {
 
     /**
      * 创建凭证
-     * @param configureId 配置id
      * @param proofName 凭证名
      * @return 状态
      */
-    String getProof(String configureId,String proofName);
+    String getProof(String proofName);
 
     String getCloneUrl(String projectName);
 

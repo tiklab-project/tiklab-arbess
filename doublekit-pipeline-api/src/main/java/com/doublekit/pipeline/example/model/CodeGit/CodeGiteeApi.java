@@ -1,7 +1,12 @@
 package com.doublekit.pipeline.example.model.CodeGit;
 
+import com.doublekit.apibox.annotation.ApiModel;
+import com.doublekit.join.annotation.Join;
+
 import java.util.List;
 
+@ApiModel
+@Join
 public class CodeGiteeApi {
 
     //应用名
