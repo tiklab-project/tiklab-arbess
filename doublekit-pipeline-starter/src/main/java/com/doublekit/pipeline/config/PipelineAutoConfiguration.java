@@ -6,7 +6,7 @@ import com.doublekit.dal.starter.annotation.EnableDal;
 import com.doublekit.dcs.starter.EnableDcs;
 import com.doublekit.dfs.starter.EnableDfs;
 import com.doublekit.join.starter.annotation.EnableJoin;
-import com.doublekit.dss.starter.EnableDss;
+import com.doublekit.dis.starter.EnableDis;
 import com.doublekit.web.starter.annotation.EnableWeb;
 import com.doublekit.pipeline.annotation.EnablePipelineServer;
 import org.springframework.context.annotation.Configuration;
@@ -19,7 +19,7 @@ import org.springframework.context.annotation.Configuration;
 @EnableJoin
 @EnableDfs
 @EnableDcs
-@EnableDss
+@EnableDis
 // @DataFly(modules = {
 //         "user"
 // })
