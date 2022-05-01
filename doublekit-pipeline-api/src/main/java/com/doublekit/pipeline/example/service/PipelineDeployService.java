@@ -7,10 +7,8 @@ import com.doublekit.join.annotation.JoinProvider;
 import com.doublekit.pipeline.definition.model.PipelineConfigure;
 import com.doublekit.pipeline.definition.model.PipelineExecConfigure;
 import com.doublekit.pipeline.example.model.PipelineDeploy;
-import com.doublekit.pipeline.setting.proof.model.Proof;
 
 import java.util.List;
-import java.util.Map;
 
 
 @JoinProvider(model = PipelineDeploy.class)

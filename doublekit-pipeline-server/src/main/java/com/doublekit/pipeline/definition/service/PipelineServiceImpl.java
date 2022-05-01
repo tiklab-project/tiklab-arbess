@@ -1,14 +1,9 @@
 package com.doublekit.pipeline.definition.service;
 
 import com.doublekit.beans.BeanMapper;
-import com.doublekit.dal.jpa.criterial.condition.QueryCondition;
-import com.doublekit.dal.jpa.criterial.conditionbuilder.QueryBuilders;
-import com.doublekit.join.JoinTemplate;
-import com.doublekit.pipeline.definition.controller.PipelineController;
 import com.doublekit.pipeline.definition.dao.PipelineDao;
 import com.doublekit.pipeline.definition.entity.PipelineEntity;
 import com.doublekit.pipeline.definition.model.Pipeline;
-import com.doublekit.pipeline.definition.model.PipelineConfigure;
 import com.doublekit.pipeline.definition.model.PipelineStatus;
 import com.doublekit.pipeline.instance.model.PipelineExecHistory;
 import com.doublekit.pipeline.instance.service.PipelineExecHistoryService;
@@ -18,9 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * PipelineServiceImpl

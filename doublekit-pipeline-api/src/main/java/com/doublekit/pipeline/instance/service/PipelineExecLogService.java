@@ -2,12 +2,9 @@ package com.doublekit.pipeline.instance.service;
 
 import com.doublekit.join.annotation.FindAll;
 import com.doublekit.join.annotation.FindList;
-import com.doublekit.join.annotation.FindOne;
 import com.doublekit.join.annotation.JoinProvider;
-import com.doublekit.pipeline.instance.model.PipelineExecHistory;
 import com.doublekit.pipeline.instance.model.PipelineExecLog;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
+
 import java.util.List;
 /**
  * 流水线日志

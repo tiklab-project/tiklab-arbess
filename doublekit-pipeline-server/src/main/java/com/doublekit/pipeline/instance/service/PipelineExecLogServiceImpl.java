@@ -1,7 +1,6 @@
 package com.doublekit.pipeline.instance.service;
 
 import com.doublekit.beans.BeanMapper;
-import com.doublekit.join.JoinTemplate;
 import com.doublekit.pipeline.instance.dao.PipelineExecLogDao;
 import com.doublekit.pipeline.instance.entity.PipelineExecLogEntity;
 import com.doublekit.pipeline.instance.model.*;
@@ -9,7 +8,6 @@ import com.doublekit.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.lang.model.element.PackageElement;
 import java.util.*;
 
 @Service

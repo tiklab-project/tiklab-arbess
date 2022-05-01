@@ -1,22 +1,17 @@
 package com.doublekit.pipeline.example.service;
 
 import com.doublekit.beans.BeanMapper;
-import com.doublekit.join.JoinTemplate;
 import com.doublekit.pipeline.definition.model.PipelineConfigure;
 import com.doublekit.pipeline.definition.model.PipelineExecConfigure;
 import com.doublekit.pipeline.definition.service.PipelineConfigureService;
 import com.doublekit.pipeline.example.dao.PipelineTestDao;
 import com.doublekit.pipeline.example.entity.PipelineTestEntity;
-import com.doublekit.pipeline.example.model.PipelineStructure;
 import com.doublekit.pipeline.example.model.PipelineTest;
 import com.doublekit.rpc.annotation.Exporter;
-import org.aspectj.lang.JoinPoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Service
 @Exporter

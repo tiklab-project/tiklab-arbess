@@ -10,7 +10,6 @@ import com.doublekit.pipeline.definition.model.PipelineStatus;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 流水线

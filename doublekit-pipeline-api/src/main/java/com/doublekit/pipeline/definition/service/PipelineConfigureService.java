@@ -8,13 +8,10 @@ import com.doublekit.join.annotation.JoinProvider;
 import com.doublekit.pipeline.definition.model.Pipeline;
 import com.doublekit.pipeline.definition.model.PipelineConfigure;
 import com.doublekit.pipeline.definition.model.PipelineExecConfigure;
-import com.doublekit.pipeline.instance.model.PipelineExecHistory;
-import com.doublekit.pipeline.setting.proof.model.Proof;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 流水线配置

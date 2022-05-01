@@ -1,7 +1,6 @@
 package com.doublekit.pipeline.example.dao;
 
 import com.doublekit.dal.jpa.JpaTemplate;
-import com.doublekit.join.JoinTemplate;
 import com.doublekit.pipeline.example.entity.PipelineCodeEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;

@@ -6,14 +6,12 @@ import com.doublekit.pipeline.definition.model.PipelineExecConfigure;
 import com.doublekit.pipeline.definition.service.PipelineConfigureService;
 import com.doublekit.pipeline.example.dao.PipelineStructureDao;
 import com.doublekit.pipeline.example.entity.PipelineStructureEntity;
-import com.doublekit.pipeline.example.model.PipelineDeploy;
 import com.doublekit.pipeline.example.model.PipelineStructure;
 import com.doublekit.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Map;
 
 @Service
 @Exporter

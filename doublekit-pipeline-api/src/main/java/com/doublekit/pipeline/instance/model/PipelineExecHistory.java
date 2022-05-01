@@ -8,8 +8,6 @@ import com.doublekit.beans.annotation.Mappings;
 import com.doublekit.join.annotation.Join;
 import com.doublekit.join.annotation.JoinQuery;
 import com.doublekit.pipeline.definition.model.Pipeline;
-import com.doublekit.pipeline.definition.model.PipelineConfigure;
-import com.doublekit.pipeline.setting.proof.model.Proof;
 
 
 @ApiModel
