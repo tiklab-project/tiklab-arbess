@@ -29,12 +29,12 @@
             <!--doublekit-->
             <dependency>
                 <groupId>com.doublekit</groupId>
-                <artifactId>doublekit-framework-common</artifactId>
+                <artifactId>doublekit-core</artifactId>
                 <version>${doublekit.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.doublekit</groupId>
-                <artifactId>doublekit-framework-utils</artifactId>
+                <artifactId>doublekit-utils</artifactId>
                 <version>${doublekit.version}</version>
             </dependency>
             <dependency>
@@ -64,7 +64,7 @@
             </dependency>
             <dependency>
                 <groupId>com.doublekit</groupId>
-                <artifactId>doublekit-framework-common</artifactId>
+                <artifactId>doublekit-core</artifactId>
                 <version>${doublekit.version}</version>
             </dependency>
             <dependency>
