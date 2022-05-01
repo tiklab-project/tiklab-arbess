@@ -1,10 +1,9 @@
 package com.doublekit.pipeline.definition.controller;
 
-import com.alibaba.fastjson.JSONObject;
 import com.doublekit.apibox.annotation.Api;
 import com.doublekit.apibox.annotation.ApiMethod;
 import com.doublekit.apibox.annotation.ApiParam;
-import com.doublekit.common.Result;
+import com.doublekit.core.Result;
 import com.doublekit.pipeline.definition.model.PipelineConfigure;
 import com.doublekit.pipeline.definition.model.PipelineExecConfigure;
 import com.doublekit.pipeline.definition.service.PipelineConfigureService;

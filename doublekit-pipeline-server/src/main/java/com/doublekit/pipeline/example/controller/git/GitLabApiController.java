@@ -2,7 +2,7 @@ package com.doublekit.pipeline.example.controller.git;
 
 import com.doublekit.apibox.annotation.Api;
 import com.doublekit.apibox.annotation.ApiMethod;
-import com.doublekit.common.Result;
+import com.doublekit.core.Result;
 import com.doublekit.pipeline.example.service.codeGit.CodeCitLabApiService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;

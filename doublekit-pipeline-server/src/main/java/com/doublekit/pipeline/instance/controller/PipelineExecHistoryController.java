@@ -3,7 +3,7 @@ package com.doublekit.pipeline.instance.controller;
 import com.doublekit.apibox.annotation.Api;
 import com.doublekit.apibox.annotation.ApiMethod;
 import com.doublekit.apibox.annotation.ApiParam;
-import com.doublekit.common.Result;
+import com.doublekit.core.Result;
 import com.doublekit.pipeline.instance.model.PipelineExecHistory;
 import com.doublekit.pipeline.instance.service.PipelineExecHistoryService;
 import org.springframework.beans.factory.annotation.Autowired;

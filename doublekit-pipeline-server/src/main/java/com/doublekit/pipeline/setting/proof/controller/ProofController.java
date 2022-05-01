@@ -3,7 +3,7 @@ package com.doublekit.pipeline.setting.proof.controller;
 import com.doublekit.apibox.annotation.Api;
 import com.doublekit.apibox.annotation.ApiMethod;
 import com.doublekit.apibox.annotation.ApiParam;
-import com.doublekit.common.Result;
+import com.doublekit.core.Result;
 import com.doublekit.pipeline.setting.proof.model.Proof;
 import com.doublekit.pipeline.setting.proof.service.ProofService;
 import org.springframework.beans.factory.annotation.Autowired;
