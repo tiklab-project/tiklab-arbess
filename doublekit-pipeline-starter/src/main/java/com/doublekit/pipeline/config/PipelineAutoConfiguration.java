@@ -2,13 +2,10 @@ package com.doublekit.pipeline.config;
 
 import com.doublekit.beans.starter.annotation.EnableBeans;
 import com.doublekit.dal.starter.annotation.EnableDal;
-
-import com.doublekit.dcs.starter.EnableDcs;
-import com.doublekit.dfs.starter.EnableDfs;
+import com.doublekit.dss.starter.EnableDss;
 import com.doublekit.join.starter.annotation.EnableJoin;
-import com.doublekit.dis.starter.EnableDis;
-import com.doublekit.web.starter.annotation.EnableWeb;
 import com.doublekit.pipeline.annotation.EnablePipelineServer;
+import com.doublekit.web.starter.annotation.EnableWeb;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
@@ -17,9 +14,7 @@ import org.springframework.context.annotation.Configuration;
 @EnableWeb
 @EnableDal
 @EnableJoin
-@EnableDfs
-@EnableDcs
-@EnableDis
+@EnableDss
 // @DataFly(modules = {
 //         "user"
 // })

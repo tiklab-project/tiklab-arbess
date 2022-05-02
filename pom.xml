@@ -30,87 +30,77 @@
             <dependency>
                 <groupId>com.doublekit</groupId>
                 <artifactId>doublekit-core</artifactId>
-                <version>${doublekit.version}</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.doublekit</groupId>
                 <artifactId>doublekit-utils</artifactId>
-                <version>${doublekit.version}</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.doublekit</groupId>
                 <artifactId>doublekit-web-spring-boot-starter</artifactId>
-                <version>${doublekit.version}</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.doublekit</groupId>
                 <artifactId>doublekit-beans-annotation</artifactId>
-                <version>${doublekit.version}</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.doublekit</groupId>
                 <artifactId>doublekit-beans-core</artifactId>
-                <version>${doublekit.version}</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.doublekit</groupId>
                 <artifactId>doublekit-join-annotation</artifactId>
-                <version>${doublekit.version}</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.doublekit</groupId>
                 <artifactId>doublekit-join-core</artifactId>
-                <version>${doublekit.version}</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.doublekit</groupId>
                 <artifactId>doublekit-core</artifactId>
-                <version>${doublekit.version}</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.doublekit</groupId>
                 <artifactId>doublekit-dal-spring-boot-starter</artifactId>
-                <version>${doublekit.version}</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.doublekit</groupId>
                 <artifactId>doublekit-rpc-spring-boot-starter</artifactId>
-                <version>${doublekit.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.doublekit</groupId>
-                <artifactId>doublekit-dfs-spring-boot-starter</artifactId>
-                <version>${doublekit.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.doublekit</groupId>
-                <artifactId>doublekit-dcs-spring-boot-starter</artifactId>
-                <version>${doublekit.version}</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.doublekit</groupId>
                 <artifactId>doublekit-dis-annotation</artifactId>
-                <version>${doublekit.version}</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.doublekit</groupId>
-                <artifactId>doublekit-dis-spring-boot-starter</artifactId>
-                <version>${doublekit.version}</version>
+                <artifactId>doublekit-dss-spring-boot-starter</artifactId>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.doublekit</groupId>
                 <artifactId>doublekit-codegen-core</artifactId>
-                <version>${doublekit.version}</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.doublekit</groupId>
                 <artifactId>doublekit-apibox-annotation</artifactId>
-                <version>${doublekit.version}</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.doublekit</groupId>
                 <artifactId>doublekit-apibox-client</artifactId>
-                <version>${doublekit.version}</version>
+                <version>${project.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
