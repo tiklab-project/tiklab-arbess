@@ -1,6 +1,5 @@
-package com.doublekit.pipeline.annotation;
+package com.doublekit.pipeline;
 
-import com.doublekit.pipeline.config.PipelineServerAutoConfiguration;
 import org.springframework.context.annotation.Import;
 
 import java.lang.annotation.*;

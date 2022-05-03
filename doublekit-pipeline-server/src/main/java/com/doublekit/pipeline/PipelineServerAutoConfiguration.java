@@ -1,14 +1,14 @@
-package com.doublekit.pipeline.config;
+package com.doublekit.pipeline;
 
 
-import com.doublekit.dsm.annotation.Dsm;
+import com.doublekit.dsm.annotation.SQL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@Dsm(modules = "pipeline")
+@SQL(modules = "pipeline")
 @ComponentScan({"com.doublekit.pipeline"})
 public class PipelineServerAutoConfiguration {
 
