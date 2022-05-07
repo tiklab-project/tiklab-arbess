@@ -19,7 +19,7 @@ CREATE TABLE `pipeline`  (
 -- Table structure for pipeline_configure
 -- ----------------------------
 DROP TABLE IF EXISTS `pipeline_configure`;
-CREATE TABLE `pipeline_configure`  (
+CREATE TABLE `pipeline_configure`(
        `configure_id` varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '配置信息id',
        `configure_code_source` int(0) NULL DEFAULT NULL COMMENT '代码源',
        `configure_code_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '仓库名',

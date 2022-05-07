@@ -50,6 +50,13 @@ public interface ProofService {
     @FindAll
     List<Proof> findAllDeployProof();
 
+    /**
+     * 根据类型查询凭证
+     * @param type 类型
+     * @return 凭证信息
+     */
+    List<Proof> findAllProof(int type);
+
 
     @FindList
     List<Proof> selectProofList(List<String> idList);

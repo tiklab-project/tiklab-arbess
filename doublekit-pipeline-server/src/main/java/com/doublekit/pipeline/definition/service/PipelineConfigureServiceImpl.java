@@ -166,6 +166,9 @@ public class PipelineConfigureServiceImpl implements PipelineConfigureService {
         allConfigure.sort(Comparator.comparing(PipelineConfigure::getTaskSort));
         List<PipelineConfigure> pipelineConfigures = new ArrayList<>();
         for (PipelineConfigure pipelineConfigure : allConfigure) {
+            if (pipelineConfigure.getPipeline() == null){
+                continue;
+            }
             if (pipelineConfigure.getPipeline().getPipelineId().equals(pipelineId)){
                 pipelineConfigures.add(pipelineConfigure);
             }

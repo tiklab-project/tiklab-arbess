@@ -1,7 +1,6 @@
 package com.doublekit.pipeline.instance.service;
 
 import com.doublekit.beans.BeanMapper;
-import com.doublekit.pipeline.definition.model.Pipeline;
 import com.doublekit.pipeline.definition.service.PipelineService;
 import com.doublekit.pipeline.instance.dao.PipelineExecHistoryDao;
 import com.doublekit.pipeline.instance.entity.PipelineExecHistoryEntity;
@@ -12,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -78,14 +78,13 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
     @Override
     public List<PipelineExecHistory> findAllHistory(String pipelineId) {
         List<PipelineExecHistory> allHistory = findAllHistory();
-        Pipeline pipeline = pipelineService.findPipeline(pipelineId);
         List<PipelineExecHistory> historyList = new ArrayList<>();
         if (allHistory != null){
             for (PipelineExecHistory pipelineExecHistory : allHistory) {
-                if (pipelineExecHistory.getPipeline() ==null){
+                if (pipelineExecHistory.getPipeline().getPipelineId() ==null){
                     continue;
                 }
-                if (pipelineExecHistory.getPipeline().getPipelineId().equals(pipeline.getPipelineId())){
+                if (pipelineExecHistory.getPipeline().getPipelineId().equals(pipelineId)){
                     pipelineExecHistory.setExecTime(formatDateTime(pipelineExecHistory.getRunTime()));
                     historyList.add(pipelineExecHistory);
                 }

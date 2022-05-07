@@ -60,6 +60,9 @@ public class PipelineExecHistory {
     //执行状态
     private int status;
 
+    //判断是否正在执行
+    private int findState;
+
     public String getHistoryId() {
         return historyId;
     }
@@ -146,5 +149,13 @@ public class PipelineExecHistory {
 
     public void setSort(int sort) {
         this.sort = sort;
+    }
+
+    public int getFindState() {
+        return findState;
+    }
+
+    public void setFindState(int findState) {
+        this.findState = findState;
     }
 }

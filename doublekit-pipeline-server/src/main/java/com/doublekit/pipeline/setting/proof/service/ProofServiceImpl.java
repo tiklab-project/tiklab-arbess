@@ -37,8 +37,10 @@ public class ProofServiceImpl implements ProofService{
         List<Proof> allProof = findAllProof();
         if (allProof != null){
             for (Proof proof1 : allProof) {
-                if (proof.getProofName().equals(proof1.getProofName())){
-                    return "1";
+                if (proof.getProofName().equals(proof1.getProofName()) || proof.getProofUsername().equals(proof1.getProofUsername())){
+                    proof.setProofId(proof1.getProofId());
+                    updateProof(proof);
+                    return proof.getProofId();
                 }
             }
         }
@@ -89,6 +91,7 @@ public class ProofServiceImpl implements ProofService{
     }
 
     //获取部署凭证
+    @Override
     public List<Proof> findAllDeployProof(){
         List<ProofEntity> proofEntityList = ProofDao.selectAllProof();
         List<ProofEntity> proofs = new ArrayList<>();
@@ -101,15 +104,17 @@ public class ProofServiceImpl implements ProofService{
         return  BeanMapper.mapList(proofs, Proof.class);
     }
 
-    public List<Proof> findAllGitee(){
-        List<Proof> proofList = findAllProof();
-        List<Proof> proofs = new ArrayList<>();
-        for (Proof proof : proofList) {
-            if (proof.getProofScope() == 3){
-                proofs.add(proof);
+    @Override
+    public List<Proof> findAllProof(int type){
+        List<ProofEntity> proofEntityList = ProofDao.selectAllProof();
+        List<ProofEntity> proofs = new ArrayList<>();
+        for (ProofEntity proofEntity : proofEntityList) {
+            //判断凭证类型
+            if (proofEntity.getProofScope() == type){
+                proofs.add(proofEntity);
             }
         }
-        return proofs;
+        return  BeanMapper.mapList(proofs, Proof.class);
     }
 
     @Override

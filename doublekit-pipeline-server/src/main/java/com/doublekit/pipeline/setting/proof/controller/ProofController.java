@@ -76,6 +76,18 @@ public class ProofController {
         return Result.ok(proofList);
     }
 
+    //根据类型查询凭证
+    @RequestMapping(path="/findAllProof",method = RequestMethod.POST)
+    @ApiMethod(name = "findAllProof",desc = "查询所有部署凭证")
+    public Result<List<Proof>> findAllProof(int type){
+
+        List<Proof> proofList = proofService.findAllProof(type);
+
+        return Result.ok(proofList);
+    }
+
+
+
     //查询
     @RequestMapping(path="/findOneProof",method = RequestMethod.POST)
     @ApiMethod(name = "findOneProof",desc = "查询凭证信息")

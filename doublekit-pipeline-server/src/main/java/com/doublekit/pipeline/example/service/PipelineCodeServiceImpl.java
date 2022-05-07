@@ -8,6 +8,7 @@ import com.doublekit.pipeline.definition.service.PipelineConfigureService;
 import com.doublekit.pipeline.example.dao.PipelineCodeDao;
 import com.doublekit.pipeline.example.entity.PipelineCodeEntity;
 import com.doublekit.pipeline.example.model.PipelineCode;
+import com.doublekit.pipeline.example.service.codeGit.CodeGiteeApiService;
 import com.doublekit.pipeline.setting.proof.model.Proof;
 import com.doublekit.pipeline.setting.proof.service.ProofService;
 import com.doublekit.rpc.annotation.Exporter;
@@ -15,7 +16,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 
 @Service
@@ -30,6 +30,9 @@ public class PipelineCodeServiceImpl implements PipelineCodeService {
 
     @Autowired
     PipelineTestService pipelineTestService;
+
+    @Autowired
+    CodeGiteeApiService codeGiteeApiService;
 
     @Autowired
     PipelineConfigureService pipelineConfigureService;
@@ -55,6 +58,10 @@ public class PipelineCodeServiceImpl implements PipelineCodeService {
         }
         pipelineCode.setType(taskType);
         pipelineConfigure.setTaskSort(1);
+        if (pipelineCode.getType() == 2){
+            String cloneUrl = codeGiteeApiService.getCloneUrl(pipelineCode.getProof().getProofId(),pipelineCode.getCodeName());
+            pipelineCode.setCodeAddress(cloneUrl);
+        }
         String codeId = createCode(pipelineCode);
         pipelineConfigure.setTaskId(codeId);
         pipelineConfigure.setTaskType(taskType);
@@ -91,9 +98,14 @@ public class PipelineCodeServiceImpl implements PipelineCodeService {
         PipelineCode pipelineCode =pipelineExecConfigure.getPipelineCode();
         PipelineConfigure oneConfigure = pipelineConfigureService.findOneConfigure(pipelineId, 10);
         if (oneConfigure != null){
+            //判断是否存在配置
             if (pipelineCode.getType() != 0){
                     updateCode(pipelineCode);
                     oneConfigure.setTaskSort(1);
+                    if (pipelineCode.getType() == 2){
+                        String cloneUrl = codeGiteeApiService.getCloneUrl(pipelineCode.getProof().getProofId(),pipelineCode.getCodeName());
+                        pipelineCode.setCodeAddress(cloneUrl);
+                    }
                     oneConfigure.setTaskAlias(pipelineCode.getCodeAlias());
                     pipelineConfigureService.updateConfigure(oneConfigure);
             }else {

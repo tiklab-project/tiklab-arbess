@@ -9,9 +9,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/gitee")
@@ -33,15 +35,16 @@ public class GiteeApiController {
     @RequestMapping(path="/code",method = RequestMethod.POST)
     @ApiMethod(name = "getAccessToken",desc = "获取accessToken")
     @ApiParam(name = "code",desc = "code",required = true)
-    public Result<String> getAccessToken(@NotNull String code) throws IOException {
-        String accessToken = codeGiteeApiService.getAccessToken(code);
+    public Result<Map<String, String>> getAccessToken(@NotNull String code) throws IOException {
+        Map<String, String> accessToken = codeGiteeApiService.getAccessToken(code);
         return Result.ok(accessToken);
     }
 
     @RequestMapping(path="/getUserMessage",method = RequestMethod.POST)
     @ApiMethod(name = "getUserMessage",desc = "获取用户信息")
-    public Result<String> getUserMessage(){
-        String userMessage = codeGiteeApiService.getUserMessage();
+    @ApiParam(name = "accessToken",desc = "accessToken",required = true)
+    public Result<String> getUserMessage(@NotNull String accessToken){
+        String userMessage = codeGiteeApiService.getUserMessage(accessToken);
 
         return Result.ok(userMessage);
     }
@@ -50,17 +53,17 @@ public class GiteeApiController {
     @RequestMapping(path="/getProof",method = RequestMethod.POST)
     @ApiMethod(name = "getProof",desc = "获取用户信息")
     @ApiParam(name = "proofName",desc = "凭证名称",required = true)
-    public Result<String> getProof(@NotNull String proofName){
-        String i = codeGiteeApiService.getProof(proofName);
-
+    public Result<String> getProof(@NotNull String proofName, String accessToken){
+        String i = codeGiteeApiService.getProof(proofName,accessToken);
         return Result.ok(i);
     }
 
     @RequestMapping(path="/getAllStorehouse",method = RequestMethod.POST)
     @ApiMethod(name = "getAllStorehouse",desc = "获取所有仓库")
-    public Result<List<String>> getAllStorehouse() {
+    @ApiParam(name = "accessToken",desc = "accessToken",required = true)
+    public Result<List<String>> getAllStorehouse(@NotNull String accessToken) {
 
-        List<String> allStorehouse = codeGiteeApiService.getAllStorehouse();
+        List<String> allStorehouse = codeGiteeApiService.getAllStorehouse(accessToken);
 
         return Result.ok(allStorehouse);
     }
@@ -68,10 +71,10 @@ public class GiteeApiController {
 
     @RequestMapping(path="/getBranch",method = RequestMethod.POST)
     @ApiMethod(name = "getBranch",desc = "根据仓库名获取所有分支")
-    @ApiParam(name = "projectName",desc = "projectName",required = true)
-    public Result<List<String>> getBranch(@NotNull String projectName){
+    @ApiParam(name = "proofId",desc = "proofId",required = true)
+    public Result<List<String>> getBranch(@NotNull String proofId, String projectName){
 
-        List<String> branch = codeGiteeApiService.getBranch(projectName);
+        List<String> branch = codeGiteeApiService.getBranch(proofId,projectName);
 
         return Result.ok(branch);
     }

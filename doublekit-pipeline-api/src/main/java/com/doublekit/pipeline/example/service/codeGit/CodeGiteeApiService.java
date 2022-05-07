@@ -2,6 +2,7 @@ package com.doublekit.pipeline.example.service.codeGit;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 码云API
@@ -9,43 +10,53 @@ import java.util.List;
 public interface CodeGiteeApiService {
 
     /**
-     * 拼装code地址
-     * @return 返回code地址
+     * 获取code
+     * @return 获取code的Url
      */
-    String getCode() ;
+    String getCode();
 
     /**
-     * 通过code获取accessToken
+     * 根据code获取AccessToken
      * @param code code
-     * @return accessToken
+     * @return AccessToken
      */
-    String getAccessToken(String code) throws IOException;
+    Map<String, String> getAccessToken(String code)  throws IOException ;
 
     /**
-     * 获取用户登录名
-     * @return 名称
+     * 获取用户所有仓库
+     * @param accessToken 凭证
+     * @return 厂库信息
      */
-    String getUserMessage();
+    List<String> getAllStorehouse(String accessToken);
+
+    /**
+     * 获取用户登录信息
+     * @param accessToken 凭证
+     * @return 用户信息
+     */
+    String getUserMessage(String accessToken);
 
     /**
      * 创建凭证
-     * @param proofName 凭证名
-     * @return 状态
+     * @param proofName 仓库名
+     * @param accessToken 凭证
+     * @return 凭证ID
      */
-    String getProof(String proofName);
-
-    String getCloneUrl(String projectName);
+    String getProof(String proofName,String accessToken);
 
     /**
-     * 获取对应code下所有的仓库
-     * @return 仓库集合
-     */
-    List<String> getAllStorehouse();
-
-    /**
-     * 获取对应仓库下的所有分支
+     * 获取仓库所有分支
+     * @param proofId 凭证ID
      * @param projectName 仓库名
-     * @return 分支信息
+     * @return 所有分支
      */
-    List<String> getBranch(String projectName);
+    List<String> getBranch(String proofId,String projectName);
+
+    /**
+     * 获取仓库克隆地址
+     * @param proofId 凭证ID
+     * @param projectName 仓库名称
+     * @return 克隆地址
+     */
+    String getCloneUrl(String proofId,String projectName);
 }

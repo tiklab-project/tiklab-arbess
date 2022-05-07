@@ -4,8 +4,7 @@ package com.doublekit.pipeline.instance.service;
 import com.doublekit.pipeline.definition.model.Pipeline;
 import com.doublekit.pipeline.definition.model.PipelineConfigure;
 import com.doublekit.pipeline.definition.service.PipelineConfigureService;
-import com.doublekit.pipeline.definition.service.PipelineService;
-import com.doublekit.pipeline.instance.model.*;
+import com.doublekit.pipeline.instance.model.PipelineExecHistory;
 import com.doublekit.pipeline.instance.service.execAchieve.*;
 import com.doublekit.rpc.annotation.Exporter;
 import com.ibm.icu.text.SimpleDateFormat;
@@ -13,8 +12,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import java.util.*;
-import java.util.concurrent.*;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 
 @Service
@@ -73,24 +76,40 @@ public class PipelineExecServiceImpl implements PipelineExecService {
     public PipelineExecHistory findInstanceState(String pipelineId){
         if (pipelineExecHistoryList != null){
             for (PipelineExecHistory pipelineExecHistory : pipelineExecHistoryList) {
-                if (pipelineExecHistory.getPipeline().getPipelineId().equals(pipelineId)){
-                    return  pipelineExecHistory;
+                if (pipelineExecHistory.getPipeline() != null){
+                    if (pipelineExecHistory.getPipeline().getPipelineId().equals(pipelineId)){
+                        int state = findState(pipelineId);
+                        if (state == 0){
+                            pipelineExecHistory.setFindState(1);
+                        }
+                        return  pipelineExecHistory;
+                    }
                 }
             }
         }
         return null;
     }
 
+    //判断流水线执行状态
+    public int findState(String pipelineId){
+        if (pipelineIdList.size() != 0){
+            for (String s : pipelineIdList) {
+                if (pipelineId.equals(s)){
+                    return 1;
+                }
+            }
+        }
+        return 0;
+    }
+
     // 构建开始
     private void begin(String pipelineId) {
         String time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
         pipelineIdList.add(pipelineId);
-        String historyId = pipelineExecHistoryService.createHistory(new PipelineExecHistory());
+        List<PipelineConfigure> allConfigure = pipelineConfigureService.findAllConfigure(pipelineId);
         PipelineExecHistory pipelineExecHistory = new PipelineExecHistory();
         pipelineExecHistory.setCreateTime(time);
         pipelineExecHistory.setRunWay(1);
-        pipelineExecHistory.setHistoryId(historyId);
-        List<PipelineConfigure> allConfigure = pipelineConfigureService.findAllConfigure(pipelineId);
         pipelineExecHistory.setSort(1);
         pipelineExecHistory.setStatus(0);
         if (allConfigure != null){
@@ -99,6 +118,8 @@ public class PipelineExecServiceImpl implements PipelineExecService {
                 Pipeline pipeline = pipelineConfigure.getPipeline();
                 pipelineExecHistory.setPipeline(pipeline);
                 pipelineExecHistory.setExecName(pipeline.getPipelineCreateUser());
+                String historyId = pipelineExecHistoryService.createHistory(pipelineExecHistory);
+                pipelineExecHistory.setHistoryId(historyId);
                 pipelineExecHistoryService.updateHistory(pipelineExecHistory);
                 pipelineExecHistoryList.add(pipelineExecHistory);
                 switch (pipelineConfigure.getTaskType()) {
