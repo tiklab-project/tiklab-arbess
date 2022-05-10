@@ -45,6 +45,10 @@ public class PipelineExecHistoryEntity {
     @Column(name = "pipeline_id",notNull = true)
     private String pipelineId;
 
+    //判断是否正在执行
+    @Column(name = "find_state",notNull = true)
+    private int findState;
+
 
     public String getHistoryId() {
         return historyId;
@@ -108,5 +112,13 @@ public class PipelineExecHistoryEntity {
 
     public void setRunTime(int runTime) {
         this.runTime = runTime;
+    }
+
+    public int getFindState() {
+        return findState;
+    }
+
+    public void setFindState(int findState) {
+        this.findState = findState;
     }
 }

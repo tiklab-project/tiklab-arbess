@@ -2,8 +2,8 @@ package com.doublekit.pipeline.setting.proof.service;
 
 import com.doublekit.beans.BeanMapper;
 import com.doublekit.join.JoinTemplate;
-import com.doublekit.pipeline.example.service.PipelineCodeServiceImpl;
-import com.doublekit.pipeline.example.service.codeGit.CodeGiteeApiService;
+import com.doublekit.pipeline.execute.service.PipelineCodeServiceImpl;
+import com.doublekit.pipeline.execute.service.codeGit.CodeGiteeApiService;
 import com.doublekit.pipeline.setting.proof.dao.ProofDao;
 import com.doublekit.pipeline.setting.proof.entity.ProofEntity;
 import com.doublekit.pipeline.setting.proof.model.Proof;

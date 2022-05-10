@@ -34,9 +34,17 @@ public class PipelineExecController {
     @RequestMapping(path="/findState",method = RequestMethod.POST)
     @ApiMethod(name = "findState",desc = "执行")
     @ApiParam(name = "pipelineId",desc = "流水线id",required = true)
-    public Result<PipelineExecHistory> findState(@NotNull String pipelineId) throws Exception {
+    public Result<PipelineExecHistory> findState(@NotNull String pipelineId)  {
         PipelineExecHistory instanceState = pipelineExecService.findInstanceState(pipelineId);
         return Result.ok(instanceState);
+    }
+
+    @RequestMapping(path="/findExecState",method = RequestMethod.POST)
+    @ApiMethod(name = "findExecState",desc = "判断是否执行")
+    @ApiParam(name = "pipelineId",desc = "流水线id",required = true)
+    public Result<Integer> findExecState(@NotNull String pipelineId) {
+        int state = pipelineExecService.findState(pipelineId);
+        return Result.ok(state);
     }
 
 }

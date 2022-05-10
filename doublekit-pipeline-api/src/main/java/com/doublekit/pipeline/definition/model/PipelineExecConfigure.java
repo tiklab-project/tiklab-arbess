@@ -4,10 +4,10 @@ import com.doublekit.apibox.annotation.ApiProperty;
 import com.doublekit.beans.annotation.Mapping;
 import com.doublekit.beans.annotation.Mappings;
 import com.doublekit.join.annotation.JoinQuery;
-import com.doublekit.pipeline.example.model.PipelineCode;
-import com.doublekit.pipeline.example.model.PipelineDeploy;
-import com.doublekit.pipeline.example.model.PipelineStructure;
-import com.doublekit.pipeline.example.model.PipelineTest;
+import com.doublekit.pipeline.execute.model.PipelineCode;
+import com.doublekit.pipeline.execute.model.PipelineDeploy;
+import com.doublekit.pipeline.execute.model.PipelineStructure;
+import com.doublekit.pipeline.execute.model.PipelineTest;
 
 public class PipelineExecConfigure {
 

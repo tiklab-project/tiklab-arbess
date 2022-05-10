@@ -61,6 +61,7 @@ public class PipelineExecHistory {
     private int status;
 
     //判断是否正在执行
+    @ApiProperty(name="findState",desc="判断是否正在执行")
     private int findState;
 
     public String getHistoryId() {

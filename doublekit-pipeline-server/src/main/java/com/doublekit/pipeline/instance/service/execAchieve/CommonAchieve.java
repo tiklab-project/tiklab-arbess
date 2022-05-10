@@ -2,14 +2,10 @@ package com.doublekit.pipeline.instance.service.execAchieve;
 
 import ch.ethz.ssh2.Connection;
 import com.doublekit.pipeline.definition.model.Pipeline;
-import com.doublekit.pipeline.definition.model.PipelineConfigure;
-import com.doublekit.pipeline.definition.service.PipelineConfigureService;
-import com.doublekit.pipeline.definition.service.PipelineService;
 import com.doublekit.pipeline.instance.model.PipelineExecHistory;
 import com.doublekit.pipeline.instance.model.PipelineExecLog;
 import com.doublekit.pipeline.instance.service.PipelineExecHistoryService;
 import com.doublekit.pipeline.instance.service.PipelineExecLogService;
-import com.doublekit.pipeline.instance.service.PipelineExecService;
 import com.doublekit.pipeline.setting.proof.model.Proof;
 import com.doublekit.rpc.annotation.Exporter;
 import com.jcraft.jsch.*;
@@ -33,17 +29,9 @@ public class CommonAchieve {
     @Autowired
     PipelineExecHistoryService pipelineExecHistoryService;
 
-    @Autowired
-    PipelineConfigureService pipelineConfigureService;
 
     @Autowired
     PipelineExecLogService pipelineExecLogService;
-
-    @Autowired
-    PipelineExecService pipelineExecService;
-
-    @Autowired
-    PipelineService pipelineService;
 
 
 
@@ -293,12 +281,10 @@ public class CommonAchieve {
     public  void  error(PipelineExecHistory pipelineExecHistory, String e, String pipelineId,List<PipelineExecHistory> pipelineExecHistoryList){
         pipelineExecHistory.setStatus(pipelineExecHistory.getStatus()+2);
         pipelineExecHistoryList.add(pipelineExecHistory);
-        if (pipelineExecHistory.getRunLog() != null){
-            pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+ "\n" + e + "\n" + " RUN RESULT : FAIL");
-        }else {
-            pipelineExecHistory.setRunLog("\n" + e + "\n"+ " RUN RESULT : FAIL");
-        }
+        pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+ "\n" + e + "\n" + " RUN RESULT : FAIL");
         pipelineExecHistory.setRunStatus(1);
+        pipelineExecHistory.setFindState(1);
+        pipelineExecHistoryService.updateHistory(pipelineExecHistory);
         pipelineExecHistoryList.add(pipelineExecHistory);
         // 清空缓存
         clean(pipelineExecHistory,pipelineId,pipelineExecHistoryList);
@@ -316,6 +302,7 @@ public class CommonAchieve {
             pipelineExecHistory.setRunLog( "\n"+ " RUN RESULT : SUCCESS");
         }
         pipelineExecHistory.setRunStatus(30);
+        pipelineExecHistory.setFindState(1);
         pipelineExecHistoryList.add(pipelineExecHistory);
         pipelineExecHistoryService.updateHistory(pipelineExecHistory);
         //清空缓存

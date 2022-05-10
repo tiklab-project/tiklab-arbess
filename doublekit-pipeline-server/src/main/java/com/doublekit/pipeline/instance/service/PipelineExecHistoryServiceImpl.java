@@ -81,10 +81,10 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
         List<PipelineExecHistory> historyList = new ArrayList<>();
         if (allHistory != null){
             for (PipelineExecHistory pipelineExecHistory : allHistory) {
-                if (pipelineExecHistory.getPipeline().getPipelineId() ==null){
+                if (pipelineExecHistory.getPipeline() ==null){
                     continue;
                 }
-                if (pipelineExecHistory.getPipeline().getPipelineId().equals(pipelineId)){
+                if (pipelineExecHistory.getPipeline().getPipelineId().equals(pipelineId) && pipelineExecHistory.getFindState() == 1){
                     pipelineExecHistory.setExecTime(formatDateTime(pipelineExecHistory.getRunTime()));
                     historyList.add(pipelineExecHistory);
                 }

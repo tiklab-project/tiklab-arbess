@@ -6,11 +6,11 @@ import com.doublekit.apibox.annotation.ApiParam;
 import com.doublekit.core.Result;
 import com.doublekit.pipeline.instance.model.PipelineExecLog;
 import com.doublekit.pipeline.instance.service.PipelineExecLogService;
-import com.doublekit.pipeline.instance.service.PipelineExecService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
@@ -22,10 +22,6 @@ public class PipelineExecLogController {
     @Autowired
     PipelineExecLogService PipelineExecLogService;
 
-    @Autowired
-    PipelineExecService pipelineExecService;
-
-
     //查询日志
     @RequestMapping(path="/findAllLog",method = RequestMethod.POST)
     @ApiMethod(name = "findAllLog",desc = "查询日志")
@@ -34,7 +30,4 @@ public class PipelineExecLogController {
         List<PipelineExecLog> allLog = PipelineExecLogService.findAllLog(historyId);
         return Result.ok(allLog);
     }
-
-
-
 }

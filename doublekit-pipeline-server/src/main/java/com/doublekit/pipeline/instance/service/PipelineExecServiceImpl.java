@@ -78,10 +78,6 @@ public class PipelineExecServiceImpl implements PipelineExecService {
             for (PipelineExecHistory pipelineExecHistory : pipelineExecHistoryList) {
                 if (pipelineExecHistory.getPipeline() != null){
                     if (pipelineExecHistory.getPipeline().getPipelineId().equals(pipelineId)){
-                        int state = findState(pipelineId);
-                        if (state == 0){
-                            pipelineExecHistory.setFindState(1);
-                        }
                         return  pipelineExecHistory;
                     }
                 }
@@ -90,7 +86,8 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         return null;
     }
 
-    //判断流水线执行状态
+    //判断流水线是否正在执行
+    @Override
     public int findState(String pipelineId){
         if (pipelineIdList.size() != 0){
             for (String s : pipelineIdList) {
@@ -112,13 +109,13 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         pipelineExecHistory.setRunWay(1);
         pipelineExecHistory.setSort(1);
         pipelineExecHistory.setStatus(0);
+        String historyId = pipelineExecHistoryService.createHistory(pipelineExecHistory);
         if (allConfigure != null){
             // allConfigure.sort(Comparator.comparing(PipelineConfigure::getTaskSort));
             for (PipelineConfigure pipelineConfigure : allConfigure) {
                 Pipeline pipeline = pipelineConfigure.getPipeline();
                 pipelineExecHistory.setPipeline(pipeline);
                 pipelineExecHistory.setExecName(pipeline.getPipelineCreateUser());
-                String historyId = pipelineExecHistoryService.createHistory(pipelineExecHistory);
                 pipelineExecHistory.setHistoryId(historyId);
                 pipelineExecHistoryService.updateHistory(pipelineExecHistory);
                 pipelineExecHistoryList.add(pipelineExecHistory);

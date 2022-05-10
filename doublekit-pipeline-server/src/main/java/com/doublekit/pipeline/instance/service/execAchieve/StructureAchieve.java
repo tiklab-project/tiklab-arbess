@@ -2,9 +2,9 @@ package com.doublekit.pipeline.instance.service.execAchieve;
 
 import com.doublekit.pipeline.definition.model.Pipeline;
 import com.doublekit.pipeline.definition.model.PipelineConfigure;
-import com.doublekit.pipeline.example.model.PipelineStructure;
-import com.doublekit.pipeline.example.service.PipelineCodeService;
-import com.doublekit.pipeline.example.service.PipelineStructureService;
+import com.doublekit.pipeline.execute.model.PipelineStructure;
+import com.doublekit.pipeline.execute.service.PipelineCodeService;
+import com.doublekit.pipeline.execute.service.PipelineStructureService;
 import com.doublekit.pipeline.instance.model.PipelineExecHistory;
 import com.doublekit.pipeline.instance.model.PipelineExecLog;
 import com.doublekit.pipeline.instance.service.PipelineExecHistoryService;
@@ -44,6 +44,7 @@ public class StructureAchieve {
         long beginTime = new Timestamp(System.currentTimeMillis()).getTime();
         Pipeline pipeline = pipelineConfigure.getPipeline();
         PipelineExecLog pipelineExecLog = new PipelineExecLog();
+        pipelineExecLog.setRunLog("null");
         pipelineExecLog.setTaskAlias(pipelineConfigure.getTaskAlias());
         PipelineStructure pipelineStructure = pipelineStructureService.findOneStructure(pipelineConfigure.getTaskId());
         String structureOrder = pipelineStructure.getStructureOrder();
@@ -66,10 +67,12 @@ public class StructureAchieve {
                 if (map.get("state").equals("0")){
                     pipelineExecLog.setRunLog(pipelineExecLog.getRunLog()+map.get("log"));
                     commonAchieve.updateTime(pipelineExecHistory,pipelineExecLog,beginTime);
-                    return "测试执行失败。";
+                    commonAchieve.updateState(pipelineExecHistory,pipelineExecLog,"",pipelineExecHistoryList);
+                    return "执行失败。";
                 }
                 pipelineExecLog.setRunLog(a+map.get("log"));
             } catch (IOException e) {
+                commonAchieve.updateState(pipelineExecHistory,pipelineExecLog,"",pipelineExecHistoryList);
                 commonAchieve.updateTime(pipelineExecHistory,pipelineExecLog,beginTime);
                 return e.toString();
             }

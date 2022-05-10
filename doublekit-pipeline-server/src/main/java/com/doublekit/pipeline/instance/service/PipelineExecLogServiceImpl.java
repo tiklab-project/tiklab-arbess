@@ -54,8 +54,8 @@ public class PipelineExecLogServiceImpl implements PipelineExecLogService {
         if (allLog != null){
             for (PipelineExecLog pipelineExecLog : allLog) {
                 if (pipelineExecLog.getHistoryId().equals(historyId)){
+                    pipelineExecLog.setExecTime(formatDateTime(pipelineExecLog.getRunTime()));
                     pipelineExecLogList.add(pipelineExecLog);
-
                 }
             }
             if (pipelineExecLogList.size() != 0){
@@ -77,6 +77,25 @@ public class PipelineExecLogServiceImpl implements PipelineExecLogService {
     public List<PipelineExecLog> findAllLogList(List<String> idList) {
         List<PipelineExecLogEntity> pipelineLogList = pipelineExecLogDao.findAllLogList(idList);
         return BeanMapper.mapList(pipelineLogList, PipelineExecLog.class);
+    }
+
+
+    public static String formatDateTime(long time) {
+        String DateTimes ;
+        long days = time / ( 60 * 60 * 24);
+        long hours = (time % ( 60 * 60 * 24)) / (60 * 60);
+        long minutes = (time % ( 60 * 60)) /60;
+        long seconds = time % 60;
+        if(days>0){
+            DateTimes= days + "天" + hours + "小时" + minutes + "分钟" + seconds + "秒";
+        }else if(hours>0){
+            DateTimes=hours + "小时" + minutes + "分钟" + seconds + "秒";
+        }else if(minutes>0){
+            DateTimes=minutes + "分钟" + seconds + "秒";
+        }else{
+            DateTimes=seconds + "秒";
+        }
+        return DateTimes;
     }
 
 }

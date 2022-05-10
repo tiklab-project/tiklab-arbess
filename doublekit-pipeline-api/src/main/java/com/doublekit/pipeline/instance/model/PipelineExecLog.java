@@ -43,6 +43,9 @@ public class PipelineExecLog {
     @ApiProperty(name = "runState",desc = "运行状态")
     private int runState;
 
+    //运行时间（转换为天，月，日 ，时，分，秒格式）
+    private String execTime;
+
 
     public String getPipelineLogId() {
         return pipelineLogId;
@@ -106,5 +109,13 @@ public class PipelineExecLog {
 
     public void setTaskAlias(String taskAlias) {
         this.taskAlias = taskAlias;
+    }
+
+    public String getExecTime() {
+        return execTime;
+    }
+
+    public void setExecTime(String execTime) {
+        this.execTime = execTime;
     }
 }

@@ -1,7 +1,6 @@
 package com.doublekit.pipeline.instance.service;
 
 import com.doublekit.pipeline.instance.model.PipelineExecHistory;
-import com.doublekit.pipeline.instance.model.PipelineExecLog;
 
 /**
  * 流水线构建
@@ -22,6 +21,13 @@ public interface PipelineExecService {
      * @return 状态信息
      */
     PipelineExecHistory findInstanceState(String pipelineId) ;
+
+    /**
+     * 判断运行状态
+     * @param pipelineId 流水线ID
+     * @return 状态
+     */
+    int findState(String pipelineId);
 
 
 }

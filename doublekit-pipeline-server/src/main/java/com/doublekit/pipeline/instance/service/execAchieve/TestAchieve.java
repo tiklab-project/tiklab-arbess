@@ -3,8 +3,8 @@ package com.doublekit.pipeline.instance.service.execAchieve;
 import com.doublekit.pipeline.definition.model.Pipeline;
 import com.doublekit.pipeline.definition.model.PipelineConfigure;
 import com.doublekit.pipeline.definition.service.PipelineConfigureService;
-import com.doublekit.pipeline.example.model.PipelineTest;
-import com.doublekit.pipeline.example.service.PipelineTestService;
+import com.doublekit.pipeline.execute.model.PipelineTest;
+import com.doublekit.pipeline.execute.service.PipelineTestService;
 import com.doublekit.pipeline.instance.model.PipelineExecHistory;
 import com.doublekit.pipeline.instance.model.PipelineExecLog;
 import com.doublekit.pipeline.instance.service.PipelineExecHistoryService;
@@ -60,11 +60,13 @@ public class TestAchieve {
                 Map<String, String> map = commonAchieve.log(inputStreamReader, pipelineExecHistory,pipelineExecHistoryList);
                 if (map.get("state").equals("0")){
                     pipelineExecLog.setRunLog(pipelineExecLog.getRunLog()+map.get("log"));
+                    commonAchieve.updateState(pipelineExecHistory,pipelineExecLog,"日志打印错误",pipelineExecHistoryList);
                     commonAchieve.updateTime(pipelineExecHistory,pipelineExecLog,beginTime);
                     return "测试执行失败。";
                 }
                 pipelineExecLog.setRunLog(a+map.get("log"));
             } catch (IOException e) {
+                commonAchieve.updateState(pipelineExecHistory,pipelineExecLog,"测试命令错误",pipelineExecHistoryList);
                 commonAchieve.updateTime(pipelineExecHistory,pipelineExecLog,beginTime);
                 return e.toString();
             }

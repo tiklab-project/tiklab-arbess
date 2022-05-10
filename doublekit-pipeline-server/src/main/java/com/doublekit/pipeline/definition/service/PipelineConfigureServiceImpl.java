@@ -8,7 +8,7 @@ import com.doublekit.pipeline.definition.entity.PipelineConfigureEntity;
 import com.doublekit.pipeline.definition.model.Pipeline;
 import com.doublekit.pipeline.definition.model.PipelineConfigure;
 import com.doublekit.pipeline.definition.model.PipelineExecConfigure;
-import com.doublekit.pipeline.example.service.PipelineCodeService;
+import com.doublekit.pipeline.execute.service.PipelineCodeService;
 import com.doublekit.rpc.annotation.Exporter;
 import com.ibm.icu.text.SimpleDateFormat;
 import org.slf4j.Logger;

@@ -3,8 +3,8 @@ package com.doublekit.pipeline.instance.service.execAchieve;
 import com.doublekit.pipeline.definition.model.Pipeline;
 import com.doublekit.pipeline.definition.model.PipelineConfigure;
 import com.doublekit.pipeline.definition.service.PipelineConfigureService;
-import com.doublekit.pipeline.example.model.PipelineDeploy;
-import com.doublekit.pipeline.example.service.PipelineDeployService;
+import com.doublekit.pipeline.execute.model.PipelineDeploy;
+import com.doublekit.pipeline.execute.service.PipelineDeployService;
 import com.doublekit.pipeline.instance.model.PipelineExecHistory;
 import com.doublekit.pipeline.instance.model.PipelineExecLog;
 import com.doublekit.pipeline.instance.service.PipelineExecHistoryService;
@@ -96,10 +96,12 @@ public class DeployAchieve {
                 String[] s1 = shell.split("\n");
                 for (String value : s1) {
                     commonAchieve.sshOrder(proof, value, pipelineExecHistory,pipelineExecHistoryList);
+                    commonAchieve.updateState(pipelineExecHistory,pipelineExecLog,"shell 命令错误",pipelineExecHistoryList);
                 }
             }
         } catch (JSchException | SftpException | IOException e) {
             commonAchieve.updateTime(pipelineExecHistory,pipelineExecLog,beginTime);
+            commonAchieve.updateState(pipelineExecHistory,pipelineExecLog,"文件发送失败",pipelineExecHistoryList);
             return e.toString();
         }
         //更新状态

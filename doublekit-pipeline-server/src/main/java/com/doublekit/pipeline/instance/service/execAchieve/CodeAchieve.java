@@ -2,13 +2,11 @@ package com.doublekit.pipeline.instance.service.execAchieve;
 
 import com.doublekit.pipeline.definition.model.Pipeline;
 import com.doublekit.pipeline.definition.model.PipelineConfigure;
-import com.doublekit.pipeline.definition.service.PipelineConfigureService;
-import com.doublekit.pipeline.example.model.PipelineCode;
-import com.doublekit.pipeline.example.service.PipelineCodeService;
-import com.doublekit.pipeline.example.service.PipelineCodeServiceImpl;
+import com.doublekit.pipeline.execute.model.PipelineCode;
+import com.doublekit.pipeline.execute.service.PipelineCodeService;
+import com.doublekit.pipeline.execute.service.PipelineCodeServiceImpl;
 import com.doublekit.pipeline.instance.model.PipelineExecHistory;
 import com.doublekit.pipeline.instance.model.PipelineExecLog;
-import com.doublekit.pipeline.instance.service.PipelineExecHistoryService;
 import com.doublekit.pipeline.setting.proof.model.Proof;
 import com.doublekit.rpc.annotation.Exporter;
 import org.eclipse.jgit.api.Git;
@@ -19,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.io.File;
 import java.sql.Timestamp;
 import java.util.List;
@@ -29,9 +28,6 @@ public class CodeAchieve {
 
     @Autowired
     PipelineCodeService pipelineCodeService;
-
-    @Autowired
-    PipelineExecHistoryService pipelineExecHistoryService;
 
     @Autowired
     CommonAchieve commonAchieve;
@@ -45,7 +41,7 @@ public class CodeAchieve {
     // git克隆
     private String gitClone(PipelineConfigure pipelineConfigure, PipelineExecHistory pipelineExecHistory, List<PipelineExecHistory> pipelineExecHistoryList){
         long beginTime = new Timestamp(System.currentTimeMillis()).getTime();
-        pipelineExecHistory.setRunLog("流水线正在执行。。。。。。。");
+        pipelineExecHistory.setRunLog("流水线开始执行。。。。。。。");
         pipelineExecHistoryList.add(pipelineExecHistory);
         PipelineCode pipelineCode = pipelineCodeService.findOneCode(pipelineConfigure.getTaskId());
         PipelineExecLog pipelineExecLog = new PipelineExecLog();
@@ -61,6 +57,7 @@ public class CodeAchieve {
         Proof proof = pipelineCode.getProof();
         if (proof == null){
             commonAchieve.updateTime(pipelineExecHistory,pipelineExecLog,beginTime);
+            commonAchieve.updateState(pipelineExecHistory,pipelineExecLog,"凭证为空。。。。",pipelineExecHistoryList);
             return "凭证为空。。。。";
         }
         String codeAddress =pipelineCode.getCodeAddress();
@@ -78,6 +75,7 @@ public class CodeAchieve {
             clone(file, codeAddress, credentialsProvider, codeBranch);
         } catch (GitAPIException e) {
             commonAchieve.updateTime(pipelineExecHistory,pipelineExecLog,beginTime);
+            commonAchieve.updateState(pipelineExecHistory,pipelineExecLog,e.toString(),pipelineExecHistoryList);
             return e.toString();
         }
         String log = s + "proofType : " +proof.getProofType() + "\n" + "clone成功。。。。。。。。。。。。。。。" + "\n";
