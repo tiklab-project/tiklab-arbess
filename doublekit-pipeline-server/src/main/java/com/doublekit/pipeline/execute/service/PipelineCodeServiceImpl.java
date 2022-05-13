@@ -58,6 +58,7 @@ public class PipelineCodeServiceImpl implements PipelineCodeService {
         }
         pipelineCode.setType(taskType);
         pipelineConfigure.setTaskSort(1);
+        pipelineCode.setCodeAddress(pipelineCode.getCodeName());
         if (pipelineCode.getType() == 2){
             String cloneUrl = codeGiteeApiService.getCloneUrl(pipelineCode.getProof().getProofId(),pipelineCode.getCodeName());
             pipelineCode.setCodeAddress(cloneUrl);
@@ -100,14 +101,15 @@ public class PipelineCodeServiceImpl implements PipelineCodeService {
         if (oneConfigure != null){
             //判断是否存在配置
             if (pipelineCode.getType() != 0){
-                    updateCode(pipelineCode);
-                    oneConfigure.setTaskSort(1);
-                    if (pipelineCode.getType() == 2){
-                        String cloneUrl = codeGiteeApiService.getCloneUrl(pipelineCode.getProof().getProofId(),pipelineCode.getCodeName());
-                        pipelineCode.setCodeAddress(cloneUrl);
-                    }
-                    oneConfigure.setTaskAlias(pipelineCode.getCodeAlias());
-                    pipelineConfigureService.updateConfigure(oneConfigure);
+                pipelineCode.setCodeAddress(pipelineCode.getCodeName());
+                oneConfigure.setTaskSort(1);
+                if (pipelineCode.getType() == 2){
+                    String cloneUrl = codeGiteeApiService.getCloneUrl(pipelineCode.getProof().getProofId(),pipelineCode.getCodeName());
+                    pipelineCode.setCodeAddress(cloneUrl);
+                }
+                updateCode(pipelineCode);
+                oneConfigure.setTaskAlias(pipelineCode.getCodeAlias());
+                pipelineConfigureService.updateConfigure(oneConfigure);
             }else {
                 pipelineConfigureService.deleteTask(oneConfigure.getTaskId(),pipelineId);
             }

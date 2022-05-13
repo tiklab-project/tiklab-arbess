@@ -3,7 +3,6 @@ package com.doublekit.pipeline.setting.proof.service;
 import com.doublekit.beans.BeanMapper;
 import com.doublekit.join.JoinTemplate;
 import com.doublekit.pipeline.execute.service.PipelineCodeServiceImpl;
-import com.doublekit.pipeline.execute.service.codeGit.CodeGiteeApiService;
 import com.doublekit.pipeline.setting.proof.dao.ProofDao;
 import com.doublekit.pipeline.setting.proof.entity.ProofEntity;
 import com.doublekit.pipeline.setting.proof.model.Proof;
@@ -13,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,9 +26,6 @@ public class ProofServiceImpl implements ProofService{
     @Autowired
     JoinTemplate joinTemplate;
 
-   @Autowired
-   CodeGiteeApiService codeGiteeApiService;
-
     private static final Logger logger = LoggerFactory.getLogger(PipelineCodeServiceImpl.class);
 
     //创建
@@ -37,10 +34,20 @@ public class ProofServiceImpl implements ProofService{
         List<Proof> allProof = findAllProof();
         if (allProof != null){
             for (Proof proof1 : allProof) {
-                if (proof.getProofName().equals(proof1.getProofName()) || proof.getProofUsername().equals(proof1.getProofUsername())){
+                if (proof.getProofUsername().equals(proof1.getProofUsername())){
                     proof.setProofId(proof1.getProofId());
                     updateProof(proof);
                     return proof.getProofId();
+                }
+            }
+        if (proof.getProofType().equals("ssh")){
+                String path="D:\\clone\\key"+proof.getProofName();
+                try {
+                    writePrivateKeyPath(proof.getProofUsername(),path);
+                    proof.setProofUsername(proof.getProofName());
+                    proof.setProofPassword(path);
+                } catch (IOException e) {
+                    return null;
                 }
             }
         }
@@ -122,6 +129,27 @@ public class ProofServiceImpl implements ProofService{
         List<ProofEntity> proofEntityList = ProofDao.selectAllProofList(idList);
         return BeanMapper.mapList(proofEntityList, Proof.class);
     }
+
+    public static Boolean writePrivateKeyPath(String Data, String filePath) throws IOException {
+        BufferedReader bufferedReader ;
+        BufferedWriter bufferedWriter;
+        File distFile= new File(filePath);
+        if (!distFile.getParentFile().exists()){
+            boolean mkdirs = distFile.getParentFile().mkdirs();
+        }
+        bufferedReader = new BufferedReader(new StringReader(Data));
+        bufferedWriter = new BufferedWriter(new FileWriter(distFile));
+        char[] buf = new char[1024]; //字符缓冲区
+        int len;
+        while ( (len = bufferedReader.read(buf)) != -1) {
+            bufferedWriter.write(buf, 0, len);
+        }
+        bufferedWriter.flush();
+        bufferedReader.close();
+        bufferedWriter.close();
+        return true;
+    }
+
 
 
 }

@@ -56,6 +56,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
     //启动
     @Override
     public int  start(String pipelineId){
+
         //创建线程池
         ExecutorService executorService = Executors.newCachedThreadPool();
         // 判断同一任务是否在运行
@@ -66,8 +67,15 @@ public class PipelineExecServiceImpl implements PipelineExecService {
                 }
             }
         }
+        executorService.submit(new Runnable() {
+            @Override
+            public void run() {
+                System.out.println("线程的名称为 ： "+Thread.currentThread().getName());
+                begin(pipelineId);
+            }
+        });
         // 执行构建
-        executorService.submit(() -> begin(pipelineId));
+        //executorService.submit(() -> begin(pipelineId));
         return 1;
     }
 

@@ -9,10 +9,13 @@ import com.doublekit.pipeline.instance.model.PipelineExecHistory;
 import com.doublekit.pipeline.instance.model.PipelineExecLog;
 import com.doublekit.pipeline.setting.proof.model.Proof;
 import com.doublekit.rpc.annotation.Exporter;
+import com.jcraft.jsch.JSch;
+import com.jcraft.jsch.JSchException;
+import com.jcraft.jsch.Session;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.transport.CredentialsProvider;
-import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
+import org.eclipse.jgit.transport.*;
+import org.eclipse.jgit.util.FS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -102,5 +105,31 @@ public class CodeAchieve {
                 .setBranch(branch)
                 .call().close();
     }
+
+    public static void sshClone(String url, String privateKeyPath,String clonePath) throws GitAPIException {
+        SshSessionFactory sshSessionFactory = new JschConfigSessionFactory() {
+            @Override
+            protected void configure(OpenSshConfig.Host host, Session session ) {
+                //取消host文件验证
+                session.setConfig("StrictHostKeyChecking","no");
+            }
+            @Override
+            protected JSch createDefaultJSch(FS fs) throws JSchException {
+                JSch defaultJSch = super.createDefaultJSch(fs);
+                defaultJSch.addIdentity(privateKeyPath);
+                return defaultJSch;
+            }
+        };
+        File file = new File(clonePath);
+        Git.cloneRepository()
+                .setURI(url)
+                .setTransportConfigCallback(transport -> {
+                    SshTransport sshTransport = (SshTransport)transport;
+                    sshTransport.setSshSessionFactory(sshSessionFactory);})
+                .setDirectory(file)
+                .call();
+
+    }
+
 
 }
