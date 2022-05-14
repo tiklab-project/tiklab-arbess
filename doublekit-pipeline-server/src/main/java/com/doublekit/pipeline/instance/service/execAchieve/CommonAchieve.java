@@ -33,8 +33,6 @@ public class CommonAchieve {
     @Autowired
     PipelineExecLogService pipelineExecLogService;
 
-
-
     /**
      *  执行ssh命令
      * @param proof 凭证信息
