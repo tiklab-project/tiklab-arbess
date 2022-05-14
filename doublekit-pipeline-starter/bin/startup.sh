@@ -23,6 +23,7 @@ export APP_HOME
 JAVA_OPTS="$JAVA_OPTS -server -Xms512m -Xmx512m -Xmn128m -XX:ParallelGCThreads=20 -XX:+UseParallelGC -XX:MaxGCPauseMillis=850 -Xloggc:$APP_LOG/gc.log -Dfile.encoding=UTF-8"
 JAVA_OPTS="$JAVA_OPTS -DlogPath=$APP_LOG"
 JAVA_OPTS="$JAVA_OPTS -Dconf.config=file:${APP_CONFIG}"
+JAVA_OPTS="$JAVA_OPTS --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.sql/java.sql=ALL-UNNAMED  -classpath"
 
 CLASSPATH=${APP_HOME}/conf
 for appJar in "$APP_HOME"/lib/*.jar;
@@ -63,7 +64,7 @@ startup(){
             mkdir "$APP_LOG"
         fi
 
-        nohup $JAVA_HOME/bin/java --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.sql/java.sql=ALL-UNNAMED $JAVA_OPTS -classpath $CLASSPATH $APP_MAIN &
+        nohup $JAVA_HOME/bin/java $JAVA_OPTS $CLASSPATH $APP_MAIN &
 
         for i in $(seq 5)
         do

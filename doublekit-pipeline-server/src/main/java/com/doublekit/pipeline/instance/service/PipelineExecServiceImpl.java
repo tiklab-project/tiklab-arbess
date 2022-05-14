@@ -53,12 +53,12 @@ public class PipelineExecServiceImpl implements PipelineExecService {
 
     private static final Logger logger = LoggerFactory.getLogger(PipelineExecServiceImpl.class);
 
+    //创建线程池
+    ExecutorService executorService = Executors.newCachedThreadPool();
+
     //启动
     @Override
     public int  start(String pipelineId){
-
-        //创建线程池
-        ExecutorService executorService = Executors.newCachedThreadPool();
         // 判断同一任务是否在运行
         if (pipelineIdList != null){
             for (String id : pipelineIdList) {
@@ -67,10 +67,11 @@ public class PipelineExecServiceImpl implements PipelineExecService {
                 }
             }
         }
+
         executorService.submit(new Runnable() {
             @Override
             public void run() {
-                System.out.println("线程的名称为 ： "+Thread.currentThread().getName());
+                Thread.currentThread().setName(pipelineId);
                 begin(pipelineId);
             }
         });
@@ -93,6 +94,35 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         }
         return null;
     }
+
+    //停止运行
+    @Override
+    public void killInstance(String pipelineId) {
+        PipelineExecHistory pipelineExecHistory = findInstanceState(pipelineId);
+        pipelineExecHistoryList.add(pipelineExecHistory);
+        pipelineExecHistoryService.updateHistory(pipelineExecHistory);
+        commonAchieve.success(pipelineExecHistory,pipelineId,pipelineExecHistoryList);
+        if (pipelineIdList != null) {
+            pipelineIdList.removeIf(id -> id.equals(pipelineId));
+        }
+        logger.info("pipelineId ：" + " = " + pipelineId);
+        ThreadGroup currentGroup = Thread.currentThread().getThreadGroup();
+        int noThreads = currentGroup.activeCount();
+        Thread[] lstThreads = new Thread[noThreads];
+        currentGroup.enumerate(lstThreads);
+        logger.info("现有线程数" + noThreads);
+        for (int i = 0; i < noThreads; i++) {
+            String nm = lstThreads[i].getName();
+            logger.info("线程号：" + i + " = " + nm);
+            if (nm.equals(pipelineId)) {
+                logger.info("杀死 ：" + i + " = " + pipelineId);
+                lstThreads[i].interrupt();
+            }
+        }
+    }
+
+
+
 
     //判断流水线是否正在执行
     @Override

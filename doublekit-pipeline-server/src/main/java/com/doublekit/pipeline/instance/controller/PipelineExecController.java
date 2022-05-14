@@ -47,4 +47,12 @@ public class PipelineExecController {
         return Result.ok(state);
     }
 
+    @RequestMapping(path="/killInstance",method = RequestMethod.POST)
+    @ApiMethod(name = "killInstance",desc = "判断是否执行")
+    @ApiParam(name = "pipelineId",desc = "流水线id",required = true)
+    public Result<Void> killInstance(@NotNull String pipelineId) {
+        pipelineExecService.killInstance(pipelineId);
+        return Result.ok();
+    }
+
 }

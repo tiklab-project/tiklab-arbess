@@ -29,5 +29,11 @@ public interface PipelineExecService {
      */
     int findState(String pipelineId);
 
+    /**
+     * 关闭运行
+     * @param pipelineId 流水线id
+     */
+    void killInstance(String pipelineId);
+
 
 }

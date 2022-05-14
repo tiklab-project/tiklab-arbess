@@ -104,7 +104,7 @@ public class CommonAchieve {
             throw new JSchException(proof.getProofIp() + "连接异常。。。。");
         }
         //设置第一次登陆的时候提示，可选值：(ask | yes | no)
-        session.setConfig("StrictHostKeyChecking", "no");
+        session.setConfig("StrictHostKeyChecking", "yes");
         //设置登陆主机的密码
         session.setPassword(proof.getProofPassword());
         //设置登陆超时时间 10s
