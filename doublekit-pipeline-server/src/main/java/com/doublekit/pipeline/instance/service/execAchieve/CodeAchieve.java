@@ -7,6 +7,7 @@ import com.doublekit.pipeline.execute.service.PipelineCodeService;
 import com.doublekit.pipeline.execute.service.PipelineCodeServiceImpl;
 import com.doublekit.pipeline.instance.model.PipelineExecHistory;
 import com.doublekit.pipeline.instance.model.PipelineExecLog;
+import com.doublekit.pipeline.instance.service.PipelineExecLogService;
 import com.doublekit.pipeline.setting.proof.model.Proof;
 import com.doublekit.rpc.annotation.Exporter;
 import com.jcraft.jsch.JSch;
@@ -35,6 +36,9 @@ public class CodeAchieve {
     @Autowired
     CommonAchieve commonAchieve;
 
+    @Autowired
+    PipelineExecLogService pipelineExecLogService;
+
     private static final Logger logger = LoggerFactory.getLogger(PipelineCodeServiceImpl.class);
 
     public String codeStart(PipelineConfigure pipelineConfigure, PipelineExecHistory pipelineExecHistory, List<PipelineExecHistory> pipelineExecHistoryList){
@@ -47,14 +51,22 @@ public class CodeAchieve {
         pipelineExecHistory.setRunLog("流水线开始执行。。。。。。。");
         pipelineExecHistoryList.add(pipelineExecHistory);
         PipelineCode pipelineCode = pipelineCodeService.findOneCode(pipelineConfigure.getTaskId());
+
         PipelineExecLog pipelineExecLog = new PipelineExecLog();
+        pipelineExecLog.setHistoryId(pipelineExecHistory.getHistoryId());
         pipelineExecLog.setTaskAlias(pipelineConfigure.getTaskAlias());
+        pipelineExecLog.setTaskSort(pipelineConfigure.getTaskSort());
+        pipelineExecLog.setTaskType(pipelineConfigure.getTaskType());
         pipelineExecLog.setRunLog("");
+        String logId = pipelineExecLogService.createLog(pipelineExecLog);
+        pipelineExecLog.setPipelineLogId(logId);
+
         Pipeline pipeline = pipelineConfigure.getPipeline();
 
         //设置代码路径
         String path = "D:\\clone\\" + pipeline.getPipelineName();
         File file = new File(path);
+
         //调用删除方法删除旧的代码
         commonAchieve.deleteFile(file);
         Proof proof = pipelineCode.getProof();
@@ -63,6 +75,7 @@ public class CodeAchieve {
             commonAchieve.updateState(pipelineExecHistory,pipelineExecLog,"凭证为空。。。。",pipelineExecHistoryList);
             return "凭证为空。。。。";
         }
+
         String codeAddress =pipelineCode.getCodeAddress();
         String codeBranch = pipelineCode.getCodeBranch();
         UsernamePasswordCredentialsProvider credentialsProvider = commonAchieve.usernamePassword(proof.getProofUsername(), proof.getProofPassword());
@@ -75,12 +88,16 @@ public class CodeAchieve {
 
         //克隆代码
         try {
-            clone(file, codeAddress, credentialsProvider, codeBranch);
-        } catch (GitAPIException e) {
-            commonAchieve.updateTime(pipelineExecHistory,pipelineExecLog,beginTime);
-            commonAchieve.updateState(pipelineExecHistory,pipelineExecLog,e.toString(),pipelineExecHistoryList);
-            return e.toString();
-        }
+            if (proof.getProofType().equals("SSH")&&proof.getProofScope()==1){
+                sshClone(codeAddress, proof.getProofPassword(), file, codeBranch);
+            }else {
+                clone(file, codeAddress, credentialsProvider, codeBranch);
+        }} catch (GitAPIException e) {
+                commonAchieve.updateTime(pipelineExecHistory,pipelineExecLog,beginTime);
+                commonAchieve.updateState(pipelineExecHistory,pipelineExecLog,e.toString(),pipelineExecHistoryList);
+                return e.toString();
+            }
+
         String log = s + "proofType : " +proof.getProofType() + "\n" + "clone成功。。。。。。。。。。。。。。。" + "\n";
         pipelineExecLog.setRunLog(pipelineExecLog.getRunLog()+log);
         pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+"\n"+log);
@@ -106,7 +123,7 @@ public class CodeAchieve {
                 .call().close();
     }
 
-    public static void sshClone(String url, String privateKeyPath,String clonePath) throws GitAPIException {
+    public static void sshClone(String url, String privateKeyPath,File clonePath,String branch) throws GitAPIException {
         SshSessionFactory sshSessionFactory = new JschConfigSessionFactory() {
             @Override
             protected void configure(OpenSshConfig.Host host, Session session ) {
@@ -120,15 +137,14 @@ public class CodeAchieve {
                 return defaultJSch;
             }
         };
-        File file = new File(clonePath);
         Git.cloneRepository()
                 .setURI(url)
+                .setBranch(branch)
                 .setTransportConfigCallback(transport -> {
                     SshTransport sshTransport = (SshTransport)transport;
                     sshTransport.setSshSessionFactory(sshSessionFactory);})
-                .setDirectory(file)
+                .setDirectory(clonePath)
                 .call();
     }
-
 
 }

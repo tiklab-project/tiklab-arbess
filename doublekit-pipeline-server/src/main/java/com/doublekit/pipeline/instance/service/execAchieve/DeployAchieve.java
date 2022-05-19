@@ -2,19 +2,18 @@ package com.doublekit.pipeline.instance.service.execAchieve;
 
 import com.doublekit.pipeline.definition.model.Pipeline;
 import com.doublekit.pipeline.definition.model.PipelineConfigure;
-import com.doublekit.pipeline.definition.service.PipelineConfigureService;
 import com.doublekit.pipeline.execute.model.PipelineDeploy;
 import com.doublekit.pipeline.execute.service.PipelineDeployService;
 import com.doublekit.pipeline.instance.model.PipelineExecHistory;
 import com.doublekit.pipeline.instance.model.PipelineExecLog;
-import com.doublekit.pipeline.instance.service.PipelineExecHistoryService;
+import com.doublekit.pipeline.instance.service.PipelineExecLogService;
 import com.doublekit.pipeline.setting.proof.model.Proof;
 import com.doublekit.rpc.annotation.Exporter;
-import com.jcraft.jsch.JSchException;
-import com.jcraft.jsch.SftpException;
+import com.jcraft.jsch.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import java.io.IOException;
+
+import java.io.*;
 import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.List;
@@ -27,18 +26,13 @@ public class DeployAchieve {
 
 
     @Autowired
-    PipelineConfigureService pipelineConfigureService;
-
-    @Autowired
-    PipelineExecHistoryService pipelineExecHistoryService;
+    PipelineExecLogService pipelineExecLogService;
 
     @Autowired
     PipelineDeployService pipelineDeployService;
 
     @Autowired
     CommonAchieve commonAchieve;
-
-
 
     public String deployStart(PipelineConfigure pipelineConfigure, PipelineExecHistory pipelineExecHistory ,List<PipelineExecHistory> pipelineExecHistoryList){
         return switch (pipelineConfigure.getTaskType()) {
@@ -57,8 +51,16 @@ public class DeployAchieve {
         //开始运行时间
         long beginTime = new Timestamp(System.currentTimeMillis()).getTime();
         Pipeline pipeline = pipelineConfigure.getPipeline();
+
         PipelineExecLog pipelineExecLog = new PipelineExecLog();
+        pipelineExecLog.setHistoryId(pipelineExecHistory.getHistoryId());
         pipelineExecLog.setTaskAlias(pipelineConfigure.getTaskAlias());
+        pipelineExecLog.setTaskSort(pipelineConfigure.getTaskSort());
+        pipelineExecLog.setTaskType(pipelineConfigure.getTaskType());
+        pipelineExecLog.setRunLog("");
+        String logId = pipelineExecLogService.createLog(pipelineExecLog);
+        pipelineExecLog.setPipelineLogId(logId);
+
         PipelineDeploy pipelineDeploy = pipelineDeployService.findOneDeploy(pipelineConfigure.getTaskId());
         String deployTargetAddress = pipelineDeploy.getDeployTargetAddress();
         String deployAddress = pipelineDeploy.getDeployAddress();
@@ -87,7 +89,7 @@ public class DeployAchieve {
             pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+"\n"+"开始发送文件:"+path);
             pipelineExecLog.setRunLog(pipelineExecLog.getRunLog()+"\n"+"开始发送文件:"+path);
             //发送文件
-            commonAchieve.sshSftp(proof,deployAddress,path);
+            sshSftp(proof,deployAddress,path);
             pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+"\n"+"文件:"+zipName+"发送成功！");
             pipelineExecLog.setRunLog(pipelineExecLog.getRunLog()+"\n"+"文件:"+zipName+"发送成功！");
             //执行shell
@@ -95,7 +97,7 @@ public class DeployAchieve {
             if (shell != null){
                 String[] s1 = shell.split("\n");
                 for (String value : s1) {
-                    commonAchieve.sshOrder(proof, value, pipelineExecHistory,pipelineExecHistoryList);
+                    commonAchieve.sshOrder(proof, value, pipelineExecHistory,pipelineExecHistoryList,pipelineExecLog);
                     commonAchieve.updateState(pipelineExecHistory,pipelineExecLog,"shell 命令错误",pipelineExecHistoryList);
                 }
             }
@@ -123,10 +125,16 @@ public class DeployAchieve {
         long beginTime = new Timestamp(System.currentTimeMillis()).getTime();
         Pipeline pipeline = pipelineConfigure.getPipeline();
         Proof proof = pipelineDeploy.getProof();
+
         PipelineExecLog pipelineExecLog = new PipelineExecLog();
+        pipelineExecLog.setHistoryId(pipelineExecHistory.getHistoryId());
         pipelineExecLog.setTaskAlias(pipelineConfigure.getTaskAlias());
         pipelineExecLog.setTaskSort(pipelineConfigure.getTaskSort());
         pipelineExecLog.setTaskType(pipelineConfigure.getTaskType());
+        pipelineExecLog.setRunLog("");
+        String logId = pipelineExecLogService.createLog(pipelineExecLog);
+        pipelineExecLog.setPipelineLogId(logId);
+
         //模块名
         String[] split = pipelineDeploy.getDeployTargetAddress().split(" ");
         String path = "D:\\clone\\" + pipeline.getPipelineName()+"\\"+split[0]+"\\"+"target";
@@ -147,7 +155,7 @@ public class DeployAchieve {
         pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+"\n"+"发送文件中。。。。。");
         pipelineExecLog.setRunLog("压缩包文件名为： "+zipName+"\n"+"解压文件名称："+fileName+"\n"+"部署到docker文件地址 ： " +deployAddress);
         try {
-            commonAchieve.sshSftp(proof,deployAddress,fileAddress);
+            sshSftp(proof,deployAddress,fileAddress);
             HashMap<Integer, String> map = new HashMap<>();
             map.put(1,"rm -rf "+" "+liunxAddress+ "/" +fileName);
             map.put(2,"unzip"+" "+deployAddress);
@@ -160,7 +168,7 @@ public class DeployAchieve {
             for (int i = 1; i <= map.size(); i++) {
                 pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+"\n"+"第"+i+"步 ："+ map.get(i));
                 pipelineExecLog.setRunLog(pipelineExecLog.getRunLog()+"\n第"+i+"步 ："+ map.get(i));
-                Map<String, String> log = commonAchieve.sshOrder(proof, map.get(i), pipelineExecHistory,pipelineExecHistoryList);
+                Map<String, String> log = commonAchieve.sshOrder(proof, map.get(i), pipelineExecHistory,pipelineExecHistoryList,pipelineExecLog);
                 pipelineExecLog.setRunLog(pipelineExecLog.getRunLog()+"\n"+log.get("log"));
             }
         } catch (JSchException | SftpException |IOException   e) {
@@ -171,4 +179,66 @@ public class DeployAchieve {
         commonAchieve.updateState(pipelineExecHistory,pipelineExecLog,null,pipelineExecHistoryList);
         return null;
     }
+
+
+    /**
+     * ssh 连接发送文件
+     * @param proof 凭证信息
+     * @param nowPath 部署文件地址
+     * @param lastPath 本机文件地址
+     */
+    public void sshSftp(Proof proof, String nowPath, String lastPath) throws JSchException, SftpException, IOException {
+
+        JSch jsch = new JSch();
+        //采用指定的端口连接服务器
+        Session session =jsch.getSession(proof.getProofUsername(), proof.getProofIp() ,proof.getProofPort());
+        //如果服务器连接不上，则抛出异常
+        if (session == null) {
+            throw new JSchException(proof.getProofIp() + "连接异常。。。。");
+        }
+        //设置第一次登陆的时候提示，可选值：(ask | yes | no)
+        session.setConfig("StrictHostKeyChecking", "no");
+        if (proof.getProofType().equals("password") && proof.getProofScope()==2){
+            //设置登陆主机的密码
+            session.setPassword(proof.getProofPassword());
+        }else {
+            //添加私钥
+            jsch.addIdentity(proof.getProofPassword());
+        }
+        //设置登陆超时时间 10s
+        session.connect(10000);
+        //调用发送方法
+        sshSending(session,nowPath,lastPath);
+        session.disconnect();
+
+    }
+    /**
+     * 发送文件
+     * @param session 连接
+     * @param nowPath 部署文件地址
+     * @param lastPath 本机文件地址
+     */
+    public void sshSending(Session session,String nowPath,String lastPath) throws JSchException, IOException, SftpException {
+
+        ChannelSftp channel;
+        //创建sftp通信通道
+        channel = (ChannelSftp) session.openChannel("sftp");
+        channel.connect();
+        ChannelSftp sftp = channel;
+
+        //发送
+        OutputStream outputStream  = sftp.put(nowPath);
+        InputStream inputStream =  new FileInputStream(new File(lastPath));
+
+        byte[] b = new byte[1024];
+        int n;
+        while ((n = inputStream.read(b)) != -1) {
+            outputStream.write(b, 0, n);
+        }
+        //关闭流
+        outputStream.flush();
+        outputStream.close();
+        inputStream.close();
+    }
+
 }

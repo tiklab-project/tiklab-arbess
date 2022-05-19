@@ -13,7 +13,6 @@ import org.apache.commons.lang.StringUtils;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.io.*;
 import java.nio.charset.Charset;
 import java.sql.Timestamp;
@@ -41,7 +40,7 @@ public class CommonAchieve {
      * @return 执行状态
      * @throws IOException 日志读写异常
      */
-    public Map<String, String> sshOrder(Proof proof, String order, PipelineExecHistory pipelineExecHistory,List<PipelineExecHistory> pipelineExecHistoryList) throws IOException {
+    public Map<String, String> sshOrder(Proof proof, String order, PipelineExecHistory pipelineExecHistory,List<PipelineExecHistory> pipelineExecHistoryList,PipelineExecLog pipelineExecLog) throws IOException {
         Connection conn = new Connection(proof.getProofIp(),proof.getProofPort());
         conn.connect();
         conn.authenticateWithPassword(proof.getProofUsername(), proof.getProofPassword());
@@ -49,7 +48,7 @@ public class CommonAchieve {
         pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog() + "\n" + order);
         session.execCommand(order);
         InputStreamReader inputStreamReader = new InputStreamReader(session.getStdout(), Charset.forName("GBK"));
-        Map<String, String> map = log(inputStreamReader, pipelineExecHistory,pipelineExecHistoryList);
+        Map<String, String> map = log(inputStreamReader, pipelineExecHistory,pipelineExecHistoryList,pipelineExecLog);
         session.close();
         inputStreamReader.close();
         return map;
@@ -62,7 +61,7 @@ public class CommonAchieve {
      * @throws IOException 字符流转换异常
      * @return map 执行状态
      */
-    public Map<String, String> log(InputStreamReader inputStreamReader , PipelineExecHistory pipelineExecHistory,List<PipelineExecHistory> pipelineExecHistoryList) throws IOException {
+    public Map<String, String> log(InputStreamReader inputStreamReader , PipelineExecHistory pipelineExecHistory,List<PipelineExecHistory> pipelineExecHistoryList,PipelineExecLog pipelineExecLog) throws IOException {
         Map<String, String> map = new HashMap<>();
         String s;
         // InputStreamReader  inputStreamReader = new InputStreamReader(process.getInputStream());
@@ -71,6 +70,8 @@ public class CommonAchieve {
         //更新日志信息
         while ((s = bufferedReader.readLine()) != null) {
             logRunLog = logRunLog + s + "\n";
+            pipelineExecLog.setRunLog(logRunLog);
+            pipelineExecLogService.updateLog(pipelineExecLog);
             pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+s+"\n");
             pipelineExecHistoryList.add(pipelineExecHistory);
             if (logRunLog.contains("BUILD FAILURE")){
@@ -87,61 +88,7 @@ public class CommonAchieve {
         return map;
     }
 
-    /**
-     * ssh 连接发送文件
-     * @param proof 凭证信息
-     * @param nowPath 部署文件地址
-     * @param lastPath 本机文件地址
-     */
-    public void sshSftp(Proof proof, String nowPath, String lastPath) throws JSchException, SftpException, IOException {
 
-        //采用指定的端口连接服务器
-        Session session = new JSch().getSession(proof.getProofUsername(), proof.getProofIp() ,proof.getProofPort());
-        //如果服务器连接不上，则抛出异常
-        if (session == null) {
-            throw new JSchException(proof.getProofIp() + "连接异常。。。。");
-        }
-        //设置第一次登陆的时候提示，可选值：(ask | yes | no)
-        session.setConfig("StrictHostKeyChecking", "yes");
-        //设置登陆主机的密码
-        session.setPassword(proof.getProofPassword());
-        //设置登陆超时时间 10s
-        session.connect(10000);
-        //调用发送方法
-        sshSending(session,nowPath,lastPath);
-
-        session.disconnect();
-
-    }
-
-    /**
-     * 发送文件
-     * @param session 连接
-     * @param nowPath 部署文件地址
-     * @param lastPath 本机文件地址
-     */
-    public void sshSending(Session session,String nowPath,String lastPath) throws JSchException, IOException, SftpException {
-
-        ChannelSftp channel;
-        //创建sftp通信通道
-        channel = (ChannelSftp) session.openChannel("sftp");
-        channel.connect();
-        ChannelSftp sftp = channel;
-
-        //发送
-        OutputStream outputStream  = sftp.put(nowPath);
-        InputStream inputStream =  new FileInputStream(new File(lastPath));
-
-        byte[] b = new byte[1024];
-        int n;
-        while ((n = inputStream.read(b)) != -1) {
-            outputStream.write(b, 0, n);
-        }
-        //关闭流
-        outputStream.flush();
-        outputStream.close();
-        inputStream.close();
-    }
 
 
     /**
@@ -230,10 +177,6 @@ public class CommonAchieve {
         return dir.delete();
     }
 
-
-
-
-
     /**
      * 更新执行时间
      * @param pipelineExecHistory 历史
@@ -263,10 +206,10 @@ public class CommonAchieve {
             error(pipelineExecHistory,e, onePipeline.getPipelineId(),pipelineExecHistoryList);
         }
         pipelineExecLog.setHistoryId(pipelineExecHistory.getHistoryId());
-        pipelineExecLogService.createLog(pipelineExecLog);
-        pipelineExecLog.setHistoryId(pipelineExecHistory.getHistoryId());
+        pipelineExecLogService.updateLog(pipelineExecLog);
         pipelineExecHistoryService.updateHistory(pipelineExecHistory);
         pipelineExecHistoryList.add(pipelineExecHistory);
+        //success(pipelineExecHistory,onePipeline.getPipelineId(),pipelineExecHistoryList);
     }
 
 
@@ -329,4 +272,6 @@ public class CommonAchieve {
             e.printStackTrace();
         }
     }
+
+
 }

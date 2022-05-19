@@ -31,6 +31,9 @@ public class PipelineExecServiceImpl implements PipelineExecService {
     PipelineExecHistoryService pipelineExecHistoryService;
 
     @Autowired
+    CommonAchieve commonAchieve;
+
+    @Autowired
     CodeAchieve codeAchieve;
 
     @Autowired
@@ -48,13 +51,8 @@ public class PipelineExecServiceImpl implements PipelineExecService {
     //存放构建流水线id
     List<String> pipelineIdList = new ArrayList<>();
 
-    @Autowired
-    CommonAchieve commonAchieve;
-
     private static final Logger logger = LoggerFactory.getLogger(PipelineExecServiceImpl.class);
 
-    //创建线程池
-    ExecutorService executorService = Executors.newCachedThreadPool();
 
     //启动
     @Override
@@ -67,6 +65,8 @@ public class PipelineExecServiceImpl implements PipelineExecService {
                 }
             }
         }
+        //创建线程池
+        ExecutorService executorService = Executors.newCachedThreadPool();
 
         executorService.submit(new Runnable() {
             @Override
@@ -105,24 +105,18 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         if (pipelineIdList != null) {
             pipelineIdList.removeIf(id -> id.equals(pipelineId));
         }
-        logger.info("pipelineId ：" + " = " + pipelineId);
         ThreadGroup currentGroup = Thread.currentThread().getThreadGroup();
         int noThreads = currentGroup.activeCount();
         Thread[] lstThreads = new Thread[noThreads];
         currentGroup.enumerate(lstThreads);
-        logger.info("现有线程数" + noThreads);
         for (int i = 0; i < noThreads; i++) {
             String nm = lstThreads[i].getName();
-            logger.info("线程号：" + i + " = " + nm);
             if (nm.equals(pipelineId)) {
-                logger.info("杀死 ：" + i + " = " + pipelineId);
-                lstThreads[i].interrupt();
+                logger.info("结束线程 ：" + i + "  pipelineId ：" + pipelineId);
+                lstThreads[i].stop();
             }
         }
     }
-
-
-
 
     //判断流水线是否正在执行
     @Override

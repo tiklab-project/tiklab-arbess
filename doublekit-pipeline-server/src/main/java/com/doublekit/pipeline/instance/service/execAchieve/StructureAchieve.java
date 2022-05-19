@@ -3,14 +3,14 @@ package com.doublekit.pipeline.instance.service.execAchieve;
 import com.doublekit.pipeline.definition.model.Pipeline;
 import com.doublekit.pipeline.definition.model.PipelineConfigure;
 import com.doublekit.pipeline.execute.model.PipelineStructure;
-import com.doublekit.pipeline.execute.service.PipelineCodeService;
 import com.doublekit.pipeline.execute.service.PipelineStructureService;
 import com.doublekit.pipeline.instance.model.PipelineExecHistory;
 import com.doublekit.pipeline.instance.model.PipelineExecLog;
-import com.doublekit.pipeline.instance.service.PipelineExecHistoryService;
+import com.doublekit.pipeline.instance.service.PipelineExecLogService;
 import com.doublekit.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
@@ -23,13 +23,10 @@ import java.util.Map;
 public class StructureAchieve {
 
     @Autowired
-    PipelineExecHistoryService pipelineExecHistoryService;
-
-    @Autowired
     PipelineStructureService pipelineStructureService;
 
     @Autowired
-    PipelineCodeService pipelineCodeService;
+    PipelineExecLogService pipelineExecLogService;
 
     @Autowired
     CommonAchieve commonAchieve;
@@ -43,8 +40,16 @@ public class StructureAchieve {
     private String structure(PipelineConfigure pipelineConfigure, PipelineExecHistory pipelineExecHistory,List<PipelineExecHistory> pipelineExecHistoryList)  {
         long beginTime = new Timestamp(System.currentTimeMillis()).getTime();
         Pipeline pipeline = pipelineConfigure.getPipeline();
+
         PipelineExecLog pipelineExecLog = new PipelineExecLog();
-        pipelineExecLog.setRunLog("null");
+        pipelineExecLog.setHistoryId(pipelineExecHistory.getHistoryId());
+        pipelineExecLog.setTaskAlias(pipelineConfigure.getTaskAlias());
+        pipelineExecLog.setTaskSort(pipelineConfigure.getTaskSort());
+        pipelineExecLog.setTaskType(pipelineConfigure.getTaskType());
+        pipelineExecLog.setRunLog("");
+        String logId = pipelineExecLogService.createLog(pipelineExecLog);
+        pipelineExecLog.setPipelineLogId(logId);
+
         pipelineExecLog.setTaskAlias(pipelineConfigure.getTaskAlias());
         PipelineStructure pipelineStructure = pipelineStructureService.findOneStructure(pipelineConfigure.getTaskId());
         String structureOrder = pipelineStructure.getStructureOrder();
@@ -62,7 +67,7 @@ public class StructureAchieve {
                 pipelineExecLog.setRunLog(pipelineExecLog.getRunLog()+a);
                 //构建失败
                 InputStreamReader inputStreamReader = new InputStreamReader(process.getInputStream(), Charset.forName("GBK"));
-                Map<String, String> map = commonAchieve.log(inputStreamReader, pipelineExecHistory,pipelineExecHistoryList);
+                Map<String, String> map = commonAchieve.log(inputStreamReader, pipelineExecHistory,pipelineExecHistoryList,pipelineExecLog);
                 pipelineExecLog.setRunLog(pipelineExecLog.getRunLog()+map.get("log"));
                 if (map.get("state").equals("0")){
                     pipelineExecLog.setRunLog(pipelineExecLog.getRunLog()+map.get("log"));

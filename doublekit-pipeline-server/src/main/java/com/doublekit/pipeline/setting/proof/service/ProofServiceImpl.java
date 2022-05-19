@@ -40,13 +40,14 @@ public class ProofServiceImpl implements ProofService{
                     return proof.getProofId();
                 }
             }
-        if (proof.getProofType().equals("ssh")){
-                String path="D:\\clone\\key"+proof.getProofName();
+        if (proof.getProofType().equals("SSH")){
+                String path="D:\\clone\\key\\"+proof.getProofName();
                 try {
-                    writePrivateKeyPath(proof.getProofUsername(),path);
+                    writePrivateKeyPath(proof.getProofPassword(),path);
                     proof.setProofUsername(proof.getProofName());
                     proof.setProofPassword(path);
                 } catch (IOException e) {
+                    logger.info("私钥保存失败。");
                     return null;
                 }
             }
