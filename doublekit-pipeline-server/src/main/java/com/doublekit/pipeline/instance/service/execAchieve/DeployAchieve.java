@@ -103,7 +103,7 @@ public class DeployAchieve {
             }
         } catch (JSchException | SftpException | IOException e) {
             commonAchieve.updateTime(pipelineExecHistory,pipelineExecLog,beginTime);
-            commonAchieve.updateState(pipelineExecHistory,pipelineExecLog,"文件发送失败",pipelineExecHistoryList);
+            commonAchieve.updateState(pipelineExecHistory,pipelineExecLog,e.toString(),pipelineExecHistoryList);
             return e.toString();
         }
         //更新状态
@@ -190,14 +190,17 @@ public class DeployAchieve {
     public void sshSftp(Proof proof, String nowPath, String lastPath) throws JSchException, SftpException, IOException {
 
         JSch jsch = new JSch();
+
         //采用指定的端口连接服务器
         Session session =jsch.getSession(proof.getProofUsername(), proof.getProofIp() ,proof.getProofPort());
+
         //如果服务器连接不上，则抛出异常
         if (session == null) {
             throw new JSchException(proof.getProofIp() + "连接异常。。。。");
         }
         //设置第一次登陆的时候提示，可选值：(ask | yes | no)
         session.setConfig("StrictHostKeyChecking", "no");
+
         if (proof.getProofType().equals("password") && proof.getProofScope()==2){
             //设置登陆主机的密码
             session.setPassword(proof.getProofPassword());
@@ -212,6 +215,9 @@ public class DeployAchieve {
         session.disconnect();
 
     }
+
+
+
     /**
      * 发送文件
      * @param session 连接

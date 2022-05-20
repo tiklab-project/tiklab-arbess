@@ -8,12 +8,15 @@ import com.doublekit.pipeline.instance.service.PipelineExecHistoryService;
 import com.doublekit.pipeline.instance.service.PipelineExecLogService;
 import com.doublekit.pipeline.setting.proof.model.Proof;
 import com.doublekit.rpc.annotation.Exporter;
-import com.jcraft.jsch.*;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import java.io.*;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -203,6 +206,7 @@ public class CommonAchieve {
         if (e != null){
             pipelineExecLog.setRunLog(pipelineExecLog.getRunLog() +"\n"+e);
             pipelineExecLog.setRunState(1);
+            pipelineExecLogService.updateLog(pipelineExecLog);
             error(pipelineExecHistory,e, onePipeline.getPipelineId(),pipelineExecHistoryList);
         }
         pipelineExecLog.setHistoryId(pipelineExecHistory.getHistoryId());
