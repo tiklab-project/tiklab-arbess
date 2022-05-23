@@ -99,6 +99,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
     @Override
     public void killInstance(String pipelineId) {
         PipelineExecHistory pipelineExecHistory = findInstanceState(pipelineId);
+        pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+"\n"+"流水线停止运行......");
         pipelineExecHistoryList.add(pipelineExecHistory);
         pipelineExecHistoryService.updateHistory(pipelineExecHistory);
         commonAchieve.success(pipelineExecHistory,pipelineId,pipelineExecHistoryList);

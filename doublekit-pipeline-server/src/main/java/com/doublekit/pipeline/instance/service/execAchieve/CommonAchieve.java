@@ -1,12 +1,10 @@
 package com.doublekit.pipeline.instance.service.execAchieve;
 
-import ch.ethz.ssh2.Connection;
 import com.doublekit.pipeline.definition.model.Pipeline;
 import com.doublekit.pipeline.instance.model.PipelineExecHistory;
 import com.doublekit.pipeline.instance.model.PipelineExecLog;
 import com.doublekit.pipeline.instance.service.PipelineExecHistoryService;
 import com.doublekit.pipeline.instance.service.PipelineExecLogService;
-import com.doublekit.pipeline.setting.proof.model.Proof;
 import com.doublekit.rpc.annotation.Exporter;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
@@ -17,7 +15,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.nio.charset.Charset;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -35,27 +32,6 @@ public class CommonAchieve {
     @Autowired
     PipelineExecLogService pipelineExecLogService;
 
-    /**
-     *  执行ssh命令
-     * @param proof 凭证信息
-     * @param order 执行命令
-     * @param pipelineExecHistory 日志信息
-     * @return 执行状态
-     * @throws IOException 日志读写异常
-     */
-    public Map<String, String> sshOrder(Proof proof, String order, PipelineExecHistory pipelineExecHistory,List<PipelineExecHistory> pipelineExecHistoryList,PipelineExecLog pipelineExecLog) throws IOException {
-        Connection conn = new Connection(proof.getProofIp(),proof.getProofPort());
-        conn.connect();
-        conn.authenticateWithPassword(proof.getProofUsername(), proof.getProofPassword());
-        ch.ethz.ssh2.Session session = conn.openSession();
-        pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog() + "\n" + order);
-        session.execCommand(order);
-        InputStreamReader inputStreamReader = new InputStreamReader(session.getStdout(), Charset.forName("GBK"));
-        Map<String, String> map = log(inputStreamReader, pipelineExecHistory,pipelineExecHistoryList,pipelineExecLog);
-        session.close();
-        inputStreamReader.close();
-        return map;
-    }
 
     /**
      * 执行日志
@@ -73,17 +49,19 @@ public class CommonAchieve {
         //更新日志信息
         while ((s = bufferedReader.readLine()) != null) {
             logRunLog = logRunLog + s + "\n";
-            pipelineExecLog.setRunLog(logRunLog);
-            pipelineExecLogService.updateLog(pipelineExecLog);
             pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+s+"\n");
             pipelineExecHistoryList.add(pipelineExecHistory);
             if (logRunLog.contains("BUILD FAILURE")){
+                pipelineExecLog.setRunLog(logRunLog);
+                pipelineExecLogService.updateLog(pipelineExecLog);
                 pipelineExecHistoryList.add(pipelineExecHistory);
                 map.put("state","0");
                 map.put("log",logRunLog);
                 return map;
             }
         }
+        pipelineExecLog.setRunLog(logRunLog);
+        pipelineExecLogService.updateLog(pipelineExecLog);
         map.put("state","1");
         map.put("log",logRunLog);
         inputStreamReader.close();

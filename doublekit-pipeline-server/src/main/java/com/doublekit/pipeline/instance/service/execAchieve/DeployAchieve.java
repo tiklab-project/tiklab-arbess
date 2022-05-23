@@ -1,5 +1,6 @@
 package com.doublekit.pipeline.instance.service.execAchieve;
 
+import ch.ethz.ssh2.Connection;
 import com.doublekit.pipeline.definition.model.Pipeline;
 import com.doublekit.pipeline.definition.model.PipelineConfigure;
 import com.doublekit.pipeline.execute.model.PipelineDeploy;
@@ -12,8 +13,8 @@ import com.doublekit.rpc.annotation.Exporter;
 import com.jcraft.jsch.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.io.*;
+import java.nio.charset.Charset;
 import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.List;
@@ -88,18 +89,21 @@ public class DeployAchieve {
         try {
             pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+"\n"+"开始发送文件:"+path);
             pipelineExecLog.setRunLog(pipelineExecLog.getRunLog()+"\n"+"开始发送文件:"+path);
+
             //发送文件
             sshSftp(proof,deployAddress,path);
             pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+"\n"+"文件:"+zipName+"发送成功！");
             pipelineExecLog.setRunLog(pipelineExecLog.getRunLog()+"\n"+"文件:"+zipName+"发送成功！");
+
             //执行shell
             String shell = pipelineDeploy.getDeployShell();
-            if (shell != null){
-                String[] s1 = shell.split("\n");
-                for (String value : s1) {
-                    commonAchieve.sshOrder(proof, value, pipelineExecHistory,pipelineExecHistoryList,pipelineExecLog);
-                    commonAchieve.updateState(pipelineExecHistory,pipelineExecLog,"shell 命令错误",pipelineExecHistoryList);
+            if (shell != null && !shell.equals("null")){
+                Map<String, String> map = sshOrder(proof, pipelineDeploy.getDeployShell(), pipelineExecHistory, pipelineExecHistoryList, pipelineExecLog);
+                if (map.get("state").equals("0")){
+                    commonAchieve.updateTime(pipelineExecHistory,pipelineExecLog,beginTime);
+                    commonAchieve.updateState(pipelineExecHistory,pipelineExecLog,"shell 命令执行错误",pipelineExecHistoryList);
                 }
+               pipelineExecLog.setRunLog(pipelineExecLog.getRunLog()+"\n"+map.get("log"));
             }
         } catch (JSchException | SftpException | IOException e) {
             commonAchieve.updateTime(pipelineExecHistory,pipelineExecLog,beginTime);
@@ -168,7 +172,7 @@ public class DeployAchieve {
             for (int i = 1; i <= map.size(); i++) {
                 pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+"\n"+"第"+i+"步 ："+ map.get(i));
                 pipelineExecLog.setRunLog(pipelineExecLog.getRunLog()+"\n第"+i+"步 ："+ map.get(i));
-                Map<String, String> log = commonAchieve.sshOrder(proof, map.get(i), pipelineExecHistory,pipelineExecHistoryList,pipelineExecLog);
+                Map<String, String> log = sshOrder(proof, map.get(i), pipelineExecHistory,pipelineExecHistoryList,pipelineExecLog);
                 pipelineExecLog.setRunLog(pipelineExecLog.getRunLog()+"\n"+log.get("log"));
             }
         } catch (JSchException | SftpException |IOException   e) {
@@ -225,16 +229,14 @@ public class DeployAchieve {
      * @param lastPath 本机文件地址
      */
     public void sshSending(Session session,String nowPath,String lastPath) throws JSchException, IOException, SftpException {
-
-        ChannelSftp channel;
         //创建sftp通信通道
-        channel = (ChannelSftp) session.openChannel("sftp");
+        ChannelSftp channel = (ChannelSftp) session.openChannel("sftp");
         channel.connect();
-        ChannelSftp sftp = channel;
+        //ChannelSftp sftp = channel;
 
         //发送
-        OutputStream outputStream  = sftp.put(nowPath);
-        InputStream inputStream =  new FileInputStream(new File(lastPath));
+        OutputStream outputStream  = channel.put(nowPath);
+        InputStream inputStream =  new FileInputStream(lastPath);
 
         byte[] b = new byte[1024];
         int n;
@@ -246,5 +248,35 @@ public class DeployAchieve {
         outputStream.close();
         inputStream.close();
     }
+
+    /**
+     *  执行ssh命令
+     * @param proof 凭证信息
+     * @param order 执行命令
+     * @param pipelineExecHistory 日志信息
+     * @return 执行状态
+     * @throws IOException 日志读写异常
+     */
+    public Map<String, String> sshOrder(Proof proof, String order, PipelineExecHistory pipelineExecHistory,List<PipelineExecHistory> pipelineExecHistoryList,PipelineExecLog pipelineExecLog) throws IOException {
+        Connection conn = new Connection(proof.getProofIp(),proof.getProofPort());
+        conn.connect();
+
+        if (proof.getProofType().equals("password") && proof.getProofScope()==2){
+            //设置登陆主机的密码
+            conn.authenticateWithPassword(proof.getProofUsername(), proof.getProofPassword());
+        }else {
+            //添加私钥
+            conn.authenticateWithPublicKey(proof.getProofUsername(),new File(proof.getProofPassword()),null);
+        }
+        ch.ethz.ssh2.Session session = conn.openSession();
+        pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog() + "\n" + order+ "\n");
+        session.execCommand(order);
+        InputStreamReader inputStreamReader = new InputStreamReader(session.getStdout(), Charset.forName("GBK"));
+        Map<String, String> map = commonAchieve.log(inputStreamReader, pipelineExecHistory,pipelineExecHistoryList,pipelineExecLog);
+        session.close();
+        inputStreamReader.close();
+        return map;
+    }
+
 
 }

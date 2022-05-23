@@ -13,6 +13,7 @@ import com.doublekit.rpc.annotation.Exporter;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
+import okhttp3.*;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.transport.*;
@@ -23,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -144,7 +146,31 @@ public class CodeAchieve {
                     SshTransport sshTransport = (SshTransport)transport;
                     sshTransport.setSshSessionFactory(sshSessionFactory);})
                 .setDirectory(clonePath)
-                .call();
+                .call().close();
+    }
+
+
+    /**
+     * 验证账户密码
+     * @param gitUrl 克隆地址
+     * @param userName 用户名
+     * @param password 密码
+     * @return 验证状态
+     */
+    public boolean checkAuth(String gitUrl, String userName, String password) {
+        String basic = Credentials.basic(userName, password);
+        Request request = new Request.Builder()
+                .addHeader("Authorization", basic)
+                .url(gitUrl + "/info/refs?service=git-upload-pack")
+                .build();
+        Call call = new OkHttpClient().newCall(request);
+        try {
+            Response execute = call.execute();
+            return execute.code() == 200;
+        } catch (IOException var8) {
+            var8.printStackTrace();
+            return false;
+        }
     }
 
 }
