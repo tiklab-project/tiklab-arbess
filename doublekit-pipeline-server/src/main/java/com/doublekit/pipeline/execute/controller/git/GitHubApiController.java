@@ -10,6 +10,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+import java.util.Map;
+
 @RestController
 @RequestMapping("/gitHub")
 @Api(name = "GitLabApiController",desc = "gitHub")
@@ -21,7 +24,7 @@ public class GitHubApiController {
     @RequestMapping(path="/getCode",method = RequestMethod.POST)
     @ApiMethod(name = "getCode",desc = "返回获取code的Url")
     public Result<String> getCode(){
-        String code = codeCitLabApiService.code();
+        String code = codeCitLabApiService.getCode();
         return Result.ok(code);
     }
 
@@ -30,16 +33,32 @@ public class GitHubApiController {
     @ApiMethod(name = "getAccessToken",desc = "获取accessToken")
     @ApiParam(name = "code",desc = "code",required = true)
     public Result<String> getAccessToken(String code){
-        String s = codeCitLabApiService.accessToken(code);
+        String s = codeCitLabApiService.getAccessToken(code);
         return Result.ok(s);
     }
 
-    @RequestMapping(path="/codeSpace",method = RequestMethod.POST)
-    @ApiMethod(name = "codeSpace",desc = "返回获取code")
+    @RequestMapping(path="/getUserMessage",method = RequestMethod.POST)
+    @ApiMethod(name = "getUserMessage",desc = "返回获取code")
     @ApiParam(name = "accessToken",desc = "accessToken",required = true)
-    public Result<String> codeSpace(String accessToken){
-        String s = codeCitLabApiService.codeSpace(accessToken);
+    public Result<String> getUserMessage(String accessToken){
+        String s = codeCitLabApiService.getUserMessage(accessToken);
         return Result.ok(s);
+    }
+
+    @RequestMapping(path="/getAllStorehouse",method = RequestMethod.POST)
+    @ApiMethod(name = "getAllStorehouse",desc = "获取用户的存储库")
+    @ApiParam(name = "accessToken",desc = "accessToken",required = true)
+    public Result<Map<String, String>> getAllStorehouse(String accessToken){
+        Map<String, String> map = codeCitLabApiService.getAllStorehouse(accessToken);
+        return Result.ok(map);
+    }
+
+    @RequestMapping(path="/getBranch",method = RequestMethod.POST)
+    @ApiMethod(name = "getAllStorehouse",desc = "获取用户的存储库")
+    @ApiParam(name = "accessToken",desc = "accessToken",required = true)
+    public Result<Map<String, String>> getBranch(String accessToken,String name){
+        List<String> branchList = codeCitLabApiService.getBranch(accessToken, name);
+        return Result.ok(branchList);
     }
 
 

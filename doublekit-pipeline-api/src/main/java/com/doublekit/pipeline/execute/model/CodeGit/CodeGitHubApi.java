@@ -7,10 +7,6 @@ import com.doublekit.join.annotation.Join;
 @Join
 public class CodeGitHubApi {
 
-//      7e5192bbec2d1a91d34b
-//      https://github.com/login/oauth/authorize?client_id=cf93e472f1ffe9521474&scope=repo admin:org_hook admin:repo_hook user admin:org admin:org_hook notifications codespace
-//  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
-
     public String getClient_ID() {
         return  "cf93e472f1ffe9521474";
     }
@@ -28,11 +24,17 @@ public class CodeGitHubApi {
         return "https://github.com/login/oauth/authorize?client_id=" + getClient_ID()+"&scope=repo admin:org_hook admin:repo_hook user admin:org admin:org_hook notifications codespace";
     }
 
-    public String getAccessToken(String code){
-        return "https://github.com/login/oauth/access_token";
+    //获取accessToken
+    public String getAccessToken(String code){ return "https://github.com/login/oauth/access_token";}
+
+    //获取用户信息
+    public String getUser(){
+        return "https://api.github.com/user";
     }
 
-    public String getCodeSpace(){
-        return "https://api.github.com/user/emails";
-    }
+    //获取所有仓库
+    public String getAllStorehouse(){ return "https://api.github.com/user/repos";}
+
+    //获取仓库下所有分支
+    public String getBranch(String username,String houseName){return "https://api.github.com/repos/"+username+"/"+houseName+"/branches";}
 }
