@@ -24,10 +24,10 @@ public interface CodeGiteeApiService {
 
     /**
      * 获取用户所有仓库
-     * @param accessToken 凭证
+     * @param ProofId 凭证
      * @return 厂库信息
      */
-    List<String> getAllStorehouse(String accessToken);
+    List<String> getAllStorehouse(String ProofId);
 
     /**
      * 获取用户登录信息

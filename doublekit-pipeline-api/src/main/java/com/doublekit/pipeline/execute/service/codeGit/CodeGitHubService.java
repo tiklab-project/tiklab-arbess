@@ -1,9 +1,8 @@
 package com.doublekit.pipeline.execute.service.codeGit;
 
 import java.util.List;
-import java.util.Map;
 
-public interface CodeCitLabApiService {
+public interface CodeGitHubService {
 
     /**
      * 获取code
@@ -28,16 +27,30 @@ public interface CodeCitLabApiService {
 
     /**
      * 获取用户的存储库
-     * @param accessToken 凭证
+     * @param proofId 凭证id
      * @return 仓库信息
      */
-    Map<String, String> getAllStorehouse(String accessToken);
+    List<String> getAllStorehouse(String proofId);
 
     /**
      * 获取仓库所有分支
-     * @param name 仓库名
-     * @param accessToken 凭证
+     * @param proofId 仓库名
+     * @param projectName 凭证
      * @return 分支
      */
-    List<String> getBranch(String accessToken, String name);
+    List<String> getBranch(String proofId,String projectName);
+
+    /**
+     * 创建凭证
+     * @return 凭证id
+     */
+    String getProof(String proofName,String accessToken);
+
+    /**
+     * 获取单个仓库
+     * @param proofId 凭证id
+     * @param houseName 仓库名
+     * @return 仓库url
+     */
+    String getOneHouse(String proofId,String houseName);
 }

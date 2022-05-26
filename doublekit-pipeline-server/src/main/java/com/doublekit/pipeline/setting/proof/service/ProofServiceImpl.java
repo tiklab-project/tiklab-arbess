@@ -34,7 +34,7 @@ public class ProofServiceImpl implements ProofService{
         List<Proof> allProof = findAllProof();
         if (allProof != null){
             for (Proof proof1 : allProof) {
-                if (proof.getProofUsername().equals(proof1.getProofUsername())){
+                if (proof.getProofUsername().equals(proof1.getProofUsername()) && proof.getProofScope() == proof1.getProofScope()){
                     proof.setProofId(proof1.getProofId());
                     updateProof(proof);
                     return proof.getProofId();
@@ -131,7 +131,7 @@ public class ProofServiceImpl implements ProofService{
         return BeanMapper.mapList(proofEntityList, Proof.class);
     }
 
-    public static Boolean writePrivateKeyPath(String Data, String filePath) throws IOException {
+    public void writePrivateKeyPath(String Data, String filePath) throws IOException {
         BufferedReader bufferedReader ;
         BufferedWriter bufferedWriter;
         File distFile= new File(filePath);
@@ -148,7 +148,6 @@ public class ProofServiceImpl implements ProofService{
         bufferedWriter.flush();
         bufferedReader.close();
         bufferedWriter.close();
-        return true;
     }
 
 

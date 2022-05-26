@@ -8,6 +8,7 @@ import com.doublekit.pipeline.definition.service.PipelineConfigureService;
 import com.doublekit.pipeline.execute.dao.PipelineCodeDao;
 import com.doublekit.pipeline.execute.entity.PipelineCodeEntity;
 import com.doublekit.pipeline.execute.model.PipelineCode;
+import com.doublekit.pipeline.execute.service.codeGit.CodeGitHubService;
 import com.doublekit.pipeline.execute.service.codeGit.CodeGiteeApiService;
 import com.doublekit.pipeline.setting.proof.model.Proof;
 import com.doublekit.pipeline.setting.proof.service.ProofService;
@@ -16,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 
 @Service
@@ -33,6 +35,9 @@ public class PipelineCodeServiceImpl implements PipelineCodeService {
 
     @Autowired
     CodeGiteeApiService codeGiteeApiService;
+
+    @Autowired
+    CodeGitHubService codeGitHubService;
 
     @Autowired
     PipelineConfigureService pipelineConfigureService;
@@ -59,10 +64,24 @@ public class PipelineCodeServiceImpl implements PipelineCodeService {
         pipelineCode.setType(taskType);
         pipelineConfigure.setTaskSort(1);
         pipelineCode.setCodeAddress(pipelineCode.getCodeName());
-        if (pipelineCode.getType() == 2){
-            String cloneUrl = codeGiteeApiService.getCloneUrl(pipelineCode.getProof().getProofId(),pipelineCode.getCodeName());
-            pipelineCode.setCodeAddress(cloneUrl);
+
+        if (pipelineCode.getProof() != null && pipelineCode.getProof().getProofId()!= null){
+            //通过授权信息获取仓库url
+            if (pipelineCode.getType() == 2 ){
+                String cloneUrl = codeGiteeApiService.getCloneUrl(pipelineCode.getProof().getProofId(),pipelineCode.getCodeName());
+                if (cloneUrl == null){
+                    return null;
+                }
+                pipelineCode.setCodeAddress(cloneUrl);
+            }else if (pipelineCode.getType() == 3){
+                String cloneUrl = codeGitHubService.getOneHouse(pipelineCode.getProof().getProofId(),pipelineCode.getCodeName());
+                if (cloneUrl == null){
+                    return null;
+                }
+                pipelineCode.setCodeAddress(cloneUrl);
+            }
         }
+
         String codeId = createCode(pipelineCode);
         pipelineConfigure.setTaskId(codeId);
         pipelineConfigure.setTaskType(taskType);
@@ -103,10 +122,16 @@ public class PipelineCodeServiceImpl implements PipelineCodeService {
             if (pipelineCode.getType() != 0){
                 pipelineCode.setCodeAddress(pipelineCode.getCodeName());
                 oneConfigure.setTaskSort(1);
+
+                //通过授权信息获取仓库url
                 if (pipelineCode.getType() == 2){
                     String cloneUrl = codeGiteeApiService.getCloneUrl(pipelineCode.getProof().getProofId(),pipelineCode.getCodeName());
                     pipelineCode.setCodeAddress(cloneUrl);
+                }else if (pipelineCode.getType() == 3){
+                    String cloneUrl = codeGitHubService.getOneHouse(pipelineCode.getProof().getProofId(),pipelineCode.getCodeName());
+                    pipelineCode.setCodeAddress(cloneUrl);
                 }
+
                 updateCode(pipelineCode);
                 oneConfigure.setTaskAlias(pipelineCode.getCodeAlias());
                 pipelineConfigureService.updateConfigure(oneConfigure);
@@ -115,7 +140,7 @@ public class PipelineCodeServiceImpl implements PipelineCodeService {
             }
         }
         if (oneConfigure == null && pipelineCode.getType() != 0){
-            createConfigure(pipelineId, pipelineCode.getType(),pipelineCode);
+             createConfigure(pipelineId, pipelineCode.getType(), pipelineCode);
         }
         pipelineTestService.updateTask(pipelineExecConfigure);
     }

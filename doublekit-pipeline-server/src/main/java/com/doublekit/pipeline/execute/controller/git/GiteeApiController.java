@@ -60,10 +60,10 @@ public class GiteeApiController {
 
     @RequestMapping(path="/getAllStorehouse",method = RequestMethod.POST)
     @ApiMethod(name = "getAllStorehouse",desc = "获取所有仓库")
-    @ApiParam(name = "accessToken",desc = "accessToken",required = true)
-    public Result<List<String>> getAllStorehouse(@NotNull String accessToken) {
+    @ApiParam(name = "ProofId",desc = "ProofId",required = true)
+    public Result<List<String>> getAllStorehouse(@NotNull String proofId) {
 
-        List<String> allStorehouse = codeGiteeApiService.getAllStorehouse(accessToken);
+        List<String> allStorehouse = codeGiteeApiService.getAllStorehouse(proofId);
 
         return Result.ok(allStorehouse);
     }

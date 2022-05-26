@@ -59,15 +59,6 @@ public class CodeGiteeApiServiceImpl implements CodeGiteeApiService {
         logger.info("获取token地址 ：" + url );
 
         String post = request(url, "POST");
-        //MultiValueMap<String,String> map = new LinkedMultiValueMap<>();
-        //map.add("code",code);
-        //map.add("client_id",codeGiteeApi.getClient_id());
-        //map.add("redirect_uri",codeGiteeApi.getCallback_uri());
-        //map.add("client_secret",codeGiteeApi.getClient_id());
-
-        //ResponseEntity<String> returnBody = restTemplate.postForEntity(url, map, String.class);
-        //logger.info(returnBody.toString());
-
         Map<String, String> map = new HashMap<>();
         if (post != null){
             JSONObject jsonObject = JSONObject.parseObject(post);
@@ -84,34 +75,27 @@ public class CodeGiteeApiServiceImpl implements CodeGiteeApiService {
 
     //列出授权用户的所有仓库
     @Override
-    public List<String> getAllStorehouse(String accessToken) {
-        if (accessToken ==null){
-            return null;
-        }
-        List<Proof> allProof = proofService.findAllProof(3);
-        if (allProof.size()!= 0){
-            for (Proof proof : allProof) {
-                if (proof.getProofPassword().equals(accessToken)){
-                    ArrayList<String> storehouseList = new ArrayList<>();
-                    String allStorehouseAddress = codeGiteeApi.getAllStorehouse(accessToken);
-                    logger.info("allStorehouseAddress : "+allStorehouseAddress);
-                    //消息转换器列表
-                    List<HttpMessageConverter<?>> messageConverters = restTemplate.getMessageConverters();
-                    //配置消息转换器StringHttpMessageConverter，并设置utf-8
-                    messageConverters.set(1, new StringHttpMessageConverter(StandardCharsets.UTF_8));
+    public List<String> getAllStorehouse(String ProofId) {
+        Proof proof = proofService.findOneProof(ProofId);
+        if (proof != null){
+            ArrayList<String> storehouseList = new ArrayList<>();
+            String allStorehouseAddress = codeGiteeApi.getAllStorehouse(proof.getProofPassword());
+            logger.info("allStorehouseAddress : "+allStorehouseAddress);
+            //消息转换器列表
+            List<HttpMessageConverter<?>> messageConverters = restTemplate.getMessageConverters();
+            //配置消息转换器StringHttpMessageConverter，并设置utf-8
+            messageConverters.set(1, new StringHttpMessageConverter(StandardCharsets.UTF_8));
 
-                    ResponseEntity<String> returnBody = restTemplate.getForEntity(allStorehouseAddress, String.class, JSONObject.class);
-                    String body = returnBody.getBody();
-                    if (body != null){
-                        logger.info("仓库信息 ： "+body);
-                        JSONArray allStorehouseJson = JSONArray.parseArray(body);
-                        for (int i = 0; i < allStorehouseJson.size(); i++) {
-                            JSONObject storehouse=allStorehouseJson.getJSONObject(i);
-                            storehouseList.add(storehouse.getString("human_name"));
-                        }
-                    }
-                    return storehouseList;
+            ResponseEntity<String> returnBody = restTemplate.getForEntity(allStorehouseAddress, String.class, JSONObject.class);
+            String body = returnBody.getBody();
+            if (body != null){
+                logger.info("仓库信息 ： "+body);
+                JSONArray allStorehouseJson = JSONArray.parseArray(body);
+                for (int i = 0; i < allStorehouseJson.size(); i++) {
+                    JSONObject storehouse=allStorehouseJson.getJSONObject(i);
+                    storehouseList.add(storehouse.getString("human_name"));
                 }
+                return storehouseList;
             }
         }
         return null;
@@ -140,7 +124,7 @@ public class CodeGiteeApiServiceImpl implements CodeGiteeApiService {
              proof.setProofPassword(accessToken);
              proof.setProofUsername(getUserMessage(accessToken));
              proof.setProofType("gitee");
-             proof.setProofScope(3);
+             proof.setProofScope(2);
              proof.setProofDescribe("gitee授权登录");
              return proofService.createProof(proof);
          }
@@ -150,7 +134,7 @@ public class CodeGiteeApiServiceImpl implements CodeGiteeApiService {
     //获取一个仓库的所有分支
     @Override
     public List<String> getBranch(String proofId,String projectName) {
-        if (proofId == null || projectName ==null){
+        if (proofId == null || projectName == null){
             return null;
         }
         logger.info("projectName:"+projectName);
@@ -223,17 +207,4 @@ public class CodeGiteeApiServiceImpl implements CodeGiteeApiService {
         return result.toString();
     }
 
-    //定时任务
-    //@Scheduled(cron = "0 0 0/23 1/1 * ? ")
-    //public void time(String refreshToken) {
-    //    String address = codeGiteeApi.getRefreshToken(refreshToken);
-    //    ResponseEntity<JSONObject> postForEntity = restTemplate.postForEntity(address, String.class, JSONObject.class);
-    //    JSONObject body = postForEntity.getBody();
-    //    if (body != null){
-    //        String access_token = body.getString("access_token");
-    //        String refresh_token = body.getString("refresh_token");
-    //        //codeGiteeApi.setAccessToken(access_token);
-    //        //codeGiteeApi.setRefreshToken(refresh_token);
-    //    }
-    //}
 }

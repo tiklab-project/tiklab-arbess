@@ -21,7 +21,7 @@ public class CodeGitHubApi {
 
     //获取code （get）
     public String getCode(){
-        return "https://github.com/login/oauth/authorize?client_id=" + getClient_ID()+"&scope=repo admin:org_hook admin:repo_hook user admin:org admin:org_hook notifications codespace";
+        return "https://github.com/login/oauth/authorize?client_id=" + getClient_ID()+"&scope=repo admin:org_hook user ";
     }
 
     //获取accessToken
@@ -30,6 +30,11 @@ public class CodeGitHubApi {
     //获取用户信息
     public String getUser(){
         return "https://api.github.com/user";
+    }
+
+    //获取单个仓库
+    public String getOneHouse(String name,String house){
+        return "https://api.github.com/repos/"+name+"/"+house;
     }
 
     //获取所有仓库
