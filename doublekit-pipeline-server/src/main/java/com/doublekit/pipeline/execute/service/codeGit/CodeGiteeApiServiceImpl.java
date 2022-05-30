@@ -56,8 +56,6 @@ public class CodeGiteeApiServiceImpl implements CodeGiteeApiService {
             return null;
         }
         String url = codeGiteeApi.getAccessToken(code);
-        logger.info("获取token地址 ：" + url );
-
         String post = request(url, "POST");
         Map<String, String> map = new HashMap<>();
         if (post != null){

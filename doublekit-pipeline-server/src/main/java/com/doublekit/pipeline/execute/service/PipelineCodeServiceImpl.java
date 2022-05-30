@@ -122,6 +122,7 @@ public class PipelineCodeServiceImpl implements PipelineCodeService {
             if (pipelineCode.getType() != 0){
                 pipelineCode.setCodeAddress(pipelineCode.getCodeName());
                 oneConfigure.setTaskSort(1);
+                oneConfigure.setTaskType(pipelineCode.getType());
 
                 //通过授权信息获取仓库url
                 if (pipelineCode.getType() == 2){

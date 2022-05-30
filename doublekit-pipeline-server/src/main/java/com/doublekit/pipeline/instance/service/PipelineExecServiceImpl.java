@@ -6,15 +6,15 @@ import com.doublekit.pipeline.definition.model.PipelineConfigure;
 import com.doublekit.pipeline.definition.service.PipelineConfigureService;
 import com.doublekit.pipeline.instance.model.PipelineExecHistory;
 import com.doublekit.pipeline.instance.service.execAchieve.*;
+import com.doublekit.pipeline.setting.proof.model.Proof;
+import com.doublekit.pipeline.setting.proof.service.ProofService;
 import com.doublekit.rpc.annotation.Exporter;
-import com.ibm.icu.text.SimpleDateFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -45,6 +45,9 @@ public class PipelineExecServiceImpl implements PipelineExecService {
     @Autowired
     DeployAchieve deployAchieve;
 
+    @Autowired
+    ProofService proofService;
+
     //存放过程状态
     List<PipelineExecHistory> pipelineExecHistoryList = new ArrayList<>();
 
@@ -53,6 +56,8 @@ public class PipelineExecServiceImpl implements PipelineExecService {
 
     private static final Logger logger = LoggerFactory.getLogger(PipelineExecServiceImpl.class);
 
+    //创建线程池
+    ExecutorService executorService = Executors.newCachedThreadPool();
 
     //启动
     @Override
@@ -65,15 +70,10 @@ public class PipelineExecServiceImpl implements PipelineExecService {
                 }
             }
         }
-        //创建线程池
-        ExecutorService executorService = Executors.newCachedThreadPool();
 
-        executorService.submit(new Runnable() {
-            @Override
-            public void run() {
-                Thread.currentThread().setName(pipelineId);
-                begin(pipelineId);
-            }
+        executorService.submit(() -> {
+            Thread.currentThread().setName(pipelineId);
+            begin(pipelineId);
         });
         // 执行构建
         //executorService.submit(() -> begin(pipelineId));
@@ -134,75 +134,85 @@ public class PipelineExecServiceImpl implements PipelineExecService {
 
     // 构建开始
     private void begin(String pipelineId) {
-        String time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
         pipelineIdList.add(pipelineId);
         List<PipelineConfigure> allConfigure = pipelineConfigureService.findAllConfigure(pipelineId);
-        PipelineExecHistory pipelineExecHistory = new PipelineExecHistory();
-        pipelineExecHistory.setCreateTime(time);
-        pipelineExecHistory.setRunWay(1);
-        pipelineExecHistory.setSort(1);
-        pipelineExecHistory.setStatus(0);
-        String historyId = pipelineExecHistoryService.createHistory(pipelineExecHistory);
+        String historyId = pipelineExecHistoryService.createHistory(new PipelineExecHistory());
+        PipelineExecHistory pipelineExecHistory = commonAchieve.initializeHistory(historyId);
         if (allConfigure != null){
-            // allConfigure.sort(Comparator.comparing(PipelineConfigure::getTaskSort));
             for (PipelineConfigure pipelineConfigure : allConfigure) {
+                //初始化历史信息
                 Pipeline pipeline = pipelineConfigure.getPipeline();
                 pipelineExecHistory.setPipeline(pipeline);
-                pipelineExecHistory.setExecName(pipeline.getPipelineCreateUser());
                 pipelineExecHistory.setHistoryId(historyId);
+                pipelineExecHistory.setExecName(pipeline.getPipelineCreateUser());
                 pipelineExecHistoryService.updateHistory(pipelineExecHistory);
                 pipelineExecHistoryList.add(pipelineExecHistory);
                 switch (pipelineConfigure.getTaskType()) {
                     case 1, 2 -> {
-                        String e = codeAchieve.codeStart(pipelineConfigure, pipelineExecHistory, pipelineExecHistoryList);
-                        if (e != null) {
-                            if (pipelineIdList != null) {
-                                pipelineIdList.removeIf(id -> id.equals(pipelineId));
-                            }
-                            commonAchieve.error(pipelineExecHistory,e,pipelineId,pipelineExecHistoryList);
+                        int state = codeAchieve.codeStart(pipelineConfigure, pipelineExecHistory, pipelineExecHistoryList);
+                        if (state == 0) {
+                            pipelineIdList.removeIf(id -> id.equals(pipelineId));
                             return ;
                         }
                     }
                     case 11 -> {
-                        String e = testAchieve.testStart(pipelineConfigure, pipelineExecHistory, pipelineExecHistoryList);
-                        if (e != null) {
-                            if (pipelineIdList != null) {
-                                pipelineIdList.removeIf(id -> id.equals(pipelineId));
-                            }
-                            commonAchieve.error(pipelineExecHistory,e,pipelineId,pipelineExecHistoryList);
+                        int state = testAchieve.testStart(pipelineConfigure, pipelineExecHistory, pipelineExecHistoryList);
+                        if (state == 0) {
+                            pipelineIdList.removeIf(id -> id.equals(pipelineId));
                             return ;
                         }
                     }
                     case 21, 22 -> {
-                        String e  = structureAchieve.structureStart(pipelineConfigure, pipelineExecHistory, pipelineExecHistoryList);
-                        if (e != null) {
-                            if (pipelineIdList != null) {
-                                pipelineIdList.removeIf(id -> id.equals(pipelineId));
-                            }
-                            commonAchieve.error(pipelineExecHistory,e,pipelineId,pipelineExecHistoryList);
+                        int state  = structureAchieve.structureStart(pipelineConfigure, pipelineExecHistory, pipelineExecHistoryList);
+                        if (state == 0) {
+                            pipelineIdList.removeIf(id -> id.equals(pipelineId));
                             return ;
                         }
                     }
                     case 31, 32-> {
-                        String e  = deployAchieve.deployStart(pipelineConfigure, pipelineExecHistory, pipelineExecHistoryList);
-                        if (e != null) {
-                            if (pipelineIdList != null) {
-                                pipelineIdList.removeIf(id -> id.equals(pipelineId));
-                            }
-                            commonAchieve.error(pipelineExecHistory,e,pipelineId,pipelineExecHistoryList);
+                        int state = deployAchieve.deployStart(pipelineConfigure, pipelineExecHistory, pipelineExecHistoryList);
+                        if (state == 0) {
+                            pipelineIdList.removeIf(id -> id.equals(pipelineId));
                             return ;
                         }
                     }
                 }
                 pipelineExecHistory.setSort(pipelineExecHistory.getSort() +1);
                 pipelineExecHistory.setStatus(pipelineExecHistory.getStatus() +1);
+                pipelineExecHistoryService.updateHistory(pipelineExecHistory);
             }
         }
-        pipelineExecHistoryList.add(pipelineExecHistory);
-        pipelineExecHistoryService.updateHistory(pipelineExecHistory);
-        commonAchieve.success(pipelineExecHistory,pipelineId,pipelineExecHistoryList);
-        if (pipelineIdList != null) {
-            pipelineIdList.removeIf(id -> id.equals(pipelineId));
-        }
+        commonAchieve.success(pipelineExecHistory, pipelineId, pipelineExecHistoryList);
+        pipelineIdList.removeIf(id -> id.equals(pipelineId));
     }
+
+    @Override
+    public Boolean testPass(String url ,String proofId){
+        Proof proof = proofService.findOneProof(proofId);
+        if (proof != null){
+            if (url != null){
+                return codeAchieve.checkAuth(url, proof);
+            }else {
+                return deployAchieve.testSshSftp(proof);
+            }
+        }
+        return false;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }

@@ -55,4 +55,13 @@ public class PipelineExecController {
         return Result.ok();
     }
 
+
+    @RequestMapping(path="/testPass",method = RequestMethod.POST)
+    @ApiMethod(name = "testPass",desc = "测试联通性")
+    @ApiParam(name = "url",desc = "代码源地址",required = true)
+    public Result<Boolean> testPass(@NotNull String url,String proofId) {
+        Boolean pass = pipelineExecService.testPass(url, proofId);
+        return Result.ok(pass);
+    }
+
 }

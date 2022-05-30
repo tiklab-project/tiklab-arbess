@@ -35,5 +35,13 @@ public interface PipelineExecService {
      */
     void killInstance(String pipelineId);
 
+    /**
+     * 测试联通性
+     * @param url 代码源地址
+     * @param proofId 凭证id
+     * @return 联通状态
+     */
+    Boolean testPass(String url ,String proofId);
+
 
 }

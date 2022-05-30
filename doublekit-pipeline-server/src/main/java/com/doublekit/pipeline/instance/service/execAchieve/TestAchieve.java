@@ -1,6 +1,5 @@
 package com.doublekit.pipeline.instance.service.execAchieve;
 
-import com.doublekit.pipeline.definition.model.Pipeline;
 import com.doublekit.pipeline.definition.model.PipelineConfigure;
 import com.doublekit.pipeline.execute.model.PipelineTest;
 import com.doublekit.pipeline.execute.service.PipelineTestService;
@@ -16,7 +15,6 @@ import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.sql.Timestamp;
 import java.util.List;
-import java.util.Map;
 
 @Service
 @Exporter
@@ -32,51 +30,37 @@ public class TestAchieve {
     CommonAchieve commonAchieve;
 
 
-    public String testStart(PipelineConfigure pipelineConfigure, PipelineExecHistory pipelineExecHistory, List<PipelineExecHistory> pipelineExecHistoryList){
+    public int testStart(PipelineConfigure pipelineConfigure, PipelineExecHistory pipelineExecHistory, List<PipelineExecHistory> pipelineExecHistoryList){
        return unitTesting(pipelineConfigure,pipelineExecHistory,pipelineExecHistoryList);
     }
 
     // 单元测试
-    private String unitTesting(PipelineConfigure pipelineConfigure, PipelineExecHistory pipelineExecHistory,List<PipelineExecHistory> pipelineExecHistoryList) {
+    private int unitTesting(PipelineConfigure pipelineConfigure, PipelineExecHistory pipelineExecHistory,List<PipelineExecHistory> pipelineExecHistoryList) {
         long beginTime = new Timestamp(System.currentTimeMillis()).getTime();
-
-        PipelineExecLog pipelineExecLog = new PipelineExecLog();
-        pipelineExecLog.setHistoryId(pipelineExecHistory.getHistoryId());
-        pipelineExecLog.setTaskAlias(pipelineConfigure.getTaskAlias());
-        pipelineExecLog.setTaskSort(pipelineConfigure.getTaskSort());
-        pipelineExecLog.setTaskType(pipelineConfigure.getTaskType());
-        pipelineExecLog.setRunLog("");
-        String logId = pipelineExecLogService.createLog(pipelineExecLog);
-        pipelineExecLog.setPipelineLogId(logId);
-
-        Pipeline pipeline = pipelineConfigure.getPipeline();
+        //初始化日志
+        PipelineExecLog pipelineExecLog = commonAchieve.initializeLog(pipelineExecHistory, pipelineConfigure);
         PipelineTest pipelineTest = pipelineTestService.findOneTest(pipelineConfigure.getTaskId());
+
         String testOrder = pipelineTest.getTestOrder();
-        String path = "D:\\clone\\"+pipeline.getPipelineName();
-        String[] split = testOrder.split("\n");
-        for (String s : split) {
-            try {
-                Process process = commonAchieve.process(path, s, null);
-                String a = "执行 : " + " ' " + s + " ' " + "\n";
-                pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog() + a);
-                InputStreamReader inputStreamReader = new InputStreamReader(process.getInputStream(), Charset.forName("GBK"));
-                Map<String, String> map = commonAchieve.log(inputStreamReader, pipelineExecHistory,pipelineExecHistoryList,pipelineExecLog);
-                if (map.get("state").equals("0")){
-                    pipelineExecLog.setRunLog(pipelineExecLog.getRunLog()+map.get("log"));
-                    commonAchieve.updateState(pipelineExecHistory,pipelineExecLog,"日志打印错误",pipelineExecHistoryList);
-                    commonAchieve.updateTime(pipelineExecHistory,pipelineExecLog,beginTime);
-                    return "测试执行失败。";
-                }
-                pipelineExecLog.setRunLog(a+map.get("log"));
-            } catch (IOException e) {
-                commonAchieve.updateState(pipelineExecHistory,pipelineExecLog,"测试命令错误",pipelineExecHistoryList);
-                commonAchieve.updateTime(pipelineExecHistory,pipelineExecLog,beginTime);
-                return e.toString();
+        String path = "D:\\clone\\"+pipelineConfigure.getPipeline().getPipelineName();
+        try {
+            Process process = commonAchieve.process(path, testOrder, null);
+            String a = "执行 : \"" + testOrder  + "\" \n";
+            pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+a);
+            //设置日志格式
+            InputStreamReader inputStreamReader = new InputStreamReader(process.getInputStream(), Charset.forName("GBK"));
+            int state = commonAchieve.log(inputStreamReader, pipelineExecHistory,pipelineExecHistoryList,pipelineExecLog);
+            commonAchieve.updateTime(pipelineExecHistory,pipelineExecLog,beginTime);
+            if (state == 0){
+                commonAchieve.updateState(pipelineExecHistory,pipelineExecLog,"测试失败",pipelineExecHistoryList);
+                return  0;
             }
+        } catch (IOException e) {
+            commonAchieve.updateState(pipelineExecHistory,pipelineExecLog,"测试失败",pipelineExecHistoryList);
+            return 0;
         }
-        commonAchieve.updateTime(pipelineExecHistory,pipelineExecLog,beginTime);
         commonAchieve.updateState(pipelineExecHistory,pipelineExecLog,null,pipelineExecHistoryList);
-        return null;
+        return 1;
     }
 
 
