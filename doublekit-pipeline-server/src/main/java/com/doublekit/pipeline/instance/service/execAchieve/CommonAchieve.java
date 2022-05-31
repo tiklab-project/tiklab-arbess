@@ -45,14 +45,14 @@ public class CommonAchieve {
 
         String s;
         BufferedReader  bufferedReader = new BufferedReader(inputStreamReader);
-        String logRunLog = "";
+        StringBuilder logRunLog = new StringBuilder();
 
         //更新日志信息
         while ((s = bufferedReader.readLine()) != null) {
-            logRunLog = logRunLog + s + "\n";
+            logRunLog.append(s).append("\n");
             pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+s+"\n");
             pipelineExecHistoryList.add(pipelineExecHistory);
-            if (logRunLog.contains("BUILD FAILURE")){
+            if (logRunLog.toString().contains("BUILD FAILURE")){
                return 0;
             }
         }
