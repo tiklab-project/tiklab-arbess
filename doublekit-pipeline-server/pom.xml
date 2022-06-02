@@ -135,6 +135,21 @@
             <artifactId>ganymed-ssh2</artifactId>
             <version>build210</version>
         </dependency>
+
+<!--        <dependency>-->
+<!--            <groupId>org.tmatesoft</groupId>-->
+<!--            <artifactId>svn</artifactId>-->
+<!--            <version>1.1.0</version>-->
+<!--        </dependency>-->
+
+        <!-- https://mvnrepository.com/artifact/org.tmatesoft.svnkit/svnkit -->
+        <dependency>
+            <groupId>org.tmatesoft.svnkit</groupId>
+            <artifactId>svnkit</artifactId>
+            <version>1.10.6</version>
+        </dependency>
+
+
     </dependencies>
 
 </project>

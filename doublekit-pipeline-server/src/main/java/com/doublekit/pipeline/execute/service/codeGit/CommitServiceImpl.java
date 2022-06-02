@@ -33,7 +33,7 @@ public class CommitServiceImpl implements CommitService{
     private static final Logger logger = LoggerFactory.getLogger(CommitServiceImpl.class);
 
 
-    public List<Commit> getSubmitMassage(String pipelineId) {
+    public List<List<Commit>> getSubmitMassage(String pipelineId) {
         if (pipelineId == null){
             return null;
         }
@@ -53,6 +53,7 @@ public class CommitServiceImpl implements CommitService{
                 cit.setCommitTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(commit.getCommitTime() * 1000L)));
                 cit.setCommitMassage(commit.getFullMessage());
                 cit.setTime(commit.getCommitTime());
+                cit.setDayTime(new SimpleDateFormat("yyyy-MM-dd").format(new Date(cit.getTime() * 1000L)));
                 List<String> arrayList = new ArrayList<>();
 
                 List<DiffEntry> changedFileList = getChangedFileList(verCommit, repo);
@@ -65,26 +66,22 @@ public class CommitServiceImpl implements CommitService{
                 list.add(cit);
             }
 
-            List<Commit> ArrayList = new ArrayList<>();
 
-            String times="";
-            for (Commit commit : list) {
+            List<List<Commit>> ArrayList = new ArrayList<>();
+            for (int i = 0;i<list.size();i++){
                 List<Commit> commitArrayList = new ArrayList<>();
-                Commit cmt = new Commit();
-                int time = commit.getTime();
-                for (Commit commit1 : list) {
-                    if (time == commit1.getTime()){
-                        times=(new SimpleDateFormat("yyyy-MM-dd").format(new Date(time* 1000L)));
-                        commitArrayList.add(commit1);
+                String dayTime = list.get(i).getDayTime();
+                for (Commit commit : list) {
+                    if (dayTime.equals(commit.getDayTime())) {
+                        commitArrayList.add(commit);
+                        i++;
                     }
-                    cmt.setCommit(commitArrayList);
                 }
-                cmt.setDayTime(times);
-                ArrayList.add(cmt);
+                ArrayList.add(commitArrayList);
             }
             return ArrayList;
         } catch (IOException | GitAPIException e) {
-            logger.info("地址找不到，没有提交信息");
+            logger.info("流水线git文件地址找不到，或者没有提交信息");
             return null;
         }
     }

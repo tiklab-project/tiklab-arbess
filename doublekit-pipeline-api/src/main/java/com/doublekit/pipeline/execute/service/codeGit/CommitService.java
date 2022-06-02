@@ -11,5 +11,5 @@ public interface CommitService {
      * @param pipelineId 流水线id
      * @return 提交信息
      */
-    List<Commit> getSubmitMassage(String pipelineId);
+    List<List<Commit>> getSubmitMassage(String pipelineId);
 }

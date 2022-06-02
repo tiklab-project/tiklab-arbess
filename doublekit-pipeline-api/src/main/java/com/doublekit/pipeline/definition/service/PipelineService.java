@@ -6,6 +6,7 @@ import com.doublekit.join.annotation.FindList;
 import com.doublekit.join.annotation.FindOne;
 import com.doublekit.join.annotation.JoinProvider;
 import com.doublekit.pipeline.definition.model.Pipeline;
+import com.doublekit.pipeline.definition.model.PipelineConfigure;
 import com.doublekit.pipeline.definition.model.PipelineStatus;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -51,6 +52,14 @@ public interface PipelineService {
      */
     @FindOne
     Pipeline findOnePipeline(@NotNull String pipelineName);
+
+
+    /**
+     * 根据流水线id获取配置信息
+     * @param pipelineId 流水线id
+     * @return 配置信息
+     */
+    List<PipelineConfigure> findPipelineConfigure(String pipelineId);
 
     /**
      * 查询所有流水线

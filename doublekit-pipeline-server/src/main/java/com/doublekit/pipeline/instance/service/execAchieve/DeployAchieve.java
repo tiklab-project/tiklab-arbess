@@ -8,6 +8,7 @@ import com.doublekit.pipeline.execute.service.PipelineDeployService;
 import com.doublekit.pipeline.instance.model.PipelineExecHistory;
 import com.doublekit.pipeline.instance.model.PipelineExecLog;
 import com.doublekit.pipeline.setting.proof.model.Proof;
+import com.doublekit.pipeline.setting.proof.service.ProofService;
 import com.doublekit.rpc.annotation.Exporter;
 import com.jcraft.jsch.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,9 @@ public class DeployAchieve {
     @Autowired
     CommonAchieve commonAchieve;
 
+    @Autowired
+    ProofService proofService;
+
     public int deployStart(PipelineConfigure pipelineConfigure, PipelineExecHistory pipelineExecHistory , List<PipelineExecHistory> pipelineExecHistoryList){
         return switch (pipelineConfigure.getTaskType()) {
             case 31 -> linux(pipelineConfigure, pipelineExecHistory, pipelineExecHistoryList);
@@ -45,7 +49,6 @@ public class DeployAchieve {
      */
     private int linux(PipelineConfigure pipelineConfigure, PipelineExecHistory pipelineExecHistory ,List<PipelineExecHistory> pipelineExecHistoryList) {
         //开始运行时间
-
         long beginTime = new Timestamp(System.currentTimeMillis()).getTime();
         PipelineExecLog pipelineExecLog = commonAchieve.initializeLog(pipelineExecHistory, pipelineConfigure);
         PipelineDeploy pipelineDeploy = pipelineDeployService.findOneDeploy(pipelineConfigure.getTaskId());
@@ -57,25 +60,42 @@ public class DeployAchieve {
             commonAchieve.updateState(pipelineExecHistory,pipelineExecLog,"凭证为空。",pipelineExecHistoryList);
             return 0;
         }
-        String s = "部署到服务器" + proof.getProofIp();
-        pipelineExecLog.setRunLog(s);
-        pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+"\n"+s);
 
         //文件地址
         String path = "D:\\clone\\" + pipelineConfigure.getPipeline().getPipelineName();
         //发送文件地址
         String filePath = commonAchieve.getFile(path,deployTargetAddress);
+        if (filePath == null){
+            commonAchieve.updateState(pipelineExecHistory,pipelineExecLog,"部署文件找不到。",pipelineExecHistoryList);
+            return 0;
+        }
         //文件名
         String fileName = new File(filePath).getName();
         //发送文件位置
         String deployAddress = pipelineDeploy.getDeployAddress()+"/"+fileName;
 
         try {
-            pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+"\n"+"开始发送文件:"+filePath);
-            pipelineExecLog.setRunLog(pipelineExecLog.getRunLog()+"\n"+"开始发送文件:"+filePath);
+            String log = "------------------------------ "+ "\n"
+                    + "开始部署" + "\n"
+                    + "匹配到一个文件 ： " +fileName + "\n"
+                    + "文件地址 ： "+filePath +"\n"
+                    + "发送服务器位置 ： "+deployAddress +"\n"
+                    + "连接服务器  ： " +proof.getProofIp() + "\n"
+                    + "连接类型  ： " +proof.getProofType();
+            pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+"\n"+log);
+            JSch jsch = new JSch();
+            //采用指定的端口连接服务器
+            Session session =jsch.getSession(proof.getProofUsername(), proof.getProofIp() ,proof.getProofPort());
+            if (session == null){
+                throw new JSchException(proof.getProofIp() + "连接异常。。。。");
+            }
+            log = "服务器连接"+proof.getProofIp()+"成功";
+            pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+"\n"+log+"\n"+"开始发送文件:"+fileName);
+
+            pipelineExecLog.setRunLog(pipelineExecLog.getRunLog()+"\n"+log+"\n"+"开始发送文件:"+fileName);
 
             //发送文件
-            sshSftp(proof,deployAddress,filePath);
+            sshSftp(session,jsch,proof,deployAddress,filePath);
 
             pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+"\n"+"文件:"+fileName+"发送成功！");
             pipelineExecLog.setRunLog(pipelineExecLog.getRunLog()+"\n"+"文件:"+fileName+"发送成功！");
@@ -126,7 +146,15 @@ public class DeployAchieve {
         pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+"\n"+"发送文件中。。。。。");
         pipelineExecLog.setRunLog("压缩包文件名为： "+fileName+"\n"+"解压文件名称："+fileName+"\n"+"部署到docker文件地址 ： " +deployAddress);
         try {
-            sshSftp(proof,filePath,filePath);
+
+            JSch jsch = new JSch();
+            //采用指定的端口连接服务器
+            Session session =jsch.getSession(proof.getProofUsername(), proof.getProofIp() ,proof.getProofPort());
+            if (session == null){
+                commonAchieve.updateState(pipelineExecHistory,pipelineExecLog,"无法连接服务器。",pipelineExecHistoryList);
+                return 0;
+            }
+            sshSftp(session,jsch,proof,filePath,filePath);
             HashMap<Integer, String> map = new HashMap<>();
             map.put(1,"rm -rf "+" "+deployAddress);
             map.put(2,"unzip"+" "+deployAddress);
@@ -157,17 +185,8 @@ public class DeployAchieve {
      * @param remotePath 部署文件地址
      * @param localPath 本机文件地址
      */
-    public void sshSftp(Proof proof, String remotePath, String localPath) throws JSchException, SftpException, IOException {
+    public void sshSftp(Session session,JSch jsch,Proof proof, String remotePath, String localPath) throws JSchException, SftpException, IOException {
 
-        JSch jsch = new JSch();
-
-        //采用指定的端口连接服务器
-        Session session =jsch.getSession(proof.getProofUsername(), proof.getProofIp() ,proof.getProofPort());
-
-        //如果服务器连接不上，则抛出异常
-        if (session == null) {
-            throw new JSchException(proof.getProofIp() + "连接异常。。。。");
-        }
         //设置第一次登陆的时候提示，可选值：(ask | yes | no)
         session.setConfig("StrictHostKeyChecking", "no");
 
@@ -183,17 +202,17 @@ public class DeployAchieve {
         //调用发送方法
         sshSending(session,remotePath,localPath);
         session.disconnect();
-
     }
 
 
     /**
      * 判断服务器是否可以连接
-     * @param proof 凭证
+     * @param proofId 凭证id
      * @return 连接状态
      */
 
-    public Boolean testSshSftp(Proof proof){
+    public Boolean testSshSftp(String proofId){
+        Proof proof = proofService.findOneProof(proofId);
 
         JSch jsch = new JSch();
         //采用指定的端口连接服务器

@@ -4,6 +4,7 @@ import com.doublekit.beans.BeanMapper;
 import com.doublekit.pipeline.definition.dao.PipelineDao;
 import com.doublekit.pipeline.definition.entity.PipelineEntity;
 import com.doublekit.pipeline.definition.model.Pipeline;
+import com.doublekit.pipeline.definition.model.PipelineConfigure;
 import com.doublekit.pipeline.definition.model.PipelineStatus;
 import com.doublekit.pipeline.instance.model.PipelineExecHistory;
 import com.doublekit.pipeline.instance.service.PipelineExecHistoryService;
@@ -89,6 +90,12 @@ public class PipelineServiceImpl implements PipelineService{
         return null;
     }
 
+    //根据流水线获取配置信息
+    @Override
+    public  List<PipelineConfigure> findPipelineConfigure(String pipelineId){
+        return pipelineConfigureService.findAllConfigure(pipelineId);
+    }
+
     //查询所有
     @Override
     public List<Pipeline> findAllPipeline() {
@@ -120,6 +127,7 @@ public class PipelineServiceImpl implements PipelineService{
             pipelineStatus.setPipelineId(pipeline.getPipelineId());
             pipelineStatus.setPipelineCollect(pipeline.getPipelineCollect());
             pipelineStatus.setPipelineName(pipeline.getPipelineName());
+            pipelineStatus.setPipelineState(pipeline.getPipelineState());
             if (latelyHistory != null){
                 pipelineStatus.setLastStructureTime(latelyHistory.getCreateTime());
                 pipelineStatus.setStructureStatus(latelyHistory.getRunStatus());

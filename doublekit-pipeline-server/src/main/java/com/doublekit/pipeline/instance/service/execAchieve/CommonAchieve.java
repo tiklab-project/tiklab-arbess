@@ -2,6 +2,7 @@ package com.doublekit.pipeline.instance.service.execAchieve;
 
 import com.doublekit.pipeline.definition.model.Pipeline;
 import com.doublekit.pipeline.definition.model.PipelineConfigure;
+import com.doublekit.pipeline.definition.service.PipelineService;
 import com.doublekit.pipeline.instance.model.PipelineExecHistory;
 import com.doublekit.pipeline.instance.model.PipelineExecLog;
 import com.doublekit.pipeline.instance.service.PipelineExecHistoryService;
@@ -29,9 +30,11 @@ public class CommonAchieve {
     @Autowired
     PipelineExecHistoryService pipelineExecHistoryService;
 
-
     @Autowired
     PipelineExecLogService pipelineExecLogService;
+
+    @Autowired
+    PipelineService pipelineService;
 
 
     /**
@@ -209,6 +212,9 @@ public class CommonAchieve {
      * @param e 错误信息
      */
     public  void  error(PipelineExecHistory pipelineExecHistory, String e, String pipelineId,List<PipelineExecHistory> pipelineExecHistoryList){
+        Pipeline pipeline = pipelineService.findPipeline(pipelineId);
+        pipeline.setPipelineState(0);
+        pipelineService.updatePipeline(pipeline);
         pipelineExecHistory.setStatus(pipelineExecHistory.getStatus()+2);
         pipelineExecHistoryList.add(pipelineExecHistory);
         pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+ "\n" + e + "\n" + " RUN RESULT : FAIL");
@@ -217,7 +223,7 @@ public class CommonAchieve {
         pipelineExecHistoryService.updateHistory(pipelineExecHistory);
         pipelineExecHistoryList.add(pipelineExecHistory);
         // 清空缓存
-        clean(pipelineExecHistory,pipelineId,pipelineExecHistoryList);
+        pipelineExecHistoryList.removeIf(execHistory -> execHistory.getPipeline().getPipelineId().equals(pipelineId));
     }
 
     /**
@@ -226,34 +232,35 @@ public class CommonAchieve {
      * @param pipelineId 流水线id
      */
     public  void  success(PipelineExecHistory pipelineExecHistory, String pipelineId,List<PipelineExecHistory> pipelineExecHistoryList) {
-        pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+ "\n"  + "\n" + " RUN RESULT : SUCCESS");
+        Pipeline pipeline = pipelineService.findPipeline(pipelineId);
+        pipeline.setPipelineState(0);
+        pipelineService.updatePipeline(pipeline);
+        pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+ "\n" + " RUN RESULT : SUCCESS");
         pipelineExecHistory.setRunStatus(30);
         pipelineExecHistory.setFindState(1);
         pipelineExecHistoryList.add(pipelineExecHistory);
         pipelineExecHistoryService.updateHistory(pipelineExecHistory);
         //清空缓存
-        clean(pipelineExecHistory,pipelineId,pipelineExecHistoryList);
+        pipelineExecHistoryList.removeIf(execHistory -> execHistory.getPipeline().getPipelineId().equals(pipelineId));
     }
 
     /**
-     * 清空缓存
+     * 输出停止信息
      * @param pipelineExecHistory 历史
      * @param pipelineId 流水线id
      */
-    public  void clean(PipelineExecHistory pipelineExecHistory, String pipelineId,List<PipelineExecHistory> pipelineExecHistoryList){
-        //恢复中断状态
-        //try {
-        //    Thread.sleep(1000);
-        //} catch (InterruptedException s) {
-        //    Thread.currentThread().interrupt();
-        //}
-        // 清除集合缓存
-        Pipeline pipeline = pipelineExecHistory.getPipeline();
-        pipelineExecHistoryList.removeIf(history ->  pipeline.getPipelineId().equals(pipelineId));
-
-
+    public  void  halt(PipelineExecHistory pipelineExecHistory, String pipelineId,List<PipelineExecHistory> pipelineExecHistoryList) {
+        Pipeline pipeline = pipelineService.findPipeline(pipelineId);
+        pipeline.setPipelineState(0);
+        pipelineService.updatePipeline(pipeline);
+        pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+ "\n" + " RUN RESULT : HALT");
+        pipelineExecHistory.setRunStatus(20);
+        pipelineExecHistory.setFindState(1);
+        pipelineExecHistoryList.add(pipelineExecHistory);
+        pipelineExecHistoryService.updateHistory(pipelineExecHistory);
+        //清空缓存
+        pipelineExecHistoryList.removeIf(execHistory -> execHistory.getPipeline().getPipelineId().equals(pipelineId));
     }
-
 
     /**
      * 初始化日志
@@ -278,7 +285,7 @@ public class CommonAchieve {
      * @param historyId 历史id
      * @return 历史
      */
-    public PipelineExecHistory initializeHistory( String historyId) {
+    public PipelineExecHistory initializeHistory( String historyId,Pipeline pipeline ) {
         PipelineExecHistory pipelineExecHistory = new PipelineExecHistory();
         String time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
         pipelineExecHistory.setCreateTime(time);
@@ -286,6 +293,9 @@ public class CommonAchieve {
         pipelineExecHistory.setSort(1);
         pipelineExecHistory.setStatus(0);
         pipelineExecHistory.setHistoryId(historyId);
+        pipelineExecHistory.setPipeline(pipeline);
+        pipelineExecHistory.setExecName(pipeline.getPipelineCreateUser());
+        pipelineExecHistoryService.updateHistory(pipelineExecHistory);
         return pipelineExecHistory;
     }
 }

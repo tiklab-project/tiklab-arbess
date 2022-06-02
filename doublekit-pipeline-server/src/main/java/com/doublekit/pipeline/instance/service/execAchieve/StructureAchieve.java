@@ -42,7 +42,9 @@ public class StructureAchieve {
         //设置拉取地址
         String path = "D:\\clone\\"+pipelineConfigure.getPipeline().getPipelineName();
         try {
-            String a = "执行 : " + " ' " + structureOrder + " ' " + "\n";
+            String a = "------------------------------------" + " \n"
+                    +"开始构建" + " \n"
+                    +"执行 : \""  + structureOrder + "\"\n";
             Process process = commonAchieve.process(path, structureOrder, structureAddress);
             pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog() + a);
             pipelineExecLog.setRunLog(pipelineExecLog.getRunLog()+a);

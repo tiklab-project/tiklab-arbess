@@ -32,9 +32,13 @@ public class PipelineEntity {
     @Column(name = "pipeline_create_type")
     private int pipelineType;
 
-    //流水线状态
+    //收藏状态
     @Column(name = "pipeline_collect")
     private int pipelineCollect;
+
+    //运行状态
+    @Column(name = "pipeline_state")
+    private int pipelineState;
 
     public String getPipelineId() {
         return pipelineId;
@@ -82,5 +86,13 @@ public class PipelineEntity {
 
     public void setPipelineCollect(int pipelineCollect) {
         this.pipelineCollect = pipelineCollect;
+    }
+
+    public int getPipelineState() {
+        return pipelineState;
+    }
+
+    public void setPipelineState(int pipelineState) {
+        this.pipelineState = pipelineState;
     }
 }

@@ -25,8 +25,8 @@ public class CommitController {
     @RequestMapping(path="/getSubmitMassage",method = RequestMethod.POST)
     @ApiMethod(name = "getSubmitMassage",desc = "获取提交信息")
     @ApiParam(name = "pipelineId",desc = "流水线id",required = true)
-    public Result< List<Commit>> getSubmitMassage(String pipelineId){
-        List<Commit> submitMassage = commitService.getSubmitMassage(pipelineId);
+    public Result<List<List<Commit>>> getSubmitMassage(String pipelineId){
+        List<List<Commit>> submitMassage = commitService.getSubmitMassage(pipelineId);
         return Result.ok(submitMassage);
     }
 }

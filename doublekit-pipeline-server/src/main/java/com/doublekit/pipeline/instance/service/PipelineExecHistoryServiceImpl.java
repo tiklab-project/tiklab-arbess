@@ -1,7 +1,6 @@
 package com.doublekit.pipeline.instance.service;
 
 import com.doublekit.beans.BeanMapper;
-import com.doublekit.pipeline.definition.service.PipelineService;
 import com.doublekit.pipeline.instance.dao.PipelineExecHistoryDao;
 import com.doublekit.pipeline.instance.entity.PipelineExecHistoryEntity;
 import com.doublekit.pipeline.instance.model.PipelineExecHistory;
@@ -19,9 +18,6 @@ import java.util.List;
 @Service
 @Exporter
 public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryService {
-
-    @Autowired
-    PipelineService pipelineService;
 
     @Autowired
     PipelineExecHistoryDao pipelineExecHistoryDao;

@@ -21,7 +21,7 @@ public class CodeGitHubApi {
 
     //获取code （get）
     public String getCode(){
-        return "https://github.com/login/oauth/authorize?client_id=" + getClient_ID()+"&scope=repo admin:org_hook user ";
+        return "https://github.com/login/oauth/authorize?client_id=" + getClient_ID() +"&callback_url="+getCallback_URL() +"&scope=repo admin:org_hook user ";
     }
 
     //获取accessToken

@@ -12,8 +12,8 @@ public class PipelineStatus {
     @ApiProperty(name="pipelineId",desc="流水线id")
     private String pipelineId;
 
-    //流水线状态
-    @ApiProperty(name="pipelineCollect",desc="流水线状态",required = true)
+    //收藏状态
+    @ApiProperty(name="pipelineCollect",desc="收藏状态",required = true)
     private int pipelineCollect;
 
     //构建状态
@@ -31,6 +31,10 @@ public class PipelineStatus {
     //上次构建时间
     @ApiProperty(name="listSuccessStatus",desc="上次构建时间")
     private String lastSuccessTime;
+
+    //运行状态
+    @ApiProperty(name="pipelineCollect",desc="运行状态",required = true)
+    private int pipelineState;
 
 
     public String getPipelineId() {
@@ -79,5 +83,13 @@ public class PipelineStatus {
 
     public void setPipelineCollect(int pipelineCollect) {
         this.pipelineCollect = pipelineCollect;
+    }
+
+    public int getPipelineState() {
+        return pipelineState;
+    }
+
+    public void setPipelineState(int pipelineState) {
+        this.pipelineState = pipelineState;
     }
 }
