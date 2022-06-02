@@ -13,6 +13,7 @@ import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 import okhttp3.*;
+import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.transport.*;
@@ -89,15 +90,20 @@ public class CodeAchieve {
         pipelineExecHistory.setRunLog(s);
         pipelineExecHistoryList.add(pipelineExecHistory);
 
-        String state;
+        String state = null;
         //克隆代码
-        if (proof.getProofType().equals("SSH")&&proof.getProofScope()==1){
-            state = sshClone(pipelineCode.getCodeAddress(), proof.getProofPassword(), file, pipelineCode.getCodeBranch());
-            commonAchieve.updateTime(pipelineExecHistory,pipelineExecLog,beginTime);
-        }else {
-            UsernamePasswordCredentialsProvider credentialsProvider = commonAchieve.usernamePassword(proof.getProofUsername(), proof.getProofPassword());
-            state = clone(file, pipelineCode.getCodeAddress(), credentialsProvider, pipelineCode.getCodeBranch());
-            commonAchieve.updateTime(pipelineExecHistory,pipelineExecLog,beginTime);
+        try {
+            if (proof.getProofType().equals("SSH")&&proof.getProofScope()==1){
+                state = sshClone(pipelineCode.getCodeAddress(), proof.getProofPassword(), file, pipelineCode.getCodeBranch());
+                commonAchieve.updateTime(pipelineExecHistory,pipelineExecLog,beginTime);
+            }else {
+                UsernamePasswordCredentialsProvider credentialsProvider = commonAchieve.usernamePassword(proof.getProofUsername(), proof.getProofPassword());
+                state = clone(file, pipelineCode.getCodeAddress(), credentialsProvider, pipelineCode.getCodeBranch());
+                commonAchieve.updateTime(pipelineExecHistory,pipelineExecLog,beginTime);
+            }
+        } catch (GitAPIException e) {
+            commonAchieve.updateState(pipelineExecHistory,pipelineExecLog,e.toString(),pipelineExecHistoryList);
+            return 0;
         }
         if (state != null ){
             logger.info("代码拉取失败");
@@ -120,24 +126,13 @@ public class CodeAchieve {
      * @param branch 分支
      * @return 克隆失败信息
      */
-    private String clone(File gitAddress, String gitUrl, CredentialsProvider credentialsProvider, String branch)  {
-        Git call = null;
-        try {
-             call = Git.cloneRepository()
-                     .setURI(gitUrl)
-                     .setCredentialsProvider(credentialsProvider)
-                     .setDirectory(gitAddress)
-                     .setBranch(branch)
-                     .call();
-             if (call == null){
-                 return null;
-             }
-        } catch (GitAPIException e) {
-            return e.toString();
-        }finally {
-            assert call != null;
-            call.close();
-        }
+    private String clone(File gitAddress, String gitUrl, CredentialsProvider credentialsProvider, String branch) throws GitAPIException {
+        CloneCommand clone = Git.cloneRepository();
+        clone.setURI(gitUrl);
+        clone.setCredentialsProvider(credentialsProvider);
+        clone.setDirectory(gitAddress);
+        clone .setBranch(branch);
+        clone.call().close();
         return null;
     }
 
@@ -149,7 +144,7 @@ public class CodeAchieve {
      * @param branch 分支
      * @return 克隆失败信息
      */
-    public String sshClone(String url, String privateKeyPath,File clonePath,String branch)  {
+    public String sshClone(String url, String privateKeyPath,File clonePath,String branch) throws GitAPIException {
         SshSessionFactory sshSessionFactory = new JschConfigSessionFactory() {
             @Override
             protected void configure(OpenSshConfig.Host host, Session session ) {
@@ -163,9 +158,7 @@ public class CodeAchieve {
                 return defaultJSch;
             }
         };
-        Git call = null;
-        try {
-             call = Git.cloneRepository()
+        Git call = Git.cloneRepository()
               .setURI(url)
               .setBranch(branch)
               .setTransportConfigCallback(transport -> {
@@ -175,15 +168,10 @@ public class CodeAchieve {
               .setDirectory(clonePath)
               .call();
             if (call == null){
-                return null;
+                return "拉取错误。";
             }
-        } catch (GitAPIException e) {
-            return e.toString();
-        }finally {
-            assert call != null;
             call.close();
-        }
-        return null;
+            return null;
     }
 
     /**

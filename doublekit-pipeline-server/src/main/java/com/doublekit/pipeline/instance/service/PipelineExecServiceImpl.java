@@ -50,7 +50,8 @@ public class PipelineExecServiceImpl implements PipelineExecService {
 
     private static final Logger logger = LoggerFactory.getLogger(PipelineExecServiceImpl.class);
 
-
+    //创建线程池
+    ExecutorService executorService = Executors.newCachedThreadPool();
 
     //启动
     @Override
@@ -60,15 +61,10 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         if (pipeline.getPipelineState() == 1){
             return 100;
         }
-        //创建线程池
-        ExecutorService executorService = Executors.newCachedThreadPool();
-
         executorService.submit(() -> {
             Thread.currentThread().setName(pipelineId);
             begin(pipelineId);
         });
-        // 执行构建
-        //executorService.submit(() -> begin(pipelineId));
         return 1;
     }
 
@@ -93,10 +89,10 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         PipelineExecHistory pipelineExecHistory = findInstanceState(pipelineId);
         pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+"\n"+"流水线停止运行......");
         pipelineExecHistoryList.add(pipelineExecHistory);
-        pipelineExecHistoryService.updateHistory(pipelineExecHistory);
         commonAchieve.halt(pipelineExecHistory,pipelineId,pipelineExecHistoryList);
         ThreadGroup currentGroup = Thread.currentThread().getThreadGroup();
         int noThreads = currentGroup.activeCount();
+
         Thread[] lstThreads = new Thread[noThreads];
         currentGroup.enumerate(lstThreads);
         for (int i = 0; i < noThreads; i++) {
@@ -104,6 +100,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
             if (nm.equals(pipelineId)) {
                 logger.info("结束线程 ：" + i + "  pipelineId ：" + pipelineId);
                 lstThreads[i].stop();
+               return;
             }
         }
     }
@@ -165,7 +162,6 @@ public class PipelineExecServiceImpl implements PipelineExecService {
                 }
                 pipelineExecHistory.setSort(pipelineExecHistory.getSort() +1);
                 pipelineExecHistory.setStatus(pipelineExecHistory.getStatus() +1);
-                pipelineExecHistoryService.updateHistory(pipelineExecHistory);
             }
         }
         commonAchieve.success(pipelineExecHistory, pipelineId, pipelineExecHistoryList);

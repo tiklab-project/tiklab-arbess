@@ -11,6 +11,8 @@ import com.doublekit.rpc.annotation.Exporter;
 import com.ibm.icu.text.SimpleDateFormat;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -36,7 +38,7 @@ public class CommonAchieve {
     @Autowired
     PipelineService pipelineService;
 
-
+    private static final Logger logger = LoggerFactory.getLogger(CommonAchieve.class);
     /**
      * 执行日志
      * @param inputStreamReader 执行信息
@@ -259,7 +261,9 @@ public class CommonAchieve {
         pipelineExecHistoryList.add(pipelineExecHistory);
         pipelineExecHistoryService.updateHistory(pipelineExecHistory);
         //清空缓存
+        logger.info("开始清除数据 。");
         pipelineExecHistoryList.removeIf(execHistory -> execHistory.getPipeline().getPipelineId().equals(pipelineId));
+        logger.info("清除数据完成 : "+ pipelineExecHistoryList.size());
     }
 
     /**
