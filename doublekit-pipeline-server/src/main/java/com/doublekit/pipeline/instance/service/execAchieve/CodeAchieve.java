@@ -28,6 +28,7 @@ import org.tmatesoft.svn.core.wc2.SvnOperationFactory;
 import org.tmatesoft.svn.core.wc2.SvnTarget;
 
 import java.io.File;
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -68,7 +69,7 @@ public class CodeAchieve {
         File file = new File(path);
 
         //删除旧的代码
-        commonAchieve.deleteFile(file);
+        //commonAchieve.deleteFile(file);
 
         //获取凭证
         Proof proof = pipelineCode.getProof();
@@ -94,10 +95,10 @@ public class CodeAchieve {
                 sshClone(pipelineCode.getCodeAddress(), proof.getProofPassword(), file, pipelineCode.getCodeBranch());
             }else {
                 UsernamePasswordCredentialsProvider credentialsProvider = commonAchieve.usernamePassword(proof.getProofUsername(), proof.getProofPassword());
-                clone(file, pipelineCode.getCodeAddress(), credentialsProvider, pipelineCode.getCodeBranch());
+                clone(path, pipelineCode.getCodeAddress(), credentialsProvider, pipelineCode.getCodeBranch());
             }
              //| JGitInternalException
-        } catch (GitAPIException e) {
+        } catch (GitAPIException |IOException  e) {
             commonAchieve.updateTime(pipelineExecHistory,pipelineExecLog,beginTime);
             commonAchieve.updateState(pipelineExecHistory,pipelineExecLog,e.toString(),pipelineExecHistoryList);
             return 0;
@@ -119,14 +120,21 @@ public class CodeAchieve {
      * @param credentialsProvider 凭证
      * @param branch 分支
      */
-    private void clone(File gitAddress, String gitUrl, CredentialsProvider credentialsProvider, String branch) throws GitAPIException, JGitInternalException {
-        Git call = Git.cloneRepository()
-                .setURI(gitUrl)
-                .setCredentialsProvider(credentialsProvider)
-                .setDirectory(gitAddress)
-                .setBranch(branch)
-                .call();
-        call.close();
+    private void clone(String gitAddress, String gitUrl, CredentialsProvider credentialsProvider, String branch) throws GitAPIException, JGitInternalException, IOException {
+        Git git;
+        File fileAddress = new File(gitAddress);
+        if (!fileAddress.exists()){
+            git = Git.cloneRepository()
+                   .setURI(gitUrl)
+                   .setCredentialsProvider(credentialsProvider)
+                   .setDirectory(fileAddress)
+                   .setBranch(branch)
+                   .call();
+       }else {
+           git = Git.open(new File(gitAddress+"\\.git"));
+           git.pull().setCredentialsProvider(credentialsProvider).call();
+       }
+        git.close();
     }
 
     /**
