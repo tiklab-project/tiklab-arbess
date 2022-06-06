@@ -205,47 +205,6 @@ public class DeployAchieve {
     }
 
 
-    /**
-     * 判断服务器是否可以连接
-     * @param proofId 凭证id
-     * @return 连接状态
-     */
-
-    public Boolean testSshSftp(String proofId){
-        Proof proof = proofService.findOneProof(proofId);
-
-        JSch jsch = new JSch();
-        //采用指定的端口连接服务器
-        Session session;
-        try {
-            session = jsch.getSession(proof.getProofUsername(), proof.getProofIp() ,proof.getProofPort());
-        } catch (JSchException e) {
-            return false;
-        }
-
-        //如果服务器连接不上，则抛出异常
-        if (session == null) {
-            return false;
-        }
-        //设置第一次登陆的时候提示，可选值：(ask | yes | no)
-        session.setConfig("StrictHostKeyChecking", "no");
-
-        if (proof.getProofType().equals("password") && proof.getProofScope()==2){
-            //设置登陆主机的密码
-            session.setPassword(proof.getProofPassword());
-        }else {
-            //添加私钥
-            try {
-                jsch.addIdentity(proof.getProofPassword());
-                //设置登陆超时时间 10s
-                session.connect(10000);
-            } catch (JSchException e) {
-                return false;
-            }
-        }
-        session.disconnect();
-        return true;
-    }
 
 
 

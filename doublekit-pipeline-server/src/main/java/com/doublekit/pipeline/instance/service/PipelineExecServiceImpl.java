@@ -127,7 +127,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
             for (PipelineConfigure pipelineConfigure : allConfigure) {
                 pipelineExecHistoryList.add(pipelineExecHistory);
                 switch (pipelineConfigure.getTaskType()) {
-                    case 1, 2 -> {
+                    case 1, 2,5 -> {
                         int state = codeAchieve.codeStart(pipelineConfigure, pipelineExecHistory, pipelineExecHistoryList);
                         if (state == 0) {
                             pipeline.setPipelineState(0);
@@ -166,24 +166,6 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         }
         commonAchieve.success(pipelineExecHistory, pipelineId, pipelineExecHistoryList);
     }
-
-    @Override
-    public Boolean testPass(String url ,String proofId){
-        if (proofId != null){
-            if (url != null){
-                return codeAchieve.checkAuth(url, proofId);
-            }else {
-                return deployAchieve.testSshSftp(proofId);
-            }
-        }
-        return false;
-    }
-
-
-
-
-
-
 
 
 

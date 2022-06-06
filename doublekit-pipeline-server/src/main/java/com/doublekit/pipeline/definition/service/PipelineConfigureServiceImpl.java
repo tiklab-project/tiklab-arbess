@@ -153,7 +153,6 @@ public class PipelineConfigureServiceImpl implements PipelineConfigureService {
                pipelineCodeService.findOneTask(pipelineConfigure,list);
             }
         }
-        logger.info("长度为 ： " + list.size());
         return list;
     }
 

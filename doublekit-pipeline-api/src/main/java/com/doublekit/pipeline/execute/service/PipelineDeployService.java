@@ -7,6 +7,7 @@ import com.doublekit.join.annotation.JoinProvider;
 import com.doublekit.pipeline.definition.model.PipelineConfigure;
 import com.doublekit.pipeline.definition.model.PipelineExecConfigure;
 import com.doublekit.pipeline.execute.model.PipelineDeploy;
+import com.doublekit.pipeline.setting.proof.model.Proof;
 
 import java.util.List;
 
@@ -77,4 +78,11 @@ public interface PipelineDeployService {
 
     @FindList
     List<PipelineDeploy> findAllDeployList(List<String> idList);
+
+    /**
+     * 测试服务器连接
+     * @param proof 凭证偶读
+     * @return 连接状态
+     */
+    Boolean testSshSftp(Proof proof);
 }

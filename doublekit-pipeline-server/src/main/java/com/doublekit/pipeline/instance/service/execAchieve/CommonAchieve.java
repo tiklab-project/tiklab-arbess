@@ -151,23 +151,26 @@ public class CommonAchieve {
 
     /**
      * 删除旧的代码
-     * @param dir 文件地址
+     * @param file 文件地址
      */
-    public boolean deleteFile(File dir){
-        if (dir.isDirectory()) {
-            String[] children = dir.list();
+    public  Boolean deleteFile(File file){
+
+        if (file.isDirectory()) {
+            String[] children = file.list();
             //递归删除目录中的子目录下
             if (children != null) {
                 for (String child : children) {
-                    boolean success = deleteFile(new File(dir, child));
-                    if (!success) {
-                        return false;
+                    boolean state = deleteFile(new File(file, child));
+                    int tryCount = 0;
+                    while (!state && tryCount++ < 10) {
+                        System.gc();    //回收资源
+                        state = file.delete();
                     }
                 }
             }
             // 目录此时为空，可以删除
         }
-        return dir.delete();
+        return file.delete();
     }
 
     /**

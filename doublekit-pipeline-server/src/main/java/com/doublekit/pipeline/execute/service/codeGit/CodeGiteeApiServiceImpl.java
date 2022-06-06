@@ -142,12 +142,12 @@ public class CodeGiteeApiServiceImpl implements CodeGiteeApiService {
         if (split.length != 2){
             return null;
         }
-        if (proof == null){
+        if (proof != null){
             ArrayList<String> branchList = new ArrayList<>();
             logger.info("loginName :"+name);
             assert false;
             String branchAddress = codeGiteeApi.getWarehouseBranch(proof.getProofUsername(),name,proof.getProofPassword());
-            ResponseEntity<String> forEntity = restTemplate.getForEntity(branchAddress, String.class, JSONObject.class);
+             ResponseEntity<String> forEntity = restTemplate.getForEntity(branchAddress, String.class, JSONObject.class);
             JSONArray branchS = JSONArray.parseArray(forEntity.getBody());
             if (branchS != null) {
                 for (int i = 0; i < branchS.size(); i++) {

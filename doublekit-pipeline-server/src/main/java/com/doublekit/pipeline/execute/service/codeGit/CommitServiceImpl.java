@@ -39,23 +39,28 @@ public class CommitServiceImpl implements CommitService{
         }
         Pipeline pipeline = pipelineService.findPipeline(pipelineId);
         List<Commit> list = new ArrayList<>();
-        Repository repo ;
+        Git git = null ;
+        RevWalk walk = null;
+        Repository repo = null;
         try {
-            repo = new FileRepository("D:\\clone\\"+pipeline.getPipelineName()+"/.git");
-            Git git = new Git(repo);
+            repo = new FileRepository("D:\\clone\\"+pipeline.getPipelineName()+"\\.git");
+            git = new Git(repo);
             Iterable<RevCommit> commits = git.log().all().call();
+
             for (RevCommit commit : commits) {
-                Commit cit = new Commit();
-                RevWalk walk = new RevWalk(repo);
+                walk = new RevWalk(repo);
                 RevCommit verCommit = walk.parseCommit(repo.resolve(commit.getName()));
+
+                //初始化
+                Commit cit = new Commit();
                 cit.setCommitId(commit.getName());
                 cit.setCommitName(commit.getAuthorIdent().getName());
                 cit.setCommitTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(commit.getCommitTime() * 1000L)));
                 cit.setCommitMassage(commit.getFullMessage());
                 cit.setTime(commit.getCommitTime());
                 cit.setDayTime(new SimpleDateFormat("yyyy-MM-dd").format(new Date(cit.getTime() * 1000L)));
-                List<String> arrayList = new ArrayList<>();
 
+                List<String> arrayList = new ArrayList<>();
                 List<DiffEntry> changedFileList = getChangedFileList(verCommit, repo);
                 if (changedFileList!= null){
                     for (DiffEntry entry : changedFileList) {
@@ -65,8 +70,7 @@ public class CommitServiceImpl implements CommitService{
                 cit.setCommitFile(arrayList);
                 list.add(cit);
             }
-
-
+            //封装返回数据
             List<List<Commit>> ArrayList = new ArrayList<>();
             for (int i = 0;i<list.size();i++){
                 List<Commit> commitArrayList = new ArrayList<>();
@@ -79,26 +83,38 @@ public class CommitServiceImpl implements CommitService{
                 }
                 ArrayList.add(commitArrayList);
             }
+
             return ArrayList;
         } catch (IOException | GitAPIException e) {
             logger.info("流水线git文件地址找不到，或者没有提交信息");
             return null;
+        }finally {
+            //关闭
+            if (walk != null) {
+                walk.dispose();
+            }
+            git.close();
+            repo.close();
         }
     }
 
     public List<DiffEntry> getChangedFileList(RevCommit revCommit, Repository repo) throws IOException, GitAPIException {
         List<DiffEntry> returnDiffs = null;
-        RevCommit previsoucommit = getPrevHash(revCommit, repo);
-        if (previsoucommit == null){return null;}
-        ObjectId head = revCommit.getTree().getId();
-        ObjectId oldHead = previsoucommit.getTree().getId();
+        RevCommit overcommitment = getPrevHash(revCommit, repo);
+        if (overcommitment == null){return null;}
 
+        //新旧树id
+        ObjectId head = revCommit.getTree().getId();
+        ObjectId oldHead = overcommitment.getTree().getId();
+
+        //新旧树信息
         ObjectReader reader = repo.newObjectReader();
         CanonicalTreeParser oldTreeItem = new CanonicalTreeParser();
         oldTreeItem.reset(reader, oldHead);
         CanonicalTreeParser newTreeItem = new CanonicalTreeParser();
         newTreeItem.reset(reader, head);
 
+        //对比新旧树
         Git git = new Git(repo);
         List<DiffEntry> diffs = git.diff()
                 .setNewTree(newTreeItem)
@@ -107,6 +123,8 @@ public class CommitServiceImpl implements CommitService{
         for (DiffEntry ignored : diffs) {
             returnDiffs = diffs;
         }
+        git.close();
+        repo.close();
         return returnDiffs;
     }
 
@@ -116,10 +134,10 @@ public class CommitServiceImpl implements CommitService{
         int count = 0;
         for(RevCommit rev :walk){
             if (count == 1) {
+                walk.dispose();
                 return rev;
             }
             count++;
-            walk.dispose();
         }
         return null;
     }

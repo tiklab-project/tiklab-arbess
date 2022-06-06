@@ -12,10 +12,9 @@ import com.doublekit.rpc.annotation.Exporter;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
-import okhttp3.*;
-import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.api.errors.JGitInternalException;
 import org.eclipse.jgit.transport.*;
 import org.eclipse.jgit.util.FS;
 import org.slf4j.Logger;
@@ -30,7 +29,6 @@ import org.tmatesoft.svn.core.wc2.SvnOperationFactory;
 import org.tmatesoft.svn.core.wc2.SvnTarget;
 
 import java.io.File;
-import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -51,7 +49,11 @@ public class CodeAchieve {
     private static final Logger logger = LoggerFactory.getLogger(PipelineCodeServiceImpl.class);
 
     public int codeStart(PipelineConfigure pipelineConfigure, PipelineExecHistory pipelineExecHistory, List<PipelineExecHistory> pipelineExecHistoryList){
-        return gitClone(pipelineConfigure, pipelineExecHistory, pipelineExecHistoryList);
+      return switch (pipelineConfigure.getTaskType()){
+           case 1,2 -> gitClone(pipelineConfigure, pipelineExecHistory, pipelineExecHistoryList);
+           case 5 -> SVN(pipelineConfigure, pipelineExecHistory, pipelineExecHistoryList);
+          default -> 1;
+       };
     }
 
     // git克隆
@@ -90,30 +92,25 @@ public class CodeAchieve {
         pipelineExecHistory.setRunLog(s);
         pipelineExecHistoryList.add(pipelineExecHistory);
 
-        String state = null;
         //克隆代码
         try {
-            if (proof.getProofType().equals("SSH")&&proof.getProofScope()==1){
-                state = sshClone(pipelineCode.getCodeAddress(), proof.getProofPassword(), file, pipelineCode.getCodeBranch());
-                commonAchieve.updateTime(pipelineExecHistory,pipelineExecLog,beginTime);
+            if (proof.getProofType().equals("SSH")&&proof.getProofScope() == 1){
+                sshClone(pipelineCode.getCodeAddress(), proof.getProofPassword(), file, pipelineCode.getCodeBranch());
             }else {
                 UsernamePasswordCredentialsProvider credentialsProvider = commonAchieve.usernamePassword(proof.getProofUsername(), proof.getProofPassword());
-                state = clone(file, pipelineCode.getCodeAddress(), credentialsProvider, pipelineCode.getCodeBranch());
-                commonAchieve.updateTime(pipelineExecHistory,pipelineExecLog,beginTime);
+                clone(file, pipelineCode.getCodeAddress(), credentialsProvider, pipelineCode.getCodeBranch());
             }
-        } catch (GitAPIException e) {
+        } catch (GitAPIException | JGitInternalException e) {
+            commonAchieve.updateTime(pipelineExecHistory,pipelineExecLog,beginTime);
             commonAchieve.updateState(pipelineExecHistory,pipelineExecLog,e.toString(),pipelineExecHistoryList);
             return 0;
         }
-        if (state != null ){
-            logger.info("代码拉取失败");
-            commonAchieve.updateState(pipelineExecHistory,pipelineExecLog,state,pipelineExecHistoryList);
-            return 0;
-        }
-        //更新状态
+
+        //更新状态e
         pipelineExecLog.setRunLog( s + "代码拉取成功" + "\n");
         pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+"\n"+ "代码拉取成功" +"\n");
         pipelineExecHistoryList.add(pipelineExecHistory);
+        commonAchieve.updateTime(pipelineExecHistory,pipelineExecLog,beginTime);
         commonAchieve.updateState(pipelineExecHistory,pipelineExecLog,null,pipelineExecHistoryList);
         return 1;
     }
@@ -124,16 +121,15 @@ public class CodeAchieve {
      * @param gitUrl git地址
      * @param credentialsProvider 凭证
      * @param branch 分支
-     * @return 克隆失败信息
      */
-    private String clone(File gitAddress, String gitUrl, CredentialsProvider credentialsProvider, String branch) throws GitAPIException {
-        CloneCommand clone = Git.cloneRepository();
-        clone.setURI(gitUrl);
-        clone.setCredentialsProvider(credentialsProvider);
-        clone.setDirectory(gitAddress);
-        clone .setBranch(branch);
-        clone.call().close();
-        return null;
+    private void clone(File gitAddress, String gitUrl, CredentialsProvider credentialsProvider, String branch) throws GitAPIException, JGitInternalException {
+        Git call = Git.cloneRepository()
+                .setURI(gitUrl)
+                .setCredentialsProvider(credentialsProvider)
+                .setDirectory(gitAddress)
+                .setBranch(branch)
+                .call();
+        call.close();
     }
 
     /**
@@ -142,9 +138,8 @@ public class CodeAchieve {
      * @param privateKeyPath 秘钥存放地址
      * @param clonePath 克隆位置
      * @param branch 分支
-     * @return 克隆失败信息
      */
-    public String sshClone(String url, String privateKeyPath,File clonePath,String branch) throws GitAPIException {
+    public void sshClone(String url, String privateKeyPath,File clonePath,String branch) throws GitAPIException , JGitInternalException {
         SshSessionFactory sshSessionFactory = new JschConfigSessionFactory() {
             @Override
             protected void configure(OpenSshConfig.Host host, Session session ) {
@@ -158,7 +153,8 @@ public class CodeAchieve {
                 return defaultJSch;
             }
         };
-        Git call = Git.cloneRepository()
+
+        Git.cloneRepository()
               .setURI(url)
               .setBranch(branch)
               .setTransportConfigCallback(transport -> {
@@ -166,36 +162,7 @@ public class CodeAchieve {
                   sshTransport.setSshSessionFactory(sshSessionFactory);
               })
               .setDirectory(clonePath)
-              .call();
-            if (call == null){
-                return "拉取错误。";
-            }
-            call.close();
-            return null;
-    }
-
-    /**
-     * 验证账户密码
-     * @param gitUrl 克隆地址
-     * @param proofId 凭证id
-     * @return 验证状态
-     */
-    public boolean checkAuth(String gitUrl, String proofId) {
-        Proof proof = proofService.findOneProof(proofId);
-        String basic = Credentials.basic(proof.getProofUsername(), proof.getProofPassword());
-        Request request = new Request.Builder()
-                .addHeader("Authorization", basic)
-                .url(gitUrl + "/info/refs?service=git-upload-pack")
-                .build();
-        Call call = new OkHttpClient().newCall(request);
-        try {
-            Response execute = call.execute();
-            execute.close();
-            return execute.code() == 200;
-        } catch (IOException var8) {
-            var8.printStackTrace();
-            return false;
-        }
+              .call().close();
     }
 
 
@@ -220,7 +187,6 @@ public class CodeAchieve {
         //代码克隆路径
         String path = "D:\\clone\\" + pipelineConfigure.getPipeline().getPipelineName();
 
-
         //获取凭证
         Proof proof = pipelineCode.getProof();
         if (proof == null){
@@ -234,9 +200,10 @@ public class CodeAchieve {
         String s = "开始拉取代码 : " + "\n"
                 + "FileAddress : " + path + "\n"
                 + "Uri : " + pipelineCode.getCodeAddress() + "\n"
-                + "Branch : " + pipelineCode.getCodeBranch() + "\n"
+                //+ "Branch : " + pipelineCode.getCodeBranch() + "\n"
                 + "proofType : " +proof.getProofType() + "\n" ;
         pipelineExecHistory.setRunLog(s);
+        pipelineExecLog.setRunLog(s);
         pipelineExecHistoryList.add(pipelineExecHistory);
 
         SvnOperationFactory svnOperationFactory = new SvnOperationFactory();
@@ -263,5 +230,4 @@ public class CodeAchieve {
         commonAchieve.updateState(pipelineExecHistory,pipelineExecLog,null,pipelineExecHistoryList);
         return 1;
     }
-
 }

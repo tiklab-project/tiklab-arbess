@@ -46,11 +46,13 @@ public class StructureAchieve {
                     +"开始构建" + " \n"
                     +"执行 : \""  + structureOrder + "\"\n";
             Process process = commonAchieve.process(path, structureOrder, structureAddress);
+
             pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog() + a);
             pipelineExecLog.setRunLog(pipelineExecLog.getRunLog()+a);
             //构建失败
             InputStreamReader inputStreamReader = new InputStreamReader(process.getInputStream(), Charset.forName("GBK"));
             int state = commonAchieve.log(inputStreamReader, pipelineExecHistory,pipelineExecHistoryList,pipelineExecLog);
+            process.destroy();
             commonAchieve.updateTime(pipelineExecHistory,pipelineExecLog,beginTime);
             if (state == 0){
                 commonAchieve.updateState(pipelineExecHistory,pipelineExecLog,"构建失败。",pipelineExecHistoryList);
