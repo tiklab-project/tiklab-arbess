@@ -7,7 +7,6 @@ import com.doublekit.pipeline.execute.service.PipelineCodeServiceImpl;
 import com.doublekit.pipeline.instance.model.PipelineExecHistory;
 import com.doublekit.pipeline.instance.model.PipelineExecLog;
 import com.doublekit.pipeline.setting.proof.model.Proof;
-import com.doublekit.pipeline.setting.proof.service.ProofService;
 import com.doublekit.rpc.annotation.Exporter;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
@@ -42,16 +41,13 @@ public class CodeAchieve {
     @Autowired
     CommonAchieve commonAchieve;
 
-    @Autowired
-    ProofService proofService;
-
 
     private static final Logger logger = LoggerFactory.getLogger(PipelineCodeServiceImpl.class);
 
     public int codeStart(PipelineConfigure pipelineConfigure, PipelineExecHistory pipelineExecHistory, List<PipelineExecHistory> pipelineExecHistoryList){
       return switch (pipelineConfigure.getTaskType()){
            case 1,2 -> gitClone(pipelineConfigure, pipelineExecHistory, pipelineExecHistoryList);
-           case 5 -> SVN(pipelineConfigure, pipelineExecHistory, pipelineExecHistoryList);
+           case 5 -> svn(pipelineConfigure, pipelineExecHistory, pipelineExecHistoryList);
           default -> 1;
        };
     }
@@ -100,7 +96,8 @@ public class CodeAchieve {
                 UsernamePasswordCredentialsProvider credentialsProvider = commonAchieve.usernamePassword(proof.getProofUsername(), proof.getProofPassword());
                 clone(file, pipelineCode.getCodeAddress(), credentialsProvider, pipelineCode.getCodeBranch());
             }
-        } catch (GitAPIException | JGitInternalException e) {
+             //| JGitInternalException
+        } catch (GitAPIException e) {
             commonAchieve.updateTime(pipelineExecHistory,pipelineExecLog,beginTime);
             commonAchieve.updateState(pipelineExecHistory,pipelineExecLog,e.toString(),pipelineExecHistoryList);
             return 0;
@@ -140,6 +137,7 @@ public class CodeAchieve {
      * @param branch 分支
      */
     public void sshClone(String url, String privateKeyPath,File clonePath,String branch) throws GitAPIException , JGitInternalException {
+
         SshSessionFactory sshSessionFactory = new JschConfigSessionFactory() {
             @Override
             protected void configure(OpenSshConfig.Host host, Session session ) {
@@ -165,7 +163,6 @@ public class CodeAchieve {
               .call().close();
     }
 
-
     /**
      * SVN 拉取代码
      * @param pipelineConfigure 配置信息
@@ -173,7 +170,7 @@ public class CodeAchieve {
      * @param pipelineExecHistoryList 执行状态
      * @return 拉取状态
      */
-    public int SVN(PipelineConfigure pipelineConfigure, PipelineExecHistory pipelineExecHistory, List<PipelineExecHistory> pipelineExecHistoryList){
+    public int svn(PipelineConfigure pipelineConfigure, PipelineExecHistory pipelineExecHistory, List<PipelineExecHistory> pipelineExecHistoryList){
 
         //开始时间
         long beginTime = new Timestamp(System.currentTimeMillis()).getTime();

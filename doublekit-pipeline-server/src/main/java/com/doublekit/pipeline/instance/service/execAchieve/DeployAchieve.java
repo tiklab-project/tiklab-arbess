@@ -8,7 +8,6 @@ import com.doublekit.pipeline.execute.service.PipelineDeployService;
 import com.doublekit.pipeline.instance.model.PipelineExecHistory;
 import com.doublekit.pipeline.instance.model.PipelineExecLog;
 import com.doublekit.pipeline.setting.proof.model.Proof;
-import com.doublekit.pipeline.setting.proof.service.ProofService;
 import com.doublekit.rpc.annotation.Exporter;
 import com.jcraft.jsch.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,8 +30,6 @@ public class DeployAchieve {
     @Autowired
     CommonAchieve commonAchieve;
 
-    @Autowired
-    ProofService proofService;
 
     public int deployStart(PipelineConfigure pipelineConfigure, PipelineExecHistory pipelineExecHistory , List<PipelineExecHistory> pipelineExecHistoryList){
         return switch (pipelineConfigure.getTaskType()) {

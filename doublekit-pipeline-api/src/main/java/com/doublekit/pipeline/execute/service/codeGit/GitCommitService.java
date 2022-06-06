@@ -1,15 +1,15 @@
 package com.doublekit.pipeline.execute.service.codeGit;
 
-import com.doublekit.pipeline.execute.model.CodeGit.Commit;
+import com.doublekit.pipeline.execute.model.CodeGit.GitCommit;
 
 import java.util.List;
 
-public interface CommitService {
+public interface GitCommitService {
 
     /**
      * 获取提交信息
      * @param pipelineId 流水线id
      * @return 提交信息
      */
-    List<List<Commit>> getSubmitMassage(String pipelineId);
+    List<List<GitCommit>> getSubmitMassage(String pipelineId);
 }

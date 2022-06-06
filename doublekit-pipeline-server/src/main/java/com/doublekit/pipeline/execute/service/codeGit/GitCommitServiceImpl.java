@@ -2,7 +2,7 @@ package com.doublekit.pipeline.execute.service.codeGit;
 
 import com.doublekit.pipeline.definition.model.Pipeline;
 import com.doublekit.pipeline.definition.service.PipelineService;
-import com.doublekit.pipeline.execute.model.CodeGit.Commit;
+import com.doublekit.pipeline.execute.model.CodeGit.GitCommit;
 import com.doublekit.rpc.annotation.Exporter;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -25,34 +25,32 @@ import java.util.*;
 
 @Service
 @Exporter
-public class CommitServiceImpl implements CommitService{
+public class GitCommitServiceImpl implements GitCommitService {
 
     @Autowired
     PipelineService pipelineService;
 
-    private static final Logger logger = LoggerFactory.getLogger(CommitServiceImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(GitCommitServiceImpl.class);
 
 
-    public List<List<Commit>> getSubmitMassage(String pipelineId) {
+    public List<List<GitCommit>> getSubmitMassage(String pipelineId) {
         if (pipelineId == null){
             return null;
         }
         Pipeline pipeline = pipelineService.findPipeline(pipelineId);
-        List<Commit> list = new ArrayList<>();
-        Git git = null ;
+        List<GitCommit> list = new ArrayList<>();
+
         RevWalk walk = null;
-        Repository repo = null;
-        try {
-            repo = new FileRepository("D:\\clone\\"+pipeline.getPipelineName()+"\\.git");
-            git = new Git(repo);
+
+        try (Repository repo = new FileRepository("D:\\clone\\" + pipeline.getPipelineName() + "\\.git"); Git git = new Git(repo)) {
             Iterable<RevCommit> commits = git.log().all().call();
 
             for (RevCommit commit : commits) {
                 walk = new RevWalk(repo);
                 RevCommit verCommit = walk.parseCommit(repo.resolve(commit.getName()));
 
-                //初始化
-                Commit cit = new Commit();
+                //初始化信息
+                GitCommit cit = new GitCommit();
                 cit.setCommitId(commit.getName());
                 cit.setCommitName(commit.getAuthorIdent().getName());
                 cit.setCommitTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(commit.getCommitTime() * 1000L)));
@@ -62,39 +60,41 @@ public class CommitServiceImpl implements CommitService{
 
                 List<String> arrayList = new ArrayList<>();
                 List<DiffEntry> changedFileList = getChangedFileList(verCommit, repo);
-                if (changedFileList!= null){
+                if (changedFileList != null) {
                     for (DiffEntry entry : changedFileList) {
                         arrayList.add(entry.getNewPath());
                     }
                 }
+                if (changedFileList != null) {
+                    changedFileList.clear();
+                }
                 cit.setCommitFile(arrayList);
                 list.add(cit);
             }
+            //关闭
+            git.close();
+            repo.close();
+            if (walk != null) {
+                walk.close();
+            }
+
             //封装返回数据
-            List<List<Commit>> ArrayList = new ArrayList<>();
-            for (int i = 0;i<list.size();i++){
-                List<Commit> commitArrayList = new ArrayList<>();
+            List<List<GitCommit>> ArrayList = new ArrayList<>();
+            for (int i = 0; i < list.size(); i++) {
+                List<GitCommit> gitCommitArrayList = new ArrayList<>();
                 String dayTime = list.get(i).getDayTime();
-                for (Commit commit : list) {
-                    if (dayTime.equals(commit.getDayTime())) {
-                        commitArrayList.add(commit);
+                for (GitCommit gitCommit : list) {
+                    if (dayTime.equals(gitCommit.getDayTime())) {
+                        gitCommitArrayList.add(gitCommit);
                         i++;
                     }
                 }
-                ArrayList.add(commitArrayList);
+                ArrayList.add(gitCommitArrayList);
             }
-
             return ArrayList;
         } catch (IOException | GitAPIException e) {
             logger.info("流水线git文件地址找不到，或者没有提交信息");
             return null;
-        }finally {
-            //关闭
-            if (walk != null) {
-                walk.dispose();
-            }
-            git.close();
-            repo.close();
         }
     }
 
@@ -103,11 +103,11 @@ public class CommitServiceImpl implements CommitService{
         RevCommit overcommitment = getPrevHash(revCommit, repo);
         if (overcommitment == null){return null;}
 
-        //新旧树id
+        //获取新旧树id
         ObjectId head = revCommit.getTree().getId();
         ObjectId oldHead = overcommitment.getTree().getId();
 
-        //新旧树信息
+        //获取新旧树信息
         ObjectReader reader = repo.newObjectReader();
         CanonicalTreeParser oldTreeItem = new CanonicalTreeParser();
         oldTreeItem.reset(reader, oldHead);
@@ -123,20 +123,24 @@ public class CommitServiceImpl implements CommitService{
         for (DiffEntry ignored : diffs) {
             returnDiffs = diffs;
         }
+
         git.close();
         repo.close();
         return returnDiffs;
     }
 
+    //遍历新旧树
     public  RevCommit getPrevHash(RevCommit commit, Repository repo) throws IOException {
         RevWalk walk = new RevWalk(repo);
         walk.markStart(commit);
         int count = 0;
         for(RevCommit rev :walk){
             if (count == 1) {
-                walk.dispose();
+                walk.close();
+                repo.close();
                 return rev;
             }
+            walk.dispose();
             count++;
         }
         return null;

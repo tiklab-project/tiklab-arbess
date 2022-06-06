@@ -5,9 +5,13 @@ import com.doublekit.join.annotation.Join;
 
 import java.util.List;
 
+/**
+ * 获取git代码的提交记录
+ */
+
 @ApiModel
 @Join
-public class Commit {
+public class GitCommit {
 
     //提交ID
     private String commitId;
@@ -25,7 +29,7 @@ public class Commit {
     private List<String> commitFile;
 
     //评论信息
-    private List<Commit> commit;
+    private List<GitCommit> gitCommit;
 
     //天数
     private String dayTime;
@@ -82,12 +86,12 @@ public class Commit {
         this.time = time;
     }
 
-    public List<Commit> getCommit() {
-        return commit;
+    public List<GitCommit> getCommit() {
+        return gitCommit;
     }
 
-    public void setCommit(List<Commit> commit) {
-        this.commit = commit;
+    public void setCommit(List<GitCommit> gitCommit) {
+        this.gitCommit = gitCommit;
     }
 
     public String getDayTime() {

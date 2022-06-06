@@ -162,8 +162,9 @@ public class CommonAchieve {
                 for (String child : children) {
                     boolean state = deleteFile(new File(file, child));
                     int tryCount = 0;
-                    while (!state && tryCount++ < 10) {
-                        System.gc();    //回收资源
+                    while (!state && tryCount++ < 30) {
+                        //回收资源
+                        System.gc();
                         state = file.delete();
                     }
                 }
