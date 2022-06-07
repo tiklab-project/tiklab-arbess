@@ -1,6 +1,7 @@
 package com.doublekit.pipeline.instance.service.execAchieve;
 
 import com.doublekit.pipeline.definition.model.PipelineConfigure;
+import com.doublekit.pipeline.execute.model.CodeGit.FileTree;
 import com.doublekit.pipeline.execute.model.PipelineCode;
 import com.doublekit.pipeline.execute.service.PipelineCodeService;
 import com.doublekit.pipeline.execute.service.PipelineCodeServiceImpl;
@@ -30,6 +31,7 @@ import org.tmatesoft.svn.core.wc2.SvnTarget;
 import java.io.File;
 import java.io.IOException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -92,7 +94,7 @@ public class CodeAchieve {
         //克隆代码
         try {
             if (proof.getProofType().equals("SSH")&&proof.getProofScope() == 1){
-                sshClone(pipelineCode.getCodeAddress(), proof.getProofPassword(), file, pipelineCode.getCodeBranch());
+                sshClone(pipelineCode.getCodeAddress(), proof.getProofPassword(), path, pipelineCode.getCodeBranch());
             }else {
                 UsernamePasswordCredentialsProvider credentialsProvider = commonAchieve.usernamePassword(proof.getProofUsername(), proof.getProofPassword());
                 clone(path, pipelineCode.getCodeAddress(), credentialsProvider, pipelineCode.getCodeBranch());
@@ -144,8 +146,9 @@ public class CodeAchieve {
      * @param clonePath 克隆位置
      * @param branch 分支
      */
-    public void sshClone(String url, String privateKeyPath,File clonePath,String branch) throws GitAPIException , JGitInternalException {
-
+    public void sshClone(String url, String privateKeyPath,String clonePath,String branch) throws GitAPIException, JGitInternalException, IOException {
+        Git git;
+        File fileAddress = new File(clonePath);
         SshSessionFactory sshSessionFactory = new JschConfigSessionFactory() {
             @Override
             protected void configure(OpenSshConfig.Host host, Session session ) {
@@ -159,16 +162,24 @@ public class CodeAchieve {
                 return defaultJSch;
             }
         };
-
-        Git.cloneRepository()
-              .setURI(url)
-              .setBranch(branch)
-              .setTransportConfigCallback(transport -> {
-                  SshTransport sshTransport = (SshTransport) transport;
-                  sshTransport.setSshSessionFactory(sshSessionFactory);
-              })
-              .setDirectory(clonePath)
-              .call().close();
+        if (!fileAddress.exists()){
+             git = Git.cloneRepository()
+                    .setURI(url)
+                    .setBranch(branch)
+                    .setTransportConfigCallback(transport -> {
+                        SshTransport sshTransport = (SshTransport) transport;
+                        sshTransport.setSshSessionFactory(sshSessionFactory);
+                    })
+                    .setDirectory(fileAddress)
+                    .call();
+        }else {
+            git = Git.open(new File(clonePath+"\\.git"));
+            git.pull().setTransportConfigCallback(transport -> {
+                SshTransport sshTransport = (SshTransport) transport;
+                sshTransport.setSshSessionFactory(sshSessionFactory);
+            }).call();
+        }
+        git.close();
     }
 
     /**
@@ -205,7 +216,6 @@ public class CodeAchieve {
         String s = "开始拉取代码 : " + "\n"
                 + "FileAddress : " + path + "\n"
                 + "Uri : " + pipelineCode.getCodeAddress() + "\n"
-                //+ "Branch : " + pipelineCode.getCodeBranch() + "\n"
                 + "proofType : " +proof.getProofType() + "\n" ;
         pipelineExecHistory.setRunLog(s);
         pipelineExecLog.setRunLog(s);
@@ -235,4 +245,33 @@ public class CodeAchieve {
         commonAchieve.updateState(pipelineExecHistory,pipelineExecLog,null,pipelineExecHistoryList);
         return 1;
     }
+
+    /**
+     * 获取文件树
+     * @param path 文件地址
+     * @param list 存放树的容器
+     * @return 树
+     */
+    public  List<FileTree> fileTree(File path, List<FileTree> list){
+        File[] files = path.listFiles();
+        if (files != null){
+            for (File file : files) {
+                FileTree fileTree = new FileTree();
+                fileTree.setTreeName(file.getName());
+                if (file.isDirectory()){
+                    fileTree.setTreeType(2);
+                    List<FileTree> trees = new ArrayList<>();
+                    fileTree.setFileTree(trees);
+                    fileTree(file,trees);
+                }else {
+                    fileTree.setTreePath(file.getPath());
+                    fileTree.setTreeType(1);
+
+                }
+                list.add(fileTree);
+            }
+        }
+        return list;
+    }
+
 }

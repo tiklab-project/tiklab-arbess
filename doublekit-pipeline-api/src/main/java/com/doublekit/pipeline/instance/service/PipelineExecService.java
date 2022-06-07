@@ -1,6 +1,9 @@
 package com.doublekit.pipeline.instance.service;
 
+import com.doublekit.pipeline.execute.model.CodeGit.FileTree;
 import com.doublekit.pipeline.instance.model.PipelineExecHistory;
+
+import java.util.List;
 
 /**
  * 流水线构建
@@ -34,5 +37,8 @@ public interface PipelineExecService {
      * @param pipelineId 流水线id
      */
     void killInstance(String pipelineId);
+
+    List<FileTree> fileTree(String pipelineId);
+
 
 }

@@ -4,6 +4,7 @@ package com.doublekit.pipeline.instance.service;
 import com.doublekit.pipeline.definition.model.Pipeline;
 import com.doublekit.pipeline.definition.model.PipelineConfigure;
 import com.doublekit.pipeline.definition.service.PipelineService;
+import com.doublekit.pipeline.execute.model.CodeGit.FileTree;
 import com.doublekit.pipeline.instance.model.PipelineExecHistory;
 import com.doublekit.pipeline.instance.service.execAchieve.*;
 import com.doublekit.rpc.annotation.Exporter;
@@ -12,7 +13,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -167,9 +170,20 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         commonAchieve.success(pipelineExecHistory, pipelineId, pipelineExecHistoryList);
     }
 
-
-
-
+    @Override
+    public List<FileTree> fileTree(String pipelineId){
+        Pipeline pipeline = pipelineService.findPipeline(pipelineId);
+        String path = "D:\\clone\\"+pipeline.getPipelineName();
+        List<FileTree> trees = new ArrayList<>();
+        File file = new File(path);
+        //判断文件是否存在
+        if (file.exists()){
+            List<FileTree> list = codeAchieve.fileTree(file, trees);
+            list.sort(Comparator.comparing(FileTree::getTreeType,Comparator.reverseOrder()));
+            return list;
+        }
+       return null;
+    }
 
 
 

@@ -5,6 +5,7 @@ import com.doublekit.apibox.annotation.ApiMethod;
 import com.doublekit.apibox.annotation.ApiParam;
 import com.doublekit.core.Result;
 import com.doublekit.pipeline.instance.model.PipelineExecHistory;
+import com.doublekit.pipeline.instance.model.PipelineHistoryQuery;
 import com.doublekit.pipeline.instance.service.PipelineExecHistoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -41,5 +42,13 @@ public class PipelineExecHistoryController {
         return Result.ok();
     }
 
+    //查询历史信息
+    @RequestMapping(path="/findLikeHistory",method = RequestMethod.POST)
+    @ApiMethod(name = "findLikeHistory",desc = "查询历史信息")
+    @ApiParam(name = "pipelineHistoryQuery",desc = "条件",required = true)
+    public Result< List<PipelineExecHistory>> findLikeHistory(@NotNull PipelineHistoryQuery pipelineHistoryQuery){
+        List<PipelineExecHistory> list = pipelineExecHistoryService.findLikeHistory(pipelineHistoryQuery);
+        return Result.ok(list);
+    }
 
 }

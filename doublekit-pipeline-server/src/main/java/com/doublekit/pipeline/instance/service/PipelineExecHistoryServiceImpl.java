@@ -1,10 +1,13 @@
 package com.doublekit.pipeline.instance.service;
 
 import com.doublekit.beans.BeanMapper;
+import com.doublekit.pipeline.definition.model.Pipeline;
+import com.doublekit.pipeline.definition.service.PipelineService;
 import com.doublekit.pipeline.instance.dao.PipelineExecHistoryDao;
 import com.doublekit.pipeline.instance.entity.PipelineExecHistoryEntity;
 import com.doublekit.pipeline.instance.model.PipelineExecHistory;
 import com.doublekit.pipeline.instance.model.PipelineExecLog;
+import com.doublekit.pipeline.instance.model.PipelineHistoryQuery;
 import com.doublekit.rpc.annotation.Exporter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +27,9 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
 
     @Autowired
     PipelineExecLogService pipelineExecLogService;
+
+    @Autowired
+    PipelineService pipelineService;
 
     private static final Logger logger = LoggerFactory.getLogger(PipelineExecHistoryServiceImpl.class);
 
@@ -70,7 +76,7 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
         return BeanMapper.mapList(pipelineExecHistoryEntityList, PipelineExecHistory.class);
     }
 
-    //根据流水线id查询所有
+    //根据流水线id查询所有历史
     @Override
     public List<PipelineExecHistory> findAllHistory(String pipelineId) {
         List<PipelineExecHistory> allHistory = findAllHistory();
@@ -90,7 +96,7 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
         return historyList;
     }
 
-    //查询最近一次历史
+    //查询最近一次执行历史
     @Override
     public PipelineExecHistory findLatelyHistory(String pipelineId){
         List<PipelineExecHistory> allHistory = findAllHistory(pipelineId);
@@ -104,7 +110,7 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
         return allHistory.get(0);
     }
 
-    //查询最近一次成功
+    //查询最近一次成功记录
     @Override
     public PipelineExecHistory findLatelySuccess(String pipelineId){
         List<PipelineExecHistory> allHistory = findAllHistory(pipelineId);
@@ -125,8 +131,30 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
         return BeanMapper.mapList(pipelineExecHistoryEntityList, PipelineExecHistory.class);
     }
 
+    //根据条件筛选历史信息
+    @Override
+    public List<PipelineExecHistory> findLikeHistory(PipelineHistoryQuery pipelineHistoryQuery){
+        Pipeline pipeline = pipelineService.findPipeline(pipelineHistoryQuery.getPipelineId());
+        if (pipeline == null){
+            return null;
+        }
+        List<PipelineExecHistory> allHistory = findAllHistory(pipelineHistoryQuery.getPipelineId());
+        ArrayList<PipelineExecHistory> list = new ArrayList<>();
+        if (allHistory != null){
+            for (PipelineExecHistory pipelineExecHistory : allHistory) {
+                if (pipelineHistoryQuery.getState() == pipelineExecHistory.getRunStatus()
+                        //&& pipelineHistoryQuery.getType() == pipelineExecHistory.getRunWay()
+                        //&& pipelineHistoryQuery.getName().equals(pipeline.getPipelineName())
+                 ){
+                        list.add(pipelineExecHistory);
+                }
+            }
+            return list;
+        }
+        return null;
+    }
 
-
+    //时间转换成时分秒
     public static String formatDateTime(long time) {
         String DateTimes ;
         long days = time / ( 60 * 60 * 24);

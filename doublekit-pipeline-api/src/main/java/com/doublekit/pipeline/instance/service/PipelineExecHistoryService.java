@@ -6,6 +6,7 @@ import com.doublekit.join.annotation.FindOne;
 import com.doublekit.join.annotation.JoinProvider;
 import com.doublekit.pipeline.instance.model.PipelineExecHistory;
 import com.doublekit.pipeline.instance.model.PipelineExecLog;
+import com.doublekit.pipeline.instance.model.PipelineHistoryQuery;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -80,6 +81,13 @@ public interface PipelineExecHistoryService {
      */
     @FindAll
     List<PipelineExecHistory> findAllHistory(String pipelineId);
+
+    /**
+     * 根据条件筛选历史
+     * @param pipelineHistoryQuery 条件
+     * @return 历史信息
+     */
+    List<PipelineExecHistory> findLikeHistory(PipelineHistoryQuery pipelineHistoryQuery);
 
     @FindList
     List<PipelineExecHistory> findHistoryList(List<String> idList);

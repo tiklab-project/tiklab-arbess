@@ -123,9 +123,7 @@ public class GitCommitServiceImpl implements GitCommitService {
         for (DiffEntry ignored : diffs) {
             returnDiffs = diffs;
         }
-
         git.close();
-        repo.close();
         return returnDiffs;
     }
 
@@ -136,8 +134,6 @@ public class GitCommitServiceImpl implements GitCommitService {
         int count = 0;
         for(RevCommit rev :walk){
             if (count == 1) {
-                walk.close();
-                repo.close();
                 return rev;
             }
             walk.dispose();

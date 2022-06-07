@@ -4,14 +4,16 @@ import com.doublekit.apibox.annotation.Api;
 import com.doublekit.apibox.annotation.ApiMethod;
 import com.doublekit.apibox.annotation.ApiParam;
 import com.doublekit.core.Result;
-
+import com.doublekit.pipeline.execute.model.CodeGit.FileTree;
 import com.doublekit.pipeline.instance.model.PipelineExecHistory;
 import com.doublekit.pipeline.instance.service.PipelineExecService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 @RestController
 @RequestMapping("/pipelineExec")
@@ -55,7 +57,13 @@ public class PipelineExecController {
         return Result.ok();
     }
 
-
+    @RequestMapping(path="/fileTree",method = RequestMethod.POST)
+    @ApiMethod(name = "fileTree",desc = "判断是否执行")
+    @ApiParam(name = "pipelineId",desc = "流水线id",required = true)
+    public Result< List<FileTree>> fileTree(@NotNull String pipelineId) {
+        List<FileTree> map = pipelineExecService.fileTree(pipelineId);
+        return Result.ok(map);
+    }
 
 
 }
