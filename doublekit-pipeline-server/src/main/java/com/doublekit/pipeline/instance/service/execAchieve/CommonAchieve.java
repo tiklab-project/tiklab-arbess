@@ -5,6 +5,7 @@ import com.doublekit.pipeline.definition.model.PipelineConfigure;
 import com.doublekit.pipeline.definition.service.PipelineService;
 import com.doublekit.pipeline.instance.model.PipelineExecHistory;
 import com.doublekit.pipeline.instance.model.PipelineExecLog;
+import com.doublekit.pipeline.instance.model.PipelineProcess;
 import com.doublekit.pipeline.instance.service.PipelineExecHistoryService;
 import com.doublekit.pipeline.instance.service.PipelineExecLogService;
 import com.doublekit.rpc.annotation.Exporter;
@@ -42,12 +43,13 @@ public class CommonAchieve {
     /**
      * 执行日志
      * @param inputStreamReader 执行信息
-     * @param pipelineExecHistory 历史
+     * @param pipelineProcess 执行信息
      * @throws IOException 字符流转换异常
      * @return map 执行状态
      */
-    public int log(InputStreamReader inputStreamReader, PipelineExecHistory pipelineExecHistory,List<PipelineExecHistory> pipelineExecHistoryList,PipelineExecLog pipelineExecLog) throws IOException {
-
+    public int log(InputStreamReader inputStreamReader, PipelineProcess pipelineProcess,List<PipelineExecHistory> pipelineExecHistoryList) throws IOException {
+        PipelineExecHistory pipelineExecHistory = pipelineProcess.getPipelineExecHistory();
+        PipelineExecLog pipelineExecLog = pipelineProcess.getPipelineExecLog();
         String s;
         BufferedReader  bufferedReader = new BufferedReader(inputStreamReader);
         StringBuilder logRunLog = new StringBuilder();
@@ -70,9 +72,6 @@ public class CommonAchieve {
         return 1;
     }
 
-
-
-
     /**
      * 获取符合条件的文件名
      * @param path 文件地址
@@ -93,7 +92,7 @@ public class CommonAchieve {
     }
 
     /**
-     * 获取文件名
+     * 匹配字符串获取文件名
      * @param path 文件地址
      * @param regex 匹配条件
      * @return 文件地址
@@ -176,25 +175,27 @@ public class CommonAchieve {
 
     /**
      * 更新执行时间
-     * @param pipelineExecHistory 历史
-     * @param pipelineExecLog 日志
+     * @param pipelineProcess 执行信息
      * @param beginTime 开始时间
      */
-    public void updateTime(PipelineExecHistory pipelineExecHistory, PipelineExecLog pipelineExecLog, long beginTime){
+    public void updateTime(PipelineProcess pipelineProcess, long beginTime){
         long overTime = new Timestamp(System.currentTimeMillis()).getTime();
         int time = (int) (overTime - beginTime) / 1000;
+        PipelineExecLog pipelineExecLog = pipelineProcess.getPipelineExecLog();
+        PipelineExecHistory pipelineExecHistory = pipelineProcess.getPipelineExecHistory();
         pipelineExecLog.setRunTime(time);
         pipelineExecHistory.setRunTime(pipelineExecHistory.getRunTime()+time);
     }
 
     /**
      * 更新状态
-     * @param pipelineExecHistory 历史
-     * @param pipelineExecLog 日志
+     * @param pipelineProcess 执行信息
      * @param e 异常
      * @param pipelineExecHistoryList 状态集合
      */
-    public  void updateState(PipelineExecHistory pipelineExecHistory,PipelineExecLog pipelineExecLog,String e,List<PipelineExecHistory> pipelineExecHistoryList){
+    public  void updateState(PipelineProcess pipelineProcess,String e,List<PipelineExecHistory> pipelineExecHistoryList){
+        PipelineExecLog pipelineExecLog = pipelineProcess.getPipelineExecLog();
+        PipelineExecHistory pipelineExecHistory = pipelineProcess.getPipelineExecHistory();
         pipelineExecLog.setRunState(10);
         Pipeline onePipeline = pipelineExecHistory.getPipeline();
         pipelineExecLog.setHistoryId(pipelineExecHistory.getHistoryId());
@@ -293,7 +294,7 @@ public class CommonAchieve {
      * @param historyId 历史id
      * @return 历史
      */
-    public PipelineExecHistory initializeHistory( String historyId,Pipeline pipeline ) {
+    public PipelineExecHistory initializeHistory( String historyId,Pipeline pipeline) {
         PipelineExecHistory pipelineExecHistory = new PipelineExecHistory();
         String time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
         pipelineExecHistory.setCreateTime(time);

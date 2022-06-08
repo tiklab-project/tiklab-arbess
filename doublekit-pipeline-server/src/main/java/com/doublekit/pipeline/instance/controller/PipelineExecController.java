@@ -65,5 +65,12 @@ public class PipelineExecController {
         return Result.ok(map);
     }
 
+    @RequestMapping(path="/readFile",method = RequestMethod.POST)
+    @ApiMethod(name = "readFile",desc = "判断是否执行")
+    @ApiParam(name = "path",desc = "文件地址",required = true)
+    public Result< List<String>> readFile(@NotNull String path) {
+        List<String> s = pipelineExecService.readFile(path);
+        return Result.ok(s);
+    }
 
 }

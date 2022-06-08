@@ -8,6 +8,7 @@ import com.doublekit.pipeline.instance.model.PipelineExecHistory;
 import com.doublekit.pipeline.instance.model.PipelineHistoryQuery;
 import com.doublekit.pipeline.instance.service.PipelineExecHistoryService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -46,7 +47,7 @@ public class PipelineExecHistoryController {
     @RequestMapping(path="/findLikeHistory",method = RequestMethod.POST)
     @ApiMethod(name = "findLikeHistory",desc = "查询历史信息")
     @ApiParam(name = "pipelineHistoryQuery",desc = "条件",required = true)
-    public Result< List<PipelineExecHistory>> findLikeHistory(@NotNull PipelineHistoryQuery pipelineHistoryQuery){
+    public Result< List<PipelineExecHistory>> findLikeHistory(@NotNull @RequestBody PipelineHistoryQuery pipelineHistoryQuery){
         List<PipelineExecHistory> list = pipelineExecHistoryService.findLikeHistory(pipelineHistoryQuery);
         return Result.ok(list);
     }

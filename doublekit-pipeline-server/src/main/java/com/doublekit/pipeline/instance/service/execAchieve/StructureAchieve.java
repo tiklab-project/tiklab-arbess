@@ -5,6 +5,7 @@ import com.doublekit.pipeline.execute.model.PipelineStructure;
 import com.doublekit.pipeline.execute.service.PipelineStructureService;
 import com.doublekit.pipeline.instance.model.PipelineExecHistory;
 import com.doublekit.pipeline.instance.model.PipelineExecLog;
+import com.doublekit.pipeline.instance.model.PipelineProcess;
 import com.doublekit.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,19 +27,18 @@ public class StructureAchieve {
     CommonAchieve commonAchieve;
 
 
-    public int structureStart(PipelineConfigure pipelineConfigure, PipelineExecHistory pipelineExecHistory,List<PipelineExecHistory> pipelineExecHistoryList){
-      return structure(pipelineConfigure,pipelineExecHistory,pipelineExecHistoryList);
-    }
-
     // 构建
-    private int structure(PipelineConfigure pipelineConfigure, PipelineExecHistory pipelineExecHistory,List<PipelineExecHistory> pipelineExecHistoryList)  {
+    public int structure(PipelineProcess pipelineProcess, List<PipelineExecHistory> pipelineExecHistoryList)  {
         long beginTime = new Timestamp(System.currentTimeMillis()).getTime();
         //初始化日志
+        PipelineExecHistory pipelineExecHistory = pipelineProcess.getPipelineExecHistory();
+        PipelineConfigure pipelineConfigure = pipelineProcess.getPipelineConfigure();
         PipelineExecLog pipelineExecLog = commonAchieve.initializeLog(pipelineExecHistory, pipelineConfigure);
 
         PipelineStructure pipelineStructure = pipelineStructureService.findOneStructure(pipelineConfigure.getTaskId());
         String structureOrder = pipelineStructure.getStructureOrder();
         String structureAddress = pipelineStructure.getStructureAddress();
+        pipelineProcess.setPipelineExecLog(pipelineExecLog);
         //设置拉取地址
         String path = "D:\\clone\\"+pipelineConfigure.getPipeline().getPipelineName();
         try {
@@ -51,18 +51,18 @@ public class StructureAchieve {
             pipelineExecLog.setRunLog(pipelineExecLog.getRunLog()+a);
             //构建失败
             InputStreamReader inputStreamReader = new InputStreamReader(process.getInputStream(), Charset.forName("GBK"));
-            int state = commonAchieve.log(inputStreamReader, pipelineExecHistory,pipelineExecHistoryList,pipelineExecLog);
+            int state = commonAchieve.log(inputStreamReader, pipelineProcess,pipelineExecHistoryList);
             process.destroy();
-            commonAchieve.updateTime(pipelineExecHistory,pipelineExecLog,beginTime);
+            commonAchieve.updateTime(pipelineProcess,beginTime);
             if (state == 0){
-                commonAchieve.updateState(pipelineExecHistory,pipelineExecLog,"构建失败。",pipelineExecHistoryList);
+                commonAchieve.updateState(pipelineProcess,"构建失败。",pipelineExecHistoryList);
                 return 0;
             }
         } catch (IOException e) {
-            commonAchieve.updateState(pipelineExecHistory,pipelineExecLog,e.getMessage(),pipelineExecHistoryList);
+            commonAchieve.updateState(pipelineProcess,e.getMessage(),pipelineExecHistoryList);
             return 0;
         }
-        commonAchieve.updateState(pipelineExecHistory,pipelineExecLog,null,pipelineExecHistoryList);
+        commonAchieve.updateState(pipelineProcess,null,pipelineExecHistoryList);
         return 1;
     }
 }

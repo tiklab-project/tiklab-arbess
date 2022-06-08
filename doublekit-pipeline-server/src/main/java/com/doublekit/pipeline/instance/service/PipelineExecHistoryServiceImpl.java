@@ -134,22 +134,16 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
     //根据条件筛选历史信息
     @Override
     public List<PipelineExecHistory> findLikeHistory(PipelineHistoryQuery pipelineHistoryQuery){
-        Pipeline pipeline = pipelineService.findPipeline(pipelineHistoryQuery.getPipelineId());
+         Pipeline pipeline = pipelineService.findPipeline(pipelineHistoryQuery.getPipelineId());
         if (pipeline == null){
             return null;
         }
         List<PipelineExecHistory> allHistory = findAllHistory(pipelineHistoryQuery.getPipelineId());
-        ArrayList<PipelineExecHistory> list = new ArrayList<>();
         if (allHistory != null){
-            for (PipelineExecHistory pipelineExecHistory : allHistory) {
-                if (pipelineHistoryQuery.getState() == pipelineExecHistory.getRunStatus()
-                        //&& pipelineHistoryQuery.getType() == pipelineExecHistory.getRunWay()
-                        //&& pipelineHistoryQuery.getName().equals(pipeline.getPipelineName())
-                 ){
-                        list.add(pipelineExecHistory);
-                }
-            }
-            return list;
+            allHistory.removeIf(pipelineExecHistory -> pipelineHistoryQuery.getState() != pipelineExecHistory.getRunStatus() && pipelineHistoryQuery.getState() != 0);
+            allHistory.removeIf(pipelineExecHistory -> pipelineHistoryQuery.getName() != null && !pipelineHistoryQuery.getName().equals(pipeline.getPipelineCreateUser()));
+            allHistory.removeIf(pipelineExecHistory -> pipelineHistoryQuery.getType() != pipelineExecHistory.getRunWay() && pipelineHistoryQuery.getType() != 0);
+            return allHistory;
         }
         return null;
     }

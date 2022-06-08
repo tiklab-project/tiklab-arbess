@@ -10,6 +10,7 @@ import com.doublekit.rpc.annotation.Exporter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
@@ -85,6 +86,12 @@ public class CodeGiteeApiServiceImpl implements CodeGiteeApiService {
             messageConverters.set(1, new StringHttpMessageConverter(StandardCharsets.UTF_8));
 
             ResponseEntity<String> returnBody = restTemplate.getForEntity(allStorehouseAddress, String.class, JSONObject.class);
+
+            HttpStatus statusCode = returnBody.getStatusCode();
+            if (statusCode.isError()){
+                return null;
+            }
+
             String body = returnBody.getBody();
             if (body != null){
                 logger.info("仓库信息 ： "+body);
@@ -148,6 +155,10 @@ public class CodeGiteeApiServiceImpl implements CodeGiteeApiService {
             assert false;
             String branchAddress = codeGiteeApi.getWarehouseBranch(proof.getProofUsername(),name,proof.getProofPassword());
              ResponseEntity<String> forEntity = restTemplate.getForEntity(branchAddress, String.class, JSONObject.class);
+            HttpStatus statusCode = forEntity.getStatusCode();
+            if (statusCode.isError()){
+                return null;
+            }
             JSONArray branchS = JSONArray.parseArray(forEntity.getBody());
             if (branchS != null) {
                 for (int i = 0; i < branchS.size(); i++) {

@@ -6,6 +6,7 @@ import com.doublekit.pipeline.definition.model.PipelineConfigure;
 import com.doublekit.pipeline.definition.service.PipelineService;
 import com.doublekit.pipeline.execute.model.CodeGit.FileTree;
 import com.doublekit.pipeline.instance.model.PipelineExecHistory;
+import com.doublekit.pipeline.instance.model.PipelineProcess;
 import com.doublekit.pipeline.instance.service.execAchieve.*;
 import com.doublekit.rpc.annotation.Exporter;
 import org.slf4j.Logger;
@@ -31,7 +32,6 @@ public class PipelineExecServiceImpl implements PipelineExecService {
     @Autowired
     PipelineService pipelineService;
 
-
     @Autowired
     CommonAchieve commonAchieve;
 
@@ -46,7 +46,6 @@ public class PipelineExecServiceImpl implements PipelineExecService {
 
     @Autowired
     DeployAchieve deployAchieve;
-
 
     //存放过程状态
     List<PipelineExecHistory> pipelineExecHistoryList = new ArrayList<>();
@@ -123,15 +122,20 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         Pipeline pipeline = pipelineService.findPipeline(pipelineId);
         pipeline.setPipelineState(1);
         pipelineService.updatePipeline(pipeline);
-        List<PipelineConfigure> allConfigure = pipelineService.findPipelineConfigure(pipelineId);
+
         String historyId = pipelineExecHistoryService.createHistory(new PipelineExecHistory());
         PipelineExecHistory pipelineExecHistory = commonAchieve.initializeHistory(historyId,pipeline);
+
+        PipelineProcess pipelineProcess = new PipelineProcess();
+        List<PipelineConfigure> allConfigure = pipelineService.findPipelineConfigure(pipelineId);
         if (allConfigure != null){
             for (PipelineConfigure pipelineConfigure : allConfigure) {
+                pipelineProcess.setPipelineExecHistory(pipelineExecHistory);
+                pipelineProcess.setPipelineConfigure(pipelineConfigure);
                 pipelineExecHistoryList.add(pipelineExecHistory);
                 switch (pipelineConfigure.getTaskType()) {
-                    case 1, 2,5 -> {
-                        int state = codeAchieve.codeStart(pipelineConfigure, pipelineExecHistory, pipelineExecHistoryList);
+                    case 1,2,3,4,5 -> {
+                        int state = codeAchieve.clone(pipelineProcess, pipelineExecHistoryList);
                         if (state == 0) {
                             pipeline.setPipelineState(0);
                             pipelineService.updatePipeline(pipeline);
@@ -139,7 +143,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
                         }
                     }
                     case 11 -> {
-                        int state = testAchieve.testStart(pipelineConfigure, pipelineExecHistory, pipelineExecHistoryList);
+                        int state = testAchieve.test(pipelineProcess, pipelineExecHistoryList);
                         if (state == 0) {
                             pipeline.setPipelineState(0);
                             pipelineService.updatePipeline(pipeline);
@@ -147,7 +151,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
                         }
                     }
                     case 21, 22 -> {
-                        int state  = structureAchieve.structureStart(pipelineConfigure, pipelineExecHistory, pipelineExecHistoryList);
+                        int state  = structureAchieve.structure(pipelineProcess, pipelineExecHistoryList);
                         if (state == 0) {
                             pipeline.setPipelineState(0);
                             pipelineService.updatePipeline(pipeline);
@@ -155,7 +159,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
                         }
                     }
                     case 31, 32-> {
-                        int state = deployAchieve.deployStart(pipelineConfigure, pipelineExecHistory, pipelineExecHistoryList);
+                        int state = deployAchieve.deploy(pipelineProcess, pipelineExecHistoryList);
                         if (state == 0) {
                             pipeline.setPipelineState(0);
                             pipelineService.updatePipeline(pipeline);
@@ -170,6 +174,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         commonAchieve.success(pipelineExecHistory, pipelineId, pipelineExecHistoryList);
     }
 
+    //获取文件树
     @Override
     public List<FileTree> fileTree(String pipelineId){
         Pipeline pipeline = pipelineService.findPipeline(pipelineId);
@@ -185,6 +190,11 @@ public class PipelineExecServiceImpl implements PipelineExecService {
        return null;
     }
 
+    //
+    @Override
+    public  List<String> readFile(String path){
+        return codeAchieve.readFile(path);
+    }
 
 
 
