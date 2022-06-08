@@ -69,19 +69,7 @@ public class PipelineCodeServiceImpl implements PipelineCodeService {
 
         if (pipelineCode.getProof() != null && pipelineCode.getProof().getProofId()!= null){
             //通过授权信息获取仓库url
-            if (pipelineCode.getType() == 2 ){
-                String cloneUrl = codeGiteeApiService.getCloneUrl(pipelineCode.getProof().getProofId(),pipelineCode.getCodeName());
-                if (cloneUrl == null){
-                    return null;
-                }
-                pipelineCode.setCodeAddress(cloneUrl);
-            }else if (pipelineCode.getType() == 3){
-                String cloneUrl = codeGitHubService.getOneHouse(pipelineCode.getProof().getProofId(),pipelineCode.getCodeName());
-                if (cloneUrl == null){
-                    return null;
-                }
-                pipelineCode.setCodeAddress(cloneUrl);
-            }
+            getUrl(pipelineCode);
         }
 
         String codeId = createCode(pipelineCode);
@@ -113,6 +101,17 @@ public class PipelineCodeServiceImpl implements PipelineCodeService {
         pipelineCodeDao.updateCode(BeanMapper.map(pipelineCode,PipelineCodeEntity.class));
     }
 
+    //通过授权信息获取仓库url
+    private void getUrl( PipelineCode pipelineCode){
+        if (pipelineCode.getType() == 2 ){
+            String cloneUrl = codeGiteeApiService.getCloneUrl(pipelineCode.getProof().getProofId(),pipelineCode.getCodeName());
+            pipelineCode.setCodeAddress(cloneUrl);
+        }else if (pipelineCode.getType() == 3){
+            String cloneUrl = codeGitHubService.getOneHouse(pipelineCode.getProof().getProofId(),pipelineCode.getCodeName());
+            pipelineCode.setCodeAddress(cloneUrl);
+        }
+    }
+
     //修改任务
     @Override
     public void updateTask(PipelineExecConfigure pipelineExecConfigure) {
@@ -127,13 +126,7 @@ public class PipelineCodeServiceImpl implements PipelineCodeService {
                 oneConfigure.setTaskType(pipelineCode.getType());
 
                 //通过授权信息获取仓库url
-                if (pipelineCode.getType() == 2){
-                    String cloneUrl = codeGiteeApiService.getCloneUrl(pipelineCode.getProof().getProofId(),pipelineCode.getCodeName());
-                    pipelineCode.setCodeAddress(cloneUrl);
-                }else if (pipelineCode.getType() == 3){
-                    String cloneUrl = codeGitHubService.getOneHouse(pipelineCode.getProof().getProofId(),pipelineCode.getCodeName());
-                    pipelineCode.setCodeAddress(cloneUrl);
-                }
+                getUrl(pipelineCode);
 
                 updateCode(pipelineCode);
                 oneConfigure.setTaskAlias(pipelineCode.getCodeAlias());

@@ -7,6 +7,9 @@ import com.doublekit.pipeline.execute.model.PipelineStructure;
 import com.doublekit.pipeline.execute.model.PipelineTest;
 import com.doublekit.pipeline.setting.proof.model.Proof;
 
+/**
+ * 存放执行的信息
+ */
 public class PipelineProcess {
 
     private Proof proof;

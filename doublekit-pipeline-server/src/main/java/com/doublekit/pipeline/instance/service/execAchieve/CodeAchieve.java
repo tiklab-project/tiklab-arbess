@@ -261,7 +261,6 @@ public class CodeAchieve {
                 }else {
                     fileTree.setTreePath(file.getPath());
                     fileTree.setTreeType(1);
-
                 }
                 list.add(fileTree);
                 list.sort(Comparator.comparing(FileTree::getTreeType,Comparator.reverseOrder()));

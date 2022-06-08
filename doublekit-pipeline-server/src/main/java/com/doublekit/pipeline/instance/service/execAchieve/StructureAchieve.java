@@ -45,6 +45,7 @@ public class StructureAchieve {
             String a = "------------------------------------" + " \n"
                     +"开始构建" + " \n"
                     +"执行 : \""  + structureOrder + "\"\n";
+
             Process process = commonAchieve.process(path, structureOrder, structureAddress);
 
             pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog() + a);
