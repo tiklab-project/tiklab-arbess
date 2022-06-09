@@ -79,5 +79,13 @@ public class GiteeApiController {
         return Result.ok(branch);
     }
 
+    @RequestMapping(path="/getState",method = RequestMethod.POST)
+    @ApiMethod(name = "getState",desc = "根据仓库名获取所有分支")
+    @ApiParam(name = "code",desc = "code",required = true)
+    public Result<Integer> getState(String code ,int state){
+        int states = codeGiteeApiService.getState(code,state);
+        return Result.ok(states);
+    }
+
 }
 

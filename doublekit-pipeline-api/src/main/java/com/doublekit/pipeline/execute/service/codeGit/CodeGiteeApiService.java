@@ -59,4 +59,7 @@ public interface CodeGiteeApiService {
      * @return 克隆地址
      */
     String getCloneUrl(String proofId,String projectName);
+
+
+    int getState(String code,int state);
 }

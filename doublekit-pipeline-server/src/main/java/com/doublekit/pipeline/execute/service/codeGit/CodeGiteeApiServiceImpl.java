@@ -16,7 +16,6 @@ import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -188,6 +187,32 @@ public class CodeGiteeApiServiceImpl implements CodeGiteeApiService {
             return jsonObject.getString("html_url");
         }
         return null;
+    }
+
+    int s = 0;
+
+    @Override
+    public int getState(String code,int state) {
+        if (state == 1){
+            if (!code.equals("access_denied")){
+                s = 1;
+            }else {
+                s = 2;
+            }
+        }
+        if (state == 0){
+            switch (s) {
+                case 1 -> {
+                    s = 0;
+                    return 1;
+                }
+                case 2 -> {
+                    s = 0;
+                    return 2;
+                }
+            }
+        }
+        return 0;
     }
 
     /**

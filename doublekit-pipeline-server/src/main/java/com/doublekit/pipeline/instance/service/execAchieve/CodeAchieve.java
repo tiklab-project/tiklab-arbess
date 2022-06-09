@@ -232,7 +232,7 @@ public class CodeAchieve {
     public void sshSvn(PipelineCode pipelineCode,Proof proof,String path) throws SVNException {
         SvnOperationFactory svnOperationFactory = new SvnOperationFactory();
         BasicAuthenticationManager auth = BasicAuthenticationManager
-                .newInstance(proof.getProofUsername(), new File("proof.getProofPassword()"),null,22);
+                .newInstance(proof.getProofUsername(), new File(proof.getProofPassword()),null,22);
         svnOperationFactory.setAuthenticationManager(auth);
         SvnCheckout checkout = svnOperationFactory.createCheckout();
         checkout.setSource(SvnTarget.fromURL(SVNURL.parseURIEncoded(pipelineCode.getCodeAddress())));
@@ -275,6 +275,9 @@ public class CodeAchieve {
      * @return 文件信息
      */
     public List<String> readFile(String path) {
+        if (path == null){
+            return null;
+        }
         List<String> lines;
         try {
             lines = Files.readAllLines(Paths.get(path),

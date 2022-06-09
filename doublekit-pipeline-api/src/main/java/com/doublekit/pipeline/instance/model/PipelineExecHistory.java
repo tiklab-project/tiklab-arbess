@@ -64,6 +64,13 @@ public class PipelineExecHistory {
     @ApiProperty(name="findState",desc="判断是否正在执行")
     private int findState;
 
+    //时间
+    private String oneTime;
+    private String twoTime;
+    private String threeTime;
+    private String fourTime;
+    private String allTime;
+
     public String getHistoryId() {
         return historyId;
     }
@@ -158,5 +165,45 @@ public class PipelineExecHistory {
 
     public void setFindState(int findState) {
         this.findState = findState;
+    }
+
+    public String getOneTime() {
+        return oneTime;
+    }
+
+    public void setOneTime(String oneTime) {
+        this.oneTime = oneTime;
+    }
+
+    public String getTwoTime() {
+        return twoTime;
+    }
+
+    public void setTwoTime(String twoTime) {
+        this.twoTime = twoTime;
+    }
+
+    public String getThreeTime() {
+        return threeTime;
+    }
+
+    public void setThreeTime(String threeTime) {
+        this.threeTime = threeTime;
+    }
+
+    public String getFourTime() {
+        return fourTime;
+    }
+
+    public void setFourTime(String fourTime) {
+        this.fourTime = fourTime;
+    }
+
+    public String getAllTime() {
+        return allTime;
+    }
+
+    public void setAllTime(String allTime) {
+        this.allTime = allTime;
     }
 }

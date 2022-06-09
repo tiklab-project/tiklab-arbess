@@ -70,6 +70,9 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         return 1;
     }
 
+    //存放运行时间
+    int[] time = {1,0,0,0};
+
     //查询构建中的信息
     @Override
     public PipelineExecHistory findInstanceState(String pipelineId){
@@ -77,6 +80,12 @@ public class PipelineExecServiceImpl implements PipelineExecService {
             for (PipelineExecHistory pipelineExecHistory : pipelineExecHistoryList) {
                 if (pipelineExecHistory.getPipeline() != null){
                     if (pipelineExecHistory.getPipeline().getPipelineId().equals(pipelineId)){
+                        time[pipelineExecHistory.getSort()-1] = time[pipelineExecHistory.getSort()-1] + 1;
+                        pipelineExecHistory.setOneTime(pipelineExecHistoryService.formatDateTime(time[0]));
+                        pipelineExecHistory.setTwoTime(pipelineExecHistoryService.formatDateTime(time[1]));
+                        pipelineExecHistory.setThreeTime(pipelineExecHistoryService.formatDateTime(time[2]));
+                        pipelineExecHistory.setFourTime(pipelineExecHistoryService.formatDateTime(time[3]));
+                        pipelineExecHistory.setAllTime(pipelineExecHistoryService.formatDateTime(time[0]+time[1]+time[2]+time[3]));
                         return  pipelineExecHistory;
                     }
                 }
@@ -88,6 +97,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
     //停止运行
     @Override
     public void killInstance(String pipelineId) {
+        time[0]=1;time[1]=0;time[2]=0;time[3]=0;
         PipelineExecHistory pipelineExecHistory = findInstanceState(pipelineId);
         pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+"\n"+"流水线停止运行......");
         pipelineExecHistoryList.add(pipelineExecHistory);
@@ -137,32 +147,28 @@ public class PipelineExecServiceImpl implements PipelineExecService {
                     case 1,2,3,4,5 -> {
                         int state = codeAchieve.clone(pipelineProcess, pipelineExecHistoryList);
                         if (state == 0) {
-                            pipeline.setPipelineState(0);
-                            pipelineService.updatePipeline(pipeline);
+                            error(pipeline);
                             return ;
                         }
                     }
                     case 11 -> {
                         int state = testAchieve.test(pipelineProcess, pipelineExecHistoryList);
                         if (state == 0) {
-                            pipeline.setPipelineState(0);
-                            pipelineService.updatePipeline(pipeline);
+                            error(pipeline);
                             return ;
                         }
                     }
                     case 21, 22 -> {
                         int state  = structureAchieve.structure(pipelineProcess, pipelineExecHistoryList);
                         if (state == 0) {
-                            pipeline.setPipelineState(0);
-                            pipelineService.updatePipeline(pipeline);
+                            error(pipeline);
                             return ;
                         }
                     }
                     case 31, 32-> {
                         int state = deployAchieve.deploy(pipelineProcess, pipelineExecHistoryList);
                         if (state == 0) {
-                            pipeline.setPipelineState(0);
-                            pipelineService.updatePipeline(pipeline);
+                            error(pipeline);
                             return ;
                         }
                     }
@@ -172,6 +178,13 @@ public class PipelineExecServiceImpl implements PipelineExecService {
             }
         }
         commonAchieve.success(pipelineExecHistory, pipelineId, pipelineExecHistoryList);
+        time[0]=1;time[1]=0;time[2]=0;time[3]=0;
+    }
+
+    private void error(Pipeline pipeline){
+        pipeline.setPipelineState(0);
+        pipelineService.updatePipeline(pipeline);
+        time[0]=1;time[1]=0;time[2]=0;time[3]=0;
     }
 
     //获取文件树

@@ -91,4 +91,11 @@ public interface PipelineExecHistoryService {
 
     @FindList
     List<PipelineExecHistory> findHistoryList(List<String> idList);
+
+    /**
+     * 时间转换器
+     * @param time 时间
+     * @return 时间
+     */
+    String formatDateTime(long time);
 }

@@ -9,7 +9,6 @@ import com.doublekit.pipeline.instance.model.PipelineProcess;
 import com.doublekit.pipeline.instance.service.PipelineExecHistoryService;
 import com.doublekit.pipeline.instance.service.PipelineExecLogService;
 import com.doublekit.rpc.annotation.Exporter;
-import com.ibm.icu.text.SimpleDateFormat;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.slf4j.Logger;
@@ -22,8 +21,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Service
@@ -183,7 +183,7 @@ public class CommonAchieve {
         int time = (int) (overTime - beginTime) / 1000;
         PipelineExecLog pipelineExecLog = pipelineProcess.getPipelineExecLog();
         PipelineExecHistory pipelineExecHistory = pipelineProcess.getPipelineExecHistory();
-        pipelineExecLog.setRunTime(time);
+        pipelineExecLog.setRunTime(time+1);
         pipelineExecHistory.setRunTime(pipelineExecHistory.getRunTime()+time);
     }
 
@@ -296,7 +296,7 @@ public class CommonAchieve {
      */
     public PipelineExecHistory initializeHistory( String historyId,Pipeline pipeline) {
         PipelineExecHistory pipelineExecHistory = new PipelineExecHistory();
-        String time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+        String time = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
         pipelineExecHistory.setCreateTime(time);
         pipelineExecHistory.setRunWay(1);
         pipelineExecHistory.setSort(1);

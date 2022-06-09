@@ -65,7 +65,6 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
     @Override
     public PipelineExecHistory findOneHistory(String historyId) {
         PipelineExecHistoryEntity pipelineExecHistoryEntity = pipelineExecHistoryDao.findOneHistory(historyId);
-        // joinTemplate.joinQuery(pipelineExecHistory);
         return BeanMapper.map(pipelineExecHistoryEntity, PipelineExecHistory.class);
     }
 
@@ -140,16 +139,20 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
         }
         List<PipelineExecHistory> allHistory = findAllHistory(pipelineHistoryQuery.getPipelineId());
         if (allHistory != null){
-            allHistory.removeIf(pipelineExecHistory -> pipelineHistoryQuery.getState() != pipelineExecHistory.getRunStatus() && pipelineHistoryQuery.getState() != 0);
-            allHistory.removeIf(pipelineExecHistory -> pipelineHistoryQuery.getName() != null && !pipelineHistoryQuery.getName().equals(pipeline.getPipelineCreateUser()));
-            allHistory.removeIf(pipelineExecHistory -> pipelineHistoryQuery.getType() != pipelineExecHistory.getRunWay() && pipelineHistoryQuery.getType() != 0);
+            allHistory.removeIf(pipelineExecHistory ->
+                    pipelineHistoryQuery.getState() != pipelineExecHistory.getRunStatus() && pipelineHistoryQuery.getState() != 0);
+            allHistory.removeIf(pipelineExecHistory ->
+                    pipelineHistoryQuery.getName() != null && !pipelineHistoryQuery.getName().equals(pipeline.getPipelineCreateUser()));
+            allHistory.removeIf(pipelineExecHistory ->
+                    pipelineHistoryQuery.getType() != pipelineExecHistory.getRunWay() && pipelineHistoryQuery.getType() != 0);
             return allHistory;
         }
         return null;
     }
 
     //时间转换成时分秒
-    public static String formatDateTime(long time) {
+    @Override
+    public String formatDateTime(long time) {
         String DateTimes ;
         long days = time / ( 60 * 60 * 24);
         long hours = (time % ( 60 * 60 * 24)) / (60 * 60);
