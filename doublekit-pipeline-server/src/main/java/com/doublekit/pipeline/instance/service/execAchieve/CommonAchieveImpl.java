@@ -8,13 +8,11 @@ import com.doublekit.pipeline.instance.model.PipelineExecLog;
 import com.doublekit.pipeline.instance.model.PipelineProcess;
 import com.doublekit.pipeline.instance.service.PipelineExecHistoryService;
 import com.doublekit.pipeline.instance.service.PipelineExecLogService;
-import com.doublekit.rpc.annotation.Exporter;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -26,9 +24,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-@Service
-@Exporter
-public class CommonAchieve {
+
+public class CommonAchieveImpl {
 
     @Autowired
     PipelineExecHistoryService pipelineExecHistoryService;
@@ -39,7 +36,7 @@ public class CommonAchieve {
     @Autowired
     PipelineService pipelineService;
 
-    private static final Logger logger = LoggerFactory.getLogger(CommonAchieve.class);
+    private static final Logger logger = LoggerFactory.getLogger(CommonAchieveImpl.class);
     /**
      * 执行日志
      * @param inputStreamReader 执行信息

@@ -2,27 +2,26 @@ package com.doublekit.pipeline;
 
 import com.doublekit.beans.starter.annotation.EnableBeans;
 import com.doublekit.dal.starter.annotation.EnableDal;
+import com.doublekit.eam.starter.EnableEam;
+import com.doublekit.gateway.starter.EnableGateway;
 import com.doublekit.join.starter.annotation.EnableJoin;
+import com.doublekit.rpc.starter.annotation.EnableRpc;
+import com.doublekit.user.starter.EnableUser;
 import com.doublekit.web.starter.annotation.EnableWeb;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-//platform
 @EnableBeans
 @EnableJoin
 @EnableWeb
 @EnableDal
-//@EnableDss
-//@EnableDsm
-//@EnableRpc
-//@EnableMessage
-//pcs
-//@EnablePortalServer
-//@EnablePortalClient
-//@EnablePrivilegeServer
-//@EnableToolkitServer
-//other
+
+@EnableRpc
+
+@EnableEam
+@EnableUser
+@EnableGateway
 @EnablePipelineServer
-//@EnableApiboxClient
+
 public class PipelineAutoConfiguration {
 }

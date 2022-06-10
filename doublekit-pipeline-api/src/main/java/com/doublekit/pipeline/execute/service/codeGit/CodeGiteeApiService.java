@@ -1,5 +1,8 @@
 package com.doublekit.pipeline.execute.service.codeGit;
 
+import com.doublekit.join.annotation.JoinProvider;
+import com.doublekit.pipeline.execute.model.CodeGit.CodeGiteeApi;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -7,6 +10,7 @@ import java.util.Map;
 /**
  * 码云API
  */
+@JoinProvider(model = CodeGiteeApi.class)
 public interface CodeGiteeApiService {
 
     /**
@@ -61,5 +65,11 @@ public interface CodeGiteeApiService {
     String getCloneUrl(String proofId,String projectName);
 
 
+    /**
+     * 获取授权状态
+     * @param code 授权凭证
+     * @param state 状态
+     * @return 0.未授权 1.成功授权 2.取消授权
+     */
     int getState(String code,int state);
 }

@@ -1,5 +1,10 @@
 package com.doublekit.pipeline.instance.model;
 
+import com.doublekit.apibox.annotation.ApiModel;
+import com.doublekit.join.annotation.Join;
+
+@ApiModel
+@Join
 public class PipelineHistoryQuery {
 
     private String pipelineId;

@@ -6,9 +6,7 @@ import com.doublekit.pipeline.execute.service.PipelineTestService;
 import com.doublekit.pipeline.instance.model.PipelineExecHistory;
 import com.doublekit.pipeline.instance.model.PipelineExecLog;
 import com.doublekit.pipeline.instance.model.PipelineProcess;
-import com.doublekit.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -16,18 +14,18 @@ import java.nio.charset.Charset;
 import java.sql.Timestamp;
 import java.util.List;
 
-@Service
-@Exporter
-public class TestAchieve {
+
+public class TestAchieveImpl {
 
     @Autowired
     PipelineTestService pipelineTestService;
 
-    @Autowired
-    CommonAchieve commonAchieve;
 
     // 单元测试
     public int test(PipelineProcess pipelineProcess, List<PipelineExecHistory> pipelineExecHistoryList) {
+
+        CommonAchieveImpl commonAchieveImpl = new CommonAchieveImpl();
+
         long beginTime = new Timestamp(System.currentTimeMillis()).getTime();
         //初始化日志
 
@@ -35,30 +33,30 @@ public class TestAchieve {
         PipelineConfigure pipelineConfigure = pipelineProcess.getPipelineConfigure();
 
         PipelineTest pipelineTest = pipelineTestService.findOneTest(pipelineConfigure.getTaskId());
-        PipelineExecLog pipelineExecLog = commonAchieve.initializeLog(pipelineExecHistory, pipelineConfigure);
+        PipelineExecLog pipelineExecLog = commonAchieveImpl.initializeLog(pipelineExecHistory, pipelineConfigure);
         pipelineProcess.setPipelineExecLog(pipelineExecLog);
 
         String testOrder = pipelineTest.getTestOrder();
         String path = "D:\\clone\\"+pipelineConfigure.getPipeline().getPipelineName();
         try {
-            Process process = commonAchieve.process(path, testOrder, null);
+            Process process = commonAchieveImpl.process(path, testOrder, null);
             String a = "------------------------------------" + " \n"
                     +"开始测试" + " \n"
                     + "执行 : \"" + testOrder + "\"\n";
             pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+a);
             //设置日志格式
             InputStreamReader inputStreamReader = new InputStreamReader(process.getInputStream(), Charset.forName("GBK"));
-            int state = commonAchieve.log(inputStreamReader, pipelineProcess,pipelineExecHistoryList);
-            commonAchieve.updateTime(pipelineProcess,beginTime);
+            int state = commonAchieveImpl.log(inputStreamReader, pipelineProcess,pipelineExecHistoryList);
+            commonAchieveImpl.updateTime(pipelineProcess,beginTime);
             if (state == 0){
-                commonAchieve.updateState(pipelineProcess,"测试失败",pipelineExecHistoryList);
+                commonAchieveImpl.updateState(pipelineProcess,"测试失败",pipelineExecHistoryList);
                 return  0;
             }
         } catch (IOException e) {
-            commonAchieve.updateState(pipelineProcess,"测试失败",pipelineExecHistoryList);
+            commonAchieveImpl.updateState(pipelineProcess,"测试失败",pipelineExecHistoryList);
             return 0;
         }
-        commonAchieve.updateState(pipelineProcess,null,pipelineExecHistoryList);
+        commonAchieveImpl.updateState(pipelineProcess,null,pipelineExecHistoryList);
         return 1;
     }
 

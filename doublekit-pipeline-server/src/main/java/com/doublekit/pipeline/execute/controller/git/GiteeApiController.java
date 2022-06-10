@@ -62,9 +62,7 @@ public class GiteeApiController {
     @ApiMethod(name = "getAllStorehouse",desc = "获取所有仓库")
     @ApiParam(name = "ProofId",desc = "ProofId",required = true)
     public Result<List<String>> getAllStorehouse(@NotNull String proofId) {
-
         List<String> allStorehouse = codeGiteeApiService.getAllStorehouse(proofId);
-
         return Result.ok(allStorehouse);
     }
 
@@ -73,14 +71,12 @@ public class GiteeApiController {
     @ApiMethod(name = "getBranch",desc = "根据仓库名获取所有分支")
     @ApiParam(name = "proofId",desc = "proofId",required = true)
     public Result<List<String>> getBranch(@NotNull String proofId, String projectName){
-
         List<String> branch = codeGiteeApiService.getBranch(proofId,projectName);
-
         return Result.ok(branch);
     }
 
     @RequestMapping(path="/getState",method = RequestMethod.POST)
-    @ApiMethod(name = "getState",desc = "根据仓库名获取所有分支")
+    @ApiMethod(name = "getState",desc = "获取授权状态")
     @ApiParam(name = "code",desc = "code",required = true)
     public Result<Integer> getState(String code ,int state){
         int states = codeGiteeApiService.getState(code,state);

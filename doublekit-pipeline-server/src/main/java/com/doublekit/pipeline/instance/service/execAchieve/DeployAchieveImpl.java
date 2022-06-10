@@ -9,10 +9,8 @@ import com.doublekit.pipeline.instance.model.PipelineExecHistory;
 import com.doublekit.pipeline.instance.model.PipelineExecLog;
 import com.doublekit.pipeline.instance.model.PipelineProcess;
 import com.doublekit.pipeline.setting.proof.model.Proof;
-import com.doublekit.rpc.annotation.Exporter;
 import com.jcraft.jsch.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import java.io.*;
 import java.nio.charset.Charset;
@@ -20,15 +18,13 @@ import java.sql.Timestamp;
 import java.util.List;
 
 
-@Service
-@Exporter
-public class DeployAchieve {
+
+public class DeployAchieveImpl {
 
     @Autowired
     PipelineDeployService pipelineDeployService;
 
-    @Autowired
-    CommonAchieve commonAchieve;
+    CommonAchieveImpl commonAchieveImpl = new CommonAchieveImpl();
 
 
     public void deployStart(PipelineProcess pipelineProcess, List<PipelineExecHistory> pipelineExecHistoryList) throws IOException {
@@ -51,7 +47,7 @@ public class DeployAchieve {
         PipelineExecHistory pipelineExecHistory = pipelineProcess.getPipelineExecHistory();
         PipelineConfigure pipelineConfigure = pipelineProcess.getPipelineConfigure();
 
-        PipelineExecLog pipelineExecLog = commonAchieve.initializeLog(pipelineExecHistory, pipelineConfigure);
+        PipelineExecLog pipelineExecLog = commonAchieveImpl.initializeLog(pipelineExecHistory, pipelineConfigure);
         PipelineDeploy pipelineDeploy = pipelineDeployService.findOneDeploy(pipelineConfigure.getTaskId());
         Proof proof = pipelineDeploy.getProof();
 
@@ -60,8 +56,8 @@ public class DeployAchieve {
         pipelineProcess.setPipelineDeploy(pipelineDeploy);
 
         if (proof == null){
-            commonAchieve.updateTime(pipelineProcess,beginTime);
-            commonAchieve.updateState(pipelineProcess,"凭证为空。",pipelineExecHistoryList);
+            commonAchieveImpl.updateTime(pipelineProcess,beginTime);
+            commonAchieveImpl.updateState(pipelineProcess,"凭证为空。",pipelineExecHistoryList);
             return 0;
         }
 
@@ -69,9 +65,9 @@ public class DeployAchieve {
         String path = "D:\\clone\\" + pipelineConfigure.getPipeline().getPipelineName();
         //发送文件地址
         String deployTargetAddress = pipelineDeploy.getDeployTargetAddress();
-        String filePath = commonAchieve.getFile(path,deployTargetAddress);
+        String filePath = commonAchieveImpl.getFile(path,deployTargetAddress);
         if (filePath == null){
-            commonAchieve.updateState(pipelineProcess,"部署文件找不到。",pipelineExecHistoryList);
+            commonAchieveImpl.updateState(pipelineProcess,"部署文件找不到。",pipelineExecHistoryList);
             return 0;
         }
         //文件名
@@ -106,13 +102,13 @@ public class DeployAchieve {
 
             deployStart(pipelineProcess,pipelineExecHistoryList);
 
-            commonAchieve.updateTime(pipelineProcess,beginTime);
+            commonAchieveImpl.updateTime(pipelineProcess,beginTime);
             } catch (JSchException | SftpException | IOException e) {
-                commonAchieve.updateState(pipelineProcess,e.toString(),pipelineExecHistoryList);
+                commonAchieveImpl.updateState(pipelineProcess,e.toString(),pipelineExecHistoryList);
                 return 0;
             }
         //更新状态
-        commonAchieve.updateState(pipelineProcess,null,pipelineExecHistoryList);
+        commonAchieveImpl.updateState(pipelineProcess,null,pipelineExecHistoryList);
         return 1;
     }
 
@@ -137,7 +133,7 @@ public class DeployAchieve {
         PipelineDeploy pipelineDeploy = pipelineProcess.getPipelineDeploy();
         Pipeline pipeline = pipelineProcess.getPipelineConfigure().getPipeline();
         String pipelineName = pipeline.getPipelineName();
-        String fileName = commonAchieve.getFile("D:\\clone\\" + pipelineName, pipelineDeploy.getDeployTargetAddress());
+        String fileName = commonAchieveImpl.getFile("D:\\clone\\" + pipelineName, pipelineDeploy.getDeployTargetAddress());
         //服务器部署位置
         String deployAddress = pipelineDeploy.getDeployAddress();
         String order = "rm -rf "+" "+deployAddress +";"
@@ -225,7 +221,7 @@ public class DeployAchieve {
         pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog() + "\n" + order+ "\n");
         session.execCommand(order);
         InputStreamReader inputStreamReader = new InputStreamReader(session.getStdout(), Charset.forName("GBK"));
-        commonAchieve.log(inputStreamReader,pipelineProcess,pipelineExecHistoryList);
+        commonAchieveImpl.log(inputStreamReader,pipelineProcess,pipelineExecHistoryList);
         session.close();
         inputStreamReader.close();
     }

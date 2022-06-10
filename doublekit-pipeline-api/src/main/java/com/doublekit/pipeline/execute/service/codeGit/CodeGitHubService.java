@@ -1,7 +1,11 @@
 package com.doublekit.pipeline.execute.service.codeGit;
 
+import com.doublekit.join.annotation.JoinProvider;
+import com.doublekit.pipeline.execute.model.CodeGit.CodeGitHubApi;
+
 import java.util.List;
 
+@JoinProvider(model = CodeGitHubApi.class)
 public interface CodeGitHubService {
 
     /**

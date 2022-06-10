@@ -1,14 +1,18 @@
 package com.doublekit.pipeline.definition.model;
 
+import com.doublekit.apibox.annotation.ApiModel;
 import com.doublekit.apibox.annotation.ApiProperty;
 import com.doublekit.beans.annotation.Mapping;
 import com.doublekit.beans.annotation.Mappings;
+import com.doublekit.join.annotation.Join;
 import com.doublekit.join.annotation.JoinQuery;
 import com.doublekit.pipeline.execute.model.PipelineCode;
 import com.doublekit.pipeline.execute.model.PipelineDeploy;
 import com.doublekit.pipeline.execute.model.PipelineStructure;
 import com.doublekit.pipeline.execute.model.PipelineTest;
 
+@ApiModel
+@Join
 public class PipelineExecConfigure {
 
 

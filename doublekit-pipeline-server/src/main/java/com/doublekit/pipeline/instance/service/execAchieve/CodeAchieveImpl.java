@@ -9,7 +9,6 @@ import com.doublekit.pipeline.instance.model.PipelineExecHistory;
 import com.doublekit.pipeline.instance.model.PipelineExecLog;
 import com.doublekit.pipeline.instance.model.PipelineProcess;
 import com.doublekit.pipeline.setting.proof.model.Proof;
-import com.doublekit.rpc.annotation.Exporter;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
@@ -21,7 +20,6 @@ import org.eclipse.jgit.util.FS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNURL;
 import org.tmatesoft.svn.core.auth.BasicAuthenticationManager;
@@ -39,15 +37,13 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-@Service
-@Exporter
-public class CodeAchieve {
+
+public class CodeAchieveImpl {
 
     @Autowired
     PipelineCodeService pipelineCodeService;
 
-    @Autowired
-    CommonAchieve commonAchieve;
+    CommonAchieveImpl commonAchieveImpl = new CommonAchieveImpl();
 
     private static final Logger logger = LoggerFactory.getLogger(PipelineCodeServiceImpl.class);
 
@@ -62,7 +58,7 @@ public class CodeAchieve {
 
         PipelineCode pipelineCode = pipelineCodeService.findOneCode(pipelineConfigure.getTaskId());
         //初始化日志
-        PipelineExecLog pipelineExecLog = commonAchieve.initializeLog(pipelineExecHistory, pipelineConfigure);
+        PipelineExecLog pipelineExecLog = commonAchieveImpl.initializeLog(pipelineExecHistory, pipelineConfigure);
 
         //代码克隆路径
         String path = "D:\\clone\\" + pipelineConfigure.getPipeline().getPipelineName();
@@ -77,8 +73,8 @@ public class CodeAchieve {
         pipelineProcess.setPipelineExecLog(pipelineExecLog);
         if (proof == null){
             logger.info("凭证为空。");
-            commonAchieve.updateTime(pipelineProcess,beginTime);
-            commonAchieve.updateState(pipelineProcess,"凭证为空。",pipelineExecHistoryList);
+            commonAchieveImpl.updateTime(pipelineProcess,beginTime);
+            commonAchieveImpl.updateState(pipelineProcess,"凭证为空。",pipelineExecHistoryList);
             return 0;
         }
 
@@ -94,8 +90,8 @@ public class CodeAchieve {
         try {
         codeStart(proof,pipelineCode,path);
         } catch (GitAPIException | IOException | SVNException e) {
-            commonAchieve.updateTime(pipelineProcess,beginTime);
-            commonAchieve.updateState(pipelineProcess,e.toString(),pipelineExecHistoryList);
+            commonAchieveImpl.updateTime(pipelineProcess,beginTime);
+            commonAchieveImpl.updateState(pipelineProcess,e.toString(),pipelineExecHistoryList);
             return 0;
         }
 
@@ -103,8 +99,8 @@ public class CodeAchieve {
         pipelineExecLog.setRunLog( s + "代码拉取成功" + "\n");
         pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+"\n"+ "代码拉取成功" +"\n");
         pipelineExecHistoryList.add(pipelineExecHistory);
-        commonAchieve.updateTime(pipelineProcess,beginTime);
-        commonAchieve.updateState(pipelineProcess,null,pipelineExecHistoryList);
+        commonAchieveImpl.updateTime(pipelineProcess,beginTime);
+        commonAchieveImpl.updateState(pipelineProcess,null,pipelineExecHistoryList);
         return 1;
     }
 
@@ -122,7 +118,7 @@ public class CodeAchieve {
                 if (proof.getProofType().equals("SSH")){
                     sshClone(pipelineCode.getCodeAddress(), proof.getProofPassword(), path, pipelineCode.getCodeBranch());
                 }else {
-                    UsernamePasswordCredentialsProvider credentialsProvider = commonAchieve.usernamePassword(proof.getProofUsername(), proof.getProofPassword());
+                    UsernamePasswordCredentialsProvider credentialsProvider = commonAchieveImpl.usernamePassword(proof.getProofUsername(), proof.getProofPassword());
                     clone(path, pipelineCode.getCodeAddress(), credentialsProvider, pipelineCode.getCodeBranch());
                 }
                 break;
@@ -211,6 +207,7 @@ public class CodeAchieve {
      * @param path 文件地址
      */
     public void svn(PipelineCode pipelineCode,Proof proof,String path) throws SVNException {
+        commonAchieveImpl.deleteFile(new File(path));
         SvnOperationFactory svnOperationFactory = new SvnOperationFactory();
         char[] password = proof.getProofPassword().toCharArray();
 
@@ -230,6 +227,7 @@ public class CodeAchieve {
      * @param path 文件地址
      */
     public void sshSvn(PipelineCode pipelineCode,Proof proof,String path) throws SVNException {
+        commonAchieveImpl.deleteFile(new File(path));
         SvnOperationFactory svnOperationFactory = new SvnOperationFactory();
         BasicAuthenticationManager auth = BasicAuthenticationManager
                 .newInstance(proof.getProofUsername(), new File(proof.getProofPassword()),null,22);
