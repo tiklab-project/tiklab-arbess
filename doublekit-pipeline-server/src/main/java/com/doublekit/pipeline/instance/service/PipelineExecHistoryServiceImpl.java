@@ -150,6 +150,21 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
         return null;
     }
 
+    //获取最后一次的运行日志
+    @Override
+    public PipelineExecLog getRunLog(String historyId){
+        List<PipelineExecLog> allLog = pipelineExecLogService.findAllLog(historyId);
+        if (allLog != null){
+            allLog.sort(Comparator.comparing(PipelineExecLog::getTaskSort));
+            PipelineExecLog pipelineExecLog = allLog.get(allLog.size() - 1);
+            for (PipelineExecLog execLog : allLog) {
+                pipelineExecLog.setRunTime(pipelineExecLog.getRunTime()+execLog.getRunTime());
+            }
+            return allLog.get(allLog.size()-1);
+        }
+        return null;
+    }
+
     //时间转换成时分秒
     @Override
     public String formatDateTime(long time) {

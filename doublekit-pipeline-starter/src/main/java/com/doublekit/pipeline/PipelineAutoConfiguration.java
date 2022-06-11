@@ -2,6 +2,7 @@ package com.doublekit.pipeline;
 
 import com.doublekit.beans.starter.annotation.EnableBeans;
 import com.doublekit.dal.starter.annotation.EnableDal;
+import com.doublekit.dsm.starter.annotation.EnableDsm;
 import com.doublekit.eam.starter.EnableEam;
 import com.doublekit.gateway.starter.EnableGateway;
 import com.doublekit.join.starter.annotation.EnableJoin;
@@ -15,11 +16,14 @@ import org.springframework.context.annotation.Configuration;
 @EnableJoin
 @EnableWeb
 @EnableDal
-
+//rpc
 @EnableRpc
-
+//数据库脚本
+@EnableDsm
+//用户中心
 @EnableEam
 @EnableUser
+
 @EnableGateway
 @EnablePipelineServer
 

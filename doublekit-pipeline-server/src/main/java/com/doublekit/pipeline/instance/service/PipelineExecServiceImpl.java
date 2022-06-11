@@ -6,8 +6,9 @@ import com.doublekit.pipeline.definition.model.PipelineConfigure;
 import com.doublekit.pipeline.definition.service.PipelineService;
 import com.doublekit.pipeline.execute.model.CodeGit.FileTree;
 import com.doublekit.pipeline.instance.model.PipelineExecHistory;
+import com.doublekit.pipeline.instance.model.PipelineExecLog;
 import com.doublekit.pipeline.instance.model.PipelineProcess;
-import com.doublekit.pipeline.instance.service.execAchieve.*;
+import com.doublekit.pipeline.instance.service.execAchieveImpl.*;
 import com.doublekit.rpc.annotation.Exporter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -32,14 +34,27 @@ public class PipelineExecServiceImpl implements PipelineExecService {
     @Autowired
     PipelineService pipelineService;
 
-    CommonAchieveImpl commonAchieveImpl = new CommonAchieveImpl();
+    @Autowired
+    CommonAchieveServiceImpl commonAchieveServiceImpl ;
 
-    CodeAchieveImpl codeAchieveImpl = new CodeAchieveImpl();
+    @Autowired
+    CodeAchieveServiceImpl codeAchieveServiceImpl ;
+
+    @Autowired
+    StructureAchieveServiceImpl structureAchieveServiceImpl ;
+
+    @Autowired
+    TestAchieveServiceImpl testAchieveServiceImpl;
+
+    @Autowired
+    DeployAchieveServiceImpl deployAchieveServiceImpl ;
 
     //存放过程状态
     List<PipelineExecHistory> pipelineExecHistoryList = new ArrayList<>();
 
     private static final Logger logger = LoggerFactory.getLogger(PipelineExecServiceImpl.class);
+
+    long beginTime = 0;
 
     //创建线程池
     ExecutorService executorService = Executors.newCachedThreadPool();
@@ -53,6 +68,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
             return 100;
         }
         executorService.submit(() -> {
+            beginTime = new Timestamp(System.currentTimeMillis()).getTime();
             Thread.currentThread().setName(pipelineId);
             begin(pipelineId);
         });
@@ -86,14 +102,23 @@ public class PipelineExecServiceImpl implements PipelineExecService {
     //停止运行
     @Override
     public void killInstance(String pipelineId) {
+        PipelineProcess pipelineProcess = new PipelineProcess();
         time[0]=1;time[1]=0;time[2]=0;time[3]=0;
         PipelineExecHistory pipelineExecHistory = findInstanceState(pipelineId);
+        if (pipelineExecHistory == null)return;
+        PipelineExecLog pipelineExecLog = pipelineExecHistoryService.getRunLog(pipelineExecHistory.getHistoryId());
+        pipelineProcess.setPipelineExecLog(pipelineExecLog);
+        pipelineProcess.setPipelineExecHistory(pipelineExecHistory);
+
+        long overTime = new Timestamp(System.currentTimeMillis()).getTime();
+        int time = (int) (overTime - beginTime) / 1000;
+        pipelineExecLog.setRunTime(time-pipelineExecHistory.getRunTime());
         pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+"\n"+"流水线停止运行......");
         pipelineExecHistoryList.add(pipelineExecHistory);
-        commonAchieveImpl.halt(pipelineExecHistory,pipelineId,pipelineExecHistoryList);
+        commonAchieveServiceImpl.halt(pipelineProcess,pipelineId,pipelineExecHistoryList);
+
         ThreadGroup currentGroup = Thread.currentThread().getThreadGroup();
         int noThreads = currentGroup.activeCount();
-
         Thread[] lstThreads = new Thread[noThreads];
         currentGroup.enumerate(lstThreads);
         for (int i = 0; i < noThreads; i++) {
@@ -122,13 +147,8 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         pipeline.setPipelineState(1);
         pipelineService.updatePipeline(pipeline);
 
-
-        StructureAchieveImpl structureAchieveImpl = new StructureAchieveImpl();
-        TestAchieveImpl testAchieveImpl  = new TestAchieveImpl();
-        DeployAchieveImpl deployAchieveImpl = new DeployAchieveImpl();
-
         String historyId = pipelineExecHistoryService.createHistory(new PipelineExecHistory());
-        PipelineExecHistory pipelineExecHistory = commonAchieveImpl.initializeHistory(historyId,pipeline);
+        PipelineExecHistory pipelineExecHistory = commonAchieveServiceImpl.initializeHistory(historyId,pipeline);
 
         PipelineProcess pipelineProcess = new PipelineProcess();
         List<PipelineConfigure> allConfigure = pipelineService.findPipelineConfigure(pipelineId);
@@ -139,28 +159,28 @@ public class PipelineExecServiceImpl implements PipelineExecService {
                 pipelineExecHistoryList.add(pipelineExecHistory);
                 switch (pipelineConfigure.getTaskType()) {
                     case 1,2,3,4,5 -> {
-                        int state = codeAchieveImpl.clone(pipelineProcess, pipelineExecHistoryList);
+                        int state = codeAchieveServiceImpl.clone(pipelineProcess, pipelineExecHistoryList);
                         if (state == 0) {
                             error(pipeline);
                             return ;
                         }
                     }
                     case 11 -> {
-                        int state = testAchieveImpl.test(pipelineProcess, pipelineExecHistoryList);
+                        int state = testAchieveServiceImpl.test(pipelineProcess, pipelineExecHistoryList);
                         if (state == 0) {
                             error(pipeline);
                             return ;
                         }
                     }
                     case 21, 22 -> {
-                        int state  = structureAchieveImpl.structure(pipelineProcess, pipelineExecHistoryList);
+                        int state  = structureAchieveServiceImpl.structure(pipelineProcess, pipelineExecHistoryList);
                         if (state == 0) {
                             error(pipeline);
                             return ;
                         }
                     }
                     case 31, 32-> {
-                        int state = deployAchieveImpl.deploy(pipelineProcess, pipelineExecHistoryList);
+                        int state = deployAchieveServiceImpl.deploy(pipelineProcess, pipelineExecHistoryList);
                         if (state == 0) {
                             error(pipeline);
                             return ;
@@ -171,7 +191,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
                 pipelineExecHistory.setStatus(pipelineExecHistory.getStatus() +1);
             }
         }
-        commonAchieveImpl.success(pipelineExecHistory, pipelineId, pipelineExecHistoryList);
+        commonAchieveServiceImpl.success(pipelineExecHistory, pipelineId, pipelineExecHistoryList);
         time[0]=1;time[1]=0;time[2]=0;time[3]=0;
     }
 
@@ -190,7 +210,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         File file = new File(path);
         //判断文件是否存在
         if (file.exists()){
-            List<FileTree> list = codeAchieveImpl.fileTree(file, trees);
+            List<FileTree> list = commonAchieveServiceImpl.fileTree(file, trees);
             list.sort(Comparator.comparing(FileTree::getTreeType,Comparator.reverseOrder()));
             return list;
         }
@@ -200,12 +220,8 @@ public class PipelineExecServiceImpl implements PipelineExecService {
     //
     @Override
     public  List<String> readFile(String path){
-        return codeAchieveImpl.readFile(path);
+        return commonAchieveServiceImpl.readFile(path);
     }
-
-
-
-
 
 
 }

@@ -36,7 +36,7 @@ public class PipelineExecController {
     @RequestMapping(path="/findState",method = RequestMethod.POST)
     @ApiMethod(name = "findState",desc = "执行")
     @ApiParam(name = "pipelineId",desc = "流水线id",required = true)
-    public Result<PipelineExecHistory> findState(@NotNull String pipelineId)  {
+    public Result<PipelineExecHistory> findState( String pipelineId)  {
         PipelineExecHistory instanceState = pipelineExecService.findInstanceState(pipelineId);
         return Result.ok(instanceState);
     }

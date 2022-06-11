@@ -1,4 +1,4 @@
-package com.doublekit.pipeline.instance.service.execAchieve;
+package com.doublekit.pipeline.instance.service.execAchieveImpl;
 
 import ch.ethz.ssh2.Connection;
 import com.doublekit.pipeline.definition.model.Pipeline;
@@ -8,9 +8,12 @@ import com.doublekit.pipeline.execute.service.PipelineDeployService;
 import com.doublekit.pipeline.instance.model.PipelineExecHistory;
 import com.doublekit.pipeline.instance.model.PipelineExecLog;
 import com.doublekit.pipeline.instance.model.PipelineProcess;
+import com.doublekit.pipeline.instance.service.execAchieveService.DeployAchieveService;
 import com.doublekit.pipeline.setting.proof.model.Proof;
+import com.doublekit.rpc.annotation.Exporter;
 import com.jcraft.jsch.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.io.*;
 import java.nio.charset.Charset;
@@ -18,13 +21,15 @@ import java.sql.Timestamp;
 import java.util.List;
 
 
-
-public class DeployAchieveImpl {
+@Service
+@Exporter
+public class DeployAchieveServiceImpl implements DeployAchieveService {
 
     @Autowired
     PipelineDeployService pipelineDeployService;
 
-    CommonAchieveImpl commonAchieveImpl = new CommonAchieveImpl();
+    @Autowired
+    CommonAchieveServiceImpl commonAchieveServiceImpl;
 
 
     public void deployStart(PipelineProcess pipelineProcess, List<PipelineExecHistory> pipelineExecHistoryList) throws IOException {
@@ -47,7 +52,7 @@ public class DeployAchieveImpl {
         PipelineExecHistory pipelineExecHistory = pipelineProcess.getPipelineExecHistory();
         PipelineConfigure pipelineConfigure = pipelineProcess.getPipelineConfigure();
 
-        PipelineExecLog pipelineExecLog = commonAchieveImpl.initializeLog(pipelineExecHistory, pipelineConfigure);
+        PipelineExecLog pipelineExecLog = commonAchieveServiceImpl.initializeLog(pipelineExecHistory, pipelineConfigure);
         PipelineDeploy pipelineDeploy = pipelineDeployService.findOneDeploy(pipelineConfigure.getTaskId());
         Proof proof = pipelineDeploy.getProof();
 
@@ -56,8 +61,8 @@ public class DeployAchieveImpl {
         pipelineProcess.setPipelineDeploy(pipelineDeploy);
 
         if (proof == null){
-            commonAchieveImpl.updateTime(pipelineProcess,beginTime);
-            commonAchieveImpl.updateState(pipelineProcess,"凭证为空。",pipelineExecHistoryList);
+            commonAchieveServiceImpl.updateTime(pipelineProcess,beginTime);
+            commonAchieveServiceImpl.updateState(pipelineProcess,"凭证为空。",pipelineExecHistoryList);
             return 0;
         }
 
@@ -65,9 +70,9 @@ public class DeployAchieveImpl {
         String path = "D:\\clone\\" + pipelineConfigure.getPipeline().getPipelineName();
         //发送文件地址
         String deployTargetAddress = pipelineDeploy.getDeployTargetAddress();
-        String filePath = commonAchieveImpl.getFile(path,deployTargetAddress);
+        String filePath = commonAchieveServiceImpl.getFile(path,deployTargetAddress);
         if (filePath == null){
-            commonAchieveImpl.updateState(pipelineProcess,"部署文件找不到。",pipelineExecHistoryList);
+            commonAchieveServiceImpl.updateState(pipelineProcess,"部署文件找不到。",pipelineExecHistoryList);
             return 0;
         }
         //文件名
@@ -81,16 +86,16 @@ public class DeployAchieveImpl {
                     + "匹配到一个文件 ： " +fileName + "\n"
                     + "文件地址 ： "+filePath +"\n"
                     + "发送服务器位置 ： "+deployAddress +"\n"
-                    + "连接服务器  ： " +proof.getProofIp() + "\n"
+                    + "连接服务器  ： " +pipelineDeploy.getIp() + "\n"
                     + "连接类型  ： " +proof.getProofType();
             pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+"\n"+log);
             JSch jsch = new JSch();
             //采用指定的端口连接服务器
-            Session session =jsch.getSession(proof.getProofUsername(), proof.getProofIp() ,proof.getProofPort());
+            Session session =jsch.getSession(proof.getProofUsername(), pipelineDeploy.getIp() ,pipelineDeploy.getPort());
             if (session == null){
-                throw new JSchException(proof.getProofIp() + "连接异常。。。。");
+                throw new JSchException(pipelineDeploy.getIp() + "连接异常。。。。");
             }
-            log = "服务器连接"+proof.getProofIp()+"成功";
+            log = "服务器连接"+pipelineDeploy.getIp()+"成功";
             pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+"\n"+log+"\n"+"开始发送文件:"+fileName);
             pipelineExecLog.setRunLog(pipelineExecLog.getRunLog()+"\n"+log+"\n"+"开始发送文件:"+fileName);
 
@@ -102,13 +107,13 @@ public class DeployAchieveImpl {
 
             deployStart(pipelineProcess,pipelineExecHistoryList);
 
-            commonAchieveImpl.updateTime(pipelineProcess,beginTime);
+            commonAchieveServiceImpl.updateTime(pipelineProcess,beginTime);
             } catch (JSchException | SftpException | IOException e) {
-                commonAchieveImpl.updateState(pipelineProcess,e.toString(),pipelineExecHistoryList);
+                commonAchieveServiceImpl.updateState(pipelineProcess,e.toString(),pipelineExecHistoryList);
                 return 0;
             }
         //更新状态
-        commonAchieveImpl.updateState(pipelineProcess,null,pipelineExecHistoryList);
+        commonAchieveServiceImpl.updateState(pipelineProcess,null,pipelineExecHistoryList);
         return 1;
     }
 
@@ -133,7 +138,7 @@ public class DeployAchieveImpl {
         PipelineDeploy pipelineDeploy = pipelineProcess.getPipelineDeploy();
         Pipeline pipeline = pipelineProcess.getPipelineConfigure().getPipeline();
         String pipelineName = pipeline.getPipelineName();
-        String fileName = commonAchieveImpl.getFile("D:\\clone\\" + pipelineName, pipelineDeploy.getDeployTargetAddress());
+        String fileName = commonAchieveServiceImpl.getFile("D:\\clone\\" + pipelineName, pipelineDeploy.getDeployTargetAddress());
         //服务器部署位置
         String deployAddress = pipelineDeploy.getDeployAddress();
         String order = "rm -rf "+" "+deployAddress +";"
@@ -205,9 +210,10 @@ public class DeployAchieveImpl {
      * @throws IOException 日志读写异常
      */
     public void sshOrder(String order, List<PipelineExecHistory> pipelineExecHistoryList,PipelineProcess pipelineProcess) throws IOException {
+        PipelineDeploy pipelineDeploy = pipelineProcess.getPipelineDeploy();
         Proof proof = pipelineProcess.getProof();
         PipelineExecHistory pipelineExecHistory = pipelineProcess.getPipelineExecHistory();
-        Connection conn = new Connection(proof.getProofIp(),proof.getProofPort());
+        Connection conn = new Connection(pipelineDeploy.getIp(),pipelineDeploy.getPort());
         conn.connect();
 
         if (proof.getProofType().equals("password") && proof.getProofScope()==31){
@@ -221,7 +227,7 @@ public class DeployAchieveImpl {
         pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog() + "\n" + order+ "\n");
         session.execCommand(order);
         InputStreamReader inputStreamReader = new InputStreamReader(session.getStdout(), Charset.forName("GBK"));
-        commonAchieveImpl.log(inputStreamReader,pipelineProcess,pipelineExecHistoryList);
+        commonAchieveServiceImpl.log(inputStreamReader,pipelineProcess,pipelineExecHistoryList);
         session.close();
         inputStreamReader.close();
     }

@@ -13,13 +13,11 @@ import com.doublekit.pipeline.execute.service.codeGit.CodeGiteeApiService;
 import com.doublekit.pipeline.setting.proof.model.Proof;
 import com.doublekit.pipeline.setting.proof.service.ProofService;
 import com.doublekit.rpc.annotation.Exporter;
-import okhttp3.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.util.List;
 
 @Service
@@ -156,6 +154,7 @@ public class PipelineCodeServiceImpl implements PipelineCodeService {
         return  pipelineCode;
     }
 
+    //获取配置
     @Override
     public List<Object> findOneTask(PipelineConfigure pipelineConfigure ,List<Object> list) {
             if (pipelineConfigure.getTaskType() < 10){
@@ -169,7 +168,6 @@ public class PipelineCodeServiceImpl implements PipelineCodeService {
         return pipelineTestService.findOneTask(pipelineConfigure,list);
     }
 
-
     //查询所有
     @Override
     public List<PipelineCode> findAllCode() {
@@ -179,29 +177,6 @@ public class PipelineCodeServiceImpl implements PipelineCodeService {
     @Override
     public List<PipelineCode> findAllCodeList(List<String> idList) {
         return BeanMapper.mapList(pipelineCodeDao.findAllCodeList(idList), PipelineCode.class);
-    }
-
-    //验证账户密码
-    @Override
-    public boolean checkAuth(String gitUrl, String proofId) {
-        Proof proof = proofService.findOneProof(proofId);
-        if(proof == null){
-            return false;
-        }
-        String basic = Credentials.basic(proof.getProofUsername(), proof.getProofPassword());
-        Request request = new Request.Builder()
-                .addHeader("Authorization", basic)
-                .url(gitUrl + "/info/refs?service=git-upload-pack")
-                .build();
-        Call call = new OkHttpClient().newCall(request);
-        try {
-            Response execute = call.execute();
-            execute.close();
-            return execute.code() == 200;
-        } catch (IOException var8) {
-            var8.printStackTrace();
-            return false;
-        }
     }
 
 }

@@ -38,13 +38,6 @@ public class Proof {
     @ApiProperty(name="proofDescribe",desc="描述")
     private String proofDescribe;
 
-    //端口号
-    @ApiProperty(name = "proofPort" ,desc="端口号")
-    private int proofPort;
-
-    //ip地址
-    @ApiProperty(name = "proofIp" ,desc="ip地址")
-    private String proofIp;
 
     public String getProofId() {
         return proofId;
@@ -102,19 +95,4 @@ public class Proof {
         this.proofScope = proofScope;
     }
 
-    public int getProofPort() {
-        return proofPort;
-    }
-
-    public void setProofPort(int proofPort) {
-        this.proofPort = proofPort;
-    }
-
-    public String getProofIp() {
-        return proofIp;
-    }
-
-    public void setProofIp(String proofIp) {
-        this.proofIp = proofIp;
-    }
 }

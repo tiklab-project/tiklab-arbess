@@ -1,31 +1,40 @@
-package com.doublekit.pipeline.instance.service.execAchieve;
+package com.doublekit.pipeline.instance.service.execAchieveImpl;
 
 import com.doublekit.pipeline.definition.model.Pipeline;
 import com.doublekit.pipeline.definition.model.PipelineConfigure;
 import com.doublekit.pipeline.definition.service.PipelineService;
+import com.doublekit.pipeline.execute.model.CodeGit.FileTree;
 import com.doublekit.pipeline.instance.model.PipelineExecHistory;
 import com.doublekit.pipeline.instance.model.PipelineExecLog;
 import com.doublekit.pipeline.instance.model.PipelineProcess;
+import com.doublekit.pipeline.instance.service.execAchieveService.CommonAchieveService;
 import com.doublekit.pipeline.instance.service.PipelineExecHistoryService;
 import com.doublekit.pipeline.instance.service.PipelineExecLogService;
+import com.doublekit.rpc.annotation.Exporter;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
-
-public class CommonAchieveImpl {
+@Service
+@Exporter
+public class CommonAchieveServiceImpl implements CommonAchieveService {
 
     @Autowired
     PipelineExecHistoryService pipelineExecHistoryService;
@@ -36,7 +45,7 @@ public class CommonAchieveImpl {
     @Autowired
     PipelineService pipelineService;
 
-    private static final Logger logger = LoggerFactory.getLogger(CommonAchieveImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(CommonAchieveServiceImpl.class);
     /**
      * 执行日志
      * @param inputStreamReader 执行信息
@@ -44,6 +53,7 @@ public class CommonAchieveImpl {
      * @throws IOException 字符流转换异常
      * @return map 执行状态
      */
+    @Override
     public int log(InputStreamReader inputStreamReader, PipelineProcess pipelineProcess,List<PipelineExecHistory> pipelineExecHistoryList) throws IOException {
         PipelineExecHistory pipelineExecHistory = pipelineProcess.getPipelineExecHistory();
         PipelineExecLog pipelineExecLog = pipelineProcess.getPipelineExecLog();
@@ -75,6 +85,7 @@ public class CommonAchieveImpl {
      * @param list 存放文件地址
      * @return 文件地址集合
      */
+    @Override
     public  List<String> getFilePath(File path,List<String> list){
         File[] fa = path.listFiles();
         if (fa != null) {
@@ -94,6 +105,7 @@ public class CommonAchieveImpl {
      * @param regex 匹配条件
      * @return 文件地址
      */
+    @Override
     public  String getFile(String path, String regex){
         List<String> list = new ArrayList<>();
         List<String> filePath = getFilePath(new File(path),new ArrayList<>());
@@ -117,6 +129,7 @@ public class CommonAchieveImpl {
      * @return 构建信息
      * @throws IOException 构建命令执行异常
      */
+    @Override
     public Process process(String path,String order,String sourceAddress) throws IOException {
         Runtime runtime=Runtime.getRuntime();
         Process process;
@@ -129,13 +142,13 @@ public class CommonAchieveImpl {
         return process;
     }
 
-
     /**
      * 凭证信息（UsernamePassword）方式
      * @param gitUser 用户名
      * @param gitPasswd 密码
      * @return 验证信息
      */
+    @Override
     public  UsernamePasswordCredentialsProvider usernamePassword(String gitUser, String gitPasswd) {
 
         UsernamePasswordCredentialsProvider credentialsProvider = null;
@@ -149,6 +162,7 @@ public class CommonAchieveImpl {
      * 删除旧的代码
      * @param file 文件地址
      */
+    @Override
     public  Boolean deleteFile(File file){
 
         if (file.isDirectory()) {
@@ -175,6 +189,7 @@ public class CommonAchieveImpl {
      * @param pipelineProcess 执行信息
      * @param beginTime 开始时间
      */
+    @Override
     public void updateTime(PipelineProcess pipelineProcess, long beginTime){
         long overTime = new Timestamp(System.currentTimeMillis()).getTime();
         int time = (int) (overTime - beginTime) / 1000;
@@ -190,6 +205,7 @@ public class CommonAchieveImpl {
      * @param e 异常
      * @param pipelineExecHistoryList 状态集合
      */
+    @Override
     public  void updateState(PipelineProcess pipelineProcess,String e,List<PipelineExecHistory> pipelineExecHistoryList){
         PipelineExecLog pipelineExecLog = pipelineProcess.getPipelineExecLog();
         PipelineExecHistory pipelineExecHistory = pipelineProcess.getPipelineExecHistory();
@@ -215,6 +231,7 @@ public class CommonAchieveImpl {
      * @param pipelineId 流水线id
      * @param e 错误信息
      */
+    @Override
     public  void  error(PipelineExecHistory pipelineExecHistory, String e, String pipelineId,List<PipelineExecHistory> pipelineExecHistoryList){
         Pipeline pipeline = pipelineService.findPipeline(pipelineId);
         pipeline.setPipelineState(0);
@@ -235,6 +252,7 @@ public class CommonAchieveImpl {
      * @param pipelineExecHistory 历史
      * @param pipelineId 流水线id
      */
+    @Override
     public  void  success(PipelineExecHistory pipelineExecHistory, String pipelineId,List<PipelineExecHistory> pipelineExecHistoryList) {
         Pipeline pipeline = pipelineService.findPipeline(pipelineId);
         pipeline.setPipelineState(0);
@@ -250,22 +268,28 @@ public class CommonAchieveImpl {
 
     /**
      * 输出停止信息
-     * @param pipelineExecHistory 历史
+     * @param pipelineProcess 历史
      * @param pipelineId 流水线id
      */
-    public  void  halt(PipelineExecHistory pipelineExecHistory, String pipelineId,List<PipelineExecHistory> pipelineExecHistoryList) {
+    @Override
+    public  void  halt(PipelineProcess pipelineProcess, String pipelineId,List<PipelineExecHistory> pipelineExecHistoryList) {
         Pipeline pipeline = pipelineService.findPipeline(pipelineId);
+        PipelineExecHistory pipelineExecHistory = pipelineProcess.getPipelineExecHistory();
+
+        //更新信息
         pipeline.setPipelineState(0);
-        pipelineService.updatePipeline(pipeline);
         pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+ "\n" + " RUN RESULT : HALT");
         pipelineExecHistory.setRunStatus(20);
         pipelineExecHistory.setFindState(1);
         pipelineExecHistoryList.add(pipelineExecHistory);
+
+        //更新状态
+        pipelineService.updatePipeline(pipeline);
+        pipelineExecLogService.updateLog(pipelineProcess.getPipelineExecLog());
         pipelineExecHistoryService.updateHistory(pipelineExecHistory);
+
         //清空缓存
-        logger.info("开始清除数据 。");
         pipelineExecHistoryList.removeIf(execHistory -> execHistory.getPipeline().getPipelineId().equals(pipelineId));
-        logger.info("清除数据完成 : "+ pipelineExecHistoryList.size());
     }
 
     /**
@@ -274,6 +298,7 @@ public class CommonAchieveImpl {
      * @param pipelineConfigure 配置信息
      * @return 日志
      */
+    @Override
     public PipelineExecLog initializeLog(PipelineExecHistory pipelineExecHistory, PipelineConfigure pipelineConfigure){
         PipelineExecLog pipelineExecLog = new PipelineExecLog();
         pipelineExecLog.setHistoryId(pipelineExecHistory.getHistoryId());
@@ -291,6 +316,7 @@ public class CommonAchieveImpl {
      * @param historyId 历史id
      * @return 历史
      */
+    @Override
     public PipelineExecHistory initializeHistory( String historyId,Pipeline pipeline) {
         PipelineExecHistory pipelineExecHistory = new PipelineExecHistory();
         String time = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
@@ -303,5 +329,55 @@ public class CommonAchieveImpl {
         pipelineExecHistory.setExecName(pipeline.getPipelineCreateUser());
         pipelineExecHistoryService.updateHistory(pipelineExecHistory);
         return pipelineExecHistory;
+    }
+
+
+    /**
+     * 获取文件树
+     * @param path 文件地址
+     * @param list 存放树的容器
+     * @return 树
+     */
+    @Override
+    public  List<FileTree> fileTree(File path, List<FileTree> list){
+        File[] files = path.listFiles();
+        if (files != null){
+            for (File file : files) {
+                FileTree fileTree = new FileTree();
+                fileTree.setTreeName(file.getName());
+                if (file.isDirectory()){
+                    fileTree.setTreeType(2);
+                    List<FileTree> trees = new ArrayList<>();
+                    fileTree.setFileTree(trees);
+                    fileTree(file,trees);
+                }else {
+                    fileTree.setTreePath(file.getPath());
+                    fileTree.setTreeType(1);
+                }
+                list.add(fileTree);
+                list.sort(Comparator.comparing(FileTree::getTreeType,Comparator.reverseOrder()));
+            }
+        }
+        return list;
+    }
+
+    /**
+     * 获取文件流
+     * @param path 文件地址
+     * @return 文件信息
+     */
+    @Override
+    public List<String> readFile(String path) {
+        if (path == null){
+            return null;
+        }
+        List<String> lines;
+        try {
+            lines = Files.readAllLines(Paths.get(path),
+                    StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return lines;
     }
 }

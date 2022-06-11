@@ -48,6 +48,14 @@ public class PipelineDeployEntity {
     @Column(name = "deploy_alias",notNull = true)
     private String deployAlias;
 
+    //端口号
+    @Column(name = "port",notNull = true )
+    private int port;
+
+    //ip地址
+    @Column(name = "ip",notNull = true )
+    private String ip;
+
 
     public String getDeployId() {
         return deployId;
@@ -127,5 +135,21 @@ public class PipelineDeployEntity {
 
     public void setDeployAlias(String deployAlias) {
         this.deployAlias = deployAlias;
+    }
+
+    public int getPort() {
+        return port;
+    }
+
+    public void setPort(int port) {
+        this.port = port;
+    }
+
+    public String getIp() {
+        return ip;
+    }
+
+    public void setIp(String ip) {
+        this.ip = ip;
     }
 }

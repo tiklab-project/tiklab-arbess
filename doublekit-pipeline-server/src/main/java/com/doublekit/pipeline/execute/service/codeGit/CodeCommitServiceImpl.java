@@ -28,11 +28,9 @@ import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNLogEntry;
 import org.tmatesoft.svn.core.SVNLogEntryPath;
 import org.tmatesoft.svn.core.SVNURL;
-import org.tmatesoft.svn.core.auth.ISVNAuthenticationManager;
-import org.tmatesoft.svn.core.internal.wc.DefaultSVNOptions;
+import org.tmatesoft.svn.core.auth.BasicAuthenticationManager;
 import org.tmatesoft.svn.core.io.SVNRepository;
 import org.tmatesoft.svn.core.io.SVNRepositoryFactory;
-import org.tmatesoft.svn.core.wc.SVNWCUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -41,7 +39,7 @@ import java.util.*;
 
 @Service
 @Exporter
-public class GitCommitServiceImpl implements GitCommitService {
+public class CodeCommitServiceImpl implements CodeCommitService {
 
     @Autowired
     PipelineService pipelineService;
@@ -52,21 +50,23 @@ public class GitCommitServiceImpl implements GitCommitService {
     @Autowired
     PipelineCodeService pipelineCodeService;
 
-    private static final Logger logger = LoggerFactory.getLogger(GitCommitServiceImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(CodeCommitServiceImpl.class);
 
     public List<List<GitCommit>> getSubmitMassage(String pipelineId){
         PipelineConfigure pipelineConfigure = pipelineConfigureService.findOneConfigure(pipelineId, 10);
-        return switch (pipelineConfigure.getTaskType()) {
-            case 1, 2, 3, 4 -> git(pipelineConfigure);
-            case 5 -> svn(pipelineConfigure);
-            default -> null;
-        };
+        if (pipelineConfigure != null){
+            return switch (pipelineConfigure.getTaskType()) {
+                case 1, 2, 3, 4 -> git(pipelineId);
+                case 5 -> svn(pipelineConfigure);
+                default -> null;
+            };
+        }
+        return null;
     }
 
-    public List<List<GitCommit>> git(PipelineConfigure pipelineConfigure) {
-        Pipeline pipeline = pipelineConfigure.getPipeline();
+    public List<List<GitCommit>> git(String pipelineId) {
         List<GitCommit> list = new ArrayList<>();
-
+        Pipeline pipeline = pipelineService.findPipeline(pipelineId);
         RevWalk walk = null;
 
         try (Repository repo = new FileRepository("D:\\clone\\" + pipeline.getPipelineName() + "\\.git"); Git git = new Git(repo)) {
@@ -99,8 +99,8 @@ public class GitCommitServiceImpl implements GitCommitService {
                 list.add(cit);
             }
             //关闭
-            git.close();
             repo.close();
+            git.close();
             if (walk != null) {
                 walk.close();
             }
@@ -159,13 +159,21 @@ public class GitCommitServiceImpl implements GitCommitService {
     //获取svn
     public SVNLogEntry[] svnMassage(Proof proof, PipelineCode pipelineCode) throws SVNException {
 
-        ISVNAuthenticationManager authManager = SVNWCUtil.createDefaultAuthenticationManager(
-                new File(System.getProperty("java.io.tmpdir")+"/auth"), proof.getProofUsername(), proof.getProofPassword().toCharArray());
-        DefaultSVNOptions options = SVNWCUtil.createDefaultOptions(true);
-        options.setDiffCommand("-x -w");
+        //ISVNAuthenticationManager authManager = SVNWCUtil.createDefaultAuthenticationManager(
+        //        new File(System.getProperty("java.io.tmpdir")+"/auth"), proof.getProofUsername(), proof.getProofPassword().toCharArray());
+        //DefaultSVNOptions options = SVNWCUtil.createDefaultOptions(true);
+        //options.setDiffCommand("-x -w");
+
+        BasicAuthenticationManager auth;
+        if (proof.getProofType().equals("SSH")){
+            auth = BasicAuthenticationManager
+                    .newInstance(proof.getProofUsername(), new File(proof.getProofPassword()),null,22);
+        }else {
+            auth = BasicAuthenticationManager.newInstance(proof.getProofUsername(), proof.getProofPassword().toCharArray());
+        }
 
         SVNRepository repos = SVNRepositoryFactory.create(SVNURL.parseURIEncoded(pipelineCode.getCodeAddress()));
-        repos.setAuthenticationManager(authManager);
+        repos.setAuthenticationManager(auth);
 
         long startRevision = repos.getDatedRevision(DateUtils.addDays(new Date(), -500));
         long endRevision = repos.getDatedRevision(new Date());

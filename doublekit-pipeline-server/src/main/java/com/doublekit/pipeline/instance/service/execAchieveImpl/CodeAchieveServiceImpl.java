@@ -1,14 +1,15 @@
-package com.doublekit.pipeline.instance.service.execAchieve;
+package com.doublekit.pipeline.instance.service.execAchieveImpl;
 
 import com.doublekit.pipeline.definition.model.PipelineConfigure;
-import com.doublekit.pipeline.execute.model.CodeGit.FileTree;
 import com.doublekit.pipeline.execute.model.PipelineCode;
 import com.doublekit.pipeline.execute.service.PipelineCodeService;
 import com.doublekit.pipeline.execute.service.PipelineCodeServiceImpl;
 import com.doublekit.pipeline.instance.model.PipelineExecHistory;
 import com.doublekit.pipeline.instance.model.PipelineExecLog;
 import com.doublekit.pipeline.instance.model.PipelineProcess;
+import com.doublekit.pipeline.instance.service.execAchieveService.CodeAchieveService;
 import com.doublekit.pipeline.setting.proof.model.Proof;
+import com.doublekit.rpc.annotation.Exporter;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
@@ -20,6 +21,7 @@ import org.eclipse.jgit.util.FS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNURL;
 import org.tmatesoft.svn.core.auth.BasicAuthenticationManager;
@@ -29,21 +31,18 @@ import org.tmatesoft.svn.core.wc2.SvnTarget;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
-
-public class CodeAchieveImpl {
+@Service
+@Exporter
+public class CodeAchieveServiceImpl implements CodeAchieveService {
 
     @Autowired
     PipelineCodeService pipelineCodeService;
 
-    CommonAchieveImpl commonAchieveImpl = new CommonAchieveImpl();
+    @Autowired
+    CommonAchieveServiceImpl commonAchieveServiceImpl;
 
     private static final Logger logger = LoggerFactory.getLogger(PipelineCodeServiceImpl.class);
 
@@ -58,14 +57,19 @@ public class CodeAchieveImpl {
 
         PipelineCode pipelineCode = pipelineCodeService.findOneCode(pipelineConfigure.getTaskId());
         //初始化日志
-        PipelineExecLog pipelineExecLog = commonAchieveImpl.initializeLog(pipelineExecHistory, pipelineConfigure);
+        PipelineExecLog pipelineExecLog = commonAchieveServiceImpl.initializeLog(pipelineExecHistory, pipelineConfigure);
 
         //代码克隆路径
         String path = "D:\\clone\\" + pipelineConfigure.getPipeline().getPipelineName();
         File file = new File(path);
 
         //删除旧的代码
-        //commonAchieve.deleteFile(file);
+        Boolean deleteFile = commonAchieveServiceImpl.deleteFile(file);
+        if (deleteFile){
+            pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+"\n开始分配代码空间。");
+            pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+"\n代码空间分配成功。\n");
+        }
+        pipelineExecHistoryList.add(pipelineExecHistory);
 
         //获取凭证
         Proof proof = pipelineCode.getProof();
@@ -73,8 +77,8 @@ public class CodeAchieveImpl {
         pipelineProcess.setPipelineExecLog(pipelineExecLog);
         if (proof == null){
             logger.info("凭证为空。");
-            commonAchieveImpl.updateTime(pipelineProcess,beginTime);
-            commonAchieveImpl.updateState(pipelineProcess,"凭证为空。",pipelineExecHistoryList);
+            commonAchieveServiceImpl.updateTime(pipelineProcess,beginTime);
+            commonAchieveServiceImpl.updateState(pipelineProcess,"凭证为空。",pipelineExecHistoryList);
             return 0;
         }
 
@@ -84,14 +88,14 @@ public class CodeAchieveImpl {
                 + "Uri : " + pipelineCode.getCodeAddress() + "\n"
                 + "Branch : " + pipelineCode.getCodeBranch() + "\n"
                 + "proofType : " +proof.getProofType();
-        pipelineExecHistory.setRunLog(s);
+        pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+s);
         pipelineExecHistoryList.add(pipelineExecHistory);
 
         try {
         codeStart(proof,pipelineCode,path);
         } catch (GitAPIException | IOException | SVNException e) {
-            commonAchieveImpl.updateTime(pipelineProcess,beginTime);
-            commonAchieveImpl.updateState(pipelineProcess,e.toString(),pipelineExecHistoryList);
+            commonAchieveServiceImpl.updateTime(pipelineProcess,beginTime);
+            commonAchieveServiceImpl.updateState(pipelineProcess,e.toString(),pipelineExecHistoryList);
             return 0;
         }
 
@@ -99,8 +103,8 @@ public class CodeAchieveImpl {
         pipelineExecLog.setRunLog( s + "代码拉取成功" + "\n");
         pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+"\n"+ "代码拉取成功" +"\n");
         pipelineExecHistoryList.add(pipelineExecHistory);
-        commonAchieveImpl.updateTime(pipelineProcess,beginTime);
-        commonAchieveImpl.updateState(pipelineProcess,null,pipelineExecHistoryList);
+        commonAchieveServiceImpl.updateTime(pipelineProcess,beginTime);
+        commonAchieveServiceImpl.updateState(pipelineProcess,null,pipelineExecHistoryList);
         return 1;
     }
 
@@ -118,7 +122,7 @@ public class CodeAchieveImpl {
                 if (proof.getProofType().equals("SSH")){
                     sshClone(pipelineCode.getCodeAddress(), proof.getProofPassword(), path, pipelineCode.getCodeBranch());
                 }else {
-                    UsernamePasswordCredentialsProvider credentialsProvider = commonAchieveImpl.usernamePassword(proof.getProofUsername(), proof.getProofPassword());
+                    UsernamePasswordCredentialsProvider credentialsProvider = commonAchieveServiceImpl.usernamePassword(proof.getProofUsername(), proof.getProofPassword());
                     clone(path, pipelineCode.getCodeAddress(), credentialsProvider, pipelineCode.getCodeBranch());
                 }
                 break;
@@ -140,20 +144,15 @@ public class CodeAchieveImpl {
      * @param branch 分支
      */
     private void clone(String gitAddress, String gitUrl, CredentialsProvider credentialsProvider, String branch)
-            throws GitAPIException, JGitInternalException, IOException {
+            throws GitAPIException, JGitInternalException {
         Git git;
         File fileAddress = new File(gitAddress);
-        if (!fileAddress.exists()){
-            git = Git.cloneRepository()
-                   .setURI(gitUrl)
-                   .setCredentialsProvider(credentialsProvider)
-                   .setDirectory(fileAddress)
-                   .setBranch(branch)
-                   .call();
-       }else {
-           git = Git.open(new File(gitAddress+"\\.git"));
-           git.pull().setCredentialsProvider(credentialsProvider).call();
-       }
+        git = Git.cloneRepository()
+                .setURI(gitUrl)
+                .setCredentialsProvider(credentialsProvider)
+                .setDirectory(fileAddress)
+                .setBranch(branch)
+                .call();
         git.close();
     }
 
@@ -164,7 +163,7 @@ public class CodeAchieveImpl {
      * @param clonePath 克隆位置
      * @param branch 分支
      */
-    public void sshClone(String url, String privateKeyPath,String clonePath,String branch) throws GitAPIException, JGitInternalException, IOException {
+    public void sshClone(String url, String privateKeyPath,String clonePath,String branch) throws GitAPIException, JGitInternalException {
         Git git;
         File fileAddress = new File(clonePath);
         SshSessionFactory sshSessionFactory = new JschConfigSessionFactory() {
@@ -180,23 +179,24 @@ public class CodeAchieveImpl {
                 return defaultJSch;
             }
         };
-        if (!fileAddress.exists()){
-             git = Git.cloneRepository()
-                    .setURI(url)
-                    .setBranch(branch)
-                    .setTransportConfigCallback(transport -> {
-                        SshTransport sshTransport = (SshTransport) transport;
-                        sshTransport.setSshSessionFactory(sshSessionFactory);
-                    })
-                    .setDirectory(fileAddress)
-                    .call();
-        }else {
-            git = Git.open(new File(clonePath+"\\.git"));
-            git.pull().setTransportConfigCallback(transport -> {
-                SshTransport sshTransport = (SshTransport) transport;
-                sshTransport.setSshSessionFactory(sshSessionFactory);
-            }).call();
-        }
+        git = Git.cloneRepository()
+                .setURI(url)
+                .setBranch(branch)
+                .setTransportConfigCallback(transport -> {
+                    SshTransport sshTransport = (SshTransport) transport;
+                    sshTransport.setSshSessionFactory(sshSessionFactory);
+                })
+                .setDirectory(fileAddress)
+                .call();
+        //if (!fileAddress.exists()){
+        //
+        //}else {
+        //    git = Git.open(new File(clonePath+"\\.git"));
+        //    git.pull().setTransportConfigCallback(transport -> {
+        //        SshTransport sshTransport = (SshTransport) transport;
+        //        sshTransport.setSshSessionFactory(sshSessionFactory);
+        //    }).call();
+        //}
         git.close();
     }
 
@@ -207,7 +207,7 @@ public class CodeAchieveImpl {
      * @param path 文件地址
      */
     public void svn(PipelineCode pipelineCode,Proof proof,String path) throws SVNException {
-        commonAchieveImpl.deleteFile(new File(path));
+        commonAchieveServiceImpl.deleteFile(new File(path));
         SvnOperationFactory svnOperationFactory = new SvnOperationFactory();
         char[] password = proof.getProofPassword().toCharArray();
 
@@ -227,7 +227,7 @@ public class CodeAchieveImpl {
      * @param path 文件地址
      */
     public void sshSvn(PipelineCode pipelineCode,Proof proof,String path) throws SVNException {
-        commonAchieveImpl.deleteFile(new File(path));
+        commonAchieveServiceImpl.deleteFile(new File(path));
         SvnOperationFactory svnOperationFactory = new SvnOperationFactory();
         BasicAuthenticationManager auth = BasicAuthenticationManager
                 .newInstance(proof.getProofUsername(), new File(proof.getProofPassword()),null,22);
@@ -239,51 +239,6 @@ public class CodeAchieveImpl {
         svnOperationFactory.dispose();
     }
 
-    /**
-     * 获取文件树
-     * @param path 文件地址
-     * @param list 存放树的容器
-     * @return 树
-     */
-    public  List<FileTree> fileTree(File path, List<FileTree> list){
-        File[] files = path.listFiles();
-        if (files != null){
-            for (File file : files) {
-                FileTree fileTree = new FileTree();
-                fileTree.setTreeName(file.getName());
-                if (file.isDirectory()){
-                    fileTree.setTreeType(2);
-                    List<FileTree> trees = new ArrayList<>();
-                    fileTree.setFileTree(trees);
-                    fileTree(file,trees);
-                }else {
-                    fileTree.setTreePath(file.getPath());
-                    fileTree.setTreeType(1);
-                }
-                list.add(fileTree);
-                list.sort(Comparator.comparing(FileTree::getTreeType,Comparator.reverseOrder()));
-            }
-        }
-        return list;
-    }
 
-    /**
-     * 获取文件流
-     * @param path 文件地址
-     * @return 文件信息
-     */
-    public List<String> readFile(String path) {
-        if (path == null){
-            return null;
-        }
-        List<String> lines;
-        try {
-            lines = Files.readAllLines(Paths.get(path),
-                    StandardCharsets.UTF_8);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        return lines;
-    }
 
 }

@@ -6,7 +6,7 @@ import com.doublekit.pipeline.execute.model.CodeGit.GitCommit;
 import java.util.List;
 
 @JoinProvider(model = GitCommit.class)
-public interface GitCommitService {
+public interface CodeCommitService {
 
     /**
      * 获取提交信息

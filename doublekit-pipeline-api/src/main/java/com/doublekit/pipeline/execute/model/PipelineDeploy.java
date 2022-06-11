@@ -58,6 +58,14 @@ public class PipelineDeploy {
     @ApiProperty(name = "deployAlias",desc="别名")
     private String deployAlias;
 
+    //端口号
+    @ApiProperty(name = "port" ,desc="端口号")
+    private int port;
+
+    //ip地址
+    @ApiProperty(name = "ip" ,desc="ip地址")
+    private String ip;
+
     public String getDeployId() {
         return deployId;
     }
@@ -137,5 +145,21 @@ public class PipelineDeploy {
 
     public void setDeployAlias(String deployAlias) {
         this.deployAlias = deployAlias;
+    }
+
+    public int getPort() {
+        return port;
+    }
+
+    public void setPort(int port) {
+        this.port = port;
+    }
+
+    public String getIp() {
+        return ip;
+    }
+
+    public void setIp(String ip) {
+        this.ip = ip;
     }
 }

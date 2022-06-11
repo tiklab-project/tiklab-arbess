@@ -78,12 +78,4 @@ public interface PipelineCodeService {
     @FindList
     List<PipelineCode> findAllCodeList(List<String> idList);
 
-    /**
-     * 验证账户密码
-     * @param gitUrl 克隆地址
-     * @param proofId 凭证id
-     * @return 验证状态
-     */
-    boolean checkAuth(String gitUrl, String proofId);
-
 }
