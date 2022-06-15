@@ -8,6 +8,7 @@ import com.doublekit.pipeline.instance.model.PipelineExecHistory;
 import com.doublekit.pipeline.instance.model.PipelineExecLog;
 import com.doublekit.pipeline.instance.model.PipelineProcess;
 import com.doublekit.pipeline.instance.service.execAchieveService.CodeAchieveService;
+import com.doublekit.pipeline.instance.service.execAchieveService.CommonAchieveService;
 import com.doublekit.pipeline.setting.proof.model.Proof;
 import com.doublekit.rpc.annotation.Exporter;
 import com.jcraft.jsch.JSch;
@@ -43,7 +44,7 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
     PipelineCodeService pipelineCodeService;
 
     @Autowired
-    CommonAchieveServiceImpl commonAchieveServiceImpl;
+    CommonAchieveService commonAchieveService;
 
     private static final Logger logger = LoggerFactory.getLogger(PipelineCodeServiceImpl.class);
 
@@ -58,14 +59,14 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
 
         PipelineCode pipelineCode = pipelineCodeService.findOneCode(pipelineConfigure.getTaskId());
         //初始化日志
-        PipelineExecLog pipelineExecLog = commonAchieveServiceImpl.initializeLog(pipelineExecHistory, pipelineConfigure);
+        PipelineExecLog pipelineExecLog = commonAchieveService.initializeLog(pipelineExecHistory, pipelineConfigure);
 
         //代码克隆路径
         String path = "D:\\clone\\" + pipelineConfigure.getPipeline().getPipelineName();
         File file = new File(path);
 
         //删除旧的代码
-        Boolean deleteFile = commonAchieveServiceImpl.deleteFile(file);
+        Boolean deleteFile = commonAchieveService.deleteFile(file);
         if (deleteFile){
             pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+"\n开始分配代码空间。");
             pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+"\n代码空间分配成功。\n");
@@ -78,8 +79,8 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
         pipelineProcess.setPipelineExecLog(pipelineExecLog);
         if (proof == null){
             logger.info("凭证为空。");
-            commonAchieveServiceImpl.updateTime(pipelineProcess,beginTime);
-            commonAchieveServiceImpl.updateState(pipelineProcess,"凭证为空。",pipelineExecHistoryList);
+            commonAchieveService.updateTime(pipelineProcess,beginTime);
+            commonAchieveService.updateState(pipelineProcess,"凭证为空。",pipelineExecHistoryList);
             return 0;
         }
 
@@ -95,8 +96,8 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
         try {
         codeStart(proof,pipelineCode,path);
         } catch (GitAPIException | IOException | SVNException e) {
-            commonAchieveServiceImpl.updateTime(pipelineProcess,beginTime);
-            commonAchieveServiceImpl.updateState(pipelineProcess,e.toString(),pipelineExecHistoryList);
+            commonAchieveService.updateTime(pipelineProcess,beginTime);
+            commonAchieveService.updateState(pipelineProcess,e.toString(),pipelineExecHistoryList);
             return 0;
         }
 
@@ -104,8 +105,8 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
         pipelineExecLog.setRunLog( s + "代码拉取成功" + "\n");
         pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+"\n"+ "代码拉取成功" +"\n");
         pipelineExecHistoryList.add(pipelineExecHistory);
-        commonAchieveServiceImpl.updateTime(pipelineProcess,beginTime);
-        commonAchieveServiceImpl.updateState(pipelineProcess,null,pipelineExecHistoryList);
+        commonAchieveService.updateTime(pipelineProcess,beginTime);
+        commonAchieveService.updateState(pipelineProcess,null,pipelineExecHistoryList);
         return 1;
     }
 
@@ -121,7 +122,10 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
         switch (pipelineCode.getType()){
             case 1,2,3,4 :
                 if (proof.getProofType().equals("SSH")){
-                    sshClone(pipelineCode.getCodeAddress(), proof.getProofPassword(), path, pipelineCode.getCodeBranch());
+                    File file = File.createTempFile("pipeline", ".txt");
+                    commonAchieveService.writePrivateKeyPath(proof.getProofPassword(),file.getAbsolutePath());
+                    sshClone(pipelineCode.getCodeAddress(), file.getAbsolutePath(), path, pipelineCode.getCodeBranch());
+                    file.deleteOnExit();
                 }else {
                     UsernamePasswordCredentialsProvider provider = new UsernamePasswordCredentialsProvider(proof.getProofUsername(), proof.getProofPassword());
                     clone(path, pipelineCode.getCodeAddress(), provider, pipelineCode.getCodeBranch());
@@ -168,6 +172,7 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
      * @param branch 分支
      */
     public void sshClone(String url, String privateKeyPath,String clonePath,String branch) throws GitAPIException, JGitInternalException {
+       
         Git git;
         File fileAddress = new File(clonePath);
         SshSessionFactory sshSessionFactory = new JschConfigSessionFactory() {
@@ -211,7 +216,7 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
      * @param path 文件地址
      */
     public void svn(PipelineCode pipelineCode,Proof proof,String path) throws SVNException {
-        commonAchieveServiceImpl.deleteFile(new File(path));
+        commonAchieveService.deleteFile(new File(path));
         SvnOperationFactory svnOperationFactory = new SvnOperationFactory();
         char[] password = proof.getProofPassword().toCharArray();
 
@@ -231,7 +236,7 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
      * @param path 文件地址
      */
     public void sshSvn(PipelineCode pipelineCode,Proof proof,String path) throws SVNException {
-        commonAchieveServiceImpl.deleteFile(new File(path));
+        commonAchieveService.deleteFile(new File(path));
         SvnOperationFactory svnOperationFactory = new SvnOperationFactory();
         BasicAuthenticationManager auth = BasicAuthenticationManager
                 .newInstance(proof.getProofUsername(), new File(proof.getProofPassword()),null,22);

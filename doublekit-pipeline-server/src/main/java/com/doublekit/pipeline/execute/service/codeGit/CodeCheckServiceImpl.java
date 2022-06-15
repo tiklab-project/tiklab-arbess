@@ -1,5 +1,6 @@
 package com.doublekit.pipeline.execute.service.codeGit;
 
+import com.doublekit.pipeline.instance.service.execAchieveService.CommonAchieveService;
 import com.doublekit.pipeline.setting.proof.model.Proof;
 import com.doublekit.pipeline.setting.proof.service.ProofService;
 import com.doublekit.rpc.annotation.Exporter;
@@ -22,6 +23,7 @@ import org.tmatesoft.svn.core.io.SVNRepositoryFactory;
 import org.tmatesoft.svn.core.wc.SVNWCUtil;
 
 import java.io.File;
+import java.io.IOException;
 
 @Service
 @Exporter
@@ -29,6 +31,9 @@ public class CodeCheckServiceImpl implements CodeCheckService {
 
     @Autowired
     ProofService proofService;
+
+    @Autowired
+    CommonAchieveService commonAchieveService;
 
     public Boolean checkAuth(String url , String proofId, int port){
 
@@ -49,7 +54,17 @@ public class CodeCheckServiceImpl implements CodeCheckService {
      * @return 状态
      */
     public boolean gitCheck(String gitUrl, Proof proof) {
-
+        File file = null;
+        try {
+            file = File.createTempFile("pipeline", ".txt");
+            commonAchieveService.writePrivateKeyPath(proof.getProofPassword(),file.getAbsolutePath());
+        } catch (IOException e) {
+            if (file != null){
+                file.deleteOnExit();
+            }
+            return false;
+        }
+        File finalFile = file;
         SshSessionFactory sshSessionFactory = new JschConfigSessionFactory() {
             @Override
             protected void configure(OpenSshConfig.Host host, Session session ) {
@@ -59,7 +74,7 @@ public class CodeCheckServiceImpl implements CodeCheckService {
             @Override
             protected JSch createDefaultJSch(FS fs) throws JSchException {
                 JSch defaultJSch = super.createDefaultJSch(fs);
-                defaultJSch.addIdentity(proof.getProofPassword());
+                defaultJSch.addIdentity(finalFile.getAbsolutePath());
                 return defaultJSch;
             }
         };
@@ -78,6 +93,7 @@ public class CodeCheckServiceImpl implements CodeCheckService {
         } catch (GitAPIException e) {
             return false;
         }
+        file.deleteOnExit();
         return true;
     }
 

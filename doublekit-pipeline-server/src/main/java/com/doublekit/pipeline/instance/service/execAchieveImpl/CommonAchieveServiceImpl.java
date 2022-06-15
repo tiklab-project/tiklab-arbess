@@ -16,10 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -365,6 +362,33 @@ public class CommonAchieveServiceImpl implements CommonAchieveService {
             }
         }
         return list;
+    }
+
+
+    /**
+     * 字符串写入文件中
+     * @param massage 支付串
+     * @param filePath 文件地址
+     * @throws IOException 写入失败
+     */
+    @Override
+    public  void writePrivateKeyPath(String massage, String filePath) throws IOException {
+        BufferedReader bufferedReader ;
+        BufferedWriter bufferedWriter;
+        File distFile= new File(filePath);
+        if (!distFile.getParentFile().exists()){
+            boolean mkdirs = distFile.getParentFile().mkdirs();
+        }
+        bufferedReader = new BufferedReader(new StringReader(massage));
+        bufferedWriter = new BufferedWriter(new FileWriter(distFile));
+        char[] buf = new char[1024]; //字符缓冲区
+        int len;
+        while ( (len = bufferedReader.read(buf)) != -1) {
+            bufferedWriter.write(buf, 0, len);
+        }
+        bufferedWriter.flush();
+        bufferedReader.close();
+        bufferedWriter.close();
     }
 
     /**

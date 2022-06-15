@@ -155,14 +155,14 @@ public class ProofServiceImpl implements ProofService{
         return BeanMapper.mapList(proofEntityList, Proof.class);
     }
 
-    public void writePrivateKeyPath(String Data, String filePath) throws IOException {
+    public void writePrivateKeyPath(String massage, String filePath) throws IOException {
         BufferedReader bufferedReader ;
         BufferedWriter bufferedWriter;
         File distFile= new File(filePath);
         if (!distFile.getParentFile().exists()){
             boolean mkdirs = distFile.getParentFile().mkdirs();
         }
-        bufferedReader = new BufferedReader(new StringReader(Data));
+        bufferedReader = new BufferedReader(new StringReader(massage));
         bufferedWriter = new BufferedWriter(new FileWriter(distFile));
         char[] buf = new char[1024]; //字符缓冲区
         int len;

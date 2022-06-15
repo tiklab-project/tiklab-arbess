@@ -122,6 +122,14 @@ public interface CommonAchieveService {
      */
       List<FileTree> fileTree(File path, List<FileTree> list);
 
+    /**
+     * 字符串写入文件中
+     * @param massage 支付串
+     * @param filePath 文件地址
+     * @throws IOException 写入失败
+     */
+    void writePrivateKeyPath(String massage, String filePath) throws IOException;
+
 
     /**
      * 获取文件流
