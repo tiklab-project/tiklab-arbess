@@ -163,7 +163,7 @@ public class DeployAchieveServiceImpl implements DeployAchieveService {
         //设置第一次登陆的时候提示，可选值：(ask | yes | no)
         session.setConfig("StrictHostKeyChecking", "no");
 
-        if (proof.getProofType().equals("password") && proof.getProofScope()==31){
+        if (proof.getProofType().equals("password")){
             //设置登陆主机的密码
             session.setPassword(proof.getProofPassword());
         }else {
@@ -216,7 +216,7 @@ public class DeployAchieveServiceImpl implements DeployAchieveService {
         Connection conn = new Connection(pipelineDeploy.getIp(),pipelineDeploy.getPort());
         conn.connect();
 
-        if (proof.getProofType().equals("password") && proof.getProofScope()==31){
+        if (proof.getProofType().equals("password")){
             //设置登陆主机的密码
             conn.authenticateWithPassword(proof.getProofUsername(), proof.getProofPassword());
         }else {

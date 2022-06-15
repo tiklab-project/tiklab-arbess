@@ -71,6 +71,15 @@ public interface PipelineService {
     @FindList
     List<Pipeline> findAllPipelineList(List<String> idList);
 
+
+    /**
+     * 查询用户下的流水线
+     * @param userId 用户id
+     * @return 流水线列表
+     */
+    List<Pipeline> findUserPipeline(String userId);
+
+
     /**
      * 根据名称模糊查询
      * @param pipelineName 查询条件
@@ -81,9 +90,10 @@ public interface PipelineService {
 
     /**
      *查询流水线状态
+     * @param userId 用户id
      * @return 状态集合
      */
-    List<PipelineStatus> findAllStatus();
+    List<PipelineStatus> findAllStatus(String userId);
 
 
 }

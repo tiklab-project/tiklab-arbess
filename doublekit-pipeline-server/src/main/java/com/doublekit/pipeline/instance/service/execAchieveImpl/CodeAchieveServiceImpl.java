@@ -16,6 +16,7 @@ import com.jcraft.jsch.Session;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.JGitInternalException;
+import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.transport.*;
 import org.eclipse.jgit.util.FS;
 import org.slf4j.Logger;
@@ -122,8 +123,8 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
                 if (proof.getProofType().equals("SSH")){
                     sshClone(pipelineCode.getCodeAddress(), proof.getProofPassword(), path, pipelineCode.getCodeBranch());
                 }else {
-                    UsernamePasswordCredentialsProvider credentialsProvider = commonAchieveServiceImpl.usernamePassword(proof.getProofUsername(), proof.getProofPassword());
-                    clone(path, pipelineCode.getCodeAddress(), credentialsProvider, pipelineCode.getCodeBranch());
+                    UsernamePasswordCredentialsProvider provider = new UsernamePasswordCredentialsProvider(proof.getProofUsername(), proof.getProofPassword());
+                    clone(path, pipelineCode.getCodeAddress(), provider, pipelineCode.getCodeBranch());
                 }
                 break;
             case 5:
@@ -154,7 +155,10 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
                 .setBranch(branch)
                 .call();
         git.close();
+        Repository repository = git.getRepository();
+        repository.isBare();
     }
+
 
     /**
      * SSH克隆代码

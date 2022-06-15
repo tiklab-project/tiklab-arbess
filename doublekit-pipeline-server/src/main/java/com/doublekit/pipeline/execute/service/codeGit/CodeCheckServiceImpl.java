@@ -6,7 +6,11 @@ import com.doublekit.rpc.annotation.Exporter;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
-import okhttp3.*;
+import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.LsRemoteCommand;
+import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.transport.*;
+import org.eclipse.jgit.util.FS;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.tmatesoft.svn.core.SVNException;
@@ -18,7 +22,6 @@ import org.tmatesoft.svn.core.io.SVNRepositoryFactory;
 import org.tmatesoft.svn.core.wc.SVNWCUtil;
 
 import java.io.File;
-import java.io.IOException;
 
 @Service
 @Exporter
@@ -28,13 +31,15 @@ public class CodeCheckServiceImpl implements CodeCheckService {
     ProofService proofService;
 
     public Boolean checkAuth(String url , String proofId, int port){
+
         Proof proof = proofService.findOneProof(proofId);
-       return switch (proof.getProofScope()){
-            case 1,2,3,4 -> gitCheck(url, proof);
-            case 5 -> svnCheck(url, proof);
-            case 31,32 -> deployCheck(url,proof,port);
-           default -> false;
-        };
+        if (port != 0){
+           return deployCheck(url,proof,port);
+        }else {
+            boolean b = gitCheck(url, proof);
+            boolean c = svnCheck(url, proof);
+            return b || c;
+        }
     }
 
     /**
@@ -44,20 +49,36 @@ public class CodeCheckServiceImpl implements CodeCheckService {
      * @return 状态
      */
     public boolean gitCheck(String gitUrl, Proof proof) {
-        String basic = Credentials.basic(proof.getProofUsername(), proof.getProofPassword());
-        Request request = new Request.Builder()
-                .addHeader("Authorization", basic)
-                .url(gitUrl + "/info/refs?service=git-upload-pack")
-                .build();
-        Call call = new OkHttpClient().newCall(request);
+
+        SshSessionFactory sshSessionFactory = new JschConfigSessionFactory() {
+            @Override
+            protected void configure(OpenSshConfig.Host host, Session session ) {
+                //取消host文件验证
+                session.setConfig("StrictHostKeyChecking","no");
+            }
+            @Override
+            protected JSch createDefaultJSch(FS fs) throws JSchException {
+                JSch defaultJSch = super.createDefaultJSch(fs);
+                defaultJSch.addIdentity(proof.getProofPassword());
+                return defaultJSch;
+            }
+        };
+        LsRemoteCommand lsRemoteCommand = Git.lsRemoteRepository();
         try {
-            Response execute = call.execute();
-            execute.close();
-            return execute.code() == 200;
-        } catch (IOException var8) {
-            var8.printStackTrace();
+            if (proof.getProofType().equals("ssh")){
+                lsRemoteCommand .setTransportConfigCallback(transport -> {
+                            SshTransport sshTransport = (SshTransport) transport;
+                            sshTransport.setSshSessionFactory(sshSessionFactory);
+                        });
+            }else {
+                UsernamePasswordCredentialsProvider provider = new UsernamePasswordCredentialsProvider(proof.getProofUsername(), proof.getProofPassword());
+                lsRemoteCommand.setCredentialsProvider(provider);
+            }
+            lsRemoteCommand.setRemote(gitUrl).callAsMap();
+        } catch (GitAPIException e) {
             return false;
         }
+        return true;
     }
 
     /**

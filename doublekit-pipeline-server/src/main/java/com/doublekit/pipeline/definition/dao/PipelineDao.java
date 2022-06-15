@@ -5,10 +5,10 @@ import com.doublekit.dal.jpa.JpaTemplate;
 import com.doublekit.dal.jpa.criterial.condition.QueryCondition;
 import com.doublekit.dal.jpa.criterial.conditionbuilder.QueryBuilders;
 import com.doublekit.pipeline.definition.entity.PipelineEntity;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.stereotype.Repository;
+
 import java.util.List;
 
 /**
@@ -68,6 +68,12 @@ public class PipelineDao {
 
     public List<PipelineEntity> findAllPipelineList(List<String> idList){
         return jpaTemplate.findList(PipelineEntity.class,idList);
+    }
+
+    public List<PipelineEntity> findUserPipeline(String userId){
+        String sql = "select p.* from orc_dm_user d,pipeline p";
+        sql = sql.concat(" where (d.domain_id  COLLATE utf8mb4_general_ci ) = (p.pipeline_id COLLATE utf8mb4_general_ci ) and  (d.user_id COLLATE utf8mb4_general_ci ) =  (? COLLATE utf8mb4_general_ci ) ");
+        return jpaTemplate.getJdbcTemplate().query(sql, new String[]{userId}, new BeanPropertyRowMapper(PipelineEntity.class));
     }
 
     /**

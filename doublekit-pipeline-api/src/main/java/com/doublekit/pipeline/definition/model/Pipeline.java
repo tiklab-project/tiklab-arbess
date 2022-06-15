@@ -38,6 +38,8 @@ public class Pipeline {
     @ApiProperty(name="pipelineCollect",desc="运行状态",required = true)
     private int pipelineState;
 
+    private String userId;
+
 
 
     public String getPipelineId() {
@@ -94,5 +96,13 @@ public class Pipeline {
 
     public void setPipelineState(int pipelineState) {
         this.pipelineState = pipelineState;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 }

@@ -9,10 +9,14 @@ import com.doublekit.pipeline.definition.model.PipelineStatus;
 import com.doublekit.pipeline.instance.model.PipelineExecHistory;
 import com.doublekit.pipeline.instance.service.PipelineExecHistoryService;
 import com.doublekit.rpc.annotation.Exporter;
+import com.doublekit.user.user.model.DmUser;
+import com.doublekit.user.user.model.User;
+import com.doublekit.user.user.service.DmUserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,6 +32,9 @@ public class PipelineServiceImpl implements PipelineService{
     PipelineDao pipelineDao;
 
     @Autowired
+    DmUserService dmUserService;
+
+    @Autowired
     PipelineExecHistoryService pipelineExecHistoryService;
 
     @Autowired
@@ -39,6 +46,7 @@ public class PipelineServiceImpl implements PipelineService{
     @Override
     public String createPipeline(Pipeline pipeline) {
         PipelineEntity pipelineEntity = BeanMapper.map(pipeline, PipelineEntity.class);
+
         List<Pipeline> pipelineList = findAllPipeline();
         //判断是否存在相同名称
         for (Pipeline pipeline1 : pipelineList) {
@@ -46,12 +54,25 @@ public class PipelineServiceImpl implements PipelineService{
                 return null;
             }
         }
-        return  pipelineDao.createPipeline(pipelineEntity);
+        String pipelineId = pipelineDao.createPipeline(pipelineEntity);
+        DmUser dmUser = new DmUser();
+        dmUser.setDomainId(pipelineId);
+        dmUser.setUser(new User().setId(pipeline.getUserId()));
+        dmUserService.createDmUser(dmUser);
+        return  pipelineId;
     }
 
     //删除
     @Override
     public void deletePipeline(String pipelineId) {
+        List<DmUser> allDmUser = dmUserService.findAllDmUser();
+        if (allDmUser != null){
+            for (DmUser dmUser : allDmUser) {
+                if (dmUser.getDomainId().equals(pipelineId)){
+                    dmUserService.deleteDmUser(dmUser.getId());
+                }
+            }
+        }
         if (pipelineId != null){
             pipelineDao.deletePipeline(pipelineId);
             //删除对应的流水线配置
@@ -108,6 +129,12 @@ public class PipelineServiceImpl implements PipelineService{
         return BeanMapper.mapList(pipelineEntityList, Pipeline.class);
     }
 
+    @Override
+    public List<Pipeline> findUserPipeline(String userId){
+        List<PipelineEntity> pipelineEntityList = pipelineDao.findUserPipeline(userId);
+        return BeanMapper.mapList(pipelineEntityList, Pipeline.class);
+    }
+
     //模糊查询
     @Override
     public List<Pipeline> findLike(String pipelineName) {
@@ -117,9 +144,9 @@ public class PipelineServiceImpl implements PipelineService{
 
     //查询所有流水线状态
     @Override
-    public List<PipelineStatus> findAllStatus() {
+    public List<PipelineStatus> findAllStatus(String userId) {
         List<PipelineStatus> pipelineStatusList= new ArrayList<>();
-        List<Pipeline> allPipeline = findAllPipeline();
+        List<Pipeline> allPipeline = findUserPipeline(userId);
         for (Pipeline pipeline : allPipeline) {
             PipelineStatus pipelineStatus = new PipelineStatus();
             PipelineExecHistory latelyHistory = pipelineExecHistoryService.findLatelyHistory(pipeline.getPipelineId());

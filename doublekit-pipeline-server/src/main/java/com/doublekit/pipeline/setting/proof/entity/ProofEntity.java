@@ -37,6 +37,22 @@ public class ProofEntity {
     @Column(name = "proof_describe")
     private String proofDescribe;
 
+    //创建时间
+    @Column(name = "proof_create_time")
+    private String proofCreateTime;
+
+    //流水线id
+    @Column(name = "pipeline_id")
+    private String pipelineId;
+
+    //类型
+    @Column(name = "type")
+    private int type;
+
+    //用户id
+    @Column(name = "user_id")
+    private String id;
+
 
 
     public String getProofId() {
@@ -93,5 +109,37 @@ public class ProofEntity {
 
     public void setProofScope(int proofScope) {
         this.proofScope = proofScope;
+    }
+
+    public String getProofCreateTime() {
+        return proofCreateTime;
+    }
+
+    public void setProofCreateTime(String proofCreateTime) {
+        this.proofCreateTime = proofCreateTime;
+    }
+
+    public String getPipelineId() {
+        return pipelineId;
+    }
+
+    public void setPipelineId(String pipelineId) {
+        this.pipelineId = pipelineId;
+    }
+
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 }

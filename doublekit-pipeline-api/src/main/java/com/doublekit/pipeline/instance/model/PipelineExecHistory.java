@@ -60,8 +60,11 @@ public class PipelineExecHistory {
     //执行状态
     private int status;
 
-    //判断是否正在执行
-    @ApiProperty(name="findState",desc="判断是否正在执行")
+    //构建次数
+    @ApiProperty(name="findNumber",desc="构建次数")
+    private int findNumber;
+
+    //运行状态
     private int findState;
 
     //时间
@@ -159,12 +162,12 @@ public class PipelineExecHistory {
         this.sort = sort;
     }
 
-    public int getFindState() {
-        return findState;
+    public int getFindNumber() {
+        return findNumber;
     }
 
-    public void setFindState(int findState) {
-        this.findState = findState;
+    public void setFindNumber(int findNumber) {
+        this.findNumber = findNumber;
     }
 
     public String getOneTime() {
@@ -205,5 +208,13 @@ public class PipelineExecHistory {
 
     public void setAllTime(String allTime) {
         this.allTime = allTime;
+    }
+
+    public int getFindState() {
+        return findState;
+    }
+
+    public void setFindState(int findState) {
+        this.findState = findState;
     }
 }

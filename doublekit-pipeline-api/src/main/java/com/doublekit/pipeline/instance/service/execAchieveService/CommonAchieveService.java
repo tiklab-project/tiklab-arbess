@@ -6,7 +6,6 @@ import com.doublekit.pipeline.execute.model.CodeGit.FileTree;
 import com.doublekit.pipeline.instance.model.PipelineExecHistory;
 import com.doublekit.pipeline.instance.model.PipelineExecLog;
 import com.doublekit.pipeline.instance.model.PipelineProcess;
-import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 
 import java.io.File;
 import java.io.IOException;
@@ -55,7 +54,7 @@ public interface CommonAchieveService {
      * @param gitPasswd 密码
      * @return 验证信息
      */
-     UsernamePasswordCredentialsProvider usernamePassword(String gitUser, String gitPasswd);
+    // UsernamePasswordCredentialsProvider usernamePassword(String gitUser, String gitPasswd);
 
     /**
      * 删除文件

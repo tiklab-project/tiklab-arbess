@@ -1,7 +1,6 @@
 package com.doublekit.pipeline.setting.proof.service;
 
 
-import com.doublekit.join.annotation.FindAll;
 import com.doublekit.join.annotation.FindList;
 import com.doublekit.join.annotation.FindOne;
 import com.doublekit.join.annotation.JoinProvider;
@@ -25,9 +24,9 @@ public interface ProofService {
 
     /**
      * 删除凭证
-     * @param id 凭证id
+     * @param proofId 凭证id
      */
-     void deleteProof(String id);
+     void deleteProof(String proofId);
 
     /**
      * 更新凭证
@@ -43,12 +42,28 @@ public interface ProofService {
     @FindOne
      Proof findOneProof(String proofId);
 
-    //获取构建凭证
-    List<Proof> findAllGitProof();
 
-    //获取部署凭证
-    @FindAll
-    List<Proof> findAllDeployProof();
+    /**
+     * 查询流水线凭证
+     * @param pipelineId 流水线id
+     * @return 凭证列表
+     */
+    List<Proof> findPipelineProof(String pipelineId);
+
+    /**
+     * 查询所有凭证
+     * @return 凭证列表
+     */
+    List<Proof> findAllProof();
+
+
+    /**
+     * 查询用户所有凭证
+     * @param userId 用户id
+     * @return 凭证
+     */
+    List<Proof> findAll(String userId);
+
 
     /**
      * 根据类型查询凭证
@@ -60,4 +75,5 @@ public interface ProofService {
 
     @FindList
     List<Proof> selectProofList(List<String> idList);
+
 }

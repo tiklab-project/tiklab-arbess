@@ -33,7 +33,7 @@ public class PipelineController {
     @RequestMapping(path="/createPipeline",method = RequestMethod.POST)
     @ApiMethod(name = "createPipeline",desc = "创建流水线")
     @ApiParam(name = "pipeline",desc = "pipeline",required = true)
-    public Result<String> createPipeline(@RequestBody @NotNull @Valid Pipeline pipeline){
+    public Result<String> createPipeline(@RequestBody @NotNull @Valid Pipeline pipeline,String userId){
 
         String pipelineId = pipelineService.createPipeline(pipeline);
 
@@ -96,10 +96,21 @@ public class PipelineController {
     //查询所有
     @RequestMapping(path="/findAllPipelineStatus",method = RequestMethod.POST)
     @ApiMethod(name = "findOnePipelineStatus",desc = "查询所有流水线状态")
-    public Result<List<PipelineStatus>> findOnePipelineStatus(){
+    public Result<List<PipelineStatus>> findOnePipelineStatus(String userId){
 
-        List<PipelineStatus> allStatus = pipelineService.findAllStatus();
+        List<PipelineStatus> allStatus = pipelineService.findAllStatus(userId);
 
         return Result.ok(allStatus);
+    }
+
+
+    @RequestMapping(path="/findUserPipeline",method = RequestMethod.POST)
+    @ApiMethod(name = "findUserPipeline",desc = "查询用户流水线")
+    @ApiParam(name = "userId",desc = "用户id",required = true)
+    public Result<List<Pipeline>> findUserPipeline(@NotNull String userId){
+
+        List<Pipeline> pipelineQueryList = pipelineService.findUserPipeline(userId);
+
+        return Result.ok(pipelineQueryList);
     }
 }

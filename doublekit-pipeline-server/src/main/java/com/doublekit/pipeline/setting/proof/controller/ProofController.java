@@ -45,6 +45,17 @@ public class ProofController {
         return Result.ok();
     }
 
+
+    @RequestMapping(path="/findPipelineProof",method = RequestMethod.POST)
+    @ApiMethod(name = "findPipelineProof",desc = "查询流水线凭证")
+    @ApiParam(name = "pipelineId",desc = "流水线id",required = true)
+    public Result<List<Proof>> findPipelineProof(@NotNull String pipelineId){
+
+        List<Proof> pipelineProof = proofService.findPipelineProof(pipelineId);
+
+        return Result.ok(pipelineProof);
+    }
+
     //修改
     @RequestMapping(path="/updateProof",method = RequestMethod.POST)
     @ApiMethod(name = "updateProof",desc = "修改凭证")
@@ -56,29 +67,9 @@ public class ProofController {
         return Result.ok();
     }
 
-    //查询所有git凭证
-    @RequestMapping(path="/findAllGitProof",method = RequestMethod.POST)
-    @ApiMethod(name = "findAllStructureProof",desc = "查询所有构建凭证")
-    public Result<List<Proof>> findAllGitProof(){
-
-        List<Proof> proofList = proofService.findAllGitProof();
-
-        return Result.ok(proofList);
-    }
-
-    //查询所有部署凭证
-    @RequestMapping(path="/findAllDeployProof",method = RequestMethod.POST)
-    @ApiMethod(name = "findAllDeployProof",desc = "查询所有部署凭证")
-    public Result<List<Proof>> findAllDeployProof(){
-
-        List<Proof> proofList = proofService.findAllDeployProof();
-
-        return Result.ok(proofList);
-    }
-
     //根据类型查询凭证
     @RequestMapping(path="/findAllProof",method = RequestMethod.POST)
-    @ApiMethod(name = "findAllProof",desc = "查询所有部署凭证")
+    @ApiMethod(name = "findAllProof",desc = "查询所有凭证")
     public Result<List<Proof>> findAllProof(int type){
 
         List<Proof> proofList = proofService.findAllProof(type);
@@ -86,7 +77,16 @@ public class ProofController {
         return Result.ok(proofList);
     }
 
+    //查询全部凭证
+    @RequestMapping(path="/findAll",method = RequestMethod.POST)
+    @ApiMethod(name = "findAll",desc = "查询用户所有凭证")
+    @ApiParam(name = "userId",desc = "用户id",required = true)
+    public Result<List<Proof>> findAll(@NotNull String userId){
 
+        List<Proof> proofList = proofService.findAll(userId);
+
+        return Result.ok(proofList);
+    }
 
     //查询
     @RequestMapping(path="/findOneProof",method = RequestMethod.POST)

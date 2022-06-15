@@ -49,6 +49,9 @@ public class PipelineExecHistoryEntity {
     @Column(name = "find_state",notNull = true)
     private int findState;
 
+    //构建次数
+    @Column(name = "find_number",notNull = true)
+    private int findNumber;
 
     public String getHistoryId() {
         return historyId;
@@ -120,5 +123,13 @@ public class PipelineExecHistoryEntity {
 
     public void setFindState(int findState) {
         this.findState = findState;
+    }
+
+    public int getFindNumber() {
+        return findNumber;
+    }
+
+    public void setFindNumber(int findNumber) {
+        this.findNumber = findNumber;
     }
 }

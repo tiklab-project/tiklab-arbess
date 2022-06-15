@@ -7,12 +7,10 @@ import com.doublekit.pipeline.execute.model.CodeGit.FileTree;
 import com.doublekit.pipeline.instance.model.PipelineExecHistory;
 import com.doublekit.pipeline.instance.model.PipelineExecLog;
 import com.doublekit.pipeline.instance.model.PipelineProcess;
-import com.doublekit.pipeline.instance.service.execAchieveService.CommonAchieveService;
 import com.doublekit.pipeline.instance.service.PipelineExecHistoryService;
 import com.doublekit.pipeline.instance.service.PipelineExecLogService;
+import com.doublekit.pipeline.instance.service.execAchieveService.CommonAchieveService;
 import com.doublekit.rpc.annotation.Exporter;
-import org.apache.commons.lang.StringUtils;
-import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -148,15 +146,15 @@ public class CommonAchieveServiceImpl implements CommonAchieveService {
      * @param gitPasswd 密码
      * @return 验证信息
      */
-    @Override
-    public  UsernamePasswordCredentialsProvider usernamePassword(String gitUser, String gitPasswd) {
 
-        UsernamePasswordCredentialsProvider credentialsProvider = null;
-        if (StringUtils.isNotEmpty(gitUser) && StringUtils.isNotEmpty(gitPasswd)) {
-            credentialsProvider = new UsernamePasswordCredentialsProvider(gitUser, gitPasswd);
-        }
-        return credentialsProvider;
-    }
+    //public  UsernamePasswordCredentialsProvider usernamePassword(String gitUser, String gitPasswd) {
+    //
+    //    UsernamePasswordCredentialsProvider credentialsProvider = null;
+    //    if (StringUtils.isNotEmpty(gitUser) && StringUtils.isNotEmpty(gitPasswd)) {
+    //        credentialsProvider = new UsernamePasswordCredentialsProvider(gitUser, gitPasswd);
+    //    }
+    //    return credentialsProvider;
+    //}
 
     /**
      * 删除旧的代码
@@ -324,8 +322,16 @@ public class CommonAchieveServiceImpl implements CommonAchieveService {
         pipelineExecHistory.setRunWay(1);
         pipelineExecHistory.setSort(1);
         pipelineExecHistory.setStatus(0);
-        pipelineExecHistory.setHistoryId(historyId);
         pipelineExecHistory.setPipeline(pipeline);
+        pipelineExecHistory.setHistoryId(historyId);
+        pipelineExecHistoryService.updateHistory(pipelineExecHistory);
+        List<PipelineExecHistory> allHistory = pipelineExecHistoryService.findAllHistory(pipeline.getPipelineId());
+        allHistory.sort(Comparator.comparing(PipelineExecHistory::getCreateTime));
+        pipelineExecHistory.setFindNumber(1);
+        if (allHistory.size() >= 1){
+            pipelineExecHistory.setFindNumber(allHistory.get(allHistory.size()-1).getFindNumber()+1);
+        }
+        pipelineExecHistory.setHistoryId(historyId);
         pipelineExecHistory.setExecName(pipeline.getPipelineCreateUser());
         pipelineExecHistoryService.updateHistory(pipelineExecHistory);
         return pipelineExecHistory;
