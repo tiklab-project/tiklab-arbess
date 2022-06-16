@@ -95,5 +95,13 @@ public interface PipelineService {
      */
     List<PipelineStatus> findAllStatus(String userId);
 
+    /**
+     * 查询用户收藏的流水线状态
+     * @param userId 用户id
+     * @param pipelineId 流水线id
+     * @return 状态集合
+     */
+    //PipelineStatus findAllStatus(String userId,String pipelineId);
+
 
 }

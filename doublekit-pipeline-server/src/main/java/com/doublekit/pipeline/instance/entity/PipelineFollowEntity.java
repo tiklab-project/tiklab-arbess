@@ -1,22 +1,26 @@
-package com.doublekit.pipeline.setting.view.entity;
+package com.doublekit.pipeline.instance.entity;
 
 import com.doublekit.dal.jpa.annotation.*;
 
+/**
+ * 关注表
+ */
+
 @Entity
-@Table(name="pipeline_top")
-public class PipelineTopEntity {
+@Table(name="pipeline_follow")
+public class PipelineFollowEntity {
 
     @Id
     @GeneratorValue
     @Column(name = "id")
     private String id;
 
-    //用户id
-    @Column(name = "view_id")
-    private String viewId;
-
     @Column(name = "pipeline_id")
     private String pipelineId;
+
+    @Column(name = "user_id")
+    private String userId ;
+
 
     public String getId() {
         return id;
@@ -26,19 +30,19 @@ public class PipelineTopEntity {
         this.id = id;
     }
 
-    public String getViewId() {
-        return viewId;
-    }
-
-    public void setViewId(String viewId) {
-        this.viewId = viewId;
-    }
-
     public String getPipelineId() {
         return pipelineId;
     }
 
     public void setPipelineId(String pipelineId) {
         this.pipelineId = pipelineId;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 }

@@ -142,7 +142,7 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
             allHistory.removeIf(pipelineExecHistory ->
                     pipelineHistoryQuery.getState() != pipelineExecHistory.getRunStatus() && pipelineHistoryQuery.getState() != 0);
             allHistory.removeIf(pipelineExecHistory ->
-                    pipelineHistoryQuery.getName() != null && !pipelineHistoryQuery.getName().equals(pipeline.getPipelineCreateUser()));
+                    pipelineHistoryQuery.getName() != null && !pipelineHistoryQuery.getName().equals(pipeline.getUser().getName()));
             allHistory.removeIf(pipelineExecHistory ->
                     pipelineHistoryQuery.getType() != pipelineExecHistory.getRunWay() && pipelineHistoryQuery.getType() != 0);
             return allHistory;

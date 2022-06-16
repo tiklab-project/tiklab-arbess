@@ -35,6 +35,13 @@ public interface PipelineTopService {
      PipelineTop findOneTop(String topId);
 
     /**
+     * 查询视图id绑定的流水线
+     * @param viewId 视图id
+     * @return 绑定集合
+     */
+    List<PipelineTop>  findAllViewTop(String viewId);
+
+    /**
      * 查询所有视图
      * @return 视图集合
      */

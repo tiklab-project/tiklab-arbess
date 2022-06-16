@@ -204,7 +204,9 @@ public class PipelineExecServiceImpl implements PipelineExecService {
     //获取文件树
     @Override
     public List<FileTree> fileTree(String pipelineId){
+
         Pipeline pipeline = pipelineService.findPipeline(pipelineId);
+        if (pipeline == null)return null;
         String path = "D:\\clone\\"+pipeline.getPipelineName();
         List<FileTree> trees = new ArrayList<>();
         File file = new File(path);

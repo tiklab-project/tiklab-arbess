@@ -8,6 +8,7 @@ import com.doublekit.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -36,6 +37,20 @@ public class PipelineTopServiceImpl implements PipelineTopService{
     @Override
     public PipelineTop findOneTop(String topId) {
         return BeanMapper.map(pipelineTopDao.findOneTop(topId), PipelineTop.class);
+    }
+
+    public List<PipelineTop>  findAllViewTop(String viewId){
+        boolean empty = findAllTop().isEmpty();
+        if (!empty){
+            List<PipelineTop> list = new ArrayList<>();
+            for (PipelineTop pipelineTop : findAllTop()) {
+                if (pipelineTop.getViewId().equals(viewId)){
+                    list.add(pipelineTop);
+                }
+            }
+            return list;
+        }
+       return null;
     }
 
     @Override

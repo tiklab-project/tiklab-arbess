@@ -10,7 +10,6 @@ import com.doublekit.pipeline.instance.model.PipelineExecHistory;
 import com.doublekit.pipeline.instance.service.PipelineExecHistoryService;
 import com.doublekit.rpc.annotation.Exporter;
 import com.doublekit.user.user.model.DmUser;
-import com.doublekit.user.user.model.User;
 import com.doublekit.user.user.service.DmUserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,7 +56,7 @@ public class PipelineServiceImpl implements PipelineService{
         String pipelineId = pipelineDao.createPipeline(pipelineEntity);
         DmUser dmUser = new DmUser();
         dmUser.setDomainId(pipelineId);
-        dmUser.setUser(new User().setId(pipeline.getUserId()));
+        dmUser.setUser(pipeline.getUser());
         dmUserService.createDmUser(dmUser);
         return  pipelineId;
     }
@@ -142,15 +141,17 @@ public class PipelineServiceImpl implements PipelineService{
         return BeanMapper.mapList(pipelineEntityList, Pipeline.class);
     }
 
-    //查询所有流水线状态
+    //获取用户所有流水线
     @Override
     public List<PipelineStatus> findAllStatus(String userId) {
         List<PipelineStatus> pipelineStatusList= new ArrayList<>();
         List<Pipeline> allPipeline = findUserPipeline(userId);
         for (Pipeline pipeline : allPipeline) {
             PipelineStatus pipelineStatus = new PipelineStatus();
+            //成功和构建时间
             PipelineExecHistory latelyHistory = pipelineExecHistoryService.findLatelyHistory(pipeline.getPipelineId());
             PipelineExecHistory latelySuccess = pipelineExecHistoryService.findLatelySuccess(pipeline.getPipelineId());
+
             pipelineStatus.setPipelineId(pipeline.getPipelineId());
             pipelineStatus.setPipelineCollect(pipeline.getPipelineCollect());
             pipelineStatus.setPipelineName(pipeline.getPipelineName());
@@ -166,6 +167,20 @@ public class PipelineServiceImpl implements PipelineService{
         }
         return pipelineStatusList;
     }
+
+    ////返回收藏的流水线
+    //@Override
+    //public PipelineStatus findAllStatus(String userId,String pipelineId){
+    //    if (!findAllStatus(userId).isEmpty()){
+    //        for (PipelineStatus allStatus : findAllStatus(userId)) {
+    //            if (allStatus.getPipelineId().equals(pipelineId)){
+    //                return  allStatus;
+    //            }
+    //        }
+    //    }
+    //    return null;
+    //}
+
 
 
 

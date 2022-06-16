@@ -1,12 +1,14 @@
-package com.doublekit.pipeline.execute.service.codeGit;
+package com.doublekit.pipeline.instance.service;
 
 import com.doublekit.pipeline.definition.model.Pipeline;
 import com.doublekit.pipeline.definition.model.PipelineConfigure;
 import com.doublekit.pipeline.definition.service.PipelineConfigureService;
 import com.doublekit.pipeline.definition.service.PipelineService;
+import com.doublekit.pipeline.execute.model.CodeGit.FileTree;
 import com.doublekit.pipeline.execute.model.CodeGit.GitCommit;
 import com.doublekit.pipeline.execute.model.PipelineCode;
 import com.doublekit.pipeline.execute.service.PipelineCodeService;
+import com.doublekit.pipeline.instance.service.execAchieveService.CommonAchieveService;
 import com.doublekit.pipeline.setting.proof.model.Proof;
 import com.doublekit.rpc.annotation.Exporter;
 import org.apache.commons.lang3.time.DateUtils;
@@ -39,10 +41,13 @@ import java.util.*;
 
 @Service
 @Exporter
-public class CodeCommitServiceImpl implements CodeCommitService {
+public class PipelineWorkSpaceServiceImpl implements  PipelineWorkSpaceService {
 
     @Autowired
     PipelineService pipelineService;
+
+    @Autowired
+    CommonAchieveService commonAchieveService;
 
     @Autowired
     PipelineConfigureService pipelineConfigureService;
@@ -50,8 +55,36 @@ public class CodeCommitServiceImpl implements CodeCommitService {
     @Autowired
     PipelineCodeService pipelineCodeService;
 
-    private static final Logger logger = LoggerFactory.getLogger(CodeCommitServiceImpl.class);
+    @Autowired
+    PipelineOpenService pipelineOpenService;
 
+    private static final Logger logger = LoggerFactory.getLogger(PipelineWorkSpaceServiceImpl.class);
+
+    //获取文件树
+    @Override
+    public List<FileTree> fileTree( String pipelineId,String userId){
+        pipelineOpenService.findOpen(userId,pipelineId);
+        Pipeline pipeline = pipelineService.findPipeline(pipelineId);
+        if (pipeline == null)return null;
+        String path = "D:\\clone\\"+pipeline.getPipelineName();
+        List<FileTree> trees = new ArrayList<>();
+        File file = new File(path);
+        //判断文件是否存在
+        if (file.exists()){
+            List<FileTree> list = commonAchieveService.fileTree(file, trees);
+            list.sort(Comparator.comparing(FileTree::getTreeType,Comparator.reverseOrder()));
+            return list;
+        }
+        return null;
+    }
+
+    //
+    @Override
+    public  List<String> readFile(String path){
+        return commonAchieveService.readFile(path);
+    }
+
+    @Override
     public List<List<GitCommit>> getSubmitMassage(String pipelineId){
         PipelineConfigure pipelineConfigure = pipelineConfigureService.findOneConfigure(pipelineId, 10);
         if (pipelineConfigure != null){
@@ -194,33 +227,37 @@ public class CodeCommitServiceImpl implements CodeCommitService {
     public List<List<GitCommit>> svn(PipelineConfigure pipelineConfigure)  {
         PipelineCode pipelineCode = pipelineCodeService.findOneCode(pipelineConfigure.getTaskId());
         Pipeline pipeline = pipelineConfigure.getPipeline();
-        try {
-            SVNLogEntry[] svnMassage = svnMassage(pipelineCode.getProof(), pipelineCode);
-            List<GitCommit> list = new ArrayList<>();
-            if (svnMassage != null){
-                for (SVNLogEntry entry : svnMassage) {
-                    List<String> strings = new ArrayList<>();
-                    if (entry.getDate() == null){
-                        continue;
+        if (pipelineCode.getProof()!= null){
+            try {
+                SVNLogEntry[] svnMassage = svnMassage(pipelineCode.getProof(), pipelineCode);
+                List<GitCommit> list = new ArrayList<>();
+                if (svnMassage != null){
+                    for (SVNLogEntry entry : svnMassage) {
+                        List<String> strings = new ArrayList<>();
+                        if (entry.getDate() == null){
+                            continue;
+                        }
+                        GitCommit commit = new GitCommit();
+                        commit.setCommitId( ""+entry.getRevision());
+                        commit.setCommitTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(entry.getDate()));
+                        commit.setCommitMassage(entry.getMessage());
+                        commit.setCommitName(entry.getAuthor());
+                        commit.setDayTime(new SimpleDateFormat("yyyy-MM-dd").format(entry.getDate()));
+                        for (Map.Entry<String, SVNLogEntryPath> pathEntry : entry.getChangedPaths().entrySet()) {
+                            //文件地址
+                            strings.add("D:/clone/" + pipeline.getPipelineName()+pathEntry.getKey());
+                        }
+                        commit.setCommitFile(strings);
+                        list.add(commit);
                     }
-                    GitCommit commit = new GitCommit();
-                    commit.setCommitId( ""+entry.getRevision());
-                    commit.setCommitTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(entry.getDate()));
-                    commit.setCommitMassage(entry.getMessage());
-                    commit.setCommitName(entry.getAuthor());
-                    commit.setDayTime(new SimpleDateFormat("yyyy-MM-dd").format(entry.getDate()));
-                    for (Map.Entry<String, SVNLogEntryPath> pathEntry : entry.getChangedPaths().entrySet()) {
-                        strings.add("D:/clone/" + pipeline.getPipelineName()+pathEntry.getKey());
-                    }
-                    commit.setCommitFile(strings);
-                    list.add(commit);
                 }
+                list.sort(Comparator.comparing(GitCommit::getDayTime,Comparator.reverseOrder()));
+                return returnValue(list);
+            } catch (SVNException e) {
+                return null;
             }
-            list.sort(Comparator.comparing(GitCommit::getDayTime,Comparator.reverseOrder()));
-            return returnValue(list);
-        } catch (SVNException e) {
-            return null;
         }
+        return null;
     }
 
     //封装返回值
@@ -239,4 +276,7 @@ public class CodeCommitServiceImpl implements CodeCommitService {
         }
         return ArrayList;
     }
+
+
+
 }

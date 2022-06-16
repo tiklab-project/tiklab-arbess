@@ -21,8 +21,8 @@ public class PipelineEntity {
     private String pipelineName;
 
     //流水线创建人
-    @Column(name = "pipeline_create_user",notNull = true)
-    private String pipelineCreateUser;
+    @Column(name = "user_id",notNull = true)
+    private String userId;
 
     //流水线创建时间
     @Column(name = "pipeline_create_time",notNull = true)
@@ -56,12 +56,12 @@ public class PipelineEntity {
         this.pipelineName = pipelineName;
     }
 
-    public String getPipelineCreateUser() {
-        return pipelineCreateUser;
+    public String getUserId() {
+        return userId;
     }
 
-    public void setPipelineCreateUser(String pipelineCreateUser) {
-        this.pipelineCreateUser = pipelineCreateUser;
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
     public String getPipelineCreateTime() {

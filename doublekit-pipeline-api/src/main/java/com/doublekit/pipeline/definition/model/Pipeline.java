@@ -3,7 +3,11 @@ package com.doublekit.pipeline.definition.model;
 import com.doublekit.apibox.annotation.ApiModel;
 import com.doublekit.apibox.annotation.ApiProperty;
 import com.doublekit.beans.annotation.Mapper;
+import com.doublekit.beans.annotation.Mapping;
+import com.doublekit.beans.annotation.Mappings;
 import com.doublekit.join.annotation.Join;
+import com.doublekit.join.annotation.JoinQuery;
+import com.doublekit.user.user.model.User;
 
 @ApiModel
 @Join
@@ -19,8 +23,12 @@ public class Pipeline {
     private String pipelineName;
 
     //流水线创建人
-    @ApiProperty(name="pipelineCreateUser",desc="流水线创建人",required = true)
-    private String pipelineCreateUser;
+    @ApiProperty(name="user",desc="用户",eg="@selectOne")
+    @Mappings({
+            @Mapping(source = "user.id",target = "userId")
+    })
+    @JoinQuery(key = "userId")
+    private User user;
 
     //流水线创建时间
     @ApiProperty(name="pipelineCreateTime",desc="流水线创建时间",required = true)
@@ -37,9 +45,6 @@ public class Pipeline {
     //运行状态
     @ApiProperty(name="pipelineCollect",desc="运行状态",required = true)
     private int pipelineState;
-
-    private String userId;
-
 
 
     public String getPipelineId() {
@@ -58,12 +63,12 @@ public class Pipeline {
         this.pipelineName = pipelineName;
     }
 
-    public String getPipelineCreateUser() {
-        return pipelineCreateUser;
+    public User getUser() {
+        return user;
     }
 
-    public void setPipelineCreateUser(String pipelineCreateUser) {
-        this.pipelineCreateUser = pipelineCreateUser;
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public String getPipelineCreateTime() {
@@ -98,11 +103,4 @@ public class Pipeline {
         this.pipelineState = pipelineState;
     }
 
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
 }

@@ -329,7 +329,7 @@ public class CommonAchieveServiceImpl implements CommonAchieveService {
             pipelineExecHistory.setFindNumber(allHistory.get(allHistory.size()-1).getFindNumber()+1);
         }
         pipelineExecHistory.setHistoryId(historyId);
-        pipelineExecHistory.setExecName(pipeline.getPipelineCreateUser());
+        pipelineExecHistory.setExecName(pipeline.getUser().getName());
         pipelineExecHistoryService.updateHistory(pipelineExecHistory);
         return pipelineExecHistory;
     }

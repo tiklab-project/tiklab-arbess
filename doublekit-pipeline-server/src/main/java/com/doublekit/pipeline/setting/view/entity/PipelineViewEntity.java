@@ -11,8 +11,8 @@ public class PipelineViewEntity {
     @Column(name = "id")
     private String id;
 
-    @Column(name = "pipeline_id")
-    private String pipelineId;
+    @Column(name = "user_id")
+    private String userId;
 
     @Column(name = "view_name")
     private String viewName;
@@ -25,12 +25,12 @@ public class PipelineViewEntity {
         this.id = id;
     }
 
-    public String getPipelineId() {
-        return pipelineId;
+    public String getUserId() {
+        return userId;
     }
 
-    public void setPipelineId(String pipelineId) {
-        this.pipelineId = pipelineId;
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
     public String getViewName() {

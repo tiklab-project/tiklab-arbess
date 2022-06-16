@@ -16,10 +16,23 @@ public interface PipelineViewService {
     String createView(PipelineView pipelineView);
 
     /**
+     * 创建视图以及视图绑定流水线信息
+     * @param pipelineView 视图信息
+     * @return 视图id
+     */
+    String createViewTop(PipelineView pipelineView);
+
+    /**
      * 删除视图
      * @param viewId 视图id
      */
     void deleteView(String viewId);
+
+    /**
+     * 删除视图以及绑定关系
+     * @param viewId 视图id
+     */
+    void deleteViewTop(String viewId);
 
     /**
      * 更新视图

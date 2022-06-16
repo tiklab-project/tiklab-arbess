@@ -16,6 +16,10 @@ public class PipelineTop {
     @ApiProperty(name="pipelineId",desc="流水线id")
     private String pipelineId;
 
+    @ApiProperty(name="viewId",desc="视图id")
+    private String viewId;
+
+
     public String getId() {
         return id;
     }
@@ -30,5 +34,13 @@ public class PipelineTop {
 
     public void setPipelineId(String pipelineId) {
         this.pipelineId = pipelineId;
+    }
+
+    public String getViewId() {
+        return viewId;
+    }
+
+    public void setViewId(String viewId) {
+        this.viewId = viewId;
     }
 }
