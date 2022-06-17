@@ -7,34 +7,34 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class PipelineAction {
+public class PipelineActionServiceImpl {
 
-    public PipelineAction() {
+    public PipelineActionServiceImpl() {
     }
 
     @Autowired
-    static PipelineActionDao pipelineActionDao;
+     PipelineActionDao pipelineActionDao;
 
     //添加动态
-    public static void createActive(PipelineActionEntity pipelineActionEntity){
+    public  void createActive(PipelineActionEntity pipelineActionEntity){
         pipelineActionDao.createAction(pipelineActionEntity);
     }
 
     //删除
-    public static void deleteAction(String activeId){
+    public  void deleteAction(String activeId){
         pipelineActionDao.deleteAction(activeId);
     }
 
     //更改
-    public static void updateActive(PipelineActionEntity pipelineActionEntity){
+    public  void updateActive(PipelineActionEntity pipelineActionEntity){
         pipelineActionDao.updateAction(pipelineActionEntity);
     }
 
-    public static PipelineActionEntity findOneActive(String activeId){
+    public  PipelineActionEntity findOneActive(String activeId){
         return pipelineActionDao.findOneAction(activeId);
     }
 
-    public static List<PipelineActionEntity> findAllActive(){
+    public  List<PipelineActionEntity> findAllActive(){
         return pipelineActionDao.findAllAction();
     }
 }

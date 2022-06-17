@@ -63,8 +63,8 @@ public class PipelineWorkSpaceServiceImpl implements  PipelineWorkSpaceService {
     //获取文件树
     @Override
     public List<FileTree> fileTree( String pipelineId,String userId){
-        pipelineOpenService.findOpen(userId,pipelineId);
         Pipeline pipeline = pipelineService.findPipeline(pipelineId);
+        pipelineOpenService.findOpen(userId,pipeline);
         if (pipeline == null)return null;
         String path = "D:\\clone\\"+pipeline.getPipelineName();
         List<FileTree> trees = new ArrayList<>();

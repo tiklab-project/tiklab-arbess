@@ -2,7 +2,7 @@ package com.doublekit.pipeline.instance.service;
 
 import com.doublekit.beans.BeanMapper;
 import com.doublekit.join.JoinTemplate;
-import com.doublekit.pipeline.definition.service.PipelineService;
+import com.doublekit.pipeline.definition.model.Pipeline;
 import com.doublekit.pipeline.instance.dao.PipelineOpenDao;
 import com.doublekit.pipeline.instance.entity.PipelineOpenEntity;
 import com.doublekit.pipeline.instance.model.PipelineOpen;
@@ -22,9 +22,6 @@ public class PipelineOpenServiceImpl implements PipelineOpenService {
     PipelineOpenDao pipelineOpenDao;
 
     @Autowired
-    PipelineService pipelineService;
-
-    @Autowired
     JoinTemplate joinTemplate;
 
     @Override
@@ -35,6 +32,18 @@ public class PipelineOpenServiceImpl implements PipelineOpenService {
     @Override
     public void deleteOpen(String openId) {
         pipelineOpenDao.deleteOpen(openId);
+    }
+
+    @Override
+    public void deleteAllOpen(String pipelineId){
+        List<PipelineOpen> allOpen = findAllOpen();
+        if (allOpen != null){
+            for (PipelineOpen pipelineOpen : allOpen) {
+                if (pipelineOpen.getPipeline().getPipelineId().equals(pipelineId)){
+                    deleteOpen(pipelineOpen.getId());
+                }
+            }
+        }
     }
 
     public PipelineOpen findOneOpenNumber(String userId , String pipelineId){
@@ -56,14 +65,14 @@ public class PipelineOpenServiceImpl implements PipelineOpenService {
     }
 
     @Override
-    public void findOpen(String userId, String pipelineId) {
-        PipelineOpen open = findOneOpenNumber(userId, pipelineId);
+    public void findOpen(String userId, Pipeline pipeline) {
+        PipelineOpen open = findOneOpenNumber(userId, pipeline.getPipelineId());
         if (open != null){
             open.setNumber(open.getNumber()+1);
             updateOpen(open);
         }else {
             PipelineOpen pipelineOpen = new PipelineOpen();
-            pipelineOpen.setPipeline(pipelineService.findPipeline(pipelineId));
+            pipelineOpen.setPipeline(pipeline);
             pipelineOpen.setUserId(userId);
             pipelineOpen.setNumber(1);
             createOpen(pipelineOpen);

@@ -28,7 +28,7 @@ public interface PipelineFollowService {
      * @param userId 用户id
      * @return 经常关注的流水线
      */
-    List<PipelineStatus> findAllFollow(String userId);
+    List<PipelineStatus> findAllFollow(String userId, List<PipelineStatus> allStatus);
 
 
     /**
@@ -36,7 +36,7 @@ public interface PipelineFollowService {
      * @param userId 用户id
      * @return 流水线信息
      */
-    List<PipelineStatus> findUserPipeline(String userId);
+    List<PipelineStatus> findUserPipeline(String userId,List<PipelineStatus> allStatus);
 
     /**
      * 查询单个信息

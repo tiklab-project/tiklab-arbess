@@ -8,6 +8,8 @@ import com.doublekit.join.annotation.JoinProvider;
 import com.doublekit.pipeline.definition.model.Pipeline;
 import com.doublekit.pipeline.definition.model.PipelineConfigure;
 import com.doublekit.pipeline.definition.model.PipelineStatus;
+import com.doublekit.user.user.model.User;
+
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.List;
@@ -96,12 +98,11 @@ public interface PipelineService {
     List<PipelineStatus> findAllStatus(String userId);
 
     /**
-     * 查询用户收藏的流水线状态
+     * 获取用户信息
      * @param userId 用户id
-     * @param pipelineId 流水线id
-     * @return 状态集合
+     * @return 用户信息
      */
-    //PipelineStatus findAllStatus(String userId,String pipelineId);
+    User findOneUser(String userId);
 
 
 }

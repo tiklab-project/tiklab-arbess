@@ -2,7 +2,6 @@ package com.doublekit.pipeline.instance.service;
 
 import com.doublekit.beans.BeanMapper;
 import com.doublekit.pipeline.definition.model.PipelineStatus;
-import com.doublekit.pipeline.definition.service.PipelineService;
 import com.doublekit.pipeline.instance.dao.PipelineFollowDao;
 import com.doublekit.pipeline.instance.entity.PipelineFollowEntity;
 import com.doublekit.pipeline.instance.model.PipelineFollow;
@@ -16,9 +15,6 @@ import java.util.List;
 @Service
 @Exporter
 public class PipelineFollowServiceImpl implements  PipelineFollowService{
-
-    @Autowired
-    PipelineService pipelineService;
 
     @Autowired
     PipelineFollowDao pipelineFollowDao;
@@ -43,11 +39,9 @@ public class PipelineFollowServiceImpl implements  PipelineFollowService{
         pipelineFollowDao.deleteFollow(followId);
     }
 
-
     @Override
-    public List<PipelineStatus> findAllFollow(String userId){
+    public List<PipelineStatus> findAllFollow(String userId,List<PipelineStatus> allStatus){
         List<PipelineStatus> list = new ArrayList<>();
-        List<PipelineStatus> allStatus = pipelineService.findAllStatus(userId);
         List<PipelineFollow> allFollow = findAll(userId);
         if (allFollow != null){
             if (allStatus !=null){
@@ -61,7 +55,6 @@ public class PipelineFollowServiceImpl implements  PipelineFollowService{
                 }
                 return list;
             }
-            return null;
         }
         return null;
     }
@@ -81,8 +74,7 @@ public class PipelineFollowServiceImpl implements  PipelineFollowService{
     }
 
     @Override
-    public List<PipelineStatus> findUserPipeline(String userId){
-        List<PipelineStatus> allStatus = pipelineService.findAllStatus(userId);
+    public List<PipelineStatus> findUserPipeline(String userId, List<PipelineStatus> allStatus){
         List<PipelineFollow> allFollow = findAll(userId);
         if (allStatus!=null){
             for (PipelineStatus status : allStatus) {

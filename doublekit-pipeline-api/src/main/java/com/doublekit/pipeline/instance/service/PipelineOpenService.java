@@ -4,6 +4,7 @@ import com.doublekit.join.annotation.FindAll;
 import com.doublekit.join.annotation.FindList;
 import com.doublekit.join.annotation.FindOne;
 import com.doublekit.join.annotation.JoinProvider;
+import com.doublekit.pipeline.definition.model.Pipeline;
 import com.doublekit.pipeline.instance.model.PipelineOpen;
 
 import java.util.List;
@@ -25,6 +26,12 @@ public interface PipelineOpenService {
     void deleteOpen(String openId);
 
     /**
+     * 删除流水线收藏
+     * @param pipelineId 流水线id
+     */
+    void deleteAllOpen(String pipelineId);
+
+    /**
      * 查询流水线打开次数
      * @param userId 用户id
      * @param pipelineId 流水线id
@@ -41,9 +48,9 @@ public interface PipelineOpenService {
     /**
      * 获取打开的流水线
      * @param userId 用户id
-     * @param pipelineId 流水线id
+     * @param pipeline 流水线
      */
-    void findOpen(String userId,String pipelineId);
+    void findOpen(String userId, Pipeline pipeline);
 
     /**
      * 用户经常打开的流水线

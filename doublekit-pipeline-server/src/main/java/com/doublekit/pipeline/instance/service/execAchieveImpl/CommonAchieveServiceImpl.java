@@ -11,6 +11,7 @@ import com.doublekit.pipeline.instance.service.PipelineExecHistoryService;
 import com.doublekit.pipeline.instance.service.PipelineExecLogService;
 import com.doublekit.pipeline.instance.service.execAchieveService.CommonAchieveService;
 import com.doublekit.rpc.annotation.Exporter;
+import com.doublekit.user.user.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -329,7 +330,8 @@ public class CommonAchieveServiceImpl implements CommonAchieveService {
             pipelineExecHistory.setFindNumber(allHistory.get(allHistory.size()-1).getFindNumber()+1);
         }
         pipelineExecHistory.setHistoryId(historyId);
-        pipelineExecHistory.setExecName(pipeline.getUser().getName());
+        User user = pipelineService.findOneUser(pipeline.getUserId());
+        pipelineExecHistory.setExecName(user.getName());
         pipelineExecHistoryService.updateHistory(pipelineExecHistory);
         return pipelineExecHistory;
     }

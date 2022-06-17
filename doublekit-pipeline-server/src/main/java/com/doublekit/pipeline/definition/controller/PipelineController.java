@@ -33,7 +33,7 @@ public class PipelineController {
     @RequestMapping(path="/createPipeline",method = RequestMethod.POST)
     @ApiMethod(name = "createPipeline",desc = "创建流水线")
     @ApiParam(name = "pipeline",desc = "pipeline",required = true)
-    public Result<String> createPipeline(@RequestBody @NotNull @Valid Pipeline pipeline,String userId){
+    public Result<String> createPipeline(@RequestBody @NotNull @Valid Pipeline pipeline){
 
         String pipelineId = pipelineService.createPipeline(pipeline);
 

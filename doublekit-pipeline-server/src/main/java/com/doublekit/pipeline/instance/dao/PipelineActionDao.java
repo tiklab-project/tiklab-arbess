@@ -3,17 +3,20 @@ package com.doublekit.pipeline.instance.dao;
 import com.doublekit.dal.jpa.JpaTemplate;
 import com.doublekit.pipeline.instance.entity.PipelineActionEntity;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+@Repository
 public class PipelineActionDao {
 
     @Autowired
     JpaTemplate jpaTemplate ;
+
     /**
      * 创建动态
-     * @param pipelineActionEntity 次数
-     * @return 次数id
+     * @param pipelineActionEntity 操作
+     * @return 操作id
      */
     public  String createAction(PipelineActionEntity pipelineActionEntity){
 
@@ -21,15 +24,15 @@ public class PipelineActionDao {
     }
 
     /**
-     * 删除次数
-     * @param actionId 次数id
+     * 删除操作
+     * @param actionId 操作id
      */
     public  void deleteAction(String actionId){
         jpaTemplate.delete(PipelineActionEntity.class, actionId);
     }
 
     /**
-     * 更新次数
+     * 更新操作
      * @param pipelineActionEntity 更新信息
      */
     public  void updateAction(PipelineActionEntity pipelineActionEntity){
@@ -37,17 +40,17 @@ public class PipelineActionDao {
     }
 
     /**
-     * 查询单个次数信息87
-     * @param actionId 次数id
-     * @return 次数信息
+     * 查询单个操作信息87
+     * @param actionId 操作id
+     * @return 操作信息
      */
     public  PipelineActionEntity findOneAction(String actionId){
         return jpaTemplate.findOne(PipelineActionEntity.class,actionId);
     }
 
     /**
-     * 查询所有次数
-     * @return 次数集合
+     * 查询所有操作
+     * @return 操作集合
      */
     public  List<PipelineActionEntity> findAllAction(){
         return jpaTemplate.findAll(PipelineActionEntity.class);

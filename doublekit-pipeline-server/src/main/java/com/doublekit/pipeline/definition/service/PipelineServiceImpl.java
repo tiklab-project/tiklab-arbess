@@ -8,9 +8,12 @@ import com.doublekit.pipeline.definition.model.PipelineConfigure;
 import com.doublekit.pipeline.definition.model.PipelineStatus;
 import com.doublekit.pipeline.instance.model.PipelineExecHistory;
 import com.doublekit.pipeline.instance.service.PipelineExecHistoryService;
+import com.doublekit.pipeline.instance.service.PipelineOpenService;
 import com.doublekit.rpc.annotation.Exporter;
 import com.doublekit.user.user.model.DmUser;
+import com.doublekit.user.user.model.User;
 import com.doublekit.user.user.service.DmUserService;
+import com.doublekit.user.user.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,10 +37,17 @@ public class PipelineServiceImpl implements PipelineService{
     DmUserService dmUserService;
 
     @Autowired
+    UserService userService;
+
+    @Autowired
+    PipelineOpenService pipelineOpenService;
+
+    @Autowired
     PipelineExecHistoryService pipelineExecHistoryService;
 
     @Autowired
     PipelineConfigureService pipelineConfigureService;
+
 
     private static final Logger logger = LoggerFactory.getLogger(PipelineServiceImpl.class);
 
@@ -56,7 +66,7 @@ public class PipelineServiceImpl implements PipelineService{
         String pipelineId = pipelineDao.createPipeline(pipelineEntity);
         DmUser dmUser = new DmUser();
         dmUser.setDomainId(pipelineId);
-        dmUser.setUser(pipeline.getUser());
+        dmUser.setUser(new User(pipeline.getUserId()));
         dmUserService.createDmUser(dmUser);
         return  pipelineId;
     }
@@ -78,6 +88,9 @@ public class PipelineServiceImpl implements PipelineService{
             pipelineConfigureService.deleteAllTask(pipelineId);
             //删除对应的历史
             pipelineExecHistoryService.deleteHistory(pipelineId);
+            //删除收藏
+            pipelineOpenService.deleteAllOpen(pipelineId);
+
         }
     }
 
@@ -168,18 +181,10 @@ public class PipelineServiceImpl implements PipelineService{
         return pipelineStatusList;
     }
 
-    ////返回收藏的流水线
-    //@Override
-    //public PipelineStatus findAllStatus(String userId,String pipelineId){
-    //    if (!findAllStatus(userId).isEmpty()){
-    //        for (PipelineStatus allStatus : findAllStatus(userId)) {
-    //            if (allStatus.getPipelineId().equals(pipelineId)){
-    //                return  allStatus;
-    //            }
-    //        }
-    //    }
-    //    return null;
-    //}
+    @Override
+   public User findOneUser(String userId){
+        return userService.findOne(userId);
+   }
 
 
 

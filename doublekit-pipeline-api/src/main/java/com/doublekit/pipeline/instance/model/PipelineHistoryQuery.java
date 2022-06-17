@@ -11,7 +11,7 @@ public class PipelineHistoryQuery {
 
     private int state;
 
-    private String name;
+    private String userId;
 
     private int type;
 
@@ -32,12 +32,12 @@ public class PipelineHistoryQuery {
         this.state = state;
     }
 
-    public String getName() {
-        return name;
+    public String getUserId() {
+        return userId;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
     public int getType() {
