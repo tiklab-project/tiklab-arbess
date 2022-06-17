@@ -8,6 +8,7 @@ import com.doublekit.join.annotation.JoinProvider;
 import com.doublekit.pipeline.definition.model.Pipeline;
 import com.doublekit.pipeline.definition.model.PipelineConfigure;
 import com.doublekit.pipeline.definition.model.PipelineStatus;
+import com.doublekit.pipeline.instance.model.PipelineExecHistory;
 import com.doublekit.user.user.model.User;
 
 import javax.validation.Valid;
@@ -96,6 +97,13 @@ public interface PipelineService {
      * @return 状态集合
      */
     List<PipelineStatus> findAllStatus(String userId);
+
+    /**
+     * 获取用户7天内的执行历史
+     * @param userId 用户id
+     * @return 历史信息
+     */
+    List<PipelineExecHistory> findAllUserHistory(String userId);
 
     /**
      * 获取用户信息

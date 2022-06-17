@@ -37,25 +37,27 @@ public class PipelineOpenServiceImpl implements PipelineOpenService {
     @Override
     public void deleteAllOpen(String pipelineId){
         List<PipelineOpen> allOpen = findAllOpen();
-        if (allOpen != null){
-            for (PipelineOpen pipelineOpen : allOpen) {
-                if (pipelineOpen.getPipeline().getPipelineId().equals(pipelineId)){
-                    deleteOpen(pipelineOpen.getId());
-                }
+        if (allOpen == null){
+           return;
+        }
+        for (PipelineOpen pipelineOpen : allOpen) {
+            if (pipelineOpen.getPipeline().getPipelineId().equals(pipelineId)){
+               continue;
             }
+            deleteOpen(pipelineOpen.getId());
         }
     }
 
     public PipelineOpen findOneOpenNumber(String userId , String pipelineId){
-       if ( !findAllOpen().isEmpty()){
-           for (PipelineOpen pipelineOpen : findAllOpen()) {
-               if (pipelineOpen.getPipeline().getPipelineId().equals(pipelineId)){
-                   if (pipelineOpen.getUserId().equals(userId)){
-                       return pipelineOpen;
-                   }
-               }
-           }
+       if ( findAllOpen()==null){
+           return null;
        }
+        for (PipelineOpen pipelineOpen : findAllOpen()) {
+            if (pipelineOpen.getPipeline().getPipelineId().equals(pipelineId) && pipelineOpen.getUserId().equals(userId)){
+                continue;
+            }
+            return pipelineOpen;
+        }
        return null;
     }
 
@@ -81,16 +83,17 @@ public class PipelineOpenServiceImpl implements PipelineOpenService {
 
     public List<PipelineOpen> findAllOpen(String userId){
         List<PipelineOpen> list = new ArrayList<>();
-        if (!findAllOpen().isEmpty()){
-            for (PipelineOpen pipelineOpen : findAllOpen()) {
-                if (pipelineOpen.getUserId().equals(userId)){
-                    pipelineOpen.setPipelineName(pipelineOpen.getPipeline().getPipelineName());
-                    list.add(pipelineOpen);
-                }
-            }
-            return list;
+        if (findAllOpen() == null){
+            return null;
         }
-        return null;
+        for (PipelineOpen pipelineOpen : findAllOpen()) {
+            if (!pipelineOpen.getUserId().equals(userId)){
+               continue;
+            }
+            pipelineOpen.setPipelineName(pipelineOpen.getPipeline().getPipelineName());
+            list.add(pipelineOpen);
+        }
+        return list;
     }
 
     @Override

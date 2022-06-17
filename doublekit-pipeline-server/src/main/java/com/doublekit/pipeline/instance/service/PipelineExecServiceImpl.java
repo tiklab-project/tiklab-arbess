@@ -123,11 +123,12 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         currentGroup.enumerate(lstThreads);
         for (int i = 0; i < noThreads; i++) {
             String nm = lstThreads[i].getName();
-            if (nm.equals(pipelineId)) {
-                logger.info("结束线程 ：" + i + "  pipelineId ：" + pipelineId);
-                lstThreads[i].stop();
-               return;
+            if (!nm.equals(pipelineId)) {
+               continue;
             }
+            logger.info("结束线程 ：" + i + "  pipelineId ：" + pipelineId);
+            lstThreads[i].stop();
+            return;
         }
     }
 
@@ -152,44 +153,45 @@ public class PipelineExecServiceImpl implements PipelineExecService {
 
         PipelineProcess pipelineProcess = new PipelineProcess();
         List<PipelineConfigure> allConfigure = pipelineService.findPipelineConfigure(pipelineId);
-        if (allConfigure != null){
-            for (PipelineConfigure pipelineConfigure : allConfigure) {
-                pipelineProcess.setPipelineExecHistory(pipelineExecHistory);
-                pipelineProcess.setPipelineConfigure(pipelineConfigure);
-                pipelineExecHistoryList.add(pipelineExecHistory);
-                switch (pipelineConfigure.getTaskType()) {
-                    case 1,2,3,4,5 -> {
-                        int state = codeAchieveServiceImpl.clone(pipelineProcess, pipelineExecHistoryList);
-                        if (state == 0) {
-                            error(pipeline);
-                            return ;
-                        }
-                    }
-                    case 11 -> {
-                        int state = testAchieveServiceImpl.test(pipelineProcess, pipelineExecHistoryList);
-                        if (state == 0) {
-                            error(pipeline);
-                            return ;
-                        }
-                    }
-                    case 21, 22 -> {
-                        int state  = structureAchieveServiceImpl.structure(pipelineProcess, pipelineExecHistoryList);
-                        if (state == 0) {
-                            error(pipeline);
-                            return ;
-                        }
-                    }
-                    case 31, 32-> {
-                        int state = deployAchieveServiceImpl.deploy(pipelineProcess, pipelineExecHistoryList);
-                        if (state == 0) {
-                            error(pipeline);
-                            return ;
-                        }
+        if (allConfigure == null){
+           return;
+        }
+        for (PipelineConfigure pipelineConfigure : allConfigure) {
+            pipelineProcess.setPipelineExecHistory(pipelineExecHistory);
+            pipelineProcess.setPipelineConfigure(pipelineConfigure);
+            pipelineExecHistoryList.add(pipelineExecHistory);
+            switch (pipelineConfigure.getTaskType()) {
+                case 1,2,3,4,5 -> {
+                    int state = codeAchieveServiceImpl.clone(pipelineProcess, pipelineExecHistoryList);
+                    if (state == 0) {
+                        error(pipeline);
+                        return ;
                     }
                 }
-                pipelineExecHistory.setSort(pipelineExecHistory.getSort() +1);
-                pipelineExecHistory.setStatus(pipelineExecHistory.getStatus() +1);
+                case 11 -> {
+                    int state = testAchieveServiceImpl.test(pipelineProcess, pipelineExecHistoryList);
+                    if (state == 0) {
+                        error(pipeline);
+                        return ;
+                    }
+                }
+                case 21, 22 -> {
+                    int state  = structureAchieveServiceImpl.structure(pipelineProcess, pipelineExecHistoryList);
+                    if (state == 0) {
+                        error(pipeline);
+                        return ;
+                    }
+                }
+                case 31, 32-> {
+                    int state = deployAchieveServiceImpl.deploy(pipelineProcess, pipelineExecHistoryList);
+                    if (state == 0) {
+                        error(pipeline);
+                        return ;
+                    }
+                }
             }
+            pipelineExecHistory.setSort(pipelineExecHistory.getSort() +1);
+            pipelineExecHistory.setStatus(pipelineExecHistory.getStatus() +1);
         }
         commonAchieveServiceImpl.success(pipelineExecHistory, pipelineId, pipelineExecHistoryList);
         time[0]=1;time[1]=0;time[2]=0;time[3]=0;

@@ -75,9 +75,9 @@ public interface PipelineExecHistoryService {
     List<PipelineExecHistory> findAllHistory();
 
     /**
-     * 根据流水线id查询所有配置信息
+     * 根据流水线id查询所有历史信息
      * @param pipelineId 流水线id
-     * @return 配置信息
+     * @return 历史信息
      */
     @FindAll
     List<PipelineExecHistory> findAllHistory(String pipelineId);

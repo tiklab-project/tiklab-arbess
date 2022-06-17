@@ -32,12 +32,14 @@ public class PipelineExecLogServiceImpl implements PipelineExecLogService {
     @Override
     public void deleteHistoryLog(String historyId) {
         List<PipelineExecLog> allLog = findAllLog();
-        if (allLog != null){
-            for (PipelineExecLog pipelineExecLog : allLog) {
-                if (pipelineExecLog.getHistoryId().equals(historyId)){
-                    deleteLog(pipelineExecLog.getPipelineLogId());
-                }
+        if (allLog == null){
+            return;
+        }
+        for (PipelineExecLog pipelineExecLog : allLog) {
+            if (!pipelineExecLog.getHistoryId().equals(historyId)){
+                continue;
             }
+            deleteLog(pipelineExecLog.getPipelineLogId());
         }
     }
 
@@ -51,19 +53,21 @@ public class PipelineExecLogServiceImpl implements PipelineExecLogService {
     public List<PipelineExecLog> findAllLog(String historyId){
         List<PipelineExecLog> allLog = findAllLog();
         List<PipelineExecLog> pipelineExecLogList = new ArrayList<>();
-        if (allLog != null){
-            for (PipelineExecLog pipelineExecLog : allLog) {
-                if (pipelineExecLog.getHistoryId().equals(historyId)){
-                    pipelineExecLog.setExecTime(formatDateTime(pipelineExecLog.getRunTime()));
-                    pipelineExecLogList.add(pipelineExecLog);
-                }
-            }
-            if (pipelineExecLogList.size() != 0){
-                pipelineExecLogList.sort(Comparator.comparing(PipelineExecLog::getTaskSort));
-            }
-            return pipelineExecLogList;
+        if (allLog == null){
+           return null;
         }
-    return null;
+        for (PipelineExecLog pipelineExecLog : allLog) {
+            if (!pipelineExecLog.getHistoryId().equals(historyId)){
+                continue;
+            }
+            pipelineExecLog.setExecTime(formatDateTime(pipelineExecLog.getRunTime()));
+            pipelineExecLogList.add(pipelineExecLog);
+        }
+        if (pipelineExecLogList.size() == 0){
+           return null;
+        }
+        pipelineExecLogList.sort(Comparator.comparing(PipelineExecLog::getTaskSort));
+        return pipelineExecLogList;
     }
     //查询所有
     @Override

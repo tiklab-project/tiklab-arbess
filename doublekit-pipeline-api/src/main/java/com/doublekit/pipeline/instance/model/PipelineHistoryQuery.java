@@ -3,6 +3,10 @@ package com.doublekit.pipeline.instance.model;
 import com.doublekit.apibox.annotation.ApiModel;
 import com.doublekit.join.annotation.Join;
 
+/**
+ * 流水线历史筛选条件
+ */
+
 @ApiModel
 @Join
 public class PipelineHistoryQuery {

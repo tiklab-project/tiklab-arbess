@@ -38,23 +38,13 @@ public class ProofServiceImpl implements ProofService{
         List<Proof> allProof = findAllProof();
         if (allProof != null){
             for (Proof proof1 : allProof) {
-                if (proof.getProofUsername().equals(proof1.getProofUsername())
-                        && proof.getProofScope() == proof1.getProofScope()){
-                    proof.setProofId(proof1.getProofId());
-                    updateProof(proof);
-                    return proof.getProofId();
+                if (!proof.getProofUsername().equals(proof1.getProofUsername())
+                        && proof.getProofScope() != proof1.getProofScope()){
+                    continue;
                 }
-            }
-        if (proof.getProofType().equals("SSH")){
-                String path="D:\\clone\\key\\"+proof.getProofName();
-                try {
-                    writePrivateKeyPath(proof.getProofPassword(),path);
-                    proof.setProofUsername(proof.getProofName());
-                    proof.setProofPassword(path);
-                } catch (IOException e) {
-                    logger.info("私钥保存失败。");
-                    return null;
-                }
+                proof.setProofId(proof1.getProofId());
+                updateProof(proof);
+                return proof.getProofId();
             }
         }
         ProofEntity proofEntity = BeanMapper.map(proof, ProofEntity.class);

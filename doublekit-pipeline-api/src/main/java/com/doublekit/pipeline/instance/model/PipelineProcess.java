@@ -9,6 +9,7 @@ import com.doublekit.pipeline.setting.proof.model.Proof;
 /**
  * 存放执行的信息
  */
+
 @ApiModel
 @Join
 public class PipelineProcess {

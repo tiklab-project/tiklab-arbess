@@ -63,54 +63,55 @@ public class CodeGitHubServiceImpl implements CodeGitHubService {
     @Override
     public  List<String> getAllStorehouse(String proofId){
         Proof proof = proofService.findOneProof(proofId);
-        if (proof!=null){
-            List<String> list = new ArrayList<>();
-            HttpHeaders headers = new HttpHeaders();
-            headers.set("Accept", "application/vnd.github.v3+json");
-            //headers.setContentType(MediaType.parseMediaType("application/json; charset=UTF-8"));
-            headers.set("Authorization", "token"+" "+proof.getProofPassword());
-            String userUrl = codeGitHubApi.getAllStorehouse();
-            HttpEntity<String> entity = new HttpEntity<>("body", headers);
-            ResponseEntity<String> forEntity = restTemplate.exchange(userUrl, HttpMethod.GET, entity, String.class);
-            String body = forEntity.getBody();
-            logger.info("仓库信息 ："+body);
-            if (body != null){
-                JSONArray allStorehouseJson = JSONArray.parseArray(body);
-                for (int i = 0; i < allStorehouseJson.size(); i++) {
-                    JSONObject storehouse=allStorehouseJson.getJSONObject(i);
-                    list.add(storehouse.getString("full_name"));
-
-                }
-            }
-            return list;
+        if (proof == null){
+            return null;
         }
-      return null;
+        List<String> list = new ArrayList<>();
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Accept", "application/vnd.github.v3+json");
+        //headers.setContentType(MediaType.parseMediaType("application/json; charset=UTF-8"));
+        headers.set("Authorization", "token"+" "+proof.getProofPassword());
+        String userUrl = codeGitHubApi.getAllStorehouse();
+        HttpEntity<String> entity = new HttpEntity<>("body", headers);
+        ResponseEntity<String> forEntity = restTemplate.exchange(userUrl, HttpMethod.GET, entity, String.class);
+        String body = forEntity.getBody();
+        logger.info("仓库信息 ："+body);
+        if (body == null){
+            return null;
+        }
+        JSONArray allStorehouseJson = JSONArray.parseArray(body);
+        for (int i = 0; i < allStorehouseJson.size(); i++) {
+            JSONObject storehouse=allStorehouseJson.getJSONObject(i);
+            list.add(storehouse.getString("full_name"));
+        }
+        return list;
     }
 
     @Override
     public List<String> getBranch(String proofId,String projectName){
         Proof proof = proofService.findOneProof(proofId);
-        if (proof!=null){
-            List<String> list = new ArrayList<>();
-            String[] split = projectName.split("/");
-            String branchUrl = codeGitHubApi.getBranch(proof.getProofUsername(), split[1]);
-            HttpHeaders headers = new HttpHeaders();
-            headers.set("Accept", "application/vnd.github.v3+json");
-            headers.set("Authorization", "token"+" "+proof.getProofPassword());
-            HttpEntity<String> entity = new HttpEntity<>("body", headers);
-            ResponseEntity<String> forEntity = restTemplate.exchange(branchUrl, HttpMethod.GET, entity, String.class);
-            String body = forEntity.getBody();
-            logger.info("分支信息 ："+body);
-            if (body != null){
-                JSONArray allBranch = JSONArray.parseArray(body);
-                for (int i = 0; i < allBranch.size(); i++) {
-                    JSONObject branch = allBranch.getJSONObject(i);
-                    list.add(branch.getString("name"));
-                }
-                return list;
-            }
+        if (proof == null){
+            return  null;
         }
-        return  null;
+        List<String> list = new ArrayList<>();
+        String[] split = projectName.split("/");
+        String branchUrl = codeGitHubApi.getBranch(proof.getProofUsername(), split[1]);
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Accept", "application/vnd.github.v3+json");
+        headers.set("Authorization", "token"+" "+proof.getProofPassword());
+        HttpEntity<String> entity = new HttpEntity<>("body", headers);
+        ResponseEntity<String> forEntity = restTemplate.exchange(branchUrl, HttpMethod.GET, entity, String.class);
+        String body = forEntity.getBody();
+        logger.info("分支信息 ："+body);
+        if (body == null){
+            return  null;
+        }
+        JSONArray allBranch = JSONArray.parseArray(body);
+        for (int i = 0; i < allBranch.size(); i++) {
+            JSONObject branch = allBranch.getJSONObject(i);
+            list.add(branch.getString("name"));
+        }
+        return list;
     }
 
     @Override
@@ -122,27 +123,28 @@ public class CodeGitHubServiceImpl implements CodeGitHubService {
         HttpEntity<String> entity = new HttpEntity<>("body", headers);
         ResponseEntity<JSONObject> response = restTemplate.exchange(userUrl, HttpMethod.GET, entity, JSONObject.class);
         JSONObject body = response.getBody();
-        if (body != null){
-            logger.info("数据为 ： "+body.getString("login"));
-            return body.getString("login");
+        if (body == null){
+            return null;
         }
-        return null;
+        logger.info("数据为 ： "+body.getString("login"));
+        return body.getString("login");
+
     }
 
     @Override
     public String getProof(String proofName,String accessToken){
         Proof proof = new Proof();
-        if (accessToken != null && proofName != null){
-            proof.setProofName(proofName);
-            proof.setProofPassword(accessToken);
-            proof.setProofUsername(getUserMessage(accessToken));
-            proof.setProofType("gitHub");
-            proof.setProofScope(3);
-            proof.setProofDescribe("gitHub授权登录");
-            return proofService.createProof(proof);
+        if (accessToken == null && proofName == null){
+            return null;
         }
+        proof.setProofName(proofName);
+        proof.setProofPassword(accessToken);
+        proof.setProofUsername(getUserMessage(accessToken));
+        proof.setProofType("gitHub");
+        proof.setProofScope(3);
+        proof.setProofDescribe("gitHub授权登录");
+        return proofService.createProof(proof);
 
-        return null;
     }
 
     @Override
@@ -152,15 +154,15 @@ public class CodeGitHubServiceImpl implements CodeGitHubService {
             return null;
         }
         String[] split = houseName.split("/");
-        if (split.length == 2){
-            String name = split[1];
-            //获取仓库URl
-            String oneStorehouse = codeGitHubApi.getOneHouse(proof.getProofUsername(),name);
-            ResponseEntity<String> forEntity1 = restTemplate.getForEntity(oneStorehouse, String.class, JSONObject.class);
-            JSONObject jsonObject = JSONObject.parseObject(forEntity1.getBody());
-            return jsonObject.getString("html_url");
+        if (split.length != 2){
+            return null;
         }
-        return null;
+        String name = split[1];
+        //获取仓库URl
+        String oneStorehouse = codeGitHubApi.getOneHouse(proof.getProofUsername(),name);
+        ResponseEntity<String> forEntity1 = restTemplate.getForEntity(oneStorehouse, String.class, JSONObject.class);
+        JSONObject jsonObject = JSONObject.parseObject(forEntity1.getBody());
+        return jsonObject.getString("html_url");
     }
 
 }

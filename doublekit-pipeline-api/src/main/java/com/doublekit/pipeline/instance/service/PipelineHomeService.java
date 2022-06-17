@@ -1,6 +1,7 @@
 package com.doublekit.pipeline.instance.service;
 
 import com.doublekit.pipeline.definition.model.PipelineStatus;
+import com.doublekit.pipeline.instance.model.PipelineExecState;
 import com.doublekit.pipeline.instance.model.PipelineFollow;
 import com.doublekit.pipeline.instance.model.PipelineOpen;
 
@@ -35,6 +36,13 @@ public interface PipelineHomeService {
      * @return 流水线
      */
     List<PipelineStatus> findUserPipeline(String userId);
+
+    /**
+     * 获取用户7天内的构建状态
+     * @param userId 用户id
+     * @return 构建状态
+     */
+    List<PipelineExecState> runState(String userId);
 
 
 }

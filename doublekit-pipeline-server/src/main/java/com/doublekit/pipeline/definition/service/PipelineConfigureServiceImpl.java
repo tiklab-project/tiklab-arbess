@@ -48,12 +48,13 @@ public class PipelineConfigureServiceImpl implements PipelineConfigureService {
     @Override
     public PipelineConfigure findOneConfigure(String pipelineId, int type) {
         List<PipelineConfigure> allConfigure = findAllConfigure(pipelineId);
-        if (allConfigure != null){
-            for (PipelineConfigure pipelineConfigure : allConfigure) {
-                int taskType = pipelineConfigure.getTaskType();
-                if (taskType < type && taskType > type - 10){
-                    return pipelineConfigure;
-                }
+        if (allConfigure == null){
+            return null;
+        }
+        for (PipelineConfigure pipelineConfigure : allConfigure) {
+            int taskType = pipelineConfigure.getTaskType();
+            if (taskType < type && taskType > type - 10){
+                return pipelineConfigure;
             }
         }
         return null;
@@ -62,11 +63,12 @@ public class PipelineConfigureServiceImpl implements PipelineConfigureService {
     @Override
     public PipelineConfigure findOneTask(String pipelineId,String taskId) {
         List<PipelineConfigure> allConfigure = findAllConfigure(pipelineId);
-        if (allConfigure != null){
-            for (PipelineConfigure pipelineConfigure : allConfigure) {
-                if (pipelineConfigure.getTaskId().equals(taskId)){
-                    return pipelineConfigure;
-                }
+        if (allConfigure == null){
+            return null;
+        }
+        for (PipelineConfigure pipelineConfigure : allConfigure) {
+            if (pipelineConfigure.getTaskId().equals(taskId)){
+                return pipelineConfigure;
             }
         }
         return null;
@@ -93,14 +95,16 @@ public class PipelineConfigureServiceImpl implements PipelineConfigureService {
     @Override
     public void deleteTask(String taskId,String pipelineId) {
         List<PipelineConfigure> allConfigure = findAllConfigure(pipelineId);
-        if (allConfigure != null){
-            for (PipelineConfigure pipelineConfigure : allConfigure) {
-                if (pipelineConfigure.getTaskId().equals(taskId)){
-                    PipelineConfigure oneConfigure = findOneConfigure(pipelineConfigure.getConfigureId());
-                    pipelineCodeService.deleteTask(oneConfigure.getTaskId(),oneConfigure.getTaskType());
-                    deleteConfigure(pipelineConfigure.getConfigureId());
-                }
+        if (allConfigure == null){
+            return;
+        }
+        for (PipelineConfigure pipelineConfigure : allConfigure) {
+            if (!pipelineConfigure.getTaskId().equals(taskId)){
+               continue;
             }
+            PipelineConfigure oneConfigure = findOneConfigure(pipelineConfigure.getConfigureId());
+            pipelineCodeService.deleteTask(oneConfigure.getTaskId(),oneConfigure.getTaskType());
+            deleteConfigure(pipelineConfigure.getConfigureId());
         }
     }
 

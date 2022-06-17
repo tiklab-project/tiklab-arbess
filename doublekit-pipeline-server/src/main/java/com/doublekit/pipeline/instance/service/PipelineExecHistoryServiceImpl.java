@@ -80,15 +80,17 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
     public List<PipelineExecHistory> findAllHistory(String pipelineId) {
         List<PipelineExecHistory> allHistory = findAllHistory();
         List<PipelineExecHistory> historyList = new ArrayList<>();
-        if (allHistory != null){
-            for (PipelineExecHistory pipelineExecHistory : allHistory) {
-                if (pipelineExecHistory.getPipeline() ==null){
-                    continue;
-                }
-                if (pipelineExecHistory.getPipeline().getPipelineId().equals(pipelineId) && pipelineExecHistory.getFindState() == 1){
-                    pipelineExecHistory.setExecTime(formatDateTime(pipelineExecHistory.getRunTime()));
-                    historyList.add(pipelineExecHistory);
-                }
+        if (allHistory == null){
+           return null;
+        }
+        for (PipelineExecHistory pipelineExecHistory : allHistory) {
+            if (pipelineExecHistory.getPipeline() == null){
+                continue;
+            }
+            if (pipelineExecHistory.getPipeline().getPipelineId().equals(pipelineId)
+                    && pipelineExecHistory.getFindState() == 1){
+                pipelineExecHistory.setExecTime(formatDateTime(pipelineExecHistory.getRunTime()));
+                historyList.add(pipelineExecHistory);
             }
         }
         historyList.sort(Comparator.comparing(PipelineExecHistory::getCreateTime,Comparator.reverseOrder()));
@@ -99,9 +101,7 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
     @Override
     public PipelineExecHistory findLatelyHistory(String pipelineId){
         List<PipelineExecHistory> allHistory = findAllHistory(pipelineId);
-        //升序排列
-        // allHistory.sort(Comparator.comparing(PipelineExecHistory::getHistoryCreateTime));
-        //根据时间降序排列
+       //根据时间降序排列
         if (allHistory.size() == 0){
             return null;
         }
@@ -113,13 +113,15 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
     @Override
     public PipelineExecHistory findLatelySuccess(String pipelineId){
         List<PipelineExecHistory> allHistory = findAllHistory(pipelineId);
-        if (allHistory != null){
-            allHistory.sort(Comparator.comparing(PipelineExecHistory::getRunTime,Comparator.reverseOrder()));
-            for (PipelineExecHistory pipelineExecHistory : allHistory) {
-                if (pipelineExecHistory.getRunStatus() ==30){
-                    return pipelineExecHistory;
-                }
+        if (allHistory == null){
+           return null;
+        }
+        allHistory.sort(Comparator.comparing(PipelineExecHistory::getRunTime,Comparator.reverseOrder()));
+        for (PipelineExecHistory pipelineExecHistory : allHistory) {
+            if (pipelineExecHistory.getRunStatus() != 30){
+               continue;
             }
+            return pipelineExecHistory;
         }
         return  null;
     }
@@ -137,7 +139,6 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
         if (pipeline == null){
             return null;
         }
-
         List<PipelineExecHistory> allHistory = findAllHistory(pipelineHistoryQuery.getPipelineId());
         if (allHistory != null){
             allHistory.removeIf(pipelineExecHistory ->
@@ -155,15 +156,15 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
     @Override
     public PipelineExecLog getRunLog(String historyId){
         List<PipelineExecLog> allLog = pipelineExecLogService.findAllLog(historyId);
-        if (allLog != null){
-            allLog.sort(Comparator.comparing(PipelineExecLog::getTaskSort));
-            PipelineExecLog pipelineExecLog = allLog.get(allLog.size() - 1);
-            for (PipelineExecLog execLog : allLog) {
-                pipelineExecLog.setRunTime(pipelineExecLog.getRunTime()+execLog.getRunTime());
-            }
-            return allLog.get(allLog.size()-1);
+        if (allLog == null){
+           return null;
         }
-        return null;
+        allLog.sort(Comparator.comparing(PipelineExecLog::getTaskSort));
+        PipelineExecLog pipelineExecLog = allLog.get(allLog.size() - 1);
+        for (PipelineExecLog execLog : allLog) {
+            pipelineExecLog.setRunTime(pipelineExecLog.getRunTime()+execLog.getRunTime());
+        }
+        return allLog.get(allLog.size()-1);
     }
 
     //时间转换成时分秒

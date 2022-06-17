@@ -9,6 +9,10 @@ import com.doublekit.join.annotation.Join;
 import com.doublekit.join.annotation.JoinQuery;
 import com.doublekit.pipeline.definition.model.Pipeline;
 
+/**
+ * 流水线最近打开记录
+ */
+
 @ApiModel
 @Join
 @Mapper(targetAlias = "PipelineOpenEntity")

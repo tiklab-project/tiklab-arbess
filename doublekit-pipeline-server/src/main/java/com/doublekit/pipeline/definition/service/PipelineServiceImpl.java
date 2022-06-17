@@ -14,12 +14,16 @@ import com.doublekit.user.user.model.DmUser;
 import com.doublekit.user.user.model.User;
 import com.doublekit.user.user.service.DmUserService;
 import com.doublekit.user.user.service.UserService;
+import org.apache.commons.lang3.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -75,12 +79,14 @@ public class PipelineServiceImpl implements PipelineService{
     @Override
     public void deletePipeline(String pipelineId) {
         List<DmUser> allDmUser = dmUserService.findAllDmUser();
-        if (allDmUser != null){
-            for (DmUser dmUser : allDmUser) {
-                if (dmUser.getDomainId().equals(pipelineId)){
-                    dmUserService.deleteDmUser(dmUser.getId());
-                }
+        if (allDmUser == null){
+            return;
+        }
+        for (DmUser dmUser : allDmUser) {
+            if (!dmUser.getDomainId().equals(pipelineId)){
+               continue;
             }
+            dmUserService.deleteDmUser(dmUser.getId());
         }
         if (pipelineId != null){
             pipelineDao.deletePipeline(pipelineId);
@@ -90,7 +96,6 @@ public class PipelineServiceImpl implements PipelineService{
             pipelineExecHistoryService.deleteHistory(pipelineId);
             //删除收藏
             pipelineOpenService.deleteAllOpen(pipelineId);
-
         }
     }
 
@@ -113,12 +118,14 @@ public class PipelineServiceImpl implements PipelineService{
     @Override
     public Pipeline findOnePipeline(String pipelineName) {
         List<Pipeline> allPipeline = findAllPipeline();
-        if (allPipeline != null){
-            for (Pipeline pipeline : allPipeline) {
-                if (pipeline.getPipelineName().equals(pipelineName)){
-                    return pipeline;
-                }
+        if (allPipeline == null){
+           return null;
+        }
+        for (Pipeline pipeline : allPipeline) {
+            if (!pipeline.getPipelineName().equals(pipelineName)){
+               continue;
             }
+            return pipeline;
         }
         return null;
     }
@@ -181,8 +188,43 @@ public class PipelineServiceImpl implements PipelineService{
         return pipelineStatusList;
     }
 
+    //获取用户7天内的所有历史
     @Override
-   public User findOneUser(String userId){
+    public  List<PipelineExecHistory>  findAllUserHistory(String userId ){
+        //获取7天前的时间
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        Date lastTime = DateUtils.addDays(new Date(), -7);
+
+        List<PipelineExecHistory> list = new ArrayList<>();
+        List<PipelineStatus> allStatus = findAllStatus(userId);
+        if (allStatus == null){
+            return null;
+        }
+        //获取用户所有的流水线
+        for (PipelineStatus status : allStatus) {
+            List<PipelineExecHistory> allHistory = pipelineExecHistoryService.findAllHistory(status.getPipelineId());
+            if (allHistory == null){
+                continue;
+            }
+            for (PipelineExecHistory pipelineExecHistory : allHistory) {
+                try {
+                    Date time = formatter.parse(pipelineExecHistory.getCreateTime());
+                    //判断是否是7天内的历史
+                    if (lastTime.compareTo(time) > 0){
+                        continue;
+                    }
+                    list.add(pipelineExecHistory);
+                } catch (ParseException e) {
+                    logger.info("获取历史创建时间时日期转换异常。");
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+        return list;
+    }
+
+    @Override
+    public User findOneUser(String userId){
         return userService.findOne(userId);
    }
 

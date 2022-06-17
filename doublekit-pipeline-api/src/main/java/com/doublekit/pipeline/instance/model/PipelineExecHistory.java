@@ -9,6 +9,9 @@ import com.doublekit.join.annotation.Join;
 import com.doublekit.join.annotation.JoinQuery;
 import com.doublekit.pipeline.definition.model.Pipeline;
 
+/**
+ * 流水线历史
+ */
 
 @ApiModel
 @Join
@@ -51,9 +54,6 @@ public class PipelineExecHistory {
    @JoinQuery(key = "pipelineId")
     private Pipeline pipeline;
 
-    //运行时间（转换为天，月，日 ，时，分，秒格式）
-    private String execTime;
-
     //执行位置
     private int sort;
 
@@ -64,9 +64,11 @@ public class PipelineExecHistory {
     @ApiProperty(name="findNumber",desc="构建次数")
     private int findNumber;
 
-    //运行状态
+    //运行状态（1.运行完成，0.运行中）
     private int findState;
 
+    //运行时间（转换为天，月，日 ，时，分，秒格式）
+    private String execTime;
     //时间
     private String oneTime;
     private String twoTime;

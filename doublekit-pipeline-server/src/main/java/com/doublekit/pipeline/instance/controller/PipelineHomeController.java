@@ -5,6 +5,7 @@ import com.doublekit.apibox.annotation.ApiMethod;
 import com.doublekit.apibox.annotation.ApiParam;
 import com.doublekit.core.Result;
 import com.doublekit.pipeline.definition.model.PipelineStatus;
+import com.doublekit.pipeline.instance.model.PipelineExecState;
 import com.doublekit.pipeline.instance.model.PipelineFollow;
 import com.doublekit.pipeline.instance.model.PipelineOpen;
 import com.doublekit.pipeline.instance.service.PipelineHomeService;
@@ -56,6 +57,15 @@ public class PipelineHomeController {
     public Result<List<PipelineStatus>>  findUserPipeline(@NotNull String userId){
         List<PipelineStatus> allOpen = pipelineHomeService.findUserPipeline(userId);
         return Result.ok(allOpen);
+    }
+
+
+    @RequestMapping(path="/runState",method = RequestMethod.POST)
+    @ApiMethod(name = "runState",desc = "获取用户7天内的构建状态")
+    @ApiParam(name = "userId",desc = "用户id",required = true)
+    public Result<List<PipelineStatus>> runState(@NotNull String userId){
+        List<PipelineExecState> list = pipelineHomeService.runState(userId);
+        return Result.ok(list);
     }
 
 

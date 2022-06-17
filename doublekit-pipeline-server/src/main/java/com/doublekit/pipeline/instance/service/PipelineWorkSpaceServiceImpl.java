@@ -227,37 +227,38 @@ public class PipelineWorkSpaceServiceImpl implements  PipelineWorkSpaceService {
     public List<List<GitCommit>> svn(PipelineConfigure pipelineConfigure)  {
         PipelineCode pipelineCode = pipelineCodeService.findOneCode(pipelineConfigure.getTaskId());
         Pipeline pipeline = pipelineConfigure.getPipeline();
-        if (pipelineCode.getProof()!= null){
-            try {
-                SVNLogEntry[] svnMassage = svnMassage(pipelineCode.getProof(), pipelineCode);
-                List<GitCommit> list = new ArrayList<>();
-                if (svnMassage != null){
-                    for (SVNLogEntry entry : svnMassage) {
-                        List<String> strings = new ArrayList<>();
-                        if (entry.getDate() == null){
-                            continue;
-                        }
-                        GitCommit commit = new GitCommit();
-                        commit.setCommitId( ""+entry.getRevision());
-                        commit.setCommitTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(entry.getDate()));
-                        commit.setCommitMassage(entry.getMessage());
-                        commit.setCommitName(entry.getAuthor());
-                        commit.setDayTime(new SimpleDateFormat("yyyy-MM-dd").format(entry.getDate()));
-                        for (Map.Entry<String, SVNLogEntryPath> pathEntry : entry.getChangedPaths().entrySet()) {
-                            //文件地址
-                            strings.add("D:/clone/" + pipeline.getPipelineName()+pathEntry.getKey());
-                        }
-                        commit.setCommitFile(strings);
-                        list.add(commit);
-                    }
-                }
-                list.sort(Comparator.comparing(GitCommit::getDayTime,Comparator.reverseOrder()));
-                return returnValue(list);
-            } catch (SVNException e) {
+        if (pipelineCode.getProof() == null){
+            return null;
+        }
+        try {
+            SVNLogEntry[] svnMassage = svnMassage(pipelineCode.getProof(), pipelineCode);
+            if (svnMassage == null){
                 return null;
             }
+            List<GitCommit> list = new ArrayList<>();
+            for (SVNLogEntry entry : svnMassage) {
+                List<String> strings = new ArrayList<>();
+                if (entry.getDate() == null){
+                    continue;
+                }
+                GitCommit commit = new GitCommit();
+                commit.setCommitId( ""+entry.getRevision());
+                commit.setCommitTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(entry.getDate()));
+                commit.setCommitMassage(entry.getMessage());
+                commit.setCommitName(entry.getAuthor());
+                commit.setDayTime(new SimpleDateFormat("yyyy-MM-dd").format(entry.getDate()));
+                for (Map.Entry<String, SVNLogEntryPath> pathEntry : entry.getChangedPaths().entrySet()) {
+                    //文件地址
+                    strings.add("D:/clone/" + pipeline.getPipelineName()+pathEntry.getKey());
+                }
+                commit.setCommitFile(strings);
+                list.add(commit);
+            }
+            list.sort(Comparator.comparing(GitCommit::getDayTime,Comparator.reverseOrder()));
+            return returnValue(list);
+        } catch (SVNException e) {
+            return null;
         }
-        return null;
     }
 
     //封装返回值
