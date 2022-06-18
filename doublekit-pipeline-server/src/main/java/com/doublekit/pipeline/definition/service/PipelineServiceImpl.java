@@ -1,19 +1,20 @@
 package com.doublekit.pipeline.definition.service;
 
 import com.doublekit.beans.BeanMapper;
+import com.doublekit.join.JoinTemplate;
 import com.doublekit.pipeline.definition.dao.PipelineDao;
 import com.doublekit.pipeline.definition.entity.PipelineEntity;
 import com.doublekit.pipeline.definition.model.Pipeline;
 import com.doublekit.pipeline.definition.model.PipelineConfigure;
 import com.doublekit.pipeline.definition.model.PipelineStatus;
 import com.doublekit.pipeline.instance.model.PipelineExecHistory;
+import com.doublekit.pipeline.instance.service.PipelineActionService;
 import com.doublekit.pipeline.instance.service.PipelineExecHistoryService;
 import com.doublekit.pipeline.instance.service.PipelineOpenService;
 import com.doublekit.rpc.annotation.Exporter;
 import com.doublekit.user.user.model.DmUser;
 import com.doublekit.user.user.model.User;
 import com.doublekit.user.user.service.DmUserService;
-import com.doublekit.user.user.service.UserService;
 import org.apache.commons.lang3.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,16 +42,19 @@ public class PipelineServiceImpl implements PipelineService{
     DmUserService dmUserService;
 
     @Autowired
-    UserService userService;
+    PipelineOpenService pipelineOpenService;
 
     @Autowired
-    PipelineOpenService pipelineOpenService;
+    PipelineActionService pipelineActionService;
 
     @Autowired
     PipelineExecHistoryService pipelineExecHistoryService;
 
     @Autowired
     PipelineConfigureService pipelineConfigureService;
+
+    @Autowired
+    JoinTemplate joinTemplate;
 
 
     private static final Logger logger = LoggerFactory.getLogger(PipelineServiceImpl.class);
@@ -67,17 +71,20 @@ public class PipelineServiceImpl implements PipelineService{
                 return null;
             }
         }
+        pipelineActionService.createActive(pipeline.getUser().getId(),pipeline,"创建了流水线"+pipeline.getPipelineName());
         String pipelineId = pipelineDao.createPipeline(pipelineEntity);
         DmUser dmUser = new DmUser();
         dmUser.setDomainId(pipelineId);
-        dmUser.setUser(new User(pipeline.getUserId()));
+        dmUser.setUser(new User().setId(pipeline.getUser().getId()));
         dmUserService.createDmUser(dmUser);
         return  pipelineId;
     }
 
     //删除
     @Override
-    public void deletePipeline(String pipelineId) {
+    public void deletePipeline(String pipelineId,String userId) {
+        Pipeline pipeline = findPipeline(pipelineId);
+        joinTemplate.joinQuery(pipeline);
         List<DmUser> allDmUser = dmUserService.findAllDmUser();
         if (allDmUser == null){
             return;
@@ -96,38 +103,29 @@ public class PipelineServiceImpl implements PipelineService{
             pipelineExecHistoryService.deleteHistory(pipelineId);
             //删除收藏
             pipelineOpenService.deleteAllOpen(pipelineId);
+            //动态
+            pipelineActionService.createActive(userId,null,"删除了流水线"+pipeline.getPipelineName());
+            //删除动态
+            pipelineActionService.deletePipelineAction(pipelineId);
         }
     }
 
     //更新
     @Override
     public int updatePipeline(Pipeline pipeline) {
-        PipelineEntity pipelineEntity = BeanMapper.map(pipeline, PipelineEntity.class);
+         PipelineEntity pipelineEntity = BeanMapper.map(pipeline, PipelineEntity.class);
         //更新用户信息
         pipelineDao.updatePipeline(pipelineEntity);
+        pipelineActionService.createActive(pipeline.getUser().getId(),pipeline,"更新了流水线/的信息");
         return 1;
     }
 
     //查询
     @Override
-    public Pipeline findPipeline(String id) {
-        return BeanMapper.map(pipelineDao.findPipeline(id), Pipeline.class);
-    }
-
-    //查询
-    @Override
-    public Pipeline findOnePipeline(String pipelineName) {
-        List<Pipeline> allPipeline = findAllPipeline();
-        if (allPipeline == null){
-           return null;
-        }
-        for (Pipeline pipeline : allPipeline) {
-            if (!pipeline.getPipelineName().equals(pipelineName)){
-               continue;
-            }
-            return pipeline;
-        }
-        return null;
+    public Pipeline findPipeline(String pipelineId) {
+        Pipeline pipeline = BeanMapper.map(pipelineDao.findPipeline(pipelineId), Pipeline.class);
+        joinTemplate.joinQuery(pipeline);
+        return pipeline;
     }
 
     //根据流水线获取配置信息
@@ -139,7 +137,9 @@ public class PipelineServiceImpl implements PipelineService{
     //查询所有
     @Override
     public List<Pipeline> findAllPipeline() {
-        return BeanMapper.mapList(pipelineDao.findAllPipeline(), Pipeline.class);
+        List<Pipeline> list = BeanMapper.mapList(pipelineDao.findAllPipeline(), Pipeline.class);
+        joinTemplate.joinQuery(list);
+        return list;
     }
 
     @Override
@@ -148,10 +148,34 @@ public class PipelineServiceImpl implements PipelineService{
         return BeanMapper.mapList(pipelineEntityList, Pipeline.class);
     }
 
+    //获取用户流水线
     @Override
     public List<Pipeline> findUserPipeline(String userId){
-        List<PipelineEntity> pipelineEntityList = pipelineDao.findUserPipeline(userId);
-        return BeanMapper.mapList(pipelineEntityList, Pipeline.class);
+        List<DmUser> allDmUser = dmUserService.findAllDmUser();
+        if (allDmUser == null){
+            return null;
+        }
+        List<DmUser> dmUsers = new ArrayList<>();
+        for (DmUser dmUser : allDmUser) {
+            if (!dmUser.getUser().getId().equals(userId)){
+                continue;
+            }
+            dmUsers.add(dmUser);
+        }
+        List<Pipeline> allPipeline = findAllPipeline();
+        if (allPipeline == null || dmUsers.size() == 0){
+            return null;
+        }
+        List<Pipeline> list = new ArrayList<>();
+        for (Pipeline pipeline : allPipeline) {
+            for (DmUser dmUser : dmUsers) {
+                if (!dmUser.getDomainId().equals(pipeline.getPipelineId())){
+                  continue;
+                }
+                list.add(pipeline);
+            }
+        }
+        return list;
     }
 
     //模糊查询
@@ -161,11 +185,14 @@ public class PipelineServiceImpl implements PipelineService{
         return BeanMapper.mapList(pipelineEntityList, Pipeline.class);
     }
 
-    //获取用户所有流水线
+    //获取用户所有流水线状态
     @Override
     public List<PipelineStatus> findAllStatus(String userId) {
         List<PipelineStatus> pipelineStatusList= new ArrayList<>();
         List<Pipeline> allPipeline = findUserPipeline(userId);
+        if (allPipeline == null){
+            return null;
+        }
         for (Pipeline pipeline : allPipeline) {
             PipelineStatus pipelineStatus = new PipelineStatus();
             //成功和构建时间
@@ -222,11 +249,6 @@ public class PipelineServiceImpl implements PipelineService{
         }
         return list;
     }
-
-    @Override
-    public User findOneUser(String userId){
-        return userService.findOne(userId);
-   }
 
 
 

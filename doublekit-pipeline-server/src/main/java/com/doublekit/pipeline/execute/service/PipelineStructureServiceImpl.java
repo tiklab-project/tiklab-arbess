@@ -1,13 +1,16 @@
 package com.doublekit.pipeline.execute.service;
 
 import com.doublekit.beans.BeanMapper;
+import com.doublekit.pipeline.definition.model.Pipeline;
 import com.doublekit.pipeline.definition.model.PipelineConfigure;
 import com.doublekit.pipeline.definition.model.PipelineExecConfigure;
 import com.doublekit.pipeline.definition.service.PipelineConfigureService;
 import com.doublekit.pipeline.execute.dao.PipelineStructureDao;
 import com.doublekit.pipeline.execute.entity.PipelineStructureEntity;
 import com.doublekit.pipeline.execute.model.PipelineStructure;
+import com.doublekit.pipeline.instance.service.PipelineActionService;
 import com.doublekit.rpc.annotation.Exporter;
+import com.doublekit.user.user.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +29,8 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
     @Autowired
     PipelineConfigureService pipelineConfigureService;
 
+    @Autowired
+    PipelineActionService pipelineActionService;
 
     //创建
     @Override
@@ -75,20 +80,27 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
     @Override
     public void updateTask(PipelineExecConfigure pipelineExecConfigure) {
         PipelineStructure pipelineStructure = pipelineExecConfigure.getPipelineStructure();
-        String pipelineId = pipelineExecConfigure.getPipelineId();
-        PipelineConfigure oneConfigure = pipelineConfigureService.findOneConfigure(pipelineId, 30);
+        Pipeline pipeline = pipelineExecConfigure.getPipeline();
+        User user = pipelineExecConfigure.getUser();
+        PipelineConfigure oneConfigure = pipelineConfigureService.findOneConfigure(pipeline.getPipelineId(), 30);
         if (oneConfigure != null){
             if (pipelineStructure.getType() != 0){
                 updateStructure(pipelineStructure);
                 oneConfigure.setTaskSort(pipelineStructure.getSort());
                 oneConfigure.setTaskAlias(pipelineStructure.getStructureAlias());
                 pipelineConfigureService.updateConfigure(oneConfigure);
+                //动态
+                pipelineActionService.createActive(user.getId(),pipeline,"更新流水线/构建的配置");
             }else {
-                pipelineConfigureService.deleteTask(oneConfigure.getTaskId(),pipelineId);
+                pipelineConfigureService.deleteTask(oneConfigure.getTaskId(),pipeline.getPipelineId());
+                //动态
+                pipelineActionService.createActive(user.getId(),pipeline,"删除流水线/构建的配置");
             }
         }
         if (oneConfigure == null && pipelineStructure.getType() != 0){
-            createConfigure(pipelineId,pipelineStructure.getType(),pipelineStructure);
+            createConfigure(pipeline.getPipelineId(),pipelineStructure.getType(),pipelineStructure);
+            //动态
+            pipelineActionService.createActive(user.getId(),pipeline,"创建流水线/构建的配置");
         }
         pipelineDeployService.updateTask(pipelineExecConfigure);
     }

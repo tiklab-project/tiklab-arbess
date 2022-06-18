@@ -9,7 +9,6 @@ import com.doublekit.pipeline.definition.model.Pipeline;
 import com.doublekit.pipeline.definition.model.PipelineConfigure;
 import com.doublekit.pipeline.definition.model.PipelineStatus;
 import com.doublekit.pipeline.instance.model.PipelineExecHistory;
-import com.doublekit.user.user.model.User;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -32,7 +31,7 @@ public interface PipelineService {
      * 删除流水线
      * @param pipelineId 流水线id
      */
-    void deletePipeline(@NotNull String pipelineId);
+    void deletePipeline(@NotNull String pipelineId,String userId);
 
     /**
      * 更新流水线
@@ -48,13 +47,13 @@ public interface PipelineService {
     @FindOne
     Pipeline findPipeline(@NotNull String pipelineId);
 
-    /**
-     * 根据名称查询流水线
-     * @param pipelineName 流水线名称
-     * @return 流水线信息
-     */
-    @FindOne
-    Pipeline findOnePipeline(@NotNull String pipelineName);
+    ///**
+    // * 根据名称查询流水线
+    // * @param pipelineName 流水线名称
+    // * @return 流水线信息
+    // */
+    //@FindOne
+    //Pipeline findOnePipeline(@NotNull String pipelineName);
 
 
     /**
@@ -104,13 +103,6 @@ public interface PipelineService {
      * @return 历史信息
      */
     List<PipelineExecHistory> findAllUserHistory(String userId);
-
-    /**
-     * 获取用户信息
-     * @param userId 用户id
-     * @return 用户信息
-     */
-    User findOneUser(String userId);
 
 
 }

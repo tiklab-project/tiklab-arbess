@@ -9,13 +9,18 @@ import com.doublekit.pipeline.definition.model.Pipeline;
 import com.doublekit.pipeline.definition.model.PipelineConfigure;
 import com.doublekit.pipeline.definition.model.PipelineExecConfigure;
 import com.doublekit.pipeline.execute.service.PipelineCodeService;
+import com.doublekit.pipeline.instance.service.PipelineActionService;
 import com.doublekit.rpc.annotation.Exporter;
 import com.ibm.icu.text.SimpleDateFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import java.util.*;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.List;
 
 
 @Service
@@ -30,6 +35,9 @@ public class PipelineConfigureServiceImpl implements PipelineConfigureService {
 
     @Autowired
     PipelineCodeService pipelineCodeService;
+
+    @Autowired
+    PipelineActionService pipelineActionService;
 
     private static final Logger logger = LoggerFactory.getLogger(PipelineConfigureServiceImpl.class);
 
@@ -103,7 +111,7 @@ public class PipelineConfigureServiceImpl implements PipelineConfigureService {
                continue;
             }
             PipelineConfigure oneConfigure = findOneConfigure(pipelineConfigure.getConfigureId());
-            pipelineCodeService.deleteTask(oneConfigure.getTaskId(),oneConfigure.getTaskType());
+            pipelineCodeService.deleteTask(oneConfigure.getTaskId(),oneConfigure.getTaskType(),pipelineConfigure.getPipeline());
             deleteConfigure(pipelineConfigure.getConfigureId());
         }
     }
@@ -122,6 +130,7 @@ public class PipelineConfigureServiceImpl implements PipelineConfigureService {
     //更新任务
     @Override
     public void updateTask(PipelineExecConfigure pipelineExecConfigure){
+
         pipelineCodeService.updateTask(pipelineExecConfigure);
     }
 

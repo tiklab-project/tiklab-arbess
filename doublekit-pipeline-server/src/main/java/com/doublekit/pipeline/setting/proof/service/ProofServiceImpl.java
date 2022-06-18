@@ -3,11 +3,13 @@ package com.doublekit.pipeline.setting.proof.service;
 import com.doublekit.beans.BeanMapper;
 import com.doublekit.join.JoinTemplate;
 import com.doublekit.pipeline.execute.service.PipelineCodeServiceImpl;
+import com.doublekit.pipeline.instance.service.PipelineActionService;
 import com.doublekit.pipeline.instance.service.execAchieveService.CommonAchieveService;
 import com.doublekit.pipeline.setting.proof.dao.ProofDao;
 import com.doublekit.pipeline.setting.proof.entity.ProofEntity;
 import com.doublekit.pipeline.setting.proof.model.Proof;
 import com.doublekit.rpc.annotation.Exporter;
+import com.doublekit.user.user.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,11 +32,15 @@ public class ProofServiceImpl implements ProofService{
     @Autowired
     CommonAchieveService commonAchieveService;
 
+    @Autowired
+    PipelineActionService pipelineActionService;
+
     private static final Logger logger = LoggerFactory.getLogger(PipelineCodeServiceImpl.class);
 
     //创建
     @Override
     public String createProof(Proof proof) {
+        User user = proof.getUser();
         List<Proof> allProof = findAllProof();
         if (allProof != null){
             for (Proof proof1 : allProof) {
@@ -44,9 +50,11 @@ public class ProofServiceImpl implements ProofService{
                 }
                 proof.setProofId(proof1.getProofId());
                 updateProof(proof);
+                pipelineActionService.createActive(user.getId(),null,"更新了凭证"+proof.getProofName());
                 return proof.getProofId();
             }
         }
+        pipelineActionService.createActive(user.getId(),null,"创建了新的凭证"+proof.getProofName());
         ProofEntity proofEntity = BeanMapper.map(proof, ProofEntity.class);
         return ProofDao.createProof(proofEntity);
     }
@@ -64,6 +72,8 @@ public class ProofServiceImpl implements ProofService{
             }
         }
         ProofDao.deleteProof(proofId);
+        User user = proof.getUser();
+        pipelineActionService.createActive(user.getId(),null,"删除了凭证"+proof.getProofName());
     }
 
 

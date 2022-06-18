@@ -2,6 +2,8 @@ package com.doublekit.pipeline.execute.service;
 
 
 import com.doublekit.beans.BeanMapper;
+import com.doublekit.join.JoinTemplate;
+import com.doublekit.pipeline.definition.model.Pipeline;
 import com.doublekit.pipeline.definition.model.PipelineConfigure;
 import com.doublekit.pipeline.definition.model.PipelineExecConfigure;
 import com.doublekit.pipeline.definition.service.PipelineConfigureService;
@@ -10,9 +12,11 @@ import com.doublekit.pipeline.execute.entity.PipelineCodeEntity;
 import com.doublekit.pipeline.execute.model.PipelineCode;
 import com.doublekit.pipeline.execute.service.codeGit.CodeGitHubService;
 import com.doublekit.pipeline.execute.service.codeGit.CodeGiteeApiService;
+import com.doublekit.pipeline.instance.service.PipelineActionService;
 import com.doublekit.pipeline.setting.proof.model.Proof;
 import com.doublekit.pipeline.setting.proof.service.ProofService;
 import com.doublekit.rpc.annotation.Exporter;
+import com.doublekit.user.user.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +45,12 @@ public class PipelineCodeServiceImpl implements PipelineCodeService {
 
     @Autowired
     PipelineConfigureService pipelineConfigureService;
+
+    @Autowired
+    PipelineActionService pipelineActionService;
+
+    @Autowired
+    JoinTemplate joinTemplate;
 
     private static final Logger logger = LoggerFactory.getLogger(PipelineCodeServiceImpl.class);
 
@@ -85,7 +95,7 @@ public class PipelineCodeServiceImpl implements PipelineCodeService {
     }
 
     @Override
-    public void deleteTask(String taskId, int taskType) {
+    public void deleteTask(String taskId, int taskType ,Pipeline pipeline) {
         if (taskType <= 10){
             deleteCode(taskId);
             return;
@@ -101,6 +111,9 @@ public class PipelineCodeServiceImpl implements PipelineCodeService {
 
     //通过授权信息获取仓库url
     private void getUrl( PipelineCode pipelineCode){
+        if (pipelineCode.getProof() == null){
+            return;
+        }
         if (pipelineCode.getType() == 2 ){
             String cloneUrl = codeGiteeApiService.getCloneUrl(pipelineCode.getProof().getProofId(),pipelineCode.getCodeName());
             pipelineCode.setCodeAddress(cloneUrl);
@@ -113,9 +126,11 @@ public class PipelineCodeServiceImpl implements PipelineCodeService {
     //修改任务
     @Override
     public void updateTask(PipelineExecConfigure pipelineExecConfigure) {
-        String pipelineId = pipelineExecConfigure.getPipelineId();
+        //joinTemplate.joinQuery(pipelineExecConfigure);
+        Pipeline pipeline = pipelineExecConfigure.getPipeline();
         PipelineCode pipelineCode =pipelineExecConfigure.getPipelineCode();
-        PipelineConfigure oneConfigure = pipelineConfigureService.findOneConfigure(pipelineId, 10);
+        User user = pipelineExecConfigure.getUser();
+        PipelineConfigure oneConfigure = pipelineConfigureService.findOneConfigure(pipeline.getPipelineId(), 10);
         if (oneConfigure != null){
             //判断是否存在配置
             if (pipelineCode.getType() != 0){
@@ -127,14 +142,20 @@ public class PipelineCodeServiceImpl implements PipelineCodeService {
                 getUrl(pipelineCode);
 
                 updateCode(pipelineCode);
+                //动态
+                pipelineActionService.createActive(user.getId(),pipeline,"更新了流水线/源码管理的配置");
                 oneConfigure.setTaskAlias(pipelineCode.getCodeAlias());
                 pipelineConfigureService.updateConfigure(oneConfigure);
             }else {
-                pipelineConfigureService.deleteTask(oneConfigure.getTaskId(),pipelineId);
+                //动态
+                pipelineActionService.createActive(user.getId(),pipeline,"删除流水线/源码管理的配置");
+                pipelineConfigureService.deleteTask(oneConfigure.getTaskId(),pipeline.getPipelineId());
             }
         }
         if (oneConfigure == null && pipelineCode.getType() != 0){
-             createConfigure(pipelineId, pipelineCode.getType(), pipelineCode);
+            //动态
+            pipelineActionService.createActive(user.getId(),pipeline,"创建流水线/源码管理的配置");
+            createConfigure(pipeline.getPipelineId(), pipelineCode.getType(), pipelineCode);
         }
         pipelineTestService.updateTask(pipelineExecConfigure);
     }

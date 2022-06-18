@@ -46,6 +46,8 @@ public class PipelineConfigure {
     @ApiProperty(name = "taskAlias",desc = "别名")
     private String taskAlias;
 
+    private String userId;
+
 
     public String getConfigureId() {
         return configureId;
@@ -101,5 +103,13 @@ public class PipelineConfigure {
 
     public void setTaskAlias(String taskAlias) {
         this.taskAlias = taskAlias;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 }

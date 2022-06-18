@@ -49,11 +49,15 @@ public class PipelineExecServiceImpl implements PipelineExecService {
     @Autowired
     DeployAchieveServiceImpl deployAchieveServiceImpl ;
 
+    @Autowired
+    PipelineActionService pipelineActionService;
+
     //存放过程状态
     List<PipelineExecHistory> pipelineExecHistoryList = new ArrayList<>();
 
     private static final Logger logger = LoggerFactory.getLogger(PipelineExecServiceImpl.class);
 
+    //开始执行时间
     long beginTime = 0;
 
     //创建线程池
@@ -61,7 +65,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
 
     //启动
     @Override
-    public int  start(String pipelineId){
+    public int  start(String pipelineId,String userId){
         // 判断同一任务是否在运行
         Pipeline pipeline = pipelineService.findPipeline(pipelineId);
         if (pipeline.getPipelineState() == 1){
@@ -101,7 +105,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
 
     //停止运行
     @Override
-    public void killInstance(String pipelineId) {
+    public void killInstance(String pipelineId,String userId) {
         PipelineProcess pipelineProcess = new PipelineProcess();
         time[0]=1;time[1]=0;time[2]=0;time[3]=0;
         PipelineExecHistory pipelineExecHistory = findInstanceState(pipelineId);
@@ -109,6 +113,9 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         PipelineExecLog pipelineExecLog = pipelineExecHistoryService.getRunLog(pipelineExecHistory.getHistoryId());
         pipelineProcess.setPipelineExecLog(pipelineExecLog);
         pipelineProcess.setPipelineExecHistory(pipelineExecHistory);
+        Pipeline pipeline = pipelineExecHistory.getPipeline();
+        //动态
+        pipelineActionService.createActive(userId,pipeline,"停止流水线/的运行");
 
         long overTime = new Timestamp(System.currentTimeMillis()).getTime();
         int time = (int) (overTime - beginTime) / 1000;
@@ -144,9 +151,14 @@ public class PipelineExecServiceImpl implements PipelineExecService {
 
     // 构建开始
     private void begin(String pipelineId) {
+
         Pipeline pipeline = pipelineService.findPipeline(pipelineId);
+
         pipeline.setPipelineState(1);
         pipelineService.updatePipeline(pipeline);
+
+        //动态
+        pipelineActionService.createActive(pipeline.getUser().getId(),pipeline,"执行流水线");
 
         String historyId = pipelineExecHistoryService.createHistory(new PipelineExecHistory());
         PipelineExecHistory pipelineExecHistory = commonAchieveServiceImpl.initializeHistory(historyId,pipeline);

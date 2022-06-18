@@ -17,6 +17,8 @@ public class PipelineExecState {
 
     private int errorNumber;
 
+    private int removeNumber;
+
     public String getTime() {
         return time;
     }
@@ -39,5 +41,13 @@ public class PipelineExecState {
 
     public void setErrorNumber(int errorNumber) {
         this.errorNumber = errorNumber;
+    }
+
+    public int getRemoveNumber() {
+        return removeNumber;
+    }
+
+    public void setRemoveNumber(int removeNumber) {
+        this.removeNumber = removeNumber;
     }
 }

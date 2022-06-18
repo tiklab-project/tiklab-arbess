@@ -2,10 +2,7 @@ package com.doublekit.pipeline.instance.service;
 
 import com.doublekit.pipeline.definition.model.PipelineStatus;
 import com.doublekit.pipeline.definition.service.PipelineService;
-import com.doublekit.pipeline.instance.model.PipelineExecHistory;
-import com.doublekit.pipeline.instance.model.PipelineExecState;
-import com.doublekit.pipeline.instance.model.PipelineFollow;
-import com.doublekit.pipeline.instance.model.PipelineOpen;
+import com.doublekit.pipeline.instance.model.*;
 import com.doublekit.rpc.annotation.Exporter;
 import org.apache.commons.lang3.time.DateUtils;
 import org.slf4j.Logger;
@@ -15,7 +12,10 @@ import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.List;
 
 @Service
 @Exporter
@@ -30,6 +30,8 @@ public class PipelineHomeServiceImpl implements PipelineHomeService{
     @Autowired
     PipelineService pipelineService;
 
+    @Autowired
+    PipelineActionService pipelineActionService;
 
 
     private static final Logger logger = LoggerFactory.getLogger(PipelineHomeServiceImpl.class);
@@ -72,27 +74,29 @@ public class PipelineHomeServiceImpl implements PipelineHomeService{
         return pipelineFollowService.findUserPipeline(userId,allStatus);
     }
 
+    //近七天构建状态
     @Override
     public List<PipelineExecState> runState(String userId){
         List<PipelineExecState> list = new ArrayList<>();
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-        int i = -7;
+        int i = -6;
         List<PipelineExecHistory> allUserHistory = pipelineService.findAllUserHistory(userId);
+        if (allUserHistory == null){
+            return null;
+        }
         while (i <= 0){
             Date lastTime = DateUtils.addDays(new Date(), i);
             PipelineExecState pipelineExecState = new PipelineExecState();
-            if (allUserHistory == null){
-                return null;
-            }
+            pipelineExecState.setTime(formatter.format(lastTime));
             for (PipelineExecHistory pipelineExecHistory : allUserHistory) {
                 try {
                     Date time = formatter.parse(pipelineExecHistory.getCreateTime());
-                    if (getTimeNumber(time,lastTime) != 0){
+                    if (!formatter.format(lastTime).equals(formatter.format(time))){
                       continue;
                     }
-                    pipelineExecState.setTime(formatter.format(time));
                     switch (pipelineExecHistory.getRunStatus()) {
                         case 30 -> pipelineExecState.setSuccessNumber(pipelineExecState.getSuccessNumber() + 1);
+                        case 20 -> pipelineExecState.setRemoveNumber(pipelineExecState.getRemoveNumber() + 1);
                         case 1 -> pipelineExecState.setErrorNumber(pipelineExecState.getErrorNumber() + 1);
                     }
                 } catch (ParseException e) {
@@ -100,7 +104,9 @@ public class PipelineHomeServiceImpl implements PipelineHomeService{
                     throw new RuntimeException(e);
                 }
             }
-            if (pipelineExecState.getTime()!=null && pipelineExecState.getErrorNumber()+pipelineExecState.getSuccessNumber()>0){
+
+            if (pipelineExecState.getTime() != null){
+                pipelineExecState.setTime(pipelineExecState.getTime().substring(5));
                 list.add(pipelineExecState);
             }
             i++;
@@ -108,14 +114,45 @@ public class PipelineHomeServiceImpl implements PipelineHomeService{
         return list;
     }
 
-    //获取天数差
-    public  int getTimeNumber(Date fDate, Date oDate) {
-        Calendar aCalendar = Calendar.getInstance();
-        aCalendar.setTime(fDate);
-        int day1 = aCalendar.get(Calendar.DAY_OF_YEAR);
-        aCalendar.setTime(oDate);
-        int day2 = aCalendar.get(Calendar.DAY_OF_YEAR);
-        return day2 - day1;
-    }
+    //用户动态
+   public List<PipelineAction> findAllAction(String userId){
+       List<PipelineStatus> userPipeline = findUserPipeline(userId);
+       List<PipelineAction> allActive = pipelineActionService.findAllUserActive();
+       if (userPipeline == null || allActive ==null){
+           return null;
+       }
+       List<PipelineAction> list = new ArrayList<>();
+       for (PipelineAction pipelineAction : allActive) {
+           if (pipelineAction.getUser().getId().equals(userId)){
+               list.add(pipelineAction);
+           }
+       }
+       for (PipelineStatus pipelineStatus : userPipeline) {
+           for (PipelineAction pipelineAction : allActive) {
+               if (pipelineAction.getPipeline() != null || pipelineAction.getPipeline().getPipelineId().equals(pipelineStatus.getPipelineId())){
+                   continue;
+               }
+               list.add(pipelineAction);
+           }
+       }
+       list.sort(Comparator.comparing(PipelineAction::getCreateTime,Comparator.reverseOrder()));
+       return list;
+   }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 }

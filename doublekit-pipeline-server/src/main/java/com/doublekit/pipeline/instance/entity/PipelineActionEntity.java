@@ -8,7 +8,7 @@ public class PipelineActionEntity {
 
     @Id
     @GeneratorValue
-    @Column(name = "open_id")
+    @Column(name = "id")
     private String id;
 
     @Column(name = "create_time")
@@ -20,6 +20,11 @@ public class PipelineActionEntity {
     @Column(name = "user_id")
     private String userId ;
 
+    @Column(name = "pipeline_id")
+    private String pipelineId ;
+
+    @Column(name = "news")
+    private String news ;
 
     public String getId() {
         return id;
@@ -51,5 +56,21 @@ public class PipelineActionEntity {
 
     public void setUserId(String userId) {
         this.userId = userId;
+    }
+
+    public String getPipelineId() {
+        return pipelineId;
+    }
+
+    public void setPipelineId(String pipelineId) {
+        this.pipelineId = pipelineId;
+    }
+
+    public String getNews() {
+        return news;
+    }
+
+    public void setNews(String news) {
+        this.news = news;
     }
 }

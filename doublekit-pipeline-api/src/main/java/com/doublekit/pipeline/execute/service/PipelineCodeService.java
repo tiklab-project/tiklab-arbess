@@ -4,6 +4,7 @@ import com.doublekit.join.annotation.FindAll;
 import com.doublekit.join.annotation.FindList;
 import com.doublekit.join.annotation.FindOne;
 import com.doublekit.join.annotation.JoinProvider;
+import com.doublekit.pipeline.definition.model.Pipeline;
 import com.doublekit.pipeline.definition.model.PipelineConfigure;
 import com.doublekit.pipeline.definition.model.PipelineExecConfigure;
 import com.doublekit.pipeline.execute.model.PipelineCode;
@@ -39,7 +40,7 @@ public interface PipelineCodeService {
      * @param taskId 任务id
      * @param taskType 任务类型
      */
-    void deleteTask(String taskId,int taskType);
+    void deleteTask(String taskId, int taskType , Pipeline pipelineId);
 
     /**
      * 更新

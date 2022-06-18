@@ -54,9 +54,9 @@ public class PipelineController {
     @RequestMapping(path="/deletePipeline",method = RequestMethod.POST)
     @ApiMethod(name = "deletePipeline",desc = "删除流水线")
     @ApiParam(name = "pipelineId",desc = "流水线id",required = true)
-    public Result deletePipeline(@NotNull String pipelineId){
+    public Result deletePipeline(@NotNull String pipelineId,String userId){
 
-        pipelineService.deletePipeline(pipelineId);
+        pipelineService.deletePipeline(pipelineId,userId);
 
         return Result.ok();
     }

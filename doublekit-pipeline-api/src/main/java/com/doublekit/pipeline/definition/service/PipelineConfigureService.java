@@ -81,7 +81,6 @@ public interface PipelineConfigureService {
      */
     void updateTask(PipelineExecConfigure pipelineExecConfigure);
 
-
     /**
      * 查询流水线配置信息
      * @param configureId 流水线配置id

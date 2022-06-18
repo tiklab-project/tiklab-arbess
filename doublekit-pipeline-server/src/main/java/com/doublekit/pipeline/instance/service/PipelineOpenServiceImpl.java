@@ -41,7 +41,8 @@ public class PipelineOpenServiceImpl implements PipelineOpenService {
            return;
         }
         for (PipelineOpen pipelineOpen : allOpen) {
-            if (pipelineOpen.getPipeline().getPipelineId().equals(pipelineId)){
+            joinTemplate.joinQuery(pipelineOpen);
+            if (!pipelineOpen.getPipeline().getPipelineId().equals(pipelineId)){
                continue;
             }
             deleteOpen(pipelineOpen.getId());
@@ -54,9 +55,8 @@ public class PipelineOpenServiceImpl implements PipelineOpenService {
        }
         for (PipelineOpen pipelineOpen : findAllOpen()) {
             if (pipelineOpen.getPipeline().getPipelineId().equals(pipelineId) && pipelineOpen.getUserId().equals(userId)){
-                continue;
+                return pipelineOpen;
             }
-            return pipelineOpen;
         }
        return null;
     }
@@ -115,8 +115,5 @@ public class PipelineOpenServiceImpl implements PipelineOpenService {
         List<PipelineOpenEntity> openList = pipelineOpenDao.findAllOpenList(idList);
         return BeanMapper.mapList(openList, PipelineOpen.class);
     }
-
-
-
 
 }

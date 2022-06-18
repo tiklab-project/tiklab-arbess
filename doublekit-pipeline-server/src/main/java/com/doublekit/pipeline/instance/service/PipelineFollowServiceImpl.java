@@ -25,15 +25,13 @@ public class PipelineFollowServiceImpl implements  PipelineFollowService{
         if (allFollow == null){
             return null;
         }
-
         for (PipelineFollow follow : allFollow) {
             //判断是否存在收藏，存在删除改为取消
-            if (!pipelineFollow.getUserId().equals(follow.getUserId())
-                    && !pipelineFollow.getPipeline().getPipelineId().equals(follow.getPipeline().getPipelineId()) ){
-               continue;
+            if (pipelineFollow.getUserId().equals(follow.getUserId())
+                    && pipelineFollow.getPipeline().getPipelineId().equals(follow.getPipeline().getPipelineId()) ){
+                deleteFollow(follow.getId());
+                return null;
             }
-            deleteFollow(follow.getId());
-            return null;
         }
         return pipelineFollowDao.createFollow(BeanMapper.map(pipelineFollow, PipelineFollowEntity.class));
     }
@@ -62,13 +60,13 @@ public class PipelineFollowServiceImpl implements  PipelineFollowService{
                 list.add(status);
             }
         }
-        return null;
+        return list;
     }
 
     //获取用户所有收藏信息
     public List<PipelineFollow> findAll(String userId){
         List<PipelineFollow> list = new ArrayList<>();
-        if (findAllFollow() ==null){
+        if (findAllFollow() == null){
             return null;
         }
         for (PipelineFollow pipelineFollow : findAllFollow()) {
@@ -83,7 +81,7 @@ public class PipelineFollowServiceImpl implements  PipelineFollowService{
     @Override
     public List<PipelineStatus> findUserPipeline(String userId, List<PipelineStatus> allStatus){
         List<PipelineFollow> allFollow = findAll(userId);
-        if (allStatus==null){
+        if (allStatus == null){
             return null;
         }
         for (PipelineStatus status : allStatus) {

@@ -64,7 +64,6 @@ public class Proof {
     @ApiProperty(name="proofCreateTime",desc="创建时间")
     private String proofCreateTime;
 
-
     //类型
     @ApiProperty(name="type",desc="类型")
     private int type;

@@ -10,42 +10,57 @@ import com.doublekit.pipeline.execute.model.PipelineCode;
 import com.doublekit.pipeline.execute.model.PipelineDeploy;
 import com.doublekit.pipeline.execute.model.PipelineStructure;
 import com.doublekit.pipeline.execute.model.PipelineTest;
+import com.doublekit.user.user.model.User;
+
+/**
+ * 需要保存流水线配置信息
+ */
 
 @ApiModel
 @Join
 public class PipelineExecConfigure {
 
+    //流水线
+    @ApiProperty(name="pipeline",desc="流水线id",eg="@selectOne")
+    @Mappings({
+            @Mapping(source = "pipeline.pipelineId",target = "pipelineId")
+    })
+    @JoinQuery(key = "pipelineId")
+    private Pipeline pipeline;
 
-    @ApiProperty(name="pipelineId",desc="id")
-    private String pipelineId;
+    @ApiProperty(name="user",desc="用户",required = true)
+    @Mappings({
+            @Mapping(source = "user.id",target = "userId")
+    })
+    @JoinQuery(key = "id")
+    private User user;
 
     @ApiProperty(name="configureCreateTime",desc="id")
     private String configureCreateTime;
 
 
-    @ApiProperty(name="pipelineCode",desc="流水线id",eg="@selectOne")
+    @ApiProperty(name="pipelineCode",desc="源码管理",eg="@selectOne")
     @Mappings({
             @Mapping(source = "pipelineCode.codeId",target = "pipelineId")
     })
     @JoinQuery(key = "codeId")
     private PipelineCode pipelineCode;
 
-
-    @ApiProperty(name="pipelineTest",desc="流水线id",eg="@selectOne")
+    @ApiProperty(name="pipelineTest",desc="测试",eg="@selectOne")
     @Mappings({
             @Mapping(source = "pipelineTest.testId",target = "testId")
     })
     @JoinQuery(key = "testId")
     private PipelineTest pipelineTest;
 
-    @ApiProperty(name="pipelineStructure",desc="流水线id",eg="@selectOne")
+    @ApiProperty(name="pipelineStructure",desc="构建",eg="@selectOne")
     @Mappings({
             @Mapping(source = "pipelineStructure.structureId",target = "structureId")
     })
     @JoinQuery(key = "structureId")
     private PipelineStructure pipelineStructure;
 
-    @ApiProperty(name="pipelineDeploy",desc="流水线id",eg="@selectOne")
+    @ApiProperty(name="pipelineDeploy",desc="部署",eg="@selectOne")
     @Mappings({
             @Mapping(source = "pipelineDeploy.deployId",target = "deployId")
     })
@@ -53,12 +68,12 @@ public class PipelineExecConfigure {
     private PipelineDeploy pipelineDeploy;
 
 
-    public String getPipelineId() {
-        return pipelineId;
+    public Pipeline getPipeline() {
+        return pipeline;
     }
 
-    public void setPipelineId(String pipelineId) {
-        this.pipelineId = pipelineId;
+    public void setPipeline(Pipeline pipeline) {
+        this.pipeline = pipeline;
     }
 
     public String getConfigureCreateTime() {
@@ -101,16 +116,11 @@ public class PipelineExecConfigure {
         this.pipelineDeploy = pipelineDeploy;
     }
 
+    public User getUser() {
+        return user;
+    }
 
-    @Override
-    public String toString() {
-        return "PipelineExecConfigure{" +
-                "pipelineId='" + pipelineId + '\'' +
-                ", configureCreateTime='" + configureCreateTime + '\'' +
-                ", pipelineCode=" + pipelineCode +
-                ", pipelineTest=" + pipelineTest +
-                ", pipelineStructure=" + pipelineStructure +
-                ", pipelineDeploy=" + pipelineDeploy +
-                '}';
+    public void setUser(User user) {
+        this.user = user;
     }
 }

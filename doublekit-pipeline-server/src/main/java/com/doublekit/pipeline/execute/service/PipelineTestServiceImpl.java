@@ -1,13 +1,16 @@
 package com.doublekit.pipeline.execute.service;
 
 import com.doublekit.beans.BeanMapper;
+import com.doublekit.pipeline.definition.model.Pipeline;
 import com.doublekit.pipeline.definition.model.PipelineConfigure;
 import com.doublekit.pipeline.definition.model.PipelineExecConfigure;
 import com.doublekit.pipeline.definition.service.PipelineConfigureService;
 import com.doublekit.pipeline.execute.dao.PipelineTestDao;
 import com.doublekit.pipeline.execute.entity.PipelineTestEntity;
 import com.doublekit.pipeline.execute.model.PipelineTest;
+import com.doublekit.pipeline.instance.service.PipelineActionService;
 import com.doublekit.rpc.annotation.Exporter;
+import com.doublekit.user.user.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +29,8 @@ public class PipelineTestServiceImpl implements PipelineTestService {
     @Autowired
     PipelineConfigureService pipelineConfigureService;
 
+    @Autowired
+    PipelineActionService pipelineActionService;
 
     //创建
     @Override
@@ -75,22 +80,29 @@ public class PipelineTestServiceImpl implements PipelineTestService {
     @Override
     public void updateTask(PipelineExecConfigure pipelineExecConfigure) {
         PipelineTest pipelineTest = pipelineExecConfigure.getPipelineTest();
-        String pipelineId = pipelineExecConfigure.getPipelineId();
-        PipelineConfigure oneConfigure = pipelineConfigureService.findOneConfigure(pipelineId, 20);
+        Pipeline pipeline = pipelineExecConfigure.getPipeline();
+        User user = pipelineExecConfigure.getUser();
+        PipelineConfigure oneConfigure = pipelineConfigureService.findOneConfigure(pipeline.getPipelineId(), 20);
 
-
-        if (pipelineTest.getType() != 0 && oneConfigure == null){
-            createConfigure(pipelineId,pipelineTest.getType(),pipelineTest);
-        }
         if (oneConfigure != null ){
             if (pipelineTest.getType() != 0){
                 updateTest(pipelineTest);
                 oneConfigure.setTaskSort(pipelineTest.getSort());
                 oneConfigure.setTaskAlias(pipelineTest.getTestAlias());
                 pipelineConfigureService.updateConfigure(oneConfigure);
+                //动态
+                pipelineActionService.createActive(user.getId(),pipeline,"更新流水线/测试的配置");
             }else {
-                pipelineConfigureService.deleteTask(oneConfigure.getTaskId(),pipelineId);
+                pipelineConfigureService.deleteTask(oneConfigure.getTaskId(),pipeline.getPipelineId());
+                //动态
+                pipelineActionService.createActive(user.getId(),pipeline,"删除流水线/测试的配置");
             }
+        }
+
+        if (pipelineTest.getType() != 0 && oneConfigure == null){
+            createConfigure(pipeline.getPipelineId(),pipelineTest.getType(),pipelineTest);
+            //动态
+            pipelineActionService.createActive(user.getId(),pipeline,"创建流水线/测试的配置");
         }
         pipelineStructureService.updateTask(pipelineExecConfigure);
     }
