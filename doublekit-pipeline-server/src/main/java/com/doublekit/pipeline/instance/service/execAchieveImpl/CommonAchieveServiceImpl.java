@@ -146,13 +146,13 @@ public class CommonAchieveServiceImpl implements CommonAchieveService {
             process = runtime.exec("cmd.exe /c cd " + path + " &&" + " " + order);
         }else {
             if (sourceAddress != null){
-                process = runtime.exec("cd " + path + "/"+sourceAddress + ";" + order);
+                process = runtime.exec(" /bin/sh -c cd " + path + "/"+sourceAddress + ";" + order);
                 logger.info("地址为1 ： " + path + "       命令 ： "+order);
                 return process;
             }
             //执行命令
             String a = "cd " + path + ";" + order;
-            process = runtime.exec(a);
+            process = runtime.exec(" /bin/sh -c cd " + path + ";" + order);
             logger.info("地址为1 ： " + a);
         }
         return process;
