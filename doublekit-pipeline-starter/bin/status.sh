@@ -1,7 +1,8 @@
 #!/bin/sh
 if [ ! -n "$JAVA_HOME" ]; then
-    export JAVA_HOME="/export/server/jdk1.8.0_141"
+    export JAVA_HOME="/export/server/jdk-16.0.2"
 fi
+
 
 #APP_MAIN=${application.main.class}
 APP_MAIN="com.doublekit.pipeline.PipelineApplication"
