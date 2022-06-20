@@ -146,7 +146,8 @@ public class CommonAchieveServiceImpl implements CommonAchieveService {
             process = runtime.exec("cmd.exe /c cd " + path + " &&" + " " + order);
         }else {
             if (sourceAddress != null){
-                process = runtime.exec(" /bin/bash  cd " + path + "/"+sourceAddress + ";" + order);
+                String[] cmd = new String[] { "/bin/sh", "-c", "cd "+path+";"+" source /etc/profile;"+order };
+                process = runtime.exec(cmd);
                 return process;
             }
             //执行命令
@@ -155,6 +156,17 @@ public class CommonAchieveServiceImpl implements CommonAchieveService {
             logger.info(" 命令为 " +cmd[2]);
         }
         return process;
+    }
+
+    @Override
+    public String getFileAddress(){
+        String files = "/usr/local/pipeline/";
+        String property = System.getProperty("os.name");
+        String[] s = property.split(" ");
+        if (s[0].equals("Windows")){
+            files = "D:\\clone\\";
+        }
+        return files;
     }
 
     /**

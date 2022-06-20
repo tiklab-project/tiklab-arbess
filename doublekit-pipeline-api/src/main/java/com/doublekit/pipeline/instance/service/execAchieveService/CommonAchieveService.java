@@ -49,6 +49,12 @@ public interface CommonAchieveService {
      Process process(String path,String order,String sourceAddress) throws IOException;
 
     /**
+     * 获取默认文件地址
+     * @return 地址路径
+     */
+    String getFileAddress();
+
+    /**
      * 凭证信息（UsernamePassword）方式
      * @param gitUser 用户名
      * @param gitPasswd 密码

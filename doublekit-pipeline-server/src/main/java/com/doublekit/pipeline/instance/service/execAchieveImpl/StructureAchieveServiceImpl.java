@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
+import java.nio.charset.Charset;
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -45,18 +45,8 @@ public class StructureAchieveServiceImpl implements StructureAchieveService {
         String structureAddress = pipelineStructure.getStructureAddress();
         pipelineProcess.setPipelineExecLog(pipelineExecLog);
 
-        String file = "/usr/local/pipeline/";
-
-        String property = System.getProperty("os.name");
-        String[] s = property.split(" ");
-        if (s[0].equals("Windows")){
-            file = "D:\\clone\\";
-        }
-
         //设置拉取地址
-        String path = file+pipelineConfigure.getPipeline().getPipelineName();
-
-        logger.info("地址为0 ： " + path);
+        String path = commonAchieveServiceImpl.getFileAddress()+pipelineConfigure.getPipeline().getPipelineName();
 
         try {
             String a = "------------------------------------" + " \n"
@@ -68,8 +58,7 @@ public class StructureAchieveServiceImpl implements StructureAchieveService {
             pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog() + a);
             pipelineExecLog.setRunLog(pipelineExecLog.getRunLog()+a);
             //构建失败
-            //InputStreamReader inputStreamReader = new InputStreamReader(process.getInputStream(), Charset.forName("GBK"));
-            InputStreamReader inputStreamReader = new InputStreamReader(process.getInputStream() , StandardCharsets.ISO_8859_1);
+            InputStreamReader inputStreamReader = new InputStreamReader(process.getInputStream() ,  Charset.forName("GBK"));
             int state = commonAchieveServiceImpl.log(inputStreamReader, pipelineProcess,pipelineExecHistoryList);
             process.destroy();
             commonAchieveServiceImpl.updateTime(pipelineProcess,beginTime);

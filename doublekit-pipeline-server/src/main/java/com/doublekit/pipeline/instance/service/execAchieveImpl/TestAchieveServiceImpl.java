@@ -41,7 +41,7 @@ public class TestAchieveServiceImpl implements TestAchieveService {
         pipelineProcess.setPipelineExecLog(pipelineExecLog);
 
         String testOrder = pipelineTest.getTestOrder();
-        String path = "D:\\clone\\"+pipelineConfigure.getPipeline().getPipelineName();
+        String path = commonAchieveServiceImpl.getFileAddress()+pipelineConfigure.getPipeline().getPipelineName();
         try {
             Process process = commonAchieveServiceImpl.process(path, testOrder, null);
             String a = "------------------------------------" + " \n"

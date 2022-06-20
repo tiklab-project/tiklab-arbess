@@ -66,7 +66,9 @@ public class PipelineWorkSpaceServiceImpl implements  PipelineWorkSpaceService {
         Pipeline pipeline = pipelineService.findPipeline(pipelineId);
         pipelineOpenService.findOpen(userId,pipeline);
         if (pipeline == null)return null;
-        String path = "D:\\clone\\"+pipeline.getPipelineName();
+
+        //设置拉取地址
+        String path = commonAchieveService.getFileAddress()+pipeline.getPipelineName();
         List<FileTree> trees = new ArrayList<>();
         File file = new File(path);
         //判断文件是否存在
@@ -101,8 +103,8 @@ public class PipelineWorkSpaceServiceImpl implements  PipelineWorkSpaceService {
         List<GitCommit> list = new ArrayList<>();
         Pipeline pipeline = pipelineService.findPipeline(pipelineId);
         RevWalk walk = null;
-
-        try (Repository repo = new FileRepository("D:\\clone\\" + pipeline.getPipelineName() + "\\.git"); Git git = new Git(repo)) {
+        String dir = commonAchieveService.getFileAddress() + pipeline.getPipelineName();
+        try (Repository repo = new FileRepository( dir+ "\\.git"); Git git = new Git(repo)) {
             Iterable<RevCommit> commits = git.log().all().call();
 
             for (RevCommit commit : commits) {
@@ -249,7 +251,7 @@ public class PipelineWorkSpaceServiceImpl implements  PipelineWorkSpaceService {
                 commit.setDayTime(new SimpleDateFormat("yyyy-MM-dd").format(entry.getDate()));
                 for (Map.Entry<String, SVNLogEntryPath> pathEntry : entry.getChangedPaths().entrySet()) {
                     //文件地址
-                    strings.add("D:/clone/" + pipeline.getPipelineName()+pathEntry.getKey());
+                    strings.add( commonAchieveService.getFileAddress()+pipeline.getPipelineName()+pathEntry.getKey());
                 }
                 commit.setCommitFile(strings);
                 list.add(commit);
