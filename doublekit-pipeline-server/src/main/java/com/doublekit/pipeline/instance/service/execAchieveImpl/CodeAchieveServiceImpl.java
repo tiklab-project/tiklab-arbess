@@ -61,8 +61,16 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
         //初始化日志
         PipelineExecLog pipelineExecLog = commonAchieveService.initializeLog(pipelineExecHistory, pipelineConfigure);
 
+        String files = "/usr/local/pipeline/";
+
+        String property = System.getProperty("os.name");
+        String[] sa = property.split(" ");
+        if (sa[0].equals("Windows")){
+            files = "D:\\clone\\";
+        }
+
         //代码克隆路径
-        String path = "D:\\clone\\" + pipelineConfigure.getPipeline().getPipelineName();
+        String path = files + pipelineConfigure.getPipeline().getPipelineName();
         File file = new File(path);
 
         //删除旧的代码
