@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -225,7 +226,7 @@ public class DeployAchieveServiceImpl implements DeployAchieveService {
         ch.ethz.ssh2.Session session = conn.openSession();
         pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog() + "\n" + order+ "\n");
         session.execCommand(order);
-        InputStreamReader inputStreamReader = new InputStreamReader(session.getStdout());
+        InputStreamReader inputStreamReader = new InputStreamReader(session.getStdout(), StandardCharsets.UTF_8);
         commonAchieveServiceImpl.log(inputStreamReader,pipelineProcess,pipelineExecHistoryList);
         session.close();
         inputStreamReader.close();
