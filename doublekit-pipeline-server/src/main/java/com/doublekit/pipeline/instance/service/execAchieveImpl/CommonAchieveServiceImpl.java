@@ -130,14 +130,27 @@ public class CommonAchieveServiceImpl implements CommonAchieveService {
      */
     @Override
     public Process process(String path,String order,String sourceAddress) throws IOException {
+
         Runtime runtime=Runtime.getRuntime();
         Process process;
-        if (sourceAddress != null){
-            process = runtime.exec("cmd.exe /c cd " + path + "\\"+sourceAddress + " &&" + " " + order);
-            return process;
+        String property = System.getProperty("os.name");
+        String[] s = property.split(" ");
+        if (s[0].equals("Windows")){
+            if (sourceAddress != null){
+                process = runtime.exec("cmd.exe /c cd " + path + "\\"+sourceAddress + " &&" + " " + order);
+                return process;
+            }
+            //执行命令
+            process = runtime.exec("cmd.exe /c cd " + path + " &&" + " " + order);
+        }else {
+            if (sourceAddress != null){
+                process = runtime.exec("cd " + path + "/"+sourceAddress + ";" + " " + order);
+                return process;
+            }
+            //执行命令
+            process = runtime.exec("cd " + path + ";" + " " + order);
         }
-        //执行命令
-        process = runtime.exec("cmd.exe /c cd " + path + " &&" + " " + order);
+
         return process;
     }
 
