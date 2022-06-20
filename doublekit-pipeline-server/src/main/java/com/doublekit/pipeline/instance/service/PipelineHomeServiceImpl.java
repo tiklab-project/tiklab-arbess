@@ -117,26 +117,38 @@ public class PipelineHomeServiceImpl implements PipelineHomeService{
     //用户动态
    public List<PipelineAction> findAllAction(String userId){
        List<PipelineStatus> userPipeline = findUserPipeline(userId);
-       List<PipelineAction> allActive = pipelineActionService.findAllUserActive();
+       List<PipelineAction> allActive = pipelineActionService.findAllActive();
        if (userPipeline == null || allActive ==null){
            return null;
        }
        List<PipelineAction> list = new ArrayList<>();
        for (PipelineAction pipelineAction : allActive) {
-           if (pipelineAction.getUser().getId().equals(userId)){
-               list.add(pipelineAction);
-           }
-       }
-       for (PipelineStatus pipelineStatus : userPipeline) {
-           for (PipelineAction pipelineAction : allActive) {
-               if (pipelineAction.getPipeline() != null || pipelineAction.getPipeline().getPipelineId().equals(pipelineStatus.getPipelineId())){
-                   continue;
+           if (pipelineAction.getPipeline() == null){
+               if (pipelineAction.getUser().getId().equals(userId)){
+                   list.add(pipelineAction);
                }
-               list.add(pipelineAction);
+           }else {
+               for (PipelineStatus pipelineStatus : userPipeline) {
+                   if (!pipelineAction.getPipeline().getPipelineId().equals(pipelineStatus.getPipelineId())){
+                       continue;
+                   }
+                list.add(pipelineAction);
+               }
            }
        }
-       list.sort(Comparator.comparing(PipelineAction::getCreateTime,Comparator.reverseOrder()));
-       return list;
+       List<PipelineAction> actionList = new ArrayList<>();
+
+       if (list.size() < 7){
+           actionList.addAll(list);
+           return actionList;
+       }
+       int i = 0;
+       while (i < 7 ){
+           list.sort(Comparator.comparing(PipelineAction::getCreateTime,Comparator.reverseOrder()));
+           actionList.add(list.get(i));
+           i++;
+       }
+       return actionList;
    }
 
 
