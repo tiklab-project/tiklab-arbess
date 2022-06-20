@@ -150,7 +150,7 @@ public class CommonAchieveServiceImpl implements CommonAchieveService {
                 return process;
             }
             //执行命令
-            String[] cmd = new String[] { "/bin/sh", "-c", "cd /usr/local/pipeline/pipeline;mvn clean package" };
+            String[] cmd = new String[] { "/bin/sh", "-c", "cd /usr/local/pipeline/pipeline; source /etc/profile;mvn clean package" };
             process = runtime.exec(cmd);
             logger.info(" 命令为 " +cmd[2]);
         }
