@@ -8,6 +8,8 @@ import com.doublekit.pipeline.instance.model.PipelineExecLog;
 import com.doublekit.pipeline.instance.model.PipelineProcess;
 import com.doublekit.pipeline.instance.service.execAchieveService.StructureAchieveService;
 import com.doublekit.rpc.annotation.Exporter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -28,7 +30,7 @@ public class StructureAchieveServiceImpl implements StructureAchieveService {
     CommonAchieveServiceImpl commonAchieveServiceImpl;
 
     //@Value("${}")
-
+    private static final Logger logger = LoggerFactory.getLogger(StructureAchieveServiceImpl.class);
     // 构建
     public int structure(PipelineProcess pipelineProcess, List<PipelineExecHistory> pipelineExecHistoryList)  {
 
@@ -53,6 +55,9 @@ public class StructureAchieveServiceImpl implements StructureAchieveService {
 
         //设置拉取地址
         String path = file+pipelineConfigure.getPipeline().getPipelineName();
+
+        logger.info("地址为0 ： " + path);
+
         try {
             String a = "------------------------------------" + " \n"
                     +"开始构建" + " \n"

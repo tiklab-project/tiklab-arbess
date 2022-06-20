@@ -134,6 +134,8 @@ public class CommonAchieveServiceImpl implements CommonAchieveService {
         Runtime runtime=Runtime.getRuntime();
         Process process;
         String property = System.getProperty("os.name");
+        logger.info("系统版本为 ： " + property);
+
         String[] s = property.split(" ");
         if (s[0].equals("Windows")){
             if (sourceAddress != null){
@@ -144,11 +146,13 @@ public class CommonAchieveServiceImpl implements CommonAchieveService {
             process = runtime.exec("cmd.exe /c cd " + path + " &&" + " " + order);
         }else {
             if (sourceAddress != null){
-                process = runtime.exec("cd " + path + "/"+sourceAddress + ";" + " " + order);
+                process = runtime.exec("cd " + path + "/"+sourceAddress + ";" + order);
+                logger.info("地址为1 ： " + path);
                 return process;
             }
             //执行命令
-            process = runtime.exec("cd " + path + ";" + " " + order);
+            process = runtime.exec("cd " + path + ";" + order);
+            logger.info("地址为1 ： " + path);
         }
 
         return process;
