@@ -115,7 +115,8 @@ public class PipelineHomeServiceImpl implements PipelineHomeService{
     }
 
     //用户动态
-   public List<PipelineAction> findAllAction(String userId){
+    @Override
+    public List<PipelineAction> findAllAction(String userId){
        List<PipelineStatus> userPipeline = findUserPipeline(userId);
        List<PipelineAction> allActive = pipelineActionService.findAllActive();
        if (userPipeline == null || allActive ==null){
