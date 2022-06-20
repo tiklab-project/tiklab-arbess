@@ -27,6 +27,8 @@ public class StructureAchieveServiceImpl implements StructureAchieveService {
     @Autowired
     CommonAchieveServiceImpl commonAchieveServiceImpl;
 
+    //@Value("${}")
+
     // 构建
     public int structure(PipelineProcess pipelineProcess, List<PipelineExecHistory> pipelineExecHistoryList)  {
 
@@ -40,8 +42,17 @@ public class StructureAchieveServiceImpl implements StructureAchieveService {
         String structureOrder = pipelineStructure.getStructureOrder();
         String structureAddress = pipelineStructure.getStructureAddress();
         pipelineProcess.setPipelineExecLog(pipelineExecLog);
+
+        String file = "/usr/local/pipeline/";
+
+        String property = System.getProperty("os.name");
+        String[] s = property.split(" ");
+        if (s[0].equals("Windows")){
+            file = "D:\\clone\\";
+        }
+
         //设置拉取地址
-        String path = "D:\\clone\\"+pipelineConfigure.getPipeline().getPipelineName();
+        String path = file+pipelineConfigure.getPipeline().getPipelineName();
         try {
             String a = "------------------------------------" + " \n"
                     +"开始构建" + " \n"
