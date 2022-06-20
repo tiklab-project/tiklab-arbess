@@ -138,6 +138,7 @@ public class CommonAchieveServiceImpl implements CommonAchieveService {
 
         String[] s = property.split(" ");
         if (s[0].equals("Windows")){
+            logger.info("aaaaaaa ： ");
             if (sourceAddress != null){
                 process = runtime.exec("cmd.exe /c cd " + path + "\\"+sourceAddress + " &&" + " " + order);
                 return process;
@@ -145,7 +146,9 @@ public class CommonAchieveServiceImpl implements CommonAchieveService {
             //执行命令
             process = runtime.exec("cmd.exe /c cd " + path + " &&" + " " + order);
         }else {
+            logger.info("bbbbbbbbbbb ： ");
             if (sourceAddress != null){
+                logger.info("ccccccccccc ： ");
                 process = runtime.exec(" /bin/bash  cd " + path + "/"+sourceAddress + ";" + order);
                 return process;
             }
