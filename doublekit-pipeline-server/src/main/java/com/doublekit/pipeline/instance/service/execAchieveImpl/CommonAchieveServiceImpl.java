@@ -146,11 +146,11 @@ public class CommonAchieveServiceImpl implements CommonAchieveService {
             process = runtime.exec("cmd.exe /c cd " + path + " &&" + " " + order);
         }else {
             if (sourceAddress != null){
-                process = runtime.exec(" /bin/bash -c cd " + path + "/"+sourceAddress + ";" + order);
+                process = runtime.exec(" /bin/bash  cd " + path + "/"+sourceAddress + ";" + order);
                 return process;
             }
             //执行命令
-            process = runtime.exec(" /bin/bash -c cd " + path + ";" + order);
+            process = runtime.exec(" /bin/bash cd " + path + ";" + order);
         }
         return process;
     }
