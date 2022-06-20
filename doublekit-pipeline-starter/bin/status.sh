@@ -1,6 +1,6 @@
 #!/bin/sh
 if [ ! -n "$JAVA_HOME" ]; then
-    export JAVA_HOME="/export/server/jdk-16.0.2"
+    export JAVA_HOME="/usr/local/jdk-16.0.2"
 fi
 
 
