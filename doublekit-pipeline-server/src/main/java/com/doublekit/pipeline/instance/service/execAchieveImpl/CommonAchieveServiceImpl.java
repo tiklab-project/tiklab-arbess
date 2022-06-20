@@ -151,8 +151,9 @@ public class CommonAchieveServiceImpl implements CommonAchieveService {
                 return process;
             }
             //执行命令
-            process = runtime.exec("cd " + path + ";" + order);
-            logger.info("地址为1 ： " + path + "       命令 ： "+order);
+            String a = "cd " + path + ";" + order;
+            process = runtime.exec(a);
+            logger.info("地址为1 ： " + a);
         }
         return process;
     }

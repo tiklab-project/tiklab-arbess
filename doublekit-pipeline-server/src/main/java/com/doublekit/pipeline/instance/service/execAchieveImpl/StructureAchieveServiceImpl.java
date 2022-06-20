@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -68,7 +67,8 @@ public class StructureAchieveServiceImpl implements StructureAchieveService {
             pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog() + a);
             pipelineExecLog.setRunLog(pipelineExecLog.getRunLog()+a);
             //构建失败
-            InputStreamReader inputStreamReader = new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8);
+            //InputStreamReader inputStreamReader = new InputStreamReader(process.getInputStream(), Charset.forName("GBK"));
+            InputStreamReader inputStreamReader = new InputStreamReader(process.getInputStream());
             int state = commonAchieveServiceImpl.log(inputStreamReader, pipelineProcess,pipelineExecHistoryList);
             process.destroy();
             commonAchieveServiceImpl.updateTime(pipelineProcess,beginTime);
