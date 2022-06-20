@@ -6,6 +6,7 @@ import com.doublekit.dsm.starter.annotation.EnableDsm;
 import com.doublekit.eam.starter.EnableEam;
 import com.doublekit.gateway.starter.EnableGateway;
 import com.doublekit.join.starter.annotation.EnableJoin;
+import com.doublekit.message.starter.EnableMessage;
 import com.doublekit.privilege.EnablePrivilegeServer;
 import com.doublekit.rpc.starter.annotation.EnableRpc;
 import com.doublekit.user.starter.EnableUser;
@@ -24,6 +25,8 @@ import org.springframework.context.annotation.Configuration;
 //用户中心
 @EnableEam
 @EnableUser
+//消息中心
+@EnableMessage
 //权限中心
 @EnablePrivilegeServer
 
