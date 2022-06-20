@@ -104,7 +104,7 @@ public class PipelineWorkSpaceServiceImpl implements  PipelineWorkSpaceService {
         Pipeline pipeline = pipelineService.findPipeline(pipelineId);
         RevWalk walk = null;
         String dir = commonAchieveService.getFileAddress() + pipeline.getPipelineName();
-        try (Repository repo = new FileRepository( dir+ "\\.git"); Git git = new Git(repo)) {
+        try (Repository repo = new FileRepository( dir+ "/.git"); Git git = new Git(repo)) {
             Iterable<RevCommit> commits = git.log().all().call();
 
             for (RevCommit commit : commits) {

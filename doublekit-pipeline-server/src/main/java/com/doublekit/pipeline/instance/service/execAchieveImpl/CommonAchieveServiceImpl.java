@@ -12,6 +12,7 @@ import com.doublekit.pipeline.instance.service.PipelineExecHistoryService;
 import com.doublekit.pipeline.instance.service.PipelineExecLogService;
 import com.doublekit.pipeline.instance.service.execAchieveService.CommonAchieveService;
 import com.doublekit.rpc.annotation.Exporter;
+import org.apache.tomcat.jni.OS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -161,6 +162,7 @@ public class CommonAchieveServiceImpl implements CommonAchieveService {
     @Override
     public String getFileAddress(){
         String files = "/usr/local/pipeline/";
+
         String property = System.getProperty("os.name");
         String[] s = property.split(" ");
         if (s[0].equals("Windows")){
