@@ -137,26 +137,22 @@ public class PipelineCodeServiceImpl implements PipelineCodeService {
                 pipelineCode.setCodeAddress(pipelineCode.getCodeName());
                 oneConfigure.setTaskSort(1);
                 oneConfigure.setTaskType(pipelineCode.getType());
-
                 //通过授权信息获取仓库url
                 getUrl(pipelineCode);
-
                 updateCode(pipelineCode);
                 //动态
-                pipelineActionService.createActive(user.getId(),pipeline,"更新了流水线/源码管理的配置");
-                oneConfigure.setTaskAlias(pipelineCode.getCodeAlias());
                 pipelineConfigureService.updateConfigure(oneConfigure);
             }else {
                 //动态
-                pipelineActionService.createActive(user.getId(),pipeline,"删除流水线/源码管理的配置");
                 pipelineConfigureService.deleteTask(oneConfigure.getTaskId(),pipeline.getPipelineId());
             }
         }
         if (oneConfigure == null && pipelineCode.getType() != 0){
             //动态
-            pipelineActionService.createActive(user.getId(),pipeline,"创建流水线/源码管理的配置");
             createConfigure(pipeline.getPipelineId(), pipelineCode.getType(), pipelineCode);
         }
+        //动态
+        pipelineActionService.createActive(user.getId(),pipeline,"更新了流水线/的配置信息");
         pipelineTestService.updateTask(pipelineExecConfigure);
     }
 

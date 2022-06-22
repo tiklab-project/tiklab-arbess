@@ -13,8 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -81,24 +79,11 @@ public class PipelineActionServiceImpl implements PipelineActionService {
         return list;
     }
 
-    public  List<PipelineAction> findAllUserActive(){
-        List<PipelineAction> list = findAllActive();
-        if (list == null){
-            return null;
-        }
-        List<PipelineAction> actionList = new ArrayList<>();
-
-        if (list.size() < 7){
-            actionList.addAll(list);
-            return actionList;
-        }
-        int i = 0;
-        while (i < 7 ){
-            list.sort(Comparator.comparing(PipelineAction::getCreateTime,Comparator.reverseOrder()));
-            actionList.add(list.get(i));
-            i++;
-        }
-        return actionList;
+    @Override
+    public List<PipelineAction> findUserAction(String userId){
+        List<PipelineAction> list = BeanMapper.mapList(pipelineActionDao.findUserAction(userId), PipelineAction.class);
+        joinTemplate.joinQuery(list);
+        return list;
     }
 
 }

@@ -29,7 +29,7 @@ public interface PipelineHomeService {
      * 收藏流水线
      * @param pipelineFollow 收藏信息
      */
-    void updateFollow(PipelineFollow pipelineFollow);
+    String updateFollow(PipelineFollow pipelineFollow);
 
     /**
      * 查询用户所有流水线
@@ -51,6 +51,8 @@ public interface PipelineHomeService {
      * @return 动态信息
      */
     List<PipelineAction> findAllAction(String userId);
+
+    List<PipelineAction> findUserAction(String userId);
 
 
 }

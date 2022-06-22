@@ -47,9 +47,9 @@ public class PipelineHomeController {
     @RequestMapping(path="/updateFollow",method = RequestMethod.POST)
     @ApiMethod(name = "updateFollow",desc = "更新收藏")
     @ApiParam(name = "pipelineFollow",desc = "收藏信息",required = true)
-    public Result<Void>  updateFollow( @RequestBody @Valid @NotNull PipelineFollow pipelineFollow){
-         pipelineHomeService.updateFollow(pipelineFollow);
-        return Result.ok();
+    public Result<String>  updateFollow( @RequestBody @Valid @NotNull PipelineFollow pipelineFollow){
+        String s = pipelineHomeService.updateFollow(pipelineFollow);
+        return Result.ok(s);
     }
 
     @RequestMapping(path="/findUserPipeline",method = RequestMethod.POST)
@@ -79,7 +79,13 @@ public class PipelineHomeController {
     }
 
 
-
+    @RequestMapping(path="/findUserAction",method = RequestMethod.POST)
+    @ApiMethod(name = "findUserAction",desc = "获取用户动态")
+    @ApiParam(name = "userId",desc = "用户id",required = true)
+    public Result< List<PipelineAction>> findUserAction(@NotNull String userId){
+        List<PipelineAction> allAction = pipelineHomeService.findUserAction(userId);
+        return Result.ok(allAction);
+    }
 
 
 

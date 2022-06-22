@@ -55,14 +55,6 @@ public interface CommonAchieveService {
     String getFileAddress();
 
     /**
-     * 凭证信息（UsernamePassword）方式
-     * @param gitUser 用户名
-     * @param gitPasswd 密码
-     * @return 验证信息
-     */
-    // UsernamePasswordCredentialsProvider usernamePassword(String gitUser, String gitPasswd);
-
-    /**
      * 删除文件
      * @param file 文件地址
      */
@@ -118,7 +110,7 @@ public interface CommonAchieveService {
      * @param historyId 历史id
      * @return 历史
      */
-     PipelineExecHistory initializeHistory(String historyId, Pipeline pipeline);
+     PipelineExecHistory initializeHistory(String historyId, Pipeline pipeline,String userId);
 
     /**
      * 获取文件树

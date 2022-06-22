@@ -30,7 +30,7 @@ public class PipelineFollowServiceImpl implements  PipelineFollowService{
             if (pipelineFollow.getUserId().equals(follow.getUserId())
                     && pipelineFollow.getPipeline().getPipelineId().equals(follow.getPipeline().getPipelineId()) ){
                 deleteFollow(follow.getId());
-                return null;
+                return "1";
             }
         }
         return pipelineFollowDao.createFollow(BeanMapper.map(pipelineFollow, PipelineFollowEntity.class));
@@ -48,52 +48,40 @@ public class PipelineFollowServiceImpl implements  PipelineFollowService{
         if (allFollow == null){
             return null;
         }
-        if (allStatus ==null){
+        if (allStatus == null){
             return list;
         }
         for (PipelineStatus status : allStatus) {
-            for (PipelineFollow pipelineFollow : allFollow) {
-                if (!pipelineFollow.getPipeline().getPipelineId().equals(status.getPipelineId())){
-                   continue;
-                }
-                status.setPipelineCollect(1);
-                list.add(status);
+            List<PipelineFollow> lists = allFollow.stream().filter(pipelineFollow -> status.getPipelineId().equals(pipelineFollow.getPipeline().getPipelineId())).toList();
+            if (lists.size() == 0){
+                continue;
             }
-        }
+            status.setPipelineCollect(1);
+            list.add(status);
+            }
         return list;
     }
 
     //获取用户所有收藏信息
     public List<PipelineFollow> findAll(String userId){
-        List<PipelineFollow> list = new ArrayList<>();
         if (findAllFollow() == null){
             return null;
         }
-        for (PipelineFollow pipelineFollow : findAllFollow()) {
-            if (!pipelineFollow.getUserId().equals(userId)){
-               continue;
-            }
-            list.add(pipelineFollow);
-        }
-        return list;
+        return findAllFollow().stream().filter(pipelineFollow -> userId.equals(pipelineFollow.getUserId())).toList();
     }
 
     @Override
     public List<PipelineStatus> findUserPipeline(String userId, List<PipelineStatus> allStatus){
         List<PipelineFollow> allFollow = findAll(userId);
-        if (allStatus == null){
+        if (allStatus == null || allFollow == null){
             return null;
         }
         for (PipelineStatus status : allStatus) {
-            if (allFollow == null){
-               continue;
+            List<PipelineFollow> list = allFollow.stream().filter(pipelineFollow -> status.getPipelineId().equals(pipelineFollow.getPipeline().getPipelineId())).toList();
+            if (list.size() == 0){
+                continue;
             }
-            for (PipelineFollow pipelineFollow : allFollow) {
-                if (!pipelineFollow.getPipeline().getPipelineId().equals(status.getPipelineId())){
-                   continue;
-                }
-                status.setPipelineCollect(1);
-            }
+            status.setPipelineCollect(1);
         }
         return allStatus;
     }

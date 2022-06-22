@@ -25,13 +25,13 @@ public class PipelineExecHistoryEntity {
     @Column(name = "run_way",notNull = true)
     private int runWay;
 
-    //分支
+    //运行日志
     @Column(name = "run_log",notNull = true)
     private String runLog;
 
     //执行人
-    @Column(name = "exec_name",notNull = true)
-    private String execName;
+    @Column(name = "user_id",notNull = true)
+    private String userId;
 
     //状态
     @Column(name = "run_status",notNull = true)
@@ -85,12 +85,12 @@ public class PipelineExecHistoryEntity {
         this.runLog = runLog;
     }
 
-    public String getExecName() {
-        return execName;
+    public String getUserId() {
+        return userId;
     }
 
-    public void setExecName(String execName) {
-        this.execName = execName;
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
     public String getPipelineId() {

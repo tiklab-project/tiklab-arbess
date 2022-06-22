@@ -1,9 +1,14 @@
 package com.doublekit.pipeline.instance.dao;
 
+import com.doublekit.core.page.Pagination;
 import com.doublekit.dal.jpa.JpaTemplate;
+import com.doublekit.dal.jpa.criterial.condition.QueryCondition;
+import com.doublekit.dal.jpa.criterial.conditionbuilder.QueryBuilders;
 import com.doublekit.pipeline.instance.entity.PipelineExecHistoryEntity;
+import com.doublekit.pipeline.instance.model.PipelineHistoryQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+
 import java.util.List;
 
 @Repository
@@ -62,12 +67,35 @@ public class PipelineExecHistoryDao {
 
     /**
      * 查询所有流水线历史
-     *
      * @return 流水线历史列表
      */
     public List<PipelineExecHistoryEntity> findAllHistory() {
 
         return jpaTemplate.findAll(PipelineExecHistoryEntity.class);
     }
+
+    /**
+     * 筛选历史
+     * @param pipelineHistoryQuery 筛选条件
+     * @return 历史
+     */
+    public Pagination<PipelineExecHistoryEntity> findPageHistory(PipelineHistoryQuery pipelineHistoryQuery){
+        QueryBuilders builders = QueryBuilders.createQuery(PipelineExecHistoryEntity.class)
+                    .eq("pipelineId", pipelineHistoryQuery.getPipelineId());
+            if (pipelineHistoryQuery.getState() != 0) {
+                builders.eq("runStatus", pipelineHistoryQuery.getState());
+            }
+            if (pipelineHistoryQuery.getType() != 0){
+                builders.eq("runWay",pipelineHistoryQuery.getType() );
+            }
+        QueryCondition pipelineExecHistoryList =  builders.pagination(pipelineHistoryQuery.getPageParam())
+                .orders(pipelineHistoryQuery.getOrderParams())
+                .get();
+        return jpaTemplate.findPage(pipelineExecHistoryList, PipelineExecHistoryEntity.class);
+    }
+
+
+
+
 
 }

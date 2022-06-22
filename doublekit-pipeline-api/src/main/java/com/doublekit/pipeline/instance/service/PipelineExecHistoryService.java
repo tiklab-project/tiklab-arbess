@@ -1,5 +1,6 @@
 package com.doublekit.pipeline.instance.service;
 
+import com.doublekit.core.page.Pagination;
 import com.doublekit.join.annotation.FindAll;
 import com.doublekit.join.annotation.FindList;
 import com.doublekit.join.annotation.FindOne;
@@ -82,13 +83,6 @@ public interface PipelineExecHistoryService {
     @FindAll
     List<PipelineExecHistory> findAllHistory(String pipelineId);
 
-    /**
-     * 根据条件筛选历史
-     * @param pipelineHistoryQuery 条件
-     * @return 历史信息
-     */
-    List<PipelineExecHistory> findLikeHistory(PipelineHistoryQuery pipelineHistoryQuery);
-
     @FindList
     List<PipelineExecHistory> findHistoryList(List<String> idList);
 
@@ -105,4 +99,7 @@ public interface PipelineExecHistoryService {
      * @return 执行日志
      */
     PipelineExecLog getRunLog(String historyId);
+
+
+    Pagination<PipelineExecHistory> findPageHistory(PipelineHistoryQuery PipelineHistoryQuery);
 }

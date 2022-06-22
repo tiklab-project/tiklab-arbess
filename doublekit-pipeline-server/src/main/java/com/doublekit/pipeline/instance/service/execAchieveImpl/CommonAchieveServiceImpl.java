@@ -12,7 +12,7 @@ import com.doublekit.pipeline.instance.service.PipelineExecHistoryService;
 import com.doublekit.pipeline.instance.service.PipelineExecLogService;
 import com.doublekit.pipeline.instance.service.execAchieveService.CommonAchieveService;
 import com.doublekit.rpc.annotation.Exporter;
-import org.apache.tomcat.jni.OS;
+import com.doublekit.user.user.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -330,7 +330,7 @@ public class CommonAchieveServiceImpl implements CommonAchieveService {
      * @return 历史
      */
     @Override
-    public PipelineExecHistory initializeHistory( String historyId,Pipeline pipeline) {
+    public PipelineExecHistory initializeHistory(String historyId,Pipeline pipeline,String userId) {
         PipelineExecHistory pipelineExecHistory = new PipelineExecHistory();
         String time = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
         pipelineExecHistory.setCreateTime(time);
@@ -339,15 +339,15 @@ public class CommonAchieveServiceImpl implements CommonAchieveService {
         pipelineExecHistory.setStatus(0);
         pipelineExecHistory.setPipeline(pipeline);
         pipelineExecHistory.setHistoryId(historyId);
-        pipelineExecHistoryService.updateHistory(pipelineExecHistory);
+        pipelineExecHistory.setUser(new User().setId(userId));
+        pipelineExecHistory.setHistoryId(historyId);
+        //构建次数
         List<PipelineExecHistory> allHistory = pipelineExecHistoryService.findAllHistory(pipeline.getPipelineId());
         allHistory.sort(Comparator.comparing(PipelineExecHistory::getCreateTime));
         pipelineExecHistory.setFindNumber(1);
         if (allHistory.size() >= 1){
             pipelineExecHistory.setFindNumber(allHistory.get(allHistory.size()-1).getFindNumber()+1);
         }
-        pipelineExecHistory.setHistoryId(historyId);
-        pipelineExecHistory.setExecName(pipeline.getUser().getName());
         pipelineExecHistoryService.updateHistory(pipelineExecHistory);
         return pipelineExecHistory;
     }

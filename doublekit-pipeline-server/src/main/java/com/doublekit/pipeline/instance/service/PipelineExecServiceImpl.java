@@ -74,7 +74,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         executorService.submit(() -> {
             beginTime = new Timestamp(System.currentTimeMillis()).getTime();
             Thread.currentThread().setName(pipelineId);
-            begin(pipelineId);
+            begin(pipelineId,userId);
         });
         return 1;
     }
@@ -150,7 +150,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
     }
 
     // 构建开始
-    private void begin(String pipelineId) {
+    private void begin(String pipelineId,String userId) {
 
         Pipeline pipeline = pipelineService.findPipeline(pipelineId);
 
@@ -161,7 +161,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         pipelineActionService.createActive(pipeline.getUser().getId(),pipeline,"执行流水线");
 
         String historyId = pipelineExecHistoryService.createHistory(new PipelineExecHistory());
-        PipelineExecHistory pipelineExecHistory = commonAchieveServiceImpl.initializeHistory(historyId,pipeline);
+        PipelineExecHistory pipelineExecHistory = commonAchieveServiceImpl.initializeHistory(historyId,pipeline,userId);
 
         PipelineProcess pipelineProcess = new PipelineProcess();
         List<PipelineConfigure> allConfigure = pipelineService.findPipelineConfigure(pipelineId);

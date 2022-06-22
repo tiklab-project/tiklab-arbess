@@ -60,8 +60,8 @@ public class PipelineHomeServiceImpl implements PipelineHomeService{
 
     //更新收藏信息
     @Override
-    public void updateFollow(PipelineFollow pipelineFollow){
-        pipelineFollowService.updateFollow(pipelineFollow);
+    public String updateFollow(PipelineFollow pipelineFollow){
+      return  pipelineFollowService.updateFollow(pipelineFollow);
     }
 
     //获取用户流水线
@@ -124,11 +124,13 @@ public class PipelineHomeServiceImpl implements PipelineHomeService{
        }
        List<PipelineAction> list = new ArrayList<>();
        for (PipelineAction pipelineAction : allActive) {
+           //用户的所有动态
            if (pipelineAction.getPipeline() == null){
                if (pipelineAction.getUser().getId().equals(userId)){
                    list.add(pipelineAction);
                }
            }else {
+               //用户流水线的动态
                for (PipelineStatus pipelineStatus : userPipeline) {
                    if (!pipelineAction.getPipeline().getPipelineId().equals(pipelineStatus.getPipelineId())){
                        continue;
@@ -137,22 +139,26 @@ public class PipelineHomeServiceImpl implements PipelineHomeService{
                }
            }
        }
-       List<PipelineAction> actionList = new ArrayList<>();
 
+       List<PipelineAction> actionList = new ArrayList<>();
        if (list.size() < 7){
            actionList.addAll(list);
            return actionList;
        }
+
+       list.sort(Comparator.comparing(PipelineAction::getCreateTime,Comparator.reverseOrder()));
        int i = 0;
        while (i < 7 ){
-           list.sort(Comparator.comparing(PipelineAction::getCreateTime,Comparator.reverseOrder()));
            actionList.add(list.get(i));
            i++;
        }
        return actionList;
    }
 
-
+    @Override
+    public List<PipelineAction> findUserAction(String userId){
+      return   pipelineActionService.findUserAction(userId);
+    }
 
 
 

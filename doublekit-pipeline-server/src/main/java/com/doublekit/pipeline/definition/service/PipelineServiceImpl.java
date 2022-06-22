@@ -12,6 +12,7 @@ import com.doublekit.pipeline.instance.service.PipelineActionService;
 import com.doublekit.pipeline.instance.service.PipelineExecHistoryService;
 import com.doublekit.pipeline.instance.service.PipelineOpenService;
 import com.doublekit.rpc.annotation.Exporter;
+import com.doublekit.user.user.entity.DmUserEntity;
 import com.doublekit.user.user.model.DmUser;
 import com.doublekit.user.user.model.User;
 import com.doublekit.user.user.service.DmUserService;
@@ -151,31 +152,23 @@ public class PipelineServiceImpl implements PipelineService{
     //获取用户流水线
     @Override
     public List<Pipeline> findUserPipeline(String userId){
-        List<DmUser> allDmUser = dmUserService.findAllDmUser();
-        if (allDmUser == null){
-            return null;
-        }
-        List<DmUser> dmUsers = new ArrayList<>();
-        for (DmUser dmUser : allDmUser) {
-            if (!dmUser.getUser().getId().equals(userId)){
-                continue;
-            }
-            dmUsers.add(dmUser);
-        }
+        //List<DmUser> allDmUser = dmUserService.findAllDmUser();
+        //if (allDmUser == null){
+        //    return null;
+        //}
+        List<DmUserEntity> dmUsers = pipelineDao.findAllDmUser(userId);
         List<Pipeline> allPipeline = findAllPipeline();
         if (allPipeline == null || dmUsers.size() == 0){
             return null;
         }
+
         List<Pipeline> list = new ArrayList<>();
-        for (Pipeline pipeline : allPipeline) {
-            for (DmUser dmUser : dmUsers) {
-                if (!dmUser.getDomainId().equals(pipeline.getPipelineId())){
-                  continue;
-                }
-                list.add(pipeline);
-            }
+
+        for (DmUserEntity dmUserEntity : dmUsers) {
+            List<Pipeline> collect = allPipeline.stream().filter(pipeline -> dmUserEntity.getDomainId().equals(pipeline.getPipelineId())).toList();
+            list.addAll(collect);
         }
-        return list;
+         return list;
     }
 
     //模糊查询
@@ -229,24 +222,23 @@ public class PipelineServiceImpl implements PipelineService{
         }
         //获取用户所有的流水线
         for (PipelineStatus status : allStatus) {
+
             List<PipelineExecHistory> allHistory = pipelineExecHistoryService.findAllHistory(status.getPipelineId());
             if (allHistory == null){
                 continue;
             }
-            for (PipelineExecHistory pipelineExecHistory : allHistory) {
-                try {
-                    Date time = formatter.parse(pipelineExecHistory.getCreateTime());
-                    //判断是否是7天内的历史
-                    if (lastTime.compareTo(time) > 0){
-                        continue;
+            //try {
+
+                List<PipelineExecHistory> collect = allHistory.stream().filter(pipelineExecHistory -> {
+                    try {
+                        return lastTime.compareTo(formatter.parse(pipelineExecHistory.getCreateTime())) <= 0;
+                    } catch (ParseException e) {
+                        logger.info("获取历史创建时间时日期转换异常。");
                     }
-                    list.add(pipelineExecHistory);
-                } catch (ParseException e) {
-                    logger.info("获取历史创建时间时日期转换异常。");
-                    throw new RuntimeException(e);
-                }
-            }
-        }
+                    return false;
+                }).toList();
+                   list.addAll(collect);
+             }
         return list;
     }
 

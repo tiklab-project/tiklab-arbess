@@ -130,7 +130,6 @@ public class PipelineConfigureServiceImpl implements PipelineConfigureService {
     //更新任务
     @Override
     public void updateTask(PipelineExecConfigure pipelineExecConfigure){
-
         pipelineCodeService.updateTask(pipelineExecConfigure);
     }
 

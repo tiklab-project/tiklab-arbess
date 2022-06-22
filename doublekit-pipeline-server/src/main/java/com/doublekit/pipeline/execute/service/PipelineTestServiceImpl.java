@@ -10,7 +10,6 @@ import com.doublekit.pipeline.execute.entity.PipelineTestEntity;
 import com.doublekit.pipeline.execute.model.PipelineTest;
 import com.doublekit.pipeline.instance.service.PipelineActionService;
 import com.doublekit.rpc.annotation.Exporter;
-import com.doublekit.user.user.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -81,7 +80,6 @@ public class PipelineTestServiceImpl implements PipelineTestService {
     public void updateTask(PipelineExecConfigure pipelineExecConfigure) {
         PipelineTest pipelineTest = pipelineExecConfigure.getPipelineTest();
         Pipeline pipeline = pipelineExecConfigure.getPipeline();
-        User user = pipelineExecConfigure.getUser();
         PipelineConfigure oneConfigure = pipelineConfigureService.findOneConfigure(pipeline.getPipelineId(), 20);
 
         if (oneConfigure != null ){
@@ -91,18 +89,13 @@ public class PipelineTestServiceImpl implements PipelineTestService {
                 oneConfigure.setTaskAlias(pipelineTest.getTestAlias());
                 pipelineConfigureService.updateConfigure(oneConfigure);
                 //动态
-                pipelineActionService.createActive(user.getId(),pipeline,"更新流水线/测试的配置");
             }else {
                 pipelineConfigureService.deleteTask(oneConfigure.getTaskId(),pipeline.getPipelineId());
-                //动态
-                pipelineActionService.createActive(user.getId(),pipeline,"删除流水线/测试的配置");
             }
         }
 
         if (pipelineTest.getType() != 0 && oneConfigure == null){
             createConfigure(pipeline.getPipelineId(),pipelineTest.getType(),pipelineTest);
-            //动态
-            pipelineActionService.createActive(user.getId(),pipeline,"创建流水线/测试的配置");
         }
         pipelineStructureService.updateTask(pipelineExecConfigure);
     }

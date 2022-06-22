@@ -39,10 +39,6 @@ public interface PipelineActionService {
      */
     void createActive(String userId, Pipeline pipeline, String massage);
 
-    /**
-     * 获取最近6条动态
-     * @return 动态列表
-     */
-    List<PipelineAction> findAllUserActive();
 
+    List<PipelineAction> findUserAction(String userId);
 }

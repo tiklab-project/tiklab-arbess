@@ -5,6 +5,7 @@ import com.doublekit.dal.jpa.JpaTemplate;
 import com.doublekit.dal.jpa.criterial.condition.QueryCondition;
 import com.doublekit.dal.jpa.criterial.conditionbuilder.QueryBuilders;
 import com.doublekit.pipeline.definition.entity.PipelineEntity;
+import com.doublekit.user.user.entity.DmUserEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.stereotype.Repository;
@@ -84,6 +85,14 @@ public class PipelineDao {
     public List<PipelineEntity> findName(String pipelineName){
         QueryCondition queryCondition = QueryBuilders.createQuery(PipelineEntity.class).like("pipelineName", pipelineName).get();
         return jpaTemplate.findList(queryCondition,PipelineEntity.class);
+    }
+
+    //获取用户的流水线
+    public List<DmUserEntity> findAllDmUser(String userId){
+        QueryCondition queryCondition = QueryBuilders.createQuery(DmUserEntity.class)
+                .eq("userId",userId)
+                .get();
+        return jpaTemplate.findList(queryCondition, DmUserEntity.class);
     }
 
 }

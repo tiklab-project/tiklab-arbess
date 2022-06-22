@@ -90,18 +90,12 @@ public class PipelineDeployServiceImpl implements PipelineDeployService {
                 oneConfigure.setTaskSort(pipelineDeploy.getSort());
                 oneConfigure.setTaskAlias(pipelineDeploy.getDeployAlias());
                 pipelineConfigureService.updateConfigure(oneConfigure);
-                //动态
-                pipelineActionService.createActive(user.getId(),pipeline,"更新流水线/部署的配置");
             }else {
                 pipelineConfigureService.deleteTask(oneConfigure.getTaskId(),pipeline.getPipelineId());
-                //动态
-                pipelineActionService.createActive(user.getId(),pipeline,"删除流水线/部署的配置");
             }
         }
         if (oneConfigure == null && pipelineDeploy.getType() != 0){
             createConfigure(pipeline.getPipelineId(),pipelineDeploy.getType(),pipelineDeploy);
-            //动态
-            pipelineActionService.createActive(user.getId(),pipeline,"创建流水线/部署的配置");
         }
     }
 

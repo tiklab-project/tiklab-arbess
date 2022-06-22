@@ -8,6 +8,7 @@ import com.doublekit.beans.annotation.Mappings;
 import com.doublekit.join.annotation.Join;
 import com.doublekit.join.annotation.JoinQuery;
 import com.doublekit.pipeline.definition.model.Pipeline;
+import com.doublekit.user.user.model.User;
 
 /**
  * 流水线历史
@@ -35,8 +36,12 @@ public class PipelineExecHistory {
     private String runLog;
 
     //执行人
-    @ApiProperty(name="execName",desc="执行人")
-    private String execName;
+    @ApiProperty(name="user",desc="认证配置",required = true)
+    @Mappings({
+            @Mapping(source = "user.id",target = "userId")
+    })
+    @JoinQuery(key = "id")
+    private User user;
 
     //状态
     @ApiProperty(name="runStatus",desc="运行状态")
@@ -47,17 +52,19 @@ public class PipelineExecHistory {
     private int runTime;
 
    //流水线id
-   @ApiProperty(name="pipeline",desc="流水线id",eg="@selectOne")
-   @Mappings({
-           @Mapping(source = "pipeline.pipelineId",target = "pipelineId")
-   })
-   @JoinQuery(key = "pipelineId")
+    @ApiProperty(name="pipeline",desc="流水线id",eg="@selectOne")
+    @Mappings({
+            @Mapping(source = "pipeline.pipelineId",target = "pipelineId")
+    })
+    @JoinQuery(key = "pipelineId")
     private Pipeline pipeline;
 
     //执行位置
+    @ApiProperty(name="sort",desc="执行过程位置")
     private int sort;
 
     //执行状态
+    @ApiProperty(name="status",desc="执行过程状态")
     private int status;
 
     //构建次数
@@ -65,16 +72,29 @@ public class PipelineExecHistory {
     private int findNumber;
 
     //运行状态（1.运行完成，0.运行中）
+    @ApiProperty(name="findState",desc="运行状态（1.运行完成，0.运行中）")
     private int findState;
 
     //运行时间（转换为天，月，日 ，时，分，秒格式）
+    @ApiProperty(name="execTime",desc="运行时间（转换为天，月，日 ，时，分，秒格式）")
     private String execTime;
+
     //时间
+    @ApiProperty(name="oneTime",desc="第一阶段时间")
     private String oneTime;
+
+    @ApiProperty(name="twoTime",desc="第二阶段时间")
     private String twoTime;
+
+    @ApiProperty(name="threeTime",desc="第三阶段时间")
     private String threeTime;
+
+    @ApiProperty(name="fourTime",desc="第四阶段时间")
     private String fourTime;
+
+    @ApiProperty(name="allTime",desc="总时间")
     private String allTime;
+
 
     public String getHistoryId() {
         return historyId;
@@ -114,14 +134,6 @@ public class PipelineExecHistory {
 
     public void setRunLog(String runLog) {
         this.runLog = runLog;
-    }
-
-    public String getExecName() {
-        return execName;
-    }
-
-    public void setExecName(String execName) {
-        this.execName = execName;
     }
 
     public Pipeline getPipeline() {
@@ -218,5 +230,13 @@ public class PipelineExecHistory {
 
     public void setFindState(int findState) {
         this.findState = findState;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }

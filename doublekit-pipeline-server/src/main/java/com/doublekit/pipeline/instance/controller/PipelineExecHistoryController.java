@@ -4,6 +4,7 @@ import com.doublekit.apibox.annotation.Api;
 import com.doublekit.apibox.annotation.ApiMethod;
 import com.doublekit.apibox.annotation.ApiParam;
 import com.doublekit.core.Result;
+import com.doublekit.core.page.Pagination;
 import com.doublekit.pipeline.instance.model.PipelineExecHistory;
 import com.doublekit.pipeline.instance.model.PipelineHistoryQuery;
 import com.doublekit.pipeline.instance.service.PipelineExecHistoryService;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
@@ -25,14 +27,13 @@ public class PipelineExecHistoryController {
 
     //查询所有历史
     @RequestMapping(path="/findAllHistory",method = RequestMethod.POST)
-    @ApiMethod(name = "selectHistoryDetails",desc = "查看所有历史")
+    @ApiMethod(name = "findAllHistory",desc = "查看所有历史")
     @ApiParam(name = "pipelineId",desc = "流水线id",required = true)
-    public Result<PipelineExecHistory> selectPipelineHistoryDetails(@NotNull String pipelineId){
+    public Result<PipelineExecHistory> findAllHistory(@NotNull String pipelineId){
 
         List<PipelineExecHistory> allHistory = pipelineExecHistoryService.findAllHistory(pipelineId);
         return Result.ok(allHistory);
     }
-
 
     //删除历史
     @RequestMapping(path="/deleteHistory",method = RequestMethod.POST)
@@ -43,12 +44,12 @@ public class PipelineExecHistoryController {
         return Result.ok();
     }
 
-    //查询历史信息
-    @RequestMapping(path="/findLikeHistory",method = RequestMethod.POST)
-    @ApiMethod(name = "findLikeHistory",desc = "查询历史信息")
-    @ApiParam(name = "pipelineHistoryQuery",desc = "条件",required = true)
-    public Result< List<PipelineExecHistory>> findLikeHistory(@NotNull @RequestBody PipelineHistoryQuery pipelineHistoryQuery){
-        List<PipelineExecHistory> list = pipelineExecHistoryService.findLikeHistory(pipelineHistoryQuery);
+
+    @RequestMapping(path="/findPageHistory",method = RequestMethod.POST)
+    @ApiMethod(name = "findPageHistory",desc = "查询历史信息")
+    @ApiParam(name = "pipelineHistoryQueryPage",desc = "条件",required = true)
+    public Result< Pagination<PipelineExecHistory>> findPageHistory(@RequestBody @NotNull PipelineHistoryQuery pipelineHistoryQuery){
+        Pagination<PipelineExecHistory> list = pipelineExecHistoryService.findPageHistory(pipelineHistoryQuery);
         return Result.ok(list);
     }
 

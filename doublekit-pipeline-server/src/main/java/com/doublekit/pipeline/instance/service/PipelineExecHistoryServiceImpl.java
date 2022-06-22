@@ -1,7 +1,9 @@
 package com.doublekit.pipeline.instance.service;
 
 import com.doublekit.beans.BeanMapper;
-import com.doublekit.pipeline.definition.model.Pipeline;
+import com.doublekit.core.page.Pagination;
+import com.doublekit.core.page.PaginationBuilder;
+import com.doublekit.join.JoinTemplate;
 import com.doublekit.pipeline.definition.service.PipelineService;
 import com.doublekit.pipeline.instance.dao.PipelineExecHistoryDao;
 import com.doublekit.pipeline.instance.entity.PipelineExecHistoryEntity;
@@ -31,11 +33,15 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
     @Autowired
     PipelineService pipelineService;
 
+    @Autowired
+    JoinTemplate joinTemplate;
+
     private static final Logger logger = LoggerFactory.getLogger(PipelineExecHistoryServiceImpl.class);
 
     //创建
     @Override
     public String createHistory(PipelineExecHistory pipelineExecHistory) {
+
         return pipelineExecHistoryDao.createHistory(BeanMapper.map(pipelineExecHistory, PipelineExecHistoryEntity.class));
     }
 
@@ -132,26 +138,6 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
         return BeanMapper.mapList(pipelineExecHistoryEntityList, PipelineExecHistory.class);
     }
 
-    //根据条件筛选历史信息
-    @Override
-    public List<PipelineExecHistory> findLikeHistory(PipelineHistoryQuery pipelineHistoryQuery){
-         Pipeline pipeline = pipelineService.findPipeline(pipelineHistoryQuery.getPipelineId());
-        if (pipeline == null){
-            return null;
-        }
-        List<PipelineExecHistory> allHistory = findAllHistory(pipelineHistoryQuery.getPipelineId());
-        if (allHistory != null){
-            allHistory.removeIf(pipelineExecHistory ->
-                    pipelineHistoryQuery.getState() != pipelineExecHistory.getRunStatus() && pipelineHistoryQuery.getState() != 0);
-            allHistory.removeIf(pipelineExecHistory ->
-                    pipelineHistoryQuery.getUserId() != null && !pipelineHistoryQuery.getUserId().equals(pipeline.getUser().getId()));
-            allHistory.removeIf(pipelineExecHistory ->
-                    pipelineHistoryQuery.getType() != pipelineExecHistory.getRunWay() && pipelineHistoryQuery.getType() != 0);
-            return allHistory;
-        }
-        return null;
-    }
-
     //获取最后一次的运行日志
     @Override
     public PipelineExecLog getRunLog(String historyId){
@@ -186,4 +172,13 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
         }
         return DateTimes;
     }
+
+    @Override
+    public Pagination<PipelineExecHistory> findPageHistory(PipelineHistoryQuery PipelineHistoryQuery){
+        Pagination<PipelineExecHistoryEntity> pagination = pipelineExecHistoryDao.findPageHistory(PipelineHistoryQuery);
+        List<PipelineExecHistory> pipelineExecHistories = BeanMapper.mapList(pagination.getDataList(), PipelineExecHistory.class);
+        joinTemplate.joinQuery(pipelineExecHistories);
+        return PaginationBuilder.build(pagination,pipelineExecHistories);
+    }
+
 }
