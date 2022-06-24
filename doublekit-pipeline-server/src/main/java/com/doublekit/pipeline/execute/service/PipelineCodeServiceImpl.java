@@ -142,15 +142,23 @@ public class PipelineCodeServiceImpl implements PipelineCodeService {
 
         PipelineConfigure oneConfigure = pipelineConfigureService.findOneConfigure(pipeline.getPipelineId(), 10);
         if (oneConfigure != null && pipelineCode.getType() == 0){
-            pipelineConfigureService.deleteTask(oneConfigure.getTaskId(),pipeline.getPipelineId());
+            deleteCode(oneConfigure.getTaskId());
+            pipelineConfigureService.deleteConfigure(oneConfigure.getConfigureId());
+            pipelineTestService.updateTask(pipelineExecConfigure);
+            //pipelineConfigureService.deleteTask(oneConfigure.getTaskId(),pipeline.getPipelineId());
             return;
         }
 
         if (oneConfigure == null){
             oneConfigure = new PipelineConfigure();
         }
-        pipelineCode.setCodeAddress(pipelineCode.getCodeName());
 
+        if (pipelineCode.getType() == 0){
+            pipelineTestService.updateTask(pipelineExecConfigure);
+            return;
+        }
+
+        pipelineCode.setCodeAddress(pipelineCode.getCodeName());
         oneConfigure.setTaskSort(1);
         oneConfigure.setView(pipelineExecConfigure.getView());
         oneConfigure.setTaskType(pipelineCode.getType());
@@ -163,6 +171,7 @@ public class PipelineCodeServiceImpl implements PipelineCodeService {
         if (pipelineCode == null){
             return;
         }
+
         if (pipelineCode.getCodeId() != null){
             updateCode(pipelineCode);
         }else {
@@ -174,38 +183,6 @@ public class PipelineCodeServiceImpl implements PipelineCodeService {
         pipelineTestService.updateTask(pipelineExecConfigure);
     }
 
-
-    public void initConfig(PipelineExecConfigure pipelineExecConfigure){
-        Pipeline pipeline = pipelineExecConfigure.getPipeline();
-        PipelineCode pipelineCode =pipelineExecConfigure.getPipelineCode();
-
-        PipelineConfigure oneConfigure = pipelineConfigureService.findOneConfigure(pipeline.getPipelineId(), 10);
-        if (oneConfigure != null && pipelineCode.getType() == 0){
-            pipelineConfigureService.deleteTask(oneConfigure.getTaskId(),pipeline.getPipelineId());
-            return;
-        }
-        if (oneConfigure == null){
-            oneConfigure = new PipelineConfigure();
-        }
-        pipelineCode.setCodeAddress(pipelineCode.getCodeName());
-
-        oneConfigure.setTaskSort(1);
-        oneConfigure.setView(pipelineExecConfigure.getView());
-        oneConfigure.setTaskType(pipelineCode.getType());
-        oneConfigure.setTaskAlias(pipelineCode.getCodeAlias());
-
-        //通过授权信息获取仓库url
-        pipelineCode = getUrl(pipelineCode);
-        if (pipelineCode == null){
-            return;
-        }
-        if (pipelineCode.getType() != 0){
-            updateCode(pipelineCode);
-        }else {
-            createConfigure(pipeline.getPipelineId(),pipelineCode);
-        }
-
-    }
 
     //查询单个
     @Override

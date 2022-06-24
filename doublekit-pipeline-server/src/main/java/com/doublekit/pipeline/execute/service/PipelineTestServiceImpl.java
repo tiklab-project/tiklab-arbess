@@ -12,6 +12,8 @@ import com.doublekit.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -76,45 +78,57 @@ public class PipelineTestServiceImpl implements PipelineTestService {
         PipelineTest pipelineTest = pipelineExecConfigure.getPipelineTest();
         Pipeline pipeline = pipelineExecConfigure.getPipeline();
         PipelineConfigure oneConfigure = pipelineConfigureService.findOneConfigure(pipeline.getPipelineId(), 20);
-        //if (oneConfigure != null && pipelineTest.getType() == 0){
-        //    pipelineConfigureService.deleteTask(oneConfigure.getTaskId(),pipeline.getPipelineId());
-        //    return;
-        //}
-        //if (oneConfigure == null ){
-        //    oneConfigure = new PipelineConfigure();
-        //}
-        //
-        //oneConfigure.setTaskSort(pipelineTest.getSort());
-        //oneConfigure.setTaskAlias(pipelineTest.getTestAlias());
-        //oneConfigure.setView(pipelineExecConfigure.getView());
-        //oneConfigure.setPipeline(pipeline);
-        //oneConfigure.setCreateTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
-        //oneConfigure.setTaskType(pipelineTest.getType());
-        //
-        //if (pipelineTest.getTestId() == null){
-        //    updateTest(pipelineTest);
-        //}else {
-        //    String testId = createTest(pipelineTest);
-        //    oneConfigure.setTaskId(testId);
-        //    pipelineConfigureService.createConfigure(oneConfigure);
-        //}
-        if (oneConfigure != null ){
-            if (pipelineTest.getType() != 0){
-                updateTest(pipelineTest);
-                oneConfigure.setTaskSort(pipelineTest.getSort());
-                oneConfigure.setTaskAlias(pipelineTest.getTestAlias());
-                oneConfigure.setView(pipelineExecConfigure.getView());
-                pipelineConfigureService.updateConfigure(oneConfigure);
-                //动态
-            }else {
-                pipelineConfigureService.deleteTask(oneConfigure.getTaskId(),pipeline.getPipelineId());
-            }
+
+        //判断新配置是否删除了测试配置
+        if (oneConfigure != null && pipelineTest.getType() == 0){
+            deleteTest(oneConfigure.getTaskId());
+            pipelineConfigureService.deleteConfigure(oneConfigure.getConfigureId());
+            pipelineStructureService.updateTask(pipelineExecConfigure);
+            return;
         }
 
-        if (pipelineTest.getType() != 0 && oneConfigure == null){
-            createConfigure(pipeline.getPipelineId(),pipelineTest);
+        if (oneConfigure == null ){
+            oneConfigure = new PipelineConfigure();
+        }
+
+        if (pipelineTest.getType() == 0){
+            pipelineStructureService.updateTask(pipelineExecConfigure);
+            return;
+        }
+        oneConfigure.setTaskSort(pipelineTest.getSort());
+        oneConfigure.setTaskAlias(pipelineTest.getTestAlias());
+        oneConfigure.setView(pipelineExecConfigure.getView());
+        oneConfigure.setPipeline(pipeline);
+        oneConfigure.setCreateTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+        oneConfigure.setTaskType(pipelineTest.getType());
+
+        //存在测试配置，更新或者创建
+        if (pipelineTest.getTestId() != null){
+            updateTest(pipelineTest);
+        }else {
+            String testId = createTest(pipelineTest);
+            oneConfigure.setTaskId(testId);
+            pipelineConfigureService.createConfigure(oneConfigure);
+
         }
         pipelineStructureService.updateTask(pipelineExecConfigure);
+
+        //if (oneConfigure != null ){
+        //    if (pipelineTest.getType() != 0){
+        //        updateTest(pipelineTest);
+        //        oneConfigure.setTaskSort(pipelineTest.getSort());
+        //        oneConfigure.setTaskAlias(pipelineTest.getTestAlias());
+        //        oneConfigure.setView(pipelineExecConfigure.getView());
+        //        pipelineConfigureService.updateConfigure(oneConfigure);
+        //        //动态
+        //    }else {
+        //        pipelineConfigureService.deleteTask(oneConfigure.getTaskId(),pipeline.getPipelineId());
+        //    }
+        //}
+        //
+        //if (pipelineTest.getType() != 0 && oneConfigure == null){
+        //    createConfigure(pipeline.getPipelineId(),pipelineTest);
+        //}
     }
 
     //查询单个

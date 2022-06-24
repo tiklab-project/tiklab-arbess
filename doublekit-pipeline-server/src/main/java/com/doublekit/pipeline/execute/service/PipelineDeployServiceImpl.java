@@ -16,6 +16,8 @@ import com.doublekit.user.user.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -83,22 +85,55 @@ public class PipelineDeployServiceImpl implements PipelineDeployService {
     public void updateTask(PipelineExecConfigure pipelineExecConfigure) {
         Pipeline pipeline = pipelineExecConfigure.getPipeline();
         PipelineDeploy pipelineDeploy = pipelineExecConfigure.getPipelineDeploy();
-        User user = pipelineExecConfigure.getUser();
         PipelineConfigure oneConfigure = pipelineConfigureService.findOneConfigure(pipeline.getPipelineId(), 40);
-        if (oneConfigure != null){
-            if (pipelineDeploy.getType() != 0){
-                updateDeploy(pipelineDeploy);
-                oneConfigure.setTaskSort(pipelineDeploy.getSort());
-                oneConfigure.setTaskAlias(pipelineDeploy.getDeployAlias());
-                //oneConfigure.setView(pipelineDeploy.getView());
-                pipelineConfigureService.updateConfigure(oneConfigure);
-            }else {
-                pipelineConfigureService.deleteTask(oneConfigure.getTaskId(),pipeline.getPipelineId());
-            }
+
+        //if (oneConfigure != null){
+        //    if (pipelineDeploy.getType() != 0){
+        //        updateDeploy(pipelineDeploy);
+        //        oneConfigure.setTaskSort(pipelineDeploy.getSort());
+        //        oneConfigure.setTaskAlias(pipelineDeploy.getDeployAlias());
+        //        //oneConfigure.setView(pipelineDeploy.getView());
+        //        pipelineConfigureService.updateConfigure(oneConfigure);
+        //    }else {
+        //        pipelineConfigureService.deleteTask(oneConfigure.getTaskId(),pipeline.getPipelineId());
+        //    }
+        //}
+        //if (oneConfigure == null && pipelineDeploy.getType() != 0){
+        //    createConfigure(pipeline.getPipelineId(),pipelineDeploy.getType(),pipelineDeploy);
+        //}
+
+        //判断新配置是否删除了测试配置
+        if (oneConfigure != null && pipelineDeploy.getType() == 0){
+            deleteDeploy(oneConfigure.getTaskId());
+            pipelineConfigureService.deleteConfigure(oneConfigure.getConfigureId());
+            return;
         }
-        if (oneConfigure == null && pipelineDeploy.getType() != 0){
-            createConfigure(pipeline.getPipelineId(),pipelineDeploy.getType(),pipelineDeploy);
+
+        //判断是否有部署配置
+        if (pipelineDeploy.getType() == 0){
+            return;
         }
+
+        //初始化
+        if (oneConfigure == null ){
+            oneConfigure = new PipelineConfigure();
+        }
+        oneConfigure.setTaskSort(pipelineDeploy.getSort());
+        oneConfigure.setTaskAlias(pipelineDeploy.getDeployAlias());
+        oneConfigure.setView(pipelineExecConfigure.getView());
+        oneConfigure.setPipeline(pipeline);
+        oneConfigure.setCreateTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+        oneConfigure.setTaskType(pipelineDeploy.getType());
+
+        //存在部署配置，更新或者创建
+        if (pipelineDeploy.getDeployId() != null){
+            updateDeploy(pipelineDeploy);
+        }else {
+            String testId = createDeploy(pipelineDeploy);
+            oneConfigure.setTaskId(testId);
+            pipelineConfigureService.createConfigure(oneConfigure);
+        }
+
     }
 
     //查询单个

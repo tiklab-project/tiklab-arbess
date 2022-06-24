@@ -14,7 +14,7 @@ public class PipelineDeployEntity {
 
     //类型
     @Column(name = "type",notNull = true)
-    private String type;
+    private int type;
 
     //地址
     @Column(name = "deploy_address",notNull = true)
@@ -65,11 +65,11 @@ public class PipelineDeployEntity {
         this.deployId = deployId;
     }
 
-    public String getType() {
+    public int getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(int type) {
         this.type = type;
     }
 

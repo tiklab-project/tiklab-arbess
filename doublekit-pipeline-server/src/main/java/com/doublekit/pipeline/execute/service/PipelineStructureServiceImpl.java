@@ -12,6 +12,8 @@ import com.doublekit.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -78,19 +80,51 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
         PipelineStructure pipelineStructure = pipelineExecConfigure.getPipelineStructure();
         Pipeline pipeline = pipelineExecConfigure.getPipeline();
         PipelineConfigure oneConfigure = pipelineConfigureService.findOneConfigure(pipeline.getPipelineId(), 30);
-        if (oneConfigure != null){
-            if (pipelineStructure.getType() != 0){
-                updateStructure(pipelineStructure);
-                oneConfigure.setTaskSort(pipelineStructure.getSort());
-                oneConfigure.setTaskAlias(pipelineStructure.getStructureAlias());
-                //oneConfigure.setView(pipelineStructure.getView());
-                pipelineConfigureService.updateConfigure(oneConfigure);
-            }else {
-                pipelineConfigureService.deleteTask(oneConfigure.getTaskId(),pipeline.getPipelineId());
-            }
+        //if (oneConfigure != null){
+        //    if (pipelineStructure.getType() != 0){
+        //        updateStructure(pipelineStructure);
+        //        oneConfigure.setTaskSort(pipelineStructure.getSort());
+        //        oneConfigure.setTaskAlias(pipelineStructure.getStructureAlias());
+        //        //oneConfigure.setView(pipelineStructure.getView());
+        //        pipelineConfigureService.updateConfigure(oneConfigure);
+        //    }else {
+        //        pipelineConfigureService.deleteTask(oneConfigure.getTaskId(),pipeline.getPipelineId());
+        //    }
+        //}
+        //if (oneConfigure == null && pipelineStructure.getType() != 0){
+        //    createConfigure(pipeline.getPipelineId(),pipelineStructure.getType(),pipelineStructure);
+        //}
+
+        //判断新配置是否删除了构建配置
+        if (oneConfigure != null && pipelineStructure.getType() == 0){
+            deleteStructure(oneConfigure.getTaskId());
+            pipelineConfigureService.deleteConfigure(oneConfigure.getConfigureId());
+            pipelineDeployService.updateTask(pipelineExecConfigure);
+            return;
         }
-        if (oneConfigure == null && pipelineStructure.getType() != 0){
-            createConfigure(pipeline.getPipelineId(),pipelineStructure.getType(),pipelineStructure);
+        if (oneConfigure == null ){
+            oneConfigure = new PipelineConfigure();
+        }
+
+        if (pipelineStructure.getType() == 0){
+            pipelineDeployService.updateTask(pipelineExecConfigure);
+            return;
+        }
+
+        oneConfigure.setTaskSort(pipelineStructure.getSort());
+        oneConfigure.setTaskAlias(pipelineStructure.getStructureAlias());
+        oneConfigure.setView(pipelineExecConfigure.getView());
+        oneConfigure.setPipeline(pipeline);
+        oneConfigure.setCreateTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+        oneConfigure.setTaskType(pipelineStructure.getType());
+
+        //存在构建配置，更新或者创建
+        if (pipelineStructure.getStructureId() != null){
+            updateStructure(pipelineStructure);
+        }else {
+            String testId = createStructure(pipelineStructure);
+            oneConfigure.setTaskId(testId);
+            pipelineConfigureService.createConfigure(oneConfigure);
         }
         pipelineDeployService.updateTask(pipelineExecConfigure);
     }
