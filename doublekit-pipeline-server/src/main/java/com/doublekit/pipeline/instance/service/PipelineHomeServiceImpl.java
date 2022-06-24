@@ -1,5 +1,6 @@
 package com.doublekit.pipeline.instance.service;
 
+import com.doublekit.pipeline.definition.model.Pipeline;
 import com.doublekit.pipeline.definition.model.PipelineStatus;
 import com.doublekit.pipeline.definition.service.PipelineService;
 import com.doublekit.pipeline.instance.model.*;
@@ -156,9 +157,32 @@ public class PipelineHomeServiceImpl implements PipelineHomeService{
    }
 
     @Override
-    public List<PipelineAction> findUserAction(String userId){
-      return   pipelineActionService.findUserAction(userId);
+    public List<PipelineAction> findUserAction(PipelineActionQuery pipelineActionQuery){
+        List<Pipeline> userPipeline = pipelineService.findUserPipeline(pipelineActionQuery.getUserId());
+        if (userPipeline == null){
+            return null;
+        }
+        pipelineActionQuery.setPipelineList(userPipeline);
+        //获取流水线动态
+        List<PipelineAction> list = pipelineActionService.findUserAction(pipelineActionQuery);
+        if (list.size()<10){
+            return list;
+        }
+        //默认0-10
+        if (pipelineActionQuery.getPage()+ pipelineActionQuery.getPageSize() == 11){
+            return list.subList(0, 10);
+        }
+        int page = (pipelineActionQuery.getPage() - 1) * pipelineActionQuery.getPageSize();
+        int pageSize = pipelineActionQuery.getPage()  * pipelineActionQuery.getPageSize();
+        if (page > list.size()){
+            return null;
+        }
+        if (pageSize > list.size()){
+            pageSize = list.size();
+        }
+        return list.subList(page, pageSize);
     }
+
 
 
 

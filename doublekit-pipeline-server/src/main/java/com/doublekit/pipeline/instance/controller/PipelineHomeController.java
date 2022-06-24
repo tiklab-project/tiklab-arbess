@@ -5,10 +5,7 @@ import com.doublekit.apibox.annotation.ApiMethod;
 import com.doublekit.apibox.annotation.ApiParam;
 import com.doublekit.core.Result;
 import com.doublekit.pipeline.definition.model.PipelineStatus;
-import com.doublekit.pipeline.instance.model.PipelineAction;
-import com.doublekit.pipeline.instance.model.PipelineExecState;
-import com.doublekit.pipeline.instance.model.PipelineFollow;
-import com.doublekit.pipeline.instance.model.PipelineOpen;
+import com.doublekit.pipeline.instance.model.*;
 import com.doublekit.pipeline.instance.service.PipelineHomeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -82,8 +79,8 @@ public class PipelineHomeController {
     @RequestMapping(path="/findUserAction",method = RequestMethod.POST)
     @ApiMethod(name = "findUserAction",desc = "获取用户动态")
     @ApiParam(name = "userId",desc = "用户id",required = true)
-    public Result< List<PipelineAction>> findUserAction(@NotNull String userId){
-        List<PipelineAction> allAction = pipelineHomeService.findUserAction(userId);
+    public Result< List<PipelineAction>> findUserAction( @RequestBody @NotNull PipelineActionQuery pipelineActionQuery){
+        List<PipelineAction> allAction = pipelineHomeService.findUserAction(pipelineActionQuery);
         return Result.ok(allAction);
     }
 

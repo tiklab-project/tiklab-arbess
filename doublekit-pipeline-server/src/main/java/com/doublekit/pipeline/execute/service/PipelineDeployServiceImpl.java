@@ -55,6 +55,7 @@ public class PipelineDeployServiceImpl implements PipelineDeployService {
         pipelineConfigure.setTaskId(deployId);
         pipelineConfigure.setTaskType(taskType);
         pipelineConfigure.setTaskSort(pipelineDeploy.getSort());
+        //pipelineConfigure.setView(pipelineDeploy.getView());
         pipelineConfigureService.createTask(pipelineConfigure,pipelineId);
         return deployId;
     }
@@ -89,6 +90,7 @@ public class PipelineDeployServiceImpl implements PipelineDeployService {
                 updateDeploy(pipelineDeploy);
                 oneConfigure.setTaskSort(pipelineDeploy.getSort());
                 oneConfigure.setTaskAlias(pipelineDeploy.getDeployAlias());
+                //oneConfigure.setView(pipelineDeploy.getView());
                 pipelineConfigureService.updateConfigure(oneConfigure);
             }else {
                 pipelineConfigureService.deleteTask(oneConfigure.getTaskId(),pipeline.getPipelineId());

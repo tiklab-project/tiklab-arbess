@@ -8,7 +8,6 @@ import com.doublekit.pipeline.definition.service.PipelineConfigureService;
 import com.doublekit.pipeline.execute.dao.PipelineStructureDao;
 import com.doublekit.pipeline.execute.entity.PipelineStructureEntity;
 import com.doublekit.pipeline.execute.model.PipelineStructure;
-import com.doublekit.pipeline.instance.service.PipelineActionService;
 import com.doublekit.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,9 +27,6 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
     @Autowired
     PipelineConfigureService pipelineConfigureService;
 
-    @Autowired
-    PipelineActionService pipelineActionService;
-
     //创建
     @Override
     public String createStructure(PipelineStructure pipelineStructure) {
@@ -49,6 +45,7 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
         pipelineConfigure.setTaskId(structureId);
         pipelineConfigure.setTaskType(taskType);
         pipelineConfigure.setTaskSort(pipelineStructure.getSort());
+        //pipelineConfigure.setView(pipelineStructure.getView());
         pipelineConfigureService.createTask(pipelineConfigure,pipelineId);
         return structureId;
     }
@@ -86,6 +83,7 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
                 updateStructure(pipelineStructure);
                 oneConfigure.setTaskSort(pipelineStructure.getSort());
                 oneConfigure.setTaskAlias(pipelineStructure.getStructureAlias());
+                //oneConfigure.setView(pipelineStructure.getView());
                 pipelineConfigureService.updateConfigure(oneConfigure);
             }else {
                 pipelineConfigureService.deleteTask(oneConfigure.getTaskId(),pipeline.getPipelineId());

@@ -4,7 +4,6 @@ import com.doublekit.beans.BeanMapper;
 import com.doublekit.core.page.Pagination;
 import com.doublekit.core.page.PaginationBuilder;
 import com.doublekit.join.JoinTemplate;
-import com.doublekit.pipeline.definition.service.PipelineService;
 import com.doublekit.pipeline.instance.dao.PipelineExecHistoryDao;
 import com.doublekit.pipeline.instance.entity.PipelineExecHistoryEntity;
 import com.doublekit.pipeline.instance.model.PipelineExecHistory;
@@ -29,9 +28,6 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
 
     @Autowired
     PipelineExecLogService pipelineExecLogService;
-
-    @Autowired
-    PipelineService pipelineService;
 
     @Autowired
     JoinTemplate joinTemplate;

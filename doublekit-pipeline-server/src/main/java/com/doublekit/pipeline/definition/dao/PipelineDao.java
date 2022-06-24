@@ -83,7 +83,8 @@ public class PipelineDao {
      * @return 流水线集合
      */
     public List<PipelineEntity> findName(String pipelineName){
-        QueryCondition queryCondition = QueryBuilders.createQuery(PipelineEntity.class).like("pipelineName", pipelineName).get();
+        QueryCondition queryCondition = QueryBuilders.createQuery(PipelineEntity.class)
+                .like("pipelineName", pipelineName).get();
         return jpaTemplate.findList(queryCondition,PipelineEntity.class);
     }
 
@@ -94,5 +95,20 @@ public class PipelineDao {
                 .get();
         return jpaTemplate.findList(queryCondition, DmUserEntity.class);
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 }

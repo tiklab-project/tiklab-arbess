@@ -46,7 +46,6 @@ public class Pipeline {
     @ApiProperty(name="pipelineCollect",desc="运行状态",required = true)
     private int pipelineState;
 
-
     public String getPipelineId() {
         return pipelineId;
     }

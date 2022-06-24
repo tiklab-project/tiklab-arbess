@@ -27,7 +27,7 @@ public interface PipelineCodeService {
      * @param pipelineId 流水线id
      * @return 配置id
      */
-    String createConfigure(String pipelineId,int taskType,PipelineCode pipelineCode);
+    String createConfigure(String pipelineId,PipelineCode pipelineCode);
 
     /**
      * 删除

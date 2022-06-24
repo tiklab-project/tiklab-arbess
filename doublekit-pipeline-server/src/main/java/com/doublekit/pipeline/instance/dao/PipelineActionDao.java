@@ -1,5 +1,6 @@
 package com.doublekit.pipeline.instance.dao;
 
+import com.doublekit.dal.jdbc.JdbcTemplate;
 import com.doublekit.dal.jpa.JpaTemplate;
 import com.doublekit.pipeline.instance.entity.PipelineActionEntity;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,27 +58,22 @@ public class PipelineActionDao {
         return jpaTemplate.findAll(PipelineActionEntity.class);
     }
 
+
     public List<PipelineActionEntity> findAllActionList(List<String> idList){
         return jpaTemplate.findList(PipelineActionEntity.class,idList);
     }
 
-    public List<PipelineActionEntity> findUserAction(String userId){
-        String sql = "select * from pipeline_action a";
-        sql = sql.concat("where (a.pipeline_id COLLATE utf8mb4_general_ci ) in ");
-        sql = sql.concat("( select pipeline.pipeline_id from orc_dm_user,pipeline " +
-                " where (orc_dm_user.domain_id COLLATE utf8mb4_general_ci ) = (pipeline.pipeline_id COLLATE utf8mb4_general_ci ) " +
-                " and  (orc_dm_user.user_id COLLATE utf8mb4_general_ci ) =  (? COLLATE utf8mb4_general_ci ) )" );
-        return jpaTemplate.getJdbcTemplate().query(sql, new String[]{userId}, new BeanPropertyRowMapper(PipelineActionEntity.class));
+    /**
+     * 获取用户动态
+     * @param s 条件
+     * @return 动态信息
+     */
+    public List<PipelineActionEntity> findUserAction(String s){
+        String sql = "select * from pipeline_action";
+        sql = sql.concat(s);
+        JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
+        return  jdbcTemplate.query(sql, new BeanPropertyRowMapper(PipelineActionEntity.class));
     }
-
-
-
-
-
-
-
-
-
 
 
 

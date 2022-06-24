@@ -46,6 +46,10 @@ public class PipelineConfigure {
     @ApiProperty(name = "taskAlias",desc = "别名")
     private String taskAlias;
 
+    @ApiProperty(name = "view",desc = "视图")
+    private int view;
+
+    @ApiProperty(name = "userId",desc = "用户Id")
     private String userId;
 
 
@@ -111,5 +115,13 @@ public class PipelineConfigure {
 
     public void setUserId(String userId) {
         this.userId = userId;
+    }
+
+    public int getView() {
+        return view;
+    }
+
+    public void setView(int view) {
+        this.view = view;
     }
 }

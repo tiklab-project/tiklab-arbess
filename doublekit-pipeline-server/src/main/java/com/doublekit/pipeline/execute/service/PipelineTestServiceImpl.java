@@ -8,7 +8,6 @@ import com.doublekit.pipeline.definition.service.PipelineConfigureService;
 import com.doublekit.pipeline.execute.dao.PipelineTestDao;
 import com.doublekit.pipeline.execute.entity.PipelineTestEntity;
 import com.doublekit.pipeline.execute.model.PipelineTest;
-import com.doublekit.pipeline.instance.service.PipelineActionService;
 import com.doublekit.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,9 +27,6 @@ public class PipelineTestServiceImpl implements PipelineTestService {
     @Autowired
     PipelineConfigureService pipelineConfigureService;
 
-    @Autowired
-    PipelineActionService pipelineActionService;
-
     //创建
     @Override
     public String createTest(PipelineTest pipelineTest) {
@@ -39,17 +35,16 @@ public class PipelineTestServiceImpl implements PipelineTestService {
 
     //创建构建表
     @Override
-    public  String createConfigure(String pipelineId,int taskType, PipelineTest pipelineTest){
-        pipelineTest.setType(taskType);
+    public  String createConfigure(String pipelineId, PipelineTest pipelineTest){
+        String testId = createTest(pipelineTest);
+
         PipelineConfigure pipelineConfigure = new PipelineConfigure();
         pipelineConfigure.setTaskAlias("测试");
-        if (pipelineTest.getTestAlias() != null){
-            pipelineConfigure.setTaskAlias(pipelineTest.getTestAlias());
-        }
-        pipelineConfigure.setTaskType(taskType);
-        String testId = createTest(pipelineTest);
+        pipelineConfigure.setTaskAlias(pipelineTest.getTestAlias());
+        pipelineConfigure.setTaskType(pipelineTest.getSort());
         pipelineConfigure.setTaskId(testId);
         pipelineConfigure.setTaskSort(pipelineTest.getSort());
+
         pipelineConfigureService.createTask(pipelineConfigure,pipelineId);
         return testId;
     }
@@ -81,12 +76,34 @@ public class PipelineTestServiceImpl implements PipelineTestService {
         PipelineTest pipelineTest = pipelineExecConfigure.getPipelineTest();
         Pipeline pipeline = pipelineExecConfigure.getPipeline();
         PipelineConfigure oneConfigure = pipelineConfigureService.findOneConfigure(pipeline.getPipelineId(), 20);
-
+        //if (oneConfigure != null && pipelineTest.getType() == 0){
+        //    pipelineConfigureService.deleteTask(oneConfigure.getTaskId(),pipeline.getPipelineId());
+        //    return;
+        //}
+        //if (oneConfigure == null ){
+        //    oneConfigure = new PipelineConfigure();
+        //}
+        //
+        //oneConfigure.setTaskSort(pipelineTest.getSort());
+        //oneConfigure.setTaskAlias(pipelineTest.getTestAlias());
+        //oneConfigure.setView(pipelineExecConfigure.getView());
+        //oneConfigure.setPipeline(pipeline);
+        //oneConfigure.setCreateTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+        //oneConfigure.setTaskType(pipelineTest.getType());
+        //
+        //if (pipelineTest.getTestId() == null){
+        //    updateTest(pipelineTest);
+        //}else {
+        //    String testId = createTest(pipelineTest);
+        //    oneConfigure.setTaskId(testId);
+        //    pipelineConfigureService.createConfigure(oneConfigure);
+        //}
         if (oneConfigure != null ){
             if (pipelineTest.getType() != 0){
                 updateTest(pipelineTest);
                 oneConfigure.setTaskSort(pipelineTest.getSort());
                 oneConfigure.setTaskAlias(pipelineTest.getTestAlias());
+                oneConfigure.setView(pipelineExecConfigure.getView());
                 pipelineConfigureService.updateConfigure(oneConfigure);
                 //动态
             }else {
@@ -95,7 +112,7 @@ public class PipelineTestServiceImpl implements PipelineTestService {
         }
 
         if (pipelineTest.getType() != 0 && oneConfigure == null){
-            createConfigure(pipeline.getPipelineId(),pipelineTest.getType(),pipelineTest);
+            createConfigure(pipeline.getPipelineId(),pipelineTest);
         }
         pipelineStructureService.updateTask(pipelineExecConfigure);
     }

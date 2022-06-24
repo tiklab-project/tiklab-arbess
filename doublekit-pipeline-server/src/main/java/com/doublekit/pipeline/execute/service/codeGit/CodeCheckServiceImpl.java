@@ -1,5 +1,6 @@
 package com.doublekit.pipeline.execute.service.codeGit;
 
+import com.doublekit.pipeline.execute.model.CodeGit.CodeCheckAuth;
 import com.doublekit.pipeline.instance.service.execAchieveService.CommonAchieveService;
 import com.doublekit.pipeline.setting.proof.model.Proof;
 import com.doublekit.pipeline.setting.proof.service.ProofService;
@@ -35,16 +36,15 @@ public class CodeCheckServiceImpl implements CodeCheckService {
     @Autowired
     CommonAchieveService commonAchieveService;
 
-    public Boolean checkAuth(String url , String proofId, int port){
-
-        Proof proof = proofService.findOneProof(proofId);
-        if (port != 0){
-           return deployCheck(url,proof,port);
-        }else {
-            boolean b = gitCheck(url, proof);
-            boolean c = svnCheck(url, proof);
-            return b || c;
-        }
+    @Override
+    public Boolean checkAuth(CodeCheckAuth codeCheckAuth){
+        Proof proof = proofService.findOneProof(codeCheckAuth.getProofId());
+        return switch (codeCheckAuth.getType()) {
+            case 0 -> gitCheck(codeCheckAuth.getUrl(), proof);
+            case 1 -> svnCheck(codeCheckAuth.getUrl(), proof);
+            case 2 -> deployCheck(codeCheckAuth.getUrl(), proof, codeCheckAuth.getPort());
+            default -> false;
+        };
     }
 
     /**
@@ -78,7 +78,8 @@ public class CodeCheckServiceImpl implements CodeCheckService {
                 return defaultJSch;
             }
         };
-        LsRemoteCommand lsRemoteCommand = Git.lsRemoteRepository();
+        LsRemoteCommand lsRemoteCommand = Git.lsRemoteRepository()
+                .setRemote(gitUrl);
         try {
             if (proof.getProofType().equals("ssh")){
                 lsRemoteCommand .setTransportConfigCallback(transport -> {
@@ -89,7 +90,7 @@ public class CodeCheckServiceImpl implements CodeCheckService {
                 UsernamePasswordCredentialsProvider provider = new UsernamePasswordCredentialsProvider(proof.getProofUsername(), proof.getProofPassword());
                 lsRemoteCommand.setCredentialsProvider(provider);
             }
-            lsRemoteCommand.setRemote(gitUrl).callAsMap();
+            lsRemoteCommand.callAsMap();
         } catch (GitAPIException e) {
             return false;
         }

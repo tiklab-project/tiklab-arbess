@@ -24,7 +24,7 @@ public interface PipelineTestService {
      * @param pipelineId 流水线id
      * @return 配置id
      */
-    String createConfigure(String pipelineId,int taskType, PipelineTest pipelineTest);
+    String createConfigure(String pipelineId, PipelineTest pipelineTest);
 
 
     /**

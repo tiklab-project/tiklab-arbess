@@ -54,13 +54,28 @@ public class PipelineFollowDao {
      * 查询所有次数
      * @return 次数集合
      */
-
     public List<PipelineFollowEntity> findAllFollow(){
         return jpaTemplate.findAll(PipelineFollowEntity.class);
     }
 
+
     public List<PipelineFollowEntity> findAllFollowList(List<String> idList){
         return jpaTemplate.findList(PipelineFollowEntity.class,idList);
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 }

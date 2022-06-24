@@ -1,10 +1,7 @@
 package com.doublekit.pipeline.instance.service;
 
 import com.doublekit.pipeline.definition.model.PipelineStatus;
-import com.doublekit.pipeline.instance.model.PipelineAction;
-import com.doublekit.pipeline.instance.model.PipelineExecState;
-import com.doublekit.pipeline.instance.model.PipelineFollow;
-import com.doublekit.pipeline.instance.model.PipelineOpen;
+import com.doublekit.pipeline.instance.model.*;
 
 import java.util.List;
 
@@ -52,7 +49,8 @@ public interface PipelineHomeService {
      */
     List<PipelineAction> findAllAction(String userId);
 
-    List<PipelineAction> findUserAction(String userId);
+
+    List<PipelineAction> findUserAction(PipelineActionQuery pipelineActionQuery);
 
 
 }

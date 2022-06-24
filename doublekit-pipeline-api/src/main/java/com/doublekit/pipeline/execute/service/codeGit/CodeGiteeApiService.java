@@ -2,6 +2,7 @@ package com.doublekit.pipeline.execute.service.codeGit;
 
 import com.doublekit.join.annotation.JoinProvider;
 import com.doublekit.pipeline.execute.model.CodeGit.CodeGiteeApi;
+import com.doublekit.pipeline.setting.proof.model.Proof;
 
 import java.io.IOException;
 import java.util.List;
@@ -58,11 +59,11 @@ public interface CodeGiteeApiService {
 
     /**
      * 获取仓库克隆地址
-     * @param proofId 凭证ID
+     * @param proof 凭证ID
      * @param projectName 仓库名称
      * @return 克隆地址
      */
-    String getCloneUrl(String proofId,String projectName);
+    String getCloneUrl(Proof proof, String projectName);
 
 
     /**

@@ -74,11 +74,8 @@ public interface PipelineService {
     List<Pipeline> findAllPipelineList(List<String> idList);
 
 
-    /**
-     * 查询用户下的流水线
-     * @param userId 用户id
-     * @return 流水线列表
-     */
+
+
     List<Pipeline> findUserPipeline(String userId);
 
 
@@ -87,7 +84,7 @@ public interface PipelineService {
      * @param pipelineName 查询条件
      * @return 查询到的集合
      */
-    List<Pipeline> findLike(String pipelineName);
+    List<Pipeline> findLike(String pipelineName,String userId);
 
 
     /**

@@ -22,7 +22,8 @@ public class GatewayFilterAutoConfiguration {
                         ".css",
                         ".json",
                         ".xml",
-                        ".ftl"
+                        ".ftl",
+                        ".map"
                 })
                 .ignoreUrls(new String[]{
                         "/",
@@ -50,7 +51,8 @@ public class GatewayFilterAutoConfiguration {
                         "/ldap/passport/logout",
                         "/version/getVersion",
                         "/licence/import",
-                        "/wechatCallback/instruct"
+                        "/wechatCallback/instruct",
+                        "/gui"
                 })
                 .ignorePreUrls(new String[]{
                         "/service",

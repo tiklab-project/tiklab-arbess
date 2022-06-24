@@ -9,7 +9,6 @@ import com.doublekit.pipeline.definition.model.Pipeline;
 import com.doublekit.pipeline.definition.model.PipelineConfigure;
 import com.doublekit.pipeline.definition.model.PipelineExecConfigure;
 import com.doublekit.pipeline.execute.service.PipelineCodeService;
-import com.doublekit.pipeline.instance.service.PipelineActionService;
 import com.doublekit.rpc.annotation.Exporter;
 import com.ibm.icu.text.SimpleDateFormat;
 import org.slf4j.Logger;
@@ -36,8 +35,6 @@ public class PipelineConfigureServiceImpl implements PipelineConfigureService {
     @Autowired
     PipelineCodeService pipelineCodeService;
 
-    @Autowired
-    PipelineActionService pipelineActionService;
 
     private static final Logger logger = LoggerFactory.getLogger(PipelineConfigureServiceImpl.class);
 
@@ -94,8 +91,7 @@ public class PipelineConfigureServiceImpl implements PipelineConfigureService {
         Pipeline pipeline = new Pipeline();
         pipeline.setPipelineId(pipelineId);
         pipelineConfigure.setPipeline(pipeline);
-        String time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
-        pipelineConfigure.setCreateTime(time);
+        pipelineConfigure.setCreateTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
         createConfigure(pipelineConfigure);
     }
 

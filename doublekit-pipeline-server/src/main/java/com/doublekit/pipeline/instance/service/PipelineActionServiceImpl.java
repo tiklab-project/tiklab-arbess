@@ -6,13 +6,18 @@ import com.doublekit.pipeline.definition.model.Pipeline;
 import com.doublekit.pipeline.instance.dao.PipelineActionDao;
 import com.doublekit.pipeline.instance.entity.PipelineActionEntity;
 import com.doublekit.pipeline.instance.model.PipelineAction;
+import com.doublekit.pipeline.instance.model.PipelineActionQuery;
 import com.doublekit.rpc.annotation.Exporter;
 import com.doublekit.user.user.model.User;
 import com.doublekit.user.user.service.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -28,6 +33,9 @@ public class PipelineActionServiceImpl implements PipelineActionService {
 
     @Autowired
     JoinTemplate joinTemplate;
+
+    private static final Logger logger = LoggerFactory.getLogger(PipelineActionServiceImpl.class);
+
 
     //添加动态
     @Override
@@ -80,9 +88,19 @@ public class PipelineActionServiceImpl implements PipelineActionService {
     }
 
     @Override
-    public List<PipelineAction> findUserAction(String userId){
-        List<PipelineAction> list = BeanMapper.mapList(pipelineActionDao.findUserAction(userId), PipelineAction.class);
+    public List<PipelineAction> findUserAction(PipelineActionQuery pipelineActionQuery){
+        ArrayList<PipelineAction> list = new ArrayList<>();
+        String sql = "";
+        for (Pipeline pipeline : pipelineActionQuery.getPipelineList()) {
+            if (pipelineActionQuery.getPage()+pipelineActionQuery.getPageSize() == 11){
+                sql = sql.concat(" where pipeline_action.pipeline_id = '"+ pipeline.getPipelineId()+"' order by create_time desc limit 0,10");
+            }else {
+                sql = sql.concat(" where pipeline_action.pipeline_id = '"+ pipeline.getPipelineId()+"'");
+            }
+             list.addAll(BeanMapper.mapList(pipelineActionDao.findUserAction(sql), PipelineAction.class));
+        }
         joinTemplate.joinQuery(list);
+        list.sort(Comparator.comparing(PipelineAction::getCreateTime,Comparator.reverseOrder()));
         return list;
     }
 

@@ -67,6 +67,9 @@ public class PipelineExecConfigure {
     @JoinQuery(key = "deployId")
     private PipelineDeploy pipelineDeploy;
 
+    @ApiProperty(name="view",desc="视图")
+    private int view;
+
 
     public Pipeline getPipeline() {
         return pipeline;
@@ -122,5 +125,13 @@ public class PipelineExecConfigure {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public int getView() {
+        return view;
+    }
+
+    public void setView(int view) {
+        this.view = view;
     }
 }

@@ -2,6 +2,7 @@ package com.doublekit.pipeline.execute.service.codeGit;
 
 import com.doublekit.join.annotation.JoinProvider;
 import com.doublekit.pipeline.execute.model.CodeGit.CodeGitHubApi;
+import com.doublekit.pipeline.setting.proof.model.Proof;
 
 import java.util.List;
 
@@ -52,9 +53,9 @@ public interface CodeGitHubService {
 
     /**
      * 获取单个仓库
-     * @param proofId 凭证id
+     * @param proof 凭证id
      * @param houseName 仓库名
      * @return 仓库url
      */
-    String getOneHouse(String proofId,String houseName);
+    String getOneHouse(Proof proof, String houseName);
 }

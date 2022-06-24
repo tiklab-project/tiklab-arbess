@@ -2,6 +2,7 @@ package com.doublekit.pipeline.instance.service;
 
 import com.doublekit.pipeline.definition.model.Pipeline;
 import com.doublekit.pipeline.instance.model.PipelineAction;
+import com.doublekit.pipeline.instance.model.PipelineActionQuery;
 
 import java.util.List;
 
@@ -39,6 +40,9 @@ public interface PipelineActionService {
      */
     void createActive(String userId, Pipeline pipeline, String massage);
 
-
-    List<PipelineAction> findUserAction(String userId);
+    /**
+     * 查询所有动态
+     * @return 动态列表
+     */
+    List<PipelineAction> findUserAction(PipelineActionQuery pipelineActionQuery);
 }

@@ -87,22 +87,21 @@ public class PipelineController {
     @RequestMapping(path="/findOneName",method = RequestMethod.POST)
     @ApiMethod(name = "findOneName",desc = "模糊查询")
     @ApiParam(name = "pipelineName",desc = "模糊查询条件",required = true)
-    public Result<List<Pipeline>> findOneName(@NotNull String pipelineName){
+    public Result<List<Pipeline>> findOneName(@NotNull String pipelineName,String userId){
 
-        List<Pipeline> pipelineQueryList = pipelineService.findLike(pipelineName);
+        List<Pipeline> pipelineQueryList = pipelineService.findLike(pipelineName,userId);
 
         return Result.ok(pipelineQueryList);
     }
     //查询所有
     @RequestMapping(path="/findAllPipelineStatus",method = RequestMethod.POST)
     @ApiMethod(name = "findOnePipelineStatus",desc = "查询所有流水线状态")
-    public Result<List<PipelineStatus>> findOnePipelineStatus(String userId){
+    public Result<List<PipelineStatus>> findOnePipelineStatus(@NotNull  String userId){
 
         List<PipelineStatus> allStatus = pipelineService.findAllStatus(userId);
 
         return Result.ok(allStatus);
     }
-
 
     @RequestMapping(path="/findUserPipeline",method = RequestMethod.POST)
     @ApiMethod(name = "findUserPipeline",desc = "查询用户流水线")

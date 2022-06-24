@@ -42,6 +42,10 @@ public class PipelineConfigureEntity {
     @Column(name = "task_alias",notNull = true)
     private String taskAlias;
 
+    //别名
+    @Column(name = "view",notNull = true)
+    private int view;
+
     public String getConfigureId() {
         return configureId;
     }
@@ -96,5 +100,13 @@ public class PipelineConfigureEntity {
 
     public void setTaskAlias(String taskAlias) {
         this.taskAlias = taskAlias;
+    }
+
+    public int getView() {
+        return view;
+    }
+
+    public void setView(int view) {
+        this.view = view;
     }
 }

@@ -152,10 +152,6 @@ public class PipelineServiceImpl implements PipelineService{
     //获取用户流水线
     @Override
     public List<Pipeline> findUserPipeline(String userId){
-        //List<DmUser> allDmUser = dmUserService.findAllDmUser();
-        //if (allDmUser == null){
-        //    return null;
-        //}
         List<DmUserEntity> dmUsers = pipelineDao.findAllDmUser(userId);
         List<Pipeline> allPipeline = findAllPipeline();
         if (allPipeline == null || dmUsers.size() == 0){
@@ -168,14 +164,25 @@ public class PipelineServiceImpl implements PipelineService{
             List<Pipeline> collect = allPipeline.stream().filter(pipeline -> dmUserEntity.getDomainId().equals(pipeline.getPipelineId())).toList();
             list.addAll(collect);
         }
+
          return list;
     }
 
     //模糊查询
     @Override
-    public List<Pipeline> findLike(String pipelineName) {
+    public List<Pipeline> findLike(String pipelineName,String userId) {
         List<PipelineEntity> pipelineEntityList = pipelineDao.findName(pipelineName);
-        return BeanMapper.mapList(pipelineEntityList, Pipeline.class);
+        List<Pipeline> list = BeanMapper.mapList(pipelineEntityList, Pipeline.class);
+        List<Pipeline> userPipeline = findUserPipeline(userId);
+        if (list == null || userPipeline==null){
+            return null;
+        }
+        ArrayList<Pipeline> pipelines = new ArrayList<>();
+        for (Pipeline pipeline : userPipeline) {
+            List<Pipeline> collect = list.stream().filter(pipeline1 -> pipeline.getPipelineId().equals(pipeline1.getPipelineId())).toList();
+            pipelines.addAll(collect);
+        }
+        return pipelines;
     }
 
     //获取用户所有流水线状态
@@ -210,7 +217,7 @@ public class PipelineServiceImpl implements PipelineService{
 
     //获取用户7天内的所有历史
     @Override
-    public  List<PipelineExecHistory>  findAllUserHistory(String userId ){
+    public  List<PipelineExecHistory>  findAllUserHistory(String userId){
         //获取7天前的时间
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         Date lastTime = DateUtils.addDays(new Date(), -7);
@@ -227,18 +234,16 @@ public class PipelineServiceImpl implements PipelineService{
             if (allHistory == null){
                 continue;
             }
-            //try {
-
-                List<PipelineExecHistory> collect = allHistory.stream().filter(pipelineExecHistory -> {
-                    try {
-                        return lastTime.compareTo(formatter.parse(pipelineExecHistory.getCreateTime())) <= 0;
-                    } catch (ParseException e) {
-                        logger.info("获取历史创建时间时日期转换异常。");
-                    }
-                    return false;
-                }).toList();
-                   list.addAll(collect);
-             }
+            List<PipelineExecHistory> collect = allHistory.stream().filter(pipelineExecHistory -> {
+                try {
+                    return lastTime.compareTo(formatter.parse(pipelineExecHistory.getCreateTime())) <= 0;
+                } catch (ParseException e) {
+                    logger.info("获取历史创建时间时日期转换异常。");
+                }
+                return false;
+            }).toList();
+               list.addAll(collect);
+         }
         return list;
     }
 

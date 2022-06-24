@@ -148,8 +148,7 @@ public class CodeGitHubServiceImpl implements CodeGitHubService {
     }
 
     @Override
-    public String getOneHouse(String proofId,String houseName){
-        Proof proof = proofService.findOneProof(proofId);
+    public String getOneHouse( Proof proof,String houseName){
         if (proof == null){
             return null;
         }

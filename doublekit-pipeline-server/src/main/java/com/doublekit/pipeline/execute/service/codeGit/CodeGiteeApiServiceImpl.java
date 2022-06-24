@@ -175,11 +175,10 @@ public class CodeGiteeApiServiceImpl implements CodeGiteeApiService {
 
     //获取仓库的url
     @Override
-    public String getCloneUrl(String proofId,String projectName){
-        if (proofId == null || projectName == null){
+    public String getCloneUrl(Proof proof,String projectName){
+        if (projectName == null){
             return null;
         }
-        Proof proof = proofService.findOneProof(proofId);
         String[] split = projectName.split("/");
         if (split.length != 2){
             return null;
