@@ -49,25 +49,10 @@ public interface PipelineConfigureService {
 
 
     /**
-     * 根据任务id查询配置信息
-     * @param pipelineId 流水线id
-     * @param taskId 任务id
-     * @return 任务信息
-     */
-    PipelineConfigure findOneTask(String pipelineId,String taskId);
-
-    /**
      * 删除单个任务
-     * @param taskId 任务id
      * @param pipelineId 流水线id
      */
-    void deleteTask(String taskId,String pipelineId);
-
-    /**
-     * 删除所有任务
-     * @param pipelineId 流水线id
-     */
-    void deleteAllTask(String pipelineId);
+    void deleteTask(String pipelineId);
 
     /**
      * 更新流水线配置
@@ -88,13 +73,6 @@ public interface PipelineConfigureService {
      */
     @FindOne
     PipelineConfigure findOneConfigure(String configureId);
-
-    /**
-     * 查询流水线信息
-     * @param pipelineId 流水线id
-     * @return 流水线信息
-     */
-    Pipeline findOnePipeline(String pipelineId);
 
     /**
      * 查询所有配置文件

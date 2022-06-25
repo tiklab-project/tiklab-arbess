@@ -22,10 +22,8 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 
 @Service
@@ -126,18 +124,27 @@ public class CodeGiteeApiServiceImpl implements CodeGiteeApiService {
     //凭证信息
     @Override
     public String getProof(String proofName,String accessToken) {
-        Proof proof = new Proof();
-         if (accessToken == null && proofName == null){
+        if (accessToken == null && proofName == null){
              return  null;
          }
-         proof.setProofName(proofName);
+        String userName = getUserMessage(accessToken);
+        Proof proof = proofService.findAllAuthProof(2, userName);
+        if (proof == null){
+            proof =  new Proof();
+        }
+        proof.setProofName(proofName);
         proof.setProofPassword(accessToken);
         proof.setProofUsername(getUserMessage(accessToken));
-        proof.setProofType("gitee");
+        proof.setProofType("gitee授权");
         proof.setProofScope(2);
+        proof.setType(2);
         proof.setProofDescribe("gitee授权登录");
-        return proofService.createProof(proof);
-
+        if (proof.getProofId() == null){
+            proof.setProofCreateTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+            return proofService.createProof(proof);
+        }
+        proofService.updateProof(proof);
+        return proof.getProofId();
     }
 
     //获取一个仓库的所有分支

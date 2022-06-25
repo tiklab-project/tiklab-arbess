@@ -15,7 +15,7 @@ public class CodeGiteeApi {
 
     public String getCallback_uri() {
         //回调地址
-        return "http%3A%2F%2F192.168.10.23%3A3004%2F%23%2Fhome%2Ftask%2Fconfig";
+        return "http%3A%2F%2F192.168.10.23%3A3004%2F%23%2Findex%2Ftask%2Fconfig";
     }
 
     public String getClient_secret() {

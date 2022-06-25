@@ -99,7 +99,7 @@ public class PipelineServiceImpl implements PipelineService{
         if (pipelineId != null){
             pipelineDao.deletePipeline(pipelineId);
             //删除对应的流水线配置
-            pipelineConfigureService.deleteAllTask(pipelineId);
+            pipelineConfigureService.deleteTask(pipelineId);
             //删除对应的历史
             pipelineExecHistoryService.deleteHistory(pipelineId);
             //删除收藏

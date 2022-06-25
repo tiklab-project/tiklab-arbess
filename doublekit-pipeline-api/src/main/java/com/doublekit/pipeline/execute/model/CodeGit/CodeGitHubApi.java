@@ -16,7 +16,7 @@ public class CodeGitHubApi {
     }
 
     public String getCallback_URL() {
-        return "http://192.168.10.23:3004/#/home/task/config";
+        return "http://192.168.10.23:3004/#/index/task/config";
     }
 
     //获取code （get）

@@ -5,6 +5,7 @@ import com.doublekit.apibox.annotation.ApiMethod;
 import com.doublekit.apibox.annotation.ApiParam;
 import com.doublekit.core.Result;
 import com.doublekit.pipeline.setting.proof.model.Proof;
+import com.doublekit.pipeline.setting.proof.model.ProofQuery;
 import com.doublekit.pipeline.setting.proof.service.ProofService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.util.HashSet;
 import java.util.List;
 
 @RestController
@@ -48,10 +50,10 @@ public class ProofController {
 
     @RequestMapping(path="/findPipelineProof",method = RequestMethod.POST)
     @ApiMethod(name = "findPipelineProof",desc = "查询流水线凭证")
-    @ApiParam(name = "pipelineId",desc = "流水线id",required = true)
-    public Result<List<Proof>> findPipelineProof(@NotNull String pipelineId){
+    @ApiParam(name = "proofQuery",desc = "条件",required = true)
+    public Result<List<Proof>> findPipelineProof(@RequestBody @Valid @NotNull ProofQuery proofQuery){
 
-        List<Proof> pipelineProof = proofService.findPipelineProof(pipelineId);
+        List<Proof> pipelineProof = proofService.findPipelineProof(proofQuery);
 
         return Result.ok(pipelineProof);
     }
@@ -67,23 +69,13 @@ public class ProofController {
         return Result.ok();
     }
 
-    //根据类型查询凭证
-    @RequestMapping(path="/findAllProof",method = RequestMethod.POST)
-    @ApiMethod(name = "findAllProof",desc = "查询所有凭证")
-    public Result<List<Proof>> findAllProof(int type){
-
-        List<Proof> proofList = proofService.findAllProof(type);
-
-        return Result.ok(proofList);
-    }
-
     //查询全部凭证
     @RequestMapping(path="/findAll",method = RequestMethod.POST)
     @ApiMethod(name = "findAll",desc = "查询用户所有凭证")
     @ApiParam(name = "userId",desc = "用户id",required = true)
-    public Result<List<Proof>> findAll(@NotNull String userId){
+    public Result<HashSet<Proof>> findAll(@NotNull String userId){
 
-        List<Proof> proofList = proofService.findAll(userId);
+        HashSet<Proof> proofList = proofService.findAllUserProof(userId);
 
         return Result.ok(proofList);
     }

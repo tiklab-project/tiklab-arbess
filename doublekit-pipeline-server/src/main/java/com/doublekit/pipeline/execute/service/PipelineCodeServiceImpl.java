@@ -66,7 +66,6 @@ public class PipelineCodeServiceImpl implements PipelineCodeService {
         pipelineConfigure.setTaskId(codeId);
         pipelineConfigure.setCreateTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
         pipelineConfigureService.createConfigure(pipelineConfigure);
-        //pipelineConfigureService.createTask(pipelineConfigure,pipelineId);
         return codeId;
     }
 
@@ -77,7 +76,7 @@ public class PipelineCodeServiceImpl implements PipelineCodeService {
     }
 
     @Override
-    public void deleteTask(String taskId, int taskType ,Pipeline pipeline) {
+    public void deleteTask(String taskId, int taskType) {
         if (taskType <= 10){
             deleteCode(taskId);
             return;

@@ -15,6 +15,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Service
@@ -133,18 +134,28 @@ public class CodeGitHubServiceImpl implements CodeGitHubService {
 
     @Override
     public String getProof(String proofName,String accessToken){
-        Proof proof = new Proof();
+
         if (accessToken == null && proofName == null){
             return null;
         }
+        String userName = getUserMessage(accessToken);
+        Proof proof = proofService.findAllAuthProof(3, userName);
+        if (proof == null){
+            proof = new Proof();
+        }
         proof.setProofName(proofName);
         proof.setProofPassword(accessToken);
-        proof.setProofUsername(getUserMessage(accessToken));
-        proof.setProofType("gitHub");
+        proof.setProofUsername(userName);
+        proof.setProofType("gitHub授权");
         proof.setProofScope(3);
+        proof.setType(2);
         proof.setProofDescribe("gitHub授权登录");
-        return proofService.createProof(proof);
-
+        if (proof.getProofId() == null){
+            proof.setProofCreateTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+            return proofService.createProof(proof);
+        }
+        proofService.updateProof(proof);
+        return proof.getProofId();
     }
 
     @Override

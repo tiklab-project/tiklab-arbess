@@ -40,7 +40,7 @@ public interface PipelineCodeService {
      * @param taskId 任务id
      * @param taskType 任务类型
      */
-    void deleteTask(String taskId, int taskType , Pipeline pipelineId);
+    void deleteTask(String taskId, int taskType );
 
     /**
      * 更新

@@ -65,19 +65,6 @@ public class PipelineConfigureServiceImpl implements PipelineConfigureService {
         return null;
     }
 
-    @Override
-    public PipelineConfigure findOneTask(String pipelineId,String taskId) {
-        List<PipelineConfigure> allConfigure = findAllConfigure(pipelineId);
-        if (allConfigure == null){
-            return null;
-        }
-        for (PipelineConfigure pipelineConfigure : allConfigure) {
-            if (pipelineConfigure.getTaskId().equals(taskId)){
-                return pipelineConfigure;
-            }
-        }
-        return null;
-    }
 
     //更新配置
     @Override
@@ -97,29 +84,15 @@ public class PipelineConfigureServiceImpl implements PipelineConfigureService {
 
     //删除任务
     @Override
-    public void deleteTask(String taskId,String pipelineId) {
+    public void deleteTask(String pipelineId) {
         List<PipelineConfigure> allConfigure = findAllConfigure(pipelineId);
         if (allConfigure == null){
             return;
         }
         for (PipelineConfigure pipelineConfigure : allConfigure) {
-            if (!pipelineConfigure.getTaskId().equals(taskId)){
-               continue;
-            }
             PipelineConfigure oneConfigure = findOneConfigure(pipelineConfigure.getConfigureId());
-            pipelineCodeService.deleteTask(oneConfigure.getTaskId(),oneConfigure.getTaskType(),pipelineConfigure.getPipeline());
+            pipelineCodeService.deleteTask(oneConfigure.getTaskId(),oneConfigure.getTaskType());
             deleteConfigure(pipelineConfigure.getConfigureId());
-        }
-    }
-
-    //删除所有任务
-    @Override
-    public void deleteAllTask(String pipelineId) {
-        List<PipelineConfigure> allConfigure = findAllConfigure(pipelineId);
-        if(allConfigure != null){
-            for (PipelineConfigure pipelineConfigure : allConfigure) {
-                deleteTask(pipelineConfigure.getTaskId(),pipelineId);
-            }
         }
     }
 
@@ -137,10 +110,6 @@ public class PipelineConfigureServiceImpl implements PipelineConfigureService {
         return BeanMapper.map(oneConfigure,PipelineConfigure.class);
     }
 
-    @Override
-    public Pipeline findOnePipeline(String pipelineId) {
-        return null;
-    }
 
     //查询所有
     @Override

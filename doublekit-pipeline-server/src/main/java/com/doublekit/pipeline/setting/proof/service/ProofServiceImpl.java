@@ -8,6 +8,7 @@ import com.doublekit.pipeline.instance.service.execAchieveService.CommonAchieveS
 import com.doublekit.pipeline.setting.proof.dao.ProofDao;
 import com.doublekit.pipeline.setting.proof.entity.ProofEntity;
 import com.doublekit.pipeline.setting.proof.model.Proof;
+import com.doublekit.pipeline.setting.proof.model.ProofQuery;
 import com.doublekit.rpc.annotation.Exporter;
 import com.doublekit.user.user.model.User;
 import org.slf4j.Logger;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 @Service
@@ -40,21 +42,6 @@ public class ProofServiceImpl implements ProofService{
     //创建
     @Override
     public String createProof(Proof proof) {
-        User user = proof.getUser();
-        List<Proof> allProof = findAllProof();
-        if (allProof != null){
-            for (Proof proof1 : allProof) {
-                if (!proof.getProofUsername().equals(proof1.getProofUsername())
-                        && proof.getProofScope() != proof1.getProofScope()){
-                    continue;
-                }
-                proof.setProofId(proof1.getProofId());
-                updateProof(proof);
-                pipelineActionService.createActive(user.getId(),null,"更新了凭证"+proof.getProofName());
-                return proof.getProofId();
-            }
-        }
-        pipelineActionService.createActive(user.getId(),null,"创建了新的凭证"+proof.getProofName());
         ProofEntity proofEntity = BeanMapper.map(proof, ProofEntity.class);
         return ProofDao.createProof(proofEntity);
     }
@@ -107,46 +94,50 @@ public class ProofServiceImpl implements ProofService{
     }
 
     @Override
-    public List<Proof> findAll(String userId) {
-        List<ProofEntity> proofEntityList = ProofDao.selectAllProof();
-        List<Proof> proofList = BeanMapper.mapList(proofEntityList, Proof.class);
+    public HashSet<Proof> findAllUserProof(String userId) {
+        HashSet<Proof> proofSet = new HashSet<>();
+        List<Proof> proofList = findAllProof();
         joinTemplate.joinQuery(proofList);
-        List<Proof> list = new ArrayList<>();
         for (Proof proof : proofList) {
             if (proof.getUser().getId().equals(userId)){
                 proof.setUsername(proof.getUser().getName());
+                proofSet.add(proof);
+            }
+        }
+        return proofSet;
+    }
+
+    @Override
+    public List<Proof> findPipelineProof(ProofQuery proofQuery){
+        List<Proof> list = new ArrayList<>();
+        List<Proof> allProof = findAllProof();
+        if (allProof == null){
+            return null;
+        }
+        joinTemplate.joinQuery(allProof);
+        for (Proof proof : allProof) {
+            if (proof.getPipeline() == null){
+                //获取自己创建的凭证
+                if (!proof.getUser().getId().equals(proofQuery.getUserId())){
+                   continue;
+                }
+                list.add(proof);
+            //判断是否是此流水线的项目凭证
+            }else if (proof.getPipeline().getPipelineId().equals(proofQuery.getPipelineId()) || proof.getType() == 1){
                 list.add(proof);
             }
         }
-        return list;
-    }
-
-
-    @Override
-    public List<Proof> findAllProof(int type){
-        List<ProofEntity> proofEntityList = ProofDao.selectAllProof();
-        List<ProofEntity> proofs = new ArrayList<>();
-        for (ProofEntity proofEntity : proofEntityList) {
-            //判断凭证类型
-            if (proofEntity.getProofScope() == type || proofEntity.getType() == 1){
-                proofs.add(proofEntity);
+        //判断是否获取
+        if (proofQuery.getType() == 0 ){
+            return list;
+        }
+        List<Proof> lists = new ArrayList<>();
+        for (Proof proof : list) {
+            if (proof.getProofScope() == proofQuery.getType()){
+                lists.add(proof);
             }
         }
-        return  BeanMapper.mapList(proofs, Proof.class);
-    }
-
-    @Override
-    public List<Proof> findPipelineProof(String pipelineId){
-        List<Proof> list = new ArrayList<>();
-        List<Proof> allProof = findAllProof();
-
-        for (Proof proof : allProof) {
-            if ( proof.getPipeline() == null && proof.getType() != 1 ){
-                continue;
-            }
-            list.add(proof);
-        }
-        return  list;
+        return lists;
     }
 
     @Override
@@ -155,24 +146,29 @@ public class ProofServiceImpl implements ProofService{
         return BeanMapper.mapList(proofEntityList, Proof.class);
     }
 
-    public void writePrivateKeyPath(String massage, String filePath) throws IOException {
-        BufferedReader bufferedReader ;
-        BufferedWriter bufferedWriter;
-        File distFile= new File(filePath);
-        if (!distFile.getParentFile().exists()){
-            boolean mkdirs = distFile.getParentFile().mkdirs();
+    //获取相同授权凭证
+    @Override
+    public Proof findAllAuthProof(int scope,String userName){
+        List<Proof> allProof = findAllProof();
+        if (allProof == null){
+            return null;
         }
-        bufferedReader = new BufferedReader(new StringReader(massage));
-        bufferedWriter = new BufferedWriter(new FileWriter(distFile));
-        char[] buf = new char[1024]; //字符缓冲区
-        int len;
-        while ( (len = bufferedReader.read(buf)) != -1) {
-            bufferedWriter.write(buf, 0, len);
+        for (Proof proof : allProof) {
+            if (proof.getProofScope() != scope || !proof.getProofUsername().equals(userName)){
+                continue;
+            }
+            return proof;
         }
-        bufferedWriter.flush();
-        bufferedReader.close();
-        bufferedWriter.close();
+        return null;
     }
+
+
+
+
+
+
+
+
 
 
 

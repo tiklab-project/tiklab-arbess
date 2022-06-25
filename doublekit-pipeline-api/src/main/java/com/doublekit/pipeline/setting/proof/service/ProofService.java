@@ -5,7 +5,9 @@ import com.doublekit.join.annotation.FindList;
 import com.doublekit.join.annotation.FindOne;
 import com.doublekit.join.annotation.JoinProvider;
 import com.doublekit.pipeline.setting.proof.model.Proof;
+import com.doublekit.pipeline.setting.proof.model.ProofQuery;
 
+import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -45,10 +47,10 @@ public interface ProofService {
 
     /**
      * 查询流水线凭证
-     * @param pipelineId 流水线id
+     * @param proofQuery 条件
      * @return 凭证列表
      */
-    List<Proof> findPipelineProof(String pipelineId);
+    List<Proof> findPipelineProof(ProofQuery proofQuery);
 
     /**
      * 查询所有凭证
@@ -62,15 +64,15 @@ public interface ProofService {
      * @param userId 用户id
      * @return 凭证
      */
-    List<Proof> findAll(String userId);
-
+    HashSet<Proof> findAllUserProof(String userId);
 
     /**
-     * 根据类型查询凭证
-     * @param type 类型
+     * 获取相同的授权凭证
+     * @param scope 凭证类型
+     * @param userName 用户名
      * @return 凭证信息
      */
-    List<Proof> findAllProof(int type);
+    Proof findAllAuthProof(int scope,String userName);
 
 
     @FindList
