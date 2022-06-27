@@ -53,6 +53,7 @@ CREATE TABLE `pipeline_configure`  (
   `task_sort` int NULL DEFAULT NULL COMMENT '执行顺序',
   `create_time` datetime NULL DEFAULT NULL COMMENT '创建时间',
   `task_alias` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '别名',
+  `view` int NULL DEFAULT NULL,
   PRIMARY KEY (`configure_id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
@@ -62,7 +63,7 @@ CREATE TABLE `pipeline_configure`  (
 -- ----------------------------
 CREATE TABLE `pipeline_deploy`  (
   `deploy_id` varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '部署id',
-  `type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '类型',
+  `type` int NULL DEFAULT NULL COMMENT '类型',
   `deploy_target_address` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '打包文件地址',
   `deploy_address` varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '部署文件地址',
   `deploy_shell` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL COMMENT 'shell命令',
@@ -96,7 +97,7 @@ CREATE TABLE `pipeline_history`  (
   `run_way` int NULL DEFAULT NULL COMMENT '构建方式',
   `run_status` int NULL DEFAULT NULL COMMENT '执行状态',
   `run_time` int NULL DEFAULT NULL COMMENT '执行时间',
-  `exec_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '执行人',
+  `user_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '执行人',
   `run_log` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL COMMENT '日志',
   `pipeline_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '流水线id',
   `find_number` int NULL DEFAULT NULL COMMENT '构建次数',
@@ -153,7 +154,7 @@ CREATE TABLE `pipeline_proof`  (
 -- ----------------------------
 CREATE TABLE `pipeline_structure`  (
   `structure_id` varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '构建id',
-  `type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '类型',
+  `type` int NULL DEFAULT NULL COMMENT '类型',
   `structure_address` varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '文件地址',
   `structure_order` varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '构建命令',
   `sort` int NULL DEFAULT NULL COMMENT '排序',

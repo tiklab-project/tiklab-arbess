@@ -118,10 +118,9 @@ public class ProofServiceImpl implements ProofService{
         for (Proof proof : allProof) {
             if (proof.getPipeline() == null){
                 //获取自己创建的凭证
-                if (!proof.getUser().getId().equals(proofQuery.getUserId())){
-                   continue;
+                if (proof.getUser().getId().equals(proofQuery.getUserId()) || proof.getType()== 1){
+                    list.add(proof);
                 }
-                list.add(proof);
             //判断是否是此流水线的项目凭证
             }else if (proof.getPipeline().getPipelineId().equals(proofQuery.getPipelineId()) || proof.getType() == 1){
                 list.add(proof);
