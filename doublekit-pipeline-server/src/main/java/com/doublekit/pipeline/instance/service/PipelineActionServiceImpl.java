@@ -94,10 +94,11 @@ public class PipelineActionServiceImpl implements PipelineActionService {
         for (Pipeline pipeline : pipelineActionQuery.getPipelineList()) {
             if (pipelineActionQuery.getPage()+pipelineActionQuery.getPageSize() == 11){
                 sql = sql.concat(" where pipeline_action.pipeline_id = '"+ pipeline.getPipelineId()+"' order by create_time desc limit 0,10");
-            }else {
-                sql = sql.concat(" where pipeline_action.pipeline_id = '"+ pipeline.getPipelineId()+"'");
+            } else {
+                sql = sql.concat(" where pipeline_action.pipeline_id = '"+ pipeline.getPipelineId()+"' order by create_time desc");
             }
-             list.addAll(BeanMapper.mapList(pipelineActionDao.findUserAction(sql), PipelineAction.class));
+            list.addAll(BeanMapper.mapList(pipelineActionDao.findUserAction(sql), PipelineAction.class));
+            sql = "";
         }
         joinTemplate.joinQuery(list);
         list.sort(Comparator.comparing(PipelineAction::getCreateTime,Comparator.reverseOrder()));

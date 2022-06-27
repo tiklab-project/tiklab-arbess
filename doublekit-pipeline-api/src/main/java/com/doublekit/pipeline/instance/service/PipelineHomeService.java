@@ -50,7 +50,7 @@ public interface PipelineHomeService {
     List<PipelineAction> findAllAction(String userId);
 
 
-    List<PipelineAction> findUserAction(PipelineActionQuery pipelineActionQuery);
+    PipelineActionQuery findUserAction(PipelineActionQuery pipelineActionQuery);
 
 
 }

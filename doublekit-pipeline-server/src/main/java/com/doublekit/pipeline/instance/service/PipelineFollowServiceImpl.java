@@ -12,6 +12,10 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 收藏信息实现
+ */
+
 @Service
 @Exporter
 public class PipelineFollowServiceImpl implements  PipelineFollowService{

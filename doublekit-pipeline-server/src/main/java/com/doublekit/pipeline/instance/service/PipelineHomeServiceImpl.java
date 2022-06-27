@@ -157,7 +157,8 @@ public class PipelineHomeServiceImpl implements PipelineHomeService{
    }
 
     @Override
-    public List<PipelineAction> findUserAction(PipelineActionQuery pipelineActionQuery){
+    public  PipelineActionQuery findUserAction(PipelineActionQuery pipelineActionQuery){
+        PipelineActionQuery query = new PipelineActionQuery();
         List<Pipeline> userPipeline = pipelineService.findUserPipeline(pipelineActionQuery.getUserId());
         if (userPipeline == null){
             return null;
@@ -165,12 +166,18 @@ public class PipelineHomeServiceImpl implements PipelineHomeService{
         pipelineActionQuery.setPipelineList(userPipeline);
         //获取流水线动态
         List<PipelineAction> list = pipelineActionService.findUserAction(pipelineActionQuery);
-        if (list.size()<10){
-            return list;
+        query.setPageSize(pipelineActionQuery.getPageSize());
+        query.setPage(pipelineActionQuery.getPage());
+        query.setListSize(list.size());
+        query.setPageNumber(1);
+        if (list.size() < 10){
+            query.setDataList(list);
+            return query;
         }
         //默认0-10
         if (pipelineActionQuery.getPage()+ pipelineActionQuery.getPageSize() == 11){
-            return list.subList(0, 10);
+            query.setDataList(list.subList(0, 10));
+            return query;
         }
         int page = (pipelineActionQuery.getPage() - 1) * pipelineActionQuery.getPageSize();
         int pageSize = pipelineActionQuery.getPage()  * pipelineActionQuery.getPageSize();
@@ -180,7 +187,10 @@ public class PipelineHomeServiceImpl implements PipelineHomeService{
         if (pageSize > list.size()){
             pageSize = list.size();
         }
-        return list.subList(page, pageSize);
+        query.setDataList(list.subList(page, pageSize));
+        query.setPageNumber(list.size()/pageSize + 1);
+        query.setListSize(list.size());
+        return query;
     }
 
 

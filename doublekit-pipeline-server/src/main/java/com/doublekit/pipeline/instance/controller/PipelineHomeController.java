@@ -76,11 +76,11 @@ public class PipelineHomeController {
     }
 
 
-    @RequestMapping(path="/findUserAction",method = RequestMethod.POST)
+    @RequestMapping(path="findUserAction",method = RequestMethod.POST)
     @ApiMethod(name = "findUserAction",desc = "获取用户动态")
     @ApiParam(name = "userId",desc = "用户id",required = true)
-    public Result< List<PipelineAction>> findUserAction( @RequestBody @NotNull PipelineActionQuery pipelineActionQuery){
-        List<PipelineAction> allAction = pipelineHomeService.findUserAction(pipelineActionQuery);
+    public Result< PipelineActionQuery> findUserAction(@RequestBody @NotNull PipelineActionQuery pipelineActionQuery){
+        PipelineActionQuery allAction = pipelineHomeService.findUserAction(pipelineActionQuery);
         return Result.ok(allAction);
     }
 

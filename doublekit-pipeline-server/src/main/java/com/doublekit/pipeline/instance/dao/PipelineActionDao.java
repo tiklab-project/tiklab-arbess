@@ -69,7 +69,7 @@ public class PipelineActionDao {
      * @return 动态信息
      */
     public List<PipelineActionEntity> findUserAction(String s){
-        String sql = "select * from pipeline_action";
+        String sql = "select * from pipeline_action ";
         sql = sql.concat(s);
         JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
         return  jdbcTemplate.query(sql, new BeanPropertyRowMapper(PipelineActionEntity.class));

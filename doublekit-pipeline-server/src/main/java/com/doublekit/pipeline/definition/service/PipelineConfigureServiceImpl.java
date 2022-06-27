@@ -9,6 +9,8 @@ import com.doublekit.pipeline.definition.model.Pipeline;
 import com.doublekit.pipeline.definition.model.PipelineConfigure;
 import com.doublekit.pipeline.definition.model.PipelineExecConfigure;
 import com.doublekit.pipeline.execute.service.PipelineCodeService;
+import com.doublekit.pipeline.instance.service.PipelineActionService;
+import com.doublekit.pipeline.instance.service.PipelineOpenService;
 import com.doublekit.rpc.annotation.Exporter;
 import com.ibm.icu.text.SimpleDateFormat;
 import org.slf4j.Logger;
@@ -34,6 +36,9 @@ public class PipelineConfigureServiceImpl implements PipelineConfigureService {
 
     @Autowired
     PipelineCodeService pipelineCodeService;
+
+    @Autowired
+    PipelineActionService pipelineActionService;
 
 
     private static final Logger logger = LoggerFactory.getLogger(PipelineConfigureServiceImpl.class);
@@ -69,6 +74,7 @@ public class PipelineConfigureServiceImpl implements PipelineConfigureService {
     //更新配置
     @Override
     public void updateConfigure(PipelineConfigure pipelineConfigure){
+
         pipelineConfigureDao.updateConfigure(BeanMapper.map(pipelineConfigure,PipelineConfigureEntity.class));
     }
 
@@ -79,6 +85,7 @@ public class PipelineConfigureServiceImpl implements PipelineConfigureService {
         pipeline.setPipelineId(pipelineId);
         pipelineConfigure.setPipeline(pipeline);
         pipelineConfigure.setCreateTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+        pipelineActionService.createActive(pipelineConfigure.getUserId(), pipelineConfigure.getPipeline(), "用户创建了流水线/的配置");
         createConfigure(pipelineConfigure);
     }
 
@@ -99,6 +106,7 @@ public class PipelineConfigureServiceImpl implements PipelineConfigureService {
     //更新任务
     @Override
     public void updateTask(PipelineExecConfigure pipelineExecConfigure){
+        pipelineActionService.createActive(pipelineExecConfigure.getUser().getId(), pipelineExecConfigure.getPipeline(), "用户更新了流水线/的配置");
         pipelineCodeService.updateTask(pipelineExecConfigure);
     }
 
