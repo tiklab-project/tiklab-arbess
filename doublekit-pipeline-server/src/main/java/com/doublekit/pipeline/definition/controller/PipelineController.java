@@ -8,6 +8,7 @@ import com.doublekit.core.Result;
 import com.doublekit.pipeline.definition.model.Pipeline;
 import com.doublekit.pipeline.definition.model.PipelineStatus;
 import com.doublekit.pipeline.definition.service.PipelineService;
+import com.doublekit.user.user.model.DmUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -93,15 +94,6 @@ public class PipelineController {
 
         return Result.ok(pipelineQueryList);
     }
-    //查询所有
-    @RequestMapping(path="/findAllPipelineStatus",method = RequestMethod.POST)
-    @ApiMethod(name = "findOnePipelineStatus",desc = "查询所有流水线状态")
-    public Result<List<PipelineStatus>> findOnePipelineStatus(@NotNull  String userId){
-
-        List<PipelineStatus> allStatus = pipelineService.findAllStatus(userId);
-
-        return Result.ok(allStatus);
-    }
 
     @RequestMapping(path="/findUserPipeline",method = RequestMethod.POST)
     @ApiMethod(name = "findUserPipeline",desc = "查询用户流水线")
@@ -111,5 +103,15 @@ public class PipelineController {
         List<Pipeline> pipelineQueryList = pipelineService.findUserPipeline(userId);
 
         return Result.ok(pipelineQueryList);
+    }
+
+    @RequestMapping(path="/findPipelineUser",method = RequestMethod.POST)
+    @ApiMethod(name = "findPipelineUser",desc = "查询此拥有流水线的用户")
+    @ApiParam(name = "pipelineId",desc = "流水线id",required = true)
+    public Result<List<DmUser>> findPipelineUser(@NotNull String pipelineId){
+
+        List<DmUser> dmUser = pipelineService.findPipelineUser(pipelineId);
+
+        return Result.ok(dmUser);
     }
 }

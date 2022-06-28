@@ -123,26 +123,20 @@ public class CodeGiteeApiServiceImpl implements CodeGiteeApiService {
 
     //凭证信息
     @Override
-    public String getProof(String proofName,String accessToken) {
-        if (accessToken == null && proofName == null){
-             return  null;
-         }
-        String userName = getUserMessage(accessToken);
-        Proof proof = proofService.findAllAuthProof(2, userName);
-        if (proof == null){
-            proof =  new Proof();
+    public String getProof(Proof proof) {
+        if (proof.getProofPassword() == null){
+            return null;
         }
-        proof.setProofName(proofName);
-        proof.setProofPassword(accessToken);
-        proof.setProofUsername(getUserMessage(accessToken));
-        proof.setProofType("gitee授权");
-        proof.setProofScope(2);
-        proof.setType(2);
-        proof.setProofDescribe("gitee授权登录");
-        if (proof.getProofId() == null){
+        String userName = getUserMessage(proof.getProofPassword());
+        //判断是否存在相同的授权
+        Proof proofs = proofService.findAllAuthProof(2, userName);
+        proof.setProofUsername(userName);
+        //不存在相同授权创建新的凭证
+        if (proofs == null){
             proof.setProofCreateTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
             return proofService.createProof(proof);
         }
+        proof.setProofId(proofs.getProofId());
         proofService.updateProof(proof);
         return proof.getProofId();
     }
@@ -183,6 +177,7 @@ public class CodeGiteeApiServiceImpl implements CodeGiteeApiService {
     //获取仓库的url
     @Override
     public String getCloneUrl(Proof proof,String projectName){
+        Proof oneProof = proofService.findOneProof(proof.getProofId());
         if (projectName == null){
             return null;
         }
@@ -192,7 +187,7 @@ public class CodeGiteeApiServiceImpl implements CodeGiteeApiService {
         }
         String name = split[1];
         //获取仓库URl
-        String oneStorehouse = codeGiteeApi.getOneStorehouse(proof.getProofUsername(),name,proof.getProofPassword());
+        String oneStorehouse = codeGiteeApi.getOneStorehouse(oneProof.getProofUsername(),name,oneProof.getProofPassword());
         ResponseEntity<String> forEntity1 = restTemplate.getForEntity(oneStorehouse, String.class, JSONObject.class);
         JSONObject jsonObject = JSONObject.parseObject(forEntity1.getBody());
         return jsonObject.getString("html_url");

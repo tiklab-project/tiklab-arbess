@@ -143,6 +143,9 @@ public class PipelineExecServiceImpl implements PipelineExecService {
     @Override
     public int findState(String pipelineId){
         Pipeline pipeline = pipelineService.findPipeline(pipelineId);
+        if (pipeline == null ){
+            return 0;
+        }
         if (pipeline.getPipelineState() == 1){
             return 1;
         }

@@ -159,8 +159,6 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
                 .setBranch(branch)
                 .call();
         git.close();
-        Repository repository = git.getRepository();
-        repository.isBare();
     }
 
 
@@ -197,15 +195,6 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
                 })
                 .setDirectory(fileAddress)
                 .call();
-        //if (!fileAddress.exists()){
-        //
-        //}else {
-        //    git = Git.open(new File(clonePath+"\\.git"));
-        //    git.pull().setTransportConfigCallback(transport -> {
-        //        SshTransport sshTransport = (SshTransport) transport;
-        //        sshTransport.setSshSessionFactory(sshSessionFactory);
-        //    }).call();
-        //}
         git.close();
     }
 

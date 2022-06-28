@@ -67,13 +67,13 @@ public class PipelineHomeController {
     }
 
 
-    @RequestMapping(path="/findAllAction",method = RequestMethod.POST)
-    @ApiMethod(name = "findAllAction",desc = "获取用户动态")
-    @ApiParam(name = "userId",desc = "用户id",required = true)
-    public Result< List<PipelineAction>> findAllAction(@NotNull String userId){
-        List<PipelineAction> allAction = pipelineHomeService.findAllAction(userId);
-        return Result.ok(allAction);
-    }
+    //@RequestMapping(path="/findAllAction",method = RequestMethod.POST)
+    //@ApiMethod(name = "findAllAction",desc = "获取用户动态")
+    //@ApiParam(name = "userId",desc = "用户id",required = true)
+    //public Result< List<PipelineAction>> findAllAction(@NotNull String userId){
+    //    List<PipelineAction> allAction = pipelineHomeService.findAllAction(userId);
+    //    return Result.ok(allAction);
+    //}
 
 
     @RequestMapping(path="findUserAction",method = RequestMethod.POST)

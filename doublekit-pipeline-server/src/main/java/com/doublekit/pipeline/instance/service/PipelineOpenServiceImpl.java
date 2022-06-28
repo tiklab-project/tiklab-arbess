@@ -83,16 +83,23 @@ public class PipelineOpenServiceImpl implements PipelineOpenService {
 
     @Override
     public List<PipelineOpen> findAllOpen(String userId){
-        List<PipelineOpen> list = new ArrayList<>();
-        if (findAllOpen() == null){
-            return null;
-        }
-        for (PipelineOpen pipelineOpen : findAllOpen()) {
-            if (!pipelineOpen.getUserId().equals(userId)){
-               continue;
-            }
+        //List<PipelineOpen> list = new ArrayList<>();
+        //if (findAllOpen() == null){
+        //    return null;
+        //}
+        //for (PipelineOpen pipelineOpen : findAllOpen()) {
+        //    if (!pipelineOpen.getUserId().equals(userId)){
+        //       continue;
+        //    }
+        //    pipelineOpen.setPipelineName(pipelineOpen.getPipeline().getPipelineName());
+        //    list.add(pipelineOpen);
+        //}
+        List<PipelineOpenEntity> allOpen = pipelineOpenDao.findAllOpen(userId);
+        List<PipelineOpen> list = BeanMapper.mapList(allOpen, PipelineOpen.class);
+        joinTemplate.joinQuery(list);
+        for (PipelineOpen pipelineOpen : list) {
             pipelineOpen.setPipelineName(pipelineOpen.getPipeline().getPipelineName());
-            list.add(pipelineOpen);
+            pipelineOpen.setPipelineId(pipelineOpen.getPipeline().getPipelineId());
         }
         return list;
     }

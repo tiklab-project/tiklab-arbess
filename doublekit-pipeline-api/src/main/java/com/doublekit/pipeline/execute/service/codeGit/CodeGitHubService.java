@@ -49,7 +49,7 @@ public interface CodeGitHubService {
      * 创建凭证
      * @return 凭证id
      */
-    String getProof(String proofName,String accessToken);
+    String getProof(Proof proof);
 
     /**
      * 获取单个仓库

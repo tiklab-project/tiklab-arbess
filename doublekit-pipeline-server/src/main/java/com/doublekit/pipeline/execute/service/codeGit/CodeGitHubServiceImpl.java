@@ -127,49 +127,35 @@ public class CodeGitHubServiceImpl implements CodeGitHubService {
         if (body == null){
             return null;
         }
-        logger.info("数据为 ： "+body.getString("login"));
         return body.getString("login");
 
     }
 
     @Override
-    public String getProof(String proofName,String accessToken){
+    public String getProof(Proof proof){
+        String userName = getUserMessage(proof.getProofPassword());
+        Proof proofs = proofService.findAllAuthProof(3, userName);
 
-        if (accessToken == null && proofName == null){
-            return null;
-        }
-        String userName = getUserMessage(accessToken);
-        Proof proof = proofService.findAllAuthProof(3, userName);
-        if (proof == null){
-            proof = new Proof();
-        }
-        proof.setProofName(proofName);
-        proof.setProofPassword(accessToken);
         proof.setProofUsername(userName);
-        proof.setProofType("gitHub授权");
-        proof.setProofScope(3);
-        proof.setType(2);
-        proof.setProofDescribe("gitHub授权登录");
-        if (proof.getProofId() == null){
+        if (proofs == null){
             proof.setProofCreateTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
             return proofService.createProof(proof);
         }
+        proof.setProofId(proofs.getProofId());
         proofService.updateProof(proof);
         return proof.getProofId();
     }
 
     @Override
     public String getOneHouse( Proof proof,String houseName){
-        if (proof == null){
-            return null;
-        }
+        Proof oneProof = proofService.findOneProof(proof.getProofId());
         String[] split = houseName.split("/");
         if (split.length != 2){
             return null;
         }
         String name = split[1];
         //获取仓库URl
-        String oneStorehouse = codeGitHubApi.getOneHouse(proof.getProofUsername(),name);
+        String oneStorehouse = codeGitHubApi.getOneHouse(oneProof.getProofUsername(),name);
         ResponseEntity<String> forEntity1 = restTemplate.getForEntity(oneStorehouse, String.class, JSONObject.class);
         JSONObject jsonObject = JSONObject.parseObject(forEntity1.getBody());
         return jsonObject.getString("html_url");

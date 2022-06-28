@@ -37,6 +37,9 @@ public class PipelineOpen {
 
     private String pipelineName;
 
+    private String pipelineId;
+
+
     public String getId() {
         return id;
     }
@@ -75,5 +78,13 @@ public class PipelineOpen {
 
     public void setPipelineName(String pipelineName) {
         this.pipelineName = pipelineName;
+    }
+
+    public String getPipelineId() {
+        return pipelineId;
+    }
+
+    public void setPipelineId(String pipelineId) {
+        this.pipelineId = pipelineId;
     }
 }

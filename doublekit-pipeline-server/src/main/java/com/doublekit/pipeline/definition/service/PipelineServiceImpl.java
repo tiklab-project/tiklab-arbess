@@ -8,6 +8,7 @@ import com.doublekit.pipeline.definition.model.Pipeline;
 import com.doublekit.pipeline.definition.model.PipelineConfigure;
 import com.doublekit.pipeline.definition.model.PipelineStatus;
 import com.doublekit.pipeline.instance.model.PipelineExecHistory;
+import com.doublekit.pipeline.instance.model.PipelineExecState;
 import com.doublekit.pipeline.instance.service.PipelineActionService;
 import com.doublekit.pipeline.instance.service.PipelineExecHistoryService;
 import com.doublekit.pipeline.instance.service.PipelineOpenService;
@@ -117,7 +118,7 @@ public class PipelineServiceImpl implements PipelineService{
          PipelineEntity pipelineEntity = BeanMapper.map(pipeline, PipelineEntity.class);
         //更新用户信息
         pipelineDao.updatePipeline(pipelineEntity);
-        pipelineActionService.createActive(pipeline.getUser().getId(),pipeline,"更新了流水线/的信息");
+        //pipelineActionService.createActive(pipeline.getUser().getId(),pipeline,"更新了流水线/的信息");
         return 1;
     }
 
@@ -152,20 +153,7 @@ public class PipelineServiceImpl implements PipelineService{
     //获取用户流水线
     @Override
     public List<Pipeline> findUserPipeline(String userId){
-        List<DmUserEntity> dmUsers = pipelineDao.findAllDmUser(userId);
-        List<Pipeline> allPipeline = findAllPipeline();
-        if (allPipeline == null || dmUsers.size() == 0){
-            return null;
-        }
-
-        List<Pipeline> list = new ArrayList<>();
-
-        for (DmUserEntity dmUserEntity : dmUsers) {
-            List<Pipeline> collect = allPipeline.stream().filter(pipeline -> dmUserEntity.getDomainId().equals(pipeline.getPipelineId())).toList();
-            list.addAll(collect);
-        }
-
-         return list;
+        return BeanMapper.mapList(pipelineDao.findUserPipeline(userId), Pipeline.class);
     }
 
     //模糊查询
@@ -186,13 +174,18 @@ public class PipelineServiceImpl implements PipelineService{
     }
 
     //获取用户所有流水线状态
-    @Override
     public List<PipelineStatus> findAllStatus(String userId) {
-        List<PipelineStatus> pipelineStatusList= new ArrayList<>();
         List<Pipeline> allPipeline = findUserPipeline(userId);
         if (allPipeline == null){
             return null;
         }
+        return findAllStatus(allPipeline);
+    }
+
+    //获取流水线状态
+    @Override
+    public  List<PipelineStatus> findAllStatus(List<Pipeline> allPipeline){
+        List<PipelineStatus> pipelineStatusList= new ArrayList<>();
         for (Pipeline pipeline : allPipeline) {
             PipelineStatus pipelineStatus = new PipelineStatus();
             //成功和构建时间
@@ -221,31 +214,30 @@ public class PipelineServiceImpl implements PipelineService{
         //获取7天前的时间
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         Date lastTime = DateUtils.addDays(new Date(), -7);
-
-        List<PipelineExecHistory> list = new ArrayList<>();
-        List<PipelineStatus> allStatus = findAllStatus(userId);
-        if (allStatus == null){
-            return null;
-        }
-        //获取用户所有的流水线
-        for (PipelineStatus status : allStatus) {
-
-            List<PipelineExecHistory> allHistory = pipelineExecHistoryService.findAllHistory(status.getPipelineId());
-            if (allHistory == null){
-                continue;
-            }
-            List<PipelineExecHistory> collect = allHistory.stream().filter(pipelineExecHistory -> {
-                try {
-                    return lastTime.compareTo(formatter.parse(pipelineExecHistory.getCreateTime())) <= 0;
-                } catch (ParseException e) {
-                    logger.info("获取历史创建时间时日期转换异常。");
-                }
-                return false;
-            }).toList();
-               list.addAll(collect);
-         }
-        return list;
+        Date nowTime = DateUtils.addDays(new Date(), 1);
+        return pipelineExecHistoryService.findAllUserHistory(userId,formatter.format(lastTime),formatter.format(nowTime));
     }
+
+    //获取拥有此流水线的用户
+    @Override
+    public List<DmUser> findPipelineUser(String PipelineId){
+        List<DmUser> dmUser = BeanMapper.mapList(pipelineDao.findPipelineUser(PipelineId), DmUser.class);
+        joinTemplate.joinQuery(dmUser);
+        return dmUser;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

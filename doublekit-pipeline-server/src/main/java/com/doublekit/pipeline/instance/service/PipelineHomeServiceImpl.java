@@ -46,17 +46,16 @@ public class PipelineHomeServiceImpl implements PipelineHomeService{
             return null;
         }
         allOpen.sort(Comparator.comparing(PipelineOpen::getNumber,Comparator.reverseOrder()));
-        return allOpen;
+        if (allOpen.size() <= 5){
+            return allOpen;
+        }
+        return allOpen.subList(0, 5);
     }
 
     //获取收藏列表
     @Override
     public List<PipelineStatus> findAllFollow(String userId){
-        List<PipelineStatus> allStatus = pipelineService.findAllStatus(userId);
-        if (allStatus == null){
-            return null;
-        }
-        return pipelineFollowService.findAllFollow(userId,allStatus);
+        return pipelineService.findAllStatus(pipelineFollowService.findAllFollow(userId));
     }
 
     //更新收藏信息
@@ -68,11 +67,9 @@ public class PipelineHomeServiceImpl implements PipelineHomeService{
     //获取用户流水线
     @Override
     public List<PipelineStatus> findUserPipeline(String userId){
-        List<PipelineStatus> allStatus = pipelineService.findAllStatus(userId);
-        if (allStatus == null){
-            return null;
-        }
-        return pipelineFollowService.findUserPipeline(userId,allStatus);
+        List<Pipeline> userPipeline = pipelineFollowService.findUserPipeline(userId);
+        return pipelineService.findAllStatus(userPipeline);
+
     }
 
     //近七天构建状态
@@ -116,46 +113,47 @@ public class PipelineHomeServiceImpl implements PipelineHomeService{
     }
 
     //用户动态
-    @Override
-    public List<PipelineAction> findAllAction(String userId){
-       List<PipelineStatus> userPipeline = findUserPipeline(userId);
-       List<PipelineAction> allActive = pipelineActionService.findAllActive();
-       if (userPipeline == null || allActive ==null){
-           return null;
-       }
-       List<PipelineAction> list = new ArrayList<>();
-       for (PipelineAction pipelineAction : allActive) {
-           //用户的所有动态
-           if (pipelineAction.getPipeline() == null){
-               if (pipelineAction.getUser().getId().equals(userId)){
-                   list.add(pipelineAction);
-               }
-           }else {
-               //用户流水线的动态
-               for (PipelineStatus pipelineStatus : userPipeline) {
-                   if (!pipelineAction.getPipeline().getPipelineId().equals(pipelineStatus.getPipelineId())){
-                       continue;
-                   }
-                list.add(pipelineAction);
-               }
-           }
-       }
+   // @Override
+   // public List<PipelineAction> findAllAction(String userId){
+   //    List<PipelineStatus> userPipeline = findUserPipeline(userId);
+   //    List<PipelineAction> allActive = pipelineActionService.findAllActive();
+   //    if (userPipeline == null || allActive ==null){
+   //        return null;
+   //    }
+   //    List<PipelineAction> list = new ArrayList<>();
+   //    for (PipelineAction pipelineAction : allActive) {
+   //        //用户的所有动态
+   //        if (pipelineAction.getPipeline() == null){
+   //            if (pipelineAction.getUser().getId().equals(userId)){
+   //                list.add(pipelineAction);
+   //            }
+   //        }else {
+   //            //用户流水线的动态
+   //            for (PipelineStatus pipelineStatus : userPipeline) {
+   //                if (!pipelineAction.getPipeline().getPipelineId().equals(pipelineStatus.getPipelineId())){
+   //                    continue;
+   //                }
+   //             list.add(pipelineAction);
+   //            }
+   //        }
+   //    }
+   //
+   //    List<PipelineAction> actionList = new ArrayList<>();
+   //    if (list.size() < 7){
+   //        actionList.addAll(list);
+   //        return actionList;
+   //    }
+   //
+   //    list.sort(Comparator.comparing(PipelineAction::getCreateTime,Comparator.reverseOrder()));
+   //    int i = 0;
+   //    while (i < 7 ){
+   //        actionList.add(list.get(i));
+   //        i++;
+   //    }
+   //    return actionList;
+   //}
 
-       List<PipelineAction> actionList = new ArrayList<>();
-       if (list.size() < 7){
-           actionList.addAll(list);
-           return actionList;
-       }
-
-       list.sort(Comparator.comparing(PipelineAction::getCreateTime,Comparator.reverseOrder()));
-       int i = 0;
-       while (i < 7 ){
-           actionList.add(list.get(i));
-           i++;
-       }
-       return actionList;
-   }
-
+    //获取用户动态
     @Override
     public  PipelineActionQuery findUserAction(PipelineActionQuery pipelineActionQuery){
         PipelineActionQuery query = new PipelineActionQuery();

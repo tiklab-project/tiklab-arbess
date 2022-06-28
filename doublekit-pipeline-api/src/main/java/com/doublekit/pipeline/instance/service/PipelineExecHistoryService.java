@@ -60,10 +60,21 @@ public interface PipelineExecHistoryService {
      */
     PipelineExecHistory findLatelyHistory(String pipelineId);
 
+
+    /**
+     * 查询用户所有流水线历史
+     * @param userId 用户id
+     * @param lastTime 开始时间
+     * @param nowTime 停止时间
+     * @return 历史信息
+     */
+    List<PipelineExecHistory> findAllUserHistory(String userId ,String lastTime,String nowTime);
+
+
     /**
      * 查询最近一次成功
      * @param pipelineId 流水线id
-     * @return
+     * @return 成功信息
      */
     PipelineExecHistory findLatelySuccess(String pipelineId);
 

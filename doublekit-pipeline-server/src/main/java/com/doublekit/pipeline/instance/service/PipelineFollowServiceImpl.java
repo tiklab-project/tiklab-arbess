@@ -1,15 +1,18 @@
 package com.doublekit.pipeline.instance.service;
 
 import com.doublekit.beans.BeanMapper;
+import com.doublekit.pipeline.definition.model.Pipeline;
 import com.doublekit.pipeline.definition.model.PipelineStatus;
 import com.doublekit.pipeline.instance.dao.PipelineFollowDao;
 import com.doublekit.pipeline.instance.entity.PipelineFollowEntity;
 import com.doublekit.pipeline.instance.model.PipelineFollow;
 import com.doublekit.rpc.annotation.Exporter;
+import com.thoughtworks.xstream.mapper.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -25,19 +28,18 @@ public class PipelineFollowServiceImpl implements  PipelineFollowService{
 
     @Override
     public String updateFollow(PipelineFollow pipelineFollow) {
-        List<PipelineFollow> allFollow = findAllFollow();
-        if (allFollow == null){
-            return null;
-        }
-        for (PipelineFollow follow : allFollow) {
-            //判断是否存在收藏，存在删除改为取消
-            if (pipelineFollow.getUserId().equals(follow.getUserId())
-                    && pipelineFollow.getPipeline().getPipelineId().equals(follow.getPipeline().getPipelineId()) ){
-                deleteFollow(follow.getId());
-                return "1";
+        String pipelineId = pipelineFollow.getPipeline().getPipelineId();
+        String userId = pipelineFollow.getUserId();
+        List<PipelineFollow> list = pipelineFollowDao.updateFollow(userId, pipelineId);
+        if (list.size() == 0){
+            String follow = pipelineFollowDao.createFollow(BeanMapper.map(pipelineFollow, PipelineFollowEntity.class));
+            if (follow == null){
+                return null;
             }
+        }else {
+            deleteFollow(list.get(0).getId());
         }
-        return pipelineFollowDao.createFollow(BeanMapper.map(pipelineFollow, PipelineFollowEntity.class));
+        return "1";
     }
 
     @Override
@@ -46,48 +48,29 @@ public class PipelineFollowServiceImpl implements  PipelineFollowService{
     }
 
     @Override
-    public List<PipelineStatus> findAllFollow(String userId,List<PipelineStatus> allStatus){
-        List<PipelineStatus> list = new ArrayList<>();
-        List<PipelineFollow> allFollow = findAll(userId);
-        if (allFollow == null){
-            return null;
-        }
-        if (allStatus == null){
-            return list;
-        }
-        for (PipelineStatus status : allStatus) {
-            List<PipelineFollow> lists = allFollow.stream().filter(pipelineFollow -> status.getPipelineId().equals(pipelineFollow.getPipeline().getPipelineId())).toList();
-            if (lists.size() == 0){
-                continue;
-            }
-            status.setPipelineCollect(1);
-            list.add(status);
-            }
-        return list;
-    }
-
-    //获取用户所有收藏信息
-    public List<PipelineFollow> findAll(String userId){
-        if (findAllFollow() == null){
-            return null;
-        }
-        return findAllFollow().stream().filter(pipelineFollow -> userId.equals(pipelineFollow.getUserId())).toList();
+    public  List<Pipeline> findAllFollow(String userId){
+        List<Pipeline> pipelineFollow = pipelineFollowDao.findPipelineFollow(userId);
+        pipelineFollow.forEach(pipeline -> pipeline.setPipelineCollect(1));
+        return pipelineFollow;
     }
 
     @Override
-    public List<PipelineStatus> findUserPipeline(String userId, List<PipelineStatus> allStatus){
-        List<PipelineFollow> allFollow = findAll(userId);
-        if (allStatus == null || allFollow == null){
-            return null;
+    public List<Pipeline> findUserPipeline(String userId){
+        List<Pipeline> pipelineFollow = pipelineFollowDao.findPipelineFollow(userId);
+        List<Pipeline> pipelineNotFollow = pipelineFollowDao.findPipelineNotFollow(userId);
+
+        List<Pipeline> pipelineList = new ArrayList<>();
+
+        if (pipelineFollow != null){
+            pipelineFollow.forEach(pipeline -> pipeline.setPipelineCollect(1));
+            pipelineList.addAll(pipelineFollow);
         }
-        for (PipelineStatus status : allStatus) {
-            List<PipelineFollow> list = allFollow.stream().filter(pipelineFollow -> status.getPipelineId().equals(pipelineFollow.getPipeline().getPipelineId())).toList();
-            if (list.size() == 0){
-                continue;
-            }
-            status.setPipelineCollect(1);
+
+        if (pipelineNotFollow != null){
+            pipelineList.addAll(pipelineNotFollow);
         }
-        return allStatus;
+        pipelineList.sort(Comparator.comparing(Pipeline::getPipelineName));
+        return pipelineList;
     }
 
     @Override

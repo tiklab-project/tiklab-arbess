@@ -42,14 +42,14 @@ public interface PipelineHomeService {
      */
     List<PipelineExecState> runState(String userId);
 
+
+    //List<PipelineAction> findAllAction(String userId);
+
     /**
      * 查询动态
-     * @param userId 用户id
+     * @param pipelineActionQuery 信息
      * @return 动态信息
      */
-    List<PipelineAction> findAllAction(String userId);
-
-
     PipelineActionQuery findUserAction(PipelineActionQuery pipelineActionQuery);
 
 

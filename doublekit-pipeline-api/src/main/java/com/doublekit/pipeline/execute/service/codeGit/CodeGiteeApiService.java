@@ -43,11 +43,10 @@ public interface CodeGiteeApiService {
 
     /**
      * 创建凭证
-     * @param proofName 仓库名
-     * @param accessToken 凭证
+     * @param proof 凭证
      * @return 凭证ID
      */
-    String getProof(String proofName,String accessToken);
+    String getProof(Proof proof);
 
     /**
      * 获取仓库所有分支

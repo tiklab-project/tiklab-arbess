@@ -141,7 +141,7 @@ public class PipelineWorkSpaceServiceImpl implements  PipelineWorkSpaceService {
             }
             return returnValue(list);
         } catch (IOException | GitAPIException e) {
-            logger.info("流水线git文件地址找不到，或者没有提交信息");
+            logger.info("流水线.git文件地址找不到，或者没有提交信息");
             return null;
         }
     }

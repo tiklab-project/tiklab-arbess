@@ -5,11 +5,15 @@ import com.doublekit.apibox.annotation.ApiMethod;
 import com.doublekit.apibox.annotation.ApiParam;
 import com.doublekit.core.Result;
 import com.doublekit.pipeline.execute.service.codeGit.CodeGitHubService;
+import com.doublekit.pipeline.setting.proof.model.Proof;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Map;
 
@@ -32,7 +36,7 @@ public class GitHubApiController {
     @RequestMapping(path="/getAccessToken",method = RequestMethod.POST)
     @ApiMethod(name = "getAccessToken",desc = "获取accessToken")
     @ApiParam(name = "code",desc = "code",required = true)
-    public Result<String> getAccessToken(String code){
+    public Result<String> getAccessToken(@NotNull String code){
         String s = codeGitHubService.getAccessToken(code);
         return Result.ok(s);
     }
@@ -40,7 +44,7 @@ public class GitHubApiController {
     @RequestMapping(path="/getUserMessage",method = RequestMethod.POST)
     @ApiMethod(name = "getUserMessage",desc = "返回获取code")
     @ApiParam(name = "accessToken",desc = "accessToken",required = true)
-    public Result<String> getUserMessage(String accessToken){
+    public Result<String> getUserMessage(@NotNull String accessToken){
         String s = codeGitHubService.getUserMessage(accessToken);
         return Result.ok(s);
     }
@@ -48,7 +52,7 @@ public class GitHubApiController {
     @RequestMapping(path="/getAllStorehouse",method = RequestMethod.POST)
     @ApiMethod(name = "getAllStorehouse",desc = "获取用户的存储库")
     @ApiParam(name = "proofId",desc = "proofId",required = true)
-    public Result<List<String>> getAllStorehouse(String proofId){
+    public Result<List<String>> getAllStorehouse(@NotNull String proofId){
         List<String> list = codeGitHubService.getAllStorehouse(proofId);
         return Result.ok(list);
     }
@@ -56,16 +60,32 @@ public class GitHubApiController {
     @RequestMapping(path="/getBranch",method = RequestMethod.POST)
     @ApiMethod(name = "getAllStorehouse",desc = "获取用户的存储库")
     @ApiParam(name = "proofId",desc = "proofId",required = true)
-    public Result<Map<String, String>> getBranch(String proofId,String projectName){
+    public Result<Map<String, String>> getBranch(@NotNull String proofId,String projectName){
         List<String> branchList = codeGitHubService.getBranch(proofId, projectName);
         return Result.ok(branchList);
     }
 
     @RequestMapping(path="/getProof",method = RequestMethod.POST)
-    @ApiMethod(name = "getProof",desc = "创建凭证")
-    @ApiParam(name = "proofName",desc = "凭证名称",required = true)
-    public Result<String> getProof(String proofName,String accessToken){
-        String s = codeGitHubService.getProof(proofName,accessToken);
+    @ApiMethod(name = "getProof",desc = "创建GitHub凭证")
+    @ApiParam(name = "proof",desc = "凭证信息",required = true)
+    public Result<String> getProof(@RequestBody @Valid @NotNull Proof proof){
+        String s = codeGitHubService.getProof(proof);
         return Result.ok(s);
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }

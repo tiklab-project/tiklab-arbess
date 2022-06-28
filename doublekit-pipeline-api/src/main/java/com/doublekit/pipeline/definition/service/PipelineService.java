@@ -9,6 +9,7 @@ import com.doublekit.pipeline.definition.model.Pipeline;
 import com.doublekit.pipeline.definition.model.PipelineConfigure;
 import com.doublekit.pipeline.definition.model.PipelineStatus;
 import com.doublekit.pipeline.instance.model.PipelineExecHistory;
+import com.doublekit.user.user.model.DmUser;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -89,10 +90,10 @@ public interface PipelineService {
 
     /**
      *查询流水线状态
-     * @param userId 用户id
+     * @param allPipeline 用户id
      * @return 状态集合
      */
-    List<PipelineStatus> findAllStatus(String userId);
+    List<PipelineStatus> findAllStatus(List<Pipeline> allPipeline);
 
     /**
      * 获取用户7天内的执行历史
@@ -101,5 +102,10 @@ public interface PipelineService {
      */
     List<PipelineExecHistory> findAllUserHistory(String userId);
 
-
+    /**
+     * 获取拥有此流水线的用户
+     * @param PipelineId 流水线id
+     * @return 用户信息
+     */
+    List<DmUser> findPipelineUser(String PipelineId);
 }

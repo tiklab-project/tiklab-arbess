@@ -1,10 +1,13 @@
 package com.doublekit.pipeline.instance.dao;
 
+import com.doublekit.dal.jdbc.JdbcTemplate;
 import com.doublekit.dal.jpa.JpaTemplate;
+import com.doublekit.pipeline.definition.model.Pipeline;
 import com.doublekit.pipeline.instance.entity.PipelineOpenEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -50,6 +53,18 @@ public class PipelineOpenDao {
      */
     public PipelineOpenEntity findOneOpen(String openId){
         return jpaTemplate.findOne(PipelineOpenEntity.class,openId);
+    }
+
+    public List<PipelineOpenEntity> findAllOpen(String userId){
+        String sql = "select pipeline_open.* from pipeline_open ";
+        sql = sql.concat(" where (pipeline_open.user_id COLLATE utf8mb4_general_ci )  = ('222222' COLLATE utf8mb4_general_ci ) " +
+                " and (pipeline_open.pipeline_id COLLATE utf8mb4_general_ci )  " +
+                " in " +
+                " ( select p.pipeline_id  from orc_dm_user d,pipeline p" +
+                " where (d.domain_id  COLLATE utf8mb4_general_ci ) = (p.pipeline_id COLLATE utf8mb4_general_ci ) " +
+                " and  (d.user_id COLLATE utf8mb4_general_ci ) =  ('"+userId+"' COLLATE utf8mb4_general_ci ))");
+        JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
+        return  jdbcTemplate.query(sql, new BeanPropertyRowMapper(PipelineOpenEntity.class));
     }
 
     /**

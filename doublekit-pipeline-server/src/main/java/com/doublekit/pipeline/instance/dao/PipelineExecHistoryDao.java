@@ -1,12 +1,16 @@
 package com.doublekit.pipeline.instance.dao;
 
 import com.doublekit.core.page.Pagination;
+import com.doublekit.dal.jdbc.JdbcTemplate;
 import com.doublekit.dal.jpa.JpaTemplate;
 import com.doublekit.dal.jpa.criterial.condition.QueryCondition;
 import com.doublekit.dal.jpa.criterial.conditionbuilder.QueryBuilders;
+import com.doublekit.pipeline.definition.model.Pipeline;
 import com.doublekit.pipeline.instance.entity.PipelineExecHistoryEntity;
+import com.doublekit.pipeline.instance.model.PipelineFollow;
 import com.doublekit.pipeline.instance.model.PipelineHistoryQuery;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -19,7 +23,6 @@ public class PipelineExecHistoryDao {
 
     /**
      * 创建流水线历史
-     *
      * @param pipelineExecHistoryEntity 流水线历史信息
      * @return 流水线id
      */
@@ -31,7 +34,6 @@ public class PipelineExecHistoryDao {
 
     /**
      * 删除流水线历史
-     *
      * @param id 流水线历史id
      */
     public void deleteHistory(String id) {
@@ -40,7 +42,6 @@ public class PipelineExecHistoryDao {
 
     /**
      * 更新流水线历史
-     *
      * @param pipelineExecHistoryEntity 更新后流水线历史信息
      */
     public void updateHistory(PipelineExecHistoryEntity pipelineExecHistoryEntity) {
@@ -51,7 +52,6 @@ public class PipelineExecHistoryDao {
 
     /**
      * 查询流水线历史
-     *
      * @param id 查询id
      * @return 流水线历史信息
      */
@@ -59,6 +59,7 @@ public class PipelineExecHistoryDao {
 
         return jpaTemplate.findOne(PipelineExecHistoryEntity.class, id);
     }
+
 
     public List<PipelineExecHistoryEntity> findHistoryList(List<String> idList) {
 
@@ -88,14 +89,60 @@ public class PipelineExecHistoryDao {
             if (pipelineHistoryQuery.getType() != 0){
                 builders.eq("runWay",pipelineHistoryQuery.getType() );
             }
+            if (pipelineHistoryQuery.getUserId() != null){
+                builders.eq("userId",pipelineHistoryQuery.getUserId() );
+            }
         QueryCondition pipelineExecHistoryList =  builders.pagination(pipelineHistoryQuery.getPageParam())
                 .orders(pipelineHistoryQuery.getOrderParams())
                 .get();
         return jpaTemplate.findPage(pipelineExecHistoryList, PipelineExecHistoryEntity.class);
     }
 
+    /**
+     * 查询用户所有流水线历史
+     * @return 流水线历史列表
+     */
+    public List<PipelineExecHistoryEntity> findAllUserHistory(String userId,String lastTime,String nowTime) {
+        String sql = "select pipeline_history.* from pipeline_history ";
+        sql = sql.concat(" where (pipeline_history.pipeline_id COLLATE utf8mb4_general_ci )"
+                + " in("
+                + " select p.pipeline_id from orc_dm_user d,pipeline p "
+                + " where (d.domain_id  COLLATE utf8mb4_general_ci ) = (p.pipeline_id COLLATE utf8mb4_general_ci ) "
+                + " and(d.user_id COLLATE utf8mb4_general_ci ) = ('"+ userId+"' COLLATE utf8mb4_general_ci ))"
+                + " and pipeline_history.create_time > '"+ lastTime +"'"
+                + " and pipeline_history.create_time < '"+nowTime + "'"
+                + " order by pipeline_history.create_time desc");
+        JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
+        return  jdbcTemplate.query(sql, new BeanPropertyRowMapper(PipelineExecHistoryEntity.class));
+    }
 
+    /**
+     * 获取最近成功的历史信息
+     * @param pipelineId 流水线id
+     * @return 成功列表
+     */
+    public List<PipelineExecHistoryEntity> findLatelySuccess(String pipelineId){
+        String sql = "select pipeline_history.* from pipeline_history  ";
+        sql = sql.concat(" where (pipeline_history.pipeline_id  COLLATE utf8mb4_general_ci ) = ('"+pipelineId+"'  COLLATE utf8mb4_general_ci ) " +
+                " and (pipeline_history.run_status  COLLATE utf8mb4_general_ci ) = ('30' COLLATE utf8mb4_general_ci ) " +
+                " order by pipeline_history.create_time desc" +
+                " limit 0 ,1");
+        JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
+        return  jdbcTemplate.query(sql, new BeanPropertyRowMapper(PipelineExecHistoryEntity.class));
+    }
 
-
+    /**
+     * 获取最近一次构建信息
+     * @param pipelineId 流水线id
+     * @return 构建信息
+     */
+    public List<PipelineExecHistoryEntity> findLatelyHistory(String pipelineId){
+        String sql = "select pipeline_history.* from pipeline_history  ";
+        sql = sql.concat(" where (pipeline_history.pipeline_id  COLLATE utf8mb4_general_ci ) = ('"+pipelineId+"'  COLLATE utf8mb4_general_ci ) " +
+                " order by pipeline_history.create_time desc" +
+                " limit 0 ,1");
+        JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
+        return  jdbcTemplate.query(sql, new BeanPropertyRowMapper(PipelineExecHistoryEntity.class));
+    }
 
 }

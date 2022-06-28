@@ -6,6 +6,7 @@ import com.doublekit.dal.jpa.criterial.condition.QueryCondition;
 import com.doublekit.dal.jpa.criterial.conditionbuilder.QueryBuilders;
 import com.doublekit.pipeline.definition.entity.PipelineEntity;
 import com.doublekit.user.user.entity.DmUserEntity;
+import com.doublekit.user.user.model.DmUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.stereotype.Repository;
@@ -71,11 +72,15 @@ public class PipelineDao {
         return jpaTemplate.findList(PipelineEntity.class,idList);
     }
 
+    //获取用户拥有的流水线
     public List<PipelineEntity> findUserPipeline(String userId){
         String sql = "select p.* from orc_dm_user d,pipeline p";
-        sql = sql.concat(" where (d.domain_id  COLLATE utf8mb4_general_ci ) = (p.pipeline_id COLLATE utf8mb4_general_ci ) and  (d.user_id COLLATE utf8mb4_general_ci ) =  (? COLLATE utf8mb4_general_ci ) ");
+        sql = sql.concat(" where (d.domain_id  COLLATE utf8mb4_general_ci ) = (p.pipeline_id COLLATE utf8mb4_general_ci ) "
+                + " and  (d.user_id COLLATE utf8mb4_general_ci ) =  (? COLLATE utf8mb4_general_ci ) ");
         return jpaTemplate.getJdbcTemplate().query(sql, new String[]{userId}, new BeanPropertyRowMapper(PipelineEntity.class));
     }
+
+
 
     /**
      * 根据名称模糊查询
@@ -88,10 +93,10 @@ public class PipelineDao {
         return jpaTemplate.findList(queryCondition,PipelineEntity.class);
     }
 
-    //获取用户的流水线
-    public List<DmUserEntity> findAllDmUser(String userId){
+    //查询拥有此流水线的用户
+    public List<DmUserEntity> findPipelineUser(String PipelineId){
         QueryCondition queryCondition = QueryBuilders.createQuery(DmUserEntity.class)
-                .eq("userId",userId)
+                .eq("domainId",PipelineId)
                 .get();
         return jpaTemplate.findList(queryCondition, DmUserEntity.class);
     }

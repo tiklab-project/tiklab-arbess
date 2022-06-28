@@ -99,33 +99,39 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
         return historyList;
     }
 
+    //查询用户所有历史
+    @Override
+    public List<PipelineExecHistory> findAllUserHistory(String userId ,String lastTime,String nowTime) {
+        List<PipelineExecHistoryEntity> allUserHistory = pipelineExecHistoryDao.findAllUserHistory(userId,lastTime,nowTime);
+        List<PipelineExecHistory> pipelineExecHistories = BeanMapper.mapList(allUserHistory, PipelineExecHistory.class);
+        joinTemplate.joinQuery(pipelineExecHistories);
+        return pipelineExecHistories;
+    }
+
+
     //查询最近一次执行历史
     @Override
     public PipelineExecHistory findLatelyHistory(String pipelineId){
-        List<PipelineExecHistory> allHistory = findAllHistory(pipelineId);
-       //根据时间降序排列
-        if (allHistory.size() == 0){
+        List<PipelineExecHistoryEntity> latelySuccess = pipelineExecHistoryDao.findLatelyHistory(pipelineId);
+        List<PipelineExecHistory> pipelineExecHistories = BeanMapper.mapList(latelySuccess, PipelineExecHistory.class);
+        if (pipelineExecHistories.size() == 0){
             return null;
         }
-        allHistory.sort(Comparator.comparing(PipelineExecHistory::getCreateTime,Comparator.reverseOrder()));
-        return allHistory.get(0);
+        joinTemplate.joinQuery(pipelineExecHistories);
+        return pipelineExecHistories.get(0);
     }
 
     //查询最近一次成功记录
     @Override
     public PipelineExecHistory findLatelySuccess(String pipelineId){
-        List<PipelineExecHistory> allHistory = findAllHistory(pipelineId);
-        if (allHistory == null){
-           return null;
+        List<PipelineExecHistoryEntity> latelySuccess = pipelineExecHistoryDao.findLatelySuccess(pipelineId);
+        List<PipelineExecHistory> pipelineExecHistories = BeanMapper.mapList(latelySuccess, PipelineExecHistory.class);
+
+        if (pipelineExecHistories.size() == 0){
+            return null;
         }
-        allHistory.sort(Comparator.comparing(PipelineExecHistory::getRunTime,Comparator.reverseOrder()));
-        for (PipelineExecHistory pipelineExecHistory : allHistory) {
-            if (pipelineExecHistory.getRunStatus() != 30){
-               continue;
-            }
-            return pipelineExecHistory;
-        }
-        return  null;
+        joinTemplate.joinQuery(pipelineExecHistories);
+        return pipelineExecHistories.get(0);
     }
 
     @Override

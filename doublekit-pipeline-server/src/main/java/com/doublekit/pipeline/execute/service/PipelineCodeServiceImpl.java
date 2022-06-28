@@ -2,6 +2,7 @@ package com.doublekit.pipeline.execute.service;
 
 
 import com.doublekit.beans.BeanMapper;
+import com.doublekit.join.JoinTemplate;
 import com.doublekit.pipeline.definition.model.Pipeline;
 import com.doublekit.pipeline.definition.model.PipelineConfigure;
 import com.doublekit.pipeline.definition.model.PipelineExecConfigure;

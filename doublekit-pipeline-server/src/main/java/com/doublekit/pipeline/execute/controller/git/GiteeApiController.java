@@ -5,11 +5,14 @@ import com.doublekit.apibox.annotation.ApiMethod;
 import com.doublekit.apibox.annotation.ApiParam;
 import com.doublekit.core.Result;
 import com.doublekit.pipeline.execute.service.codeGit.CodeGiteeApiService;
+import com.doublekit.pipeline.setting.proof.model.Proof;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.util.List;
@@ -51,10 +54,10 @@ public class GiteeApiController {
 
 
     @RequestMapping(path="/getProof",method = RequestMethod.POST)
-    @ApiMethod(name = "getProof",desc = "获取用户信息")
-    @ApiParam(name = "proofName",desc = "凭证名称",required = true)
-    public Result<String> getProof(@NotNull String proofName, String accessToken){
-        String i = codeGiteeApiService.getProof(proofName,accessToken);
+    @ApiMethod(name = "getProof",desc = "创建gitee凭证")
+    @ApiParam(name = "proof",desc = "凭证信息",required = true)
+    public Result<String> getProof(@RequestBody @Valid @NotNull Proof proof){
+        String i = codeGiteeApiService.getProof(proof);
         return Result.ok(i);
     }
 

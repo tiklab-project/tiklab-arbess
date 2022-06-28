@@ -1,5 +1,6 @@
 package com.doublekit.pipeline.instance.service;
 
+import com.doublekit.pipeline.definition.model.Pipeline;
 import com.doublekit.pipeline.definition.model.PipelineStatus;
 import com.doublekit.pipeline.instance.model.PipelineFollow;
 
@@ -28,7 +29,7 @@ public interface PipelineFollowService {
      * @param userId 用户id
      * @return 经常关注的流水线
      */
-    List<PipelineStatus> findAllFollow(String userId, List<PipelineStatus> allStatus);
+    List<Pipeline> findAllFollow(String userId);
 
 
     /**
@@ -36,7 +37,7 @@ public interface PipelineFollowService {
      * @param userId 用户id
      * @return 流水线信息
      */
-    List<PipelineStatus> findUserPipeline(String userId,List<PipelineStatus> allStatus);
+    List<Pipeline> findUserPipeline(String userId);
 
     /**
      * 查询单个信息
