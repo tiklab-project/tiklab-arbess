@@ -80,7 +80,7 @@ public class PipelineWorkSpaceServiceImpl implements  PipelineWorkSpaceService {
         return null;
     }
 
-    //
+    //读取文件信息
     @Override
     public  List<String> readFile(String path){
         return commonAchieveService.readFile(path);
@@ -147,7 +147,7 @@ public class PipelineWorkSpaceServiceImpl implements  PipelineWorkSpaceService {
     }
 
     //git提交信息
-    public List<DiffEntry> changedFileList(RevCommit revCommit, Repository repo) throws IOException, GitAPIException {
+    private List<DiffEntry> changedFileList(RevCommit revCommit, Repository repo) throws IOException, GitAPIException {
         List<DiffEntry> returnDiffs = null;
         RevCommit overcommitment = prevHash(revCommit, repo);
         if (overcommitment == null){return null;}
@@ -193,11 +193,6 @@ public class PipelineWorkSpaceServiceImpl implements  PipelineWorkSpaceService {
 
     //获取svn
     public SVNLogEntry[] svnMassage(Proof proof, PipelineCode pipelineCode) throws SVNException {
-
-        //ISVNAuthenticationManager authManager = SVNWCUtil.createDefaultAuthenticationManager(
-        //        new File(System.getProperty("java.io.tmpdir")+"/auth"), proof.getProofUsername(), proof.getProofPassword().toCharArray());
-        //DefaultSVNOptions options = SVNWCUtil.createDefaultOptions(true);
-        //options.setDiffCommand("-x -w");
 
         BasicAuthenticationManager auth;
         if (proof.getProofType().equals("SSH")){
