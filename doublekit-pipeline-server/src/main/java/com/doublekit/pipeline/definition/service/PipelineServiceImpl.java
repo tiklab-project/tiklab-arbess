@@ -105,10 +105,10 @@ public class PipelineServiceImpl implements PipelineService{
             pipelineExecHistoryService.deleteHistory(pipelineId);
             //删除收藏
             pipelineOpenService.deleteAllOpen(pipelineId);
-            //动态
-            pipelineActionService.createActive(userId,null,"删除了流水线"+pipeline.getPipelineName());
             //删除动态
             pipelineActionService.deletePipelineAction(pipelineId);
+            //动态
+            pipelineActionService.createActive(userId,null,"删除了流水线"+pipeline.getPipelineName());
         }
     }
 

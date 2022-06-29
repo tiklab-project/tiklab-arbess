@@ -1,7 +1,9 @@
 package com.doublekit.pipeline.instance.dao;
 
 import com.doublekit.dal.jdbc.JdbcTemplate;
+import com.doublekit.dal.jdbc.NamedParameterJdbcTemplate;
 import com.doublekit.dal.jpa.JpaTemplate;
+import com.doublekit.dal.jpa.criterial.condition.DeleteCondition;
 import com.doublekit.pipeline.definition.model.Pipeline;
 import com.doublekit.pipeline.instance.entity.PipelineOpenEntity;
 import org.slf4j.Logger;
@@ -66,6 +68,15 @@ public class PipelineOpenDao {
         JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
         return  jdbcTemplate.query(sql, new BeanPropertyRowMapper(PipelineOpenEntity.class));
     }
+
+
+    public void deleteAllOpen(String pipelineId){
+        String sql = "select pipeline_open.* from pipeline_open ";
+        sql = sql.concat(" where (pipeline_open.pipeline_id COLLATE utf8mb4_general_ci )  = ('"+pipelineId+"' COLLATE utf8mb4_general_ci ) ");
+        JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
+        jdbcTemplate.execute(sql);
+    }
+
 
     /**
      * 查询所有次数

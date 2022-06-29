@@ -24,11 +24,12 @@ public class SystemMassageServiceImpl implements  SystemMassageService{
 //    /usr/local/apps/doublekit-pipeline-1.0.0-SNAPSHOT/bin/LOG_PATH_IS_UNDEFINED/doublekit/doublekit-pipeline/logs
 
     public List<String> getSystemLog(){
-        String files = "/usr/local/apps/doublekit-pipeline-1.0.0-SNAPSHOT/bin/LOG_PATH_IS_UNDEFINED/doublekit/doublekit-pipeline/logs/app.pipelineExecLog";
+        String address = System.getProperty("user.dir");
+        String files = address+ "/LOG_PATH_IS_UNDEFINED/doublekit/doublekit-pipeline/logs/app.pipelineExecLog";
         String property = System.getProperty("os.name");
         String[] s = property.split(" ");
         if (s[0].equals("Windows")){
-            files = "D:\\桌面\\项目\\doublekit-pipeline\\LOG_PATH_IS_UNDEFINED\\doublekit\\doublekit-pipeline\\logs\\app.pipelineExecLog";
+            files = address+ "\\LOG_PATH_IS_UNDEFINED\\doublekit\\doublekit-pipeline\\logs\\app.pipelineExecLog";
         }
         return commonAchieveService.readFile(files);
     }
