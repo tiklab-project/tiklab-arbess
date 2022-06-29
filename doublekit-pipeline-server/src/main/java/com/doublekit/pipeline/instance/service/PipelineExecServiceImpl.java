@@ -109,7 +109,13 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         PipelineProcess pipelineProcess = new PipelineProcess();
         time[0]=1;time[1]=0;time[2]=0;time[3]=0;
         PipelineExecHistory pipelineExecHistory = findInstanceState(pipelineId);
-        if (pipelineExecHistory == null)return;
+        if (pipelineExecHistory == null){
+            Pipeline pipeline = pipelineService.findPipeline(pipelineId);
+            pipeline.setPipelineState(0);
+            pipelineService.updatePipeline(pipeline);
+            return;
+        }
+
         PipelineExecLog pipelineExecLog = pipelineExecHistoryService.getRunLog(pipelineExecHistory.getHistoryId());
         pipelineProcess.setPipelineExecLog(pipelineExecLog);
         pipelineProcess.setPipelineExecHistory(pipelineExecHistory);

@@ -109,34 +109,61 @@ public class ProofServiceImpl implements ProofService{
 
     @Override
     public List<Proof> findPipelineProof(ProofQuery proofQuery){
-        List<Proof> list = new ArrayList<>();
-        List<Proof> allProof = findAllProof();
-        if (allProof == null){
-            return null;
-        }
-        joinTemplate.joinQuery(allProof);
-        for (Proof proof : allProof) {
-            if (proof.getPipeline() == null){
-                //获取自己创建的凭证
-                if (proof.getUser().getId().equals(proofQuery.getUserId()) || proof.getType()== 1){
-                    list.add(proof);
+            if (proofQuery.getType() == 0 ){
+                if (proofQuery.getPipelineId() == null){
+                    List<ProofEntity> allProof = ProofDao.findAllProof(proofQuery.getUserId());
+                    if (allProof == null){
+                        return null;
+                    }
+                    List<Proof> proofs = BeanMapper.mapList(allProof, Proof.class);
+                    joinTemplate.joinQuery(proofs);
+                    return proofs;
                 }
-            //判断是否是此流水线的项目凭证
-            }else if (proof.getPipeline().getPipelineId().equals(proofQuery.getPipelineId()) || proof.getType() == 1){
-                list.add(proof);
+                List<ProofEntity> allProof = ProofDao.findPipelineAllProof(proofQuery.getUserId(), proofQuery.getPipelineId());
+                if (allProof == null){
+                    return null;
+                }
+                List<Proof> proofs = BeanMapper.mapList(allProof, Proof.class);
+                joinTemplate.joinQuery(proofs);
+                return proofs;
+            }else {
+                List<ProofEntity> allProof = ProofDao.findPipelineProof(proofQuery);
+                if (allProof == null){
+                    return null;
+                }
+                List<Proof> proofs = BeanMapper.mapList(allProof, Proof.class);
+                joinTemplate.joinQuery(proofs);
+                return proofs;
             }
-        }
-        //判断是否获取
-        if (proofQuery.getType() == 0 ){
-            return list;
-        }
-        List<Proof> lists = new ArrayList<>();
-        for (Proof proof : list) {
-            if (proof.getProofScope() == proofQuery.getType()){
-                lists.add(proof);
-            }
-        }
-        return lists;
+
+        //List<Proof> list = new ArrayList<>();
+        //List<Proof> allProof = findAllProof();
+        //if (allProof == null){
+        //    return null;
+        //}
+        //joinTemplate.joinQuery(allProof);
+        //for (Proof proof : allProof) {
+        //    if (proof.getPipeline() == null){
+        //        //获取自己创建的凭证
+        //        if (proof.getUser().getId().equals(proofQuery.getUserId()) || proof.getType()== 1){
+        //            list.add(proof);
+        //        }
+        //    //判断是否是此流水线的项目凭证
+        //    }else if (proof.getPipeline().getPipelineId().equals(proofQuery.getPipelineId()) || proof.getType() == 1){
+        //        list.add(proof);
+        //    }
+        //}
+        ////判断是否获取
+        //if (proofQuery.getType() == 0 ){
+        //    return list;
+        //}
+        //List<Proof> lists = new ArrayList<>();
+        //for (Proof proof : list) {
+        //    if (proof.getProofScope() == proofQuery.getType()){
+        //        lists.add(proof);
+        //    }
+        //}
+        //return lists;
     }
 
     @Override

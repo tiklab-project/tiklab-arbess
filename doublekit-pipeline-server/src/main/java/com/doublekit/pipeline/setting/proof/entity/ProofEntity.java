@@ -17,11 +17,11 @@ public class ProofEntity {
     @Column(name = "proof_name")
     private String proofName;
 
-    //作用域 (1 : gitlab  2 : ssh 认证)
+    //作用域
     @Column(name = "proof_scope")
     private int proofScope;
 
-    //凭证类型
+    //凭证类型 (1 : password  2 : ssh 认证)
     @Column(name = "proof_type")
     private String proofType;
 
