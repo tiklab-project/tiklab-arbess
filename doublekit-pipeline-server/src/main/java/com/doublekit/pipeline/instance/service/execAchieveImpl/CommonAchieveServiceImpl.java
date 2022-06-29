@@ -42,9 +42,6 @@ public class CommonAchieveServiceImpl implements CommonAchieveService {
     @Autowired
     PipelineService pipelineService;
 
-    @Autowired
-    PipelineActionService pipelineActionService;
-
     private static final Logger logger = LoggerFactory.getLogger(CommonAchieveServiceImpl.class);
     /**
      * 执行日志
@@ -390,7 +387,7 @@ public class CommonAchieveServiceImpl implements CommonAchieveService {
      * @throws IOException 写入失败
      */
     @Override
-    public  void writePrivateKeyPath(String massage, String filePath) throws IOException {
+    public void writePrivateKeyPath(String massage, String filePath) throws IOException {
         BufferedReader bufferedReader ;
         BufferedWriter bufferedWriter;
         File distFile= new File(filePath);

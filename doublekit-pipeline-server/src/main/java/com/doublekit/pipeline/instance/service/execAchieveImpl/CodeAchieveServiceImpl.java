@@ -119,6 +119,9 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
      * @throws IOException 地址找不到
      */
     public void codeStart(Proof proof,PipelineCode pipelineCode,String path) throws GitAPIException, IOException, SVNException {
+        if (pipelineCode == null){
+            return;
+        }
         switch (pipelineCode.getType()){
             case 1,2,3,4 :
                 if (proof.getProofType().equals("SSH")){
