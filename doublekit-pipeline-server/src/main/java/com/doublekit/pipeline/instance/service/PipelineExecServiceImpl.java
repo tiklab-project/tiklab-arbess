@@ -52,8 +52,10 @@ public class PipelineExecServiceImpl implements PipelineExecService {
     @Autowired
     PipelineActionService pipelineActionService;
 
+
     //存放过程状态
     List<PipelineExecHistory> pipelineExecHistoryList = new ArrayList<>();
+
 
     private static final Logger logger = LoggerFactory.getLogger(PipelineExecServiceImpl.class);
 
@@ -85,22 +87,23 @@ public class PipelineExecServiceImpl implements PipelineExecService {
     //查询构建中的信息
     @Override
     public PipelineExecHistory findInstanceState(String pipelineId){
-        if (pipelineExecHistoryList != null){
-            for (PipelineExecHistory pipelineExecHistory : pipelineExecHistoryList) {
-                if (pipelineExecHistory.getPipeline() != null){
-                    if (pipelineExecHistory.getPipeline().getPipelineId().equals(pipelineId)){
-                        time[pipelineExecHistory.getSort()-1] = time[pipelineExecHistory.getSort()-1] + 1;
-                        pipelineExecHistory.setOneTime(pipelineExecHistoryService.formatDateTime(time[0]));
-                        pipelineExecHistory.setTwoTime(pipelineExecHistoryService.formatDateTime(time[1]));
-                        pipelineExecHistory.setThreeTime(pipelineExecHistoryService.formatDateTime(time[2]));
-                        pipelineExecHistory.setFourTime(pipelineExecHistoryService.formatDateTime(time[3]));
-                        pipelineExecHistory.setAllTime(pipelineExecHistoryService.formatDateTime(time[0]+time[1]+time[2]+time[3]));
-                        return  pipelineExecHistory;
-                    }
-                }
-            }
+        if (pipelineExecHistoryList == null){
+            return null;
         }
-        return null;
+        for (PipelineExecHistory pipelineExecHistory : pipelineExecHistoryList) {
+            Pipeline pipeline = pipelineExecHistory.getPipeline();
+            if (pipeline == null || !pipeline.getPipelineId().equals(pipelineId)){
+                continue;
+            }
+            time[pipelineExecHistory.getSort()-1] = time[pipelineExecHistory.getSort()-1] + 1;
+            pipelineExecHistory.setOneTime(pipelineExecHistoryService.formatDateTime(time[0]));
+            pipelineExecHistory.setTwoTime(pipelineExecHistoryService.formatDateTime(time[1]));
+            pipelineExecHistory.setThreeTime(pipelineExecHistoryService.formatDateTime(time[2]));
+            pipelineExecHistory.setFourTime(pipelineExecHistoryService.formatDateTime(time[3]));
+            pipelineExecHistory.setAllTime(pipelineExecHistoryService.formatDateTime(time[0]+time[1]+time[2]+time[3]));
+            return  pipelineExecHistory;
+        }
+      return null;
     }
 
     //停止运行
@@ -161,56 +164,64 @@ public class PipelineExecServiceImpl implements PipelineExecService {
     // 构建开始
     private void begin(String pipelineId,String userId) {
 
+        //更新流水线状态
         Pipeline pipeline = pipelineService.findPipeline(pipelineId);
-
         pipeline.setPipelineState(1);
         pipelineService.updatePipeline(pipeline);
 
-        //动态
+        //添加动态
         pipelineActionService.createActive(pipeline.getUser().getId(),pipeline,"执行流水线");
 
+        //初始化历史
         String historyId = pipelineExecHistoryService.createHistory(new PipelineExecHistory());
         PipelineExecHistory pipelineExecHistory = commonAchieveServiceImpl.initializeHistory(historyId,pipeline,userId);
 
+        //获取配置信息
         PipelineProcess pipelineProcess = new PipelineProcess();
         List<PipelineConfigure> allConfigure = pipelineService.findPipelineConfigure(pipelineId);
         if (allConfigure == null){
            return;
         }
+
+        //开始执行
         for (PipelineConfigure pipelineConfigure : allConfigure) {
             pipelineProcess.setPipelineExecHistory(pipelineExecHistory);
             pipelineProcess.setPipelineConfigure(pipelineConfigure);
             pipelineExecHistoryList.add(pipelineExecHistory);
-            switch (pipelineConfigure.getTaskType()) {
-                case 1,2,3,4,5 -> {
-                    int state = codeAchieveServiceImpl.clone(pipelineProcess, pipelineExecHistoryList);
-                    if (state == 0) {
-                        error(pipeline);
-                        return ;
-                    }
-                }
-                case 11 -> {
-                    int state = testAchieveServiceImpl.test(pipelineProcess, pipelineExecHistoryList);
-                    if (state == 0) {
-                        error(pipeline);
-                        return ;
-                    }
-                }
-                case 21, 22 -> {
-                    int state  = structureAchieveServiceImpl.structure(pipelineProcess, pipelineExecHistoryList);
-                    if (state == 0) {
-                        error(pipeline);
-                        return ;
-                    }
-                }
-                case 31, 32-> {
-                    int state = deployAchieveServiceImpl.deploy(pipelineProcess, pipelineExecHistoryList);
-                    if (state == 0) {
-                        error(pipeline);
-                        return ;
-                    }
-                }
+            Integer integer = beginState(pipelineProcess, pipeline, pipelineConfigure.getTaskType());
+            if (integer == 0){
+                return;
             }
+            //switch (pipelineConfigure.getTaskType()) {
+            //    case 1,2,3,4,5 -> {
+            //        int state = codeAchieveServiceImpl.clone(pipelineProcess, pipelineExecHistoryList);
+            //        if (state == 0) {
+            //            error(pipeline);
+            //            return ;
+            //        }
+            //    }
+            //    case 11 -> {
+            //        int state = testAchieveServiceImpl.test(pipelineProcess, pipelineExecHistoryList);
+            //        if (state == 0) {
+            //            error(pipeline);
+            //            return ;
+            //        }
+            //    }
+            //    case 21, 22 -> {
+            //        int state  = structureAchieveServiceImpl.structure(pipelineProcess, pipelineExecHistoryList);
+            //        if (state == 0) {
+            //            error(pipeline);
+            //            return ;
+            //        }
+            //    }
+            //    case 31, 32-> {
+            //        int state = deployAchieveServiceImpl.deploy(pipelineProcess, pipelineExecHistoryList);
+            //        if (state == 0) {
+            //            error(pipeline);
+            //            return ;
+            //        }
+            //    }
+            //}
             pipelineExecHistory.setSort(pipelineExecHistory.getSort() +1);
             pipelineExecHistory.setStatus(pipelineExecHistory.getStatus() +1);
         }
@@ -218,35 +229,21 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         time[0]=1;time[1]=0;time[2]=0;time[3]=0;
     }
 
-    private void error(Pipeline pipeline){
-        pipeline.setPipelineState(0);
-        pipelineService.updatePipeline(pipeline);
-        time[0]=1;time[1]=0;time[2]=0;time[3]=0;
-    }
-
-    //获取文件树
-    @Override
-    public List<FileTree> fileTree(String pipelineId){
-
-        Pipeline pipeline = pipelineService.findPipeline(pipelineId);
-        if (pipeline == null)return null;
-        String path = "D:\\clone\\"+pipeline.getPipelineName();
-        List<FileTree> trees = new ArrayList<>();
-        File file = new File(path);
-        //判断文件是否存在
-        if (file.exists()){
-            List<FileTree> list = commonAchieveServiceImpl.fileTree(file, trees);
-            list.sort(Comparator.comparing(FileTree::getTreeType,Comparator.reverseOrder()));
-            return list;
+    private Integer beginState(PipelineProcess pipelineProcess ,Pipeline pipeline,int type){
+        int state = 1;
+        switch (type) {
+            case 1,2,3,4,5 -> state = codeAchieveServiceImpl.clone(pipelineProcess, pipelineExecHistoryList);
+            case 11 -> state = testAchieveServiceImpl.test(pipelineProcess, pipelineExecHistoryList);
+            case 21, 22 -> state  = structureAchieveServiceImpl.structure(pipelineProcess, pipelineExecHistoryList);
+            case 31, 32-> state = deployAchieveServiceImpl.deploy(pipelineProcess, pipelineExecHistoryList);
         }
-       return null;
+        if (state == 0) {
+            pipeline.setPipelineState(0);
+            pipelineService.updatePipeline(pipeline);
+            time[0]=1;time[1]=0;time[2]=0;time[3]=0;
+            return 0;
+        }
+        return 1;
     }
-
-    //
-    @Override
-    public  List<String> readFile(String path){
-        return commonAchieveServiceImpl.readFile(path);
-    }
-
 
 }

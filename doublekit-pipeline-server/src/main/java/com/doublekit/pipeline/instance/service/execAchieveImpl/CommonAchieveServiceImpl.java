@@ -132,7 +132,6 @@ public class CommonAchieveServiceImpl implements CommonAchieveService {
         Runtime runtime=Runtime.getRuntime();
         Process process;
         String property = System.getProperty("os.name");
-        logger.info("系统版本为 ： " + property);
 
         String[] s = property.split(" ");
         if (s[0].equals("Windows")){
@@ -144,14 +143,13 @@ public class CommonAchieveServiceImpl implements CommonAchieveService {
             process = runtime.exec("cmd.exe /c cd " + path + " &&" + " " + order);
         }else {
             if (sourceAddress != null){
-                String[] cmd = new String[] { "/bin/sh", "-c", "cd "+path+";"+" source /etc/profile;"+order };
+                String[] cmd = new String[] { "/bin/sh", "-c", "cd "+path+"/"+sourceAddress+";"+" source /etc/profile;"+order };
                 process = runtime.exec(cmd);
                 return process;
             }
             //执行命令
             String[] cmd = new String[] { "/bin/sh", "-c", "cd "+path+";"+" source /etc/profile;"+order };
             process = runtime.exec(cmd);
-            logger.info(" 命令为 " +cmd[2]);
         }
         return process;
     }
@@ -418,10 +416,9 @@ public class CommonAchieveServiceImpl implements CommonAchieveService {
         }
         List<String> lines;
         try {
-            lines = Files.readAllLines(Paths.get(path),
-                    StandardCharsets.UTF_8);
+            lines = Files.readAllLines(Paths.get(path), StandardCharsets.UTF_8);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+           return  null;
         }
         return lines;
     }

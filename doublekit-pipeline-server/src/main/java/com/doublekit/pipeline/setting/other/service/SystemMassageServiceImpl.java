@@ -31,6 +31,10 @@ public class SystemMassageServiceImpl implements  SystemMassageService{
         if (s[0].equals("Windows")){
             files = address+ "\\LOG_PATH_IS_UNDEFINED\\doublekit\\doublekit-pipeline\\logs\\app.pipelineExecLog";
         }
-        return commonAchieveService.readFile(files);
+        List<String> list = commonAchieveService.readFile(files);
+        if (list.size() < 1000){
+            return list;
+        }
+        return list.subList(list.size()-1000, list.size());
     }
 }

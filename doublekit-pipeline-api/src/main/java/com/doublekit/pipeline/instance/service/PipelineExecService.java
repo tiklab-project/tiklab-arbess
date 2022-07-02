@@ -38,20 +38,6 @@ public interface PipelineExecService {
      */
     void killInstance(String pipelineId,String userId);
 
-    /**
-     * 获取目录树
-     * @param pipelineId 流水线id
-     * @return 目录树
-     */
-    List<FileTree> fileTree(String pipelineId);
-
-    /**
-     * 读取文件
-     * @param path 文件地址
-     * @return 文件信息
-     */
-    List<String> readFile(String path);
-
 
 
 }

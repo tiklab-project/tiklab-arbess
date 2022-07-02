@@ -62,7 +62,8 @@ public class GatewayFilterAutoConfiguration {
                         "/plugin",
                         "/authConfig",
                         "/ws",
-                        "/socket"
+                        "/socket",
+                        "/start"
                 })
                 .get();
     }

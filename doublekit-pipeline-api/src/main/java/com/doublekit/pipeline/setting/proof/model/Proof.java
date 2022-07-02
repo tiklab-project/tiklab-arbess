@@ -46,11 +46,10 @@ public class Proof {
 
     @ApiProperty(name="User",desc="用户id",eg="@selectOne")
     @Mappings({
-            @Mapping(source = "user.id",target = "id")
+            @Mapping(source = "user.id",target = "userId")
     })
     @JoinQuery(key = "id")
     private User user;
-
 
     //流水线
     @ApiProperty(name="pipeline",desc="流水线id",eg="@selectOne")
@@ -162,6 +161,9 @@ public class Proof {
     }
 
     public String getUsername() {
+        if (getUser() != null){
+            username = getUser().getName();
+        }
         return username;
     }
 

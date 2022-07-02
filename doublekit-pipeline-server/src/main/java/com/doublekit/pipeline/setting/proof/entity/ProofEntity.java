@@ -51,7 +51,7 @@ public class ProofEntity {
 
     //用户id
     @Column(name = "user_id")
-    private String id;
+    private String userId;
 
 
 
@@ -135,11 +135,11 @@ public class ProofEntity {
         this.type = type;
     }
 
-    public String getId() {
-        return id;
+    public String getUserId() {
+        return userId;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 }
