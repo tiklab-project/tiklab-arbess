@@ -43,6 +43,7 @@ public class CommonAchieveServiceImpl implements CommonAchieveService {
     PipelineService pipelineService;
 
     private static final Logger logger = LoggerFactory.getLogger(CommonAchieveServiceImpl.class);
+
     /**
      * 执行日志
      * @param inputStreamReader 执行信息
