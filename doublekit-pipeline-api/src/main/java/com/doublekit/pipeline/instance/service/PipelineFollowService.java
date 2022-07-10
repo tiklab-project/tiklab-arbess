@@ -20,16 +20,13 @@ public interface PipelineFollowService {
      * @param followId 关注id
      */
     void deleteFollow(String followId);
-    
-
-
    
     /**
      * 用户关注的流水线
      * @param userId 用户id
      * @return 经常关注的流水线
      */
-    List<Pipeline> findAllFollow(String userId);
+    List<Pipeline> findAllFollow(String userId,StringBuilder s);
 
 
     /**
@@ -37,7 +34,7 @@ public interface PipelineFollowService {
      * @param userId 用户id
      * @return 流水线信息
      */
-    List<Pipeline> findUserPipeline(String userId);
+    List<Pipeline> findUserPipeline(String userId,StringBuilder s);
 
     /**
      * 查询单个信息

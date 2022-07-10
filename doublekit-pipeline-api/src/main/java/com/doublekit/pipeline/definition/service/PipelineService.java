@@ -48,15 +48,6 @@ public interface PipelineService {
     @FindOne
     Pipeline findPipeline(@NotNull String pipelineId);
 
-    ///**
-    // * 根据名称查询流水线
-    // * @param pipelineName 流水线名称
-    // * @return 流水线信息
-    // */
-    //@FindOne
-    //Pipeline findOnePipeline(@NotNull String pipelineName);
-
-
     /**
      * 根据流水线id获取配置信息
      * @param pipelineId 流水线id
@@ -75,10 +66,10 @@ public interface PipelineService {
     List<Pipeline> findAllPipelineList(List<String> idList);
 
 
-
-
     List<Pipeline> findUserPipeline(String userId);
 
+
+    StringBuilder findUserPipelineId(String userId);
 
     /**
      * 根据名称模糊查询

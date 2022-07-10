@@ -153,7 +153,43 @@ public class PipelineServiceImpl implements PipelineService{
     //获取用户流水线
     @Override
     public List<Pipeline> findUserPipeline(String userId){
-        return BeanMapper.mapList(pipelineDao.findUserPipeline(userId), Pipeline.class);
+        StringBuilder s = findUserPipelineId(userId);
+        List<PipelineEntity> userPipeline = pipelineDao.findUserPipeline(s);
+        return BeanMapper.mapList(userPipeline, Pipeline.class);
+        //List<Pipeline> pipelineList = new ArrayList<>();
+        //List<Pipeline> allPipeline = findAllPipeline();
+        //if (allPipeline != null){
+        //    for (Pipeline pipeline : allPipeline) {
+        //        for (String s : list) {
+        //            if (!pipeline.getPipelineId().equals(s)){
+        //                continue;
+        //            }
+        //            pipelineList.add(pipeline);
+        //        }
+        //    }
+        //}
+        //return pipelineList;
+    }
+
+    //获取用户所有流水线id
+    @Override
+    public StringBuilder findUserPipelineId(String userId){
+        StringBuilder s = new StringBuilder();
+        List<DmUser> allDmUser = dmUserService.findAllDmUser();
+        if (allDmUser != null){
+            for (DmUser dmUser : allDmUser) {
+                if (!dmUser.getUser().getId().equals(userId)){
+                    continue;
+                }
+                if (s.toString().equals("") ) {
+                    s.append("'");
+                } else {
+                    s.append(",'");
+                }
+                s.append(dmUser.getDomainId()).append("'");
+            }
+        }
+        return s;
     }
 
     //模糊查询
@@ -171,15 +207,6 @@ public class PipelineServiceImpl implements PipelineService{
             pipelines.addAll(collect);
         }
         return pipelines;
-    }
-
-    //获取用户所有流水线状态
-    public List<PipelineStatus> findAllStatus(String userId) {
-        List<Pipeline> allPipeline = findUserPipeline(userId);
-        if (allPipeline == null){
-            return null;
-        }
-        return findAllStatus(allPipeline);
     }
 
     //获取流水线状态
@@ -215,7 +242,8 @@ public class PipelineServiceImpl implements PipelineService{
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         Date lastTime = DateUtils.addDays(new Date(), -7);
         Date nowTime = DateUtils.addDays(new Date(), 1);
-        return pipelineExecHistoryService.findAllUserHistory(userId,formatter.format(lastTime),formatter.format(nowTime));
+        StringBuilder s = findUserPipelineId(userId);
+        return pipelineExecHistoryService.findAllUserHistory(formatter.format(lastTime),formatter.format(nowTime),s);
     }
 
     //获取拥有此流水线的用户

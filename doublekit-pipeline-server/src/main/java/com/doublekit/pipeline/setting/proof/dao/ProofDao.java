@@ -66,47 +66,40 @@ public class ProofDao {
         return jpaTemplate.findAll(ProofEntity.class);
     }
 
-    //系统凭证
-    public List<ProofEntity> findAllProof(String userId){
+    public List<ProofEntity> findAllProof(String userId,StringBuilder s){
         String sql = " select pipeline_proof.* from pipeline_proof ";
         sql = sql.concat(" where pipeline_proof.user_id = '" + userId +"'"
                 + " or pipeline_proof.type = 1 "
                 + " or pipeline_proof.pipeline_id "
-                + " in ( "
-                + " select p.pipeline_id from orc_dm_user d,pipeline p  "
-                + " where (d.domain_id COLLATE utf8mb4_general_ci ) = ( p.pipeline_id COLLATE utf8mb4_general_ci )  "
-                + " and (d.user_id COLLATE utf8mb4_general_ci ) =  ('"+ userId +"' COLLATE utf8mb4_general_ci ))");
+                + " in ( "+ s +" )");
         JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
         return  jdbcTemplate.query(sql, new BeanPropertyRowMapper(ProofEntity.class));
     }
 
-    //项目凭证
+
     public List<ProofEntity> findPipelineAllProof(String userId ,String pipelineId){
         String sql = " select pipeline_proof.* from pipeline_proof ";
-        sql = sql.concat(" where (pipeline_proof.pipeline_id COLLATE utf8mb4_general_ci ) =  ('"+pipelineId+"' COLLATE utf8mb4_general_ci ) "
+        sql = sql.concat(" where pipeline_proof.pipeline_id =  '"+pipelineId+"' "
                 + " or pipeline_proof.user_id = '"+userId+"' "
                 + " or pipeline_proof.type = 1 ");
         JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
         return  jdbcTemplate.query(sql, new BeanPropertyRowMapper(ProofEntity.class));
     }
 
-   //项目内配置凭证
-    public List<ProofEntity> findPipelineProof(ProofQuery proofQuery){
-        String userId = proofQuery.getUserId();
-        int type = proofQuery.getType();
-        String sql = " select pipeline_proof.* from pipeline_proof ";
-        sql = sql.concat(" where (pipeline_proof.proof_scope COLLATE utf8mb4_general_ci ) = ( " + type + " COLLATE utf8mb4_general_ci )"
-                + " and (pipeline_proof.proof_id COLLATE utf8mb4_general_ci )"
-                + " in (select pipeline_proof.proof_id from pipeline_proof "
-                + " where (pipeline_proof.user_id COLLATE utf8mb4_general_ci ) = ('"+ userId +"' COLLATE utf8mb4_general_ci ) "
-                + " or pipeline_proof.type = 1 "
-                + " or pipeline_proof.pipeline_id"
-                + " in (select p.pipeline_id from orc_dm_user d,pipeline p "
-                + " where (d.domain_id  COLLATE utf8mb4_general_ci ) = (p.pipeline_id COLLATE utf8mb4_general_ci ) "
-                + " and (d.user_id COLLATE utf8mb4_general_ci ) = ('"+userId+"' COLLATE utf8mb4_general_ci )))");
-        JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
-        return  jdbcTemplate.query(sql, new BeanPropertyRowMapper(ProofEntity.class));
-    }
+   public List<ProofEntity> findPipelineProof(ProofQuery proofQuery,StringBuilder s){
+       String userId = proofQuery.getUserId();
+       int type = proofQuery.getType();
+       String sql = " select pipeline_proof.* from pipeline_proof ";
+       sql = sql.concat(" where pipeline_proof.proof_scope  = " + type
+               + " and pipeline_proof.proof_id "
+               + " in (select pipeline_proof.proof_id from pipeline_proof "
+               + " where pipeline_proof.user_id  = '"+ userId +"' "
+               + " or pipeline_proof.type = 1 "
+               + " or pipeline_proof.pipeline_id"
+               + " in ("+s+"))");
+       JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
+       return  jdbcTemplate.query(sql, new BeanPropertyRowMapper(ProofEntity.class));
+   }
 
     public List<ProofEntity> selectAllProofList(List<String> idList){
         return jpaTemplate.findList(ProofEntity.class,idList);

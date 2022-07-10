@@ -57,7 +57,7 @@ public interface PipelineOpenService {
      * @param userId 用户id
      * @return 经常打开的流水线
      */
-    List<PipelineOpen> findAllOpen(String userId);
+    List<PipelineOpen> findAllOpen(String userId,StringBuilder s);
 
     /**
      * 查询单个次数信息

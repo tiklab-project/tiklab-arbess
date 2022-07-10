@@ -41,7 +41,8 @@ public class PipelineHomeServiceImpl implements PipelineHomeService{
     //查询用户最近打开的流水线
     @Override
     public List<PipelineOpen> findAllOpen(String userId){
-        List<PipelineOpen> allOpen = pipelineOpenService.findAllOpen(userId);
+        StringBuilder s = pipelineService.findUserPipelineId(userId);
+        List<PipelineOpen> allOpen = pipelineOpenService.findAllOpen(userId,s);
         if (allOpen == null){
             return null;
         }
@@ -55,7 +56,8 @@ public class PipelineHomeServiceImpl implements PipelineHomeService{
     //获取收藏列表
     @Override
     public List<PipelineStatus> findAllFollow(String userId){
-        return pipelineService.findAllStatus(pipelineFollowService.findAllFollow(userId));
+        StringBuilder s = pipelineService.findUserPipelineId(userId);
+        return pipelineService.findAllStatus(pipelineFollowService.findAllFollow(userId,s));
     }
 
     //更新收藏信息
@@ -67,9 +69,9 @@ public class PipelineHomeServiceImpl implements PipelineHomeService{
     //获取用户流水线
     @Override
     public List<PipelineStatus> findUserPipeline(String userId){
-        List<Pipeline> userPipeline = pipelineFollowService.findUserPipeline(userId);
+        StringBuilder s = pipelineService.findUserPipelineId(userId);
+        List<Pipeline> userPipeline = pipelineFollowService.findUserPipeline(userId,s);
         return pipelineService.findAllStatus(userPipeline);
-
     }
 
     //近七天构建状态

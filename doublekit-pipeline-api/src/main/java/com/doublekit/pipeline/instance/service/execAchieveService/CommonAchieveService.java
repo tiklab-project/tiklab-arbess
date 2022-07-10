@@ -135,4 +135,6 @@ public interface CommonAchieveService {
      * @return 文件信息
      */
      List<String> readFile(String path);
+
+    StringBuilder findUserPipelineId(String userId);
 }

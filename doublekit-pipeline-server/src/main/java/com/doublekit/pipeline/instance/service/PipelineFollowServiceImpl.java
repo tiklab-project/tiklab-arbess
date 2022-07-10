@@ -48,16 +48,17 @@ public class PipelineFollowServiceImpl implements  PipelineFollowService{
     }
 
     @Override
-    public  List<Pipeline> findAllFollow(String userId){
-        List<Pipeline> pipelineFollow = pipelineFollowDao.findPipelineFollow(userId);
+    public  List<Pipeline> findAllFollow(String userId,StringBuilder s){
+        List<Pipeline> pipelineFollow = pipelineFollowDao.findPipelineFollow(userId,s);
         pipelineFollow.forEach(pipeline -> pipeline.setPipelineCollect(1));
         return pipelineFollow;
     }
 
     @Override
-    public List<Pipeline> findUserPipeline(String userId){
-        List<Pipeline> pipelineFollow = pipelineFollowDao.findPipelineFollow(userId);
-        List<Pipeline> pipelineNotFollow = pipelineFollowDao.findPipelineNotFollow(userId);
+    public List<Pipeline> findUserPipeline(String userId,StringBuilder s){
+
+        List<Pipeline> pipelineFollow = pipelineFollowDao.findPipelineFollow(userId,s);
+        List<Pipeline> pipelineNotFollow = pipelineFollowDao.findPipelineNotFollow(userId,s);
 
         List<Pipeline> pipelineList = new ArrayList<>();
 

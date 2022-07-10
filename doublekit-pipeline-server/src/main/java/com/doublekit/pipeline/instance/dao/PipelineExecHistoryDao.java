@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.stereotype.Repository;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Repository
@@ -102,13 +103,10 @@ public class PipelineExecHistoryDao {
      * 查询用户所有流水线历史
      * @return 流水线历史列表
      */
-    public List<PipelineExecHistoryEntity> findAllUserHistory(String userId,String lastTime,String nowTime) {
+    public List<PipelineExecHistoryEntity> findAllUserHistory(String lastTime,String nowTime,StringBuilder s) {
         String sql = "select pipeline_history.* from pipeline_history ";
-        sql = sql.concat(" where (pipeline_history.pipeline_id COLLATE utf8mb4_general_ci )"
-                + " in("
-                + " select p.pipeline_id from orc_dm_user d,pipeline p "
-                + " where (d.domain_id  COLLATE utf8mb4_general_ci ) = (p.pipeline_id COLLATE utf8mb4_general_ci ) "
-                + " and(d.user_id COLLATE utf8mb4_general_ci ) = ('"+ userId+"' COLLATE utf8mb4_general_ci ))"
+        sql = sql.concat(" where pipeline_history.pipeline_id "
+                + " in("+ s +" )"
                 + " and pipeline_history.create_time > '"+ lastTime +"'"
                 + " and pipeline_history.create_time < '"+nowTime + "'"
                 + " order by pipeline_history.create_time desc");
@@ -123,8 +121,8 @@ public class PipelineExecHistoryDao {
      */
     public List<PipelineExecHistoryEntity> findLatelySuccess(String pipelineId){
         String sql = "select pipeline_history.* from pipeline_history  ";
-        sql = sql.concat(" where (pipeline_history.pipeline_id  COLLATE utf8mb4_general_ci ) = ('"+pipelineId+"'  COLLATE utf8mb4_general_ci ) " +
-                " and (pipeline_history.run_status  COLLATE utf8mb4_general_ci ) = ('30' COLLATE utf8mb4_general_ci ) " +
+        sql = sql.concat(" where pipeline_history.pipeline_id   = '"+pipelineId+"' " +
+                " and pipeline_history.run_status = '30'  " +
                 " order by pipeline_history.create_time desc" +
                 " limit 0 ,1");
         JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
@@ -138,11 +136,12 @@ public class PipelineExecHistoryDao {
      */
     public List<PipelineExecHistoryEntity> findLatelyHistory(String pipelineId){
         String sql = "select pipeline_history.* from pipeline_history  ";
-        sql = sql.concat(" where (pipeline_history.pipeline_id  COLLATE utf8mb4_general_ci ) = ('"+pipelineId+"'  COLLATE utf8mb4_general_ci ) " +
+        sql = sql.concat(" where pipeline_history.pipeline_id = '"+pipelineId+"' " +
                 " order by pipeline_history.create_time desc" +
                 " limit 0 ,1");
         JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
         return  jdbcTemplate.query(sql, new BeanPropertyRowMapper(PipelineExecHistoryEntity.class));
     }
+
 
 }

@@ -82,7 +82,7 @@ public class PipelineOpenServiceImpl implements PipelineOpenService {
     }
 
     @Override
-    public List<PipelineOpen> findAllOpen(String userId){
+    public List<PipelineOpen> findAllOpen(String userId,StringBuilder s){
         //List<PipelineOpen> list = new ArrayList<>();
         //if (findAllOpen() == null){
         //    return null;
@@ -94,7 +94,7 @@ public class PipelineOpenServiceImpl implements PipelineOpenService {
         //    pipelineOpen.setPipelineName(pipelineOpen.getPipeline().getPipelineName());
         //    list.add(pipelineOpen);
         //}
-        List<PipelineOpenEntity> allOpen = pipelineOpenDao.findAllOpen(userId);
+        List<PipelineOpenEntity> allOpen = pipelineOpenDao.findAllOpen(userId,s);
         List<PipelineOpen> list = BeanMapper.mapList(allOpen, PipelineOpen.class);
         joinTemplate.joinQuery(list);
         for (PipelineOpen pipelineOpen : list) {

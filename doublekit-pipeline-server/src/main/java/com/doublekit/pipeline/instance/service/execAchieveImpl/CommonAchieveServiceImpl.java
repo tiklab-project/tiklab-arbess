@@ -7,7 +7,6 @@ import com.doublekit.pipeline.execute.model.CodeGit.FileTree;
 import com.doublekit.pipeline.instance.model.PipelineExecHistory;
 import com.doublekit.pipeline.instance.model.PipelineExecLog;
 import com.doublekit.pipeline.instance.model.PipelineProcess;
-import com.doublekit.pipeline.instance.service.PipelineActionService;
 import com.doublekit.pipeline.instance.service.PipelineExecHistoryService;
 import com.doublekit.pipeline.instance.service.PipelineExecLogService;
 import com.doublekit.pipeline.instance.service.execAchieveService.CommonAchieveService;
@@ -422,5 +421,10 @@ public class CommonAchieveServiceImpl implements CommonAchieveService {
            return  null;
         }
         return lines;
+    }
+
+    @Override
+    public StringBuilder findUserPipelineId(String userId){
+        return pipelineService.findUserPipelineId(userId);
     }
 }

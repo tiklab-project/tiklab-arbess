@@ -101,8 +101,8 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
 
     //查询用户所有历史
     @Override
-    public List<PipelineExecHistory> findAllUserHistory(String userId ,String lastTime,String nowTime) {
-        List<PipelineExecHistoryEntity> allUserHistory = pipelineExecHistoryDao.findAllUserHistory(userId,lastTime,nowTime);
+    public List<PipelineExecHistory> findAllUserHistory(String lastTime,String nowTime,StringBuilder s) {
+        List<PipelineExecHistoryEntity> allUserHistory = pipelineExecHistoryDao.findAllUserHistory(lastTime,nowTime,s);
         List<PipelineExecHistory> pipelineExecHistories = BeanMapper.mapList(allUserHistory, PipelineExecHistory.class);
         joinTemplate.joinQuery(pipelineExecHistories);
         return pipelineExecHistories;

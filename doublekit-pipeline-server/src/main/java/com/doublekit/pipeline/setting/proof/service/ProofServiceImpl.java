@@ -107,9 +107,10 @@ public class ProofServiceImpl implements ProofService{
 
     @Override
     public List<Proof> findPipelineProof(ProofQuery proofQuery){
-            if (proofQuery.getType() == 0 ){
+        StringBuilder s = commonAchieveService.findUserPipelineId(proofQuery.getUserId());
+        if (proofQuery.getType() == 0 ){
                 if (proofQuery.getPipelineId() == null){
-                    List<ProofEntity> allProof = ProofDao.findAllProof(proofQuery.getUserId());
+                    List<ProofEntity> allProof = ProofDao.findAllProof(proofQuery.getUserId(),s);
                     if (allProof == null){
                         return null;
                     }
@@ -125,7 +126,7 @@ public class ProofServiceImpl implements ProofService{
                 joinTemplate.joinQuery(proofs);
                 return proofs;
             }else {
-                List<ProofEntity> allProof = ProofDao.findPipelineProof(proofQuery);
+                List<ProofEntity> allProof = ProofDao.findPipelineProof(proofQuery,s);
                 if (allProof == null){
                     return null;
                 }

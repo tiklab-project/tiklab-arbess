@@ -69,17 +69,6 @@ public class ProofController {
         return Result.ok();
     }
 
-    ////查询全部凭证
-    //@RequestMapping(path="/findAll",method = RequestMethod.POST)
-    //@ApiMethod(name = "findAll",desc = "查询用户所有凭证")
-    //@ApiParam(name = "userId",desc = "用户id",required = true)
-    //public Result<HashSet<Proof>> findAll(@NotNull String userId){
-    //
-    //    HashSet<Proof> proofList = proofService.findAllUserProof(userId);
-    //
-    //    return Result.ok(proofList);
-    //}
-
     //查询
     @RequestMapping(path="/findOneProof",method = RequestMethod.POST)
     @ApiMethod(name = "findOneProof",desc = "查询凭证信息")

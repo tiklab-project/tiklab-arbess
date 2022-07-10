@@ -57,26 +57,14 @@ public class PipelineOpenDao {
         return jpaTemplate.findOne(PipelineOpenEntity.class,openId);
     }
 
-    public List<PipelineOpenEntity> findAllOpen(String userId){
+    public List<PipelineOpenEntity> findAllOpen(String userId,StringBuilder s){
         String sql = "select pipeline_open.* from pipeline_open ";
-        sql = sql.concat(" where (pipeline_open.user_id COLLATE utf8mb4_general_ci )  = ('222222' COLLATE utf8mb4_general_ci ) " +
-                " and (pipeline_open.pipeline_id COLLATE utf8mb4_general_ci )  " +
-                " in " +
-                " ( select p.pipeline_id  from orc_dm_user d,pipeline p" +
-                " where (d.domain_id  COLLATE utf8mb4_general_ci ) = (p.pipeline_id COLLATE utf8mb4_general_ci ) " +
-                " and  (d.user_id COLLATE utf8mb4_general_ci ) =  ('"+userId+"' COLLATE utf8mb4_general_ci ))");
+        sql = sql.concat(" where pipeline_open.user_id   = '"+userId+"' "
+                + " and pipeline_open.pipeline_id   "
+                + " in (" + s +" ) ");
         JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
         return  jdbcTemplate.query(sql, new BeanPropertyRowMapper(PipelineOpenEntity.class));
     }
-
-
-    public void deleteAllOpen(String pipelineId){
-        String sql = "select pipeline_open.* from pipeline_open ";
-        sql = sql.concat(" where (pipeline_open.pipeline_id COLLATE utf8mb4_general_ci )  = ('"+pipelineId+"' COLLATE utf8mb4_general_ci ) ");
-        JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
-        jdbcTemplate.execute(sql);
-    }
-
 
     /**
      * 查询所有次数

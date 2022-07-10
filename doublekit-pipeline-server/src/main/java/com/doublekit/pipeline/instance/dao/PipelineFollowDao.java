@@ -68,32 +68,32 @@ public class PipelineFollowDao {
         return jpaTemplate.findList(PipelineFollowEntity.class,idList);
     }
 
-    public List<Pipeline> findPipelineFollow(String userId){
-        String sql = "select p.* from orc_dm_user d,pipeline p ";
-        sql = sql.concat(" where (d.domain_id  COLLATE utf8mb4_general_ci ) = (p.pipeline_id COLLATE utf8mb4_general_ci ) "
-                + " and (d.user_id COLLATE utf8mb4_general_ci ) =  ('"+userId+"' COLLATE utf8mb4_general_ci ) "
-                + " and (p.pipeline_id COLLATE utf8mb4_general_ci )"
+    public List<Pipeline> findPipelineFollow(String userId,StringBuilder s){
+        String sql = "select p.* from pipeline p ";
+        sql = sql.concat(" where p.pipeline_id  "
+                + " in ("+ s +")"
+                + " and p.pipeline_id "
                 + " in (select pipeline_follow.pipeline_id from pipeline_follow"
-                + " where (pipeline_follow.user_id COLLATE utf8mb4_general_ci ) =  ('"+userId+"' COLLATE utf8mb4_general_ci ) )");
+                + " where pipeline_follow.user_id  =  '"+userId+"'  )");
         JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
         return  jdbcTemplate.query(sql, new BeanPropertyRowMapper(Pipeline.class));
     }
 
-    public List<Pipeline> findPipelineNotFollow(String userId){
-        String sql = "select p.* from orc_dm_user d,pipeline p ";
-        sql = sql.concat(" where (d.domain_id  COLLATE utf8mb4_general_ci ) = (p.pipeline_id COLLATE utf8mb4_general_ci ) "
-                + " and (d.user_id COLLATE utf8mb4_general_ci ) =  ('"+userId+"' COLLATE utf8mb4_general_ci ) "
-                + " and (p.pipeline_id COLLATE utf8mb4_general_ci )"
+    public List<Pipeline> findPipelineNotFollow(String userId,StringBuilder s){
+        String sql = "select p.* from pipeline p ";
+        sql = sql.concat(" where p.pipeline_id  "
+                + " in ("+ s +")"
+                + " and p.pipeline_id "
                 + " not in (select pipeline_follow.pipeline_id from pipeline_follow"
-                + " where (pipeline_follow.user_id COLLATE utf8mb4_general_ci ) =  ('"+userId+"' COLLATE utf8mb4_general_ci ) )");
+                + " where pipeline_follow.user_id  =  '"+userId+"'  )");
         JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
         return  jdbcTemplate.query(sql, new BeanPropertyRowMapper(Pipeline.class));
     }
 
     public List<PipelineFollow> updateFollow(String userId, String pipelineId){
         String sql = "select pipeline_follow.* from pipeline_follow ";
-        sql = sql.concat(" where (pipeline_follow.user_id COLLATE utf8mb4_general_ci ) = ('"+userId+"'COLLATE utf8mb4_general_ci ) "
-                + " and (pipeline_follow.pipeline_id COLLATE utf8mb4_general_ci ) = ('"+pipelineId+"' COLLATE utf8mb4_general_ci )");
+        sql = sql.concat(" where pipeline_follow.user_id  = '"+userId+"' "
+                + " and pipeline_follow.pipeline_id  = '"+pipelineId+"' ");
         JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
         return  jdbcTemplate.query(sql, new BeanPropertyRowMapper(PipelineFollow.class));
     }

@@ -73,11 +73,10 @@ public class PipelineDao {
     }
 
     //获取用户拥有的流水线
-    public List<PipelineEntity> findUserPipeline(String userId){
-        String sql = "select p.* from orc_dm_user d,pipeline p";
-        sql = sql.concat(" where (d.domain_id  COLLATE utf8mb4_general_ci ) = (p.pipeline_id COLLATE utf8mb4_general_ci ) "
-                + " and  (d.user_id COLLATE utf8mb4_general_ci ) =  (? COLLATE utf8mb4_general_ci ) ");
-        return jpaTemplate.getJdbcTemplate().query(sql, new String[]{userId}, new BeanPropertyRowMapper(PipelineEntity.class));
+    public List<PipelineEntity> findUserPipeline(StringBuilder s){
+        String sql = " select p.* from pipeline p";
+        sql = sql.concat(" where p.pipeline_id in ("+s+")");
+        return jpaTemplate.getJdbcTemplate().query(sql, new BeanPropertyRowMapper(PipelineEntity.class));
     }
 
 

@@ -62,8 +62,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
     //开始执行时间
     long beginTime = 0;
 
-    //创建线程池
-    ExecutorService executorService = Executors.newCachedThreadPool();
+
 
     //启动
     @Override
@@ -73,11 +72,16 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         if (pipeline.getPipelineState() == 1){
             return 100;
         }
-        executorService.submit(() -> {
-            beginTime = new Timestamp(System.currentTimeMillis()).getTime();
-            Thread.currentThread().setName(pipelineId);
-            begin(pipelineId,userId);
-        });
+        //创建线程池
+        ExecutorService executorService = Executors.newCachedThreadPool();
+
+        Thread.currentThread().setName(pipelineId);
+        begin(pipeline,userId);
+
+        //executorService.submit(() -> {
+        //    beginTime = new Timestamp(System.currentTimeMillis()).getTime();
+        //
+        //});
         return 1;
     }
 
@@ -162,15 +166,15 @@ public class PipelineExecServiceImpl implements PipelineExecService {
     }
 
     // 构建开始
-    private void begin(String pipelineId,String userId) {
+    private void begin(Pipeline pipeline,String userId) {
 
         //更新流水线状态
-        Pipeline pipeline = pipelineService.findPipeline(pipelineId);
+        //Pipeline pipeline = pipelineService.findPipeline(pipelineId);
         pipeline.setPipelineState(1);
         pipelineService.updatePipeline(pipeline);
 
         //添加动态
-        pipelineActionService.createActive(pipeline.getUser().getId(),pipeline,"执行流水线");
+        //pipelineActionService.createActive(pipeline.getUser().getId(),pipeline,"执行流水线");
 
         //初始化历史
         String historyId = pipelineExecHistoryService.createHistory(new PipelineExecHistory());
@@ -178,11 +182,10 @@ public class PipelineExecServiceImpl implements PipelineExecService {
 
         //获取配置信息
         PipelineProcess pipelineProcess = new PipelineProcess();
-        List<PipelineConfigure> allConfigure = pipelineService.findPipelineConfigure(pipelineId);
+        List<PipelineConfigure> allConfigure = pipelineService.findPipelineConfigure(pipeline.getPipelineId());
         if (allConfigure == null){
            return;
         }
-
         //开始执行
         for (PipelineConfigure pipelineConfigure : allConfigure) {
             pipelineProcess.setPipelineExecHistory(pipelineExecHistory);
@@ -225,7 +228,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
             pipelineExecHistory.setSort(pipelineExecHistory.getSort() +1);
             pipelineExecHistory.setStatus(pipelineExecHistory.getStatus() +1);
         }
-        commonAchieveServiceImpl.success(pipelineExecHistory, pipelineId, pipelineExecHistoryList);
+        commonAchieveServiceImpl.success(pipelineExecHistory, pipeline.getPipelineId(), pipelineExecHistoryList);
         time[0]=1;time[1]=0;time[2]=0;time[3]=0;
     }
 
