@@ -55,16 +55,18 @@ public class CodeCheckServiceImpl implements CodeCheckService {
      */
     public boolean gitCheck(String gitUrl, Proof proof) {
         File file = null;
+        String path = "";
         try {
             file = File.createTempFile("pipeline", ".txt");
-            commonAchieveService.writePrivateKeyPath(proof.getProofPassword(),file.getAbsolutePath());
+            path = file.getAbsolutePath();
+            commonAchieveService.writePrivateKeyPath(proof.getProofPassword(),path);
         } catch (IOException e) {
             if (file != null){
                 file.deleteOnExit();
             }
             return false;
         }
-        File finalFile = file;
+        String finalPath = path;
         SshSessionFactory sshSessionFactory = new JschConfigSessionFactory() {
             @Override
             protected void configure(OpenSshConfig.Host host, Session session ) {
@@ -74,14 +76,14 @@ public class CodeCheckServiceImpl implements CodeCheckService {
             @Override
             protected JSch createDefaultJSch(FS fs) throws JSchException {
                 JSch defaultJSch = super.createDefaultJSch(fs);
-                defaultJSch.addIdentity(finalFile.getAbsolutePath());
+                defaultJSch.addIdentity(finalPath);
                 return defaultJSch;
             }
         };
         LsRemoteCommand lsRemoteCommand = Git.lsRemoteRepository()
                 .setRemote(gitUrl);
         try {
-            if (proof.getProofType().equals("ssh")){
+            if (proof.getProofType().equals("SSH")){
                 lsRemoteCommand .setTransportConfigCallback(transport -> {
                             SshTransport sshTransport = (SshTransport) transport;
                             sshTransport.setSshSessionFactory(sshSessionFactory);

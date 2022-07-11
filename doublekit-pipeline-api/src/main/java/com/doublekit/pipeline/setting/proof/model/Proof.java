@@ -68,7 +68,7 @@ public class Proof {
     private int type;
 
     //用户名
-    @ApiProperty(name="username",desc="类型")
+    @ApiProperty(name="proofUsername",desc="类型")
     private String username;
 
 

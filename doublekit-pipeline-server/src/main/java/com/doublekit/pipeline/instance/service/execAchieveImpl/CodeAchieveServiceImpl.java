@@ -84,11 +84,16 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
             return 0;
         }
 
+        String codeBranch = pipelineCode.getCodeBranch();
+        if (codeBranch == null){
+            codeBranch = "master";
+        }
+
         //更新日志
         String s = "开始拉取代码 : " + "\n"
                 + "FileAddress : " + file + "\n"
                 + "Uri : " + pipelineCode.getCodeAddress() + "\n"
-                + "Branch : " + pipelineCode.getCodeBranch() + "\n"
+                + "Branch : " + codeBranch + "\n"
                 + "proofType : " +proof.getProofType();
         pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+s);
         pipelineExecHistoryList.add(pipelineExecHistory);

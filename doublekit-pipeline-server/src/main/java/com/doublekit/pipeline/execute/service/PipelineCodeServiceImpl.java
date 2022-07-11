@@ -61,7 +61,6 @@ public class PipelineCodeServiceImpl implements PipelineCodeService {
     @Override
     public String createConfigure(String pipelineId,PipelineCode pipelineCode){
         String codeId = createCode(pipelineCode);
-
         PipelineConfigure pipelineConfigure = new PipelineConfigure();
         pipelineConfigure.setTaskAlias("源码管理");
         pipelineConfigure.setTaskId(codeId);

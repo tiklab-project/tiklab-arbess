@@ -16,6 +16,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.io.*;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.HashSet;
 import java.util.List;
 
@@ -40,6 +42,13 @@ public class ProofServiceImpl implements ProofService{
     //创建
     @Override
     public String createProof(Proof proof) {
+        if (proof.getProofType().equals("SSH")){
+            try {
+                proof.setProofUsername(InetAddress.getLocalHost().getHostName());
+            } catch (UnknownHostException e) {
+                proof.setProofUsername(proof.getProofName());
+            }
+        }
         ProofEntity proofEntity = BeanMapper.map(proof, ProofEntity.class);
         return ProofDao.createProof(proofEntity);
     }
@@ -48,14 +57,14 @@ public class ProofServiceImpl implements ProofService{
     @Override
     public void deleteProof(String proofId) {
         Proof proof = findOneProof(proofId);
-        if (proof.getProofType().equals("SSH")){
-            //判断秘钥是否存在
-            File file = new File(proof.getProofPassword());
-            boolean exists = file.exists();
-            if (exists){
-                commonAchieveService.deleteFile(file);
-            }
-        }
+        //if (proof.getProofType().equals("SSH")){
+        //    //判断秘钥是否存在
+        //    File file = new File(proof.getProofPassword());
+        //    boolean exists = file.exists();
+        //    if (exists){
+        //        commonAchieveService.deleteFile(file);
+        //    }
+        //}
         ProofDao.deleteProof(proofId);
         User user = proof.getUser();
         pipelineActionService.createActive(user.getId(),null,"删除了凭证"+proof.getProofName());
