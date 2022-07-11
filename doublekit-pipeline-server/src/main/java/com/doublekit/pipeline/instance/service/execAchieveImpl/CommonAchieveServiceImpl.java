@@ -154,6 +154,10 @@ public class CommonAchieveServiceImpl implements CommonAchieveService {
         return process;
     }
 
+    /**
+     * 获取不同系统应用文件保存地址
+     * @return 应用地址
+     */
     @Override
     public String getFileAddress(){
         String files = "/usr/local/pipeline/";

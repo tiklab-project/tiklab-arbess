@@ -8,6 +8,7 @@ import com.doublekit.pipeline.execute.service.PipelineDeployService;
 import com.doublekit.pipeline.instance.model.PipelineExecHistory;
 import com.doublekit.pipeline.instance.model.PipelineExecLog;
 import com.doublekit.pipeline.instance.model.PipelineProcess;
+import com.doublekit.pipeline.instance.service.execAchieveService.CommonAchieveService;
 import com.doublekit.pipeline.instance.service.execAchieveService.DeployAchieveService;
 import com.doublekit.pipeline.setting.proof.model.Proof;
 import com.doublekit.rpc.annotation.Exporter;
@@ -29,7 +30,7 @@ public class DeployAchieveServiceImpl implements DeployAchieveService {
     PipelineDeployService pipelineDeployService;
 
     @Autowired
-    CommonAchieveServiceImpl commonAchieveServiceImpl;
+    CommonAchieveService commonAchieveService;
 
 
     public void deployStart(PipelineProcess pipelineProcess, List<PipelineExecHistory> pipelineExecHistoryList) throws IOException {
@@ -52,7 +53,7 @@ public class DeployAchieveServiceImpl implements DeployAchieveService {
         PipelineExecHistory pipelineExecHistory = pipelineProcess.getPipelineExecHistory();
         PipelineConfigure pipelineConfigure = pipelineProcess.getPipelineConfigure();
 
-        PipelineExecLog pipelineExecLog = commonAchieveServiceImpl.initializeLog(pipelineExecHistory, pipelineConfigure);
+        PipelineExecLog pipelineExecLog = commonAchieveService.initializeLog(pipelineExecHistory, pipelineConfigure);
         PipelineDeploy pipelineDeploy = pipelineDeployService.findOneDeploy(pipelineConfigure.getTaskId());
         Proof proof = pipelineDeploy.getProof();
 
@@ -61,18 +62,20 @@ public class DeployAchieveServiceImpl implements DeployAchieveService {
         pipelineProcess.setPipelineDeploy(pipelineDeploy);
 
         if (proof == null){
-            commonAchieveServiceImpl.updateTime(pipelineProcess,beginTime);
-            commonAchieveServiceImpl.updateState(pipelineProcess,"凭证为空。",pipelineExecHistoryList);
+            commonAchieveService.updateTime(pipelineProcess,beginTime);
+            commonAchieveService.updateState(pipelineProcess,"凭证为空。",pipelineExecHistoryList);
             return 0;
         }
 
         //文件地址
-        String path = "D:\\clone\\" + pipelineConfigure.getPipeline().getPipelineName();
+        String path = commonAchieveService.getFileAddress() + pipelineConfigure.getPipeline().getPipelineName();;
         //发送文件地址
         String deployTargetAddress = pipelineDeploy.getDeployTargetAddress();
-        String filePath = commonAchieveServiceImpl.getFile(path,deployTargetAddress);
+        
+        String filePath = commonAchieveService.getFile(path,deployTargetAddress);
+        
         if (filePath == null){
-            commonAchieveServiceImpl.updateState(pipelineProcess,"部署文件找不到。",pipelineExecHistoryList);
+            commonAchieveService.updateState(pipelineProcess,"部署文件找不到。",pipelineExecHistoryList);
             return 0;
         }
         //文件名
@@ -107,13 +110,13 @@ public class DeployAchieveServiceImpl implements DeployAchieveService {
 
             deployStart(pipelineProcess,pipelineExecHistoryList);
 
-            commonAchieveServiceImpl.updateTime(pipelineProcess,beginTime);
+            commonAchieveService.updateTime(pipelineProcess,beginTime);
             } catch (JSchException | SftpException | IOException e) {
-                commonAchieveServiceImpl.updateState(pipelineProcess,e.toString(),pipelineExecHistoryList);
+                commonAchieveService.updateState(pipelineProcess,e.toString(),pipelineExecHistoryList);
                 return 0;
             }
         //更新状态
-        commonAchieveServiceImpl.updateState(pipelineProcess,null,pipelineExecHistoryList);
+        commonAchieveService.updateState(pipelineProcess,null,pipelineExecHistoryList);
         return 1;
     }
 
@@ -138,7 +141,9 @@ public class DeployAchieveServiceImpl implements DeployAchieveService {
         PipelineDeploy pipelineDeploy = pipelineProcess.getPipelineDeploy();
         Pipeline pipeline = pipelineProcess.getPipelineConfigure().getPipeline();
         String pipelineName = pipeline.getPipelineName();
-        String fileName = commonAchieveServiceImpl.getFile("D:\\clone\\" + pipelineName, pipelineDeploy.getDeployTargetAddress());
+        PipelineConfigure pipelineConfigure = pipelineProcess.getPipelineConfigure();
+        String path = commonAchieveService.getFileAddress() + pipelineConfigure.getPipeline().getPipelineName();
+        String fileName = commonAchieveService.getFile( path, pipelineDeploy.getDeployTargetAddress());
         //服务器部署位置
         String deployAddress = pipelineDeploy.getDeployAddress();
         String order = "rm -rf "+" "+deployAddress +";"
@@ -227,7 +232,7 @@ public class DeployAchieveServiceImpl implements DeployAchieveService {
         pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog() + "\n" + order+ "\n");
         session.execCommand(order);
         InputStreamReader inputStreamReader = new InputStreamReader(session.getStdout(), Charset.forName("GBK"));
-        commonAchieveServiceImpl.log(inputStreamReader,pipelineProcess,pipelineExecHistoryList);
+        commonAchieveService.log(inputStreamReader,pipelineProcess,pipelineExecHistoryList);
         session.close();
         inputStreamReader.close();
     }
