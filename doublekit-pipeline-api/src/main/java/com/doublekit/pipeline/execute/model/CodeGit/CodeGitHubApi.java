@@ -2,26 +2,38 @@ package com.doublekit.pipeline.execute.model.CodeGit;
 
 import com.doublekit.apibox.annotation.ApiModel;
 import com.doublekit.join.annotation.Join;
+import org.springframework.beans.factory.annotation.Value;
 
 @ApiModel
 @Join
 public class CodeGitHubApi {
 
-    public String getClient_ID() {
-        return  "cf93e472f1ffe9521474";
-    }
+    //第三方应用id
+    @Value("gitHubClientId")
+    private String clientId;
 
-    public String getClient_Secret() {
-        return "a9fb450fe0d746b71c06f18992487458938da9a1";
-    }
+    @Value("gitHubClientSecret")
+    private String clientSecret;
 
-    public String getCallback_URL() {
-        return "http://192.168.10.23:3004/#/index/task/config";
-    }
+    //回调地址
+    @Value("gitHubCallbackUrl")
+    private String callbackUri;
+
+    //public String getClient_ID() {
+    //    return  "cf93e472f1ffe9521474";
+    //}
+
+    //public String getClient_Secret() {
+    //    return "a9fb450fe0d746b71c06f18992487458938da9a1";
+    //}
+
+    //public String getCallback_URL() {
+    //    return "http://192.168.10.23:3004/#/index/task/config";
+    //}
 
     //获取code （get）
     public String getCode(){
-        return "https://github.com/login/oauth/authorize?client_id=" + getClient_ID() +"&callback_url="+getCallback_URL() +"&scope=repo admin:org_hook user ";
+        return "https://github.com/login/oauth/authorize?client_id=" + getClientId() +"&callback_url="+getClientSecret() +"&scope=repo admin:org_hook user ";
     }
 
     //获取accessToken
@@ -42,4 +54,29 @@ public class CodeGitHubApi {
 
     //获取仓库下所有分支
     public String getBranch(String username,String houseName){return "https://api.github.com/repos/"+username+"/"+houseName+"/branches";}
+
+
+    public String getClientId() {
+        return clientId;
+    }
+
+    public void setClientId(String clientId) {
+        this.clientId = clientId;
+    }
+
+    public String getClientSecret() {
+        return clientSecret;
+    }
+
+    public void setClientSecret(String clientSecret) {
+        this.clientSecret = clientSecret;
+    }
+
+    public String getCallbackUri() {
+        return callbackUri;
+    }
+
+    public void setCallbackUri(String callbackUri) {
+        this.callbackUri = callbackUri;
+    }
 }

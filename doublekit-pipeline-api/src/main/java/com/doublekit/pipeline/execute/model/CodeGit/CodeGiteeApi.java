@@ -2,30 +2,41 @@ package com.doublekit.pipeline.execute.model.CodeGit;
 
 import com.doublekit.apibox.annotation.ApiModel;
 import com.doublekit.join.annotation.Join;
+import org.springframework.beans.factory.annotation.Value;
 
 @ApiModel
 @Join
 public class CodeGiteeApi {
 
+    //第三方应用id
+    @Value("gieeClientId")
+    private String clientId;
 
-    public String getClient_id() {
-        //第三方应用id
-        return "84e4a3626d037a717fb4952f09abdf2624ce28a0beffb92cb4eac67479e05b34";
-    }
+    @Value("giteeClientSecret")
+    private String clientSecret;
 
-    public String getCallback_uri() {
-        //回调地址
-        return "http%3A%2F%2F192.168.10.23%3A3004%2F%23%2Findex%2Ftask%2Fconfig";
-    }
+    //回调地址
+    @Value("giteeCallbackUrl")
+    private String callbackUri;
 
-    public String getClient_secret() {
-        //第三方应用秘钥
-        return "f38167d54948136b9ca4e4ca454573b3c3d485db575a91a0e784a04599a20054";
-    }
+    //public String getClientId() {
+    //    //第三方应用id
+    //    return "84e4a3626d037a717fb4952f09abdf2624ce28a0beffb92cb4eac67479e05b34";
+    //}
+    //
+    //public String getCallback_uri() {
+    //    //回调地址
+    //    return "http%3A%2F%2F192.168.10.23%3A3004%2F%23%2Findex%2Ftask%2Fconfig";
+    //}
+    //
+    //public String getClient_secret() {
+    //    //第三方应用秘钥
+    //    return "f38167d54948136b9ca4e4ca454573b3c3d485db575a91a0e784a04599a20054";
+    //}
 
     public String getCode() {
         //获取code
-        return "https://gitee.com/oauth/authorize?client_id="+getClient_id()+"&redirect_uri="+getCallback_uri()+"&response_type=code";
+        return "https://gitee.com/oauth/authorize?client_id="+getClientId()+"&redirect_uri="+getCallbackUri()+"&response_type=code";
     }
 
     /**
@@ -35,7 +46,7 @@ public class CodeGiteeApi {
      */
     public String getAccessToken(String code) {
         //获取accessToken
-        return "https://gitee.com/oauth/token?grant_type=authorization_code&code="+code+"&client_id="+getClient_id()+"&redirect_uri="+getCallback_uri()+"&client_secret="+getClient_secret();
+        return "https://gitee.com/oauth/token?grant_type=authorization_code&code="+code+"&client_id="+getClientId()+"&redirect_uri="+getCallbackUri()+"&client_secret="+getClientSecret();
         // return "https://gitee.com/oauth/token?";
     }
 
@@ -93,5 +104,27 @@ public class CodeGiteeApi {
         return "https://gitee.com/api/v5/user?access_token="+accessToken;
     }
 
+    public String getClientId() {
+        return clientId;
+    }
 
+    public void setClientId(String clientId) {
+        this.clientId = clientId;
+    }
+
+    public String getClientSecret() {
+        return clientSecret;
+    }
+
+    public void setClientSecret(String clientSecret) {
+        this.clientSecret = clientSecret;
+    }
+
+    public String getCallbackUri() {
+        return callbackUri;
+    }
+
+    public void setCallbackUri(String callbackUri) {
+        this.callbackUri = callbackUri;
+    }
 }

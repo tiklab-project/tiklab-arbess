@@ -47,8 +47,9 @@ public class CodeGitHubServiceImpl implements CodeGitHubService {
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
         String accessTokenUrl = codeGitHubApi.getAccessToken(code);
         MultiValueMap<String, Object> paramMap = new LinkedMultiValueMap<>();
-        paramMap.add("client_id",codeGitHubApi.getClient_ID());
-        paramMap.add("client_secret",codeGitHubApi.getClient_Secret());
+        paramMap.add("client_id",codeGitHubApi.getClientId());
+        paramMap.add("client_secret",codeGitHubApi.getClientSecret());
+        paramMap.add("callback_url",codeGitHubApi.getCallbackUri());
         paramMap.add("code",code);
         HttpEntity<MultiValueMap<String, Object>> entity = new HttpEntity<>(paramMap, headers);
         ResponseEntity<JSONObject> response = restTemplate.exchange(accessTokenUrl, HttpMethod.POST, entity, JSONObject.class);
@@ -58,7 +59,6 @@ public class CodeGitHubServiceImpl implements CodeGitHubService {
             return body.getString("access_token");
         }
         return null;
-
     }
 
     @Override
