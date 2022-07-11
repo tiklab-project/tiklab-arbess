@@ -28,7 +28,8 @@ public class CodeGitHubServiceImpl implements CodeGitHubService {
     @Autowired
     ProofService proofService;
 
-    CodeGitHubApi codeGitHubApi = new CodeGitHubApi();
+    @Autowired
+    CodeGitHubApi codeGitHubApi;
 
     private static final Logger logger = LoggerFactory.getLogger(CodeGiteeApiServiceImpl.class);
 

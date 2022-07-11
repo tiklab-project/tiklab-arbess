@@ -2,21 +2,24 @@ package com.doublekit.pipeline.execute.model.CodeGit;
 
 import com.doublekit.apibox.annotation.ApiModel;
 import com.doublekit.join.annotation.Join;
+import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 @ApiModel
 @Join
+@Component
 public class CodeGiteeApi {
 
     //第三方应用id
-    @Value("gieeClientId")
+    @Value("${gieeClientId}")
     private String clientId;
 
-    @Value("giteeClientSecret")
+    @Value("${giteeClientSecret}")
     private String clientSecret;
 
     //回调地址
-    @Value("giteeCallbackUrl")
+    @Value("${giteeCallbackUrl}")
     private String callbackUri;
 
     //public String getClientId() {
@@ -36,7 +39,7 @@ public class CodeGiteeApi {
 
     public String getCode() {
         //获取code
-        return "https://gitee.com/oauth/authorize?client_id="+getClientId()+"&redirect_uri="+getCallbackUri()+"&response_type=code";
+        return "https://gitee.com/oauth/authorize?client_id="+clientId+"&redirect_uri="+callbackUri+"&response_type=code";
     }
 
     /**
@@ -46,7 +49,7 @@ public class CodeGiteeApi {
      */
     public String getAccessToken(String code) {
         //获取accessToken
-        return "https://gitee.com/oauth/token?grant_type=authorization_code&code="+code+"&client_id="+getClientId()+"&redirect_uri="+getCallbackUri()+"&client_secret="+getClientSecret();
+        return "https://gitee.com/oauth/token?grant_type=authorization_code&code="+code+"&client_id="+clientId+"&redirect_uri="+callbackUri+"&client_secret="+clientSecret;
         // return "https://gitee.com/oauth/token?";
     }
 
@@ -102,29 +105,5 @@ public class CodeGiteeApi {
     public String getUserMessage( String accessToken) {
         //获取授权用户的资料
         return "https://gitee.com/api/v5/user?access_token="+accessToken;
-    }
-
-    public String getClientId() {
-        return clientId;
-    }
-
-    public void setClientId(String clientId) {
-        this.clientId = clientId;
-    }
-
-    public String getClientSecret() {
-        return clientSecret;
-    }
-
-    public void setClientSecret(String clientSecret) {
-        this.clientSecret = clientSecret;
-    }
-
-    public String getCallbackUri() {
-        return callbackUri;
-    }
-
-    public void setCallbackUri(String callbackUri) {
-        this.callbackUri = callbackUri;
     }
 }

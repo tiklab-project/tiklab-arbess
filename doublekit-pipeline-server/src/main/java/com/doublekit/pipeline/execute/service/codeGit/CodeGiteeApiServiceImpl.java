@@ -36,7 +36,8 @@ public class CodeGiteeApiServiceImpl implements CodeGiteeApiService {
     @Autowired
     ProofService proofService;
 
-    CodeGiteeApi codeGiteeApi = new CodeGiteeApi();
+    @Autowired
+    CodeGiteeApi codeGiteeApi;
 
     private static final Logger logger = LoggerFactory.getLogger(CodeGiteeApiServiceImpl.class);
 

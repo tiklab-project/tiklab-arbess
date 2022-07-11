@@ -3,33 +3,23 @@ package com.doublekit.pipeline.execute.model.CodeGit;
 import com.doublekit.apibox.annotation.ApiModel;
 import com.doublekit.join.annotation.Join;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 @ApiModel
 @Join
+@Component
 public class CodeGitHubApi {
 
     //第三方应用id
-    @Value("gitHubClientId")
+    @Value("${gitHubClientId}")
     private String clientId;
 
-    @Value("gitHubClientSecret")
+    @Value("${gitHubClientSecret}")
     private String clientSecret;
 
     //回调地址
-    @Value("gitHubCallbackUrl")
+    @Value("${gitHubCallbackUrl}")
     private String callbackUri;
-
-    //public String getClient_ID() {
-    //    return  "cf93e472f1ffe9521474";
-    //}
-
-    //public String getClient_Secret() {
-    //    return "a9fb450fe0d746b71c06f18992487458938da9a1";
-    //}
-
-    //public String getCallback_URL() {
-    //    return "http://192.168.10.23:3004/#/index/task/config";
-    //}
 
     //获取code （get）
     public String getCode(){
