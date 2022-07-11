@@ -75,11 +75,11 @@
             <artifactId>doublekit-user-spring-boot-starter</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>com.doublekit</groupId>
-            <artifactId>doublekit-eam-spring-boot-starter</artifactId>
-            <version>${project.version}</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>com.doublekit</groupId>-->
+<!--            <artifactId>doublekit-eam-spring-boot-starter</artifactId>-->
+<!--            <version>${project.version}</version>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>com.doublekit</groupId>
             <artifactId>doublekit-privilege-spring-boot-starter</artifactId>

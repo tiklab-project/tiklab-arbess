@@ -98,6 +98,7 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
         pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+s);
         pipelineExecHistoryList.add(pipelineExecHistory);
 
+        //开始克隆
         try {
         codeStart(proof,pipelineCode,path);
         } catch (GitAPIException | IOException | SVNException e) {
