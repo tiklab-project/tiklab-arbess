@@ -93,32 +93,29 @@ public class PipelineServiceImpl implements PipelineService{
         }
         for (DmUser dmUser : allDmUser) {
             if (!dmUser.getDomainId().equals(pipelineId)){
-               continue;
+                continue;
             }
             dmUserService.deleteDmUser(dmUser.getId());
         }
-        if (pipelineId != null){
-            pipelineDao.deletePipeline(pipelineId);
-            //删除对应的流水线配置
-            pipelineConfigureService.deleteTask(pipelineId);
-            //删除对应的历史
-            pipelineExecHistoryService.deleteHistory(pipelineId);
-            //删除收藏
-            pipelineOpenService.deleteAllOpen(pipelineId);
-            //删除动态
-            pipelineActionService.deletePipelineAction(pipelineId);
-            //动态
-            pipelineActionService.createActive(userId,null,"删除了流水线"+pipeline.getPipelineName());
-        }
+        pipelineDao.deletePipeline(pipelineId);
+        //删除对应的流水线配置
+        pipelineConfigureService.deleteTask(pipelineId);
+        //删除对应的历史
+        pipelineExecHistoryService.deleteHistory(pipelineId);
+        //删除收藏
+        pipelineOpenService.deleteAllOpen(pipelineId);
+        //删除动态
+        pipelineActionService.deletePipelineAction(pipelineId);
+        //动态
+        //pipelineActionService.createActive(userId,null,"删除了流水线"+pipeline.getPipelineName());
+
     }
 
     //更新
     @Override
     public int updatePipeline(Pipeline pipeline) {
-         PipelineEntity pipelineEntity = BeanMapper.map(pipeline, PipelineEntity.class);
-        //更新用户信息
+        PipelineEntity pipelineEntity = BeanMapper.map(pipeline, PipelineEntity.class);
         pipelineDao.updatePipeline(pipelineEntity);
-        //pipelineActionService.createActive(pipeline.getUser().getId(),pipeline,"更新了流水线/的信息");
         return 1;
     }
 
@@ -156,19 +153,6 @@ public class PipelineServiceImpl implements PipelineService{
         StringBuilder s = findUserPipelineId(userId);
         List<PipelineEntity> userPipeline = pipelineDao.findUserPipeline(s);
         return BeanMapper.mapList(userPipeline, Pipeline.class);
-        //List<Pipeline> pipelineList = new ArrayList<>();
-        //List<Pipeline> allPipeline = findAllPipeline();
-        //if (allPipeline != null){
-        //    for (Pipeline pipeline : allPipeline) {
-        //        for (String s : list) {
-        //            if (!pipeline.getPipelineId().equals(s)){
-        //                continue;
-        //            }
-        //            pipelineList.add(pipeline);
-        //        }
-        //    }
-        //}
-        //return pipelineList;
     }
 
     //获取用户所有流水线id

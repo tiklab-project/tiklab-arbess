@@ -50,7 +50,9 @@ public class PipelineActionServiceImpl implements PipelineActionService {
         User user = userService.findOne(userId);
         pipelineAction.setCreateTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
         pipelineAction.setUser(user);
-        pipelineAction.setPipeline(pipeline);
+        if (pipeline != null){
+            pipelineAction.setPipeline(pipeline);
+        }
         String[] split = massage.split("/");
         pipelineAction.setMassage(""+split[0]);
         if (split.length == 2){
