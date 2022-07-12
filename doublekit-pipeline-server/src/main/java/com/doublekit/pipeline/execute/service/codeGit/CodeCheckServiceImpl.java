@@ -1,5 +1,6 @@
 package com.doublekit.pipeline.execute.service.codeGit;
 
+import com.doublekit.pipeline.definition.service.PipelineCommonService;
 import com.doublekit.pipeline.execute.model.CodeGit.CodeCheckAuth;
 import com.doublekit.pipeline.instance.service.execAchieveService.CommonAchieveService;
 import com.doublekit.pipeline.setting.proof.model.Proof;
@@ -36,6 +37,9 @@ public class CodeCheckServiceImpl implements CodeCheckService {
     @Autowired
     CommonAchieveService commonAchieveService;
 
+    @Autowired
+    PipelineCommonService pipelineCommonService;
+
     @Override
     public Boolean checkAuth(CodeCheckAuth codeCheckAuth){
         Proof proof = proofService.findOneProof(codeCheckAuth.getProofId());
@@ -59,7 +63,7 @@ public class CodeCheckServiceImpl implements CodeCheckService {
         try {
             file = File.createTempFile("pipeline", ".txt");
             path = file.getAbsolutePath();
-            commonAchieveService.writePrivateKeyPath(proof.getProofPassword(),path);
+            pipelineCommonService.writePrivateKeyPath(proof.getProofPassword(),path);
         } catch (IOException e) {
             if (file != null){
                 file.deleteOnExit();

@@ -69,17 +69,7 @@ public class PipelineActionServiceImpl implements PipelineActionService {
 
     @Override
     public void deletePipelineAction(String pipelineId){
-        List<PipelineAction> allActive = findAllActive();
-        if (allActive == null){
-            return;
-        }
-        for (PipelineAction pipelineAction : allActive) {
-            joinTemplate.joinQuery(pipelineAction);
-            if (pipelineAction.getPipeline() ==null ||!pipelineAction.getPipeline().getPipelineId().equals(pipelineId)){
-                continue;
-            }
-            deleteAction(pipelineAction.getId());
-        }
+        pipelineActionDao.deleteAllAction(pipelineId);
     }
 
     @Override

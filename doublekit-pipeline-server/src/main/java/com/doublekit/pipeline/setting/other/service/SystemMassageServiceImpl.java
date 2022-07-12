@@ -1,5 +1,6 @@
 package com.doublekit.pipeline.setting.other.service;
 
+import com.doublekit.pipeline.definition.service.PipelineCommonService;
 import com.doublekit.pipeline.instance.service.execAchieveService.CommonAchieveService;
 import com.doublekit.pipeline.setting.other.model.SystemMassage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,16 +13,13 @@ public class SystemMassageServiceImpl implements  SystemMassageService{
 
 
     @Autowired
-    CommonAchieveService commonAchieveService;
+    PipelineCommonService pipelineCommonService;
 
     @Autowired
     public SystemMassage getSystemMassage(){
         return new SystemMassage();
     }
 
-
-//    D:\桌面\项目\doublekit-pipeline\LOG_PATH_IS_UNDEFINED\doublekit\doublekit-pipeline\logs\app.pipelineExecLog
-//    /usr/local/apps/doublekit-pipeline-1.0.0-SNAPSHOT/bin/LOG_PATH_IS_UNDEFINED/doublekit/doublekit-pipeline/logs
 
     public List<String> getSystemLog(){
         String address = System.getProperty("user.dir");
@@ -31,7 +29,7 @@ public class SystemMassageServiceImpl implements  SystemMassageService{
         if (s[0].equals("Windows")){
             files = address+ "\\LOG_PATH_IS_UNDEFINED\\doublekit\\doublekit-pipeline\\logs\\app.pipelineExecLog";
         }
-        List<String> list = commonAchieveService.readFile(files);
+        List<String> list = pipelineCommonService.readFile(files);
         if (list.size() < 1000){
             return list;
         }

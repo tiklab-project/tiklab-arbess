@@ -2,6 +2,7 @@ package com.doublekit.pipeline.instance.service;
 
 import com.doublekit.pipeline.definition.model.Pipeline;
 import com.doublekit.pipeline.definition.model.PipelineConfigure;
+import com.doublekit.pipeline.definition.service.PipelineCommonService;
 import com.doublekit.pipeline.definition.service.PipelineConfigureService;
 import com.doublekit.pipeline.definition.service.PipelineService;
 import com.doublekit.pipeline.execute.model.CodeGit.FileTree;
@@ -47,9 +48,6 @@ public class PipelineWorkSpaceServiceImpl implements  PipelineWorkSpaceService {
     PipelineService pipelineService;
 
     @Autowired
-    CommonAchieveService commonAchieveService;
-
-    @Autowired
     PipelineConfigureService pipelineConfigureService;
 
     @Autowired
@@ -57,6 +55,9 @@ public class PipelineWorkSpaceServiceImpl implements  PipelineWorkSpaceService {
 
     @Autowired
     PipelineOpenService pipelineOpenService;
+
+    @Autowired
+    PipelineCommonService pipelineCommonService;
 
     private static final Logger logger = LoggerFactory.getLogger(PipelineWorkSpaceServiceImpl.class);
 
@@ -68,12 +69,12 @@ public class PipelineWorkSpaceServiceImpl implements  PipelineWorkSpaceService {
         if (pipeline == null)return null;
 
         //设置拉取地址
-        String path = commonAchieveService.getFileAddress()+pipeline.getPipelineName();
+        String path = pipelineCommonService.getFileAddress()+pipeline.getPipelineName();
         List<FileTree> trees = new ArrayList<>();
         File file = new File(path);
         //判断文件是否存在
         if (file.exists()){
-            List<FileTree> list = commonAchieveService.fileTree(file, trees);
+            List<FileTree> list = pipelineCommonService.fileTree(file, trees);
             list.sort(Comparator.comparing(FileTree::getTreeType,Comparator.reverseOrder()));
             return list;
         }
@@ -83,7 +84,7 @@ public class PipelineWorkSpaceServiceImpl implements  PipelineWorkSpaceService {
     //读取文件信息
     @Override
     public  List<String> readFile(String path){
-        return commonAchieveService.readFile(path);
+        return pipelineCommonService.readFile(path);
     }
 
     @Override
@@ -99,11 +100,12 @@ public class PipelineWorkSpaceServiceImpl implements  PipelineWorkSpaceService {
         return null;
     }
 
+
     public List<List<GitCommit>> git(String pipelineId) {
         List<GitCommit> list = new ArrayList<>();
         Pipeline pipeline = pipelineService.findPipeline(pipelineId);
         RevWalk walk = null;
-        String dir = commonAchieveService.getFileAddress() + pipeline.getPipelineName();
+        String dir = pipelineCommonService.getFileAddress() + pipeline.getPipelineName();
         try (Repository repo = new FileRepository( dir+ "/.git"); Git git = new Git(repo)) {
             Iterable<RevCommit> commits = git.log().all().call();
 
@@ -246,7 +248,7 @@ public class PipelineWorkSpaceServiceImpl implements  PipelineWorkSpaceService {
                 commit.setDayTime(new SimpleDateFormat("yyyy-MM-dd").format(entry.getDate()));
                 for (Map.Entry<String, SVNLogEntryPath> pathEntry : entry.getChangedPaths().entrySet()) {
                     //文件地址
-                    strings.add( commonAchieveService.getFileAddress()+pipeline.getPipelineName()+pathEntry.getKey());
+                    strings.add(pipelineCommonService.getFileAddress()+pipeline.getPipelineName()+pathEntry.getKey());
                 }
                 commit.setCommitFile(strings);
                 list.add(commit);

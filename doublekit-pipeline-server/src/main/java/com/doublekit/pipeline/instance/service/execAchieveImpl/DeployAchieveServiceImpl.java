@@ -3,6 +3,7 @@ package com.doublekit.pipeline.instance.service.execAchieveImpl;
 import ch.ethz.ssh2.Connection;
 import com.doublekit.pipeline.definition.model.Pipeline;
 import com.doublekit.pipeline.definition.model.PipelineConfigure;
+import com.doublekit.pipeline.definition.service.PipelineCommonService;
 import com.doublekit.pipeline.execute.model.PipelineDeploy;
 import com.doublekit.pipeline.execute.service.PipelineDeployService;
 import com.doublekit.pipeline.instance.model.PipelineExecHistory;
@@ -31,6 +32,9 @@ public class DeployAchieveServiceImpl implements DeployAchieveService {
 
     @Autowired
     CommonAchieveService commonAchieveService;
+
+    @Autowired
+    PipelineCommonService pipelineCommonService;
 
 
     public void deployStart(PipelineProcess pipelineProcess, List<PipelineExecHistory> pipelineExecHistoryList) throws IOException {
@@ -68,11 +72,11 @@ public class DeployAchieveServiceImpl implements DeployAchieveService {
         }
 
         //文件地址
-        String path = commonAchieveService.getFileAddress() + pipelineConfigure.getPipeline().getPipelineName();;
+        String path = pipelineCommonService.getFileAddress() + pipelineConfigure.getPipeline().getPipelineName();;
         //发送文件地址
         String deployTargetAddress = pipelineDeploy.getDeployTargetAddress();
         
-        String filePath = commonAchieveService.getFile(path,deployTargetAddress);
+        String filePath = pipelineCommonService.getFile(path,deployTargetAddress);
         
         if (filePath == null){
             commonAchieveService.updateState(pipelineProcess,"部署文件找不到。",pipelineExecHistoryList);
@@ -93,22 +97,21 @@ public class DeployAchieveServiceImpl implements DeployAchieveService {
                     + "连接类型  ： " +proof.getProofType();
             pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+"\n"+log);
             JSch jsch = new JSch();
-            //采用指定的端口连接服务器
+            //指定的端口连接服务器
             Session session =jsch.getSession(proof.getProofUsername(), pipelineDeploy.getIp() ,pipelineDeploy.getPort());
             if (session == null){
                 throw new JSchException(pipelineDeploy.getIp() + "连接异常。。。。");
             }
             log = "服务器连接"+pipelineDeploy.getIp()+"成功";
-            pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+"\n"+log+"\n"+"开始发送文件:"+fileName);
-            pipelineExecLog.setRunLog(pipelineExecLog.getRunLog()+"\n"+log+"\n"+"开始发送文件:"+fileName);
-            pipelineExecLog.setRunLog(pipelineExecLog.getRunLog()+"\n"+log+"\n"+"文件:"+fileName+"发送中......");
+            pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+"\n"+log+"\n"+"开始发送文件:"+fileName+"\n"+"文件:"+fileName+"发送中......");
+            pipelineExecLog.setRunLog(pipelineExecLog.getRunLog()+"\n"+log+"\n"+"开始发送文件:"+fileName+"\n"+"文件: "+fileName+" 发送中......");
 
             //发送文件
             sshSftp(session,jsch,proof,deployAddress,filePath);
 
             pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+"\n"+"文件:"+fileName+"发送成功！");
-            pipelineExecHistory.setRunLog(pipelineExecLog.getRunLog()+"\n"+"文件:"+fileName+"发送成功！");
 
+            //执行shell
             deployStart(pipelineProcess,pipelineExecHistoryList);
 
             commonAchieveService.updateTime(pipelineProcess,beginTime);
@@ -143,8 +146,8 @@ public class DeployAchieveServiceImpl implements DeployAchieveService {
         Pipeline pipeline = pipelineProcess.getPipelineConfigure().getPipeline();
         String pipelineName = pipeline.getPipelineName();
         PipelineConfigure pipelineConfigure = pipelineProcess.getPipelineConfigure();
-        String path = commonAchieveService.getFileAddress() + pipelineConfigure.getPipeline().getPipelineName();
-        String fileName = commonAchieveService.getFile( path, pipelineDeploy.getDeployTargetAddress());
+        String path = pipelineCommonService.getFileAddress() + pipelineConfigure.getPipeline().getPipelineName();
+        String fileName = pipelineCommonService.getFile( path, pipelineDeploy.getDeployTargetAddress());
         //服务器部署位置
         String deployAddress = pipelineDeploy.getDeployAddress();
         String order = "rm -rf "+" "+deployAddress +";"
@@ -219,9 +222,10 @@ public class DeployAchieveServiceImpl implements DeployAchieveService {
         PipelineDeploy pipelineDeploy = pipelineProcess.getPipelineDeploy();
         Proof proof = pipelineProcess.getProof();
         PipelineExecHistory pipelineExecHistory = pipelineProcess.getPipelineExecHistory();
+        //效验
         Connection conn = new Connection(pipelineDeploy.getIp(),pipelineDeploy.getPort());
         conn.connect();
-
+        //效验方式
         if (proof.getProofType().equals("password")){
             //设置登陆主机的密码
             conn.authenticateWithPassword(proof.getProofUsername(), proof.getProofPassword());
@@ -229,10 +233,14 @@ public class DeployAchieveServiceImpl implements DeployAchieveService {
             //添加私钥
             conn.authenticateWithPublicKey(proof.getProofUsername(),new File(proof.getProofPassword()),null);
         }
+        //连接
         ch.ethz.ssh2.Session session = conn.openSession();
-        pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog() + "\n" + order+ "\n");
         session.execCommand(order);
+        //日志信息
+        pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog() + "\n" + order+ "\n");
+        //获取执行信息
         InputStreamReader inputStreamReader = new InputStreamReader(session.getStdout(), Charset.forName("GBK"));
+        //输出执行信息
         commonAchieveService.log(inputStreamReader,pipelineProcess,pipelineExecHistoryList);
         session.close();
         inputStreamReader.close();

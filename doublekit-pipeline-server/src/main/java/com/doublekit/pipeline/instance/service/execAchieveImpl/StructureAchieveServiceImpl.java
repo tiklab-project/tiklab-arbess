@@ -1,6 +1,7 @@
 package com.doublekit.pipeline.instance.service.execAchieveImpl;
 
 import com.doublekit.pipeline.definition.model.PipelineConfigure;
+import com.doublekit.pipeline.definition.service.PipelineCommonService;
 import com.doublekit.pipeline.execute.model.PipelineStructure;
 import com.doublekit.pipeline.execute.service.PipelineStructureService;
 import com.doublekit.pipeline.instance.model.PipelineExecHistory;
@@ -29,6 +30,9 @@ public class StructureAchieveServiceImpl implements StructureAchieveService {
     @Autowired
     CommonAchieveServiceImpl commonAchieveServiceImpl;
 
+    @Autowired
+    PipelineCommonService pipelineCommonService;
+
     //@Value("${}")
     private static final Logger logger = LoggerFactory.getLogger(StructureAchieveServiceImpl.class);
     // 构建
@@ -46,7 +50,7 @@ public class StructureAchieveServiceImpl implements StructureAchieveService {
         pipelineProcess.setPipelineExecLog(pipelineExecLog);
 
         //设置拉取地址
-        String path = commonAchieveServiceImpl.getFileAddress()+pipelineConfigure.getPipeline().getPipelineName();
+        String path = pipelineCommonService.getFileAddress()+pipelineConfigure.getPipeline().getPipelineName();
 
         try {
             String a = "------------------------------------" + " \n"

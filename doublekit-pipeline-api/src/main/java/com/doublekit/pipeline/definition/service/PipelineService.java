@@ -32,7 +32,7 @@ public interface PipelineService {
      * 删除流水线
      * @param pipelineId 流水线id
      */
-    void deletePipeline(@NotNull String pipelineId,String userId);
+    Integer deletePipeline(@NotNull String pipelineId,String userId);
 
     /**
      * 更新流水线

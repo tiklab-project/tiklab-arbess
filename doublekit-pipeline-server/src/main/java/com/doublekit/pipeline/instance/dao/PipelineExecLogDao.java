@@ -1,5 +1,6 @@
 package com.doublekit.pipeline.instance.dao;
 
+import com.doublekit.dal.jdbc.JdbcTemplate;
 import com.doublekit.dal.jpa.JpaTemplate;
 import com.doublekit.pipeline.instance.entity.PipelineExecLogEntity;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,6 +57,17 @@ public class PipelineExecLogDao {
 
     public List<PipelineExecLogEntity> findAllLogList(List<String> idList){
         return jpaTemplate.findList(PipelineExecLogEntity.class,idList);
+    }
+
+    /**
+     * 删除历史关联的日志
+     * @param historyId 历史id
+     */
+    public void deleteAllLog(String historyId){
+        String sql = "delete from pipeline_log ";
+        sql = sql.concat(" where pipeline_log.history_id = '"+historyId +"'");
+        JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
+        jdbcTemplate.execute(sql);
     }
 
 }

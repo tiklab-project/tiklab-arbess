@@ -55,11 +55,11 @@ public class PipelineController {
     @RequestMapping(path="/deletePipeline",method = RequestMethod.POST)
     @ApiMethod(name = "deletePipeline",desc = "删除流水线")
     @ApiParam(name = "pipelineId",desc = "流水线id",required = true)
-    public Result deletePipeline(@NotNull String pipelineId,String userId){
+    public Result<Integer> deletePipeline(@NotNull String pipelineId,String userId){
 
-        pipelineService.deletePipeline(pipelineId,userId);
+        Integer integer = pipelineService.deletePipeline(pipelineId, userId);
 
-        return Result.ok();
+        return Result.ok(integer);
     }
 
     //查询

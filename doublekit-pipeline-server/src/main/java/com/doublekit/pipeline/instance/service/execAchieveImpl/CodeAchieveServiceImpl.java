@@ -1,6 +1,7 @@
 package com.doublekit.pipeline.instance.service.execAchieveImpl;
 
 import com.doublekit.pipeline.definition.model.PipelineConfigure;
+import com.doublekit.pipeline.definition.service.PipelineCommonService;
 import com.doublekit.pipeline.execute.model.PipelineCode;
 import com.doublekit.pipeline.execute.service.PipelineCodeService;
 import com.doublekit.pipeline.execute.service.PipelineCodeServiceImpl;
@@ -46,6 +47,9 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
     @Autowired
     CommonAchieveService commonAchieveService;
 
+    @Autowired
+    PipelineCommonService pipelineCommonService;
+
     private static final Logger logger = LoggerFactory.getLogger(PipelineCodeServiceImpl.class);
 
     // git克隆
@@ -62,11 +66,11 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
         PipelineExecLog pipelineExecLog = commonAchieveService.initializeLog(pipelineExecHistory, pipelineConfigure);
 
         //代码克隆路径
-        String path = commonAchieveService.getFileAddress() + pipelineConfigure.getPipeline().getPipelineName();
+        String path = pipelineCommonService.getFileAddress() + pipelineConfigure.getPipeline().getPipelineName();
         File file = new File(path);
 
         //删除旧的代码
-        Boolean deleteFile = commonAchieveService.deleteFile(file);
+        Boolean deleteFile = pipelineCommonService.deleteFile(file);
         if (deleteFile){
             pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+"\n开始分配代码空间。");
             pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+"\n代码空间分配成功。\n");
@@ -132,7 +136,7 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
             case 1,2,3,4 :
                 if (proof.getProofType().equals("SSH")){
                     File file = File.createTempFile("pipeline", ".txt");
-                    commonAchieveService.writePrivateKeyPath(proof.getProofPassword(),file.getAbsolutePath());
+                    pipelineCommonService.writePrivateKeyPath(proof.getProofPassword(),file.getAbsolutePath());
                     sshClone(pipelineCode.getCodeAddress(), file.getAbsolutePath(), path, pipelineCode.getCodeBranch());
                     file.deleteOnExit();
                 }else {
@@ -214,7 +218,7 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
      * @param path 文件地址
      */
     public void svn(PipelineCode pipelineCode,Proof proof,String path) throws SVNException {
-        commonAchieveService.deleteFile(new File(path));
+        pipelineCommonService.deleteFile(new File(path));
         SvnOperationFactory svnOperationFactory = new SvnOperationFactory();
         char[] password = proof.getProofPassword().toCharArray();
 
@@ -234,7 +238,7 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
      * @param path 文件地址
      */
     public void sshSvn(PipelineCode pipelineCode,Proof proof,String path) throws SVNException {
-        commonAchieveService.deleteFile(new File(path));
+        pipelineCommonService.deleteFile(new File(path));
         SvnOperationFactory svnOperationFactory = new SvnOperationFactory();
         BasicAuthenticationManager auth = BasicAuthenticationManager
                 .newInstance(proof.getProofUsername(), new File(proof.getProofPassword()),null,22);

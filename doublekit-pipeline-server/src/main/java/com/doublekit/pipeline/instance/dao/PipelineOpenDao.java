@@ -78,4 +78,6 @@ public class PipelineOpenDao {
         return jpaTemplate.findList(PipelineOpenEntity.class,idList);
     }
 
+
+
 }

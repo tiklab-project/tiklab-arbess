@@ -57,14 +57,6 @@ public class ProofServiceImpl implements ProofService{
     @Override
     public void deleteProof(String proofId) {
         Proof proof = findOneProof(proofId);
-        //if (proof.getProofType().equals("SSH")){
-        //    //判断秘钥是否存在
-        //    File file = new File(proof.getProofPassword());
-        //    boolean exists = file.exists();
-        //    if (exists){
-        //        commonAchieveService.deleteFile(file);
-        //    }
-        //}
         ProofDao.deleteProof(proofId);
         User user = proof.getUser();
         pipelineActionService.createActive(user.getId(),null,"删除了凭证"+proof.getProofName());
@@ -143,35 +135,6 @@ public class ProofServiceImpl implements ProofService{
                 joinTemplate.joinQuery(proofs);
                 return proofs;
             }
-
-        //List<Proof> list = new ArrayList<>();
-        //List<Proof> allProof = findAllProof();
-        //if (allProof == null){
-        //    return null;
-        //}
-        //joinTemplate.joinQuery(allProof);
-        //for (Proof proof : allProof) {
-        //    if (proof.getPipeline() == null){
-        //        //获取自己创建的凭证
-        //        if (proof.getUser().getId().equals(proofQuery.getUserId()) || proof.getType()== 1){
-        //            list.add(proof);
-        //        }
-        //    //判断是否是此流水线的项目凭证
-        //    }else if (proof.getPipeline().getPipelineId().equals(proofQuery.getPipelineId()) || proof.getType() == 1){
-        //        list.add(proof);
-        //    }
-        //}
-        ////判断是否获取
-        //if (proofQuery.getType() == 0 ){
-        //    return list;
-        //}
-        //List<Proof> lists = new ArrayList<>();
-        //for (Proof proof : list) {
-        //    if (proof.getProofScope() == proofQuery.getType()){
-        //        lists.add(proof);
-        //    }
-        //}
-        //return lists;
     }
 
     @Override

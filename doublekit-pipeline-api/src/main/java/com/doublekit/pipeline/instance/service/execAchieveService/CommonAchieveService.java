@@ -24,22 +24,6 @@ public interface CommonAchieveService {
      int log(InputStreamReader inputStreamReader, PipelineProcess pipelineProcess, List<PipelineExecHistory> pipelineExecHistoryList) throws IOException;
 
     /**
-     * 获取符合条件的文件名
-     * @param path 文件地址
-     * @param list 存放文件地址
-     * @return 文件地址集合
-     */
-    List<String> getFilePath(File path, List<String> list);
-
-    /**
-     * 匹配字符串获取文件名
-     * @param path 文件地址
-     * @param regex 匹配条件
-     * @return 文件地址
-     */
-      String getFile(String path, String regex);
-
-    /**
      * 调用cmd执行命令
      * @param path 构建地址
      * @param order 构建命令
@@ -47,18 +31,6 @@ public interface CommonAchieveService {
      * @throws IOException 构建命令执行异常
      */
      Process process(String path,String order,String sourceAddress) throws IOException;
-
-    /**
-     * 获取默认文件地址
-     * @return 地址路径
-     */
-    String getFileAddress();
-
-    /**
-     * 删除文件
-     * @param file 文件地址
-     */
-      Boolean deleteFile(File file);
 
     /**
      * 更新执行时间
@@ -112,29 +84,6 @@ public interface CommonAchieveService {
      */
      PipelineExecHistory initializeHistory(String historyId, Pipeline pipeline,String userId);
 
-    /**
-     * 获取文件树
-     * @param path 文件地址
-     * @param list 存放树的容器
-     * @return 树
-     */
-      List<FileTree> fileTree(File path, List<FileTree> list);
-
-    /**
-     * 字符串写入文件中
-     * @param massage 支付串
-     * @param filePath 文件地址
-     * @throws IOException 写入失败
-     */
-    void writePrivateKeyPath(String massage, String filePath) throws IOException;
-
-
-    /**
-     * 获取文件流
-     * @param path 文件地址
-     * @return 文件信息
-     */
-     List<String> readFile(String path);
 
     StringBuilder findUserPipelineId(String userId);
 }

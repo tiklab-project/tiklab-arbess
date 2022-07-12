@@ -75,6 +75,16 @@ public class PipelineActionDao {
         return  jdbcTemplate.query(sql, new BeanPropertyRowMapper(PipelineActionEntity.class));
     }
 
+    /**
+     * 根据流水线id删除所有动态
+     * @param pipelineId 流水线id
+     */
+    public void deleteAllAction(String pipelineId){
+        String sql = "delete  from pipeline_action ";
+        sql = sql.concat(" where pipeline_action.pipeline_id = '"+pipelineId +"'");
+        JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
+        jdbcTemplate.execute(sql);
+    }
 
 
 

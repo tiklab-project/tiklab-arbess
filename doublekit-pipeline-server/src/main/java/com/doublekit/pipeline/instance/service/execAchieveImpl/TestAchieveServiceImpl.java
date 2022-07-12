@@ -1,6 +1,7 @@
 package com.doublekit.pipeline.instance.service.execAchieveImpl;
 
 import com.doublekit.pipeline.definition.model.PipelineConfigure;
+import com.doublekit.pipeline.definition.service.PipelineCommonService;
 import com.doublekit.pipeline.execute.model.PipelineTest;
 import com.doublekit.pipeline.execute.service.PipelineTestService;
 import com.doublekit.pipeline.instance.model.PipelineExecHistory;
@@ -27,6 +28,9 @@ public class TestAchieveServiceImpl implements TestAchieveService {
     @Autowired
     CommonAchieveServiceImpl commonAchieveServiceImpl;
 
+    @Autowired
+    PipelineCommonService pipelineCommonService;
+
     // 单元测试
     public int test(PipelineProcess pipelineProcess, List<PipelineExecHistory> pipelineExecHistoryList) {
 
@@ -41,7 +45,7 @@ public class TestAchieveServiceImpl implements TestAchieveService {
         pipelineProcess.setPipelineExecLog(pipelineExecLog);
 
         String testOrder = pipelineTest.getTestOrder();
-        String path = commonAchieveServiceImpl.getFileAddress()+pipelineConfigure.getPipeline().getPipelineName();
+        String path = pipelineCommonService.getFileAddress()+pipelineConfigure.getPipeline().getPipelineName();
         try {
             Process process = commonAchieveServiceImpl.process(path, testOrder, null);
             String a = "------------------------------------" + " \n"

@@ -31,16 +31,7 @@ public class PipelineExecLogServiceImpl implements PipelineExecLogService {
 
     @Override
     public void deleteHistoryLog(String historyId) {
-        List<PipelineExecLog> allLog = findAllLog();
-        if (allLog == null){
-            return;
-        }
-        for (PipelineExecLog pipelineExecLog : allLog) {
-            if (!pipelineExecLog.getHistoryId().equals(historyId)){
-                continue;
-            }
-            deleteLog(pipelineExecLog.getPipelineLogId());
-        }
+        pipelineExecLogDao.deleteAllLog(historyId);
     }
 
     //更新

@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -56,6 +57,9 @@ public class PipelineServiceImpl implements PipelineService{
     PipelineConfigureService pipelineConfigureService;
 
     @Autowired
+    PipelineCommonService pipelineCommonService;
+
+    @Autowired
     JoinTemplate joinTemplate;
 
 
@@ -84,12 +88,12 @@ public class PipelineServiceImpl implements PipelineService{
 
     //删除
     @Override
-    public void deletePipeline(String pipelineId,String userId) {
+    public Integer deletePipeline(String pipelineId,String userId) {
         Pipeline pipeline = findPipeline(pipelineId);
         joinTemplate.joinQuery(pipeline);
         List<DmUser> allDmUser = dmUserService.findAllDmUser();
         if (allDmUser == null){
-            return;
+            return 1;
         }
         for (DmUser dmUser : allDmUser) {
             if (!dmUser.getDomainId().equals(pipelineId)){
@@ -102,20 +106,32 @@ public class PipelineServiceImpl implements PipelineService{
         pipelineConfigureService.deleteTask(pipelineId);
         //删除对应的历史
         pipelineExecHistoryService.deleteHistory(pipelineId);
-        //删除收藏
+        //删除打开信息
         pipelineOpenService.deleteAllOpen(pipelineId);
         //删除动态
         pipelineActionService.deletePipelineAction(pipelineId);
+        //删除对应文件
+        String fileAddress = pipelineCommonService.getFileAddress();
+        pipelineCommonService.deleteFile(new File(fileAddress+pipeline.getPipelineName()));
         //动态
-        //pipelineActionService.createActive(userId,null,"删除了流水线"+pipeline.getPipelineName());
-
+        pipelineActionService.createActive(userId,null,"删除了流水线"+pipeline.getPipelineName());
+        return 1;
     }
 
     //更新
     @Override
     public int updatePipeline(Pipeline pipeline) {
+        //更改对应文件名
+        String fileAddress = pipelineCommonService.getFileAddress();
+        String lastName = fileAddress+findPipeline(pipeline.getPipelineId()).getPipelineName();
+        String newName = fileAddress+pipeline.getPipelineName();
+        File file = new File(lastName);
+        if (file.exists()){
+            boolean b = file.renameTo(new File(newName));
+        }
         PipelineEntity pipelineEntity = BeanMapper.map(pipeline, PipelineEntity.class);
         pipelineDao.updatePipeline(pipelineEntity);
+        pipelineActionService.createActive(pipeline.getUser().getId(),null,"删除了流水线"+pipeline.getPipelineName());
         return 1;
     }
 
@@ -237,9 +253,6 @@ public class PipelineServiceImpl implements PipelineService{
         joinTemplate.joinQuery(dmUser);
         return dmUser;
     }
-
-
-
 
 
 
