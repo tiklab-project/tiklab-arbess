@@ -107,7 +107,7 @@ public class DeployAchieveServiceImpl implements DeployAchieveService {
             sshSftp(session,jsch,proof,deployAddress,filePath);
 
             pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+"\n"+"文件:"+fileName+"发送成功！");
-            pipelineExecLog.setRunLog(pipelineExecLog.getRunLog()+"\n"+"文件:"+fileName+"发送成功！");
+            pipelineExecHistory.setRunLog(pipelineExecLog.getRunLog()+"\n"+"文件:"+fileName+"发送成功！");
 
             deployStart(pipelineProcess,pipelineExecHistoryList);
 
