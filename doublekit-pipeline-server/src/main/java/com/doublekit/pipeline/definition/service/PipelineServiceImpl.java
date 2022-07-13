@@ -167,6 +167,9 @@ public class PipelineServiceImpl implements PipelineService{
     @Override
     public List<Pipeline> findUserPipeline(String userId){
         StringBuilder s = findUserPipelineId(userId);
+        if (s == null){
+            return null;
+        }
         List<PipelineEntity> userPipeline = pipelineDao.findUserPipeline(s);
         return BeanMapper.mapList(userPipeline, Pipeline.class);
     }
@@ -243,6 +246,9 @@ public class PipelineServiceImpl implements PipelineService{
         Date lastTime = DateUtils.addDays(new Date(), -7);
         Date nowTime = DateUtils.addDays(new Date(), 1);
         StringBuilder s = findUserPipelineId(userId);
+        if (s == null){
+            return null;
+        }
         return pipelineExecHistoryService.findAllUserHistory(formatter.format(lastTime),formatter.format(nowTime),s);
     }
 

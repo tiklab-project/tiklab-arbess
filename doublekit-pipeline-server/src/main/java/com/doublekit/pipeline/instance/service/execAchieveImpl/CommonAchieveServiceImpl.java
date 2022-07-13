@@ -266,12 +266,4 @@ public class CommonAchieveServiceImpl implements CommonAchieveService {
         return pipelineExecHistory;
     }
 
-
-
-
-
-    @Override
-    public StringBuilder findUserPipelineId(String userId){
-        return pipelineService.findUserPipelineId(userId);
-    }
 }

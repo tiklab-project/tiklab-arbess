@@ -2,6 +2,7 @@ package com.doublekit.pipeline.setting.proof.service;
 
 import com.doublekit.beans.BeanMapper;
 import com.doublekit.join.JoinTemplate;
+import com.doublekit.pipeline.definition.service.PipelineService;
 import com.doublekit.pipeline.execute.service.PipelineCodeServiceImpl;
 import com.doublekit.pipeline.instance.service.PipelineActionService;
 import com.doublekit.pipeline.instance.service.execAchieveService.CommonAchieveService;
@@ -32,7 +33,7 @@ public class ProofServiceImpl implements ProofService{
     JoinTemplate joinTemplate;
 
     @Autowired
-    CommonAchieveService commonAchieveService;
+    PipelineService pipelineService;
 
     @Autowired
     PipelineActionService pipelineActionService;
@@ -108,7 +109,10 @@ public class ProofServiceImpl implements ProofService{
 
     @Override
     public List<Proof> findPipelineProof(ProofQuery proofQuery){
-        StringBuilder s = commonAchieveService.findUserPipelineId(proofQuery.getUserId());
+        StringBuilder s = pipelineService.findUserPipelineId(proofQuery.getUserId());
+        if (s == null){
+            return null;
+        }
         if (proofQuery.getType() == 0 ){
                 if (proofQuery.getPipelineId() == null){
                     List<ProofEntity> allProof = ProofDao.findAllProof(proofQuery.getUserId(),s);

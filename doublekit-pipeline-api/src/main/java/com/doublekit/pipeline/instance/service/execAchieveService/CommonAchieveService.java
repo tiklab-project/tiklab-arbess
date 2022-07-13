@@ -84,6 +84,4 @@ public interface CommonAchieveService {
      */
      PipelineExecHistory initializeHistory(String historyId, Pipeline pipeline,String userId);
 
-
-    StringBuilder findUserPipelineId(String userId);
 }

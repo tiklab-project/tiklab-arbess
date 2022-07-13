@@ -42,6 +42,9 @@ public class PipelineHomeServiceImpl implements PipelineHomeService{
     @Override
     public List<PipelineOpen> findAllOpen(String userId){
         StringBuilder s = pipelineService.findUserPipelineId(userId);
+        if (s == null){
+            return null;
+        }
         List<PipelineOpen> allOpen = pipelineOpenService.findAllOpen(userId,s);
         if (allOpen == null){
             return null;
@@ -57,6 +60,9 @@ public class PipelineHomeServiceImpl implements PipelineHomeService{
     @Override
     public List<PipelineStatus> findAllFollow(String userId){
         StringBuilder s = pipelineService.findUserPipelineId(userId);
+        if (s == null){
+            return null;
+        }
         return pipelineService.findAllStatus(pipelineFollowService.findAllFollow(userId,s));
     }
 
@@ -70,6 +76,9 @@ public class PipelineHomeServiceImpl implements PipelineHomeService{
     @Override
     public List<PipelineStatus> findUserPipeline(String userId){
         StringBuilder s = pipelineService.findUserPipelineId(userId);
+        if (s == null){
+            return null;
+        }
         List<Pipeline> userPipeline = pipelineFollowService.findUserPipeline(userId,s);
         return pipelineService.findAllStatus(userPipeline);
     }
