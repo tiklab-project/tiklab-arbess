@@ -14,7 +14,7 @@ APP_MAIN="com.doublekit.pipeline.PipelineApplication"
 
 DIR=$(cd "$(dirname "$0")"; pwd)
 APP_HOME=${DIR}/..
-APP_CONFIG=${APP_HOME}/conf/application.properties
+APP_CONFIG=${APP_HOME}/conf/application-${env}.properties
 APP_LOG=${APP_HOME}/logs
 
 export APP_HOME

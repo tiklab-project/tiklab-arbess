@@ -38,9 +38,6 @@ public class CommonAchieveServiceImpl implements CommonAchieveService {
     @Autowired
     PipelineExecLogService pipelineExecLogService;
 
-    @Autowired
-    PipelineService pipelineService;
-
     private static final Logger logger = LoggerFactory.getLogger(CommonAchieveServiceImpl.class);
 
     /**
@@ -160,9 +157,6 @@ public class CommonAchieveServiceImpl implements CommonAchieveService {
      */
     @Override
     public  void  error(PipelineExecHistory pipelineExecHistory, String e, String pipelineId,List<PipelineExecHistory> pipelineExecHistoryList){
-        Pipeline pipeline = pipelineService.findPipeline(pipelineId);
-        pipeline.setPipelineState(0);
-        pipelineService.updatePipeline(pipeline);
         pipelineExecHistory.setStatus(pipelineExecHistory.getStatus()+2);
         pipelineExecHistoryList.add(pipelineExecHistory);
         pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+ "\n" + e + "\n" + " RUN RESULT : FAIL");
@@ -181,9 +175,6 @@ public class CommonAchieveServiceImpl implements CommonAchieveService {
      */
     @Override
     public  void  success(PipelineExecHistory pipelineExecHistory, String pipelineId,List<PipelineExecHistory> pipelineExecHistoryList) {
-        Pipeline pipeline = pipelineService.findPipeline(pipelineId);
-        pipeline.setPipelineState(0);
-        pipelineService.updatePipeline(pipeline);
         pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+ "\n" + " RUN RESULT : SUCCESS");
         pipelineExecHistory.setRunStatus(30);
         pipelineExecHistory.setFindState(1);
@@ -200,21 +191,16 @@ public class CommonAchieveServiceImpl implements CommonAchieveService {
      */
     @Override
     public  void  halt(PipelineProcess pipelineProcess, String pipelineId,List<PipelineExecHistory> pipelineExecHistoryList) {
-        Pipeline pipeline = pipelineService.findPipeline(pipelineId);
         PipelineExecHistory pipelineExecHistory = pipelineProcess.getPipelineExecHistory();
 
         //更新信息
-        pipeline.setPipelineState(0);
         pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+ "\n" + " RUN RESULT : HALT");
         pipelineExecHistory.setRunStatus(20);
         pipelineExecHistory.setFindState(1);
         pipelineExecHistoryList.add(pipelineExecHistory);
-
         //更新状态
-        pipelineService.updatePipeline(pipeline);
         pipelineExecLogService.updateLog(pipelineProcess.getPipelineExecLog());
         pipelineExecHistoryService.updateHistory(pipelineExecHistory);
-
         //清空缓存
         pipelineExecHistoryList.removeIf(execHistory -> execHistory.getPipeline().getPipelineId().equals(pipelineId));
     }

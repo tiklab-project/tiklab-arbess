@@ -119,7 +119,6 @@ public class PipelineExecServiceImpl implements PipelineExecService {
             pipelineService.updatePipeline(pipeline);
             return;
         }
-
         PipelineExecLog pipelineExecLog = pipelineExecHistoryService.getRunLog(pipelineExecHistory.getHistoryId());
         pipelineProcess.setPipelineExecLog(pipelineExecLog);
         pipelineProcess.setPipelineExecHistory(pipelineExecHistory);
@@ -143,8 +142,9 @@ public class PipelineExecServiceImpl implements PipelineExecService {
             if (!nm.equals(pipelineId)) {
                continue;
             }
-            logger.info("结束线程 ：" + i + "  pipelineId ：" + pipelineId);
             lstThreads[i].stop();
+            pipeline.setPipelineState(0);
+            pipelineService.updatePipeline(pipeline);
             return;
         }
     }
@@ -180,23 +180,23 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         //获取配置信息
         PipelineProcess pipelineProcess = new PipelineProcess();
         List<PipelineConfigure> allConfigure = pipelineService.findPipelineConfigure(pipeline.getPipelineId());
-        if (allConfigure == null){
-           return;
-        }
-        //开始执行
-        for (PipelineConfigure pipelineConfigure : allConfigure) {
-            pipelineProcess.setPipelineExecHistory(pipelineExecHistory);
-            pipelineProcess.setPipelineConfigure(pipelineConfigure);
-            pipelineExecHistoryList.add(pipelineExecHistory);
-            Integer integer = beginState(pipelineProcess, pipeline, pipelineConfigure.getTaskType());
-            if (integer == 0){
-                return;
+        if (allConfigure != null){
+            //开始执行
+            for (PipelineConfigure pipelineConfigure : allConfigure) {
+                pipelineProcess.setPipelineExecHistory(pipelineExecHistory);
+                pipelineProcess.setPipelineConfigure(pipelineConfigure);
+                pipelineExecHistoryList.add(pipelineExecHistory);
+                Integer integer = beginState(pipelineProcess, pipeline, pipelineConfigure.getTaskType());
+                if (integer == 0){
+                    return;
+                }
+                pipelineExecHistory.setSort(pipelineExecHistory.getSort() +1);
+                pipelineExecHistory.setStatus(pipelineExecHistory.getStatus() +1);
             }
-
-            pipelineExecHistory.setSort(pipelineExecHistory.getSort() +1);
-            pipelineExecHistory.setStatus(pipelineExecHistory.getStatus() +1);
         }
         commonAchieveServiceImpl.success(pipelineExecHistory, pipeline.getPipelineId(), pipelineExecHistoryList);
+        pipeline.setPipelineState(0);
+        pipelineService.updatePipeline(pipeline);
         time[0]=1;time[1]=0;time[2]=0;time[3]=0;
     }
 
