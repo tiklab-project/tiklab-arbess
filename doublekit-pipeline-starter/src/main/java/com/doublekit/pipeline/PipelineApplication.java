@@ -12,7 +12,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
  * WikiApplication
  */
 @SpringBootApplication
-@PropertySource(value = "classpath:application-${env:test}.properties")
+@PropertySource(value = "classpath:application-${env:prd}.properties")
 @EnableScheduling
 @EnablePipeline
 public class PipelineApplication {

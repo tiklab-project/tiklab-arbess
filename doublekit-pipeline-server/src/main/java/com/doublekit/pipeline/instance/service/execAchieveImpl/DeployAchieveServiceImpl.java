@@ -14,6 +14,8 @@ import com.doublekit.pipeline.instance.service.execAchieveService.DeployAchieveS
 import com.doublekit.pipeline.setting.proof.model.Proof;
 import com.doublekit.rpc.annotation.Exporter;
 import com.jcraft.jsch.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -35,6 +37,8 @@ public class DeployAchieveServiceImpl implements DeployAchieveService {
 
     @Autowired
     PipelineCommonService pipelineCommonService;
+
+    private static final Logger logger = LoggerFactory.getLogger(DeployAchieveServiceImpl.class);
 
 
     public void deployStart(PipelineProcess pipelineProcess, List<PipelineExecHistory> pipelineExecHistoryList) throws IOException {
@@ -72,7 +76,7 @@ public class DeployAchieveServiceImpl implements DeployAchieveService {
         }
 
         //文件地址
-        String path = pipelineCommonService.getFileAddress() + pipelineConfigure.getPipeline().getPipelineName();;
+        String path = pipelineCommonService.getFileAddress() + pipelineConfigure.getPipeline().getPipelineName();
         //发送文件地址
         String deployTargetAddress = pipelineDeploy.getDeployTargetAddress();
         
@@ -90,33 +94,29 @@ public class DeployAchieveServiceImpl implements DeployAchieveService {
         try {
             String log = "------------------------------ "+ "\n"
                     + "开始部署" + "\n"
-                    + "匹配到一个文件 ： " +fileName + "\n"
+                    + "匹配到文件 ： " +fileName + "\n"
                     + "文件地址 ： "+filePath +"\n"
                     + "发送服务器位置 ： "+deployAddress +"\n"
                     + "连接服务器  ： " +pipelineDeploy.getIp() + "\n"
                     + "连接类型  ： " +proof.getProofType();
             pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+"\n"+log);
-            JSch jsch = new JSch();
-            //指定的端口连接服务器
-            Session session =jsch.getSession(proof.getProofUsername(), pipelineDeploy.getIp() ,pipelineDeploy.getPort());
-            if (session == null){
-                throw new JSchException(pipelineDeploy.getIp() + "连接异常。。。。");
-            }
+
             log = "服务器连接"+pipelineDeploy.getIp()+"成功";
-            pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+"\n"+log+"\n"+"开始发送文件:"+fileName+"\n"+"文件:"+fileName+"发送中......");
+            pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+"\n"+log+"\n"+"开始发送文件:"+fileName+"\n"+"文件: "+fileName+" 发送中......");
             pipelineExecLog.setRunLog(pipelineExecLog.getRunLog()+"\n"+log+"\n"+"开始发送文件:"+fileName+"\n"+"文件: "+fileName+" 发送中......");
 
             //发送文件
-            sshSftp(session,jsch,proof,deployAddress,filePath);
+            sshSftp(pipelineDeploy,proof,pipelineDeploy.getDeployAddress(),filePath,fileName);
 
             pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+"\n"+"文件:"+fileName+"发送成功！");
+            pipelineExecLog.setRunLog(pipelineExecHistory.getRunLog()+"\n"+"文件:"+fileName+"发送成功！");
 
             //执行shell
             deployStart(pipelineProcess,pipelineExecHistoryList);
 
             commonAchieveService.updateTime(pipelineProcess,beginTime);
             } catch (JSchException | SftpException | IOException e) {
-                commonAchieveService.updateState(pipelineProcess,e.toString(),pipelineExecHistoryList);
+                commonAchieveService.updateState(pipelineProcess,"部署失败 ： "+e,pipelineExecHistoryList);
                 return 0;
             }
         //更新状态
@@ -167,8 +167,14 @@ public class DeployAchieveServiceImpl implements DeployAchieveService {
      * @param remotePath 部署文件地址
      * @param localPath 本机文件地址
      */
-    public void sshSftp(Session session,JSch jsch,Proof proof, String remotePath, String localPath) throws JSchException, SftpException, IOException {
+    public void sshSftp(PipelineDeploy pipelineDeploy ,Proof proof, String remotePath, String localPath,String fileName) throws JSchException, IOException, SftpException {
 
+        JSch jsch = new JSch();
+        //指定的端口连接服务器
+        Session session =jsch.getSession(proof.getProofUsername(), pipelineDeploy.getIp() ,pipelineDeploy.getPort());
+        if (session == null){
+            throw new JSchException(pipelineDeploy.getIp() + "连接异常。。。。");
+        }
         //设置第一次登陆的时候提示，可选值：(ask | yes | no)
         session.setConfig("StrictHostKeyChecking", "no");
 
@@ -180,37 +186,26 @@ public class DeployAchieveServiceImpl implements DeployAchieveService {
             jsch.addIdentity(proof.getProofPassword());
         }
         //设置登陆超时时间 10s
-        session.connect(10000);
-        //调用发送方法
-        sshSending(session,remotePath,localPath);
-        session.disconnect();
-    }
+        session.connect();
 
-    /**
-     * 发送文件
-     * @param session 连接
-     * @param remotePath 部署文件地址
-     * @param localPath 本机文件地址
-     */
-    public void sshSending(Session session,String remotePath, String localPath) throws JSchException, IOException, SftpException {
         //创建sftp通信通道
-        ChannelSftp channel = (ChannelSftp) session.openChannel("sftp");
-        channel.connect();
-        //ChannelSftp sftp = channel;
+        ChannelSftp channelSftp = (ChannelSftp) session.openChannel("sftp");
+        channelSftp.connect();
 
+        logger.info(remotePath);
         //发送
         InputStream inputStream =  new FileInputStream(localPath);
-        OutputStream outputStream  = channel.put(remotePath);
-
-        byte[] b = new byte[1024];
-        int n;
-        while ((n = inputStream.read(b)) != -1) {
-            outputStream.write(b, 0, n);
+        try {
+            channelSftp.ls(remotePath);
+        } catch (SftpException e) {
+            //捕获文件夹不存在异常，创建文件夹
+            channelSftp.mkdir(remotePath);
         }
-        //关闭流
-        outputStream.flush();
-        outputStream.close();
+        channelSftp.cd(remotePath);
+        channelSftp.put(inputStream,fileName);
         inputStream.close();
+        channelSftp.disconnect();
+        session.disconnect();
     }
 
     /**
