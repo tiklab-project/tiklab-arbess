@@ -13,16 +13,12 @@
     <name>${project.artifactId}</name>
 
     <dependencies>
-        <!--common-->
-        <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>fastjson</artifactId>
-        </dependency>
+
         <!--doublekit-->
-        <dependency>
-            <groupId>com.doublekit</groupId>
-            <artifactId>doublekit-core</artifactId>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>com.doublekit</groupId>-->
+<!--            <artifactId>doublekit-core</artifactId>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>com.doublekit</groupId>
             <artifactId>doublekit-beans-annotation</artifactId>
@@ -35,11 +31,6 @@
         </dependency>
         <dependency>
             <groupId>com.doublekit</groupId>
-            <artifactId>doublekit-dfs-common</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.doublekit</groupId>
             <artifactId>doublekit-dss-annotation</artifactId>
         </dependency>
         <dependency>
@@ -47,26 +38,13 @@
             <artifactId>doublekit-user-api</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>com.doublekit</groupId>
-            <artifactId>doublekit-form-api</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.doublekit</groupId>
-            <artifactId>doublekit-flow-api</artifactId>
-            <version>${project.version}</version>
-        </dependency>
+
         <dependency>
             <groupId>com.doublekit</groupId>
             <artifactId>doublekit-apibox-annotation</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.eclipse.jgit</groupId>
-            <artifactId>org.eclipse.jgit</artifactId>
-            <version>6.0.0.202111291000-r</version>
-        </dependency>
     </dependencies>
+
     <build>
         <plugins>
             <plugin>
@@ -83,4 +61,5 @@
             </plugin>
         </plugins>
     </build>
+
 </project>

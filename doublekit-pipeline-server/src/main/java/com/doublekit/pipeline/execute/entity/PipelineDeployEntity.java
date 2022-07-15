@@ -12,32 +12,36 @@ public class PipelineDeployEntity {
     @Column(name = "deploy_id")
     private String deployId;
 
-    //类型
+    //容器类型
     @Column(name = "type",notNull = true)
     private int type;
 
-    //地址
+    //部署类型
+    @Column(name = "deploy_type",notNull = true )
+    private int deployType;
+
+    //部署文件地址
     @Column(name = "deploy_address",notNull = true)
     private String deployAddress;
 
-    //打包文件地址
-    @Column(name = "deploy_target_address",notNull = true)
-    private String deployTargetAddress;
+    //源地址
+    @Column(name = "source_address",notNull = true)
+    private String sourceAddress;
 
-    //shell
-    @Column(name = "deploy_shell")
-    private String deployShell;
+    //启动脚本
+    @Column(name = "start_shell")
+    private String startShell;
 
     //凭证id
     @Column(name = "proof_id")
     private String proofId;
 
     //启动端口
-    @Column(name = "deploy_docker_port")
-    private int dockerPort;
+    @Column(name = "start_port")
+    private int startPort;
 
     //映射端口
-    @Column(name = "deploy_mapping_port")
+    @Column(name = "mapping_port")
     private int mappingPort;
 
     //顺序
@@ -48,14 +52,21 @@ public class PipelineDeployEntity {
     @Column(name = "deploy_alias",notNull = true)
     private String deployAlias;
 
-    //端口号
-    @Column(name = "port",notNull = true )
-    private int port;
+    //ssh连接端口
+    @Column(name = "ssh_port",notNull = true )
+    private int sshPort;
 
-    //ip地址
-    @Column(name = "ip",notNull = true )
-    private String ip;
+    //ssh连接ip
+    @Column(name = "ssh_ip",notNull = true )
+    private String sshIp;
 
+    //启动文件地址
+    @Column(name = "start_address",notNull = true )
+    private String startAddress;
+
+    //部署命令
+    @Column(name = "deploy_order",notNull = true )
+    private String deployOrder;
 
     public String getDeployId() {
         return deployId;
@@ -73,6 +84,14 @@ public class PipelineDeployEntity {
         this.type = type;
     }
 
+    public int getDeployType() {
+        return deployType;
+    }
+
+    public void setDeployType(int deployType) {
+        this.deployType = deployType;
+    }
+
     public String getDeployAddress() {
         return deployAddress;
     }
@@ -81,20 +100,20 @@ public class PipelineDeployEntity {
         this.deployAddress = deployAddress;
     }
 
-    public String getDeployTargetAddress() {
-        return deployTargetAddress;
+    public String getSourceAddress() {
+        return sourceAddress;
     }
 
-    public void setDeployTargetAddress(String deployTargetAddress) {
-        this.deployTargetAddress = deployTargetAddress;
+    public void setSourceAddress(String sourceAddress) {
+        this.sourceAddress = sourceAddress;
     }
 
-    public String getDeployShell() {
-        return deployShell;
+    public String getStartShell() {
+        return startShell;
     }
 
-    public void setDeployShell(String deployShell) {
-        this.deployShell = deployShell;
+    public void setStartShell(String startShell) {
+        this.startShell = startShell;
     }
 
     public String getProofId() {
@@ -105,12 +124,12 @@ public class PipelineDeployEntity {
         this.proofId = proofId;
     }
 
-    public int getDockerPort() {
-        return dockerPort;
+    public int getStartPort() {
+        return startPort;
     }
 
-    public void setDockerPort(int dockerPort) {
-        this.dockerPort = dockerPort;
+    public void setStartPort(int startPort) {
+        this.startPort = startPort;
     }
 
     public int getMappingPort() {
@@ -137,19 +156,35 @@ public class PipelineDeployEntity {
         this.deployAlias = deployAlias;
     }
 
-    public int getPort() {
-        return port;
+    public int getSshPort() {
+        return sshPort;
     }
 
-    public void setPort(int port) {
-        this.port = port;
+    public void setSshPort(int sshPort) {
+        this.sshPort = sshPort;
     }
 
-    public String getIp() {
-        return ip;
+    public String getSshIp() {
+        return sshIp;
     }
 
-    public void setIp(String ip) {
-        this.ip = ip;
+    public void setSshIp(String sshIp) {
+        this.sshIp = sshIp;
+    }
+
+    public String getStartAddress() {
+        return startAddress;
+    }
+
+    public void setStartAddress(String startAddress) {
+        this.startAddress = startAddress;
+    }
+
+    public String getDeployOrder() {
+        return deployOrder;
+    }
+
+    public void setDeployOrder(String deployOrder) {
+        this.deployOrder = deployOrder;
     }
 }

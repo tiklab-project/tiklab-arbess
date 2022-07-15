@@ -55,10 +55,10 @@ public interface PipelineCommonService {
 
 
     /**
-     * 匹配字符串获取文件名
-     * @param path 文件地址
+     * 匹配字符串获取文件全路径
+     * @param pipelineName 文件地址
      * @param regex 匹配条件
      * @return 文件地址
      */
-    String getFile(String path, String regex);
+    String getFile(String pipelineName, String regex);
 }

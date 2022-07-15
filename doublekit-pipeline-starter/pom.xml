@@ -44,21 +44,6 @@
         </dependency>
         <dependency>
             <groupId>com.doublekit</groupId>
-            <artifactId>doublekit-user-api</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>com.doublekit</groupId>
-            <artifactId>doublekit-eam-api</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>com.doublekit</groupId>
-            <artifactId>doublekit-member-api</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>com.doublekit</groupId>
             <artifactId>doublekit-dss-spring-boot-starter</artifactId>
         </dependency>
 
@@ -78,35 +63,6 @@
                     </excludes>
                 </configuration>
             </plugin>
-            <!--<plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <version>2.8</version>
-                <executions>
-                    <execution>
-                        <phase>prepare-package</phase>
-                        <goals>
-                            <goal>copy</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <artifactItems>
-                        <artifactItem>
-                            <groupId>com.doublekit</groupId>
-                            <artifactId>doublekit-user-language-en-plugin</artifactId>
-                            <version>${project.version}</version>
-                        </artifactItem>
-                        <artifactItem>
-                            <groupId>com.doublekit</groupId>
-                            <artifactId>doublekit-pipeline-language-en-plugin</artifactId>
-                            <version>${project.version}</version>
-                        </artifactItem>
-                    </artifactItems>
-                    <includeTypes>jar</includeTypes>
-                    <outputDirectory>${project.basedir}/plugin</outputDirectory>
-                </configuration>
-            </plugin>-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
@@ -126,30 +82,6 @@
                     </execution>
                 </executions>
             </plugin>
-            <!--
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>copy</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                        <configuration>
-                            <tasks>
-                                <copy todir="${app.home}/plugin">
-                                    <fileset dir="${project.build.directory}">
-                                        <include name="${project.artifactId}-${project.version}.jar"/>
-                                    </fileset>
-                                </copy>
-                            </tasks>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            -->
         </plugins>
     </build>
 

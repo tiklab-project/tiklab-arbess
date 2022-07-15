@@ -166,7 +166,6 @@ public class PipelineExecServiceImpl implements PipelineExecService {
     private void begin(Pipeline pipeline,String userId) {
 
         //更新流水线状态
-        //Pipeline pipeline = pipelineService.findPipeline(pipelineId);
         pipeline.setPipelineState(1);
         pipelineService.updatePipeline(pipeline);
 

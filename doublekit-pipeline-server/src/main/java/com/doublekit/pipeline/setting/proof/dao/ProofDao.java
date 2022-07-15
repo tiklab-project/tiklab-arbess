@@ -67,6 +67,7 @@ public class ProofDao {
     }
 
     public List<ProofEntity> findAllProof(String userId,StringBuilder s){
+
         String sql = " select pipeline_proof.* from pipeline_proof ";
         sql = sql.concat(" where pipeline_proof.user_id = '" + userId +"'"
                 + " or pipeline_proof.type = 1 "

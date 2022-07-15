@@ -1,7 +1,6 @@
 package com.doublekit.pipeline.definition.service;
 
 import com.doublekit.pipeline.execute.model.CodeGit.FileTree;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
@@ -51,7 +50,7 @@ public class PipelineCommonServiceImpl implements PipelineCommonService{
                     }
                 }
             }
-            // 目录此时为空，可以删除
+            // 目录此时为空，删除
         }
         return file.delete();
     }
@@ -151,18 +150,19 @@ public class PipelineCommonServiceImpl implements PipelineCommonService{
     }
 
     /**
-     * 匹配字符串获取文件名
-     * @param path 文件地址
+     * 匹配字符串获取文件全路径
+     * @param pipelineName 文件地址
      * @param regex 匹配条件
      * @return 文件地址
      */
     @Override
-    public  String getFile(String path, String regex){
+    public String getFile(String pipelineName, String regex){
         List<String> list = new ArrayList<>();
+        String  path= getFileAddress() + pipelineName;
         List<String> filePath = getFilePath(new File(path),new ArrayList<>());
         for (String s : filePath) {
             File file = new File(s);
-            if (file.getName().matches("^(.*"+regex+".*)")){
+            if (file.getName().matches("^(.*"+regex+".*)") || file.getName().matches(regex)){
                 list.add(s);
             }
         }

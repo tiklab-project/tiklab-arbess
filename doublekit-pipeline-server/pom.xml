@@ -72,14 +72,9 @@
         <!--pcs-->
         <dependency>
             <groupId>com.doublekit</groupId>
-            <artifactId>doublekit-user-spring-boot-starter</artifactId>
-            <version>${project.version}</version>
+            <artifactId>doublekit-user-api</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>com.doublekit</groupId>-->
-<!--            <artifactId>doublekit-eam-spring-boot-starter</artifactId>-->
-<!--            <version>${project.version}</version>-->
-<!--        </dependency>-->
         <dependency>
             <groupId>com.doublekit</groupId>
             <artifactId>doublekit-privilege-spring-boot-starter</artifactId>
@@ -144,12 +139,12 @@
             <version>1.10.6</version>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-websocket -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-websocket</artifactId>
-            <version>2.7.0</version>
-        </dependency>
+<!--        &lt;!&ndash; https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-websocket &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.boot</groupId>-->
+<!--            <artifactId>spring-boot-starter-websocket</artifactId>-->
+<!--            <version>2.7.0</version>-->
+<!--        </dependency>-->
 
     </dependencies>
     <!-- Source attach plugin -->

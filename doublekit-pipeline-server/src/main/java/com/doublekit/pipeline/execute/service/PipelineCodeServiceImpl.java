@@ -108,43 +108,16 @@ public class PipelineCodeServiceImpl implements PipelineCodeService {
     //修改任务
     @Override
     public void updateTask(PipelineExecConfigure pipelineExecConfigure) {
-        //Pipeline pipeline = pipelineExecConfigure.getPipeline();
-        //PipelineCode pipelineCode =pipelineExecConfigure.getPipelineCode();
-        ////判断是否存在源码配置
-        //PipelineConfigure oneConfigure = pipelineConfigureService.findOneConfigure(pipeline.getPipelineId(), 10);
-        //
-        //if (oneConfigure != null){
-        //    //判断更新配置还是删除配置
-        //    if (pipelineCode.getType() != 0){
-        //        pipelineCode.setCodeAddress(pipelineCode.getCodeName());
-        //
-        //        oneConfigure.setTaskSort(1);
-        //        oneConfigure.setView(pipelineExecConfigure.getView());
-        //        oneConfigure.setTaskType(pipelineCode.getType());
-        //        oneConfigure.setTaskAlias(pipelineCode.getCodeAlias());
-        //        //通过授权信息获取仓库url
-        //        pipelineCode = getUrl(pipelineCode);
-        //        updateCode(pipelineCode);
-        //
-        //        pipelineConfigureService.updateConfigure(oneConfigure);
-        //    }else {
-        //        pipelineConfigureService.deleteTask(oneConfigure.getTaskId(),pipeline.getPipelineId());
-        //    }
-        //}
-        //if (oneConfigure == null && pipelineCode.getType() != 0){
-        //    //动态
-        //    createConfigure(pipeline.getPipelineId(), pipelineCode);
-        //}
 
         Pipeline pipeline = pipelineExecConfigure.getPipeline();
         PipelineCode pipelineCode =pipelineExecConfigure.getPipelineCode();
 
         PipelineConfigure oneConfigure = pipelineConfigureService.findOneConfigure(pipeline.getPipelineId(), 10);
+
         if (oneConfigure != null && pipelineCode.getType() == 0){
             deleteCode(oneConfigure.getTaskId());
             pipelineConfigureService.deleteConfigure(oneConfigure.getConfigureId());
             pipelineTestService.updateTask(pipelineExecConfigure);
-            //pipelineConfigureService.deleteTask(oneConfigure.getTaskId(),pipeline.getPipelineId());
             return;
         }
 
@@ -177,7 +150,6 @@ public class PipelineCodeServiceImpl implements PipelineCodeService {
             String codeId = createCode(pipelineCode);
             oneConfigure.setTaskId(codeId);
             pipelineConfigureService.createConfigure(oneConfigure);
-            //createConfigure(pipeline.getPipelineId(),pipelineCode);
         }
         pipelineTestService.updateTask(pipelineExecConfigure);
     }

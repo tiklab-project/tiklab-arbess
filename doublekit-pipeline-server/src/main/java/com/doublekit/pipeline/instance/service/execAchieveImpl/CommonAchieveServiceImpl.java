@@ -2,8 +2,7 @@ package com.doublekit.pipeline.instance.service.execAchieveImpl;
 
 import com.doublekit.pipeline.definition.model.Pipeline;
 import com.doublekit.pipeline.definition.model.PipelineConfigure;
-import com.doublekit.pipeline.definition.service.PipelineService;
-import com.doublekit.pipeline.execute.model.CodeGit.FileTree;
+
 import com.doublekit.pipeline.instance.model.PipelineExecHistory;
 import com.doublekit.pipeline.instance.model.PipelineExecLog;
 import com.doublekit.pipeline.instance.model.PipelineProcess;
@@ -18,13 +17,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
@@ -159,7 +154,7 @@ public class CommonAchieveServiceImpl implements CommonAchieveService {
     public  void  error(PipelineExecHistory pipelineExecHistory, String e, String pipelineId,List<PipelineExecHistory> pipelineExecHistoryList){
         pipelineExecHistory.setStatus(pipelineExecHistory.getStatus()+2);
         pipelineExecHistoryList.add(pipelineExecHistory);
-        pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+ "\n" + e + "\n" + " RUN RESULT : FAIL");
+        pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+ "\n" + e + "\n" + "RUN RESULT : FAIL");
         pipelineExecHistory.setRunStatus(1);
         pipelineExecHistory.setFindState(1);
         pipelineExecHistoryService.updateHistory(pipelineExecHistory);

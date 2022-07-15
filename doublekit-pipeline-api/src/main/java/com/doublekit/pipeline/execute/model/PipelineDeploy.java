@@ -14,27 +14,24 @@ import com.doublekit.pipeline.setting.proof.model.Proof;
 @Mapper(targetAlias = "PipelineDeployEntity")
 public class PipelineDeploy {
 
-    //id
     @ApiProperty(name = "deployId" , desc = "id")
     private String deployId;
 
-    //部署类型
-    @ApiProperty(name = "type" , desc = "部署类型")
+    @ApiProperty(name = "type" , desc = "容器类型")
     private int type;
 
-    //打包文件地址
-    @ApiProperty(name = "deployTargetAddress" , desc = "打包文件地址")
-    private String deployTargetAddress;
+    @ApiProperty(name = "deployType",desc = "部署类型" )
+    private int deployType;
 
-    //发送文件地址
-    @ApiProperty(name="deployAddress",desc="文件地址")
+    @ApiProperty(name = "deployAddress" , desc = "部署文件地址")
     private String deployAddress;
 
-    //shell脚本
-    @ApiProperty(name = "deployShell" , desc = "部署脚本")
-    private String deployShell;
+    @ApiProperty(name="sourceAddress",desc="源文件地址")
+    private String sourceAddress;
 
-    //凭证id
+    @ApiProperty(name = "startShell" , desc = "启动脚本")
+    private String startShell;
+
     @ApiProperty(name="proof",desc="凭证id",eg="@selectOne")
     @Mappings({
             @Mapping(source = "proof.proofId",target = "proofId")
@@ -42,29 +39,29 @@ public class PipelineDeploy {
     @JoinQuery(key = "proofId")
     private Proof proof;
 
-    //启动端口
-    @ApiProperty(name = "dockerPort",desc="启动端口")
-    private int dockerPort;
+    @ApiProperty(name = "startPort",desc="启动端口")
+    private int startPort;
 
-    //映射端口
     @ApiProperty(name = "mappingPort",desc="映射端口")
     private int mappingPort;
 
-    //顺序
     @ApiProperty(name = "sort",desc="顺序")
     private int sort;
 
-    //别名
     @ApiProperty(name = "deployAlias",desc="别名")
     private String deployAlias;
 
-    //端口号
-    @ApiProperty(name = "port" ,desc="端口号")
-    private int port;
+    @ApiProperty(name = "sshPort" ,desc="ssh连接端口")
+    private int sshPort;
 
-    //ip地址
-    @ApiProperty(name = "ip" ,desc="ip地址")
-    private String ip;
+    @ApiProperty(name = "sshIp" ,desc="ssh连接ip")
+    private String sshIp;
+
+    @ApiProperty(name = "startAddress",desc = "启动文件地址" )
+    private String startAddress;
+
+    @ApiProperty(name = "deployOrder",desc = "部署命令" )
+    private String deployOrder;
 
     public String getDeployId() {
         return deployId;
@@ -82,14 +79,13 @@ public class PipelineDeploy {
         this.type = type;
     }
 
-    public String getDeployTargetAddress() {
-        return deployTargetAddress;
+    public int getDeployType() {
+        return deployType;
     }
 
-    public void setDeployTargetAddress(String deployTargetAddress) {
-        this.deployTargetAddress = deployTargetAddress;
+    public void setDeployType(int deployType) {
+        this.deployType = deployType;
     }
-
 
     public String getDeployAddress() {
         return deployAddress;
@@ -99,12 +95,20 @@ public class PipelineDeploy {
         this.deployAddress = deployAddress;
     }
 
-    public String getDeployShell() {
-        return deployShell;
+    public String getSourceAddress() {
+        return sourceAddress;
     }
 
-    public void setDeployShell(String deployShell) {
-        this.deployShell = deployShell;
+    public void setSourceAddress(String sourceAddress) {
+        this.sourceAddress = sourceAddress;
+    }
+
+    public String getStartShell() {
+        return startShell;
+    }
+
+    public void setStartShell(String startShell) {
+        this.startShell = startShell;
     }
 
     public Proof getProof() {
@@ -115,12 +119,12 @@ public class PipelineDeploy {
         this.proof = proof;
     }
 
-    public int getDockerPort() {
-        return dockerPort;
+    public int getStartPort() {
+        return startPort;
     }
 
-    public void setDockerPort(int dockerPort) {
-        this.dockerPort = dockerPort;
+    public void setStartPort(int startPort) {
+        this.startPort = startPort;
     }
 
     public int getMappingPort() {
@@ -147,19 +151,35 @@ public class PipelineDeploy {
         this.deployAlias = deployAlias;
     }
 
-    public int getPort() {
-        return port;
+    public int getSshPort() {
+        return sshPort;
     }
 
-    public void setPort(int port) {
-        this.port = port;
+    public void setSshPort(int sshPort) {
+        this.sshPort = sshPort;
     }
 
-    public String getIp() {
-        return ip;
+    public String getSshIp() {
+        return sshIp;
     }
 
-    public void setIp(String ip) {
-        this.ip = ip;
+    public void setSshIp(String sshIp) {
+        this.sshIp = sshIp;
+    }
+
+    public String getStartAddress() {
+        return startAddress;
+    }
+
+    public void setStartAddress(String startAddress) {
+        this.startAddress = startAddress;
+    }
+
+    public String getDeployOrder() {
+        return deployOrder;
+    }
+
+    public void setDeployOrder(String deployOrder) {
+        this.deployOrder = deployOrder;
     }
 }

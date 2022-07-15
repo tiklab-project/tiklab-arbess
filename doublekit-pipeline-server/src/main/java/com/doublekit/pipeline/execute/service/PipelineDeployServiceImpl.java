@@ -4,6 +4,7 @@ import com.doublekit.beans.BeanMapper;
 import com.doublekit.pipeline.definition.model.Pipeline;
 import com.doublekit.pipeline.definition.model.PipelineConfigure;
 import com.doublekit.pipeline.definition.model.PipelineExecConfigure;
+import com.doublekit.pipeline.definition.service.PipelineCommonService;
 import com.doublekit.pipeline.definition.service.PipelineConfigureService;
 import com.doublekit.pipeline.execute.dao.PipelineDeployDao;
 import com.doublekit.pipeline.execute.entity.PipelineDeployEntity;
@@ -34,8 +35,6 @@ public class PipelineDeployServiceImpl implements PipelineDeployService {
     @Autowired
     PipelineConfigureService pipelineConfigureService;
 
-    @Autowired
-    PipelineActionService pipelineActionService;
 
     //创建
     @Override
@@ -57,7 +56,6 @@ public class PipelineDeployServiceImpl implements PipelineDeployService {
         pipelineConfigure.setTaskId(deployId);
         pipelineConfigure.setTaskType(taskType);
         pipelineConfigure.setTaskSort(pipelineDeploy.getSort());
-        //pipelineConfigure.setView(pipelineDeploy.getView());
         pipelineConfigureService.createTask(pipelineConfigure,pipelineId);
         return deployId;
     }
@@ -87,33 +85,16 @@ public class PipelineDeployServiceImpl implements PipelineDeployService {
         PipelineDeploy pipelineDeploy = pipelineExecConfigure.getPipelineDeploy();
         PipelineConfigure oneConfigure = pipelineConfigureService.findOneConfigure(pipeline.getPipelineId(), 40);
 
-        //if (oneConfigure != null){
-        //    if (pipelineDeploy.getType() != 0){
-        //        updateDeploy(pipelineDeploy);
-        //        oneConfigure.setTaskSort(pipelineDeploy.getSort());
-        //        oneConfigure.setTaskAlias(pipelineDeploy.getDeployAlias());
-        //        //oneConfigure.setView(pipelineDeploy.getView());
-        //        pipelineConfigureService.updateConfigure(oneConfigure);
-        //    }else {
-        //        pipelineConfigureService.deleteTask(oneConfigure.getTaskId(),pipeline.getPipelineId());
-        //    }
-        //}
-        //if (oneConfigure == null && pipelineDeploy.getType() != 0){
-        //    createConfigure(pipeline.getPipelineId(),pipelineDeploy.getType(),pipelineDeploy);
-        //}
-
         //判断新配置是否删除了测试配置
         if (oneConfigure != null && pipelineDeploy.getType() == 0){
             deleteDeploy(oneConfigure.getTaskId());
             pipelineConfigureService.deleteConfigure(oneConfigure.getConfigureId());
             return;
         }
-
         //判断是否有部署配置
         if (pipelineDeploy.getType() == 0){
             return;
         }
-
         //初始化
         if (oneConfigure == null ){
             oneConfigure = new PipelineConfigure();

@@ -40,15 +40,6 @@ public class DeployAchieveServiceImpl implements DeployAchieveService {
 
     private static final Logger logger = LoggerFactory.getLogger(DeployAchieveServiceImpl.class);
 
-
-    public void deployStart(PipelineProcess pipelineProcess, List<PipelineExecHistory> pipelineExecHistoryList) throws IOException {
-        PipelineDeploy pipelineDeploy = pipelineProcess.getPipelineDeploy();
-        switch (pipelineDeploy.getType()) {
-            case 31 -> linux(pipelineProcess, pipelineExecHistoryList);
-            case 32 -> docker(pipelineProcess, pipelineExecHistoryList);
-        }
-    }
-
     /**
      * 部署
      * @param pipelineProcess 配置信息
@@ -75,12 +66,7 @@ public class DeployAchieveServiceImpl implements DeployAchieveService {
             return 0;
         }
 
-        //文件地址
-        String path = pipelineCommonService.getFileAddress() + pipelineConfigure.getPipeline().getPipelineName();
-        //发送文件地址
-        String deployTargetAddress = pipelineDeploy.getDeployTargetAddress();
-        
-        String filePath = pipelineCommonService.getFile(path,deployTargetAddress);
+        String filePath = pipelineCommonService.getFile(pipelineConfigure.getPipeline().getPipelineName(),pipelineDeploy.getSourceAddress());
         
         if (filePath == null){
             commonAchieveService.updateState(pipelineProcess,"部署文件找不到。",pipelineExecHistoryList);
@@ -91,29 +77,35 @@ public class DeployAchieveServiceImpl implements DeployAchieveService {
         //发送文件位置
         String deployAddress = pipelineDeploy.getDeployAddress()+"/"+fileName;
 
+        if (pipelineExecHistory.getRunLog() == null){
+            pipelineExecHistory.setRunLog("");
+        }
         try {
             String log = "------------------------------ "+ "\n"
                     + "开始部署" + "\n"
                     + "匹配到文件 ： " +fileName + "\n"
                     + "文件地址 ： "+filePath +"\n"
                     + "发送服务器位置 ： "+deployAddress +"\n"
-                    + "连接服务器  ： " +pipelineDeploy.getIp() + "\n"
+                    + "连接服务器  ： " +pipelineDeploy.getSshIp() + "\n"
                     + "连接类型  ： " +proof.getProofType();
             pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+"\n"+log);
 
-            log = "服务器连接"+pipelineDeploy.getIp()+"成功";
-            pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+"\n"+log+"\n"+"开始发送文件:"+fileName+"\n"+"文件: "+fileName+" 发送中......");
-            pipelineExecLog.setRunLog(pipelineExecLog.getRunLog()+"\n"+log+"\n"+"开始发送文件:"+fileName+"\n"+"文件: "+fileName+" 发送中......");
+            log = "服务器连接"+pipelineDeploy.getSshIp()+"成功";
+
+            pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+"\n"+log+"\n"+"开始发送文件:"+fileName+"\n"+"文件发送中......");
+            pipelineExecLog.setRunLog(pipelineExecLog.getRunLog()+"\n"+log+"\n"+"开始发送文件:"+fileName+"\n"+"文件发送中......");
 
             //发送文件
-            sshSftp(pipelineDeploy,proof,pipelineDeploy.getDeployAddress(),filePath,fileName);
+            sshSftp(pipelineDeploy,filePath,fileName);
 
             pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+"\n"+"文件:"+fileName+"发送成功！");
             pipelineExecLog.setRunLog(pipelineExecHistory.getRunLog()+"\n"+"文件:"+fileName+"发送成功！");
 
             //执行shell
-            deployStart(pipelineProcess,pipelineExecHistoryList);
-
+            switch (pipelineDeploy.getType()) {
+                case 31 -> linux(pipelineProcess, pipelineExecHistoryList);
+                case 32 -> docker(pipelineProcess, pipelineExecHistoryList);
+            }
             commonAchieveService.updateTime(pipelineProcess,beginTime);
             } catch (JSchException | SftpException | IOException e) {
                 commonAchieveService.updateState(pipelineProcess,"部署失败 ： "+e,pipelineExecHistoryList);
@@ -131,11 +123,43 @@ public class DeployAchieveServiceImpl implements DeployAchieveService {
      */
     private void linux(PipelineProcess pipelineProcess,List<PipelineExecHistory> pipelineExecHistoryList) throws IOException {
         PipelineDeploy pipelineDeploy = pipelineProcess.getPipelineDeploy();
-        String shell = pipelineDeploy.getDeployShell();
-        if (shell != null){
-            sshOrder( pipelineDeploy.getDeployShell(), pipelineExecHistoryList, pipelineProcess);
+
+        //选择自定义部署
+        if (pipelineDeploy.getDeployType() == 1){
+           sshOrder(pipelineDeploy.getStartShell(),pipelineProcess, pipelineExecHistoryList);
+           return;
+        }
+
+        //部署地址
+        String deployAddress = "/"+ pipelineDeploy.getDeployAddress();
+
+        //部署文件命令
+        String  startOrder= pipelineDeploy.getDeployOrder();
+        //启动文件地址
+        String startAddress = pipelineDeploy.getStartAddress();
+
+        //部署文件命令启动文件地址都为null的时候
+        String order = "cd "+" "+ deployAddress +";"+pipelineDeploy.getStartShell();
+        if ((startOrder == null || startOrder.equals("")) && (startAddress == null || startAddress.equals("")) ){
+            if (pipelineDeploy.getStartShell() == null || pipelineDeploy.getStartShell().equals("") ){
+                return;
+            }
+            sshOrder(order, pipelineProcess,pipelineExecHistoryList);
+            return;
+        }
+        String orders = "cd "+" "+ deployAddress + "/" + startAddress+";" +pipelineDeploy.getStartShell();
+        if (startAddress != null && !startAddress.equals("")){
+            if (startOrder == null ||startOrder.equals("")){
+                sshOrder(orders, pipelineProcess,pipelineExecHistoryList);
+                return;
+            }
+            sshOrder(startOrder, pipelineProcess,pipelineExecHistoryList);
+            sshOrder(orders, pipelineProcess,pipelineExecHistoryList);
+        }else {
+            sshOrder(order, pipelineProcess,pipelineExecHistoryList);
         }
     }
+
     /**
      * docker部署
      * @param pipelineProcess 配置信息
@@ -143,37 +167,58 @@ public class DeployAchieveServiceImpl implements DeployAchieveService {
      */
     private void docker(PipelineProcess pipelineProcess,List<PipelineExecHistory> pipelineExecHistoryList) throws IOException {
         PipelineDeploy pipelineDeploy = pipelineProcess.getPipelineDeploy();
-        Pipeline pipeline = pipelineProcess.getPipelineConfigure().getPipeline();
-        String pipelineName = pipeline.getPipelineName();
-        PipelineConfigure pipelineConfigure = pipelineProcess.getPipelineConfigure();
-        String path = pipelineCommonService.getFileAddress() + pipelineConfigure.getPipeline().getPipelineName();
-        String fileName = pipelineCommonService.getFile( path, pipelineDeploy.getDeployTargetAddress());
-        //服务器部署位置
-        String deployAddress = pipelineDeploy.getDeployAddress();
-        String order = "rm -rf "+" "+deployAddress +";"
-                + "unzip"+" "+deployAddress +";"
-                +"docker stop $(docker ps -a | grep '"+pipelineName+"' | awk '{print $1 }');"
+
+        //选择自定义部署
+        if (pipelineDeploy.getDeployType() == 1){
+            sshOrder(pipelineDeploy.getStartShell(),pipelineProcess, pipelineExecHistoryList);
+            return;
+        }
+
+        String pipelineName = pipelineProcess.getPipelineConfigure().getPipeline().getPipelineName();
+        //部署位置
+        String deployAddress = "/"+  pipelineDeploy.getDeployAddress();
+        //部署文件命令
+        String  deployOrder= pipelineDeploy.getDeployOrder();
+        //启动文件地址
+        String startAddress = pipelineDeploy.getStartAddress();
+
+        String order = "docker stop $(docker ps -a | grep '"+pipelineName+"' | awk '{print $1 }');"
                 +"docker rm $(docker ps -a | grep '"+pipelineName+"' | awk '{print $1 }');"
-                +"docker image rm"+" "+pipelineName+";"
-                +"find"+" "+deployAddress+" "+ "-name '*.sh' | xargs dos2unix;"
-                +"cd"+" "+fileName+";"+"docker image build -t"+" "+pipelineName+"  .;"
-                +"docker run -itd -p"+" "+pipelineDeploy.getMappingPort()+":"+pipelineDeploy.getDockerPort()+" "+pipelineName;
-        sshOrder(order,pipelineExecHistoryList,pipelineProcess);
+                +"docker image rm"+" "+pipelineName+";";
+
+        if ((deployOrder == null || deployOrder.equals("")) && (startAddress == null || startAddress.equals("/")) ){
+             order = order +"cd"+" "+deployAddress+";"+"docker image build -t"+" "+pipelineName+"  .;"
+                    +"docker run -itd -p"+" "+pipelineDeploy.getMappingPort()+":"+pipelineDeploy.getStartPort()+" "+pipelineName;
+            sshOrder(order,pipelineProcess,pipelineExecHistoryList);
+            return;
+        }
+        if (deployOrder != null && !deployOrder.equals("") ) {
+            sshOrder(deployOrder, pipelineProcess, pipelineExecHistoryList);
+            if (startAddress == null || startAddress.equals("/")) {
+                order = order + "cd" + " " + deployAddress + ";" + "docker image build -t" + " " + pipelineName + "  .;"
+                        + "docker run -itd -p" + " " + pipelineDeploy.getMappingPort() + ":" + pipelineDeploy.getStartPort() + " " + pipelineName;
+                sshOrder(order, pipelineProcess, pipelineExecHistoryList);
+                return;
+            }
+        }
+        order = order +"cd"+" "+deployAddress+"/"+startAddress+";"+"docker image build -t"+" "+pipelineName+"  .;"
+                +"docker run -itd -p"+" "+pipelineDeploy.getMappingPort()+":"+pipelineDeploy.getStartPort()+" "+pipelineName;
+        sshOrder(order,pipelineProcess,pipelineExecHistoryList);
     }
 
     /**
      * ssh 连接发送文件
-     * @param proof 凭证信息
-     * @param remotePath 部署文件地址
+     * @param pipelineDeploy 部署信息
      * @param localPath 本机文件地址
      */
-    public void sshSftp(PipelineDeploy pipelineDeploy ,Proof proof, String remotePath, String localPath,String fileName) throws JSchException, IOException, SftpException {
-
+    public void sshSftp(PipelineDeploy pipelineDeploy, String localPath,String fileName) throws JSchException, IOException, SftpException {
+        Proof proof = pipelineDeploy.getProof();
+        String remotePath ="/"+ pipelineDeploy.getDeployAddress();
         JSch jsch = new JSch();
         //指定的端口连接服务器
-        Session session =jsch.getSession(proof.getProofUsername(), pipelineDeploy.getIp() ,pipelineDeploy.getPort());
+        Session session =jsch.getSession(proof.getProofUsername(), pipelineDeploy.getSshIp() ,pipelineDeploy.getSshPort());
         if (session == null){
-            throw new JSchException(pipelineDeploy.getIp() + "连接异常。。。。");
+            throw new JSchException(pipelineDeploy.getSshIp() + "连接异常。。。。");
         }
         //设置第一次登陆的时候提示，可选值：(ask | yes | no)
         session.setConfig("StrictHostKeyChecking", "no");
@@ -192,7 +237,6 @@ public class DeployAchieveServiceImpl implements DeployAchieveService {
         ChannelSftp channelSftp = (ChannelSftp) session.openChannel("sftp");
         channelSftp.connect();
 
-        logger.info(remotePath);
         //发送
         InputStream inputStream =  new FileInputStream(localPath);
         try {
@@ -213,12 +257,12 @@ public class DeployAchieveServiceImpl implements DeployAchieveService {
      * @param order 执行命令
      * @throws IOException 日志读写异常
      */
-    public void sshOrder(String order, List<PipelineExecHistory> pipelineExecHistoryList,PipelineProcess pipelineProcess) throws IOException {
+    public void sshOrder(String order, PipelineProcess pipelineProcess,List<PipelineExecHistory> pipelineExecHistoryList) throws IOException {
         PipelineDeploy pipelineDeploy = pipelineProcess.getPipelineDeploy();
         Proof proof = pipelineProcess.getProof();
         PipelineExecHistory pipelineExecHistory = pipelineProcess.getPipelineExecHistory();
         //效验
-        Connection conn = new Connection(pipelineDeploy.getIp(),pipelineDeploy.getPort());
+        Connection conn = new Connection(pipelineDeploy.getSshIp(),pipelineDeploy.getSshPort());
         conn.connect();
         //效验方式
         if (proof.getProofType().equals("password")){
