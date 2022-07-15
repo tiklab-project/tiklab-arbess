@@ -153,6 +153,7 @@ public class DeployAchieveServiceImpl implements DeployAchieveService {
                 sshOrder(orders, pipelineProcess,pipelineExecHistoryList);
                 return;
             }
+            startOrder = "cd "+" "+ deployAddress +";"+startOrder;
             sshOrder(startOrder, pipelineProcess,pipelineExecHistoryList);
             sshOrder(orders, pipelineProcess,pipelineExecHistoryList);
         }else {
