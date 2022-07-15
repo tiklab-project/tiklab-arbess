@@ -50,17 +50,20 @@ CREATE TABLE `pipeline_configure`  (
 
 CREATE TABLE `pipeline_deploy`  (
   `deploy_id` varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '部署id',
-  `type` int NULL DEFAULT NULL COMMENT '类型',
-  `deploy_target_address` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '打包文件地址',
+  `type` int NULL DEFAULT NULL COMMENT '容器类型',
+  `deploy_type` int NULL DEFAULT NULL COMMENT '部署类型',
+  `source_address` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '打包文件地址',
   `deploy_address` varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '部署文件地址',
-  `deploy_shell` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT 'shell命令',
-  `deploy_docker_port` int NULL DEFAULT NULL COMMENT 'docker启动端口',
+  `start_port` int NULL DEFAULT NULL COMMENT 'docker启动端口',
   `proof_id` varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '凭证id',
-  `deploy_mapping_port` int NULL DEFAULT NULL COMMENT '映射端口',
+  `mapping_port` int NULL DEFAULT NULL COMMENT '映射端口',
   `sort` int NULL DEFAULT NULL COMMENT '排序',
   `deploy_alias` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '执行名称',
-  `ip` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT 'IP地址',
-  `port` int NULL DEFAULT NULL COMMENT '端口号',
+  `ssh_ip` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT 'IP地址',
+  `ssh_port` int NULL DEFAULT NULL COMMENT '端口号',
+  `start_address` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '启动文件地址',
+  `deploy_order` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '文件操作',
+  `start_shell` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '启动命令',
   PRIMARY KEY (`deploy_id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
