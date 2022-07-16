@@ -105,6 +105,7 @@ public class PipelineTestServiceImpl implements PipelineTestService {
         //存在测试配置，更新或者创建
         if (pipelineTest.getTestId() != null){
             updateTest(pipelineTest);
+            pipelineConfigureService.updateConfigure(oneConfigure);
         }else {
             String testId = createTest(pipelineTest);
             oneConfigure.setTaskId(testId);

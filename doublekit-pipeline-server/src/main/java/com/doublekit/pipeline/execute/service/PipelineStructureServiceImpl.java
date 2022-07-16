@@ -80,20 +80,6 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
         PipelineStructure pipelineStructure = pipelineExecConfigure.getPipelineStructure();
         Pipeline pipeline = pipelineExecConfigure.getPipeline();
         PipelineConfigure oneConfigure = pipelineConfigureService.findOneConfigure(pipeline.getPipelineId(), 30);
-        //if (oneConfigure != null){
-        //    if (pipelineStructure.getType() != 0){
-        //        updateStructure(pipelineStructure);
-        //        oneConfigure.setTaskSort(pipelineStructure.getSort());
-        //        oneConfigure.setTaskAlias(pipelineStructure.getStructureAlias());
-        //        //oneConfigure.setView(pipelineStructure.getView());
-        //        pipelineConfigureService.updateConfigure(oneConfigure);
-        //    }else {
-        //        pipelineConfigureService.deleteTask(oneConfigure.getTaskId(),pipeline.getPipelineId());
-        //    }
-        //}
-        //if (oneConfigure == null && pipelineStructure.getType() != 0){
-        //    createConfigure(pipeline.getPipelineId(),pipelineStructure.getType(),pipelineStructure);
-        //}
 
         //判断新配置是否删除了构建配置
         if (oneConfigure != null && pipelineStructure.getType() == 0){
@@ -121,6 +107,7 @@ public class PipelineStructureServiceImpl implements PipelineStructureService {
         //存在构建配置，更新或者创建
         if (pipelineStructure.getStructureId() != null){
             updateStructure(pipelineStructure);
+            pipelineConfigureService.updateConfigure(oneConfigure);
         }else {
             String testId = createStructure(pipelineStructure);
             oneConfigure.setTaskId(testId);

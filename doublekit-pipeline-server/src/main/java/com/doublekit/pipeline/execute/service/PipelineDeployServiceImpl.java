@@ -109,6 +109,7 @@ public class PipelineDeployServiceImpl implements PipelineDeployService {
         //存在部署配置，更新或者创建
         if (pipelineDeploy.getDeployId() != null){
             updateDeploy(pipelineDeploy);
+            pipelineConfigureService.updateConfigure(oneConfigure);
         }else {
             String testId = createDeploy(pipelineDeploy);
             oneConfigure.setTaskId(testId);
