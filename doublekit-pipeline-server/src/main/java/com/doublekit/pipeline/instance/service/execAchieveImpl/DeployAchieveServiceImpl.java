@@ -21,8 +21,11 @@ import org.springframework.stereotype.Service;
 
 import java.io.*;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.util.List;
+
+import static org.apache.commons.codec.CharEncoding.UTF_8;
 
 
 @Service
@@ -279,7 +282,7 @@ public class DeployAchieveServiceImpl implements DeployAchieveService {
         //日志信息
         pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog() + "\n" + order+ "\n");
         //获取执行信息
-        InputStreamReader inputStreamReader = new InputStreamReader(session.getStdout(), Charset.forName("GBK"));
+        InputStreamReader inputStreamReader = new InputStreamReader(session.getStdout(), StandardCharsets.UTF_8);
         //输出执行信息
         commonAchieveService.log(inputStreamReader,pipelineProcess,pipelineExecHistoryList);
         session.close();
