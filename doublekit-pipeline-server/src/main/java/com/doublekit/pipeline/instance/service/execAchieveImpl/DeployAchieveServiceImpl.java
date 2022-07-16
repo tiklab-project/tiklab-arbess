@@ -124,7 +124,7 @@ public class DeployAchieveServiceImpl implements DeployAchieveService {
      * @param pipelineProcess 配置信息
      * @param pipelineExecHistoryList 状态集合
      */
-    private void linux(PipelineProcess pipelineProcess,List<PipelineExecHistory> pipelineExecHistoryList) throws IOException {
+    private void linux(PipelineProcess pipelineProcess,List<PipelineExecHistory> pipelineExecHistoryList) throws IOException, JSchException {
         PipelineDeploy pipelineDeploy = pipelineProcess.getPipelineDeploy();
 
         //选择自定义部署
@@ -169,7 +169,7 @@ public class DeployAchieveServiceImpl implements DeployAchieveService {
      * @param pipelineProcess 配置信息
      * @param pipelineExecHistoryList 状态集合
      */
-    private void docker(PipelineProcess pipelineProcess,List<PipelineExecHistory> pipelineExecHistoryList) throws IOException {
+    private void docker(PipelineProcess pipelineProcess,List<PipelineExecHistory> pipelineExecHistoryList) throws IOException, JSchException {
         PipelineDeploy pipelineDeploy = pipelineProcess.getPipelineDeploy();
 
         //选择自定义部署
@@ -261,33 +261,60 @@ public class DeployAchieveServiceImpl implements DeployAchieveService {
      * @param order 执行命令
      * @throws IOException 日志读写异常
      */
-    public void sshOrder(String order, PipelineProcess pipelineProcess,List<PipelineExecHistory> pipelineExecHistoryList) throws IOException {
-        PipelineDeploy pipelineDeploy = pipelineProcess.getPipelineDeploy();
-        Proof proof = pipelineProcess.getProof();
-        PipelineExecHistory pipelineExecHistory = pipelineProcess.getPipelineExecHistory();
-        //效验
-        Connection conn = new Connection(pipelineDeploy.getSshIp(),pipelineDeploy.getSshPort());
-        conn.connect();
-        //效验方式
-        if (proof.getProofType().equals("password")){
-            //设置登陆主机的密码
-            conn.authenticateWithPassword(proof.getProofUsername(), proof.getProofPassword());
-        }else {
-            //添加私钥
-            conn.authenticateWithPublicKey(proof.getProofUsername(),new File(proof.getProofPassword()),null);
-        }
-        //连接
-        ch.ethz.ssh2.Session session = conn.openSession();
-        session.execCommand(order);
-        //日志信息
-        pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog() + "\n" + order+ "\n");
-        //获取执行信息
-        InputStreamReader inputStreamReader = new InputStreamReader(session.getStdout(), StandardCharsets.UTF_8);
-        //输出执行信息
-        commonAchieveService.log(inputStreamReader,pipelineProcess,pipelineExecHistoryList);
-        session.close();
-        inputStreamReader.close();
-    }
+    //public void sshOrder(String order, PipelineProcess pipelineProcess,List<PipelineExecHistory> pipelineExecHistoryList) throws IOException {
+    //    PipelineDeploy pipelineDeploy = pipelineProcess.getPipelineDeploy();
+    //    Proof proof = pipelineProcess.getProof();
+    //    PipelineExecHistory pipelineExecHistory = pipelineProcess.getPipelineExecHistory();
+    //    //效验
+    //    Connection conn = new Connection(pipelineDeploy.getSshIp(),pipelineDeploy.getSshPort());
+    //    conn.connect();
+    //    //效验方式
+    //    if (proof.getProofType().equals("password")){
+    //        //设置登陆主机的密码
+    //        conn.authenticateWithPassword(proof.getProofUsername(), proof.getProofPassword());
+    //    }else {
+    //        //添加私钥
+    //        conn.authenticateWithPublicKey(proof.getProofUsername(),new File(proof.getProofPassword()),null);
+    //    }
+    //    //连接
+    //    ch.ethz.ssh2.Session session = conn.openSession();
+    //    session.execCommand(order);
+    //    //日志信息
+    //    pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog() + "\n" + order+ "\n");
+    //    //获取执行信息
+    //    InputStreamReader inputStreamReader = new InputStreamReader(session.getStdout(), StandardCharsets.UTF_8);
+    //    //输出执行信息
+    //    commonAchieveService.log(inputStreamReader,pipelineProcess,pipelineExecHistoryList);
+    //    session.close();
+    //    inputStreamReader.close();
+    //}
+    public void sshOrder(String order, PipelineProcess pipelineProcess,List<PipelineExecHistory> pipelineExecHistoryList) throws JSchException, IOException {
 
+        JSch jsch = new JSch();
+        //指定的端口连接服务器
+        Session session =jsch.getSession("root","172.12.1.18" ,22);
+        if (session == null){
+            throw new JSchException( "连接异常。。。。");
+        }
+        //设置第一次登陆的时候提示，可选值：(ask | yes | no)
+        session.setConfig("StrictHostKeyChecking", "no");
+        //设置登陆主机的密码
+        session.setPassword("darth2020");
+
+        //设置登陆超时时间 10s
+        session.connect(200000);
+        //创建sftp通信通道
+        ChannelExec channel = (ChannelExec) session.openChannel("exec");
+        channel.setCommand(order);
+        channel.setInputStream(null);
+        channel.setErrStream(System.err);
+        InputStream in = channel.getInputStream();
+        channel.connect();
+
+        InputStreamReader inputStreamReader = new InputStreamReader(in);
+        commonAchieveService.log(inputStreamReader,pipelineProcess,pipelineExecHistoryList);
+        channel.disconnect();
+        session.disconnect();
+    }
 
 }
