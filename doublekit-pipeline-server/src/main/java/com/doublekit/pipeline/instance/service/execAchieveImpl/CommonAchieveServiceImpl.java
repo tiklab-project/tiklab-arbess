@@ -3,6 +3,7 @@ package com.doublekit.pipeline.instance.service.execAchieveImpl;
 import com.doublekit.pipeline.definition.model.Pipeline;
 import com.doublekit.pipeline.definition.model.PipelineConfigure;
 
+import com.doublekit.pipeline.definition.service.PipelineCommonService;
 import com.doublekit.pipeline.instance.model.PipelineExecHistory;
 import com.doublekit.pipeline.instance.model.PipelineExecLog;
 import com.doublekit.pipeline.instance.model.PipelineProcess;
@@ -11,12 +12,15 @@ import com.doublekit.pipeline.instance.service.PipelineExecLogService;
 import com.doublekit.pipeline.instance.service.execAchieveService.CommonAchieveService;
 import com.doublekit.rpc.annotation.Exporter;
 import com.doublekit.user.user.model.User;
+import com.thoughtworks.xstream.mapper.Mapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -33,17 +37,27 @@ public class CommonAchieveServiceImpl implements CommonAchieveService {
     @Autowired
     PipelineExecLogService pipelineExecLogService;
 
+    @Autowired
+    PipelineCommonService pipelineCommonService;
+
     private static final Logger logger = LoggerFactory.getLogger(CommonAchieveServiceImpl.class);
 
     /**
      * 执行日志
-     * @param inputStreamReader 执行信息
+     * @param inputStream 执行信息
      * @param pipelineProcess 执行信息
      * @throws IOException 字符流转换异常
      * @return map 执行状态
      */
     @Override
-    public int log(InputStreamReader inputStreamReader, PipelineProcess pipelineProcess,List<PipelineExecHistory> pipelineExecHistoryList) throws IOException {
+    public int log(InputStream inputStream, PipelineProcess pipelineProcess,List<PipelineExecHistory> pipelineExecHistoryList) throws IOException {
+        String fileAddress = pipelineCommonService.getFileAddress();
+        InputStreamReader inputStreamReader;
+        if (fileAddress.equals("/usr/local/pipeline/")){
+            inputStreamReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
+        }else {
+            inputStreamReader = new InputStreamReader(inputStream, Charset.forName("GBK"));
+        }
         PipelineExecHistory pipelineExecHistory = pipelineProcess.getPipelineExecHistory();
         PipelineExecLog pipelineExecLog = pipelineProcess.getPipelineExecLog();
         String s;

@@ -53,8 +53,8 @@ public class TestAchieveServiceImpl implements TestAchieveService {
                     + "执行 : \"" + testOrder + "\"\n";
             pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+a);
             //设置日志格式
-            InputStreamReader inputStreamReader = new InputStreamReader(process.getInputStream(), Charset.forName("GBK"));
-            int state = commonAchieveServiceImpl.log(inputStreamReader, pipelineProcess,pipelineExecHistoryList);
+            //InputStreamReader inputStreamReader = new InputStreamReader(process.getInputStream(), Charset.forName("GBK"));
+            int state = commonAchieveServiceImpl.log(process.getInputStream(), pipelineProcess,pipelineExecHistoryList);
             commonAchieveServiceImpl.updateTime(pipelineProcess,beginTime);
             if (state == 0){
                 commonAchieveServiceImpl.updateState(pipelineProcess,"测试失败",pipelineExecHistoryList);

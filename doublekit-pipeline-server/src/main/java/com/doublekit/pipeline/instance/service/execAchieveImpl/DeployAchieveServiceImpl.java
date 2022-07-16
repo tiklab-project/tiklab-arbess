@@ -308,11 +308,11 @@ public class DeployAchieveServiceImpl implements DeployAchieveService {
         channel.setCommand(order);
         channel.setInputStream(null);
         channel.setErrStream(System.err);
-        InputStream in = channel.getInputStream();
+        //InputStream in = channel.getInputStream();
         channel.connect();
-
-        InputStreamReader inputStreamReader = new InputStreamReader(in);
-        commonAchieveService.log(inputStreamReader,pipelineProcess,pipelineExecHistoryList);
+        //InputStreamReader inputStreamReader = new InputStreamReader(channel.getInputStream());
+        //InputStreamReader inputStreamReader = new InputStreamReader(in);
+        commonAchieveService.log(channel.getInputStream(),pipelineProcess,pipelineExecHistoryList);
         channel.disconnect();
         session.disconnect();
     }

@@ -34,7 +34,6 @@ public class StructureAchieveServiceImpl implements StructureAchieveService {
     @Autowired
     PipelineCommonService pipelineCommonService;
 
-    //@Value("${}")
     private static final Logger logger = LoggerFactory.getLogger(StructureAchieveServiceImpl.class);
     // 构建
     public int structure(PipelineProcess pipelineProcess, List<PipelineExecHistory> pipelineExecHistoryList)  {
@@ -64,8 +63,8 @@ public class StructureAchieveServiceImpl implements StructureAchieveService {
             pipelineExecLog.setRunLog(pipelineExecLog.getRunLog()+a);
             //构建失败
             //InputStreamReader inputStreamReader = new InputStreamReader(process.getInputStream() ,  Charset.forName("GBK"));
-            InputStreamReader inputStreamReader = new InputStreamReader(process.getInputStream() ,  StandardCharsets.UTF_8);
-            int state = commonAchieveServiceImpl.log(inputStreamReader, pipelineProcess,pipelineExecHistoryList);
+            //InputStreamReader inputStreamReader = new InputStreamReader(process.getInputStream() ,  StandardCharsets.UTF_8);
+            int state = commonAchieveServiceImpl.log(process.getInputStream(), pipelineProcess,pipelineExecHistoryList);
             process.destroy();
             commonAchieveServiceImpl.updateTime(pipelineProcess,beginTime);
             if (state == 0){

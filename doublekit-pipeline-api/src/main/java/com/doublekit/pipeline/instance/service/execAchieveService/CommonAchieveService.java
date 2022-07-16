@@ -9,6 +9,7 @@ import com.doublekit.pipeline.instance.model.PipelineProcess;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.List;
 
@@ -16,12 +17,12 @@ public interface CommonAchieveService {
 
     /**
      * 执行日志
-     * @param inputStreamReader 执行信息
+     * @param inputStream 执行信息
      * @param pipelineProcess 执行信息
      * @throws IOException 字符流转换异常
      * @return map 执行状态
      */
-     int log(InputStreamReader inputStreamReader, PipelineProcess pipelineProcess, List<PipelineExecHistory> pipelineExecHistoryList) throws IOException;
+     int log(InputStream inputStream, PipelineProcess pipelineProcess, List<PipelineExecHistory> pipelineExecHistoryList) throws IOException;
 
     /**
      * 调用cmd执行命令
