@@ -62,8 +62,6 @@ public class StructureAchieveServiceImpl implements StructureAchieveService {
             pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog() + a);
             pipelineExecLog.setRunLog(pipelineExecLog.getRunLog()+a);
             //构建失败
-            //InputStreamReader inputStreamReader = new InputStreamReader(process.getInputStream() ,  Charset.forName("GBK"));
-            //InputStreamReader inputStreamReader = new InputStreamReader(process.getInputStream() ,  StandardCharsets.UTF_8);
             int state = commonAchieveServiceImpl.log(process.getInputStream(), pipelineProcess,pipelineExecHistoryList);
             process.destroy();
             commonAchieveServiceImpl.updateTime(pipelineProcess,beginTime);

@@ -184,7 +184,7 @@ public class CommonAchieveServiceImpl implements CommonAchieveService {
      */
     @Override
     public  void  success(PipelineExecHistory pipelineExecHistory, String pipelineId,List<PipelineExecHistory> pipelineExecHistoryList) {
-        pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+ "\n" + " RUN RESULT : SUCCESS");
+        pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+ "\n" + "RUN RESULT : SUCCESS");
         pipelineExecHistory.setRunStatus(30);
         pipelineExecHistory.setFindState(1);
         pipelineExecHistoryList.add(pipelineExecHistory);
@@ -203,7 +203,7 @@ public class CommonAchieveServiceImpl implements CommonAchieveService {
         PipelineExecHistory pipelineExecHistory = pipelineProcess.getPipelineExecHistory();
 
         //更新信息
-        pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+ "\n" + " RUN RESULT : HALT");
+        pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+ "\n" + "RUN RESULT : HALT");
         pipelineExecHistory.setRunStatus(20);
         pipelineExecHistory.setFindState(1);
         pipelineExecHistoryList.add(pipelineExecHistory);
