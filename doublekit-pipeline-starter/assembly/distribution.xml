@@ -43,6 +43,11 @@
 			<fileMode>755</fileMode>
 			<outputDirectory>/plugin</outputDirectory>
 		</fileSet>
+		<fileSet>
+			<directory>${basedir}/docker</directory>
+			<fileMode>755</fileMode>
+			<outputDirectory>/docker</outputDirectory>
+		</fileSet>
 	</fileSets>
 	<dependencySets>
 		<dependencySet>
