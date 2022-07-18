@@ -10,6 +10,7 @@ import com.doublekit.pipeline.setting.proof.dao.ProofDao;
 import com.doublekit.pipeline.setting.proof.entity.ProofEntity;
 import com.doublekit.pipeline.setting.proof.model.Proof;
 import com.doublekit.pipeline.setting.proof.model.ProofQuery;
+import com.doublekit.pipeline.setting.proof.model.ProofTask;
 import com.doublekit.rpc.annotation.Exporter;
 import com.doublekit.user.user.model.User;
 import org.slf4j.Logger;
@@ -33,7 +34,7 @@ public class ProofServiceImpl implements ProofService{
     JoinTemplate joinTemplate;
 
     @Autowired
-    PipelineService pipelineService;
+    ProofTaskService proofTaskService;
 
     @Autowired
     PipelineActionService pipelineActionService;
@@ -43,15 +44,26 @@ public class ProofServiceImpl implements ProofService{
     //创建
     @Override
     public String createProof(Proof proof) {
+        //判断凭证类型
         if (proof.getProofType().equals("SSH")){
             try {
+                //获取主机名
                 proof.setProofUsername(InetAddress.getLocalHost().getHostName());
             } catch (UnknownHostException e) {
+                //失败更改为凭证名称
                 proof.setProofUsername(proof.getProofName());
             }
         }
         ProofEntity proofEntity = BeanMapper.map(proof, ProofEntity.class);
-        return ProofDao.createProof(proofEntity);
+        //判断凭证作用域
+        if (proof.getType() == 1){
+            return ProofDao.createProof(proofEntity);
+        }
+        String proofId = ProofDao.createProof(proofEntity);
+        for (String s : proof.getProofList()) {
+            proofTaskService.createProofTask(new ProofTask(proofId,s));
+        }
+        return proofId;
     }
 
     //删除
@@ -59,8 +71,7 @@ public class ProofServiceImpl implements ProofService{
     public void deleteProof(String proofId) {
         Proof proof = findOneProof(proofId);
         ProofDao.deleteProof(proofId);
-        User user = proof.getUser();
-        pipelineActionService.createActive(user.getId(),null,"删除了凭证"+proof.getProofName());
+        pipelineActionService.createActive(proof.getUser().getId(),null,"删除了凭证"+proof.getProofName());
     }
 
 
@@ -108,37 +119,42 @@ public class ProofServiceImpl implements ProofService{
     }
 
     @Override
-    public List<Proof> findPipelineProof(ProofQuery proofQuery){
-        StringBuilder s = pipelineService.findUserPipelineId(proofQuery.getUserId());
-        if (s == null){
-            return null;
+    public List<Proof> findPipelineProof(String pipelineId,int type){
+        if (pipelineId.equals("")){
+            return findAllProof();
         }
-        if (proofQuery.getType() == 0 ){
-                if (proofQuery.getPipelineId() == null){
-                    List<ProofEntity> allProof = ProofDao.findAllProof(proofQuery.getUserId(),s);
-                    if (allProof == null){
-                        return null;
-                    }
-                    List<Proof> proofs = BeanMapper.mapList(allProof, Proof.class);
-                    joinTemplate.joinQuery(proofs);
-                    return proofs;
-                }
-                List<ProofEntity> allProof = ProofDao.findPipelineAllProof(proofQuery.getUserId(), proofQuery.getPipelineId());
-                if (allProof == null){
-                    return null;
-                }
-                List<Proof> proofs = BeanMapper.mapList(allProof, Proof.class);
-                joinTemplate.joinQuery(proofs);
-                return proofs;
-            }else {
-                List<ProofEntity> allProof = ProofDao.findPipelineProof(proofQuery,s);
-                if (allProof == null){
-                    return null;
-                }
-                List<Proof> proofs = BeanMapper.mapList(allProof, Proof.class);
-                joinTemplate.joinQuery(proofs);
-                return proofs;
-            }
+        return BeanMapper.mapList(ProofDao.findPipelineProof(pipelineId,type), Proof.class);
+        //StringBuilder s = pipelineService.findUserPipelineId(proofQuery.getUserId());
+        //
+        //if (s == null){
+        //    return null;
+        //}
+        //if (proofQuery.getType() == 0 ){
+        //        if (proofQuery.getPipelineId() == null){
+        //            List<ProofEntity> allProof = ProofDao.findAllProof(proofQuery.getUserId(),s);
+        //            if (allProof == null){
+        //                return null;
+        //            }
+        //            List<Proof> proofs = BeanMapper.mapList(allProof, Proof.class);
+        //            joinTemplate.joinQuery(proofs);
+        //            return proofs;
+        //        }
+        //        List<ProofEntity> allProof = ProofDao.findPipelineAllProof(proofQuery.getUserId(), proofQuery.getPipelineId());
+        //        if (allProof == null){
+        //            return null;
+        //        }
+        //        List<Proof> proofs = BeanMapper.mapList(allProof, Proof.class);
+        //        joinTemplate.joinQuery(proofs);
+        //        return proofs;
+        //    }else {
+        //        List<ProofEntity> allProof = ProofDao.findPipelineProof(proofQuery,s);
+        //        if (allProof == null){
+        //            return null;
+        //        }
+        //        List<Proof> proofs = BeanMapper.mapList(allProof, Proof.class);
+        //        joinTemplate.joinQuery(proofs);
+        //        return proofs;
+        //    }
     }
 
     @Override

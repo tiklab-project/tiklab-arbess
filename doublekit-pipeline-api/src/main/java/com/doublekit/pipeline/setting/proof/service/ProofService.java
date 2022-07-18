@@ -48,10 +48,11 @@ public interface ProofService {
 
     /**
      * 查询流水线凭证
-     * @param proofQuery 条件
+     * @param pipelineId 条件
      * @return 凭证列表
      */
-    List<Proof> findPipelineProof(ProofQuery proofQuery);
+    //List<Proof> findPipelineProof(ProofQuery proofQuery);
+    List<Proof> findPipelineProof(String pipelineId,int type);
 
     /**
      * 查询所有凭证

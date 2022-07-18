@@ -1,6 +1,5 @@
 package com.doublekit.pipeline.instance.service.execAchieveImpl;
 
-import com.doublekit.core.order.Order;
 import com.doublekit.pipeline.definition.model.PipelineConfigure;
 import com.doublekit.pipeline.definition.service.PipelineCommonService;
 import com.doublekit.pipeline.execute.model.PipelineDeploy;
@@ -21,8 +20,6 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.util.List;
-
-
 
 @Service
 @Exporter
@@ -287,12 +284,9 @@ public class DeployAchieveServiceImpl implements DeployAchieveService {
     /**
      * 初始化Docker镜像
      */
-    public void initializeDocker(Session session,PipelineProcess pipelineProcess,List<PipelineExecHistory> pipelineExecHistoryList) throws JSchException, IOException, SftpException {
+    public void initializeDocker(Session session,PipelineProcess pipelineProcess,List<PipelineExecHistory> pipelineExecHistoryList) throws JSchException, IOException {
 
         String order ;
-
-        //创建sftp通信通道
-        logger.info("开始初始化镜像。。。。。。。。。。。。。。。");
         //创建centos镜像
         order = "docker pull zcamy/darth_pipeline:centos-8";
         sshOrder(session, order, pipelineProcess, pipelineExecHistoryList);
@@ -303,7 +297,6 @@ public class DeployAchieveServiceImpl implements DeployAchieveService {
         logger.info("jdk镜像初始化成功。。。。。。。。。。。。。。。");
 
         //创建mysql镜像
-
         order = "[[ ! -z `docker ps -a | grep 'mysql' | awk '{print $1 }'` ]] " +
                 "&& docker container restart pipeline || "
                 +"docker pull zcamy/darth_pipeline:mysql-8.0.28;docker run --name mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=darth2020 -d zcamy/darth_pipeline:mysql-8.0.28";
@@ -311,16 +304,16 @@ public class DeployAchieveServiceImpl implements DeployAchieveService {
         logger.info("mysql镜像初始化成功。。。。。。。。。。。。。。。");
 
         //创建maven镜像
-        order ="docker pull zcamy/darth_pipeline:maven-3.8.6";
-        sshOrder(session, order, pipelineProcess, pipelineExecHistoryList);
-        logger.info("maven镜像初始化成功。。。。。。。。。。。。。。。");
+        //order ="docker pull zcamy/darth_pipeline:maven-3.8.6";
+        //sshOrder(session, order, pipelineProcess, pipelineExecHistoryList);
+        //logger.info("maven镜像初始化成功。。。。。。。。。。。。。。。");
 
         //创建node镜像
-        order = "docker pull zcamy/darth_pipeline:node-14.19.0";
-        sshOrder(session, order, pipelineProcess, pipelineExecHistoryList);
-        logger.info("node镜像初始化成功。。。。。。。。。。。。。。。");
-
-        logger.info("初始化镜像完成。。。。。。。。。。。。。。。");
+        //order = "docker pull zcamy/darth_pipeline:node-14.19.0";
+        //sshOrder(session, order, pipelineProcess, pipelineExecHistoryList);
+        //logger.info("node镜像初始化成功。。。。。。。。。。。。。。。");
+        //
+        //logger.info("初始化镜像完成。。。。。。。。。。。。。。。");
 
     }
 

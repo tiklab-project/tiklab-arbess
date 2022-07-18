@@ -1,0 +1,41 @@
+package com.doublekit.pipeline.setting.proof.service;
+
+import com.doublekit.pipeline.setting.proof.model.ProofTask;
+
+import java.util.List;
+
+public interface ProofTaskService {
+
+    /**
+     * 创建凭证关联表
+     * @param proofTask 信息
+     * @return 创建Id
+     */
+     String createProofTask(ProofTask proofTask);
+
+    /**
+     * 删除凭证关联表
+     * @param proofTaskId 信息
+     */
+     void deleteProofTask(String proofTaskId);
+
+    /**
+     * 创建凭证关联表
+     * @param proofTask 信息
+     */
+     void updateProofTask(ProofTask proofTask);
+
+    /**
+     * 查询凭证关联表
+     * @param proofTaskId 信息
+     * @return 创建Id
+     */
+     ProofTask findProofTask(String proofTaskId);
+
+    /**
+     * 查询所有凭证关联表
+     * @return 创建Id
+     */
+     List<ProofTask> findAllProofTask();
+    
+}

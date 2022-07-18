@@ -50,10 +50,10 @@ public class ProofController {
 
     @RequestMapping(path="/findPipelineProof",method = RequestMethod.POST)
     @ApiMethod(name = "findPipelineProof",desc = "查询流水线凭证")
-    @ApiParam(name = "proofQuery",desc = "条件",required = true)
-    public Result<List<Proof>> findPipelineProof(@RequestBody @Valid @NotNull ProofQuery proofQuery){
+    @ApiParam(name = "pipelineId",desc = "条件",required = true)
+    public Result<List<Proof>> findPipelineProof(String pipelineId,int type){
 
-        List<Proof> pipelineProof = proofService.findPipelineProof(proofQuery);
+        List<Proof> pipelineProof = proofService.findPipelineProof(pipelineId,type);
 
         return Result.ok(pipelineProof);
     }

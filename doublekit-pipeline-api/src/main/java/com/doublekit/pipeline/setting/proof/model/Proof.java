@@ -10,6 +10,8 @@ import com.doublekit.join.annotation.JoinQuery;
 import com.doublekit.pipeline.definition.model.Pipeline;
 import com.doublekit.user.user.model.User;
 
+import java.util.List;
+
 @ApiModel
 @Join
 @Mapper(targetAlias = "ProofEntity")
@@ -43,7 +45,6 @@ public class Proof {
     @ApiProperty(name="proofDescribe",desc="描述")
     private String proofDescribe;
 
-
     @ApiProperty(name="User",desc="用户id",eg="@selectOne")
     @Mappings({
             @Mapping(source = "user.id",target = "userId")
@@ -71,6 +72,8 @@ public class Proof {
     @ApiProperty(name="proofUsername",desc="类型")
     private String username;
 
+    @ApiProperty(name="proofList",desc="流水线凭证列表")
+    private List<String> proofList;
 
     public String getProofId() {
         return proofId;
@@ -169,5 +172,13 @@ public class Proof {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public List<String> getProofList() {
+        return proofList;
+    }
+
+    public void setProofList(List<String> proofList) {
+        this.proofList = proofList;
     }
 }
