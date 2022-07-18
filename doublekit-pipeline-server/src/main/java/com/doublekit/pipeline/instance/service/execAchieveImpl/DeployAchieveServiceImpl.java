@@ -1,5 +1,6 @@
 package com.doublekit.pipeline.instance.service.execAchieveImpl;
 
+import com.doublekit.core.order.Order;
 import com.doublekit.pipeline.definition.model.PipelineConfigure;
 import com.doublekit.pipeline.definition.service.PipelineCommonService;
 import com.doublekit.pipeline.execute.model.PipelineDeploy;
@@ -17,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -191,7 +193,7 @@ public class DeployAchieveServiceImpl implements DeployAchieveService {
      * @param pipelineProcess 配置信息
      * @param pipelineExecHistoryList 状态集合
      */
-    private void docker(Session session,PipelineProcess pipelineProcess,List<PipelineExecHistory> pipelineExecHistoryList) throws IOException, JSchException {
+    private void docker(Session session,PipelineProcess pipelineProcess,List<PipelineExecHistory> pipelineExecHistoryList) throws IOException, JSchException, SftpException {
         PipelineDeploy pipelineDeploy = pipelineProcess.getPipelineDeploy();
 
         //选择自定义部署
@@ -208,25 +210,32 @@ public class DeployAchieveServiceImpl implements DeployAchieveService {
         //启动文件地址
         String startAddress = pipelineDeploy.getStartAddress();
 
+
         String order = "docker stop $(docker ps -a | grep '"+pipelineName+"' | awk '{print $1 }');"
                 +"docker rm $(docker ps -a | grep '"+pipelineName+"' | awk '{print $1 }');"
                 +"docker image rm"+" "+pipelineName+";";
 
         if ((deployOrder == null || deployOrder.equals("")) && (startAddress == null || startAddress.equals("/")) ){
+
+            initializeDocker(session,pipelineProcess,pipelineExecHistoryList);
+
              order = order +"cd"+" "+deployAddress+";"+"docker image build -t"+" "+pipelineName+"  .;"
                     +"docker run -itd -p"+" "+pipelineDeploy.getMappingPort()+":"+pipelineDeploy.getStartPort()+" "+pipelineName;
             sshOrder(session, order,pipelineProcess,pipelineExecHistoryList);
             return;
         }
         if (deployOrder != null && !deployOrder.equals("") ) {
+            deployOrder = "cd "+" "+ deployAddress +";"+deployOrder;
             sshOrder(session, deployOrder, pipelineProcess, pipelineExecHistoryList);
             if (startAddress == null || startAddress.equals("/")) {
+                initializeDocker(session,pipelineProcess,pipelineExecHistoryList);
                 order = order + "cd" + " " + deployAddress + ";" + "docker image build -t" + " " + pipelineName + "  .;"
                         + "docker run -itd -p" + " " + pipelineDeploy.getMappingPort() + ":" + pipelineDeploy.getStartPort() + " " + pipelineName;
                 sshOrder(session, order, pipelineProcess, pipelineExecHistoryList);
                 return;
             }
         }
+        initializeDocker(session,pipelineProcess,pipelineExecHistoryList);
         order = order +"cd"+" "+deployAddress+"/"+startAddress+";"+"docker image build -t"+" "+pipelineName+"  .;"
                 +"docker run -itd -p"+" "+pipelineDeploy.getMappingPort()+":"+pipelineDeploy.getStartPort()+" "+pipelineName;
         sshOrder(session, order,pipelineProcess,pipelineExecHistoryList);
@@ -261,38 +270,10 @@ public class DeployAchieveServiceImpl implements DeployAchieveService {
      * @param order 执行命令
      * @throws IOException 日志读写异常
      */
-    //public void sshOrder(String order, PipelineProcess pipelineProcess,List<PipelineExecHistory> pipelineExecHistoryList) throws IOException {
-    //    PipelineDeploy pipelineDeploy = pipelineProcess.getPipelineDeploy();
-    //    Proof proof = pipelineProcess.getProof();
-    //    PipelineExecHistory pipelineExecHistory = pipelineProcess.getPipelineExecHistory();
-    //    //效验
-    //    Connection conn = new Connection(pipelineDeploy.getSshIp(),pipelineDeploy.getSshPort());
-    //    conn.connect();
-    //    //效验方式
-    //    if (proof.getProofType().equals("password")){
-    //        //设置登陆主机的密码
-    //        conn.authenticateWithPassword(proof.getProofUsername(), proof.getProofPassword());
-    //    }else {
-    //        //添加私钥
-    //        conn.authenticateWithPublicKey(proof.getProofUsername(),new File(proof.getProofPassword()),null);
-    //    }
-    //    //连接
-    //    ch.ethz.ssh2.Session session = conn.openSession();
-    //    session.execCommand(order);
-    //    //日志信息
-    //    pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog() + "\n" + order+ "\n");
-    //    //获取执行信息
-    //    InputStreamReader inputStreamReader = new InputStreamReader(session.getStdout(), StandardCharsets.UTF_8);
-    //    //输出执行信息
-    //    commonAchieveService.log(inputStreamReader,pipelineProcess,pipelineExecHistoryList);
-    //    session.close();
-    //    inputStreamReader.close();
-    //}
     public void sshOrder(Session session,String order, PipelineProcess pipelineProcess,List<PipelineExecHistory> pipelineExecHistoryList) throws JSchException, IOException {
         //创建sftp通信通道
         ChannelExec channel = (ChannelExec) session.openChannel("exec");
 
-        logger.info("命令为："+order);
         channel.setCommand(order);
 
         channel.setInputStream(null);
@@ -302,5 +283,46 @@ public class DeployAchieveServiceImpl implements DeployAchieveService {
         commonAchieveService.log(channel.getInputStream(),pipelineProcess,pipelineExecHistoryList);
         channel.disconnect();
     }
+
+    /**
+     * 初始化Docker镜像
+     */
+    public void initializeDocker(Session session,PipelineProcess pipelineProcess,List<PipelineExecHistory> pipelineExecHistoryList) throws JSchException, IOException, SftpException {
+
+        String order ;
+
+        //创建sftp通信通道
+        logger.info("开始初始化镜像。。。。。。。。。。。。。。。");
+        //创建centos镜像
+        order = "docker pull zcamy/darth_pipeline:centos-8";
+        sshOrder(session, order, pipelineProcess, pipelineExecHistoryList);
+
+        //创建jdk镜像
+        order = "docker pull zcamy/darth_pipeline:jdk-16.0.2";
+        sshOrder(session, order, pipelineProcess, pipelineExecHistoryList);
+        logger.info("jdk镜像初始化成功。。。。。。。。。。。。。。。");
+
+        //创建mysql镜像
+
+        order = "[[ ! -z `docker ps -a | grep 'mysql' | awk '{print $1 }'` ]] " +
+                "&& docker container restart pipeline || "
+                +"docker pull zcamy/darth_pipeline:mysql-8.0.28;docker run --name mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=darth2020 -d zcamy/darth_pipeline:mysql-8.0.28";
+        sshOrder(session, order, pipelineProcess, pipelineExecHistoryList);
+        logger.info("mysql镜像初始化成功。。。。。。。。。。。。。。。");
+
+        //创建maven镜像
+        order ="docker pull zcamy/darth_pipeline:maven-3.8.6";
+        sshOrder(session, order, pipelineProcess, pipelineExecHistoryList);
+        logger.info("maven镜像初始化成功。。。。。。。。。。。。。。。");
+
+        //创建node镜像
+        order = "docker pull zcamy/darth_pipeline:node-14.19.0";
+        sshOrder(session, order, pipelineProcess, pipelineExecHistoryList);
+        logger.info("node镜像初始化成功。。。。。。。。。。。。。。。");
+
+        logger.info("初始化镜像完成。。。。。。。。。。。。。。。");
+
+    }
+
 
 }

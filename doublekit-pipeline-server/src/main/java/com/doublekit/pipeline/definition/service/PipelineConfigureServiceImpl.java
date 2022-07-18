@@ -106,7 +106,7 @@ public class PipelineConfigureServiceImpl implements PipelineConfigureService {
     //更新任务
     @Override
     public void updateTask(PipelineExecConfigure pipelineExecConfigure){
-        pipelineActionService.createActive(pipelineExecConfigure.getUser().getId(), pipelineExecConfigure.getPipeline(), "用户更新了流水线/的配置");
+        pipelineActionService.createActive(pipelineExecConfigure.getUser().getId(), pipelineExecConfigure.getPipeline(), "更新了流水线/的配置");
         pipelineCodeService.updateTask(pipelineExecConfigure);
     }
 
