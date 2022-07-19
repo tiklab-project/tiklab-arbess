@@ -61,14 +61,6 @@ public interface ProofService {
     @FindAll
     List<Proof> findAllProof();
 
-
-    /**
-     * 查询用户所有凭证
-     * @param userId 用户id
-     * @return 凭证
-     */
-    HashSet<Proof> findAllUserProof(String userId);
-
     /**
      * 获取相同的授权凭证
      * @param scope 凭证类型

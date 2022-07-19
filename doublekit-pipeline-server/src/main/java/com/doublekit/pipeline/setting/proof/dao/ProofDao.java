@@ -67,6 +67,12 @@ public class ProofDao {
     }
 
 
+    /**
+     * 获取不同类型的凭证
+     * @param pipelineId 流水线id
+     * @param type 类型
+     * @return 凭证列表
+     */
     public List<ProofEntity> findPipelineProof(String pipelineId,int type){
         String sql = " select pipeline_proof.* from pipeline_proof ";
         JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
@@ -92,6 +98,18 @@ public class ProofDao {
         }
         return  lists;
     }
+
+    /**
+     * 删除凭证关联信息
+     * @param proofId 凭证id
+     */
+    public void deleteProofTask(String proofId){
+        String sql = " delete from pipeline_proof_task ";
+        sql=sql.concat(" where pipeline_proof_task.proof_id = '"+ proofId +"'" );
+        JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
+        jdbcTemplate.execute(sql);
+    }
+
 
    //public List<ProofEntity> findPipelineProof(ProofQuery proofQuery,StringBuilder s){
    //    String userId = proofQuery.getUserId();

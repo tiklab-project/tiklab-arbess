@@ -42,23 +42,16 @@ public class PipelineExecLogServiceImpl implements PipelineExecLogService {
 
     @Override
     public List<PipelineExecLog> findAllLog(String historyId){
-        List<PipelineExecLog> allLog = findAllLog();
-        List<PipelineExecLog> pipelineExecLogList = new ArrayList<>();
-        if (allLog == null){
+        List<PipelineExecLogEntity> pipelineExecLogList = pipelineExecLogDao.findAllLog(historyId);
+        List<PipelineExecLog> list = BeanMapper.mapList(pipelineExecLogList, PipelineExecLog.class);
+        if (list == null){
            return null;
         }
-        for (PipelineExecLog pipelineExecLog : allLog) {
-            if (!pipelineExecLog.getHistoryId().equals(historyId)){
-                continue;
-            }
+        for (PipelineExecLog pipelineExecLog : list) {
             pipelineExecLog.setExecTime(formatDateTime(pipelineExecLog.getRunTime()));
-            pipelineExecLogList.add(pipelineExecLog);
         }
-        if (pipelineExecLogList.size() == 0){
-           return null;
-        }
-        pipelineExecLogList.sort(Comparator.comparing(PipelineExecLog::getTaskSort));
-        return pipelineExecLogList;
+        list.sort(Comparator.comparing(PipelineExecLog::getTaskSort));
+        return list;
     }
     //查询所有
     @Override

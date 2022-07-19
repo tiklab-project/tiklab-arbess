@@ -56,10 +56,10 @@ public class ProofServiceImpl implements ProofService{
         }
         ProofEntity proofEntity = BeanMapper.map(proof, ProofEntity.class);
         //判断凭证作用域
-        if (proof.getType() == 1){
-            return ProofDao.createProof(proofEntity);
-        }
         String proofId = ProofDao.createProof(proofEntity);
+        if (proof.getType() == 1){
+            return proofId;
+        }
         for (String s : proof.getProofList()) {
             proofTaskService.createProofTask(new ProofTask(proofId,s));
         }
@@ -70,6 +70,10 @@ public class ProofServiceImpl implements ProofService{
     @Override
     public void deleteProof(String proofId) {
         Proof proof = findOneProof(proofId);
+        //判断是否存在关联信息
+        if (proof.getType() == 2){
+            ProofDao.deleteProofTask(proofId);
+        }
         ProofDao.deleteProof(proofId);
         pipelineActionService.createActive(proof.getUser().getId(),null,"删除了凭证"+proof.getProofName());
     }
@@ -78,7 +82,19 @@ public class ProofServiceImpl implements ProofService{
     //更新
     @Override
     public void updateProof(Proof proof) {
-        ProofDao.updateProof(BeanMapper.map(proof, ProofEntity.class));
+        String proofId = proof.getProofId();
+        ProofDao.deleteProofTask(proofId);
+        if (proof.getType() == 1){
+            ProofDao.updateProof(BeanMapper.map(proof, ProofEntity.class));
+        }else {
+            if (proof.getProofList().size() == 0){
+                return;
+            }
+            for (String s : proof.getProofList()) {
+                proofTaskService.createProofTask(new ProofTask(proofId,s));
+            }
+        }
+
     }
 
     //查询
@@ -96,26 +112,7 @@ public class ProofServiceImpl implements ProofService{
         List<ProofEntity> proofEntityList = ProofDao.selectAllProof();
         List<Proof> proofList = BeanMapper.mapList(proofEntityList, Proof.class);
         joinTemplate.joinQuery(proofList);
-        for (Proof proof : proofList) {
-            if (proof.getUser() != null){
-                proof.setUsername(proof.getUser().getName());
-            }
-        }
         return proofList;
-    }
-
-    @Override
-    public HashSet<Proof> findAllUserProof(String userId) {
-        HashSet<Proof> proofSet = new HashSet<>();
-        List<Proof> proofList = findAllProof();
-        joinTemplate.joinQuery(proofList);
-        for (Proof proof : proofList) {
-            if (proof.getUser().getId().equals(userId)){
-                proof.setUsername(proof.getUser().getName());
-                proofSet.add(proof);
-            }
-        }
-        return proofSet;
     }
 
     @Override

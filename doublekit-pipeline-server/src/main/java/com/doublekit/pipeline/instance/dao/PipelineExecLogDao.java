@@ -3,7 +3,10 @@ package com.doublekit.pipeline.instance.dao;
 import com.doublekit.dal.jdbc.JdbcTemplate;
 import com.doublekit.dal.jpa.JpaTemplate;
 import com.doublekit.pipeline.instance.entity.PipelineExecLogEntity;
+import com.doublekit.pipeline.instance.model.PipelineExecLog;
+import com.doublekit.pipeline.setting.proof.entity.ProofEntity;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.stereotype.Repository;
 import java.util.List;
 
@@ -68,6 +71,18 @@ public class PipelineExecLogDao {
         sql = sql.concat(" where pipeline_log.history_id = '"+historyId +"'");
         JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
         jdbcTemplate.execute(sql);
+    }
+
+    /**
+     * 根据历史id查询日志
+     * @param historyId 历史id
+     * @return 历史信息
+     */
+    public List<PipelineExecLogEntity> findAllLog(String historyId){
+        String sql = "select pipeline_log.* from pipeline_log ";
+        sql = sql.concat(" where pipeline_log.history_id = '"+historyId +"'");
+        JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
+        return jdbcTemplate.query(sql,new BeanPropertyRowMapper(PipelineExecLogEntity.class));
     }
 
 }

@@ -68,10 +68,6 @@ public class Proof {
     @ApiProperty(name="type",desc="类型")
     private int type;
 
-    //用户名
-    @ApiProperty(name="proofUsername",desc="类型")
-    private String username;
-
     @ApiProperty(name="proofList",desc="流水线凭证列表")
     private List<String> proofList;
 
@@ -161,17 +157,6 @@ public class Proof {
 
     public void setUser(User user) {
         this.user = user;
-    }
-
-    public String getUsername() {
-        if (getUser() != null){
-            username = getUser().getName();
-        }
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
     }
 
     public List<String> getProofList() {
