@@ -80,16 +80,12 @@ public class ProofServiceImpl implements ProofService{
     public void updateProof(Proof proof) {
         String proofId = proof.getProofId();
         proofDao.deleteProofTask(proofId);
-        if (proof.getType() == 1){
-            proofDao.updateProof(BeanMapper.map(proof, ProofEntity.class));
-        }else {
-            if (proof.getProofList() == null){
-                return;
-            }
+        if (proof.getType() == 2 && proof.getProofList() != null){
             for (String s : proof.getProofList()) {
                 proofTaskService.createProofTask(new ProofTask(proofId,s));
             }
         }
+        proofDao.updateProof(BeanMapper.map(proof, ProofEntity.class));
 
     }
 
