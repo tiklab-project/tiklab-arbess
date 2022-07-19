@@ -2,25 +2,21 @@ package com.doublekit.pipeline.setting.proof.service;
 
 import com.doublekit.beans.BeanMapper;
 import com.doublekit.join.JoinTemplate;
-import com.doublekit.pipeline.definition.service.PipelineService;
 import com.doublekit.pipeline.execute.service.PipelineCodeServiceImpl;
 import com.doublekit.pipeline.instance.service.PipelineActionService;
-import com.doublekit.pipeline.instance.service.execAchieveService.CommonAchieveService;
 import com.doublekit.pipeline.setting.proof.dao.ProofDao;
 import com.doublekit.pipeline.setting.proof.entity.ProofEntity;
+import com.doublekit.pipeline.setting.proof.entity.ProofTaskEntity;
 import com.doublekit.pipeline.setting.proof.model.Proof;
-import com.doublekit.pipeline.setting.proof.model.ProofQuery;
 import com.doublekit.pipeline.setting.proof.model.ProofTask;
 import com.doublekit.rpc.annotation.Exporter;
-import com.doublekit.user.user.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import java.io.*;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -28,7 +24,7 @@ import java.util.List;
 public class ProofServiceImpl implements ProofService{
 
     @Autowired
-    ProofDao ProofDao;
+    ProofDao proofDao;
 
     @Autowired
     JoinTemplate joinTemplate;
@@ -56,7 +52,7 @@ public class ProofServiceImpl implements ProofService{
         }
         ProofEntity proofEntity = BeanMapper.map(proof, ProofEntity.class);
         //判断凭证作用域
-        String proofId = ProofDao.createProof(proofEntity);
+        String proofId = proofDao.createProof(proofEntity);
         if (proof.getType() == 1){
             return proofId;
         }
@@ -72,9 +68,9 @@ public class ProofServiceImpl implements ProofService{
         Proof proof = findOneProof(proofId);
         //判断是否存在关联信息
         if (proof.getType() == 2){
-            ProofDao.deleteProofTask(proofId);
+            proofDao.deleteProofTask(proofId);
         }
-        ProofDao.deleteProof(proofId);
+        proofDao.deleteProof(proofId);
         pipelineActionService.createActive(proof.getUser().getId(),null,"删除了凭证"+proof.getProofName());
     }
 
@@ -83,11 +79,11 @@ public class ProofServiceImpl implements ProofService{
     @Override
     public void updateProof(Proof proof) {
         String proofId = proof.getProofId();
-        ProofDao.deleteProofTask(proofId);
+        proofDao.deleteProofTask(proofId);
         if (proof.getType() == 1){
-            ProofDao.updateProof(BeanMapper.map(proof, ProofEntity.class));
+            proofDao.updateProof(BeanMapper.map(proof, ProofEntity.class));
         }else {
-            if (proof.getProofList().size() == 0){
+            if (proof.getProofList() == null){
                 return;
             }
             for (String s : proof.getProofList()) {
@@ -100,7 +96,7 @@ public class ProofServiceImpl implements ProofService{
     //查询
     @Override
     public Proof findOneProof(String proofId) {
-        ProofEntity proofEntity = ProofDao.findOneProof(proofId);
+        ProofEntity proofEntity = proofDao.findOneProof(proofId);
         Proof proof = BeanMapper.map(proofEntity, Proof.class);
         joinTemplate.joinQuery(proof);
         return proof;
@@ -109,7 +105,7 @@ public class ProofServiceImpl implements ProofService{
     //查询所有
     @Override
     public List<Proof> findAllProof() {
-        List<ProofEntity> proofEntityList = ProofDao.selectAllProof();
+        List<ProofEntity> proofEntityList = proofDao.selectAllProof();
         List<Proof> proofList = BeanMapper.mapList(proofEntityList, Proof.class);
         joinTemplate.joinQuery(proofList);
         return proofList;
@@ -117,46 +113,36 @@ public class ProofServiceImpl implements ProofService{
 
     @Override
     public List<Proof> findPipelineProof(String pipelineId,int type){
+        List<Proof> allProof;
+
+        //判断查询系统凭证还是项目凭证
         if (pipelineId.equals("")){
-            return findAllProof();
+             allProof = findAllProof();
+        }else {
+            allProof =  BeanMapper.mapList(proofDao.findPipelineProof(pipelineId, type), Proof.class);
         }
-        return BeanMapper.mapList(ProofDao.findPipelineProof(pipelineId,type), Proof.class);
-        //StringBuilder s = pipelineService.findUserPipelineId(proofQuery.getUserId());
-        //
-        //if (s == null){
-        //    return null;
-        //}
-        //if (proofQuery.getType() == 0 ){
-        //        if (proofQuery.getPipelineId() == null){
-        //            List<ProofEntity> allProof = ProofDao.findAllProof(proofQuery.getUserId(),s);
-        //            if (allProof == null){
-        //                return null;
-        //            }
-        //            List<Proof> proofs = BeanMapper.mapList(allProof, Proof.class);
-        //            joinTemplate.joinQuery(proofs);
-        //            return proofs;
-        //        }
-        //        List<ProofEntity> allProof = ProofDao.findPipelineAllProof(proofQuery.getUserId(), proofQuery.getPipelineId());
-        //        if (allProof == null){
-        //            return null;
-        //        }
-        //        List<Proof> proofs = BeanMapper.mapList(allProof, Proof.class);
-        //        joinTemplate.joinQuery(proofs);
-        //        return proofs;
-        //    }else {
-        //        List<ProofEntity> allProof = ProofDao.findPipelineProof(proofQuery,s);
-        //        if (allProof == null){
-        //            return null;
-        //        }
-        //        List<Proof> proofs = BeanMapper.mapList(allProof, Proof.class);
-        //        joinTemplate.joinQuery(proofs);
-        //        return proofs;
-        //    }
+
+        if (allProof == null){
+            return null;
+        }
+
+        for (Proof proof : allProof) {
+            List<String> arrayList = new ArrayList<>();
+            List<ProofTaskEntity> list = proofDao.findAllProofTask(proof.getProofId());
+            if (list.size() == 0){
+                continue;
+            }
+            for (ProofTaskEntity proofTaskEntity : list) {
+                arrayList.add(proofTaskEntity.getPipelineId());
+                proof.setProofList(arrayList);
+            }
+        }
+        return allProof;
     }
 
     @Override
     public List<Proof> selectProofList(List<String> idList) {
-        List<ProofEntity> proofEntityList = ProofDao.selectAllProofList(idList);
+        List<ProofEntity> proofEntityList = proofDao.selectAllProofList(idList);
         return BeanMapper.mapList(proofEntityList, Proof.class);
     }
 

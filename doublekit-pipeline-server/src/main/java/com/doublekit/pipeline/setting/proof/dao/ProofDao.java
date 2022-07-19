@@ -5,6 +5,7 @@ import com.doublekit.dal.jpa.JpaTemplate;
 import com.doublekit.pipeline.definition.dao.PipelineDao;
 import com.doublekit.pipeline.definition.model.Pipeline;
 import com.doublekit.pipeline.setting.proof.entity.ProofEntity;
+import com.doublekit.pipeline.setting.proof.entity.ProofTaskEntity;
 import com.doublekit.pipeline.setting.proof.model.ProofQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -108,6 +109,17 @@ public class ProofDao {
         sql=sql.concat(" where pipeline_proof_task.proof_id = '"+ proofId +"'" );
         JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
         jdbcTemplate.execute(sql);
+    }
+
+    /**
+     * 删除凭证关联信息
+     * @param proofId 凭证id
+     */
+    public List<ProofTaskEntity> findAllProofTask(String proofId){
+        String sql = " select pipeline_proof_task.* from pipeline_proof_task ";
+        sql=sql.concat(" where pipeline_proof_task.proof_id = '"+ proofId +"'" );
+        JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
+        return  jdbcTemplate.query(sql, new BeanPropertyRowMapper(ProofTaskEntity.class));
     }
 
 
