@@ -17,7 +17,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -214,7 +213,7 @@ public class DeployAchieveServiceImpl implements DeployAchieveService {
 
         if ((deployOrder == null || deployOrder.equals("")) && (startAddress == null || startAddress.equals("/")) ){
 
-            initializeDocker(session,pipelineProcess,pipelineExecHistoryList);
+            //initializeDocker(session,pipelineProcess,pipelineExecHistoryList);
 
              order = order +"cd"+" "+deployAddress+";"+"docker image build -t"+" "+pipelineName+"  .;"
                     +"docker run -itd -p"+" "+pipelineDeploy.getMappingPort()+":"+pipelineDeploy.getStartPort()+" "+pipelineName;
@@ -225,14 +224,18 @@ public class DeployAchieveServiceImpl implements DeployAchieveService {
             deployOrder = "cd "+" "+ deployAddress +";"+deployOrder;
             sshOrder(session, deployOrder, pipelineProcess, pipelineExecHistoryList);
             if (startAddress == null || startAddress.equals("/")) {
-                initializeDocker(session,pipelineProcess,pipelineExecHistoryList);
+
+                //initializeDocker(session,pipelineProcess,pipelineExecHistoryList);
+
                 order = order + "cd" + " " + deployAddress + ";" + "docker image build -t" + " " + pipelineName + "  .;"
                         + "docker run -itd -p" + " " + pipelineDeploy.getMappingPort() + ":" + pipelineDeploy.getStartPort() + " " + pipelineName;
                 sshOrder(session, order, pipelineProcess, pipelineExecHistoryList);
                 return;
             }
         }
-        initializeDocker(session,pipelineProcess,pipelineExecHistoryList);
+
+        //initializeDocker(session,pipelineProcess,pipelineExecHistoryList);
+
         order = order +"cd"+" "+deployAddress+"/"+startAddress+";"+"docker image build -t"+" "+pipelineName+"  .;"
                 +"docker run -itd -p"+" "+pipelineDeploy.getMappingPort()+":"+pipelineDeploy.getStartPort()+" "+pipelineName;
         sshOrder(session, order,pipelineProcess,pipelineExecHistoryList);

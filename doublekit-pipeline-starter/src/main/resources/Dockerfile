@@ -1,4 +1,4 @@
-FROM jdk:16.0.2
+FROM zcamy/darth_pipeline:jdk-16.0.2
 COPY . /app
 WORKDIR /app
 EXPOSE 8080

@@ -14,7 +14,7 @@ public class PipelineExecLogEntity {
     @Id
     @GeneratorValue
     @Column(name = "log_id")
-    private String pipelineLogId;
+    private String logId;
 
     //historyId
     @Column(name = "history_id")
@@ -43,12 +43,12 @@ public class PipelineExecLogEntity {
     private String taskAlias;
 
 
-    public String getPipelineLogId() {
-        return pipelineLogId;
+    public String getLogId() {
+        return logId;
     }
 
-    public void setPipelineLogId(String pipelineLogId) {
-        this.pipelineLogId = pipelineLogId;
+    public void setLogId(String logId) {
+        this.logId = logId;
     }
 
     public String getHistoryId() {

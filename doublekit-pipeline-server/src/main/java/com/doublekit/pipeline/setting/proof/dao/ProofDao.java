@@ -67,6 +67,22 @@ public class ProofDao {
         return jpaTemplate.findAll(ProofEntity.class);
     }
 
+    public List<ProofEntity> findPipelineProof(StringBuilder s){
+        JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
+        String sql = " select pipeline_proof.* from pipeline_proof ";
+        String concat = sql.concat("where pipeline_proof.type = 1");
+        List<ProofEntity> list = jdbcTemplate.query(concat, new BeanPropertyRowMapper(ProofEntity.class));
+        sql = sql.concat(" where pipeline_proof.type  = 2"
+                +" and pipeline_proof.proof_id "
+                +" in ( "
+                +" select pipeline_proof_task.proof_id from pipeline_proof_task "
+                +" where pipeline_proof_task.pipeline_id "
+                +" in ("+ s +")"
+                + ")");
+        List<ProofEntity> lists = jdbcTemplate.query(sql, new BeanPropertyRowMapper(ProofEntity.class));
+        lists.addAll(list);
+        return  lists;
+    }
 
     /**
      * 获取不同类型的凭证
@@ -91,7 +107,6 @@ public class ProofDao {
         sql = sql.concat( " and pipeline_proof.proof_id "
                 +" in (select pipeline_proof_task.proof_id from pipeline_proof_task "
                 +" where pipeline_proof_task.pipeline_id  = '"+ pipelineId+"')");
-
         List<ProofEntity> lists = jdbcTemplate.query(sql, new BeanPropertyRowMapper(ProofEntity.class));
 
         if (list != null){
@@ -121,22 +136,6 @@ public class ProofDao {
         JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
         return  jdbcTemplate.query(sql, new BeanPropertyRowMapper(ProofTaskEntity.class));
     }
-
-
-   //public List<ProofEntity> findPipelineProof(ProofQuery proofQuery,StringBuilder s){
-   //    String userId = proofQuery.getUserId();
-   //    int type = proofQuery.getType();
-   //    String sql = " select pipeline_proof.* from pipeline_proof ";
-   //    sql = sql.concat(" where pipeline_proof.proof_scope  = " + type
-   //            + " and pipeline_proof.proof_id "
-   //            + " in (select pipeline_proof.proof_id from pipeline_proof "
-   //            + " where pipeline_proof.user_id  = '"+ userId +"' "
-   //            + " or pipeline_proof.type = 1 "
-   //            + " or pipeline_proof.pipeline_id"
-   //            + " in ("+s+"))");
-   //    JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
-   //    return  jdbcTemplate.query(sql, new BeanPropertyRowMapper(ProofEntity.class));
-   //}
 
     public List<ProofEntity> selectAllProofList(List<String> idList){
         return jpaTemplate.findList(ProofEntity.class,idList);

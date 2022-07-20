@@ -2,6 +2,7 @@ package com.doublekit.pipeline.setting.proof.service;
 
 import com.doublekit.beans.BeanMapper;
 import com.doublekit.join.JoinTemplate;
+import com.doublekit.pipeline.definition.service.PipelineService;
 import com.doublekit.pipeline.execute.service.PipelineCodeServiceImpl;
 import com.doublekit.pipeline.instance.service.PipelineActionService;
 import com.doublekit.pipeline.setting.proof.dao.ProofDao;
@@ -31,6 +32,9 @@ public class ProofServiceImpl implements ProofService{
 
     @Autowired
     ProofTaskService proofTaskService;
+
+    @Autowired
+    PipelineService pipelineService;
 
     @Autowired
     PipelineActionService pipelineActionService;
@@ -103,19 +107,21 @@ public class ProofServiceImpl implements ProofService{
     public List<Proof> findAllProof() {
         List<ProofEntity> proofEntityList = proofDao.selectAllProof();
         List<Proof> proofList = BeanMapper.mapList(proofEntityList, Proof.class);
-        joinTemplate.joinQuery(proofList);
+        //joinTemplate.joinQuery(proofList);
         return proofList;
     }
 
     @Override
-    public List<Proof> findPipelineProof(String pipelineId,int type){
+    public List<Proof> findPipelineProof(String userId,String pipelineId,int type){
         List<Proof> allProof;
 
+        StringBuilder s = pipelineService.findUserPipelineId(userId);
         //判断查询系统凭证还是项目凭证
         if (pipelineId.equals("")){
-             allProof = findAllProof();
+             allProof = BeanMapper.mapList(proofDao.findPipelineProof(s), Proof.class);
         }else {
-            allProof =  BeanMapper.mapList(proofDao.findPipelineProof(pipelineId, type), Proof.class);
+            allProof =  BeanMapper.mapList(proofDao.findPipelineProof(pipelineId,type), Proof.class);
+
         }
 
         if (allProof == null){

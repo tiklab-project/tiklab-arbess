@@ -2,7 +2,6 @@ package com.doublekit.pipeline.instance.service.execAchieveImpl;
 
 import com.doublekit.pipeline.definition.model.Pipeline;
 import com.doublekit.pipeline.definition.model.PipelineConfigure;
-
 import com.doublekit.pipeline.definition.service.PipelineCommonService;
 import com.doublekit.pipeline.instance.model.PipelineExecHistory;
 import com.doublekit.pipeline.instance.model.PipelineExecLog;
@@ -12,12 +11,10 @@ import com.doublekit.pipeline.instance.service.PipelineExecLogService;
 import com.doublekit.pipeline.instance.service.execAchieveService.CommonAchieveService;
 import com.doublekit.rpc.annotation.Exporter;
 import com.doublekit.user.user.model.User;
-import com.thoughtworks.xstream.mapper.Mapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -229,7 +226,7 @@ public class CommonAchieveServiceImpl implements CommonAchieveService {
         pipelineExecLog.setTaskType(pipelineConfigure.getTaskType());
         pipelineExecLog.setRunLog("");
         String logId = pipelineExecLogService.createLog(pipelineExecLog);
-        pipelineExecLog.setPipelineLogId(logId);
+        pipelineExecLog.setLogId(logId);
         return pipelineExecLog;
     }
 
@@ -241,6 +238,7 @@ public class CommonAchieveServiceImpl implements CommonAchieveService {
     @Override
     public PipelineExecHistory initializeHistory(String historyId,Pipeline pipeline,String userId) {
         PipelineExecHistory pipelineExecHistory = new PipelineExecHistory();
+        //初始化基本信息
         String time = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
         pipelineExecHistory.setCreateTime(time);
         pipelineExecHistory.setRunWay(1);

@@ -52,7 +52,7 @@ public interface ProofService {
      * @return 凭证列表
      */
     //List<Proof> findPipelineProof(ProofQuery proofQuery);
-    List<Proof> findPipelineProof(String pipelineId,int type);
+    List<Proof> findPipelineProof(String userId,String pipelineId,int type);
 
     /**
      * 查询所有凭证

@@ -9,7 +9,6 @@ import com.doublekit.pipeline.execute.model.CodeGit.FileTree;
 import com.doublekit.pipeline.execute.model.CodeGit.GitCommit;
 import com.doublekit.pipeline.execute.model.PipelineCode;
 import com.doublekit.pipeline.execute.service.PipelineCodeService;
-import com.doublekit.pipeline.instance.service.execAchieveService.CommonAchieveService;
 import com.doublekit.pipeline.setting.proof.model.Proof;
 import com.doublekit.rpc.annotation.Exporter;
 import org.apache.commons.lang3.time.DateUtils;
@@ -100,7 +99,6 @@ public class PipelineWorkSpaceServiceImpl implements  PipelineWorkSpaceService {
         return null;
     }
 
-
     public List<List<GitCommit>> git(String pipelineId) {
         List<GitCommit> list = new ArrayList<>();
         Pipeline pipeline = pipelineService.findPipeline(pipelineId);
@@ -143,7 +141,6 @@ public class PipelineWorkSpaceServiceImpl implements  PipelineWorkSpaceService {
             }
             return returnValue(list);
         } catch (IOException | GitAPIException e) {
-            logger.info("流水线.git文件地址找不到，或者没有提交信息");
             return null;
         }
     }

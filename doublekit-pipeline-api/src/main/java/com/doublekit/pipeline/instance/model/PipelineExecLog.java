@@ -15,8 +15,8 @@ import com.doublekit.join.annotation.Join;
 public class PipelineExecLog {
 
     //日志id
-    @ApiProperty(name="pipelineLogId",desc="日志id")
-    private String pipelineLogId;
+    @ApiProperty(name="logId",desc="日志id")
+    private String logId;
 
     //historyId
     @ApiProperty(name = "historyId",desc = "历史Id")
@@ -50,12 +50,12 @@ public class PipelineExecLog {
     private String execTime;
 
 
-    public String getPipelineLogId() {
-        return pipelineLogId;
+    public String getLogId() {
+        return logId;
     }
 
-    public void setPipelineLogId(String pipelineLogId) {
-        this.pipelineLogId = pipelineLogId;
+    public void setLogId(String logId) {
+        this.logId = logId;
     }
 
     public String getHistoryId() {
