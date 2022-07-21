@@ -72,6 +72,9 @@ public class ProofDao {
         String sql = " select pipeline_proof.* from pipeline_proof ";
         String concat = sql.concat("where pipeline_proof.type = 1");
         List<ProofEntity> list = jdbcTemplate.query(concat, new BeanPropertyRowMapper(ProofEntity.class));
+        if (s.toString().equals("")){
+            return list;
+        }
         sql = sql.concat(" where pipeline_proof.type  = 2"
                 +" and pipeline_proof.proof_id "
                 +" in ( "

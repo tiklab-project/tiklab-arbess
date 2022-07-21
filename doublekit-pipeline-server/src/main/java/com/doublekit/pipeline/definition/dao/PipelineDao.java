@@ -5,8 +5,6 @@ import com.doublekit.dal.jpa.JpaTemplate;
 import com.doublekit.dal.jpa.criterial.condition.QueryCondition;
 import com.doublekit.dal.jpa.criterial.conditionbuilder.QueryBuilders;
 import com.doublekit.pipeline.definition.entity.PipelineEntity;
-import com.doublekit.user.user.entity.DmUserEntity;
-import com.doublekit.user.user.model.DmUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.stereotype.Repository;
@@ -90,14 +88,6 @@ public class PipelineDao {
         QueryCondition queryCondition = QueryBuilders.createQuery(PipelineEntity.class)
                 .like("pipelineName", pipelineName).get();
         return jpaTemplate.findList(queryCondition,PipelineEntity.class);
-    }
-
-    //查询拥有此流水线的用户
-    public List<DmUserEntity> findPipelineUser(String PipelineId){
-        QueryCondition queryCondition = QueryBuilders.createQuery(DmUserEntity.class)
-                .eq("domainId",PipelineId)
-                .get();
-        return jpaTemplate.findList(queryCondition, DmUserEntity.class);
     }
 
 

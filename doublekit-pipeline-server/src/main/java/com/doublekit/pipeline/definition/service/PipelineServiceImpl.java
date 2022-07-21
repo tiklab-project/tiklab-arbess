@@ -8,12 +8,10 @@ import com.doublekit.pipeline.definition.model.Pipeline;
 import com.doublekit.pipeline.definition.model.PipelineConfigure;
 import com.doublekit.pipeline.definition.model.PipelineStatus;
 import com.doublekit.pipeline.instance.model.PipelineExecHistory;
-import com.doublekit.pipeline.instance.model.PipelineExecState;
 import com.doublekit.pipeline.instance.service.PipelineActionService;
 import com.doublekit.pipeline.instance.service.PipelineExecHistoryService;
 import com.doublekit.pipeline.instance.service.PipelineOpenService;
 import com.doublekit.rpc.annotation.Exporter;
-import com.doublekit.user.user.entity.DmUserEntity;
 import com.doublekit.user.user.model.DmUser;
 import com.doublekit.user.user.model.User;
 import com.doublekit.user.user.service.DmUserService;
@@ -167,7 +165,7 @@ public class PipelineServiceImpl implements PipelineService{
     @Override
     public List<Pipeline> findUserPipeline(String userId){
         StringBuilder s = findUserPipelineId(userId);
-        if (s == null){
+        if (s.toString().equals("")){
             return null;
         }
         List<PipelineEntity> userPipeline = pipelineDao.findUserPipeline(s);
@@ -179,7 +177,7 @@ public class PipelineServiceImpl implements PipelineService{
     public StringBuilder findUserPipelineId(String userId){
         StringBuilder s = new StringBuilder();
         List<DmUser> allDmUser = dmUserService.findAllDmUser();
-        if (allDmUser != null){
+        if (allDmUser != null && allDmUser.size()!=0){
             for (DmUser dmUser : allDmUser) {
                 if (!dmUser.getUser().getId().equals(userId)){
                     continue;
@@ -246,18 +244,10 @@ public class PipelineServiceImpl implements PipelineService{
         Date lastTime = DateUtils.addDays(new Date(), -7);
         Date nowTime = DateUtils.addDays(new Date(), 1);
         StringBuilder s = findUserPipelineId(userId);
-        if (s == null){
+        if (s.toString().equals("")){
             return null;
         }
         return pipelineExecHistoryService.findAllUserHistory(formatter.format(lastTime),formatter.format(nowTime),s);
-    }
-
-    //获取拥有此流水线的用户
-    @Override
-    public List<DmUser> findPipelineUser(String PipelineId){
-        List<DmUser> dmUser = BeanMapper.mapList(pipelineDao.findPipelineUser(PipelineId), DmUser.class);
-        joinTemplate.joinQuery(dmUser);
-        return dmUser;
     }
 
 

@@ -47,6 +47,13 @@
             <artifactId>doublekit-dss-spring-boot-starter</artifactId>
         </dependency>
 
+<!--        &lt;!&ndash; https://mvnrepository.com/artifact/com.spotify/docker-maven-plugin &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>com.spotify</groupId>-->
+<!--            <artifactId>docker-maven-plugin</artifactId>-->
+<!--            <version>1.2.2</version>-->
+<!--        </dependency>-->
+
 
 
     </dependencies>
