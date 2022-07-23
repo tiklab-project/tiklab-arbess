@@ -121,7 +121,6 @@ public class ProofServiceImpl implements ProofService{
              allProof = BeanMapper.mapList(proofDao.findPipelineProof(s), Proof.class);
         }else {
             allProof =  BeanMapper.mapList(proofDao.findPipelineProof(pipelineId,type), Proof.class);
-
         }
 
         if (allProof == null){

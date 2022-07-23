@@ -80,23 +80,17 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
     //根据流水线id查询所有历史
     @Override
     public List<PipelineExecHistory> findAllHistory(String pipelineId) {
-        List<PipelineExecHistory> allHistory = findAllHistory();
-        List<PipelineExecHistory> historyList = new ArrayList<>();
-        if (allHistory == null){
-           return null;
+        //List<PipelineExecHistory> allHistory = findAllHistory();
+        List<PipelineExecHistoryEntity> list = pipelineExecHistoryDao.findAllHistory(pipelineId);
+        if (list == null){
+            return null;
         }
+        List<PipelineExecHistory> allHistory = BeanMapper.mapList(list, PipelineExecHistory.class);
         for (PipelineExecHistory pipelineExecHistory : allHistory) {
-            if (pipelineExecHistory.getPipeline() == null){
-                continue;
-            }
-            if (pipelineExecHistory.getPipeline().getPipelineId().equals(pipelineId)
-                    && pipelineExecHistory.getFindState() == 1){
-                pipelineExecHistory.setExecTime(formatDateTime(pipelineExecHistory.getRunTime()));
-                historyList.add(pipelineExecHistory);
-            }
+            pipelineExecHistory.setExecTime(formatDateTime(pipelineExecHistory.getRunTime()));
         }
-        historyList.sort(Comparator.comparing(PipelineExecHistory::getCreateTime,Comparator.reverseOrder()));
-        return historyList;
+        allHistory.sort(Comparator.comparing(PipelineExecHistory::getCreateTime,Comparator.reverseOrder()));
+        return allHistory;
     }
 
     //查询用户所有历史
@@ -179,6 +173,10 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
     public Pagination<PipelineExecHistory> findPageHistory(PipelineHistoryQuery PipelineHistoryQuery){
         Pagination<PipelineExecHistoryEntity> pagination = pipelineExecHistoryDao.findPageHistory(PipelineHistoryQuery);
         List<PipelineExecHistory> pipelineExecHistories = BeanMapper.mapList(pagination.getDataList(), PipelineExecHistory.class);
+        if (pipelineExecHistories == null){
+            return null;
+        }
+        pipelineExecHistories.removeIf(pipelineExecHistory -> pipelineExecHistory.getFindState() == 0);
         joinTemplate.joinQuery(pipelineExecHistories);
         return PaginationBuilder.build(pagination,pipelineExecHistories);
     }

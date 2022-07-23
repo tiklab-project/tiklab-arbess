@@ -250,17 +250,26 @@ public class PipelineServiceImpl implements PipelineService{
         return pipelineExecHistoryService.findAllUserHistory(formatter.format(lastTime),formatter.format(nowTime),s);
     }
 
-
-
-
-
-
-
-
-
-
-
-
+    /**
+     * 获取拥有此流水线的用户
+     *
+     * @param pipelineId 流水线id
+     * @return 用户信息
+     */
+    @Override
+    public List<DmUser> findPipelineUser(String pipelineId) {
+        List<DmUser> allDmUser = dmUserService.findAllDmUser();
+        if (allDmUser == null){
+            return null;
+        }
+        List<DmUser> dmUsers = new ArrayList<>();
+        for (DmUser dmUser : allDmUser) {
+            if (dmUser.getDomainId().equals(pipelineId)){
+                dmUsers.add(dmUser);
+            }
+        }
+        return dmUsers;
+    }
 
 
 }

@@ -105,4 +105,14 @@ public class PipelineController {
         return Result.ok(pipelineQueryList);
     }
 
+
+    @RequestMapping(path="/findPipelineUser",method = RequestMethod.POST)
+    @ApiMethod(name = "findPipelineUser",desc = "查询此拥有流水线的用户")
+    @ApiParam(name = "pipelineId",desc = "流水线id",required = true)
+    public Result<List<DmUser>> findPipelineUser(@NotNull String pipelineId){
+
+        List<DmUser> dmUser = pipelineService.findPipelineUser(pipelineId);
+
+        return Result.ok(dmUser);
+    }
 }

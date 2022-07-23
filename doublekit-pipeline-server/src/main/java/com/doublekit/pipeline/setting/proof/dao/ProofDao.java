@@ -101,7 +101,7 @@ public class ProofDao {
             String concat = sql.concat("where pipeline_proof.type = 1");
             list = jdbcTemplate.query(concat, new BeanPropertyRowMapper(ProofEntity.class));
         }
-        sql = sql.concat(" where pipeline_proof.type  = 2");
+        sql = sql.concat(" where pipeline_proof.type  = 2 or pipeline_proof.type = 1");
         sql = switch (type) {
             case 1 -> sql.concat(" and pipeline_proof.proof_scope = 1 or pipeline_proof.proof_scope = 4");
             case 2, 3, 5 -> sql.concat(" and pipeline_proof.proof_scope = " + type);

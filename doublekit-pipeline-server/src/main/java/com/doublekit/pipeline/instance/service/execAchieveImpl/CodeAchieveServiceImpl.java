@@ -58,6 +58,9 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
         PipelineExecHistory pipelineExecHistory = pipelineProcess.getPipelineExecHistory();
         PipelineConfigure pipelineConfigure = pipelineProcess.getPipelineConfigure();
         long beginTime = new Timestamp(System.currentTimeMillis()).getTime();
+        if (pipelineExecHistory.getRunLog() == null){
+            pipelineExecHistory.setRunLog("");
+        }
         pipelineExecHistory.setRunLog("流水线开始执行。。。。。。。");
         pipelineExecHistoryList.add(pipelineExecHistory);
 
@@ -70,11 +73,9 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
         File file = new File(path);
 
         //删除旧的代码
-        Boolean deleteFile = pipelineCommonService.deleteFile(file);
-        if (deleteFile){
-            pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+"\n开始分配代码空间。");
-            pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+"\n代码空间分配成功。\n");
-        }
+        pipelineCommonService.deleteFile(file);
+        pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+"\n开始分配代码空间。");
+        pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+"\n代码空间分配成功。\n");
         pipelineExecHistoryList.add(pipelineExecHistory);
 
         //获取凭证
@@ -140,6 +141,9 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
                     sshClone(pipelineCode.getCodeAddress(), file.getAbsolutePath(), path, pipelineCode.getCodeBranch());
                     file.deleteOnExit();
                 }else {
+                    if (proof.getProofUsername() == null || proof.getProofPassword() == null){
+                        throw new IOException("账户或密码不能为空。");
+                    }
                     UsernamePasswordCredentialsProvider provider = new UsernamePasswordCredentialsProvider(proof.getProofUsername(), proof.getProofPassword());
                     clone(path, pipelineCode.getCodeAddress(), provider, pipelineCode.getCodeBranch());
                 }
@@ -161,11 +165,9 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
      * @param credentialsProvider 凭证
      * @param branch 分支
      */
-    private void clone(String gitAddress, String gitUrl, CredentialsProvider credentialsProvider, String branch)
-            throws GitAPIException, JGitInternalException {
-        Git git;
+    private void clone(String gitAddress, String gitUrl, CredentialsProvider credentialsProvider, String branch) throws GitAPIException, JGitInternalException {
         File fileAddress = new File(gitAddress);
-        git = Git.cloneRepository()
+        Git git = Git.cloneRepository()
                 .setURI(gitUrl)
                 .setCredentialsProvider(credentialsProvider)
                 .setDirectory(fileAddress)

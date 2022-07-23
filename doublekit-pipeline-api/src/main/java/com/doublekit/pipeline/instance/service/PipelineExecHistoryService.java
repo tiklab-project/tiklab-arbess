@@ -94,6 +94,7 @@ public interface PipelineExecHistoryService {
     @FindAll
     List<PipelineExecHistory> findAllHistory(String pipelineId);
 
+
     @FindList
     List<PipelineExecHistory> findHistoryList(List<String> idList);
 

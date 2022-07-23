@@ -46,13 +46,11 @@
             <groupId>com.doublekit</groupId>
             <artifactId>doublekit-dss-spring-boot-starter</artifactId>
         </dependency>
-
-<!--        &lt;!&ndash; https://mvnrepository.com/artifact/com.spotify/docker-maven-plugin &ndash;&gt;-->
-<!--        <dependency>-->
-<!--            <groupId>com.spotify</groupId>-->
-<!--            <artifactId>docker-maven-plugin</artifactId>-->
-<!--            <version>1.2.2</version>-->
-<!--        </dependency>-->
+        <dependency>
+            <groupId>com.doublekit</groupId>
+            <artifactId>doublekit-privilege-spring-boot-starter</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
 
 
@@ -89,6 +87,26 @@
                     </execution>
                 </executions>
             </plugin>
+
+            <plugin>
+                <groupId>com.spotify</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+                <version>0.4.13</version>
+                <configuration>
+                    <imageName>pipeline:1.0.0</imageName>
+                    <!--Dockerfile文件位置-->
+                    <dockerDirectory>./</dockerDirectory>
+<!--                        <resources>-->
+<!--                            <resource>-->
+<!--                                <targetPath>./</targetPath>-->
+<!--                                <directory>${project.build.directory}</directory>-->
+<!--                                <include>${project.build.finalName}-distribution.zip</include>-->
+<!--                            </resource>-->
+<!--                        </resources>-->
+                </configuration>
+            </plugin>
+
+
         </plugins>
     </build>
 

@@ -114,6 +114,20 @@ public class PipelineExecHistoryDao {
         return  jdbcTemplate.query(sql, new BeanPropertyRowMapper(PipelineExecHistoryEntity.class));
     }
 
+
+    /**
+     * 根据流水线id查询所有历史
+     * @param pipelineId 流水线id
+     * @return 历史集合
+     */
+    public List<PipelineExecHistoryEntity> findAllHistory(String pipelineId){
+        String sql = "select pipeline_history.* from pipeline_history  ";
+        sql = sql.concat(" where pipeline_history.pipeline_id   = '"+pipelineId+"' " +
+                " and pipeline_history.find_state = 1 ");
+        JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
+        return  jdbcTemplate.query(sql, new BeanPropertyRowMapper(PipelineExecHistoryEntity.class));
+    }
+
     /**
      * 获取最近成功的历史信息
      * @param pipelineId 流水线id
