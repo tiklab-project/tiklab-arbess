@@ -64,9 +64,8 @@ public class PipelineWorkSpaceServiceImpl implements  PipelineWorkSpaceService {
     @Override
     public List<FileTree> fileTree(String pipelineId,String userId){
         Pipeline pipeline = pipelineService.findPipeline(pipelineId);
-        pipelineOpenService.findOpen(userId,pipeline);
         if (pipeline == null)return null;
-
+        pipelineOpenService.findOpen(userId,pipeline);
         //设置拉取地址
         String path = pipelineCommonService.getFileAddress()+pipeline.getPipelineName();
         List<FileTree> trees = new ArrayList<>();

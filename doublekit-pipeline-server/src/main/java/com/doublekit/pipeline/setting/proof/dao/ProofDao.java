@@ -96,25 +96,33 @@ public class ProofDao {
     public List<ProofEntity> findPipelineProof(String pipelineId,int type){
         String sql = " select pipeline_proof.* from pipeline_proof ";
         JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
-        List<ProofEntity> list = null;
+
         if (type == 0 ){
-            String concat = sql.concat("where pipeline_proof.type = 1");
-            list = jdbcTemplate.query(concat, new BeanPropertyRowMapper(ProofEntity.class));
+            sql = sql.concat("where pipeline_proof.type = 1");
+            return jdbcTemplate.query(sql, new BeanPropertyRowMapper(ProofEntity.class));
         }
-        sql = sql.concat(" where pipeline_proof.type  = 2 or pipeline_proof.type = 1");
-        sql = switch (type) {
-            case 1 -> sql.concat(" and pipeline_proof.proof_scope = 1 or pipeline_proof.proof_scope = 4");
-            case 2, 3, 5 -> sql.concat(" and pipeline_proof.proof_scope = " + type);
-            default -> sql;
+
+        String scope = "";
+           scope = switch (type) {
+            case 1 -> scope.concat(" and pipeline_proof.proof_scope = 1 or pipeline_proof.proof_scope = 4");
+            case 2, 3, 5 -> scope.concat(" and pipeline_proof.proof_scope = " + type);
+            default -> scope;
         };
-        sql = sql.concat( " and pipeline_proof.proof_id "
+
+        //项目凭证
+        String type1 = "select pipeline_proof.* from pipeline_proof  where pipeline_proof.type  = 2";
+        type1 = type1.concat(scope + " and pipeline_proof.proof_id "
                 +" in (select pipeline_proof_task.proof_id from pipeline_proof_task "
                 +" where pipeline_proof_task.pipeline_id  = '"+ pipelineId+"')");
-        List<ProofEntity> lists = jdbcTemplate.query(sql, new BeanPropertyRowMapper(ProofEntity.class));
+        List<ProofEntity> lists = jdbcTemplate.query(type1, new BeanPropertyRowMapper(ProofEntity.class));
 
-        if (list != null){
-            lists.addAll(list);
-        }
+        //全局凭证
+        String types = "select pipeline_proof.* from pipeline_proof where pipeline_proof.type = 1";
+        types = types.concat(scope);
+        List<ProofEntity> proofEntityList = jdbcTemplate.query(types, new BeanPropertyRowMapper(ProofEntity.class));
+
+        lists.addAll(proofEntityList);
+
         return  lists;
     }
 

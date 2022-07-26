@@ -1,9 +1,11 @@
 #!/bin/sh
 
-#镜像名
-imageName=zcamy/darth_pipeline:pipeline-1.0.0
-#容器名
-containerName=pipeline
+#应用名称
+name=pipeline
+#版本
+version=1.0.0
+#数据库密码
+mysqlWord=darth2020
 #应用端口
 port=8080
 #应用映射端口
@@ -11,31 +13,54 @@ mappingPort=9000
 #数据库映射端口
 mysqlMapping=5000
 
+#镜像名
+imageName=$name-$version
 #工作目录
-workdir=/usr/local/doublekit-$containerName-1.0.0-SNAPSHOT/bin
+workdir=/usr/local/doublekit-$imageName-SNAPSHOT/bin
 
-echo "启动${containerName}镜像"
+#镜像文件地址
+path=$(dirname $(readlink -f "$0"))
 
-docker run -tid --name $containerName \
-  -p $mysqlMapping:3306 -p $mappingPort:$port \
+#获取镜像id
+imageId=`docker images -q --filter reference=$imageName`
+
+echo "==========================================="
+if [ $imageId ]; then
+    echo "镜像存在"
+else
+    echo "加载镜像"$imageName
+    cd $path;docker load -i $name-$version.tar
+    echo "镜像加载完成"$imageName
+fi
+echo "==========================================="
+
+
+
+echo "启动${name}镜像"
+
+docker run -tid \
+  --name $name \
+  -p $mysqlMapping:3306 \
+  -p $mappingPort:$port \
+  -e MYSQL_ROOT_PASSWORD=$mysqlWord \
   -v /sys/fs/cgroup:/sys/fs/cgroup \
+  -v /root/mysql/datadir:/var/lib/mysql \
+  -v /root/mysql/conf:/etc/mysql/conf.d \
+  -v /root/mysql/logs:/var/log/mysql \
   --privileged=true \
-  $imageName \
-  /usr/sbin/init
+  zcamy/doublekit:$imageName
 
-echo "${containerName}镜像启动成功"
+# java --list-modules      jmap -histo 11724
 
-containerId=`docker ps -aqf "name=${containerName}"`
+echo "${name}镜像启动成功"
+
+containerId=`docker ps -aqf "name=${name}"`
 
 echo $containerId
 
-echo "开始启动${containerName}"
+echo "开始启动${name}"
 docker exec -it $containerId /bin/bash -c "cd ${workdir} && sh startup.sh"
-echo "${containerName}启动成功"
-
-echo "开始初始化数据库"
-docker exec -it $containerId /bin/bash -c "cd ${workdir} && sh mysqlstart.sh"
-echo "数据库初始化成功"
+echo "${name}启动成功"
 
 
 
