@@ -1,4 +1,4 @@
-FROM zcamy/doublekit:darth-1.0.0
+FROM hahahh
 ADD /target/doublekit-pipeline-1.0.0-SNAPSHOT-distribution.tar.gz /usr/local
 WORKDIR /usr/local/doublekit-pipeline-1.0.0-SNAPSHOT
 EXPOSE 8080

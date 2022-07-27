@@ -28,9 +28,10 @@ public class GiteeApiController {
 
     @RequestMapping(path="/url",method = RequestMethod.POST)
     @ApiMethod(name = "getCode",desc = "返回获取code的地址")
-    public Result<String> getCode(){
+    @ApiParam(name = "callbackUri",desc = "回调地址",required = true)
+    public Result<String> getCode(String callbackUri){
 
-        String git = codeGiteeApiService.getCode();
+        String git = codeGiteeApiService.getCode(callbackUri);
 
         return Result.ok(git);
     }
@@ -38,8 +39,8 @@ public class GiteeApiController {
     @RequestMapping(path="/code",method = RequestMethod.POST)
     @ApiMethod(name = "getAccessToken",desc = "获取accessToken")
     @ApiParam(name = "code",desc = "code",required = true)
-    public Result<Map<String, String>> getAccessToken(@NotNull String code) throws IOException {
-        Map<String, String> accessToken = codeGiteeApiService.getAccessToken(code);
+    public Result<Map<String, String>> getAccessToken(@NotNull String code,String callbackUri) throws IOException {
+        Map<String, String> accessToken = codeGiteeApiService.getAccessToken(code,callbackUri);
         return Result.ok(accessToken);
     }
 

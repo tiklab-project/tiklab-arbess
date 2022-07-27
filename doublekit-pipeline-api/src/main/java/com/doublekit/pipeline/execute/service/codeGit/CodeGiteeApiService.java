@@ -18,14 +18,14 @@ public interface CodeGiteeApiService {
      * 获取code
      * @return 获取code的Url
      */
-    String getCode();
+    String getCode(String callbackUri);
 
     /**
      * 根据code获取AccessToken
      * @param code code
      * @return AccessToken
      */
-    Map<String, String> getAccessToken(String code)  throws IOException ;
+    Map<String, String> getAccessToken(String code,String callbackUri)  throws IOException ;
 
     /**
      * 获取用户所有仓库

@@ -170,8 +170,11 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
     }
 
     @Override
-    public Pagination<PipelineExecHistory> findPageHistory(PipelineHistoryQuery PipelineHistoryQuery){
-        Pagination<PipelineExecHistoryEntity> pagination = pipelineExecHistoryDao.findPageHistory(PipelineHistoryQuery);
+    public Pagination<PipelineExecHistory> findPageHistory(PipelineHistoryQuery pipelineHistoryQuery){
+        if (pipelineHistoryQuery.getPipelineId() == null){
+            return null;
+        }
+        Pagination<PipelineExecHistoryEntity> pagination = pipelineExecHistoryDao.findPageHistory(pipelineHistoryQuery);
         List<PipelineExecHistory> pipelineExecHistories = BeanMapper.mapList(pagination.getDataList(), PipelineExecHistory.class);
         if (pipelineExecHistories == null){
             return null;

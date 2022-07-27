@@ -19,8 +19,10 @@ import org.springframework.web.client.RestTemplate;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -42,18 +44,22 @@ public class CodeGiteeApiServiceImpl implements CodeGiteeApiService {
     private static final Logger logger = LoggerFactory.getLogger(CodeGiteeApiServiceImpl.class);
 
 
-    public String getCode(){
+    public String getCode(String callbackUri){
+        String encode = getURLEncoderString(callbackUri, "UTF-8");
         return  codeGiteeApi.getCode();
     }
 
     //获取accessToken
     @Override
-    public Map<String, String>  getAccessToken(String code) throws IOException {
+    public Map<String, String>  getAccessToken(String code,String callbackUri) throws IOException {
 
         logger.info("获取code凭证 ：" +code);
         if (code == null || code.equals("undefined")){
             return null;
         }
+
+        String encode = getURLEncoderString(callbackUri, "encode");
+
         String url = codeGiteeApi.getAccessToken(code);
         String post = request(url, "POST");
         Map<String, String> map = new HashMap<>();
@@ -68,6 +74,16 @@ public class CodeGiteeApiServiceImpl implements CodeGiteeApiService {
         map.put("refreshToken", refresh_token);
         return map;
 
+    }
+
+    public  String getURLEncoderString(String str, String encode) {
+        String result = null;
+        try {
+            result = URLEncoder.encode(str, encode);
+        } catch (UnsupportedEncodingException e) {
+           return null;
+        }
+        return result;
     }
 
 

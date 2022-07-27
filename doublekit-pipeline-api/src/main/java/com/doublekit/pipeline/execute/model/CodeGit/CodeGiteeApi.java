@@ -22,20 +22,6 @@ public class CodeGiteeApi {
     @Value("${giteeCallbackUrl}")
     private String callbackUri;
 
-    //public String getClientId() {
-    //    //第三方应用id
-    //    return "84e4a3626d037a717fb4952f09abdf2624ce28a0beffb92cb4eac67479e05b34";
-    //}
-    //
-    //public String getCallback_uri() {
-    //    //回调地址
-    //    return "http%3A%2F%2F192.168.10.23%3A3004%2F%23%2Findex%2Ftask%2Fconfig";
-    //}
-    //
-    //public String getClient_secret() {
-    //    //第三方应用秘钥
-    //    return "f38167d54948136b9ca4e4ca454573b3c3d485db575a91a0e784a04599a20054";
-    //}
 
     public String getCode() {
         //获取code

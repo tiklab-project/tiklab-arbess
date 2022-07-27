@@ -136,7 +136,8 @@ public class PipelineServiceImpl implements PipelineService{
     //查询
     @Override
     public Pipeline findPipeline(String pipelineId) {
-        Pipeline pipeline = BeanMapper.map(pipelineDao.findPipeline(pipelineId), Pipeline.class);
+        PipelineEntity pipelineEntity = pipelineDao.findPipeline(pipelineId);
+        Pipeline pipeline = BeanMapper.map(pipelineEntity, Pipeline.class);
         joinTemplate.joinQuery(pipeline);
         return pipeline;
     }

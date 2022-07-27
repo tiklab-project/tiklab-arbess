@@ -106,9 +106,9 @@ public class ProofServiceImpl implements ProofService{
     @Override
     public List<Proof> findAllProof() {
         List<ProofEntity> proofEntityList = proofDao.selectAllProof();
-        List<Proof> proofList = BeanMapper.mapList(proofEntityList, Proof.class);
+        return BeanMapper.mapList(proofEntityList, Proof.class);
         //joinTemplate.joinQuery(proofList);
-        return proofList;
+        //return proofList;
     }
 
     @Override

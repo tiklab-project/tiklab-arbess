@@ -94,13 +94,13 @@ public class ProofDao {
      * @return 凭证列表
      */
     public List<ProofEntity> findPipelineProof(String pipelineId,int type){
-        String sql = " select pipeline_proof.* from pipeline_proof ";
+        //String sql = " select pipeline_proof.* from pipeline_proof ";
         JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
 
-        if (type == 0 ){
-            sql = sql.concat("where pipeline_proof.type = 1");
-            return jdbcTemplate.query(sql, new BeanPropertyRowMapper(ProofEntity.class));
-        }
+        //if (type == 0 ){
+        //    sql = sql.concat("where pipeline_proof.type = 1");
+        //    List<ProofEntity> list = jdbcTemplate.query(sql, new BeanPropertyRowMapper(ProofEntity.class));
+        //}
 
         String scope = "";
            scope = switch (type) {
@@ -111,9 +111,9 @@ public class ProofDao {
 
         //项目凭证
         String type1 = "select pipeline_proof.* from pipeline_proof  where pipeline_proof.type  = 2";
-        type1 = type1.concat(scope + " and pipeline_proof.proof_id "
+        type1 = type1.concat(  " and pipeline_proof.proof_id "
                 +" in (select pipeline_proof_task.proof_id from pipeline_proof_task "
-                +" where pipeline_proof_task.pipeline_id  = '"+ pipelineId+"')");
+                +" where pipeline_proof_task.pipeline_id  = '"+ pipelineId+"') "+scope);
         List<ProofEntity> lists = jdbcTemplate.query(type1, new BeanPropertyRowMapper(ProofEntity.class));
 
         //全局凭证
