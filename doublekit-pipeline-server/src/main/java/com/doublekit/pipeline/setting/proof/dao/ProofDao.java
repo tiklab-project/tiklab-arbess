@@ -94,14 +94,7 @@ public class ProofDao {
      * @return 凭证列表
      */
     public List<ProofEntity> findPipelineProof(String pipelineId,int type){
-        //String sql = " select pipeline_proof.* from pipeline_proof ";
         JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
-
-        //if (type == 0 ){
-        //    sql = sql.concat("where pipeline_proof.type = 1");
-        //    List<ProofEntity> list = jdbcTemplate.query(sql, new BeanPropertyRowMapper(ProofEntity.class));
-        //}
-
         String scope = "";
            scope = switch (type) {
             case 1 -> scope.concat(" and pipeline_proof.proof_scope = 1 or pipeline_proof.proof_scope = 4");

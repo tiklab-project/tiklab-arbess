@@ -8,7 +8,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@SQL(modules = "pipeline")
+@SQL(modules = {"pipeline","source-pipeline","pipeline-project"})
 @ComponentScan({"com.doublekit.pipeline"})
 public class PipelineServerAutoConfiguration {
 
