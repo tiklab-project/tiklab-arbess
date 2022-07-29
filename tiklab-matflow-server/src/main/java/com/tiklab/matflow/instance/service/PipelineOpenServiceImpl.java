@@ -1,0 +1,115 @@
+package com.tiklab.matflow.instance.service;
+
+import com.doublekit.beans.BeanMapper;
+import com.doublekit.join.JoinTemplate;
+import com.tiklab.matflow.definition.model.Pipeline;
+import com.tiklab.matflow.instance.dao.PipelineOpenDao;
+import com.tiklab.matflow.instance.entity.PipelineOpenEntity;
+import com.tiklab.matflow.instance.model.PipelineOpen;
+import com.doublekit.rpc.annotation.Exporter;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Service
+@Exporter
+public class PipelineOpenServiceImpl implements PipelineOpenService {
+
+
+    @Autowired
+    PipelineOpenDao pipelineOpenDao;
+
+    @Autowired
+    JoinTemplate joinTemplate;
+
+    @Override
+    public String createOpen(PipelineOpen pipelineOpen) {
+        return pipelineOpenDao.createOpen(BeanMapper.map(pipelineOpen, PipelineOpenEntity.class));
+    }
+
+    @Override
+    public void deleteOpen(String openId) {
+        pipelineOpenDao.deleteOpen(openId);
+    }
+
+    @Override
+    public void deleteAllOpen(String pipelineId){
+        List<PipelineOpen> allOpen = findAllOpen();
+        if (allOpen == null){
+           return;
+        }
+        for (PipelineOpen pipelineOpen : allOpen) {
+            joinTemplate.joinQuery(pipelineOpen);
+            if (!pipelineOpen.getPipeline().getPipelineId().equals(pipelineId)){
+               continue;
+            }
+            deleteOpen(pipelineOpen.getId());
+        }
+    }
+
+    public PipelineOpen findOneOpenNumber(String userId , String pipelineId){
+       if ( findAllOpen()==null){
+           return null;
+       }
+        for (PipelineOpen pipelineOpen : findAllOpen()) {
+            if (pipelineOpen.getPipeline().getPipelineId().equals(pipelineId) && pipelineOpen.getUserId().equals(userId)){
+                return pipelineOpen;
+            }
+        }
+       return null;
+    }
+
+    @Override
+    public void updateOpen(PipelineOpen pipelineOpen) {
+        pipelineOpenDao.updateOpen(BeanMapper.map(pipelineOpen, PipelineOpenEntity.class));
+    }
+
+    @Override
+    public void findOpen(String userId, Pipeline pipeline) {
+        PipelineOpen open = findOneOpenNumber(userId, pipeline.getPipelineId());
+        if (open != null){
+            open.setNumber(open.getNumber()+1);
+            updateOpen(open);
+        }else {
+            PipelineOpen pipelineOpen = new PipelineOpen();
+            pipelineOpen.setPipeline(pipeline);
+            pipelineOpen.setUserId(userId);
+            pipelineOpen.setNumber(1);
+            createOpen(pipelineOpen);
+        }
+    }
+
+    @Override
+    public List<PipelineOpen> findAllOpen(String userId,StringBuilder s){
+        List<PipelineOpenEntity> allOpen = pipelineOpenDao.findAllOpen(userId,s);
+        List<PipelineOpen> list = BeanMapper.mapList(allOpen, PipelineOpen.class);
+        joinTemplate.joinQuery(list);
+        for (PipelineOpen pipelineOpen : list) {
+            pipelineOpen.setPipelineName(pipelineOpen.getPipeline().getPipelineName());
+            pipelineOpen.setPipelineId(pipelineOpen.getPipeline().getPipelineId());
+        }
+        return list;
+    }
+
+    @Override
+    public PipelineOpen findOneOpen(String openId) {
+        PipelineOpen pipelineOpen = BeanMapper.map(pipelineOpenDao.findOneOpen(openId), PipelineOpen.class);
+        joinTemplate.joinQuery(pipelineOpen);
+        return pipelineOpen;
+    }
+
+    @Override
+    public List<PipelineOpen> findAllOpen() {
+        List<PipelineOpen> list = BeanMapper.mapList(pipelineOpenDao.findAllOpen(), PipelineOpen.class);
+        joinTemplate.joinQuery(list);
+        return list;
+    }
+
+    @Override
+    public List<PipelineOpen> findAllOpenList(List<String> idList) {
+        List<PipelineOpenEntity> openList = pipelineOpenDao.findAllOpenList(idList);
+        return BeanMapper.mapList(openList, PipelineOpen.class);
+    }
+
+}
