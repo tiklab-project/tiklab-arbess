@@ -21,41 +21,38 @@ INSERT INTO `prc_function` VALUES ('d5535a61c9cefaccd71b44d298474775', '成员�
 INSERT INTO `prc_function` VALUES ('dfa50d1a6f3466a75c37325c71b9a8fc', '插件管理', 'G', NULL, NULL, '1');
 INSERT INTO `prc_function` VALUES ('f741b2f59129f7b025884b4000de72b0', '项目权限', 'I', NULL, NULL, '1');
 
-INSERT INTO `prc_role` VALUES ('83dc0140bc3a491383b8de5099b1d87b', 'user', '用户', 'custom', '1');
-INSERT INTO `prc_role` VALUES ('f1b425c39359e053eed89a069c9601cf', 'root', '管理员', 'custom', '1');
+INSERT INTO `prc_role` VALUES ('7cfee91edf221ae1deed232ca14c03af', '项目角色', '项目角色', 'custom', '1');
+INSERT INTO `prc_role` VALUES ('97a7db718273636659fc5e146a00edd2', '管理员角色', NULL, 'system', '1');
 
+INSERT INTO `prc_role_function` VALUES ('002e6860f371172d9ecadcf975d9ab0e', '97a7db718273636659fc5e146a00edd2', '744c253cce9c06d4aa27081707279457');
+INSERT INTO `prc_role_function` VALUES ('035e08a1613caf6cb13fdbc894df7aa7', '97a7db718273636659fc5e146a00edd2', 'c08882dca6ab325b10fb2b7c0cfc8156');
+INSERT INTO `prc_role_function` VALUES ('08c6c732491745692f1463a6da12aff1', '97a7db718273636659fc5e146a00edd2', '0b2120afa185b713a99e330e153d5c09');
+INSERT INTO `prc_role_function` VALUES ('11f8eedd75001731074e8f3a151bcf64', '97a7db718273636659fc5e146a00edd2', '0301f3df9112e6a49cb8092e0c63b270');
+INSERT INTO `prc_role_function` VALUES ('1d38fbb022cf06d89a39c7ca2d7b7e25', '7cfee91edf221ae1deed232ca14c03af', '1ac7a5144aab83db56d0bdaab9da97dc');
+INSERT INTO `prc_role_function` VALUES ('26fe8a8b28a617e95894535c2f7f3ce4', '97a7db718273636659fc5e146a00edd2', 'd5535a61c9cefaccd71b44d298474775');
+INSERT INTO `prc_role_function` VALUES ('298de307e3ddfac85416f014923d8d20', '97a7db718273636659fc5e146a00edd2', '1de34bdfaad1e2e8d4f5b6a04670f787');
+INSERT INTO `prc_role_function` VALUES ('2c999a039c0749fddfb8417e78531e93', '97a7db718273636659fc5e146a00edd2', 'c103338b85c47ee6f5f9bc65e03cfa87');
+INSERT INTO `prc_role_function` VALUES ('35b868b8b34d057caa028455c763caba', '97a7db718273636659fc5e146a00edd2', '8d26791c4634aee4121115b29e944bc1');
+INSERT INTO `prc_role_function` VALUES ('3706eda84cbd13bbb1192a576b4204fb', '97a7db718273636659fc5e146a00edd2', '36f831865dd4bd490e1fdb4b1d38b763');
+INSERT INTO `prc_role_function` VALUES ('3aa55fb02a7b9bad039e014a353c6f5c', '7cfee91edf221ae1deed232ca14c03af', '3ff92a1c0d35ff83f37d92aab543bb21');
+INSERT INTO `prc_role_function` VALUES ('498d681f42d5af60f16cdb680500931b', '97a7db718273636659fc5e146a00edd2', 'd258d8c1f73d4afc733600ab6504bf0c');
+INSERT INTO `prc_role_function` VALUES ('4b62eefdd9c8d558a950970c6376a166', '97a7db718273636659fc5e146a00edd2', 'c3a07289216a53628a4f9c558e58d05c');
+INSERT INTO `prc_role_function` VALUES ('4fb44e966c66c0ef89ebf00bd0d07c35', '97a7db718273636659fc5e146a00edd2', 'f741b2f59129f7b025884b4000de72b0');
+INSERT INTO `prc_role_function` VALUES ('69d195ba31757957529182abcf66b578', '7cfee91edf221ae1deed232ca14c03af', 'd258d8c1f73d4afc733600ab6504bf0c');
+INSERT INTO `prc_role_function` VALUES ('71c6dd5b32f4f1f7079e49323f87c304', '97a7db718273636659fc5e146a00edd2', '3ff92a1c0d35ff83f37d92aab543bb21');
+INSERT INTO `prc_role_function` VALUES ('87f158ec8b353dc0ba4692d4468febeb', '97a7db718273636659fc5e146a00edd2', '6c325e97fc58bd362cd00f74bf3f3609');
+INSERT INTO `prc_role_function` VALUES ('8b74451cc1df6a117fc34b46a08e0a24', '97a7db718273636659fc5e146a00edd2', 'dfa50d1a6f3466a75c37325c71b9a8fc');
+INSERT INTO `prc_role_function` VALUES ('8eea0b6e79da80cb2dfebd85dcc0f3d9', '97a7db718273636659fc5e146a00edd2', '1ac7a5144aab83db56d0bdaab9da97dc');
+INSERT INTO `prc_role_function` VALUES ('96c766ac2cb8c033a8c214f95f9a2a9b', '7cfee91edf221ae1deed232ca14c03af', 'c103338b85c47ee6f5f9bc65e03cfa87');
+INSERT INTO `prc_role_function` VALUES ('987189d9243af8b1135659bbbb190e08', '97a7db718273636659fc5e146a00edd2', '8700a662f1aebb83f790783c3abe15b5');
+INSERT INTO `prc_role_function` VALUES ('9a21b50249d40a7894888e5e8b73db0a', '7cfee91edf221ae1deed232ca14c03af', '3af907a0b9d62159c50ae13f17cb2c36');
+INSERT INTO `prc_role_function` VALUES ('9e70b160b0d1429428e7e097ef4f4d0c', '97a7db718273636659fc5e146a00edd2', '715a723396096aef0dca4bafa8f4cd24');
+INSERT INTO `prc_role_function` VALUES ('9eca8d031a103cb42d4361729ffbcd67', '97a7db718273636659fc5e146a00edd2', '0aee720166d8a13beb81f23bcf0f8d2d');
+INSERT INTO `prc_role_function` VALUES ('b7a8be493069202e3404a2ed66139d5e', '7cfee91edf221ae1deed232ca14c03af', '8d26791c4634aee4121115b29e944bc1');
+INSERT INTO `prc_role_function` VALUES ('c12af496894579339ce94e70c684d9e3', '97a7db718273636659fc5e146a00edd2', '3af907a0b9d62159c50ae13f17cb2c36');
+INSERT INTO `prc_role_function` VALUES ('d4357701e5040553c341854b28017584', '7cfee91edf221ae1deed232ca14c03af', '36f831865dd4bd490e1fdb4b1d38b763');
+INSERT INTO `prc_role_function` VALUES ('da0c3aa4a572241233c0ca419a99e82b', '97a7db718273636659fc5e146a00edd2', '66ffbf32b20033c9546faae7336943f9');
+INSERT INTO `prc_role_function` VALUES ('f0c64325fc0875f1fe3544c4c5c2a2b6', '7cfee91edf221ae1deed232ca14c03af', 'c3a07289216a53628a4f9c558e58d05c');
 
-INSERT INTO `prc_role_function` VALUES ('05a3ea2d80ddefeb2b264bcbad294f93', 'f1b425c39359e053eed89a069c9601cf', 'c103338b85c47ee6f5f9bc65e03cfa87');
-INSERT INTO `prc_role_function` VALUES ('141e9e0785a5dfbbe9c1890a020da09f', 'f1b425c39359e053eed89a069c9601cf', 'c08882dca6ab325b10fb2b7c0cfc8156');
-INSERT INTO `prc_role_function` VALUES ('1931f07540ebd9fc393fe95a12b07f64', 'f1b425c39359e053eed89a069c9601cf', '36f831865dd4bd490e1fdb4b1d38b763');
-INSERT INTO `prc_role_function` VALUES ('1c5c8a8f8aabaa7f7b39dffc4aac0d96', 'f1b425c39359e053eed89a069c9601cf', '6c325e97fc58bd362cd00f74bf3f3609');
-INSERT INTO `prc_role_function` VALUES ('1d401ccf8e830863a1f9f64f8cc408c8', '83dc0140bc3a491383b8de5099b1d87b', 'c3a07289216a53628a4f9c558e58d05c');
-INSERT INTO `prc_role_function` VALUES ('294fa3ed4ad01b938461a83caff4ab33', 'f1b425c39359e053eed89a069c9601cf', '0aee720166d8a13beb81f23bcf0f8d2d');
---系统功能
---INSERT INTO `prc_role_function` VALUES ('32227af1f706dee925560670c8467461', 'f1b425c39359e053eed89a069c9601cf', '0301f3df9112e6a49cb8092e0c63b270');
-
-INSERT INTO `prc_role_function` VALUES ('471696af197e899a887e0d526a59f5e8', 'f1b425c39359e053eed89a069c9601cf', 'c3a07289216a53628a4f9c558e58d05c');
-INSERT INTO `prc_role_function` VALUES ('5eab324e375ca979136268e53c8677d5', '83dc0140bc3a491383b8de5099b1d87b', '36f831865dd4bd490e1fdb4b1d38b763');
-INSERT INTO `prc_role_function` VALUES ('621330ae7508b7b9706e7295cfe876b0', 'f1b425c39359e053eed89a069c9601cf', 'f741b2f59129f7b025884b4000de72b0');
-INSERT INTO `prc_role_function` VALUES ('67ab7dda75d1b5abe06d23238900bce7', '83dc0140bc3a491383b8de5099b1d87b', '8d26791c4634aee4121115b29e944bc1');
-INSERT INTO `prc_role_function` VALUES ('70bb3d37ebdd3acfbc3b048ecd28944c', 'f1b425c39359e053eed89a069c9601cf', '66ffbf32b20033c9546faae7336943f9');
-INSERT INTO `prc_role_function` VALUES ('76a6e37ea5cface70e952edd68ac5293', 'f1b425c39359e053eed89a069c9601cf', '3af907a0b9d62159c50ae13f17cb2c36');
-INSERT INTO `prc_role_function` VALUES ('7fb53048f672717c8b350f6d582f1afd', 'f1b425c39359e053eed89a069c9601cf', '715a723396096aef0dca4bafa8f4cd24');
-INSERT INTO `prc_role_function` VALUES ('8924712bc42ce166a7f1d6fa01e39dbc', 'f1b425c39359e053eed89a069c9601cf', 'dfa50d1a6f3466a75c37325c71b9a8fc');
-INSERT INTO `prc_role_function` VALUES ('89d2137b1a8c8355c4e63f2363d538b9', 'f1b425c39359e053eed89a069c9601cf', '8d26791c4634aee4121115b29e944bc1');
-INSERT INTO `prc_role_function` VALUES ('961020c4c73c63be77ef7d5299111825', 'f1b425c39359e053eed89a069c9601cf', '1de34bdfaad1e2e8d4f5b6a04670f787');
-
---项目功能
---INSERT INTO `prc_role_function` VALUES ('b1e50ab0ab7a56b3ea4e440b47c2d17c', 'f1b425c39359e053eed89a069c9601cf', '744c253cce9c06d4aa27081707279457');
-
-INSERT INTO `prc_role_function` VALUES ('bfaa8c53da5ddc317e7a1567686d4ce4', '83dc0140bc3a491383b8de5099b1d87b', '3ff92a1c0d35ff83f37d92aab543bb21');
-INSERT INTO `prc_role_function` VALUES ('cc112e16dcf37be3fe9e5a71d375ae07', 'f1b425c39359e053eed89a069c9601cf', '3ff92a1c0d35ff83f37d92aab543bb21');
-INSERT INTO `prc_role_function` VALUES ('d2ef83e0aa36cf57bd84ce54d2b9a9c0', 'f1b425c39359e053eed89a069c9601cf', '0b2120afa185b713a99e330e153d5c09');
-INSERT INTO `prc_role_function` VALUES ('e584521ba07b2ae6b8dbf521e8920171', 'f1b425c39359e053eed89a069c9601cf', 'd258d8c1f73d4afc733600ab6504bf0c');
-INSERT INTO `prc_role_function` VALUES ('eae3c67c44c6e040a2469f5c794ffa49', 'f1b425c39359e053eed89a069c9601cf', 'd5535a61c9cefaccd71b44d298474775');
-INSERT INTO `prc_role_function` VALUES ('f613e919f659d2abe26fb89fd20bef46', 'f1b425c39359e053eed89a069c9601cf', '1ac7a5144aab83db56d0bdaab9da97dc');
-INSERT INTO `prc_role_function` VALUES ('f8ef3ab245f87dd9012907efc60e9c20', 'f1b425c39359e053eed89a069c9601cf', '8700a662f1aebb83f790783c3abe15b5');
-INSERT INTO `prc_role_function` VALUES ('ffcfba5120c8a26b9d3b02a6178df68f', '83dc0140bc3a491383b8de5099b1d87b', '1ac7a5144aab83db56d0bdaab9da97dc');
-
-INSERT INTO `prc_role_user` VALUES ('3822dcb805855ae85c51a3522c90e623', 'f1b425c39359e053eed89a069c9601cf', '111111');
-INSERT INTO `prc_role_user` VALUES ('95cbb9ee728100b79cf9a18290298ace', '83dc0140bc3a491383b8de5099b1d87b', '222222');
+INSERT INTO `prc_role_user` VALUES ('1713bccf06b2341ddd4f29acedeb17c4', '7cfee91edf221ae1deed232ca14c03af', 'f7d301865bb64ef21ef88f8cd58a69a5');
+INSERT INTO `prc_role_user` VALUES ('4276176cba2493e88ade5132cce268cb', '97a7db718273636659fc5e146a00edd2', '111111');
