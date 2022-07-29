@@ -1,14 +1,15 @@
 package com.tiklab.matflow;
 
 
-import com.doublekit.dsm.annotation.SQL;
+
+import com.tiklab.dsm.annotation.SQL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@SQL(modules = {"DDL-matFlow.sql","project-matflow.sql","source-matflow.sql"})
+@SQL(modules = {"DDL-matFlow","project-matflow","source-matflow"})
 @ComponentScan({"com.tiklab.matfiow"})
 public class MatFlowServerAutoConfiguration {
 

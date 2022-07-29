@@ -1,16 +1,18 @@
 package com.tiklab.matflow.setting.proof.service;
 
-import com.doublekit.beans.BeanMapper;
-import com.doublekit.join.JoinTemplate;
-import com.tiklab.matflow.definition.service.PipelineService;
-import com.tiklab.matflow.execute.service.PipelineCodeServiceImpl;
-import com.tiklab.matflow.instance.service.PipelineActionService;
+
+import com.tiklab.beans.BeanMapper;
+import com.tiklab.join.JoinTemplate;
+import com.tiklab.matflow.definition.service.MatFlowService;
+import com.tiklab.matflow.execute.service.MatFlowCodeServiceImpl;
+import com.tiklab.matflow.instance.service.MatFlowActionService;
 import com.tiklab.matflow.setting.proof.dao.ProofDao;
 import com.tiklab.matflow.setting.proof.entity.ProofEntity;
 import com.tiklab.matflow.setting.proof.entity.ProofTaskEntity;
 import com.tiklab.matflow.setting.proof.model.Proof;
 import com.tiklab.matflow.setting.proof.model.ProofTask;
-import com.doublekit.rpc.annotation.Exporter;
+
+import com.tiklab.rpc.annotation.Exporter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,12 +36,12 @@ public class ProofServiceImpl implements ProofService{
     ProofTaskService proofTaskService;
 
     @Autowired
-    PipelineService pipelineService;
+    MatFlowService matFlowService;
 
     @Autowired
-    PipelineActionService pipelineActionService;
+    MatFlowActionService matFlowActionService;
 
-    private static final Logger logger = LoggerFactory.getLogger(PipelineCodeServiceImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(MatFlowCodeServiceImpl.class);
 
     //创建
     @Override
@@ -75,7 +77,7 @@ public class ProofServiceImpl implements ProofService{
             proofDao.deleteProofTask(proofId);
         }
         proofDao.deleteProof(proofId);
-        pipelineActionService.createActive(proof.getUser().getId(),null,"删除了凭证"+proof.getProofName());
+        matFlowActionService.createActive(proof.getUser().getId(),null,"删除了凭证"+proof.getProofName());
     }
 
 
@@ -112,15 +114,15 @@ public class ProofServiceImpl implements ProofService{
     }
 
     @Override
-    public List<Proof> findPipelineProof(String userId,String pipelineId,int type){
+    public List<Proof> findMatFlowProof(String userId,String matFlowId,int type){
         List<Proof> allProof;
 
-        StringBuilder s = pipelineService.findUserPipelineId(userId);
+        StringBuilder s = matFlowService.findUserMatFlowId(userId);
         //判断查询系统凭证还是项目凭证
-        if (pipelineId.equals("")){
-             allProof = BeanMapper.mapList(proofDao.findPipelineProof(s), Proof.class);
+        if (matFlowId.equals("")){
+             allProof = BeanMapper.mapList(proofDao.findMatFlowProof(s), Proof.class);
         }else {
-            allProof =  BeanMapper.mapList(proofDao.findPipelineProof(pipelineId,type), Proof.class);
+            allProof =  BeanMapper.mapList(proofDao.findMatFlowProof(matFlowId,type), Proof.class);
         }
 
         if (allProof == null){
@@ -134,7 +136,7 @@ public class ProofServiceImpl implements ProofService{
                 continue;
             }
             for (ProofTaskEntity proofTaskEntity : list) {
-                arrayList.add(proofTaskEntity.getPipelineId());
+                arrayList.add(proofTaskEntity.getMatFlowId());
                 proof.setProofList(arrayList);
             }
         }

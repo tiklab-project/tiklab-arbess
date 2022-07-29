@@ -1,7 +1,8 @@
 package com.tiklab.matflow.execute.model.CodeGit;
 
-import com.doublekit.apibox.annotation.ApiModel;
-import com.doublekit.apibox.annotation.ApiProperty;
+
+import com.tiklab.postlink.annotation.ApiModel;
+import com.tiklab.postlink.annotation.ApiProperty;
 
 @ApiModel
 public class CodeCheckAuth {

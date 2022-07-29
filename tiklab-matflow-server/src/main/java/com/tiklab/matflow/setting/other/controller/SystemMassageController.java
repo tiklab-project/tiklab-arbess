@@ -1,16 +1,15 @@
 package com.tiklab.matflow.setting.other.controller;
 
-import com.doublekit.apibox.annotation.Api;
-import com.doublekit.apibox.annotation.ApiMethod;
-import com.doublekit.core.Result;
+
+import com.tiklab.core.Result;
 import com.tiklab.matflow.setting.other.model.SystemMassage;
 import com.tiklab.matflow.setting.other.service.SystemMassageService;
+import com.tiklab.postlink.annotation.Api;
+import com.tiklab.postlink.annotation.ApiMethod;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 
 @RestController
@@ -29,10 +28,10 @@ public class SystemMassageController {
         return Result.ok(systemMassage);
     }
 
-    @RequestMapping(path="/getSystemLog",method = RequestMethod.POST)
-    @ApiMethod(name = "getSystemLog",desc = "获取系统日志")
-    public Result<List<String>> getSystemLog(){
-        List<String> systemLog = systemMassageService.getSystemLog();
-        return Result.ok(systemLog);
-    }
+    //@RequestMapping(path="/getSystemLog",method = RequestMethod.POST)
+    //@ApiMethod(name = "getSystemLog",desc = "获取系统日志")
+    //public Result<List<String>> getSystemLog(){
+    //    List<String> systemLog = systemMassageService.getSystemLog();
+    //    return Result.ok(systemLog);
+    //}
 }

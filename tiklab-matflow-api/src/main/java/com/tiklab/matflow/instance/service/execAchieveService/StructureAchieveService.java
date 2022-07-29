@@ -1,7 +1,7 @@
 package com.tiklab.matflow.instance.service.execAchieveService;
 
-import com.tiklab.matflow.instance.model.PipelineExecHistory;
-import com.tiklab.matflow.instance.model.PipelineProcess;
+import com.tiklab.matflow.instance.model.MatFlowExecHistory;
+import com.tiklab.matflow.instance.model.MatFlowProcess;
 
 import java.util.List;
 
@@ -9,9 +9,9 @@ public interface StructureAchieveService {
 
     /**
      * 构建
-     * @param pipelineProcess 构建信息
-     * @param pipelineExecHistoryList 构建过程
+     * @param matFlowProcess 构建信息
+     * @param matFlowExecHistoryList 构建过程
      * @return 构建状态
      */
-    int structure(PipelineProcess pipelineProcess, List<PipelineExecHistory> pipelineExecHistoryList);
+    int structure(MatFlowProcess matFlowProcess, List<MatFlowExecHistory> matFlowExecHistoryList);
 }

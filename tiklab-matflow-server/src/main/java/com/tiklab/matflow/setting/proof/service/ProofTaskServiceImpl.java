@@ -1,6 +1,7 @@
 package com.tiklab.matflow.setting.proof.service;
 
-import com.doublekit.beans.BeanMapper;
+
+import com.tiklab.beans.BeanMapper;
 import com.tiklab.matflow.setting.proof.dao.ProofTaskDao;
 import com.tiklab.matflow.setting.proof.entity.ProofTaskEntity;
 import com.tiklab.matflow.setting.proof.model.ProofTask;

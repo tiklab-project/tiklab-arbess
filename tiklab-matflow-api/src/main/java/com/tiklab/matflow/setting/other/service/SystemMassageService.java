@@ -12,10 +12,10 @@ public interface SystemMassageService {
      */
     SystemMassage getSystemMassage();
 
-    /**
-     * 读取日志信息
-     * @return 系统日志
-     */
-    List<String> getSystemLog();
+    ///**
+    // * 读取日志信息
+    // * @return 系统日志
+    // */
+    //List<String> getSystemLog();
 
 }

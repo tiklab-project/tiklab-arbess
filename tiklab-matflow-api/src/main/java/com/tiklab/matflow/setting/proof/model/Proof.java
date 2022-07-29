@@ -1,14 +1,15 @@
 package com.tiklab.matflow.setting.proof.model;
 
-import com.doublekit.apibox.annotation.ApiModel;
-import com.doublekit.apibox.annotation.ApiProperty;
-import com.doublekit.beans.annotation.Mapper;
-import com.doublekit.beans.annotation.Mapping;
-import com.doublekit.beans.annotation.Mappings;
-import com.doublekit.join.annotation.Join;
-import com.doublekit.join.annotation.JoinQuery;
-import com.tiklab.matflow.definition.model.Pipeline;
-import com.doublekit.user.user.model.User;
+
+import com.tiklab.beans.annotation.Mapper;
+import com.tiklab.beans.annotation.Mapping;
+import com.tiklab.beans.annotation.Mappings;
+import com.tiklab.join.annotation.Join;
+import com.tiklab.join.annotation.JoinQuery;
+import com.tiklab.matflow.definition.model.MatFlow;
+import com.tiklab.postlink.annotation.ApiModel;
+import com.tiklab.postlink.annotation.ApiProperty;
+import com.tiklab.user.user.model.User;
 
 import java.util.List;
 
@@ -53,12 +54,12 @@ public class Proof {
     private User user;
 
     //流水线
-    @ApiProperty(name="pipeline",desc="流水线id",eg="@selectOne")
+    @ApiProperty(name="matFlow",desc="流水线id",eg="@selectOne")
     @Mappings({
-            @Mapping(source = "pipeline.pipelineId",target = "pipelineId")
+            @Mapping(source = "matFlow.matflowId",target = "matflowId")
     })
-    @JoinQuery(key = "pipelineId")
-    private Pipeline pipeline;
+    @JoinQuery(key = "matflowId")
+    private MatFlow matFlow;
 
     //创建时间
     @ApiProperty(name="proofCreateTime",desc="创建时间")
@@ -127,12 +128,12 @@ public class Proof {
         this.proofScope = proofScope;
     }
 
-    public Pipeline getPipeline() {
-        return pipeline;
+    public MatFlow getMatFlow() {
+        return matFlow;
     }
 
-    public void setPipeline(Pipeline pipeline) {
-        this.pipeline = pipeline;
+    public void setMatFlow(MatFlow matFlow) {
+        this.matFlow = matFlow;
     }
 
     public String getProofCreateTime() {

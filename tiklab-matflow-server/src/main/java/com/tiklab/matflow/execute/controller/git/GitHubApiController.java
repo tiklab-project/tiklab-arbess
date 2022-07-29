@@ -1,11 +1,12 @@
 package com.tiklab.matflow.execute.controller.git;
 
-import com.doublekit.apibox.annotation.Api;
-import com.doublekit.apibox.annotation.ApiMethod;
-import com.doublekit.apibox.annotation.ApiParam;
-import com.doublekit.core.Result;
+
+import com.tiklab.core.Result;
 import com.tiklab.matflow.execute.service.codeGit.CodeGitHubService;
 import com.tiklab.matflow.setting.proof.model.Proof;
+import com.tiklab.postlink.annotation.Api;
+import com.tiklab.postlink.annotation.ApiMethod;
+import com.tiklab.postlink.annotation.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;

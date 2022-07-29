@@ -1,10 +1,11 @@
 package com.tiklab.matflow.setting.proof.service;
 
 
-import com.doublekit.join.annotation.FindAll;
-import com.doublekit.join.annotation.FindList;
-import com.doublekit.join.annotation.FindOne;
-import com.doublekit.join.annotation.JoinProvider;
+
+import com.tiklab.join.annotation.FindAll;
+import com.tiklab.join.annotation.FindList;
+import com.tiklab.join.annotation.FindOne;
+import com.tiklab.join.annotation.JoinProvider;
 import com.tiklab.matflow.setting.proof.model.Proof;
 
 import java.util.List;
@@ -46,11 +47,11 @@ public interface ProofService {
 
     /**
      * 查询流水线凭证
-     * @param pipelineId 条件
+     * @param matFlowId 条件
      * @return 凭证列表
      */
-    //List<Proof> findPipelineProof(ProofQuery proofQuery);
-    List<Proof> findPipelineProof(String userId,String pipelineId,int type);
+    //List<Proof> findMatFlowProof(ProofQuery proofQuery);
+    List<Proof> findMatFlowProof(String userId,String matFlowId,int type);
 
     /**
      * 查询所有凭证

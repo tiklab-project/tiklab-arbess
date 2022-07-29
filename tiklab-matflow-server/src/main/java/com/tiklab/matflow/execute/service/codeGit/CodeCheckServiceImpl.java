@@ -1,14 +1,13 @@
 package com.tiklab.matflow.execute.service.codeGit;
 
-import com.tiklab.matflow.definition.service.PipelineCommonService;
+import com.tiklab.matflow.definition.service.MatFlowCommonService;
 import com.tiklab.matflow.execute.model.CodeGit.CodeCheckAuth;
-import com.tiklab.matflow.instance.service.execAchieveService.CommonAchieveService;
 import com.tiklab.matflow.setting.proof.model.Proof;
 import com.tiklab.matflow.setting.proof.service.ProofService;
-import com.doublekit.rpc.annotation.Exporter;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
+import com.tiklab.rpc.annotation.Exporter;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.LsRemoteCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -35,10 +34,7 @@ public class CodeCheckServiceImpl implements CodeCheckService {
     ProofService proofService;
 
     @Autowired
-    CommonAchieveService commonAchieveService;
-
-    @Autowired
-    PipelineCommonService pipelineCommonService;
+    MatFlowCommonService matFlowCommonService;
 
     @Override
     public Boolean checkAuth(CodeCheckAuth codeCheckAuth){
@@ -61,9 +57,9 @@ public class CodeCheckServiceImpl implements CodeCheckService {
         File file = null;
         String path = "";
         try {
-            file = File.createTempFile("pipeline", ".txt");
+            file = File.createTempFile("matFlow", ".txt");
             path = file.getAbsolutePath();
-            pipelineCommonService.writePrivateKeyPath(proof.getProofPassword(),path);
+            matFlowCommonService.writePrivateKeyPath(proof.getProofPassword(),path);
         } catch (IOException e) {
             if (file != null){
                 file.deleteOnExit();

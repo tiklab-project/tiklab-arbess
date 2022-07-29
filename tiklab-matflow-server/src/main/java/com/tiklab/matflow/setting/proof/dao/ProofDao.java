@@ -1,8 +1,9 @@
 package com.tiklab.matflow.setting.proof.dao;
 
-import com.doublekit.dal.jdbc.JdbcTemplate;
-import com.doublekit.dal.jpa.JpaTemplate;
-import com.tiklab.matflow.definition.dao.PipelineDao;
+
+import com.tiklab.dal.jdbc.JdbcTemplate;
+import com.tiklab.dal.jpa.JpaTemplate;
+import com.tiklab.matflow.definition.dao.MatFlowDao;
 import com.tiklab.matflow.setting.proof.entity.ProofEntity;
 import com.tiklab.matflow.setting.proof.entity.ProofTaskEntity;
 import org.slf4j.Logger;
@@ -16,7 +17,7 @@ import java.util.List;
 @Repository
 public class ProofDao {
 
-    private static final Logger logger = LoggerFactory.getLogger(PipelineDao.class);
+    private static final Logger logger = LoggerFactory.getLogger(MatFlowDao.class);
 
     @Autowired
     JpaTemplate jpaTemplate;
@@ -65,19 +66,19 @@ public class ProofDao {
         return jpaTemplate.findAll(ProofEntity.class);
     }
 
-    public List<ProofEntity> findPipelineProof(StringBuilder s){
+    public List<ProofEntity> findMatFlowProof(StringBuilder s){
         JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
-        String sql = " select pipeline_proof.* from pipeline_proof ";
-        String concat = sql.concat("where pipeline_proof.type = 1");
+        String sql = " select matFlow_proof.* from matFlow_proof ";
+        String concat = sql.concat("where matFlow_proof.type = 1");
         List<ProofEntity> list = jdbcTemplate.query(concat, new BeanPropertyRowMapper(ProofEntity.class));
         if (s.toString().equals("")){
             return list;
         }
-        sql = sql.concat(" where pipeline_proof.type  = 2"
-                +" and pipeline_proof.proof_id "
+        sql = sql.concat(" where matFlow_proof.type  = 2"
+                +" and matFlow_proof.proof_id "
                 +" in ( "
-                +" select pipeline_proof_task.proof_id from pipeline_proof_task "
-                +" where pipeline_proof_task.pipeline_id "
+                +" select matFlow_proof_task.proof_id from matFlow_proof_task "
+                +" where matFlow_proof_task.matFlow_id "
                 +" in ("+ s +")"
                 + ")");
         List<ProofEntity> lists = jdbcTemplate.query(sql, new BeanPropertyRowMapper(ProofEntity.class));
@@ -87,28 +88,28 @@ public class ProofDao {
 
     /**
      * 获取不同类型的凭证
-     * @param pipelineId 流水线id
+     * @param matFlowId 流水线id
      * @param type 类型
      * @return 凭证列表
      */
-    public List<ProofEntity> findPipelineProof(String pipelineId,int type){
+    public List<ProofEntity> findMatFlowProof(String matFlowId,int type){
         JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
         String scope = "";
            scope = switch (type) {
-            case 1 -> scope.concat(" and pipeline_proof.proof_scope = 1 or pipeline_proof.proof_scope = 4");
-            case 2, 3, 5 -> scope.concat(" and pipeline_proof.proof_scope = " + type);
+            case 1 -> scope.concat(" and matFlow_proof.proof_scope = 1 or matFlow_proof.proof_scope = 4");
+            case 2, 3, 5 -> scope.concat(" and matFlow_proof.proof_scope = " + type);
             default -> scope;
         };
 
         //项目凭证
-        String type1 = "select pipeline_proof.* from pipeline_proof  where pipeline_proof.type  = 2";
-        type1 = type1.concat(  " and pipeline_proof.proof_id "
-                +" in (select pipeline_proof_task.proof_id from pipeline_proof_task "
-                +" where pipeline_proof_task.pipeline_id  = '"+ pipelineId+"') "+scope);
+        String type1 = "select matFlow_proof.* from matFlow_proof  where matFlow_proof.type  = 2";
+        type1 = type1.concat(  " and matFlow_proof.proof_id "
+                +" in (select matFlow_proof_task.proof_id from matFlow_proof_task "
+                +" where matFlow_proof_task.matFlow_id  = '"+ matFlowId+"') "+scope);
         List<ProofEntity> lists = jdbcTemplate.query(type1, new BeanPropertyRowMapper(ProofEntity.class));
 
         //全局凭证
-        String types = "select pipeline_proof.* from pipeline_proof where pipeline_proof.type = 1";
+        String types = "select matFlow_proof.* from matFlow_proof where matFlow_proof.type = 1";
         types = types.concat(scope);
         List<ProofEntity> proofEntityList = jdbcTemplate.query(types, new BeanPropertyRowMapper(ProofEntity.class));
 
@@ -122,8 +123,8 @@ public class ProofDao {
      * @param proofId 凭证id
      */
     public void deleteProofTask(String proofId){
-        String sql = " delete from pipeline_proof_task ";
-        sql=sql.concat(" where pipeline_proof_task.proof_id = '"+ proofId +"'" );
+        String sql = " delete from matFlow_proof_task ";
+        sql=sql.concat(" where matFlow_proof_task.proof_id = '"+ proofId +"'" );
         JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
         jdbcTemplate.execute(sql);
     }
@@ -133,8 +134,8 @@ public class ProofDao {
      * @param proofId 凭证id
      */
     public List<ProofTaskEntity> findAllProofTask(String proofId){
-        String sql = " select pipeline_proof_task.* from pipeline_proof_task ";
-        sql=sql.concat(" where pipeline_proof_task.proof_id = '"+ proofId +"'" );
+        String sql = " select matFlow_proof_task.* from matFlow_proof_task ";
+        sql=sql.concat(" where matFlow_proof_task.proof_id = '"+ proofId +"'" );
         JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
         return  jdbcTemplate.query(sql, new BeanPropertyRowMapper(ProofTaskEntity.class));
     }

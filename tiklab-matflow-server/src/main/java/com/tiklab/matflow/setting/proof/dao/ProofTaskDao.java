@@ -1,6 +1,7 @@
 package com.tiklab.matflow.setting.proof.dao;
 
-import com.doublekit.dal.jpa.JpaTemplate;
+
+import com.tiklab.dal.jpa.JpaTemplate;
 import com.tiklab.matflow.setting.proof.entity.ProofTaskEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

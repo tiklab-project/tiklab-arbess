@@ -1,18 +1,19 @@
 package com.tiklab.matflow;
 
-import com.doublekit.beans.starter.annotation.EnableBeans;
-import com.doublekit.dal.starter.annotation.EnableDal;
-import com.doublekit.dsm.starter.annotation.EnableDsm;
-import com.doublekit.eam.starter.EnableEam;
-import com.doublekit.gateway.starter.EnableGateway;
-import com.doublekit.join.starter.annotation.EnableJoin;
-import com.doublekit.message.starter.EnableMessage;
 
-import com.doublekit.pluginx.starter.EnablePluginServer;
-import com.doublekit.privilege.stater.EnablePrivilegeServer;
-import com.doublekit.rpc.starter.annotation.EnableRpc;
-import com.doublekit.user.starter.EnableUser;
-import com.doublekit.web.starter.annotation.EnableWeb;
+
+import com.tiklab.beans.starter.annotation.EnableBeans;
+import com.tiklab.dal.starter.annotation.EnableDal;
+import com.tiklab.dsm.starter.annotation.EnableDsm;
+import com.tiklab.eam.starter.EnableEam;
+import com.tiklab.gateway.starter.EnableGateway;
+import com.tiklab.join.starter.annotation.EnableJoin;
+import com.tiklab.message.starter.EnableMessage;
+import com.tiklab.pluginx.starter.EnablePluginServer;
+import com.tiklab.privilege.stater.EnablePrivilegeServer;
+import com.tiklab.rpc.starter.annotation.EnableRpc;
+import com.tiklab.user.starter.EnableUser;
+import com.tiklab.web.starter.annotation.EnableWeb;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration

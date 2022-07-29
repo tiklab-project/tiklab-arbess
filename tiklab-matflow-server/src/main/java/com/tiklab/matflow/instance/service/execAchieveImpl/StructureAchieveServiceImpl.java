@@ -1,14 +1,16 @@
 package com.tiklab.matflow.instance.service.execAchieveImpl;
 
-import com.tiklab.matflow.definition.model.PipelineConfigure;
-import com.tiklab.matflow.definition.service.PipelineCommonService;
-import com.tiklab.matflow.execute.model.PipelineStructure;
-import com.tiklab.matflow.execute.service.PipelineStructureService;
-import com.tiklab.matflow.instance.model.PipelineExecHistory;
-import com.tiklab.matflow.instance.model.PipelineExecLog;
-import com.tiklab.matflow.instance.model.PipelineProcess;
+
+
+import com.tiklab.matflow.definition.model.MatFlowConfigure;
+import com.tiklab.matflow.definition.service.MatFlowCommonService;
+import com.tiklab.matflow.execute.model.MatFlowStructure;
+import com.tiklab.matflow.execute.service.MatFlowStructureService;
+import com.tiklab.matflow.instance.model.MatFlowExecHistory;
+import com.tiklab.matflow.instance.model.MatFlowExecLog;
+import com.tiklab.matflow.instance.model.MatFlowProcess;
 import com.tiklab.matflow.instance.service.execAchieveService.StructureAchieveService;
-import com.doublekit.rpc.annotation.Exporter;
+import com.tiklab.rpc.annotation.Exporter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,31 +25,31 @@ import java.util.List;
 public class StructureAchieveServiceImpl implements StructureAchieveService {
 
     @Autowired
-    PipelineStructureService pipelineStructureService;
+    MatFlowStructureService matFlowStructureService;
 
     @Autowired
     CommonAchieveServiceImpl commonAchieveServiceImpl;
 
     @Autowired
-    PipelineCommonService pipelineCommonService;
+    MatFlowCommonService matFlowCommonService;
 
     private static final Logger logger = LoggerFactory.getLogger(StructureAchieveServiceImpl.class);
     // 构建
-    public int structure(PipelineProcess pipelineProcess, List<PipelineExecHistory> pipelineExecHistoryList)  {
+    public int structure(MatFlowProcess matFlowProcess, List<MatFlowExecHistory> matFlowExecHistoryList)  {
 
         long beginTime = new Timestamp(System.currentTimeMillis()).getTime();
         //初始化日志
-        PipelineExecHistory pipelineExecHistory = pipelineProcess.getPipelineExecHistory();
-        PipelineConfigure pipelineConfigure = pipelineProcess.getPipelineConfigure();
-        PipelineExecLog pipelineExecLog = commonAchieveServiceImpl.initializeLog(pipelineExecHistory, pipelineConfigure);
+        MatFlowExecHistory matFlowExecHistory = matFlowProcess.getMatFlowExecHistory();
+        MatFlowConfigure matFlowConfigure = matFlowProcess.getMatFlowConfigure();
+        MatFlowExecLog matFlowExecLog = commonAchieveServiceImpl.initializeLog(matFlowExecHistory, matFlowConfigure);
 
-        PipelineStructure pipelineStructure = pipelineStructureService.findOneStructure(pipelineConfigure.getTaskId());
-        String structureOrder = pipelineStructure.getStructureOrder();
-        String structureAddress = pipelineStructure.getStructureAddress();
-        pipelineProcess.setPipelineExecLog(pipelineExecLog);
+        MatFlowStructure matFlowStructure = matFlowStructureService.findOneStructure(matFlowConfigure.getTaskId());
+        String structureOrder = matFlowStructure.getStructureOrder();
+        String structureAddress = matFlowStructure.getStructureAddress();
+        matFlowProcess.setMatFlowExecLog(matFlowExecLog);
 
         //设置拉取地址
-        String path = pipelineCommonService.getFileAddress()+pipelineConfigure.getPipeline().getPipelineName();
+        String path = matFlowCommonService.getFileAddress()+ matFlowConfigure.getMatFlow().getMatflowName();
 
         try {
             String a = "------------------------------------" + " \n"
@@ -56,21 +58,21 @@ public class StructureAchieveServiceImpl implements StructureAchieveService {
 
             Process process = commonAchieveServiceImpl.process(path, structureOrder, structureAddress);
 
-            pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog() + a);
-            pipelineExecLog.setRunLog(pipelineExecLog.getRunLog()+a);
+            matFlowExecHistory.setRunLog(matFlowExecHistory.getRunLog() + a);
+            matFlowExecLog.setRunLog(matFlowExecLog.getRunLog()+a);
             //构建失败
-            int state = commonAchieveServiceImpl.log(process.getInputStream(), pipelineProcess,pipelineExecHistoryList);
+            int state = commonAchieveServiceImpl.log(process.getInputStream(), matFlowProcess, matFlowExecHistoryList);
             process.destroy();
-            commonAchieveServiceImpl.updateTime(pipelineProcess,beginTime);
+            commonAchieveServiceImpl.updateTime(matFlowProcess,beginTime);
             if (state == 0){
-                commonAchieveServiceImpl.updateState(pipelineProcess,"构建失败。",pipelineExecHistoryList);
+                commonAchieveServiceImpl.updateState(matFlowProcess,"构建失败。", matFlowExecHistoryList);
                 return 0;
             }
         } catch (IOException e) {
-            commonAchieveServiceImpl.updateState(pipelineProcess,e.getMessage(),pipelineExecHistoryList);
+            commonAchieveServiceImpl.updateState(matFlowProcess,e.getMessage(), matFlowExecHistoryList);
             return 0;
         }
-        commonAchieveServiceImpl.updateState(pipelineProcess,null,pipelineExecHistoryList);
+        commonAchieveServiceImpl.updateState(matFlowProcess,null, matFlowExecHistoryList);
         return 1;
     }
 }

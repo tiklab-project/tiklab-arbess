@@ -1,9 +1,10 @@
 package com.tiklab.matflow.setting.proof.model;
 
-import com.doublekit.apibox.annotation.ApiModel;
-import com.doublekit.apibox.annotation.ApiProperty;
-import com.doublekit.beans.annotation.Mapper;
-import com.doublekit.join.annotation.Join;
+
+import com.tiklab.beans.annotation.Mapper;
+import com.tiklab.join.annotation.Join;
+import com.tiklab.postlink.annotation.ApiModel;
+import com.tiklab.postlink.annotation.ApiProperty;
 
 @ApiModel
 @Join
@@ -19,15 +20,15 @@ public class ProofTask {
     private String proofId;
 
     //流水线id
-    @ApiProperty(name = "pipelineId" ,desc = "流水线id")
-    private String pipelineId;
+    @ApiProperty(name = "matflowId" ,desc = "流水线id")
+    private String matFlowId;
 
     public ProofTask() {
     }
 
-    public ProofTask(String proofId, String pipelineId) {
+    public ProofTask(String proofId, String matFlowId) {
         this.proofId = proofId;
-        this.pipelineId = pipelineId;
+        this.matFlowId = matFlowId;
     }
 
     public String getTaskId() {
@@ -46,11 +47,11 @@ public class ProofTask {
         this.proofId = proofId;
     }
 
-    public String getPipelineId() {
-        return pipelineId;
+    public String getMatFlowId() {
+        return matFlowId;
     }
 
-    public void setPipelineId(String pipelineId) {
-        this.pipelineId = pipelineId;
+    public void setMatFlowId(String matFlowId) {
+        this.matFlowId = matFlowId;
     }
 }

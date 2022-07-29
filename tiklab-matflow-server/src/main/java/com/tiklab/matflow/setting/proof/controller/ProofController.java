@@ -1,11 +1,12 @@
 package com.tiklab.matflow.setting.proof.controller;
 
-import com.doublekit.apibox.annotation.Api;
-import com.doublekit.apibox.annotation.ApiMethod;
-import com.doublekit.apibox.annotation.ApiParam;
-import com.doublekit.core.Result;
+
+import com.tiklab.core.Result;
 import com.tiklab.matflow.setting.proof.model.Proof;
 import com.tiklab.matflow.setting.proof.service.ProofService;
+import com.tiklab.postlink.annotation.Api;
+import com.tiklab.postlink.annotation.ApiMethod;
+import com.tiklab.postlink.annotation.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -46,14 +47,14 @@ public class ProofController {
     }
 
 
-    @RequestMapping(path="/findPipelineProof",method = RequestMethod.POST)
-    @ApiMethod(name = "findPipelineProof",desc = "查询流水线凭证")
+    @RequestMapping(path="/findMatFlowProof",method = RequestMethod.POST)
+    @ApiMethod(name = "findMatFlowProof",desc = "查询流水线凭证")
     @ApiParam(name = "userId",desc = "用户id",required = true)
-    public Result<List<Proof>> findPipelineProof(@NotNull String userId,String pipelineId,int type){
+    public Result<List<Proof>> findMatFlowProof(@NotNull String userId,String matFlowId,int type){
 
-        List<Proof> pipelineProof = proofService.findPipelineProof(userId,pipelineId,type);
+        List<Proof> matFlowProof = proofService.findMatFlowProof(userId,matFlowId,type);
 
-        return Result.ok(pipelineProof);
+        return Result.ok(matFlowProof);
     }
 
     //修改

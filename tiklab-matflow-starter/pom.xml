@@ -4,51 +4,54 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>com.doublekit</groupId>
-        <artifactId>doublekit-pipeline</artifactId>
+        <groupId>com.tiklab</groupId>
+        <artifactId>tiklab-matflow</artifactId>
         <version>1.0.0-SNAPSHOT</version>
     </parent>
-    <artifactId>doublekit-pipeline-starter</artifactId>
+    <artifactId>tiklab-matflow-starter</artifactId>
     <name>${project.artifactId}</name>
 
     <dependencies>
         <dependency>
-            <groupId>com.doublekit</groupId>
-            <artifactId>doublekit-beans-spring-boot-starter</artifactId>
+            <groupId>com.tiklab</groupId>
+            <artifactId>tiklab-beans-spring-boot-starter</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.doublekit</groupId>
-            <artifactId>doublekit-join-spring-boot-starter</artifactId>
+            <groupId>com.tiklab</groupId>
+            <artifactId>tiklab-join-spring-boot-starter</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.doublekit</groupId>
-            <artifactId>doublekit-eam-spring-boot-starter</artifactId>
+            <groupId>com.tiklab</groupId>
+            <artifactId>tiklab-eam-spring-boot-starter</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.doublekit</groupId>
-            <artifactId>doublekit-pipeline-server</artifactId>
+            <groupId>com.tiklab</groupId>
+            <artifactId>tiklab-matflow-server</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.doublekit</groupId>
-            <artifactId>doublekit-message-spring-boot-starter</artifactId>
+            <groupId>com.tiklab</groupId>
+            <artifactId>tiklab-message-spring-boot-starter</artifactId>
             <version>1.0.0-SNAPSHOT</version>
         </dependency>
         <dependency>
-            <groupId>com.doublekit</groupId>
-            <artifactId>doublekit-user-spring-boot-starter</artifactId>
+            <groupId>com.tiklab</groupId>
+            <artifactId>tiklab-user-spring-boot-starter</artifactId>
             <version>1.0.0-SNAPSHOT</version>
         </dependency>
+
         <dependency>
-            <groupId>com.doublekit</groupId>
-            <artifactId>doublekit-dss-spring-boot-starter</artifactId>
+            <groupId>com.tiklab</groupId>
+            <artifactId>tiklab-dss-spring-boot-starter</artifactId>
+            <version>${project.version}</version>
         </dependency>
+
         <dependency>
-            <groupId>com.doublekit</groupId>
-            <artifactId>doublekit-privilege-spring-boot-starter</artifactId>
+            <groupId>com.tiklab</groupId>
+            <artifactId>tiklab-privilege-spring-boot-starter</artifactId>
             <version>${project.version}</version>
         </dependency>
 
@@ -78,7 +81,7 @@
                             <descriptors>
                                 <descriptor>assembly/distribution.xml</descriptor>
                             </descriptors>
-                            <finalName>doublekit-pipeline-${project.version}</finalName>
+                            <finalName>tiklab-matFlow-${project.version}</finalName>
                         </configuration>
                         <phase>package</phase>
                         <goals>
@@ -93,7 +96,7 @@
                 <artifactId>docker-maven-plugin</artifactId>
                 <version>0.4.13</version>
                 <configuration>
-                    <imageName>pipeline:1.0.0</imageName>
+                    <imageName>matFlow:1.0.0</imageName>
                     <!--Dockerfile文件位置-->
                     <dockerDirectory>./</dockerDirectory>
 <!--                        <resources>-->

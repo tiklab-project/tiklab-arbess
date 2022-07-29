@@ -1,10 +1,10 @@
 package com.tiklab.matflow.setting.proof.entity;
 
 
-import com.doublekit.dal.jpa.annotation.*;
+import com.tiklab.dal.jpa.annotation.*;
 
 @Entity
-@Table(name="pipeline_proof")
+@Table(name="matflow_proof")
 public class ProofEntity {
 
     //凭证id
@@ -42,8 +42,8 @@ public class ProofEntity {
     private String proofCreateTime;
 
     //流水线id
-    @Column(name = "pipeline_id")
-    private String pipelineId;
+    @Column(name = "matflow_id")
+    private String matflowId;
 
     //类型
     @Column(name = "type")
@@ -119,12 +119,12 @@ public class ProofEntity {
         this.proofCreateTime = proofCreateTime;
     }
 
-    public String getPipelineId() {
-        return pipelineId;
+    public String getMatflowId() {
+        return matflowId;
     }
 
-    public void setPipelineId(String pipelineId) {
-        this.pipelineId = pipelineId;
+    public void setMatflowId(String matflowId) {
+        this.matflowId = matflowId;
     }
 
     public int getType() {

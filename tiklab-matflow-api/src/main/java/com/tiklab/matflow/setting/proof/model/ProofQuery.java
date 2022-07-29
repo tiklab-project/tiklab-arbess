@@ -1,14 +1,14 @@
 package com.tiklab.matflow.setting.proof.model;
 
 
-import com.doublekit.apibox.annotation.ApiModel;
-import com.doublekit.apibox.annotation.ApiProperty;
+import com.tiklab.postlink.annotation.ApiModel;
+import com.tiklab.postlink.annotation.ApiProperty;
 
 @ApiModel
 public class ProofQuery {
 
-    @ApiProperty(name="pipelineId",desc="流水线id")
-    String pipelineId;
+    @ApiProperty(name="matFlowId",desc="流水线id")
+    String matFlowId;
 
     @ApiProperty(name="type",desc="类型")
     int type;
@@ -17,12 +17,12 @@ public class ProofQuery {
     String userId;
 
 
-    public String getPipelineId() {
-        return pipelineId;
+    public String getMatFlowId() {
+        return matFlowId;
     }
 
-    public void setPipelineId(String pipelineId) {
-        this.pipelineId = pipelineId;
+    public void setMatFlowId(String matFlowId) {
+        this.matFlowId = matFlowId;
     }
 
     public int getType() {
