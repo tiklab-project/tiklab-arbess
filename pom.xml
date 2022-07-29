@@ -9,15 +9,15 @@
         <artifactId>doublekit-dependencies</artifactId>
         <version>1.0.0-SNAPSHOT</version>
     </parent>
-    <artifactId>doublekit-pipeline</artifactId>
+    <artifactId>tiklab-matflow</artifactId>
     <name>${project.artifactId}</name>
     <packaging>pom</packaging>
     <version>1.0.0-SNAPSHOT</version>
 
     <modules>
-        <module>doublekit-pipeline-api</module>
-        <module>doublekit-pipeline-server</module>
-        <module>doublekit-pipeline-starter</module>
+        <module>tiklab-matflow-api</module>
+        <module>tiklab-matflow-server</module>
+        <module>tiklab-matflow-starter</module>
     </modules>
 
     <properties>
