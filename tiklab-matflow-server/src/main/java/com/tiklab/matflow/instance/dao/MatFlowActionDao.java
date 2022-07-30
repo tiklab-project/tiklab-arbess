@@ -70,7 +70,7 @@ public class MatFlowActionDao {
      * @return 动态信息
      */
     public List<MatFlowActionEntity> findUserAction(String s){
-        String sql = "select * from matFlow_action ";
+        String sql = "select * from matflow_action ";
         sql = sql.concat(s);
         JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
         return  jdbcTemplate.query(sql, new BeanPropertyRowMapper(MatFlowActionEntity.class));
@@ -81,8 +81,8 @@ public class MatFlowActionDao {
      * @param matFlowId 流水线id
      */
     public void deleteAllAction(String matFlowId){
-        String sql = "delete  from matFlow_action ";
-        sql = sql.concat(" where matFlow_action.matFlow_id = '"+matFlowId +"'");
+        String sql = "delete  from matflow_action ";
+        sql = sql.concat(" where matflow_action.matflow_id = '"+matFlowId +"'");
         JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
         jdbcTemplate.execute(sql);
     }

@@ -66,8 +66,8 @@ public class MatFlowExecLogDao {
      * @param historyId 历史id
      */
     public void deleteAllLog(String historyId){
-        String sql = "delete from matFlow_log ";
-        sql = sql.concat(" where matFlow_log.history_id = '"+historyId +"'");
+        String sql = "delete from matflow_log ";
+        sql = sql.concat(" where matflow_log.history_id = '"+historyId +"'");
         JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
         jdbcTemplate.execute(sql);
     }
@@ -78,8 +78,8 @@ public class MatFlowExecLogDao {
      * @return 历史信息
      */
     public List<MatFlowExecLogEntity> findAllLog(String historyId){
-        String sql = "select matFlow_log.* from matFlow_log ";
-        sql = sql.concat(" where matFlow_log.history_id = '"+historyId +"'");
+        String sql = "select matflow_log.* from matflow_log ";
+        sql = sql.concat(" where matflow_log.history_id = '"+historyId +"'");
         JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
         return jdbcTemplate.query(sql,new BeanPropertyRowMapper(MatFlowExecLogEntity.class));
     }

@@ -56,9 +56,9 @@ public class MatFlowOpenDao {
     }
 
     public List<MatFlowOpenEntity> findAllOpen(String userId, StringBuilder s){
-        String sql = "select matFlow_open.* from matFlow_open ";
-        sql = sql.concat(" where matFlow_open.user_id   = '"+userId+"' "
-                + " and matFlow_open.matFlow_id   "
+        String sql = "select matflow_open.* from matflow_open ";
+        sql = sql.concat(" where matflow_open.user_id   = '"+userId+"' "
+                + " and matflow_open.matflow_id   "
                 + " in (" + s +" ) ");
         JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
         return  jdbcTemplate.query(sql, new BeanPropertyRowMapper(MatFlowOpenEntity.class));
