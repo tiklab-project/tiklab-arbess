@@ -1,14 +1,17 @@
 CREATE TABLE `matflow`  (
-  `id` varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '流水线id',
-  `name` varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '流水线名称',
+  `matflow_id` varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '流水线id',
+  `matflow_name` varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '流水线名称',
   `user_id` varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '用户id',
-  `create_time` datetime NULL DEFAULT NULL COMMENT '流水线创建时间',
-  `create_type` int NULL DEFAULT NULL COMMENT '流水线类型',
-  `collect` int NULL DEFAULT NULL COMMENT '收藏状态',
-  `state` int NULL DEFAULT NULL COMMENT '运行状态',
-  PRIMARY KEY (`id`) USING BTREE
+  `matflow_create_time` datetime NULL DEFAULT NULL COMMENT '流水线创建时间',
+  `matflow_create_type` int NULL DEFAULT NULL COMMENT '流水线类型',
+  `matflow_collect` int NULL DEFAULT NULL COMMENT '收藏状态',
+  `matflow_state` int NULL DEFAULT NULL COMMENT '运行状态',
+  PRIMARY KEY (`matflow_id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '流水线表' ROW_FORMAT = DYNAMIC;
 
+-- ----------------------------
+-- Table structure for matflow_action
+-- ----------------------------
 CREATE TABLE `matflow_action`  (
   `id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `create_time` datetime NULL DEFAULT NULL,
@@ -19,7 +22,9 @@ CREATE TABLE `matflow_action`  (
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
-
+-- ----------------------------
+-- Table structure for matflow_code
+-- ----------------------------
 CREATE TABLE `matflow_code`  (
   `code_id` varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT 'gitId',
   `type` int NULL DEFAULT NULL COMMENT '类型',
@@ -32,7 +37,9 @@ CREATE TABLE `matflow_code`  (
   PRIMARY KEY (`code_id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
-
+-- ----------------------------
+-- Table structure for matflow_configure
+-- ----------------------------
 CREATE TABLE `matflow_configure`  (
   `configure_id` varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '配置id',
   `matflow_id` varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '流水线id',
@@ -45,7 +52,9 @@ CREATE TABLE `matflow_configure`  (
   PRIMARY KEY (`configure_id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
-
+-- ----------------------------
+-- Table structure for matflow_deploy
+-- ----------------------------
 CREATE TABLE `matflow_deploy`  (
   `deploy_id` varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '部署id',
   `type` int NULL DEFAULT NULL COMMENT '容器类型',
@@ -65,7 +74,9 @@ CREATE TABLE `matflow_deploy`  (
   PRIMARY KEY (`deploy_id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
-
+-- ----------------------------
+-- Table structure for matflow_follow
+-- ----------------------------
 CREATE TABLE `matflow_follow`  (
   `id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `user_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
@@ -73,7 +84,9 @@ CREATE TABLE `matflow_follow`  (
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
-
+-- ----------------------------
+-- Table structure for matflow_history
+-- ----------------------------
 CREATE TABLE `matflow_history`  (
   `history_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT 'id',
   `create_time` datetime NULL DEFAULT NULL COMMENT '创建时间',
@@ -88,7 +101,9 @@ CREATE TABLE `matflow_history`  (
   PRIMARY KEY (`history_id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '构建历史表' ROW_FORMAT = DYNAMIC;
 
-
+-- ----------------------------
+-- Table structure for matflow_log
+-- ----------------------------
 CREATE TABLE `matflow_log`  (
   `log_id` varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '日志id',
   `history_id` varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '历史id',
@@ -101,7 +116,9 @@ CREATE TABLE `matflow_log`  (
   PRIMARY KEY (`log_id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
-
+-- ----------------------------
+-- Table structure for matflow_open
+-- ----------------------------
 CREATE TABLE `matflow_open`  (
   `open_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `matflow_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
@@ -110,7 +127,9 @@ CREATE TABLE `matflow_open`  (
   PRIMARY KEY (`open_id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
-
+-- ----------------------------
+-- Table structure for matflow_proof
+-- ----------------------------
 CREATE TABLE `matflow_proof`  (
   `proof_id` varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '凭证id',
   `proof_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '凭证名',
@@ -126,7 +145,9 @@ CREATE TABLE `matflow_proof`  (
   PRIMARY KEY (`proof_id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '凭证表' ROW_FORMAT = DYNAMIC;
 
-
+-- ----------------------------
+-- Table structure for matflow_proof_task
+-- ----------------------------
 CREATE TABLE `matflow_proof_task`  (
   `task_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `proof_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
@@ -134,7 +155,9 @@ CREATE TABLE `matflow_proof_task`  (
   PRIMARY KEY (`task_id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
-
+-- ----------------------------
+-- Table structure for matflow_structure
+-- ----------------------------
 CREATE TABLE `matflow_structure`  (
   `structure_id` varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '构建id',
   `type` int NULL DEFAULT NULL COMMENT '类型',
@@ -145,7 +168,9 @@ CREATE TABLE `matflow_structure`  (
   PRIMARY KEY (`structure_id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
-
+-- ----------------------------
+-- Table structure for matflow_test
+-- ----------------------------
 CREATE TABLE `matflow_test`  (
   `test_id` varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '测试id',
   `type` int NULL DEFAULT NULL COMMENT '类型',
