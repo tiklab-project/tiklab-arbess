@@ -80,6 +80,7 @@ public class MatFlowStructureServiceImpl implements MatFlowStructureService {
     public void updateTask(MatFlowExecConfigure matFlowExecConfigure) {
         MatFlowStructure matFlowStructure = matFlowExecConfigure.getMatFlowStructure();
         MatFlow matFlow = matFlowExecConfigure.getMatFlow();
+
         MatFlowConfigure oneConfigure = matFlowConfigureService.findOneConfigure(matFlow.getMatflowId(), 30);
 
         //判断新配置是否删除了构建配置

@@ -74,7 +74,6 @@ public class MatFlowConfigureServiceImpl implements MatFlowConfigureService {
     //更新配置
     @Override
     public void updateConfigure(MatFlowConfigure matFlowConfigure){
-
         matFlowConfigureDao.updateConfigure(BeanMapper.map(matFlowConfigure, MatFlowConfigureEntity.class));
     }
 
@@ -144,23 +143,14 @@ public class MatFlowConfigureServiceImpl implements MatFlowConfigureService {
     //通过流水线id查询所有配置
     @Override
     public List<MatFlowConfigure> findAllConfigure(String matFlowId) {
-        List<MatFlowConfigure> allConfigure = findAllConfigure();
-        if (allConfigure.size() == 0){
+        List<MatFlowConfigureEntity> allConfigure = matFlowConfigureDao.findAllConfigure(matFlowId);
+
+        if (allConfigure ==null ){
             return null;
         }
-        allConfigure.sort(Comparator.comparing(MatFlowConfigure::getTaskSort));
-        List<MatFlowConfigure> matFlowConfigures = new ArrayList<>();
-        for (MatFlowConfigure matFlowConfigure : allConfigure) {
-            if (matFlowConfigure.getMatFlow() == null){
-                continue;
-            }
-            if (matFlowConfigure.getMatFlow().getMatflowId().equals(matFlowId)){
-                matFlowConfigures.add(matFlowConfigure);
-            }
-        }
-        if (matFlowConfigures.size() != 0){
-            allConfigure.sort(Comparator.comparing(MatFlowConfigure::getTaskSort));
-        }
+        List<MatFlowConfigure> matFlowConfigures = BeanMapper.mapList(allConfigure, MatFlowConfigure.class);
+        joinTemplate.joinQuery(matFlowConfigures);
+        matFlowConfigures.sort(Comparator.comparing(MatFlowConfigure::getTaskSort));
         return matFlowConfigures;
     }
 

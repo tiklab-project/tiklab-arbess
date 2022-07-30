@@ -2,11 +2,14 @@ package com.tiklab.matflow.definition.dao;
 
 
 
+import com.tiklab.dal.jdbc.JdbcTemplate;
 import com.tiklab.dal.jpa.JpaTemplate;
 import com.tiklab.matflow.definition.entity.MatFlowConfigureEntity;
+import com.tiklab.matflow.instance.entity.MatFlowExecHistoryEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -56,6 +59,19 @@ public class MatFlowConfigureDao {
     public MatFlowConfigureEntity findOneConfigure(String configureId){
         return jpaTemplate.findOne(MatFlowConfigureEntity.class, configureId);
     }
+
+    /**
+     * 根据流水线id获取配置
+     * @param matFlowId 流水线id
+     * @return 配置信息
+     */
+    public List<MatFlowConfigureEntity> findAllConfigure(String matFlowId){
+        String sql = "select matflow_configure.* from matflow_configure";
+        sql = sql.concat(" where matflow_configure.matflow_id = '"+ matFlowId+"' " );
+        JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
+        return  jdbcTemplate.query(sql, new BeanPropertyRowMapper(MatFlowConfigureEntity.class));
+    }
+
 
     /**
      * 查询所有配置信息

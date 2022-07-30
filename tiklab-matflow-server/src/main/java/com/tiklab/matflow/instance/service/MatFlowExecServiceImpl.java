@@ -72,13 +72,18 @@ public class MatFlowExecServiceImpl implements MatFlowExecService {
         if (matFlow.getMatflowState() == 1){
             return 100;
         }
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            return 1;
+        }
         executorService.submit(() -> {
             beginTime = new Timestamp(System.currentTimeMillis()).getTime();
          Thread.currentThread().setName(matFlowId);
                 begin(matFlow,userId);
         });
         try {
-            Thread.sleep(1000);
+            Thread.sleep(500);
         } catch (InterruptedException e) {
            return 1;
         }

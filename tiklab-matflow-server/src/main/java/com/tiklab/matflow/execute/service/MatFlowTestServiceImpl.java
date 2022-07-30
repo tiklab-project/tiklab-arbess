@@ -111,26 +111,8 @@ public class MatFlowTestServiceImpl implements MatFlowTestService {
             String testId = createTest(matFlowTest);
             oneConfigure.setTaskId(testId);
             matFlowConfigureService.createConfigure(oneConfigure);
-
         }
         matFlowStructureService.updateTask(matFlowExecConfigure);
-
-        //if (oneConfigure != null ){
-        //    if (matFlowTest.getType() != 0){
-        //        updateTest(matFlowTest);
-        //        oneConfigure.setTaskSort(matFlowTest.getSort());
-        //        oneConfigure.setTaskAlias(matFlowTest.getTestAlias());
-        //        oneConfigure.setView(matFlowExecConfigure.getView());
-        //        matFlowConfigureService.updateConfigure(oneConfigure);
-        //        //动态
-        //    }else {
-        //        matFlowConfigureService.deleteTask(oneConfigure.getTaskId(),matFlow.getMatFlowId());
-        //    }
-        //}
-        //
-        //if (matFlowTest.getType() != 0 && oneConfigure == null){
-        //    createConfigure(matFlow.getMatFlowId(),matFlowTest);
-        //}
     }
 
     //查询单个

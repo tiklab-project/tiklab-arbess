@@ -63,21 +63,10 @@ public class MatFlowFollowServiceImpl implements MatFlowFollowService {
             matFlowFollow.forEach(matFlow -> matFlow.setMatflowCollect(1));
             matFlowNotFollow.addAll(matFlowFollow);
         }
+        //排序
         matFlowNotFollow.sort(Comparator.comparing(MatFlowEntity::getMatflowName));
 
         return BeanMapper.mapList(matFlowNotFollow, MatFlow.class);
-        //List<MatFlow> matFlowList = new ArrayList<>();
-
-        //if (matFlowFollow != null){
-        //    matFlowFollow.forEach(matFlow -> matFlow.setMatflowCollect(1));
-        //    matFlowList.addAll(matFlowFollow);
-        //}
-        //
-        //if (matFlowNotFollow != null){
-        //    matFlowList.addAll(matFlowNotFollow);
-        //}
-
-        //return matFlows;
     }
 
     @Override

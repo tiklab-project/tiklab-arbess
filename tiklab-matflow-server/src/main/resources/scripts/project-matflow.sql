@@ -1,6 +1,6 @@
 INSERT INTO `matflow` VALUES ('679668d5ce24a7a9ff697feca5bb94ff', '示例项目1', '111111', '2022-07-28 15:47:29', 1, 0, 0);
 
-INSERT INTO `orc_dm_user` VALUES ('q3ewqrfasf', '679668d5ce24a7a9ff697feca5bb94ff', '111111');
+--INSERT INTO `orc_dm_user` VALUES ('q3ewqrfasf', '679668d5ce24a7a9ff697feca5bb94ff', '111111');
 
 INSERT INTO `matflow_configure` VALUES ('5ad268afc021ade3548e3d2aa53c5891', '679668d5ce24a7a9ff697feca5bb94ff', '76806330a7f7157828ddb12c44c17019', 1, 1, '2022-07-28 16:49:41', '源码管理', 0);
 INSERT INTO `matflow_configure` VALUES ('94ea78a31854d2b93df84a9508953d6f', '679668d5ce24a7a9ff697feca5bb94ff', '9b420a082fc51e79792edaea928dd1b7', 21, 2, '2022-07-28 16:17:54', '构建', 0);
