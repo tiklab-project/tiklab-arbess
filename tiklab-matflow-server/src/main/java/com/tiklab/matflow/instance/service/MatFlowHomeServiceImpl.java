@@ -81,7 +81,19 @@ public class MatFlowHomeServiceImpl implements MatFlowHomeService {
         if (s.toString().equals("")){
             return null;
         }
+        List<MatFlow> allMatFlow = matFlowService.findAllMatFlow();
+
         List<MatFlow> userMatFlow = matFlowFollowService.findUserMatFlow(userId,s);
+
+        if (allMatFlow == null ){
+            return matFlowService.findAllStatus(userMatFlow);
+        }
+        for (MatFlow matFlow : allMatFlow) {
+            if (matFlow.getMatflowCollect() == 1){
+                allMatFlow.add(matFlow);
+            }
+        }
+
         return matFlowService.findAllStatus(userMatFlow);
     }
 

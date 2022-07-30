@@ -173,7 +173,18 @@ public class MatFlowServiceImpl implements MatFlowService {
             return null;
         }
         List<MatFlowEntity> userMatFlow = matFlowDao.findUserMatFlow(s);
-        return BeanMapper.mapList(userMatFlow, MatFlow.class);
+        List<MatFlow> list = BeanMapper.mapList(userMatFlow, MatFlow.class);
+
+        List<MatFlow> allMatFlow = findAllMatFlow();
+        if (allMatFlow == null){
+            return list;
+        }
+        for (MatFlow matFlow : allMatFlow) {
+            if (matFlow.getMatflowCollect() == 1){
+                list.add(matFlow);
+            }
+        }
+        return list;
     }
 
     //获取用户所有流水线id
