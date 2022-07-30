@@ -103,7 +103,7 @@ public class MatFlowExecHistoryDao {
      */
     public List<MatFlowExecHistoryEntity> findAllUserHistory(String lastTime, String nowTime, StringBuilder s) {
         String sql = "select matflow_history.* from matflow_history ";
-        sql = sql.concat(" where matFlow_history.matflow_id "
+        sql = sql.concat(" where matflow_history.matflow_id "
                 + " in("+ s +" )"
                 + " and matflow_history.create_time > '"+ lastTime +"'"
                 + " and matflow_history.create_time < '"+nowTime + "'"
