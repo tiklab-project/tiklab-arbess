@@ -75,10 +75,6 @@
             <artifactId>tiklab-matflow-api</artifactId>
             <version>${project.version}</version>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>com.tiklab</groupId>-->
-<!--            <artifactId>tiklab-apibox-client</artifactId>-->
-<!--        </dependency>-->
         <dependency>
             <groupId>maven</groupId>
             <artifactId>dom4j</artifactId>
