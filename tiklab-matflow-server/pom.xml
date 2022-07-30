@@ -42,19 +42,6 @@
             <artifactId>spring-boot-starter</artifactId>
         </dependency>
 
-<!--        <dependency>-->
-<!--            <groupId>com.tiklab</groupId>-->
-<!--            <artifactId>tiklab-web-spring-boot-starter</artifactId>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>com.tiklab</groupId>-->
-<!--            <artifactId>tiklab-dal-spring-boot-starter</artifactId>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>com.tiklab</groupId>-->
-<!--            <artifactId>tiklab-dss-spring-boot-starter</artifactId>-->
-<!--        </dependency>-->
-
         <!--tiklab-->
         <dependency>
             <groupId>com.tiklab</groupId>
@@ -66,13 +53,6 @@
             <artifactId>tiklab-join-spring-boot-starter</artifactId>
             <version>1.0.0-SNAPSHOT</version>
         </dependency>
-
-<!--        <dependency>-->
-<!--            <groupId>com.tiklab</groupId>-->
-<!--            <artifactId>tiklab-codegen-core</artifactId>-->
-<!--            <scope>test</scope>-->
-<!--        </dependency>-->
-
         <!--pcs-->
         <dependency>
             <groupId>com.tiklab</groupId>

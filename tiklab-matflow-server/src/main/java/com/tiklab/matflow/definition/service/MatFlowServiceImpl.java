@@ -123,7 +123,8 @@ public class MatFlowServiceImpl implements MatFlowService {
     public int updateMatFlow(MatFlow matFlow) {
         //更改对应文件名
         String fileAddress = matFlowCommonService.getFileAddress();
-        String lastName = fileAddress+findMatFlow(matFlow.getMatflowId()).getMatflowName();
+        MatFlow flow = findMatFlow(matFlow.getMatflowId());
+        String lastName = fileAddress+flow.getMatflowName();
         String newName = fileAddress+ matFlow.getMatflowName();
         File file = new File(lastName);
         if (file.exists()){

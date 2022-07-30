@@ -5,9 +5,9 @@ package com.tiklab.matflow.definition.controller;
 import com.tiklab.core.Result;
 import com.tiklab.matflow.definition.model.MatFlow;
 import com.tiklab.matflow.definition.service.MatFlowService;
-import com.tiklab.postlink.annotation.Api;
-import com.tiklab.postlink.annotation.ApiMethod;
-import com.tiklab.postlink.annotation.ApiParam;
+import com.tiklab.postin.annotation.Api;
+import com.tiklab.postin.annotation.ApiMethod;
+import com.tiklab.postin.annotation.ApiParam;
 import com.tiklab.user.user.model.DmUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -85,10 +85,10 @@ public class MatFlowController {
     }
 
     //模糊查询
-    @RequestMapping(path="/findOneName",method = RequestMethod.POST)
-    @ApiMethod(name = "findOneName",desc = "模糊查询")
+    @RequestMapping(path="/findLike",method = RequestMethod.POST)
+    @ApiMethod(name = "findLike",desc = "模糊查询")
     @ApiParam(name = "matFlowName",desc = "模糊查询条件",required = true)
-    public Result<List<MatFlow>> findOneName(@NotNull String matFlowName, String userId){
+    public Result<List<MatFlow>> findLike(@NotNull String matFlowName, String userId){
 
         List<MatFlow> matFlowQueryList = matFlowService.findLike(matFlowName,userId);
 

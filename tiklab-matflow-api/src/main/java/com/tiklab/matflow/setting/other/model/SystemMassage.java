@@ -2,8 +2,8 @@ package com.tiklab.matflow.setting.other.model;
 
 
 
-import com.tiklab.postlink.annotation.ApiModel;
-import com.tiklab.postlink.annotation.ApiProperty;
+import com.tiklab.postin.annotation.ApiModel;
+import com.tiklab.postin.annotation.ApiProperty;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;

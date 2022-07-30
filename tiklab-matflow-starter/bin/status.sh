@@ -5,7 +5,7 @@ fi
 
 
 #APP_MAIN=${application.main.class}
-APP_MAIN="com.doublekit.pipeline.PipelineApplication"
+APP_MAIN="com.tiklab.matflow.MatFlowApplication"
 
 PID=0
 getPID(){

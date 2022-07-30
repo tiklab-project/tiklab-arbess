@@ -2,8 +2,8 @@ package com.tiklab.matflow.definition.model;
 
 
 import com.tiklab.join.annotation.Join;
-import com.tiklab.postlink.annotation.ApiModel;
-import com.tiklab.postlink.annotation.ApiProperty;
+import com.tiklab.postin.annotation.ApiModel;
+import com.tiklab.postin.annotation.ApiProperty;
 
 @ApiModel
 @Join

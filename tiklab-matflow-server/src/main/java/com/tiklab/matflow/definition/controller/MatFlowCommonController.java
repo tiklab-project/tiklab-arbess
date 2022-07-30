@@ -3,9 +3,9 @@ package com.tiklab.matflow.definition.controller;
 
 import com.tiklab.core.Result;
 import com.tiklab.matflow.definition.service.MatFlowCommonService;
-import com.tiklab.postlink.annotation.Api;
-import com.tiklab.postlink.annotation.ApiMethod;
-import com.tiklab.postlink.annotation.ApiParam;
+import com.tiklab.postin.annotation.Api;
+import com.tiklab.postin.annotation.ApiMethod;
+import com.tiklab.postin.annotation.ApiParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

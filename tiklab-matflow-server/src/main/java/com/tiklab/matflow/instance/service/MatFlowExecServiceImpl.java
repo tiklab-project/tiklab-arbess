@@ -77,6 +77,11 @@ public class MatFlowExecServiceImpl implements MatFlowExecService {
          Thread.currentThread().setName(matFlowId);
                 begin(matFlow,userId);
         });
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+           return 1;
+        }
         return 1;
     }
 

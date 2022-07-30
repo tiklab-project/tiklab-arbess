@@ -18,8 +18,8 @@ public class ProofTaskEntity {
     private String proofId;
 
     //凭证名
-    @Column(name = "matFlow_id")
-    private String matFlowId;
+    @Column(name = "matflow_id")
+    private String matflowId;
 
 
     public String getTaskId() {
@@ -38,11 +38,11 @@ public class ProofTaskEntity {
         this.proofId = proofId;
     }
 
-    public String getMatFlowId() {
-        return matFlowId;
+    public String getMatflowId() {
+        return matflowId;
     }
 
-    public void setMatFlowId(String matFlowId) {
-        this.matFlowId = matFlowId;
+    public void setMatflowId(String matflowId) {
+        this.matflowId = matflowId;
     }
 }

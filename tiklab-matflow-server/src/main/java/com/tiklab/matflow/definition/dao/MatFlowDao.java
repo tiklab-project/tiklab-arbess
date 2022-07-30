@@ -87,7 +87,7 @@ public class MatFlowDao {
      */
     public List<MatFlowEntity> findName(String matFlowName){
         QueryCondition queryCondition = QueryBuilders.createQuery(MatFlowEntity.class)
-                .like("matFlowName", matFlowName).get();
+                .like("matflowName", matFlowName).get();
         return jpaTemplate.findList(queryCondition, MatFlowEntity.class);
     }
 

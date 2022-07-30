@@ -6,8 +6,8 @@ import com.tiklab.beans.annotation.Mappings;
 import com.tiklab.join.annotation.Join;
 import com.tiklab.join.annotation.JoinQuery;
 import com.tiklab.matflow.setting.proof.model.Proof;
-import com.tiklab.postlink.annotation.ApiModel;
-import com.tiklab.postlink.annotation.ApiProperty;
+import com.tiklab.postin.annotation.ApiModel;
+import com.tiklab.postin.annotation.ApiProperty;
 
 @ApiModel
 @Join

@@ -64,7 +64,8 @@ public class MatFlowHomeServiceImpl implements MatFlowHomeService {
         if (s.toString().equals("")){
             return null;
         }
-        return matFlowService.findAllStatus(matFlowFollowService.findAllFollow(userId,s));
+        List<MatFlow> allFollow = matFlowFollowService.findAllFollow(userId, s);
+        return matFlowService.findAllStatus(allFollow);
     }
 
     //更新收藏信息

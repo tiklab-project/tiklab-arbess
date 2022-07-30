@@ -136,7 +136,7 @@ public class ProofServiceImpl implements ProofService{
                 continue;
             }
             for (ProofTaskEntity proofTaskEntity : list) {
-                arrayList.add(proofTaskEntity.getMatFlowId());
+                arrayList.add(proofTaskEntity.getMatflowId());
                 proof.setProofList(arrayList);
             }
         }

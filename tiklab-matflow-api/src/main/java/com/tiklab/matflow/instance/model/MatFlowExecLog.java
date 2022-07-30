@@ -3,8 +3,8 @@ package com.tiklab.matflow.instance.model;
 
 import com.tiklab.beans.annotation.Mapper;
 import com.tiklab.join.annotation.Join;
-import com.tiklab.postlink.annotation.ApiModel;
-import com.tiklab.postlink.annotation.ApiProperty;
+import com.tiklab.postin.annotation.ApiModel;
+import com.tiklab.postin.annotation.ApiProperty;
 
 /**
  * 流水线日志

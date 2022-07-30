@@ -5,8 +5,8 @@ package com.tiklab.matflow.instance.model;
 import com.tiklab.core.order.Order;
 import com.tiklab.core.order.OrderBuilders;
 import com.tiklab.core.page.Page;
-import com.tiklab.postlink.annotation.ApiModel;
-import com.tiklab.postlink.annotation.ApiProperty;
+import com.tiklab.postin.annotation.ApiModel;
+import com.tiklab.postin.annotation.ApiProperty;
 
 import java.util.List;
 
@@ -17,8 +17,8 @@ import java.util.List;
 @ApiModel
 public class MatFlowHistoryQuery {
 
-    @ApiProperty(name ="matFlowId",desc = "流水线id")
-    private String matFlowId;
+    @ApiProperty(name ="matflowId",desc = "流水线id")
+    private String matflowId;
 
     @ApiProperty(name ="state",desc = "状态")
     private int state;
@@ -36,12 +36,12 @@ public class MatFlowHistoryQuery {
     private List<Order> orderParams = OrderBuilders.instance().desc("createTime").get();
 
 
-    public String getMatFlowId() {
-        return matFlowId;
+    public String getMatflowId() {
+        return matflowId;
     }
 
-    public void setMatFlowId(String matFlowId) {
-        this.matFlowId = matFlowId;
+    public void setMatflowId(String matflowId) {
+        this.matflowId = matflowId;
     }
 
     public int getState() {

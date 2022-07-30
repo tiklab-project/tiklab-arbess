@@ -7,8 +7,9 @@ import com.tiklab.beans.annotation.Mappings;
 import com.tiklab.join.annotation.Join;
 import com.tiklab.join.annotation.JoinQuery;
 import com.tiklab.matflow.definition.model.MatFlow;
-import com.tiklab.postlink.annotation.ApiModel;
-import com.tiklab.postlink.annotation.ApiProperty;
+import com.tiklab.postin.annotation.ApiModel;
+import com.tiklab.postin.annotation.ApiProperty;
+
 
 /**
  * 最近收藏记录
@@ -32,7 +33,6 @@ public class MatFlowFollow {
     })
     @JoinQuery(key = "matflowId")
     private MatFlow matFlow;
-
 
     private String matFlowName;
 

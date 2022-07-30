@@ -81,7 +81,7 @@ public class MatFlowExecHistoryDao {
      */
     public Pagination<MatFlowExecHistoryEntity> findPageHistory(MatFlowHistoryQuery matFlowHistoryQuery){
         QueryBuilders builders = QueryBuilders.createQuery(MatFlowExecHistoryEntity.class)
-                    .eq("matFlowId", matFlowHistoryQuery.getMatFlowId());
+                    .eq("matflowId", matFlowHistoryQuery.getMatflowId());
             if (matFlowHistoryQuery.getState() != 0) {
                 builders.eq("runStatus", matFlowHistoryQuery.getState());
             }
@@ -102,12 +102,12 @@ public class MatFlowExecHistoryDao {
      * @return 流水线历史列表
      */
     public List<MatFlowExecHistoryEntity> findAllUserHistory(String lastTime, String nowTime, StringBuilder s) {
-        String sql = "select matFlow_history.* from matFlow_history ";
-        sql = sql.concat(" where matFlow_history.matFlow_id "
+        String sql = "select matflow_history.* from matflow_history ";
+        sql = sql.concat(" where matFlow_history.matflow_id "
                 + " in("+ s +" )"
-                + " and matFlow_history.create_time > '"+ lastTime +"'"
-                + " and matFlow_history.create_time < '"+nowTime + "'"
-                + " order by matFlow_history.create_time desc");
+                + " and matflow_history.create_time > '"+ lastTime +"'"
+                + " and matflow_history.create_time < '"+nowTime + "'"
+                + " order by matflow_history.create_time desc");
         JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
         return  jdbcTemplate.query(sql, new BeanPropertyRowMapper(MatFlowExecHistoryEntity.class));
     }
@@ -119,9 +119,9 @@ public class MatFlowExecHistoryDao {
      * @return 历史集合
      */
     public List<MatFlowExecHistoryEntity> findAllHistory(String matFlowId){
-        String sql = "select matFlow_history.* from matFlow_history  ";
-        sql = sql.concat(" where matFlow_history.matFlow_id   = '"+matFlowId+"' " +
-                " and matFlow_history.find_state = 1 ");
+        String sql = "select matflow_history.* from matflow_history  ";
+        sql = sql.concat(" where matflow_history.matflow_id   = '"+matFlowId+"' " +
+                " and matflow_history.find_state = 1 ");
         JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
         return  jdbcTemplate.query(sql, new BeanPropertyRowMapper(MatFlowExecHistoryEntity.class));
     }
@@ -132,10 +132,10 @@ public class MatFlowExecHistoryDao {
      * @return 成功列表
      */
     public List<MatFlowExecHistoryEntity> findLatelySuccess(String matFlowId){
-        String sql = "select matFlow_history.* from matFlow_history  ";
-        sql = sql.concat(" where matFlow_history.matFlow_id   = '"+matFlowId+"' " +
-                " and matFlow_history.run_status = '30'  " +
-                " order by matFlow_history.create_time desc" +
+        String sql = "select matflow_history.* from matflow_history  ";
+        sql = sql.concat(" where matflow_history.matflow_id   = '"+matFlowId+"' " +
+                " and matflow_history.run_status = '30'  " +
+                " order by matflow_history.create_time desc" +
                 " limit 0 ,1");
         JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
         return  jdbcTemplate.query(sql, new BeanPropertyRowMapper(MatFlowExecHistoryEntity.class));
@@ -147,9 +147,9 @@ public class MatFlowExecHistoryDao {
      * @return 构建信息
      */
     public List<MatFlowExecHistoryEntity> findLatelyHistory(String matFlowId){
-        String sql = "select matFlow_history.* from matFlow_history  ";
-        sql = sql.concat(" where matFlow_history.matFlow_id = '"+matFlowId+"' " +
-                " order by matFlow_history.create_time desc" +
+        String sql = "select matflow_history.* from matflow_history  ";
+        sql = sql.concat(" where matflow_history.matflow_id = '"+matFlowId+"' " +
+                " order by matflow_history.create_time desc" +
                 " limit 0 ,1");
         JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
         return  jdbcTemplate.query(sql, new BeanPropertyRowMapper(MatFlowExecHistoryEntity.class));

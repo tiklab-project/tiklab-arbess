@@ -1,8 +1,8 @@
 package com.tiklab.matflow.setting.proof.model;
 
 
-import com.tiklab.postlink.annotation.ApiModel;
-import com.tiklab.postlink.annotation.ApiProperty;
+import com.tiklab.postin.annotation.ApiModel;
+import com.tiklab.postin.annotation.ApiProperty;
 
 @ApiModel
 public class ProofQuery {

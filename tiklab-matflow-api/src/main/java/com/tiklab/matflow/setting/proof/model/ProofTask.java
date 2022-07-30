@@ -3,8 +3,8 @@ package com.tiklab.matflow.setting.proof.model;
 
 import com.tiklab.beans.annotation.Mapper;
 import com.tiklab.join.annotation.Join;
-import com.tiklab.postlink.annotation.ApiModel;
-import com.tiklab.postlink.annotation.ApiProperty;
+import com.tiklab.postin.annotation.ApiModel;
+import com.tiklab.postin.annotation.ApiProperty;
 
 @ApiModel
 @Join
@@ -21,14 +21,14 @@ public class ProofTask {
 
     //流水线id
     @ApiProperty(name = "matflowId" ,desc = "流水线id")
-    private String matFlowId;
+    private String matflowId;
 
     public ProofTask() {
     }
 
     public ProofTask(String proofId, String matFlowId) {
         this.proofId = proofId;
-        this.matFlowId = matFlowId;
+        this.matflowId = matFlowId;
     }
 
     public String getTaskId() {
@@ -47,11 +47,11 @@ public class ProofTask {
         this.proofId = proofId;
     }
 
-    public String getMatFlowId() {
-        return matFlowId;
+    public String getMatflowId() {
+        return matflowId;
     }
 
-    public void setMatFlowId(String matFlowId) {
-        this.matFlowId = matFlowId;
+    public void setMatflowId(String matflowId) {
+        this.matflowId = matflowId;
     }
 }

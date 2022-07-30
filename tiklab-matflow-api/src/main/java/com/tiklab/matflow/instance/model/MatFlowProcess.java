@@ -5,7 +5,7 @@ import com.tiklab.join.annotation.Join;
 import com.tiklab.matflow.definition.model.MatFlowConfigure;
 import com.tiklab.matflow.execute.model.MatFlowDeploy;
 import com.tiklab.matflow.setting.proof.model.Proof;
-import com.tiklab.postlink.annotation.ApiModel;
+import com.tiklab.postin.annotation.ApiModel;
 
 /**
  * 存放执行的信息

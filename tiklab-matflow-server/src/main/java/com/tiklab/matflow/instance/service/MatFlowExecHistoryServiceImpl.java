@@ -171,7 +171,7 @@ public class MatFlowExecHistoryServiceImpl implements MatFlowExecHistoryService 
 
     @Override
     public Pagination<MatFlowExecHistory> findPageHistory(MatFlowHistoryQuery matFlowHistoryQuery){
-        if (matFlowHistoryQuery.getMatFlowId() == null){
+        if (matFlowHistoryQuery.getMatflowId() == null){
             return null;
         }
         Pagination<MatFlowExecHistoryEntity> pagination = matFlowExecHistoryDao.findPageHistory(matFlowHistoryQuery);

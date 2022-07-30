@@ -10,8 +10,6 @@ import com.tiklab.matflow.instance.model.MatFlowFollow;
 import com.tiklab.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
@@ -60,9 +58,14 @@ public class MatFlowFollowServiceImpl implements MatFlowFollowService {
 
         List<MatFlowEntity> matFlowFollow = matFlowFollowDao.findMatFlowFollow(userId,s);
         List<MatFlowEntity> matFlowNotFollow = matFlowFollowDao.findMatFlowNotFollow(userId,s);
-        matFlowFollow.addAll(matFlowNotFollow);
 
-        List<MatFlow> matFlows = BeanMapper.mapList(matFlowFollow, MatFlow.class);
+        if (matFlowFollow != null){
+            matFlowFollow.forEach(matFlow -> matFlow.setMatflowCollect(1));
+            matFlowNotFollow.addAll(matFlowFollow);
+        }
+        matFlowNotFollow.sort(Comparator.comparing(MatFlowEntity::getMatflowName));
+
+        return BeanMapper.mapList(matFlowNotFollow, MatFlow.class);
         //List<MatFlow> matFlowList = new ArrayList<>();
 
         //if (matFlowFollow != null){
@@ -73,8 +76,8 @@ public class MatFlowFollowServiceImpl implements MatFlowFollowService {
         //if (matFlowNotFollow != null){
         //    matFlowList.addAll(matFlowNotFollow);
         //}
-        matFlows.sort(Comparator.comparing(MatFlow::getMatflowName));
-        return matFlows;
+
+        //return matFlows;
     }
 
     @Override

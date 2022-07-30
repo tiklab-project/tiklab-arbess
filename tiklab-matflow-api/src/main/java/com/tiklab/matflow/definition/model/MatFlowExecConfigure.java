@@ -9,8 +9,8 @@ import com.tiklab.matflow.execute.model.MatFlowCode;
 import com.tiklab.matflow.execute.model.MatFlowDeploy;
 import com.tiklab.matflow.execute.model.MatFlowStructure;
 import com.tiklab.matflow.execute.model.MatFlowTest;
-import com.tiklab.postlink.annotation.ApiModel;
-import com.tiklab.postlink.annotation.ApiProperty;
+import com.tiklab.postin.annotation.ApiModel;
+import com.tiklab.postin.annotation.ApiProperty;
 import com.tiklab.user.user.model.User;
 
 /**
