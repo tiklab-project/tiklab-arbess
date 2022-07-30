@@ -81,7 +81,7 @@ public class MatFlowActionDao {
      * @param matFlowId 流水线id
      */
     public void deleteAllAction(String matFlowId){
-        String sql = "delete  from matflow_action ";
+        String sql = "delete from matflow_action ";
         sql = sql.concat(" where matflow_action.matflow_id = '"+matFlowId +"'");
         JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
         jdbcTemplate.execute(sql);

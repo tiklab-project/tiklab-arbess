@@ -86,9 +86,9 @@ public class MatFlowActionServiceImpl implements MatFlowActionService {
         String sql = "";
         for (MatFlow matFlow : matFlowActionQuery.getMatFlowList()) {
             if (matFlowActionQuery.getPage()+ matFlowActionQuery.getPageSize() == 11){
-                sql = sql.concat(" where matFlow_action.matFlow_id = '"+ matFlow.getMatflowId()+"' order by create_time desc limit 0,10");
+                sql = sql.concat(" where matFlow_action.matflow_id = '"+ matFlow.getMatflowId()+"' order by create_time desc limit 0,10");
             } else {
-                sql = sql.concat(" where matFlow_action.matFlow_id = '"+ matFlow.getMatflowId()+"' order by create_time desc");
+                sql = sql.concat(" where matFlow_action.matflow_id = '"+ matFlow.getMatflowId()+"' order by create_time desc");
             }
             list.addAll(BeanMapper.mapList(matFlowActionDao.findUserAction(sql), MatFlowAction.class));
             sql = "";
