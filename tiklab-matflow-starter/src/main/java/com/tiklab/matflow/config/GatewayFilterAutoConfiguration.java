@@ -1,8 +1,9 @@
 package com.tiklab.matflow.config;
 
 
-import com.tiklab.gateway.author.config.IgnoreConfig;
-import com.tiklab.gateway.author.config.IgnoreConfigBuilder;
+
+import com.tiklab.eam.server.author.config.IgnoreConfig;
+import com.tiklab.eam.server.author.config.IgnoreConfigBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
