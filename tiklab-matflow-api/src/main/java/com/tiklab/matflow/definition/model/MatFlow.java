@@ -48,6 +48,9 @@ public class MatFlow {
     @ApiProperty(name="matflowCollect",desc="运行状态",required = true)
     private int matflowState;
 
+    @ApiProperty(name="matflowPower",desc="项目作用域",required = true)
+    private int matflowPower;
+
     public String getMatflowId() {
         return matflowId;
     }
@@ -102,5 +105,13 @@ public class MatFlow {
 
     public void setMatflowState(int matflowState) {
         this.matflowState = matflowState;
+    }
+
+    public int getMatflowPower() {
+        return matflowPower;
+    }
+
+    public void setMatflowPower(int matflowPower) {
+        this.matflowPower = matflowPower;
     }
 }

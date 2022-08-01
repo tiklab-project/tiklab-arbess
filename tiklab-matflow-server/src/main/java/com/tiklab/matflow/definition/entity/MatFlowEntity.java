@@ -41,6 +41,9 @@ public class MatFlowEntity {
     @Column(name = "matflow_state")
     private int matflowState;
 
+    @Column(name = "matflow_power")
+    private int matflowPower;
+
     public String getMatflowId() {
         return matflowId;
     }
@@ -95,5 +98,13 @@ public class MatFlowEntity {
 
     public void setMatflowState(int matflowState) {
         this.matflowState = matflowState;
+    }
+
+    public int getMatflowPower() {
+        return matflowPower;
+    }
+
+    public void setMatflowPower(int matflowPower) {
+        this.matflowPower = matflowPower;
     }
 }

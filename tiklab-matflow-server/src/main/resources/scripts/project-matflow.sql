@@ -1,4 +1,4 @@
-INSERT INTO `matflow` VALUES ('679668d5ce24a7a9ff697feca5bb94ff', '示例项目1', '111111', '2022-07-28 15:47:29', 1, 0, 0);
+INSERT INTO `matflow` VALUES ('679668d5ce24a7a9ff697feca5bb94ff', '示例项目1', '111111', '2022-07-28 15:47:29', 1, 0, 0, 1);
 
 --INSERT INTO `orc_dm_user` VALUES ('q3ewqrfasf', '679668d5ce24a7a9ff697feca5bb94ff', '111111');
 

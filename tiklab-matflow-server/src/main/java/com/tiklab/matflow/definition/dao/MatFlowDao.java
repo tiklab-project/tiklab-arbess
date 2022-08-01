@@ -78,6 +78,13 @@ public class MatFlowDao {
         return jpaTemplate.getJdbcTemplate().query(sql, new BeanPropertyRowMapper(MatFlowEntity.class));
     }
 
+    //获取所有全局项目
+    public List<MatFlowEntity> findUserMatFlow(){
+        String sql = " select p.* from matflow p";
+        sql = sql.concat(" where p.matflow_power = 1");
+        return jpaTemplate.getJdbcTemplate().query(sql, new BeanPropertyRowMapper(MatFlowEntity.class));
+    }
+
 
 
     /**

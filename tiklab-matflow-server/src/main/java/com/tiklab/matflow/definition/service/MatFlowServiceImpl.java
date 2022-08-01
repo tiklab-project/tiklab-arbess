@@ -194,8 +194,31 @@ public class MatFlowServiceImpl implements MatFlowService {
                 s.append(dmUser.getDomainId()).append("'");
             }
         }
+        StringBuilder findPowerMatFlow = findPowerMatFlow();
+        if (s.toString().equals("")){
+            return findPowerMatFlow;
+        }
+        logger.info("id "+s.append(findPowerMatFlow));
+        return s.append(findPowerMatFlow);
+    }
+
+    public StringBuilder findPowerMatFlow(){
+        List<MatFlowEntity> userMatFlow = matFlowDao.findUserMatFlow();
+        StringBuilder s = new StringBuilder();
+        if (userMatFlow == null){
+            return null;
+        }
+        for (MatFlowEntity matFlowEntity : userMatFlow) {
+            if (s.toString().equals("") ) {
+                s.append("'");
+            } else {
+                s.append(",'");
+            }
+            s.append(matFlowEntity.getMatflowId()).append("'");
+        }
         return s;
     }
+
 
     //模糊查询
     @Override

@@ -6,6 +6,7 @@ CREATE TABLE `matflow`  (
   `matflow_create_type` int NULL DEFAULT NULL COMMENT '流水线类型',
   `matflow_collect` int NULL DEFAULT NULL COMMENT '收藏状态',
   `matflow_state` int NULL DEFAULT NULL COMMENT '运行状态',
+  `matflow_power` int NULL DEFAULT NULL COMMENT '项目权限',
   PRIMARY KEY (`matflow_id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '流水线表' ROW_FORMAT = DYNAMIC;
 
