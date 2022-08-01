@@ -2,13 +2,32 @@ package com.tiklab.matflow.config;
 
 
 
+import com.tiklab.eam.author.Authenticator;
 import com.tiklab.eam.server.author.config.IgnoreConfig;
 import com.tiklab.eam.server.author.config.IgnoreConfigBuilder;
+import com.tiklab.eam.server.handler.AuthorHandler;
+import com.tiklab.gateway.GatewayFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class GatewayFilterAutoConfiguration {
+
+    //网关filter
+    @Bean
+    GatewayFilter gatewayFilter(AuthorHandler authorHandler){
+        return new GatewayFilter()
+                .addHandler(authorHandler);
+    }
+
+    //认证handler
+    @Bean
+    AuthorHandler authorHandler(Authenticator authenticator, IgnoreConfig ignoreConfig){
+        return new AuthorHandler()
+                .setAuthenticator(authenticator)
+                .setIgnoreConfig(ignoreConfig);
+
+    }
 
     @Bean
     public IgnoreConfig ignoreConfig(){
