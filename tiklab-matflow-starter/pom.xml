@@ -81,7 +81,7 @@
                             <descriptors>
                                 <descriptor>assembly/distribution.xml</descriptor>
                             </descriptors>
-                            <finalName>tiklab-matFlow-${project.version}</finalName>
+                            <finalName>tiklab-matflow-${project.version}</finalName>
                         </configuration>
                         <phase>package</phase>
                         <goals>
