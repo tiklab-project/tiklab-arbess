@@ -198,8 +198,7 @@ public class MatFlowServiceImpl implements MatFlowService {
         if (s.toString().equals("")){
             return findPowerMatFlow;
         }
-        logger.info("id "+s.append(findPowerMatFlow));
-        return s.append(findPowerMatFlow);
+        return s.append(",").append(findPowerMatFlow);
     }
 
     public StringBuilder findPowerMatFlow(){

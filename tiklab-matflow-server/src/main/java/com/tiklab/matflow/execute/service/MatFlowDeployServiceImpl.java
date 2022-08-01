@@ -23,39 +23,16 @@ import java.util.List;
 @Exporter
 public class MatFlowDeployServiceImpl implements MatFlowDeployService {
 
-
     @Autowired
     MatFlowDeployDao matFlowDeployDao;
 
     @Autowired
     ProofService proofService;
 
-    @Autowired
-    MatFlowConfigureService matFlowConfigureService;
-
-
     //创建
     @Override
     public String createDeploy(MatFlowDeploy matFlowDeploy) {
         return matFlowDeployDao.createDeploy(BeanMapper.map(matFlowDeploy, MatFlowDeployEntity.class));
-    }
-
-    //创建配置
-    @Override
-    public String createConfigure(String matFlowId,int taskType, MatFlowDeploy matFlowDeploy) {
-        matFlowDeploy.setType(taskType);
-        MatFlowConfigure matFlowConfigure = new MatFlowConfigure();
-        matFlowConfigure.setTaskAlias("部署");
-        if (matFlowDeploy.getDeployAlias() != null){
-            matFlowConfigure.setTaskAlias(matFlowDeploy.getDeployAlias());
-        }
-        matFlowDeploy.setType(taskType);
-        String deployId = createDeploy(matFlowDeploy);
-        matFlowConfigure.setTaskId(deployId);
-        matFlowConfigure.setTaskType(taskType);
-        matFlowConfigure.setTaskSort(matFlowDeploy.getSort());
-        matFlowConfigureService.createTask(matFlowConfigure,matFlowId);
-        return deployId;
     }
 
     //删除
@@ -64,56 +41,10 @@ public class MatFlowDeployServiceImpl implements MatFlowDeployService {
         matFlowDeployDao.deleteDeploy(deployId);
     }
 
-    @Override
-    public void deleteTask(String taskId, int taskType) {
-        if (taskType >30 && taskType < 40){
-            deleteDeploy(taskId);
-        }
-    }
-
     //修改
     @Override
     public void updateDeploy(MatFlowDeploy matFlowDeploy) {
         matFlowDeployDao.updateDeploy(BeanMapper.map(matFlowDeploy, MatFlowDeployEntity.class));
-    }
-
-    @Override
-    public void updateTask(MatFlowExecConfigure matFlowExecConfigure) {
-        MatFlow matFlow = matFlowExecConfigure.getMatFlow();
-        MatFlowDeploy matFlowDeploy = matFlowExecConfigure.getMatFlowDeploy();
-        MatFlowConfigure oneConfigure = matFlowConfigureService.findOneConfigure(matFlow.getMatflowId(), 40);
-
-        //判断新配置是否删除了测试配置
-        if (oneConfigure != null && matFlowDeploy.getType() == 0){
-            deleteDeploy(oneConfigure.getTaskId());
-            matFlowConfigureService.deleteConfigure(oneConfigure.getConfigureId());
-            return;
-        }
-        //判断是否有部署配置
-        if (matFlowDeploy.getType() == 0){
-            return;
-        }
-        //初始化
-        if (oneConfigure == null ){
-            oneConfigure = new MatFlowConfigure();
-        }
-        oneConfigure.setTaskSort(matFlowDeploy.getSort());
-        oneConfigure.setTaskAlias(matFlowDeploy.getDeployAlias());
-        oneConfigure.setView(matFlowExecConfigure.getView());
-        oneConfigure.setMatFlow(matFlow);
-        oneConfigure.setCreateTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
-        oneConfigure.setTaskType(matFlowDeploy.getType());
-
-        //存在部署配置，更新或者创建
-        if (matFlowDeploy.getDeployId() != null){
-            updateDeploy(matFlowDeploy);
-            matFlowConfigureService.updateConfigure(oneConfigure);
-        }else {
-            String testId = createDeploy(matFlowDeploy);
-            oneConfigure.setTaskId(testId);
-            matFlowConfigureService.createConfigure(oneConfigure);
-        }
-
     }
 
     //查询单个
@@ -127,20 +58,6 @@ public class MatFlowDeployServiceImpl implements MatFlowDeployService {
         }
         return matFlowDeploy;
     }
-
-    @Override
-    public List<Object> findOneTask(MatFlowConfigure matFlowConfigure, List<Object> list) {
-        if (matFlowConfigure.getTaskType() > 30){
-            MatFlowDeploy oneDeploy =findOneDeploy(matFlowConfigure.getTaskId());
-            if (oneDeploy.getProof() != null){
-                Proof proof = proofService.findOneProof(oneDeploy.getProof().getProofId());
-                oneDeploy.setProof(proof);
-            }
-            list.add(oneDeploy);
-        }
-        return list;
-    }
-
 
     //查询所有
     @Override

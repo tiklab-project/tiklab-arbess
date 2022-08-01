@@ -23,24 +23,10 @@ public interface MatFlowCodeService {
      String createCode(MatFlowCode matFlowCode);
 
     /**
-     * 创建配置
-     * @param pipelineId 流水线id
-     * @return 配置id
-     */
-    String createConfigure(String pipelineId, MatFlowCode matFlowCode);
-
-    /**
      * 删除
      * @param codeId codeId
      */
      void deleteCode(String codeId);
-
-    /**
-     * 删除关联配置
-     * @param taskId 任务id
-     * @param taskType 任务类型
-     */
-    void deleteTask(String taskId, int taskType );
 
     /**
      * 更新
@@ -49,10 +35,11 @@ public interface MatFlowCodeService {
      void updateCode(MatFlowCode matFlowCode);
 
     /**
-     * 更新任务
-     * @param matFlowExecConfigure 更新信息
+     * 更新源码地址
+     * @param matFlowCode 源码信息
+     * @return 源码信息
      */
-     void updateTask(MatFlowExecConfigure matFlowExecConfigure);
+     MatFlowCode getUrl(MatFlowCode matFlowCode);
 
     /**
      * 查询单个信息
@@ -61,20 +48,13 @@ public interface MatFlowCodeService {
      */
     @FindOne
     MatFlowCode findOneCode(String codeId);
-
-    /**
-     * 查询信息
-     * @param matFlowConfigure 配置信息
-     * @return 配置
-     */
-    List<Object> findOneTask(MatFlowConfigure matFlowConfigure, List<Object> list);
-
     /**
      * 查询所有信息
      * @return code信息集合
      */
     @FindAll
-     List<MatFlowCode> findAllCode();
+    List<MatFlowCode> findAllCode();
+
 
     @FindList
     List<MatFlowCode> findAllCodeList(List<String> idList);

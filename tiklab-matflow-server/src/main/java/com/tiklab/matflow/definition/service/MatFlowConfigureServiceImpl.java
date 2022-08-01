@@ -1,7 +1,5 @@
 package com.tiklab.matflow.definition.service;
 
-
-
 import com.ibm.icu.text.SimpleDateFormat;
 import com.tiklab.beans.BeanMapper;
 import com.tiklab.join.JoinTemplate;
@@ -10,6 +8,10 @@ import com.tiklab.matflow.definition.entity.MatFlowConfigureEntity;
 import com.tiklab.matflow.definition.model.MatFlow;
 import com.tiklab.matflow.definition.model.MatFlowConfigure;
 import com.tiklab.matflow.definition.model.MatFlowExecConfigure;
+import com.tiklab.matflow.execute.model.MatFlowCode;
+import com.tiklab.matflow.execute.model.MatFlowDeploy;
+import com.tiklab.matflow.execute.model.MatFlowStructure;
+import com.tiklab.matflow.execute.model.MatFlowTest;
 import com.tiklab.matflow.execute.service.MatFlowCodeService;
 import com.tiklab.matflow.instance.service.MatFlowActionService;
 import com.tiklab.rpc.annotation.Exporter;
@@ -23,6 +25,9 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * 维护配置关联信息
+ */
 
 @Service
 @Exporter
@@ -35,11 +40,10 @@ public class MatFlowConfigureServiceImpl implements MatFlowConfigureService {
     MatFlowConfigureDao matFlowConfigureDao;
 
     @Autowired
-    MatFlowCodeService matFlowCodeService;
+    MatFlowTaskService matFlowTaskService;
 
     @Autowired
     MatFlowActionService matFlowActionService;
-
 
     private static final Logger logger = LoggerFactory.getLogger(MatFlowConfigureServiceImpl.class);
 
@@ -97,7 +101,7 @@ public class MatFlowConfigureServiceImpl implements MatFlowConfigureService {
         }
         for (MatFlowConfigure matFlowConfigure : allConfigure) {
             MatFlowConfigure oneConfigure = findOneConfigure(matFlowConfigure.getConfigureId());
-            matFlowCodeService.deleteTask(oneConfigure.getTaskId(),oneConfigure.getTaskType());
+            matFlowTaskService.deleteTaskConfig(oneConfigure.getTaskId(),oneConfigure.getTaskType());
             deleteConfigure(matFlowConfigure.getConfigureId());
         }
     }
@@ -106,8 +110,98 @@ public class MatFlowConfigureServiceImpl implements MatFlowConfigureService {
     @Override
     public void updateTask(MatFlowExecConfigure matFlowExecConfigure){
         matFlowActionService.createActive(matFlowExecConfigure.getUser().getId(), matFlowExecConfigure.getMatFlow(), "更新了流水线/的配置");
-        matFlowCodeService.updateTask(matFlowExecConfigure);
+        //获取源码配置
+        MatFlowCode matFlowCode = matFlowExecConfigure.getMatFlowCode();
+        updateTask(matFlowExecConfigure,matFlowCode,matFlowCode.getType(),10);
+
+        //获取测试配置
+        MatFlowTest matFlowTest = matFlowExecConfigure.getMatFlowTest();
+        updateTask(matFlowExecConfigure,matFlowTest,matFlowTest.getType(),20);
+
+        //获取构建配置
+        MatFlowStructure matFlowStructure = matFlowExecConfigure.getMatFlowStructure();
+        updateTask(matFlowExecConfigure,matFlowStructure,matFlowStructure.getType(),30);
+
+        //获取部署配置
+        MatFlowDeploy matFlowDeploy = matFlowExecConfigure.getMatFlowDeploy();
+        updateTask(matFlowExecConfigure,matFlowDeploy,matFlowDeploy.getType(),40);
+
     }
+
+    public void updateTask(MatFlowExecConfigure execConfigure,Object o,Integer objectType,Integer type){
+        MatFlow matFlow = execConfigure.getMatFlow();
+         MatFlowConfigure configure = findOneConfigure(matFlow.getMatflowId(), type);
+        //存在旧的配置
+        if (configure != null){
+            //没有新的配置
+            if (objectType == 0){
+                deleteTask(configure.getConfigureId());
+                matFlowTaskService.deleteTaskConfig(configure.getTaskId(),type);
+            }else {
+                matFlowTaskService.updateTaskConfig(o,configure.getTaskId(),type);
+            }
+            //不存在旧的配置
+        }else {
+            //新的有配置
+            if (objectType != 0){
+                String taskId = matFlowTaskService.createTaskConfig(o, type);
+                if (taskId == null){
+                    return;
+                }
+                MatFlowConfigure matFlowConfigure = initTaskConfig(execConfigure, type);
+                matFlowConfigure.setTaskId(taskId);
+                createConfigure(matFlowConfigure);
+            }
+        }
+    }
+
+    /**
+     * 初始化配置信息
+     * @param configure 配置
+     * @param type 类型
+     * @return 配置
+     */
+    public MatFlowConfigure initTaskConfig(MatFlowExecConfigure configure,Integer type){
+        MatFlow matFlow = configure.getMatFlow();
+        MatFlowConfigure oneConfigure = new MatFlowConfigure();
+        oneConfigure.setMatFlow(matFlow);
+        oneConfigure.setCreateTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+        oneConfigure.setView(configure.getView());
+        int sort = 0;
+        int types = 0;
+        String alias = null;
+        switch (type) {
+            case 10 -> {
+                MatFlowCode matFlowCode = configure.getMatFlowCode();
+                sort = 1;
+                alias="源码管理";
+                types = matFlowCode.getType();
+            }
+            case 20 -> {
+                MatFlowTest matFlowTest = configure.getMatFlowTest();
+                sort = matFlowTest.getSort();
+                types = matFlowTest.getType();
+                alias = matFlowTest.getTestAlias();
+            }
+            case 30 -> {
+                MatFlowStructure matFlowStructure = configure.getMatFlowStructure();
+                sort = matFlowStructure.getSort();
+                types = matFlowStructure.getType();
+                alias = matFlowStructure.getStructureAlias();
+            }
+            case 40 -> {
+                MatFlowDeploy matFlowDeploy = configure.getMatFlowDeploy();
+                sort = matFlowDeploy.getSort();
+                types = matFlowDeploy.getType();
+                alias = matFlowDeploy.getDeployAlias();
+            }
+        }
+        oneConfigure.setTaskType(types);
+        oneConfigure.setTaskSort(sort);
+        oneConfigure.setTaskAlias(alias);
+        return oneConfigure;
+    }
+
 
     //查询
     @Override
@@ -134,7 +228,7 @@ public class MatFlowConfigureServiceImpl implements MatFlowConfigureService {
         List<MatFlowConfigure> allConfigure = findAllConfigure(matFlowId);
         if (allConfigure != null){
             for (MatFlowConfigure matFlowConfigure : allConfigure) {
-               matFlowCodeService.findOneTask(matFlowConfigure,list);
+                matFlowTaskService.findOneTask(list, matFlowConfigure.getTaskId(), matFlowConfigure.getTaskType());
             }
         }
         return list;
