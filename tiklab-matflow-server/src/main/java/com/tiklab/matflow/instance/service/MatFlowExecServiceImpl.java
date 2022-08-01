@@ -10,11 +10,8 @@ import com.tiklab.matflow.instance.model.MatFlowExecLog;
 import com.tiklab.matflow.instance.model.MatFlowProcess;
 import com.tiklab.matflow.instance.service.execAchieveImpl.*;
 import com.tiklab.rpc.annotation.Exporter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,39 +24,25 @@ import java.util.concurrent.Executors;
 public class MatFlowExecServiceImpl implements MatFlowExecService {
 
     @Autowired
-    MatFlowExecHistoryService matFlowExecHistoryService;
-
-    @Autowired
     MatFlowService matFlowService;
-
-    @Autowired
-    CommonAchieveServiceImpl commonAchieveServiceImpl ;
-
-    @Autowired
-    CodeAchieveServiceImpl codeAchieveServiceImpl ;
-
-    @Autowired
-    StructureAchieveServiceImpl structureAchieveServiceImpl ;
-
-    @Autowired
-    TestAchieveServiceImpl testAchieveServiceImpl;
-
-    @Autowired
-    DeployAchieveServiceImpl deployAchieveServiceImpl ;
 
     @Autowired
     MatFlowActionService matFlowActionService;
 
+    @Autowired
+    MatFlowTaskExecService matFlowTaskExecService;
+
+    @Autowired
+    CommonAchieveServiceImpl commonAchieveServiceImpl;
+
+    @Autowired
+    MatFlowExecHistoryService matFlowExecHistoryService;
 
     //存放过程状态
     List<MatFlowExecHistory> matFlowExecHistoryList = new ArrayList<>();
 
-
-    private static final Logger logger = LoggerFactory.getLogger(MatFlowExecServiceImpl.class);
-
     //开始执行时间
     long beginTime = 0;
-
 
     //创建线程池
     ExecutorService executorService = Executors.newCachedThreadPool();
@@ -73,19 +56,15 @@ public class MatFlowExecServiceImpl implements MatFlowExecService {
             return 100;
         }
         try {
+            Thread.sleep(100);
+            executorService.submit(() -> {
+                beginTime = new Timestamp(System.currentTimeMillis()).getTime();
+                Thread.currentThread().setName(matFlowId);
+                begin(matFlow,userId);
+            });
             Thread.sleep(500);
         } catch (InterruptedException e) {
             return 1;
-        }
-        executorService.submit(() -> {
-            beginTime = new Timestamp(System.currentTimeMillis()).getTime();
-         Thread.currentThread().setName(matFlowId);
-                begin(matFlow,userId);
-        });
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-           return 1;
         }
         return 1;
     }
@@ -139,6 +118,7 @@ public class MatFlowExecServiceImpl implements MatFlowExecService {
         matFlowExecLog.setRunTime(time- matFlowExecHistory.getRunTime());
         matFlowExecHistory.setRunLog(matFlowExecHistory.getRunLog()+"\n"+"流水线停止运行......");
         matFlowExecHistoryList.add(matFlowExecHistory);
+
         commonAchieveServiceImpl.halt(matFlowProcess,matFlowId, matFlowExecHistoryList);
 
         ThreadGroup currentGroup = Thread.currentThread().getThreadGroup();
@@ -193,8 +173,11 @@ public class MatFlowExecServiceImpl implements MatFlowExecService {
                 matFlowProcess.setMatFlowExecHistory(matFlowExecHistory);
                 matFlowProcess.setMatFlowConfigure(matFlowConfigure);
                 matFlowExecHistoryList.add(matFlowExecHistory);
-                Integer integer = beginState(matFlowProcess, matFlow, matFlowConfigure.getTaskType());
-                if (integer == 0){
+                int state = matFlowTaskExecService.beginState(matFlowProcess, matFlowExecHistoryList, matFlowConfigure.getTaskType());
+                if (state == 0){
+                    matFlow.setMatflowState(0);
+                    matFlowService.updateMatFlow(matFlow);
+                    time[0]=1;time[1]=0;time[2]=0;time[3]=0;
                     return;
                 }
                 matFlowExecHistory.setSort(matFlowExecHistory.getSort() +1);
@@ -206,22 +189,4 @@ public class MatFlowExecServiceImpl implements MatFlowExecService {
         matFlowService.updateMatFlow(matFlow);
         time[0]=1;time[1]=0;time[2]=0;time[3]=0;
     }
-
-    private Integer beginState(MatFlowProcess matFlowProcess, MatFlow matFlow, int type){
-        int state = 1;
-        switch (type) {
-            case 1,2,3,4,5 -> state = codeAchieveServiceImpl.clone(matFlowProcess, matFlowExecHistoryList);
-            case 11 -> state = testAchieveServiceImpl.test(matFlowProcess, matFlowExecHistoryList);
-            case 21, 22 -> state  = structureAchieveServiceImpl.structure(matFlowProcess, matFlowExecHistoryList);
-            case 31, 32-> state = deployAchieveServiceImpl.deploy(matFlowProcess, matFlowExecHistoryList);
-        }
-        if (state == 0) {
-            matFlow.setMatflowState(0);
-            matFlowService.updateMatFlow(matFlow);
-            time[0]=1;time[1]=0;time[2]=0;time[3]=0;
-            return 0;
-        }
-        return 1;
-    }
-
 }

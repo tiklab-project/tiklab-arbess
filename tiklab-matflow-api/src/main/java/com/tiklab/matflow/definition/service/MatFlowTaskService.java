@@ -26,6 +26,6 @@ public interface MatFlowTaskService {
      * 查询配置信息
      * @param type 查询类型
      */
-    List<Object> findOneTask(List<Object> list,String taskId, Integer type);
+    void findOneTask(List<Object> list,String taskId, Integer type);
 
 }

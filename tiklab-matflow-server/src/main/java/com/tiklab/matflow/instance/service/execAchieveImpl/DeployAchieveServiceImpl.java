@@ -1,7 +1,5 @@
 package com.tiklab.matflow.instance.service.execAchieveImpl;
 
-
-
 import com.jcraft.jsch.*;
 import com.tiklab.matflow.definition.model.MatFlowConfigure;
 import com.tiklab.matflow.definition.service.MatFlowCommonService;
@@ -21,6 +19,10 @@ import org.springframework.stereotype.Service;
 import java.io.*;
 import java.sql.Timestamp;
 import java.util.List;
+
+/**
+ * 部署执行方法
+ */
 
 @Service
 @Exporter

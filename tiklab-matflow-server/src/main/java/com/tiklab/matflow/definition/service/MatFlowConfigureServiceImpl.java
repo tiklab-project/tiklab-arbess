@@ -67,7 +67,7 @@ public class MatFlowConfigureServiceImpl implements MatFlowConfigureService {
         }
         for (MatFlowConfigure matFlowConfigure : allConfigure) {
             int taskType = matFlowConfigure.getTaskType();
-            if (taskType < type && taskType > type - 10){
+            if ( type - 10 < taskType  && taskType < type  ){
                 return matFlowConfigure;
             }
         }
@@ -128,6 +128,11 @@ public class MatFlowConfigureServiceImpl implements MatFlowConfigureService {
 
     }
 
+    /**
+     * 判断对配置的操作
+     * @param execConfigure 配置信息
+     * @param type 配置类型
+     */
     public void updateTask(MatFlowExecConfigure execConfigure,Object o,Integer objectType,Integer type){
         MatFlow matFlow = execConfigure.getMatFlow();
          MatFlowConfigure configure = findOneConfigure(matFlow.getMatflowId(), type);

@@ -68,7 +68,6 @@ public class MatFlowExecLogServiceImpl implements MatFlowExecLogService {
         return BeanMapper.mapList(matFlowLogList, MatFlowExecLog.class);
     }
 
-
     public static String formatDateTime(long time) {
         String DateTimes ;
         long days = time / ( 60 * 60 * 24);
