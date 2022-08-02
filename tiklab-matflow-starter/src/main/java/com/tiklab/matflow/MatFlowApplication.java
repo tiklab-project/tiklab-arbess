@@ -12,7 +12,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
  * matflowApplication
  */
 @SpringBootApplication
-@PropertySource(value = "classpath:application-${env:prd]}.properties")
+@PropertySource(value = "classpath:application-${env:test}.properties")
 @EnableScheduling
 @EnableMatFlow
 public class MatFlowApplication {

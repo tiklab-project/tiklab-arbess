@@ -6,26 +6,7 @@
 #if [ ! -n "$JAVA_HOME" ]; then
 #    export JAVA_HOME="/usr/local/jdk-16.0.2"
 #fi
-
-dir=$(dirname "$PWD")
-
-echo "文件根目录: " $dir
-
-mysql=$dir/mysql-8.0.28
-
-echo "========================================================================="
-cd $dir && find /opt -name '*.sh' | xargs dos2unix;
-cd $dir/bin && sh startup.sh
-
-echo "========================================================================="
-echo "数据库启动中"
-cd /$mysql/lib && nohup ./mysqld --defaults-file=$mysql/config/my.cnf > $mysql/log/log.txt 2>&1 &
-echo "数据库启动成功"
-echo "账号：root"
-echo "密码：darth2020"
-
-
-JAVA_HOME=$dir/jdk-16.0.2
+JAVA_HOME=/opt/jdk-16.0.2
 #-------------------------------------------------------------------------------------------------------------
 #       系统运行参数
 #-------------------------------------------------------------------------------------------------------------

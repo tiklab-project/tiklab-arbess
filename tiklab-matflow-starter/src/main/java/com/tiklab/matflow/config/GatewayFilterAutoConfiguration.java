@@ -1,7 +1,5 @@
 package com.tiklab.matflow.config;
 
-
-
 import com.tiklab.eam.author.Authenticator;
 import com.tiklab.eam.server.author.config.IgnoreConfig;
 import com.tiklab.eam.server.author.config.IgnoreConfigBuilder;
