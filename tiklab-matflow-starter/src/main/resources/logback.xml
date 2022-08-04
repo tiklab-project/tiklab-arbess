@@ -2,7 +2,7 @@
 <configuration>
     <contextListener class="com.tiklab.web.context.LogHomeConfiguration" />
     <!-- 应用名称：和统一配置中的项目代码保持一致（小写） -->
-    <property name="app.name" value="tiklab-matFlow" />
+    <property name="app.name" value="tiklab-matflow" />
     <property name="LOG_PATH" value="${LOG_PATH}/tiklab/${app.name}/logs" />
     <!--在没有定义${LOG_PATH}系统变量的时候，可以设置此本地变量。提交测试、上线时，要将其注释掉，使用系统变量。-->
     <!--

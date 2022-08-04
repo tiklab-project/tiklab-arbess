@@ -69,6 +69,11 @@
             <artifactId>tiklab-toolkit-spring-boot-starter</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.tiklab</groupId>
+            <artifactId>tiklab-user-server</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+        </dependency>
         <!--other-->
         <dependency>
             <groupId>com.tiklab</groupId>

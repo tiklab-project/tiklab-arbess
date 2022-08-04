@@ -51,6 +51,12 @@
 
         <dependency>
             <groupId>com.tiklab</groupId>
+            <artifactId>tiklab-dfs-spring-boot-starter</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.tiklab</groupId>
             <artifactId>tiklab-privilege-spring-boot-starter</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -61,6 +67,7 @@
 
     <build>
         <plugins>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
@@ -71,6 +78,7 @@
                     </excludes>
                 </configuration>
             </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
@@ -96,16 +104,16 @@
                 <artifactId>docker-maven-plugin</artifactId>
                 <version>0.4.13</version>
                 <configuration>
-                    <imageName>matFlow:1.0.0</imageName>
+                    <imageName>matflow:1.0.0</imageName>
                     <!--Dockerfile文件位置-->
                     <dockerDirectory>./</dockerDirectory>
-<!--                        <resources>-->
-<!--                            <resource>-->
-<!--                                <targetPath>./</targetPath>-->
-<!--                                <directory>${project.build.directory}</directory>-->
-<!--                                <include>${project.build.finalName}-distribution.zip</include>-->
-<!--                            </resource>-->
-<!--                        </resources>-->
+                        <resources>
+                            <resource>
+                                <targetPath>./</targetPath>
+                                <directory>${project.build.directory}</directory>
+                                <include>${project.build.finalName}-distribution.zip</include>
+                            </resource>
+                        </resources>
                 </configuration>
             </plugin>
 

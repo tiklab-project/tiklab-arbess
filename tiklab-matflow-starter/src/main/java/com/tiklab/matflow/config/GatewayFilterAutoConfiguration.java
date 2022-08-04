@@ -5,6 +5,10 @@ import com.tiklab.eam.server.author.config.IgnoreConfig;
 import com.tiklab.eam.server.author.config.IgnoreConfigBuilder;
 import com.tiklab.eam.server.handler.AuthorHandler;
 import com.tiklab.gateway.GatewayFilter;
+import com.tiklab.gateway.router.RouterHandler;
+import com.tiklab.gateway.router.config.RouterConfig;
+import com.tiklab.gateway.router.config.RouterConfigBuilder;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -86,4 +90,5 @@ public class GatewayFilterAutoConfiguration {
                 })
                 .get();
     }
+
 }
