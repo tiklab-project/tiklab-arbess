@@ -107,13 +107,27 @@ public class MatFlowTaskServiceImpl implements MatFlowTaskService{
     @Override
     public void findOneTask( List<Object> list,String taskId, Integer type){
         if (type < 10){
-            list.add(matFlowCodeService.findOneCode(taskId));
+            MatFlowCode oneCode = matFlowCodeService.findOneCode(taskId);
+            if (oneCode != null){
+                list.add(oneCode);
+            }
         }else if (10 < type && type < 20){
-            list.add(matFlowCodeService.findOneCode(taskId));
+            MatFlowTest oneTest = matFlowTestService.findOneTest(taskId);
+            if (oneTest != null){
+                list.add(oneTest);
+            }
+
         } else if (20 < type && type < 30){
-            list.add(matFlowStructureService.findOneStructure(taskId));
+            MatFlowStructure oneStructure = matFlowStructureService.findOneStructure(taskId);
+            if (oneStructure != null){
+                list.add(oneStructure);
+            }
         } else if (30 < type && type < 40){
-            list.add(matFlowDeployService.findOneDeploy(taskId));
+            MatFlowDeploy oneDeploy = matFlowDeployService.findOneDeploy(taskId);
+            if (oneDeploy != null){
+                list.add(oneDeploy);
+            }
+
         }
     }
 }
