@@ -64,7 +64,7 @@ startup(){
             mkdir "$APP_LOG"
         fi
 
-        nohup $JAVA_HOME/bin/java $JAVA_OPTS $CLASSPATH $APP_MAIN &
+        nohup $JAVA_HOME/bin/java $JAVA_OPTS $CLASSPATH $APP_MAIN  > log.log 2>&1 &
 
         for i in $(seq 5)
         do
