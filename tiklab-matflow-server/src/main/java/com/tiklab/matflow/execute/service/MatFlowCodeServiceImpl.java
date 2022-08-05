@@ -73,6 +73,8 @@ public class MatFlowCodeServiceImpl implements MatFlowCodeService {
         }else if (matFlowCode.getType() == 3){
             String cloneUrl = codeGitHubService.getOneHouse(matFlowCode.getProof(), matFlowCode.getCodeName());
             matFlowCode.setCodeAddress(cloneUrl);
+        }else {
+            matFlowCode.setCodeAddress(matFlowCode.getCodeName());
         }
         return matFlowCode;
     }

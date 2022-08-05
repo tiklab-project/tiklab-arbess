@@ -39,6 +39,7 @@ public class MatFlowTaskServiceImpl implements MatFlowTaskService{
         switch (type) {
             case 10 -> {
                 MatFlowCode matFlowCode = (MatFlowCode) o;
+                matFlowCode = matFlowCodeService.getUrl(matFlowCode);
                 matFlowCode.setCodeId(taskId);
                 matFlowCodeService.updateCode(matFlowCode);
             }
