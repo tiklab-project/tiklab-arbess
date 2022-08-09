@@ -111,7 +111,7 @@
                             <resource>
                                 <targetPath>./</targetPath>
                                 <directory>${project.build.directory}</directory>
-                                <include>${project.build.finalName}-distribution.zip</include>
+                                <include>${project.build.finalName}-distribution.tar.gz</include>
                             </resource>
                         </resources>
                 </configuration>

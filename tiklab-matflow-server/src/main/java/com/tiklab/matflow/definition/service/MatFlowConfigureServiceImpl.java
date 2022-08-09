@@ -102,6 +102,7 @@ public class MatFlowConfigureServiceImpl implements MatFlowConfigureService {
         for (MatFlowConfigure matFlowConfigure : allConfigure) {
             MatFlowConfigure oneConfigure = findOneConfigure(matFlowConfigure.getConfigureId());
             matFlowTaskService.deleteTaskConfig(oneConfigure.getTaskId(),oneConfigure.getTaskType());
+            deleteConfigure(oneConfigure.getConfigureId());
             deleteConfigure(matFlowConfigure.getConfigureId());
         }
     }
@@ -142,6 +143,7 @@ public class MatFlowConfigureServiceImpl implements MatFlowConfigureService {
             if (objectType == 0){
                 deleteTask(configure.getConfigureId());
                 matFlowTaskService.deleteTaskConfig(configure.getTaskId(),type);
+                deleteConfigure(configure.getConfigureId());
             }else {
                 matFlowTaskService.updateTaskConfig(o,configure.getTaskId(),type);
             }

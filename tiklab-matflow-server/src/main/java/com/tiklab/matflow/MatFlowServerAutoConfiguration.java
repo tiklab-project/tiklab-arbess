@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @SQL(modules = {"DDL-matFlow","project-matflow","source-matflow"})
-@ComponentScan({"com.tiklab.matfiow"})
+@ComponentScan({"com.tiklab.matflow"})
 public class MatFlowServerAutoConfiguration {
 
     private static Logger logger = LoggerFactory.getLogger(MatFlowServerAutoConfiguration.class);
