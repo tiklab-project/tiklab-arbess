@@ -87,7 +87,7 @@
                         <id>make-assembly</id>
                         <configuration>
                             <descriptors>
-                                <descriptor>assembly/distribution.xml</descriptor>
+                                <descriptor>assembly/distribution1.xml</descriptor>
                             </descriptors>
                             <finalName>tiklab-matflow-${project.version}</finalName>
                         </configuration>

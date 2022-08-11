@@ -11,6 +11,7 @@ import com.tiklab.matflow.instance.service.MatFlowExecLogService;
 import com.tiklab.matflow.instance.service.execAchieveService.CommonAchieveService;
 import com.tiklab.rpc.annotation.Exporter;
 import com.tiklab.user.user.model.User;
+import org.apache.maven.shared.invoker.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,7 @@ import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -89,9 +91,10 @@ public class CommonAchieveServiceImpl implements CommonAchieveService {
      * @param order 构建命令
      * @return 构建信息
      * @throws IOException 构建命令执行异常
+     * @throws NullPointerException 命令为空
      */
     @Override
-    public Process process(String path,String order,String sourceAddress) throws IOException {
+    public Process process(String path,String order,String sourceAddress) throws IOException,NullPointerException {
 
         Runtime runtime=Runtime.getRuntime();
         Process process;
@@ -117,6 +120,33 @@ public class CommonAchieveServiceImpl implements CommonAchieveService {
         }
         return process;
     }
+
+
+    /**
+     * @param args d
+     * @throws MavenInvocationException 参数错误
+     */
+    public  void getMvn(String[] args) throws MavenInvocationException {
+        //maven地址
+        Invoker invoker = new DefaultInvoker();
+        invoker.setMavenHome(new File("D:\\maven\\apache-maven-3.8.3"));
+        //pom文件地址
+        InvocationRequest request = new DefaultInvocationRequest();
+        request.setPomFile( new File( "D:\\clone\\示例项目1\\pom.xml" ) );
+        //执行命令
+        request.setGoals(Collections.singletonList( "clean"));
+
+        request.setOutputHandler(new InvocationOutputHandler() {
+            @Override
+            public void consumeLine(String s) {
+                //System.out.println(s);
+            }
+        });
+
+        invoker.execute(request);
+
+    }
+
 
     /**
      * 更新执行时间

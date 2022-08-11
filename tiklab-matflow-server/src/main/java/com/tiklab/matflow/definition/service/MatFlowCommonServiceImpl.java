@@ -24,7 +24,7 @@ public class MatFlowCommonServiceImpl implements MatFlowCommonService {
      */
     @Override
     public String getFileAddress(){
-        String files = "/usr/local/pipeline/";
+        String files = "/usr/local/matFlow/";
 
         String property = System.getProperty("os.name");
         String[] s = property.split(" ");
