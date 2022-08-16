@@ -57,7 +57,6 @@ public class MatFlowExecServiceImpl implements MatFlowExecService {
         }
 
         try {
-            Thread.sleep(100);
             executorService.submit(() -> {
                 beginTime = new Timestamp(System.currentTimeMillis()).getTime();
                 Thread.currentThread().setName(matFlowId);
