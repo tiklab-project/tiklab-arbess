@@ -47,7 +47,7 @@ public class MatFlowCommonServiceImpl implements MatFlowCommonService {
                 for (String child : children) {
                     boolean state = deleteFile(new File(file, child));
                     int tryCount = 0;
-                    while (!state && tryCount++ < 30) {
+                    while (!state && tryCount++ < 10) {
                         //回收资源
                         System.gc();
                         state = file.delete();
@@ -155,14 +155,14 @@ public class MatFlowCommonServiceImpl implements MatFlowCommonService {
 
     /**
      * 匹配字符串获取文件全路径
-     * @param pipelineName 文件地址
+     * @param matFlowName 文件地址
      * @param regex 匹配条件
      * @return 文件地址
      */
     @Override
-    public String getFile(String pipelineName, String regex){
+    public String getFile(String matFlowName, String regex){
         List<String> list = new ArrayList<>();
-        String  path= getFileAddress() + pipelineName;
+        String  path= getFileAddress() + matFlowName;
         List<String> filePath = getFilePath(new File(path),new ArrayList<>());
         for (String s : filePath) {
             File file = new File(s);

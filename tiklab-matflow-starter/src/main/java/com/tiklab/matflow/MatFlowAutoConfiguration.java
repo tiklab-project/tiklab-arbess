@@ -6,6 +6,7 @@ import com.tiklab.dsm.starter.annotation.EnableDsm;
 import com.tiklab.eam.starter.EnableEam;
 import com.tiklab.gateway.starter.EnableGateway;
 import com.tiklab.join.starter.annotation.EnableJoin;
+import com.tiklab.licence.starter.EnableLicenceServer;
 import com.tiklab.message.starter.EnableMessage;
 import com.tiklab.pluginx.starter.EnablePluginServer;
 import com.tiklab.privilege.stater.EnablePrivilegeServer;
@@ -33,6 +34,7 @@ import org.springframework.context.annotation.Configuration;
 @EnableMessage
 //权限中心
 @EnablePrivilegeServer
+@EnableLicenceServer
 
 @EnableGateway
 @EnableMatFlowServer

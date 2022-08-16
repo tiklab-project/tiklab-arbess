@@ -1,8 +1,7 @@
 #!/bin/sh
-if [ ! -n "$JAVA_HOME" ]; then
-    export JAVA_HOME="/usr/local/jdk-16.0.2"
-fi
 
+JDK_HOME=$(dirname "$PWD")
+JAVA_HOME=${JDK_HOME}/jdk-16.0.2
 
 #APP_MAIN=${application.main.class}
 APP_MAIN="com.tiklab.matflow.MatFlowApplication"

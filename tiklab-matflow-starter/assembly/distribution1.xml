@@ -53,6 +53,16 @@
             <fileMode>755</fileMode>
             <outputDirectory>/mysql-8.0.28</outputDirectory>
         </fileSet>
+        <fileSet>
+            <directory>${basedir}/etc</directory>
+            <fileMode>755</fileMode>
+            <outputDirectory>/etc</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>${basedir}/licences</directory>
+            <fileMode>755</fileMode>
+            <outputDirectory>/licences</outputDirectory>
+        </fileSet>
     </fileSets>
     <dependencySets>
         <dependencySet>

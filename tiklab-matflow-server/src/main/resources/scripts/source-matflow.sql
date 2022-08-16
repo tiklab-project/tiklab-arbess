@@ -20,6 +20,7 @@ INSERT INTO `prc_function` VALUES ('d258d8c1f73d4afc733600ab6504bf0c', '用户�
 INSERT INTO `prc_function` VALUES ('d5535a61c9cefaccd71b44d298474775', '成员列表', 'DD1', '8700a662f1aebb83f790783c3abe15b5', NULL, '2');
 INSERT INTO `prc_function` VALUES ('dfa50d1a6f3466a75c37325c71b9a8fc', '插件管理', 'G', NULL, NULL, '1');
 INSERT INTO `prc_function` VALUES ('f741b2f59129f7b025884b4000de72b0', '项目权限', 'I', NULL, NULL, '1');
+INSERT INTO `prc_function` VALUES ('e49f5de6ceda7ca40c5dfe91bc25df3d', 'licence功能管理', 'J', NULL, NULL, '1');
 
 --INSERT INTO `prc_role` VALUES ('7cfee91edf221ae1deed232ca14c03af', '项目角色', '项目角色', 'custom', '1');
 --INSERT INTO `prc_role` VALUES ('97a7db718273636659fc5e146a00edd2', '管理员角色', NULL, 'system', '1');
@@ -56,6 +57,7 @@ INSERT INTO `prc_role_function` VALUES ('c12af496894579339ce94e70c684d9e3', '97a
 INSERT INTO `prc_role_function` VALUES ('d4357701e5040553c341854b28017584', '7cfee91edf221ae1deed232ca14c03af', '36f831865dd4bd490e1fdb4b1d38b763');
 INSERT INTO `prc_role_function` VALUES ('da0c3aa4a572241233c0ca419a99e82b', '97a7db718273636659fc5e146a00edd2', '66ffbf32b20033c9546faae7336943f9');
 INSERT INTO `prc_role_function` VALUES ('f0c64325fc0875f1fe3544c4c5c2a2b6', '7cfee91edf221ae1deed232ca14c03af', 'c3a07289216a53628a4f9c558e58d05c');
+INSERT INTO `prc_role_function` VALUES ('c688ff0e519dc0b917d180090e7c50ac', '97a7db718273636659fc5e146a00edd2', 'e49f5de6ceda7ca40c5dfe91bc25df3d');
 
 --INSERT INTO `prc_role_user` VALUES ('1713bccf06b2341ddd4f29acedeb17c4', '7cfee91edf221ae1deed232ca14c03af', 'f7d301865bb64ef21ef88f8cd58a69a5');
 --INSERT INTO `prc_role_user` VALUES ('4276176cba2493e88ade5132cce268cb', '97a7db718273636659fc5e146a00edd2', '111111');
