@@ -3,6 +3,7 @@ package com.tiklab.matflow.execute.service;
 
 import com.ibm.icu.text.SimpleDateFormat;
 import com.tiklab.beans.BeanMapper;
+import com.tiklab.join.JoinTemplate;
 import com.tiklab.matflow.definition.model.MatFlow;
 import com.tiklab.matflow.definition.model.MatFlowConfigure;
 import com.tiklab.matflow.definition.model.MatFlowExecConfigure;
@@ -31,7 +32,7 @@ public class MatFlowCodeServiceImpl implements MatFlowCodeService {
     MatFlowCodeDao matFlowCodeDao;
 
     @Autowired
-    ProofService proofService;
+    JoinTemplate joinTemplate;
 
     @Autowired
     CodeGiteeApiService codeGiteeApiService;
@@ -87,10 +88,11 @@ public class MatFlowCodeServiceImpl implements MatFlowCodeService {
         if (oneCode == null){
             return null;
         }
-        if (oneCode.getProofId() != null){
-            Proof proof = proofService.findOneProof(oneCode.getProofId());
-            matFlowCode.setProof(proof);
-        }
+        joinTemplate.joinQuery(matFlowCode);
+        //if (oneCode.getProofId() != null){
+        //    Proof proof = proofService.findOneProof(oneCode.getProofId());
+        //    matFlowCode.setProof(proof);
+        //}
         return matFlowCode;
     }
 

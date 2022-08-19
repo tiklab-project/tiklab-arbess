@@ -73,7 +73,9 @@ public class CommonAchieveServiceImpl implements CommonAchieveService {
             matFlowExecHistory.setRunLog(matFlowExecHistory.getRunLog()+s+"\n");
             matFlowExecHistoryList.add(matFlowExecHistory);
             if (logRunLog.toString().contains("BUILD FAILURE")){
-               return 0;
+                inputStreamReader.close();
+                bufferedReader.close();
+                return 0;
             }
         }
         //更新状态

@@ -5,6 +5,8 @@ import com.tiklab.matflow.definition.model.MatFlow;
 import com.tiklab.matflow.definition.model.MatFlowStatus;
 import com.tiklab.matflow.definition.service.MatFlowService;
 import com.tiklab.matflow.instance.model.*;
+import com.tiklab.matflow.setting.proof.model.Proof;
+import com.tiklab.matflow.setting.proof.service.ProofService;
 import com.tiklab.rpc.annotation.Exporter;
 import org.apache.commons.lang3.time.DateUtils;
 import org.slf4j.Logger;
@@ -12,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.validation.constraints.NotNull;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -34,6 +37,9 @@ public class MatFlowHomeServiceImpl implements MatFlowHomeService {
 
     @Autowired
     MatFlowActionService matFlowActionService;
+
+    @Autowired
+    ProofService proofService;
 
 
     private static final Logger logger = LoggerFactory.getLogger(MatFlowHomeServiceImpl.class);
@@ -163,7 +169,11 @@ public class MatFlowHomeServiceImpl implements MatFlowHomeService {
         return query;
     }
 
-
+    @Override
+    public List<Proof> findMatFlowProof(@NotNull String userId, String matFlowId, int type){
+        StringBuilder userMatFlowId = matFlowService.findUserMatFlowId(userId);
+        return proofService.findMatFlowProof(userId, matFlowId, type, userMatFlowId);
+    }
 
 
 

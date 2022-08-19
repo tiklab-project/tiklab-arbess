@@ -8,6 +8,7 @@ import com.tiklab.matflow.instance.model.MatFlowExecState;
 import com.tiklab.matflow.instance.model.MatFlowOpen;
 import com.tiklab.matflow.instance.service.MatFlowHomeService;
 import com.tiklab.matflow.instance.model.MatFlowFollow;
+import com.tiklab.matflow.setting.proof.model.Proof;
 import com.tiklab.postin.annotation.Api;
 import com.tiklab.postin.annotation.ApiMethod;
 import com.tiklab.postin.annotation.ApiParam;
@@ -88,7 +89,15 @@ public class MatFlowHomeController {
         return Result.ok(allAction);
     }
 
+    @RequestMapping(path="/findMatFlowProof",method = RequestMethod.POST)
+    @ApiMethod(name = "findMatFlowProof",desc = "查询流水线凭证")
+    @ApiParam(name = "userId",desc = "用户id",required = true)
+    public Result<List<Proof>> findMatFlowProof(@NotNull String userId, String matFlowId, int type){
 
+        List<Proof> matFlowProof = matFlowHomeService.findMatFlowProof(userId,matFlowId,type);
+
+        return Result.ok(matFlowProof);
+    }
 
 
 

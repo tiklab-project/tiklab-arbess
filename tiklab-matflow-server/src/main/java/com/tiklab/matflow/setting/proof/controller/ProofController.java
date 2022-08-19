@@ -47,15 +47,15 @@ public class ProofController {
     }
 
 
-    @RequestMapping(path="/findMatFlowProof",method = RequestMethod.POST)
-    @ApiMethod(name = "findMatFlowProof",desc = "查询流水线凭证")
-    @ApiParam(name = "userId",desc = "用户id",required = true)
-    public Result<List<Proof>> findMatFlowProof(@NotNull String userId,String matFlowId,int type){
-
-        List<Proof> matFlowProof = proofService.findMatFlowProof(userId,matFlowId,type);
-
-        return Result.ok(matFlowProof);
-    }
+    //@RequestMapping(path="/findMatFlowProof",method = RequestMethod.POST)
+    //@ApiMethod(name = "findMatFlowProof",desc = "查询流水线凭证")
+    //@ApiParam(name = "userId",desc = "用户id",required = true)
+    //public Result<List<Proof>> findMatFlowProof(@NotNull String userId,String matFlowId,int type){
+    //
+    //    List<Proof> matFlowProof = proofService.findMatFlowProof(userId,matFlowId,type);
+    //
+    //    return Result.ok(matFlowProof);
+    //}
 
     //修改
     @RequestMapping(path="/updateProof",method = RequestMethod.POST)

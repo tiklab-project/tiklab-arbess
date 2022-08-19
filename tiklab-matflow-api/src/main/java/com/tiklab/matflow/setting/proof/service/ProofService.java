@@ -50,8 +50,7 @@ public interface ProofService {
      * @param matFlowId 条件
      * @return 凭证列表
      */
-    //List<Proof> findMatFlowProof(ProofQuery proofQuery);
-    List<Proof> findMatFlowProof(String userId,String matFlowId,int type);
+    List<Proof> findMatFlowProof(String userId,String matFlowId,int type,StringBuilder s);
 
     /**
      * 查询所有凭证

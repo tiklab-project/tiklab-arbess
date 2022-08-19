@@ -59,4 +59,5 @@ public interface CodeGitHubService {
      * @return 仓库url
      */
     String getOneHouse(Proof proof, String houseName);
+
 }

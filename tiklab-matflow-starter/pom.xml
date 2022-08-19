@@ -54,7 +54,6 @@
             <artifactId>tiklab-dfs-spring-boot-starter</artifactId>
             <version>${project.version}</version>
         </dependency>
-
         <dependency>
             <groupId>com.tiklab</groupId>
             <artifactId>tiklab-privilege-spring-boot-starter</artifactId>
@@ -65,7 +64,6 @@
             <artifactId>tiklab-licence-spring-boot-starter</artifactId>
             <version>${project.version}</version>
         </dependency>
-
 
 
     </dependencies>

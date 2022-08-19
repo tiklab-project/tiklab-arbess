@@ -5,7 +5,9 @@ import com.tiklab.matflow.instance.model.MatFlowActionQuery;
 import com.tiklab.matflow.instance.model.MatFlowExecState;
 import com.tiklab.matflow.instance.model.MatFlowFollow;
 import com.tiklab.matflow.instance.model.MatFlowOpen;
+import com.tiklab.matflow.setting.proof.model.Proof;
 
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 public interface MatFlowHomeService {
@@ -45,15 +47,22 @@ public interface MatFlowHomeService {
      */
     List<MatFlowExecState> runState(String userId);
 
-
-    //List<MatFlowAction> findAllAction(String userId);
-
     /**
      * 查询动态
      * @param matFlowActionQuery 信息
      * @return 动态信息
      */
     MatFlowActionQuery findUserAction(MatFlowActionQuery matFlowActionQuery);
+
+
+    /**
+     * 获取用户凭证
+     * @param userId 用户id
+     * @param matFlowId 流水线id
+     * @param type 类型
+     * @return 凭证信息
+     */
+    List<Proof> findMatFlowProof(@NotNull String userId, String matFlowId, int type);
 
 
 }

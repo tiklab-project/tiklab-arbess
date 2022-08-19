@@ -3,6 +3,7 @@ package com.tiklab.matflow.setting.proof.service;
 
 import com.tiklab.beans.BeanMapper;
 import com.tiklab.join.JoinTemplate;
+import com.tiklab.matflow.definition.entity.MatFlowEntity;
 import com.tiklab.matflow.definition.service.MatFlowService;
 import com.tiklab.matflow.execute.service.MatFlowCodeServiceImpl;
 import com.tiklab.matflow.instance.service.MatFlowActionService;
@@ -13,6 +14,7 @@ import com.tiklab.matflow.setting.proof.model.Proof;
 import com.tiklab.matflow.setting.proof.model.ProofTask;
 
 import com.tiklab.rpc.annotation.Exporter;
+import com.tiklab.user.user.model.DmUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,9 +36,6 @@ public class ProofServiceImpl implements ProofService{
 
     @Autowired
     ProofTaskService proofTaskService;
-
-    @Autowired
-    MatFlowService matFlowService;
 
     @Autowired
     MatFlowActionService matFlowActionService;
@@ -109,15 +108,11 @@ public class ProofServiceImpl implements ProofService{
     public List<Proof> findAllProof() {
         List<ProofEntity> proofEntityList = proofDao.selectAllProof();
         return BeanMapper.mapList(proofEntityList, Proof.class);
-        //joinTemplate.joinQuery(proofList);
-        //return proofList;
     }
 
     @Override
-    public List<Proof> findMatFlowProof(String userId,String matFlowId,int type){
+    public List<Proof> findMatFlowProof(String userId,String matFlowId,int type,StringBuilder s){
         List<Proof> allProof;
-
-        StringBuilder s = matFlowService.findUserMatFlowId(userId);
         //判断查询系统凭证还是项目凭证
         if (matFlowId.equals("")){
              allProof = BeanMapper.mapList(proofDao.findMatFlowProof(s), Proof.class);
@@ -164,15 +159,5 @@ public class ProofServiceImpl implements ProofService{
         }
         return null;
     }
-
-
-
-
-
-
-
-
-
-
 
 }
