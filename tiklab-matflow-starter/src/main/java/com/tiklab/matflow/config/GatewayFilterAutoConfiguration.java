@@ -17,8 +17,9 @@ public class GatewayFilterAutoConfiguration {
 
     //网关filter
     @Bean
-    GatewayFilter gatewayFilter(AuthorHandler authorHandler){
+    GatewayFilter gatewayFilter(RouterHandler routerHandler, AuthorHandler authorHandler){
         return new GatewayFilter()
+                .setRouterHandler(routerHandler)
                 .addHandler(authorHandler);
     }
 
@@ -28,7 +29,6 @@ public class GatewayFilterAutoConfiguration {
         return new AuthorHandler()
                 .setAuthenticator(authenticator)
                 .setIgnoreConfig(ignoreConfig);
-
     }
 
     @Bean
@@ -87,8 +87,33 @@ public class GatewayFilterAutoConfiguration {
                         "/authConfig",
                         "/ws",
                         "/socket",
-                        "/start"
+                        "/start",
+                        "/eas"
                 })
+                .get();
+    }
+
+
+    //路由handler
+    @Bean
+    RouterHandler routerHandler(RouterConfig routerConfig){
+        return new RouterHandler()
+                .setRouterConfig(routerConfig);
+    }
+
+    //路由转发配置
+    @Value("${auth.address:null}")
+    String projectUrl;
+
+    @Bean
+    RouterConfig routerConfig(){
+        return RouterConfigBuilder.instance()
+                .route(new String[]{
+                        "/user/findUserPage",
+                        "/userdir/findAllList",
+                        "/eam/auth/logout",
+                        "/productauth/validUserInProduct"
+                }, projectUrl)
                 .get();
     }
 }

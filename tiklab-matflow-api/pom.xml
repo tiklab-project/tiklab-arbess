@@ -24,18 +24,37 @@
             <artifactId>tiklab-join-annotation</artifactId>
             <version>${project.version}</version>
         </dependency>
-
         <dependency>
             <groupId>com.tiklab</groupId>
             <artifactId>tiklab-user-api</artifactId>
             <version>${project.version}</version>
         </dependency>
-
         <dependency>
             <groupId>com.tiklab</groupId>
             <artifactId>tiklab-postin-annotation</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.tiklab</groupId>
+            <artifactId>tiklab-rpc-annotation</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.tiklab</groupId>
+            <artifactId>tiklab-join-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.tiklab</groupId>
+            <artifactId>tiklab-beans-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.tiklab</groupId>
+            <artifactId>tiklab-dsm-annotation</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+        </dependency>
+
     </dependencies>
 
     <build>

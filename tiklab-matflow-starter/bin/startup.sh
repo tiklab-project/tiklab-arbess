@@ -1,13 +1,5 @@
 #!/bin/sh
 #-------------------------------------------------------------------------------------------------------------
-#该脚本的使用方式为-->[sh startup.sh]
-#该脚本可在服务器上的任意目录下执行,不会影响到日志的输出位置等
-#-------------------------------------------------------------------------------------------------------------
-#if [ ! -n "$JAVA_HOME" ]; then
-#    export JAVA_HOME="/usr/local/jdk-16.0.2"
-#fi
-#!/bin/sh
-#-------------------------------------------------------------------------------------------------------------
 
 DIR=$(dirname "$PWD")
 #数据库名称
@@ -18,6 +10,8 @@ MYSQL_VERSION=mysql-8.0.28
 MYSQL_DIR="/opt/tiklab/mysql/"
 #数据库程序位置
 MYSQL_HOME=${DIR}/${MYSQL_VERSION}
+
+mv ${DIR}/temp/* ${DIR}
 
 mkdir -p /var/lib/mysql-files
 
@@ -48,9 +42,11 @@ if [ ! -d ${MYSQL_DIR} ]; then
       done
 
   rm -rf /var/lib/mysql/mysql.sock
+  mkdir -p /var/lib/mysql
   ln -s ${MYSQL_HOME}/log/mysql.sock /var/lib/mysql/mysql.sock
 
   mysql -uroot -pdarth2020 -e "create database ${MYSQL_NAME}"
+  mysql -uroot -pdarth2020 -e "create database tiklab_eas"
   echo "数据库初始化完成"
   rm -rf /opt/tiklab/app
 else

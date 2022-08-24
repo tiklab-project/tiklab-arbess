@@ -117,7 +117,7 @@ public class CommonAchieveServiceImpl implements CommonAchieveService {
                 return process;
             }
             //执行命令
-            String[] cmd = new String[] { "/bin/sh", "-c", "cd "+path+";"+" source /etc/profile;"+order };
+            String[] cmd = new String[] { "/bin/sh", "-c", "cd "+path+";"+" source /etc/profile;"+ order };
             process = runtime.exec(cmd);
         }
         return process;

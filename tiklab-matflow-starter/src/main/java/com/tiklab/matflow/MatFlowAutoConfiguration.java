@@ -1,6 +1,6 @@
 package com.tiklab.matflow;
 
-import   com.tiklab.beans.starter.annotation.EnableBeans;
+import com.tiklab.beans.starter.annotation.EnableBeans;
 import com.tiklab.dal.starter.annotation.EnableDal;
 import com.tiklab.dsm.starter.annotation.EnableDsm;
 import com.tiklab.eam.starter.EnableEam;
@@ -16,6 +16,7 @@ import com.tiklab.web.starter.annotation.EnableWeb;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
+
 @Configuration
 @EnableBeans
 @EnableJoin
@@ -25,7 +26,6 @@ import org.springframework.context.annotation.Configuration;
 @EnableRpc
 //数据库脚本
 @EnableDsm
-
 @EnablePluginServer
 //用户中心
 @EnableEam
@@ -35,7 +35,6 @@ import org.springframework.context.annotation.Configuration;
 //权限中心
 @EnablePrivilegeServer
 @EnableLicenceServer
-
 @EnableGateway
 @EnableMatFlowServer
 @ComponentScan("com.tiklab.matflow")

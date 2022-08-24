@@ -5,7 +5,6 @@ package com.tiklab.matflow.definition.dao;
 import com.tiklab.dal.jdbc.JdbcTemplate;
 import com.tiklab.dal.jpa.JpaTemplate;
 import com.tiklab.matflow.definition.entity.MatFlowConfigureEntity;
-import com.tiklab.matflow.instance.entity.MatFlowExecHistoryEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -16,69 +16,31 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
+            <version>4.12</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.aspectj</groupId>
             <artifactId>aspectjweaver</artifactId>
+            <version>1.9.2</version>
         </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-validator</artifactId>
+            <version>5.2.4.Final</version>
         </dependency>
         <!--spring-->
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-test</artifactId>
+            <version>5.3.12</version>
             <scope>test</scope>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter</artifactId>
-        </dependency>
-
-        <!--tiklab-->
-        <dependency>
-            <groupId>com.tiklab</groupId>
-            <artifactId>tiklab-beans-spring-boot-starter</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.tiklab</groupId>
-            <artifactId>tiklab-join-spring-boot-starter</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
-        </dependency>
-        <!--pcs-->
-        <dependency>
-            <groupId>com.tiklab</groupId>
-            <artifactId>tiklab-privilege-server</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>com.tiklab</groupId>
-            <artifactId>tiklab-plugin-spring-boot-starter</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.tiklab</groupId>
-            <artifactId>tiklab-toolkit-spring-boot-starter</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.tiklab</groupId>
-            <artifactId>tiklab-user-server</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
-        </dependency>
-        <!--other-->
-        <dependency>
-            <groupId>com.tiklab</groupId>
-            <artifactId>tiklab-matflow-api</artifactId>
-            <version>${project.version}</version>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.12.0</version>
         </dependency>
         <dependency>
             <groupId>maven</groupId>
@@ -119,7 +81,20 @@
             <artifactId>maven-invoker</artifactId>
             <version>3.2.0</version>
         </dependency>
-
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.tiklab</groupId>
+            <artifactId>tiklab-dal-jpa</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.tiklab</groupId>
+            <artifactId>tiklab-matflow-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
 
     </dependencies>

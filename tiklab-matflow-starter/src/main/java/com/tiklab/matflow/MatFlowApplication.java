@@ -14,7 +14,7 @@ import java.util.Map;
  */
 
 @SpringBootApplication
-@PropertySource(value = "classpath:application-${env:dev}.properties")
+@PropertySource(value = "classpath:application-${env:prd}.properties")
 @EnableScheduling
 @EnableMatFlow
 public class MatFlowApplication {

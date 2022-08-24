@@ -25,6 +25,11 @@
         <dependency>
             <groupId>com.tiklab</groupId>
             <artifactId>tiklab-eam-spring-boot-starter</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.tiklab</groupId>
+            <artifactId>tiklab-eas-spring-boot-stater</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -40,9 +45,8 @@
         <dependency>
             <groupId>com.tiklab</groupId>
             <artifactId>tiklab-user-spring-boot-starter</artifactId>
-            <version>${project.version}</version>
+            <version>1.0.0-SNAPSHOT</version>
         </dependency>
-
         <dependency>
             <groupId>com.tiklab</groupId>
             <artifactId>tiklab-dss-spring-boot-starter</artifactId>
@@ -64,13 +68,64 @@
             <artifactId>tiklab-licence-spring-boot-starter</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.tiklab</groupId>
+            <artifactId>tiklab-plugin-spring-boot-starter</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.tiklab</groupId>
+            <artifactId>tiklab-toolkit-spring-boot-starter</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
+        <dependency>
+            <groupId>com.tiklab</groupId>
+            <artifactId>tiklab-mysql</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.tiklab</groupId>
+            <artifactId>tiklab-jdk</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+        </dependency>
+        <!--zip-->
+        <dependency>
+            <groupId>com.tiklab</groupId>
+            <artifactId>tiklab-jdk</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+            <type>zip</type>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.tiklab</groupId>
+            <artifactId>tiklab-mysql</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+            <type>zip</type>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.tiklab</groupId>
+            <artifactId>tiklab-eas-starter</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+            <type>zip</type>
+            <scope>provided</scope>
+        </dependency>
 
     </dependencies>
 
     <build>
         <plugins>
+            <!--跳过发包-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
 
+            <!--jar包-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
@@ -82,6 +137,21 @@
                 </configuration>
             </plugin>
 
+            <!--源码source-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!--maven打包插件-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
@@ -92,7 +162,8 @@
                             <descriptors>
                                 <descriptor>assembly/distribution1.xml</descriptor>
                             </descriptors>
-                            <finalName>tiklab-matflow-${project.version}</finalName>
+                            <finalName>tiklab-matflow</finalName>
+                            <appendAssemblyId>false</appendAssemblyId>
                         </configuration>
                         <phase>package</phase>
                         <goals>
@@ -102,6 +173,7 @@
                 </executions>
             </plugin>
 
+            <!--docker打包插件-->
             <plugin>
                 <groupId>com.spotify</groupId>
                 <artifactId>docker-maven-plugin</artifactId>
@@ -120,23 +192,51 @@
                 </configuration>
             </plugin>
 
+            <!--解压文件-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>2.8</version>
                 <executions>
                     <execution>
-                        <id>attach-sources</id>
+                        <id>unpack</id>
+                        <phase>clean</phase>
                         <goals>
-                            <goal>jar</goal>
+                            <goal>unpack</goal>
                         </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>com.tiklab</groupId>
+                                    <artifactId>tiklab-eas-starter</artifactId>
+                                    <version>1.0.0-SNAPSHOT</version>
+<!--                                    <classifier>distribution</classifier>-->
+                                    <type>zip</type>
+                                    <outputDirectory>temp</outputDirectory>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>com.tiklab</groupId>
+                                    <artifactId>tiklab-jdk</artifactId>
+                                    <version>1.0.0-SNAPSHOT</version>
+                                    <type>zip</type>
+                                    <outputDirectory>temp</outputDirectory>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>com.tiklab</groupId>
+                                    <artifactId>tiklab-mysql</artifactId>
+                                    <version>1.0.0-SNAPSHOT</version>
+                                    <type>zip</type>
+                                    <outputDirectory>temp</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+
                     </execution>
                 </executions>
             </plugin>
 
         </plugins>
     </build>
-
-
 
 </project>
 
