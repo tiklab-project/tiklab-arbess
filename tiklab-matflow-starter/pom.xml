@@ -52,10 +52,14 @@
             <artifactId>tiklab-dss-spring-boot-starter</artifactId>
             <version>${project.version}</version>
         </dependency>
-
         <dependency>
             <groupId>com.tiklab</groupId>
             <artifactId>tiklab-dfs-spring-boot-starter</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.tiklab</groupId>
+            <artifactId>tiklab-dcs-spring-boot-starter</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -89,6 +93,7 @@
             <artifactId>tiklab-jdk</artifactId>
             <version>1.0.0-SNAPSHOT</version>
         </dependency>
+
         <!--zip-->
         <dependency>
             <groupId>com.tiklab</groupId>
@@ -113,6 +118,27 @@
         </dependency>
 
     </dependencies>
+
+    <profiles>
+        <profile>
+            <id>enable</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <profile.assembly.package.suffix>enable</profile.assembly.package.suffix>
+            </properties>
+        </profile>
+        <profile>
+            <id>dev</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <profile.assembly.package.suffix>local</profile.assembly.package.suffix>
+            </properties>
+        </profile>
+    </profiles>
 
     <build>
         <plugins>
@@ -160,7 +186,8 @@
                         <id>make-assembly</id>
                         <configuration>
                             <descriptors>
-                                <descriptor>assembly/distribution1.xml</descriptor>
+                                <!--suppress UnresolvedMavenProperty -->
+                                <descriptor>assembly/distribution-${profile.assembly.package.suffix}.xml</descriptor>
                             </descriptors>
                             <finalName>tiklab-matflow</finalName>
                             <appendAssemblyId>false</appendAssemblyId>
@@ -230,11 +257,9 @@
                                 </artifactItem>
                             </artifactItems>
                         </configuration>
-
                     </execution>
                 </executions>
             </plugin>
-
         </plugins>
     </build>
 

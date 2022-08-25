@@ -1,74 +1,17 @@
 #!/bin/sh
 #-------------------------------------------------------------------------------------------------------------
+DIRS=$(dirname "$PWD")
 
-DIR=$(dirname "$PWD")
-#数据库名称
-MYSQL_NAME=tiklab_matflow
-#mysql版本
-MYSQL_VERSION=mysql-8.0.28
-#数据库数据文件位置
-MYSQL_DIR="/opt/tiklab/mysql/"
-#数据库程序位置
-MYSQL_HOME=${DIR}/${MYSQL_VERSION}
+mv "${DIRS}"/temp/* ${DIRS}
 
-mv ${DIR}/temp/* ${DIR}
-
-mkdir -p /var/lib/mysql-files
-
-if [ ! -d ${MYSQL_DIR} ]; then
-  echo "初次安装，加载数据库文件"
-  mkdir -p /opt/tiklab/mysql
-  mkdir -p /opt/tiklab/app
-
-  mv ${MYSQL_HOME}/tiklab/mysql/* /opt/tiklab/mysql
-  mv ${MYSQL_HOME}/tiklab/app/* /opt/tiklab/app
-
-  echo "启动数据库"
-   for i in $(seq 2)
-      do
-        sleep 0.6
-        echo -e  ".\c"
-      done
-
-  cd ${MYSQL_HOME}/bin && nohup ./mysqld --defaults-file=${MYSQL_HOME}/config/my.cnf --datadir=/opt/tiklab/mysql --socket=${MYSQL_HOME}/log/mysql.sock --log-error=${MYSQL_HOME}/config/mysqld.log --pid-file=${MYSQL_HOME}/config/mysqld.pid --lc_messages_dir=${MYSQL_HOME}/config > ${MYSQL_HOME}/log/log.txt 2>&1 &
-  echo "===========================================数据库启动成功============================================================"
-  mv ${MYSQL_HOME}/mysqld/* /bin
-
-  echo "初始化数据库"
-   for i in $(seq 5)
-      do
-        sleep 0.6
-        echo -e  ".\c"
-      done
-
-  rm -rf /var/lib/mysql/mysql.sock
-  mkdir -p /var/lib/mysql
-  ln -s ${MYSQL_HOME}/log/mysql.sock /var/lib/mysql/mysql.sock
-
-  mysql -uroot -pdarth2020 -e "create database ${MYSQL_NAME}"
-  mysql -uroot -pdarth2020 -e "create database tiklab_eas"
-  echo "数据库初始化完成"
-  rm -rf /opt/tiklab/app
-else
-  echo "启动数据库"
-     for i in $(seq 2)
-        do
-          sleep 0.6
-          echo -e  ".\c"
-        done
-  echo "===========================================同步数据库数据============================================================"
-  cd ${MYSQL_HOME}/bin && nohup ./mysqld --defaults-file=${MYSQL_HOME}/config/my.cnf --datadir=/opt/tiklab/mysql --socket=${MYSQL_HOME}/log/mysql.sock --log-error=${MYSQL_HOME}/config/mysqld.log --pid-file=${MYSQL_HOME}/config/mysqld.pid --lc_messages_dir=${MYSQL_HOME}/config > ${MYSQL_HOME}/log/log.txt 2>&1 &
-  echo "===========================================数据库启动成功============================================================"
-
-  mv ${DIR}/${MYSQL_HOME}/mysqld/* /bin
-  rm -rf /opt/tiklab/app
+#判断是否自定义jdk
+if [ -n "$1" ];then
+      JDK_HOME=$1
+    else
+    JDK_HOME=$(dirname "$PWD")
+    JAVA_HOME=${JDK_HOME}/jdk-16.0.2
 fi
 
-echo "启动应用程序"
-
-JDK_HOME=$(dirname "$PWD")
-
-JAVA_HOME=${JDK_HOME}/jdk-16.0.2
 #-------------------------------------------------------------------------------------------------------------
 #       系统运行参数
 #-------------------------------------------------------------------------------------------------------------
@@ -88,10 +31,18 @@ JAVA_OPTS="$JAVA_OPTS -Dconf.config=file:${APP_CONFIG}"
 JAVA_OPTS="$JAVA_OPTS --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.sql/java.sql=ALL-UNNAMED  -classpath"
 
 CLASSPATH=${APP_HOME}/conf
+
+#加载私有依赖
 for appJar in "$APP_HOME"/lib/*.jar;
 do
    CLASSPATH="$CLASSPATH":"$appJar"
 done
+#加载公共依赖
+for appJar in "$DIRS"/comment/*.jar;
+do
+   CLASSPATH="$CLASSPATH":"$appJar"
+done
+
 
 echo "JAVA_HOME="$JAVA_HOME
 echo "JAVA_OPTS="$JAVA_OPTS

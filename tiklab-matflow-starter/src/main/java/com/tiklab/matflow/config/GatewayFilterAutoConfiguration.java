@@ -8,12 +8,18 @@ import com.tiklab.gateway.GatewayFilter;
 import com.tiklab.gateway.router.RouterHandler;
 import com.tiklab.gateway.router.config.RouterConfig;
 import com.tiklab.gateway.router.config.RouterConfigBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.Arrays;
+
 @Configuration
 public class GatewayFilterAutoConfiguration {
+
+    private static final Logger logger = LoggerFactory.getLogger(GatewayFilterAutoConfiguration.class);
 
     //网关filter
     @Bean
@@ -93,7 +99,6 @@ public class GatewayFilterAutoConfiguration {
                 .get();
     }
 
-
     //路由handler
     @Bean
     RouterHandler routerHandler(RouterConfig routerConfig){
@@ -103,17 +108,24 @@ public class GatewayFilterAutoConfiguration {
 
     //路由转发配置
     @Value("${auth.address:null}")
-    String projectUrl;
+    String authAddress;
+
+    @Value("${auth.type:null}")
+    String authType;
 
     @Bean
     RouterConfig routerConfig(){
+        String[] s = {
+                "/user/findUserPage",
+                "/userdir/findAllList",
+                "/eam/auth/logout",
+                "/productauth/validUserInProduct"
+        };
+        if (authType.equals("null") || authType.equals("local")){
+            s = new String[]{""};
+        }
         return RouterConfigBuilder.instance()
-                .route(new String[]{
-                        "/user/findUserPage",
-                        "/userdir/findAllList",
-                        "/eam/auth/logout",
-                        "/productauth/validUserInProduct"
-                }, projectUrl)
+                .route(s, authAddress)
                 .get();
     }
 }

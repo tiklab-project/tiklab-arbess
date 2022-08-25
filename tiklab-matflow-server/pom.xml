@@ -74,8 +74,6 @@
             <artifactId>svnkit</artifactId>
             <version>1.10.6</version>
         </dependency>
-
-        <!-- https://mvnrepository.com/artifact/org.apache.maven.shared/maven-invoker -->
         <dependency>
             <groupId>org.apache.maven.shared</groupId>
             <artifactId>maven-invoker</artifactId>
