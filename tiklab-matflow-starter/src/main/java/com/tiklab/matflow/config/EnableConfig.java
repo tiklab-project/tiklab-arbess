@@ -83,15 +83,35 @@ public class EnableConfig {
         }
 
         MysqlConfig mysqlConfig = new MysqlConfig();
-        String mysqlName = environment.getProperty("mysql.name");
 
-        Process process = mysqlConfig.startMysql(mysqlName);
+        Process process = mysqlConfig.startMysql("tiklab_matflow");
 
         //执行启动脚本错误
         if (process == null){
             throw new IOException("MYSQL启动错误。");
+
         }
+
         Thread.sleep(5000);
+
+        Process initMysql = mysqlConfig.initMysql("tiklab_matflow");
+
+        //执行启动脚本错误
+        if (initMysql == null){
+            throw new IOException("INIT启动错误。");
+        }
+
+        //输出执行过程
+        InputStream inputStream = initMysql.getInputStream();
+        InputStreamReader inputStreamReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
+        String s;
+        BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+        while ((s = bufferedReader.readLine()) != null) {
+            logger.info("INIT ："+s);
+        }
+        inputStreamReader.close();
+        bufferedReader.close();
+        logger.info("INIT启动完成");
         logger.info("MYSQL启动完成");
     }
 

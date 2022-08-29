@@ -31,12 +31,20 @@
             <outputDirectory>/</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>${basedir}/bin</directory>
+            <directory>${basedir}/bin-linux</directory>
             <fileMode>755</fileMode>
             <excludes>
                 <exclude>*.classpath</exclude>
             </excludes>
-            <outputDirectory>/bin</outputDirectory>
+            <outputDirectory>/bin-linux</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>${basedir}/bin-windows</directory>
+            <fileMode>755</fileMode>
+            <excludes>
+                <exclude>*.classpath</exclude>
+            </excludes>
+            <outputDirectory>/bin-windows</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>${basedir}/plugin</directory>

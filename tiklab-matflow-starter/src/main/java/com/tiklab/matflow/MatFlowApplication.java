@@ -6,7 +6,6 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import java.util.Map;
 
 
 /**
@@ -14,7 +13,7 @@ import java.util.Map;
  */
 
 @SpringBootApplication
-@PropertySource(value = "classpath:application-${env:prd}.properties")
+@PropertySource(value = "classpath:application-${env:dev}.properties")
 @EnableScheduling
 @EnableMatFlow
 public class MatFlowApplication {

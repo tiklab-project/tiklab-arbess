@@ -42,6 +42,8 @@ mv $DIR/lib $DIR/history
 mv $DIR/logs $DIR/history
 mv $DIR/mysql-8.0.28 $DIR/history
 mv $DIR/plugin $DIR/history
+mv $DIR/comment $DIR/comment
+mv $DIR/tiklab-eas $DIR/tiklab-eas
 
 tar -xvf ${APP} -C ${DIR} --strip-components 1
 

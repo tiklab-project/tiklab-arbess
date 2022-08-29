@@ -152,53 +152,87 @@
             </plugin>
 
             <!--jar包-->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <configuration>
-                    <excludes>
-                        <exclude>*.properties</exclude>
-                        <exclude>*.xml</exclude>
-                    </excludes>
-                </configuration>
-            </plugin>
+<!--            <plugin>-->
+<!--                <groupId>org.apache.maven.plugins</groupId>-->
+<!--                <artifactId>maven-jar-plugin</artifactId>-->
+<!--                <configuration>-->
+<!--                    <excludes>-->
+<!--                        <exclude>*.properties</exclude>-->
+<!--                        <exclude>*.xml</exclude>-->
+<!--                    </excludes>-->
+<!--                </configuration>-->
+<!--            </plugin>-->
 
-            <!--源码source-->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>attach-sources</id>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
 
-            <!--maven打包插件-->
+<!--            <plugin>-->
+<!--                <groupId>org.apache.maven.plugins</groupId>-->
+<!--                <artifactId>maven-assembly-plugin</artifactId>-->
+<!--                <executions>-->
+<!--                    <execution>-->
+<!--                        <id>make-assembly</id>-->
+<!--                        <configuration>-->
+<!--                            <descriptors>-->
+<!--                                &lt;!&ndash;suppress UnresolvedMavenProperty &ndash;&gt;-->
+<!--                                <descriptor>assembly/distribution-${profile.assembly.package.suffix}.xml</descriptor>-->
+<!--                            </descriptors>-->
+<!--                            <finalName>tiklab-matflow</finalName>-->
+<!--                            <appendAssemblyId>false</appendAssemblyId>-->
+<!--                        </configuration>-->
+<!--                        <phase>package</phase>-->
+<!--                        <goals>-->
+<!--                            <goal>single</goal>-->
+<!--                        </goals>-->
+<!--                    </execution>-->
+<!--                </executions>-->
+<!--            </plugin>-->
+
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <appendAssemblyId>false</appendAssemblyId>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                    <archive>
+                        <manifest>
+                            <mainClass>com.tiklab.matflow.MatFlowApplication</mainClass>
+                        </manifest>
+                        <manifestEntries>
+                            <Class-Path>lib/*.jar</Class-Path>
+                        </manifestEntries>
+                    </archive>
+                    <descriptors>
+                        <descriptor>assembly/distribution-${profile.assembly.package.suffix}.xml</descriptor>
+                    </descriptors>
+                </configuration>
                 <executions>
                     <execution>
                         <id>make-assembly</id>
-                        <configuration>
-                            <descriptors>
-                                <!--suppress UnresolvedMavenProperty -->
-                                <descriptor>assembly/distribution-${profile.assembly.package.suffix}.xml</descriptor>
-                            </descriptors>
-                            <finalName>tiklab-matflow</finalName>
-                            <appendAssemblyId>false</appendAssemblyId>
-                        </configuration>
                         <phase>package</phase>
                         <goals>
-                            <goal>single</goal>
+                            <goal>assembly</goal>
                         </goals>
                     </execution>
                 </executions>
             </plugin>
+
+            <!--源码source-->
+<!--            <plugin>-->
+<!--                <groupId>org.apache.maven.plugins</groupId>-->
+<!--                <artifactId>maven-source-plugin</artifactId>-->
+<!--                <executions>-->
+<!--                    <execution>-->
+<!--                        <id>attach-sources</id>-->
+<!--                        <goals>-->
+<!--                            <goal>jar</goal>-->
+<!--                        </goals>-->
+<!--                    </execution>-->
+<!--                </executions>-->
+<!--            </plugin>-->
+
+            <!--maven打包插件-->
 
             <!--docker打包插件-->
             <plugin>
@@ -227,7 +261,7 @@
                 <executions>
                     <execution>
                         <id>unpack</id>
-                        <phase>clean</phase>
+                        <phase>compile</phase>
                         <goals>
                             <goal>unpack</goal>
                         </goals>
