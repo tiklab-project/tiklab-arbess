@@ -1,6 +1,5 @@
 package com.tiklab.matflow.definition.service;
 
-import com.ibm.icu.text.SimpleDateFormat;
 import com.tiklab.beans.BeanMapper;
 import com.tiklab.join.JoinTemplate;
 import com.tiklab.matflow.definition.dao.MatFlowConfigureDao;
@@ -20,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
