@@ -73,7 +73,7 @@
                 <include>org.aspectj:aspectjrt</include>
                 <include>org.aspectj:aspectjweaver</include>
                 <include>org.bouncycastle:bcprov-jdk15on</include>
-                <include>org.checkerframework:checker-qual</include>
+<!--                <include>org.checkerframework:checker-qual</include>-->
                 <include>com.fasterxml:classmate</include>
                 <include>commons-beanutils:commons-beanutils</include>
                 <include>commons-codec:commons-codec</include>
@@ -84,12 +84,12 @@
                 <include>commons-logging:commons-logging</include>
                 <include>commons-pool:commons-pool</include>
                 <include>org.apache.commons:commons-text</include>
-                <include>com.aliyun:credentials-java</include>
-                <include>com.aliyun:dysmsapi20170525</include>
+<!--                <include>com.aliyun:credentials-java</include>-->
+<!--                <include>com.aliyun:dysmsapi20170525</include>-->
                 <include>net.sf.ehcache:ehcache</include>
-                <include>com.aliyun:endpoint-util</include>
-                <include>com.google.errorprone:error_prone_annotations</include>
-                <include>com.google.guava:failureaccess</include>
+<!--                <include>com.aliyun:endpoint-util</include>-->
+<!--                <include>com.google.errorprone:error_prone_annotations</include>-->
+<!--                <include>com.google.guava:failureaccess</include>-->
                 <include>com.alibaba:fastjson</include>
                 <include>org.freemarker:freemarker</include>
                 <include>com.google.code.gson:gson</include>
@@ -97,8 +97,8 @@
                 <include>com.caucho:hessian</include>
                 <include>org.hibernate:hibernate-validator</include>
                 <include>org.hsqldb:hsqldb</include>
-                <include>org.ini4j:ini4j</include>
-                <include>com.google.j2objc:j2objc-annotations</include>
+<!--                <include>org.ini4j:ini4j</include>-->
+<!--                <include>com.google.j2objc:j2objc-annotations</include>-->
                 <include>com.fasterxml.jackson.core:jackson-annotations</include>
                 <include>com.fasterxml.jackson.core:jackson-core</include>
                 <include>com.fasterxml.jackson.core:jackson-databind</include>
@@ -115,7 +115,7 @@
                 <include>org.jboss.logging:jboss-logging</include>
                 <include>joda-time:joda-time</include>
                 <include>org.json:json</include>
-                <include>com.google.code.findbugs:jsr305</include>
+<!--                <include>com.google.code.findbugs:jsr305</include>-->
                 <include>org.slf4j:jul-to-slf4j</include>
                 <include>com.esotericsoftware:kryo</include>
                 <include>com.esotericsoftware:kryo-shaded</include>
@@ -133,11 +133,11 @@
                 <include>org.jboss.netty:netty</include>
                 <include>org.objenesis:objenesis</include>
                 <include>ognl:ognl</include>
-                <include>com.squareup.okhttp3:okhttp</include>
-                <include>com.squareup.okio:okio</include>
-                <include>com.aliyun:openapiutil</include>
-                <include>org.jacoco:org.jacoco.agent</include>
-                <include>com.google.protobuf:protobuf-java</include>
+<!--                <include>com.squareup.okhttp3:okhttp</include>-->
+<!--                <include>com.squareup.okio:okio</include>-->
+<!--                <include>com.aliyun:openapiutil</include>-->
+<!--                <include>org.jacoco:org.jacoco.agent</include>-->
+<!--                <include>com.google.protobuf:protobuf-java</include>-->
                 <include>com.esotericsoftware:reflectasm</include>
                 <include>org.slf4j:slf4j-api</include>
                 <include>org.yaml:snakeyaml</include>
@@ -189,9 +189,9 @@
                 <include>com.tiklab:tiklab-core</include>
                 <include>com.tiklab:tiklab-beans-core</include>
                 <include>com.tiklab:tiklab-beans-annotation</include>
-                <include>com.aliyun:tea-util</include>
-                <include>com.aliyun:tea-openapi</include>
-                <include>com.aliyun:tea</include>
+<!--                <include>com.aliyun:tea-util</include>-->
+<!--                <include>com.aliyun:tea-openapi</include>-->
+<!--                <include>com.aliyun:tea</include>-->
                 <include>org.springframework:spring-websocket</include>
                 <include>org.springframework:spring-webmvc</include>
                 <include>org.springframework:spring-web</include>
@@ -246,7 +246,7 @@
                 <exclude>com.caucho:hessian</exclude>
                 <exclude>org.hibernate:hibernate-validator</exclude>
                 <exclude>org.hsqldb:hsqldb</exclude>
-                <exclude>org.ini4j:ini4j</exclude>
+<!--                <exclude>org.ini4j:ini4j</exclude>-->
                 <exclude>com.google.j2objc:j2objc-annotations</exclude>
                 <exclude>com.fasterxml.jackson.core:jackson-annotations</exclude>
                 <exclude>com.fasterxml.jackson.core:jackson-core</exclude>
@@ -282,10 +282,10 @@
                 <exclude>org.jboss.netty:netty</exclude>
                 <exclude>org.objenesis:objenesis</exclude>
                 <exclude>ognl:ognl</exclude>
-                <exclude>com.squareup.okhttp3:okhttp</exclude>
+<!--                <exclude>com.squareup.okhttp3:okhttp</exclude>-->
                 <exclude>com.squareup.okio:okio</exclude>
                 <exclude>com.aliyun:openapiutil</exclude>
-                <exclude>org.jacoco:org.jacoco.agent</exclude>
+<!--                <exclude>org.jacoco:org.jacoco.agent</exclude>-->
                 <exclude>com.google.protobuf:protobuf-java</exclude>
                 <exclude>com.esotericsoftware:reflectasm</exclude>
                 <exclude>org.slf4j:slf4j-api</exclude>

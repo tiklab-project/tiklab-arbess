@@ -35,17 +35,14 @@ set JAVA_OPTS="%JAVA_OPTS% -DlogPath=%APP_LOG%"
 set JAVA_OPTS="%JAVA_OPTS% -Dconf.config=file:%APP_CONFIG%"
 set JAVA_OPTS="%JAVA_OPTS% --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.sql/java.sql=ALL-UNNAMED  -classpath"
 
-set comment=%DIRS%/comment
+set public=%DIRS%lib\
 @echo off & setlocal enabledelayedexpansion
-for /f "delims=" %%i in ('dir / b /a-d /s "%comment%"') do echo %%~nxi & set s=!s!:%%~nxi
-echo %s%
-
-set public=%DIRS%/lib
+for /f "delims=" %%i in ('dir /b /s "%public%"') do (set s=!s!%public%%%~nxi;)
+set comment=%DIRS%comment\
 @echo off & setlocal enabledelayedexpansion
-for /f "delims=" %%i in ('dir / b /a-d /s "%public%"') do echo %%~nxi & set st=!st!:%%~nxi
-echo %st%
+for /f "delims=" %%i in ('dir /b /s "%comment%"') do (set st=!st!%comment%%%~nxi;)
 
-set CLASSPATH=%s%:%st%
+set CLASSPATH=%st%%s%
 
 echo "%JAVA_HOME%="%JAVA_HOME%
 echo "%JAVA_OPTS%="%JAVA_OPTS%
@@ -65,7 +62,7 @@ echo pid: %PID%
 
 if "%PID%" == 0 (
 
-    %JAVA_HOME%/bin/java.exe %JAVA_OPTS% %CLASSPATH% %APP_MAIN%
+    %JAVA_HOME%/bin/java.exe %JAVA_OPTS% %CLASSPATH% %APP_MAIN% --spring.config.location=%DIRS%conf\ --logging.config=%DIRS%conf\logback.xml
 
     for /f "usebackq tokens=1-2" %%a in (`jps -l ^| findstr %main%`) do (
         set PID=%%a
