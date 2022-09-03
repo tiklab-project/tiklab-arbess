@@ -12,20 +12,20 @@ import org.springframework.stereotype.Component;
 public class CodeGiteeApi {
 
     //第三方应用id
-    @Value("${gieeClientId}")
+    @Value("${git.gitee.client.id}")
     private String clientId;
 
-    @Value("${giteeClientSecret}")
+    @Value("${git.gitee.client.secret}")
     private String clientSecret;
 
     //回调地址
-    @Value("${giteeCallbackUrl}")
-    private String callbackUri;
+    @Value("${git.gitee.callback.url}")
+    private String callbackUrl;
 
 
     public String getCode() {
         //获取code
-        return "https://gitee.com/oauth/authorize?client_id="+clientId+"&redirect_uri="+callbackUri+"&response_type=code";
+        return "https://gitee.com/oauth/authorize?client_id="+clientId+"&redirect_uri="+callbackUrl+"&response_type=code";
     }
 
     /**
@@ -35,7 +35,7 @@ public class CodeGiteeApi {
      */
     public String getAccessToken(String code) {
         //获取accessToken
-        return "https://gitee.com/oauth/token?grant_type=authorization_code&code="+code+"&client_id="+clientId+"&redirect_uri="+callbackUri+"&client_secret="+clientSecret;
+        return "https://gitee.com/oauth/token?grant_type=authorization_code&code="+code+"&client_id="+clientId+"&redirect_uri="+callbackUrl+"&client_secret="+clientSecret;
         // return "https://gitee.com/oauth/token?";
     }
 

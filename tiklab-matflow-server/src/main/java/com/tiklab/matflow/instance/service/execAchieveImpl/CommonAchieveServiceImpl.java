@@ -38,10 +38,20 @@ public class CommonAchieveServiceImpl implements CommonAchieveService {
     @Autowired
     MatFlowExecLogService matFlowExecLogService;
 
-    @Autowired
-    MatFlowCommonService matFlowCommonService;
-
     private static final Logger logger = LoggerFactory.getLogger(CommonAchieveServiceImpl.class);
+
+
+    @Override
+    public int getSystemType(){
+        String property = System.getProperty("os.name");
+        String[] s1 = property.split(" ");
+        if (s1[0].equals("Windows")){
+            return 1;
+        }else {
+            return 2;
+        }
+    }
+
 
     /**
      * 执行日志
@@ -52,13 +62,16 @@ public class CommonAchieveServiceImpl implements CommonAchieveService {
      */
     @Override
     public int log(InputStream inputStream, MatFlowProcess matFlowProcess, List<MatFlowExecHistory> matFlowExecHistoryList) throws IOException {
-        String fileAddress = matFlowCommonService.getFileAddress();
+
         InputStreamReader inputStreamReader;
-        if (fileAddress.equals("/usr/local/matFlow/")){
-            inputStreamReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
-        }else {
+
+        //根据系统指定不同日志输出格式
+        if (getSystemType()==1){
             inputStreamReader = new InputStreamReader(inputStream, Charset.forName("GBK"));
+        }else {
+            inputStreamReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
         }
+
         MatFlowExecHistory matFlowExecHistory = matFlowProcess.getMatFlowExecHistory();
         MatFlowExecLog matFlowExecLog = matFlowProcess.getMatFlowExecLog();
         String s;
@@ -98,10 +111,8 @@ public class CommonAchieveServiceImpl implements CommonAchieveService {
 
         Runtime runtime=Runtime.getRuntime();
         Process process;
-        String property = System.getProperty("os.name");
 
-        String[] s = property.split(" ");
-        if (s[0].equals("Windows")){
+        if (getSystemType()==1){
             if (sourceAddress != null){
                 process = runtime.exec("cmd.exe /c cd " + path + "\\"+sourceAddress + " &&" + " " + order);
                 return process;

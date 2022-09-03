@@ -1,18 +1,8 @@
 #!/bin/sh
 #-------------------------------------------------------------------------------------------------------------
-DIRS=$(dirname "$PWD")
-
-mv "${DIRS}"/temp/* ${DIRS}
-
-#判断是否自定义jdk
-if [ -n "$1" ];then
-    JDK_HOME=$1
-    else
-    JDK_HOME=$(dirname "$PWD")
-    JAVA_HOME=${JDK_HOME}/jdk-16.0.2
+if [ ! -n "$JAVA_HOME" ]; then
+    export JAVA_HOME="/usr/local/jdk-16.0.2"
 fi
-
-find ${DIRS}/ -name '*.sh' | xargs dos2unix;
 
 #-------------------------------------------------------------------------------------------------------------
 #       系统运行参数
@@ -39,11 +29,7 @@ for appJar in "$APP_HOME"/lib/*.jar;
 do
    CLASSPATH="$CLASSPATH":"$appJar"
 done
-#加载公共依赖
-for appJar in "$DIRS"/comment/*.jar;
-do
-   CLASSPATH="$CLASSPATH":"$appJar"
-done
+
 
 
 echo "JAVA_HOME="$JAVA_HOME

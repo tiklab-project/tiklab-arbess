@@ -12,6 +12,13 @@ import java.util.List;
 
 public interface CommonAchieveService {
 
+
+    /**
+     * 获取当前系统
+     * @return 1.windows 2.linux
+     */
+    int getSystemType();
+
     /**
      * 执行日志
      * @param inputStream 执行信息

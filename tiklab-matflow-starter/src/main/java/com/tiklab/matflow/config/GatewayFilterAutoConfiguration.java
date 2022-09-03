@@ -1,9 +1,9 @@
 package com.tiklab.matflow.config;
 
 import com.tiklab.eam.author.Authenticator;
-import com.tiklab.eam.server.author.config.IgnoreConfig;
-import com.tiklab.eam.server.author.config.IgnoreConfigBuilder;
-import com.tiklab.eam.server.handler.AuthorHandler;
+import com.tiklab.eam.client.author.AuthorHandler;
+import com.tiklab.eam.client.author.config.IgnoreConfig;
+import com.tiklab.eam.client.author.config.IgnoreConfigBuilder;
 import com.tiklab.gateway.GatewayFilter;
 import com.tiklab.gateway.router.RouterHandler;
 import com.tiklab.gateway.router.config.RouterConfig;
@@ -107,25 +107,20 @@ public class GatewayFilterAutoConfiguration {
     }
 
     //路由转发配置
-    @Value("${auth.address:null}")
+    @Value("${eas.address:null}")
     String authAddress;
 
-    @Value("${auth.type:null}")
-    String authType;
 
+    //gateway路由配置
     @Bean
     RouterConfig routerConfig(){
-        String[] s = {
-                "/user/findUserPage",
-                "/userdir/findAllList",
-                "/eam/auth/logout",
-                "/productauth/validUserInProduct"
-        };
-        if (authType.equals("null") || authType.equals("local")){
-            s = new String[]{""};
-        }
         return RouterConfigBuilder.instance()
-                .route(s, authAddress)
+                .preRoute(new String[]{
+                        "/user",
+                        "/eam",
+                        "/message",
+                }, authAddress)
                 .get();
     }
+
 }

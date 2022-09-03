@@ -7,6 +7,6 @@ import java.lang.annotation.*;
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-@Import({MatFlowAutoConfiguration.class})
+@Import({MatFlowAutoConfiguration.class })
 public @interface EnableMatFlow {
 }

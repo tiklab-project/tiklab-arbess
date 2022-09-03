@@ -3,7 +3,7 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2 http://maven.apache.org/xsd/assembly-1.1.2.xsd">
 
-    <id>distribution</id>
+    <id>windows</id>
     <formats>
         <format>tar.gz</format>
     </formats>
@@ -21,7 +21,7 @@
                 <include>*.properties</include>
                 <include>*.xml</include>
             </includes>
-            <outputDirectory>/conf</outputDirectory>
+            <outputDirectory>/lib/conf</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>${basedir}/src/main/resources</directory>
@@ -29,14 +29,6 @@
                 <include>Dockerfile</include>
             </includes>
             <outputDirectory>/</outputDirectory>
-        </fileSet>
-        <fileSet>
-            <directory>${basedir}/bin-linux</directory>
-            <fileMode>755</fileMode>
-            <excludes>
-                <exclude>*.classpath</exclude>
-            </excludes>
-            <outputDirectory>/bin-linux</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>${basedir}/bin-windows</directory>
@@ -65,15 +57,13 @@
 
     <dependencySets>
         <dependencySet>
-            <outputDirectory>comment</outputDirectory>
+            <outputDirectory>co</outputDirectory>
             <includes>
                 <!--api-->
                 <include>javax.activation:activation</include>
                 <include>org.ow2.asm:asm</include>
                 <include>org.aspectj:aspectjrt</include>
                 <include>org.aspectj:aspectjweaver</include>
-                <include>org.bouncycastle:bcprov-jdk15on</include>
-<!--                <include>org.checkerframework:checker-qual</include>-->
                 <include>com.fasterxml:classmate</include>
                 <include>commons-beanutils:commons-beanutils</include>
                 <include>commons-codec:commons-codec</include>
@@ -84,21 +74,13 @@
                 <include>commons-logging:commons-logging</include>
                 <include>commons-pool:commons-pool</include>
                 <include>org.apache.commons:commons-text</include>
-<!--                <include>com.aliyun:credentials-java</include>-->
-<!--                <include>com.aliyun:dysmsapi20170525</include>-->
                 <include>net.sf.ehcache:ehcache</include>
-<!--                <include>com.aliyun:endpoint-util</include>-->
-<!--                <include>com.google.errorprone:error_prone_annotations</include>-->
-<!--                <include>com.google.guava:failureaccess</include>-->
                 <include>com.alibaba:fastjson</include>
                 <include>org.freemarker:freemarker</include>
                 <include>com.google.code.gson:gson</include>
-                <include>com.google.guava:guava</include>
                 <include>com.caucho:hessian</include>
                 <include>org.hibernate:hibernate-validator</include>
                 <include>org.hsqldb:hsqldb</include>
-<!--                <include>org.ini4j:ini4j</include>-->
-<!--                <include>com.google.j2objc:j2objc-annotations</include>-->
                 <include>com.fasterxml.jackson.core:jackson-annotations</include>
                 <include>com.fasterxml.jackson.core:jackson-core</include>
                 <include>com.fasterxml.jackson.core:jackson-databind</include>
@@ -115,7 +97,6 @@
                 <include>org.jboss.logging:jboss-logging</include>
                 <include>joda-time:joda-time</include>
                 <include>org.json:json</include>
-<!--                <include>com.google.code.findbugs:jsr305</include>-->
                 <include>org.slf4j:jul-to-slf4j</include>
                 <include>com.esotericsoftware:kryo</include>
                 <include>com.esotericsoftware:kryo-shaded</include>
@@ -133,11 +114,6 @@
                 <include>org.jboss.netty:netty</include>
                 <include>org.objenesis:objenesis</include>
                 <include>ognl:ognl</include>
-<!--                <include>com.squareup.okhttp3:okhttp</include>-->
-<!--                <include>com.squareup.okio:okio</include>-->
-<!--                <include>com.aliyun:openapiutil</include>-->
-<!--                <include>org.jacoco:org.jacoco.agent</include>-->
-<!--                <include>com.google.protobuf:protobuf-java</include>-->
                 <include>com.esotericsoftware:reflectasm</include>
                 <include>org.slf4j:slf4j-api</include>
                 <include>org.yaml:snakeyaml</include>
@@ -153,7 +129,6 @@
                 <include>com.tiklab:tiklab-toolkit-server</include>
                 <include>com.tiklab:tiklab-toolkit-api</include>
                 <include>com.tiklab:tiklab-rpc-spring-boot-starter</include>
-                <include>com.tiklab:tiklab-rpc-server</include>
                 <include>com.tiklab:tiklab-rpc-remoting</include>
                 <include>com.tiklab:tiklab-rpc-common</include>
                 <include>com.tiklab:tiklab-rpc-codec</include>
@@ -189,10 +164,6 @@
                 <include>com.tiklab:tiklab-core</include>
                 <include>com.tiklab:tiklab-beans-core</include>
                 <include>com.tiklab:tiklab-beans-annotation</include>
-<!--                <include>com.aliyun:tea-util</include>-->
-<!--                <include>com.aliyun:tea-openapi</include>-->
-<!--                <include>com.aliyun:tea</include>-->
-                <include>org.springframework:spring-websocket</include>
                 <include>org.springframework:spring-webmvc</include>
                 <include>org.springframework:spring-web</include>
                 <include>org.springframework:spring-tx</include>
@@ -211,7 +182,7 @@
                 <include>org.springframework:spring-beans</include>
                 <include>org.springframework:spring-aop</include>
                 <include>org.yaml:snakeyaml</include>
-                <include>com.tiklab:tiklab-mysql</include>
+                <include>com.tiklab:tiklab-mysql-starter</include>
             </includes>
         </dependencySet>
         <dependencySet>
@@ -221,8 +192,6 @@
                 <exclude>org.ow2.asm:asm</exclude>
                 <exclude>org.aspectj:aspectjrt</exclude>
                 <exclude>org.aspectj:aspectjweaver</exclude>
-                <exclude>org.bouncycastle:bcprov-jdk15on</exclude>
-                <exclude>org.checkerframework:checker-qual</exclude>
                 <exclude>com.fasterxml:classmate</exclude>
                 <exclude>commons-beanutils:commons-beanutils</exclude>
                 <exclude>commons-codec:commons-codec</exclude>
@@ -233,21 +202,13 @@
                 <exclude>commons-logging:commons-logging</exclude>
                 <exclude>commons-pool:commons-pool</exclude>
                 <exclude>org.apache.commons:commons-text</exclude>
-                <exclude>com.aliyun:credentials-java</exclude>
-                <exclude>com.aliyun:dysmsapi20170525</exclude>
                 <exclude>net.sf.ehcache:ehcache</exclude>
-                <exclude>com.aliyun:endpoint-util</exclude>
-                <exclude>com.google.errorprone:error_prone_annotations</exclude>
-                <exclude>com.google.guava:failureaccess</exclude>
                 <exclude>com.alibaba:fastjson</exclude>
                 <exclude>org.freemarker:freemarker</exclude>
                 <exclude>com.google.code.gson:gson</exclude>
-                <exclude>com.google.guava:guava</exclude>
                 <exclude>com.caucho:hessian</exclude>
                 <exclude>org.hibernate:hibernate-validator</exclude>
                 <exclude>org.hsqldb:hsqldb</exclude>
-<!--                <exclude>org.ini4j:ini4j</exclude>-->
-                <exclude>com.google.j2objc:j2objc-annotations</exclude>
                 <exclude>com.fasterxml.jackson.core:jackson-annotations</exclude>
                 <exclude>com.fasterxml.jackson.core:jackson-core</exclude>
                 <exclude>com.fasterxml.jackson.core:jackson-databind</exclude>
@@ -264,7 +225,6 @@
                 <exclude>org.jboss.logging:jboss-logging</exclude>
                 <exclude>joda-time:joda-time</exclude>
                 <exclude>org.json:json</exclude>
-                <exclude>com.google.code.findbugs:jsr305</exclude>
                 <exclude>org.slf4j:jul-to-slf4j</exclude>
                 <exclude>com.esotericsoftware:kryo</exclude>
                 <exclude>com.esotericsoftware:kryo-shaded</exclude>
@@ -282,10 +242,6 @@
                 <exclude>org.jboss.netty:netty</exclude>
                 <exclude>org.objenesis:objenesis</exclude>
                 <exclude>ognl:ognl</exclude>
-<!--                <exclude>com.squareup.okhttp3:okhttp</exclude>-->
-                <exclude>com.squareup.okio:okio</exclude>
-                <exclude>com.aliyun:openapiutil</exclude>
-<!--                <exclude>org.jacoco:org.jacoco.agent</exclude>-->
                 <exclude>com.google.protobuf:protobuf-java</exclude>
                 <exclude>com.esotericsoftware:reflectasm</exclude>
                 <exclude>org.slf4j:slf4j-api</exclude>
@@ -302,7 +258,6 @@
                 <exclude>com.tiklab:tiklab-toolkit-server</exclude>
                 <exclude>com.tiklab:tiklab-toolkit-api</exclude>
                 <exclude>com.tiklab:tiklab-rpc-spring-boot-starter</exclude>
-                <exclude>com.tiklab:tiklab-rpc-server</exclude>
                 <exclude>com.tiklab:tiklab-rpc-remoting</exclude>
                 <exclude>com.tiklab:tiklab-rpc-common</exclude>
                 <exclude>com.tiklab:tiklab-rpc-codec</exclude>
@@ -338,10 +293,6 @@
                 <exclude>com.tiklab:tiklab-core</exclude>
                 <exclude>com.tiklab:tiklab-beans-core</exclude>
                 <exclude>com.tiklab:tiklab-beans-annotation</exclude>
-                <exclude>com.aliyun:tea-util</exclude>
-                <exclude>com.aliyun:tea-openapi</exclude>
-                <exclude>com.aliyun:tea</exclude>
-                <exclude>org.springframework:spring-websocket</exclude>
                 <exclude>org.springframework:spring-webmvc</exclude>
                 <exclude>org.springframework:spring-web</exclude>
                 <exclude>org.springframework:spring-tx</exclude>
@@ -360,7 +311,7 @@
                 <exclude>org.springframework:spring-beans</exclude>
                 <exclude>org.springframework:spring-aop</exclude>
                 <exclude>org.yaml:snakeyaml</exclude>
-                <exclude>com.tiklab:tiklab-mysql</exclude>
+                <exclude>com.tiklab:tiklab-mysql-starter</exclude>
             </excludes>
         </dependencySet>
     </dependencySets>

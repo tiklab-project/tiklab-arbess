@@ -12,14 +12,14 @@ import org.springframework.stereotype.Component;
 public class CodeGitHubApi {
 
     //第三方应用id
-    @Value("${gitHubClientId}")
+    @Value("${git.github.client.id}")
     private String clientId;
 
-    @Value("${gitHubClientSecret}")
+    @Value("${git.github.client.secret}")
     private String clientSecret;
 
     //回调地址
-    @Value("${gitHubCallbackUrl}")
+    @Value("${git.github.callback.url}")
     private String callbackUri;
 
     //获取code （get）

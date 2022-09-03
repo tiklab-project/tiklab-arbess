@@ -1,0 +1,120 @@
+app:
+  name: tiklab-matflow
+
+spring:
+  profiles:
+    active: dev
+
+APP_HOME: ${APP_HOME}
+application: matFlow
+
+server:
+  port: 8090
+
+jdbc:
+  driverClassName: com.mysql.cj.jdbc.Driver
+  url: jdbc:mysql://172.10.1.10:3306/tiklab_matflow?characterEncoding=utf8&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+  username: root
+  password: darth2020
+
+#plugin config
+PROJECT_HOME: ${user.home}/matflow/${app.name}
+plugin:
+  path: ${PROJECT_HOME}/plugin
+
+#dfs config
+dfs:
+  server:
+    enabled: false
+    mode: server
+    port: 4000
+    datapath: ${PROJECT_HOME}/files
+  client:
+    url: 127.0.0.1:4000
+    bucket: ${app.name}
+
+#dcs config
+dcs:
+  server:
+    enabled: false
+    mode: server
+    port: 5000
+  client:
+    url: 127.0.0.1:5000
+    bucket: ${app.name}
+
+#dcs config
+dss:
+  server:
+    enabled: false
+    mode: server
+    port: 6000
+    datapath: ${PROJECT_HOME}/index
+  client:
+    url: 127.0.0.1:6000
+    bucket: ${app.name}
+
+datapath: ${PROJECT_HOME}/caches
+
+#eas config
+eas:
+  embbed:
+    enable: true
+  server:
+    port: 8080
+  address: http://localhost:8080
+  web:
+    address: http://localhost:8080
+  jdbc:
+    driverClassName: ${jdbc.driverClassName}
+    url: ${jdbc.url}
+    username: ${jdbc.username}
+    password: ${jdbc.password}
+
+mysql:
+  embbed:
+    enable: false
+  server:
+    port: 3306
+  version: mysql-8.0.28
+  name: tiklab_matflow
+
+#homes
+homes:
+  address: http://192.168.10.19:8080
+
+#license
+licences:
+  path: ${APP_HOME}/licences
+
+#file
+file:
+  path: http://file.dev.tiklab.net
+
+git:
+  gitee:
+    client:
+      id: 8a2f94e843f5ad2d0fb7b3e8ce8b8e97d661c1988034059ed3249563070817cf
+      secret: 93b7d9305babc695cdebe5cafa4a24701b14672d212d4daa7aba67df20fbed1c
+    callback:
+      url: http%3A%2F%2F192.168.10.23%3A3004%2F%23%2Findex%2Ftask%2Fconfig
+  github:
+    client:
+      id: 44e35e0891b3b30846eb
+      secret: 2241ab6c5fba11638ed9c4ea70c4a8a5671ef247
+    callback:
+      url: http://192.168.10.23:3004/#/index/task/config
+
+
+
+
+
+
+
+
+
+
+
+
+
+
