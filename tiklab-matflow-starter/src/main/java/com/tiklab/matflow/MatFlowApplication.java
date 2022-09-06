@@ -13,7 +13,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
  */
 
 @SpringBootApplication
-@PropertySource(value = "classpath:application-${env:prd}.yaml",factory = PropertyAndYamlSourceFactory.class)
+@PropertySource(value = {"classpath:application.yaml"}, factory = PropertyAndYamlSourceFactory.class)
 @EnableScheduling
 @EnableMatFlow
 public class MatFlowApplication {
@@ -25,9 +25,6 @@ public class MatFlowApplication {
         SpringApplication.run(MatFlowApplication.class, args);
 
     }
-
-
-
 }
 
 

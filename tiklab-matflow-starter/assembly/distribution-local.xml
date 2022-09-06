@@ -35,6 +35,7 @@
 			<fileMode>755</fileMode>
 			<excludes>
 				<exclude>*.classpath</exclude>
+				<exclude>*.bat</exclude>
 			</excludes>
 			<outputDirectory>/bin</outputDirectory>
 		</fileSet>

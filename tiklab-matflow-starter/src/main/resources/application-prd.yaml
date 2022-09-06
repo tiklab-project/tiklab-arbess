@@ -25,7 +25,7 @@ plugin:
 #dfs config
 dfs:
   server:
-    enabled: false
+    enabled: true
     mode: server
     port: 4000
     datapath: ${PROJECT_HOME}/files
@@ -39,6 +39,7 @@ dcs:
     enabled: false
     mode: server
     port: 5000
+    datapath: ${PROJECT_HOME}/caches
   client:
     url: 127.0.0.1:5000
     bucket: ${app.name}

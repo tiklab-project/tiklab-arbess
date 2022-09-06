@@ -34,11 +34,6 @@
         </dependency>
         <dependency>
             <groupId>com.tiklab</groupId>
-            <artifactId>tiklab-eas-spring-boot-stater</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.tiklab</groupId>
             <artifactId>tiklab-matflow-server</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -111,6 +106,12 @@
             <version>1.0.0-SNAPSHOT</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.tiklab</groupId>
+            <artifactId>tiklab-eas-enable-util</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
     </dependencies>
 
     <profiles>
@@ -133,7 +134,7 @@
                 </dependency>
                 <dependency>
                     <groupId>com.tiklab</groupId>
-                    <artifactId>tiklab-eas-starter-linux</artifactId>
+                    <artifactId>tiklab-eas-enable-starter-linux</artifactId>
                     <version>1.0.0-SNAPSHOT</version>
                     <type>zip</type>
                     <scope>provided</scope>
@@ -142,6 +143,7 @@
             <properties>
                 <profile.assembly.package.suffix>linux</profile.assembly.package.suffix>
                 <systemType>linux</systemType>
+                <env>test</env>
             </properties>
         </profile>
         <profile>
@@ -189,6 +191,18 @@
 
     <build>
         <plugins>
+            <!--jar去掉配置文件-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>*.yaml</exclude>
+                        <exclude>*.properties</exclude>
+                        <exclude>*.xml</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
             <!--跳过发包-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -256,7 +270,7 @@
                             <artifactItems>
                                 <artifactItem>
                                     <groupId>com.tiklab</groupId>
-                                    <artifactId>tiklab-eas-starter-${systemType}</artifactId>
+                                    <artifactId>tiklab-eas-enable-starter-${systemType}</artifactId>
                                     <version>1.0.0-SNAPSHOT</version>
                                     <!-- <classifier>distribution</classifier>-->
                                     <type>zip</type>

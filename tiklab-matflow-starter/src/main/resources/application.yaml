@@ -1,12 +1,16 @@
 app:
   name: tiklab-matflow
 
-spring:
-  profiles:
-    active: dev
+#spring:
+#  profiles:
+#    active: dev
 
 APP_HOME: ${APP_HOME}
 application: matFlow
+
+#spring:
+#  config:
+#    import: optional:D:\clone\application.yaml
 
 server:
   port: 8090
@@ -25,7 +29,7 @@ plugin:
 #dfs config
 dfs:
   server:
-    enabled: false
+    enabled: true
     mode: server
     port: 4000
     datapath: ${PROJECT_HOME}/files
@@ -39,6 +43,7 @@ dcs:
     enabled: false
     mode: server
     port: 5000
+    datapath: ${PROJECT_HOME}/caches
   client:
     url: 127.0.0.1:5000
     bucket: ${app.name}
@@ -59,17 +64,24 @@ datapath: ${PROJECT_HOME}/caches
 #eas config
 eas:
   embbed:
-    enable: true
+    enable: false
   server:
     port: 8080
-  address: http://localhost:8080
+  address: http://192.168.10.14:8080
   web:
-    address: http://localhost:8080
+    address: http://192.168.10.14:3001
   jdbc:
     driverClassName: ${jdbc.driverClassName}
     url: ${jdbc.url}
     username: ${jdbc.username}
     password: ${jdbc.password}
+  mysql:
+    embbed:
+      enable: false
+    server:
+      port: 3306
+    version: mysql-8.0.28
+    name: tiklab_matflow
 
 mysql:
   embbed:
@@ -78,6 +90,7 @@ mysql:
     port: 3306
   version: mysql-8.0.28
   name: tiklab_matflow
+
 
 #homes
 homes:
@@ -104,8 +117,6 @@ git:
       secret: 2241ab6c5fba11638ed9c4ea70c4a8a5671ef247
     callback:
       url: http://192.168.10.23:3004/#/index/task/config
-
-
 
 
 
