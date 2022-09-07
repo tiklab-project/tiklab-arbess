@@ -10,7 +10,7 @@ application: matFlow
 
 spring:
   config:
-    import: optional:{APP_HOME}/application.yaml
+    import: optional:/usr/local/apps/conf/matFlow/application.yaml
 
 server:
   port: 8090
