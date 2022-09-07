@@ -19,6 +19,7 @@
 			<directory>${basedir}/src/main/resources</directory>
 			<includes>
 				<include>*.properties</include>
+				<include>*.yaml</include>
 				<include>*.xml</include>
 			</includes>
 			<outputDirectory>/conf</outputDirectory>
