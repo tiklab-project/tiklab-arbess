@@ -142,22 +142,25 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
      * 组装git命令
      * @param matFlowCode 源码信息
      * @param codeDir 存放位置
-     * @return 命令信息
+     * @return 执行命令
      * @throws URISyntaxException url格式不正确
      * @throws MalformedURLException 不是https或者http
      */
     public String getGitOrder(MatFlowCode matFlowCode,String codeDir,int systemType) throws URISyntaxException, MalformedURLException {
+
+        //凭证
         Proof proof = matFlowCode.getProof();
         String username= proof.getProofUsername();
         String password = proof.getProofPassword();
+
+        //地址信息
         StringBuilder url = new StringBuilder(matFlowCode.getCodeAddress());
         String branch = matFlowCode.getCodeBranch();
-        String urlType;
-        String up=username.replace("@", "%40")+":"+password+"@";
 
+        String up=username.replace("@", "%40")+":"+password+"@";
         //获取url类型
         URL urls = new URL(url.toString());
-        urlType = urls.toURI().getScheme();
+        String urlType = urls.toURI().getScheme();
 
         //根据不同类型拼出不同地址
         if (urlType.equals("http")){

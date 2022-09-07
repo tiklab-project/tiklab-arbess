@@ -2,13 +2,14 @@ package com.tiklab.matflow.instance.service.execAchieveImpl;
 
 import com.tiklab.matflow.definition.model.MatFlow;
 import com.tiklab.matflow.definition.model.MatFlowConfigure;
-import com.tiklab.matflow.definition.service.MatFlowCommonService;
 import com.tiklab.matflow.instance.model.MatFlowExecHistory;
 import com.tiklab.matflow.instance.model.MatFlowExecLog;
 import com.tiklab.matflow.instance.model.MatFlowProcess;
 import com.tiklab.matflow.instance.service.MatFlowExecHistoryService;
 import com.tiklab.matflow.instance.service.MatFlowExecLogService;
 import com.tiklab.matflow.instance.service.execAchieveService.CommonAchieveService;
+import com.tiklab.matflow.setting.envConfig.model.MatFlowEnvConfig;
+import com.tiklab.matflow.setting.envConfig.service.MatFlowEnvConfigService;
 import com.tiklab.rpc.annotation.Exporter;
 import com.tiklab.user.user.model.User;
 import org.slf4j.Logger;
@@ -38,9 +39,16 @@ public class CommonAchieveServiceImpl implements CommonAchieveService {
     @Autowired
     MatFlowExecLogService matFlowExecLogService;
 
+    @Autowired
+    MatFlowEnvConfigService matFlowEnvConfigService;
+
     private static final Logger logger = LoggerFactory.getLogger(CommonAchieveServiceImpl.class);
 
 
+    /**
+     * 获取系统类型
+     * @return 系统类型
+     */
     @Override
     public int getSystemType(){
         String property = System.getProperty("os.name");
@@ -51,7 +59,6 @@ public class CommonAchieveServiceImpl implements CommonAchieveService {
             return 2;
         }
     }
-
 
     /**
      * 执行日志
@@ -276,6 +283,17 @@ public class CommonAchieveServiceImpl implements CommonAchieveService {
         }
         matFlowExecHistoryService.updateHistory(matFlowExecHistory);
         return matFlowExecHistory;
+    }
+
+
+    /**
+     * 获取环境配置信息
+     * @param type 类型
+     * @return 配置信息
+     */
+    @Override
+    public MatFlowEnvConfig getEnvConfig(int type){
+       return matFlowEnvConfigService.findOneMatFlowEnvConfig(type);
     }
 
 }

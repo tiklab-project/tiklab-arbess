@@ -233,6 +233,7 @@ public class MatFlowConfigureServiceImpl implements MatFlowConfigureService {
     public  List<Object> findAll(String matFlowId){
         List<Object> list = new ArrayList<>();
         List<MatFlowConfigure> allConfigure = findAllConfigure(matFlowId);
+
         if (allConfigure != null){
             for (MatFlowConfigure matFlowConfigure : allConfigure) {
                 matFlowTaskService.findOneTask(list, matFlowConfigure.getTaskId(), matFlowConfigure.getTaskType());

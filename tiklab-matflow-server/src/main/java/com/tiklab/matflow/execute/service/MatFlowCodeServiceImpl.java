@@ -88,10 +88,6 @@ public class MatFlowCodeServiceImpl implements MatFlowCodeService {
             return null;
         }
         joinTemplate.joinQuery(matFlowCode);
-        //if (oneCode.getProofId() != null){
-        //    Proof proof = proofService.findOneProof(oneCode.getProofId());
-        //    matFlowCode.setProof(proof);
-        //}
         return matFlowCode;
     }
 

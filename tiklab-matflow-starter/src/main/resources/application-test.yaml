@@ -70,7 +70,11 @@ eas:
     url: ${jdbc.url}
     username: ${jdbc.username}
     password: ${jdbc.password}
+  mysql:
+    name: tiklab_matflow
 
+
+#mysql config
 mysql:
   embbed:
     enable: false

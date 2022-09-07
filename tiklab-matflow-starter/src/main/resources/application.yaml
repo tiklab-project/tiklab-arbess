@@ -8,9 +8,9 @@ app:
 APP_HOME: ${APP_HOME}
 application: matFlow
 
-#spring:
-#  config:
-#    import: optional:D:\clone\application.yaml
+spring:
+  config:
+    import: optional:{APP_HOME}/application.yaml
 
 server:
   port: 8090
@@ -76,13 +76,9 @@ eas:
     username: ${jdbc.username}
     password: ${jdbc.password}
   mysql:
-    embbed:
-      enable: false
-    server:
-      port: 3306
-    version: mysql-8.0.28
     name: tiklab_matflow
 
+#mysql config
 mysql:
   embbed:
     enable: false
@@ -90,7 +86,6 @@ mysql:
     port: 3306
   version: mysql-8.0.28
   name: tiklab_matflow
-
 
 #homes
 homes:

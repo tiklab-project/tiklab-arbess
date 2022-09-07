@@ -5,6 +5,7 @@ import com.tiklab.matflow.definition.model.MatFlowConfigure;
 import com.tiklab.matflow.instance.model.MatFlowExecHistory;
 import com.tiklab.matflow.instance.model.MatFlowExecLog;
 import com.tiklab.matflow.instance.model.MatFlowProcess;
+import com.tiklab.matflow.setting.envConfig.model.MatFlowEnvConfig;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -88,5 +89,12 @@ public interface CommonAchieveService {
      * @return 历史
      */
      MatFlowExecHistory initializeHistory(String historyId, MatFlow matFlow, String userId);
+
+    /**
+     * 获取环境配置信息
+     * @param type 类型
+     * @return 配置信息
+     */
+    MatFlowEnvConfig getEnvConfig(int type);
 
 }

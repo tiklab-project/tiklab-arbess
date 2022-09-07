@@ -108,7 +108,7 @@
 
         <dependency>
             <groupId>com.tiklab</groupId>
-            <artifactId>tiklab-eas-enable-util</artifactId>
+            <artifactId>tiklab-eas-embbed-spring-boot-starter</artifactId>
             <version>${project.version}</version>
         </dependency>
 
@@ -120,21 +120,21 @@
             <dependencies>
                 <dependency>
                     <groupId>com.tiklab</groupId>
-                    <artifactId>tiklab-linux-mysql</artifactId>
+                    <artifactId>tiklab-mysql-linux</artifactId>
                     <version>1.0.0-SNAPSHOT</version>
                     <type>zip</type>
                     <scope>provided</scope>
                 </dependency>
                 <dependency>
                     <groupId>com.tiklab</groupId>
-                    <artifactId>tiklab-linux-jdk</artifactId>
+                    <artifactId>tiklab-jdk-linux</artifactId>
                     <version>1.0.0-SNAPSHOT</version>
                     <type>zip</type>
                     <scope>provided</scope>
                 </dependency>
                 <dependency>
                     <groupId>com.tiklab</groupId>
-                    <artifactId>tiklab-eas-enable-starter-linux</artifactId>
+                    <artifactId>tiklab-eas-enable-starter</artifactId>
                     <version>1.0.0-SNAPSHOT</version>
                     <type>zip</type>
                     <scope>provided</scope>
@@ -151,21 +151,21 @@
             <dependencies>
                 <dependency>
                     <groupId>com.tiklab</groupId>
-                    <artifactId>tiklab-windows-mysql</artifactId>
+                    <artifactId>tiklab-mysql-windows</artifactId>
                     <version>1.0.0-SNAPSHOT</version>
                     <type>zip</type>
                     <scope>provided</scope>
                 </dependency>
                 <dependency>
                     <groupId>com.tiklab</groupId>
-                    <artifactId>tiklab-windows-jdk</artifactId>
+                    <artifactId>tiklab-jdk-windows</artifactId>
                     <version>1.0.0-SNAPSHOT</version>
                     <type>zip</type>
                     <scope>provided</scope>
                 </dependency>
                 <dependency>
                     <groupId>com.tiklab</groupId>
-                    <artifactId>tiklab-eas-starter-windows</artifactId>
+                    <artifactId>tiklab-eas-enable-starter</artifactId>
                     <version>1.0.0-SNAPSHOT</version>
                     <type>zip</type>
                     <scope>provided</scope>
@@ -270,7 +270,7 @@
                             <artifactItems>
                                 <artifactItem>
                                     <groupId>com.tiklab</groupId>
-                                    <artifactId>tiklab-eas-enable-starter-${systemType}</artifactId>
+                                    <artifactId>tiklab-eas-enable-starter</artifactId>
                                     <version>1.0.0-SNAPSHOT</version>
                                     <!-- <classifier>distribution</classifier>-->
                                     <type>zip</type>
@@ -278,14 +278,14 @@
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>com.tiklab</groupId>
-                                    <artifactId>tiklab-${systemType}-jdk</artifactId>
+                                    <artifactId>tiklab-jdk-${systemType}</artifactId>
                                     <version>1.0.0-SNAPSHOT</version>
                                     <type>zip</type>
                                     <outputDirectory>temp</outputDirectory>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>com.tiklab</groupId>
-                                    <artifactId>tiklab-${systemType}-mysql</artifactId>
+                                    <artifactId>tiklab-mysql-${systemType}</artifactId>
                                     <version>1.0.0-SNAPSHOT</version>
                                     <type>zip</type>
                                     <outputDirectory>temp</outputDirectory>

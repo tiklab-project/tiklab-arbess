@@ -72,11 +72,6 @@ eas:
     username: ${jdbc.username}
     password: ${jdbc.password}
 mysql:
-  embbed:
-    enable: true
-  server:
-    port: 3306
-  version: mysql-8.0.28
   name: tiklab_matflow
 
 #homes
