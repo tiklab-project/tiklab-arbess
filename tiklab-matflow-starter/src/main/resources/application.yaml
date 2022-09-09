@@ -64,7 +64,7 @@ eas:
   embbed:
     enable: false
   env:
-    local: true
+    local: false
   server:
     port: 8080
   address: http://192.168.10.14:8080

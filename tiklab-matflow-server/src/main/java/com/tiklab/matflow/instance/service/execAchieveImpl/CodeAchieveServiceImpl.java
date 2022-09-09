@@ -2,6 +2,8 @@ package com.tiklab.matflow.instance.service.execAchieveImpl;
 
 
 
+import com.tiklab.core.exception.ApplicationException;
+import com.tiklab.matflow.definition.model.MatFlow;
 import com.tiklab.matflow.definition.model.MatFlowConfigure;
 import com.tiklab.matflow.definition.service.MatFlowCommonService;
 import com.tiklab.matflow.execute.model.MatFlowCode;
@@ -12,6 +14,7 @@ import com.tiklab.matflow.instance.model.MatFlowExecLog;
 import com.tiklab.matflow.instance.model.MatFlowProcess;
 import com.tiklab.matflow.instance.service.execAchieveService.CodeAchieveService;
 import com.tiklab.matflow.instance.service.execAchieveService.CommonAchieveService;
+import com.tiklab.matflow.setting.envConfig.model.MatFlowEnvConfig;
 import com.tiklab.matflow.setting.proof.model.Proof;
 import com.tiklab.rpc.annotation.Exporter;
 import org.slf4j.Logger;
@@ -19,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -53,21 +57,24 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
         if (matFlowExecHistory.getRunLog() == null){
             matFlowExecHistory.setRunLog("");
         }
+
         matFlowExecHistory.setRunLog("流水线开始执行。。。。。。。");
+
         matFlowExecHistoryList.add(matFlowExecHistory);
 
         MatFlowCode matFlowCode = matFlowCodeService.findOneCode(matFlowConfigure.getTaskId());
         //初始化日志
         MatFlowExecLog matFlowExecLog = commonAchieveService.initializeLog(matFlowExecHistory, matFlowConfigure);
 
+        MatFlow matFlow = matFlowConfigure.getMatFlow();
         //代码保存路径
         String codeDir = matFlowCommonService.getFileAddress() + matFlowConfigure.getMatFlow().getMatflowName();
         File file = new File(codeDir);
 
         //删除旧的代码
         matFlowCommonService.deleteFile(file);
-        matFlowExecHistory.setRunLog(matFlowExecHistory.getRunLog()+"\n开始分配代码空间。");
-        matFlowExecHistory.setRunLog(matFlowExecHistory.getRunLog()+"\n代码空间分配成功。\n");
+        matFlowExecHistory.setRunLog(matFlowExecHistory.getRunLog()+"\n开始分配空间。");
+        matFlowExecHistory.setRunLog(matFlowExecHistory.getRunLog()+"\n空间分配成功。\n");
         matFlowExecHistoryList.add(matFlowExecHistory);
 
         //获取凭证
@@ -91,8 +98,13 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
         matFlowExecHistory.setRunLog(matFlowExecHistory.getRunLog()+s);
         matFlowExecHistoryList.add(matFlowExecHistory);
 
-        //throw new ApplicationException(50000, "地址错误");
-
+        try {
+            Process process = codeStart(proof, matFlowCode);
+             commonAchieveService.log(process.getInputStream(), matFlowProcess, matFlowExecHistoryList);
+        } catch (IOException | URISyntaxException e) {
+            commonAchieveService.error(matFlowExecHistory, "拉取代码错误 \n" + e, matFlow.getMatflowId(),matFlowExecHistoryList);
+            throw new ApplicationException(50001, "拉取代码错误 \n" + e);
+        }
 
         //更新状态
         matFlowExecLog.setRunLog( s + "代码拉取成功" + "\n");
@@ -104,42 +116,46 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
     }
 
 
-    public void codeStart(Proof proof, MatFlowCode matFlowCode, String path) {
+    public Process codeStart(Proof proof, MatFlowCode matFlowCode) throws IOException, URISyntaxException {
         if (matFlowCode == null){
-            return;
+            return null;
         }
+        //git server地址
+        MatFlowEnvConfig envConfig = commonAchieveService.getEnvConfig(1);
+        String configAddress = envConfig.getConfigAddress();
+        //系统类型
+        int systemType = commonAchieveService.getSystemType();
+        //源码存放位置
+        String fileAddress = matFlowCommonService.getFileAddress();
 
         switch (matFlowCode.getType()){
             case 1,2,3,4 :
                 if (proof.getProofType().equals("SSH")){
-
+                    return null;
                 }else {
-                    if (proof.getProofUsername() == null || proof.getProofPassword() == null){
-
-                    }
-
-
+                    String gitOrder = getGitOrder(matFlowCode, fileAddress, systemType);
+                    return commonAchieveService.process(configAddress, gitOrder, null);
                 }
-                break;
+
             case 5:
                 if (proof.getProofType().equals("SSH")){
-
+                    return null;
                 }else {
-
+                    return null;
                 }
-                break;
         }
+        return null;
     }
 
     public String getOrder(){
-        int systemType = commonAchieveService.getSystemType();
+
 
 
         return null;
     }
 
     /**
-     * 组装git命令
+     * 组装http git命令
      * @param matFlowCode 源码信息
      * @param codeDir 存放位置
      * @return 执行命令
