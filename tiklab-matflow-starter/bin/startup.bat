@@ -23,11 +23,15 @@ set JAVA_HOME=%DIRS%jdk-16.0.2
 
 echo %DIRS%
 
-xcopy /E %DIRS%temp\*.* %DIRS%
+IF EXIST %DIR%temp (
+  cd %DIRS%
+  md logs
+  xcopy /E %DIRS%temp\*.* %DIRS%
+) else (
+   echo ""
+)
 
 set APP_HOME=%DIRS%
-
-set APP_CONFIG=%DIRS%conf\application-prd.properties
 
 set CLASSPATH=%DIRS%conf\
 
@@ -40,47 +44,49 @@ set public=%DIRS%lib\
 @echo off & setlocal enabledelayedexpansion
 for /f "delims=" %%i in ('dir /b /s "%public%"') do (set s=!s!%public%%%~nxi;)
 
-set comment=%DIRS%co\
+set comment=%DIRS%tiklab-eas\comment\
 @echo off & setlocal enabledelayedexpansion
 for /f "delims=" %%i in ('dir /b /s "%comment%"') do (set st=!st!%comment%%%~nxi;)
 
 set CLASSPATH=%st%%s%
 
+echo %CLASSPATH%
+call:judge
+call:status
+
+:GetPID
 set PID=0
+for /f "usebackq tokens=1-2" %%a in (`jps -l ^| findstr %APP_MAIN%`) do (set PID=%%a)
+goto:eof
 
-for /f "usebackq tokens=1-2" %%a in (`jps -l ^| findstr %APP_MAIN%`) do (
-set PID=%%a
-)
-
-if %PID% == 0 (
-    cd %DIRS%
-    md logs
-    cd %JAVA_HOME%\bin
-
-    start /b .\java.exe %JAVA_OPTS%  %CLASSPATH%  %APP_MAIN% >> %DIRS%info.log
-
-    echo %APP_MAIN% START STARTING.............
-
+:judge
+call:GetPID
+if %PID%==0 (
+    call:start
+    for /l %%i in (1,1,100000) do echo %%i>>nul
 ) else (
     echo ================================================================================================================
     echo %APP_MAIN% already started(PID=%PID%)
-   )
+)
+goto:eof
 
-for /l %%i in (1,1,100000) do echo %%i>>nul
+:start
+cd %JAVA_HOME%\bin
+start /b .\java.exe %JAVA_OPTS%  %CLASSPATH%  %APP_MAIN% >> %DIRS%info.log
+echo %APP_MAIN% START STARTING.............
+goto:eof
 
-set state=
-    for /f "usebackq tokens=1-2" %%c in (`jps -l ^| findstr %APP_MAIN%`) do (
-    set state=%%c
-    )
+:status
+call:GetPID
+if %PID%==0 (
+     echo ================================================================================================================
+     echo %APP_MAIN% START FAIL
+) else (
+     echo %APP_MAIN% START SUCCESS(PID=%state%)
+)
+goto:eof
 
-  if %state% == 0 (
-    echo ================================================================================================================
-    echo %APP_MAIN% START FAIL(PID=%state%)
-    ) else (
-    echo ================================================================================================================
-    echo %APP_MAIN% START SUCCESS(PID=%state%)
-    )
-  echo ================================================================================================================
+
 
 
 

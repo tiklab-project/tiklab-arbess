@@ -142,7 +142,6 @@
                 <include>com.tiklab:tiklab-licence-spring-boot-starter</include>
                 <include>com.tiklab:tiklab-join-core</include>
                 <include>com.tiklab:tiklab-join-annotation</include>
-                <include>com.tiklab:tiklab-eas-spring-boot-stater</include>
                 <include>com.tiklab:tiklab-eam-spring-boot-starter</include>
                 <include>com.tiklab:tiklab-dss-server</include>
                 <include>com.tiklab:tiklab-dss-common</include>
@@ -271,7 +270,6 @@
                 <exclude>com.tiklab:tiklab-licence-spring-boot-starter</exclude>
                 <exclude>com.tiklab:tiklab-join-core</exclude>
                 <exclude>com.tiklab:tiklab-join-annotation</exclude>
-                <exclude>com.tiklab:tiklab-eas-spring-boot-stater</exclude>
                 <exclude>com.tiklab:tiklab-eam-spring-boot-starter</exclude>
                 <exclude>com.tiklab:tiklab-dss-server</exclude>
                 <exclude>com.tiklab:tiklab-dss-common</exclude>

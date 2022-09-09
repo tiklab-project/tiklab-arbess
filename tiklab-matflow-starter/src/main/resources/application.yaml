@@ -1,16 +1,14 @@
 app:
   name: tiklab-matflow
 
-#spring:
-#  profiles:
-#    active: dev
-
 APP_HOME: ${APP_HOME}
 application: matFlow
 
 spring:
   config:
     import: optional:/usr/local/apps/conf/matFlow/application.yaml
+  jmx:
+    default-domain: tiklab-matflow
 
 server:
   port: 8090
@@ -29,7 +27,7 @@ plugin:
 #dfs config
 dfs:
   server:
-    enabled: true
+    enabled: false
     mode: server
     port: 4000
     datapath: ${PROJECT_HOME}/files
@@ -65,6 +63,8 @@ datapath: ${PROJECT_HOME}/caches
 eas:
   embbed:
     enable: false
+  env:
+    local: true
   server:
     port: 8080
   address: http://192.168.10.14:8080
@@ -82,10 +82,12 @@ eas:
 mysql:
   embbed:
     enable: false
+  local: false
   server:
-    port: 3306
+    port: 3307
   version: mysql-8.0.28
   name: tiklab_matflow
+
 
 #homes
 homes:

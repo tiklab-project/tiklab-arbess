@@ -115,6 +115,7 @@
     </dependencies>
 
     <profiles>
+        <!--linux-->
         <profile>
             <id>linux</id>
             <dependencies>
@@ -146,6 +147,7 @@
                 <env>test</env>
             </properties>
         </profile>
+        <!--windows-->
         <profile>
             <id>windows</id>
             <dependencies>
@@ -176,9 +178,40 @@
                 <systemType>windows</systemType>
             </properties>
         </profile>
-
+        <!--mac-->
         <profile>
-            <id>dev</id>
+            <id>mac</id>
+            <dependencies>
+<!--                <dependency>-->
+<!--                    <groupId>com.tiklab</groupId>-->
+<!--                    <artifactId>tiklab-mysql-mac</artifactId>-->
+<!--                    <version>1.0.0-SNAPSHOT</version>-->
+<!--                    <type>zip</type>-->
+<!--                    <scope>provided</scope>-->
+<!--                </dependency>-->
+                <dependency>
+                    <groupId>com.tiklab</groupId>
+                    <artifactId>tiklab-jdk-mac</artifactId>
+                    <version>1.0.0-SNAPSHOT</version>
+                    <type>zip</type>
+                    <scope>provided</scope>
+                </dependency>
+                <dependency>
+                    <groupId>com.tiklab</groupId>
+                    <artifactId>tiklab-eas-enable-starter</artifactId>
+                    <version>1.0.0-SNAPSHOT</version>
+                    <type>zip</type>
+                    <scope>provided</scope>
+                </dependency>
+            </dependencies>
+            <properties>
+                <profile.assembly.package.suffix>mac</profile.assembly.package.suffix>
+                <systemType>mac</systemType>
+            </properties>
+        </profile>
+        <!--local-->
+        <profile>
+            <id>local</id>
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
@@ -187,6 +220,7 @@
                 <systemType>windows</systemType>
             </properties>
         </profile>
+
     </profiles>
 
     <build>
