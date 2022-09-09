@@ -17,6 +17,10 @@ public class MatFlowEnvConfigEntity {
     @Column(name = "config_type")
     private int configType;
 
+    //名称
+    @Column(name = "config_name")
+    private String configName;
+
     //地址
     @Column(name = "config_address")
     private String configAddress;
@@ -44,5 +48,13 @@ public class MatFlowEnvConfigEntity {
 
     public void setConfigAddress(String configAddress) {
         this.configAddress = configAddress;
+    }
+
+    public String getConfigName() {
+        return configName;
+    }
+
+    public void setConfigName(String configName) {
+        this.configName = configName;
     }
 }

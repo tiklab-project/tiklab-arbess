@@ -237,6 +237,7 @@
                     </excludes>
                 </configuration>
             </plugin>
+
             <!--跳过发包-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -306,7 +307,6 @@
                                     <groupId>com.tiklab</groupId>
                                     <artifactId>tiklab-eas-enable-starter</artifactId>
                                     <version>1.0.0-SNAPSHOT</version>
-                                    <!-- <classifier>distribution</classifier>-->
                                     <type>zip</type>
                                     <outputDirectory>temp</outputDirectory>
                                 </artifactItem>

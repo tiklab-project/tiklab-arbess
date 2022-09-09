@@ -11,11 +11,13 @@ public class MatFlowEnvConfig {
     @ApiProperty(name = "configId",desc = "id")
     private String configId;
 
-    //git
+
     @ApiProperty(name = "configType",desc = "类型")
     private int configType;
 
-    //svn
+    @ApiProperty(name = "configName",desc = "名称")
+    private String configName;
+
     @ApiProperty(name = "configAddress",desc = "地址")
     private String configAddress;
 
