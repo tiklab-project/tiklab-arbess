@@ -5,7 +5,6 @@ import com.tiklab.matflow.definition.model.MatFlowConfigure;
 import com.tiklab.matflow.instance.model.MatFlowExecHistory;
 import com.tiklab.matflow.instance.model.MatFlowExecLog;
 import com.tiklab.matflow.instance.model.MatFlowProcess;
-import com.tiklab.matflow.setting.envConfig.model.MatFlowEnvConfig;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -36,7 +35,7 @@ public interface CommonAchieveService {
      * @return 构建信息
      * @throws IOException 构建命令执行异常
      */
-     Process process(String path,String order,String sourceAddress) throws IOException;
+     Process process(String path,String order) throws IOException;
 
     /**
      * 更新执行时间
@@ -95,6 +94,6 @@ public interface CommonAchieveService {
      * @param type 类型
      * @return 配置信息
      */
-    MatFlowEnvConfig getEnvConfig(int type);
+    String getPath(int type);
 
 }

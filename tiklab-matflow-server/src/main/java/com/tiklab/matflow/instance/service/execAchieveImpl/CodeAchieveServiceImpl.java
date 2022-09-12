@@ -14,7 +14,6 @@ import com.tiklab.matflow.instance.model.MatFlowExecLog;
 import com.tiklab.matflow.instance.model.MatFlowProcess;
 import com.tiklab.matflow.instance.service.execAchieveService.CodeAchieveService;
 import com.tiklab.matflow.instance.service.execAchieveService.CommonAchieveService;
-import com.tiklab.matflow.setting.envConfig.model.MatFlowEnvConfig;
 import com.tiklab.matflow.setting.proof.model.Proof;
 import com.tiklab.rpc.annotation.Exporter;
 import org.slf4j.Logger;
@@ -101,7 +100,7 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
         try {
             Process process = codeStart(proof, matFlowCode);
              commonAchieveService.log(process.getInputStream(), matFlowProcess, matFlowExecHistoryList);
-        } catch (IOException | URISyntaxException e) {
+        } catch (IOException | URISyntaxException |ApplicationException e) {
             commonAchieveService.error(matFlowExecHistory, "拉取代码错误 \n" + e, matFlow.getMatflowId(),matFlowExecHistoryList);
             throw new ApplicationException(50001, "拉取代码错误 \n" + e);
         }
@@ -116,13 +115,20 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
     }
 
 
-    public Process codeStart(Proof proof, MatFlowCode matFlowCode) throws IOException, URISyntaxException {
+    public Process codeStart(Proof proof, MatFlowCode matFlowCode) throws IOException, URISyntaxException ,ApplicationException{
         if (matFlowCode == null){
             return null;
         }
         //git server地址
-        MatFlowEnvConfig envConfig = commonAchieveService.getEnvConfig(1);
-        String configAddress = envConfig.getConfigAddress();
+        String gitAddress = commonAchieveService.getPath(1);
+        if (gitAddress== null){
+            throw new ApplicationException("不存在Git配置");
+        }
+        //svn server地址
+        String svnAddress = commonAchieveService.getPath(2);
+        if (svnAddress== null){
+            throw new ApplicationException("不存在Svn配置");
+        }
         //系统类型
         int systemType = commonAchieveService.getSystemType();
         //源码存放位置
@@ -133,24 +139,17 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
                 if (proof.getProofType().equals("SSH")){
                     return null;
                 }else {
-                    String gitOrder = getGitOrder(matFlowCode, fileAddress, systemType);
-                    return commonAchieveService.process(configAddress, gitOrder, null);
+                    String gitOrder = gitOrder(matFlowCode, fileAddress, systemType);
+                    return commonAchieveService.process(gitAddress, gitOrder);
                 }
-
             case 5:
                 if (proof.getProofType().equals("SSH")){
                     return null;
                 }else {
-                    return null;
+                    String gitOrder = svnOrder(matFlowCode, fileAddress, systemType);
+                    return commonAchieveService.process(gitAddress, gitOrder);
                 }
         }
-        return null;
-    }
-
-    public String getOrder(){
-
-
-
         return null;
     }
 
@@ -162,7 +161,7 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
      * @throws URISyntaxException url格式不正确
      * @throws MalformedURLException 不是https或者http
      */
-    public String getGitOrder(MatFlowCode matFlowCode,String codeDir,int systemType) throws URISyntaxException, MalformedURLException {
+    private String gitOrder(MatFlowCode matFlowCode,String codeDir,int systemType) throws URISyntaxException, MalformedURLException {
 
         //凭证
         Proof proof = matFlowCode.getProof();
@@ -200,13 +199,42 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
         return order;
     }
 
+    /**
+     * 组装svn命令
+     * @param matFlowCode 源码信息
+     * @param codeDir 存放位置
+     * @return 执行命令
+     */
+    private String svnOrder(MatFlowCode matFlowCode,String codeDir,int systemType){
+        //凭证
+        Proof proof = matFlowCode.getProof();
+        String username= proof.getProofUsername();
+        String password = proof.getProofPassword();
 
+        //地址信息
+        StringBuilder url = new StringBuilder(matFlowCode.getCodeAddress());
+        String branch = matFlowCode.getCodeBranch();
 
+        String up=username.replace("@", "%40")+":"+password+"@";
 
+        url.insert(6, up);
 
-
-
-
+        //判断是否存在分支
+        String order;
+        if (branch == null){
+            order = url+" "+codeDir;
+        }else {
+            //order =" -b "+branch+" "+ url+" "+codeDir;
+            order =url+" "+codeDir;
+        }
+        //根据不同系统更新命令
+        if (systemType == 1){
+            order=".\\svn.exe checkout"+" "+order;
+        }else {
+            order="./svn checkout"+" "+order;
+        }
+        return order;
+    }
 
 
 }

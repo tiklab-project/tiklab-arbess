@@ -8,8 +8,8 @@ import com.tiklab.matflow.instance.model.MatFlowProcess;
 import com.tiklab.matflow.instance.service.MatFlowExecHistoryService;
 import com.tiklab.matflow.instance.service.MatFlowExecLogService;
 import com.tiklab.matflow.instance.service.execAchieveService.CommonAchieveService;
-import com.tiklab.matflow.setting.envConfig.model.MatFlowEnvConfig;
-import com.tiklab.matflow.setting.envConfig.service.MatFlowEnvConfigService;
+import com.tiklab.matflow.setting.path.model.MatFlowPath;
+import com.tiklab.matflow.setting.path.service.MatFlowPathService;
 import com.tiklab.rpc.annotation.Exporter;
 import com.tiklab.user.user.model.User;
 import org.slf4j.Logger;
@@ -40,7 +40,7 @@ public class CommonAchieveServiceImpl implements CommonAchieveService {
     MatFlowExecLogService matFlowExecLogService;
 
     @Autowired
-    MatFlowEnvConfigService matFlowEnvConfigService;
+    MatFlowPathService matFlowPathService;
 
     private static final Logger logger = LoggerFactory.getLogger(CommonAchieveServiceImpl.class);
 
@@ -64,11 +64,10 @@ public class CommonAchieveServiceImpl implements CommonAchieveService {
      * 执行日志
      * @param inputStream 执行信息
      * @param matFlowProcess 执行信息
-     * @throws IOException 字符流转换异常
      * @return map 执行状态
      */
     @Override
-    public int log(InputStream inputStream, MatFlowProcess matFlowProcess, List<MatFlowExecHistory> matFlowExecHistoryList) throws IOException {
+    public int log(InputStream inputStream, MatFlowProcess matFlowProcess, List<MatFlowExecHistory> matFlowExecHistoryList)  {
 
         InputStreamReader inputStreamReader;
 
@@ -86,22 +85,26 @@ public class CommonAchieveServiceImpl implements CommonAchieveService {
         StringBuilder logRunLog = new StringBuilder();
 
         //更新日志信息
-        while ((s = bufferedReader.readLine()) != null) {
-            logRunLog.append(s).append("\n");
-            matFlowExecHistory.setRunLog(matFlowExecHistory.getRunLog()+s+"\n");
-            matFlowExecHistoryList.add(matFlowExecHistory);
-            if (logRunLog.toString().contains("BUILD FAILURE")){
-                inputStreamReader.close();
-                bufferedReader.close();
-                return 0;
+        try {
+            while ((s = bufferedReader.readLine()) != null) {
+                logRunLog.append(s).append("\n");
+                matFlowExecHistory.setRunLog(matFlowExecHistory.getRunLog()+s+"\n");
+                matFlowExecHistoryList.add(matFlowExecHistory);
+                if (logRunLog.toString().contains("BUILD FAILURE")) {
+                    inputStreamReader.close();
+                    bufferedReader.close();
+                    return 0;
+                }
             }
+            //更新状态
+            matFlowExecLog.setRunLog(matFlowExecLog.getRunLog()+logRunLog);
+            matFlowExecHistoryService.updateHistory(matFlowExecHistory);
+            matFlowExecLogService.updateLog(matFlowExecLog);
+            inputStreamReader.close();
+            bufferedReader.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
-        //更新状态
-        matFlowExecLog.setRunLog(matFlowExecLog.getRunLog()+logRunLog);
-        matFlowExecHistoryService.updateHistory(matFlowExecHistory);
-        matFlowExecLogService.updateLog(matFlowExecLog);
-        inputStreamReader.close();
-        bufferedReader.close();
         return 1;
     }
 
@@ -114,24 +117,14 @@ public class CommonAchieveServiceImpl implements CommonAchieveService {
      * @throws NullPointerException 命令为空
      */
     @Override
-    public Process process(String path,String order,String sourceAddress) throws IOException,NullPointerException {
-
+    public Process process(String path,String order) throws IOException,NullPointerException {
         Runtime runtime=Runtime.getRuntime();
         Process process;
 
         if (getSystemType()==1){
-            if (sourceAddress != null){
-                process = runtime.exec("cmd.exe /c cd " + path + "\\"+sourceAddress + " &&" + " " + order);
-                return process;
-            }
             //执行命令
             process = runtime.exec("cmd.exe /c cd " + path + " &&" + " " + order);
         }else {
-            if (sourceAddress != null){
-                String[] cmd = new String[] { "/bin/sh", "-c", "cd "+path+"/"+sourceAddress+";"+" source /etc/profile;"+order };
-                process = runtime.exec(cmd);
-                return process;
-            }
             //执行命令
             String[] cmd = new String[] { "/bin/sh", "-c", "cd "+path+";"+" source /etc/profile;"+ order };
             process = runtime.exec(cmd);
@@ -292,8 +285,12 @@ public class CommonAchieveServiceImpl implements CommonAchieveService {
      * @return 配置信息
      */
     @Override
-    public MatFlowEnvConfig getEnvConfig(int type){
-       return matFlowEnvConfigService.findOneMatFlowEnvConfig(type);
+    public String getPath(int type){
+        MatFlowPath matFlowPath = matFlowPathService.findOneMatFlowPath(type);
+        if (matFlowPath == null){
+            return null;
+        }
+        return matFlowPath.getPathAddress();
     }
 
 }

@@ -49,7 +49,7 @@ public class TestAchieveServiceImpl implements TestAchieveService {
         String testOrder = matFlowTest.getTestOrder();
         String path = matFlowCommonService.getFileAddress()+ matFlowConfigure.getMatFlow().getMatflowName();
         try {
-            Process process = commonAchieveServiceImpl.process(path, testOrder, null);
+            Process process = commonAchieveServiceImpl.process(path, testOrder);
             String a = "------------------------------------" + " \n"
                     +"开始测试" + " \n"
                     + "执行 : \"" + testOrder + "\"\n";
