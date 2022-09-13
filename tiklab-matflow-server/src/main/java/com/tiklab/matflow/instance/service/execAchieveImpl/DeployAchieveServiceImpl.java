@@ -7,6 +7,7 @@ import com.tiklab.matflow.execute.service.MatFlowDeployService;
 import com.tiklab.matflow.instance.model.MatFlowExecHistory;
 import com.tiklab.matflow.instance.model.MatFlowExecLog;
 import com.tiklab.matflow.instance.model.MatFlowProcess;
+import com.tiklab.matflow.instance.service.MatFlowExecServiceImpl;
 import com.tiklab.matflow.instance.service.execAchieveService.CommonAchieveService;
 import com.tiklab.matflow.instance.service.execAchieveService.DeployAchieveService;
 import com.tiklab.matflow.setting.proof.model.Proof;
@@ -43,7 +44,7 @@ public class DeployAchieveServiceImpl implements DeployAchieveService {
      * @param matFlowProcess 配置信息
      * @return 状态
      */
-    public int deploy(MatFlowProcess matFlowProcess, List<MatFlowExecHistory> matFlowExecHistoryList) {
+    public int deploy(MatFlowProcess matFlowProcess) {
         //开始运行时间
         long beginTime = new Timestamp(System.currentTimeMillis()).getTime();
 
@@ -53,7 +54,7 @@ public class DeployAchieveServiceImpl implements DeployAchieveService {
         MatFlowExecLog matFlowExecLog = commonAchieveService.initializeLog(matFlowExecHistory, matFlowConfigure);
         MatFlowDeploy matFlowDeploy = matFlowDeployService.findOneDeploy(matFlowConfigure.getTaskId());
         Proof proof = matFlowDeploy.getProof();
-
+        List<MatFlowExecHistory> matFlowExecHistoryList = MatFlowExecServiceImpl.matFlowExecHistoryList;
         matFlowProcess.setMatFlowExecLog(matFlowExecLog);
         matFlowProcess.setProof(proof);
         matFlowProcess.setMatFlowDeploy(matFlowDeploy);

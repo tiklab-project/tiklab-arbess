@@ -7,6 +7,6 @@ import java.util.List;
 
 public interface MatFlowTaskExecService {
 
-    Integer beginState(MatFlowProcess matFlowProcess, List<MatFlowExecHistory> list, int type);
+    Integer beginState(MatFlowProcess matFlowProcess, int type);
 
 }

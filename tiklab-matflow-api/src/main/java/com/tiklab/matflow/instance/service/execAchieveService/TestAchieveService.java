@@ -10,8 +10,7 @@ public interface TestAchieveService {
     /**
      * 测试
      * @param matFlowProcess 配置信息
-     * @param matFlowExecHistoryList 执行过程
      * @return 执行状态
      */
-    int test(MatFlowProcess matFlowProcess, List<MatFlowExecHistory> matFlowExecHistoryList);
+    int test(MatFlowProcess matFlowProcess);
 }

@@ -7,6 +7,7 @@ import com.tiklab.matflow.execute.service.MatFlowStructureService;
 import com.tiklab.matflow.instance.model.MatFlowExecHistory;
 import com.tiklab.matflow.instance.model.MatFlowExecLog;
 import com.tiklab.matflow.instance.model.MatFlowProcess;
+import com.tiklab.matflow.instance.service.MatFlowExecServiceImpl;
 import com.tiklab.matflow.instance.service.execAchieveService.StructureAchieveService;
 import com.tiklab.rpc.annotation.Exporter;
 import org.slf4j.Logger;
@@ -38,8 +39,8 @@ public class StructureAchieveServiceImpl implements StructureAchieveService {
     private static final Logger logger = LoggerFactory.getLogger(StructureAchieveServiceImpl.class);
 
     // 构建
-    public int structure(MatFlowProcess matFlowProcess, List<MatFlowExecHistory> matFlowExecHistoryList)  {
-
+    public int structure(MatFlowProcess matFlowProcess)  {
+        List<MatFlowExecHistory> matFlowExecHistoryList = MatFlowExecServiceImpl.matFlowExecHistoryList;
         long beginTime = new Timestamp(System.currentTimeMillis()).getTime();
         //获取配置信息
         MatFlowExecHistory matFlowExecHistory = matFlowProcess.getMatFlowExecHistory();
@@ -84,10 +85,22 @@ public class StructureAchieveServiceImpl implements StructureAchieveService {
     private String mavenOrder(String structureOrder,String path,String structureAddress ){
         String order;
         int systemType = commonAchieveServiceImpl.getSystemType();
+        order = " ./" + structureOrder + " " + "-f" +path ;
         if (systemType == 1){
-            order = " .\\mvn" + " " + structureOrder + " " + "-f" +path;
-        }else {
-            order = " ./mvn" + " " + structureOrder + " " + "-f" +path ;
+            order = " .\\" + structureOrder + " " + "-f" +path;
+        }
+        if (structureAddress != null){
+            order = order + structureAddress;
+        }
+        return order;
+    }
+
+    private String nodeOrder(String structureOrder,String path,String structureAddress ){
+        String order;
+        int systemType = commonAchieveServiceImpl.getSystemType();
+        order = " ./" + structureOrder + " " + "-f" +path ;
+        if (systemType == 1){
+            order = " .\\" + structureOrder + " " + "-f" +path;
         }
         if (structureAddress != null){
             order = order + structureAddress;

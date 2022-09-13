@@ -117,7 +117,7 @@ public class CommonAchieveServiceImpl implements CommonAchieveService {
      * @throws NullPointerException 命令为空
      */
     @Override
-    public Process process(String path,String order) throws IOException,NullPointerException {
+    public Process process(String path,String order) throws IOException {
         Runtime runtime=Runtime.getRuntime();
         Process process;
 

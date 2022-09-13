@@ -18,31 +18,30 @@
         <module>tiklab-matflow-api</module>
         <module>tiklab-matflow-server</module>
         <module>tiklab-matflow-starter</module>
+        <module>tiklab-matflow-distribution</module>
     </modules>
 
     <properties>
         <tiklab.version>1.0.0-SNAPSHOT</tiklab.version>
     </properties>
 
-    <build>
-<!--        <plugins>-->
-<!--            <plugin>-->
-<!--                <groupId>org.apache.maven.plugins</groupId>-->
-<!--                <artifactId>maven-compiler-plugin</artifactId>-->
-<!--            </plugin>-->
-<!--            <plugin>-->
-<!--                <groupId>org.apache.maven.plugins</groupId>-->
-<!--                <artifactId>maven-jar-plugin</artifactId>-->
-<!--                <configuration>-->
-<!--                    <excludes>-->
-<!--                        <exclude>*.properties</exclude>-->
-<!--                        <exclude>*.xml</exclude>-->
-<!--                    </excludes>-->
-<!--                </configuration>-->
-<!--            </plugin>-->
-<!--        </plugins>-->
-
-    </build>
+   <dependencies>
+       <dependency>
+           <groupId>com.tiklab</groupId>
+           <artifactId>tiklab-dss-spring-boot-starter</artifactId>
+           <version>${project.version}</version>
+       </dependency>
+       <dependency>
+           <groupId>com.tiklab</groupId>
+           <artifactId>tiklab-dfs-spring-boot-starter</artifactId>
+           <version>${project.version}</version>
+       </dependency>
+       <dependency>
+           <groupId>com.tiklab</groupId>
+           <artifactId>tiklab-dcs-spring-boot-starter</artifactId>
+           <version>${project.version}</version>
+       </dependency>
+   </dependencies>
     
     <repositories>
         <repository>

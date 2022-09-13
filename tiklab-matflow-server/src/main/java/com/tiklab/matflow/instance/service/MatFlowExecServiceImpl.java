@@ -39,7 +39,7 @@ public class MatFlowExecServiceImpl implements MatFlowExecService {
     MatFlowExecHistoryService matFlowExecHistoryService;
 
     //存放过程状态
-    List<MatFlowExecHistory> matFlowExecHistoryList = new ArrayList<>();
+    public static final List<MatFlowExecHistory> matFlowExecHistoryList = new ArrayList<>();
 
     //开始执行时间
     long beginTime = 0;
@@ -75,9 +75,6 @@ public class MatFlowExecServiceImpl implements MatFlowExecService {
     //查询构建中的信息
     @Override
     public MatFlowExecHistory findInstanceState(String matFlowId){
-        if (matFlowExecHistoryList == null){
-            return null;
-        }
         for (MatFlowExecHistory matFlowExecHistory : matFlowExecHistoryList) {
             MatFlow matFlow = matFlowExecHistory.getMatFlow();
             if (matFlow == null || !matFlow.getMatflowId().equals(matFlowId)){
@@ -173,7 +170,7 @@ public class MatFlowExecServiceImpl implements MatFlowExecService {
                 matFlowProcess.setMatFlowExecHistory(matFlowExecHistory);
                 matFlowProcess.setMatFlowConfigure(matFlowConfigure);
                 matFlowExecHistoryList.add(matFlowExecHistory);
-                int state = matFlowTaskExecService.beginState(matFlowProcess, matFlowExecHistoryList, matFlowConfigure.getTaskType());
+                int state = matFlowTaskExecService.beginState(matFlowProcess, matFlowConfigure.getTaskType());
                 if (state == 0){
                     matFlow.setMatflowState(0);
                     matFlowService.updateMatFlow(matFlow);

@@ -10,8 +10,7 @@ public interface StructureAchieveService {
     /**
      * 构建
      * @param matFlowProcess 构建信息
-     * @param matFlowExecHistoryList 构建过程
      * @return 构建状态
      */
-    int structure(MatFlowProcess matFlowProcess, List<MatFlowExecHistory> matFlowExecHistoryList);
+    int structure(MatFlowProcess matFlowProcess);
 }

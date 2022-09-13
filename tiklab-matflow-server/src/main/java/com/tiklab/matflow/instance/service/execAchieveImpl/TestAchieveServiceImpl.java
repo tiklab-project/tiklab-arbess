@@ -7,6 +7,7 @@ import com.tiklab.matflow.execute.service.MatFlowTestService;
 import com.tiklab.matflow.instance.model.MatFlowExecHistory;
 import com.tiklab.matflow.instance.model.MatFlowExecLog;
 import com.tiklab.matflow.instance.model.MatFlowProcess;
+import com.tiklab.matflow.instance.service.MatFlowExecServiceImpl;
 import com.tiklab.matflow.instance.service.execAchieveService.TestAchieveService;
 import com.tiklab.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +35,8 @@ public class TestAchieveServiceImpl implements TestAchieveService {
     MatFlowCommonService matFlowCommonService;
 
     // 单元测试
-    public int test(MatFlowProcess matFlowProcess, List<MatFlowExecHistory> matFlowExecHistoryList) {
+    public int test(MatFlowProcess matFlowProcess) {
+        List<MatFlowExecHistory> matFlowExecHistoryList = MatFlowExecServiceImpl.matFlowExecHistoryList;
 
         long beginTime = new Timestamp(System.currentTimeMillis()).getTime();
         //初始化日志

@@ -55,21 +55,6 @@
         </dependency>
         <dependency>
             <groupId>com.tiklab</groupId>
-            <artifactId>tiklab-dss-spring-boot-starter</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.tiklab</groupId>
-            <artifactId>tiklab-dfs-spring-boot-starter</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.tiklab</groupId>
-            <artifactId>tiklab-dcs-spring-boot-starter</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.tiklab</groupId>
             <artifactId>tiklab-privilege-spring-boot-starter</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -100,128 +85,9 @@
             <version>${project.version}</version>
         </dependency>
 
-        <dependency>
-            <groupId>com.tiklab</groupId>
-            <artifactId>tiklab-mysql-starter</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.tiklab</groupId>
-            <artifactId>tiklab-eas-embbed-spring-boot-starter</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
     </dependencies>
 
-    <profiles>
-        <!--linux-->
-        <profile>
-            <id>linux</id>
-            <dependencies>
-                <dependency>
-                    <groupId>com.tiklab</groupId>
-                    <artifactId>tiklab-mysql-linux</artifactId>
-                    <version>1.0.0-SNAPSHOT</version>
-                    <type>zip</type>
-                    <scope>provided</scope>
-                </dependency>
-                <dependency>
-                    <groupId>com.tiklab</groupId>
-                    <artifactId>tiklab-jdk-linux</artifactId>
-                    <version>1.0.0-SNAPSHOT</version>
-                    <type>zip</type>
-                    <scope>provided</scope>
-                </dependency>
-                <dependency>
-                    <groupId>com.tiklab</groupId>
-                    <artifactId>tiklab-eas-enable-starter</artifactId>
-                    <version>1.0.0-SNAPSHOT</version>
-                    <type>zip</type>
-                    <scope>provided</scope>
-                </dependency>
-            </dependencies>
-            <properties>
-                <profile.assembly.package.suffix>linux</profile.assembly.package.suffix>
-                <systemType>linux</systemType>
-                <env>test</env>
-            </properties>
-        </profile>
-        <!--windows-->
-        <profile>
-            <id>windows</id>
-            <dependencies>
-                <dependency>
-                    <groupId>com.tiklab</groupId>
-                    <artifactId>tiklab-mysql-windows</artifactId>
-                    <version>1.0.0-SNAPSHOT</version>
-                    <type>zip</type>
-                    <scope>provided</scope>
-                </dependency>
-                <dependency>
-                    <groupId>com.tiklab</groupId>
-                    <artifactId>tiklab-jdk-windows</artifactId>
-                    <version>1.0.0-SNAPSHOT</version>
-                    <type>zip</type>
-                    <scope>provided</scope>
-                </dependency>
-                <dependency>
-                    <groupId>com.tiklab</groupId>
-                    <artifactId>tiklab-eas-enable-starter</artifactId>
-                    <version>1.0.0-SNAPSHOT</version>
-                    <type>zip</type>
-                    <scope>provided</scope>
-                </dependency>
-            </dependencies>
-            <properties>
-                <profile.assembly.package.suffix>windows</profile.assembly.package.suffix>
-                <systemType>windows</systemType>
-            </properties>
-        </profile>
-        <!--mac-->
-        <profile>
-            <id>mac</id>
-            <dependencies>
-<!--                <dependency>-->
-<!--                    <groupId>com.tiklab</groupId>-->
-<!--                    <artifactId>tiklab-mysql-mac</artifactId>-->
-<!--                    <version>1.0.0-SNAPSHOT</version>-->
-<!--                    <type>zip</type>-->
-<!--                    <scope>provided</scope>-->
-<!--                </dependency>-->
-                <dependency>
-                    <groupId>com.tiklab</groupId>
-                    <artifactId>tiklab-jdk-mac</artifactId>
-                    <version>1.0.0-SNAPSHOT</version>
-                    <type>zip</type>
-                    <scope>provided</scope>
-                </dependency>
-                <dependency>
-                    <groupId>com.tiklab</groupId>
-                    <artifactId>tiklab-eas-enable-starter</artifactId>
-                    <version>1.0.0-SNAPSHOT</version>
-                    <type>zip</type>
-                    <scope>provided</scope>
-                </dependency>
-            </dependencies>
-            <properties>
-                <profile.assembly.package.suffix>mac</profile.assembly.package.suffix>
-                <systemType>mac</systemType>
-            </properties>
-        </profile>
-        <!--local-->
-        <profile>
-            <id>local</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <properties>
-                <profile.assembly.package.suffix>local</profile.assembly.package.suffix>
-                <systemType>windows</systemType>
-            </properties>
-        </profile>
 
-    </profiles>
 
     <build>
         <plugins>
@@ -257,7 +123,7 @@
                         <configuration>
                             <descriptors>
                                 <!--suppress UnresolvedMavenProperty -->
-                                <descriptor>assembly/distribution-${profile.assembly.package.suffix}.xml</descriptor>
+                                <descriptor>assembly/distribution.xml</descriptor>
                             </descriptors>
                             <finalName>tiklab-matflow</finalName>
                             <appendAssemblyId>false</appendAssemblyId>
@@ -289,46 +155,6 @@
                 </configuration>
             </plugin>
 
-            <!--解压文件-->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <version>2.8</version>
-                <executions>
-                    <execution>
-                        <id>unpack</id>
-                        <phase>compile</phase>
-                        <goals>
-                            <goal>unpack</goal>
-                        </goals>
-                        <configuration>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>com.tiklab</groupId>
-                                    <artifactId>tiklab-eas-enable-starter</artifactId>
-                                    <version>1.0.0-SNAPSHOT</version>
-                                    <type>zip</type>
-                                    <outputDirectory>temp</outputDirectory>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>com.tiklab</groupId>
-                                    <artifactId>tiklab-jdk-${systemType}</artifactId>
-                                    <version>1.0.0-SNAPSHOT</version>
-                                    <type>zip</type>
-                                    <outputDirectory>temp</outputDirectory>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>com.tiklab</groupId>
-                                    <artifactId>tiklab-mysql-${systemType}</artifactId>
-                                    <version>1.0.0-SNAPSHOT</version>
-                                    <type>zip</type>
-                                    <outputDirectory>temp</outputDirectory>
-                                </artifactItem>
-                            </artifactItems>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>
     </build>
 

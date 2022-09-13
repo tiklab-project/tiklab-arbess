@@ -24,13 +24,13 @@ public class MatFlowTaskExecServiceImpl implements MatFlowTaskExecService {
     @Autowired
     DeployAchieveServiceImpl deployAchieveServiceImpl ;
 
-    public Integer beginState(MatFlowProcess matFlowProcess, List<MatFlowExecHistory> list, int type){
+    public Integer beginState(MatFlowProcess matFlowProcess, int type){
         int state = 1;
         switch (type) {
-            case 1,2,3,4,5 -> state = codeAchieveServiceImpl.clone(matFlowProcess, list);
-            case 11 -> state = testAchieveServiceImpl.test(matFlowProcess, list);
-            case 21, 22 -> state  = structureAchieveServiceImpl.structure(matFlowProcess, list);
-            case 31, 32-> state = deployAchieveServiceImpl.deploy(matFlowProcess, list);
+            case 1,2,3,4,5 -> state = codeAchieveServiceImpl.clone(matFlowProcess);
+            case 11 -> state = testAchieveServiceImpl.test(matFlowProcess);
+            case 21, 22 -> state  = structureAchieveServiceImpl.structure(matFlowProcess);
+            case 31, 32-> state = deployAchieveServiceImpl.deploy(matFlowProcess);
         }
         if (state == 0) {
             return 0;
