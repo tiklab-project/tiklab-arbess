@@ -265,7 +265,9 @@ public class CommonAchieveServiceImpl implements CommonAchieveService {
         matFlowExecHistory.setStatus(0);
         matFlowExecHistory.setMatFlow(matFlow);
         matFlowExecHistory.setHistoryId(historyId);
-        matFlowExecHistory.setUser(new User().setId(userId));
+        User user = new User();
+        user.setId(userId);
+        matFlowExecHistory.setUser(user);
         matFlowExecHistory.setHistoryId(historyId);
         //构建次数
         List<MatFlowExecHistory> allHistory = matFlowExecHistoryService.findAllHistory(matFlow.getMatflowId());

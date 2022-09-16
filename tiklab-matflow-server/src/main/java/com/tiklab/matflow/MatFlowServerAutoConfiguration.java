@@ -9,7 +9,11 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@SQL(modules = {"DDL-matFlow","project-matflow","source-matflow"})
+@SQL(modules = {
+        "DDL-matFlow",
+        "project-matflow",
+        "source-matflow",
+        "source-matflow-1.0.1"})
 @ComponentScan({"com.tiklab.matflow"})
 public class MatFlowServerAutoConfiguration {
 

@@ -4,6 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
+<!--        <groupId>io.gitee.zhangzh1978_admin</groupId>-->
         <groupId>com.tiklab</groupId>
         <artifactId>tiklab-matflow</artifactId>
         <version>1.0.0-SNAPSHOT</version>
@@ -13,65 +14,54 @@
     <name>${project.artifactId}</name>
 
     <dependencies>
-
         <dependency>
             <groupId>com.tiklab</groupId>
             <artifactId>tiklab-beans-annotation</artifactId>
+<!--            <version>${project.version}</version>-->
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.tiklab</groupId>
             <artifactId>tiklab-join-annotation</artifactId>
+<!--            <version>${project.version}</version>-->
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.tiklab</groupId>
             <artifactId>tiklab-user-api</artifactId>
+<!--            <version>${project.version}</version>-->
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.tiklab</groupId>
             <artifactId>tiklab-postin-annotation</artifactId>
+<!--            <version>${project.version}</version>-->
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.tiklab</groupId>
             <artifactId>tiklab-rpc-annotation</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.tiklab</groupId>
             <artifactId>tiklab-join-core</artifactId>
+<!--            <version>${project.version}</version>-->
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.tiklab</groupId>
             <artifactId>tiklab-beans-core</artifactId>
+<!--            <version>${project.version}</version>-->
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.tiklab</groupId>
             <artifactId>tiklab-dsm-annotation</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
+<!--            <version>${project.version}</version>-->
+            <version>${project.version}</version>
         </dependency>
 
     </dependencies>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>attach-sources</id>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
 
 </project>

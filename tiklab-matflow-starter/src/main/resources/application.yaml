@@ -59,6 +59,14 @@ dss:
 
 datapath: ${PROJECT_HOME}/caches
 
+auth:
+  type: local
+
+eas:
+  embbed:
+    enable: true
+
+
 #homes
 homes:
   address: http://192.168.10.19:8080

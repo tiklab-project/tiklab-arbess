@@ -114,9 +114,9 @@ public class GatewayFilterAutoConfiguration {
     RouterConfig routerConfig(){
         return RouterConfigBuilder.instance()
                 .preRoute(new String[]{
-                        "/user",
-                        "/eam",
-                        "/message",
+                        //"/user",
+                        //"/eam",
+                        //"/message",
                 }, authAddress)
                 .get();
     }

@@ -12,11 +12,11 @@ spring:
     default-domain: tiklab-matflow
 
 server:
-  port: 8090
+  port: 8091
 
 jdbc:
   driverClassName: com.mysql.cj.jdbc.Driver
-  url: jdbc:mysql://172.10.1.10:3306/tiklab_matflow?characterEncoding=utf8&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+  url: jdbc:mysql://localhost:3333/tiklab_matflow?characterEncoding=utf8&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
   username: root
   password: darth2020
 
@@ -60,35 +60,22 @@ dss:
 
 datapath: ${PROJECT_HOME}/caches
 
-#eas config
+auth:
+  type: local
 eas:
   embbed:
-    enable: false
-  env:
-    local: false
-  server:
-    port: 8080
-  address: http://192.168.10.14:8080
-  web:
-    address: http://192.168.10.14:3001
-  jdbc:
-    driverClassName: ${jdbc.driverClassName}
-    url: ${jdbc.url}
-    username: ${jdbc.username}
-    password: ${jdbc.password}
-  mysql:
-    name: tiklab_matflow
+    enable: true
 
-#mysql config
+#enable mysql config
 mysql:
   embbed:
-    enable: false
-  local: false
+    enable: true
+  local: true
   server:
     port: 3333
-  version: mysql-8.0.28
-  name: tiklab_matflow
-
+  username: root
+  password: darth2020
+  database : tiklab_matflow
 
 #homes
 homes:

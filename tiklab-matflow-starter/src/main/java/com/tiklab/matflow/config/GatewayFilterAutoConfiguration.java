@@ -65,14 +65,14 @@ public class GatewayFilterAutoConfiguration {
                         "/comment/view",
                         "/share/verifyAuthCode",
                         "/share/judgeAuthCode",
-                        "/user/findAllUser",
-                        "/orga/findAllOrga",
+                        "/user/user/findAllUser",
+                        "/user/orga/findAllOrga",
                         "/userOrga/findAllUserOrga",
-                        "/dingdingcfg/findId",
                         "/dingding/passport/login",
+                        "/user/dingdingcfg/findId",
                         "/dingding/passport/logout",
                         "/dingding/passport/valid",
-                        "/wechatcfg/findWechatById",
+                        "/user/wechatcfg/findWechatById",
                         "/wechat/passport/login",
                         "/wechat/passport/logout",
                         "/wechat/passport/internallogin",
@@ -116,9 +116,9 @@ public class GatewayFilterAutoConfiguration {
     RouterConfig routerConfig(){
         return RouterConfigBuilder.instance()
                 .preRoute(new String[]{
-                        "/user",
-                        "/eam",
-                        "/message",
+                        //"/user",
+                        //"/eam",
+                        //"/message",
                 }, authAddress)
                 .get();
     }

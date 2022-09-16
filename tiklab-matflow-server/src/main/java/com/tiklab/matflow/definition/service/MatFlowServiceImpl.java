@@ -81,7 +81,9 @@ public class MatFlowServiceImpl implements MatFlowService {
         String matFlowId = matFlowDao.createMatFlow(matFlowEntity);
         DmUser dmUser = new DmUser();
         dmUser.setDomainId(matFlowId);
-        dmUser.setUser(new User().setId(matFlow.getUser().getId()));
+        User user = new User();
+        user.setId(matFlow.getUser().getId());
+        dmUser.setUser(user);
         dmUserService.createDmUser(dmUser);
         return  matFlowId;
     }

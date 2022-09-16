@@ -4,12 +4,14 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
+<!--        <groupId>io.gitee.zhangzh1978_admin</groupId>-->
         <groupId>com.tiklab</groupId>
         <artifactId>tiklab-matflow</artifactId>
         <version>1.0.0-SNAPSHOT</version>
     </parent>
     <artifactId>tiklab-matflow-starter</artifactId>
     <name>${project.artifactId}</name>
+
     <dependencies>
         <dependency>
             <groupId>com.tiklab</groupId>
@@ -30,7 +32,7 @@
                     <artifactId>dysmsapi20170525</artifactId>
                 </exclusion>
             </exclusions>
-            <version>1.0.0-SNAPSHOT</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.tiklab</groupId>
@@ -46,12 +48,12 @@
                     <artifactId>dysmsapi20170525</artifactId>
                 </exclusion>
             </exclusions>
-            <version>1.0.0-SNAPSHOT</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.tiklab</groupId>
             <artifactId>tiklab-user-spring-boot-starter</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.tiklab</groupId>
@@ -76,7 +78,7 @@
         <dependency>
             <groupId>com.tiklab</groupId>
             <artifactId>tiklab-gateway-spring-boot-starter</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>
@@ -84,13 +86,17 @@
             <artifactId>tiklab-rpc-spring-boot-starter</artifactId>
             <version>${project.version}</version>
         </dependency>
-
+        <dependency>
+            <groupId>com.tiklab</groupId>
+            <artifactId>tiklab-eas-embbed-spring-boot-starter</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
-
 
 
     <build>
         <plugins>
+
             <!--jar去掉配置文件-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -122,7 +128,6 @@
                         <id>make-assembly</id>
                         <configuration>
                             <descriptors>
-                                <!--suppress UnresolvedMavenProperty -->
                                 <descriptor>assembly/distribution.xml</descriptor>
                             </descriptors>
                             <finalName>tiklab-matflow</finalName>
@@ -153,6 +158,20 @@
                             </resource>
                         </resources>
                 </configuration>
+            </plugin>
+
+            <!--源码-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
 
         </plugins>

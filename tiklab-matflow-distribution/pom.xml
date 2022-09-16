@@ -3,12 +3,15 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
+<!--		<groupId>io.gitee.zhangzh1978_admin</groupId>-->
 		<groupId>com.tiklab</groupId>
 		<artifactId>tiklab-matflow</artifactId>
 		<version>1.0.0-SNAPSHOT</version>
 	</parent>
+
 	<artifactId>tiklab-matflow-distribution</artifactId>
 	<name>${project.artifactId}</name>
+
 	<dependencies>
 		<dependency>
 			<groupId>com.tiklab</groupId>
@@ -29,7 +32,7 @@
 					<artifactId>dysmsapi20170525</artifactId>
 				</exclusion>
 			</exclusions>
-			<version>1.0.0-SNAPSHOT</version>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.tiklab</groupId>
@@ -45,12 +48,12 @@
 					<artifactId>dysmsapi20170525</artifactId>
 				</exclusion>
 			</exclusions>
-			<version>1.0.0-SNAPSHOT</version>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.tiklab</groupId>
 			<artifactId>tiklab-user-spring-boot-starter</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.tiklab</groupId>
@@ -75,7 +78,7 @@
 		<dependency>
 			<groupId>com.tiklab</groupId>
 			<artifactId>tiklab-gateway-spring-boot-starter</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.tiklab</groupId>
@@ -85,16 +88,17 @@
 		<dependency>
 			<groupId>com.tiklab</groupId>
 			<artifactId>tiklab-mysql-starter</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
+			<version>${project.version}</version>
 		</dependency>
+
 		<dependency>
 			<groupId>com.tiklab</groupId>
-			<artifactId>tiklab-eas-embbed-spring-boot-starter</artifactId>
+			<artifactId>tiklab-utils</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.tiklab</groupId>
-			<artifactId>tiklab-utils</artifactId>
+			<artifactId>tiklab-eas-embbed-spring-boot-starter</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
@@ -110,21 +114,14 @@
 				<dependency>
 					<groupId>com.tiklab</groupId>
 					<artifactId>tiklab-mysql-linux</artifactId>
-					<version>1.0.0-SNAPSHOT</version>
+					<version>${project.version}</version>
 					<type>zip</type>
 					<scope>provided</scope>
 				</dependency>
 				<dependency>
 					<groupId>com.tiklab</groupId>
 					<artifactId>tiklab-jdk-linux</artifactId>
-					<version>1.0.0-SNAPSHOT</version>
-					<type>zip</type>
-					<scope>provided</scope>
-				</dependency>
-				<dependency>
-					<groupId>com.tiklab</groupId>
-					<artifactId>tiklab-eas-enable-starter</artifactId>
-					<version>1.0.0-SNAPSHOT</version>
+					<version>${project.version}</version>
 					<type>zip</type>
 					<scope>provided</scope>
 				</dependency>
@@ -132,9 +129,9 @@
 			<properties>
 				<profile.assembly.package.suffix>linux</profile.assembly.package.suffix>
 				<systemType>linux</systemType>
-				<env>test</env>
 			</properties>
 		</profile>
+
 		<!--windows-->
 		<profile>
 			<id>windows</id>
@@ -142,21 +139,14 @@
 				<dependency>
 					<groupId>com.tiklab</groupId>
 					<artifactId>tiklab-mysql-windows</artifactId>
-					<version>1.0.0-SNAPSHOT</version>
+					<version>${project.version}</version>
 					<type>zip</type>
 					<scope>provided</scope>
 				</dependency>
 				<dependency>
 					<groupId>com.tiklab</groupId>
 					<artifactId>tiklab-jdk-windows</artifactId>
-					<version>1.0.0-SNAPSHOT</version>
-					<type>zip</type>
-					<scope>provided</scope>
-				</dependency>
-				<dependency>
-					<groupId>com.tiklab</groupId>
-					<artifactId>tiklab-eas-enable-starter</artifactId>
-					<version>1.0.0-SNAPSHOT</version>
+					<version>${project.version}</version>
 					<type>zip</type>
 					<scope>provided</scope>
 				</dependency>
@@ -166,28 +156,15 @@
 				<systemType>windows</systemType>
 			</properties>
 		</profile>
+
 		<!--mac-->
 		<profile>
 			<id>mac</id>
 			<dependencies>
-				<!--                <dependency>-->
-				<!--                    <groupId>com.tiklab</groupId>-->
-				<!--                    <artifactId>tiklab-mysql-mac</artifactId>-->
-				<!--                    <version>1.0.0-SNAPSHOT</version>-->
-				<!--                    <type>zip</type>-->
-				<!--                    <scope>provided</scope>-->
-				<!--                </dependency>-->
 				<dependency>
 					<groupId>com.tiklab</groupId>
 					<artifactId>tiklab-jdk-mac</artifactId>
-					<version>1.0.0-SNAPSHOT</version>
-					<type>zip</type>
-					<scope>provided</scope>
-				</dependency>
-				<dependency>
-					<groupId>com.tiklab</groupId>
-					<artifactId>tiklab-eas-enable-starter</artifactId>
-					<version>1.0.0-SNAPSHOT</version>
+					<version>${project.version}</version>
 					<type>zip</type>
 					<scope>provided</scope>
 				</dependency>
@@ -202,6 +179,7 @@
 
 	<build>
 		<plugins>
+
 			<!--jar去掉配置文件-->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -282,22 +260,15 @@
 							<artifactItems>
 								<artifactItem>
 									<groupId>com.tiklab</groupId>
-									<artifactId>tiklab-eas-enable-starter</artifactId>
-									<version>1.0.0-SNAPSHOT</version>
-									<type>zip</type>
-									<outputDirectory>temp</outputDirectory>
-								</artifactItem>
-								<artifactItem>
-									<groupId>com.tiklab</groupId>
 									<artifactId>tiklab-jdk-${systemType}</artifactId>
-									<version>1.0.0-SNAPSHOT</version>
+									<version>${project.version}</version>
 									<type>zip</type>
 									<outputDirectory>temp</outputDirectory>
 								</artifactItem>
 								<artifactItem>
 									<groupId>com.tiklab</groupId>
 									<artifactId>tiklab-mysql-${systemType}</artifactId>
-									<version>1.0.0-SNAPSHOT</version>
+									<version>${project.version}</version>
 									<type>zip</type>
 									<outputDirectory>temp</outputDirectory>
 								</artifactItem>
@@ -306,6 +277,7 @@
 					</execution>
 				</executions>
 			</plugin>
+
 		</plugins>
 	</build>
 
