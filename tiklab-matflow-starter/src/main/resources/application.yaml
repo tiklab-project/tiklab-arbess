@@ -59,9 +59,6 @@ dss:
 
 datapath: ${PROJECT_HOME}/caches
 
-auth:
-  type: local
-
 eas:
   embbed:
     enable: true
