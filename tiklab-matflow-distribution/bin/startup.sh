@@ -2,7 +2,7 @@
 #-------------------------------------------------------------------------------------------------------------
 DIRS=$(dirname "$PWD")
 
-APP_MAIN="com.tiklab.matflow.MatFlowDistributionApplication"
+APP_MAIN="net.tiklab.matflow.MatFlowDistributionApplication"
 
 if [ -e "${DIRS}/temp" ]; then
       mv "${DIRS}"/temp/* ${DIRS}

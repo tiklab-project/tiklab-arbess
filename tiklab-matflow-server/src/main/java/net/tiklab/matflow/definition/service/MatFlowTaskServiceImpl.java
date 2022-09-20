@@ -1,0 +1,132 @@
+package net.tiklab.matflow.definition.service;
+
+
+import net.tiklab.matflow.definition.model.MatFlowCode;
+import net.tiklab.matflow.definition.model.MatFlowDeploy;
+import net.tiklab.matflow.definition.model.MatFlowBuild;
+import net.tiklab.matflow.definition.model.MatFlowTest;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import java.util.List;
+
+/**
+ * 维护各个阶段的配置信息
+ */
+
+@Service
+public class MatFlowTaskServiceImpl implements MatFlowTaskService{
+
+    @Autowired
+    MatFlowCodeService matFlowCodeService;
+
+    @Autowired
+    MatFlowTestService matFlowTestService;
+
+    @Autowired
+    MatFlowBuildService matFlowBuildService;
+
+    @Autowired
+    MatFlowDeployService matFlowDeployService;
+
+
+    /**
+     * 更新配置信息
+     * @param type 更新类型
+     */
+    @Override
+    public void updateTaskConfig(Object o,String taskId,Integer type) {
+        switch (type) {
+            case 10 -> {
+                MatFlowCode matFlowCode = (MatFlowCode) o;
+                matFlowCode = matFlowCodeService.getUrl(matFlowCode);
+                matFlowCode.setCodeId(taskId);
+                matFlowCodeService.updateCode(matFlowCode);
+            }
+            case 20 -> {
+                MatFlowTest matFlowTest = (MatFlowTest) o;
+                matFlowTest.setTestId(taskId);
+                matFlowTestService.updateTest(matFlowTest);
+            }
+            case 30 -> {
+                MatFlowBuild matFlowBuild = (MatFlowBuild) o;
+                matFlowBuild.setBuildId(taskId);
+                matFlowBuildService.updateBuild(matFlowBuild);
+            }
+            case 40 -> {
+                MatFlowDeploy matFlowDeploy = (MatFlowDeploy) o;
+                matFlowDeploy.setDeployId(taskId);
+                matFlowDeployService.updateDeploy(matFlowDeploy);
+            }
+        }
+    }
+
+    /**
+     * 创建配置信息
+     * @param type 创建类型
+     */
+    @Override
+    public String createTaskConfig(Object o,Integer type) {
+        switch (type) {
+            case 10 -> {
+                MatFlowCode matFlowCode = (MatFlowCode) o;
+                matFlowCode = matFlowCodeService.getUrl(matFlowCode);
+                return matFlowCodeService.createCode(matFlowCode);
+            }
+            case 20 -> {
+                MatFlowTest matFlowTest = (MatFlowTest) o;
+                return matFlowTestService.createTest(matFlowTest);
+            }
+            case 30 -> {
+                MatFlowBuild matFlowBuild = (MatFlowBuild) o;
+                return matFlowBuildService.createBuild(matFlowBuild);
+            }
+            case 40 -> {
+                MatFlowDeploy matFlowDeploy = (MatFlowDeploy) o;
+                return matFlowDeployService.createDeploy(matFlowDeploy);
+            }
+        }
+        return null;
+    }
+
+
+    /**
+     * 删除配置信息
+     * @param type 删除类型
+     */
+    @Override
+    public void deleteTaskConfig(String taskId,Integer type) {
+        switch (type) {
+            case 10 -> matFlowCodeService.deleteCode(taskId);
+            case 20 -> matFlowTestService.deleteTest(taskId);
+            case 30 -> matFlowBuildService.deleteBuild(taskId);
+            case 40 -> matFlowDeployService.deleteDeploy(taskId);
+        }
+    }
+
+    @Override
+    public void findOneTask( List<Object> list,String taskId, Integer type){
+        if (type < 10){
+            MatFlowCode oneCode = matFlowCodeService.findOneCode(taskId);
+            if (oneCode != null){
+                list.add(oneCode);
+            }
+        }else if (10 < type && type < 20){
+            MatFlowTest oneTest = matFlowTestService.findOneTest(taskId);
+            if (oneTest != null){
+                list.add(oneTest);
+            }
+
+        } else if (20 < type && type < 30){
+            MatFlowBuild oneBuild = matFlowBuildService.findOneBuild(taskId);
+            if (oneBuild != null){
+                list.add(oneBuild);
+            }
+        } else if (30 < type && type < 40){
+            MatFlowDeploy oneDeploy = matFlowDeployService.findOneDeploy(taskId);
+            if (oneDeploy != null){
+                list.add(oneDeploy);
+            }
+
+        }
+    }
+}

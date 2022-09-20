@@ -4,8 +4,8 @@
     <id name="id">1048632</id>
     <property name="body"><![CDATA[<ac:layout><ac:layout-section ac:type="single"><ac:layout-cell>
 <h4>关于我 (yuanjiexuan)</h4><p>你可以编辑本页面来介绍自己。</p><p>电子邮件: 1396761364@qq.com</p></ac:layout-cell></ac:layout-section><ac:layout-section ac:type="two_right_sidebar"><ac:layout-cell>
-<p><ac:structured-macro ac:name="recently-updated" ac:schema-version="1" ac:macro-id="514de3e4-4340-4861-a13a-a352fc85f962" /></p></ac:layout-cell><ac:layout-cell>
-<h2>空间导航</h2><p><ac:structured-macro ac:name="pagetreesearch" ac:schema-version="1" ac:macro-id="07418a43-36d3-4915-bdce-cc544376ed72" /></p><p><ac:structured-macro ac:name="pagetree" ac:schema-version="1" ac:macro-id="66c47556-d56e-41b9-8106-ff9cad117bfb" /></p></ac:layout-cell></ac:layout-section><ac:layout-section ac:type="single"><ac:layout-cell>
+<p><ac:buildd-macro ac:name="recently-updated" ac:schema-version="1" ac:macro-id="514de3e4-4340-4861-a13a-a352fc85f962" /></p></ac:layout-cell><ac:layout-cell>
+<h2>空间导航</h2><p><ac:buildd-macro ac:name="pagetreesearch" ac:schema-version="1" ac:macro-id="07418a43-36d3-4915-bdce-cc544376ed72" /></p><p><ac:buildd-macro ac:name="pagetree" ac:schema-version="1" ac:macro-id="66c47556-d56e-41b9-8106-ff9cad117bfb" /></p></ac:layout-cell></ac:layout-section><ac:layout-section ac:type="single"><ac:layout-cell>
 <p>&nbsp;</p></ac:layout-cell></ac:layout-section></ac:layout>]]></property>
     <property name="content" class="Page" package="com.atlassian.confluence.pages"><id name="id">1015879</id>
     </property>

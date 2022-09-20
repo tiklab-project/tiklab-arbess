@@ -1,0 +1,37 @@
+package net.tiklab.matflow.setting.service;
+
+
+import net.tiklab.matflow.definition.service.MatFlowCommonService;
+import net.tiklab.matflow.setting.model.SystemMassage;
+import net.tiklab.matflow.setting.service.SystemMassageService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+@Service
+public class SystemMassageServiceImpl implements SystemMassageService {
+
+
+    @Autowired
+    MatFlowCommonService matFlowCommonService;
+
+    @Autowired
+    public SystemMassage getSystemMassage(){
+        return new SystemMassage();
+    }
+
+
+    //public List<String> getSystemLog(){
+    //    String address = System.getProperty("user.dir");
+    //    String files = address+ "/LOG_PATH_IS_UNDEFINED/doublekit/doublekit-pipeline/logs/app.pipelineExecLog";
+    //    String property = System.getProperty("os.name");
+    //    String[] s = property.split(" ");
+    //    if (s[0].equals("Windows")){
+    //        files = address+ "\\LOG_PATH_IS_UNDEFINED\\doublekit\\doublekit-pipeline\\logs\\app.pipelineExecLog";
+    //    }
+    //    List<String> list = pipelineCommonService.readFile(files);
+    //    if (list.size() < 1000){
+    //        return list;
+    //    }
+    //    return list.subList(list.size()-1000, list.size());
+    //}
+}

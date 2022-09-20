@@ -11,9 +11,9 @@ CREATE TABLE `matflow`  (
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '流水线表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
--- Table structure for matflow_action
+-- Table build for matflow_activity
 -- ----------------------------
-CREATE TABLE `matflow_action`  (
+CREATE TABLE `matflow_activity`  (
   `id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `create_time` datetime NULL DEFAULT NULL,
   `user_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
@@ -24,7 +24,7 @@ CREATE TABLE `matflow_action`  (
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
--- Table structure for matflow_code
+-- Table build for matflow_code
 -- ----------------------------
 CREATE TABLE `matflow_code`  (
   `code_id` varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT 'gitId',
@@ -39,7 +39,7 @@ CREATE TABLE `matflow_code`  (
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
--- Table structure for matflow_configure
+-- Table build for matflow_configure
 -- ----------------------------
 CREATE TABLE `matflow_configure`  (
   `configure_id` varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '配置id',
@@ -54,7 +54,7 @@ CREATE TABLE `matflow_configure`  (
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
--- Table structure for matflow_deploy
+-- Table build for matflow_deploy
 -- ----------------------------
 CREATE TABLE `matflow_deploy`  (
   `deploy_id` varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '部署id',
@@ -76,7 +76,7 @@ CREATE TABLE `matflow_deploy`  (
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
--- Table structure for matflow_follow
+-- Table build for matflow_follow
 -- ----------------------------
 CREATE TABLE `matflow_follow`  (
   `id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
@@ -86,7 +86,7 @@ CREATE TABLE `matflow_follow`  (
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
--- Table structure for matflow_history
+-- Table build for matflow_history
 -- ----------------------------
 CREATE TABLE `matflow_history`  (
   `history_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT 'id',
@@ -103,7 +103,7 @@ CREATE TABLE `matflow_history`  (
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '构建历史表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
--- Table structure for matflow_log
+-- Table build for matflow_log
 -- ----------------------------
 CREATE TABLE `matflow_log`  (
   `log_id` varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '日志id',
@@ -118,7 +118,7 @@ CREATE TABLE `matflow_log`  (
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
--- Table structure for matflow_open
+-- Table build for matflow_open
 -- ----------------------------
 CREATE TABLE `matflow_open`  (
   `open_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
@@ -129,7 +129,7 @@ CREATE TABLE `matflow_open`  (
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
--- Table structure for matflow_proof
+-- Table build for matflow_proof
 -- ----------------------------
 CREATE TABLE `matflow_proof`  (
   `proof_id` varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '凭证id',
@@ -147,7 +147,7 @@ CREATE TABLE `matflow_proof`  (
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '凭证表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
--- Table structure for matflow_proof_task
+-- Table build for matflow_proof_task
 -- ----------------------------
 CREATE TABLE `matflow_proof_task`  (
   `task_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
@@ -157,20 +157,20 @@ CREATE TABLE `matflow_proof_task`  (
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
--- Table structure for matflow_structure
+-- Table build for matflow_build
 -- ----------------------------
-CREATE TABLE `matflow_structure`  (
-  `structure_id` varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '构建id',
+CREATE TABLE `matflow_build`  (
+  `build_id` varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '构建id',
   `type` int NULL DEFAULT NULL COMMENT '类型',
-  `structure_address` varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '文件地址',
-  `structure_order` varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '构建命令',
+  `build_address` varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '文件地址',
+  `build_order` varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '构建命令',
   `sort` int NULL DEFAULT NULL COMMENT '排序',
-  `structure_alias` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '执行名称',
-  PRIMARY KEY (`structure_id`) USING BTREE
+  `build_alias` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '执行名称',
+  PRIMARY KEY (`build_id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
--- Table structure for matflow_test
+-- Table build for matflow_test
 -- ----------------------------
 CREATE TABLE `matflow_test`  (
   `test_id` varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '测试id',
@@ -183,9 +183,9 @@ CREATE TABLE `matflow_test`  (
 
 
 -- ----------------------------
--- Table structure for matflow_path
+-- Table build for matflow_path
 -- ----------------------------
-CREATE TABLE `matflow_path`  (
+CREATE TABLE `matflow_scm`  (
   `path_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `path_type` int NULL DEFAULT NULL,
   `path_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,

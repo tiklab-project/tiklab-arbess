@@ -4,8 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-<!--        <groupId>io.gitee.zhangzh1978_admin</groupId>-->
-        <groupId>com.tiklab</groupId>
+        <groupId>net.tiklab</groupId>
         <artifactId>tiklab-matflow</artifactId>
         <version>1.0.0-SNAPSHOT</version>
     </parent>
@@ -14,17 +13,17 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.tiklab</groupId>
+            <groupId>net.tiklab</groupId>
             <artifactId>tiklab-beans-spring-boot-starter</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.tiklab</groupId>
+            <groupId>net.tiklab</groupId>
             <artifactId>tiklab-join-spring-boot-starter</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.tiklab</groupId>
+            <groupId>net.tiklab</groupId>
             <artifactId>tiklab-eam-spring-boot-starter</artifactId>
             <exclusions>
                 <exclusion>
@@ -35,12 +34,12 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.tiklab</groupId>
+            <groupId>net.tiklab</groupId>
             <artifactId>tiklab-matflow-server</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.tiklab</groupId>
+            <groupId>net.tiklab</groupId>
             <artifactId>tiklab-message-spring-boot-starter</artifactId>
             <exclusions>
                 <exclusion>
@@ -51,48 +50,47 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.tiklab</groupId>
+            <groupId>net.tiklab</groupId>
             <artifactId>tiklab-user-spring-boot-starter</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.tiklab</groupId>
+            <groupId>net.tiklab</groupId>
             <artifactId>tiklab-privilege-spring-boot-starter</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.tiklab</groupId>
+            <groupId>net.tiklab</groupId>
             <artifactId>tiklab-licence-spring-boot-starter</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.tiklab</groupId>
+            <groupId>net.tiklab</groupId>
             <artifactId>tiklab-plugin-spring-boot-starter</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.tiklab</groupId>
+            <groupId>net.tiklab</groupId>
             <artifactId>tiklab-toolkit-spring-boot-starter</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.tiklab</groupId>
+            <groupId>net.tiklab</groupId>
             <artifactId>tiklab-gateway-spring-boot-starter</artifactId>
             <version>${project.version}</version>
         </dependency>
 
         <dependency>
-            <groupId>com.tiklab</groupId>
+            <groupId>net.tiklab</groupId>
             <artifactId>tiklab-rpc-spring-boot-starter</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.tiklab</groupId>
+            <groupId>net.tiklab</groupId>
             <artifactId>tiklab-eas-embbed-spring-boot-starter</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>
-
 
     <build>
         <plugins>

@@ -8,7 +8,7 @@ INSERT INTO matflow_configure VALUES ('ba67e442d1c1deefc2a74826101598aa', '67966
 
 INSERT INTO matflow_code VALUES ('76806330a7f7157828ddb12c44c17019', 1, 'https://gitee.com/zcamy/doublekit.git', 'https://gitee.com/zcamy/doublekit.git', NULL, 'a8cc49221d618151939f2162f3cbeecb', 1, NULL);
 
-INSERT INTO matflow_structure VALUES ('9b420a082fc51e79792edaea928dd1b7', 21, '/', 'mvn clean package', 2, '构建');
+INSERT INTO matflow_build VALUES ('9b420a082fc51e79792edaea928dd1b7', 21, '/', 'mvn clean package', 2, '构建');
 
 INSERT INTO matflow_deploy VALUES ('41d705d8029d379a8a2330c315d9527f', 31, 0, 'doublekit-0.0.1-SNAPSHOT.jar', 'root', 0, '52e6d477df54ba80b939dc27b911cd16', 0, 3, '部署', '172.12.1.18', 22, '/', '', 'java -jar demo-0.0.1-SNAPSHOT.jar');
 
