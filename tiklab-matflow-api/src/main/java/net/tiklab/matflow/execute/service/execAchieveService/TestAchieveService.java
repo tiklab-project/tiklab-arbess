@@ -9,5 +9,5 @@ public interface TestAchieveService {
      * @param matFlowProcess 配置信息
      * @return 执行状态
      */
-    int test(MatFlowProcess matFlowProcess);
+    String test(MatFlowProcess matFlowProcess);
 }

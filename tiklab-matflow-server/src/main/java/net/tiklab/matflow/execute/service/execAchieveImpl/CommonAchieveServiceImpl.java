@@ -90,7 +90,7 @@ public class CommonAchieveServiceImpl implements CommonAchieveService {
                 logRunLog.append(s).append("\n");
                 matFlowExecHistory.setRunLog(matFlowExecHistory.getRunLog()+s+"\n");
                 matFlowExecHistoryList.add(matFlowExecHistory);
-                if (logRunLog.toString().contains("BUILD FAILURE")) {
+                if (logRunLog.toString().contains("BUILD FAILURE")||logRunLog.toString().contains("ERROR")) {
                     inputStreamReader.close();
                     bufferedReader.close();
                     return 0;
@@ -123,7 +123,7 @@ public class CommonAchieveServiceImpl implements CommonAchieveService {
 
         if (getSystemType()==1){
             //执行命令
-            process = runtime.exec("cmd.exe /c cd " + path + " &&" + " " + order);
+            process = runtime.exec(" cmd.exe /c cd " + path + " &&" + " " + order);
         }else {
             //执行命令
             String[] cmd = new String[] { "/bin/sh", "-c", "cd "+path+";"+" source /etc/profile;"+ order };
@@ -151,11 +151,12 @@ public class CommonAchieveServiceImpl implements CommonAchieveService {
     /**
      * 更新状态
      * @param matFlowProcess 执行信息
-     * @param e 异常
+     * @param b 异常
      * @param matFlowExecHistoryList 状态集合
      */
     @Override
-    public  void updateState(MatFlowProcess matFlowProcess, String e, List<MatFlowExecHistory> matFlowExecHistoryList){
+    //public  void updateState(MatFlowProcess matFlowProcess, String e, List<MatFlowExecHistory> matFlowExecHistoryList){
+    public  void updateState(MatFlowProcess matFlowProcess, boolean b, List<MatFlowExecHistory> matFlowExecHistoryList){
         MatFlowExecLog matFlowExecLog = matFlowProcess.getMatFlowExecLog();
         MatFlowExecHistory matFlowExecHistory = matFlowProcess.getMatFlowExecHistory();
         matFlowExecLog.setRunState(10);
@@ -163,12 +164,8 @@ public class CommonAchieveServiceImpl implements CommonAchieveService {
         matFlowExecLog.setHistoryId(matFlowExecHistory.getHistoryId());
         matFlowExecHistoryService.updateHistory(matFlowExecHistory);
         matFlowExecHistoryList.add(matFlowExecHistory);
-        if (e != null){
-            matFlowExecLog.setRunLog(matFlowExecLog.getRunLog() +"\n"+e);
+        if (!b){
             matFlowExecLog.setRunState(1);
-            matFlowExecLogService.updateLog(matFlowExecLog);
-            error(matFlowExecHistory,e, oneMatFlow.getMatflowId(), matFlowExecHistoryList);
-            return;
         }
         matFlowExecLogService.updateLog(matFlowExecLog);
     }
@@ -287,12 +284,12 @@ public class CommonAchieveServiceImpl implements CommonAchieveService {
      * @return 配置信息
      */
     @Override
-    public String getPath(int type){
+    public String getScm(int type){
         MatFlowScm matFlowScm = matFlowScmService.findOneMatFlowScm(type);
         if (matFlowScm == null){
             return null;
         }
-        return matFlowScm.getPathAddress();
+        return matFlowScm.getScmAddress();
     }
 
 }

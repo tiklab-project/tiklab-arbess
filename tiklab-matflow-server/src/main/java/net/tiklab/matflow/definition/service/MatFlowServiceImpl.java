@@ -1,8 +1,5 @@
 package net.tiklab.matflow.definition.service;
 
-
-
-
 import net.tiklab.beans.BeanMapper;
 import net.tiklab.join.JoinTemplate;
 import net.tiklab.matflow.definition.dao.MatFlowDao;
@@ -11,6 +8,7 @@ import net.tiklab.matflow.definition.model.MatFlow;
 import net.tiklab.matflow.definition.model.MatFlowConfigure;
 import net.tiklab.matflow.definition.model.MatFlowStatus;
 import net.tiklab.matflow.execute.model.MatFlowExecHistory;
+import net.tiklab.matflow.orther.service.MatFlowActivityLogService;
 import net.tiklab.matflow.orther.service.MatFlowActivityService;
 import net.tiklab.matflow.execute.service.MatFlowExecHistoryService;
 import net.tiklab.matflow.orther.service.MatFlowOpenService;
@@ -23,12 +21,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.io.File;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * MatFlowServiceImpl
@@ -60,6 +55,9 @@ public class MatFlowServiceImpl implements MatFlowService {
     MatFlowCommonService matFlowCommonService;
 
     @Autowired
+    MatFlowActivityLogService matFlowActivityLogService;
+
+    @Autowired
     JoinTemplate joinTemplate;
 
 
@@ -77,6 +75,11 @@ public class MatFlowServiceImpl implements MatFlowService {
                 return null;
             }
         }
+
+        Map<String, String> map = new HashMap<>();
+        map.put("massage", "创建了流水线"+ matFlow.getMatflowName());
+
+        matFlowActivityLogService.log("create", "matflow",map);
         matFlowActivityService.createActive(matFlow.getUser().getId(), matFlow,"创建了流水线"+ matFlow.getMatflowName());
         String matFlowId = matFlowDao.createMatFlow(matFlowEntity);
         DmUser dmUser = new DmUser();

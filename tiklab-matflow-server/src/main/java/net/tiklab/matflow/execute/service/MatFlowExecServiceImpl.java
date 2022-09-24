@@ -1,17 +1,14 @@
 package net.tiklab.matflow.execute.service;
 
 
-
 import net.tiklab.matflow.definition.model.MatFlow;
 import net.tiklab.matflow.definition.model.MatFlowConfigure;
 import net.tiklab.matflow.definition.service.MatFlowService;
 import net.tiklab.matflow.execute.model.MatFlowExecHistory;
 import net.tiklab.matflow.execute.model.MatFlowExecLog;
-import net.tiklab.matflow.execute.service.MatFlowExecHistoryService;
-import net.tiklab.matflow.execute.service.MatFlowExecService;
 import net.tiklab.matflow.orther.model.MatFlowProcess;
 import net.tiklab.matflow.orther.service.MatFlowActivityService;
-import net.tiklab.matflow.orther.service.MatFlowTaskExecService;
+import net.tiklab.matflow.execute.service.execAchieveService.MatFlowTaskExecService;
 import net.tiklab.rpc.annotation.Exporter;
 import net.tiklab.matflow.execute.service.execAchieveImpl.CommonAchieveServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -174,9 +171,10 @@ public class MatFlowExecServiceImpl implements MatFlowExecService {
                 matFlowProcess.setMatFlowExecHistory(matFlowExecHistory);
                 matFlowProcess.setMatFlowConfigure(matFlowConfigure);
                 matFlowExecHistoryList.add(matFlowExecHistory);
-                int state = matFlowTaskExecService.beginState(matFlowProcess, matFlowConfigure.getTaskType());
-                if (state == 0){
+                String state = matFlowTaskExecService.beginState(matFlowProcess, matFlowConfigure.getTaskType());
+                if (state != null){
                     matFlow.setMatflowState(0);
+                    commonAchieveServiceImpl.error(matFlowExecHistory, state, matFlow.getMatflowId(), matFlowExecHistoryList);
                     matFlowService.updateMatFlow(matFlow);
                     time[0]=1;time[1]=0;time[2]=0;time[3]=0;
                     return;

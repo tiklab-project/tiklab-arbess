@@ -9,5 +9,5 @@ public interface CodeAchieveService {
      * @param matFlowProcess 执行信息
      * @return 执行状态
      */
-    int clone(MatFlowProcess matFlowProcess);
+    String clone(MatFlowProcess matFlowProcess);
 }

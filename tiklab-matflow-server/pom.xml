@@ -52,6 +52,12 @@
             <version>0.1.55</version>
         </dependency>
 
+        <dependency>
+            <groupId>net.tiklab</groupId>
+            <artifactId>tiklab-oplog-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
 
 
     </dependencies>

@@ -14,12 +14,7 @@
     <dependencies>
         <dependency>
             <groupId>net.tiklab</groupId>
-            <artifactId>tiklab-beans-spring-boot-starter</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>net.tiklab</groupId>
-            <artifactId>tiklab-join-spring-boot-starter</artifactId>
+            <artifactId>tiklab-tks-spring-boot-starter</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -88,6 +83,36 @@
         <dependency>
             <groupId>net.tiklab</groupId>
             <artifactId>tiklab-eas-embbed-spring-boot-starter</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>net.tiklab</groupId>
+            <artifactId>tiklab-dss-spring-boot-starter</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>net.tiklab</groupId>
+            <artifactId>tiklab-dfs-spring-boot-starter</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>net.tiklab</groupId>
+            <artifactId>tiklab-dcs-spring-boot-starter</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>net.tiklab</groupId>
+            <artifactId>tiklab-oplog-spring-boot-starter</artifactId>
+         <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>net.tiklab</groupId>
+            <artifactId>tiklab-update-starter</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>net.tiklab</groupId>
+            <artifactId>tiklab-todotask-spring-boot-stater</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

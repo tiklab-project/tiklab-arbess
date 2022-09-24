@@ -4,11 +4,6 @@ DIRS=$(dirname "$PWD")
 
 APP_MAIN="net.tiklab.matflow.MatFlowDistributionApplication"
 
-if [ -e "${DIRS}/temp" ]; then
-      mv "${DIRS}"/temp/* ${DIRS}
-      rm -rf "${DIRS}"/temp
-fi
-
 JDK_VERSION=jdk-16.0.2
 #判断是否自定义jdk
 JAVA_HOME="/usr/local/${JDK_VERSION}"

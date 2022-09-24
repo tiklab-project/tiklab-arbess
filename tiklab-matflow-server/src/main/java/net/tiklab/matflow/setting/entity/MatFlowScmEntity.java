@@ -10,50 +10,50 @@ public class MatFlowScmEntity {
     //凭证id
     @Id
     @GeneratorValue
-    @Column(name = "path_id")
-    private String pathId;
+    @Column(name = "scm_id")
+    private String scmId;
 
     //1.git 2.svn 11.node 12.maven
-    @Column(name = "path_type")
-    private int pathType;
+    @Column(name = "scm_type")
+    private int scmType;
 
     //名称
-    @Column(name = "path_name")
-    private String pathName;
+    @Column(name = "scm_name")
+    private String scmName;
 
     //地址
-    @Column(name = "path_address")
-    private String pathAddress;
+    @Column(name = "scm_address")
+    private String scmAddress;
 
-    public String getPathId() {
-        return pathId;
+    public String getScmId() {
+        return scmId;
     }
 
-    public void setPathId(String pathId) {
-        this.pathId = pathId;
+    public void setScmId(String scmId) {
+        this.scmId = scmId;
     }
 
-    public int getPathType() {
-        return pathType;
+    public int getScmType() {
+        return scmType;
     }
 
-    public void setPathType(int pathType) {
-        this.pathType = pathType;
+    public void setScmType(int scmType) {
+        this.scmType = scmType;
     }
 
-    public String getPathName() {
-        return pathName;
+    public String getScmName() {
+        return scmName;
     }
 
-    public void setPathName(String pathName) {
-        this.pathName = pathName;
+    public void setScmName(String scmName) {
+        this.scmName = scmName;
     }
 
-    public String getPathAddress() {
-        return pathAddress;
+    public String getScmAddress() {
+        return scmAddress;
     }
 
-    public void setPathAddress(String pathAddress) {
-        this.pathAddress = pathAddress;
+    public void setScmAddress(String scmAddress) {
+        this.scmAddress = scmAddress;
     }
 }

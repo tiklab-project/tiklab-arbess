@@ -32,7 +32,7 @@ public class MatFlowScmServiceImpl implements MatFlowScmService {
     //更新
     @Override
     public void updateMatFlowScm(MatFlowScm matFlowScm) {
-        if (matFlowScm.getPathId()==null || findOneMatFlowScm(matFlowScm.getPathId())==null){
+        if (matFlowScm.getScmId()==null || findOneMatFlowScm(matFlowScm.getScmId())==null){
             createMatFlowScm(matFlowScm);
             return;
         }
@@ -66,7 +66,7 @@ public class MatFlowScmServiceImpl implements MatFlowScmService {
         }
 
         for (MatFlowScm matFlowScm : allMatFlowScm) {
-            if (type != matFlowScm.getPathType()){
+            if (type != matFlowScm.getScmType()){
                 continue;
             }
             return matFlowScm;

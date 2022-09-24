@@ -16,7 +16,7 @@ server:
 
 jdbc:
   driverClassName: com.mysql.cj.jdbc.Driver
-  url: jdbc:mysql://localhost:3333/tiklab_matflow?characterEncoding=utf8&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+  url: jdbc:mysql://172.10.1.10:3306/tiklab_matflow?characterEncoding=utf8&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
   username: root
   password: darth2020
 
@@ -67,8 +67,8 @@ eas:
 #enable mysql config
 mysql:
   embbed:
-    enable: true
-  local: true
+    enable: false
+  local: false
   server:
     port: 3333
   username: root

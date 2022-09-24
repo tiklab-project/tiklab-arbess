@@ -25,9 +25,16 @@
 			<outputDirectory>/conf</outputDirectory>
 		</fileSet>
 		<fileSet>
-			<directory>${basedir}/src/main/resources</directory>
+			<directory>${basedir}</directory>
 			<includes>
 				<include>Dockerfile</include>
+			</includes>
+			<outputDirectory>/</outputDirectory>
+		</fileSet>
+		<fileSet>
+			<directory>${basedir}</directory>
+			<includes>
+				<include>version</include>
 			</includes>
 			<outputDirectory>/</outputDirectory>
 		</fileSet>

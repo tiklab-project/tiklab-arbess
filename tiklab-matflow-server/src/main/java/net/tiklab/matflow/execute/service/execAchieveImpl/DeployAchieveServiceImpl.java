@@ -1,5 +1,6 @@
 package net.tiklab.matflow.execute.service.execAchieveImpl;
 
+import com.jcraft.jsch.*;
 import net.tiklab.core.exception.ApplicationException;
 import net.tiklab.matflow.definition.model.MatFlowConfigure;
 import net.tiklab.matflow.definition.service.MatFlowCommonService;
@@ -45,7 +46,7 @@ public class DeployAchieveServiceImpl implements DeployAchieveService {
      * @param matFlowProcess 配置信息
      * @return 状态
      */
-    public int deploy(MatFlowProcess matFlowProcess) {
+    public String deploy(MatFlowProcess matFlowProcess) {
         //开始运行时间
         long beginTime = new Timestamp(System.currentTimeMillis()).getTime();
 
@@ -60,29 +61,28 @@ public class DeployAchieveServiceImpl implements DeployAchieveService {
         matFlowProcess.setProof(proof);
         matFlowProcess.setMatFlowDeploy(matFlowDeploy);
 
+
         if (proof == null){
             commonAchieveService.updateTime(matFlowProcess,beginTime);
-            commonAchieveService.updateState(matFlowProcess,"凭证为空。", matFlowExecHistoryList);
-            return 0;
+            commonAchieveService.updateState(matFlowProcess,false, matFlowExecHistoryList);
+            return "凭证为空。";
         }
 
         String filePath = matFlowCommonService.getFile(matFlowConfigure.getMatFlow().getMatflowName(), matFlowDeploy.getSourceAddress());
         
         if (filePath == null){
-            commonAchieveService.updateState(matFlowProcess,"部署文件找不到。", matFlowExecHistoryList);
-            return 0;
+            commonAchieveService.updateTime(matFlowProcess,beginTime);
+            commonAchieveService.updateState(matFlowProcess,true, matFlowExecHistoryList);
+            return "部署文件找不到。";
         }
+
         //文件名
         String fileName = new File(filePath).getName();
 
         //发送文件位置
         String deployAddress ="/"+ matFlowDeploy.getDeployAddress();
 
-        if (matFlowExecHistory.getRunLog() == null){
-            matFlowExecHistory.setRunLog("");
-        }
-
-        return 1;
+        return null;
     }
 
     /**
@@ -90,12 +90,14 @@ public class DeployAchieveServiceImpl implements DeployAchieveService {
      * @param matFlowProcess 配置信息
      * @param matFlowExecHistoryList 状态集合
      */
-    private void linux(MatFlowProcess matFlowProcess, List<MatFlowExecHistory> matFlowExecHistoryList){
+    private void linux(MatFlowProcess matFlowProcess, List<MatFlowExecHistory> matFlowExecHistoryList) throws JSchException, IOException {
         MatFlowDeploy matFlowDeploy = matFlowProcess.getMatFlowDeploy();
+
+        Session session = createSession(matFlowProcess);
 
         //选择自定义部署
         if (matFlowDeploy.getDeployType() == 1){
-           //sshOrder(session, matFlowDeploy.getStartShell(), matFlowProcess, matFlowExecHistoryList);
+           sshOrder(session,matFlowDeploy.getStartShell(),matFlowProcess,matFlowExecHistoryList);
            return;
         }
 
@@ -109,89 +111,136 @@ public class DeployAchieveServiceImpl implements DeployAchieveService {
 
         //部署文件命令启动文件地址都为null的时候
         String order = "cd "+" "+ deployAddress +";"+ matFlowDeploy.getStartShell();
-        //if ((startOrder == null || startOrder.equals("")) && (startAddress == null || startAddress.equals("")) ){
-        //    if (matFlowDeploy.getStartShell() == null || matFlowDeploy.getStartShell().equals("") ){
-        //        return;
-        //    }
-        //    commonAchieveService.process(gitAddress, order);
-        //    return;
-        //}
-        //String orders = "cd "+" "+ deployAddress + "/" + startAddress+";" + matFlowDeploy.getStartShell();
-        //if (startAddress != null && !startAddress.equals("")){
-        //    if (startOrder == null ||startOrder.equals("")){
-        //        sshOrder(session, orders, matFlowProcess, matFlowExecHistoryList);
-        //        return;
-        //    }
-        //    startOrder = "cd "+" "+ deployAddress +";"+startOrder;
-        //    sshOrder(session, startOrder, matFlowProcess, matFlowExecHistoryList);
-        //    sshOrder(session, orders, matFlowProcess, matFlowExecHistoryList);
-        //}else {
-        //    sshOrder(session, order, matFlowProcess, matFlowExecHistoryList);
-        //}
+        if ((startOrder == null || startOrder.equals("")) && (startAddress == null || startAddress.equals("")) ){
+            if (matFlowDeploy.getStartShell() == null || matFlowDeploy.getStartShell().equals("") ){
+                return;
+            }
+            sshOrder(session,order, matFlowProcess, matFlowExecHistoryList);
+            return;
+        }
+        String orders = "cd "+" "+ deployAddress + "/" + startAddress+";" + matFlowDeploy.getStartShell();
+        if (startAddress != null && !startAddress.equals("")){
+            if (startOrder == null ||startOrder.equals("")){
+                sshOrder(session,orders, matFlowProcess, matFlowExecHistoryList);
+                return;
+            }
+            startOrder = "cd "+" "+ deployAddress +";"+startOrder;
+            sshOrder( session,startOrder, matFlowProcess, matFlowExecHistoryList);
+            sshOrder(session,orders, matFlowProcess, matFlowExecHistoryList);
+        }else {
+            sshOrder(session,order, matFlowProcess, matFlowExecHistoryList);
+        }
     }
 
     /**
-     * docker部署
+     * 连接服务器执行命令
+     * @param orders 命令
      * @param matFlowProcess 配置信息
-     * @param matFlowExecHistoryList 状态集合
+     * @param matFlowExecHistoryList 执行历史
+     * @throws JSchException 连接错误
+     * @throws IOException 读取执行信息失败
      */
-    private void docker( MatFlowProcess matFlowProcess, List<MatFlowExecHistory> matFlowExecHistoryList){
-        //MatFlowDeploy matFlowDeploy = matFlowProcess.getMatFlowDeploy();
-        //
-        ////选择自定义部署
-        //if (matFlowDeploy.getDeployType() == 1){
-        //    sshOrder(session, matFlowDeploy.getStartShell(), matFlowProcess, matFlowExecHistoryList);
-        //    return;
-        //}
-        //
-        //String matFlowName = matFlowProcess.getMatFlowConfigure().getMatFlow().getMatflowName();
-        ////部署位置
-        //String deployAddress = "/"+  matFlowDeploy.getDeployAddress();
-        ////部署文件命令
-        //String  deployOrder= matFlowDeploy.getDeployOrder();
-        ////启动文件地址
-        //String startAddress = matFlowDeploy.getStartAddress();
-        //
-        //
-        //String order = "docker stop $(docker ps -a | grep '"+matFlowName+"' | awk '{print $1 }');"
-        //        +"docker rm $(docker ps -a | grep '"+matFlowName+"' | awk '{print $1 }');"
-        //        +"docker image rm"+" "+matFlowName+";";
-        //
-        //if ((deployOrder == null || deployOrder.equals("")) && (startAddress == null || startAddress.equals("/")) ){
-        //
-        //     order = order +"cd"+" "+deployAddress+";"+"docker image build -t"+" "+matFlowName+"  .;"
-        //            +"docker run -itd -p"+" "+ matFlowDeploy.getMappingPort()+":"+ matFlowDeploy.getStartPort()+" "+matFlowName;
-        //    sshOrder(session, order, matFlowProcess, matFlowExecHistoryList);
-        //    return;
-        //}
-        //if (deployOrder != null && !deployOrder.equals("") ) {
-        //    deployOrder = "cd "+" "+ deployAddress +";"+deployOrder;
-        //    sshOrder(session, deployOrder, matFlowProcess, matFlowExecHistoryList);
-        //    if (startAddress == null || startAddress.equals("/")) {
-        //
-        //        order = order + "cd" + " " + deployAddress + ";" + "docker image build -t" + " " + matFlowName + "  .;"
-        //                + "docker run -itd -p" + " " + matFlowDeploy.getMappingPort() + ":" + matFlowDeploy.getStartPort() + " " + matFlowName;
-        //        sshOrder(session, order, matFlowProcess, matFlowExecHistoryList);
-        //        return;
-        //    }
-        //}
-        //
-        //order = order +"cd"+" "+deployAddress+"/"+startAddress+";"+"docker image build -t"+" "+matFlowName+"  .;"
-        //        +"docker run -itd -p"+" "+ matFlowDeploy.getMappingPort()+":"+ matFlowDeploy.getStartPort()+" "+matFlowName;
-        //sshOrder(session, order, matFlowProcess, matFlowExecHistoryList);
+    private void sshOrder(Session session,String orders,MatFlowProcess matFlowProcess,List<MatFlowExecHistory> matFlowExecHistoryList) throws JSchException, IOException {
+
+        ChannelExec exec = (ChannelExec) session.openChannel("exec");
+
+        exec.setCommand(orders);
+
+        commonAchieveService.log(exec.getInputStream(), matFlowProcess, matFlowExecHistoryList);
+
+        exec.disconnect();
+        session.disconnect();
     }
 
-    private String getBuildOrder(Proof proof){
-        int systemType = commonAchieveService.getSystemType();
-        if (systemType==1){
-            logger.info("部署Windows未开放");
-        }else {
-            return null;
+    /**
+     * 创建连接实例
+     * @param matFlowProcess 连接配置信息
+     * @return 实例
+     * @throws JSchException 连接失败
+     */
+    private Session createSession(MatFlowProcess matFlowProcess) throws JSchException {
+        MatFlowDeploy matFlowDeploy = matFlowProcess.getMatFlowDeploy();
+        String sshIp = matFlowDeploy.getSshIp();
+        int sshPort = matFlowDeploy.getSshPort();
+
+        Proof proof = matFlowDeploy.getProof();
+        String proofUsername = proof.getProofUsername();
+        String proofPassword = proof.getProofPassword();
+
+        JSch jsch = new JSch();
+
+        Session session = jsch.getSession(proofPassword, sshIp, sshPort);
+        session.setPassword(proofUsername);
+        session.setConfig("StrictHostKeyChecking", "no");
+        session.connect();
+        return session;
+    }
+
+    /**
+     * 发送文件
+     * @param session 连接实例
+     * @param file 文件
+     * @throws JSchException 连接失败
+     * @throws IOException 日志异常
+     */
+    private void ftp(Session session,String file) throws JSchException, IOException {
+
+        ChannelSftp sftp = (ChannelSftp) session.openChannel("sftp");
+
+
+
+    }
+
+        /**
+         * docker部署
+         * @param matFlowProcess 配置信息
+         * @param matFlowExecHistoryList 状态集合
+         */
+    private void docker(Session session, MatFlowProcess matFlowProcess, List<MatFlowExecHistory> matFlowExecHistoryList) throws JSchException, IOException {
+        MatFlowDeploy matFlowDeploy = matFlowProcess.getMatFlowDeploy();
+
+        //选择自定义部署
+        if (matFlowDeploy.getDeployType() == 1){
+            sshOrder(session, matFlowDeploy.getStartShell(), matFlowProcess, matFlowExecHistoryList);
+            return;
         }
-        return null;
+
+        String matFlowName = matFlowProcess.getMatFlowConfigure().getMatFlow().getMatflowName();
+        //部署位置
+        String deployAddress = "/"+  matFlowDeploy.getDeployAddress();
+        //部署文件命令
+        String  deployOrder= matFlowDeploy.getDeployOrder();
+        //启动文件地址
+        String startAddress = matFlowDeploy.getStartAddress();
+
+
+        String order = "docker stop $(docker ps -a | grep '"+matFlowName+"' | awk '{print $1 }');"
+                +"docker rm $(docker ps -a | grep '"+matFlowName+"' | awk '{print $1 }');"
+                +"docker image rm"+" "+matFlowName+";";
+
+        if ((deployOrder == null || deployOrder.equals("")) && (startAddress == null || startAddress.equals("/")) ){
+
+             order = order +"cd"+" "+deployAddress+";"+"docker image build -t"+" "+matFlowName+"  .;"
+                    +"docker run -itd -p"+" "+ matFlowDeploy.getMappingPort()+":"+ matFlowDeploy.getStartPort()+" "+matFlowName;
+            sshOrder(session,order, matFlowProcess, matFlowExecHistoryList);
+            return;
+        }
+        if (deployOrder != null && !deployOrder.equals("") ) {
+            deployOrder = "cd "+" "+ deployAddress +";"+deployOrder;
+            sshOrder(session,deployOrder, matFlowProcess, matFlowExecHistoryList);
+            if (startAddress == null || startAddress.equals("/")) {
+
+                order = order + "cd" + " " + deployAddress + ";" + "docker image build -t" + " " + matFlowName + "  .;"
+                        + "docker run -itd -p" + " " + matFlowDeploy.getMappingPort() + ":" + matFlowDeploy.getStartPort() + " " + matFlowName;
+                sshOrder(session, order, matFlowProcess, matFlowExecHistoryList);
+                return;
+            }
+        }
+
+        order = order +"cd"+" "+deployAddress+"/"+startAddress+";"+"docker image build -t"+" "+matFlowName+"  .;"
+                +"docker run -itd -p"+" "+ matFlowDeploy.getMappingPort()+":"+ matFlowDeploy.getStartPort()+" "+matFlowName;
+        sshOrder(session, order, matFlowProcess, matFlowExecHistoryList);
     }
-
-
 
     /**
      * 初始化Docker镜像

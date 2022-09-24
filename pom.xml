@@ -38,9 +38,7 @@
         <developerConnection>https://gitee.com/zhangzh1978_admin/tiklab_matflow</developerConnection>
     </scm>
 
-
     <profiles>
-
         <profile>
             <id>deploy-local</id>
             <activation>
@@ -131,26 +129,6 @@
         </profile>
 
     </profiles>
-
-
-   <dependencies>
-       <dependency>
-           <groupId>net.tiklab</groupId>
-           <artifactId>tiklab-dss-spring-boot-starter</artifactId>
-           <version>${project.version}</version>
-       </dependency>
-       <dependency>
-           <groupId>net.tiklab</groupId>
-           <artifactId>tiklab-dfs-spring-boot-starter</artifactId>
-           <version>${project.version}</version>
-       </dependency>
-       <dependency>
-           <groupId>net.tiklab</groupId>
-           <artifactId>tiklab-dcs-spring-boot-starter</artifactId>
-           <version>${project.version}</version>
-       </dependency>
-   </dependencies>
-
 
 
     <build>

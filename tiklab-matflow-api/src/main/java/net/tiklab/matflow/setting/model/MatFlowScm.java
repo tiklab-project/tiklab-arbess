@@ -12,47 +12,47 @@ import net.tiklab.postin.annotation.ApiProperty;
 @Mapper(targetAlias = "MatFlowScmEntity")
 public class MatFlowScm {
 
-    @ApiProperty(name = "pathId",desc = "id")
-    private String pathId;
+    @ApiProperty(name = "scmId",desc = "id")
+    private String scmId;
 
-    @ApiProperty(name = "pathType",desc = "类型")
-    private int pathType;
+    @ApiProperty(name = "scmType",desc = "类型")
+    private int scmType;
 
-    @ApiProperty(name = "pathName",desc = "名称")
-    private String pathName;
+    @ApiProperty(name = "scmName",desc = "名称")
+    private String scmName;
 
-    @ApiProperty(name = "pathAddress",desc = "地址")
-    private String pathAddress;
+    @ApiProperty(name = "scmAddress",desc = "地址")
+    private String scmAddress;
 
-    public String getPathId() {
-        return pathId;
+    public String getScmId() {
+        return scmId;
     }
 
-    public void setPathId(String pathId) {
-        this.pathId = pathId;
+    public void setScmId(String scmId) {
+        this.scmId = scmId;
     }
 
-    public int getPathType() {
-        return pathType;
+    public int getScmType() {
+        return scmType;
     }
 
-    public void setPathType(int pathType) {
-        this.pathType = pathType;
+    public void setScmType(int scmType) {
+        this.scmType = scmType;
     }
 
-    public String getPathName() {
-        return pathName;
+    public String getScmName() {
+        return scmName;
     }
 
-    public void setPathName(String pathName) {
-        this.pathName = pathName;
+    public void setScmName(String scmName) {
+        this.scmName = scmName;
     }
 
-    public String getPathAddress() {
-        return pathAddress;
+    public String getScmAddress() {
+        return scmAddress;
     }
 
-    public void setPathAddress(String pathAddress) {
-        this.pathAddress = pathAddress;
+    public void setScmAddress(String scmAddress) {
+        this.scmAddress = scmAddress;
     }
 }

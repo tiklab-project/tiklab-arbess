@@ -9,5 +9,5 @@ public interface DeployAchieveService {
      * @param matFlowProcess 部署信息
      * @return 部署状态
      */
-    int deploy(MatFlowProcess matFlowProcess);
+    String deploy(MatFlowProcess matFlowProcess);
 }

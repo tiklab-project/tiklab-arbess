@@ -18,7 +18,7 @@ import java.util.List;
 
 
 @RestController
-@RequestMapping("/path")
+@RequestMapping("/scm")
 @Api(name = "MatFlowScmController",desc = "系统信息")
 public class MatFlowScmController {
 

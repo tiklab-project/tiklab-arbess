@@ -32,7 +32,6 @@ public class MatFlowBuildEntity {
     @Column(name = "build_alias",notNull = true)
     private String buildAlias;
 
-
     public String getBuildId() {
         return buildId;
     }

@@ -14,12 +14,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>net.tiklab</groupId>
-			<artifactId>tiklab-beans-spring-boot-starter</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>net.tiklab</groupId>
-			<artifactId>tiklab-join-spring-boot-starter</artifactId>
+			<artifactId>tiklab-tks-spring-boot-starter</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
@@ -79,6 +74,7 @@
 			<artifactId>tiklab-gateway-spring-boot-starter</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+
 		<dependency>
 			<groupId>net.tiklab</groupId>
 			<artifactId>tiklab-rpc-spring-boot-starter</artifactId>
@@ -86,19 +82,43 @@
 		</dependency>
 		<dependency>
 			<groupId>net.tiklab</groupId>
-			<artifactId>tiklab-mysql-starter</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>net.tiklab</groupId>
-			<artifactId>tiklab-utils</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>net.tiklab</groupId>
 			<artifactId>tiklab-eas-embbed-spring-boot-starter</artifactId>
 			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>net.tiklab</groupId>
+			<artifactId>tiklab-dss-spring-boot-starter</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>net.tiklab</groupId>
+			<artifactId>tiklab-dfs-spring-boot-starter</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>net.tiklab</groupId>
+			<artifactId>tiklab-dcs-spring-boot-starter</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>net.tiklab</groupId>
+			<artifactId>tiklab-oplog-spring-boot-starter</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>net.tiklab</groupId>
+			<artifactId>tiklab-update-starter</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>net.tiklab</groupId>
+			<artifactId>tiklab-todotask-spring-boot-stater</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>net.tiklab</groupId>
+			<artifactId>tiklab-mysql-starter</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 
@@ -211,7 +231,7 @@
 						<configuration>
 							<descriptors>
 								<!--suppress UnresolvedMavenProperty -->
-								<descriptor>assembly/distribution-${profile.assembly.package.suffix}.xml</descriptor>
+								<descriptor>assembly/distribution.xml</descriptor>
 							</descriptors>
 							<finalName>tiklab-matflow</finalName>
 							<appendAssemblyId>false</appendAssemblyId>
@@ -262,14 +282,14 @@
 									<artifactId>tiklab-jdk-${systemType}</artifactId>
 									<version>${project.version}</version>
 									<type>zip</type>
-									<outputDirectory>temp</outputDirectory>
+									<outputDirectory>embbed</outputDirectory>
 								</artifactItem>
 								<artifactItem>
 									<groupId>net.tiklab</groupId>
 									<artifactId>tiklab-mysql-${systemType}</artifactId>
 									<version>${project.version}</version>
 									<type>zip</type>
-									<outputDirectory>temp</outputDirectory>
+									<outputDirectory>embbed</outputDirectory>
 								</artifactItem>
 							</artifactItems>
 						</configuration>

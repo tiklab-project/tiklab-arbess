@@ -47,10 +47,10 @@ public interface CommonAchieveService {
     /**
      * 更新状态
      * @param matFlowProcess 执行信息
-     * @param e 异常
+     * @param b 异常
      * @param matFlowExecHistoryList 状态集合
      */
-      void updateState(MatFlowProcess matFlowProcess, String e, List<MatFlowExecHistory> matFlowExecHistoryList);
+      void updateState(MatFlowProcess matFlowProcess, boolean b, List<MatFlowExecHistory> matFlowExecHistoryList);
 
     /**
      * 输出错误信息
@@ -94,6 +94,6 @@ public interface CommonAchieveService {
      * @param type 类型
      * @return 配置信息
      */
-    String getPath(int type);
+    String getScm(int type);
 
 }

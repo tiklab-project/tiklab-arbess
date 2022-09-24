@@ -9,5 +9,5 @@ public interface BuildAchieveService {
      * @param matFlowProcess 构建信息
      * @return 构建状态
      */
-    int build(MatFlowProcess matFlowProcess);
+    String build(MatFlowProcess matFlowProcess);
 }

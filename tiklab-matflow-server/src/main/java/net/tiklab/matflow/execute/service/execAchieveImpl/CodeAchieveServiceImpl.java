@@ -49,7 +49,7 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
     private static final Logger logger = LoggerFactory.getLogger(MatFlowCodeServiceImpl.class);
 
     // git克隆
-    public int clone(MatFlowProcess matFlowProcess){
+    public String clone(MatFlowProcess matFlowProcess){
         List<MatFlowExecHistory> matFlowExecHistoryList = MatFlowExecServiceImpl.matFlowExecHistoryList;
         //开始时间
         MatFlowExecHistory matFlowExecHistory = matFlowProcess.getMatFlowExecHistory();
@@ -66,7 +66,7 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
         MatFlowCode matFlowCode = matFlowCodeService.findOneCode(matFlowConfigure.getTaskId());
         //初始化日志
         MatFlowExecLog matFlowExecLog = commonAchieveService.initializeLog(matFlowExecHistory, matFlowConfigure);
-        //
+
         MatFlow matFlow = matFlowConfigure.getMatFlow();
         //代码保存路径
         String codeDir = matFlowCommonService.getFileAddress() + matFlowConfigure.getMatFlow().getMatflowName();
@@ -84,8 +84,8 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
         matFlowProcess.setMatFlowExecLog(matFlowExecLog);
         if (proof == null){
             commonAchieveService.updateTime(matFlowProcess,beginTime);
-            commonAchieveService.updateState(matFlowProcess,"凭证为空。", matFlowExecHistoryList);
-            return 0;
+            commonAchieveService.updateState(matFlowProcess,false, matFlowExecHistoryList);
+            return "凭证为空。";
         }
         //分支
         String codeBranch = matFlowCode.getCodeBranch();
@@ -100,20 +100,21 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
         matFlowExecHistoryList.add(matFlowExecHistory);
 
         try {
-             Process process = codeStart(proof, matFlowCode);
+             Process process = codeStart(proof, matFlowCode,matFlow.getMatflowName());
              commonAchieveService.log(process.getInputStream(), matFlowProcess, matFlowExecHistoryList);
+            commonAchieveService.updateState(matFlowProcess,false, matFlowExecHistoryList);
         } catch (IOException e) {
+            commonAchieveService.updateState(matFlowProcess,false, matFlowExecHistoryList);
             commonAchieveService.updateTime(matFlowProcess,beginTime);
-            commonAchieveService.error(matFlowExecHistory, "系统执行命令错误 \n" + e, matFlow.getMatflowId(),matFlowExecHistoryList);
-            throw new ApplicationException("系统执行命令错误 \n" + e);
+            return "系统执行命令错误 \n" + e;
         }catch (URISyntaxException e){
             commonAchieveService.updateTime(matFlowProcess,beginTime);
-            commonAchieveService.error(matFlowExecHistory, "git地址错误 \n" + e, matFlow.getMatflowId(),matFlowExecHistoryList);
-            throw new ApplicationException("git地址错误 \n" + e);
+            commonAchieveService.updateState(matFlowProcess,false, matFlowExecHistoryList);
+            return "git地址错误 \n" + e;
         }catch (ApplicationException e){
             commonAchieveService.updateTime(matFlowProcess,beginTime);
-            commonAchieveService.error(matFlowExecHistory, "不存在配置 \n" + e, matFlow.getMatflowId(),matFlowExecHistoryList);
-            throw new ApplicationException(e);
+            commonAchieveService.updateState(matFlowProcess,false, matFlowExecHistoryList);
+            return "" + e;
         }
 
         //更新状态
@@ -121,8 +122,8 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
         matFlowExecHistory.setRunLog(matFlowExecHistory.getRunLog()+"\n"+ "代码拉取成功" +"\n");
         matFlowExecHistoryList.add(matFlowExecHistory);
         commonAchieveService.updateTime(matFlowProcess,beginTime);
-        commonAchieveService.updateState(matFlowProcess,null, matFlowExecHistoryList);
-        return 1;
+        commonAchieveService.updateState(matFlowProcess,true, matFlowExecHistoryList);
+        return null;
     }
 
     /**
@@ -134,40 +135,43 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
      * @throws URISyntaxException git地址错误
      * @throws ApplicationException 不存在配置
      */
-    private Process codeStart(Proof proof, MatFlowCode matFlowCode) throws IOException, URISyntaxException ,ApplicationException{
+    private Process codeStart(Proof proof, MatFlowCode matFlowCode,String matFlowName) throws IOException, URISyntaxException ,ApplicationException{
         if (matFlowCode == null){
             return null;
         }
-        //git server地址
-        String gitAddress = commonAchieveService.getPath(1);
-        if (gitAddress== null){
-            throw new ApplicationException("不存在Git配置");
-        }
-        //svn server地址
-        String svnAddress = commonAchieveService.getPath(5);
-        if (svnAddress== null){
-            throw new ApplicationException("不存在Svn配置");
-        }
+
         //系统类型
         int systemType = commonAchieveService.getSystemType();
         //源码存放位置
-        String fileAddress = matFlowCommonService.getFileAddress();
+        String fileAddress = matFlowCommonService.getFileAddress()+matFlowName;
 
-        switch (matFlowCode.getType()){
-            case 1,2,3,4 :
-                if (proof.getProofType().equals("SSH")){
+        switch (matFlowCode.getType()) {
+            case 1, 2, 3, 4 -> {
+                //git server地址
+                String gitAddress = commonAchieveService.getScm(1);
+                if (gitAddress == null) {
+                    throw new ApplicationException("不存在Git配置");
+                }
+                if (proof.getProofType().equals("SSH")) {
                     return null;
-                }else {
+                } else {
                     String gitOrder = gitOrder(matFlowCode, fileAddress, systemType);
                     return commonAchieveService.process(gitAddress, gitOrder);
                 }
-            case 5:
-                if (proof.getProofType().equals("SSH")){
+            }
+            case 5 -> {
+                //svn server地址
+                String svnAddress = commonAchieveService.getScm(5);
+                if (svnAddress == null) {
+                    throw new ApplicationException("不存在Svn配置");
+                }
+                if (proof.getProofType().equals("SSH")) {
                     return null;
-                }else {
+                } else {
                     String gitOrder = svnOrder(matFlowCode, fileAddress, systemType);
                     return commonAchieveService.process(svnAddress, gitOrder);
                 }
+            }
         }
         return null;
     }
@@ -211,9 +215,10 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
         }
 
         //根据不同系统更新命令
-        order="./git clone"+" " + order;
         if (systemType == 1){
             order=".\\git.exe clone"+" " + order;
+        }else {
+            order="./git clone"+" " + order;
         }
         return order;
     }
