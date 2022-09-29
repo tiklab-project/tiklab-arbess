@@ -1,4 +1,3 @@
-
 app:
   name: tiklab-matflow
 
@@ -8,8 +7,6 @@ application: matFlow
 spring:
   config:
     import: optional:/usr/local/apps/conf/matFlow/application.yaml
-  jmx:
-    default-domain: tiklab-matflow
 
 server:
   port: 8091
@@ -22,6 +19,7 @@ jdbc:
 
 #plugin config
 PROJECT_HOME: ${user.home}/matflow/${app.name}
+
 plugin:
   path: ${PROJECT_HOME}/plugin
 
@@ -60,20 +58,19 @@ dss:
 
 datapath: ${PROJECT_HOME}/caches
 
+#eas config
 eas:
   embbed:
     enable: true
 
-#enable mysql config
+
+#mysql config
 mysql:
   embbed:
     enable: false
-  local: false
   server:
-    port: 3333
-  username: root
-  password: darth2020
-  database : tiklab_matflow
+    port: 3001
+  database: tiklab_matflow
 
 #homes
 homes:

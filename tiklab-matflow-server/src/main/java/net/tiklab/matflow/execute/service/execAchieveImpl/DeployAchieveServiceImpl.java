@@ -50,17 +50,20 @@ public class DeployAchieveServiceImpl implements DeployAchieveService {
         //开始运行时间
         long beginTime = new Timestamp(System.currentTimeMillis()).getTime();
 
+        List<MatFlowExecHistory> matFlowExecHistoryList = MatFlowExecServiceImpl.matFlowExecHistoryList;
+
         MatFlowExecHistory matFlowExecHistory = matFlowProcess.getMatFlowExecHistory();
         MatFlowConfigure matFlowConfigure = matFlowProcess.getMatFlowConfigure();
 
         MatFlowExecLog matFlowExecLog = commonAchieveService.initializeLog(matFlowExecHistory, matFlowConfigure);
+
         MatFlowDeploy matFlowDeploy = matFlowDeployService.findOneDeploy(matFlowConfigure.getTaskId());
+
         Proof proof = matFlowDeploy.getProof();
-        List<MatFlowExecHistory> matFlowExecHistoryList = MatFlowExecServiceImpl.matFlowExecHistoryList;
+
         matFlowProcess.setMatFlowExecLog(matFlowExecLog);
         matFlowProcess.setProof(proof);
         matFlowProcess.setMatFlowDeploy(matFlowDeploy);
-
 
         if (proof == null){
             commonAchieveService.updateTime(matFlowProcess,beginTime);
@@ -68,8 +71,8 @@ public class DeployAchieveServiceImpl implements DeployAchieveService {
             return "凭证为空。";
         }
 
+        //获取部署文件
         String filePath = matFlowCommonService.getFile(matFlowConfigure.getMatFlow().getMatflowName(), matFlowDeploy.getSourceAddress());
-        
         if (filePath == null){
             commonAchieveService.updateTime(matFlowProcess,beginTime);
             commonAchieveService.updateState(matFlowProcess,true, matFlowExecHistoryList);
@@ -82,6 +85,19 @@ public class DeployAchieveServiceImpl implements DeployAchieveService {
         //发送文件位置
         String deployAddress ="/"+ matFlowDeploy.getDeployAddress();
 
+        Session session;
+        try {
+            session = createSession(matFlowProcess);
+        } catch (JSchException e) {
+            commonAchieveService.updateTime(matFlowProcess,beginTime);
+            commonAchieveService.updateState(matFlowProcess,true, matFlowExecHistoryList);
+            return "连接失败，无法连接到服务器";
+        }
+
+        //ftp(session,deployAddress, )
+
+
+
         return null;
     }
 
@@ -90,10 +106,8 @@ public class DeployAchieveServiceImpl implements DeployAchieveService {
      * @param matFlowProcess 配置信息
      * @param matFlowExecHistoryList 状态集合
      */
-    private void linux(MatFlowProcess matFlowProcess, List<MatFlowExecHistory> matFlowExecHistoryList) throws JSchException, IOException {
+    private void linux(Session session, MatFlowProcess matFlowProcess, List<MatFlowExecHistory> matFlowExecHistoryList) throws JSchException, IOException {
         MatFlowDeploy matFlowDeploy = matFlowProcess.getMatFlowDeploy();
-
-        Session session = createSession(matFlowProcess);
 
         //选择自定义部署
         if (matFlowDeploy.getDeployType() == 1){
@@ -132,25 +146,6 @@ public class DeployAchieveServiceImpl implements DeployAchieveService {
         }
     }
 
-    /**
-     * 连接服务器执行命令
-     * @param orders 命令
-     * @param matFlowProcess 配置信息
-     * @param matFlowExecHistoryList 执行历史
-     * @throws JSchException 连接错误
-     * @throws IOException 读取执行信息失败
-     */
-    private void sshOrder(Session session,String orders,MatFlowProcess matFlowProcess,List<MatFlowExecHistory> matFlowExecHistoryList) throws JSchException, IOException {
-
-        ChannelExec exec = (ChannelExec) session.openChannel("exec");
-
-        exec.setCommand(orders);
-
-        commonAchieveService.log(exec.getInputStream(), matFlowProcess, matFlowExecHistoryList);
-
-        exec.disconnect();
-        session.disconnect();
-    }
 
     /**
      * 创建连接实例
@@ -177,25 +172,62 @@ public class DeployAchieveServiceImpl implements DeployAchieveService {
     }
 
     /**
+     * 连接服务器执行命令
+     * @param orders 命令
+     * @param matFlowProcess 配置信息
+     * @param matFlowExecHistoryList 执行历史
+     * @throws JSchException 连接错误
+     * @throws IOException 读取执行信息失败
+     */
+    private void sshOrder(Session session,String orders,MatFlowProcess matFlowProcess,List<MatFlowExecHistory> matFlowExecHistoryList) throws JSchException, IOException {
+        ChannelExec exec = (ChannelExec) session.openChannel("exec");
+        exec.setCommand(orders);
+        commonAchieveService.log(exec.getInputStream(), matFlowProcess, matFlowExecHistoryList);
+        exec.disconnect();
+        session.disconnect();
+    }
+
+
+    /**
+     * 判断sftp是否连接
+     */
+    public boolean isChannel(Channel channel) {
+        try {
+            if (channel.isConnected()) {
+                return true;
+            }
+        } catch (Exception e) {
+            logger.info(e.getMessage());
+        }
+        return false;
+    }
+
+    /**
      * 发送文件
      * @param session 连接实例
-     * @param file 文件
+     * @param localFile 文件
      * @throws JSchException 连接失败
-     * @throws IOException 日志异常
      */
-    private void ftp(Session session,String file) throws JSchException, IOException {
-
+    private String ftp(Session session,String localFile,String uploadAddress) throws JSchException, SftpException {
         ChannelSftp sftp = (ChannelSftp) session.openChannel("sftp");
-
-
+        sftp.connect();
+        File file = new File(localFile);
+        if(file.exists()){
+            //判断目录是否存在
+            sftp.lstat(uploadAddress);
+            //ChannelSftp.OVERWRITE 覆盖上传
+            sftp.put(localFile,uploadAddress,ChannelSftp.OVERWRITE);
+            return null;
+        }
+        return "找不到需要部署的文件。";
 
     }
 
-        /**
-         * docker部署
-         * @param matFlowProcess 配置信息
-         * @param matFlowExecHistoryList 状态集合
-         */
+    /**
+     * docker部署
+     * @param matFlowProcess 配置信息
+     * @param matFlowExecHistoryList 状态集合
+     */
     private void docker(Session session, MatFlowProcess matFlowProcess, List<MatFlowExecHistory> matFlowExecHistoryList) throws JSchException, IOException {
         MatFlowDeploy matFlowDeploy = matFlowProcess.getMatFlowDeploy();
 
@@ -241,41 +273,5 @@ public class DeployAchieveServiceImpl implements DeployAchieveService {
                 +"docker run -itd -p"+" "+ matFlowDeploy.getMappingPort()+":"+ matFlowDeploy.getStartPort()+" "+matFlowName;
         sshOrder(session, order, matFlowProcess, matFlowExecHistoryList);
     }
-
-    /**
-     * 初始化Docker镜像
-     */
-    //public void initializeDocker(String gitAddress) {
-    //
-    //    String order ;
-    //    //创建centos镜像
-    //    order = "docker pull zcamy/darth_matFlow:centos-8";
-    //    try {
-    //        commonAchieveService.process(gitAddress, order);
-    //    } catch (IOException e) {
-    //        throw new ApplicationException("拉取");
-    //    }
-    //
-    //    //创建jdk镜像
-    //    order = "docker pull zcamy/darth_matFlow:jdk-16.0.2";
-    //    try {
-    //        commonAchieveService.process(gitAddress, order);
-    //    } catch (IOException e) {
-    //        throw new RuntimeException(e);
-    //    }
-    //
-    //    //创建mysql镜像
-    //    order = "[[ ! -z `docker ps -a | grep 'mysql' | awk '{print $1 }'` ]] " +
-    //            "&& docker container restart matFlow || "
-    //            +"docker pull zcamy/darth_matFlow:mysql-8.0.28;docker run --name mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=darth2020 -d zcamy/darth_matFlow:mysql-8.0.28";
-    //    try {
-    //        commonAchieveService.process(gitAddress, order);
-    //    } catch (IOException e) {
-    //        throw new RuntimeException(e);
-    //    }
-    //    logger.info("mysql镜像初始化成功。。。。。。。。。。。。。。。");
-    //
-    //}
-
 
 }

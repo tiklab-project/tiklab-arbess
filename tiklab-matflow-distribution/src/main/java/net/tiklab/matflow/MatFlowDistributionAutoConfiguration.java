@@ -44,7 +44,7 @@ import org.springframework.context.annotation.Configuration;
 @EnableTodoTask
 @EnableEas
 
-
+@EnableMatFlowServer
 @ComponentScan("net.tiklab.matflow")
 public class MatFlowDistributionAutoConfiguration {
 }

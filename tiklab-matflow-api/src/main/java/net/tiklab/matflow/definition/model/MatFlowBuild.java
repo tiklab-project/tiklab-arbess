@@ -2,7 +2,10 @@ package net.tiklab.matflow.definition.model;
 
 
 import net.tiklab.beans.annotation.Mapper;
+import net.tiklab.beans.annotation.Mapping;
+import net.tiklab.beans.annotation.Mappings;
 import net.tiklab.join.annotation.Join;
+import net.tiklab.join.annotation.JoinQuery;
 import net.tiklab.postin.annotation.ApiModel;
 import net.tiklab.postin.annotation.ApiProperty;
 
@@ -34,6 +37,14 @@ public class MatFlowBuild {
     //别名
     @ApiProperty(name = "buildAlias",desc="别名")
     private String buildAlias;
+
+    @ApiProperty(name="matFlow",desc="流水线id",eg="@selectOne")
+    @Mappings({
+            @Mapping(source = "matflow.matFlowId",target = "matflowId")
+    })
+    @JoinQuery(key = "matflowId")
+    private MatFlow matFlow;
+
 
     public String getBuildId() {
         return buildId;
@@ -81,5 +92,13 @@ public class MatFlowBuild {
 
     public void setBuildAlias(String buildAlias) {
         this.buildAlias = buildAlias;
+    }
+
+    public MatFlow getMatFlow() {
+        return matFlow;
+    }
+
+    public void setMatFlow(MatFlow matFlow) {
+        this.matFlow = matFlow;
     }
 }

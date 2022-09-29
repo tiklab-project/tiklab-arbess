@@ -27,6 +27,12 @@ public class MatFlowTestEntity {
     @Column(name = "test_alias",notNull = true)
     private String testAlias;
 
+
+    //流水线id
+    @Column(name = "matflow_id",notNull = true)
+    private String matflowId;
+
+
     public String getTestId() {
         return testId;
     }
@@ -65,5 +71,13 @@ public class MatFlowTestEntity {
 
     public void setTestAlias(String testAlias) {
         this.testAlias = testAlias;
+    }
+
+    public String getMatflowId() {
+        return matflowId;
+    }
+
+    public void setMatflowId(String matflowId) {
+        this.matflowId = matflowId;
     }
 }

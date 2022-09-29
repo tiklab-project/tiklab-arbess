@@ -41,6 +41,10 @@ public class MatFlowCodeEntity {
     @Column(name = "code_alias",notNull = true)
     private String codeAlias;
 
+    //流水线id
+    @Column(name = "matflow_id",notNull = true)
+    private String matflowId;
+
 
     public String getCodeId() {
         return codeId;
@@ -104,5 +108,13 @@ public class MatFlowCodeEntity {
 
     public void setCodeAlias(String codeAlias) {
         this.codeAlias = codeAlias;
+    }
+
+    public String getMatflowId() {
+        return matflowId;
+    }
+
+    public void setMatflowId(String matflowId) {
+        this.matflowId = matflowId;
     }
 }

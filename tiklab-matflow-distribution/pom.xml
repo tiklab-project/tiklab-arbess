@@ -107,8 +107,8 @@
 		</dependency>
 		<dependency>
 			<groupId>net.tiklab</groupId>
-			<artifactId>tiklab-update-starter</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
+			<artifactId>tiklab-upgrade-starter</artifactId>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>net.tiklab</groupId>

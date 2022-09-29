@@ -52,6 +52,14 @@ public class MatFlowCode {
     @ApiProperty(name = "codeAlias",desc="别名")
     private String codeAlias;
 
+    @ApiProperty(name="matFlow",desc="流水线id",eg="@selectOne")
+    @Mappings({
+            @Mapping(source = "matflow.matFlowId",target = "matflowId")
+    })
+    @JoinQuery(key = "matflowId")
+    private MatFlow matFlow;
+
+
 
     public String getCodeId() {
         return codeId;
@@ -118,4 +126,12 @@ public class MatFlowCode {
         this.codeAlias = codeAlias;
     }
 
+
+    public MatFlow getMatFlow() {
+        return matFlow;
+    }
+
+    public void setMatFlow(MatFlow matFlow) {
+        this.matFlow = matFlow;
+    }
 }

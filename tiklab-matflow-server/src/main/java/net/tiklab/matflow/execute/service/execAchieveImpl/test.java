@@ -5,11 +5,11 @@ import java.io.*;
 
 public class test {
 
-    public static void main(String[] args) throws JSchException, IOException {
+    public static void main(String[] args) throws JSchException, SftpException {
         exec();
     }
 
-    public static void exec() throws JSchException, IOException {
+    public static void exec() throws JSchException, SftpException {
         JSch jsch = new JSch();
 
         //1.创建session
@@ -19,18 +19,20 @@ public class test {
         session.setConfig("StrictHostKeyChecking", "no");
         session.connect();
 
-        ChannelExec exec = (ChannelExec) session.openChannel("exec");
+        ChannelSftp sftp = (ChannelSftp) session.openChannel("sftp");
 
-        exec.setCommand("ls -all");
+        String localFile= "";
+        String uploadAddress= "";
 
-        InputStream input = exec.getInputStream();
-        exec.connect();
-        BufferedReader inputReader = new BufferedReader(new InputStreamReader(input));
-        String inputLine = null;
-        while ((inputLine = inputReader.readLine()) != null) {
-            System.out.println(inputLine);
+        sftp.connect();
+        File file = new File(localFile);
+        if(file.exists()){
+            //判断目录是否存在
+            sftp.lstat(uploadAddress);
+            //ChannelSftp.OVERWRITE 覆盖上传
+            sftp.put(localFile,uploadAddress,ChannelSftp.OVERWRITE);
         }
-        exec.disconnect();
         session.disconnect();
+
     }
 }

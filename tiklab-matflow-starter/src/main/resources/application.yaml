@@ -66,6 +66,9 @@ eas:
   web:
     address: http://192.168.10.14:3001
 
+mysql:
+  server:
+    port: 3333
 
 #homes
 homes:

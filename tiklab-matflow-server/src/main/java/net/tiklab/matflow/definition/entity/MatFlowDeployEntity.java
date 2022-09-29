@@ -69,6 +69,11 @@ public class MatFlowDeployEntity {
     @Column(name = "deploy_order",notNull = true )
     private String deployOrder;
 
+    //流水线id
+    @Column(name = "matflow_id",notNull = true)
+    private String matflowId;
+
+
     public String getDeployId() {
         return deployId;
     }
@@ -187,5 +192,13 @@ public class MatFlowDeployEntity {
 
     public void setDeployOrder(String deployOrder) {
         this.deployOrder = deployOrder;
+    }
+
+    public String getMatflowId() {
+        return matflowId;
+    }
+
+    public void setMatflowId(String matflowId) {
+        this.matflowId = matflowId;
     }
 }

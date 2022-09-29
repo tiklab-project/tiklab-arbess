@@ -63,6 +63,15 @@ public class MatFlowDeploy {
     @ApiProperty(name = "deployOrder",desc = "部署命令" )
     private String deployOrder;
 
+    @ApiProperty(name="matFlow",desc="流水线id",eg="@selectOne")
+    @Mappings({
+            @Mapping(source = "matflow.matFlowId",target = "matflowId")
+    })
+    @JoinQuery(key = "matflowId")
+    private MatFlow matFlow;
+
+
+
     public String getDeployId() {
         return deployId;
     }
@@ -181,5 +190,13 @@ public class MatFlowDeploy {
 
     public void setDeployOrder(String deployOrder) {
         this.deployOrder = deployOrder;
+    }
+
+    public MatFlow getMatFlow() {
+        return matFlow;
+    }
+
+    public void setMatFlow(MatFlow matFlow) {
+        this.matFlow = matFlow;
     }
 }

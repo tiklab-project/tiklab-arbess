@@ -32,6 +32,12 @@ public class MatFlowBuildEntity {
     @Column(name = "build_alias",notNull = true)
     private String buildAlias;
 
+
+    //流水线id
+    @Column(name = "matflow_id",notNull = true)
+    private String matflowId;
+
+
     public String getBuildId() {
         return buildId;
     }
@@ -78,5 +84,13 @@ public class MatFlowBuildEntity {
 
     public void setBuildAlias(String buildAlias) {
         this.buildAlias = buildAlias;
+    }
+
+    public String getMatflowId() {
+        return matflowId;
+    }
+
+    public void setMatflowId(String matflowId) {
+        this.matflowId = matflowId;
     }
 }
