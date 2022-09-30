@@ -9,7 +9,7 @@ if [ -e "${DIRS}/${JDK_VERSION}" ]; then
 fi
 
 #APP_MAIN=${application.main.class}
-APP_MAIN="net.tiklab.matflow.MatFlowApplication"
+APP_MAIN="net.tiklab.pipeline.PipelineApplication"
 
 PID=0
 getPID(){

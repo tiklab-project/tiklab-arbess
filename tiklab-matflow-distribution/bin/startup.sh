@@ -2,7 +2,7 @@
 #-------------------------------------------------------------------------------------------------------------
 DIRS=$(dirname "$PWD")
 
-APP_MAIN="net.tiklab.matflow.MatFlowDistributionApplication"
+APP_MAIN="net.tiklab.pipeline.PipelineDistributionApplication"
 
 JDK_VERSION=jdk-16.0.2
 #判断是否自定义jdk

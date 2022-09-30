@@ -17,7 +17,7 @@ goto begin
 
 set DIRS=%P1Path%
 
-set APP_MAIN=net.tiklab.matflow.MatFlowDistributionApplication
+set APP_MAIN=net.tiklab.pipeline.PipelineDistributionApplication
 
 set JAVA_HOME=%DIRS%jdk-16.0.2
 

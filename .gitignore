@@ -12,5 +12,5 @@ logs/
 plugin/
 APP_NAME_IS_UNDEFINED/
 DATA_HOME_IS_UNDEFINED/
-matflow-log
+pipeline-log
 tiklab-matflow-distribution/embbed

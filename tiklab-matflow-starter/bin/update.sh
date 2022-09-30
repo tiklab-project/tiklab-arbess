@@ -2,7 +2,7 @@
 
 DIR=$(dirname "$PWD")
 
-APP_NAME=matflow
+APP_NAME=pipeline
 
 DIR_FILE="http://file.dev.tiklab.net/update/"
 

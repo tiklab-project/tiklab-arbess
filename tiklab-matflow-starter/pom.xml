@@ -82,11 +82,6 @@
         </dependency>
         <dependency>
             <groupId>net.tiklab</groupId>
-            <artifactId>tiklab-eas-embbed-spring-boot-starter</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>net.tiklab</groupId>
             <artifactId>tiklab-dss-spring-boot-starter</artifactId>
             <version>${project.version}</version>
         </dependency>

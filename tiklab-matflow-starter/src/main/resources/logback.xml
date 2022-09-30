@@ -2,9 +2,9 @@
 <configuration>
     <contextListener class="net.tiklab.web.context.LogHomeConfiguration" />
     <!-- 应用名称：和统一配置中的项目代码保持一致（小写） -->
-    <property name="app.name" value="tiklab-matflow" />
-    <property name="log" value="tiklab-matflow-log" />
-    <property name="LOG_PATH" value="matflow-log/logs" />
+    <property name="app.name" value="tiklab-pipeline" />
+    <property name="log" value="tiklab-pipeline-log" />
+    <property name="LOG_PATH" value="pipeline-log/logs" />
     <!--在没有定义${LOG_PATH}系统变量的时候，可以设置此本地变量。提交测试、上线时，要将其注释掉，使用系统变量。-->
     <!--
     <property name="user.home" value="/usr" />
@@ -25,56 +25,56 @@
     </appender>
 
     <appender name="app" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${LOG_PATH}/app.matFlowExecLog</file>
+        <file>${LOG_PATH}/app.pipelineExecLog</file>
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
             <!--格式化输出：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度%msg：日志消息，%n是换行符-->
             <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n</pattern>
         </encoder>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!--日志文件输出的文件名-->
-            <FileNamePattern>${LOG_PATH}/app.matFlowExecLog.%d{yyyy-MM-dd}.matFlowExecLog</FileNamePattern>
+            <FileNamePattern>${LOG_PATH}/app.pipelineExecLog.%d{yyyy-MM-dd}.pipelineExecLog</FileNamePattern>
             <!--日志文件保留天数-->
             <MaxHistory>${LOG_MAX_HISTORY}</MaxHistory>
         </rollingPolicy>
     </appender>
 
     <appender name="app.tracer" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${LOG_PATH}/app-tracer.matFlowExecLog</file>
+        <file>${LOG_PATH}/app-tracer.pipelineExecLog</file>
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
             <!-- 格式化输出：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度%msg：日志消息，%n是换行符 -->
             <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n</pattern>
         </encoder>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!--日志文件输出的文件名-->
-            <FileNamePattern>${LOG_PATH}/app-tracer.matFlowExecLog.%d{yyyy-MM-dd}</FileNamePattern>
+            <FileNamePattern>${LOG_PATH}/app-tracer.pipelineExecLog.%d{yyyy-MM-dd}</FileNamePattern>
             <!--日志文件保留天数-->
             <MaxHistory>${LOG_MAX_HISTORY}</MaxHistory>
         </rollingPolicy>
     </appender>
 
     <appender name="app.error" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${LOG_PATH}/app-error.matFlowExecLog</file>
+        <file>${LOG_PATH}/app-error.pipelineExecLog</file>
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
             <!-- 格式化输出：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度%msg：日志消息，%n是换行符 -->
             <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n</pattern>
         </encoder>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!--日志文件输出的文件名-->
-            <FileNamePattern>${LOG_PATH}/app-error.matFlowExecLog.%d{yyyy-MM-dd}</FileNamePattern>
+            <FileNamePattern>${LOG_PATH}/app-error.pipelineExecLog.%d{yyyy-MM-dd}</FileNamePattern>
             <!--日志文件保留天数-->
             <MaxHistory>${LOG_MAX_HISTORY}</MaxHistory>
         </rollingPolicy>
     </appender>
 
     <appender name="app.slow" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${LOG_PATH}/app-slow.matFlowExecLog</file>
+        <file>${LOG_PATH}/app-slow.pipelineExecLog</file>
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
             <!-- 格式化输出：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度%msg：日志消息，%n是换行符 -->
             <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n</pattern>
         </encoder>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!--日志文件输出的文件名-->
-            <FileNamePattern>${LOG_PATH}/app-slow.matFlowExecLog.%d{yyyy-MM-dd}</FileNamePattern>
+            <FileNamePattern>${LOG_PATH}/app-slow.pipelineExecLog.%d{yyyy-MM-dd}</FileNamePattern>
             <!--日志文件保留天数-->
             <MaxHistory>${LOG_MAX_HISTORY}</MaxHistory>
         </rollingPolicy>

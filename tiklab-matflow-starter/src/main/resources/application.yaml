@@ -1,14 +1,14 @@
 app:
-  name: tiklab-matflow
+  name: tiklab-pipeline
 
 APP_HOME: ${APP_HOME}
-application: matFlow
+application: pipeline
 
 spring:
   config:
-    import: optional:/usr/local/apps/conf/matFlow/application.yaml
+    import: optional:/usr/local/apps/conf/matflow/application.yaml
   jmx:
-    default-domain: tiklab-matflow
+    default-domain: tiklab-pipeline
 
 server:
   port: 8090
@@ -20,7 +20,7 @@ jdbc:
   password: darth2020
 
 #plugin config
-PROJECT_HOME: ${user.home}/matflow/${app.name}
+PROJECT_HOME: ${user.home}/pipeline/${app.name}
 plugin:
   path: ${PROJECT_HOME}/plugin
 

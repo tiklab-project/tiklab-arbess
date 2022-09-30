@@ -1,15 +1,15 @@
 app:
-  name: tiklab-matflow
+  name: tiklab-pipeline
 
 APP_HOME: ${APP_HOME}
-application: matFlow
+application: pipeline
 
 spring:
   config:
-    import: optional:/usr/local/apps/conf/matFlow/application.yaml
+    import: optional:/usr/local/apps/conf/matflow/application.yaml
 
 server:
-  port: 8091
+  port: 8090
 
 jdbc:
   driverClassName: com.mysql.cj.jdbc.Driver
@@ -18,7 +18,7 @@ jdbc:
   password: darth2020
 
 #plugin config
-PROJECT_HOME: ${user.home}/matflow/${app.name}
+PROJECT_HOME: ${user.home}/pipeline/${app.name}
 
 plugin:
   path: ${PROJECT_HOME}/plugin
@@ -70,7 +70,7 @@ mysql:
     enable: false
   server:
     port: 3001
-  database: tiklab_matflow
+  database: tiklab_pipeline
 
 #homes
 homes:

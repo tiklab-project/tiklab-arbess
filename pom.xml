@@ -10,7 +10,6 @@
         <version>1.0.0-SNAPSHOT</version>
     </parent>
 
-<!--    <groupId>net.tiklab</groupId>-->
     <artifactId>tiklab-matflow</artifactId>
     <name>${project.artifactId}</name>
     <packaging>pom</packaging>
@@ -33,9 +32,9 @@
     </licenses>
 
     <scm>
-        <url>https://gitee.com/zhangzh1978_admin/tiklab_matflow</url>
-        <connection>https://gitee.com/zhangzh1978_admin/tiklab_matflow.git</connection>
-        <developerConnection>https://gitee.com/zhangzh1978_admin/tiklab_matflow</developerConnection>
+        <url>https://gitee.com/zhangzh1978_admin/tiklab_pipeline</url>
+        <connection>https://gitee.com/zhangzh1978_admin/tiklab_pipeline.git</connection>
+        <developerConnection>https://gitee.com/zhangzh1978_admin/tiklab_pipeline</developerConnection>
     </scm>
 
     <profiles>

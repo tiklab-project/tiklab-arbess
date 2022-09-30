@@ -1,6 +1,6 @@
 
 
-set APP_NAME=matflow
+set APP_NAME=pipeline
 
 set IP=172.12.1.30
 
