@@ -50,6 +50,13 @@ public class Pipeline {
     @ApiProperty(name="pipelinePower",desc="项目作用域",required = true)
     private int pipelinePower;
 
+    public Pipeline(String pipelineId) {
+        this.pipelineId = pipelineId;
+    }
+
+    public Pipeline() {
+    }
+
     public String getPipelineId() {
         return pipelineId;
     }

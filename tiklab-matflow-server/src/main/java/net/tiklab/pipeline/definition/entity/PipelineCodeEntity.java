@@ -13,10 +13,6 @@ public class PipelineCodeEntity {
     @Column(name = "code_id")
     private String codeId;
 
-    //类型
-    @Column(name = "type",notNull = true)
-    private int type;
-
     //地址名
     @Column(name = "code_name",notNull = true)
     private String codeName;
@@ -33,33 +29,12 @@ public class PipelineCodeEntity {
     @Column(name = "proof_id",notNull = true)
     private String proofId;
 
-    //顺序
-    @Column(name = "sort",notNull = true)
-    private int sort;
-
-    //别名
-    @Column(name = "code_alias",notNull = true)
-    private String codeAlias;
-
-    //流水线id
-    @Column(name = "pipeline_id",notNull = true)
-    private String pipelineId;
-
-
     public String getCodeId() {
         return codeId;
     }
 
     public void setCodeId(String codeId) {
         this.codeId = codeId;
-    }
-
-    public int getType() {
-        return type;
-    }
-
-    public void setType(int type) {
-        this.type = type;
     }
 
     public String getCodeName() {
@@ -94,27 +69,4 @@ public class PipelineCodeEntity {
         this.proofId = proofId;
     }
 
-    public int getSort() {
-        return sort;
-    }
-
-    public void setSort(int sort) {
-        this.sort = sort;
-    }
-
-    public String getCodeAlias() {
-        return codeAlias;
-    }
-
-    public void setCodeAlias(String codeAlias) {
-        this.codeAlias = codeAlias;
-    }
-
-    public String getPipelineId() {
-        return pipelineId;
-    }
-
-    public void setPipelineId(String pipelineId) {
-        this.pipelineId = pipelineId;
-    }
 }

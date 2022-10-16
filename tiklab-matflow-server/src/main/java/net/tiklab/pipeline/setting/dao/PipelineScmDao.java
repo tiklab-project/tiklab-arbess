@@ -58,7 +58,6 @@ public class PipelineScmDao {
      * @return 配置列表
      */
     public List<PipelineScmEntity> selectAllPipelineScm(){
-
         return jpaTemplate.findAll(PipelineScmEntity.class);
     }
 

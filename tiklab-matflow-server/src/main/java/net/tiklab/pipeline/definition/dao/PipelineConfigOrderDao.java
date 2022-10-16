@@ -4,7 +4,8 @@ package net.tiklab.pipeline.definition.dao;
 
 import net.tiklab.dal.jdbc.JdbcTemplate;
 import net.tiklab.dal.jpa.JpaTemplate;
-import net.tiklab.pipeline.definition.entity.PipelineConfigureEntity;
+import net.tiklab.pipeline.definition.entity.PipelineConfigOrderEntity;
+import net.tiklab.pipeline.definition.entity.PipelineConfigOrderEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,19 +19,19 @@ import java.util.List;
  */
 
 @Repository
-public class PipelineConfigureDao {
+public class PipelineConfigOrderDao {
 
     @Autowired
     JpaTemplate jpaTemplate;
 
-    private static final Logger logger = LoggerFactory.getLogger(PipelineConfigureDao.class);
+    private static final Logger logger = LoggerFactory.getLogger(PipelineConfigOrderDao.class);
 
     /**
      * 添加流水线配置信息
      * @param pipelineConfigureEntity 配置信息
      * @return 配置信息id
      */
-    public String createConfigure(PipelineConfigureEntity pipelineConfigureEntity){
+    public String createConfigure(PipelineConfigOrderEntity pipelineConfigureEntity){
         return jpaTemplate.save(pipelineConfigureEntity,String.class);
     }
 
@@ -39,14 +40,14 @@ public class PipelineConfigureDao {
      * @param id 配置id
      */
     public void deleteConfigure(String id){
-        jpaTemplate.delete(PipelineConfigureEntity.class,id);
+        jpaTemplate.delete(PipelineConfigOrderEntity.class,id);
     }
 
     /**
      * 更新流水线配置
      * @param pipelineConfigureEntity 配置信息
      */
-    public void updateConfigure(PipelineConfigureEntity pipelineConfigureEntity){
+    public void updateConfigure(PipelineConfigOrderEntity pipelineConfigureEntity){
         jpaTemplate.update(pipelineConfigureEntity);
     }
 
@@ -55,8 +56,8 @@ public class PipelineConfigureDao {
      * @param configureId 查询id
      * @return 配置信息
      */
-    public PipelineConfigureEntity findOneConfigure(String configureId){
-        return jpaTemplate.findOne(PipelineConfigureEntity.class, configureId);
+    public PipelineConfigOrderEntity findOneConfigure(String configureId){
+        return jpaTemplate.findOne(PipelineConfigOrderEntity.class, configureId);
     }
 
     /**
@@ -64,11 +65,11 @@ public class PipelineConfigureDao {
      * @param pipelineId 流水线id
      * @return 配置信息
      */
-    public List<PipelineConfigureEntity> findAllConfigure(String pipelineId){
-        String sql = "select pipeline_configure.* from pipeline_configure";
-        sql = sql.concat(" where pipeline_configure.pipeline_id = '"+ pipelineId+"' " );
+    public List<PipelineConfigOrderEntity> findAllConfigure(String pipelineId){
+        String sql = "select pipeline_config_order.* from pipeline_config_order";
+        sql = sql.concat(" where pipeline_config_order.pipeline_id = '"+ pipelineId+"' " );
         JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
-        return  jdbcTemplate.query(sql, new BeanPropertyRowMapper(PipelineConfigureEntity.class));
+        return  jdbcTemplate.query(sql, new BeanPropertyRowMapper(PipelineConfigOrderEntity.class));
     }
 
 
@@ -76,11 +77,11 @@ public class PipelineConfigureDao {
      * 查询所有配置信息
      * @return 配置信息集合
      */
-    public List<PipelineConfigureEntity> findAllConfigure(){
-        return jpaTemplate.findAll(PipelineConfigureEntity.class);
+    public List<PipelineConfigOrderEntity> findAllConfigure(){
+        return jpaTemplate.findAll(PipelineConfigOrderEntity.class);
     }
 
-    public List<PipelineConfigureEntity> findAllConfigureList(List<String> idList){
-        return jpaTemplate.findList(PipelineConfigureEntity.class,idList);
+    public List<PipelineConfigOrderEntity> findAllConfigureList(List<String> idList){
+        return jpaTemplate.findList(PipelineConfigOrderEntity.class,idList);
     }
 }

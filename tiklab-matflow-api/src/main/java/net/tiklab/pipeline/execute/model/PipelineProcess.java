@@ -1,7 +1,8 @@
-package net.tiklab.pipeline.orther.model;
+package net.tiklab.pipeline.execute.model;
 
 
 import net.tiklab.join.annotation.Join;
+import net.tiklab.pipeline.definition.model.Pipeline;
 import net.tiklab.pipeline.execute.model.PipelineExecHistory;
 import net.tiklab.pipeline.execute.model.PipelineExecLog;
 import net.tiklab.pipeline.setting.model.Proof;
@@ -12,7 +13,6 @@ import net.tiklab.postin.annotation.ApiModel;
  */
 
 @ApiModel
-@Join
 public class PipelineProcess {
 
     private Proof proof;
@@ -20,6 +20,8 @@ public class PipelineProcess {
     private PipelineExecHistory pipelineExecHistory;
 
     private PipelineExecLog pipelineExecLog;
+
+    private Pipeline pipeline;
 
     public PipelineExecHistory getPipelineExecHistory() {
         return pipelineExecHistory;
@@ -43,5 +45,13 @@ public class PipelineProcess {
 
     public void setProof(Proof proof) {
         this.proof = proof;
+    }
+
+    public Pipeline getPipeline() {
+        return pipeline;
+    }
+
+    public void setPipeline(Pipeline pipeline) {
+        this.pipeline = pipeline;
     }
 }

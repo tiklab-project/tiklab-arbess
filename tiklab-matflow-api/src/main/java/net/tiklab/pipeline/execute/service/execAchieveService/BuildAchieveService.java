@@ -1,7 +1,7 @@
 package net.tiklab.pipeline.execute.service.execAchieveService;
 
-import net.tiklab.pipeline.definition.model.PipelineConfig;
-import net.tiklab.pipeline.orther.model.PipelineProcess;
+import net.tiklab.pipeline.definition.model.PipelineBuild;
+import net.tiklab.pipeline.execute.model.PipelineProcess;
 
 public interface BuildAchieveService {
 
@@ -10,5 +10,5 @@ public interface BuildAchieveService {
      * @param pipelineProcess 构建信息
      * @return 构建状态
      */
-    String build(PipelineProcess pipelineProcess, PipelineConfig pipelineConfig);
+    String build(PipelineProcess pipelineProcess,  PipelineBuild pipelineBuild);
 }

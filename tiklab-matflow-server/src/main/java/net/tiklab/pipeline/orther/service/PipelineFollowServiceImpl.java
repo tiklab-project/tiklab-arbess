@@ -24,13 +24,18 @@ public class PipelineFollowServiceImpl implements PipelineFollowService {
     @Autowired
     PipelineFollowDao pipelineFollowDao;
 
+    @Autowired
+    PipelineActivityService pipelineActivityService;
+
     @Override
     public String updateFollow(PipelineFollow pipelineFollow) {
-        String pipelineId = pipelineFollow.getPipeline().getPipelineId();
+        Pipeline pipeline = pipelineFollow.getPipeline();
+        String pipelineId = pipeline.getPipelineId();
         String userId = pipelineFollow.getUserId();
         List<PipelineFollow> list = pipelineFollowDao.updateFollow(userId, pipelineId);
         if (list.size() == 0){
             String follow = pipelineFollowDao.createFollow(BeanMapper.map(pipelineFollow, PipelineFollowEntity.class));
+            pipelineActivityService.log("create", "pipelineOther", "收藏了流水线"+pipeline.getPipelineName());
             if (follow == null){
                 return null;
             }

@@ -90,9 +90,9 @@ public class PipelineController {
     @RequestMapping(path="/findLikePipeline",method = RequestMethod.POST)
     @ApiMethod(name = "findLikePipeline",desc = "模糊查询")
     @ApiParam(name = "pipelineName",desc = "模糊查询条件",required = true)
-    public Result<List<Pipeline>> findLikePipeline(@NotNull String pipelineName, String userId){
+    public Result<List<PipelineMassage>> findLikePipeline(@NotNull String pipelineName, String userId){
 
-        List<Pipeline> pipelineQueryList = pipelineService.findLikePipeline(pipelineName,userId);
+        List<PipelineMassage> pipelineQueryList = pipelineService.findLikePipeline(pipelineName,userId);
 
         return Result.ok(pipelineQueryList);
     }

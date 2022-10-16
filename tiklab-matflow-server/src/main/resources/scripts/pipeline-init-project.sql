@@ -9,6 +9,3 @@ INSERT INTO pipeline_deploy(deploy_id,type,deploy_type,source_address,deploy_add
 INSERT INTO pipeline_proof VALUES ('52e6d477df54ba80b939dc27b911cd16', 'linux', 5, 'password', 'root', 'darth2020', NULL, NULL, '2022-07-28 15:47:29', 1, '111111');
 INSERT INTO pipeline_proof VALUES ('a8cc49221d618151939f2162f3cbeecb', '示例凭证1', 1, 'password', 'zcamy', 'zhq11191750', NULL, NULL, '2022-07-28 15:47:29', 1, '111111');
 
-
-
-pipeline_id varchar(256) COMMENT '流水线id',

@@ -4,17 +4,16 @@ package net.tiklab.pipeline.execute.service.execAchieveImpl;
 
 import net.tiklab.core.exception.ApplicationException;
 import net.tiklab.pipeline.definition.model.Pipeline;
-import net.tiklab.pipeline.definition.model.PipelineConfig;
+import net.tiklab.pipeline.execute.model.PipelineExecLog;
 import net.tiklab.pipeline.execute.service.execAchieveService.ConfigCommonService;
 import net.tiklab.pipeline.orther.service.PipelineFileService;
 import net.tiklab.pipeline.definition.model.PipelineCode;
 import net.tiklab.pipeline.definition.service.PipelineCodeService;
 import net.tiklab.pipeline.definition.service.PipelineCodeServiceImpl;
 import net.tiklab.pipeline.execute.model.PipelineExecHistory;
-import net.tiklab.pipeline.execute.model.PipelineExecLog;
 import net.tiklab.pipeline.execute.service.PipelineExecServiceImpl;
 import net.tiklab.pipeline.execute.service.execAchieveService.CodeAchieveService;
-import net.tiklab.pipeline.orther.model.PipelineProcess;
+import net.tiklab.pipeline.execute.model.PipelineProcess;
 import net.tiklab.pipeline.setting.model.Proof;
 import net.tiklab.rpc.annotation.Exporter;
 import org.slf4j.Logger;
@@ -38,9 +37,6 @@ import java.util.List;
 public class CodeAchieveServiceImpl implements CodeAchieveService {
 
     @Autowired
-    PipelineCodeService pipelineCodeService;
-
-    @Autowired
     ConfigCommonService configCommonService;
 
     @Autowired
@@ -49,25 +45,17 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
     private static final Logger logger = LoggerFactory.getLogger(PipelineCodeServiceImpl.class);
 
     // git克隆
-    public String clone(PipelineProcess pipelineProcess, PipelineConfig pipelineConfig){
+    public String clone(PipelineProcess pipelineProcess, PipelineCode pipelineCode){
 
-        PipelineCode pipelineCode = pipelineConfig.getPipelineCode();
-        Pipeline pipeline = pipelineCode.getPipeline();
+        Pipeline pipeline = pipelineProcess.getPipeline();
+        PipelineExecLog pipelineExecLog = pipelineProcess.getPipelineExecLog();
 
-        List<PipelineExecHistory> pipelineExecHistoryList = PipelineExecServiceImpl.pipelineExecHistoryList;
+        List<PipelineExecHistory> list = PipelineExecServiceImpl.pipelineExecHistoryList;
+
         //开始时间
-        PipelineExecHistory pipelineExecHistory = pipelineProcess.getPipelineExecHistory();
-
         long beginTime = new Timestamp(System.currentTimeMillis()).getTime();
-        if (pipelineExecHistory.getRunLog() == null){
-            pipelineExecHistory.setRunLog("");
-        }
 
-        pipelineExecHistory.setRunLog("流水线开始执行。。。。。。。");
-        pipelineExecHistoryList.add(pipelineExecHistory);
-
-        //初始化日志
-        PipelineExecLog pipelineExecLog = configCommonService.initializeLog(pipelineExecHistory,pipeline,10);
+        configCommonService.execHistory(list,pipeline.getPipelineId(),"流水线开始执行",pipelineExecLog);
 
         //代码保存路径
         String codeDir = pipelineFileService.getFileAddress() + pipeline.getPipelineName();
@@ -75,17 +63,22 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
 
         //删除旧的代码
         pipelineFileService.deleteFile(file);
-        pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+"\n开始分配空间。");
-        pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+"\n空间分配成功。\n");
-        pipelineExecHistoryList.add(pipelineExecHistory);
+        
+        configCommonService.execHistory(list,pipeline.getPipelineId(),"分配源码空间。",pipelineExecLog);
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        configCommonService.execHistory(list,pipeline.getPipelineId(),"空间分配成功。",pipelineExecLog);
 
         //获取凭证
         Proof proof = pipelineCode.getProof();
         pipelineProcess.setProof(proof);
-        pipelineProcess.setPipelineExecLog(pipelineExecLog);
+
         if (proof == null){
             configCommonService.updateTime(pipelineProcess,beginTime);
-            configCommonService.updateState(pipelineProcess,false, pipelineExecHistoryList);
+            configCommonService.updateState(pipelineProcess,false, list);
             return "凭证为空。";
         }
         //分支
@@ -97,33 +90,30 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
                 + "Branch : " + codeBranch + "\n"
                 + "proofType : " +proof.getProofType();
 
-        pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+s);
-        pipelineExecHistoryList.add(pipelineExecHistory);
+        configCommonService.execHistory(list,pipeline.getPipelineId(),"\n"+s,pipelineExecLog);
 
         try {
-             Process process = codeStart(proof, pipelineCode,pipeline.getPipelineName());
-             configCommonService.log(process.getInputStream(), pipelineProcess, pipelineExecHistoryList);
-            configCommonService.updateState(pipelineProcess,false, pipelineExecHistoryList);
+            Process process = codeStart(proof, pipelineCode,pipeline.getPipelineName());
+            configCommonService.log(process.getInputStream(), pipelineProcess, list);
+            configCommonService.updateState(pipelineProcess,false, list);
         } catch (IOException e) {
-            configCommonService.updateState(pipelineProcess,false, pipelineExecHistoryList);
+            configCommonService.updateState(pipelineProcess,false, list);
             configCommonService.updateTime(pipelineProcess,beginTime);
             return "系统执行命令错误 \n" + e;
         }catch (URISyntaxException e){
             configCommonService.updateTime(pipelineProcess,beginTime);
-            configCommonService.updateState(pipelineProcess,false, pipelineExecHistoryList);
+            configCommonService.updateState(pipelineProcess,false, list);
             return "git地址错误 \n" + e;
         }catch (ApplicationException e){
             configCommonService.updateTime(pipelineProcess,beginTime);
-            configCommonService.updateState(pipelineProcess,false, pipelineExecHistoryList);
+            configCommonService.updateState(pipelineProcess,false, list);
             return "" + e;
         }
 
-        //更新状态
-        pipelineExecLog.setRunLog( s + "代码拉取成功" + "\n");
-        pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+"\n"+ "代码拉取成功" +"\n");
-        pipelineExecHistoryList.add(pipelineExecHistory);
+        configCommonService.execHistory(list,pipeline.getPipelineId(),"代码拉取成功\n",pipelineExecLog);
+
         configCommonService.updateTime(pipelineProcess,beginTime);
-        configCommonService.updateState(pipelineProcess,true, pipelineExecHistoryList);
+        configCommonService.updateState(pipelineProcess,true, list);
         return null;
     }
 
@@ -209,7 +199,7 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
         }
         //判断是否存在分支
         String order;
-        if (branch == null){
+        if (branch == null || branch.equals("")){
             order = url+" "+codeDir;
         }else {
             order =" -b "+branch+" "+ url+" "+codeDir;
@@ -246,7 +236,7 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
 
         //判断是否存在分支
         String order;
-        if (branch == null){
+        if (branch == null || branch.equals("")){
             order = url+" "+codeDir;
         }else {
             order =" -b "+branch+" "+ url+" "+codeDir;

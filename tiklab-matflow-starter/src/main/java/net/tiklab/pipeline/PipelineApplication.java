@@ -1,6 +1,5 @@
 package net.tiklab.pipeline;
 
-import net.tiklab.pipeline.EnablePipeline;
 import net.tiklab.utils.property.PropertyAndYamlSourceFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

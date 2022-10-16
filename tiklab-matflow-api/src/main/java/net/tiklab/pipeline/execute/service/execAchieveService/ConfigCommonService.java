@@ -1,9 +1,10 @@
 package net.tiklab.pipeline.execute.service.execAchieveService;
 
 import net.tiklab.pipeline.definition.model.Pipeline;
+import net.tiklab.pipeline.definition.model.PipelineConfigOrder;
 import net.tiklab.pipeline.execute.model.PipelineExecHistory;
 import net.tiklab.pipeline.execute.model.PipelineExecLog;
-import net.tiklab.pipeline.orther.model.PipelineProcess;
+import net.tiklab.pipeline.execute.model.PipelineProcess;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -82,7 +83,19 @@ public interface ConfigCommonService {
      */
      PipelineExecHistory initializeHistory(Pipeline pipeline, String userId);
 
-    PipelineExecLog initializeLog(PipelineExecHistory pipelineExecHistory,Object o ,Integer type);
+    /**
+     * 初始化日志
+     * @param historyId 历史id
+     * @return 日志信息
+     */
+    PipelineExecLog initializeLog(String historyId, PipelineConfigOrder configOrder);
+
+    /**
+     * 执行过程中的历史
+     * @param list 历史
+     * @param pipelineId 流水线id
+     */
+    void execHistory(List<PipelineExecHistory> list,String pipelineId,String log,PipelineExecLog pipelineExecLog);
 
     /**
      * 获取环境配置信息

@@ -10,12 +10,12 @@ import net.tiklab.pipeline.setting.entity.ProofEntity;
 import net.tiklab.pipeline.setting.entity.ProofTaskEntity;
 import net.tiklab.pipeline.setting.model.Proof;
 import net.tiklab.pipeline.setting.model.ProofTask;
-
 import net.tiklab.rpc.annotation.Exporter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -48,7 +48,7 @@ public class ProofServiceImpl implements ProofService {
             try {
                 //获取主机名
                 proof.setProofUsername(InetAddress.getLocalHost().getHostName());
-            } catch (UnknownHostException e) {
+            } catch ( UnknownHostException e) {
                 //失败更改为凭证名称
                 proof.setProofUsername(proof.getProofName());
             }
@@ -107,11 +107,10 @@ public class ProofServiceImpl implements ProofService {
         return BeanMapper.mapList(proofEntityList, Proof.class);
     }
 
+    //查询流水线凭证
     @Override
     public List<Proof> findPipelineProof(String userId,String pipelineId,int type){
-
         StringBuilder builder = pipelineService.findUserPipelineId(userId);
-
         List<Proof> allProof;
 
         //判断查询系统凭证还是项目凭证

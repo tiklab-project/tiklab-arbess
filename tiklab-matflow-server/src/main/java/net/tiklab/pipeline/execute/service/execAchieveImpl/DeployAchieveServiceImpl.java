@@ -2,15 +2,13 @@ package net.tiklab.pipeline.execute.service.execAchieveImpl;
 
 import com.jcraft.jsch.*;
 import net.tiklab.pipeline.definition.model.Pipeline;
-import net.tiklab.pipeline.definition.model.PipelineConfig;
 import net.tiklab.pipeline.execute.service.execAchieveService.ConfigCommonService;
 import net.tiklab.pipeline.orther.service.PipelineFileService;
 import net.tiklab.pipeline.definition.model.PipelineDeploy;
 import net.tiklab.pipeline.execute.model.PipelineExecHistory;
-import net.tiklab.pipeline.execute.model.PipelineExecLog;
 import net.tiklab.pipeline.execute.service.PipelineExecServiceImpl;
 import net.tiklab.pipeline.execute.service.execAchieveService.DeployAchieveService;
-import net.tiklab.pipeline.orther.model.PipelineProcess;
+import net.tiklab.pipeline.execute.model.PipelineProcess;
 import net.tiklab.pipeline.setting.model.Proof;
 import net.tiklab.rpc.annotation.Exporter;
 import org.slf4j.Logger;
@@ -42,22 +40,15 @@ public class DeployAchieveServiceImpl implements DeployAchieveService {
      * @param pipelineProcess 配置信息
      * @return 状态
      */
-    public String deploy(PipelineProcess pipelineProcess, PipelineConfig pipelineConfig) {
+    public String deploy(PipelineProcess pipelineProcess, PipelineDeploy pipelineDeploy) {
         //开始运行时间
         long beginTime = new Timestamp(System.currentTimeMillis()).getTime();
         List<PipelineExecHistory> pipelineExecHistoryList = PipelineExecServiceImpl.pipelineExecHistoryList;
-        PipelineExecHistory pipelineExecHistory = pipelineProcess.getPipelineExecHistory();
 
-        PipelineDeploy pipelineDeploy = pipelineConfig.getPipelineDeploy();
-        Pipeline pipeline = pipelineDeploy.getPipeline();
-
-        PipelineExecLog pipelineExecLog = configCommonService.initializeLog(pipelineExecHistory, pipelineDeploy,40);
-
+        Pipeline pipeline = null;
 
         Proof proof = pipelineDeploy.getProof();
-        pipelineProcess.setPipelineExecLog(pipelineExecLog);
         pipelineProcess.setProof(proof);
-
 
         if (proof == null){
             configCommonService.updateTime(pipelineProcess,beginTime);
@@ -100,8 +91,7 @@ public class DeployAchieveServiceImpl implements DeployAchieveService {
      * @param pipelineProcess 配置信息
      * @param pipelineExecHistoryList 状态集合
      */
-    private void linux(Session session, PipelineProcess pipelineProcess,PipelineConfig pipelineConfig, List<PipelineExecHistory> pipelineExecHistoryList) throws JSchException, IOException {
-        PipelineDeploy pipelineDeploy = pipelineConfig.getPipelineDeploy();
+    private void linux(Session session, PipelineProcess pipelineProcess,PipelineDeploy pipelineDeploy, List<PipelineExecHistory> pipelineExecHistoryList) throws JSchException, IOException {
 
         //选择自定义部署
         if (pipelineDeploy.getDeployType() == 1){
@@ -223,7 +213,7 @@ public class DeployAchieveServiceImpl implements DeployAchieveService {
      * @param pipelineExecHistoryList 状态集合
      */
     private void docker(Session session, PipelineProcess pipelineProcess,PipelineDeploy pipelineDeploy, List<PipelineExecHistory> pipelineExecHistoryList) throws JSchException, IOException {
-        Pipeline pipeline = pipelineDeploy.getPipeline();
+        Pipeline pipeline = null;
 
         //选择自定义部署
         if (pipelineDeploy.getDeployType() == 1){

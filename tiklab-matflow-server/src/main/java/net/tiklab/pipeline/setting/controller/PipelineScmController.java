@@ -38,8 +38,8 @@ public class PipelineScmController {
     @RequestMapping(path="/deletePipelineScm",method = RequestMethod.POST)
     @ApiMethod(name = "deletePipelineScm",desc = "删除")
     @ApiParam(name = "pipelineConfigId",desc = "配置id",required = true)
-    public Result<Void> deletePipelineScm(@NotNull @Valid String pathId) {
-        pipelineScmService.deletePipelineScm(pathId);
+    public Result<Void> deletePipelineScm(@NotNull @Valid String scmId) {
+        pipelineScmService.deletePipelineScm(scmId);
         return Result.ok();
     }
 
@@ -56,8 +56,8 @@ public class PipelineScmController {
     @RequestMapping(path="/findPipelineScm",method = RequestMethod.POST)
     @ApiMethod(name = "findPipelineScm",desc = "查询")
     @ApiParam(name = "pipelineConfigId",desc = "配置id",required = true)
-    public Result<PipelineScm> findPipelineScm(@NotNull @Valid String pathId) {
-        PipelineScm pipelineScm = pipelineScmService.findOnePipelineScm(pathId);
+    public Result<PipelineScm> findPipelineScm(@NotNull @Valid String scmId) {
+        PipelineScm pipelineScm = pipelineScmService.findOnePipelineScm(scmId);
         return Result.ok(pipelineScm);
     }
 

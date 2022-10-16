@@ -31,11 +31,6 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
     @Autowired
     PipelineFollowService pipelineFollowService;
 
-    @Autowired
-    PipelineService pipelineService;
-
-    @Autowired
-    PipelineActivityService pipelineActivityService;
 
     private static final Logger logger = LoggerFactory.getLogger(PipelineHomeServiceImpl.class);
 
@@ -47,42 +42,41 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
     }
 
     //获取用户动态
-    @Override
-    public PipelineActivityQuery findUserActivity(PipelineActivityQuery pipelineActivityQuery){
-        PipelineActivityQuery query = new PipelineActivityQuery();
-        List<Pipeline> userPipeline = pipelineService.findAllPipeline(pipelineActivityQuery.getUserId());
-        if (userPipeline == null){
-            return null;
-        }
-        pipelineActivityQuery.setPipelineList(userPipeline);
-        //获取流水线动态
-        List<PipelineActivity> list = pipelineActivityService.findUserActivity(pipelineActivityQuery);
-        query.setPageSize(pipelineActivityQuery.getPageSize());
-        query.setPage(pipelineActivityQuery.getPage());
-        query.setListSize(list.size());
-        query.setPageNumber(1);
-        if (list.size() < 10){
-            query.setDataList(list);
-            return query;
-        }
-        //默认0-10
-        if (pipelineActivityQuery.getPage()+ pipelineActivityQuery.getPageSize() == 11){
-            query.setDataList(list.subList(0, 10));
-            return query;
-        }
-        int page = (pipelineActivityQuery.getPage() - 1) * pipelineActivityQuery.getPageSize();
-        int pageSize = pipelineActivityQuery.getPage()  * pipelineActivityQuery.getPageSize();
-        if (page > list.size()){
-            return null;
-        }
-        if (pageSize > list.size()){
-            pageSize = list.size();
-        }
-        query.setDataList(list.subList(page, pageSize));
-        query.setPageNumber(list.size()/pageSize + 1);
-        query.setListSize(list.size());
-        return query;
-    }
+    //public PipelineActivityQuery findUserActivity(PipelineActivityQuery pipelineActivityQuery){
+    //    PipelineActivityQuery query = new PipelineActivityQuery();
+    //    List<Pipeline> userPipeline = pipelineService.findAllPipeline(pipelineActivityQuery.getUserId());
+    //    if (userPipeline == null){
+    //        return null;
+    //    }
+    //    pipelineActivityQuery.setPipelineList(userPipeline);
+    //    //获取流水线动态
+    //    List<PipelineActivity> list = pipelineActivityService.findUserActivity(pipelineActivityQuery);
+    //    query.setPageSize(pipelineActivityQuery.getPageSize());
+    //    query.setPage(pipelineActivityQuery.getPage());
+    //    query.setListSize(list.size());
+    //    query.setPageNumber(1);
+    //    if (list.size() < 10){
+    //        query.setDataList(list);
+    //        return query;
+    //    }
+    //    //默认0-10
+    //    if (pipelineActivityQuery.getPage()+ pipelineActivityQuery.getPageSize() == 11){
+    //        query.setDataList(list.subList(0, 10));
+    //        return query;
+    //    }
+    //    int page = (pipelineActivityQuery.getPage() - 1) * pipelineActivityQuery.getPageSize();
+    //    int pageSize = pipelineActivityQuery.getPage()  * pipelineActivityQuery.getPageSize();
+    //    if (page > list.size()){
+    //        return null;
+    //    }
+    //    if (pageSize > list.size()){
+    //        pageSize = list.size();
+    //    }
+    //    query.setDataList(list.subList(page, pageSize));
+    //    query.setPageNumber(list.size()/pageSize + 1);
+    //    query.setListSize(list.size());
+    //    return query;
+    //}
 
 
     /**
@@ -91,7 +85,7 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
      * @param templateId 模板id (创建 流水线--pipeline，运行 pipelineExec，凭证--pipelineProof,其他--pipelineOther)
      * @param massage 日志信息
      */
-    public  void log(String type, String templateId,String massage){
+    public void log(String type, String templateId,String massage){
         OpLog log = new OpLog();
         OpLogTemplate opLogTemplate = new OpLogTemplate();
         opLogTemplate.setId(templateId);

@@ -29,18 +29,11 @@ public interface PipelineDeployService {
      void deleteDeploy(String deployId) ;
 
     /**
-     * 根据流水线id查询配置
-     * @param pipelineId 流水线id
-     * @return 配置
-     */
-    PipelineDeploy findDeploy(String pipelineId);
-
-    /**
      * 更新
      * @param pipelineDeploy 更新信息
-     * @param pipelineId 流水线id
      */
-    void updateDeploy(PipelineDeploy pipelineDeploy, String pipelineId);
+    void updateDeploy(PipelineDeploy pipelineDeploy);
+
 
     /**
      * 查询单个信息

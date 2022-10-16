@@ -16,9 +16,15 @@
             <outputDirectory>/lib</outputDirectory>
         </fileSet>
         <fileSet>
+            <directory>${basedir}/src/main/resources/${yaml-type}</directory>
+            <includes>
+                <include>application.yaml</include>
+            </includes>
+            <outputDirectory>/conf</outputDirectory>
+        </fileSet>
+        <fileSet>
             <directory>${basedir}/src/main/resources</directory>
             <includes>
-                <include>*.yaml</include>
                 <include>*.xml</include>
             </includes>
             <outputDirectory>/conf</outputDirectory>

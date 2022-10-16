@@ -19,7 +19,6 @@ public class PipelineBuild {
     private String buildId;
 
     //构建类型
-    @ApiProperty(name = "type",desc="构建类型")
     private int type;
 
     //构建文件地址
@@ -31,19 +30,8 @@ public class PipelineBuild {
     private String buildOrder;
 
     //顺序
-    @ApiProperty(name = "sort",desc="顺序")
     private int sort;
 
-    //别名
-    @ApiProperty(name = "buildAlias",desc="别名")
-    private String buildAlias;
-
-    @ApiProperty(name="pipeline",desc="流水线id",eg="@selectOne")
-    @Mappings({
-            @Mapping(source = "pipeline.pipelineId",target = "pipelineId")
-    })
-    @JoinQuery(key = "pipelineId")
-    private Pipeline pipeline;
 
 
     public String getBuildId() {
@@ -86,19 +74,5 @@ public class PipelineBuild {
         this.sort = sort;
     }
 
-    public String getBuildAlias() {
-        return buildAlias;
-    }
 
-    public void setBuildAlias(String buildAlias) {
-        this.buildAlias = buildAlias;
-    }
-
-    public Pipeline getPipeline() {
-        return pipeline;
-    }
-
-    public void setPipeline(Pipeline pipeline) {
-        this.pipeline = pipeline;
-    }
 }

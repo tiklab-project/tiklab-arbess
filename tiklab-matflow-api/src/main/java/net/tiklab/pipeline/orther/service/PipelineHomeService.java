@@ -12,12 +12,6 @@ public interface PipelineHomeService {
      */
     String updateFollow(PipelineFollow pipelineFollow);
 
-    /**
-     * 查询动态
-     * @param pipelineActivityQuery 信息
-     * @return 动态信息
-     */
-    PipelineActivityQuery findUserActivity(PipelineActivityQuery pipelineActivityQuery);
 
 
 

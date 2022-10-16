@@ -19,7 +19,6 @@ public class PipelineTest {
     private String testId;
 
     //测试类型
-    @ApiProperty(name="type",desc="测试类型",required = true)
     private int type;
 
     //测试内容
@@ -27,19 +26,7 @@ public class PipelineTest {
     private String testOrder;
 
     //顺序
-    @ApiProperty(name = "sort",desc="顺序")
     private int sort;
-
-    //别名
-    @ApiProperty(name = "testAlias",desc="别名")
-    private String testAlias;
-
-    @ApiProperty(name="pipeline",desc="流水线id",eg="@selectOne")
-    @Mappings({
-            @Mapping(source = "pipeline.pipelineId",target = "pipelineId")
-    })
-    @JoinQuery(key = "pipelineId")
-    private Pipeline pipeline;
 
 
     public String getTestId() {
@@ -74,19 +61,5 @@ public class PipelineTest {
         this.sort = sort;
     }
 
-    public String getTestAlias() {
-        return testAlias;
-    }
 
-    public void setTestAlias(String testAlias) {
-        this.testAlias = testAlias;
-    }
-
-    public Pipeline getPipeline() {
-        return pipeline;
-    }
-
-    public void setPipeline(Pipeline pipeline) {
-        this.pipeline = pipeline;
-    }
 }

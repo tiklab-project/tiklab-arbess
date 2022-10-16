@@ -8,6 +8,7 @@ import net.tiklab.pipeline.definition.model.Pipeline;
 import net.tiklab.pipeline.definition.model.PipelineMassage;
 import net.tiklab.pipeline.execute.model.PipelineExecHistory;
 import net.tiklab.pipeline.execute.model.PipelineExecState;
+import net.tiklab.pipeline.orther.service.PipelineActivityService;
 import net.tiklab.rpc.annotation.Exporter;
 import net.tiklab.user.user.model.DmUser;
 import net.tiklab.user.user.model.User;
@@ -42,6 +43,9 @@ public class PipelineServiceImpl implements PipelineService {
     @Autowired
     PipelineCommonServer pipelineCommonServer;
 
+    @Autowired
+    PipelineActivityService pipelineActivityService;
+
 
     private static final Logger logger = LoggerFactory.getLogger(PipelineServiceImpl.class);
 
@@ -59,7 +63,7 @@ public class PipelineServiceImpl implements PipelineService {
 
         PipelineEntity pipelineEntity = BeanMapper.map(pipeline, PipelineEntity.class);
         String pipelineId = pipelineDao.createPipeline(pipelineEntity);
-
+        pipelineActivityService.log("create", "pipeline", "创建了流水线"+pipeline.getPipelineName());
         DmUser dmUser = new DmUser();
         dmUser.setDomainId(pipelineId);
         User user = new User();
@@ -86,6 +90,7 @@ public class PipelineServiceImpl implements PipelineService {
         }
         pipelineDao.deletePipeline(pipelineId);
         pipelineCommonServer.delete(pipeline);
+        pipelineActivityService.log("delete", "pipeline", "删除了流水线"+pipeline.getPipelineName());
         return 1;
     }
 
@@ -96,6 +101,7 @@ public class PipelineServiceImpl implements PipelineService {
         Pipeline flow = findOnePipeline(pipeline.getPipelineId());
         if (!pipeline.getPipelineName().equals( flow.getPipelineName())){
             pipelineCommonServer.updatePipeline(pipeline.getPipelineName(), flow.getPipelineName());
+            pipelineActivityService.log("update", "pipeline", "修改流水线"+flow.getPipelineName()+"名称为"+pipeline.getPipelineName());
         }
 
         PipelineEntity pipelineEntity = BeanMapper.map(pipeline, PipelineEntity.class);
@@ -240,7 +246,7 @@ public class PipelineServiceImpl implements PipelineService {
 
     //模糊查询
     @Override
-    public List<Pipeline> findLikePipeline(String pipelineName, String userId) {
+    public List<PipelineMassage> findLikePipeline(String pipelineName, String userId) {
         List<PipelineEntity> pipelineEntityList = pipelineDao.findLikeName(pipelineName);
         List<Pipeline> list = BeanMapper.mapList(pipelineEntityList, Pipeline.class);
 
@@ -259,7 +265,10 @@ public class PipelineServiceImpl implements PipelineService {
             List<Pipeline> collect = list.stream().filter(pipeline1 -> pipeline.getPipelineId().equals(pipeline1.getPipelineId())).toList();
             pipelines.addAll(collect);
         }
-        return pipelines;
+        if (pipelines.size() == 0){
+            return null;
+        }
+        return pipelineCommonServer.findAllStatus(pipelines);
     }
 
     /**

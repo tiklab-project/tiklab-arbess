@@ -138,7 +138,7 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
     @Override
     public PipelineExecLog getRunLog(String historyId){
         List<PipelineExecLog> allLog = pipelineExecLogService.findAllLog(historyId);
-        if (allLog == null){
+        if (allLog == null || allLog.size() == 0){
            return null;
         }
         allLog.sort(Comparator.comparing(PipelineExecLog::getTaskSort));

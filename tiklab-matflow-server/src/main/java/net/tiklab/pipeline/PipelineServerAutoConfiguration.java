@@ -1,7 +1,5 @@
 package net.tiklab.pipeline;
 
-
-
 import net.tiklab.dsm.annotation.SQL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

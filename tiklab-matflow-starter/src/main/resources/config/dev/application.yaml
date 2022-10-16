@@ -1,12 +1,11 @@
 app:
-  name: tiklab-pipeline
-
-APP_HOME: ${APP_HOME}
-application: pipeline
+  name: tiklab-matflow
 
 spring:
-  config:
-    import: optional:/usr/local/apps/conf/matflow/application.yaml
+  profiles.active: dev
+
+APP_HOME: ${APP_HOME}
+application: matflow
 
 server:
   port: 8090
@@ -19,7 +18,6 @@ jdbc:
 
 #plugin config
 PROJECT_HOME: ${user.home}/pipeline/${app.name}
-
 plugin:
   path: ${PROJECT_HOME}/plugin
 
@@ -58,19 +56,12 @@ dss:
 
 datapath: ${PROJECT_HOME}/caches
 
-#eas config
 eas:
   embbed:
-    enable: true
-
-
-#mysql config
-mysql:
-  embbed:
     enable: false
-  server:
-    port: 3001
-  database: tiklab_pipeline
+#  address: http://172.10.1.12:8080
+#  web:
+#    address: http://172.10.1.12:8080
 
 #homes
 homes:

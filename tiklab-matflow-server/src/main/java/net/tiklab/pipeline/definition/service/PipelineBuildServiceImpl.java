@@ -8,6 +8,7 @@ import net.tiklab.pipeline.definition.service.PipelineBuildService;
 import net.tiklab.pipeline.definition.dao.PipelineBuildDao;
 import net.tiklab.pipeline.definition.entity.PipelineBuildEntity;
 import net.tiklab.pipeline.definition.model.PipelineBuild;
+import net.tiklab.pipeline.orther.service.PipelineActivityService;
 import net.tiklab.rpc.annotation.Exporter;
 import org.apache.commons.codec.language.Nysiis;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,9 @@ public class PipelineBuildServiceImpl implements PipelineBuildService {
 
     @Autowired
     JoinTemplate joinTemplate;
+
+    @Autowired
+    PipelineActivityService activityService;
 
     //创建
     @Override
@@ -47,41 +51,6 @@ public class PipelineBuildServiceImpl implements PipelineBuildService {
     @Override
     public PipelineBuild findOneBuild(String buildId) {
         return BeanMapper.map(pipelineBuildDao.findOneBuild(buildId), PipelineBuild.class);
-    }
-
-    //根据流水线id查询配置
-    @Override
-    public PipelineBuild findBuild(String pipelineId) {
-        List<PipelineBuild> allBuild = findAllBuild();
-        if (allBuild != null){
-            for (PipelineBuild pipelineBuild : allBuild) {
-                if (pipelineBuild.getPipeline() == null){
-                    continue;
-                }
-                if (pipelineBuild.getPipeline().getPipelineId().equals(pipelineId)){
-                    joinTemplate.joinQuery(pipelineBuild);
-                    return pipelineBuild;
-                }
-            }
-        }
-        return null;
-    }
-
-    @Override
-    public void updateBuild(PipelineBuild pipelineBuild, String pipelineId) {
-        PipelineBuild build = findBuild(pipelineId);
-        if (build == null){
-            if (pipelineBuild.getSort() != 0){
-                createBuild(pipelineBuild);
-            }
-        }else {
-            if (pipelineBuild.getSort() == 0){
-                deleteBuild(build.getBuildId());
-            }else {
-                pipelineBuild.setBuildId(build.getBuildId());
-                updateBuild(pipelineBuild);
-            }
-        }
     }
 
     //查询所有

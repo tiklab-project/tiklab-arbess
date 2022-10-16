@@ -13,10 +13,6 @@ public class PipelineDeployEntity {
     @Column(name = "deploy_id")
     private String deployId;
 
-    //容器类型
-    @Column(name = "type",notNull = true)
-    private int type;
-
     //部署类型
     @Column(name = "deploy_type",notNull = true )
     private int deployType;
@@ -45,14 +41,6 @@ public class PipelineDeployEntity {
     @Column(name = "mapping_port")
     private int mappingPort;
 
-    //顺序
-    @Column(name = "sort",notNull = true)
-    private int sort;
-
-    //别名
-    @Column(name = "deploy_alias",notNull = true)
-    private String deployAlias;
-
     //ssh连接端口
     @Column(name = "ssh_port",notNull = true )
     private int sshPort;
@@ -69,10 +57,6 @@ public class PipelineDeployEntity {
     @Column(name = "deploy_order",notNull = true )
     private String deployOrder;
 
-    //流水线id
-    @Column(name = "pipeline_id",notNull = true)
-    private String pipelineId;
-
 
     public String getDeployId() {
         return deployId;
@@ -80,14 +64,6 @@ public class PipelineDeployEntity {
 
     public void setDeployId(String deployId) {
         this.deployId = deployId;
-    }
-
-    public int getType() {
-        return type;
-    }
-
-    public void setType(int type) {
-        this.type = type;
     }
 
     public int getDeployType() {
@@ -146,22 +122,6 @@ public class PipelineDeployEntity {
         this.mappingPort = mappingPort;
     }
 
-    public int getSort() {
-        return sort;
-    }
-
-    public void setSort(int sort) {
-        this.sort = sort;
-    }
-
-    public String getDeployAlias() {
-        return deployAlias;
-    }
-
-    public void setDeployAlias(String deployAlias) {
-        this.deployAlias = deployAlias;
-    }
-
     public int getSshPort() {
         return sshPort;
     }
@@ -194,11 +154,4 @@ public class PipelineDeployEntity {
         this.deployOrder = deployOrder;
     }
 
-    public String getPipelineId() {
-        return pipelineId;
-    }
-
-    public void setPipelineId(String pipelineId) {
-        this.pipelineId = pipelineId;
-    }
 }

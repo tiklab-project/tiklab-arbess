@@ -45,24 +45,19 @@
             <artifactId>tiklab-matflow-api</artifactId>
             <version>${project.version}</version>
         </dependency>
-
         <dependency>
             <groupId>com.jcraft</groupId>
             <artifactId>jsch</artifactId>
             <version>0.1.55</version>
         </dependency>
-
         <dependency>
             <groupId>net.tiklab</groupId>
             <artifactId>tiklab-oplog-api</artifactId>
             <version>${project.version}</version>
         </dependency>
 
-
-
     </dependencies>
-    <!-- Source attach plugin -->
-<!--    <build>-->
+    <build>
 <!--        <plugins>-->
 <!--            <plugin>-->
 <!--                <groupId>org.apache.maven.plugins</groupId>-->
@@ -77,6 +72,6 @@
 <!--                </executions>-->
 <!--            </plugin>-->
 <!--        </plugins>-->
-<!--    </build>-->
+    </build>
 
 </project>

@@ -1,20 +1,15 @@
 app:
-  name: tiklab-matflow
+  name: tiklab-pipeline
 
 APP_HOME: ${APP_HOME}
-application: matflow
-
-
-spring:
-  config:
-    import: optional:classpath:/config/${env:dev}/application.yaml
+application: pipeline
 
 server:
-  port: 8090
+  port: 8091
 
 jdbc:
   driverClassName: com.mysql.cj.jdbc.Driver
-  url: jdbc:mysql://localhost:3306/tiklab_matflow?characterEncoding=utf8&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+  url: jdbc:mysql://172.11.1.10:3306/tiklab_matflow?characterEncoding=utf8&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
   username: root
   password: darth2020
 
@@ -60,10 +55,14 @@ datapath: ${PROJECT_HOME}/caches
 
 eas:
   embbed:
-    enable: false
-#  address: http://172.10.1.12:8080
-#  web:
-#    address: http://172.10.1.12:8080
+    enable: true
+  address: http://172.10.1.12:8080
+  web:
+    address: http://172.10.1.12:8080
+
+mysql:
+  server:
+    port: 3333
 
 #homes
 homes:

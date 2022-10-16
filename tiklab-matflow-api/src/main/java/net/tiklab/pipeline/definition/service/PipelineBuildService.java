@@ -27,20 +27,6 @@ public interface PipelineBuildService {
     void deleteBuild(String buildId);
 
     /**
-     * 根据流水线id查询配置
-     * @param pipelineId 流水线id
-     * @return 配置
-     */
-    PipelineBuild findBuild(String pipelineId);
-
-    /**
-     * 更新
-     * @param pipelineBuild 更新信息
-     * @param pipelineId 流水线id
-     */
-    void updateBuild(PipelineBuild pipelineBuild, String pipelineId);
-
-    /**
      * 更新
      * @param PipelineBuild 更新信息
      */

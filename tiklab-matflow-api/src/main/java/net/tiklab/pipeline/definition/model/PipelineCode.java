@@ -21,7 +21,6 @@ public class PipelineCode {
     private String codeId;
 
     //代码类型
-    @ApiProperty(name="type",desc="代码类型")
     private int type;
 
     //地址名
@@ -45,21 +44,11 @@ public class PipelineCode {
     private Proof proof;
 
     //顺序
-    @ApiProperty(name = "sort",desc="顺序")
     private int sort;
 
     //别名
     @ApiProperty(name = "codeAlias",desc="别名")
     private String codeAlias;
-
-    @ApiProperty(name="pipeline",desc="流水线id",eg="@selectOne")
-    @Mappings({
-            @Mapping(source = "pipeline.pipelineId",target = "pipelineId")
-    })
-    @JoinQuery(key = "pipelineId")
-    private Pipeline pipeline;
-
-
 
     public String getCodeId() {
         return codeId;
@@ -126,12 +115,4 @@ public class PipelineCode {
         this.codeAlias = codeAlias;
     }
 
-
-    public Pipeline getPipeline() {
-        return pipeline;
-    }
-
-    public void setPipeline(Pipeline pipeline) {
-        this.pipeline = pipeline;
-    }
 }

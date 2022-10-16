@@ -28,31 +28,10 @@ public interface PipelineCodeService {
      void deleteCode(String codeId);
 
     /**
-     * 根据流水线id查询配置
-     * @param pipelineId 流水线id
-     * @return 配置
-     */
-    PipelineCode findCode(String pipelineId);
-
-    /**
      * 更新
      * @param pipelineCode 更新信息
      */
      void updateCode(PipelineCode pipelineCode);
-
-    /**
-     * 更新
-     * @param pipelineCode 更新信息
-     * @param pipelineId 流水线id
-     */
-     void updateCode(PipelineCode pipelineCode,String pipelineId);
-
-    /**
-     * 更新源码地址
-     * @param pipelineCode 源码信息
-     * @return 源码信息
-     */
-     PipelineCode getUrl(PipelineCode pipelineCode);
 
     /**
      * 查询单个信息

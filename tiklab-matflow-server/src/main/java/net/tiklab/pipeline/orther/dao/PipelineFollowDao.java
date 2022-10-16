@@ -91,6 +91,12 @@ public class PipelineFollowDao {
         return  jdbcTemplate.query(sql, new BeanPropertyRowMapper(PipelineEntity.class));
     }
 
+    /**
+     *
+     * @param userId 用户id
+     * @param pipelineId 流水线id
+     * @return 收藏信息
+     */
     public List<PipelineFollow> updateFollow(String userId, String pipelineId){
         String sql = "select pipeline_follow.* from pipeline_follow ";
         sql = sql.concat(" where pipeline_follow.user_id  = '"+userId+"' "

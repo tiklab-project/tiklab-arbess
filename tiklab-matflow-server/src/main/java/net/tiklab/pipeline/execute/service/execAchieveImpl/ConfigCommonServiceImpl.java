@@ -6,7 +6,7 @@ import net.tiklab.pipeline.execute.model.PipelineExecLog;
 import net.tiklab.pipeline.execute.service.PipelineExecHistoryService;
 import net.tiklab.pipeline.execute.service.PipelineExecLogService;
 import net.tiklab.pipeline.execute.service.execAchieveService.ConfigCommonService;
-import net.tiklab.pipeline.orther.model.PipelineProcess;
+import net.tiklab.pipeline.execute.model.PipelineProcess;
 import net.tiklab.pipeline.setting.model.PipelineScm;
 import net.tiklab.pipeline.setting.service.PipelineScmService;
 import net.tiklab.rpc.annotation.Exporter;
@@ -77,8 +77,9 @@ public class ConfigCommonServiceImpl implements ConfigCommonService {
             inputStreamReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
         }
 
-        PipelineExecHistory pipelineExecHistory = pipelineProcess.getPipelineExecHistory();
         PipelineExecLog pipelineExecLog = pipelineProcess.getPipelineExecLog();
+        Pipeline pipeline = pipelineProcess.getPipeline();
+
         String s;
         BufferedReader  bufferedReader = new BufferedReader(inputStreamReader);
         StringBuilder logRunLog = new StringBuilder();
@@ -87,18 +88,13 @@ public class ConfigCommonServiceImpl implements ConfigCommonService {
         try {
             while ((s = bufferedReader.readLine()) != null) {
                 logRunLog.append(s).append("\n");
-                pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+s+"\n");
-                pipelineExecHistoryList.add(pipelineExecHistory);
+                execHistory(pipelineExecHistoryList,pipeline.getPipelineId(),s,pipelineExecLog);
                 if (logRunLog.toString().contains("BUILD FAILURE")||logRunLog.toString().contains("ERROR")) {
                     inputStreamReader.close();
                     bufferedReader.close();
                     return 0;
                 }
             }
-            //更新状态
-            pipelineExecLog.setRunLog(pipelineExecLog.getRunLog()+logRunLog);
-            pipelineExecHistoryService.updateHistory(pipelineExecHistory);
-            pipelineExecLogService.updateLog(pipelineExecLog);
             inputStreamReader.close();
             bufferedReader.close();
         } catch (IOException e) {
@@ -160,7 +156,7 @@ public class ConfigCommonServiceImpl implements ConfigCommonService {
         pipelineExecLog.setRunState(10);
         pipelineExecLog.setHistoryId(pipelineExecHistory.getHistoryId());
         pipelineExecHistoryService.updateHistory(pipelineExecHistory);
-        pipelineExecHistoryList.add(pipelineExecHistory);
+        //pipelineExecHistoryList.add(pipelineExecHistory);
         if (!b){
             pipelineExecLog.setRunState(1);
         }
@@ -197,7 +193,7 @@ public class ConfigCommonServiceImpl implements ConfigCommonService {
         pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+ "\n" + "RUN RESULT : SUCCESS");
         pipelineExecHistory.setRunStatus(30);
         pipelineExecHistory.setFindState(1);
-        pipelineExecHistoryList.add(pipelineExecHistory);
+        //pipelineExecHistoryList.add(pipelineExecHistory);
         pipelineExecHistoryService.updateHistory(pipelineExecHistory);
         //清空缓存
         pipelineExecHistoryList.removeIf(execHistory -> execHistory.getPipeline().getPipelineId().equals(pipelineId));
@@ -246,6 +242,7 @@ public class ConfigCommonServiceImpl implements ConfigCommonService {
         pipelineExecHistory.setStatus(0);
         pipelineExecHistory.setPipeline(pipeline);
         pipelineExecHistory.setHistoryId(historyId);
+        pipelineExecHistory.setRunLog("");
         User user = new User();
         user.setId(userId);
         pipelineExecHistory.setUser(user);
@@ -262,36 +259,41 @@ public class ConfigCommonServiceImpl implements ConfigCommonService {
     }
 
     /**
+     * 执行过程中的历史
+     * @param list 历史
+     * @param pipelineId 流水线id
+     */
+    public void execHistory(List<PipelineExecHistory> list,String pipelineId,String log,PipelineExecLog pipelineExecLog){
+        PipelineExecHistory execHistory = null;
+        for (PipelineExecHistory pipelineExecHistory : list) {
+            if (!pipelineExecHistory.getPipeline().getPipelineId().equals(pipelineId)){
+              continue;
+            }
+            execHistory = pipelineExecHistory;
+        }
+        if (execHistory == null) return ;
+        //更新单个配置日志
+        pipelineExecLog.setRunLog(pipelineExecLog.getRunLog()+"\n"+log);
+        pipelineExecLogService.updateLog(pipelineExecLog);
+
+        //更新历史日志
+        list.remove(execHistory);
+        execHistory.setRunLog(execHistory.getRunLog()+"\n"+log);
+        list.add(execHistory);
+
+    }
+
+    /**
      * 初始化日志
-     * @param pipelineExecHistory 历史
+     * @param historyId 历史
      * @return 日志
      */
     @Override
-    public PipelineExecLog initializeLog(PipelineExecHistory pipelineExecHistory,Object o ,Integer type){
+    public PipelineExecLog initializeLog(String historyId,PipelineConfigOrder configOrder){
         PipelineExecLog pipelineExecLog = new PipelineExecLog();
-        pipelineExecLog.setHistoryId(pipelineExecHistory.getHistoryId());
-        switch (type){
-            case 10:
-                PipelineCode code = (PipelineCode) o;
-                pipelineExecLog.setTaskAlias(code.getCodeAlias());
-                pipelineExecLog.setTaskSort(code.getSort());
-                pipelineExecLog.setTaskType(code.getType());
-            case 20:
-                PipelineTest test = (PipelineTest) o;
-                pipelineExecLog.setTaskAlias(test.getTestAlias());
-                pipelineExecLog.setTaskSort(test.getSort());
-                pipelineExecLog.setTaskType(test.getType());
-            case 30:
-                PipelineBuild build = (PipelineBuild) o;
-                pipelineExecLog.setTaskAlias(build.getBuildAlias());
-                pipelineExecLog.setTaskSort(build.getSort());
-                pipelineExecLog.setTaskType(build.getType());
-            case 40:
-                PipelineDeploy deploy = (PipelineDeploy) o;
-                pipelineExecLog.setTaskAlias(deploy.getDeployAlias());
-                pipelineExecLog.setTaskSort(deploy.getSort());
-                pipelineExecLog.setTaskType(deploy.getType());
-        }
+        pipelineExecLog.setHistoryId(historyId);
+        pipelineExecLog.setTaskSort(configOrder.getTaskSort());
+        pipelineExecLog.setTaskType(configOrder.getTaskType());
         pipelineExecLog.setRunLog("");
         String logId = pipelineExecLogService.createLog(pipelineExecLog);
         pipelineExecLog.setLogId(logId);

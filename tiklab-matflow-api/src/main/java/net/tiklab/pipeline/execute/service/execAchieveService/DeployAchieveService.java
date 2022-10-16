@@ -1,7 +1,7 @@
 package net.tiklab.pipeline.execute.service.execAchieveService;
 
-import net.tiklab.pipeline.definition.model.PipelineConfig;
-import net.tiklab.pipeline.orther.model.PipelineProcess;
+import net.tiklab.pipeline.definition.model.PipelineDeploy;
+import net.tiklab.pipeline.execute.model.PipelineProcess;
 
 public interface DeployAchieveService {
 
@@ -10,5 +10,5 @@ public interface DeployAchieveService {
      * @param pipelineProcess 部署信息
      * @return 部署状态
      */
-    String deploy(PipelineProcess pipelineProcess, PipelineConfig pipelineConfig);
+    String deploy(PipelineProcess pipelineProcess, PipelineDeploy pipelineDeploy);
 }

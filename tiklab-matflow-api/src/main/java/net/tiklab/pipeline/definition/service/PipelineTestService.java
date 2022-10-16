@@ -26,20 +26,6 @@ public interface PipelineTestService {
     void deleteTest(String testId);
 
     /**
-     * 根据流水线id查询配置
-     * @param pipelineId 流水线id
-     * @return 配置
-     */
-    PipelineTest findTest(String pipelineId);
-
-    /**
-     * 更新
-     * @param pipelineTest 更新信息
-     * @param pipelineId 流水线id
-     */
-    void updateTest(PipelineTest pipelineTest, String pipelineId);
-
-    /**
      * 更新
      * @param pipelineTest 更新信息
      */

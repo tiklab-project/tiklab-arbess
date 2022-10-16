@@ -24,7 +24,7 @@ public class PipelineCommonServerImpl implements PipelineCommonServer{
     PipelineFileService pipelineFileService;
 
     @Autowired
-    PipelineConfigService pipelineConfigService;
+    PipelineConfigOrderService pipelineConfigOrderService;
 
     @Autowired
     PipelineExecHistoryService pipelineExecHistoryService;
@@ -39,7 +39,7 @@ public class PipelineCommonServerImpl implements PipelineCommonServer{
 
         String pipelineId = pipeline.getPipelineId();
         //删除对应的流水线配置
-        pipelineConfigService.deleteConfig(pipelineId);
+        pipelineConfigOrderService.deleteConfig(pipelineId);
         //删除对应的历史
         pipelineExecHistoryService.deleteHistory(pipelineId);
 
@@ -50,7 +50,7 @@ public class PipelineCommonServerImpl implements PipelineCommonServer{
     }
 
     /**
-     * 流水线更改名称时更新源文件名称
+     * 流水线更改名称时更新源文件夹名称
      * @param newName 新的名称
      * @param lastName 旧的名称
      * @return 更新状态
@@ -103,7 +103,6 @@ public class PipelineCommonServerImpl implements PipelineCommonServer{
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         Date lastTime = DateUtils.addDays(new Date(), -7);
         Date nowTime = DateUtils.addDays(new Date(), 1);
-        //StringBuilder s = findUserPipelineId(userId,allDmUser,userPipeline);
         if (s.toString().equals("")){
             return null;
         }

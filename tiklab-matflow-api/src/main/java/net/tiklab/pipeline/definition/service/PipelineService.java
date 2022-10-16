@@ -99,7 +99,7 @@ public interface PipelineService {
      * @param userId 用户id
      * @return 流水线
      */
-    List<Pipeline> findLikePipeline(String pipelineName, String userId);
+    List<PipelineMassage> findLikePipeline(String pipelineName, String userId);
 
     /**
      * 获取拥有此流水线的用户

@@ -17,7 +17,6 @@ public class PipelineDeploy {
     @ApiProperty(name = "deployId" , desc = "id")
     private String deployId;
 
-    @ApiProperty(name = "type" , desc = "容器类型")
     private int type;
 
     @ApiProperty(name = "deployType",desc = "部署类型" )
@@ -45,11 +44,7 @@ public class PipelineDeploy {
     @ApiProperty(name = "mappingPort",desc="映射端口")
     private int mappingPort;
 
-    @ApiProperty(name = "sort",desc="顺序")
     private int sort;
-
-    @ApiProperty(name = "deployAlias",desc="别名")
-    private String deployAlias;
 
     @ApiProperty(name = "sshPort" ,desc="ssh连接端口")
     private int sshPort;
@@ -63,12 +58,6 @@ public class PipelineDeploy {
     @ApiProperty(name = "deployOrder",desc = "部署命令" )
     private String deployOrder;
 
-    @ApiProperty(name="pipeline",desc="流水线id",eg="@selectOne")
-    @Mappings({
-            @Mapping(source = "pipeline.pipelineId",target = "pipelineId")
-    })
-    @JoinQuery(key = "pipelineId")
-    private Pipeline pipeline;
 
 
 
@@ -152,14 +141,6 @@ public class PipelineDeploy {
         this.sort = sort;
     }
 
-    public String getDeployAlias() {
-        return deployAlias;
-    }
-
-    public void setDeployAlias(String deployAlias) {
-        this.deployAlias = deployAlias;
-    }
-
     public int getSshPort() {
         return sshPort;
     }
@@ -192,11 +173,5 @@ public class PipelineDeploy {
         this.deployOrder = deployOrder;
     }
 
-    public Pipeline getPipeline() {
-        return pipeline;
-    }
 
-    public void setPipeline(Pipeline pipeline) {
-        this.pipeline = pipeline;
-    }
 }

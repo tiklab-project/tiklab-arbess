@@ -19,7 +19,6 @@
         <module>tiklab-matflow-api</module>
         <module>tiklab-matflow-server</module>
         <module>tiklab-matflow-starter</module>
-        <module>tiklab-matflow-distribution</module>
     </modules>
 
     <!-- 许可证信息 -->

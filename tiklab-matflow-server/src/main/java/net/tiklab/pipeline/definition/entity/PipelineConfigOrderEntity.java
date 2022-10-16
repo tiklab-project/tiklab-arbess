@@ -3,24 +3,26 @@ package net.tiklab.pipeline.definition.entity;
 
 import net.tiklab.dal.jpa.annotation.*;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 /**
- * 流水线配置
+ * 流水线顺序配置
  */
 
 @Entity
-@Table(name="pipeline_configure")
-public class PipelineConfigureEntity {
+@Table(name="pipeline_config_order")
+public class PipelineConfigOrderEntity {
 
     //流水线配置id
-    //id
     @Id
     @GeneratorValue
-    @Column(name = "configure_id")
-    private String configureId;
+    @Column(name = "config_id",notNull = true)
+    private String configId;
 
     //创建配置时间
     @Column(name = "create_time",notNull = true)
-    private String createTime;
+    private String createTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
 
     //流水线
     @Column(name = "pipeline_id",notNull = true)
@@ -38,20 +40,12 @@ public class PipelineConfigureEntity {
     @Column(name = "task_sort",notNull = true)
     private int taskSort;
 
-    //别名
-    @Column(name = "task_alias",notNull = true)
-    private String taskAlias;
-
-    //别名
-    @Column(name = "view",notNull = true)
-    private int view;
-
-    public String getConfigureId() {
-        return configureId;
+    public String getConfigId() {
+        return configId;
     }
 
-    public void setConfigureId(String configureId) {
-        this.configureId = configureId;
+    public void setConfigId(String configId) {
+        this.configId = configId;
     }
 
     public String getCreateTime() {
@@ -92,21 +86,5 @@ public class PipelineConfigureEntity {
 
     public void setTaskSort(int taskSort) {
         this.taskSort = taskSort;
-    }
-
-    public String getTaskAlias() {
-        return taskAlias;
-    }
-
-    public void setTaskAlias(String taskAlias) {
-        this.taskAlias = taskAlias;
-    }
-
-    public int getView() {
-        return view;
-    }
-
-    public void setView(int view) {
-        this.view = view;
     }
 }

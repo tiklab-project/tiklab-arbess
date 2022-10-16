@@ -66,6 +66,11 @@ public class ProofDao {
         return jpaTemplate.findAll(ProofEntity.class);
     }
 
+    /**
+     *
+     * @param s 条件
+     * @return 凭证
+     */
     public List<ProofEntity> findPipelineProof(StringBuilder s){
         JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
         String sql = " select pipeline_proof.* from pipeline_proof ";

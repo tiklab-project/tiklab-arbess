@@ -4,7 +4,6 @@ package net.tiklab.pipeline.setting.model;
 
 import net.tiklab.postin.annotation.ApiModel;
 import net.tiklab.postin.annotation.ApiProperty;
-
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 

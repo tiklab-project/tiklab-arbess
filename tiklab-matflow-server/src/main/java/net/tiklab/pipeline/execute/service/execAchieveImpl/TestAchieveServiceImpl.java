@@ -2,15 +2,13 @@ package net.tiklab.pipeline.execute.service.execAchieveImpl;
 
 import net.tiklab.core.exception.ApplicationException;
 import net.tiklab.pipeline.definition.model.Pipeline;
-import net.tiklab.pipeline.definition.model.PipelineConfig;
 import net.tiklab.pipeline.orther.service.PipelineFileService;
 import net.tiklab.pipeline.definition.model.PipelineTest;
 import net.tiklab.pipeline.definition.service.PipelineTestService;
 import net.tiklab.pipeline.execute.model.PipelineExecHistory;
-import net.tiklab.pipeline.execute.model.PipelineExecLog;
 import net.tiklab.pipeline.execute.service.PipelineExecServiceImpl;
 import net.tiklab.pipeline.execute.service.execAchieveService.TestAchieveService;
-import net.tiklab.pipeline.orther.model.PipelineProcess;
+import net.tiklab.pipeline.execute.model.PipelineProcess;
 import net.tiklab.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -38,18 +36,13 @@ public class TestAchieveServiceImpl implements TestAchieveService {
     PipelineFileService pipelineFileService;
 
     // 单元测试
-    public String test(PipelineProcess pipelineProcess, PipelineConfig pipelineConfig) {
+    public String test(PipelineProcess pipelineProcess, PipelineTest pipelineTest) {
         List<PipelineExecHistory> pipelineExecHistoryList = PipelineExecServiceImpl.pipelineExecHistoryList;
         long beginTime = new Timestamp(System.currentTimeMillis()).getTime();
         //初始化日志
         PipelineExecHistory pipelineExecHistory = pipelineProcess.getPipelineExecHistory();
 
-        PipelineTest pipelineTest = pipelineConfig.getPipelineTest();
-        Pipeline pipeline = pipelineTest.getPipeline();
-
-
-        PipelineExecLog pipelineExecLog = commonAchieveService.initializeLog(pipelineExecHistory, pipelineTest,20);
-        pipelineProcess.setPipelineExecLog(pipelineExecLog);
+        Pipeline pipeline = null;
 
         String testOrder = pipelineTest.getTestOrder();
         String path = pipelineFileService.getFileAddress()+pipeline.getPipelineName();

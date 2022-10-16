@@ -2,15 +2,14 @@ package net.tiklab.pipeline.execute.service.execAchieveImpl;
 
 import net.tiklab.core.exception.ApplicationException;
 import net.tiklab.pipeline.definition.model.Pipeline;
-import net.tiklab.pipeline.definition.model.PipelineConfig;
+import net.tiklab.pipeline.execute.model.PipelineExecLog;
 import net.tiklab.pipeline.execute.service.execAchieveService.ConfigCommonService;
 import net.tiklab.pipeline.orther.service.PipelineFileService;
 import net.tiklab.pipeline.definition.model.PipelineBuild;
 import net.tiklab.pipeline.execute.model.PipelineExecHistory;
-import net.tiklab.pipeline.execute.model.PipelineExecLog;
 import net.tiklab.pipeline.execute.service.PipelineExecServiceImpl;
 import net.tiklab.pipeline.execute.service.execAchieveService.BuildAchieveService;
-import net.tiklab.pipeline.orther.model.PipelineProcess;
+import net.tiklab.pipeline.execute.model.PipelineProcess;
 import net.tiklab.rpc.annotation.Exporter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,19 +38,11 @@ public class BuildAchieveServiceImpl implements BuildAchieveService {
     private static final Logger logger = LoggerFactory.getLogger(BuildAchieveServiceImpl.class);
 
     // 构建
-    public String build(PipelineProcess pipelineProcess, PipelineConfig pipelineConfig)  {
-        List<PipelineExecHistory> pipelineExecHistoryList = PipelineExecServiceImpl.pipelineExecHistoryList;
+    public String build(PipelineProcess pipelineProcess,  PipelineBuild pipelineBuild)  {
+        List<PipelineExecHistory> list = PipelineExecServiceImpl.pipelineExecHistoryList;
         long beginTime = new Timestamp(System.currentTimeMillis()).getTime();
-
-        PipelineBuild pipelineBuild = pipelineConfig.getPipelineBuild();
-        Pipeline pipeline = pipelineBuild.getPipeline();
-        //获取配置信息
-        PipelineExecHistory pipelineExecHistory = pipelineProcess.getPipelineExecHistory();
-
-        //初始化日志
-        PipelineExecLog pipelineExecLog = configCommonService.initializeLog(pipelineExecHistory, pipelineBuild,30);
-        pipelineProcess.setPipelineExecLog(pipelineExecLog);
-
+        Pipeline pipeline = pipelineProcess.getPipeline();
+        PipelineExecLog pipelineExecLog = pipelineProcess.getPipelineExecLog();
 
         //项目地址
         String path = pipelineFileService.getFileAddress()+ pipeline.getPipelineName();
@@ -62,30 +53,29 @@ public class BuildAchieveServiceImpl implements BuildAchieveService {
                     +"执行 : \""  + pipelineBuild.getBuildOrder() + "\"\n";
 
             //更新日志
-            pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog() + a);
-            pipelineExecLog.setRunLog(pipelineExecLog.getRunLog()+a);
+            configCommonService.execHistory(list,pipeline.getPipelineId(),a,pipelineExecLog);
 
             //执行命令
             Process process = getOrder(pipelineBuild, path);
             if (process == null){
                 configCommonService.updateTime(pipelineProcess,beginTime);
-                configCommonService.updateState(pipelineProcess,false, pipelineExecHistoryList);
+                configCommonService.updateState(pipelineProcess,false, list);
                 return "构建命令执行错误" ;
             }
 
             //构建失败
-            int state = configCommonService.log(process.getInputStream(), pipelineProcess, pipelineExecHistoryList);
+            int state = configCommonService.log(process.getInputStream(), pipelineProcess, list);
             process.destroy();
             configCommonService.updateTime(pipelineProcess,beginTime);
             if (state == 0){
-                configCommonService.updateState(pipelineProcess,false, pipelineExecHistoryList);
+                configCommonService.updateState(pipelineProcess,false, list);
                 return "构建失败";
             }
         } catch (IOException | ApplicationException e) {
-            configCommonService.updateState(pipelineProcess,false, pipelineExecHistoryList);
+            configCommonService.updateState(pipelineProcess,false, list);
             return e.getMessage() ;
         }
-        configCommonService.updateState(pipelineProcess,true, pipelineExecHistoryList);
+        configCommonService.updateState(pipelineProcess,true, list);
         return null;
     }
 

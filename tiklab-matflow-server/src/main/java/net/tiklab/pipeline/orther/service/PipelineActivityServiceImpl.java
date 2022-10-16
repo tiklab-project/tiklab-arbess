@@ -1,25 +1,18 @@
 package net.tiklab.pipeline.orther.service;
 
-import net.tiklab.beans.BeanMapper;
-import net.tiklab.join.JoinTemplate;
-import net.tiklab.pipeline.definition.model.Pipeline;
-import net.tiklab.pipeline.orther.dao.PipelineActivityDao;
-import net.tiklab.pipeline.orther.entity.PipelineActivityEntity;
-import net.tiklab.pipeline.orther.model.PipelineActivity;
-import net.tiklab.pipeline.orther.model.PipelineActivityQuery;
+import com.alibaba.fastjson.JSONObject;
+import net.tiklab.oplog.log.modal.OpLog;
+import net.tiklab.oplog.log.modal.OpLogTemplate;
+import net.tiklab.oplog.log.service.OpLogService;
 import net.tiklab.rpc.annotation.Exporter;
 import net.tiklab.user.user.model.User;
-import net.tiklab.user.user.service.UserService;
+import net.tiklab.utils.context.LoginContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
+import java.sql.Timestamp;
+import java.util.*;
 
 /**
  * 动态
@@ -30,75 +23,37 @@ import java.util.List;
 public class PipelineActivityServiceImpl implements PipelineActivityService {
 
     @Autowired
-    PipelineActivityDao pipelineActivityDao;
-
-    @Autowired
-    UserService userService;
-
-    @Autowired
-    JoinTemplate joinTemplate;
+    OpLogService logService;
 
     private static final Logger logger = LoggerFactory.getLogger(PipelineActivityServiceImpl.class);
 
-
-    //添加动态
-    @Override
-    public  void createActive(PipelineActivity pipelineActivity){
-        pipelineActivityDao.createActivity(BeanMapper.map(pipelineActivity, PipelineActivityEntity.class));
+    /**
+     * 创建日志
+     * @param type 日志类型 (创建 create，删除 delete，执行 exec，更新 update)
+     * @param templateId 模板id (创建 流水线--pipeline，运行 pipelineExec，凭证--pipelineProof,其他--pipelineOther)
+     * @param massage 日志信息
+     */
+    public void log(String type, String templateId,String massage){
+        OpLog log = new OpLog();
+        OpLogTemplate opLogTemplate = new OpLogTemplate();
+        opLogTemplate.setId(templateId);
+        log.setActionType(type);
+        log.setModule("matflow");
+        log.setTimestamp(new Timestamp(System.currentTimeMillis()));
+        String loginId = LoginContext.getLoginId();
+        User user = new User();
+        user.setId(loginId);
+        log.setUser(user);
+        log.setBgroup("matflow");
+        log.setOpLogTemplate(opLogTemplate);
+        HashMap<String, String> map = new HashMap<>();
+        map.put("massage", massage);
+        log.setContent(JSONObject.toJSONString(map));
+        logService.createLog(log);
     }
 
-    //对外创建动态
-    @Override
-    public void createActive(String userId, Pipeline pipeline, String massage){
-        PipelineActivity pipelineActivity = new PipelineActivity();
-        User user = userService.findOne(userId);
-        pipelineActivity.setCreateTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
-        pipelineActivity.setUser(user);
-        if (pipeline != null){
-            pipelineActivity.setPipeline(pipeline);
-        }
-        String[] split = massage.split("/");
-        pipelineActivity.setMassage(""+split[0]);
-        if (split.length == 2){
-            pipelineActivity.setNews(""+split[1]);
-        }
-        createActive(pipelineActivity);
-    }
-
-    //删除
-    @Override
-    public  void deleteActivity(String activeId){
-        pipelineActivityDao.deleteActivity(activeId);
-    }
-
-    @Override
-    public void deletePipelineActivity(String pipelineId){
-        pipelineActivityDao.deleteAllActivity(pipelineId);
-    }
-
-    @Override
-    public  List<PipelineActivity> findAllActive(){
-        List<PipelineActivity> list = BeanMapper.mapList(pipelineActivityDao.findAllActivity(), PipelineActivity.class);
-        joinTemplate.joinQuery(list);
-        return list;
-    }
-
-    @Override
-    public List<PipelineActivity> findUserActivity(PipelineActivityQuery pipelineActivityQuery){
-        ArrayList<PipelineActivity> list = new ArrayList<>();
-        String sql = "";
-        for (Pipeline pipeline : pipelineActivityQuery.getPipelineList()) {
-            if (pipelineActivityQuery.getPage()+ pipelineActivityQuery.getPageSize() == 11){
-                sql = sql.concat(" where pipeline_activity.pipeline_id = '"+ pipeline.getPipelineId()+"' order by create_time desc limit 0,10");
-            } else {
-                sql = sql.concat(" where pipeline_activity.pipeline_id = '"+ pipeline.getPipelineId()+"' order by create_time desc");
-            }
-            list.addAll(BeanMapper.mapList(pipelineActivityDao.findUserActivity(sql), PipelineActivity.class));
-            sql = "";
-        }
-        joinTemplate.joinQuery(list);
-        list.sort(Comparator.comparing(PipelineActivity::getCreateTime,Comparator.reverseOrder()));
-        return list;
-    }
+    //public OpLog findLog(){
+    //
+    //}
 
 }

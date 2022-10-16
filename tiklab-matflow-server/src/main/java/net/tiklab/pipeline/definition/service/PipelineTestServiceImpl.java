@@ -6,6 +6,7 @@ import net.tiklab.join.JoinTemplate;
 import net.tiklab.pipeline.definition.dao.PipelineTestDao;
 import net.tiklab.pipeline.definition.entity.PipelineTestEntity;
 import net.tiklab.pipeline.definition.model.PipelineTest;
+import net.tiklab.pipeline.orther.service.PipelineActivityService;
 import net.tiklab.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,9 @@ public class PipelineTestServiceImpl implements PipelineTestService {
     @Autowired
     JoinTemplate joinTemplate;
 
+    @Autowired
+    PipelineActivityService activityService;
+
     //创建
     @Override
     public String createTest(PipelineTest pipelineTest) {
@@ -34,40 +38,6 @@ public class PipelineTestServiceImpl implements PipelineTestService {
         pipelineTestDao.deleteTest(testId);
     }
 
-    //根据流水线id查询配置
-    @Override
-    public PipelineTest findTest(String pipelineId) {
-        List<PipelineTest> allBuild = findAllTest();
-        if (allBuild != null){
-            for (PipelineTest pipelineTest : allBuild) {
-                if (pipelineTest.getPipeline() == null){
-                    continue;
-                }
-                if (pipelineTest.getPipeline().getPipelineId().equals(pipelineId)){
-                    joinTemplate.joinQuery(pipelineTest);
-                    return pipelineTest;
-                }
-            }
-        }
-        return null;
-    }
-
-    @Override
-    public void updateTest(PipelineTest pipelineTest, String pipelineId) {
-        PipelineTest test = findTest(pipelineId);
-        if (test == null){
-            if (pipelineTest.getSort() != 0){
-                createTest(pipelineTest);
-            }
-        }else {
-            if (pipelineTest.getSort() == 0){
-                deleteTest(test.getTestId());
-            }else {
-                pipelineTest.setTestId(test.getTestId());
-                updateTest(pipelineTest);
-            }
-        }
-    }
 
     //修改
     @Override

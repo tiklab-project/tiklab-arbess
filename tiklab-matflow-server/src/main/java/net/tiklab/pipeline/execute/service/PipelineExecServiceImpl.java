@@ -2,13 +2,13 @@ package net.tiklab.pipeline.execute.service;
 
 
 import net.tiklab.pipeline.definition.model.Pipeline;
-import net.tiklab.pipeline.definition.model.PipelineConfig;
-import net.tiklab.pipeline.definition.service.PipelineConfigService;
+import net.tiklab.pipeline.definition.model.PipelineConfigOrder;
+import net.tiklab.pipeline.definition.service.PipelineConfigOrderService;
 import net.tiklab.pipeline.definition.service.PipelineService;
 import net.tiklab.pipeline.execute.model.PipelineExecHistory;
 import net.tiklab.pipeline.execute.model.PipelineExecLog;
 import net.tiklab.pipeline.execute.service.execAchieveService.ConfigCommonService;
-import net.tiklab.pipeline.orther.model.PipelineProcess;
+import net.tiklab.pipeline.execute.model.PipelineProcess;
 import net.tiklab.pipeline.execute.service.execAchieveService.PipelineTaskExecService;
 import net.tiklab.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -35,7 +34,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
     ConfigCommonService configCommonService;
 
     @Autowired
-    PipelineConfigService pipelineConfigService;
+    PipelineConfigOrderService pipelineConfigOrderService;
 
     //存放过程状态
     public static final List<PipelineExecHistory> pipelineExecHistoryList = new ArrayList<>();
@@ -107,6 +106,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
 
         pipelineProcess.setPipelineExecLog(pipelineExecLog);
         pipelineProcess.setPipelineExecHistory(pipelineExecHistory);
+
         Pipeline pipeline = pipelineExecHistory.getPipeline();
 
         long overTime = new Timestamp(System.currentTimeMillis()).getTime();
@@ -149,7 +149,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
     // 构建开始
     private void begin(Pipeline pipeline, String userId) {
 
-        //更新流水线状态
+        //更新流水线状态为执行
         pipeline.setPipelineState(1);
         pipelineService.updatePipeline(pipeline);
         String pipelineId = pipeline.getPipelineId();
@@ -162,11 +162,21 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         pipelineProcess.setPipelineExecHistory(pipelineExecHistory);
         pipelineExecHistoryList.add(pipelineExecHistory);
 
-        for (int i = 1; i <= 4; i++) {
-            Map<Integer, Integer> map = pipelineConfigService.findConfig(pipeline.getPipelineId());
-            PipelineConfig pipelineConfig = pipelineConfigService.AllConfig(pipelineId);
-            String state = pipelineTaskExecService.beginState(pipelineProcess,pipelineConfig,map.get(i));
+        //获取所有配置顺序
+        List<PipelineConfigOrder> allPipelineConfig = pipelineConfigOrderService.findAllPipelineConfig(pipelineId);
+        if (allPipelineConfig == null){
+            return;
+        }
+        for (PipelineConfigOrder pipelineConfigOrder : allPipelineConfig) {
+            //初始化日志
+            PipelineExecLog pipelineExecLog = configCommonService.initializeLog(pipelineExecHistory.getHistoryId(), pipelineConfigOrder);
+            pipelineProcess.setPipeline(pipeline);
+            pipelineProcess.setPipelineExecLog(pipelineExecLog);
 
+            int taskType = pipelineConfigOrder.getTaskType();
+            PipelineConfigOrder oneConfig = pipelineConfigOrderService.findOneConfig(pipelineId, taskType);
+
+            String state = pipelineTaskExecService.beginState(pipelineProcess,oneConfig,taskType);
             if (state != null){
                 pipeline.setPipelineState(0);
                 configCommonService.error(pipelineExecHistory, state, pipeline.getPipelineId(), pipelineExecHistoryList);
@@ -177,8 +187,6 @@ public class PipelineExecServiceImpl implements PipelineExecService {
             pipelineExecHistory.setSort(pipelineExecHistory.getSort() +1);
             pipelineExecHistory.setStatus(pipelineExecHistory.getStatus() +1);
         }
-
-
 
         configCommonService.success(pipelineExecHistory, pipeline.getPipelineId(), pipelineExecHistoryList);
         pipeline.setPipelineState(0);
