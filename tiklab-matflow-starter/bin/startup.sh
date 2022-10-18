@@ -1,6 +1,6 @@
 #!/bin/sh
 #-------------------------------------------------------------------------------------------------------------
-APP_MAIN="net.tiklab.pipeline.PipelineApplication"
+APP_MAIN="net.tiklab.matflow.MatFlowApplication"
 
 JAVA_HOME="/usr/local/jdk-16.0.2"
 

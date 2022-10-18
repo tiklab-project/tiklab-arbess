@@ -58,7 +58,7 @@ datapath: ${PROJECT_HOME}/caches
 
 eas:
   embbed:
-    enable: false
+    enable: true
 #  address: http://172.10.1.12:8080
 #  web:
 #    address: http://172.10.1.12:8080

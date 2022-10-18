@@ -8,7 +8,7 @@ if [ -e "${DIRS}/${JDK_VERSION}" ]; then
       JAVA_HOME="${DIRS}/${JDK_VERSION}"
 fi
 
-APP_MAIN="net.tiklab.pipeline.PipelineApplication"
+APP_MAIN="net.tiklab.matflow.MatFlowApplication"
 
 PID=0
 getPID(){

@@ -62,8 +62,7 @@ eas:
   embbed:
     enable: false
 #  address: http://172.10.1.12:8080
-#  web:
-#    address: http://172.10.1.12:8080
+
 
 #homes
 homes:
