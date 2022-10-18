@@ -17,5 +17,5 @@ import org.springframework.context.annotation.Configuration;
 @ComponentScan({"net.tiklab.matflow"})
 public class MatFlowServerAutoConfiguration {
 
-    private static Logger logger = LoggerFactory.getLogger(MatFlowServerAutoConfiguration.class);
+    private static final Logger logger = LoggerFactory.getLogger(MatFlowServerAutoConfiguration.class);
 }

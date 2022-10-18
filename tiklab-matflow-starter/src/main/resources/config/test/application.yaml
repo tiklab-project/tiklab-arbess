@@ -1,15 +1,15 @@
 app:
-  name: tiklab-pipeline
+  name: tiklab-matflow
 
 APP_HOME: ${APP_HOME}
-application: pipeline
+application: matflow
 
 server:
-  port: 8091
+  port: 8080
 
 jdbc:
   driverClassName: com.mysql.cj.jdbc.Driver
-  url: jdbc:mysql://172.11.1.10:3306/tiklab_matflow?characterEncoding=utf8&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+  url: jdbc:mysql://localhost:3306/tiklab_matflow?characterEncoding=utf8&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
   username: root
   password: darth2020
 
@@ -56,13 +56,14 @@ datapath: ${PROJECT_HOME}/caches
 eas:
   embbed:
     enable: true
-  address: http://172.10.1.12:8080
+  address: http://eas-ce.test.tiklab.net
   web:
-    address: http://172.10.1.12:8080
+    address: http://eas-ce.test.tiklab.net
 
 mysql:
-  server:
-    port: 3333
+  embbed:
+    enable: true
+  database: tiklab_matflow
 
 #homes
 homes:

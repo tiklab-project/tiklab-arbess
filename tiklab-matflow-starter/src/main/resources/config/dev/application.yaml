@@ -1,14 +1,11 @@
 app:
   name: tiklab-matflow
 
-spring:
-  profiles.active: dev
-
 APP_HOME: ${APP_HOME}
 application: matflow
 
 server:
-  port: 8090
+  port: 8080
 
 jdbc:
   driverClassName: com.mysql.cj.jdbc.Driver
@@ -59,9 +56,14 @@ datapath: ${PROJECT_HOME}/caches
 eas:
   embbed:
     enable: true
-#  address: http://172.10.1.12:8080
-#  web:
-#    address: http://172.10.1.12:8080
+  address: http://172.11.1.12:8080
+  web:
+    address: http://172.11.1.12:8080
+
+mysql:
+  embbed:
+    enable: true
+  database: tiklab_matflow
 
 #homes
 homes:

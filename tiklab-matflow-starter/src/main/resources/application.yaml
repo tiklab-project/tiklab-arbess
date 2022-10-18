@@ -10,7 +10,7 @@ spring:
     import: optional:classpath:/config/${env:dev}/application.yaml
 
 server:
-  port: 8090
+  port: 8080
 
 jdbc:
   driverClassName: com.mysql.cj.jdbc.Driver
@@ -60,9 +60,15 @@ datapath: ${PROJECT_HOME}/caches
 
 eas:
   embbed:
-    enable: false
-#  address: http://172.10.1.12:8080
+    enable: true
+  address: http://eas-ce.tiklab.net
+#  web:
+#    address: http://172.11.1.12:8080
 
+mysql:
+  embbed:
+    enable: true
+  database: tiklab_matflow
 
 #homes
 homes:
@@ -74,7 +80,7 @@ licences:
 
 #file
 file:
-  path: http://file.dev.tiklab.net
+  path: http://file.tiklab.net
 
 git:
   gitee:
