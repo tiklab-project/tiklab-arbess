@@ -30,12 +30,8 @@ public class PipelineEntity {
     private String  pipelineCreateTime;
 
     //流水线类型
-    @Column(name = "pipeline_create_type")
+    @Column(name = "pipeline_type")
     private int pipelineType;
-
-    //收藏状态
-    @Column(name = "pipeline_collect")
-    private int pipelineCollect;
 
     //运行状态
     @Column(name = "pipeline_state")
@@ -82,14 +78,6 @@ public class PipelineEntity {
 
     public void setPipelineType(int pipelineType) {
         this.pipelineType = pipelineType;
-    }
-
-    public int getPipelineCollect() {
-        return pipelineCollect;
-    }
-
-    public void setPipelineCollect(int pipelineCollect) {
-        this.pipelineCollect = pipelineCollect;
     }
 
     public int getPipelineState() {

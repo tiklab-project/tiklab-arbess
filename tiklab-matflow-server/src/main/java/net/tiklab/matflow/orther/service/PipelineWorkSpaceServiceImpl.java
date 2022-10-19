@@ -24,9 +24,6 @@ public class PipelineWorkSpaceServiceImpl implements PipelineWorkSpaceService {
     PipelineService pipelineService;
 
     @Autowired
-    PipelineCodeService pipelineCodeService;
-
-    @Autowired
     PipelineOpenService pipelineOpenService;
 
     @Autowired

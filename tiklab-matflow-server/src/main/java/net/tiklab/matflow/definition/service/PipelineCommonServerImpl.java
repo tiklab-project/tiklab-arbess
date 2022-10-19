@@ -7,6 +7,7 @@ import net.tiklab.matflow.execute.service.PipelineExecHistoryService;
 import net.tiklab.matflow.orther.service.PipelineFileService;
 import net.tiklab.rpc.annotation.Exporter;
 import net.tiklab.user.user.model.DmUser;
+import net.tiklab.user.user.service.DmUserService;
 import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,9 @@ import java.util.List;
 @Service
 @Exporter
 public class PipelineCommonServerImpl implements PipelineCommonServer{
+
+    @Autowired
+    DmUserService dmUserService;
 
     @Autowired
     PipelineFileService pipelineFileService;
@@ -127,7 +131,8 @@ public class PipelineCommonServerImpl implements PipelineCommonServer{
      * @return 所有流水线id
      */
     @Override
-    public StringBuilder findUserPipelineId(String userId, List<DmUser> allDmUser,List<Pipeline> pipelineList){
+    public StringBuilder findUserPipelineId(String userId,List<Pipeline> pipelineList){
+        List<DmUser> allDmUser = dmUserService.findAllDmUser();
         //获取项目域条件
         StringBuilder s = new StringBuilder();
         if (allDmUser != null && allDmUser.size() != 0){
@@ -161,6 +166,54 @@ public class PipelineCommonServerImpl implements PipelineCommonServer{
         }
         return s.append(",").append(j);
     }
+
+
+    /**
+     * 获取拥有此流水线的用户
+     * @param pipelineId 流水线id
+     * @return 用户信息
+     */
+    @Override
+    public List<DmUser> findPipelineUser(String pipelineId) {
+        List<DmUser> allDmUser = dmUserService.findAllDmUser();
+        if (allDmUser == null){
+            return null;
+        }
+        List<DmUser> dmUsers = new ArrayList<>();
+        for (DmUser dmUser : allDmUser) {
+            if (dmUser.getDomainId().equals(pipelineId)){
+                dmUsers.add(dmUser);
+            }
+        }
+        return dmUsers;
+    }
+
+    /**
+     * 更新项目域权限
+     * @param pipelineId 流水线id
+     * @param dmUser 权限域
+     * @param b 类型
+     */
+    @Override
+    public void updateDmUser(String pipelineId,DmUser dmUser,boolean b){
+
+        if (b){
+            dmUserService.createDmUser(dmUser);
+            return;
+        }
+
+        List<DmUser> allDmUser = dmUserService.findAllDmUser();
+        if (allDmUser == null){
+            return ;
+        }
+        for (DmUser dm : allDmUser) {
+            if (!dm.getDomainId().equals(pipelineId)){
+                continue;
+            }
+            dmUserService.deleteDmUser(dm.getId());
+        }
+    }
+
 
 }
 

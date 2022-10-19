@@ -57,12 +57,12 @@ eas:
   embbed:
     enable: true
   address: http://172.11.1.12:8080
-  web:
-    address: http://172.11.1.12:8080
+#  web:
+#    address: http://172.11.1.12:8080
 
 mysql:
   embbed:
-    enable: true
+    enable: false
   database: tiklab_matflow
 
 #homes

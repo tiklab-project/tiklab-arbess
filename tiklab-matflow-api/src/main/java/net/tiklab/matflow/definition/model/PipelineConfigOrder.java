@@ -1,6 +1,10 @@
 package net.tiklab.matflow.definition.model;
 
 import net.tiklab.beans.annotation.Mapper;
+import net.tiklab.beans.annotation.Mapping;
+import net.tiklab.beans.annotation.Mappings;
+import net.tiklab.join.annotation.Join;
+import net.tiklab.join.annotation.JoinQuery;
 import net.tiklab.postin.annotation.ApiModel;
 import net.tiklab.postin.annotation.ApiProperty;
 
@@ -9,15 +13,16 @@ import net.tiklab.postin.annotation.ApiProperty;
  */
 
 @ApiModel
+@Join
 @Mapper(targetAlias = "PipelineConfigOrderEntity")
 public class PipelineConfigOrder {
 
     @ApiProperty(name="configId",desc="配置id")
     private String configId;
 
-    //流水线id
-    @ApiProperty(name="pipelineId",desc="流水线id")
-    private String pipelineId;
+    ////流水线id
+    //@ApiProperty(name="pipelineId",desc="流水线id")
+    //private String pipelineId;
 
     @ApiProperty(name="createTime",desc="创建时间")
     private String createTime;
@@ -30,6 +35,14 @@ public class PipelineConfigOrder {
 
     @ApiProperty(name="taskSort",desc="顺序")
     private int taskSort;
+
+    //流水线
+    @ApiProperty(name="pipeline",desc="流水线id",eg="@selectOne")
+    @Mappings({
+            @Mapping(source = "pipeline.pipelineId",target = "pipelineId")
+    })
+    @JoinQuery(key = "pipelineId")
+    private Pipeline pipeline;
 
     private PipelineCode pipelineCode;
 
@@ -48,10 +61,35 @@ public class PipelineConfigOrder {
     public PipelineConfigOrder() {
     }
 
-    public PipelineConfigOrder(String pipelineId) {
-        this.pipelineId = pipelineId;
+    public PipelineConfigOrder(Pipeline pipeline) {
+        this.pipeline = pipeline;
     }
 
+    public PipelineConfigOrder(Pipeline pipeline, String message) {
+        this.pipeline = pipeline;
+        this.message = message;
+    }
+
+    public PipelineConfigOrder(int taskType, int taskSort, Pipeline pipeline) {
+        this.taskType = taskType;
+        this.taskSort = taskSort;
+        this.pipeline = pipeline;
+    }
+
+    //public PipelineConfigOrder(String pipelineId) {
+    //    this.pipelineId = pipelineId;
+    //}
+
+    //public PipelineConfigOrder(String pipelineId,String message) {
+    //    this.pipelineId = pipelineId;
+    //    this.message = message;
+    //}
+
+    //public PipelineConfigOrder(String pipelineId, int taskType, int taskSort) {
+    //    this.pipelineId = pipelineId;
+    //    this.taskType = taskType;
+    //    this.taskSort = taskSort;
+    //}
 
     public int getTaskType() {
         return taskType;
@@ -61,13 +99,13 @@ public class PipelineConfigOrder {
         this.taskType = taskType;
     }
 
-    public String getPipelineId() {
-        return pipelineId;
-    }
-
-    public void setPipelineId(String pipelineId) {
-        this.pipelineId = pipelineId;
-    }
+    //public String getPipelineId() {
+    //    return pipelineId;
+    //}
+    //
+    //public void setPipelineId(String pipelineId) {
+    //    this.pipelineId = pipelineId;
+    //}
 
     public String getMessage() {
         return message;
@@ -147,5 +185,13 @@ public class PipelineConfigOrder {
 
     public void setSort(int sort) {
         this.sort = sort;
+    }
+
+    public Pipeline getPipeline() {
+        return pipeline;
+    }
+
+    public void setPipeline(Pipeline pipeline) {
+        this.pipeline = pipeline;
     }
 }

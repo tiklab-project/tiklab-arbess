@@ -2,9 +2,13 @@ package net.tiklab.matflow.orther.controller;
 
 
 import net.tiklab.core.Result;
+import net.tiklab.core.page.Pagination;
 import net.tiklab.matflow.execute.model.FileTree;
 import net.tiklab.matflow.execute.model.GitCommit;
+import net.tiklab.matflow.orther.model.PipelineActivity;
+import net.tiklab.matflow.orther.service.PipelineActivityService;
 import net.tiklab.matflow.orther.service.PipelineWorkSpaceService;
+import net.tiklab.oplog.log.modal.OpLog;
 import net.tiklab.postin.annotation.Api;
 import net.tiklab.postin.annotation.ApiMethod;
 import net.tiklab.postin.annotation.ApiParam;
@@ -23,6 +27,9 @@ public class PipelineWorkSpaceController {
 
     @Autowired
     PipelineWorkSpaceService pipelineWorkSpaceService;
+
+    @Autowired
+    PipelineActivityService pipelineActivityService;
 
 
     @RequestMapping(path="/fileTree",method = RequestMethod.POST)
@@ -47,6 +54,14 @@ public class PipelineWorkSpaceController {
     public Result<List<List<GitCommit>>> getSubmitMassage(String pipelineId){
         List<List<GitCommit>> submitMassage = pipelineWorkSpaceService.getSubmitMassage(pipelineId);
         return Result.ok(submitMassage);
+    }
+
+    @RequestMapping(path="/findLog",method = RequestMethod.POST)
+    @ApiMethod(name = "getSubmitMassage",desc = "获取提交信息")
+    @ApiParam(name = "pipelineId",desc = "流水线id",required = true)
+    public Result<List<PipelineActivity>> findLog(){
+        List<PipelineActivity> log = pipelineActivityService.findLog();
+        return Result.ok(log);
     }
 
 }

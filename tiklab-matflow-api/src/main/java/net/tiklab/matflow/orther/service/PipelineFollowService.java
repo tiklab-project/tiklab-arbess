@@ -29,13 +29,6 @@ public interface PipelineFollowService {
 
 
     /**
-     * 查询所有流水线
-     * @param userId 用户id
-     * @return 流水线信息
-     */
-    List<Pipeline> findUserPipeline(String userId, StringBuilder s);
-
-    /**
      * 查询单个信息
      * @param followId 关注id
      * @return 关注信息

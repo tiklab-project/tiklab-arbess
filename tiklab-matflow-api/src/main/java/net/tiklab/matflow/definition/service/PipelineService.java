@@ -101,10 +101,4 @@ public interface PipelineService {
      */
     List<PipelineMassage> findLikePipeline(String pipelineName, String userId);
 
-    /**
-     * 获取拥有此流水线的用户
-     * @param PipelineId 流水线id
-     * @return 用户信息
-     */
-    List<DmUser> findPipelineUser(String PipelineId);
 }

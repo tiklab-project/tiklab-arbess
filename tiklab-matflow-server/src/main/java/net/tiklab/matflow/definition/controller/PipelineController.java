@@ -5,6 +5,7 @@ package net.tiklab.matflow.definition.controller;
 import net.tiklab.core.Result;
 import net.tiklab.matflow.definition.model.Pipeline;
 import net.tiklab.matflow.definition.model.PipelineMassage;
+import net.tiklab.matflow.definition.service.PipelineCommonServer;
 import net.tiklab.matflow.definition.service.PipelineService;
 import net.tiklab.matflow.execute.model.PipelineExecState;
 import net.tiklab.postin.annotation.Api;
@@ -31,6 +32,9 @@ public class PipelineController {
 
     @Autowired
     PipelineService pipelineService;
+
+    @Autowired
+    PipelineCommonServer pipelineCommonServer;
 
     //创建
     @RequestMapping(path="/createPipeline",method = RequestMethod.POST)
@@ -137,7 +141,7 @@ public class PipelineController {
     @ApiParam(name = "pipelineId",desc = "流水线id",required = true)
     public Result<List<DmUser>> findPipelineUser(@NotNull String pipelineId){
 
-        List<DmUser> dmUser = pipelineService.findPipelineUser(pipelineId);
+        List<DmUser> dmUser = pipelineCommonServer.findPipelineUser(pipelineId);
 
         return Result.ok(dmUser);
     }

@@ -114,5 +114,10 @@ public interface PipelineExecHistoryService {
     PipelineExecLog getRunLog(String historyId);
 
 
+    /**
+     * 分页查询历史
+     * @param PipelineHistoryQuery 条件
+     * @return 历史
+     */
     Pagination<PipelineExecHistory> findPageHistory(PipelineHistoryQuery PipelineHistoryQuery);
 }

@@ -40,7 +40,6 @@ public class Pipeline {
     private int pipelineType;
 
     //收藏状态
-    @ApiProperty(name="pipelineCollect",desc="收藏状态",required = true)
     private int pipelineCollect;
 
     //运行状态

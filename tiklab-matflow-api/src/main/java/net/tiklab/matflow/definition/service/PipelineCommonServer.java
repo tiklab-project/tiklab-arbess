@@ -43,6 +43,20 @@ public interface PipelineCommonServer {
      * @param userId 用户id
      * @return 所有流水线id
      */
-    StringBuilder findUserPipelineId(String userId, List<DmUser> allDmUser, List<Pipeline> userPipeline);
+    StringBuilder findUserPipelineId(String userId, List<Pipeline> userPipeline);
+
+    /**
+     * 获取拥有此流水线的用户
+     * @param pipelineId 流水线id
+     * @return 用户信息
+     */
+    List<DmUser> findPipelineUser(String pipelineId);
+
+
+    /**
+     * 更新项目域权限
+     * @param pipelineId 流水线id
+     */
+    void updateDmUser(String pipelineId,DmUser dmUser,boolean b);
 
 }

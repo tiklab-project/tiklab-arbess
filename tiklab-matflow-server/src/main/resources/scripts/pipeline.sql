@@ -190,5 +190,5 @@ create table pipeline_test  (
   test_id varchar(256)  COMMENT '测试id',
   test_order varchar(255)  COMMENT '测试命令',
   PRIMARY KEY (test_id) USING BTREE
-)
+);
 

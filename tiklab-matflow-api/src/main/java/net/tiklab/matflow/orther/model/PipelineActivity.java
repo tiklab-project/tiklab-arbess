@@ -12,46 +12,27 @@ import net.tiklab.postin.annotation.ApiProperty;
 import net.tiklab.user.user.model.User;
 
 @ApiModel
-@Join
-@Mapper(targetAlias = "PipelineActivityEntity")
 public class PipelineActivity {
 
-    @ApiProperty(name = "id")
-    private String id;
-
-    @ApiProperty(name = "createTime")
+    //创建时间
     private String createTime;
 
-    @ApiProperty(name = "massage")
-    private String massage ;
+    //信息
+    private String message ;
 
-    @ApiProperty(name = "news")
-    private String news ;
+    //用户名称
+    private String userName;
 
-    @ApiProperty(name="user",desc="认证配置",required = true)
-    @Mappings({
-            @Mapping(source = "user.id",target = "userId")
-    })
-    @JoinQuery(key = "id")
-    private User user;
+    //流水线id
+    private String pipelineId;
 
-    //流水线
-    @ApiProperty(name="pipeline",desc="流水线id",eg="@selectOne")
-    @Mappings({
-            @Mapping(source = "pipeline.pipelineId",target = "pipelineId")
-    })
-    @JoinQuery(key = "pipelineId")
-    private Pipeline pipeline;
+    private String pipelineName;
 
+    //类型
+    private String type;
 
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
+    //模板类型
+    private String templateType;
 
     public String getCreateTime() {
         return createTime;
@@ -61,36 +42,51 @@ public class PipelineActivity {
         this.createTime = createTime;
     }
 
-    public String getMassage() {
-        return massage;
+    public String getMessage() {
+        return message;
     }
 
-    public void setMassage(String massage) {
-        this.massage = massage;
+    public void setMessage(String message) {
+        this.message = message;
     }
 
-
-    public String getNews() {
-        return news;
+    public String getUserName() {
+        return userName;
     }
 
-    public void setNews(String news) {
-        this.news = news;
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 
-    public User getUser() {
-        return user;
+    public String getPipelineId() {
+        return pipelineId;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setPipelineId(String pipelineId) {
+        this.pipelineId = pipelineId;
     }
 
-    public Pipeline getPipeline() {
-        return pipeline;
+    public String getType() {
+        return type;
     }
 
-    public void setPipeline(Pipeline pipeline) {
-        this.pipeline = pipeline;
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getTemplateType() {
+        return templateType;
+    }
+
+    public void setTemplateType(String templateType) {
+        this.templateType = templateType;
+    }
+
+    public String getPipelineName() {
+        return pipelineName;
+    }
+
+    public void setPipelineName(String pipelineName) {
+        this.pipelineName = pipelineName;
     }
 }

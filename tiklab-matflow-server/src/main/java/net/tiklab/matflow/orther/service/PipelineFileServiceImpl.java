@@ -23,7 +23,7 @@ public class PipelineFileServiceImpl implements PipelineFileService {
      */
     @Override
     public String getFileAddress(){
-        String files = "/usr/local/pipeline/";
+        String files = "/usr/local/matflow/";
 
         String property = System.getProperty("os.name");
         String[] s = property.split(" ");

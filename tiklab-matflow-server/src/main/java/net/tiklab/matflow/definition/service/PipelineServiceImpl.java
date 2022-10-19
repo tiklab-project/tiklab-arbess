@@ -1,6 +1,7 @@
 package net.tiklab.matflow.definition.service;
 
 import net.tiklab.beans.BeanMapper;
+import net.tiklab.core.exception.ApplicationException;
 import net.tiklab.join.JoinTemplate;
 import net.tiklab.matflow.definition.dao.PipelineDao;
 import net.tiklab.matflow.definition.entity.PipelineEntity;
@@ -35,7 +36,7 @@ public class PipelineServiceImpl implements PipelineService {
     PipelineDao pipelineDao;
 
     @Autowired
-    DmUserService dmUserService;
+    PipelineConfigOrderService pipelineConfigOrderService;
 
     @Autowired
     JoinTemplate joinTemplate;
@@ -46,51 +47,47 @@ public class PipelineServiceImpl implements PipelineService {
     @Autowired
     PipelineActivityService pipelineActivityService;
 
-
     private static final Logger logger = LoggerFactory.getLogger(PipelineServiceImpl.class);
 
     //创建
     @Override
     public String createPipeline(Pipeline pipeline) {
-
-        List<Pipeline> pipelineList = findAllPipeline();
-        //判断是否存在相同名称
-        for (Pipeline pipeline1 : pipelineList) {
-            if (pipeline1.getPipelineName().equals(pipeline.getPipelineName())){
-                return null;
-            }
-        }
-
         PipelineEntity pipelineEntity = BeanMapper.map(pipeline, PipelineEntity.class);
         String pipelineId = pipelineDao.createPipeline(pipelineEntity);
-        pipelineActivityService.log("create", "pipeline", "创建了流水线"+pipeline.getPipelineName());
+        //创建模板配置
+        if (pipeline.getPipelineType() != 1){
+            pipelineConfigOrderService.createTemplate(pipelineId, pipeline.getPipelineType());
+        }
+        //动态
+        HashMap<String, String> map = new HashMap<>();
+        map.put("message", "");
+        map.put("pipelineId", pipelineId);
+        map.put("pipelineName", pipeline.getPipelineName());
+        pipelineActivityService.log("create", "pipeline", map);
         DmUser dmUser = new DmUser();
         dmUser.setDomainId(pipelineId);
         User user = new User();
         user.setId(pipeline.getUser().getId());
         dmUser.setUser(user);
-        dmUserService.createDmUser(dmUser);
-        return  pipelineId;
+        pipelineCommonServer.updateDmUser(pipelineId,dmUser,true);
+        return pipelineId;
     }
 
     //删除
     @Override
     public Integer deletePipeline(String pipelineId) {
         Pipeline pipeline = findOnePipeline(pipelineId);
+        pipelineCommonServer.updateDmUser(pipelineId,new DmUser(),false);
         joinTemplate.joinQuery(pipeline);
-        List<DmUser> allDmUser = dmUserService.findAllDmUser();
-        if (allDmUser == null){
-            return 1;
-        }
-        for (DmUser dmUser : allDmUser) {
-            if (!dmUser.getDomainId().equals(pipelineId)){
-                continue;
-            }
-            dmUserService.deleteDmUser(dmUser.getId());
-        }
         pipelineDao.deletePipeline(pipelineId);
         pipelineCommonServer.delete(pipeline);
-        pipelineActivityService.log("delete", "pipeline", "删除了流水线"+pipeline.getPipelineName());
+        pipelineConfigOrderService.deleteConfig(pipelineId);
+        //动态
+        HashMap<String, String> map = new HashMap<>();
+        map.put("message", "");
+        map.put("pipelineId", pipelineId);
+        map.put("pipelineName", pipeline.getPipelineName());
+        pipelineActivityService.log("delete", "pipeline", map);
         return 1;
     }
 
@@ -101,9 +98,12 @@ public class PipelineServiceImpl implements PipelineService {
         Pipeline flow = findOnePipeline(pipeline.getPipelineId());
         if (!pipeline.getPipelineName().equals( flow.getPipelineName())){
             pipelineCommonServer.updatePipeline(pipeline.getPipelineName(), flow.getPipelineName());
-            pipelineActivityService.log("update", "pipeline", "修改流水线"+flow.getPipelineName()+"名称为"+pipeline.getPipelineName());
+            HashMap<String, String> map = new HashMap<>();
+            map.put("message","名称为"+pipeline.getPipelineName());
+            map.put("pipelineId", pipeline.getPipelineId());
+            map.put("pipelineName", pipeline.getPipelineName());
+            pipelineActivityService.log("update", "pipeline", map);
         }
-
         PipelineEntity pipelineEntity = BeanMapper.map(pipeline, PipelineEntity.class);
         pipelineDao.updatePipeline(pipelineEntity);
         return 1;
@@ -141,8 +141,7 @@ public class PipelineServiceImpl implements PipelineService {
     public StringBuilder findUserPipelineId(String userId){
         List<PipelineEntity> allPipeline = pipelineDao.findUserPipeline();
         List<Pipeline> pipelineList = BeanMapper.mapList(allPipeline, Pipeline.class);
-        List<DmUser> allDmUser = dmUserService.findAllDmUser();
-       return pipelineCommonServer.findUserPipelineId(userId, allDmUser, pipelineList);
+       return pipelineCommonServer.findUserPipelineId(userId, pipelineList);
     }
 
     /**
@@ -167,18 +166,20 @@ public class PipelineServiceImpl implements PipelineService {
         if (builder == null){
             return null;
         }
-        List<PipelineEntity> pipelineFollow = pipelineDao.findPipelineFollow(userId,builder);
-        List<PipelineEntity> pipelineNotFollow = pipelineDao.findPipelineNotFollow(userId,builder);
+        List<PipelineEntity> pipelineFollowEntity = pipelineDao.findPipelineFollow(userId,builder);
+        List<Pipeline> pipelineFollow = BeanMapper.mapList(pipelineFollowEntity, Pipeline.class);
 
+        List<Pipeline> pipelineNotFollow = new ArrayList<>();
         if (pipelineFollow != null){
+            List<PipelineEntity> pipelineNotFollowEntity = pipelineDao.findPipelineNotFollow(userId,builder);
+            pipelineNotFollow = BeanMapper.mapList(pipelineNotFollowEntity, Pipeline.class);
             pipelineFollow.forEach(pipeline -> pipeline.setPipelineCollect(1));
             pipelineNotFollow.addAll(pipelineFollow);
         }
         //排序
-        pipelineNotFollow.sort(Comparator.comparing(PipelineEntity::getPipelineName));
-        List<Pipeline> pipelines = BeanMapper.mapList(pipelineNotFollow, Pipeline.class);
+        pipelineNotFollow.sort(Comparator.comparing(Pipeline::getPipelineName));
 
-        return pipelineCommonServer.findAllStatus(pipelines);
+        return pipelineCommonServer.findAllStatus(pipelineNotFollow);
     }
 
     //获取用户收藏的流水线
@@ -188,16 +189,16 @@ public class PipelineServiceImpl implements PipelineService {
         if (builder == null){
             return null;
         }
-        List<PipelineEntity> pipelineFollow = pipelineDao.findPipelineFollow(userId,builder);
+        List<PipelineEntity> pipelineFollowEntity = pipelineDao.findPipelineFollow(userId,builder);
+        List<Pipeline> pipelineFollow = BeanMapper.mapList(pipelineFollowEntity, Pipeline.class);
         if (pipelineFollow == null){
           return null;
         }
         pipelineFollow.forEach(pipeline -> pipeline.setPipelineCollect(1));
         //排序
-        pipelineFollow.sort(Comparator.comparing(PipelineEntity::getPipelineName));
-        List<Pipeline> pipelines = BeanMapper.mapList(pipelineFollow, Pipeline.class);
+        pipelineFollow.sort(Comparator.comparing(Pipeline::getPipelineName));
 
-        return pipelineCommonServer.findAllStatus(pipelines);
+        return pipelineCommonServer.findAllStatus(pipelineFollow);
     }
 
     //查询流水线最近运行状态
@@ -271,25 +272,6 @@ public class PipelineServiceImpl implements PipelineService {
         return pipelineCommonServer.findAllStatus(pipelines);
     }
 
-    /**
-     * 获取拥有此流水线的用户
-     * @param pipelineId 流水线id
-     * @return 用户信息
-     */
-    @Override
-    public List<DmUser> findPipelineUser(String pipelineId) {
-        List<DmUser> allDmUser = dmUserService.findAllDmUser();
-        if (allDmUser == null){
-            return null;
-        }
-        List<DmUser> dmUsers = new ArrayList<>();
-        for (DmUser dmUser : allDmUser) {
-            if (dmUser.getDomainId().equals(pipelineId)){
-                dmUsers.add(dmUser);
-            }
-        }
-        return dmUsers;
-    }
 
 
 }
