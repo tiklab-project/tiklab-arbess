@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 
 /**
- * 维护配置关联信息
+ * 配置顺序表操作
  */
 
 @Service
@@ -26,21 +26,12 @@ public class PipelineConfigOrderServiceImpl implements PipelineConfigOrderServic
     @Autowired
     PipelineConfigOrderDao pipelineConfigOrderDao;
 
-    @Autowired
-    PipelineCodeService pipelineCodeService;
-
-    @Autowired
-    PipelineBuildService pipelineBuildService;
-
-    @Autowired
-    PipelineTestService pipelineTestService;
-
-    @Autowired
-    PipelineDeployService pipelineDeployService;
-
     //动态
     @Autowired
     PipelineActivityService pipelineActivityService;
+
+    @Autowired
+    PipelineConfigService pipelineConfigService;
 
     @Autowired
     JoinTemplate joinTemplate;
@@ -61,8 +52,9 @@ public class PipelineConfigOrderServiceImpl implements PipelineConfigOrderServic
     //创建流水线模板
     @Override
     public void createTemplate(String pipelineId, int type){
-        PipelineConfigOrder pipelineConfigOrder = new PipelineConfigOrder(new Pipeline(pipelineId),"create");
+        PipelineConfigOrder pipelineConfigOrder = new PipelineConfigOrder(pipelineId,"create");
         int[] ints = switch (type) {
+            case 1 -> new int[]{1};
             case 2131 -> new int[]{1,21, 31};
             case 2132 -> new int[]{1,21, 32};
             case 112131 -> new int[]{1,11, 21, 31};
@@ -83,39 +75,11 @@ public class PipelineConfigOrderServiceImpl implements PipelineConfigOrderServic
     //查询流水线配置
     @Override
     public List<Object> findAllConfig(String pipelineId){
-        List<Object> list = new ArrayList<>();
         List<PipelineConfigOrder> allPipelineConfig = findAllPipelineConfig(pipelineId);
         if (allPipelineConfig == null){
             return null;
         }
-
-        for (PipelineConfigOrder pipelineConfigOrder : allPipelineConfig) {
-            String taskId = pipelineConfigOrder.getTaskId();
-            int taskSort = pipelineConfigOrder.getTaskSort();
-            int type = pipelineConfigOrder.getTaskType();
-            if (type < 10){
-                PipelineCode code = pipelineCodeService.findOneCode(taskId);
-                code.setType(type);
-                code.setSort(taskSort);
-                list.add(code);
-            }else if (10<type && type<20){
-                PipelineTest test = pipelineTestService.findOneTest(taskId);
-                test.setType(type);
-                test.setSort(taskSort);
-                list.add(test);
-            }else if (20<type && type<30){
-                PipelineBuild build = pipelineBuildService.findOneBuild(taskId);
-                build.setType(type);
-                build.setSort(taskSort);
-                list.add(build);
-            }else if (30<type && type<40){
-                PipelineDeploy deploy = pipelineDeployService.findOneDeploy(taskId);
-                deploy.setType(type);
-                deploy.setSort(taskSort);
-                list.add(deploy);
-            }
-        }
-        return list;
+        return pipelineConfigService.findAllConfig(allPipelineConfig);
     }
 
     //更新流水线配置
@@ -143,7 +107,7 @@ public class PipelineConfigOrderServiceImpl implements PipelineConfigOrderServic
         //判断配置类型
         switch (message) {
             case "create" -> createConfig(config,types);
-            case "update" -> updateOneConfig(config,types);
+            case "update" -> updateConfig(config,types);
             case "delete" -> deleteConfig(pipelineId,types,type);
             case "updateType" -> updateOneConfigType(config,types);
             case "order" -> updateOrder(pipelineId,config.getTaskSort(),config.getSort());
@@ -169,26 +133,7 @@ public class PipelineConfigOrderServiceImpl implements PipelineConfigOrderServic
         if (typeConfig == null){
             return null;
         }
-        String taskId = typeConfig.getTaskId();
-        int taskType = typeConfig.getTaskType();
-        if (type < 10){
-            PipelineCode oneCode = pipelineCodeService.findOneCode(taskId);
-            oneCode.setType(taskType);
-            typeConfig.setPipelineCode(oneCode);
-        }else if (10<type && type<20){
-            PipelineTest oneTest = pipelineTestService.findOneTest(taskId);
-            oneTest.setType(taskType);
-            typeConfig.setPipelineTest(oneTest);
-        }else if (20<type && type<30){
-            PipelineBuild oneBuild = pipelineBuildService.findOneBuild(taskId);
-            oneBuild.setType(taskType);
-            typeConfig.setPipelineBuild(oneBuild);
-        }else if (30<type && type<40){
-            PipelineDeploy oneDeploy = pipelineDeployService.findOneDeploy(taskId);
-            oneDeploy.setType(taskType);
-            typeConfig.setPipelineDeploy(oneDeploy);
-        }
-        return typeConfig;
+        return pipelineConfigService.findConfig(typeConfig, type);
     }
 
     /**
@@ -196,41 +141,15 @@ public class PipelineConfigOrderServiceImpl implements PipelineConfigOrderServic
      * @param config 配置阻断字段
      * @param types 配置类型
      */
-    public void updateOneConfig(PipelineConfigOrder config,String types){
+    public void updateConfig(PipelineConfigOrder config,String types){
         String pipelineId = config.getPipeline().getPipelineId();
         PipelineConfigOrder typeConfig = findTypeConfig(pipelineId, config.getTaskType());
         if (typeConfig == null) return;
         joinTemplate.joinQuery(typeConfig);
         Pipeline pipeline = typeConfig.getPipeline();
-        HashMap<String, String> map = new HashMap<>();
+        Map<String, String> map = pipelineConfigService.updateConfig(config, typeConfig, types);
         map.put("pipelineId", pipeline.getPipelineId());
         map.put("pipelineName", pipeline.getPipelineName());
-        switch (types) {
-            case "code" -> {
-                PipelineCode pipelineCode = config.getPipelineCode();
-                pipelineCode.setCodeId(typeConfig.getTaskId());
-                pipelineCodeService.updateCode(pipelineCode);
-                map.put("message","源码管理配置");
-            }
-            case "test" -> {
-                PipelineTest pipelineTest = config.getPipelineTest();
-                pipelineTest.setTestId(typeConfig.getTaskId());
-                pipelineTestService.updateTest(pipelineTest);
-                map.put("message","测试配置");
-            }
-            case "build" -> {
-                PipelineBuild pipelineBuild = config.getPipelineBuild();
-                pipelineBuild.setBuildId(typeConfig.getTaskId());
-                pipelineBuildService.updateBuild(pipelineBuild);
-                map.put("message","构建配置");
-            }
-            case "deploy" -> {
-                PipelineDeploy pipelineDeploy =  config.getPipelineDeploy();
-                pipelineDeploy.setDeployId(typeConfig.getTaskId());
-                pipelineDeployService.updateDeploy(pipelineDeploy);
-                map.put("message","部署配置");
-            }
-        }
         pipelineActivityService.log("update", "pipelineConfig", map);
     }
 
@@ -265,46 +184,23 @@ public class PipelineConfigOrderServiceImpl implements PipelineConfigOrderServic
         if (typeConfig != null){
             throw new ApplicationException(50001,"已存在相同类型配置");
         }
-
+        //获取已存在的配置，对新增加的配置添加排序
         int size = 1;
         List<PipelineConfigOrder> allPipelineConfig = findAllPipelineConfig(pipelineId);
         if (allPipelineConfig!= null){
             size = allPipelineConfig.size()+1;
         }
-        PipelineConfigOrder configOrder = new PipelineConfigOrder(config.getTaskType(),size,new Pipeline(pipelineId));
-        String id = null;
+        PipelineConfigOrder configOrder = new PipelineConfigOrder(config.getTaskType(),size,pipelineId);
+        //判断添加的配置是否为源码
+        if (types.equals("code")){
+            updateConfigOrder(new PipelineConfigOrder(pipelineId),true);
+            configOrder.setTaskSort(1);
+        }
+        Map<String, String> map = pipelineConfigService.createConfig(config, types, size);
 
-        HashMap<String, String> map = new HashMap<>();
         map.put("pipelineId", pipeline.getPipelineId());
         map.put("pipelineName", pipeline.getPipelineName());
-        switch (types) {
-            case "code" -> {
-                updateConfigOrder(new PipelineConfigOrder(new Pipeline(pipelineId)),true);
-                PipelineCode pipelineCode = new PipelineCode();
-                id = pipelineCodeService.createCode(pipelineCode);
-                configOrder.setTaskSort(1);
-                map.put("message","源码管理配置");
-            }
-            case "test" -> {
-                PipelineTest pipelineTest = new PipelineTest();
-                id = pipelineTestService.createTest(pipelineTest);
-                map.put("message","测试配置");
-            }
-            case "build" -> {
-                PipelineBuild pipelineBuild = new PipelineBuild();
-                id = pipelineBuildService.createBuild(pipelineBuild);
-                map.put("message","构建配置");
-            }
-            case "deploy" -> {
-                PipelineDeploy pipelineDeploy =  new PipelineDeploy();
-                id = pipelineDeployService.createDeploy(pipelineDeploy);
-                map.put("message","部署配置");
-            }
-        }
-        if (id == null){
-            throw new ApplicationException(50001,"添加失败");
-        }
-        configOrder.setTaskId(id);
+        configOrder.setTaskId(map.get("id"));
         String configure = createConfigure(configOrder);
         pipelineActivityService.log("create", "pipelineConfig", map);
         if (configure == null){
@@ -323,28 +219,31 @@ public class PipelineConfigOrderServiceImpl implements PipelineConfigOrderServic
         PipelineConfigOrder typeConfig = findTypeConfig(pipelineId, type);
         if (typeConfig == null) return;
         updateConfigOrder(typeConfig,false);
+
+        Map<String, String> map = pipelineConfigService.deleteConfig(typeConfig, types);
+
         Pipeline pipeline = typeConfig.getPipeline();
-        HashMap<String, String> map = new HashMap<>();
+        //HashMap<String, String> map = new HashMap<>();
         map.put("pipelineId", pipeline.getPipelineId());
         map.put("pipelineName", pipeline.getPipelineName());
-        switch (types) {
-            case "code" -> {
-                pipelineCodeService.deleteCode(typeConfig.getTaskId());
-                map.put("message","源码管理配置");
-            }
-            case "test" -> {
-                pipelineTestService.deleteTest(typeConfig.getTaskId());
-                map.put("message","测试配置");
-            }
-            case "build" -> {
-                pipelineBuildService.deleteBuild(typeConfig.getTaskId());
-                map.put("message","构建配置");
-            }
-            case "deploy" -> {
-                pipelineDeployService.deleteDeploy(typeConfig.getTaskId());
-                map.put("message","部署配置");
-            }
-        }
+        //switch (types) {
+        //    case "code" -> {
+        //        pipelineCodeService.deleteCode(typeConfig.getTaskId());
+        //        map.put("message","源码管理配置");
+        //    }
+        //    case "test" -> {
+        //        pipelineTestService.deleteTest(typeConfig.getTaskId());
+        //        map.put("message","测试配置");
+        //    }
+        //    case "build" -> {
+        //        pipelineBuildService.deleteBuild(typeConfig.getTaskId());
+        //        map.put("message","构建配置");
+        //    }
+        //    case "deploy" -> {
+        //        pipelineDeployService.deleteDeploy(typeConfig.getTaskId());
+        //        map.put("message","部署配置");
+        //    }
+        //}
         pipelineConfigOrderDao.deleteConfigure(typeConfig.getConfigId());
         pipelineActivityService.log("delete", "pipelineConfig", map);
     }

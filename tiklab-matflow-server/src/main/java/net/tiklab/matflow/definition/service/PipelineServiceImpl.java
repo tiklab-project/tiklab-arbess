@@ -55,9 +55,8 @@ public class PipelineServiceImpl implements PipelineService {
         PipelineEntity pipelineEntity = BeanMapper.map(pipeline, PipelineEntity.class);
         String pipelineId = pipelineDao.createPipeline(pipelineEntity);
         //创建模板配置
-        if (pipeline.getPipelineType() != 1){
-            pipelineConfigOrderService.createTemplate(pipelineId, pipeline.getPipelineType());
-        }
+        pipelineConfigOrderService.createTemplate(pipelineId, pipeline.getPipelineType());
+
         //动态
         HashMap<String, String> map = new HashMap<>();
         map.put("message", "");

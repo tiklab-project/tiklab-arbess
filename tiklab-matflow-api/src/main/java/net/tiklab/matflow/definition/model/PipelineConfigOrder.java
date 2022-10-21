@@ -61,19 +61,19 @@ public class PipelineConfigOrder {
     public PipelineConfigOrder() {
     }
 
-    public PipelineConfigOrder(Pipeline pipeline) {
-        this.pipeline = pipeline;
+    public PipelineConfigOrder(String pipelineId) {
+        this.pipeline = new Pipeline(pipelineId);
     }
 
-    public PipelineConfigOrder(Pipeline pipeline, String message) {
-        this.pipeline = pipeline;
+    public PipelineConfigOrder(String pipelineId, String message) {
+        this.pipeline = new Pipeline(pipelineId);
         this.message = message;
     }
 
-    public PipelineConfigOrder(int taskType, int taskSort, Pipeline pipeline) {
+    public PipelineConfigOrder(int taskType, int taskSort, String pipelineId) {
         this.taskType = taskType;
         this.taskSort = taskSort;
-        this.pipeline = pipeline;
+        this.pipeline = new Pipeline(pipelineId);
     }
 
     //public PipelineConfigOrder(String pipelineId) {

@@ -13,6 +13,7 @@ import net.tiklab.privilege.stater.EnablePrivilegeServer;
 import net.tiklab.rpc.starter.annotation.EnableRpc;
 import net.tiklab.tks.annotation.EnableTks;
 import net.tiklab.todotask.stater.EnableTodoTask;
+import net.tiklab.toolkit.EnableToolkitServer;
 import net.tiklab.user.starter.EnableUser;
 import net.tiklab.web.starter.annotation.EnableWeb;
 import net.tiklab.widget.starter.EnableWidget;
@@ -37,6 +38,7 @@ import org.springframework.context.annotation.Configuration;
 //权限中心
 @EnablePrivilegeServer
 @EnableLicenceServer
+@EnableToolkitServer
 @EnableGateway
 @EnableLog
 @EnableEam

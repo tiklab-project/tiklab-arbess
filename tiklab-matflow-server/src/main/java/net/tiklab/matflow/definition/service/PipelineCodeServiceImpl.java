@@ -28,18 +28,13 @@ public class PipelineCodeServiceImpl implements PipelineCodeService {
     @Autowired
     PipelineCodeAuthorizeService codeAuthorizeService;
 
-    @Autowired
-    PipelineActivityService activityService;
-
     private static final Logger logger = LoggerFactory.getLogger(PipelineCodeServiceImpl.class);
 
     //创建
     @Override
     public String createCode(PipelineCode pipelineCode) {
-        if (pipelineCode.getType() == 1){
-            pipelineCode.setCodeAddress(pipelineCode.getCodeName());
-        }
-        return pipelineCodeDao.createCode(BeanMapper.map(pipelineCode, PipelineCodeEntity.class));
+        PipelineCode authorizeUrl = codeAuthorizeService.getAuthorizeUrl(pipelineCode);
+        return pipelineCodeDao.createCode(BeanMapper.map(authorizeUrl, PipelineCodeEntity.class));
     }
 
 
@@ -52,7 +47,8 @@ public class PipelineCodeServiceImpl implements PipelineCodeService {
     //修改
     @Override
     public void updateCode(PipelineCode pipelineCode) {
-        pipelineCodeDao.updateCode(BeanMapper.map(pipelineCode, PipelineCodeEntity.class));
+        PipelineCode authorizeUrl = codeAuthorizeService.getAuthorizeUrl(pipelineCode);
+        pipelineCodeDao.updateCode(BeanMapper.map(authorizeUrl, PipelineCodeEntity.class));
     }
 
     //查询单个
@@ -60,9 +56,6 @@ public class PipelineCodeServiceImpl implements PipelineCodeService {
     public PipelineCode findOneCode(String codeId) {
         PipelineCodeEntity oneCode = pipelineCodeDao.findOneCode(codeId);
         PipelineCode pipelineCode = BeanMapper.map(oneCode, PipelineCode.class);
-        if (oneCode == null){
-            return null;
-        }
         joinTemplate.joinQuery(pipelineCode);
         return pipelineCode;
     }
@@ -70,9 +63,9 @@ public class PipelineCodeServiceImpl implements PipelineCodeService {
     //查询所有
     @Override
     public List<PipelineCode> findAllCode() {
-        List<PipelineCode> pipelineCodeList = BeanMapper.mapList(pipelineCodeDao.findAllCode(), PipelineCode.class);
-        joinTemplate.joinQuery(pipelineCodeList);
-        return pipelineCodeList;
+        List<PipelineCode> pipelineCodes = BeanMapper.mapList(pipelineCodeDao.findAllCode(), PipelineCode.class);
+        joinTemplate.joinQuery(pipelineCodes);
+        return pipelineCodes;
     }
 
     @Override

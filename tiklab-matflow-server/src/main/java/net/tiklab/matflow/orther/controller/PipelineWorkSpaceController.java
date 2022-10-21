@@ -6,6 +6,7 @@ import net.tiklab.core.page.Pagination;
 import net.tiklab.matflow.execute.model.FileTree;
 import net.tiklab.matflow.execute.model.GitCommit;
 import net.tiklab.matflow.orther.model.PipelineActivity;
+import net.tiklab.matflow.orther.model.PipelineTask;
 import net.tiklab.matflow.orther.service.PipelineActivityService;
 import net.tiklab.matflow.orther.service.PipelineWorkSpaceService;
 import net.tiklab.oplog.log.modal.OpLog;
@@ -57,11 +58,18 @@ public class PipelineWorkSpaceController {
     }
 
     @RequestMapping(path="/findLog",method = RequestMethod.POST)
-    @ApiMethod(name = "getSubmitMassage",desc = "获取提交信息")
-    @ApiParam(name = "pipelineId",desc = "流水线id",required = true)
+    @ApiMethod(name = "findLog",desc = "获取提交信息")
     public Result<List<PipelineActivity>> findLog(){
         List<PipelineActivity> log = pipelineActivityService.findLog();
         return Result.ok(log);
     }
+
+    @RequestMapping(path="/findTask",method = RequestMethod.POST)
+    @ApiMethod(name = "findTask",desc = "获取提交信息")
+    public Result<List<PipelineTask>> findTask(){
+        List<PipelineTask> task = pipelineActivityService.findTask();
+        return Result.ok(task);
+    }
+
 
 }

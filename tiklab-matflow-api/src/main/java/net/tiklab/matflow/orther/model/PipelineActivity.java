@@ -1,17 +1,11 @@
 package net.tiklab.matflow.orther.model;
 
-
-import net.tiklab.beans.annotation.Mapper;
-import net.tiklab.beans.annotation.Mapping;
-import net.tiklab.beans.annotation.Mappings;
-import net.tiklab.join.annotation.Join;
-import net.tiklab.join.annotation.JoinQuery;
-import net.tiklab.matflow.definition.model.Pipeline;
 import net.tiklab.postin.annotation.ApiModel;
-import net.tiklab.postin.annotation.ApiProperty;
-import net.tiklab.user.user.model.User;
 
-@ApiModel
+/**
+ * 动态
+ */
+
 public class PipelineActivity {
 
     //创建时间

@@ -46,13 +46,12 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
     // git克隆
     public String clone(PipelineProcess pipelineProcess, PipelineCode pipelineCode){
 
-        Pipeline pipeline = pipelineProcess.getPipeline();
-        PipelineExecLog pipelineExecLog = pipelineProcess.getPipelineExecLog();
-
-        List<PipelineExecHistory> list = PipelineExecServiceImpl.pipelineExecHistoryList;
-
         //开始时间
         long beginTime = new Timestamp(System.currentTimeMillis()).getTime();
+        Pipeline pipeline = pipelineProcess.getPipeline();
+        PipelineExecLog pipelineExecLog = pipelineProcess.getPipelineExecLog();
+        List<PipelineExecHistory> list = PipelineExecServiceImpl.pipelineExecHistoryList;
+
 
         configCommonService.execHistory(list,pipeline.getPipelineId(),"流水线开始执行",pipelineExecLog);
 
