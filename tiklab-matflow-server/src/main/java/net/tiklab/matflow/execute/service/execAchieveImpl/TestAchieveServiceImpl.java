@@ -2,13 +2,13 @@ package net.tiklab.matflow.execute.service.execAchieveImpl;
 
 import net.tiklab.core.exception.ApplicationException;
 import net.tiklab.matflow.definition.model.Pipeline;
-import net.tiklab.matflow.orther.service.PipelineFileService;
+import net.tiklab.matflow.execute.service.execAchieveService.ConfigCommonService;
 import net.tiklab.matflow.definition.model.PipelineTest;
-import net.tiklab.matflow.definition.service.PipelineTestService;
 import net.tiklab.matflow.execute.model.PipelineExecHistory;
 import net.tiklab.matflow.execute.service.PipelineExecServiceImpl;
 import net.tiklab.matflow.execute.service.execAchieveService.TestAchieveService;
 import net.tiklab.matflow.execute.model.PipelineProcess;
+import net.tiklab.matflow.orther.service.PipelineUntil;
 import net.tiklab.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,25 +27,19 @@ import java.util.Objects;
 public class TestAchieveServiceImpl implements TestAchieveService {
 
     @Autowired
-    PipelineTestService pipelineTestService;
-
-    @Autowired
-    ConfigCommonServiceImpl commonAchieveService;
-
-    @Autowired
-    PipelineFileService pipelineFileService;
-
+    ConfigCommonService commonService;
+    
     // 单元测试
-    public String test(PipelineProcess pipelineProcess, PipelineTest pipelineTest) {
+    public boolean test(PipelineProcess pipelineProcess, PipelineTest pipelineTest) {
         List<PipelineExecHistory> pipelineExecHistoryList = PipelineExecServiceImpl.pipelineExecHistoryList;
         long beginTime = new Timestamp(System.currentTimeMillis()).getTime();
         //初始化日志
         PipelineExecHistory pipelineExecHistory = pipelineProcess.getPipelineExecHistory();
 
-        Pipeline pipeline = null;
+        Pipeline pipeline = pipelineProcess.getPipeline();
 
         String testOrder = pipelineTest.getTestOrder();
-        String path = pipelineFileService.getFileAddress()+pipeline.getPipelineName();
+        String path = PipelineUntil.getFileAddress()+pipeline.getPipelineName();
         try {
 
             String a = "------------------------------------" + " \n"
@@ -56,27 +50,26 @@ public class TestAchieveServiceImpl implements TestAchieveService {
             Process process = getOrder(pipelineTest,path);
 
             if (process == null){
-                commonAchieveService.updateTime(pipelineProcess,beginTime);
-                commonAchieveService.updateState(pipelineProcess,false, pipelineExecHistoryList);
-                return  "命令错误。";
+                commonService.execHistory(pipelineProcess,"命令错误。");
+                return false;
             }
 
-            int state = commonAchieveService.log(process.getInputStream(), pipelineProcess, pipelineExecHistoryList);
+            int state = commonService.log(process.getInputStream(), pipelineProcess);
 
-            commonAchieveService.updateTime(pipelineProcess,beginTime);
+           
             if (state == 0){
-                commonAchieveService.updateState(pipelineProcess,false, pipelineExecHistoryList);
-                return  "Fail";
+                commonService.execHistory(pipelineProcess,"Fail");
+                return false;
             }
         } catch (IOException e) {
-            commonAchieveService.updateState(pipelineProcess,false, pipelineExecHistoryList);
-            return "日志打印失败"+e;
+            commonService.execHistory(pipelineProcess,"日志打印失败"+e);
+            return false;
         } catch (ApplicationException e) {
-            commonAchieveService.updateState(pipelineProcess,false, pipelineExecHistoryList);
-            return e.getMessage();
+            commonService.execHistory(pipelineProcess,e.getMessage());
+            return false;
         }
-        commonAchieveService.updateState(pipelineProcess,true, pipelineExecHistoryList);
-        return null;
+        
+        return true;
     }
 
     /**
@@ -92,12 +85,12 @@ public class TestAchieveServiceImpl implements TestAchieveService {
 
         String order ;
         if (type == 11) {
-            String mavenAddress = commonAchieveService.getScm(21);
+            String mavenAddress = commonService.getScm(21);
             if (mavenAddress == null) {
                 throw new ApplicationException("不存在maven配置");
             }
             order = testOrder(testOrder, path, "/");
-            return commonAchieveService.process(mavenAddress, order);
+            return PipelineUntil.process(mavenAddress, order);
         }
         return null;
     }
@@ -112,7 +105,7 @@ public class TestAchieveServiceImpl implements TestAchieveService {
     private String testOrder(String buildOrder,String path,String buildAddress){
 
         String order;
-        int systemType = commonAchieveService.getSystemType();
+        int systemType = PipelineUntil.getSystemType();
         order = " ./" + buildOrder + " " + "-f" +" " +path ;
         if (systemType == 1){
             order = " .\\" + buildOrder + " " + "-f"+" "  +path;

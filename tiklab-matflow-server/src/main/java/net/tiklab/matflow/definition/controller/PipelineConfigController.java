@@ -49,5 +49,14 @@ public class PipelineConfigController {
     }
 
 
+    @RequestMapping(path="/findAllPipelineConfig",method = RequestMethod.POST)
+    @ApiMethod(name = "findAllConfig",desc = "流水线id查询配置顺序信息")
+    @ApiParam(name = "pipelineId",desc = "流水线id",required = true)
+    public Result<List<PipelineConfigOrder>> findAllPipelineConfig(@NotNull String pipelineId) {
+        List<PipelineConfigOrder> list = pipelineConfigOrderService.findAllPipelineConfig(pipelineId);
+        return Result.ok(list);
+    }
+
+
 
 }

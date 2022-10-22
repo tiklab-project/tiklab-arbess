@@ -9,11 +9,11 @@ import java.util.List;
 
 @ApiModel
 @Join
-public class FileTree {
+public  class FileTree {
 
 
     //文件名
-    private  String treeName;
+    private String treeName;
 
     //文件类型
     private  Integer treeType;

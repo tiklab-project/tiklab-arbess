@@ -13,6 +13,7 @@ import net.tiklab.matflow.execute.model.PipelineExecHistory;
 import net.tiklab.matflow.execute.service.PipelineExecServiceImpl;
 import net.tiklab.matflow.execute.service.execAchieveService.CodeAchieveService;
 import net.tiklab.matflow.execute.model.PipelineProcess;
+import net.tiklab.matflow.orther.service.PipelineUntil;
 import net.tiklab.matflow.setting.model.Proof;
 import net.tiklab.rpc.annotation.Exporter;
 import org.slf4j.Logger;
@@ -36,48 +37,43 @@ import java.util.List;
 public class CodeAchieveServiceImpl implements CodeAchieveService {
 
     @Autowired
-    ConfigCommonService configCommonService;
-
-    @Autowired
-    PipelineFileService pipelineFileService;
+    ConfigCommonService commonService;
 
     private static final Logger logger = LoggerFactory.getLogger(PipelineCodeServiceImpl.class);
 
     // git克隆
-    public String clone(PipelineProcess pipelineProcess, PipelineCode pipelineCode){
+    public boolean clone(PipelineProcess pipelineProcess, PipelineCode pipelineCode){
 
         //开始时间
         long beginTime = new Timestamp(System.currentTimeMillis()).getTime();
         Pipeline pipeline = pipelineProcess.getPipeline();
-        PipelineExecLog pipelineExecLog = pipelineProcess.getPipelineExecLog();
-        List<PipelineExecHistory> list = PipelineExecServiceImpl.pipelineExecHistoryList;
+        pipelineProcess.setBeginTime(beginTime);
 
-
-        configCommonService.execHistory(list,pipeline.getPipelineId(),"流水线开始执行",pipelineExecLog);
+        commonService.execHistory(pipelineProcess,"流水线开始执行");
 
         //代码保存路径
-        String codeDir = pipelineFileService.getFileAddress() + pipeline.getPipelineName();
+        String codeDir = PipelineUntil.getFileAddress() + pipeline.getPipelineName();
         File file = new File(codeDir);
-
         //删除旧的代码
-        pipelineFileService.deleteFile(file);
-        
-        configCommonService.execHistory(list,pipeline.getPipelineId(),"分配源码空间。",pipelineExecLog);
+        PipelineUntil.deleteFile(file);
+        commonService.execHistory(pipelineProcess,"分配源码空间。");
+
         try {
             Thread.sleep(2000);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-        configCommonService.execHistory(list,pipeline.getPipelineId(),"空间分配成功。",pipelineExecLog);
+
+        commonService.execHistory(pipelineProcess,"空间分配成功。");
 
         //获取凭证
         Proof proof = pipelineCode.getProof();
         pipelineProcess.setProof(proof);
 
         if (proof == null){
-            configCommonService.updateTime(pipelineProcess,beginTime);
-            configCommonService.updateState(pipelineProcess,false, list);
-            return "凭证为空。";
+            commonService.updateState(pipelineProcess,false);
+            commonService.execHistory(pipelineProcess,"凭证为空。");
+            return false;
         }
         //分支
         String codeBranch = pipelineCode.getCodeBranch();
@@ -87,32 +83,29 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
                 + "Uri : " + pipelineCode.getCodeAddress() + "\n"
                 + "Branch : " + codeBranch + "\n"
                 + "proofType : " +proof.getProofType();
-
-        configCommonService.execHistory(list,pipeline.getPipelineId(),"\n"+s,pipelineExecLog);
+        
+        commonService.execHistory(pipelineProcess,s);
 
         try {
             Process process = codeStart(proof, pipelineCode,pipeline.getPipelineName());
-            configCommonService.log(process.getInputStream(), pipelineProcess, list);
-            configCommonService.updateState(pipelineProcess,false, list);
+            commonService.log(process.getInputStream(), pipelineProcess);
         } catch (IOException e) {
-            configCommonService.updateState(pipelineProcess,false, list);
-            configCommonService.updateTime(pipelineProcess,beginTime);
-            return "系统执行命令错误 \n" + e;
+            commonService.execHistory(pipelineProcess,"系统执行命令错误 \n" + e);
+            commonService.updateState(pipelineProcess,false);
+            return false;
         }catch (URISyntaxException e){
-            configCommonService.updateTime(pipelineProcess,beginTime);
-            configCommonService.updateState(pipelineProcess,false, list);
-            return "git地址错误 \n" + e;
+            commonService.execHistory(pipelineProcess,"git地址错误 \n" + e);
+            commonService.updateState(pipelineProcess,false);
+            return false;
         }catch (ApplicationException e){
-            configCommonService.updateTime(pipelineProcess,beginTime);
-            configCommonService.updateState(pipelineProcess,false, list);
-            return "" + e;
+            commonService.execHistory(pipelineProcess,"" + e);
+            commonService.updateState(pipelineProcess,false);
+            return false;
         }
 
-        configCommonService.execHistory(list,pipeline.getPipelineId(),"代码拉取成功\n",pipelineExecLog);
-
-        configCommonService.updateTime(pipelineProcess,beginTime);
-        configCommonService.updateState(pipelineProcess,true, list);
-        return null;
+        commonService.execHistory(pipelineProcess,"代码拉取成功");
+        commonService.updateState(pipelineProcess,true);
+        return true;
     }
 
     /**
@@ -130,14 +123,14 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
         }
 
         //系统类型
-        int systemType = configCommonService.getSystemType();
+        int systemType = PipelineUntil.getSystemType();
         //源码存放位置
-        String fileAddress = pipelineFileService.getFileAddress()+pipelineName;
+        String fileAddress = PipelineUntil.getFileAddress()+pipelineName;
 
         switch (pipelineCode.getType()) {
             case 1, 2, 3, 4 -> {
                 //git server地址
-                String gitAddress = configCommonService.getScm(1);
+                String gitAddress = commonService.getScm(1);
                 if (gitAddress == null) {
                     throw new ApplicationException("不存在Git配置");
                 }
@@ -145,12 +138,12 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
                     return null;
                 } else {
                     String gitOrder = gitOrder(pipelineCode, fileAddress, systemType);
-                    return configCommonService.process(gitAddress, gitOrder);
+                    return PipelineUntil.process(gitAddress, gitOrder);
                 }
             }
             case 5 -> {
                 //svn server地址
-                String svnAddress = configCommonService.getScm(5);
+                String svnAddress = commonService.getScm(5);
                 if (svnAddress == null) {
                     throw new ApplicationException("不存在Svn配置");
                 }
@@ -158,7 +151,7 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
                     return null;
                 } else {
                     String gitOrder = svnOrder(pipelineCode, fileAddress, systemType);
-                    return configCommonService.process(svnAddress, gitOrder);
+                    return PipelineUntil.process(svnAddress, gitOrder);
                 }
             }
         }

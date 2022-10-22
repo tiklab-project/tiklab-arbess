@@ -10,5 +10,5 @@ public interface BuildAchieveService {
      * @param pipelineProcess 构建信息
      * @return 构建状态
      */
-    String build(PipelineProcess pipelineProcess,  PipelineBuild pipelineBuild);
+    boolean build(PipelineProcess pipelineProcess,  PipelineBuild pipelineBuild);
 }

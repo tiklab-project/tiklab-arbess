@@ -5,6 +5,7 @@ import net.tiklab.matflow.definition.model.PipelineMassage;
 import net.tiklab.matflow.execute.model.PipelineExecHistory;
 import net.tiklab.matflow.execute.service.PipelineExecHistoryService;
 import net.tiklab.matflow.orther.service.PipelineFileService;
+import net.tiklab.matflow.orther.service.PipelineUntil;
 import net.tiklab.rpc.annotation.Exporter;
 import net.tiklab.user.user.model.DmUser;
 import net.tiklab.user.user.service.DmUserService;
@@ -48,8 +49,8 @@ public class PipelineCommonServerImpl implements PipelineCommonServer{
         pipelineExecHistoryService.deleteHistory(pipelineId);
 
         //删除对应文件
-        String fileAddress = pipelineFileService.getFileAddress();
-        pipelineFileService.deleteFile(new File(fileAddress+ pipeline.getPipelineName()));
+        String fileAddress = PipelineUntil.getFileAddress();
+        PipelineUntil.deleteFile(new File(fileAddress+ pipeline.getPipelineName()));
 
     }
 
@@ -62,7 +63,7 @@ public class PipelineCommonServerImpl implements PipelineCommonServer{
     @Override
     public int updatePipeline(String newName, String lastName) {
         //更改对应文件名
-        String fileAddress = pipelineFileService.getFileAddress();
+        String fileAddress = PipelineUntil.getFileAddress();
         File file = new File(fileAddress+lastName);
         if (file.exists()){
             boolean b = file.renameTo(new File( fileAddress+newName));
@@ -103,18 +104,6 @@ public class PipelineCommonServerImpl implements PipelineCommonServer{
      * @return 历史
      */
     public  List<PipelineExecHistory> findRecentStatus(String userId,StringBuilder s){
-        //获取7天前的时间
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-        Date lastTime = DateUtils.addDays(new Date(), -7);
-        Date nowTime = DateUtils.addDays(new Date(), 1);
-        if (s.toString().equals("")){
-            return null;
-        }
-        return pipelineExecHistoryService.findAllUserHistory(formatter.format(lastTime),formatter.format(nowTime),s);
-    }
-
-    //获取用户7天内的所有历史
-    public  List<PipelineExecHistory> findAllUserHistory(StringBuilder s){
         //获取7天前的时间
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         Date lastTime = DateUtils.addDays(new Date(), -7);

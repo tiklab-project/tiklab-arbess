@@ -10,5 +10,5 @@ public interface TestAchieveService {
      * @param pipelineProcess 配置信息
      * @return 执行状态
      */
-    String test(PipelineProcess pipelineProcess, PipelineTest pipelineTest);
+    boolean test(PipelineProcess pipelineProcess, PipelineTest pipelineTest);
 }

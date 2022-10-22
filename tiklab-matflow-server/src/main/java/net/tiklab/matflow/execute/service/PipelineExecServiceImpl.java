@@ -10,12 +10,15 @@ import net.tiklab.matflow.execute.model.PipelineExecLog;
 import net.tiklab.matflow.execute.service.execAchieveService.ConfigCommonService;
 import net.tiklab.matflow.execute.model.PipelineProcess;
 import net.tiklab.matflow.execute.service.execAchieveService.PipelineTaskExecService;
+import net.tiklab.matflow.orther.service.PipelineUntil;
 import net.tiklab.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -28,13 +31,13 @@ public class PipelineExecServiceImpl implements PipelineExecService {
     PipelineService pipelineService;
 
     @Autowired
-    PipelineTaskExecService pipelineTaskExecService;
+    PipelineTaskExecService taskExecService;
 
     @Autowired
-    ConfigCommonService configCommonService;
+    ConfigCommonService commonService;
 
     @Autowired
-    PipelineConfigOrderService pipelineConfigOrderService;
+    PipelineConfigOrderService configOrderService;
 
     //存放过程状态
     public static final List<PipelineExecHistory> pipelineExecHistoryList = new ArrayList<>();
@@ -78,12 +81,13 @@ public class PipelineExecServiceImpl implements PipelineExecService {
             if (pipeline == null || !pipeline.getPipelineId().equals(pipelineId)){
                 continue;
             }
-            time[pipelineExecHistory.getSort()-1] = time[pipelineExecHistory.getSort()-1] + 1;
-            pipelineExecHistory.setOneTime(configCommonService.formatDateTime(time[0]));
-            pipelineExecHistory.setTwoTime(configCommonService.formatDateTime(time[1]));
-            pipelineExecHistory.setThreeTime(configCommonService.formatDateTime(time[2]));
-            pipelineExecHistory.setFourTime(configCommonService.formatDateTime(time[3]));
-            pipelineExecHistory.setAllTime(configCommonService.formatDateTime(time[0]+time[1]+time[2]+time[3]));
+            int i = pipelineExecHistory.getSort() - 1;
+            time[i] = time[i] + 1;
+            pipelineExecHistory.setOneTime(PipelineUntil.formatDateTime(time[0]));
+            pipelineExecHistory.setTwoTime(PipelineUntil.formatDateTime(time[1]));
+            pipelineExecHistory.setThreeTime(PipelineUntil.formatDateTime(time[2]));
+            pipelineExecHistory.setFourTime(PipelineUntil.formatDateTime(time[3]));
+            pipelineExecHistory.setAllTime(PipelineUntil.formatDateTime(time[0]+time[1]+time[2]+time[3]));
             return pipelineExecHistory;
         }
       return null;
@@ -102,21 +106,18 @@ public class PipelineExecServiceImpl implements PipelineExecService {
             return;
         }
 
-        PipelineExecLog pipelineExecLog = new PipelineExecLog();
+        PipelineExecLog pipelineExecLog =commonService.getExecPipelineLog(pipelineExecHistory.getHistoryId());
 
         pipelineProcess.setPipelineExecLog(pipelineExecLog);
         pipelineProcess.setPipelineExecHistory(pipelineExecHistory);
-
         Pipeline pipeline = pipelineExecHistory.getPipeline();
 
         long overTime = new Timestamp(System.currentTimeMillis()).getTime();
         int time = (int) (overTime - beginTime) / 1000;
         pipelineExecLog.setRunTime(time- pipelineExecHistory.getRunTime());
         pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+"\n"+"流水线停止运行......");
-        pipelineExecHistoryList.add(pipelineExecHistory);
 
-        configCommonService.halt(pipelineProcess,pipelineId, pipelineExecHistoryList);
-
+        //停止运行
         ThreadGroup currentGroup = Thread.currentThread().getThreadGroup();
         int noThreads = currentGroup.activeCount();
         Thread[] lstThreads = new Thread[noThreads];
@@ -129,8 +130,9 @@ public class PipelineExecServiceImpl implements PipelineExecService {
             lstThreads[i].stop();
             pipeline.setPipelineState(0);
             pipelineService.updatePipeline(pipeline);
-            return;
         }
+        commonService.halt(pipelineProcess,pipelineId);
+
     }
 
     //判断流水线是否正在执行
@@ -155,7 +157,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         String pipelineId = pipeline.getPipelineId();
 
         //初始化历史
-        PipelineExecHistory pipelineExecHistory = configCommonService.initializeHistory(pipeline,userId);
+        PipelineExecHistory pipelineExecHistory = commonService.initializeHistory(pipeline,userId);
 
         //获取配置信息
         PipelineProcess pipelineProcess = new PipelineProcess();
@@ -163,34 +165,82 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         pipelineExecHistoryList.add(pipelineExecHistory);
 
         //获取所有配置顺序
-        List<PipelineConfigOrder> allPipelineConfig = pipelineConfigOrderService.findAllPipelineConfig(pipelineId);
+        List<PipelineConfigOrder> allPipelineConfig = configOrderService.findAllPipelineConfig(pipelineId);
         if (allPipelineConfig == null){
             return;
         }
         for (PipelineConfigOrder pipelineConfigOrder : allPipelineConfig) {
             //初始化日志
-            PipelineExecLog pipelineExecLog = configCommonService.initializeLog(pipelineExecHistory.getHistoryId(), pipelineConfigOrder);
+            PipelineExecLog pipelineExecLog = commonService.initializeLog(pipelineExecHistory.getHistoryId(), pipelineConfigOrder);
             pipelineProcess.setPipeline(pipeline);
             pipelineProcess.setPipelineExecLog(pipelineExecLog);
 
             int taskType = pipelineConfigOrder.getTaskType();
-            PipelineConfigOrder oneConfig = pipelineConfigOrderService.findOneConfig(pipelineId, taskType);
+            PipelineConfigOrder oneConfig = configOrderService.findOneConfig(pipelineId, taskType);
 
-            String state = pipelineTaskExecService.beginState(pipelineProcess,oneConfig,taskType);
-            if (state != null){
+            boolean state = taskExecService.beginState(pipelineProcess,oneConfig,taskType);
+
+            if (!state){
                 pipeline.setPipelineState(0);
-                configCommonService.error(pipelineExecHistory, state, pipeline.getPipelineId(), pipelineExecHistoryList);
+                commonService.error(pipelineExecHistory, pipeline.getPipelineId());
                 pipelineService.updatePipeline(pipeline);
                 time[0]=1;time[1]=0;time[2]=0;time[3]=0;
                 return;
             }
+
             pipelineExecHistory.setSort(pipelineExecHistory.getSort() +1);
             pipelineExecHistory.setStatus(pipelineExecHistory.getStatus() +1);
         }
-
-        configCommonService.success(pipelineExecHistory, pipeline.getPipelineId(), pipelineExecHistoryList);
+        commonService.success(pipelineExecHistory, pipeline.getPipelineId());
         pipeline.setPipelineState(0);
         pipelineService.updatePipeline(pipeline);
         time[0]=1;time[1]=0;time[2]=0;time[3]=0;
     }
+
+    Map<String,Integer> map = new HashMap<>();
+
+    public String getTime(PipelineExecLog log,int sort){
+        String logId = log.getLogId();
+        int taskSort = log.getTaskSort();
+        Integer integer = map.get(logId);
+        if (taskSort == sort){
+            integer =integer+1;
+            map.put(logId, map.get(logId)+1);
+        }
+       return PipelineUntil.formatDateTime(integer);
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

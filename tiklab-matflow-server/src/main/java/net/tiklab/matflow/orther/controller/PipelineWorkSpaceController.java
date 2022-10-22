@@ -8,6 +8,7 @@ import net.tiklab.matflow.execute.model.GitCommit;
 import net.tiklab.matflow.orther.model.PipelineActivity;
 import net.tiklab.matflow.orther.model.PipelineTask;
 import net.tiklab.matflow.orther.service.PipelineActivityService;
+import net.tiklab.matflow.orther.service.PipelineUntil;
 import net.tiklab.matflow.orther.service.PipelineWorkSpaceService;
 import net.tiklab.oplog.log.modal.OpLog;
 import net.tiklab.postin.annotation.Api;
@@ -45,7 +46,7 @@ public class PipelineWorkSpaceController {
     @ApiMethod(name = "readFile",desc = "判断是否执行")
     @ApiParam(name = "path",desc = "文件地址",required = true)
     public Result< List<String>> readFile(@NotNull String path) {
-        List<String> s = pipelineWorkSpaceService.readFile(path);
+        List<String> s = PipelineUntil.readFile(path);
         return Result.ok(s);
     }
 

@@ -20,10 +20,6 @@ public class PipelineConfigOrder {
     @ApiProperty(name="configId",desc="配置id")
     private String configId;
 
-    ////流水线id
-    //@ApiProperty(name="pipelineId",desc="流水线id")
-    //private String pipelineId;
-
     @ApiProperty(name="createTime",desc="创建时间")
     private String createTime;
 
@@ -35,6 +31,11 @@ public class PipelineConfigOrder {
 
     @ApiProperty(name="taskSort",desc="顺序")
     private int taskSort;
+
+    //更改的数据
+    private Object values;
+
+    private PipelineConfigOrder configOrder;
 
     //流水线
     @ApiProperty(name="pipeline",desc="流水线id",eg="@selectOne")
@@ -76,20 +77,13 @@ public class PipelineConfigOrder {
         this.pipeline = new Pipeline(pipelineId);
     }
 
-    //public PipelineConfigOrder(String pipelineId) {
-    //    this.pipelineId = pipelineId;
-    //}
+    public Object getValues() {
+        return values;
+    }
 
-    //public PipelineConfigOrder(String pipelineId,String message) {
-    //    this.pipelineId = pipelineId;
-    //    this.message = message;
-    //}
-
-    //public PipelineConfigOrder(String pipelineId, int taskType, int taskSort) {
-    //    this.pipelineId = pipelineId;
-    //    this.taskType = taskType;
-    //    this.taskSort = taskSort;
-    //}
+    public void setValues(Object values) {
+        this.values = values;
+    }
 
     public int getTaskType() {
         return taskType;
@@ -98,14 +92,6 @@ public class PipelineConfigOrder {
     public void setTaskType(int taskType) {
         this.taskType = taskType;
     }
-
-    //public String getPipelineId() {
-    //    return pipelineId;
-    //}
-    //
-    //public void setPipelineId(String pipelineId) {
-    //    this.pipelineId = pipelineId;
-    //}
 
     public String getMessage() {
         return message;
@@ -193,5 +179,13 @@ public class PipelineConfigOrder {
 
     public void setPipeline(Pipeline pipeline) {
         this.pipeline = pipeline;
+    }
+
+    public PipelineConfigOrder getConfigOrder() {
+        return configOrder;
+    }
+
+    public void setConfigOrder(PipelineConfigOrder configOrder) {
+        this.configOrder = configOrder;
     }
 }

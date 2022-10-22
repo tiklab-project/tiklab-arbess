@@ -10,6 +10,7 @@ import net.tiklab.matflow.execute.entity.PipelineExecHistoryEntity;
 import net.tiklab.matflow.execute.model.PipelineExecHistory;
 import net.tiklab.matflow.execute.model.PipelineExecLog;
 import net.tiklab.matflow.execute.model.PipelineHistoryQuery;
+import net.tiklab.matflow.orther.service.PipelineUntil;
 import net.tiklab.rpc.annotation.Exporter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -87,7 +88,7 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
         }
         List<PipelineExecHistory> allHistory = BeanMapper.mapList(list, PipelineExecHistory.class);
         for (PipelineExecHistory pipelineExecHistory : allHistory) {
-            pipelineExecHistory.setExecTime(formatDateTime(pipelineExecHistory.getRunTime()));
+            pipelineExecHistory.setExecTime(PipelineUntil.formatDateTime(pipelineExecHistory.getRunTime()));
         }
         allHistory.sort(Comparator.comparing(PipelineExecHistory::getCreateTime,Comparator.reverseOrder()));
         return allHistory;
@@ -149,25 +150,6 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
         return allLog.get(allLog.size()-1);
     }
 
-    //时间转换成时分秒
-    @Override
-    public String formatDateTime(long time) {
-        String DateTimes ;
-        long days = time / ( 60 * 60 * 24);
-        long hours = (time % ( 60 * 60 * 24)) / (60 * 60);
-        long minutes = (time % ( 60 * 60)) /60;
-        long seconds = time % 60;
-        if(days>0){
-            DateTimes= days + "天" + hours + "小时" + minutes + "分钟" + seconds + "秒";
-        }else if(hours>0){
-            DateTimes=hours + "小时" + minutes + "分钟" + seconds + "秒";
-        }else if(minutes>0){
-            DateTimes=minutes + "分钟" + seconds + "秒";
-        }else{
-            DateTimes=seconds + "秒";
-        }
-        return DateTimes;
-    }
 
     @Override
     public Pagination<PipelineExecHistory> findPageHistory(PipelineHistoryQuery pipelineHistoryQuery){

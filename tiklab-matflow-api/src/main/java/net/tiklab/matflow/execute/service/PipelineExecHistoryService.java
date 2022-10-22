@@ -100,13 +100,6 @@ public interface PipelineExecHistoryService {
     List<PipelineExecHistory> findHistoryList(List<String> idList);
 
     /**
-     * 时间转换器
-     * @param time 时间
-     * @return 时间
-     */
-    String formatDateTime(long time);
-
-    /**
      * 获取最后的执行日志
      * @param historyId 历史id
      * @return 执行日志

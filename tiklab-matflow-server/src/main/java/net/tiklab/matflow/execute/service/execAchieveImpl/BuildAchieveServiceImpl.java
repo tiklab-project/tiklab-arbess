@@ -10,6 +10,7 @@ import net.tiklab.matflow.execute.model.PipelineExecHistory;
 import net.tiklab.matflow.execute.service.PipelineExecServiceImpl;
 import net.tiklab.matflow.execute.service.execAchieveService.BuildAchieveService;
 import net.tiklab.matflow.execute.model.PipelineProcess;
+import net.tiklab.matflow.orther.service.PipelineUntil;
 import net.tiklab.rpc.annotation.Exporter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,53 +31,52 @@ import java.util.Objects;
 public class BuildAchieveServiceImpl implements BuildAchieveService {
 
     @Autowired
-    PipelineFileService pipelineFileService;
-
-    @Autowired
-    ConfigCommonService configCommonService;
+    ConfigCommonService commonService;
 
     private static final Logger logger = LoggerFactory.getLogger(BuildAchieveServiceImpl.class);
 
     // 构建
-    public String build(PipelineProcess pipelineProcess,  PipelineBuild pipelineBuild)  {
-        List<PipelineExecHistory> list = PipelineExecServiceImpl.pipelineExecHistoryList;
+    public boolean build(PipelineProcess pipelineProcess,  PipelineBuild pipelineBuild)  {
         long beginTime = new Timestamp(System.currentTimeMillis()).getTime();
         Pipeline pipeline = pipelineProcess.getPipeline();
-        PipelineExecLog pipelineExecLog = pipelineProcess.getPipelineExecLog();
+        pipelineProcess.setBeginTime(beginTime);
 
         //项目地址
-        String path = pipelineFileService.getFileAddress()+ pipeline.getPipelineName();
+        String path = PipelineUntil.getFileAddress()+ pipeline.getPipelineName();
 
         try {
             String a = "------------------------------------" + " \n"
                     +"开始构建" + " \n"
+                    +"项目地址：" +path + " \n"
                     +"执行 : \""  + pipelineBuild.getBuildOrder() + "\"\n";
 
             //更新日志
-            configCommonService.execHistory(list,pipeline.getPipelineId(),a,pipelineExecLog);
+            commonService.execHistory(pipelineProcess,a);
 
             //执行命令
             Process process = getOrder(pipelineBuild, path);
             if (process == null){
-                configCommonService.updateTime(pipelineProcess,beginTime);
-                configCommonService.updateState(pipelineProcess,false, list);
-                return "构建命令执行错误" ;
+                commonService.execHistory(pipelineProcess,"构建命令执行错误");
+                commonService.updateState(pipelineProcess,false);
+                return false;
             }
 
             //构建失败
-            int state = configCommonService.log(process.getInputStream(), pipelineProcess, list);
+            int state = commonService.log(process.getInputStream(), pipelineProcess);
             process.destroy();
-            configCommonService.updateTime(pipelineProcess,beginTime);
+            
             if (state == 0){
-                configCommonService.updateState(pipelineProcess,false, list);
-                return "构建失败";
+                commonService.execHistory(pipelineProcess,"构建失败");
+                commonService.updateState(pipelineProcess,false);
+                return false;
             }
         } catch (IOException | ApplicationException e) {
-            configCommonService.updateState(pipelineProcess,false, list);
-            return e.getMessage() ;
+            commonService.execHistory(pipelineProcess,e.getMessage());
+            commonService.updateState(pipelineProcess,false);
+            return false;
         }
-        configCommonService.updateState(pipelineProcess,true, list);
-        return null;
+        commonService.updateState(pipelineProcess,true);
+        return true;
     }
 
     /**
@@ -85,7 +85,7 @@ public class BuildAchieveServiceImpl implements BuildAchieveService {
      * @param path 项目地址
      * @return 执行命令
      */
-    private Process getOrder(PipelineBuild pipelineBuild,String path ) throws ApplicationException, IOException {
+    private Process getOrder(PipelineBuild pipelineBuild,String path) throws ApplicationException, IOException {
         String buildOrder = pipelineBuild.getBuildOrder();
         String buildAddress = pipelineBuild.getBuildAddress();
         
@@ -93,24 +93,27 @@ public class BuildAchieveServiceImpl implements BuildAchieveService {
         String order ;
         switch (type){
             case 21 -> {
-                String mavenAddress = configCommonService.getScm(21);
+                String mavenAddress = commonService.getScm(21);
                 if (mavenAddress == null) {
                     throw new ApplicationException("不存在maven配置");
                 }
                 order = mavenOrder(buildOrder, path, buildAddress);
-                return configCommonService.process(mavenAddress, order);
+                return PipelineUntil.process(mavenAddress, order);
             }
             case 22 -> {
-                String nodeAddress = configCommonService.getScm(22);
+                String nodeAddress = commonService.getScm(22);
                 if (nodeAddress == null) {
                     throw new ApplicationException("不存在node配置");
                 }
                 order = nodeOrder(buildOrder, path, buildAddress);
-                return configCommonService.process(nodeAddress, order);
+                return PipelineUntil.process(nodeAddress, order);
             }
         }
         return null;
     }
+
+    //系统类型
+    int systemType = PipelineUntil.getSystemType();
 
     /**
      * 拼装maven命令
@@ -122,7 +125,7 @@ public class BuildAchieveServiceImpl implements BuildAchieveService {
     private String mavenOrder(String buildOrder,String path,String buildAddress){
         
         String order;
-        int systemType = configCommonService.getSystemType();
+
         order = " ./" + buildOrder + " " + "-f" +" " +path ;
         if (systemType == 1){
             order = " .\\" + buildOrder + " " + "-f"+" "  +path;
@@ -142,7 +145,6 @@ public class BuildAchieveServiceImpl implements BuildAchieveService {
      */
     private String nodeOrder(String buildOrder,String path,String buildAddress ){
         String order;
-        int systemType = configCommonService.getSystemType();
         order = " ./" + buildOrder + " " + "-f" +path ;
         if (systemType == 1){
             order = " .\\" + buildOrder + " " + "-f" +path;

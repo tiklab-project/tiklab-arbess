@@ -1,5 +1,7 @@
 package net.tiklab.matflow.definition.service;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import net.tiklab.core.exception.ApplicationException;
 import net.tiklab.matflow.definition.model.*;
 import net.tiklab.rpc.annotation.Exporter;
@@ -109,27 +111,34 @@ public class PipelineConfigServiceImpl implements PipelineConfigService {
         HashMap<String, String> map = new HashMap<>();
         map.put("pipelineId", pipeline.getPipelineId());
         map.put("pipelineName", pipeline.getPipelineName());
+        //把值转换成json字符串
+        String object = JSON.toJSONString(config.getValues());
         switch (types) {
             case "code" -> {
-                PipelineCode pipelineCode = config.getPipelineCode();
+                //字符串转换成对象
+                PipelineCode pipelineCode = JSON.parseObject(object, PipelineCode.class);
+                //PipelineCode pipelineCode = config.getPipelineCode();
                 pipelineCode.setCodeId(typeConfig.getTaskId());
                 pipelineCodeService.updateCode(pipelineCode);
                 map.put("message", "源码管理配置");
             }
             case "test" -> {
-                PipelineTest pipelineTest = config.getPipelineTest();
+                PipelineTest pipelineTest = JSON.parseObject(object, PipelineTest.class);
+                //PipelineTest pipelineTest = config.getPipelineTest();
                 pipelineTest.setTestId(typeConfig.getTaskId());
                 pipelineTestService.updateTest(pipelineTest);
                 map.put("message", "测试配置");
             }
             case "build" -> {
-                PipelineBuild pipelineBuild = config.getPipelineBuild();
+                PipelineBuild pipelineBuild = JSON.parseObject(object, PipelineBuild.class);
+                //PipelineBuild pipelineBuild = config.getPipelineBuild();
                 pipelineBuild.setBuildId(typeConfig.getTaskId());
                 pipelineBuildService.updateBuild(pipelineBuild);
                 map.put("message", "构建配置");
             }
             case "deploy" -> {
-                PipelineDeploy pipelineDeploy = config.getPipelineDeploy();
+                PipelineDeploy pipelineDeploy = JSON.parseObject(object, PipelineDeploy.class);
+                //PipelineDeploy pipelineDeploy = config.getPipelineDeploy();
                 pipelineDeploy.setDeployId(typeConfig.getTaskId());
                 PipelineDeploy deploy = updateNumber(typeConfig, pipelineDeploy);
                 pipelineDeployService.updateDeploy(deploy);

@@ -6,6 +6,6 @@ import net.tiklab.matflow.execute.model.PipelineProcess;
 public interface PipelineTaskExecService {
 
 
-    String beginState(PipelineProcess pipelineProcess, PipelineConfigOrder oneConfig, int type);
+    boolean beginState(PipelineProcess pipelineProcess, PipelineConfigOrder oneConfig, int type);
 
 }

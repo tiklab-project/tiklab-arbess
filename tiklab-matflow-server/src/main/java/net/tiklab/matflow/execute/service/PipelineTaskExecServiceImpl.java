@@ -6,7 +6,7 @@ import net.tiklab.matflow.execute.service.execAchieveImpl.CodeAchieveServiceImpl
 import net.tiklab.matflow.execute.service.execAchieveImpl.DeployAchieveServiceImpl;
 import net.tiklab.matflow.execute.service.execAchieveImpl.TestAchieveServiceImpl;
 import net.tiklab.matflow.execute.model.PipelineProcess;
-import net.tiklab.matflow.execute.service.execAchieveService.PipelineTaskExecService;
+import net.tiklab.matflow.execute.service.execAchieveService.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,27 +14,27 @@ import org.springframework.stereotype.Service;
 public class PipelineTaskExecServiceImpl implements PipelineTaskExecService {
 
     @Autowired
-    CodeAchieveServiceImpl codeAchieveServiceImpl ;
+    CodeAchieveService code ;
 
     @Autowired
-    BuildAchieveServiceImpl buildAchieveServiceImpl ;
+    BuildAchieveService build ;
 
     @Autowired
-    TestAchieveServiceImpl testAchieveServiceImpl;
+    TestAchieveService test;
 
     @Autowired
-    DeployAchieveServiceImpl deployAchieveServiceImpl ;
+    DeployAchieveService deploy ;
 
-    public String beginState(PipelineProcess pipelineProcess, PipelineConfigOrder oneConfig, int type){
-        String state = null;
+    public boolean beginState(PipelineProcess pipelineProcess, PipelineConfigOrder oneConfig, int type){
+        boolean state = true;
         if (type < 10){
-            state = codeAchieveServiceImpl.clone(pipelineProcess,oneConfig.getPipelineCode());
+            state = code.clone(pipelineProcess,oneConfig.getPipelineCode());
         }else if (10<type && type<20){
-            state = testAchieveServiceImpl.test(pipelineProcess,oneConfig.getPipelineTest());
+            state = test.test(pipelineProcess,oneConfig.getPipelineTest());
         }else if (20<type && type<30){
-            state  = buildAchieveServiceImpl.build(pipelineProcess, oneConfig.getPipelineBuild());
+            state  = build.build(pipelineProcess, oneConfig.getPipelineBuild());
         }else if (30<type && type<40){
-            deployAchieveServiceImpl.deploy(pipelineProcess, oneConfig.getPipelineDeploy());
+            state  = deploy.deploy(pipelineProcess, oneConfig.getPipelineDeploy());
         }
         return state;
     }

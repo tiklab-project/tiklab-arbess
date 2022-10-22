@@ -3,6 +3,7 @@ package net.tiklab.matflow.definition.controller;
 
 import net.tiklab.core.Result;
 import net.tiklab.matflow.orther.service.PipelineFileService;
+import net.tiklab.matflow.orther.service.PipelineUntil;
 import net.tiklab.postin.annotation.Api;
 import net.tiklab.postin.annotation.ApiMethod;
 import net.tiklab.postin.annotation.ApiParam;
@@ -27,7 +28,7 @@ public class PipelineCommonController {
     @RequestMapping(path="/fileAddress",method = RequestMethod.POST)
     @ApiMethod(name = "fileAddress",desc = "根据流水线id查询配置信息")
     public Result<String> fileAddress() {
-        String fileAddress = pipelineFileService.getFileAddress();
+        String fileAddress = PipelineUntil.getFileAddress();
         return Result.ok(fileAddress);
     }
 
@@ -37,7 +38,7 @@ public class PipelineCommonController {
     @ApiMethod(name = "getFile",desc = "根据流水线id查询配置信息")
     @ApiParam(name = "pipelineName",desc = "流水线名称",required = true)
     public Result<String> getFile(String pipelineName,String regex) {
-        String fileAddress = pipelineFileService.getFile(pipelineName,regex);
+        String fileAddress = PipelineUntil.getFile(pipelineName,regex);
         return Result.ok(fileAddress);
     }
 }

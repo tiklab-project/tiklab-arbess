@@ -10,5 +10,5 @@ public interface CodeAchieveService {
      * @param pipelineProcess 执行信息
      * @return 执行状态
      */
-    String clone(PipelineProcess pipelineProcess, PipelineCode pipelineCode);
+    boolean clone(PipelineProcess pipelineProcess, PipelineCode pipelineCode);
 }

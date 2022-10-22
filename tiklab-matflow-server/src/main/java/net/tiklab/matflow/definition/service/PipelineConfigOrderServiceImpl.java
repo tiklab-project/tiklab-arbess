@@ -108,8 +108,9 @@ public class PipelineConfigOrderServiceImpl implements PipelineConfigOrderServic
         switch (message) {
             case "create" -> createConfig(config,types);
             case "update" -> updateConfig(config,types);
+            case "judge" -> judgeConfig(config);
             case "delete" -> deleteConfig(pipelineId,types,type);
-            case "updateType" -> updateOneConfigType(config,types);
+            case "updateType" -> updateConfigType(config,types);
             case "order" -> updateOrder(pipelineId,config.getTaskSort(),config.getSort());
         }
     }
@@ -153,12 +154,23 @@ public class PipelineConfigOrderServiceImpl implements PipelineConfigOrderServic
         pipelineActivityService.log("update", "pipelineConfig", map);
     }
 
+
+    public void judgeConfig(PipelineConfigOrder config){
+        joinTemplate.joinQuery(config);
+        Pipeline pipeline = config.getPipeline();
+        String pipelineId = pipeline.getPipelineId();
+        PipelineConfigOrder typeConfig = findTypeConfig(pipelineId, config.getTaskType());
+        if (typeConfig != null){
+            throw new ApplicationException(50001,"已存在相同类型配置");
+        }
+    }
+
     /**
      * 更新配置类型
      * @param config 配置
      * @param types 更新类型
      */
-    public void updateOneConfigType(PipelineConfigOrder config,String types){
+    public void updateConfigType(PipelineConfigOrder config,String types){
         String pipelineId = config.getPipeline().getPipelineId();
         PipelineConfigOrder typeConfig = findTypeConfig(pipelineId, config.getTaskType());
         if (typeConfig == null) return;
@@ -180,10 +192,6 @@ public class PipelineConfigOrderServiceImpl implements PipelineConfigOrderServic
         joinTemplate.joinQuery(config);
         Pipeline pipeline = config.getPipeline();
         String pipelineId = pipeline.getPipelineId();
-        PipelineConfigOrder typeConfig = findTypeConfig(pipelineId, config.getTaskType());
-        if (typeConfig != null){
-            throw new ApplicationException(50001,"已存在相同类型配置");
-        }
         //获取已存在的配置，对新增加的配置添加排序
         int size = 1;
         List<PipelineConfigOrder> allPipelineConfig = findAllPipelineConfig(pipelineId);

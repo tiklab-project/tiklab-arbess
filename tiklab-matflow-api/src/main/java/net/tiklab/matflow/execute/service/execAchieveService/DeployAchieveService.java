@@ -10,5 +10,7 @@ public interface DeployAchieveService {
      * @param pipelineProcess 部署信息
      * @return 部署状态
      */
-    String deploy(PipelineProcess pipelineProcess, PipelineDeploy pipelineDeploy);
+    boolean deploy(PipelineProcess pipelineProcess, PipelineDeploy pipelineDeploy);
+
+
 }

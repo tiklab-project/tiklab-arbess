@@ -38,7 +38,7 @@ public class PipelineWorkSpaceServiceImpl implements PipelineWorkSpaceService {
         if (pipeline == null)return null;
         pipelineOpenService.findOpen(userId, pipeline);
         //设置拉取地址
-        String path = pipelineFileService.getFileAddress()+ pipeline.getPipelineName();
+        String path = PipelineUntil.getFileAddress()+ pipeline.getPipelineName();
         List<FileTree> trees = new ArrayList<>();
         File file = new File(path);
         //判断文件是否存在
@@ -53,7 +53,7 @@ public class PipelineWorkSpaceServiceImpl implements PipelineWorkSpaceService {
     //读取文件信息
     @Override
     public  List<String> readFile(String path){
-        return pipelineFileService.readFile(path);
+        return PipelineUntil.readFile(path);
     }
 
     @Override
