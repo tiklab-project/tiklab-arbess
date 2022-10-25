@@ -6,7 +6,6 @@ import net.tiklab.join.JoinTemplate;
 import net.tiklab.matflow.definition.dao.PipelineCodeDao;
 import net.tiklab.matflow.definition.entity.PipelineCodeEntity;
 import net.tiklab.matflow.definition.model.PipelineCode;
-import net.tiklab.matflow.orther.service.PipelineActivityService;
 import net.tiklab.rpc.annotation.Exporter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,6 +46,8 @@ public class PipelineCodeServiceImpl implements PipelineCodeService {
     //修改
     @Override
     public void updateCode(PipelineCode pipelineCode) {
+        PipelineCode oneCode = findOneCode(pipelineCode.getCodeId());
+        pipelineCode.setProof(oneCode.getProof());
         PipelineCode authorizeUrl = codeAuthorizeService.getAuthorizeUrl(pipelineCode);
         pipelineCodeDao.updateCode(BeanMapper.map(authorizeUrl, PipelineCodeEntity.class));
     }

@@ -1,5 +1,5 @@
 app:
-  name: tiklab-matflow
+  name: matflow
 
 APP_HOME: ${APP_HOME}
 application: matflow
@@ -56,9 +56,6 @@ datapath: ${PROJECT_HOME}/caches
 eas:
   embbed:
     enable: true
-  address: http://172.11.1.12:8080
-#  web:
-#    address: http://172.11.1.12:8080
 
 mysql:
   embbed:

@@ -6,7 +6,6 @@ import net.tiklab.join.JoinTemplate;
 import net.tiklab.matflow.definition.dao.PipelineTestDao;
 import net.tiklab.matflow.definition.entity.PipelineTestEntity;
 import net.tiklab.matflow.definition.model.PipelineTest;
-import net.tiklab.matflow.orther.service.PipelineActivityService;
 import net.tiklab.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,9 +21,6 @@ public class PipelineTestServiceImpl implements PipelineTestService {
 
     @Autowired
     JoinTemplate joinTemplate;
-
-    @Autowired
-    PipelineActivityService activityService;
 
     //创建
     @Override

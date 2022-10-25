@@ -1,4 +1,4 @@
-INSERT INTO pipeline (pipeline_id,pipeline_name,user_id,pipeline_create_time,pipeline_create_type,pipeline_collect,pipeline_state,pipeline_power) VALUES ('679668d5ce24a7a9ff697feca5bb94ff', '示例项目1', '111111', '2022-07-28 15:47:29', 1, 0, 0, 1);
+INSERT INTO pipeline (pipeline_id,pipeline_name,user_id,pipeline_create_time,pipeline_type,pipeline_state,pipeline_power) VALUES ('679668d5ce24a7a9ff697feca5bb94ff', '示例项目1', '111111', '2022-07-28 15:47:29', 1,  0, 1);
 
 INSERT INTO pipeline_proof VALUES ('52e6d477df54ba80b939dc27b911cd16', 'linux', 5, 'password', 'root', 'darth2020', NULL, NULL, '2022-07-28 15:47:29', 1, '111111');
 

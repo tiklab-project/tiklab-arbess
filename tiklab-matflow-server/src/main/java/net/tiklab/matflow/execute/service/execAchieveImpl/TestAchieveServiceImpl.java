@@ -31,15 +31,15 @@ public class TestAchieveServiceImpl implements TestAchieveService {
     
     // 单元测试
     public boolean test(PipelineProcess pipelineProcess, PipelineTest pipelineTest) {
-        List<PipelineExecHistory> pipelineExecHistoryList = PipelineExecServiceImpl.pipelineExecHistoryList;
+
         long beginTime = new Timestamp(System.currentTimeMillis()).getTime();
         //初始化日志
         PipelineExecHistory pipelineExecHistory = pipelineProcess.getPipelineExecHistory();
-
+        pipelineProcess.setBeginTime(beginTime);
         Pipeline pipeline = pipelineProcess.getPipeline();
 
         String testOrder = pipelineTest.getTestOrder();
-        String path = PipelineUntil.getFileAddress()+pipeline.getPipelineName();
+        String path = PipelineUntil.findFileAddress()+pipeline.getPipelineName();
         try {
 
             String a = "------------------------------------" + " \n"
@@ -51,24 +51,27 @@ public class TestAchieveServiceImpl implements TestAchieveService {
 
             if (process == null){
                 commonService.execHistory(pipelineProcess,"命令错误。");
+                commonService.updateState(pipelineProcess,false);
                 return false;
             }
 
             int state = commonService.log(process.getInputStream(), pipelineProcess);
 
-           
             if (state == 0){
                 commonService.execHistory(pipelineProcess,"Fail");
+                commonService.updateState(pipelineProcess,false);
                 return false;
             }
         } catch (IOException e) {
             commonService.execHistory(pipelineProcess,"日志打印失败"+e);
+            commonService.updateState(pipelineProcess,false);
             return false;
         } catch (ApplicationException e) {
             commonService.execHistory(pipelineProcess,e.getMessage());
+            commonService.updateState(pipelineProcess,false);
             return false;
         }
-        
+        commonService.updateState(pipelineProcess,true);
         return true;
     }
 
@@ -105,7 +108,7 @@ public class TestAchieveServiceImpl implements TestAchieveService {
     private String testOrder(String buildOrder,String path,String buildAddress){
 
         String order;
-        int systemType = PipelineUntil.getSystemType();
+        int systemType = PipelineUntil.findSystemType();
         order = " ./" + buildOrder + " " + "-f" +" " +path ;
         if (systemType == 1){
             order = " .\\" + buildOrder + " " + "-f"+" "  +path;

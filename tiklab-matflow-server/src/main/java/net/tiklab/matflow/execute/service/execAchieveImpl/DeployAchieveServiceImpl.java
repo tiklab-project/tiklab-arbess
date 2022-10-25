@@ -43,9 +43,8 @@ public class DeployAchieveServiceImpl implements DeployAchieveService {
         //开始运行时间
         long beginTime = new Timestamp(System.currentTimeMillis()).getTime();
         Pipeline pipeline = pipelineProcess.getPipeline();
-        PipelineExecLog pipelineExecLog = pipelineProcess.getPipelineExecLog();
         List<PipelineExecHistory> list = PipelineExecServiceImpl.pipelineExecHistoryList;
-        
+        pipelineProcess.setBeginTime(beginTime);
         Proof proof = pipelineDeploy.getProof();
         pipelineProcess.setProof(proof);
 
@@ -115,7 +114,7 @@ public class DeployAchieveServiceImpl implements DeployAchieveService {
         commonService.execHistory(pipelineProcess,"部署文件上传成功\n执行部署命令：" );
 
         try {
-            linux(session, pipelineProcess,pipelineDeploy,list);
+            linux(session, pipelineProcess,pipelineDeploy);
         } catch (JSchException | IOException e) {
             session.disconnect();
             commonService.updateState(pipelineProcess,false);
@@ -130,45 +129,50 @@ public class DeployAchieveServiceImpl implements DeployAchieveService {
     /**
      * linux部署
      * @param pipelineProcess 配置信息
-     * @param list 状态集合
      */
-    private void linux(Session session, PipelineProcess pipelineProcess,PipelineDeploy pipelineDeploy, List<PipelineExecHistory> list) throws JSchException, IOException {
-
-        //选择自定义部署
-        if (pipelineDeploy.getDeployType() == 1){
-           sshOrder(session,pipelineDeploy.getStartShell(),pipelineProcess,list);
-           return;
-        }
-
+    private void linux(Session session, PipelineProcess pipelineProcess,PipelineDeploy pipelineDeploy) throws JSchException, IOException {
         //部署地址
         String deployAddress = "/"+ pipelineDeploy.getDeployAddress();
-
-        //部署文件命令
+        //部署脚本命令
         String  startOrder= pipelineDeploy.getDeployOrder();
         //启动文件地址
         String startAddress = pipelineDeploy.getStartAddress();
+        //启动脚本命令
+        String startShell = pipelineDeploy.getStartShell();
 
-        //部署文件命令启动文件地址都为null的时候
-        String order = "cd "+" "+ deployAddress +";"+ pipelineDeploy.getStartShell();
-        if ((startOrder == null || startOrder.equals("")) && (startAddress == null || startAddress.equals("")) ){
-            if (pipelineDeploy.getStartShell() == null || pipelineDeploy.getStartShell().equals("") ){
-                return;
-            }
-            sshOrder(session,order, pipelineProcess, list);
-            return;
+        if (PipelineUntil.isNoNull(startOrder)){
+            //部署文件命令启动文件地址都为null的时候
+            String order = "cd "+" "+ deployAddress +";"+ startOrder;
+            sshOrder(session,order, pipelineProcess);
         }
-        String orders = "cd "+" "+ deployAddress + "/" + startAddress+";" + pipelineDeploy.getStartShell();
-        if (startAddress != null && !startAddress.equals("")){
-            if (startOrder == null ||startOrder.equals("")){
-                sshOrder(session,orders, pipelineProcess, list);
-                return;
-            }
-            startOrder = "cd "+" "+ deployAddress +";"+startOrder;
-            sshOrder( session,startOrder, pipelineProcess, list);
-            sshOrder(session,orders, pipelineProcess, list);
-        }else {
-            sshOrder(session,order, pipelineProcess, list);
+
+        if (PipelineUntil.isNoNull(startShell)){
+            String order = "cd "+" "+ startAddress +";"+ startShell;
+            sshOrder(session,order, pipelineProcess);
         }
+
+
+        //if ((startOrder == null || startOrder.equals("")) && (startAddress == null || startAddress.equals("")) ){
+        //    if (pipelineDeploy.getStartShell() == null || pipelineDeploy.getStartShell().equals("") ){
+        //        return;
+        //    }
+        //    sshOrder(session,order, pipelineProcess);
+        //    return;
+        //}
+
+
+        //String orders = "cd "+" "+ deployAddress + "/" + startAddress+";" + pipelineDeploy.getStartShell();
+        //if (startAddress != null && !startAddress.equals("")){
+        //    if (startOrder == null ||startOrder.equals("")){
+        //        sshOrder(session,orders, pipelineProcess);
+        //        return;
+        //    }
+        //    startOrder = "cd "+" "+ deployAddress +";"+startOrder;
+        //    sshOrder( session,startOrder, pipelineProcess);
+        //    sshOrder(session,orders, pipelineProcess);
+        //}else {
+        //    sshOrder(session,order, pipelineProcess);
+        //}
     }
 
 
@@ -200,15 +204,18 @@ public class DeployAchieveServiceImpl implements DeployAchieveService {
      * 连接服务器执行命令
      * @param orders 命令
      * @param pipelineProcess 配置信息
-     * @param list 执行历史
      * @throws JSchException 连接错误
      * @throws IOException 读取执行信息失败
      */
-    private void sshOrder(Session session,String orders,PipelineProcess pipelineProcess,List<PipelineExecHistory> list) throws JSchException, IOException {
+    private void sshOrder(Session session,String orders,PipelineProcess pipelineProcess) throws JSchException, IOException {
         ChannelExec exec = (ChannelExec) session.openChannel("exec");
+        commonService.execHistory(pipelineProcess,"执行："+orders );
         exec.setCommand(orders);
-        commonService.log(exec.getInputStream(), pipelineProcess);
+        exec.connect();
+        InputStream inputStream = exec.getInputStream();
+        commonService.log(inputStream, pipelineProcess);
         exec.disconnect();
+
     }
 
 
@@ -245,14 +252,13 @@ public class DeployAchieveServiceImpl implements DeployAchieveService {
     /**
      * docker部署
      * @param pipelineProcess 配置信息
-     * @param list 状态集合
      */
-    private void docker(Session session, PipelineProcess pipelineProcess,PipelineDeploy pipelineDeploy, List<PipelineExecHistory> list) throws JSchException, IOException {
+    private void docker(Session session, PipelineProcess pipelineProcess,PipelineDeploy pipelineDeploy) throws JSchException, IOException {
         Pipeline pipeline = pipelineProcess.getPipeline();
 
         //选择自定义部署
         if (pipelineDeploy.getDeployType() == 1){
-            sshOrder(session, pipelineDeploy.getStartShell(), pipelineProcess, list);
+            sshOrder(session, pipelineDeploy.getStartShell(), pipelineProcess);
             return;
         }
 
@@ -273,24 +279,24 @@ public class DeployAchieveServiceImpl implements DeployAchieveService {
 
              order = order +"cd"+" "+deployAddress+";"+"docker image build -t"+" "+pipelineName+"  .;"
                     +"docker run -itd -p"+" "+ pipelineDeploy.getMappingPort()+":"+ pipelineDeploy.getStartPort()+" "+pipelineName;
-            sshOrder(session,order, pipelineProcess, list);
+            sshOrder(session,order, pipelineProcess);
             return;
         }
         if (deployOrder != null && !deployOrder.equals("") ) {
             deployOrder = "cd "+" "+ deployAddress +";"+deployOrder;
-            sshOrder(session,deployOrder, pipelineProcess, list);
+            sshOrder(session,deployOrder, pipelineProcess);
             if (startAddress == null || startAddress.equals("/")) {
 
                 order = order + "cd" + " " + deployAddress + ";" + "docker image build -t" + " " + pipelineName + "  .;"
                         + "docker run -itd -p" + " " + pipelineDeploy.getMappingPort() + ":" + pipelineDeploy.getStartPort() + " " + pipelineName;
-                sshOrder(session, order, pipelineProcess, list);
+                sshOrder(session, order, pipelineProcess);
                 return;
             }
         }
 
         order = order +"cd"+" "+deployAddress+"/"+startAddress+";"+"docker image build -t"+" "+pipelineName+"  .;"
                 +"docker run -itd -p"+" "+ pipelineDeploy.getMappingPort()+":"+ pipelineDeploy.getStartPort()+" "+pipelineName;
-        sshOrder(session, order, pipelineProcess, list);
+        sshOrder(session, order, pipelineProcess);
     }
 
 }

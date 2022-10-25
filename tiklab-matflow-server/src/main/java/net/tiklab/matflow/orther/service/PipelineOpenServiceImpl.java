@@ -41,10 +41,8 @@ public class PipelineOpenServiceImpl implements PipelineOpenService {
             return null;
         }
         allOpen.sort(Comparator.comparing(PipelineOpen::getNumber,Comparator.reverseOrder()));
-        if (allOpen.size() <= 5){
-            return allOpen;
-        }
-        return allOpen.subList(0, 5);
+        int size = Math.min(allOpen.size(), 6);
+        return allOpen.subList(0, size);
     }
 
     //删除流水线所有最近打开信息
@@ -78,8 +76,6 @@ public class PipelineOpenServiceImpl implements PipelineOpenService {
         }
     }
 
-
-
     @Override
     public PipelineOpen findOneOpen(String openId) {
         PipelineOpen pipelineOpen = BeanMapper.map(pipelineOpenDao.findOneOpen(openId), PipelineOpen.class);
@@ -99,7 +95,6 @@ public class PipelineOpenServiceImpl implements PipelineOpenService {
         List<PipelineOpenEntity> openList = pipelineOpenDao.findAllOpenList(idList);
         return BeanMapper.mapList(openList, PipelineOpen.class);
     }
-
 
     //获取流水线打开次数
     private PipelineOpen findOneOpenNumber(String userId , String pipelineId){

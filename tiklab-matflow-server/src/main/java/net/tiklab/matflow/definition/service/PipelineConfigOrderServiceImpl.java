@@ -6,7 +6,7 @@ import net.tiklab.join.JoinTemplate;
 import net.tiklab.matflow.definition.dao.PipelineConfigOrderDao;
 import net.tiklab.matflow.definition.entity.PipelineConfigOrderEntity;
 import net.tiklab.matflow.definition.model.*;
-import net.tiklab.matflow.orther.service.PipelineActivityService;
+import net.tiklab.matflow.orther.service.PipelineHomeService;
 import net.tiklab.rpc.annotation.Exporter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +28,7 @@ public class PipelineConfigOrderServiceImpl implements PipelineConfigOrderServic
 
     //动态
     @Autowired
-    PipelineActivityService pipelineActivityService;
+    PipelineHomeService pipelineHomeService;
 
     @Autowired
     PipelineConfigService pipelineConfigService;
@@ -54,13 +54,12 @@ public class PipelineConfigOrderServiceImpl implements PipelineConfigOrderServic
     public void createTemplate(String pipelineId, int type){
         PipelineConfigOrder pipelineConfigOrder = new PipelineConfigOrder(pipelineId,"create");
         int[] ints = switch (type) {
-            case 1 -> new int[]{1};
-            case 2131 -> new int[]{1,21, 31};
-            case 2132 -> new int[]{1,21, 32};
-            case 112131 -> new int[]{1,11, 21, 31};
-            case 112132 -> new int[]{1,11, 21, 32};
-            case 2231 -> new int[]{1,22, 31};
-            case 2232 -> new int[]{1,22, 32};
+            case 2131 -> new int[]{21, 31};
+            case 2132 -> new int[]{21, 32};
+            case 112131 -> new int[]{11, 21, 31};
+            case 112132 -> new int[]{11, 21, 32};
+            case 2231 -> new int[]{22, 31};
+            case 2232 -> new int[]{22, 32};
             default -> null;
         };
         if (ints == null){
@@ -108,7 +107,6 @@ public class PipelineConfigOrderServiceImpl implements PipelineConfigOrderServic
         switch (message) {
             case "create" -> createConfig(config,types);
             case "update" -> updateConfig(config,types);
-            case "judge" -> judgeConfig(config);
             case "delete" -> deleteConfig(pipelineId,types,type);
             case "updateType" -> updateConfigType(config,types);
             case "order" -> updateOrder(pipelineId,config.getTaskSort(),config.getSort());
@@ -137,6 +135,21 @@ public class PipelineConfigOrderServiceImpl implements PipelineConfigOrderServic
         return pipelineConfigService.findConfig(typeConfig, type);
     }
 
+    //效验字段
+    @Override
+     public Map<String, String> configValid(String pipelineId){
+         List<PipelineConfigOrder> allPipelineConfig = findAllPipelineConfig(pipelineId);
+         if (allPipelineConfig == null){
+             return null;
+         }
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        return pipelineConfigService.configValid(allPipelineConfig);
+     }
+
     /**
      * 更新配置
      * @param config 配置阻断字段
@@ -151,18 +164,7 @@ public class PipelineConfigOrderServiceImpl implements PipelineConfigOrderServic
         Map<String, String> map = pipelineConfigService.updateConfig(config, typeConfig, types);
         map.put("pipelineId", pipeline.getPipelineId());
         map.put("pipelineName", pipeline.getPipelineName());
-        pipelineActivityService.log("update", "pipelineConfig", map);
-    }
-
-
-    public void judgeConfig(PipelineConfigOrder config){
-        joinTemplate.joinQuery(config);
-        Pipeline pipeline = config.getPipeline();
-        String pipelineId = pipeline.getPipelineId();
-        PipelineConfigOrder typeConfig = findTypeConfig(pipelineId, config.getTaskType());
-        if (typeConfig != null){
-            throw new ApplicationException(50001,"已存在相同类型配置");
-        }
+        pipelineHomeService.log("update", "pipelineConfig", map);
     }
 
     /**
@@ -192,6 +194,10 @@ public class PipelineConfigOrderServiceImpl implements PipelineConfigOrderServic
         joinTemplate.joinQuery(config);
         Pipeline pipeline = config.getPipeline();
         String pipelineId = pipeline.getPipelineId();
+        PipelineConfigOrder typeConfig = findTypeConfig(pipelineId, config.getTaskType());
+        if (typeConfig != null){
+            throw new ApplicationException(50001,"已存在相同类型配置");
+        }
         //获取已存在的配置，对新增加的配置添加排序
         int size = 1;
         List<PipelineConfigOrder> allPipelineConfig = findAllPipelineConfig(pipelineId);
@@ -210,7 +216,7 @@ public class PipelineConfigOrderServiceImpl implements PipelineConfigOrderServic
         map.put("pipelineName", pipeline.getPipelineName());
         configOrder.setTaskId(map.get("id"));
         String configure = createConfigure(configOrder);
-        pipelineActivityService.log("create", "pipelineConfig", map);
+        pipelineHomeService.log("create", "pipelineConfig", map);
         if (configure == null){
             throw new ApplicationException(50001,"创建配置顺序信息失败");
         }
@@ -231,29 +237,10 @@ public class PipelineConfigOrderServiceImpl implements PipelineConfigOrderServic
         Map<String, String> map = pipelineConfigService.deleteConfig(typeConfig, types);
 
         Pipeline pipeline = typeConfig.getPipeline();
-        //HashMap<String, String> map = new HashMap<>();
         map.put("pipelineId", pipeline.getPipelineId());
         map.put("pipelineName", pipeline.getPipelineName());
-        //switch (types) {
-        //    case "code" -> {
-        //        pipelineCodeService.deleteCode(typeConfig.getTaskId());
-        //        map.put("message","源码管理配置");
-        //    }
-        //    case "test" -> {
-        //        pipelineTestService.deleteTest(typeConfig.getTaskId());
-        //        map.put("message","测试配置");
-        //    }
-        //    case "build" -> {
-        //        pipelineBuildService.deleteBuild(typeConfig.getTaskId());
-        //        map.put("message","构建配置");
-        //    }
-        //    case "deploy" -> {
-        //        pipelineDeployService.deleteDeploy(typeConfig.getTaskId());
-        //        map.put("message","部署配置");
-        //    }
-        //}
         pipelineConfigOrderDao.deleteConfigure(typeConfig.getConfigId());
-        pipelineActivityService.log("delete", "pipelineConfig", map);
+        pipelineHomeService.log("delete", "pipelineConfig", map);
     }
 
     /**

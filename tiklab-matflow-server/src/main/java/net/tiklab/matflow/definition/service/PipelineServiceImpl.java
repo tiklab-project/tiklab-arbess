@@ -1,7 +1,6 @@
 package net.tiklab.matflow.definition.service;
 
 import net.tiklab.beans.BeanMapper;
-import net.tiklab.core.exception.ApplicationException;
 import net.tiklab.join.JoinTemplate;
 import net.tiklab.matflow.definition.dao.PipelineDao;
 import net.tiklab.matflow.definition.entity.PipelineEntity;
@@ -9,11 +8,11 @@ import net.tiklab.matflow.definition.model.Pipeline;
 import net.tiklab.matflow.definition.model.PipelineMassage;
 import net.tiklab.matflow.execute.model.PipelineExecHistory;
 import net.tiklab.matflow.execute.model.PipelineExecState;
-import net.tiklab.matflow.orther.service.PipelineActivityService;
+import net.tiklab.matflow.orther.service.PipelineHomeService;
+import net.tiklab.matflow.orther.service.PipelineHomeServiceImpl;
 import net.tiklab.rpc.annotation.Exporter;
 import net.tiklab.user.user.model.DmUser;
 import net.tiklab.user.user.model.User;
-import net.tiklab.user.user.service.DmUserService;
 import org.apache.commons.lang3.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,7 +44,7 @@ public class PipelineServiceImpl implements PipelineService {
     PipelineCommonServer pipelineCommonServer;
 
     @Autowired
-    PipelineActivityService pipelineActivityService;
+    PipelineHomeService pipelineHomeService;
 
     private static final Logger logger = LoggerFactory.getLogger(PipelineServiceImpl.class);
 
@@ -55,14 +54,16 @@ public class PipelineServiceImpl implements PipelineService {
         PipelineEntity pipelineEntity = BeanMapper.map(pipeline, PipelineEntity.class);
         String pipelineId = pipelineDao.createPipeline(pipelineEntity);
         //创建模板配置
-        pipelineConfigOrderService.createTemplate(pipelineId, pipeline.getPipelineType());
+        if (pipeline.getPipelineType() != 1){
+            pipelineConfigOrderService.createTemplate(pipelineId, pipeline.getPipelineType());
+        }
 
         //动态
         HashMap<String, String> map = new HashMap<>();
         map.put("message", "");
         map.put("pipelineId", pipelineId);
         map.put("pipelineName", pipeline.getPipelineName());
-        pipelineActivityService.log("create", "pipeline", map);
+        pipelineHomeService.log("create", "pipeline", map);
         DmUser dmUser = new DmUser();
         dmUser.setDomainId(pipelineId);
         User user = new User();
@@ -86,7 +87,7 @@ public class PipelineServiceImpl implements PipelineService {
         map.put("message", "");
         map.put("pipelineId", pipelineId);
         map.put("pipelineName", pipeline.getPipelineName());
-        pipelineActivityService.log("delete", "pipeline", map);
+        pipelineHomeService.log("delete", "pipeline", map);
         return 1;
     }
 
@@ -101,7 +102,7 @@ public class PipelineServiceImpl implements PipelineService {
             map.put("message","名称为"+pipeline.getPipelineName());
             map.put("pipelineId", pipeline.getPipelineId());
             map.put("pipelineName", pipeline.getPipelineName());
-            pipelineActivityService.log("update", "pipeline", map);
+            pipelineHomeService.log("update", "pipeline", map);
         }
         PipelineEntity pipelineEntity = BeanMapper.map(pipeline, PipelineEntity.class);
         pipelineDao.updatePipeline(pipelineEntity);

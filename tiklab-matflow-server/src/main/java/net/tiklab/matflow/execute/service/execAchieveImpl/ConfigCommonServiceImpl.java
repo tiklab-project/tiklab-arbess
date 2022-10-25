@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.io.*;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
@@ -56,12 +57,12 @@ public class ConfigCommonServiceImpl implements ConfigCommonService {
      * @return map 执行状态
      */
     @Override
-    public int log(InputStream inputStream, PipelineProcess pipelineProcess)  {
+    public int log(InputStream inputStream, PipelineProcess pipelineProcess) throws IOException {
 
         InputStreamReader inputStreamReader;
 
         //根据系统指定不同日志输出格式
-        if (PipelineUntil.getSystemType()==1){
+        if (PipelineUntil.findSystemType()==1){
             inputStreamReader = new InputStreamReader(inputStream, Charset.forName("GBK"));
         }else {
             inputStreamReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
@@ -72,21 +73,18 @@ public class ConfigCommonServiceImpl implements ConfigCommonService {
         StringBuilder logRunLog = new StringBuilder();
 
         //更新日志信息
-        try {
-            while ((s = bufferedReader.readLine()) != null) {
-                logRunLog.append(s).append("\n");
-                execHistory(pipelineProcess,s);
-                if (logRunLog.toString().contains("BUILD FAILURE")||logRunLog.toString().contains("ERROR")) {
-                    inputStreamReader.close();
-                    bufferedReader.close();
-                    return 0;
-                }
+        while ((s = bufferedReader.readLine()) != null) {
+            logRunLog.append(s).append("\n");
+            execHistory(pipelineProcess,s);
+            if (logRunLog.toString().contains("BUILD FAILURE")||logRunLog.toString().contains("ERROR")) {
+                inputStreamReader.close();
+                bufferedReader.close();
+                return 0;
             }
-            inputStreamReader.close();
-            bufferedReader.close();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
+        inputStreamReader.close();
+        bufferedReader.close();
+
         return 1;
     }
 

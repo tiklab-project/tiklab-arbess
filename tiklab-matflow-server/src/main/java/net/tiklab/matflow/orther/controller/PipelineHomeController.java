@@ -47,13 +47,6 @@ public class PipelineHomeController {
         return Result.ok(s);
     }
 
-    //@RequestMapping(path="findUserActivity",method = RequestMethod.POST)
-    //@ApiMethod(name = "findUserActivity",desc = "获取用户动态")
-    //@ApiParam(name = "userId",desc = "用户id",required = true)
-    //public Result<PipelineActivityQuery> findUserActivity(@RequestBody @NotNull PipelineActivityQuery pipelineActivityQuery){
-    //    PipelineActivityQuery allActivity = pipelineHomeService.findUserActivity(pipelineActivityQuery);
-    //    return Result.ok(allActivity);
-    //}
 
 
 

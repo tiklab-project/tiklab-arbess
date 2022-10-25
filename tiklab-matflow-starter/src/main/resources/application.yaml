@@ -61,9 +61,6 @@ datapath: ${PROJECT_HOME}/caches
 eas:
   embbed:
     enable: true
-  address: http://eas-ce.tiklab.net
-#  web:
-#    address: http://172.11.1.12:8080
 
 mysql:
   embbed:

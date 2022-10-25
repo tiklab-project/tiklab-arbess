@@ -38,7 +38,7 @@ public class PipelineWorkSpaceServiceImpl implements PipelineWorkSpaceService {
         if (pipeline == null)return null;
         pipelineOpenService.findOpen(userId, pipeline);
         //设置拉取地址
-        String path = PipelineUntil.getFileAddress()+ pipeline.getPipelineName();
+        String path = PipelineUntil.findFileAddress()+ pipeline.getPipelineName();
         List<FileTree> trees = new ArrayList<>();
         File file = new File(path);
         //判断文件是否存在

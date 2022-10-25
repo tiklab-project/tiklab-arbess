@@ -42,7 +42,7 @@ public class BuildAchieveServiceImpl implements BuildAchieveService {
         pipelineProcess.setBeginTime(beginTime);
 
         //项目地址
-        String path = PipelineUntil.getFileAddress()+ pipeline.getPipelineName();
+        String path = PipelineUntil.findFileAddress()+ pipeline.getPipelineName();
 
         try {
             String a = "------------------------------------" + " \n"
@@ -113,7 +113,7 @@ public class BuildAchieveServiceImpl implements BuildAchieveService {
     }
 
     //系统类型
-    int systemType = PipelineUntil.getSystemType();
+    int systemType = PipelineUntil.findSystemType();
 
     /**
      * 拼装maven命令

@@ -5,6 +5,7 @@ import net.tiklab.beans.BeanMapper;
 import net.tiklab.matflow.execute.dao.PipelineExecLogDao;
 import net.tiklab.matflow.execute.entity.PipelineExecLogEntity;
 import net.tiklab.matflow.execute.model.PipelineExecLog;
+import net.tiklab.matflow.orther.service.PipelineUntil;
 import net.tiklab.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -48,7 +49,7 @@ public class PipelineExecLogServiceImpl implements PipelineExecLogService {
            return null;
         }
         for (PipelineExecLog pipelineExecLog : list) {
-            pipelineExecLog.setExecTime(formatDateTime(pipelineExecLog.getRunTime()));
+            pipelineExecLog.setExecTime(PipelineUntil.formatDateTime(pipelineExecLog.getRunTime()));
         }
         list.sort(Comparator.comparing(PipelineExecLog::getTaskSort));
         return list;
@@ -67,22 +68,5 @@ public class PipelineExecLogServiceImpl implements PipelineExecLogService {
         return BeanMapper.mapList(pipelineLogList, PipelineExecLog.class);
     }
 
-    public  String formatDateTime(long time) {
-        String DateTimes ;
-        long days = time / ( 60 * 60 * 24);
-        long hours = (time % ( 60 * 60 * 24)) / (60 * 60);
-        long minutes = (time % ( 60 * 60)) /60;
-        long seconds = time % 60;
-        if(days>0){
-            DateTimes= days + "天" + hours + "小时" + minutes + "分钟" + seconds + "秒";
-        }else if(hours>0){
-            DateTimes=hours + "小时" + minutes + "分钟" + seconds + "秒";
-        }else if(minutes>0){
-            DateTimes=minutes + "分钟" + seconds + "秒";
-        }else{
-            DateTimes=seconds + "秒";
-        }
-        return DateTimes;
-    }
 
 }

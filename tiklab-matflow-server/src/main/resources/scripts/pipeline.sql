@@ -7,8 +7,7 @@ create table pipeline  (
   pipeline_name varchar(256)  COMMENT '流水线名称',
   user_id varchar(256)  COMMENT '用户id',
   pipeline_create_time datetime  COMMENT '流水线创建时间',
-  pipeline_create_type int  COMMENT '流水线类型',
-  pipeline_collect int  COMMENT '收藏状态',
+  pipeline_type int  COMMENT '流水线类型',
   pipeline_state int  COMMENT '运行状态',
   pipeline_power int  COMMENT '项目权限',
   PRIMARY KEY (pipeline_id) USING BTREE

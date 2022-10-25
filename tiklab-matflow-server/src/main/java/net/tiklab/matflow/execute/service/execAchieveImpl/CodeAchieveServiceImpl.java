@@ -52,7 +52,7 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
         commonService.execHistory(pipelineProcess,"流水线开始执行");
 
         //代码保存路径
-        String codeDir = PipelineUntil.getFileAddress() + pipeline.getPipelineName();
+        String codeDir = PipelineUntil.findFileAddress() + pipeline.getPipelineName();
         File file = new File(codeDir);
         //删除旧的代码
         PipelineUntil.deleteFile(file);
@@ -123,9 +123,9 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
         }
 
         //系统类型
-        int systemType = PipelineUntil.getSystemType();
+        int systemType = PipelineUntil.findSystemType();
         //源码存放位置
-        String fileAddress = PipelineUntil.getFileAddress()+pipelineName;
+        String fileAddress = PipelineUntil.findFileAddress()+pipelineName;
 
         switch (pipelineCode.getType()) {
             case 1, 2, 3, 4 -> {

@@ -26,9 +26,6 @@ public class PipelineCommonServerImpl implements PipelineCommonServer{
     DmUserService dmUserService;
 
     @Autowired
-    PipelineFileService pipelineFileService;
-
-    @Autowired
     PipelineConfigOrderService pipelineConfigOrderService;
 
     @Autowired
@@ -49,7 +46,7 @@ public class PipelineCommonServerImpl implements PipelineCommonServer{
         pipelineExecHistoryService.deleteHistory(pipelineId);
 
         //删除对应文件
-        String fileAddress = PipelineUntil.getFileAddress();
+        String fileAddress = PipelineUntil.findFileAddress();
         PipelineUntil.deleteFile(new File(fileAddress+ pipeline.getPipelineName()));
 
     }
@@ -63,7 +60,7 @@ public class PipelineCommonServerImpl implements PipelineCommonServer{
     @Override
     public int updatePipeline(String newName, String lastName) {
         //更改对应文件名
-        String fileAddress = PipelineUntil.getFileAddress();
+        String fileAddress = PipelineUntil.findFileAddress();
         File file = new File(fileAddress+lastName);
         if (file.exists()){
             boolean b = file.renameTo(new File( fileAddress+newName));

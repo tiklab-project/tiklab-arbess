@@ -26,17 +26,11 @@ public class PipelineCodeAuthorizeServiceImpl implements PipelineCodeAuthorizeSe
     public PipelineCode getAuthorizeUrl(PipelineCode pipelineCode) {
         int type = pipelineCode.getType();
         if (type == 2) {
-            if (pipelineCode.getProof() == null) {
-                return null;
-            }
             String cloneUrl = codeGiteeApiService.getCloneUrl(pipelineCode.getProof(), pipelineCode.getCodeName());
             pipelineCode.setCodeAddress(cloneUrl);
             return pipelineCode;
         }
         if (type == 3) {
-            if (pipelineCode.getProof() == null) {
-                return null;
-            }
             String cloneUrl = codeGitHubService.getOneHouse(pipelineCode.getProof(), pipelineCode.getCodeName());
             pipelineCode.setCodeAddress(cloneUrl);
             return pipelineCode;

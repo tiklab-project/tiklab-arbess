@@ -12,6 +12,8 @@ import net.tiklab.matflow.execute.model.PipelineProcess;
 import net.tiklab.matflow.execute.service.execAchieveService.PipelineTaskExecService;
 import net.tiklab.matflow.orther.service.PipelineUntil;
 import net.tiklab.rpc.annotation.Exporter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.sql.Timestamp;
@@ -38,6 +40,8 @@ public class PipelineExecServiceImpl implements PipelineExecService {
 
     @Autowired
     PipelineConfigOrderService configOrderService;
+
+    private static final Logger logger = LoggerFactory.getLogger(PipelineExecServiceImpl.class);
 
     //存放过程状态
     public static final List<PipelineExecHistory> pipelineExecHistoryList = new ArrayList<>();
@@ -76,19 +80,20 @@ public class PipelineExecServiceImpl implements PipelineExecService {
     //查询构建中的信息
     @Override
     public PipelineExecHistory findInstanceState(String pipelineId){
-        for (PipelineExecHistory pipelineExecHistory : pipelineExecHistoryList) {
-            Pipeline pipeline = pipelineExecHistory.getPipeline();
+        for (PipelineExecHistory history : pipelineExecHistoryList) {
+            Pipeline pipeline = history.getPipeline();
             if (pipeline == null || !pipeline.getPipelineId().equals(pipelineId)){
                 continue;
             }
-            int i = pipelineExecHistory.getSort() - 1;
-            time[i] = time[i] + 1;
-            pipelineExecHistory.setOneTime(PipelineUntil.formatDateTime(time[0]));
-            pipelineExecHistory.setTwoTime(PipelineUntil.formatDateTime(time[1]));
-            pipelineExecHistory.setThreeTime(PipelineUntil.formatDateTime(time[2]));
-            pipelineExecHistory.setFourTime(PipelineUntil.formatDateTime(time[3]));
-            pipelineExecHistory.setAllTime(PipelineUntil.formatDateTime(time[0]+time[1]+time[2]+time[3]));
-            return pipelineExecHistory;
+            PipelineExecLog log = commonService.getExecPipelineLog(history.getHistoryId());
+            //int i = history.getSort() - 1;
+            //time[i] = time[i] + 1;
+            history.setOneTime(getTime(log.getTaskSort(),1));
+            history.setTwoTime(getTime( log.getTaskSort(),2));
+            history.setThreeTime(getTime( log.getTaskSort(),3));
+            history.setFourTime(getTime(log.getTaskSort(),4));
+            //history.setAllTime(getTime(log, 1));
+            return history;
         }
       return null;
     }
@@ -175,6 +180,8 @@ public class PipelineExecServiceImpl implements PipelineExecService {
             pipelineProcess.setPipeline(pipeline);
             pipelineProcess.setPipelineExecLog(pipelineExecLog);
 
+            map.put(pipelineExecLog.getTaskSort(), 1);
+
             int taskType = pipelineConfigOrder.getTaskType();
             PipelineConfigOrder oneConfig = configOrderService.findOneConfig(pipelineId, taskType);
 
@@ -197,17 +204,23 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         time[0]=1;time[1]=0;time[2]=0;time[3]=0;
     }
 
-    Map<String,Integer> map = new HashMap<>();
+    static Map<Integer,Integer> map = new HashMap<>();
 
-    public String getTime(PipelineExecLog log,int sort){
-        String logId = log.getLogId();
-        int taskSort = log.getTaskSort();
-        Integer integer = map.get(logId);
+    public static String getTime(int taskSort,int sort){
+        if (map.get(sort) == null){
+            return PipelineUntil.formatDateTime(0);
+        }
+        int integer = map.get(sort);
+        //logger.info("sort:"+sort+"     integer:"+integer);
+        if (integer == 0){
+            return PipelineUntil.formatDateTime(0);
+        }
         if (taskSort == sort){
             integer =integer+1;
-            map.put(logId, map.get(logId)+1);
+            map.put(sort, map.get(sort)+1);
+            return PipelineUntil.formatDateTime(integer);
         }
-       return PipelineUntil.formatDateTime(integer);
+       return PipelineUntil.formatDateTime(map.get(sort));
     }
 }
 

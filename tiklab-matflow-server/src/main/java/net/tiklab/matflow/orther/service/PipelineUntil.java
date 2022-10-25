@@ -1,6 +1,7 @@
 package net.tiklab.matflow.orther.service;
 
 import java.io.*;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -9,15 +10,10 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 /**
- * 静态方法，效验地址，文件操作等
+ * 效验地址，文件操作
  */
 
 public class PipelineUntil {
-
-    //效验code
-    public static boolean validCode(String address){
-        return validGit(address) || validSvn(address);
-    }
 
     //效验git地址
     public static boolean validGit(String address){
@@ -31,14 +27,14 @@ public class PipelineUntil {
         return Pattern.matches(valid,address);
     }
 
-    //效验ip地址
+    //效验ip
     public static boolean validIp(String ip){
         String valid = "^((25[0-5]|2[0-4]\\d|1\\d{2}|[1-9]?\\d)\\.){3}(25[0-5]|2[0-4]\\d|1\\d{2}|[1-9]?\\d)";
         return Pattern.matches(valid,ip);
     }
 
-    //获取系统类型
-    public static int getSystemType(){
+    //系统类型
+    public static int findSystemType(){
         String property = System.getProperty("os.name");
         String[] s1 = property.split(" ");
         if (s1[0].equals("Windows")){
@@ -48,16 +44,13 @@ public class PipelineUntil {
         }
     }
 
-    //调用cmd执行命令
+    //执行cmd命令
     public static Process process(String path,String order) throws IOException {
         Runtime runtime=Runtime.getRuntime();
         Process process;
-
-        if (getSystemType()==1){
-            //执行命令
+        if (findSystemType()==1){
             process = runtime.exec(" cmd.exe /c cd " + path + " &&" + " " + order);
         }else {
-            //执行命令
             String[] cmd = new String[] { "/bin/sh", "-c", "cd "+path+";"+" source /etc/profile;"+ order };
             process = runtime.exec(cmd);
         }
@@ -72,19 +65,19 @@ public class PipelineUntil {
         long minutes = (time % ( 60 * 60)) /60;
         long seconds = time % 60;
         if(days>0){
-            DateTimes= days + "天" + hours + "小时" + minutes + "分钟" + seconds + "秒";
+            DateTimes= days + "天" + hours + "时" + minutes + "分" + seconds + "秒";
         }else if(hours>0){
-            DateTimes=hours + "小时" + minutes + "分钟" + seconds + "秒";
+            DateTimes=hours + "时" + minutes + "分" + seconds + "秒";
         }else if(minutes>0){
-            DateTimes=minutes + "分钟" + seconds + "秒";
+            DateTimes=minutes + "分" + seconds + "秒";
         }else{
             DateTimes=seconds + "秒";
         }
         return DateTimes;
     }
 
-    //返回系统文件地址
-    public static String getFileAddress(){
+    //获取系统文件存储地址
+    public static String findFileAddress(){
         String files = "/usr/local/matflow/";
 
         String property = System.getProperty("os.name");
@@ -105,7 +98,7 @@ public class PipelineUntil {
                     boolean state = deleteFile(new File(file, child));
                     int tryCount = 0;
                     while (!state && tryCount++ < 10) {
-                        //回收资源
+
                         System.gc();
                         state = file.delete();
                     }
@@ -130,7 +123,7 @@ public class PipelineUntil {
         return lines;
     }
 
-    // 字符串写入文件中
+    //字符串写入文件中
     public static void writePrivateKeyPath(String massage, String filePath) throws IOException {
         BufferedReader bufferedReader ;
         BufferedWriter bufferedWriter;
@@ -140,7 +133,7 @@ public class PipelineUntil {
         }
         bufferedReader = new BufferedReader(new StringReader(massage));
         bufferedWriter = new BufferedWriter(new FileWriter(distFile));
-        char[] buf = new char[1024]; //字符缓冲区
+        char[] buf = new char[1024]; //?????
         int len;
         while ( (len = bufferedReader.read(buf)) != -1) {
             bufferedWriter.write(buf, 0, len);
@@ -167,7 +160,7 @@ public class PipelineUntil {
     //匹配字符串获取文件全路径
     public static String getFile(String pipelineName, String regex){
         List<String> list = new ArrayList<>();
-        String  path= PipelineUntil.getFileAddress() + pipelineName;
+        String  path= findFileAddress() + pipelineName;
         List<String> filePath = PipelineUntil.getFilePath(new File(path),new ArrayList<>());
         for (String s : filePath) {
             File file = new File(s);
@@ -179,6 +172,29 @@ public class PipelineUntil {
             return list.get(0);
         }
         return null;
+    }
+
+    //判断字符串是否为空  true:不为空 false:空
+    public static boolean isNoNull(String s){
+        if (s == null){
+            return false;
+        }
+        if (s.equals(" ")){
+            return false;
+        }
+        return !s.isEmpty();
+    }
+
+    //格式化输出流  encode:US-ASCII,ISO-8859-1,ISO-8859-1,UTF-16BE ,UTF-16LE, UTF-16,UTF-8
+    public static InputStreamReader encode(InputStream inputStream,String encode){
+        if (encode != null){
+            return  new InputStreamReader(inputStream, Charset.forName(encode));
+        }
+        if (findSystemType()==1){
+            return new InputStreamReader(inputStream, Charset.forName("GBK"));
+        }else {
+            return new InputStreamReader(inputStream, StandardCharsets.UTF_8);
+        }
     }
 
 

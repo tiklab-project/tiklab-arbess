@@ -48,6 +48,11 @@
             <artifactId>tiklab-oplog-api</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>net.tiklab</groupId>
+            <artifactId>tiklab-message-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
     </dependencies>
 

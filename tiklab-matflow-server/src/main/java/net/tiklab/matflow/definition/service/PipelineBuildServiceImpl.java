@@ -6,7 +6,7 @@ import net.tiklab.join.JoinTemplate;
 import net.tiklab.matflow.definition.dao.PipelineBuildDao;
 import net.tiklab.matflow.definition.entity.PipelineBuildEntity;
 import net.tiklab.matflow.definition.model.PipelineBuild;
-import net.tiklab.matflow.orther.service.PipelineActivityService;
+import net.tiklab.matflow.orther.service.PipelineHomeService;
 import net.tiklab.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,12 +19,6 @@ public class PipelineBuildServiceImpl implements PipelineBuildService {
 
     @Autowired
     PipelineBuildDao pipelineBuildDao;
-
-    @Autowired
-    JoinTemplate joinTemplate;
-
-    @Autowired
-    PipelineActivityService activityService;
 
     //创建
     @Override

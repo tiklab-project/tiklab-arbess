@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/pipelineConfig")
@@ -54,6 +55,14 @@ public class PipelineConfigController {
     @ApiParam(name = "pipelineId",desc = "流水线id",required = true)
     public Result<List<PipelineConfigOrder>> findAllPipelineConfig(@NotNull String pipelineId) {
         List<PipelineConfigOrder> list = pipelineConfigOrderService.findAllPipelineConfig(pipelineId);
+        return Result.ok(list);
+    }
+
+    @RequestMapping(path="/configValid",method = RequestMethod.POST)
+    @ApiMethod(name = "configValid",desc = "效验必填字段")
+    @ApiParam(name = "pipelineId",desc = "流水线id",required = true)
+    public Result< Map<String, String>> configValid(@NotNull String pipelineId) {
+        Map<String, String> list = pipelineConfigOrderService.configValid(pipelineId);
         return Result.ok(list);
     }
 

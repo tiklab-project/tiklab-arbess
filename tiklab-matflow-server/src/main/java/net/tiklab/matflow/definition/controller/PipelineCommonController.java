@@ -28,7 +28,7 @@ public class PipelineCommonController {
     @RequestMapping(path="/fileAddress",method = RequestMethod.POST)
     @ApiMethod(name = "fileAddress",desc = "根据流水线id查询配置信息")
     public Result<String> fileAddress() {
-        String fileAddress = PipelineUntil.getFileAddress();
+        String fileAddress = PipelineUntil.findFileAddress();
         return Result.ok(fileAddress);
     }
 

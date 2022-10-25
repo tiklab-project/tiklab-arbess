@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import net.tiklab.core.exception.ApplicationException;
 import net.tiklab.matflow.definition.model.*;
+import net.tiklab.matflow.orther.service.PipelineUntil;
 import net.tiklab.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -117,28 +118,25 @@ public class PipelineConfigServiceImpl implements PipelineConfigService {
             case "code" -> {
                 //字符串转换成对象
                 PipelineCode pipelineCode = JSON.parseObject(object, PipelineCode.class);
-                //PipelineCode pipelineCode = config.getPipelineCode();
                 pipelineCode.setCodeId(typeConfig.getTaskId());
+                pipelineCode.setType(config.getTaskType());
                 pipelineCodeService.updateCode(pipelineCode);
                 map.put("message", "源码管理配置");
             }
             case "test" -> {
                 PipelineTest pipelineTest = JSON.parseObject(object, PipelineTest.class);
-                //PipelineTest pipelineTest = config.getPipelineTest();
                 pipelineTest.setTestId(typeConfig.getTaskId());
                 pipelineTestService.updateTest(pipelineTest);
                 map.put("message", "测试配置");
             }
             case "build" -> {
                 PipelineBuild pipelineBuild = JSON.parseObject(object, PipelineBuild.class);
-                //PipelineBuild pipelineBuild = config.getPipelineBuild();
                 pipelineBuild.setBuildId(typeConfig.getTaskId());
                 pipelineBuildService.updateBuild(pipelineBuild);
                 map.put("message", "构建配置");
             }
             case "deploy" -> {
                 PipelineDeploy pipelineDeploy = JSON.parseObject(object, PipelineDeploy.class);
-                //PipelineDeploy pipelineDeploy = config.getPipelineDeploy();
                 pipelineDeploy.setDeployId(typeConfig.getTaskId());
                 PipelineDeploy deploy = updateNumber(typeConfig, pipelineDeploy);
                 pipelineDeployService.updateDeploy(deploy);
@@ -158,28 +156,32 @@ public class PipelineConfigServiceImpl implements PipelineConfigService {
     public Map<String, String> createConfig(PipelineConfigOrder config, String types, int size){
         Pipeline pipeline = config.getPipeline();
         String id = null;
-
+        String object = JSON.toJSONString(config.getValues());
         HashMap<String, String> map = new HashMap<>();
         map.put("pipelineId", pipeline.getPipelineId());
         map.put("pipelineName", pipeline.getPipelineName());
         switch (types) {
             case "code" -> {
-                PipelineCode pipelineCode = new PipelineCode();
+                PipelineCode pipelineCode = JSON.parseObject(object, PipelineCode.class);
+                if (pipelineCode == null) pipelineCode = new PipelineCode();
                 id = pipelineCodeService.createCode(pipelineCode);
                 map.put("message","源码管理配置");
             }
             case "test" -> {
-                PipelineTest pipelineTest = new PipelineTest();
+                PipelineTest pipelineTest = JSON.parseObject(object, PipelineTest.class);
+                if (pipelineTest == null) pipelineTest=new PipelineTest();
                 id = pipelineTestService.createTest(pipelineTest);
                 map.put("message","测试配置");
             }
             case "build" -> {
-                PipelineBuild pipelineBuild = new PipelineBuild();
+                PipelineBuild pipelineBuild = JSON.parseObject(object, PipelineBuild.class);
+                if (pipelineBuild == null) pipelineBuild = new PipelineBuild();
                 id = pipelineBuildService.createBuild(pipelineBuild);
                 map.put("message","构建配置");
             }
             case "deploy" -> {
-                PipelineDeploy pipelineDeploy =  new PipelineDeploy();
+                PipelineDeploy pipelineDeploy = JSON.parseObject(object, PipelineDeploy.class);
+                if (pipelineDeploy == null) pipelineDeploy = new PipelineDeploy();
                 id = pipelineDeployService.createDeploy(pipelineDeploy);
                 map.put("message","部署配置");
             }
@@ -223,6 +225,7 @@ public class PipelineConfigServiceImpl implements PipelineConfigService {
         return map;
     }
 
+    //保存顺序
     private PipelineDeploy updateNumber(PipelineConfigOrder typeConfig,PipelineDeploy deploy){
         PipelineDeploy oneDeploy = pipelineDeployService.findOneDeploy(typeConfig.getTaskId());
         if (deploy.getMappingPort() == 0){
@@ -235,6 +238,38 @@ public class PipelineConfigServiceImpl implements PipelineConfigService {
             deploy.setStartPort(oneDeploy.getStartPort());
         }
         return deploy;
+    }
+
+    /**
+     * 效验必填字段
+     * @param configOrderList 所有配置
+     * @return 效验信息
+     */
+    public  Map<String, String> configValid(List<PipelineConfigOrder> configOrderList){
+        Map<String, String> map = new HashMap<>();
+        for (PipelineConfigOrder pipelineConfigOrder : configOrderList) {
+            int type = pipelineConfigOrder.getTaskType();
+            String taskId = pipelineConfigOrder.getTaskId();
+            if (type < 10){
+                PipelineCode code = pipelineCodeService.findOneCode(taskId);
+                if (!PipelineUntil.isNoNull(code.getCodeName())){
+                    map.put("codeName", String.valueOf(type));
+                }
+            }else if (10<type && type<20){
+                PipelineTest test = pipelineTestService.findOneTest(taskId);
+            }else if (20<type && type<30){
+                PipelineBuild build = pipelineBuildService.findOneBuild(taskId);
+            }else if (30<type && type<40){
+                PipelineDeploy deploy = pipelineDeployService.findOneDeploy(taskId);
+                if (!PipelineUntil.isNoNull(deploy.getSshIp())){
+                    map.put("sshIp", String.valueOf(type));
+                }
+            }
+        }
+        if(map.size() == 0){
+            return null;
+        }
+        return map;
     }
 }
 

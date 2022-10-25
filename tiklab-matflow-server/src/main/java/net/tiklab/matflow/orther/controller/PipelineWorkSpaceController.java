@@ -2,15 +2,14 @@ package net.tiklab.matflow.orther.controller;
 
 
 import net.tiklab.core.Result;
-import net.tiklab.core.page.Pagination;
 import net.tiklab.matflow.execute.model.FileTree;
 import net.tiklab.matflow.execute.model.GitCommit;
 import net.tiklab.matflow.orther.model.PipelineActivity;
+import net.tiklab.matflow.orther.model.PipelineMessage;
 import net.tiklab.matflow.orther.model.PipelineTask;
-import net.tiklab.matflow.orther.service.PipelineActivityService;
+import net.tiklab.matflow.orther.service.PipelineHomeService;
 import net.tiklab.matflow.orther.service.PipelineUntil;
 import net.tiklab.matflow.orther.service.PipelineWorkSpaceService;
-import net.tiklab.oplog.log.modal.OpLog;
 import net.tiklab.postin.annotation.Api;
 import net.tiklab.postin.annotation.ApiMethod;
 import net.tiklab.postin.annotation.ApiParam;
@@ -31,7 +30,7 @@ public class PipelineWorkSpaceController {
     PipelineWorkSpaceService pipelineWorkSpaceService;
 
     @Autowired
-    PipelineActivityService pipelineActivityService;
+    PipelineHomeService pipelineHomeService;
 
 
     @RequestMapping(path="/fileTree",method = RequestMethod.POST)
@@ -61,15 +60,22 @@ public class PipelineWorkSpaceController {
     @RequestMapping(path="/findLog",method = RequestMethod.POST)
     @ApiMethod(name = "findLog",desc = "获取提交信息")
     public Result<List<PipelineActivity>> findLog(){
-        List<PipelineActivity> log = pipelineActivityService.findLog();
+        List<PipelineActivity> log = pipelineHomeService.findLog();
         return Result.ok(log);
     }
 
     @RequestMapping(path="/findTask",method = RequestMethod.POST)
     @ApiMethod(name = "findTask",desc = "获取提交信息")
     public Result<List<PipelineTask>> findTask(){
-        List<PipelineTask> task = pipelineActivityService.findTask();
+        List<PipelineTask> task = pipelineHomeService.findTask();
         return Result.ok(task);
+    }
+
+    @RequestMapping(path="/findMessage",method = RequestMethod.POST)
+    @ApiMethod(name = "findMessage",desc = "获取提交信息")
+    public Result<List<PipelineMessage>> findMessage(){
+        List<PipelineMessage> message = pipelineHomeService.findMessage();
+        return Result.ok(message);
     }
 
 
