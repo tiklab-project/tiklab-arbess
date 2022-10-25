@@ -32,6 +32,7 @@ public class PipelineCodeServiceImpl implements PipelineCodeService {
     //创建
     @Override
     public String createCode(PipelineCode pipelineCode) {
+        joinTemplate.joinQuery(pipelineCode);
         PipelineCode authorizeUrl = codeAuthorizeService.getAuthorizeUrl(pipelineCode);
         return pipelineCodeDao.createCode(BeanMapper.map(authorizeUrl, PipelineCodeEntity.class));
     }
@@ -47,7 +48,10 @@ public class PipelineCodeServiceImpl implements PipelineCodeService {
     @Override
     public void updateCode(PipelineCode pipelineCode) {
         PipelineCode oneCode = findOneCode(pipelineCode.getCodeId());
-        pipelineCode.setProof(oneCode.getProof());
+        if (pipelineCode.getProof() == null){
+            pipelineCode.setProof(oneCode.getProof());
+        }
+        joinTemplate.joinQuery(pipelineCode);
         PipelineCode authorizeUrl = codeAuthorizeService.getAuthorizeUrl(pipelineCode);
         pipelineCodeDao.updateCode(BeanMapper.map(authorizeUrl, PipelineCodeEntity.class));
     }

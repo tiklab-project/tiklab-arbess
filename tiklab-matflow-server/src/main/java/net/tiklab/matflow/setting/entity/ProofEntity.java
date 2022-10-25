@@ -41,9 +41,8 @@ public class ProofEntity {
     @Column(name = "proof_create_time")
     private String proofCreateTime;
 
-    //流水线id
-    @Column(name = "pipeline_id")
-    private String pipelineId;
+    @Column(name = "callback_url")
+    private String callbackUrl;
 
     //类型
     @Column(name = "type")
@@ -119,14 +118,6 @@ public class ProofEntity {
         this.proofCreateTime = proofCreateTime;
     }
 
-    public String getPipelineId() {
-        return pipelineId;
-    }
-
-    public void setPipelineId(String pipelineId) {
-        this.pipelineId = pipelineId;
-    }
-
     public int getType() {
         return type;
     }
@@ -141,5 +132,13 @@ public class ProofEntity {
 
     public void setUserId(String userId) {
         this.userId = userId;
+    }
+
+    public String getCallbackUrl() {
+        return callbackUrl;
+    }
+
+    public void setCallbackUrl(String callbackUrl) {
+        this.callbackUrl = callbackUrl;
     }
 }

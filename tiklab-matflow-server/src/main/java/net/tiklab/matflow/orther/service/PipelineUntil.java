@@ -15,6 +15,8 @@ import java.util.regex.Pattern;
 
 public class PipelineUntil {
 
+    public static String appName = "matflow";
+
     //效验git地址
     public static boolean validGit(String address){
         String valid = "^(http(s)?:\\/\\/([^\\/]+?\\/){2}|git@[^:]+:[^\\/]+?\\/).*?\\.git$";

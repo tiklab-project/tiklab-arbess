@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Configuration;
         "pipeline",
         "pipeline-authority",
         "pipeline-authority-1.0.1",
+        "pipeline-init-message",
         "pipeline-init-project",
         "pipeline-log-template"
 },order = 101)

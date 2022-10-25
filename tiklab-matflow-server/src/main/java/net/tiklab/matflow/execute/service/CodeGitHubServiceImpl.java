@@ -2,6 +2,7 @@ package net.tiklab.matflow.execute.service;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import net.tiklab.core.exception.ApplicationException;
 import net.tiklab.matflow.execute.model.CodeGitHubApi;
 import net.tiklab.matflow.setting.model.Proof;
 import net.tiklab.matflow.setting.service.ProofService;
@@ -46,7 +47,7 @@ public class CodeGitHubServiceImpl implements CodeGitHubService {
         logger.info("code : "+code);
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-        String accessTokenUrl = codeGitHubApi.getAccessToken(code);
+        String accessTokenUrl = codeGitHubApi.getAccessToken();
         MultiValueMap<String, Object> paramMap = new LinkedMultiValueMap<>();
         paramMap.add("client_id",codeGitHubApi.getClientId());
         paramMap.add("client_secret",codeGitHubApi.getClientSecret());
@@ -74,7 +75,9 @@ public class CodeGitHubServiceImpl implements CodeGitHubService {
         //headers.setContentType(MediaType.parseMediaType("application/json; charset=UTF-8"));
         headers.set("Authorization", "token"+" "+proof.getProofPassword());
         String userUrl = codeGitHubApi.getAllStorehouse();
-        HttpEntity<String> entity = new HttpEntity<>("body", headers);
+        MultiValueMap<String, Object> paramMap = new LinkedMultiValueMap<>();
+        //paramMap.add("visibility","public");
+        HttpEntity<MultiValueMap<String, Object>> entity = new HttpEntity<>(paramMap, headers);
         ResponseEntity<String> forEntity = restTemplate.exchange(userUrl, HttpMethod.GET, entity, String.class);
         String body = forEntity.getBody();
         logger.info("仓库信息 ："+body);
@@ -155,11 +158,50 @@ public class CodeGitHubServiceImpl implements CodeGitHubService {
             return null;
         }
         String name = split[1];
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Accept", "application/vnd.github+json");
+        headers.set("Authorization", "token"+" "+proof.getProofPassword());
+        MultiValueMap<String, Object> paramMap = new LinkedMultiValueMap<>();
+        HttpEntity<MultiValueMap<String, Object>> entity = new HttpEntity<>(paramMap, headers);
         //获取仓库URl
         String oneStorehouse = codeGitHubApi.getOneHouse(oneProof.getProofUsername(),name);
-        ResponseEntity<String> forEntity1 = restTemplate.getForEntity(oneStorehouse, String.class, JSONObject.class);
-        JSONObject jsonObject = JSONObject.parseObject(forEntity1.getBody());
+        ResponseEntity<String> response = restTemplate.exchange(oneStorehouse, HttpMethod.GET, entity, String.class);
+        if (response.getStatusCodeValue() != 200){
+            throw new ApplicationException(50001, "仓库"+houseName+"信息获取失败。");
+        }
+        JSONObject jsonObject = JSONObject.parseObject(response.getBody());
         return jsonObject.getString("html_url");
     }
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

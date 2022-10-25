@@ -8,9 +8,9 @@ import net.tiklab.matflow.orther.model.PipelineActivity;
 import net.tiklab.matflow.orther.model.PipelineFollow;
 import net.tiklab.matflow.orther.model.PipelineMessage;
 import net.tiklab.matflow.orther.model.PipelineTask;
-import net.tiklab.message.message.model.MessageDispatchItem;
-import net.tiklab.message.message.model.MessageDispatchItemQuery;
+import net.tiklab.message.message.model.*;
 import net.tiklab.message.message.service.MessageDispatchItemService;
+import net.tiklab.message.message.service.MessageService;
 import net.tiklab.oplog.log.modal.OpLog;
 import net.tiklab.oplog.log.modal.OpLogQuery;
 import net.tiklab.oplog.log.modal.OpLogTemplate;
@@ -44,8 +44,7 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
     TaskService taskService;
 
     @Autowired
-    MessageDispatchItemService messageService;
-
+    MessageService messageService;
 
     private static final Logger logger = LoggerFactory.getLogger(PipelineHomeServiceImpl.class);
 
@@ -56,7 +55,7 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
       return  pipelineFollowService.updateFollow(pipelineFollow);
     }
 
-    String appName = "matflow";
+    String appName = PipelineUntil.appName;
 
     /**
      * 创建日志
@@ -70,13 +69,13 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
         OpLogTemplate opLogTemplate = new OpLogTemplate();
         opLogTemplate.setId(templateId);
         log.setActionType(type);
-        log.setModule("matflow");
+        log.setModule(appName);
         log.setTimestamp(new Timestamp(System.currentTimeMillis()));
-        String loginId = LoginContext.getLoginId();
         User user = new User();
+        String loginId = LoginContext.getLoginId();
         user.setId(loginId);
         log.setUser(user);
-        log.setBgroup("matflow");
+        log.setBgroup(appName);
         log.setOpLogTemplate(opLogTemplate);
         log.setContent(JSONObject.toJSONString(map));
         logService.createLog(log);
@@ -165,28 +164,57 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
         return pipelineTask;
     }
 
+    ///**
+    // * 查询消息
+    // * @return 消息
+    // */
+    //@Override
+    //public  List<PipelineMessage> findMessage(int size){
+    //    //MessageDispatchItemQuery messageDispatchItemQuery = new MessageDispatchItemQuery();
+    //    //messageDispatchItemQuery.setApplication(appName);
+    //    //String loginId = LoginContext.getLoginId();
+    //    //messageDispatchItemQuery.setReceiver(loginId);
+    //    //Pagination<MessageDispatchItem> messageDispatchItemPage = messageService.findMessageDispatchItemPage(messageDispatchItemQuery);
+    //    //List<MessageDispatchItem> dataList = messageDispatchItemPage.getDataList();
+    //    //if (dataList == null){
+    //    //    return null;
+    //    //}
+    //    //dataList.sort(Comparator.comparing(MessageDispatchItem::getReceiveTime));
+    //    //int a = Math.min(dataList.size(), size);
+    //    //if (size == 0){
+    //    //    a = dataList.size();
+    //    //}
+    //    List<PipelineMessage> pipelineMessages = new ArrayList<>();
+    //    //for (int i = 0; i < a; i++) {
+    //    //    PipelineMessage pipelineMessage = updateMessage(dataList.get(i));
+    //    //    pipelineMessages.add(pipelineMessage);
+    //    //}
+    //    //pipelineMessages.sort(Comparator.comparing(PipelineMessage::getTime).reversed());
+    //    return pipelineMessages;
+    //}
+    //
     /**
-     * 查询消息
-     * @return 消息
+     * 创建消息
      */
     @Override
-    public  List<PipelineMessage> findMessage(){
-        MessageDispatchItemQuery messageDispatchItemQuery = new MessageDispatchItemQuery();
-        messageDispatchItemQuery.setApplication(appName);
-        Pagination<MessageDispatchItem> messageDispatchItemPage = messageService.findMessageDispatchItemPage(messageDispatchItemQuery);
-        List<MessageDispatchItem> dataList = messageDispatchItemPage.getDataList();
-        if (dataList == null){
-            return null;
-        }
-        dataList.sort(Comparator.comparing(MessageDispatchItem::getReceiveTime));
-        int size = Math.min(dataList.size(), 6);
-        List<PipelineMessage> pipelineMessages = new ArrayList<>();
-        for (int i = 0; i < size; i++) {
-            PipelineMessage pipelineMessage = updateMessage(dataList.get(i));
-            pipelineMessages.add(pipelineMessage);
-        }
-        pipelineMessages.sort(Comparator.comparing(PipelineMessage::getTime).reversed());
-        return pipelineMessages;
+    public void message(String messageTemplateId,String messages){
+        Message message = new Message();
+        message.setApplication(appName);
+        message.setSender(appName);
+        //模板
+        MessageTemplate messageTemplate = new MessageTemplate();
+        messageTemplate.setId(messageTemplateId);
+        message.setMessageTemplate(messageTemplate);
+        //接收人
+        ArrayList<MessageReceiver> list = new ArrayList<>();
+        MessageReceiver messageReceiver = new MessageReceiver();
+        String userId = LoginContext.getLoginId();
+        messageReceiver.setReceiver(userId);
+        list.add(messageReceiver);
+        message.setMessageReceiverList(list);
+        //消息信息
+        message.setData("{\"message\":\" "+messages+" \",\"state\":\" \"}");
+        messageService.sendMessage(message);
     }
 
     //封装消息信息
@@ -197,6 +225,7 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
         message.setMessage(m.getMessageTemplate().getContent());
         message.setSendUser(m.getMessage().getSender());
         message.setReceiveUser(m.getReceiver());
+        message.setLink(m.getMessageTemplate().getLink());
         return message;
     }
 

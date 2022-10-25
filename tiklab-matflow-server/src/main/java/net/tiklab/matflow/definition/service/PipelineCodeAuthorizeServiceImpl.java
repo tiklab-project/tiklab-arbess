@@ -24,6 +24,9 @@ public class PipelineCodeAuthorizeServiceImpl implements PipelineCodeAuthorizeSe
     //通过授权信息获取仓库url
     @Override
     public PipelineCode getAuthorizeUrl(PipelineCode pipelineCode) {
+        if (!PipelineUntil.isNoNull(pipelineCode.getCodeName())){
+            return pipelineCode;
+        }
         int type = pipelineCode.getType();
         if (type == 2) {
             String cloneUrl = codeGiteeApiService.getCloneUrl(pipelineCode.getProof(), pipelineCode.getCodeName());

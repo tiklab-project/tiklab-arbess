@@ -156,6 +156,7 @@ create table pipeline_proof  (
   proof_describe varchar(256)  COMMENT '凭证描述',
   pipeline_id varchar(255)  COMMENT '流水线id',
   proof_create_time datetime  COMMENT '创建时间',
+  callback_url varchar(255)  COMMENT '回调地址',
   type int  COMMENT '类型',
   user_id varchar(255)  COMMENT '用户id',
   PRIMARY KEY (proof_id) USING BTREE

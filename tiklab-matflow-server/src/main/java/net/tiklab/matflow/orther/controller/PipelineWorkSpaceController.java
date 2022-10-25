@@ -71,12 +71,13 @@ public class PipelineWorkSpaceController {
         return Result.ok(task);
     }
 
-    @RequestMapping(path="/findMessage",method = RequestMethod.POST)
-    @ApiMethod(name = "findMessage",desc = "获取提交信息")
-    public Result<List<PipelineMessage>> findMessage(){
-        List<PipelineMessage> message = pipelineHomeService.findMessage();
-        return Result.ok(message);
-    }
+    //@RequestMapping(path="/findMessage",method = RequestMethod.POST)
+    //@ApiMethod(name = "findMessage",desc = "获取提交信息")
+    //@ApiParam(name = "size",desc = "长度",required = true)
+    //public Result<List<PipelineMessage>> findMessage(@NotNull int size){
+    //    List<PipelineMessage> message = pipelineHomeService.findMessage(size);
+    //    return Result.ok(message);
+    //}
 
 
 }

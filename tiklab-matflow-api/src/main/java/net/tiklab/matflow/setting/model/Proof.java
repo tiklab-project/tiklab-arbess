@@ -53,14 +53,6 @@ public class Proof {
     @JoinQuery(key = "id")
     private User user;
 
-    //流水线
-    @ApiProperty(name="pipeline",desc="流水线id",eg="@selectOne")
-    @Mappings({
-            @Mapping(source = "pipeline.pipelineId",target = "pipelineId")
-    })
-    @JoinQuery(key = "pipelineId")
-    private Pipeline pipeline;
-
     //创建时间
     @ApiProperty(name="proofCreateTime",desc="创建时间")
     private String proofCreateTime;
@@ -68,6 +60,9 @@ public class Proof {
     //类型
     @ApiProperty(name="type",desc="类型")
     private int type;
+
+    @ApiProperty(name="callbackUrl",desc="类型")
+    private int callbackUrl;
 
     @ApiProperty(name="proofList",desc="流水线凭证列表")
     private List<String> proofList;
@@ -128,14 +123,6 @@ public class Proof {
         this.proofScope = proofScope;
     }
 
-    public Pipeline getPipeline() {
-        return pipeline;
-    }
-
-    public void setPipeline(Pipeline pipeline) {
-        this.pipeline = pipeline;
-    }
-
     public String getProofCreateTime() {
         return proofCreateTime;
     }
@@ -166,5 +153,13 @@ public class Proof {
 
     public void setProofList(List<String> proofList) {
         this.proofList = proofList;
+    }
+
+    public int getCallbackUrl() {
+        return callbackUrl;
+    }
+
+    public void setCallbackUrl(int callbackUrl) {
+        this.callbackUrl = callbackUrl;
     }
 }

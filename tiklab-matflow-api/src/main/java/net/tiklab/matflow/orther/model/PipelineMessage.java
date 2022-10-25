@@ -17,6 +17,9 @@ public class PipelineMessage {
     //接收人
     private String receiveUser;
 
+    //地址
+    private String link;
+
 
     public int getState() {
         return state;
@@ -56,5 +59,13 @@ public class PipelineMessage {
 
     public void setReceiveUser(String receiveUser) {
         this.receiveUser = receiveUser;
+    }
+
+    public String getLink() {
+        return link;
+    }
+
+    public void setLink(String link) {
+        this.link = link;
     }
 }

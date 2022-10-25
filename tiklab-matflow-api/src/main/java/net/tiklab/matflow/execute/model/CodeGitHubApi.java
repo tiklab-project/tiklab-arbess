@@ -24,11 +24,13 @@ public class CodeGitHubApi {
 
     //获取code （get）
     public String getCode(){
-        return "https://github.com/login/oauth/authorize?client_id=" + getClientId() +"&callback_url="+getClientSecret() +"&scope=repo admin:org_hook user ";
+        return "https://github.com/login/oauth/authorize?client_id=" + getClientId() +"&callback_url="+getClientSecret() +"&scope=repo repo admin:org_hook user ";
     }
 
     //获取accessToken
-    public String getAccessToken(String code){ return "https://github.com/login/oauth/access_token";}
+    public String getAccessToken(){
+        return "https://github.com/login/oauth/access_token";
+    }
 
     //获取用户信息
     public String getUser(){
@@ -36,12 +38,14 @@ public class CodeGitHubApi {
     }
 
     //获取单个仓库
-    public String getOneHouse(String name,String house){
-        return "https://api.github.com/repos/"+name+"/"+house;
+    public String getOneHouse(String username,String houseName){
+        return "https://api.github.com/repos/"+username+"/"+houseName;
     }
 
     //获取所有仓库
-    public String getAllStorehouse(){ return "https://api.github.com/user/repos";}
+    public String getAllStorehouse(){
+        return "https://api.github.com/user/repos";
+    }
 
     //获取仓库下所有分支
     public String getBranch(String username,String houseName){return "https://api.github.com/repos/"+username+"/"+houseName+"/branches";}

@@ -38,11 +38,13 @@ public interface PipelineHomeService {
      */
     List<PipelineTask> findTask();
 
+
     /**
-     * 查询消息
-     * @return 消息
+     * 创建消息
+     * @param messageTemplateId 消息类型
+     * @param messages 信息
      */
-    List<PipelineMessage> findMessage();
+    void message(String messageTemplateId,String messages);
 
 
 

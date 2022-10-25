@@ -45,7 +45,6 @@ public class CodeGiteeApiServiceImpl implements CodeGiteeApiService {
 
 
     public String getCode(String callbackUri){
-        String encode = getURLEncoderString(callbackUri, "UTF-8");
         return  codeGiteeApi.getCode();
     }
 
@@ -58,14 +57,17 @@ public class CodeGiteeApiServiceImpl implements CodeGiteeApiService {
             return null;
         }
 
-        String encode = getURLEncoderString(callbackUri, "encode");
-
         String url = codeGiteeApi.getAccessToken(code);
         String post = request(url, "POST");
         Map<String, String> map = new HashMap<>();
         if (post == null){
             return null;
         }
+
+        ResponseEntity<String> returnBody = restTemplate.postForEntity(url, JSONObject.class, String.class);
+
+        System.out.println(returnBody);
+
         JSONObject jsonObject = JSONObject.parseObject(post);
         String access_token = jsonObject.getString("access_token");
         String refresh_token = jsonObject.getString("refresh_token");
