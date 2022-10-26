@@ -1,8 +1,8 @@
 INSERT INTO pipeline (pipeline_id,pipeline_name,user_id,pipeline_create_time,pipeline_type,pipeline_state,pipeline_power,color) VALUES ('679668d5ce24a7a9ff697feca5bb94ff', '示例项目1', '111111', '2022-07-28 15:47:29', 1,  0, 1,3);
 
-INSERT INTO pipeline_proof VALUES ('52e6d477df54ba80b939dc27b911cd16', 'linux', 5, 'password', 'root', 'darth2020', NULL, NULL, '2022-07-28 15:47:29', 1, '111111');
+INSERT INTO pipeline_proof (proof_id,proof_name,proof_scope,proof_type,proof_username,proof_password,proof_describe,pipeline_id,proof_create_time,callback_url,type,user_id) VALUES ('52e6d477df54ba80b939dc27b911cd16', 'linux', 5, 'password', 'root', 'darth2020', NULL, NULL, '2022-07-28 15:47:29',NULL, 1, '111111');
 
-INSERT INTO pipeline_proof VALUES ('a8cc49221d618151939f2162f3cbeecb', '示例凭证1', 1, 'password', 'zcamy', 'zhq11191750', NULL, NULL, '2022-07-28 15:47:29', 1, '111111');
+INSERT INTO pipeline_proof  (proof_id,proof_name,proof_scope,proof_type,proof_username,proof_password,proof_describe,pipeline_id,proof_create_time,callback_url,type,user_id) VALUES ('a8cc49221d618151939f2162f3cbeecb', '示例凭证1', 1, 'password', 'zcamy', 'zhq11191750', NULL, NULL, '2022-07-28 15:47:29',NULL, 1, '111111');
 
 INSERT INTO pipeline_code (code_id,code_name,code_address,code_branch,proof_id) VALUES ('3f412d09d56cd38733395f52f78eb646', 'https://gitee.com/zcamy/doublekit.git', 'https://gitee.com/zcamy/doublekit.git', "master", 'a8cc49221d618151939f2162f3cbeecb');
 
