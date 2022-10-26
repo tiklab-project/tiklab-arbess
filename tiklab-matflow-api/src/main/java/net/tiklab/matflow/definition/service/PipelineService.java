@@ -14,6 +14,7 @@ import net.tiklab.user.user.model.DmUser;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 流水线
@@ -66,13 +67,6 @@ public interface PipelineService {
     StringBuilder findUserPipelineId(String userId);
 
     /**
-     * 获取用户所有流水线
-     * @param userId 用户id
-     * @return 流水线
-     */
-    List<Pipeline> findAllPipeline(String userId);
-
-    /**
      * 获取用户流水线状态
      * @param userId 用户id
      * @return 流水线信息
@@ -100,5 +94,13 @@ public interface PipelineService {
      * @return 流水线
      */
     List<PipelineMassage> findLikePipeline(String pipelineName, String userId);
+
+
+    /**
+     * 构建成功失败信息
+     * @param userId 用户id
+     * @return 信息
+     */
+    Map<String,Integer> findBuildState(String userId);
 
 }

@@ -4,9 +4,6 @@ package net.tiklab.matflow.orther.controller;
 import net.tiklab.core.Result;
 import net.tiklab.matflow.execute.model.FileTree;
 import net.tiklab.matflow.execute.model.GitCommit;
-import net.tiklab.matflow.orther.model.PipelineActivity;
-import net.tiklab.matflow.orther.model.PipelineMessage;
-import net.tiklab.matflow.orther.model.PipelineTask;
 import net.tiklab.matflow.orther.service.PipelineHomeService;
 import net.tiklab.matflow.orther.service.PipelineUntil;
 import net.tiklab.matflow.orther.service.PipelineWorkSpaceService;
@@ -56,28 +53,6 @@ public class PipelineWorkSpaceController {
         List<List<GitCommit>> submitMassage = pipelineWorkSpaceService.getSubmitMassage(pipelineId);
         return Result.ok(submitMassage);
     }
-
-    @RequestMapping(path="/findLog",method = RequestMethod.POST)
-    @ApiMethod(name = "findLog",desc = "获取提交信息")
-    public Result<List<PipelineActivity>> findLog(){
-        List<PipelineActivity> log = pipelineHomeService.findLog();
-        return Result.ok(log);
-    }
-
-    @RequestMapping(path="/findTask",method = RequestMethod.POST)
-    @ApiMethod(name = "findTask",desc = "获取提交信息")
-    public Result<List<PipelineTask>> findTask(){
-        List<PipelineTask> task = pipelineHomeService.findTask();
-        return Result.ok(task);
-    }
-
-    //@RequestMapping(path="/findMessage",method = RequestMethod.POST)
-    //@ApiMethod(name = "findMessage",desc = "获取提交信息")
-    //@ApiParam(name = "size",desc = "长度",required = true)
-    //public Result<List<PipelineMessage>> findMessage(@NotNull int size){
-    //    List<PipelineMessage> message = pipelineHomeService.findMessage(size);
-    //    return Result.ok(message);
-    //}
 
 
 }

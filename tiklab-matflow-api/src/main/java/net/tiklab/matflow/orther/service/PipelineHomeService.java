@@ -1,11 +1,7 @@
 package net.tiklab.matflow.orther.service;
 
-import net.tiklab.matflow.orther.model.PipelineActivity;
 import net.tiklab.matflow.orther.model.PipelineFollow;
-import net.tiklab.matflow.orther.model.PipelineMessage;
-import net.tiklab.matflow.orther.model.PipelineTask;
 
-import java.util.List;
 import java.util.Map;
 
 public interface PipelineHomeService {
@@ -27,24 +23,20 @@ public interface PipelineHomeService {
 
 
     /**
-     * 查询日志
-     * @return 日志
-     */
-    List<PipelineActivity> findLog();
-
-
-    /**
-     * 查询待办
-     */
-    List<PipelineTask> findTask();
-
-
-    /**
      * 创建消息
      * @param messageTemplateId 消息类型
      * @param messages 信息
      */
     void message(String messageTemplateId,String messages);
+
+
+    /**
+     * 获取跳转地址
+     * @param type 类型
+     * @param pipelineId 流水线id
+     * @return 地址
+     */
+    String findAddress(String type,String pipelineId);
 
 
 

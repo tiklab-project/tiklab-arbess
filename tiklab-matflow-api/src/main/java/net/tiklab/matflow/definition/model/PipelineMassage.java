@@ -33,6 +33,10 @@ public class PipelineMassage {
     @ApiProperty(name="createTime",desc="创建时间")
     private String createTime;
 
+    @ApiProperty(name="color",desc="颜色")
+    private int color;
+
+
     public String getPipelineId() {
         return pipelineId;
     }
@@ -95,5 +99,13 @@ public class PipelineMassage {
 
     public void setCreateTime(String createTime) {
         this.createTime = createTime;
+    }
+
+    public int getColor() {
+        return color;
+    }
+
+    public void setColor(int color) {
+        this.color = color;
     }
 }

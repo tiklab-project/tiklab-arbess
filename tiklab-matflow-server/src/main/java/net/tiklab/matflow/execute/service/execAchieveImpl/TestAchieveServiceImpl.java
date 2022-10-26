@@ -55,7 +55,7 @@ public class TestAchieveServiceImpl implements TestAchieveService {
                 return false;
             }
 
-            int state = commonService.log(process.getInputStream(), pipelineProcess);
+            int state = commonService.log(process.getInputStream(),process.getErrorStream(),pipelineProcess);
 
             if (state == 0){
                 commonService.execHistory(pipelineProcess,"Fail");

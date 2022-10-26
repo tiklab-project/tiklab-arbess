@@ -28,7 +28,7 @@ public class PipelineConfigOrderServiceImpl implements PipelineConfigOrderServic
 
     //动态
     @Autowired
-    PipelineHomeService pipelineHomeService;
+    PipelineHomeService homeService;
 
     @Autowired
     PipelineConfigService pipelineConfigService;
@@ -54,12 +54,12 @@ public class PipelineConfigOrderServiceImpl implements PipelineConfigOrderServic
     public void createTemplate(String pipelineId, int type){
         PipelineConfigOrder pipelineConfigOrder = new PipelineConfigOrder(pipelineId,"create");
         int[] ints = switch (type) {
-            case 2131 -> new int[]{21, 31};
-            case 2132 -> new int[]{21, 32};
-            case 112131 -> new int[]{11, 21, 31};
-            case 112132 -> new int[]{11, 21, 32};
-            case 2231 -> new int[]{22, 31};
-            case 2232 -> new int[]{22, 32};
+            case 2131 -> new int[]{1,21, 31};
+            case 2132 -> new int[]{1,21, 32};
+            case 112131 -> new int[]{1,11, 21, 31};
+            case 112132 -> new int[]{1,11, 21, 32};
+            case 2231 -> new int[]{1,22, 31};
+            case 2232 -> new int[]{1,22, 32};
             default -> null;
         };
         if (ints == null){
@@ -164,7 +164,9 @@ public class PipelineConfigOrderServiceImpl implements PipelineConfigOrderServic
         Map<String, String> map = pipelineConfigService.updateConfig(config, typeConfig, types);
         map.put("pipelineId", pipeline.getPipelineId());
         map.put("pipelineName", pipeline.getPipelineName());
-        pipelineHomeService.log("update", "pipelineConfig", map);
+        String address = homeService.findAddress("pipelineConfig", pipelineId);
+        map.put("link", address);
+        homeService.log("update", "pipelineConfig", map);
     }
 
     /**
@@ -214,9 +216,11 @@ public class PipelineConfigOrderServiceImpl implements PipelineConfigOrderServic
 
         map.put("pipelineId", pipeline.getPipelineId());
         map.put("pipelineName", pipeline.getPipelineName());
+        String address = homeService.findAddress("pipelineConfig", pipelineId);
+        map.put("link", address);
         configOrder.setTaskId(map.get("id"));
         String configure = createConfigure(configOrder);
-        pipelineHomeService.log("create", "pipelineConfig", map);
+        homeService.log("create", "pipelineConfig", map);
         if (configure == null){
             throw new ApplicationException(50001,"创建配置顺序信息失败");
         }
@@ -239,8 +243,10 @@ public class PipelineConfigOrderServiceImpl implements PipelineConfigOrderServic
         Pipeline pipeline = typeConfig.getPipeline();
         map.put("pipelineId", pipeline.getPipelineId());
         map.put("pipelineName", pipeline.getPipelineName());
+        String address = homeService.findAddress("pipelineConfig", pipelineId);
+        map.put("link", address);
         pipelineConfigOrderDao.deleteConfigure(typeConfig.getConfigId());
-        pipelineHomeService.log("delete", "pipelineConfig", map);
+        homeService.log("delete", "pipelineConfig", map);
     }
 
     /**

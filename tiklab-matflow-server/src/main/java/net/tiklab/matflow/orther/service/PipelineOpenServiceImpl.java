@@ -41,7 +41,7 @@ public class PipelineOpenServiceImpl implements PipelineOpenService {
             return null;
         }
         allOpen.sort(Comparator.comparing(PipelineOpen::getNumber,Comparator.reverseOrder()));
-        int size = Math.min(allOpen.size(), 6);
+        int size = Math.min(allOpen.size(), 4);
         return allOpen.subList(0, size);
     }
 

@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/pipeline")
@@ -145,4 +146,32 @@ public class PipelineController {
 
         return Result.ok(dmUser);
     }
+
+    @RequestMapping(path="/findState",method = RequestMethod.POST)
+    @ApiMethod(name = "findState",desc = "查询流水线最近状态")
+    @ApiParam(name = "userId",desc = "用户id",required = true)
+    public Result<Map<String,Integer>> findState(@NotNull String userId){
+
+        Map<String,Integer> buildStatus = pipelineService.findBuildState(userId);
+
+        return Result.ok(buildStatus);
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

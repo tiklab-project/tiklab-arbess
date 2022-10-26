@@ -1,6 +1,7 @@
 package net.tiklab.matflow.definition.service;
 
 import net.tiklab.beans.BeanMapper;
+import net.tiklab.core.exception.ApplicationException;
 import net.tiklab.join.JoinTemplate;
 import net.tiklab.matflow.definition.dao.PipelineDao;
 import net.tiklab.matflow.definition.entity.PipelineEntity;
@@ -41,16 +42,19 @@ public class PipelineServiceImpl implements PipelineService {
     JoinTemplate joinTemplate;
 
     @Autowired
-    PipelineCommonServer pipelineCommonServer;
+    PipelineCommonServer commonServer;
 
     @Autowired
-    PipelineHomeService pipelineHomeService;
+    PipelineHomeService homeService;
 
     private static final Logger logger = LoggerFactory.getLogger(PipelineServiceImpl.class);
 
     //创建
     @Override
     public String createPipeline(Pipeline pipeline) {
+        //随机颜色
+        Random random = new Random();
+        pipeline.setColor((random.nextInt(5) + 1));
         PipelineEntity pipelineEntity = BeanMapper.map(pipeline, PipelineEntity.class);
         String pipelineId = pipelineDao.createPipeline(pipelineEntity);
         //创建模板配置
@@ -60,34 +64,42 @@ public class PipelineServiceImpl implements PipelineService {
 
         //动态
         HashMap<String, String> map = new HashMap<>();
-        map.put("message", "");
+        map.put("message",  "创建了流水线");
         map.put("pipelineId", pipelineId);
         map.put("pipelineName", pipeline.getPipelineName());
-        pipelineHomeService.log("create", "pipeline", map);
+        String address = homeService.findAddress("pipeline", pipelineId);
+        map.put("link", address);
+        homeService.log("create", "pipeline", map);
         DmUser dmUser = new DmUser();
         dmUser.setDomainId(pipelineId);
         User user = new User();
         user.setId(pipeline.getUser().getId());
         dmUser.setUser(user);
-        pipelineCommonServer.updateDmUser(pipelineId,dmUser,true);
+        commonServer.updateDmUser(pipelineId,dmUser,true);
+        homeService.message("matflow", "创建了流水线"+pipeline.getPipelineName());
         return pipelineId;
     }
 
     //删除
     @Override
     public Integer deletePipeline(String pipelineId) {
+        if (pipelineId == null){
+            throw new ApplicationException(50001, "pipelineId为空。");
+        }
         Pipeline pipeline = findOnePipeline(pipelineId);
-        pipelineCommonServer.updateDmUser(pipelineId,new DmUser(),false);
         joinTemplate.joinQuery(pipeline);
+        //删除关联信息
         pipelineDao.deletePipeline(pipelineId);
-        pipelineCommonServer.delete(pipeline);
-        pipelineConfigOrderService.deleteConfig(pipelineId);
+        commonServer.updateDmUser(pipelineId,new DmUser(),false);//权限
+        commonServer.delete(pipeline);//历史等
+        pipelineConfigOrderService.deleteConfig(pipelineId);//配置
         //动态
         HashMap<String, String> map = new HashMap<>();
-        map.put("message", "");
+        map.put("message", "删除了流水线");
         map.put("pipelineId", pipelineId);
         map.put("pipelineName", pipeline.getPipelineName());
-        pipelineHomeService.log("delete", "pipeline", map);
+        homeService.log("delete", "deletePipeline", map);
+        homeService.message("matflow", "删除了流水线"+pipeline.getPipelineName());
         return 1;
     }
 
@@ -97,12 +109,12 @@ public class PipelineServiceImpl implements PipelineService {
         //更新名称
         Pipeline flow = findOnePipeline(pipeline.getPipelineId());
         if (!pipeline.getPipelineName().equals( flow.getPipelineName())){
-            pipelineCommonServer.updatePipeline(pipeline.getPipelineName(), flow.getPipelineName());
+            commonServer.updatePipeline(pipeline.getPipelineName(), flow.getPipelineName());
             HashMap<String, String> map = new HashMap<>();
             map.put("message","名称为"+pipeline.getPipelineName());
             map.put("pipelineId", pipeline.getPipelineId());
             map.put("pipelineName", pipeline.getPipelineName());
-            pipelineHomeService.log("update", "pipeline", map);
+            homeService.log("update", "pipeline", map);
         }
         PipelineEntity pipelineEntity = BeanMapper.map(pipeline, PipelineEntity.class);
         pipelineDao.updatePipeline(pipelineEntity);
@@ -141,7 +153,17 @@ public class PipelineServiceImpl implements PipelineService {
     public StringBuilder findUserPipelineId(String userId){
         List<PipelineEntity> allPipeline = pipelineDao.findUserPipeline();
         List<Pipeline> pipelineList = BeanMapper.mapList(allPipeline, Pipeline.class);
-       return pipelineCommonServer.findUserPipelineId(userId, pipelineList);
+       return commonServer.findUserPipelineId(userId, pipelineList);
+    }
+
+    /**
+     * 构建成功失败信息
+     * @param userId 用户id
+     * @return 信息
+     */
+    public Map<String,Integer> findBuildState(String userId){
+        List<Pipeline> allPipeline = findAllPipeline(userId);
+        return commonServer.findBuildState(allPipeline);
     }
 
     /**
@@ -149,7 +171,6 @@ public class PipelineServiceImpl implements PipelineService {
      * @param userId 用户id
      * @return 流水线
      */
-    @Override
     public List<Pipeline> findAllPipeline(String userId){
         StringBuilder userPipelineId = findUserPipelineId(userId);
         List<PipelineEntity> userPipeline = pipelineDao.findUserPipeline(userPipelineId);
@@ -179,7 +200,7 @@ public class PipelineServiceImpl implements PipelineService {
         //排序
         pipelineNotFollow.sort(Comparator.comparing(Pipeline::getPipelineName));
 
-        return pipelineCommonServer.findAllStatus(pipelineNotFollow);
+        return commonServer.findAllStatus(pipelineNotFollow);
     }
 
     //获取用户收藏的流水线
@@ -198,7 +219,7 @@ public class PipelineServiceImpl implements PipelineService {
         //排序
         pipelineFollow.sort(Comparator.comparing(Pipeline::getPipelineName));
 
-        return pipelineCommonServer.findAllStatus(pipelineFollow);
+        return commonServer.findAllStatus(pipelineFollow);
     }
 
     //查询流水线最近运行状态
@@ -211,7 +232,7 @@ public class PipelineServiceImpl implements PipelineService {
         List<PipelineExecState> list = new ArrayList<>();
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         int i = -6;
-        List<PipelineExecHistory> allUserHistory = pipelineCommonServer.findRecentStatus(userId,builder);
+        List<PipelineExecHistory> allUserHistory = commonServer.findRecentStatus(userId,builder);
         if (allUserHistory == null){
             return null;
         }
@@ -269,7 +290,7 @@ public class PipelineServiceImpl implements PipelineService {
         if (pipelines.size() == 0){
             return null;
         }
-        return pipelineCommonServer.findAllStatus(pipelines);
+        return commonServer.findAllStatus(pipelines);
     }
 
 

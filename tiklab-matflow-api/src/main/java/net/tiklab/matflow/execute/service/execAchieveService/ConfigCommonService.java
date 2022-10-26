@@ -23,7 +23,7 @@ public interface ConfigCommonService {
      * @throws IOException 字符流转换异常
      * @return map 执行状态
      */
-     int log(InputStream inputStream, PipelineProcess pipelineProcess) throws IOException;
+     int log(InputStream inputStream,InputStream errInputStream, PipelineProcess pipelineProcess) throws IOException;
 
     /**
      * 输出错误信息

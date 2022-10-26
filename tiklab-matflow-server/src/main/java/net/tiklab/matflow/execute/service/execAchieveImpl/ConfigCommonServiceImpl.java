@@ -13,6 +13,7 @@ import net.tiklab.matflow.setting.model.PipelineScm;
 import net.tiklab.matflow.setting.service.PipelineScmService;
 import net.tiklab.rpc.annotation.Exporter;
 import net.tiklab.user.user.model.User;
+import org.apache.commons.codec.language.Nysiis;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,29 +58,36 @@ public class ConfigCommonServiceImpl implements ConfigCommonService {
      * @return map 执行状态
      */
     @Override
-    public int log(InputStream inputStream, PipelineProcess pipelineProcess) throws IOException {
+    public int log(InputStream inputStream,InputStream errInputStream, PipelineProcess pipelineProcess) throws IOException {
 
-        InputStreamReader inputStreamReader;
-
-        //根据系统指定不同日志输出格式
-        if (PipelineUntil.findSystemType()==1){
-            inputStreamReader = new InputStreamReader(inputStream, Charset.forName("GBK"));
-        }else {
-            inputStreamReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
+        int taskType = pipelineProcess.getPipelineExecLog().getTaskType();
+        String encode = "GBK";
+        if (taskType >= 30){
+            encode = "UTF-8";
         }
+
+        InputStreamReader inputStreamReader = PipelineUntil.encode(inputStream, encode);
         
         String s;
         BufferedReader  bufferedReader = new BufferedReader(inputStreamReader);
-        StringBuilder logRunLog = new StringBuilder();
+        String logRunLog = null;
 
         //更新日志信息
         while ((s = bufferedReader.readLine()) != null) {
-            logRunLog.append(s).append("\n");
+            logRunLog = logRunLog + s +"\n";
             execHistory(pipelineProcess,s);
-            if (logRunLog.toString().contains("BUILD FAILURE")||logRunLog.toString().contains("ERROR")) {
+            if (logRunLog.contains("BUILD FAILURE")||logRunLog.contains("ERROR")) {
                 inputStreamReader.close();
                 bufferedReader.close();
                 return 0;
+            }
+        }
+        if (logRunLog == null){
+            inputStreamReader = PipelineUntil.encode(errInputStream, encode);
+            bufferedReader = new BufferedReader(inputStreamReader);
+            while ((s = bufferedReader.readLine()) != null) {
+                logRunLog = logRunLog + s +"\n";
+                execHistory(pipelineProcess,s);
             }
         }
         inputStreamReader.close();
@@ -116,7 +124,6 @@ public class ConfigCommonServiceImpl implements ConfigCommonService {
         pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+ "\n" + "RUN RESULT : SUCCESS");
         pipelineExecHistory.setRunStatus(30);
         pipelineExecHistory.setFindState(1);
-        //list.add(pipelineExecHistory);
         historyService.updateHistory(pipelineExecHistory);
         //清空缓存
         list.removeIf(execHistory -> execHistory.getPipeline().getPipelineId().equals(pipelineId));
@@ -242,7 +249,11 @@ public class ConfigCommonServiceImpl implements ConfigCommonService {
 
         //更新历史日志
         list.remove(execHistory);
-        execHistory.setRunLog(execHistory.getRunLog()+"\n"+log);
+        if (!PipelineUntil.isNoNull(execHistory.getRunLog())){
+            execHistory.setRunLog(log);
+        }else {
+            execHistory.setRunLog(execHistory.getRunLog()+"\n"+log);
+        }
         list.add(execHistory);
 
         //更新单个配置日志

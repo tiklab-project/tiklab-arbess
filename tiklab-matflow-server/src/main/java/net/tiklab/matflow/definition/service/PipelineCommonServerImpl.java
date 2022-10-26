@@ -14,9 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.io.File;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Service
 @Exporter
@@ -26,10 +24,7 @@ public class PipelineCommonServerImpl implements PipelineCommonServer{
     DmUserService dmUserService;
 
     @Autowired
-    PipelineConfigOrderService pipelineConfigOrderService;
-
-    @Autowired
-    PipelineExecHistoryService pipelineExecHistoryService;
+    PipelineExecHistoryService historyService;
 
 
     /**
@@ -40,10 +35,9 @@ public class PipelineCommonServerImpl implements PipelineCommonServer{
     public void delete(Pipeline pipeline){
 
         String pipelineId = pipeline.getPipelineId();
-        //删除对应的流水线配置
-        pipelineConfigOrderService.deleteConfig(pipelineId);
+
         //删除对应的历史
-        pipelineExecHistoryService.deleteHistory(pipelineId);
+        historyService.deleteHistory(pipelineId);
 
         //删除对应文件
         String fileAddress = PipelineUntil.findFileAddress();
@@ -75,14 +69,15 @@ public class PipelineCommonServerImpl implements PipelineCommonServer{
         for (Pipeline pipeline : allPipeline) {
             PipelineMassage pipelineMassage = new PipelineMassage();
             //成功和构建时间
-            PipelineExecHistory latelyHistory = pipelineExecHistoryService.findLatelyHistory(pipeline.getPipelineId());
-            PipelineExecHistory latelySuccess = pipelineExecHistoryService.findLatelySuccess(pipeline.getPipelineId());
+            PipelineExecHistory latelyHistory = historyService.findLatelyHistory(pipeline.getPipelineId());
+            PipelineExecHistory latelySuccess = historyService.findLatelySuccess(pipeline.getPipelineId());
 
             pipelineMassage.setPipelineId(pipeline.getPipelineId());
             pipelineMassage.setPipelineCollect(pipeline.getPipelineCollect());
             pipelineMassage.setPipelineName(pipeline.getPipelineName());
             pipelineMassage.setPipelineState(pipeline.getPipelineState());
             pipelineMassage.setCreateTime(pipeline.getPipelineCreateTime());
+            pipelineMassage.setColor(pipeline.getColor());
             if (latelyHistory != null){
                 pipelineMassage.setLastBuildTime(latelyHistory.getCreateTime());
                 pipelineMassage.setBuildStatus(latelyHistory.getRunStatus());
@@ -108,7 +103,7 @@ public class PipelineCommonServerImpl implements PipelineCommonServer{
         if (s.toString().equals("")){
             return null;
         }
-        return pipelineExecHistoryService.findAllUserHistory(formatter.format(lastTime),formatter.format(nowTime),s);
+        return historyService.findAllUserHistory(formatter.format(lastTime),formatter.format(nowTime),s);
     }
 
     /**
@@ -152,7 +147,6 @@ public class PipelineCommonServerImpl implements PipelineCommonServer{
         }
         return s.append(",").append(j);
     }
-
 
     /**
      * 获取拥有此流水线的用户
@@ -198,6 +192,38 @@ public class PipelineCommonServerImpl implements PipelineCommonServer{
             }
             dmUserService.deleteDmUser(dm.getId());
         }
+    }
+
+   
+    public Map<String,Integer> findBuildState(List<Pipeline> list){
+        Map<String, Integer> map = new HashMap<>();
+        int success = 0,error = 0,hilt = 0;
+        if (list == null){
+            map.put("成功", success);
+            map.put("失败", error);
+            map.put("停止", hilt);
+            return map;
+        }
+        for (Pipeline pipeline : list) {
+            List<PipelineExecHistory> allHistory = historyService.findAllHistory(pipeline.getPipelineId());
+            if (allHistory == null){
+               continue;
+            }
+
+            for (PipelineExecHistory history : allHistory) {
+                int status = history.getStatus();
+                switch (status) {
+                    case 30 -> success = success + 1;
+                    case 10 -> hilt = hilt + 1;
+                    case 1 -> error = error + 1;
+                }
+            }
+        }
+
+        map.put("成功", success);
+        map.put("失败", error);
+        map.put("停止", hilt);
+        return map;
     }
 
 

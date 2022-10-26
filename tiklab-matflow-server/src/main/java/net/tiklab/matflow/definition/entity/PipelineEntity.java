@@ -2,6 +2,7 @@ package net.tiklab.matflow.definition.entity;
 
 
 import net.tiklab.dal.jpa.annotation.*;
+import net.tiklab.postin.annotation.ApiProperty;
 
 /**
  * 流水线
@@ -39,6 +40,11 @@ public class PipelineEntity {
 
     @Column(name = "pipeline_power")
     private int pipelinePower;
+
+    //颜色
+    @Column(name="color")
+    private int color;
+
 
     public String getPipelineId() {
         return pipelineId;
@@ -94,5 +100,13 @@ public class PipelineEntity {
 
     public void setPipelinePower(int pipelinePower) {
         this.pipelinePower = pipelinePower;
+    }
+
+    public int getColor() {
+        return color;
+    }
+
+    public void setColor(int color) {
+        this.color = color;
     }
 }

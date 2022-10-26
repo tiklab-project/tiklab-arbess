@@ -10,6 +10,7 @@ create table pipeline  (
   pipeline_type int  COMMENT '流水线类型',
   pipeline_state int  COMMENT '运行状态',
   pipeline_power int  COMMENT '项目权限',
+  color int  COMMENT '项目权限',
   PRIMARY KEY (pipeline_id) USING BTREE
 );
 

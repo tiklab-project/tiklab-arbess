@@ -49,6 +49,10 @@ public class Pipeline {
     @ApiProperty(name="pipelinePower",desc="项目作用域",required = true)
     private int pipelinePower;
 
+    @ApiProperty(name="color",desc="颜色",required = true)
+    private int color;
+
+
     public Pipeline(String pipelineId) {
         this.pipelineId = pipelineId;
     }
@@ -118,5 +122,13 @@ public class Pipeline {
 
     public void setPipelinePower(int pipelinePower) {
         this.pipelinePower = pipelinePower;
+    }
+
+    public int getColor() {
+        return color;
+    }
+
+    public void setColor(int color) {
+        this.color = color;
     }
 }

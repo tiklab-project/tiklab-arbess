@@ -88,7 +88,7 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
 
         try {
             Process process = codeStart(proof, pipelineCode,pipeline.getPipelineName());
-            commonService.log(process.getInputStream(), pipelineProcess);
+            commonService.log(process.getInputStream(),process.getErrorStream(), pipelineProcess);
         } catch (IOException e) {
             commonService.execHistory(pipelineProcess,"系统执行命令错误 \n" + e);
             commonService.updateState(pipelineProcess,false);

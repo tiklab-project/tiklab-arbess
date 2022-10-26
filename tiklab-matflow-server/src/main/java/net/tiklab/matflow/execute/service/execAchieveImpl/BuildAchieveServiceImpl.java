@@ -62,7 +62,7 @@ public class BuildAchieveServiceImpl implements BuildAchieveService {
             }
 
             //构建失败
-            int state = commonService.log(process.getInputStream(), pipelineProcess);
+            int state = commonService.log(process.getInputStream(), process.getErrorStream(),pipelineProcess);
             process.destroy();
             
             if (state == 0){

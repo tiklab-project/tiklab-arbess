@@ -6,6 +6,7 @@ import net.tiklab.matflow.execute.model.PipelineExecHistory;
 import net.tiklab.user.user.model.DmUser;
 
 import java.util.List;
+import java.util.Map;
 
 public interface PipelineCommonServer {
 
@@ -58,5 +59,8 @@ public interface PipelineCommonServer {
      * @param pipelineId 流水线id
      */
     void updateDmUser(String pipelineId,DmUser dmUser,boolean b);
+
+
+    Map<String,Integer> findBuildState(List<Pipeline> list);
 
 }

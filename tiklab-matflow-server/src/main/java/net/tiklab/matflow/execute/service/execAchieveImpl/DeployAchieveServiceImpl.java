@@ -55,7 +55,7 @@ public class DeployAchieveServiceImpl implements DeployAchieveService {
             if (pipelineDeploy.getDeployType() == 1) {
                 commonService.execHistory(pipelineProcess,"执行脚本：" + startShell);
                 Process process = PipelineUntil.process("/", startShell);
-                commonService.log(process.getInputStream(), pipelineProcess);
+                commonService.log(process.getInputStream(),process.getErrorStream(), pipelineProcess);
                 commonService.updateState(pipelineProcess,true);
                 return true;
             }
@@ -213,7 +213,7 @@ public class DeployAchieveServiceImpl implements DeployAchieveService {
         exec.setCommand(orders);
         exec.connect();
         InputStream inputStream = exec.getInputStream();
-        commonService.log(inputStream, pipelineProcess);
+        commonService.log(inputStream,exec.getErrStream(),  pipelineProcess);
         exec.disconnect();
 
     }

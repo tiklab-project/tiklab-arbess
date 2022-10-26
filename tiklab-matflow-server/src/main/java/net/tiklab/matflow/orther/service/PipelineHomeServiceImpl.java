@@ -2,32 +2,25 @@ package net.tiklab.matflow.orther.service;
 
 
 import com.alibaba.fastjson.JSONObject;
-import net.tiklab.core.page.Page;
-import net.tiklab.core.page.Pagination;
-import net.tiklab.matflow.orther.model.PipelineActivity;
 import net.tiklab.matflow.orther.model.PipelineFollow;
-import net.tiklab.matflow.orther.model.PipelineMessage;
-import net.tiklab.matflow.orther.model.PipelineTask;
 import net.tiklab.message.message.model.*;
-import net.tiklab.message.message.service.MessageDispatchItemService;
 import net.tiklab.message.message.service.MessageService;
 import net.tiklab.oplog.log.modal.OpLog;
-import net.tiklab.oplog.log.modal.OpLogQuery;
 import net.tiklab.oplog.log.modal.OpLogTemplate;
 import net.tiklab.oplog.log.service.OpLogService;
 import net.tiklab.rpc.annotation.Exporter;
-import net.tiklab.todotask.task.modal.Task;
-import net.tiklab.todotask.task.modal.TaskQuery;
 import net.tiklab.todotask.task.service.TaskService;
 import net.tiklab.user.user.model.User;
 import net.tiklab.utils.context.LoginContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Service
@@ -40,8 +33,8 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
     @Autowired
     PipelineFollowService pipelineFollowService;
 
-    @Autowired
-    TaskService taskService;
+    //@Autowired
+    //TaskService taskService;
 
     @Autowired
     MessageService messageService;
@@ -81,118 +74,7 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
         logService.createLog(log);
     }
 
-    /**
-     * 查询日志
-     * @return 日志
-     */
-    @Override
-    public List<PipelineActivity> findLog(){
-        OpLogQuery opLogQuery = new OpLogQuery();
-        opLogQuery.setBgroup(appName);
-        opLogQuery.setPageParam(new Page(1,30));
-        Pagination<OpLog> logPage = logService.findLogPage(opLogQuery);
-        List<OpLog> logList = logPage.getDataList();
 
-        if (logList == null){
-            return null;
-        }
-
-        logList.sort(Comparator.comparing(OpLog::getTimestamp).reversed());
-        List<PipelineActivity> pipelineActivities = new ArrayList<>();
-
-        int size = Math.min(logList.size(), 7);
-        for (int i = 0; i < size; i++) {
-            PipelineActivity pipelineActivity = updateActivities(logList.get(i));
-            pipelineActivities.add(pipelineActivity);
-        }
-
-        pipelineActivities.sort(Comparator.comparing(PipelineActivity::getCreateTime).reversed());
-        return pipelineActivities;
-    }
-
-    //封装动态信息
-    private PipelineActivity updateActivities(OpLog opLog){
-        String content = opLog.getContent();
-        JSONObject jsonObject = JSONObject.parseObject(content);
-        PipelineActivity pipelineActivity = new PipelineActivity();
-        pipelineActivity.setPipelineId(jsonObject.getString("pipelineId"));
-        pipelineActivity.setMessage(jsonObject.getString("message"));
-        pipelineActivity.setCreateTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(opLog.getTimestamp().getTime()));
-        pipelineActivity.setType(opLog.getActionType());
-        pipelineActivity.setUserName(opLog.getUser().getName());
-        pipelineActivity.setPipelineName(jsonObject.getString("pipelineName"));
-        pipelineActivity.setTemplateType(opLog.getOpLogTemplate().getId());
-        return pipelineActivity;
-    }
-
-    /**
-     * 查询待办
-     */
-    @Override
-    public List<PipelineTask> findTask(){
-        TaskQuery taskQuery = new TaskQuery();
-        taskQuery.setBgroup(appName);
-        String userId = LoginContext.getLoginId();
-        taskQuery.setUserId(userId);
-        Pagination<Task> taskPage = taskService.findTaskPage(taskQuery);
-        List<Task> dataList = taskPage.getDataList();
-        if (dataList == null){
-            return null;
-        }
-        dataList.sort(Comparator.comparing(Task::getEndTime));
-
-        int size = Math.min(dataList.size(), 6);
-        List<PipelineTask> pipelineTasks = new ArrayList<>();
-
-        for (int i = 0; i < size; i++) {
-            PipelineTask pipelineTask = updateTask(dataList.get(i));
-            pipelineTasks.add(pipelineTask);
-        }
-        pipelineTasks.sort(Comparator.comparing(PipelineTask::getCreateTime).reversed());
-        return pipelineTasks;
-    }
-
-    //封装待办信息
-    private PipelineTask updateTask(Task task){
-        PipelineTask pipelineTask = new PipelineTask();
-        pipelineTask.setTaskName(task.getTitle());
-        pipelineTask.setCreateTime(new SimpleDateFormat("yyyy-MM-dd HH:mm").format(task.getCreateTime().getTime()));
-        pipelineTask.setEndTime(new SimpleDateFormat("yyyy-MM-dd HH:mm").format(task.getEndTime().getTime()));
-        pipelineTask.setState(task.getStatus());
-        pipelineTask.setCreateUser(task.getCreateUser().getName());
-        pipelineTask.setExecUser(task.getAssignUser().getName());
-        return pipelineTask;
-    }
-
-    ///**
-    // * 查询消息
-    // * @return 消息
-    // */
-    //@Override
-    //public  List<PipelineMessage> findMessage(int size){
-    //    //MessageDispatchItemQuery messageDispatchItemQuery = new MessageDispatchItemQuery();
-    //    //messageDispatchItemQuery.setApplication(appName);
-    //    //String loginId = LoginContext.getLoginId();
-    //    //messageDispatchItemQuery.setReceiver(loginId);
-    //    //Pagination<MessageDispatchItem> messageDispatchItemPage = messageService.findMessageDispatchItemPage(messageDispatchItemQuery);
-    //    //List<MessageDispatchItem> dataList = messageDispatchItemPage.getDataList();
-    //    //if (dataList == null){
-    //    //    return null;
-    //    //}
-    //    //dataList.sort(Comparator.comparing(MessageDispatchItem::getReceiveTime));
-    //    //int a = Math.min(dataList.size(), size);
-    //    //if (size == 0){
-    //    //    a = dataList.size();
-    //    //}
-    //    List<PipelineMessage> pipelineMessages = new ArrayList<>();
-    //    //for (int i = 0; i < a; i++) {
-    //    //    PipelineMessage pipelineMessage = updateMessage(dataList.get(i));
-    //    //    pipelineMessages.add(pipelineMessage);
-    //    //}
-    //    //pipelineMessages.sort(Comparator.comparing(PipelineMessage::getTime).reversed());
-    //    return pipelineMessages;
-    //}
-    //
     /**
      * 创建消息
      */
@@ -217,33 +99,41 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
         messageService.sendMessage(message);
     }
 
-    //封装消息信息
-    private PipelineMessage updateMessage(MessageDispatchItem m){
-        PipelineMessage message = new PipelineMessage();
-        message.setState(m.getStatus());
-        message.setTime(new SimpleDateFormat("yyyy-MM-dd").format(m.getReceiveTime()));
-        message.setMessage(m.getMessageTemplate().getContent());
-        message.setSendUser(m.getMessage().getSender());
-        message.setReceiveUser(m.getReceiver());
-        message.setLink(m.getMessageTemplate().getLink());
-        return message;
+
+    @Value("${server.port:8080}")
+    int port;
+
+
+    public String findAddress(String type,String pipelineId){
+        String ip ;
+        try {
+            ip = InetAddress.getLocalHost().getHostAddress();
+        } catch (UnknownHostException e) {
+            ip = "localhost"  ;
+        }
+        return "http://"+ip+":"+port+"/#"+findRouting(type,pipelineId);
     }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    private  String findRouting(String type,String pipelineId){
+        switch (type) {
+            case "pipeline" -> {
+                return "/index/task/" + pipelineId + "/work";
+            }
+            case "pipelineConfig" -> {
+                return "/index/task/" + pipelineId + "/config";
+            }
+            case "pipelineExec" -> {
+                return "/index/task/" + pipelineId + "/structure";
+            }
+            case "proof" -> {
+                return "/index/system/proof";
+            }
+            case "other" -> {
+                return "/index/pipeline";
+            }
+        }
+        return null;
+    }
 
 }
