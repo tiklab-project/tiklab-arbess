@@ -62,10 +62,28 @@ public class Proof {
     private int type;
 
     @ApiProperty(name="callbackUrl",desc="类型")
-    private int callbackUrl;
+    private String callbackUrl;
 
     @ApiProperty(name="proofList",desc="流水线凭证列表")
     private List<String> proofList;
+
+
+    public Proof() {
+    }
+
+    public Proof(int type, int proofScope, String proofType, String proofUsername, String proofPassword, String callbackUrl, String proofDescribe, String userId) {
+        this.proofScope = proofScope;
+        this.proofType = proofType;
+        this.proofUsername = proofUsername;
+        this.proofPassword = proofPassword;
+        this.callbackUrl = callbackUrl;
+        this.proofDescribe = proofDescribe;
+        User user = new User();
+        user.setId(userId);
+        this.user =user;
+        this.type = type;
+    }
+
 
     public String getProofId() {
         return proofId;
@@ -155,11 +173,11 @@ public class Proof {
         this.proofList = proofList;
     }
 
-    public int getCallbackUrl() {
+    public String getCallbackUrl() {
         return callbackUrl;
     }
 
-    public void setCallbackUrl(int callbackUrl) {
+    public void setCallbackUrl(String callbackUrl) {
         this.callbackUrl = callbackUrl;
     }
 }

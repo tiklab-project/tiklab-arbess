@@ -48,7 +48,7 @@ public class ProofServiceImpl implements ProofService {
             try {
                 //获取主机名
                 proof.setProofUsername(InetAddress.getLocalHost().getHostName());
-            } catch ( UnknownHostException e) {
+            } catch (UnknownHostException e) {
                 //失败更改为凭证名称
                 proof.setProofUsername(proof.getProofName());
             }
@@ -58,6 +58,11 @@ public class ProofServiceImpl implements ProofService {
         String proofId = proofDao.createProof(proofEntity);
         if (proof.getType() == 1){
             return proofId;
+        }
+        if (proof.getProofList() == null){
+            List<String> list = new ArrayList<>();
+            list.add(proofId);
+            proof.setProofList(list);
         }
         for (String s : proof.getProofList()) {
             proofTaskService.createProofTask(new ProofTask(proofId,s));

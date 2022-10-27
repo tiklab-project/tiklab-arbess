@@ -2,12 +2,12 @@ package net.tiklab.matflow.execute.service;
 
 
 import net.tiklab.join.annotation.JoinProvider;
-import net.tiklab.matflow.execute.model.CodeGitHubApi;
+import net.tiklab.matflow.execute.model.CodeAuthorizeApi;
 import net.tiklab.matflow.setting.model.Proof;
 
 import java.util.List;
 
-@JoinProvider(model = CodeGitHubApi.class)
+@JoinProvider(model = CodeAuthorizeApi.class)
 public interface CodeGitHubService {
 
     /**

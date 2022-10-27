@@ -3,6 +3,9 @@ package net.tiklab.matflow.setting.entity;
 
 import net.tiklab.dal.jpa.annotation.*;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 @Entity
 @Table(name="pipeline_proof")
 public class ProofEntity {
@@ -39,7 +42,7 @@ public class ProofEntity {
 
     //创建时间
     @Column(name = "proof_create_time")
-    private String proofCreateTime;
+    private String proofCreateTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
 
     @Column(name = "callback_url")
     private String callbackUrl;

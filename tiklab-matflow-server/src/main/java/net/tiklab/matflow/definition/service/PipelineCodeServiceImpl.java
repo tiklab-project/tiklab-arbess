@@ -2,10 +2,13 @@ package net.tiklab.matflow.definition.service;
 
 
 import net.tiklab.beans.BeanMapper;
+import net.tiklab.dal.jpa.annotation.Id;
 import net.tiklab.join.JoinTemplate;
 import net.tiklab.matflow.definition.dao.PipelineCodeDao;
 import net.tiklab.matflow.definition.entity.PipelineCodeEntity;
 import net.tiklab.matflow.definition.model.PipelineCode;
+import net.tiklab.matflow.execute.service.CodeAuthorizeService;
+import net.tiklab.matflow.setting.model.Proof;
 import net.tiklab.rpc.annotation.Exporter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,16 +28,14 @@ public class PipelineCodeServiceImpl implements PipelineCodeService {
     JoinTemplate joinTemplate;
 
     @Autowired
-    PipelineCodeAuthorizeService codeAuthorizeService;
+    CodeAuthorizeService codeAuthorizeService;
 
     private static final Logger logger = LoggerFactory.getLogger(PipelineCodeServiceImpl.class);
 
     //创建
     @Override
     public String createCode(PipelineCode pipelineCode) {
-        joinTemplate.joinQuery(pipelineCode);
-        PipelineCode authorizeUrl = codeAuthorizeService.getAuthorizeUrl(pipelineCode);
-        return pipelineCodeDao.createCode(BeanMapper.map(authorizeUrl, PipelineCodeEntity.class));
+        return pipelineCodeDao.createCode(BeanMapper.map(pipelineCode, PipelineCodeEntity.class));
     }
 
 
@@ -52,8 +53,20 @@ public class PipelineCodeServiceImpl implements PipelineCodeService {
             pipelineCode.setProof(oneCode.getProof());
         }
         joinTemplate.joinQuery(pipelineCode);
-        PipelineCode authorizeUrl = codeAuthorizeService.getAuthorizeUrl(pipelineCode);
-        pipelineCodeDao.updateCode(BeanMapper.map(authorizeUrl, PipelineCodeEntity.class));
+        Proof proof = pipelineCode.getProof();
+        if (proof == null){
+            pipelineCodeDao.updateCode(BeanMapper.map(pipelineCode, PipelineCodeEntity.class));
+            return;
+        }
+        int proofScope = proof.getProofScope();
+        switch (proofScope) {
+            case 2, 3 -> {
+                String houseUrl = codeAuthorizeService.getHouseUrl(proof.getProofId(), pipelineCode.getCodeName(), proofScope);
+                pipelineCode.setCodeAddress(houseUrl);
+            }
+            default -> pipelineCode.setCodeAddress(pipelineCode.getCodeName());
+        }
+        pipelineCodeDao.updateCode(BeanMapper.map(pipelineCode, PipelineCodeEntity.class));
     }
 
     //查询单个
