@@ -7,21 +7,14 @@ import net.tiklab.matflow.definition.dao.PipelineDao;
 import net.tiklab.matflow.definition.entity.PipelineEntity;
 import net.tiklab.matflow.definition.model.Pipeline;
 import net.tiklab.matflow.definition.model.PipelineMassage;
-import net.tiklab.matflow.execute.model.PipelineExecHistory;
-import net.tiklab.matflow.execute.model.PipelineExecState;
 import net.tiklab.matflow.orther.service.PipelineHomeService;
-import net.tiklab.matflow.orther.service.PipelineHomeServiceImpl;
 import net.tiklab.rpc.annotation.Exporter;
 import net.tiklab.user.user.model.DmUser;
 import net.tiklab.user.user.model.User;
-import org.apache.commons.lang3.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -222,49 +215,6 @@ public class PipelineServiceImpl implements PipelineService {
         return commonServer.findAllStatus(pipelineFollow);
     }
 
-    //查询流水线最近运行状态
-    @Override
-    public List<PipelineExecState> findBuildStatus(String userId){
-        StringBuilder builder = findUserPipelineId(userId);
-        if (builder == null){
-            return null;
-        }
-        List<PipelineExecState> list = new ArrayList<>();
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-        int i = -6;
-        List<PipelineExecHistory> allUserHistory = commonServer.findRecentStatus(userId,builder);
-        if (allUserHistory == null){
-            return null;
-        }
-        while (i <= 0){
-            Date lastTime = DateUtils.addDays(new Date(), i);
-            PipelineExecState pipelineExecState = new PipelineExecState();
-            pipelineExecState.setTime(formatter.format(lastTime));
-            for (PipelineExecHistory pipelineExecHistory : allUserHistory) {
-                try {
-                    Date time = formatter.parse(pipelineExecHistory.getCreateTime());
-                    if (!formatter.format(lastTime).equals(formatter.format(time))){
-                        continue;
-                    }
-                    switch (pipelineExecHistory.getRunStatus()) {
-                        case 30 -> pipelineExecState.setSuccessNumber(pipelineExecState.getSuccessNumber() + 1);
-                        case 20 -> pipelineExecState.setRemoveNumber(pipelineExecState.getRemoveNumber() + 1);
-                        case 1 -> pipelineExecState.setErrorNumber(pipelineExecState.getErrorNumber() + 1);
-                    }
-                } catch (ParseException e) {
-                    logger.info("获取历史创建时间时日期转换异常。");
-                    throw new RuntimeException(e);
-                }
-            }
-
-            if (pipelineExecState.getTime() != null){
-                pipelineExecState.setTime(pipelineExecState.getTime().substring(5));
-                list.add(pipelineExecState);
-            }
-            i++;
-        }
-        return list;
-    }
 
     //模糊查询
     @Override

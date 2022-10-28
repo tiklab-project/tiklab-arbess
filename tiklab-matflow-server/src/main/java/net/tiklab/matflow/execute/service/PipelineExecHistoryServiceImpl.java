@@ -81,7 +81,6 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
     //根据流水线id查询所有历史
     @Override
     public List<PipelineExecHistory> findAllHistory(String pipelineId) {
-        //List<PipelineExecHistory> allHistory = findAllHistory();
         List<PipelineExecHistoryEntity> list = pipelineExecHistoryDao.findAllHistory(pipelineId);
         if (list == null){
             return null;
@@ -94,14 +93,6 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
         return allHistory;
     }
 
-    //查询用户所有历史
-    @Override
-    public List<PipelineExecHistory> findAllUserHistory(String lastTime, String nowTime, StringBuilder s) {
-        List<PipelineExecHistoryEntity> allUserHistory = pipelineExecHistoryDao.findAllUserHistory(lastTime,nowTime,s);
-        List<PipelineExecHistory> pipelineExecHistories = BeanMapper.mapList(allUserHistory, PipelineExecHistory.class);
-        joinTemplate.joinQuery(pipelineExecHistories);
-        return pipelineExecHistories;
-    }
 
 
     //查询最近一次执行历史
@@ -135,7 +126,7 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
         return BeanMapper.mapList(pipelineExecHistoryEntityList, PipelineExecHistory.class);
     }
 
-    //获取最后一次的运行日志
+    //获取最后一次的运行日志详情
     @Override
     public PipelineExecLog getRunLog(String historyId){
         List<PipelineExecLog> allLog = pipelineExecLogService.findAllLog(historyId);

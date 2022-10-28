@@ -124,18 +124,6 @@ public class PipelineController {
         return Result.ok(userPipeline);
     }
 
-    //查询流水线最近运行状态
-    @RequestMapping(path="/findBuildStatus",method = RequestMethod.POST)
-    @ApiMethod(name = "findBuildStatus",desc = "查询流水线最近状态")
-    @ApiParam(name = "userId",desc = "用户id",required = true)
-    public Result<List<PipelineExecState>> findBuildStatus(@NotNull String userId){
-
-        List<PipelineExecState> buildStatus = pipelineService.findBuildStatus(userId);
-
-        return Result.ok(buildStatus);
-    }
-
-
 
     @RequestMapping(path="/findPipelineUser",method = RequestMethod.POST)
     @ApiMethod(name = "findPipelineUser",desc = "查询此拥有流水线的用户")
@@ -147,12 +135,12 @@ public class PipelineController {
         return Result.ok(dmUser);
     }
 
-    @RequestMapping(path="/findState",method = RequestMethod.POST)
-    @ApiMethod(name = "findState",desc = "查询流水线最近状态")
-    @ApiParam(name = "userId",desc = "用户id",required = true)
-    public Result<Map<String,Integer>> findState(@NotNull String userId){
+    @RequestMapping(path="/pipelineCensus",method = RequestMethod.POST)
+    @ApiMethod(name = "pipelineCensus",desc = "查询流水线最近状态")
+    @ApiParam(name = "pipelineId",desc = "流水线id",required = true)
+    public Result<PipelineExecState> pipelineCensus(@NotNull String pipelineId){
 
-        Map<String,Integer> buildStatus = pipelineService.findBuildState(userId);
+        PipelineExecState buildStatus = pipelineCommonServer.pipelineCensus(pipelineId);
 
         return Result.ok(buildStatus);
     }

@@ -1,7 +1,7 @@
 package net.tiklab.matflow.orther.service;
 
 import net.tiklab.matflow.execute.model.FileTree;
-import net.tiklab.matflow.execute.model.GitCommit;
+
 
 import java.util.List;
 
@@ -21,12 +21,6 @@ public interface PipelineWorkSpaceService {
      */
     List<String> readFile(String path);
 
-    /**
-     * 获取提交信息
-     * @param pipelineId 流水线id
-     * @return 提交信息
-     */
-    List<List<GitCommit>> getSubmitMassage(String pipelineId);
 
 
 }

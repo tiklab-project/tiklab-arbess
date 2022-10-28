@@ -69,13 +69,13 @@ public class PipelineUntil {
         long minutes = (time % ( 60 * 60)) /60;
         long seconds = time % 60;
         if(days>0){
-            DateTimes= days + "天" + hours + "时" + minutes + "分" + seconds + "秒";
+            DateTimes= days + " 天" + hours + " 时" + minutes + " 分" + seconds + " 秒";
         }else if(hours>0){
-            DateTimes=hours + "时" + minutes + "分" + seconds + "秒";
+            DateTimes=hours + " 时" + minutes + " 分" + seconds + " 秒";
         }else if(minutes>0){
-            DateTimes=minutes + "分" + seconds + "秒";
+            DateTimes=minutes + " 分" + seconds + " 秒";
         }else{
-            DateTimes=seconds + "秒";
+            DateTimes=seconds + " 秒";
         }
         return DateTimes;
     }

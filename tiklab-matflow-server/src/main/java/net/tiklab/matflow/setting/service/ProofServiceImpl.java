@@ -2,6 +2,7 @@ package net.tiklab.matflow.setting.service;
 
 
 import net.tiklab.beans.BeanMapper;
+import net.tiklab.dal.jdbc.JdbcTemplate;
 import net.tiklab.join.JoinTemplate;
 import net.tiklab.matflow.definition.service.PipelineCodeServiceImpl;
 import net.tiklab.matflow.definition.service.PipelineService;
@@ -14,6 +15,7 @@ import net.tiklab.rpc.annotation.Exporter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.stereotype.Service;
 
 import java.net.InetAddress;
@@ -53,6 +55,7 @@ public class ProofServiceImpl implements ProofService {
                 proof.setProofUsername(proof.getProofName());
             }
         }
+
         ProofEntity proofEntity = BeanMapper.map(proof, ProofEntity.class);
         //判断凭证作用域
         String proofId = proofDao.createProof(proofEntity);
@@ -79,6 +82,20 @@ public class ProofServiceImpl implements ProofService {
             proofDao.deleteProofTask(proofId);
         }
         proofDao.deleteProof(proofId);
+    }
+
+    /**
+     * 查询指定类型凭证
+     * @param type 类型
+     * @return 凭证
+     */
+    @Override
+    public List<Proof> findAuthorizationProof(int type){
+        List<ProofEntity> authorizationProof = proofDao.findAuthorizationProof(type);
+        if (authorizationProof == null){
+            return null;
+        }
+        return BeanMapper.mapList(authorizationProof,Proof.class);
     }
 
 

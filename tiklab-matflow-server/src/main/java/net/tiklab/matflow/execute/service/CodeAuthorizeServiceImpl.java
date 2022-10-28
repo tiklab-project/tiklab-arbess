@@ -14,6 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -24,11 +26,13 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 
 @Service
 @Exporter
+@EnableScheduling
 public class CodeAuthorizeServiceImpl implements CodeAuthorizeService {
 
     @Autowired
@@ -79,6 +83,7 @@ public class CodeAuthorizeServiceImpl implements CodeAuthorizeService {
         logger.info("获取到的accessToken : "+ map.get("accessToken"));
         Proof proof = new Proof(1,type,"password",username,map.get("accessToken"),map.get("refreshToken"),"授权登录",loginId);
         mapState.put(loginId, 1);
+
         return  proofService.createProof(proof);
     }
 
@@ -151,7 +156,7 @@ public class CodeAuthorizeServiceImpl implements CodeAuthorizeService {
         JSONArray allStorehouseJson = JSONArray.parseArray(body);
         for (int i = 0; i < allStorehouseJson.size(); i++) {
             JSONObject storehouse=allStorehouseJson.getJSONObject(i);
-            storehouseList.add(storehouse.getString("human_name"));
+            storehouseList.add(storehouse.getString("full_name"));
         }
         return storehouseList;
     }
@@ -183,9 +188,9 @@ public class CodeAuthorizeServiceImpl implements CodeAuthorizeService {
     public List<String> findBranch(String proofId,String houseName,int type) {
         Proof oneProof = proofService.findOneProof(proofId);
         String accessToken = oneProof.getProofPassword();
-        String username = oneProof.getProofUsername();
         String house = houseName.split("/")[1];
-        String url = codeAuthorizeApi.getBranch(username,house,accessToken,type);
+        String name = houseName.split("/")[0];
+        String url = codeAuthorizeApi.getBranch(name,house,accessToken,type);
         return switch (type) {
             case 2 -> giteeBranch(accessToken, url);
             case 3 -> gitHubBranch(accessToken, url);
@@ -243,9 +248,10 @@ public class CodeAuthorizeServiceImpl implements CodeAuthorizeService {
             return null;
         }
         String house = houseName.split("/")[1];
+        String name = houseName.split("/")[0];
 
         //获取仓库URl
-        String oneStorehouse = codeAuthorizeApi.getOneHouse(username,house,accessToken,type);
+        String oneStorehouse = codeAuthorizeApi.getOneHouse(name,house,accessToken,type);
         return switch (type) {
             case 2 -> giteeHouseUrl(accessToken, oneStorehouse);
             case 3 -> gitHubHouseUrl(accessToken, oneStorehouse);
@@ -272,7 +278,6 @@ public class CodeAuthorizeServiceImpl implements CodeAuthorizeService {
         return jsonObject.getString("html_url");
     }
 
-    int s = 0;
 
     @Override
     public int findState() {
@@ -349,4 +354,65 @@ public class CodeAuthorizeServiceImpl implements CodeAuthorizeService {
         return result.toString();
     }
 
+
+    /**
+     * 更新授权
+     */
+    @Scheduled(cron = "59 59 23 * * ?")
+    public void updateAuthorization() {
+        logger.info("定时任务");
+        List<Proof> authorizationProof = proofService.findAuthorizationProof(2);
+        if (authorizationProof == null){
+            return;
+        }
+        for (Proof proof : authorizationProof) {
+            logger.info("gitee定时任务，时间:" +new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())+"更新授权信息");
+            String refreshToken = codeAuthorizeApi.findRefreshToken(proof.getCallbackUrl());
+            ResponseEntity<JSONObject> forEntity = restTemplate.postForEntity(refreshToken,String.class, JSONObject.class);
+            JSONObject body = forEntity.getBody();
+            if (body== null){
+                return;
+            }
+            String access_token = body.getString("access_token");
+            String refresh_token = body.getString("refresh_token");
+            proof.setProofPassword(access_token);
+            proof.setCallbackUrl(refresh_token);
+            proofService.updateProof(proof);
+        }
+    }
+
+
+
+
+
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

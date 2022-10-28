@@ -3,7 +3,6 @@ package net.tiklab.matflow.orther.controller;
 
 import net.tiklab.core.Result;
 import net.tiklab.matflow.execute.model.FileTree;
-import net.tiklab.matflow.execute.model.GitCommit;
 import net.tiklab.matflow.orther.service.PipelineHomeService;
 import net.tiklab.matflow.orther.service.PipelineUntil;
 import net.tiklab.matflow.orther.service.PipelineWorkSpaceService;
@@ -26,8 +25,6 @@ public class PipelineWorkSpaceController {
     @Autowired
     PipelineWorkSpaceService pipelineWorkSpaceService;
 
-    @Autowired
-    PipelineHomeService pipelineHomeService;
 
 
     @RequestMapping(path="/fileTree",method = RequestMethod.POST)
@@ -46,13 +43,6 @@ public class PipelineWorkSpaceController {
         return Result.ok(s);
     }
 
-    @RequestMapping(path="/getSubmitMassage",method = RequestMethod.POST)
-    @ApiMethod(name = "getSubmitMassage",desc = "获取提交信息")
-    @ApiParam(name = "pipelineId",desc = "流水线id",required = true)
-    public Result<List<List<GitCommit>>> getSubmitMassage(String pipelineId){
-        List<List<GitCommit>> submitMassage = pipelineWorkSpaceService.getSubmitMassage(pipelineId);
-        return Result.ok(submitMassage);
-    }
 
 
 }

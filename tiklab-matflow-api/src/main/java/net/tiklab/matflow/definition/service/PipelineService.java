@@ -7,9 +7,6 @@ import net.tiklab.join.annotation.FindOne;
 import net.tiklab.join.annotation.JoinProvider;
 import net.tiklab.matflow.definition.model.Pipeline;
 import net.tiklab.matflow.definition.model.PipelineMassage;
-import net.tiklab.matflow.execute.model.PipelineExecState;
-import net.tiklab.user.user.model.DmUser;
-
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -79,13 +76,6 @@ public interface PipelineService {
      * @return 流水线信息
      */
     List<PipelineMassage> findUserFollowPipeline(String userId);
-
-    /**
-     * 获取流水线近七天状态
-     * @param userId 用户id
-     * @return 状态信息
-     */
-    List<PipelineExecState> findBuildStatus(String userId);
 
     /**
      * 模糊查询流水线

@@ -3,6 +3,7 @@ package net.tiklab.matflow.definition.service;
 import net.tiklab.matflow.definition.model.Pipeline;
 import net.tiklab.matflow.definition.model.PipelineMassage;
 import net.tiklab.matflow.execute.model.PipelineExecHistory;
+import net.tiklab.matflow.execute.model.PipelineExecState;
 import net.tiklab.matflow.execute.service.PipelineExecHistoryService;
 import net.tiklab.matflow.orther.service.PipelineFileService;
 import net.tiklab.matflow.orther.service.PipelineUntil;
@@ -33,12 +34,9 @@ public class PipelineCommonServerImpl implements PipelineCommonServer{
      */
     @Override
     public void delete(Pipeline pipeline){
-
         String pipelineId = pipeline.getPipelineId();
-
         //删除对应的历史
         historyService.deleteHistory(pipelineId);
-
         //删除对应文件
         String fileAddress = PipelineUntil.findFileAddress();
         PipelineUntil.deleteFile(new File(fileAddress+ pipeline.getPipelineName()));
@@ -88,22 +86,6 @@ public class PipelineCommonServerImpl implements PipelineCommonServer{
             pipelineMassageList.add(pipelineMassage);
         }
         return pipelineMassageList;
-    }
-
-    /**
-     * 获取近七天的历史
-     * @param userId 用户id
-     * @return 历史
-     */
-    public  List<PipelineExecHistory> findRecentStatus(String userId,StringBuilder s){
-        //获取7天前的时间
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-        Date lastTime = DateUtils.addDays(new Date(), -7);
-        Date nowTime = DateUtils.addDays(new Date(), 1);
-        if (s.toString().equals("")){
-            return null;
-        }
-        return historyService.findAllUserHistory(formatter.format(lastTime),formatter.format(nowTime),s);
     }
 
     /**
@@ -192,6 +174,42 @@ public class PipelineCommonServerImpl implements PipelineCommonServer{
             }
             dmUserService.deleteDmUser(dm.getId());
         }
+    }
+
+    /**
+     * 流水线执行信息统计
+     * @param pipelineId 流水线id
+     * @return 统计信息
+     */
+    public PipelineExecState pipelineCensus(String pipelineId){
+        List<PipelineExecHistory> allHistory = historyService.findAllHistory(pipelineId);
+        if (allHistory == null){
+            return null;
+        }
+        PipelineExecState state = new PipelineExecState();
+        for (PipelineExecHistory history : allHistory) {
+            if (history.getRunStatus() == 1){
+                state.setErrorNumber(state.getErrorNumber() + 1);
+            }
+            if (history.getRunStatus() == 20){
+                state.setRemoveNumber(state.getRemoveNumber() + 1);
+            }
+            if (history.getRunStatus() == 30){
+                state.setSuccessNumber(state.getSuccessNumber() + 1);
+            }
+            state.setExecTime(state.getExecTime()+history.getRunTime());
+            state.setNumber(state.getNumber()+1);
+        }
+        if (state.getNumber() != 0){
+            state.setExecTime(state.getExecTime()/state.getNumber()+1);
+        }
+
+        if (state.getExecTime() == 0){
+            state.setTime("0 秒");
+            return state;
+        }
+        state.setTime(PipelineUntil.formatDateTime(state.getExecTime()));
+        return state;
     }
 
    

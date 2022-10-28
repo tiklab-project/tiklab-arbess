@@ -121,30 +121,26 @@ public class PipelineConfigServiceImpl implements PipelineConfigService {
                 pipelineCode.setCodeId(typeConfig.getTaskId());
                 pipelineCode.setType(config.getTaskType());
                 pipelineCodeService.updateCode(pipelineCode);
-                map.put("message", "更新了流水线");
-                map.put("messages", "的源码管理配置");
+                map.put("message", "源码管理配置");
             }
             case "test" -> {
                 PipelineTest pipelineTest = JSON.parseObject(object, PipelineTest.class);
                 pipelineTest.setTestId(typeConfig.getTaskId());
                 pipelineTestService.updateTest(pipelineTest);
-                map.put("message",  "更新了流水线");
-                map.put("messages",  "测试配置");
+                map.put("message",  "测试配置");
             }
             case "build" -> {
                 PipelineBuild pipelineBuild = JSON.parseObject(object, PipelineBuild.class);
                 pipelineBuild.setBuildId(typeConfig.getTaskId());
                 pipelineBuildService.updateBuild(pipelineBuild);
-                map.put("message",  "更新了流水线");
-                map.put("messages",  "构建配置");
+                map.put("message",  "构建配置");
             }
             case "deploy" -> {
                 PipelineDeploy pipelineDeploy = JSON.parseObject(object, PipelineDeploy.class);
                 pipelineDeploy.setDeployId(typeConfig.getTaskId());
                 PipelineDeploy deploy = updateNumber(typeConfig, pipelineDeploy);
                 pipelineDeployService.updateDeploy(deploy);
-                map.put("message",  "更新了流水线");
-                map.put("messages",  "部署配置");
+                map.put("message",  "部署配置");
             }
         }
         return map;
@@ -169,29 +165,25 @@ public class PipelineConfigServiceImpl implements PipelineConfigService {
                 PipelineCode pipelineCode = JSON.parseObject(object, PipelineCode.class);
                 if (pipelineCode == null) pipelineCode = new PipelineCode();
                 id = pipelineCodeService.createCode(pipelineCode);
-                map.put("message", "创建了流水线");
-                map.put("messages", "源码管理配置");
+                map.put("message", "源码管理配置");
             }
             case "test" -> {
                 PipelineTest pipelineTest = JSON.parseObject(object, PipelineTest.class);
                 if (pipelineTest == null) pipelineTest=new PipelineTest();
                 id = pipelineTestService.createTest(pipelineTest);
-                map.put("message", "创建了流水线");
-                map.put("messages", "测试配置");
+                map.put("message", "测试配置");
             }
             case "build" -> {
                 PipelineBuild pipelineBuild = JSON.parseObject(object, PipelineBuild.class);
                 if (pipelineBuild == null) pipelineBuild = new PipelineBuild();
                 id = pipelineBuildService.createBuild(pipelineBuild);
-                map.put("message", "创建了流水线");
-                map.put("messages", "构建配置");
+                map.put("message", "构建配置");
             }
             case "deploy" -> {
                 PipelineDeploy pipelineDeploy = JSON.parseObject(object, PipelineDeploy.class);
                 if (pipelineDeploy == null) pipelineDeploy = new PipelineDeploy();
                 id = pipelineDeployService.createDeploy(pipelineDeploy);
-                map.put("message", "创建了流水线");
-                map.put("messages", "部署配置");
+                map.put("message", "部署配置");
             }
         }
         if (id == null){
@@ -213,23 +205,19 @@ public class PipelineConfigServiceImpl implements PipelineConfigService {
         switch (types) {
             case "code" -> {
                 pipelineCodeService.deleteCode(typeConfig.getTaskId());
-                map.put("message","删除了流水线");
-                map.put("messages","源码管理配置");
+                map.put("message","源码管理配置");
             }
             case "test" -> {
                 pipelineTestService.deleteTest(typeConfig.getTaskId());
-                map.put("message","删除了流水线");
-                map.put("messages","测试配置");
+                map.put("message","测试配置");
             }
             case "build" -> {
                 pipelineBuildService.deleteBuild(typeConfig.getTaskId());
-                map.put("message","删除了流水线");
-                map.put("messages","构建配置");
+                map.put("message","构建配置");
             }
             case "deploy" -> {
                 pipelineDeployService.deleteDeploy(typeConfig.getTaskId());
-                map.put("message","删除了流水线");
-                map.put("messages","部署配置");
+                map.put("message","部署配置");
             }
         }
         return map;

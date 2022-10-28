@@ -96,7 +96,7 @@ public class CodeAuthorizeApi {
      * @param refreshToken 回调token
      * @return 地址
      */
-    public String getRefreshToken(String refreshToken) {
+    public String findRefreshToken(String refreshToken) {
         //获取新的token
         return "https://gitee.com/oauth/token?grant_type=refresh_token&refresh_token="+ refreshToken;
     }

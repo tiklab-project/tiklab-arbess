@@ -33,13 +33,24 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
     @Autowired
     PipelineFollowService pipelineFollowService;
 
-    //@Autowired
-    //TaskService taskService;
-
     @Autowired
     MessageService messageService;
 
     private static final Logger logger = LoggerFactory.getLogger(PipelineHomeServiceImpl.class);
+
+
+
+    private String logMessage(String type){
+        Map<String ,String> map = new HashMap<>();
+        map.put("update", "更新了");
+        map.put("create", "创建了");
+        map.put("delete", "删除了");
+        String s = map.get(type);
+        if (s == null){
+           return "";
+        }
+        return s;
+    }
 
 
     //更新收藏信息
@@ -70,6 +81,7 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
         log.setUser(user);
         log.setBgroup(appName);
         log.setOpLogTemplate(opLogTemplate);
+        map.put("type", logMessage(type));
         log.setContent(JSONObject.toJSONString(map));
         logService.createLog(log);
     }

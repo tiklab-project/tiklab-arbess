@@ -37,6 +37,13 @@ public interface ProofService {
      void updateProof(Proof proof);
 
     /**
+     * 查询指定类型凭证
+     * @param type 类型
+     * @return 凭证
+     */
+    List<Proof> findAuthorizationProof(int type);
+
+    /**
      * 查询凭证
      * @param proofId 凭证id
      * @return 凭证信息

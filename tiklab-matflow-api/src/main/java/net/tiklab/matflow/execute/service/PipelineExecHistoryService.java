@@ -63,16 +63,6 @@ public interface PipelineExecHistoryService {
 
 
     /**
-     * 查询用户所有流水线历史
-     * @param s 流水线id
-     * @param lastTime 开始时间
-     * @param nowTime 停止时间
-     * @return 历史信息
-     */
-    List<PipelineExecHistory> findAllUserHistory(String lastTime, String nowTime, StringBuilder s);
-
-
-    /**
      * 查询最近一次成功
      * @param pipelineId 流水线id
      * @return 成功信息

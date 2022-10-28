@@ -43,7 +43,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
     PipelineConfigOrderService configOrderService;
 
     @Autowired
-    PipelineHomeService pipelineHomeService;
+    PipelineHomeService homeService;
 
     private static final Logger logger = LoggerFactory.getLogger(PipelineExecServiceImpl.class);
 
@@ -65,7 +65,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
             return 100;
         }
 
-        pipelineHomeService.message("matflowExec", "流水线"+pipeline.getPipelineName()+"开始执行");
+        homeService.message("matflowExec", "流水线"+pipeline.getPipelineName()+"开始执行");
 
         try {
             executorService.submit(() -> {
@@ -92,13 +92,10 @@ public class PipelineExecServiceImpl implements PipelineExecService {
                 continue;
             }
             PipelineExecLog log = commonService.getExecPipelineLog(history.getHistoryId());
-            //int i = history.getSort() - 1;
-            //time[i] = time[i] + 1;
             history.setOneTime(getTime(log.getTaskSort(),1));
             history.setTwoTime(getTime( log.getTaskSort(),2));
             history.setThreeTime(getTime( log.getTaskSort(),3));
             history.setFourTime(getTime(log.getTaskSort(),4));
-            //history.setAllTime(getTime(log, 1));
             return history;
         }
       return null;
@@ -108,7 +105,6 @@ public class PipelineExecServiceImpl implements PipelineExecService {
     @Override
     public void killInstance(String pipelineId,String userId) {
         PipelineProcess pipelineProcess = new PipelineProcess();
-        time[0]=1;time[1]=0;time[2]=0;time[3]=0;
         PipelineExecHistory pipelineExecHistory = findInstanceState(pipelineId);
         if (pipelineExecHistory == null){
             Pipeline pipeline = pipelineService.findOnePipeline(pipelineId);
@@ -143,7 +139,12 @@ public class PipelineExecServiceImpl implements PipelineExecService {
             pipelineService.updatePipeline(pipeline);
         }
         commonService.halt(pipelineProcess,pipelineId);
-        pipelineHomeService.message("matflowExec", "用户停止了流水线"+pipeline.getPipelineName()+"的运行。");
+        HashMap<String, String> map = new HashMap<>();
+        map.put("message","停止执行");
+        map.put("pipelineId", pipeline.getPipelineId());
+        map.put("pipelineName", pipeline.getPipelineName());
+        homeService.log("execStatus", "pipelineExec", map);
+        homeService.message("matflowExec", "用户停止了流水线"+pipeline.getPipelineName()+"的运行。");
     }
 
     //判断流水线是否正在执行
@@ -180,6 +181,12 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         if (allPipelineConfig == null){
             return;
         }
+
+        HashMap<String, String> maps = new HashMap<>();
+        maps.put("message","执行成功");
+        maps.put("pipelineId", pipeline.getPipelineId());
+        maps.put("pipelineName", pipeline.getPipelineName());
+
         for (PipelineConfigOrder pipelineConfigOrder : allPipelineConfig) {
             //初始化日志
             PipelineExecLog pipelineExecLog = commonService.initializeLog(pipelineExecHistory.getHistoryId(), pipelineConfigOrder);
@@ -197,8 +204,9 @@ public class PipelineExecServiceImpl implements PipelineExecService {
                 pipeline.setPipelineState(0);
                 commonService.error(pipelineExecHistory, pipeline.getPipelineId());
                 pipelineService.updatePipeline(pipeline);
-                time[0]=1;time[1]=0;time[2]=0;time[3]=0;
-                pipelineHomeService.message("matflowExec", "流水线"+pipeline.getPipelineName()+"执行失败。");
+                maps.put("message","执行失败");
+                homeService.log("execStatus", "pipelineExec", maps);
+                homeService.message("matflowExec", "流水线"+pipeline.getPipelineName()+"执行失败。");
                 return;
             }
             pipelineExecHistory.setSort(pipelineExecHistory.getSort() +1);
@@ -207,8 +215,11 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         commonService.success(pipelineExecHistory, pipeline.getPipelineId());
         pipeline.setPipelineState(0);
         pipelineService.updatePipeline(pipeline);
-        time[0]=1;time[1]=0;time[2]=0;time[3]=0;
-        pipelineHomeService.message("matflowExec", "流水线"+pipeline.getPipelineName()+"执行成功。");
+
+        maps.put("message","执行成功");
+        homeService.log("execStatus", "pipelineExec", maps);
+
+        homeService.message("matflowExec", "流水线"+pipeline.getPipelineName()+"执行成功。");
     }
 
     static Map<Integer,Integer> map = new HashMap<>();

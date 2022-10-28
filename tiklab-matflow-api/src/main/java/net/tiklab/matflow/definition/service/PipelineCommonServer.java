@@ -3,6 +3,7 @@ package net.tiklab.matflow.definition.service;
 import net.tiklab.matflow.definition.model.Pipeline;
 import net.tiklab.matflow.definition.model.PipelineMassage;
 import net.tiklab.matflow.execute.model.PipelineExecHistory;
+import net.tiklab.matflow.execute.model.PipelineExecState;
 import net.tiklab.user.user.model.DmUser;
 
 import java.util.List;
@@ -33,13 +34,6 @@ public interface PipelineCommonServer {
 
 
     /**
-     * 获取近七天的运行状态
-     * @param userId 用户id
-     * @return 历史
-     */
-    List<PipelineExecHistory> findRecentStatus(String userId, StringBuilder s);
-
-    /**
      * 获取用户名下的流水线
      * @param userId 用户id
      * @return 所有流水线id
@@ -59,6 +53,13 @@ public interface PipelineCommonServer {
      * @param pipelineId 流水线id
      */
     void updateDmUser(String pipelineId,DmUser dmUser,boolean b);
+
+    /**
+     * 流水线执行信息统计
+     * @param pipelineId 流水线id
+     * @return 统计信息
+     */
+    PipelineExecState pipelineCensus(String pipelineId);
 
 
     Map<String,Integer> findBuildState(List<Pipeline> list);

@@ -5,31 +5,30 @@ import net.tiklab.postin.annotation.ApiModel;
 import net.tiklab.postin.annotation.ApiProperty;
 
 /**
- * 流水线近期构建状态
+ * 流水线概况统计
  */
 
 @ApiModel
 public class PipelineExecState {
 
-    @ApiProperty(name="time",desc="时间")
-    private String time;
+    //运行次数
+    private int number;
 
-    @ApiProperty(name="successNumber",desc="成功次数")
+    //平均执行时长
+    private int execTime;
+
+    //成功次数
     private int successNumber;
 
-    @ApiProperty(name="errorNumber",desc="失败次数")
+    //失败次数
     private int errorNumber;
 
-    @ApiProperty(name="removeNumber",desc="停止次数")
+    //停止次数
     private int removeNumber;
 
-    public String getTime() {
-        return time;
-    }
+    //时间
+    private String time;
 
-    public void setTime(String time) {
-        this.time = time;
-    }
 
     public int getSuccessNumber() {
         return successNumber;
@@ -53,5 +52,29 @@ public class PipelineExecState {
 
     public void setRemoveNumber(int removeNumber) {
         this.removeNumber = removeNumber;
+    }
+
+    public int getNumber() {
+        return number;
+    }
+
+    public void setNumber(int number) {
+        this.number = number;
+    }
+
+    public int getExecTime() {
+        return execTime;
+    }
+
+    public void setExecTime(int execTime) {
+        this.execTime = execTime;
+    }
+
+    public String getTime() {
+        return time;
+    }
+
+    public void setTime(String time) {
+        this.time = time;
     }
 }

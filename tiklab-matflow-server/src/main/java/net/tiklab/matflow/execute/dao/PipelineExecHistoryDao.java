@@ -98,7 +98,7 @@ public class PipelineExecHistoryDao {
     }
 
     /**
-     * 查询用户所有流水线历史
+     * 查询一定时间内的用户所有流水线历史
      * @return 流水线历史列表
      */
     public List<PipelineExecHistoryEntity> findAllUserHistory(String lastTime, String nowTime, StringBuilder s) {

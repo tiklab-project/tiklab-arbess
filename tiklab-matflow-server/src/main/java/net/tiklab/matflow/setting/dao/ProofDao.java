@@ -135,6 +135,19 @@ public class ProofDao {
     }
 
     /**
+     * 查询指定类型凭证
+     * @param type 类型
+     * @return 凭证
+     */
+    public List<ProofEntity> findAuthorizationProof(int type){
+        String sql = " select pipeline_proof.* from pipeline_proof ";
+        sql=sql.concat(" where pipeline_proof.proof_scope="+ type);
+        JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
+       return jdbcTemplate.query(sql, new BeanPropertyRowMapper(ProofEntity.class));
+    }
+
+
+    /**
      * 删除凭证关联信息
      * @param proofId 凭证id
      */
