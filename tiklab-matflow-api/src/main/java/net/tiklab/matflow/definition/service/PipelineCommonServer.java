@@ -3,6 +3,7 @@ package net.tiklab.matflow.definition.service;
 import net.tiklab.matflow.definition.model.Pipeline;
 import net.tiklab.matflow.definition.model.PipelineMassage;
 import net.tiklab.matflow.execute.model.PipelineExecState;
+import net.tiklab.matflow.orther.model.PipelineOpen;
 import net.tiklab.user.user.model.DmUser;
 import java.util.List;
 
@@ -57,6 +58,8 @@ public interface PipelineCommonServer {
      * @return 统计信息
      */
     PipelineExecState pipelineCensus(String pipelineId);
+
+
 
 
 

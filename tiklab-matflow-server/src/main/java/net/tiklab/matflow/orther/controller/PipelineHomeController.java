@@ -30,13 +30,6 @@ public class PipelineHomeController {
     @Autowired
     PipelineOpenService pipelineOpenService;
 
-    @RequestMapping(path="/findAllOpen",method = RequestMethod.POST)
-    @ApiMethod(name = "findAllOpen",desc = "最近打开的流水线")
-    @ApiParam(name = "userId",desc = "用户id",required = true)
-    public Result<List<PipelineOpen>>  findAllOpen(@NotNull String userId){
-        List<PipelineOpen> allOpen = pipelineOpenService.findAllOpen(userId);
-        return Result.ok(allOpen);
-    }
 
 
     @RequestMapping(path="/updateFollow",method = RequestMethod.POST)

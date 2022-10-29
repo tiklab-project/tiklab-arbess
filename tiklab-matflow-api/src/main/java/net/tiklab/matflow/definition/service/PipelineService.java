@@ -7,6 +7,9 @@ import net.tiklab.join.annotation.FindOne;
 import net.tiklab.join.annotation.JoinProvider;
 import net.tiklab.matflow.definition.model.Pipeline;
 import net.tiklab.matflow.definition.model.PipelineMassage;
+import net.tiklab.matflow.execute.model.PipelineExecState;
+import net.tiklab.matflow.orther.model.PipelineOpen;
+
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.List;
@@ -82,6 +85,23 @@ public interface PipelineService {
      * @return 流水线
      */
     List<PipelineMassage> findLikePipeline(String pipelineName, String userId);
+
+
+    /**
+     * 查询最近打开的流水线
+     *
+     * @return 流水线
+     */
+    List<PipelineOpen> findAllOpen();
+
+
+    /**
+     * 流水线执行信息统计
+     * @param pipelineId 流水线id
+     * @return 统计信息
+     */
+    PipelineExecState pipelineCensus(String pipelineId);
+
 
 
 

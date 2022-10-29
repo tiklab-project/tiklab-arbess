@@ -8,6 +8,7 @@ import net.tiklab.matflow.definition.model.PipelineMassage;
 import net.tiklab.matflow.definition.service.PipelineCommonServer;
 import net.tiklab.matflow.definition.service.PipelineService;
 import net.tiklab.matflow.execute.model.PipelineExecState;
+import net.tiklab.matflow.orther.model.PipelineOpen;
 import net.tiklab.postin.annotation.Api;
 import net.tiklab.postin.annotation.ApiMethod;
 import net.tiklab.postin.annotation.ApiParam;
@@ -140,10 +141,20 @@ public class PipelineController {
     @ApiParam(name = "pipelineId",desc = "流水线id",required = true)
     public Result<PipelineExecState> pipelineCensus(@NotNull String pipelineId){
 
-        PipelineExecState buildStatus = pipelineCommonServer.pipelineCensus(pipelineId);
+        PipelineExecState buildStatus = pipelineService.pipelineCensus(pipelineId);
 
         return Result.ok(buildStatus);
     }
+
+    @RequestMapping(path="/findAllOpen",method = RequestMethod.POST)
+    @ApiMethod(name = "findAllOpen",desc = "查询流水线最近状态")
+    public Result< List<PipelineOpen>> findAllOpen(){
+
+        List<PipelineOpen> openList = pipelineService.findAllOpen();
+
+        return Result.ok(openList);
+    }
+
 }
 
 

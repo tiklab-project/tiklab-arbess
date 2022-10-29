@@ -7,10 +7,15 @@ import net.tiklab.matflow.definition.dao.PipelineDao;
 import net.tiklab.matflow.definition.entity.PipelineEntity;
 import net.tiklab.matflow.definition.model.Pipeline;
 import net.tiklab.matflow.definition.model.PipelineMassage;
+import net.tiklab.matflow.execute.model.PipelineExecState;
+import net.tiklab.matflow.orther.entity.PipelineOpenEntity;
+import net.tiklab.matflow.orther.model.PipelineOpen;
 import net.tiklab.matflow.orther.service.PipelineHomeService;
+import net.tiklab.matflow.orther.service.PipelineOpenService;
 import net.tiklab.rpc.annotation.Exporter;
 import net.tiklab.user.user.model.DmUser;
 import net.tiklab.user.user.model.User;
+import net.tiklab.utils.context.LoginContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +36,7 @@ public class PipelineServiceImpl implements PipelineService {
     PipelineDao pipelineDao;
 
     @Autowired
-    PipelineConfigOrderService pipelineConfigOrderService;
+    PipelineConfigOrderService configOrderService;
 
     @Autowired
     JoinTemplate joinTemplate;
@@ -42,13 +47,17 @@ public class PipelineServiceImpl implements PipelineService {
     @Autowired
     PipelineHomeService homeService;
 
+    @Autowired
+    PipelineOpenService openService;
+
+
     private static final Logger logger = LoggerFactory.getLogger(PipelineServiceImpl.class);
 
     //创建
     @Override
     public String createPipeline(Pipeline pipeline) {
         //随机颜色
-        Random random = null;
+        Random random ;
         try {
             random = SecureRandom.getInstanceStrong();
         } catch (NoSuchAlgorithmException e) {
@@ -59,7 +68,7 @@ public class PipelineServiceImpl implements PipelineService {
         String pipelineId = pipelineDao.createPipeline(pipelineEntity);
         //创建模板配置
         if (pipeline.getPipelineType() != 1){
-            pipelineConfigOrderService.createTemplate(pipelineId, pipeline.getPipelineType());
+            configOrderService.createTemplate(pipelineId, pipeline.getPipelineType());
         }
 
         //动态
@@ -92,7 +101,7 @@ public class PipelineServiceImpl implements PipelineService {
         pipelineDao.deletePipeline(pipelineId);
         commonServer.updateDmUser(pipelineId,new DmUser(),false);//权限
         commonServer.delete(pipeline);//历史等
-        pipelineConfigOrderService.deleteConfig(pipelineId);//配置
+        configOrderService.deleteConfig(pipelineId);//配置
         //动态
         HashMap<String, String> map = new HashMap<>();
         map.put("message", "删除了流水线");
@@ -211,8 +220,7 @@ public class PipelineServiceImpl implements PipelineService {
 
         return commonServer.findAllStatus(pipelineFollow);
     }
-
-
+    
     //模糊查询
     @Override
     public List<PipelineMassage> findLikePipeline(String pipelineName, String userId) {
@@ -240,6 +248,64 @@ public class PipelineServiceImpl implements PipelineService {
         return commonServer.findAllStatus(pipelines);
     }
 
+    /**
+     * 查询最近打开的流水线
+     * @return 流水线
+     */
+    @Override
+    public List<PipelineOpen> findAllOpen() {
+        StringBuilder s = findUserPipelineId(LoginContext.getLoginId());
+        List<PipelineOpen> allOpen = openService.findAllOpen(s);
+        if (allOpen == null){
+            return Collections.emptyList();
+        }
+        allOpen.sort(Comparator.comparing(PipelineOpen::getNumber).reversed());
+        int min = Math.min(5, allOpen.size());
+        return allOpen.subList(0,min);
+    }
+
+
+    /**
+     * 流水线执行信息统计
+     * @param pipelineId 流水线id
+     * @return 统计信息
+     */
+    @Override
+     public PipelineExecState pipelineCensus(String pipelineId) {
+        Pipeline pipeline = findOnePipeline(pipelineId);
+        String loginId = LoginContext.getLoginId();
+        openService.findOpen(loginId,pipeline);
+        return commonServer.pipelineCensus(pipelineId);
+    }
+
 
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

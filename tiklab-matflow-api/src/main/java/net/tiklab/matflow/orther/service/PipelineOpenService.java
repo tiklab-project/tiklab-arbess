@@ -16,10 +16,9 @@ public interface PipelineOpenService {
 
     /**
      * 获取经常打开列表
-     * @param userId 用户id
      * @return 列表
      */
-    List<PipelineOpen> findAllOpen(String userId);
+    List<PipelineOpen> findAllOpen(StringBuilder s);
 
     /**
      * 删除流水线收藏

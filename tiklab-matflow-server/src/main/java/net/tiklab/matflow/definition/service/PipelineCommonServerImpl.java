@@ -5,16 +5,15 @@ import net.tiklab.matflow.definition.model.PipelineMassage;
 import net.tiklab.matflow.execute.model.PipelineExecHistory;
 import net.tiklab.matflow.execute.model.PipelineExecState;
 import net.tiklab.matflow.execute.service.PipelineExecHistoryService;
-import net.tiklab.matflow.orther.service.PipelineFileService;
+import net.tiklab.matflow.orther.model.PipelineOpen;
+import net.tiklab.matflow.orther.service.PipelineOpenService;
 import net.tiklab.matflow.orther.service.PipelineUntil;
 import net.tiklab.rpc.annotation.Exporter;
 import net.tiklab.user.user.model.DmUser;
 import net.tiklab.user.user.service.DmUserService;
-import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.io.File;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Service
@@ -212,6 +211,7 @@ public class PipelineCommonServerImpl implements PipelineCommonServer{
             return state;
         }
         state.setTime(PipelineUntil.formatDateTime(state.getExecTime()));
+
         return state;
     }
 

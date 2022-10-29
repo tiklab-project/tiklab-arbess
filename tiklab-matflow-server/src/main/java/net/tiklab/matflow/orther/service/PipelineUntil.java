@@ -6,9 +6,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.Properties;
-import java.util.ResourceBundle;
 import java.util.regex.Pattern;
 
 /**
@@ -102,7 +101,6 @@ public class PipelineUntil {
                     boolean state = deleteFile(new File(file, child));
                     int tryCount = 0;
                     while (!state && tryCount++ < 10) {
-
                         System.gc();
                         state = file.delete();
                     }
@@ -116,36 +114,16 @@ public class PipelineUntil {
     //获取文件流
     public static List<String> readFile(String path) {
         if (path == null){
-            return null;
+            return Collections.emptyList();
         }
         List<String> lines;
         try {
             lines = Files.readAllLines(Paths.get(path), StandardCharsets.UTF_8);
         } catch (IOException e) {
-            return  null;
+            return Collections.emptyList();
         }
         return lines;
     }
-
-    ////字符串写入文件中
-    //public static void writePrivateKeyPath(String massage, String filePath) throws IOException {
-    //    BufferedReader bufferedReader ;
-    //    BufferedWriter bufferedWriter;
-    //    File distFile= new File(filePath);
-    //    if (!distFile.getParentFile().exists()){
-    //       distFile.getParentFile().mkdirs();
-    //    }
-    //    bufferedReader = new BufferedReader(new StringReader(massage));
-    //    bufferedWriter = new BufferedWriter(new FileWriter(distFile));
-    //    char[] buf = new char[1024]; //?????
-    //    int len;
-    //    while ( (len = bufferedReader.read(buf)) != -1) {
-    //        bufferedWriter.write(buf, 0, len);
-    //    }
-    //    bufferedWriter.flush();
-    //    bufferedReader.close();
-    //    bufferedWriter.close();
-    //}
 
     //获取符合条件的文件名
     public static List<String> getFilePath(File path,List<String> list){

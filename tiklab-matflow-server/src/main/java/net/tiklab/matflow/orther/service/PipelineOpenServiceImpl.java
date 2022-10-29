@@ -9,9 +9,11 @@ import net.tiklab.matflow.orther.dao.PipelineOpenDao;
 import net.tiklab.matflow.orther.entity.PipelineOpenEntity;
 import net.tiklab.matflow.orther.model.PipelineOpen;
 import net.tiklab.rpc.annotation.Exporter;
+import net.tiklab.utils.context.LoginContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -25,25 +27,6 @@ public class PipelineOpenServiceImpl implements PipelineOpenService {
     @Autowired
     JoinTemplate joinTemplate;
 
-    @Autowired
-    PipelineService pipelineService;
-
-
-    //查询用户最近打开的流水线
-    @Override
-    public List<PipelineOpen> findAllOpen(String userId){
-        StringBuilder s = pipelineService.findUserPipelineId(userId);
-        if (s == null){
-            return null;
-        }
-        List<PipelineOpen> allOpen = findAllOpen(userId,s);
-        if (allOpen == null){
-            return null;
-        }
-        allOpen.sort(Comparator.comparing(PipelineOpen::getNumber,Comparator.reverseOrder()));
-        int size = Math.min(allOpen.size(), 4);
-        return allOpen.subList(0, size);
-    }
 
     //删除流水线所有最近打开信息
     @Override
@@ -125,8 +108,10 @@ public class PipelineOpenServiceImpl implements PipelineOpenService {
     }
 
     //查询流水线最近打开
-    private List<PipelineOpen> findAllOpen(String userId, StringBuilder s){
-        List<PipelineOpenEntity> allOpen = pipelineOpenDao.findAllOpen(userId,s);
+    @Override
+    public List<PipelineOpen> findAllOpen(StringBuilder s){
+        String loginId = LoginContext.getLoginId();
+        List<PipelineOpenEntity> allOpen = pipelineOpenDao.findAllOpen(loginId,s);
         List<PipelineOpen> list = BeanMapper.mapList(allOpen, PipelineOpen.class);
         joinTemplate.joinQuery(list);
         for (PipelineOpen pipelineOpen : list) {

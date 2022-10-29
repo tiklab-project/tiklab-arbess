@@ -33,7 +33,7 @@ public class PipelineWorkSpaceServiceImpl implements PipelineWorkSpaceService {
     @Override
     public List<FileTree> fileTree(String pipelineId, String userId){
         Pipeline pipeline = pipelineService.findOnePipeline(pipelineId);
-        if (pipeline == null)return null;
+        if (pipeline == null)return Collections.emptyList();
         pipelineOpenService.findOpen(userId, pipeline);
         //设置拉取地址
         String path = PipelineUntil.findFileAddress()+ pipeline.getPipelineName();
@@ -45,7 +45,7 @@ public class PipelineWorkSpaceServiceImpl implements PipelineWorkSpaceService {
             list.sort(Comparator.comparing(FileTree::getTreeType,Comparator.reverseOrder()));
             return list;
         }
-        return null;
+        return Collections.emptyList();
     }
 
     //读取文件信息
