@@ -55,7 +55,10 @@ public class PipelineCommonServerImpl implements PipelineCommonServer{
         String fileAddress = PipelineUntil.findFileAddress();
         File file = new File(fileAddress+lastName);
         if (file.exists()){
-            boolean b = file.renameTo(new File( fileAddress+newName));
+          boolean b=  file.renameTo(new File( fileAddress+newName));
+          if (!b){
+              return 0;
+          }
         }
         return 1;
     }
@@ -98,7 +101,7 @@ public class PipelineCommonServerImpl implements PipelineCommonServer{
         List<DmUser> allDmUser = dmUserService.findAllDmUser();
         //获取项目域条件
         StringBuilder s = new StringBuilder();
-        if (allDmUser != null && allDmUser.size() != 0){
+        if (allDmUser != null && !allDmUser.isEmpty()){
             for (DmUser dmUser : allDmUser) {
                 if (!dmUser.getUser().getId().equals(userId)){
                     continue;
@@ -139,7 +142,7 @@ public class PipelineCommonServerImpl implements PipelineCommonServer{
     public List<DmUser> findPipelineUser(String pipelineId) {
         List<DmUser> allDmUser = dmUserService.findAllDmUser();
         if (allDmUser == null){
-            return null;
+            return Collections.emptyList();
         }
         List<DmUser> dmUsers = new ArrayList<>();
         for (DmUser dmUser : allDmUser) {
@@ -210,38 +213,6 @@ public class PipelineCommonServerImpl implements PipelineCommonServer{
         }
         state.setTime(PipelineUntil.formatDateTime(state.getExecTime()));
         return state;
-    }
-
-   
-    public Map<String,Integer> findBuildState(List<Pipeline> list){
-        Map<String, Integer> map = new HashMap<>();
-        int success = 0,error = 0,hilt = 0;
-        if (list == null){
-            map.put("成功", success);
-            map.put("失败", error);
-            map.put("停止", hilt);
-            return map;
-        }
-        for (Pipeline pipeline : list) {
-            List<PipelineExecHistory> allHistory = historyService.findAllHistory(pipeline.getPipelineId());
-            if (allHistory == null){
-               continue;
-            }
-
-            for (PipelineExecHistory history : allHistory) {
-                int status = history.getStatus();
-                switch (status) {
-                    case 30 -> success = success + 1;
-                    case 10 -> hilt = hilt + 1;
-                    case 1 -> error = error + 1;
-                }
-            }
-        }
-
-        map.put("成功", success);
-        map.put("失败", error);
-        map.put("停止", hilt);
-        return map;
     }
 
 

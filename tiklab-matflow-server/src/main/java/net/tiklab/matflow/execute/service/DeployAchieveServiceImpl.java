@@ -1,14 +1,9 @@
-package net.tiklab.matflow.execute.service.execAchieveImpl;
+package net.tiklab.matflow.execute.service;
 
 import com.jcraft.jsch.*;
 import net.tiklab.matflow.definition.model.Pipeline;
-import net.tiklab.matflow.execute.model.PipelineExecLog;
-import net.tiklab.matflow.execute.service.execAchieveService.ConfigCommonService;
-import net.tiklab.matflow.orther.service.PipelineFileService;
 import net.tiklab.matflow.definition.model.PipelineDeploy;
 import net.tiklab.matflow.execute.model.PipelineExecHistory;
-import net.tiklab.matflow.execute.service.PipelineExecServiceImpl;
-import net.tiklab.matflow.execute.service.execAchieveService.DeployAchieveService;
 import net.tiklab.matflow.execute.model.PipelineProcess;
 import net.tiklab.matflow.orther.service.PipelineUntil;
 import net.tiklab.matflow.setting.model.Proof;

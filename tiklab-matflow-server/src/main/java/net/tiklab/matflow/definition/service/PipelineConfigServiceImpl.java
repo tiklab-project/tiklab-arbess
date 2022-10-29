@@ -1,7 +1,6 @@
 package net.tiklab.matflow.definition.service;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import net.tiklab.core.exception.ApplicationException;
 import net.tiklab.matflow.definition.model.*;
 import net.tiklab.matflow.orther.service.PipelineUntil;
@@ -9,6 +8,7 @@ import net.tiklab.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,7 +37,7 @@ public class PipelineConfigServiceImpl implements PipelineConfigService {
     public List<Object> findAllConfig(List<PipelineConfigOrder> allPipelineConfig){
         List<Object> list = new ArrayList<>();
         if (allPipelineConfig == null){
-            return null;
+            return Collections.emptyList();
         }
         for (PipelineConfigOrder pipelineConfigOrder : allPipelineConfig) {
             String taskId = pipelineConfigOrder.getTaskId();
@@ -100,6 +100,8 @@ public class PipelineConfigServiceImpl implements PipelineConfigService {
         return typeConfig;
     }
 
+    String message = "message";
+
     /**
      * 更新配置
      * @param config 更新数据
@@ -108,12 +110,10 @@ public class PipelineConfigServiceImpl implements PipelineConfigService {
      * @return 动态
      */
     public Map<String, String> updateConfig(PipelineConfigOrder config,PipelineConfigOrder typeConfig,String types) {
-        Pipeline pipeline = typeConfig.getPipeline();
         HashMap<String, String> map = new HashMap<>();
-        map.put("pipelineId", pipeline.getPipelineId());
-        map.put("pipelineName", pipeline.getPipelineName());
         //把值转换成json字符串
         String object = JSON.toJSONString(config.getValues());
+
         switch (types) {
             case "code" -> {
                 //字符串转换成对象
@@ -121,26 +121,29 @@ public class PipelineConfigServiceImpl implements PipelineConfigService {
                 pipelineCode.setCodeId(typeConfig.getTaskId());
                 pipelineCode.setType(config.getTaskType());
                 pipelineCodeService.updateCode(pipelineCode);
-                map.put("message", "源码管理配置");
+                map.put(message, "源码管理配置");
             }
             case "test" -> {
                 PipelineTest pipelineTest = JSON.parseObject(object, PipelineTest.class);
                 pipelineTest.setTestId(typeConfig.getTaskId());
                 pipelineTestService.updateTest(pipelineTest);
-                map.put("message",  "测试配置");
+                map.put(message,  "测试配置");
             }
             case "build" -> {
                 PipelineBuild pipelineBuild = JSON.parseObject(object, PipelineBuild.class);
                 pipelineBuild.setBuildId(typeConfig.getTaskId());
                 pipelineBuildService.updateBuild(pipelineBuild);
-                map.put("message",  "构建配置");
+                map.put(message,  "构建配置");
             }
             case "deploy" -> {
                 PipelineDeploy pipelineDeploy = JSON.parseObject(object, PipelineDeploy.class);
                 pipelineDeploy.setDeployId(typeConfig.getTaskId());
                 PipelineDeploy deploy = updateNumber(typeConfig, pipelineDeploy);
                 pipelineDeployService.updateDeploy(deploy);
-                map.put("message",  "部署配置");
+                map.put(message,  "部署配置");
+            }
+            default -> {
+                return map;
             }
         }
         return map;
@@ -165,25 +168,28 @@ public class PipelineConfigServiceImpl implements PipelineConfigService {
                 PipelineCode pipelineCode = JSON.parseObject(object, PipelineCode.class);
                 if (pipelineCode == null) pipelineCode = new PipelineCode();
                 id = pipelineCodeService.createCode(pipelineCode);
-                map.put("message", "源码管理配置");
+                map.put(message, "源码管理配置");
             }
             case "test" -> {
                 PipelineTest pipelineTest = JSON.parseObject(object, PipelineTest.class);
                 if (pipelineTest == null) pipelineTest=new PipelineTest();
                 id = pipelineTestService.createTest(pipelineTest);
-                map.put("message", "测试配置");
+                map.put(message, "测试配置");
             }
             case "build" -> {
                 PipelineBuild pipelineBuild = JSON.parseObject(object, PipelineBuild.class);
                 if (pipelineBuild == null) pipelineBuild = new PipelineBuild();
                 id = pipelineBuildService.createBuild(pipelineBuild);
-                map.put("message", "构建配置");
+                map.put(message, "构建配置");
             }
             case "deploy" -> {
                 PipelineDeploy pipelineDeploy = JSON.parseObject(object, PipelineDeploy.class);
                 if (pipelineDeploy == null) pipelineDeploy = new PipelineDeploy();
                 id = pipelineDeployService.createDeploy(pipelineDeploy);
-                map.put("message", "部署配置");
+                map.put(message, "部署配置");
+            }
+            default -> {
+                return map;
             }
         }
         if (id == null){
@@ -200,24 +206,26 @@ public class PipelineConfigServiceImpl implements PipelineConfigService {
      * @return 动态
      */
     public Map<String, String> deleteConfig( PipelineConfigOrder typeConfig ,String types){
-        Pipeline pipeline = typeConfig.getPipeline();
         HashMap<String, String> map = new HashMap<>();
         switch (types) {
             case "code" -> {
                 pipelineCodeService.deleteCode(typeConfig.getTaskId());
-                map.put("message","源码管理配置");
+                map.put(message,"源码管理配置");
             }
             case "test" -> {
                 pipelineTestService.deleteTest(typeConfig.getTaskId());
-                map.put("message","测试配置");
+                map.put(message,"测试配置");
             }
             case "build" -> {
                 pipelineBuildService.deleteBuild(typeConfig.getTaskId());
-                map.put("message","构建配置");
+                map.put(message,"构建配置");
             }
             case "deploy" -> {
                 pipelineDeployService.deleteDeploy(typeConfig.getTaskId());
-                map.put("message","部署配置");
+                map.put(message,"部署配置");
+            }
+            default -> {
+                return map;
             }
         }
         return map;
@@ -253,11 +261,8 @@ public class PipelineConfigServiceImpl implements PipelineConfigService {
                 if (!PipelineUntil.isNoNull(code.getCodeName())){
                     map.put("codeName", String.valueOf(type));
                 }
-            }else if (10<type && type<20){
-                PipelineTest test = pipelineTestService.findOneTest(taskId);
-            }else if (20<type && type<30){
-                PipelineBuild build = pipelineBuildService.findOneBuild(taskId);
-            }else if (30<type && type<40){
+            }
+            if (30<type && type<40){
                 PipelineDeploy deploy = pipelineDeployService.findOneDeploy(taskId);
                 if (!PipelineUntil.isNoNull(deploy.getSshIp()) && deploy.getDeployType() == 0){
                     map.put("sshIp", String.valueOf(type));
@@ -265,7 +270,7 @@ public class PipelineConfigServiceImpl implements PipelineConfigService {
             }
         }
         if(map.size() == 0){
-            return null;
+            return Collections.emptyMap();
         }
         return map;
     }

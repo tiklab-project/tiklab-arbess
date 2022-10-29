@@ -7,9 +7,7 @@ import net.tiklab.matflow.definition.service.PipelineConfigOrderService;
 import net.tiklab.matflow.definition.service.PipelineService;
 import net.tiklab.matflow.execute.model.PipelineExecHistory;
 import net.tiklab.matflow.execute.model.PipelineExecLog;
-import net.tiklab.matflow.execute.service.execAchieveService.ConfigCommonService;
 import net.tiklab.matflow.execute.model.PipelineProcess;
-import net.tiklab.matflow.execute.service.execAchieveService.PipelineTaskExecService;
 import net.tiklab.matflow.orther.service.PipelineHomeService;
 import net.tiklab.matflow.orther.service.PipelineUntil;
 import net.tiklab.rpc.annotation.Exporter;
@@ -67,16 +65,12 @@ public class PipelineExecServiceImpl implements PipelineExecService {
 
         homeService.message("matflowExec", "流水线"+pipeline.getPipelineName()+"开始执行");
 
-        try {
-            executorService.submit(() -> {
-                beginTime = new Timestamp(System.currentTimeMillis()).getTime();
-                Thread.currentThread().setName(pipelineId);
-                begin(pipeline,userId);
-            });
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            return 1;
-        }
+        executorService.submit(() -> {
+            beginTime = new Timestamp(System.currentTimeMillis()).getTime();
+            Thread.currentThread().setName(pipelineId);
+            begin(pipeline,userId);
+        });
+
         return 1;
     }
 

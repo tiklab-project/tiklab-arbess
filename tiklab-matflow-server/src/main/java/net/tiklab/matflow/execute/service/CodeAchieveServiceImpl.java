@@ -1,23 +1,14 @@
-package net.tiklab.matflow.execute.service.execAchieveImpl;
-
-
+package net.tiklab.matflow.execute.service;
 
 import net.tiklab.core.exception.ApplicationException;
 import net.tiklab.matflow.definition.model.Pipeline;
-import net.tiklab.matflow.execute.model.PipelineExecLog;
-import net.tiklab.matflow.execute.service.execAchieveService.ConfigCommonService;
-import net.tiklab.matflow.orther.service.PipelineFileService;
+import net.tiklab.matflow.execute.service.ConfigCommonService;
 import net.tiklab.matflow.definition.model.PipelineCode;
-import net.tiklab.matflow.definition.service.PipelineCodeServiceImpl;
-import net.tiklab.matflow.execute.model.PipelineExecHistory;
-import net.tiklab.matflow.execute.service.PipelineExecServiceImpl;
-import net.tiklab.matflow.execute.service.execAchieveService.CodeAchieveService;
+import net.tiklab.matflow.execute.service.CodeAchieveService;
 import net.tiklab.matflow.execute.model.PipelineProcess;
 import net.tiklab.matflow.orther.service.PipelineUntil;
 import net.tiklab.matflow.setting.model.Proof;
 import net.tiklab.rpc.annotation.Exporter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.io.File;
@@ -26,7 +17,6 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.sql.Timestamp;
-import java.util.List;
 
 /**
  * 源码管理执行方法
@@ -39,7 +29,6 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
     @Autowired
     ConfigCommonService commonService;
 
-    private static final Logger logger = LoggerFactory.getLogger(PipelineCodeServiceImpl.class);
 
     // git克隆
     public boolean clone(PipelineProcess pipelineProcess, PipelineCode pipelineCode){
@@ -57,12 +46,6 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
         //删除旧的代码
         PipelineUntil.deleteFile(file);
         commonService.execHistory(pipelineProcess,"分配源码空间。");
-
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
 
         commonService.execHistory(pipelineProcess,"空间分配成功。");
 
@@ -88,6 +71,11 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
 
         try {
             Process process = codeStart(proof, pipelineCode,pipeline.getPipelineName());
+            if (process == null){
+                commonService.execHistory(pipelineProcess,"代码拉取成功");
+                commonService.updateState(pipelineProcess,true);
+                return true;
+            }
             commonService.log(process.getInputStream(),process.getErrorStream(), pipelineProcess);
         } catch (IOException e) {
             commonService.execHistory(pipelineProcess,"系统执行命令错误 \n" + e);
@@ -154,8 +142,10 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
                     return PipelineUntil.process(svnAddress, gitOrder);
                 }
             }
+            default -> {
+                return null;
+            }
         }
-        return null;
     }
 
     /**

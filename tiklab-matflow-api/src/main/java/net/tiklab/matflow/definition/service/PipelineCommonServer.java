@@ -2,12 +2,9 @@ package net.tiklab.matflow.definition.service;
 
 import net.tiklab.matflow.definition.model.Pipeline;
 import net.tiklab.matflow.definition.model.PipelineMassage;
-import net.tiklab.matflow.execute.model.PipelineExecHistory;
 import net.tiklab.matflow.execute.model.PipelineExecState;
 import net.tiklab.user.user.model.DmUser;
-
 import java.util.List;
-import java.util.Map;
 
 public interface PipelineCommonServer {
 
@@ -62,6 +59,5 @@ public interface PipelineCommonServer {
     PipelineExecState pipelineCensus(String pipelineId);
 
 
-    Map<String,Integer> findBuildState(List<Pipeline> list);
 
 }

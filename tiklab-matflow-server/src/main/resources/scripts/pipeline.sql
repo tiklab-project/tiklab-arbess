@@ -15,19 +15,6 @@ create table pipeline  (
 );
 
 -- ----------------------------
--- Table structure for pipeline_activity
--- ----------------------------
-create table pipeline_activity  (
-  id varchar(255) ,
-  create_time datetime ,
-  user_id varchar(255) ,
-  massage varchar(255) ,
-  pipeline_id varchar(255) ,
-  news varchar(255) ,
-  PRIMARY KEY (id) USING BTREE
-);
-
--- ----------------------------
 -- Table structure for pipeline_build
 -- ----------------------------
 create table pipeline_build  (
@@ -192,5 +179,18 @@ create table pipeline_test  (
   test_order varchar(255)  COMMENT '测试命令',
   PRIMARY KEY (test_id) USING BTREE
 );
+
+-- ----------------------------
+-- Table structure for pipeline_authorization
+-- ----------------------------
+create table pipeline_authorize  (
+  id varchar(256) ,
+  type int ,
+  client_id varchar(255) ,
+  client_secret varchar(255) ,
+  callback_url varchar(255) ,
+  PRIMARY KEY (id) USING BTREE
+);
+
 
 

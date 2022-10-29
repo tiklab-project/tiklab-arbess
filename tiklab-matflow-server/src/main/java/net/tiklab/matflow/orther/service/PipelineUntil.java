@@ -127,25 +127,25 @@ public class PipelineUntil {
         return lines;
     }
 
-    //字符串写入文件中
-    public static void writePrivateKeyPath(String massage, String filePath) throws IOException {
-        BufferedReader bufferedReader ;
-        BufferedWriter bufferedWriter;
-        File distFile= new File(filePath);
-        if (!distFile.getParentFile().exists()){
-            boolean mkdirs = distFile.getParentFile().mkdirs();
-        }
-        bufferedReader = new BufferedReader(new StringReader(massage));
-        bufferedWriter = new BufferedWriter(new FileWriter(distFile));
-        char[] buf = new char[1024]; //?????
-        int len;
-        while ( (len = bufferedReader.read(buf)) != -1) {
-            bufferedWriter.write(buf, 0, len);
-        }
-        bufferedWriter.flush();
-        bufferedReader.close();
-        bufferedWriter.close();
-    }
+    ////字符串写入文件中
+    //public static void writePrivateKeyPath(String massage, String filePath) throws IOException {
+    //    BufferedReader bufferedReader ;
+    //    BufferedWriter bufferedWriter;
+    //    File distFile= new File(filePath);
+    //    if (!distFile.getParentFile().exists()){
+    //       distFile.getParentFile().mkdirs();
+    //    }
+    //    bufferedReader = new BufferedReader(new StringReader(massage));
+    //    bufferedWriter = new BufferedWriter(new FileWriter(distFile));
+    //    char[] buf = new char[1024]; //?????
+    //    int len;
+    //    while ( (len = bufferedReader.read(buf)) != -1) {
+    //        bufferedWriter.write(buf, 0, len);
+    //    }
+    //    bufferedWriter.flush();
+    //    bufferedReader.close();
+    //    bufferedWriter.close();
+    //}
 
     //获取符合条件的文件名
     public static List<String> getFilePath(File path,List<String> list){

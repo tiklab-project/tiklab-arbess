@@ -1,54 +1,27 @@
 package net.tiklab.matflow.execute.model;
 
 
-import net.tiklab.join.annotation.Join;
-import net.tiklab.postin.annotation.ApiModel;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
+import net.tiklab.matflow.orther.model.PipelineAuthorize;
+import org.springframework.stereotype.Service;
 
-@ApiModel
-@Join
-@Component
+@Service
 public class CodeAuthorizeApi {
 
-    //第三方应用id
-    @Value("${git.github.client.id}")
-    private String githubClientId;
-
-    @Value("${git.github.client.secret}")
-    private String githubClientSecret;
-
-    //回调地址
-    @Value("${git.github.callback.url}")
-    private String githubCallbackUri;
-
-    //第三方应用id
-    @Value("${git.gitee.client.id}")
-    private String giteeClientId;
-
-    @Value("${git.gitee.client.secret}")
-    private String giteeClientSecret;
-
-    //回调地址
-    @Value("${git.gitee.callback.url}")
-    private String giteeCallbackUri;
-
-
     //获取code （get）
-    public String getCode(Integer type) {
+    public  String getCode(PipelineAuthorize oneAuthorize, int type) {
         return switch (type) {
             case 2 ->
-                    "https://gitee.com/oauth/authorize?client_id=" + giteeClientId + "&redirect_uri=" + giteeCallbackUri + "&response_type=code";
+                    "https://gitee.com/oauth/authorize?client_id=" + oneAuthorize.getClientId() + "&redirect_uri=" + oneAuthorize.getCallbackUrl() + "&response_type=code";
             case 3 ->
-                    "https://github.com/login/oauth/authorize?client_id=" + githubClientId + "&callback_url=" + githubCallbackUri + "&scope=repo repo admin:org_hook user ";
+                    "https://github.com/login/oauth/authorize?client_id=" + oneAuthorize.getClientId() + "&callback_url=" + oneAuthorize.getCallbackUrl() + "&scope=repo repo admin:org_hook user ";
             default -> null;
         };
     }
 
     //获取accessToken
-    public String getAccessToken(String code, Integer type) {
+    public String getAccessToken(PipelineAuthorize oneAuthorize,String code, Integer type) {
         return switch (type) {
-            case 2 -> "https://gitee.com/oauth/token?grant_type=authorization_code&code=" + code + "&client_id=" + giteeClientId + "&redirect_uri=" + giteeCallbackUri + "&client_secret=" + giteeClientSecret;
+            case 2 -> "https://gitee.com/oauth/token?grant_type=authorization_code&code=" + code + "&client_id=" + oneAuthorize.getClientId() + "&redirect_uri=" + oneAuthorize.getCallbackUrl() + "&client_secret=" + oneAuthorize.getClientSecret();
             case 3 -> "https://github.com/login/oauth/access_token";
             default -> null;
         };
@@ -101,51 +74,4 @@ public class CodeAuthorizeApi {
         return "https://gitee.com/oauth/token?grant_type=refresh_token&refresh_token="+ refreshToken;
     }
 
-    public String getGithubClientId() {
-        return githubClientId;
-    }
-
-    public void setGithubClientId(String githubClientId) {
-        this.githubClientId = githubClientId;
-    }
-
-    public String getGithubClientSecret() {
-        return githubClientSecret;
-    }
-
-    public void setGithubClientSecret(String githubClientSecret) {
-        this.githubClientSecret = githubClientSecret;
-    }
-
-    public String getGithubCallbackUri() {
-        return githubCallbackUri;
-    }
-
-    public void setGithubCallbackUri(String githubCallbackUri) {
-        this.githubCallbackUri = githubCallbackUri;
-    }
-
-    public String getGiteeClientId() {
-        return giteeClientId;
-    }
-
-    public void setGiteeClientId(String giteeClientId) {
-        this.giteeClientId = giteeClientId;
-    }
-
-    public String getGiteeClientSecret() {
-        return giteeClientSecret;
-    }
-
-    public void setGiteeClientSecret(String giteeClientSecret) {
-        this.giteeClientSecret = giteeClientSecret;
-    }
-
-    public String getGiteeCallbackUri() {
-        return giteeCallbackUri;
-    }
-
-    public void setGiteeCallbackUri(String giteeCallbackUri) {
-        this.giteeCallbackUri = giteeCallbackUri;
-    }
 }

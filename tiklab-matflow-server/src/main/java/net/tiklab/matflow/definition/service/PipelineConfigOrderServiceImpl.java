@@ -12,7 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.*;
 
 /**
@@ -76,7 +75,7 @@ public class PipelineConfigOrderServiceImpl implements PipelineConfigOrderServic
     public List<Object> findAllConfig(String pipelineId){
         List<PipelineConfigOrder> allPipelineConfig = findAllPipelineConfig(pipelineId);
         if (allPipelineConfig == null){
-            return null;
+            return Collections.emptyList();
         }
         return pipelineConfigService.findAllConfig(allPipelineConfig);
     }
@@ -87,20 +86,14 @@ public class PipelineConfigOrderServiceImpl implements PipelineConfigOrderServic
         int type = config.getTaskType();
         joinTemplate.joinQuery(config);
         String pipelineId = config.getPipeline().getPipelineId();
-        String types = null;
+        String types ;
         String message = config.getMessage();
         switch (type) {
             case 1,2,3,4,5 -> types = "code";
             case 11,12,13,14 -> types = "test";
             case 21,22,23,24 -> types = "build";
             case 31,32,33 -> types = "deploy";
-        }
-        if (types == null){
-            throw new ApplicationException(50001, "找不到该类型");
-        }
-
-        if (message == null){
-            throw new ApplicationException(50001, "配置失败，无法获取操作属性。");
+            default ->   throw new ApplicationException(50001, "找不到该类型");
         }
 
         //判断配置类型
@@ -110,6 +103,7 @@ public class PipelineConfigOrderServiceImpl implements PipelineConfigOrderServic
             case "delete" -> deleteConfig(pipelineId,types,type);
             case "updateType" -> updateConfigType(config,types);
             case "order" -> updateOrder(pipelineId,config.getTaskSort(),config.getSort());
+            default -> throw new ApplicationException(50001, "配置失败，无法获取操作属性。");
         }
     }
 
@@ -117,7 +111,7 @@ public class PipelineConfigOrderServiceImpl implements PipelineConfigOrderServic
     @Override
     public List<PipelineConfigOrder> findAllPipelineConfig(String pipelineId){
         List<PipelineConfigOrderEntity> allConfigure = pipelineConfigOrderDao.findAllConfigure(pipelineId);
-        if (allConfigure == null || allConfigure.size() == 0) return null;
+        if (allConfigure == null || allConfigure.isEmpty()) return Collections.emptyList();
         List<PipelineConfigOrder> pipelineConfigOrders = BeanMapper.mapList(allConfigure, PipelineConfigOrder.class);
         //排序
         pipelineConfigOrders.sort(Comparator.comparing(PipelineConfigOrder::getTaskSort));
@@ -140,13 +134,8 @@ public class PipelineConfigOrderServiceImpl implements PipelineConfigOrderServic
      public Map<String, String> configValid(String pipelineId){
          List<PipelineConfigOrder> allPipelineConfig = findAllPipelineConfig(pipelineId);
          if (allPipelineConfig == null){
-             return null;
+             return Collections.emptyMap();
          }
-        try {
-            Thread.sleep(100);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
         return pipelineConfigService.configValid(allPipelineConfig);
      }
 
@@ -293,7 +282,7 @@ public class PipelineConfigOrderServiceImpl implements PipelineConfigOrderServic
      */
     public PipelineConfigOrder findTypeConfig(String pipelineId,int type){
         List<PipelineConfigOrder> allPipelineConfig = findAllPipelineConfig(pipelineId);
-        if (allPipelineConfig == null || allPipelineConfig.size() == 0) return null;
+        if (allPipelineConfig == null || allPipelineConfig.isEmpty()) return null;
         for (PipelineConfigOrder pipelineConfigOrder : allPipelineConfig) {
             int taskType = pipelineConfigOrder.getTaskType();
             if (taskType/10 != type/10){
@@ -345,7 +334,6 @@ public class PipelineConfigOrderServiceImpl implements PipelineConfigOrderServic
     //查询单个配置
     public PipelineConfigOrder findOneConfig(String configId){
         PipelineConfigOrderEntity oneConfigure = pipelineConfigOrderDao.findOneConfigure(configId);
-        PipelineConfigOrder order = BeanMapper.map(oneConfigure, PipelineConfigOrder.class);
         return BeanMapper.map(oneConfigure, PipelineConfigOrder.class);
     }
 

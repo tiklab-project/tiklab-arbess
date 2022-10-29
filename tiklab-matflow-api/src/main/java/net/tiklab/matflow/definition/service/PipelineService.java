@@ -7,11 +7,9 @@ import net.tiklab.join.annotation.FindOne;
 import net.tiklab.join.annotation.JoinProvider;
 import net.tiklab.matflow.definition.model.Pipeline;
 import net.tiklab.matflow.definition.model.PipelineMassage;
-
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 流水线
@@ -86,11 +84,5 @@ public interface PipelineService {
     List<PipelineMassage> findLikePipeline(String pipelineName, String userId);
 
 
-    /**
-     * 构建成功失败信息
-     * @param userId 用户id
-     * @return 信息
-     */
-    Map<String,Integer> findBuildState(String userId);
 
 }

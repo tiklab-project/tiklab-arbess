@@ -15,6 +15,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.*;
 
 /**
@@ -46,7 +48,12 @@ public class PipelineServiceImpl implements PipelineService {
     @Override
     public String createPipeline(Pipeline pipeline) {
         //随机颜色
-        Random random = new Random();
+        Random random = null;
+        try {
+            random = SecureRandom.getInstanceStrong();
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
         pipeline.setColor((random.nextInt(5) + 1));
         PipelineEntity pipelineEntity = BeanMapper.map(pipeline, PipelineEntity.class);
         String pipelineId = pipelineDao.createPipeline(pipelineEntity);
@@ -150,16 +157,6 @@ public class PipelineServiceImpl implements PipelineService {
     }
 
     /**
-     * 构建成功失败信息
-     * @param userId 用户id
-     * @return 信息
-     */
-    public Map<String,Integer> findBuildState(String userId){
-        List<Pipeline> allPipeline = findAllPipeline(userId);
-        return commonServer.findBuildState(allPipeline);
-    }
-
-    /**
      * 获取用户所有流水线
      * @param userId 用户id
      * @return 流水线
@@ -170,7 +167,7 @@ public class PipelineServiceImpl implements PipelineService {
         if (userPipeline != null){
             return BeanMapper.mapList(userPipeline, Pipeline.class);
         }
-        return null;
+        return Collections.emptyList();
     }
 
     //所有的流水线状态
@@ -178,7 +175,7 @@ public class PipelineServiceImpl implements PipelineService {
     public List<PipelineMassage> findUserPipeline(String userId){
         StringBuilder builder = findUserPipelineId(userId);
         if (builder == null){
-            return null;
+            return Collections.emptyList();
         }
         List<PipelineEntity> pipelineFollowEntity = pipelineDao.findPipelineFollow(userId,builder);
         List<Pipeline> pipelineFollow = BeanMapper.mapList(pipelineFollowEntity, Pipeline.class);
@@ -201,12 +198,12 @@ public class PipelineServiceImpl implements PipelineService {
     public List<PipelineMassage> findUserFollowPipeline(String userId) {
         StringBuilder builder = findUserPipelineId(userId);
         if (builder == null){
-            return null;
+            return Collections.emptyList();
         }
         List<PipelineEntity> pipelineFollowEntity = pipelineDao.findPipelineFollow(userId,builder);
         List<Pipeline> pipelineFollow = BeanMapper.mapList(pipelineFollowEntity, Pipeline.class);
         if (pipelineFollow == null){
-          return null;
+          return Collections.emptyList();
         }
         pipelineFollow.forEach(pipeline -> pipeline.setPipelineCollect(1));
         //排序
@@ -225,11 +222,11 @@ public class PipelineServiceImpl implements PipelineService {
         StringBuilder s = findUserPipelineId(userId);
 
         if (s == null){
-            return null;
+            return Collections.emptyList();
         }
         List<PipelineEntity> allPipeline = pipelineDao.findAllPipeline(s);
         if (list == null || allPipeline ==null){
-            return null;
+            return Collections.emptyList();
         }
         List<Pipeline> userPipeline = BeanMapper.mapList(allPipeline, Pipeline.class);
         ArrayList<Pipeline> pipelines = new ArrayList<>();
@@ -237,8 +234,8 @@ public class PipelineServiceImpl implements PipelineService {
             List<Pipeline> collect = list.stream().filter(pipeline1 -> pipeline.getPipelineId().equals(pipeline1.getPipelineId())).toList();
             pipelines.addAll(collect);
         }
-        if (pipelines.size() == 0){
-            return null;
+        if (pipelines.isEmpty()){
+            return Collections.emptyList();
         }
         return commonServer.findAllStatus(pipelines);
     }

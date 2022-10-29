@@ -1,9 +1,12 @@
 package net.tiklab.matflow.execute.service;
 
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import net.tiklab.matflow.execute.model.CodeAuthorizeApi;
+import net.tiklab.matflow.orther.model.PipelineAuthorize;
+import net.tiklab.matflow.orther.service.PipelineAuthorizeService;
 import net.tiklab.matflow.setting.model.Proof;
 import net.tiklab.matflow.setting.service.ProofService;
 import net.tiklab.rpc.annotation.Exporter;
@@ -44,30 +47,32 @@ public class CodeAuthorizeServiceImpl implements CodeAuthorizeService {
     @Autowired
     ProofService proofService;
 
+    @Autowired
+    PipelineAuthorizeService authorizeService;
+
     Map<String,Integer> mapState = new HashMap<>();
 
     private static final Logger logger = LoggerFactory.getLogger(CodeAuthorizeServiceImpl.class);
 
     //获取code
     public String findCode(int type){
-        return  codeAuthorizeApi.getCode(type);
+        PipelineAuthorize oneAuthorize = authorizeService.findOneAuthorize(type);
+        return  codeAuthorizeApi.getCode(oneAuthorize,type);
     }
 
     //获取accessToken
     @Override
     public String findAccessToken(String code,int type) throws IOException {
         String loginId = LoginContext.getLoginId();
-
+        PipelineAuthorize oneAuthorize = authorizeService.findOneAuthorize(type);
         if (code.equals("false")){
             mapState.put(loginId, 2);
             return null;
         }
 
-        logger.info("授权的code ：" +code);
-
-        String accessTokenUrl = codeAuthorizeApi.getAccessToken(code,type);
-        Map<String, String> map = new HashMap<>();
-        String username = null;
+        String accessTokenUrl = codeAuthorizeApi.getAccessToken(oneAuthorize,code,type);
+        Map<String, String> map;
+        String username ;
         switch (type) {
             case 2 -> {
                 map = giteeAccessToken(accessTokenUrl);
@@ -79,8 +84,10 @@ public class CodeAuthorizeServiceImpl implements CodeAuthorizeService {
                 String accessToken = map.get("accessToken");
                 username = gitHubUserMessage(accessToken);
             }
+            default -> {
+                return null;
+            }
         }
-        logger.info("获取到的accessToken : "+ map.get("accessToken"));
         Proof proof = new Proof(1,type,"password",username,map.get("accessToken"),map.get("refreshToken"),"授权登录",loginId);
         mapState.put(loginId, 1);
 
@@ -90,31 +97,27 @@ public class CodeAuthorizeServiceImpl implements CodeAuthorizeService {
     private Map<String, String> giteeAccessToken(String accessTokenUrl) throws IOException {
         String post = request(accessTokenUrl, "POST");
         Map<String, String> map = new HashMap<>();
-        JSONObject jsonObject = JSONObject.parseObject(post);
-        String access_token = jsonObject.getString("access_token");
-        String refresh_token = jsonObject.getString("refresh_token");
-        logger.info("Gitee的token值 : "+ access_token);
-        map.put("accessToken", access_token);
-        map.put("refreshToken", refresh_token);
+        JSONObject jsonObject = JSON.parseObject(post);
+        map.put("accessToken", jsonObject.getString("access_token"));
+        map.put("refreshToken", jsonObject.getString("refresh_token"));
         return map;
     }
 
     private Map<String, String> gitHubAccessToken(String code,String accessTokenUrl){
         Map<String, String> map = new HashMap<>();
-
+        PipelineAuthorize oneAuthorize = authorizeService.findOneAuthorize(2);
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
         MultiValueMap<String, Object> paramMap = new LinkedMultiValueMap<>();
-        paramMap.add("client_id", codeAuthorizeApi.getGithubClientId());
-        paramMap.add("client_secret", codeAuthorizeApi.getGithubClientSecret());
-        paramMap.add("callback_url", codeAuthorizeApi.getGithubCallbackUri());
+        paramMap.add("client_id", oneAuthorize.getClientId());
+        paramMap.add("client_secret", oneAuthorize.getClientSecret());
+        paramMap.add("callback_url", oneAuthorize.getCallbackUrl());
         paramMap.add("code",code);
         HttpEntity<MultiValueMap<String, Object>> entity = new HttpEntity<>(paramMap, headers);
         ResponseEntity<JSONObject> response = restTemplate.exchange(accessTokenUrl, HttpMethod.POST, entity, JSONObject.class);
         JSONObject body = response.getBody();
         if (body != null){
-            String access_token = body.getString("access_token");
-            map.put("accessToken",access_token) ;
+            map.put("accessToken",body.getString("access_token")) ;
         }
         return map;
     }
@@ -127,13 +130,13 @@ public class CodeAuthorizeServiceImpl implements CodeAuthorizeService {
 
         String allStorehouseAddress = codeAuthorizeApi.getAllStorehouse(accessToken,type);
         return switch (type) {
-            case 2 -> giteeAllStorehouse(accessToken, allStorehouseAddress);
+            case 2 -> giteeAllStorehouse( allStorehouseAddress);
             case 3 -> gitHubAllStorehouse(accessToken, allStorehouseAddress);
             default -> null;
         };
     }
 
-    private List<String> giteeAllStorehouse( String accessToken, String allStorehouseAddress) {
+    private List<String> giteeAllStorehouse( String allStorehouseAddress) {
         List<String> storehouseList = new ArrayList<>();
 
         //消息转换器列表
@@ -145,15 +148,15 @@ public class CodeAuthorizeServiceImpl implements CodeAuthorizeService {
 
         HttpStatus statusCode = returnBody.getStatusCode();
         if (statusCode.isError()){
-            return null;
+            return Collections.emptyList();
         }
 
         String body = returnBody.getBody();
         if (body == null){
-            return null;
+            return Collections.emptyList();
         }
-        logger.info("仓库信息 ： "+body);
-        JSONArray allStorehouseJson = JSONArray.parseArray(body);
+
+        JSONArray allStorehouseJson = JSON.parseArray(body);
         for (int i = 0; i < allStorehouseJson.size(); i++) {
             JSONObject storehouse=allStorehouseJson.getJSONObject(i);
             storehouseList.add(storehouse.getString("full_name"));
@@ -172,11 +175,10 @@ public class CodeAuthorizeServiceImpl implements CodeAuthorizeService {
         HttpEntity<MultiValueMap<String, Object>> entity = new HttpEntity<>(paramMap, headers);
         ResponseEntity<String> forEntity = restTemplate.exchange(allStorehouseAddress, HttpMethod.GET, entity, String.class);
         String body = forEntity.getBody();
-        logger.info("仓库信息 ："+body);
         if (body == null){
-            return null;
+            return Collections.emptyList();
         }
-        JSONArray allStorehouseJson = JSONArray.parseArray(body);
+        JSONArray allStorehouseJson = JSON.parseArray(body);
         for (int i = 0; i < allStorehouseJson.size(); i++) {
             JSONObject storehouse=allStorehouseJson.getJSONObject(i);
             list.add(storehouse.getString("full_name"));
@@ -192,21 +194,21 @@ public class CodeAuthorizeServiceImpl implements CodeAuthorizeService {
         String name = houseName.split("/")[0];
         String url = codeAuthorizeApi.getBranch(name,house,accessToken,type);
         return switch (type) {
-            case 2 -> giteeBranch(accessToken, url);
+            case 2 -> giteeBranch(url);
             case 3 -> gitHubBranch(accessToken, url);
             default -> null;
         };
 
     }
 
-    private List<String> giteeBranch(String accessToken,String url) {
+    private List<String> giteeBranch(String url) {
         ArrayList<String> branchList = new ArrayList<>();
         ResponseEntity<String> forEntity = restTemplate.getForEntity(url, String.class, JSONObject.class);
         HttpStatus statusCode = forEntity.getStatusCode();
         if (statusCode.isError()){
-            return null;
+            return Collections.emptyList();
         }
-        JSONArray branchS = JSONArray.parseArray(forEntity.getBody());
+        JSONArray branchS = JSON.parseArray(forEntity.getBody());
         if (branchS != null) {
             for (int i = 0; i < branchS.size(); i++) {
                 JSONObject jsonArray = branchS.getJSONObject(i);
@@ -225,11 +227,10 @@ public class CodeAuthorizeServiceImpl implements CodeAuthorizeService {
         HttpEntity<String> entity = new HttpEntity<>("body", headers);
         ResponseEntity<String> forEntity = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
         String body = forEntity.getBody();
-        logger.info("分支信息 ："+body);
         if (body == null){
-            return  null;
+            return Collections.emptyList();
         }
-        JSONArray allBranch = JSONArray.parseArray(body);
+        JSONArray allBranch = JSON.parseArray(body);
         for (int i = 0; i < allBranch.size(); i++) {
             JSONObject branch = allBranch.getJSONObject(i);
             list.add(branch.getString("name"));
@@ -237,13 +238,11 @@ public class CodeAuthorizeServiceImpl implements CodeAuthorizeService {
         return list;
     }
 
-
     //获取仓库的url
     @Override
     public String getHouseUrl(String proofId,String houseName,int type){
         Proof oneProof = proofService.findOneProof(proofId);
         String accessToken = oneProof.getProofPassword();
-        String username = oneProof.getProofUsername();
         if (houseName == null){
             return null;
         }
@@ -253,15 +252,15 @@ public class CodeAuthorizeServiceImpl implements CodeAuthorizeService {
         //获取仓库URl
         String oneStorehouse = codeAuthorizeApi.getOneHouse(name,house,accessToken,type);
         return switch (type) {
-            case 2 -> giteeHouseUrl(accessToken, oneStorehouse);
+            case 2 -> giteeHouseUrl(oneStorehouse);
             case 3 -> gitHubHouseUrl(accessToken, oneStorehouse);
             default -> null;
         };
     }
 
-    private String giteeHouseUrl(String accessToken, String oneStorehouse){
+    private String giteeHouseUrl( String oneStorehouse){
         ResponseEntity<String> forEntity1 = restTemplate.getForEntity(oneStorehouse, String.class, JSONObject.class);
-        JSONObject jsonObject = JSONObject.parseObject(forEntity1.getBody());
+        JSONObject jsonObject = JSON.parseObject(forEntity1.getBody());
         return jsonObject.getString("html_url");
 
     }
@@ -274,10 +273,9 @@ public class CodeAuthorizeServiceImpl implements CodeAuthorizeService {
         HttpEntity<MultiValueMap<String, Object>> entity = new HttpEntity<>(paramMap, headers);
         //获取仓库URl
         ResponseEntity<String> response = restTemplate.exchange(oneStorehouse, HttpMethod.GET, entity, String.class);
-        JSONObject jsonObject = JSONObject.parseObject(response.getBody());
+        JSONObject jsonObject = JSON.parseObject(response.getBody());
         return jsonObject.getString("html_url");
     }
-
 
     @Override
     public int findState() {
@@ -327,7 +325,6 @@ public class CodeAuthorizeServiceImpl implements CodeAuthorizeService {
         proofService.updateProof(oneProof);
     }
 
-
     /**
      * 访问url
      * @param url 访问地址
@@ -373,10 +370,8 @@ public class CodeAuthorizeServiceImpl implements CodeAuthorizeService {
             if (body== null){
                 return;
             }
-            String access_token = body.getString("access_token");
-            String refresh_token = body.getString("refresh_token");
-            proof.setProofPassword(access_token);
-            proof.setCallbackUrl(refresh_token);
+            proof.setProofPassword(body.getString("access_token"));
+            proof.setCallbackUrl( body.getString("refresh_token"));
             proofService.updateProof(proof);
         }
     }
