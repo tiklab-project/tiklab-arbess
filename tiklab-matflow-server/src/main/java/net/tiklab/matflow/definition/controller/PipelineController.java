@@ -1,7 +1,5 @@
 package net.tiklab.matflow.definition.controller;
 
-
-
 import net.tiklab.core.Result;
 import net.tiklab.matflow.definition.model.Pipeline;
 import net.tiklab.matflow.definition.model.PipelineMassage;
@@ -23,7 +21,6 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/pipeline")

@@ -29,6 +29,9 @@ public class PipelineConfigServiceImpl implements PipelineConfigService {
     @Autowired
     PipelineDeployService pipelineDeployService;
 
+    @Autowired
+    PipelineCodeScanService pipelineCodeScanService;
+
     /**
      * 获取所有配置
      * @param allPipelineConfig 配置关联信息
@@ -63,6 +66,11 @@ public class PipelineConfigServiceImpl implements PipelineConfigService {
                 deploy.setType(type);
                 deploy.setSort(taskSort);
                 list.add(deploy);
+            }else if (40<type && type<50){
+                PipelineCodeScan codeScan = pipelineCodeScanService.findOneCodeScan(taskId);
+                codeScan.setType(type);
+                codeScan.setSort(taskSort);
+                list.add(codeScan);
             }
         }
         return list;
@@ -96,6 +104,10 @@ public class PipelineConfigServiceImpl implements PipelineConfigService {
             PipelineDeploy oneDeploy = pipelineDeployService.findOneDeploy(taskId);
             oneDeploy.setType(taskType);
             typeConfig.setPipelineDeploy(oneDeploy);
+        }else if (40<type && type<50){
+            PipelineCodeScan codeScan = pipelineCodeScanService.findOneCodeScan(taskId);
+            codeScan.setType(taskType);
+            typeConfig.setPipelineCodeScan(codeScan);
         }
         return typeConfig;
     }
@@ -138,9 +150,14 @@ public class PipelineConfigServiceImpl implements PipelineConfigService {
             case "deploy" -> {
                 PipelineDeploy pipelineDeploy = JSON.parseObject(object, PipelineDeploy.class);
                 pipelineDeploy.setDeployId(typeConfig.getTaskId());
-                PipelineDeploy deploy = updateNumber(typeConfig, pipelineDeploy);
-                pipelineDeployService.updateDeploy(deploy);
+                pipelineDeployService.updateDeploy(pipelineDeploy);
                 map.put(message,  "部署配置");
+            }
+            case "codeScan" -> {
+                PipelineCodeScan pipelineCodeScan = JSON.parseObject(object, PipelineCodeScan.class);
+                pipelineCodeScan.setCodeScanId(typeConfig.getTaskId());
+                pipelineCodeScanService.updateCodeScan(pipelineCodeScan);
+                map.put(message,  "代码扫描配置");
             }
             default -> {
                 return map;
@@ -188,6 +205,12 @@ public class PipelineConfigServiceImpl implements PipelineConfigService {
                 id = pipelineDeployService.createDeploy(pipelineDeploy);
                 map.put(message, "部署配置");
             }
+            case "codeScan" -> {
+                PipelineCodeScan pipelineCodeScan = JSON.parseObject(object, PipelineCodeScan.class);
+                if (pipelineCodeScan == null) pipelineCodeScan = new PipelineCodeScan();
+                id = pipelineCodeScanService.createCodeScan(pipelineCodeScan);
+                map.put(message, "代码扫描配置");
+            }
             default -> {
                 return map;
             }
@@ -224,6 +247,10 @@ public class PipelineConfigServiceImpl implements PipelineConfigService {
                 pipelineDeployService.deleteDeploy(typeConfig.getTaskId());
                 map.put(message,"部署配置");
             }
+            case "codeSacn" -> {
+                pipelineCodeScanService.deleteCodeScan(typeConfig.getTaskId());
+                map.put(message,"代码扫描配置");
+            }
             default -> {
                 return map;
             }
@@ -231,27 +258,14 @@ public class PipelineConfigServiceImpl implements PipelineConfigService {
         return map;
     }
 
-    //保存顺序
-    private PipelineDeploy updateNumber(PipelineConfigOrder typeConfig,PipelineDeploy deploy){
-        PipelineDeploy oneDeploy = pipelineDeployService.findOneDeploy(typeConfig.getTaskId());
-        if (deploy.getMappingPort() == 0){
-            deploy.setMappingPort(oneDeploy.getMappingPort());
-        }
-        if (deploy.getSshPort() == 0){
-            deploy.setSshPort(oneDeploy.getSshPort());
-        }
-        if (deploy.getStartPort() == 0){
-            deploy.setStartPort(oneDeploy.getStartPort());
-        }
-        return deploy;
-    }
+
 
     /**
      * 效验必填字段
      * @param configOrderList 所有配置
      * @return 效验信息
      */
-    public  Map<String, String> configValid(List<PipelineConfigOrder> configOrderList){
+    public Map<String, String> configValid(List<PipelineConfigOrder> configOrderList){
         Map<String, String> map = new HashMap<>();
         for (PipelineConfigOrder pipelineConfigOrder : configOrderList) {
             int type = pipelineConfigOrder.getTaskType();

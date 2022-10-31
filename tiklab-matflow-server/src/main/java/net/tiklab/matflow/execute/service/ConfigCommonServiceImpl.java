@@ -54,7 +54,7 @@ public class ConfigCommonServiceImpl implements ConfigCommonService {
 
         int taskType = pipelineProcess.getPipelineExecLog().getTaskType();
         String encode = "GBK";
-        if (taskType >= 30){
+        if (taskType >= 30 && taskType<40){
             encode = "UTF-8";
         }
 
@@ -68,11 +68,11 @@ public class ConfigCommonServiceImpl implements ConfigCommonService {
         while ((s = bufferedReader.readLine()) != null) {
             logRunLog = logRunLog + s +"\n";
             execHistory(pipelineProcess,s);
-            if (logRunLog.contains("BUILD FAILURE")||logRunLog.contains("ERROR")) {
-                inputStreamReader.close();
-                bufferedReader.close();
-                return 0;
-            }
+//            if (logRunLog.contains("BUILD FAILURE")||logRunLog.contains("ERROR")) {
+//                inputStreamReader.close();
+//                bufferedReader.close();
+//                return 0;
+//            }
         }
         if (logRunLog == null){
             inputStreamReader = PipelineUntil.encode(errInputStream, encode);

@@ -32,7 +32,6 @@ public interface PipelineDeployService {
      */
     void updateDeploy(PipelineDeploy pipelineDeploy);
 
-
     /**
      * 查询单个信息
      * @param deployId pipelineDeployId

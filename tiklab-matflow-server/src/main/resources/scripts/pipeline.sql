@@ -192,5 +192,54 @@ create table pipeline_authorize  (
   PRIMARY KEY (id) USING BTREE
 );
 
+-- ----------------------------
+-- Table structure for pipeline_code_scan
+-- ----------------------------
+create table pipeline_code_scan  (
+    id varchar(256)  COMMENT 'id',
+    type int  COMMENT '类型',
+    auth_id varchar(256)  COMMENT '授权id',
+    project_name varchar(256)  COMMENT '授权id',
+    PRIMARY KEY (id) USING BTREE
+);
+
+
+create table pipeline_auth  (
+    id varchar(256)  COMMENT '凭证id',
+    name varchar(256)  COMMENT '名称',
+    type int  COMMENT '类型',
+    auth_type int  COMMENT '授权类型',
+    url varchar(256)  COMMENT '地址',
+    create_time varchar(256)  COMMENT '创建时间',
+    username longtext  COMMENT '用户名',
+    password varchar(256)  COMMENT '密码',
+    token varchar(255)  COMMENT '凭证',
+    PRIMARY KEY (id) USING BTREE
+);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 

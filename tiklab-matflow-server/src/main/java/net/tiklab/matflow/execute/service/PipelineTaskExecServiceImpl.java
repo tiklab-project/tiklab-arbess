@@ -20,6 +20,9 @@ public class PipelineTaskExecServiceImpl implements PipelineTaskExecService {
     @Autowired
     DeployAchieveService deploy ;
 
+    @Autowired
+    CodeScanService scanService;
+
     public boolean beginState(PipelineProcess pipelineProcess, PipelineConfigOrder oneConfig, int type){
         boolean state = true;
         if (type < 10){
@@ -30,6 +33,8 @@ public class PipelineTaskExecServiceImpl implements PipelineTaskExecService {
             state  = build.build(pipelineProcess, oneConfig.getPipelineBuild());
         }else if (30<type && type<40){
             state  = deploy.deploy(pipelineProcess, oneConfig.getPipelineDeploy());
+        }else if (40<type && type<50){
+            state  = scanService.codeScan(pipelineProcess, oneConfig.getPipelineCodeScan());
         }
         return state;
     }

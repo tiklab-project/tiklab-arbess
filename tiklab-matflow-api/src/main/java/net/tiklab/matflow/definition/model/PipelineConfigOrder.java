@@ -53,6 +53,8 @@ public class PipelineConfigOrder {
 
     private PipelineDeploy pipelineDeploy;
 
+    private PipelineCodeScan pipelineCodeScan;
+
     //信息
     private String message;
 
@@ -187,5 +189,13 @@ public class PipelineConfigOrder {
 
     public void setConfigOrder(PipelineConfigOrder configOrder) {
         this.configOrder = configOrder;
+    }
+
+    public PipelineCodeScan getPipelineCodeScan() {
+        return pipelineCodeScan;
+    }
+
+    public void setPipelineCodeScan(PipelineCodeScan pipelineCodeScan) {
+        this.pipelineCodeScan = pipelineCodeScan;
     }
 }

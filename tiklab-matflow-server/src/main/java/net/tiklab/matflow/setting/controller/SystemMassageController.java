@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(name = "SystemMassageController",desc = "系统信息")
 public class SystemMassageController {
 
+
     @Autowired
     SystemMassageService systemMassageService;
 
@@ -27,11 +28,4 @@ public class SystemMassageController {
         SystemMassage systemMassage = systemMassageService.getSystemMassage();
         return Result.ok(systemMassage);
     }
-
-    //@RequestMapping(path="/getSystemLog",method = RequestMethod.POST)
-    //@ApiMethod(name = "getSystemLog",desc = "获取系统日志")
-    //public Result<List<String>> getSystemLog(){
-    //    List<String> systemLog = systemMassageService.getSystemLog();
-    //    return Result.ok(systemLog);
-    //}
 }

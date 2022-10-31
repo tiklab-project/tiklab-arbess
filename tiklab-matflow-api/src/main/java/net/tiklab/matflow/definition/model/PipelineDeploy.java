@@ -59,8 +59,6 @@ public class PipelineDeploy {
     private String deployOrder;
 
 
-
-
     public String getDeployId() {
         return deployId;
     }

@@ -16,7 +16,6 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.aspectj</groupId>
@@ -65,6 +64,23 @@
             <artifactId>tiklab-message-api</artifactId>
             <version>1.0.0-SNAPSHOT</version>
         </dependency>
+
+
+<!--        <profile>-->
+<!--            <id>sonar</id>-->
+<!--            <activation>-->
+<!--                <activeByDefault>true</activeByDefault>-->
+<!--            </activation>-->
+<!--            <properties>-->
+<!--                <sonar.login>admin</sonar.login>-->
+<!--                <sonar.password>123456</sonar.password>-->
+<!--                <sonar.host.url>http://localhost:9000</sonar.host.url>-->
+<!--            </properties>-->
+<!--        </profile>-->
+
+
+
+
 
     </dependencies>
     <build>

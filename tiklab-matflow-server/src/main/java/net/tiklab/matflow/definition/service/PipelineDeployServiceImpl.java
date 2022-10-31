@@ -5,6 +5,7 @@ import net.tiklab.beans.BeanMapper;
 import net.tiklab.join.JoinTemplate;
 import net.tiklab.matflow.definition.dao.PipelineDeployDao;
 import net.tiklab.matflow.definition.entity.PipelineDeployEntity;
+import net.tiklab.matflow.definition.model.PipelineConfigOrder;
 import net.tiklab.matflow.definition.model.PipelineDeploy;
 import net.tiklab.matflow.setting.model.Proof;
 import net.tiklab.matflow.setting.service.ProofService;
@@ -57,11 +58,26 @@ public class PipelineDeployServiceImpl implements PipelineDeployService {
     public List<PipelineDeploy> findAllDeployList(List<String> idList) {
         return BeanMapper.mapList(pipelineDeployDao.findAllCodeList(idList), PipelineDeploy.class);
     }
-
     //修改
     @Override
     public void updateDeploy(PipelineDeploy pipelineDeploy) {
-        pipelineDeployDao.updateDeploy(BeanMapper.map(pipelineDeploy, PipelineDeployEntity.class));
+        PipelineDeploy deploy = updateNumber(pipelineDeploy.getDeployId(), pipelineDeploy);
+        pipelineDeployDao.updateDeploy(BeanMapper.map(deploy, PipelineDeployEntity.class));
     }
+
+    private PipelineDeploy updateNumber(String deployId, PipelineDeploy deploy){
+        PipelineDeploy oneDeploy = findOneDeploy(deployId);
+        if (deploy.getMappingPort() == 0){
+            deploy.setMappingPort(oneDeploy.getMappingPort());
+        }
+        if (deploy.getSshPort() == 0){
+            deploy.setSshPort(oneDeploy.getSshPort());
+        }
+        if (deploy.getStartPort() == 0){
+            deploy.setStartPort(oneDeploy.getStartPort());
+        }
+        return deploy;
+    }
+
 
 }
