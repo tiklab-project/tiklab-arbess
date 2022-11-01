@@ -51,7 +51,7 @@ public class ConfigCommonServiceImpl implements ConfigCommonService {
      */
     @Override
     public int log(InputStream inputStream,InputStream errInputStream, PipelineProcess pipelineProcess) throws IOException {
-
+        int state = 1;
         int taskType = pipelineProcess.getPipelineExecLog().getTaskType();
         String encode = "GBK";
         if (taskType >= 30 && taskType<40){
@@ -68,11 +68,9 @@ public class ConfigCommonServiceImpl implements ConfigCommonService {
         while ((s = bufferedReader.readLine()) != null) {
             logRunLog = logRunLog + s +"\n";
             execHistory(pipelineProcess,s);
-//            if (logRunLog.contains("BUILD FAILURE")||logRunLog.contains("ERROR")) {
-//                inputStreamReader.close();
-//                bufferedReader.close();
-//                return 0;
-//            }
+            if (logRunLog.contains("BUILD FAILURE")||logRunLog.contains("ERROR")) {
+                state = 0 ;
+            }
         }
         if (logRunLog == null){
             inputStreamReader = PipelineUntil.encode(errInputStream, encode);
@@ -84,8 +82,7 @@ public class ConfigCommonServiceImpl implements ConfigCommonService {
         }
         inputStreamReader.close();
         bufferedReader.close();
-
-        return 1;
+        return state;
     }
 
     /**

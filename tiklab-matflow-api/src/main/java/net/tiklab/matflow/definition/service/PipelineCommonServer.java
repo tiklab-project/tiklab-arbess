@@ -19,9 +19,8 @@ public interface PipelineCommonServer {
      * 流水线更改名称时更新源文件名称
      * @param newName 新的名称
      * @param lastName 旧的名称
-     * @return 更新状态
      */
-    int updatePipeline(String newName, String lastName);
+    void updatePipeline(String newName, String lastName);
 
     /**
      * 获取流水线状态

@@ -1,7 +1,7 @@
 package net.tiklab.matflow.setting.entity;
 
 import net.tiklab.dal.jpa.annotation.*;
-
+import net.tiklab.matflow.orther.service.PipelineUntil;
 
 
 @Entity
@@ -26,7 +26,7 @@ public class PipelineAuthEntity {
     private String url;
 
     @Column(name = "create_time")
-    private String createTime;
+    private String createTime = PipelineUntil.date;
 
     @Column(name = "username")
     private String username;

@@ -60,6 +60,9 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
         }
         //分支
         String codeBranch = pipelineCode.getCodeBranch();
+        if(!PipelineUntil.isNoNull(codeBranch)){
+            codeBranch = "master";
+        }
         //更新日志
         String s = "开始拉取代码 : " + "\n"
                 + "FileAddress : " + file + "\n"

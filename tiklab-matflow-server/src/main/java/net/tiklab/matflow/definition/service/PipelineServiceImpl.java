@@ -186,20 +186,16 @@ public class PipelineServiceImpl implements PipelineService {
         if (builder == null){
             return Collections.emptyList();
         }
-        List<PipelineEntity> pipelineFollowEntity = pipelineDao.findPipelineFollow(userId,builder);
-        List<Pipeline> pipelineFollow = BeanMapper.mapList(pipelineFollowEntity, Pipeline.class);
-
-        List<Pipeline> pipelineNotFollow = new ArrayList<>();
-        if (pipelineFollow != null){
-            List<PipelineEntity> pipelineNotFollowEntity = pipelineDao.findPipelineNotFollow(userId,builder);
-            pipelineNotFollow = BeanMapper.mapList(pipelineNotFollowEntity, Pipeline.class);
-            pipelineFollow.forEach(pipeline -> pipeline.setPipelineCollect(1));
-            pipelineNotFollow.addAll(pipelineFollow);
-        }
+        List<PipelineEntity> pipelineNotFollowEntity = pipelineDao.findPipelineNotFollow(userId,builder);
+        List<Pipeline> pipelineNotFollow = BeanMapper.mapList(pipelineNotFollowEntity, Pipeline.class);
+        List<PipelineMassage> allStatus = commonServer.findAllStatus(pipelineNotFollow);
+        joinTemplate.joinQuery(allStatus);
+        List<PipelineMassage> userFollowPipeline = findUserFollowPipeline(userId);
+        allStatus.addAll(userFollowPipeline);
         //排序
-        pipelineNotFollow.sort(Comparator.comparing(Pipeline::getPipelineName));
+        allStatus.sort(Comparator.comparing(PipelineMassage::getPipelineName));
 
-        return commonServer.findAllStatus(pipelineNotFollow);
+        return allStatus;
     }
 
     //获取用户收藏的流水线
@@ -217,8 +213,9 @@ public class PipelineServiceImpl implements PipelineService {
         pipelineFollow.forEach(pipeline -> pipeline.setPipelineCollect(1));
         //排序
         pipelineFollow.sort(Comparator.comparing(Pipeline::getPipelineName));
-
-        return commonServer.findAllStatus(pipelineFollow);
+        List<PipelineMassage> allStatus = commonServer.findAllStatus(pipelineFollow);
+        joinTemplate.joinQuery(allStatus);
+        return allStatus;
     }
     
     //模糊查询

@@ -7,7 +7,6 @@ import net.tiklab.postin.annotation.ApiProperty;
 /**
  * 流水线
  */
-
 @Entity
 @Table(name="pipeline")
 public class PipelineEntity {

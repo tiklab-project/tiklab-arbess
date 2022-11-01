@@ -1,5 +1,7 @@
 package net.tiklab.matflow.definition.service;
 
+import net.tiklab.join.JoinTemplate;
+import net.tiklab.join.annotation.Join;
 import net.tiklab.matflow.definition.model.Pipeline;
 import net.tiklab.matflow.definition.model.PipelineMassage;
 import net.tiklab.matflow.execute.model.PipelineExecHistory;
@@ -24,6 +26,9 @@ public class PipelineCommonServerImpl implements PipelineCommonServer{
     DmUserService dmUserService;
 
     @Autowired
+    JoinTemplate joinTemplate;
+
+    @Autowired
     PipelineExecHistoryService historyService;
 
 
@@ -46,20 +51,15 @@ public class PipelineCommonServerImpl implements PipelineCommonServer{
      * 流水线更改名称时更新源文件夹名称
      * @param newName 新的名称
      * @param lastName 旧的名称
-     * @return 更新状态
      */
     @Override
-    public int updatePipeline(String newName, String lastName) {
+    public void updatePipeline(String newName, String lastName) {
         //更改对应文件名
         String fileAddress = PipelineUntil.findFileAddress();
         File file = new File(fileAddress+lastName);
         if (file.exists()){
-          boolean b=  file.renameTo(new File( fileAddress+newName));
-          if (!b){
-              return 0;
-          }
+         file.renameTo(new File( fileAddress+newName));
         }
-        return 1;
     }
 
     //获取流水线状态
@@ -67,6 +67,7 @@ public class PipelineCommonServerImpl implements PipelineCommonServer{
     public List<PipelineMassage> findAllStatus(List<Pipeline> allPipeline){
         List<PipelineMassage> pipelineMassageList = new ArrayList<>();
         for (Pipeline pipeline : allPipeline) {
+            joinTemplate.joinQuery(pipeline);
             PipelineMassage pipelineMassage = new PipelineMassage();
             //成功和构建时间
             PipelineExecHistory latelyHistory = historyService.findLatelyHistory(pipeline.getPipelineId());
@@ -78,6 +79,7 @@ public class PipelineCommonServerImpl implements PipelineCommonServer{
             pipelineMassage.setPipelineState(pipeline.getPipelineState());
             pipelineMassage.setCreateTime(pipeline.getPipelineCreateTime());
             pipelineMassage.setColor(pipeline.getColor());
+            pipelineMassage.setUserName(pipeline.getUser().getName());
             if (latelyHistory != null){
                 pipelineMassage.setLastBuildTime(latelyHistory.getCreateTime());
                 pipelineMassage.setBuildStatus(latelyHistory.getRunStatus());
