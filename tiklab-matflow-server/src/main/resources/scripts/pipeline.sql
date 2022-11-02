@@ -203,7 +203,9 @@ create table pipeline_code_scan  (
     PRIMARY KEY (id) USING BTREE
 );
 
-
+-- ----------------------------
+-- Table structure for pipeline_auth
+-- ----------------------------
 create table pipeline_auth  (
     id varchar(256)  COMMENT '凭证id',
     name varchar(256)  COMMENT '名称',
@@ -216,6 +218,21 @@ create table pipeline_auth  (
     token varchar(255)  COMMENT '凭证',
     PRIMARY KEY (id) USING BTREE
 );
+
+-- ----------------------------
+-- Table structure for pipeline_product
+-- ----------------------------
+create table pipeline_product  (
+    id varchar(256)  COMMENT 'id',
+    group_id varchar(255)  COMMENT 'groupId',
+    artifact_id varchar(256)  COMMENT 'artifactId',
+    version varchar(256)  COMMENT 'version',
+    file_type varchar(256)  COMMENT '文件类型',
+    file_address varchar(256)  COMMENT '文件地址',
+    auth_id varchar(256)  COMMENT '凭证id',
+    PRIMARY KEY (id) USING BTREE
+);
+
 
 
 

@@ -32,6 +32,9 @@ public class PipelineConfigServiceImpl implements PipelineConfigService {
     @Autowired
     PipelineCodeScanService pipelineCodeScanService;
 
+    @Autowired
+    PipelineProductServer pipelineProductServer;
+
     /**
      * 获取所有配置
      * @param allPipelineConfig 配置关联信息
@@ -71,6 +74,11 @@ public class PipelineConfigServiceImpl implements PipelineConfigService {
                 codeScan.setType(type);
                 codeScan.setSort(taskSort);
                 list.add(codeScan);
+            }else if (50<type && type<60){
+                PipelineProduct product = pipelineProductServer.findOneProduct(taskId);
+                product.setType(type);
+                product.setSort(taskSort);
+                list.add(product);
             }
         }
         return list;
@@ -108,6 +116,10 @@ public class PipelineConfigServiceImpl implements PipelineConfigService {
             PipelineCodeScan codeScan = pipelineCodeScanService.findOneCodeScan(taskId);
             codeScan.setType(taskType);
             typeConfig.setPipelineCodeScan(codeScan);
+        }else if (50<type && type<60){
+            PipelineProduct product = pipelineProductServer.findOneProduct(taskId);
+            product.setType(taskType);
+            typeConfig.setPipelineProduct(product);
         }
         return typeConfig;
     }
@@ -158,6 +170,12 @@ public class PipelineConfigServiceImpl implements PipelineConfigService {
                 pipelineCodeScan.setCodeScanId(typeConfig.getTaskId());
                 pipelineCodeScanService.updateCodeScan(pipelineCodeScan);
                 map.put(message,  "代码扫描配置");
+            }
+            case "product" -> {
+                PipelineProduct product = JSON.parseObject(object, PipelineProduct.class);
+                product.setProductId(typeConfig.getTaskId());
+                pipelineProductServer.updateProduct(product);
+                map.put(message,  "推送制品配置");
             }
             default -> {
                 return map;
@@ -210,6 +228,11 @@ public class PipelineConfigServiceImpl implements PipelineConfigService {
                 if (pipelineCodeScan == null) pipelineCodeScan = new PipelineCodeScan();
                 id = pipelineCodeScanService.createCodeScan(pipelineCodeScan);
                 map.put(message, "代码扫描配置");
+            } case "product" -> {
+                PipelineProduct product = JSON.parseObject(object, PipelineProduct.class);
+                if (product == null) product = new PipelineProduct();
+                id = pipelineProductServer.createProduct(product);
+                map.put(message,  "推送制品配置");
             }
             default -> {
                 return map;
@@ -230,26 +253,30 @@ public class PipelineConfigServiceImpl implements PipelineConfigService {
      */
     public Map<String, String> deleteConfig( PipelineConfigOrder typeConfig ,String types){
         HashMap<String, String> map = new HashMap<>();
+        String taskId = typeConfig.getTaskId();
         switch (types) {
             case "code" -> {
-                pipelineCodeService.deleteCode(typeConfig.getTaskId());
+                pipelineCodeService.deleteCode(taskId);
                 map.put(message,"源码管理配置");
             }
             case "test" -> {
-                pipelineTestService.deleteTest(typeConfig.getTaskId());
+                pipelineTestService.deleteTest(taskId);
                 map.put(message,"测试配置");
             }
             case "build" -> {
-                pipelineBuildService.deleteBuild(typeConfig.getTaskId());
+                pipelineBuildService.deleteBuild(taskId);
                 map.put(message,"构建配置");
             }
             case "deploy" -> {
-                pipelineDeployService.deleteDeploy(typeConfig.getTaskId());
+                pipelineDeployService.deleteDeploy(taskId);
                 map.put(message,"部署配置");
             }
-            case "codeSacn" -> {
-                pipelineCodeScanService.deleteCodeScan(typeConfig.getTaskId());
+            case "codeScan" -> {
+                pipelineCodeScanService.deleteCodeScan(taskId);
                 map.put(message,"代码扫描配置");
+            } case "product" -> {
+               pipelineProductServer.deleteProduct(taskId);
+                map.put(message,  "推送制品配置");
             }
             default -> {
                 return map;

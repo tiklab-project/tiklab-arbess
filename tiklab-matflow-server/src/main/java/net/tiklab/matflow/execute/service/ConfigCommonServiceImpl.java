@@ -257,7 +257,7 @@ public class ConfigCommonServiceImpl implements ConfigCommonService {
      * @param pipelineProcess 执行信息
      * @param b 异常
      */
-    public void updateState(PipelineProcess pipelineProcess, boolean b){
+    public boolean updateState(PipelineProcess pipelineProcess, boolean b){
         long beginTime = pipelineProcess.getBeginTime();
         long overTime = new Timestamp(System.currentTimeMillis()).getTime();
         int time = (int) (overTime - beginTime) / 1000;
@@ -272,6 +272,7 @@ public class ConfigCommonServiceImpl implements ConfigCommonService {
             pipelineExecLog.setRunState(1);
         }
         logService.updateLog(pipelineExecLog);
+        return b;
     }
 
 }

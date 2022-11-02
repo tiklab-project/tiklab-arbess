@@ -14,14 +14,14 @@ import java.sql.Timestamp;
 
 @Service
 @Exporter
-public class CodeScanServiceImpl implements CodeScanService {
+public class CodeScanAchieveServiceImpl implements CodeScanService {
 
 
     @Autowired
     ConfigCommonService commonService;
 
     /**
-     * 源码管理
+     * 扫描代码
      * @param pipelineProcess 执行信息
      * @param pipelineCodeScan 配置信息
      * @return 执行状态
@@ -36,18 +36,20 @@ public class CodeScanServiceImpl implements CodeScanService {
         try {
             Process process = getOrder(pipelineProcess,pipelineCodeScan,fileAddress+pipeline.getPipelineName());
             if (process == null){
-                commonService.execHistory(pipelineProcess,"代码扫描执行错误");
-                commonService.updateState(pipelineProcess,false);
-                return false;
+                commonService.execHistory(pipelineProcess,"代码扫描执行失败");
+                return commonService.updateState(pipelineProcess,false);
             }
-            commonService.log(process.getInputStream(),process.getErrorStream(),pipelineProcess);
+            int log = commonService.log(process.getInputStream(), process.getErrorStream(), pipelineProcess);
+            if (log == 0){
+                commonService.execHistory(pipelineProcess,"代码扫描失败");
+                return commonService.updateState(pipelineProcess,false);
+            }
         } catch (IOException |ApplicationException e) {
             commonService.execHistory(pipelineProcess,"代码扫描执行错误\n"+e.getMessage());
-            commonService.updateState(pipelineProcess,false);
+            return commonService.updateState(pipelineProcess,false);
         }
         commonService.execHistory(pipelineProcess,"代码扫描完成");
-        commonService.updateState(pipelineProcess,true);
-        return true;
+        return commonService.updateState(pipelineProcess,true);
     }
 
     private Process getOrder(PipelineProcess pipelineProcess,PipelineCodeScan pipelineCodeScan, String path) throws ApplicationException, IOException {

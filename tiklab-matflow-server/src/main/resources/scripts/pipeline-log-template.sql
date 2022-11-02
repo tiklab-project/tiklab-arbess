@@ -11,7 +11,7 @@ INSERT INTO pcs_op_log_template
 INSERT INTO pcs_op_log_template
 (id,title,content,link,bgroup)
  VALUES
-('pipelineExec', '流水线执行动态', '${message}<span color="blue"><a href="${link}">${pipelineName}</a></span>${messages}', NULL, 'matflow');
+('pipelineExec', '流水线执行动态', '${message}<span color="blue"><a href="${link}">${pipelineName}</a></span>', NULL, 'matflow');
 
 INSERT INTO pcs_op_log_template
 (id,title,content,link,bgroup)

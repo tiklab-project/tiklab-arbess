@@ -94,6 +94,7 @@ public class PipelineConfigOrderServiceImpl implements PipelineConfigOrderServic
             case 21,22,23,24 -> types = "build";
             case 31,32,33 -> types = "deploy";
             case 41 -> types = "codeScan";
+            case 51 -> types = "product";
             default ->   throw new ApplicationException(50001, "找不到该类型");
         }
 
@@ -102,7 +103,6 @@ public class PipelineConfigOrderServiceImpl implements PipelineConfigOrderServic
             case "create" -> createConfig(config,types);
             case "update" -> updateConfig(config,types);
             case "delete" -> deleteConfig(pipelineId,types,type);
-            case "updateType" -> updateConfigType(config,types);
             case "order" -> updateOrder(pipelineId,config.getTaskSort(),config.getSort());
             default -> throw new ApplicationException(50001, "配置失败，无法获取操作属性。");
         }
@@ -159,23 +159,6 @@ public class PipelineConfigOrderServiceImpl implements PipelineConfigOrderServic
         homeService.log("update", "pipelineConfig", map);
     }
 
-    /**
-     * 更新配置类型
-     * @param config 配置
-     * @param types 更新类型
-     */
-    public void updateConfigType(PipelineConfigOrder config,String types){
-        String pipelineId = config.getPipeline().getPipelineId();
-        PipelineConfigOrder typeConfig = findTypeConfig(pipelineId, config.getTaskType());
-        if (typeConfig == null) return;
-
-        typeConfig.setTaskType(config.getTaskType());
-        typeConfig.setTaskSort(typeConfig.getTaskType());
-        updateConfigOrder(typeConfig);
-
-        deleteConfig(pipelineId,types,typeConfig.getTaskType());
-        createConfig(typeConfig, types);
-    }
 
     /**
      * 创建配置

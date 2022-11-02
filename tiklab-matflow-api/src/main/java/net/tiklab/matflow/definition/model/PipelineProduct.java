@@ -39,6 +39,12 @@ public class PipelineProduct {
     @JoinQuery(key = "authId")
     private PipelineAuth pipelineAuth;
 
+    private int type;
+
+    private int sort;
+
+
+
     public String getProductId() {
         return productId;
     }
@@ -93,5 +99,21 @@ public class PipelineProduct {
 
     public void setPipelineAuth(PipelineAuth pipelineAuth) {
         this.pipelineAuth = pipelineAuth;
+    }
+
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
+    }
+
+    public int getSort() {
+        return sort;
+    }
+
+    public void setSort(int sort) {
+        this.sort = sort;
     }
 }

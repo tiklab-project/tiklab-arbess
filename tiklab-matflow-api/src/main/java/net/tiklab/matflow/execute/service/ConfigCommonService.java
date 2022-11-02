@@ -72,7 +72,7 @@ public interface ConfigCommonService {
     void execHistory(PipelineProcess pipelineProcess,String log);
 
 
-    void updateState(PipelineProcess pipelineProcess, boolean b);
+    boolean updateState(PipelineProcess pipelineProcess, boolean b);
 
     /**
      * 获取环境配置信息
