@@ -1,11 +1,7 @@
 package net.tiklab.matflow.definition.model;
 
 import net.tiklab.beans.annotation.Mapper;
-import net.tiklab.beans.annotation.Mapping;
-import net.tiklab.beans.annotation.Mappings;
 import net.tiklab.join.annotation.Join;
-import net.tiklab.join.annotation.JoinQuery;
-import net.tiklab.matflow.setting.model.PipelineAuth;
 import net.tiklab.postin.annotation.ApiModel;
 import net.tiklab.postin.annotation.ApiProperty;
 
@@ -32,12 +28,12 @@ public class PipelineProduct {
     @ApiProperty(name = "fileAddress",desc = "文件地址")
     private String fileAddress;
 
-    @ApiProperty(name="pipelineAuth",desc="授权id",eg="@selectOne")
-    @Mappings({
-            @Mapping(source = "pipelineAuth.authId",target = "authId")
-    })
-    @JoinQuery(key = "authId")
-    private PipelineAuth pipelineAuth;
+    // @ApiProperty(name="pipelineAuth",desc="授权id",eg="@selectOne")
+    // @Mappings({
+    //         @Mapping(source = "pipelineAuth.authId",target = "authId")
+    // })
+    // @JoinQuery(key = "authId")
+    // private PipelineAuth pipelineAuth;
 
     private int type;
 
@@ -91,14 +87,6 @@ public class PipelineProduct {
 
     public void setFileAddress(String fileAddress) {
         this.fileAddress = fileAddress;
-    }
-
-    public PipelineAuth getPipelineAuth() {
-        return pipelineAuth;
-    }
-
-    public void setPipelineAuth(PipelineAuth pipelineAuth) {
-        this.pipelineAuth = pipelineAuth;
     }
 
     public int getType() {

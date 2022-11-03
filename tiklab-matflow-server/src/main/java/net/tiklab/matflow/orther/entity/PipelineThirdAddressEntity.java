@@ -3,16 +3,16 @@ package net.tiklab.matflow.orther.entity;
 import net.tiklab.dal.jpa.annotation.*;
 
 @Entity
-@Table(name="pipeline_authorize")
-public class PipelineAuthorizeEntity {
+@Table(name="pipeline_third_address")
+public class PipelineThirdAddressEntity {
 
     @Id
     @GeneratorValue
     @Column(name = "id")
-    private String id;
+    private String authorizedId;
 
     @Column(name = "type")
-    private Integer type;
+    private Integer authType;
 
     @Column(name = "client_id")
     private String clientId;
@@ -24,20 +24,20 @@ public class PipelineAuthorizeEntity {
     private String callbackUrl;
 
 
-    public String getId() {
-        return id;
+    public String getAuthorizedId() {
+        return authorizedId;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setAuthorizedId(String authorizedId) {
+        this.authorizedId = authorizedId;
     }
 
-    public Integer getType() {
-        return type;
+    public Integer getAuthType() {
+        return authType;
     }
 
-    public void setType(Integer type) {
-        this.type = type;
+    public void setAuthType(Integer authType) {
+        this.authType = authType;
     }
 
     public String getClientId() {
@@ -63,4 +63,5 @@ public class PipelineAuthorizeEntity {
     public void setCallbackUrl(String callbackUrl) {
         this.callbackUrl = callbackUrl;
     }
+
 }

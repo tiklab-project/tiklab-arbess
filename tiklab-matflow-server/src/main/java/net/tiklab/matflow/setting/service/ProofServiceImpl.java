@@ -2,7 +2,6 @@ package net.tiklab.matflow.setting.service;
 
 
 import net.tiklab.beans.BeanMapper;
-import net.tiklab.dal.jdbc.JdbcTemplate;
 import net.tiklab.join.JoinTemplate;
 import net.tiklab.matflow.definition.service.PipelineCodeServiceImpl;
 import net.tiklab.matflow.definition.service.PipelineService;
@@ -15,7 +14,6 @@ import net.tiklab.rpc.annotation.Exporter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.stereotype.Service;
 
 import java.net.InetAddress;
@@ -57,8 +55,9 @@ public class ProofServiceImpl implements ProofService {
         }
 
         ProofEntity proofEntity = BeanMapper.map(proof, ProofEntity.class);
-        //判断凭证作用域
         String proofId = proofDao.createProof(proofEntity);
+        //判断凭证作用域
+
         if (proof.getType() == 1){
             return proofId;
         }

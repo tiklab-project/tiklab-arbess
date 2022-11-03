@@ -181,18 +181,6 @@ create table pipeline_test  (
 );
 
 -- ----------------------------
--- Table structure for pipeline_authorization
--- ----------------------------
-create table pipeline_authorize  (
-  id varchar(256) ,
-  type int ,
-  client_id varchar(255) ,
-  client_secret varchar(255) ,
-  callback_url varchar(255) ,
-  PRIMARY KEY (id) USING BTREE
-);
-
--- ----------------------------
 -- Table structure for pipeline_code_scan
 -- ----------------------------
 create table pipeline_code_scan  (
@@ -200,22 +188,6 @@ create table pipeline_code_scan  (
     type int  COMMENT '类型',
     auth_id varchar(256)  COMMENT '授权id',
     project_name varchar(256)  COMMENT '授权id',
-    PRIMARY KEY (id) USING BTREE
-);
-
--- ----------------------------
--- Table structure for pipeline_auth
--- ----------------------------
-create table pipeline_auth  (
-    id varchar(256)  COMMENT '凭证id',
-    name varchar(256)  COMMENT '名称',
-    type int  COMMENT '类型',
-    auth_type int  COMMENT '授权类型',
-    url varchar(256)  COMMENT '地址',
-    create_time varchar(256)  COMMENT '创建时间',
-    username longtext  COMMENT '用户名',
-    password varchar(256)  COMMENT '密码',
-    token varchar(255)  COMMENT '凭证',
     PRIMARY KEY (id) USING BTREE
 );
 
@@ -233,6 +205,86 @@ create table pipeline_product  (
     PRIMARY KEY (id) USING BTREE
 );
 
+
+-- ----------------------------
+-- Table structure for pipeline_authorization
+-- ----------------------------
+create table pipeline_third_address  (
+    id varchar(256) ,
+    type int ,
+    client_id varchar(255) ,
+    client_secret varchar(255) ,
+    callback_url varchar(255) ,
+    PRIMARY KEY (id) USING BTREE
+);
+
+
+-- ----------------------------
+-- Table structure for pipeline_auth_basic
+-- ----------------------------
+create table pipeline_auth_basic  (
+    id varchar(256) ,
+    type int ,
+    name varchar(255) ,
+    create_time varchar(255) ,
+    username varchar(255) ,
+    password varchar(255) ,
+    token varchar(255) ,
+    auth_public int ,
+    user_id varchar(255) ,
+    PRIMARY KEY (id) USING BTREE
+);
+
+-- ----------------------------
+-- Table structure for pipeline_auth_host
+-- ----------------------------
+create table pipeline_auth_host  (
+    id varchar(256) ,
+    type int ,
+    name varchar(255) ,
+    create_time varchar(255) ,
+    username varchar(255) ,
+    ip varchar(255) ,
+    port int ,
+    password varchar(255) ,
+    token varchar(255) ,
+    auth_public int ,
+    user_id varchar(255) ,
+    PRIMARY KEY (id) USING BTREE
+);
+
+-- ----------------------------
+-- Table structure for pipeline_auth_server
+-- ----------------------------
+create table pipeline_auth_other  (
+    id varchar(256) ,
+    type int ,
+    name varchar(255) ,
+    create_time varchar(255) ,
+    address varchar(255) ,
+    username varchar(255) ,
+    password varchar(255) ,
+    token varchar(255) ,
+    auth_public int ,
+    user_id varchar(255) ,
+    PRIMARY KEY (id) USING BTREE
+);
+
+-- ----------------------------
+-- Table structure for pipeline_auth_third
+-- ----------------------------
+create table pipeline_auth_third  (
+    id varchar(256) ,
+    type int ,
+    name varchar(255) ,
+    create_time varchar(255) ,
+    access_token varchar(255) ,
+    username varchar(255) ,
+    refresh_token varchar(255) ,
+    auth_public int ,
+    user_id varchar(255) ,
+    PRIMARY KEY (id) USING BTREE
+);
 
 
 

@@ -6,7 +6,6 @@ import net.tiklab.matflow.definition.model.PipelineProduct;
 import net.tiklab.matflow.definition.service.ProductAchieveService;
 import net.tiklab.matflow.execute.model.PipelineProcess;
 import net.tiklab.matflow.orther.service.PipelineUntil;
-import net.tiklab.matflow.setting.model.PipelineAuth;
 import net.tiklab.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -63,28 +62,28 @@ public class ProductAchieveServiceImpl implements ProductAchieveService {
                 throw new ApplicationException("不存在maven配置");
             }
 
-            PipelineAuth pipelineAuth = product.getPipelineAuth();
-            if (pipelineAuth == null){
-                order = mavenOrder(execOrder, path);
-                commonService.execHistory(pipelineProcess,"执行推送制品命令："+order);
-                return PipelineUntil.process(mavenAddress, order);
-            }
-
-            execOrder = execOrder +
-                    " -DgroupId="+product.getGroupId() +
-                    " -DartifactId="+product.getArtifactId() +
-                    " -Dversion="+product.getVersion()+
-                    " -Dpackaging="+product.getFileType() +
-                    " -Dfile="+product.getFileAddress() +
-                    " -Durl="+pipelineAuth.getUrl() ;
-            if (pipelineAuth.getAuthType() == 1){
-                execOrder = execOrder +
-                        " -Dusername="+pipelineAuth.getUsername()+
-                        " -Dpassword="+pipelineAuth.getPassword();
-            }else {
-                execOrder = execOrder +
-                        " -DrepositoryId="+pipelineAuth.getToken();
-            }
+            // PipelineAuth pipelineAuth = product.getPipelineAuth();
+            // if (pipelineAuth == null){
+            //     order = mavenOrder(execOrder, path);
+            //     commonService.execHistory(pipelineProcess,"执行推送制品命令："+order);
+            //     return PipelineUntil.process(mavenAddress, order);
+            // }
+            //
+            // execOrder = execOrder +
+            //         " -DgroupId="+product.getGroupId() +
+            //         " -DartifactId="+product.getArtifactId() +
+            //         " -Dversion="+product.getVersion()+
+            //         " -Dpackaging="+product.getFileType() +
+            //         " -Dfile="+product.getFileAddress() +
+            //         " -Durl="+pipelineAuth.getUrl() ;
+            // if (pipelineAuth.getAuthType() == 1){
+            //     execOrder = execOrder +
+            //             " -Dserver.username="+pipelineAuth.getUsername()+
+            //             " -Dserver.password="+pipelineAuth.getPassword();
+            // }else {
+            //     execOrder = execOrder +
+            //             " -DrepositoryId="+pipelineAuth.getToken();
+            // }
             order = mavenOrder(execOrder, path);
             commonService.execHistory(pipelineProcess,"执行推送制品命令："+order);
             return PipelineUntil.process(mavenAddress, order);

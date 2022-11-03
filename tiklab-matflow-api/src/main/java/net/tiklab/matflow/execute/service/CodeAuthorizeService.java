@@ -50,5 +50,12 @@ public interface CodeAuthorizeService {
      */
     int findState();
 
+    /**
+     * 获取授权账户名
+     * @param authId 授权id
+     * @return 账户名称
+     */
+    String findMessage(String authId);
+
     void updateProof(String proofId ,String name);
 }

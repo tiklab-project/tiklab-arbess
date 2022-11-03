@@ -3,13 +3,14 @@ package net.tiklab.matflow.orther.service;
 
 import com.alibaba.fastjson.JSONObject;
 import net.tiklab.matflow.orther.model.PipelineFollow;
-import net.tiklab.message.message.model.*;
+import net.tiklab.message.message.model.Message;
+import net.tiklab.message.message.model.MessageReceiver;
+import net.tiklab.message.message.model.MessageTemplate;
 import net.tiklab.message.message.service.MessageService;
 import net.tiklab.oplog.log.modal.OpLog;
 import net.tiklab.oplog.log.modal.OpLogTemplate;
 import net.tiklab.oplog.log.service.OpLogService;
 import net.tiklab.rpc.annotation.Exporter;
-import net.tiklab.todotask.task.service.TaskService;
 import net.tiklab.user.user.model.User;
 import net.tiklab.utils.context.LoginContext;
 import org.slf4j.Logger;
@@ -21,7 +22,9 @@ import org.springframework.stereotype.Service;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.sql.Timestamp;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 @Exporter
@@ -37,8 +40,6 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
     MessageService messageService;
 
     private static final Logger logger = LoggerFactory.getLogger(PipelineHomeServiceImpl.class);
-
-
 
     private String logMessage(String type){
         Map<String ,String> map = new HashMap<>();

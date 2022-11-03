@@ -3,17 +3,14 @@ package net.tiklab.matflow.execute.controller;
 
 import net.tiklab.core.Result;
 import net.tiklab.matflow.execute.service.CodeAuthorizeService;
-import net.tiklab.matflow.setting.model.Proof;
 import net.tiklab.postin.annotation.Api;
 import net.tiklab.postin.annotation.ApiMethod;
 import net.tiklab.postin.annotation.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.util.List;
@@ -62,7 +59,6 @@ public class CodeAuthorizeController {
         return Result.ok(branch);
     }
 
-
     @RequestMapping(path="/updateProof",method = RequestMethod.POST)
     @ApiMethod(name = "updateProof",desc = "创建gitee凭证")
     @ApiParam(name = "proofId",desc = "凭证信息",required = true)
@@ -78,5 +74,38 @@ public class CodeAuthorizeController {
         return Result.ok(states);
     }
 
+    @RequestMapping(path="/findMessage",method = RequestMethod.POST)
+    @ApiMethod(name = "findMessage",desc = "创建gitee凭证")
+    @ApiParam(name = "authId",desc = "授权信息",required = true)
+    public Result<String> findMessage(@NotNull String authId){
+        String message = codeAuthorizeService.findMessage(authId);
+        return Result.ok(message);
+    }
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

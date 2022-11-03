@@ -7,14 +7,14 @@ import net.tiklab.postin.annotation.ApiProperty;
 
 @ApiModel
 @Join
-@Mapper(targetAlias = "PipelineAuthorizeEntity")
-public class PipelineAuthorize {
+@Mapper(targetAlias = "PipelineThirdAddressEntity")
+public class PipelineThirdAddress {
 
-    @ApiProperty(name = "id",desc="id")
-    private String id;
+    @ApiProperty(name = "authorizedId",desc="id")
+    private String authorizedId;
 
-    @ApiProperty(name = "type",desc="类型 2.gitee 3.github")
-    private Integer type;
+    @ApiProperty(name = "authType",desc="类型 1.gitee 2.github")
+    private Integer authType;
 
     @ApiProperty(name = "clientId",desc="授权id")
     private String clientId;
@@ -25,20 +25,21 @@ public class PipelineAuthorize {
     @ApiProperty(name = "callbackUrl",desc="回调地址")
     private String callbackUrl;
 
-    public String getId() {
-        return id;
+    public String getAuthorizedId() {
+        return authorizedId;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setAuthorizedId(String authorizedId) {
+        this.authorizedId = authorizedId;
     }
 
-    public Integer getType() {
-        return type;
+
+    public Integer getAuthType() {
+        return authType;
     }
 
-    public void setType(Integer type) {
-        this.type = type;
+    public void setAuthType(Integer authType) {
+        this.authType = authType;
     }
 
     public String getClientId() {
@@ -64,4 +65,6 @@ public class PipelineAuthorize {
     public void setCallbackUrl(String callbackUrl) {
         this.callbackUrl = callbackUrl;
     }
+
+
 }

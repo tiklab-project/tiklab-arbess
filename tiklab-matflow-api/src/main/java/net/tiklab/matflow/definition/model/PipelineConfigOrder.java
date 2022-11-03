@@ -35,8 +35,6 @@ public class PipelineConfigOrder {
     //更改的数据
     private Object values;
 
-    private PipelineConfigOrder configOrder;
-
     //流水线
     @ApiProperty(name="pipeline",desc="流水线id",eg="@selectOne")
     @Mappings({
@@ -183,14 +181,6 @@ public class PipelineConfigOrder {
 
     public void setPipeline(Pipeline pipeline) {
         this.pipeline = pipeline;
-    }
-
-    public PipelineConfigOrder getConfigOrder() {
-        return configOrder;
-    }
-
-    public void setConfigOrder(PipelineConfigOrder configOrder) {
-        this.configOrder = configOrder;
     }
 
     public PipelineCodeScan getPipelineCodeScan() {

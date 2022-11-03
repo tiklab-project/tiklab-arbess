@@ -29,7 +29,6 @@ public class PipelineProductEntity {
     @Column(name = "auth_id")
     private String authId;
 
-
     public String getProductId() {
         return productId;
     }

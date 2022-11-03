@@ -29,8 +29,6 @@ public class PipelineBuild {
     //顺序
     private int sort;
 
-
-
     public String getBuildId() {
         return buildId;
     }

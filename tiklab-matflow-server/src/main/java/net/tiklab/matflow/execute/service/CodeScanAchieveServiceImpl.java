@@ -5,7 +5,6 @@ import net.tiklab.matflow.definition.model.Pipeline;
 import net.tiklab.matflow.definition.model.PipelineCodeScan;
 import net.tiklab.matflow.execute.model.PipelineProcess;
 import net.tiklab.matflow.orther.service.PipelineUntil;
-import net.tiklab.matflow.setting.model.PipelineAuth;
 import net.tiklab.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -62,24 +61,24 @@ public class CodeScanAchieveServiceImpl implements CodeScanService {
                 throw new ApplicationException("不存在maven配置");
             }
 
-            PipelineAuth pipelineAuth = pipelineCodeScan.getPipelineAuth();
-            if (pipelineAuth == null){
-                commonService.execHistory(pipelineProcess,"执行扫描命令："+execOrder);
-                order = mavenOrder(execOrder, path);
-                return PipelineUntil.process(mavenAddress, order);
-            }
-
-            execOrder = execOrder +
-                    " -Dsonar.projectKey="+pipelineCodeScan.getProjectName()+
-                    " -Dsonar.host.url="+pipelineAuth.getUrl();
-            if (pipelineAuth.getAuthType() == 1){
-                execOrder = execOrder +
-                        " -Dsonar.host.username="+pipelineAuth.getUsername()+
-                        " -Dsonar.host.password="+pipelineAuth.getPassword();
-            }else {
-                execOrder = execOrder +
-                        " -Dsonar.login="+pipelineAuth.getToken();
-            }
+            // PipelineAuth pipelineAuth = pipelineCodeScan.getPipelineAuth();
+            // if (pipelineAuth == null){
+            //     commonService.execHistory(pipelineProcess,"执行扫描命令："+execOrder);
+            //     order = mavenOrder(execOrder, path);
+            //     return PipelineUntil.process(mavenAddress, order);
+            // }
+            //
+            // execOrder = execOrder +
+            //         " -Dsonar.projectKey="+pipelineCodeScan.getProjectName()+
+            //         " -Dsonar.host.url="+pipelineAuth.getUrl();
+            // if (pipelineAuth.getAuthType() == 1){
+            //     execOrder = execOrder +
+            //             " -Dsonar.host.username="+pipelineAuth.getUsername()+
+            //             " -Dsonar.host.password="+pipelineAuth.getPassword();
+            // }else {
+            //     execOrder = execOrder +
+            //             " -Dsonar.login="+pipelineAuth.getToken();
+            // }
             commonService.execHistory(pipelineProcess,"执行扫描命令："+execOrder);
             order = mavenOrder(execOrder, path);
             return PipelineUntil.process(mavenAddress, order);

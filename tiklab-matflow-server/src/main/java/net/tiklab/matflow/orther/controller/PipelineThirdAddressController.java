@@ -1,8 +1,8 @@
 package net.tiklab.matflow.orther.controller;
 
 import net.tiklab.core.Result;
-import net.tiklab.matflow.orther.model.PipelineAuthorize;
-import net.tiklab.matflow.orther.service.PipelineAuthorizeService;
+import net.tiklab.matflow.orther.model.PipelineThirdAddress;
+import net.tiklab.matflow.orther.service.PipelineThirdAddressService;
 import net.tiklab.postin.annotation.Api;
 import net.tiklab.postin.annotation.ApiMethod;
 import net.tiklab.postin.annotation.ApiParam;
@@ -19,18 +19,18 @@ import java.util.List;
 @RestController
 @RequestMapping("/pipelineAuthorize")
 @Api(name = "PipelineAuthorizeController",desc = "流水线授权")
-public class PipelineAuthorizeController {
+public class PipelineThirdAddressController {
 
 
     @Autowired
-    PipelineAuthorizeService authorizeService;
+    PipelineThirdAddressService authorizeService;
 
 
     @RequestMapping(path="/createAuthorize",method = RequestMethod.POST)
     @ApiMethod(name = "createAuthorize",desc = "创建权限信息")
     @ApiParam(name = "pipelineAuthorize",desc = "权限信息",required = true)
-    public Result<String> createAuthorize(@RequestBody @Valid @NotNull PipelineAuthorize pipelineAuthorize) {
-        String authorizeId = authorizeService.createAuthorize(pipelineAuthorize);
+    public Result<String> createAuthorize(@RequestBody @Valid @NotNull PipelineThirdAddress pipelineThirdAddress) {
+        String authorizeId = authorizeService.createAuthorize(pipelineThirdAddress);
         return Result.ok(authorizeId);
     }
 
@@ -38,8 +38,8 @@ public class PipelineAuthorizeController {
     @RequestMapping(path="/updateAuthorize",method = RequestMethod.POST)
     @ApiMethod(name = "updateAuthorize",desc = "更新权限信息")
     @ApiParam(name = "pipelineAuthorize",desc = "权限信息",required = true)
-    public Result<Void> updateAuthorize(@RequestBody @Valid @NotNull PipelineAuthorize pipelineAuthorize) {
-        authorizeService.updateAuthorize(pipelineAuthorize);
+    public Result<Void> updateAuthorize(@RequestBody @Valid @NotNull PipelineThirdAddress pipelineThirdAddress) {
+        authorizeService.updateAuthorize(pipelineThirdAddress);
         return Result.ok();
     }
 
@@ -54,8 +54,8 @@ public class PipelineAuthorizeController {
     @RequestMapping(path="/findOneAuthorize",method = RequestMethod.POST)
     @ApiMethod(name = "findOneAuthorize",desc = "删除权限信息")
     @ApiParam(name = "authorizeId",desc = "权限信息",required = true)
-    public Result<PipelineAuthorize> findOneAuthorize(@NotNull String authorizeId) {
-        PipelineAuthorize oneAuthorize = authorizeService.findOneAuthorize(authorizeId);
+    public Result<PipelineThirdAddress> findOneAuthorize(@NotNull String authorizeId) {
+        PipelineThirdAddress oneAuthorize = authorizeService.findOneAuthorize(authorizeId);
         return Result.ok(oneAuthorize);
     }
 
@@ -63,8 +63,8 @@ public class PipelineAuthorizeController {
     @RequestMapping(path="/findAllAuthorize",method = RequestMethod.POST)
     @ApiMethod(name = "findAllAuthorize",desc = "删除权限信息")
     @ApiParam(name = "authorizeId",desc = "权限信息",required = true)
-    public Result<List<PipelineAuthorize>> findAllAuthorize() {
-        List<PipelineAuthorize> allAuthorize = authorizeService.findAllAuthorize();
+    public Result<List<PipelineThirdAddress>> findAllAuthorize() {
+        List<PipelineThirdAddress> allAuthorize = authorizeService.findAllAuthorize();
         return Result.ok(allAuthorize);
     }
 

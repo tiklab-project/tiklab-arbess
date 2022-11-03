@@ -56,7 +56,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
 
     //启动
     @Override
-    public int  start(String pipelineId,String userId){
+    public int start(String pipelineId,String userId){
         // 判断同一任务是否在运行
         Pipeline pipeline = pipelineService.findOnePipeline(pipelineId);
         if (pipeline.getPipelineState() == 1){
@@ -70,7 +70,6 @@ public class PipelineExecServiceImpl implements PipelineExecService {
             Thread.currentThread().setName(pipelineId);
             begin(pipeline,userId);
         });
-
         return 1;
     }
 

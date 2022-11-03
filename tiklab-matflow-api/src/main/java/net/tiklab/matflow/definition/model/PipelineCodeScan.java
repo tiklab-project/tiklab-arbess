@@ -1,11 +1,7 @@
 package net.tiklab.matflow.definition.model;
 
 import net.tiklab.beans.annotation.Mapper;
-import net.tiklab.beans.annotation.Mapping;
-import net.tiklab.beans.annotation.Mappings;
 import net.tiklab.join.annotation.Join;
-import net.tiklab.join.annotation.JoinQuery;
-import net.tiklab.matflow.setting.model.PipelineAuth;
 import net.tiklab.postin.annotation.ApiModel;
 import net.tiklab.postin.annotation.ApiProperty;
 
@@ -20,12 +16,12 @@ public class PipelineCodeScan {
     @ApiProperty(name="projectName",desc="项目名称")
     private String projectName;
 
-    @ApiProperty(name="pipelineAuth",desc="授权id",eg="@selectOne")
-    @Mappings({
-            @Mapping(source = "pipelineAuth.authId",target = "authId")
-    })
-    @JoinQuery(key = "authId")
-    private PipelineAuth pipelineAuth;
+    // @ApiProperty(name="pipelineAuth",desc="授权id",eg="@selectOne")
+    // @Mappings({
+    //         @Mapping(source = "pipelineAuth.authId",target = "authId")
+    // })
+    // @JoinQuery(key = "authId")
+    // private PipelineAuth pipelineAuth;
 
     private int sort;
 
@@ -38,14 +34,6 @@ public class PipelineCodeScan {
 
     public void setCodeScanId(String codeScanId) {
         this.codeScanId = codeScanId;
-    }
-
-    public PipelineAuth getPipelineAuth() {
-        return pipelineAuth;
-    }
-
-    public void setPipelineAuth(PipelineAuth pipelineAuth) {
-        this.pipelineAuth = pipelineAuth;
     }
 
     public String getProjectName() {
