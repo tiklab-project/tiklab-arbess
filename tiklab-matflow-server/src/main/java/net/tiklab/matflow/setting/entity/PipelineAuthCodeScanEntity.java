@@ -5,31 +5,28 @@ import net.tiklab.matflow.orther.service.PipelineUntil;
 import net.tiklab.utils.context.LoginContext;
 
 @Entity
-@Table(name="pipeline_auth_host")
-public class PipelineAuthHostEntity {
+@Table(name="pipeline_auth_code_scan")
+public class PipelineAuthCodeScanEntity {
 
     @Id
     @GeneratorValue
     @Column(name = "id")
-    private String hostId;
+    private String codeScanId;
 
     @Column(name = "name")
     private String name;
 
     @Column(name = "type")
-    private String type;
-
-    @Column(name = "create_time")
-    private String createTime = PipelineUntil.date;
+    private int type;
 
     @Column(name = "auth_type")
     private int authType;
 
-    @Column(name = "ip")
-    private String ip;
+    @Column(name = "create_time")
+    private String createTime = PipelineUntil.date;
 
-    @Column(name = "port")
-    private int port;
+    @Column(name = "server_address")
+    private String serverAddress;
 
     @Column(name = "username")
     private String username;
@@ -51,12 +48,12 @@ public class PipelineAuthHostEntity {
     @Column(name = "auth_public")
     private int authPublic;
 
-    public String getHostId() {
-        return hostId;
+    public String getCodeScanId() {
+        return codeScanId;
     }
 
-    public void setHostId(String hostId) {
-        this.hostId = hostId;
+    public void setCodeScanId(String codeScanId) {
+        this.codeScanId = codeScanId;
     }
 
     public String getName() {
@@ -67,20 +64,12 @@ public class PipelineAuthHostEntity {
         this.name = name;
     }
 
-    public String getType() {
+    public int getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(int type) {
         this.type = type;
-    }
-
-    public String getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(String createTime) {
-        this.createTime = createTime;
     }
 
     public int getAuthType() {
@@ -91,20 +80,20 @@ public class PipelineAuthHostEntity {
         this.authType = authType;
     }
 
-    public String getIp() {
-        return ip;
+    public String getCreateTime() {
+        return createTime;
     }
 
-    public void setIp(String ip) {
-        this.ip = ip;
+    public void setCreateTime(String createTime) {
+        this.createTime = createTime;
     }
 
-    public int getPort() {
-        return port;
+    public String getServerAddress() {
+        return serverAddress;
     }
 
-    public void setPort(int port) {
-        this.port = port;
+    public void setServerAddress(String serverAddress) {
+        this.serverAddress = serverAddress;
     }
 
     public String getUsername() {

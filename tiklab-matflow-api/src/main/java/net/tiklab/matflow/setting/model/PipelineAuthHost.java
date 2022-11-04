@@ -20,8 +20,11 @@ public class PipelineAuthHost {
     @ApiProperty(name = "authType",desc="类型")
     private int authType;
 
-    @ApiProperty(name = "names",desc="名称")
-    private String names;
+    @ApiProperty(name = "type",desc="类型")
+    private int type;
+
+    @ApiProperty(name = "name",desc="名称")
+    private String name;
 
     @ApiProperty(name = "ip",desc="ip地址")
     private String ip;
@@ -38,8 +41,8 @@ public class PipelineAuthHost {
     @ApiProperty(name = "password",desc="密码")
     private String password;
 
-    @ApiProperty(name = "token",desc="token")
-    private String token;
+    @ApiProperty(name = "privateKey",desc="私钥")
+    private String privateKey;
 
     @Mappings({
             @Mapping(source = "user.id",target = "userId")
@@ -49,6 +52,12 @@ public class PipelineAuthHost {
 
     @ApiProperty(name = "authPublic",desc="是否公开")
     private int authPublic;
+
+    @Mappings({
+            @Mapping(source = "pipelineAuth.authId",target = "authId")
+    })
+    @JoinQuery(key = "authId")
+    private PipelineAuth pipelineAuth;
 
 
     public String getHostId() {
@@ -67,12 +76,20 @@ public class PipelineAuthHost {
         this.authType = authType;
     }
 
-    public String getNames() {
-        return names;
+    public int getType() {
+        return type;
     }
 
-    public void setNames(String names) {
-        this.names = names;
+    public void setType(int type) {
+        this.type = type;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getIp() {
@@ -115,12 +132,12 @@ public class PipelineAuthHost {
         this.password = password;
     }
 
-    public String getToken() {
-        return token;
+    public String getPrivateKey() {
+        return privateKey;
     }
 
-    public void setToken(String token) {
-        this.token = token;
+    public void setPrivateKey(String privateKey) {
+        this.privateKey = privateKey;
     }
 
     public User getUser() {
@@ -139,7 +156,11 @@ public class PipelineAuthHost {
         this.authPublic = authPublic;
     }
 
-    public int getType() {
-        return 3;
+    public PipelineAuth getPipelineAuth() {
+        return pipelineAuth;
+    }
+
+    public void setPipelineAuth(PipelineAuth pipelineAuth) {
+        this.pipelineAuth = pipelineAuth;
     }
 }

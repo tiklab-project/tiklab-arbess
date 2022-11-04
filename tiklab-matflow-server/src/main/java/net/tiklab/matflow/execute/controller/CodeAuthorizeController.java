@@ -59,27 +59,11 @@ public class CodeAuthorizeController {
         return Result.ok(branch);
     }
 
-    @RequestMapping(path="/updateProof",method = RequestMethod.POST)
-    @ApiMethod(name = "updateProof",desc = "创建gitee凭证")
-    @ApiParam(name = "proofId",desc = "凭证信息",required = true)
-    public Result<String> updateProof( @NotNull String proofId,String name){
-        codeAuthorizeService.updateProof(proofId,name);
-        return Result.ok();
-    }
-
     @RequestMapping(path="/findState",method = RequestMethod.POST)
     @ApiMethod(name = "findState",desc = "获取授权状态")
     public Result<Integer> getState(){
         int states = codeAuthorizeService.findState();
         return Result.ok(states);
-    }
-
-    @RequestMapping(path="/findMessage",method = RequestMethod.POST)
-    @ApiMethod(name = "findMessage",desc = "创建gitee凭证")
-    @ApiParam(name = "authId",desc = "授权信息",required = true)
-    public Result<String> findMessage(@NotNull String authId){
-        String message = codeAuthorizeService.findMessage(authId);
-        return Result.ok(message);
     }
 
 }

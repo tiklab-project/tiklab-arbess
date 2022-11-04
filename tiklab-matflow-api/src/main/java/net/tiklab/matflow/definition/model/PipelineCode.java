@@ -6,7 +6,7 @@ import net.tiklab.beans.annotation.Mapping;
 import net.tiklab.beans.annotation.Mappings;
 import net.tiklab.join.annotation.Join;
 import net.tiklab.join.annotation.JoinQuery;
-import net.tiklab.matflow.setting.model.Proof;
+import net.tiklab.matflow.setting.model.PipelineAuthCode;
 import net.tiklab.postin.annotation.ApiModel;
 import net.tiklab.postin.annotation.ApiProperty;
 
@@ -19,9 +19,6 @@ public class PipelineCode {
     //id
     @ApiProperty(name="codeId",desc="codeId")
     private String codeId;
-
-    //代码类型
-    private int type;
 
     //地址名
     @ApiProperty(name="codeName",desc="地址名")
@@ -36,15 +33,17 @@ public class PipelineCode {
     private String codeBranch;
 
     //凭证id
-    @ApiProperty(name="proof",desc="凭证id",eg="@selectOne")
     @Mappings({
-            @Mapping(source = "proof.proofId",target = "proofId")
+            @Mapping(source = "pipelineAuthCode.codeId",target = "authCodeId")
     })
-    @JoinQuery(key = "proofId")
-    private Proof proof;
+    @JoinQuery(key = "codeId")
+    private PipelineAuthCode pipelineAuthCode;
 
     //顺序
     private int sort;
+
+    //代码类型
+    private int type;
 
     //别名
     @ApiProperty(name = "codeAlias",desc="别名")
@@ -90,12 +89,12 @@ public class PipelineCode {
         this.codeBranch = codeBranch;
     }
 
-    public Proof getProof() {
-        return proof;
+    public PipelineAuthCode getPipelineAuthCode() {
+        return pipelineAuthCode;
     }
 
-    public void setProof(Proof proof) {
-        this.proof = proof;
+    public void setPipelineAuthCode(PipelineAuthCode pipelineAuthCode) {
+        this.pipelineAuthCode = pipelineAuthCode;
     }
 
     public int getSort() {

@@ -11,20 +11,26 @@ import net.tiklab.user.user.model.User;
 
 @ApiModel
 @Join
-@Mapper(targetAlias = "PipelineAuthBasicEntity")
-public class PipelineAuthBasic {
+@Mapper(targetAlias = "PipelineAuthCodeScanEntity")
+public class PipelineAuthCodeScan {
 
-    @ApiProperty(name = "basicId",desc="id")
-    private String basicId;
+    @ApiProperty(name = "codeScanId",desc="id")
+    private String codeScanId;
+
+    @ApiProperty(name = "type",desc="类型")
+    private int type;
 
     @ApiProperty(name = "authType",desc="类型")
     private int authType;
 
-    @ApiProperty(name = "names",desc="名称")
-    private String names;
+    @ApiProperty(name = "name",desc="名称")
+    private String name;
 
     @ApiProperty(name = "create_time")
     private String createTime;
+
+    @ApiProperty(name = "serverAddress")
+    private String serverAddress;
 
     @ApiProperty(name = "username",desc="用户名")
     private String username;
@@ -32,8 +38,8 @@ public class PipelineAuthBasic {
     @ApiProperty(name = "password",desc="密码")
     private String password;
 
-    @ApiProperty(name = "token",desc="token")
-    private String token;
+    @ApiProperty(name = "privateKey",desc="私钥")
+    private String privateKey;
 
     @Mappings({
             @Mapping(source = "user.id",target = "userId")
@@ -44,13 +50,27 @@ public class PipelineAuthBasic {
     @ApiProperty(name = "authPublic",desc="是否公开")
     private int authPublic;
 
+    @Mappings({
+            @Mapping(source = "pipelineAuth.authId",target = "authId")
+    })
+    @JoinQuery(key = "authId")
+    private PipelineAuth pipelineAuth;
 
-    public String getBasicId() {
-        return basicId;
+
+    public String getCodeScanId() {
+        return codeScanId;
     }
 
-    public void setBasicId(String basicId) {
-        this.basicId = basicId;
+    public void setCodeScanId(String codeScanId) {
+        this.codeScanId = codeScanId;
+    }
+
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
     }
 
     public int getAuthType() {
@@ -61,12 +81,12 @@ public class PipelineAuthBasic {
         this.authType = authType;
     }
 
-    public String getNames() {
-        return names;
+    public String getName() {
+        return name;
     }
 
-    public void setNames(String names) {
-        this.names = names;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getCreateTime() {
@@ -75,6 +95,14 @@ public class PipelineAuthBasic {
 
     public void setCreateTime(String createTime) {
         this.createTime = createTime;
+    }
+
+    public String getServerAddress() {
+        return serverAddress;
+    }
+
+    public void setServerAddress(String serverAddress) {
+        this.serverAddress = serverAddress;
     }
 
     public String getUsername() {
@@ -93,12 +121,12 @@ public class PipelineAuthBasic {
         this.password = password;
     }
 
-    public String getToken() {
-        return token;
+    public String getPrivateKey() {
+        return privateKey;
     }
 
-    public void setToken(String token) {
-        this.token = token;
+    public void setPrivateKey(String privateKey) {
+        this.privateKey = privateKey;
     }
 
     public User getUser() {
@@ -117,7 +145,11 @@ public class PipelineAuthBasic {
         this.authPublic = authPublic;
     }
 
-    public int getType() {
-        return 1;
+    public PipelineAuth getPipelineAuth() {
+        return pipelineAuth;
+    }
+
+    public void setPipelineAuth(PipelineAuth pipelineAuth) {
+        this.pipelineAuth = pipelineAuth;
     }
 }

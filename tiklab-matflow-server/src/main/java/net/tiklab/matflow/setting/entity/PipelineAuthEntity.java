@@ -5,22 +5,22 @@ import net.tiklab.matflow.orther.service.PipelineUntil;
 import net.tiklab.utils.context.LoginContext;
 
 @Entity
-@Table(name="pipeline_auth_basic")
-public class PipelineAuthBasicEntity {
+@Table(name="pipeline_auth")
+public class PipelineAuthEntity {
 
     @Id
     @GeneratorValue
     @Column(name = "id")
-    private String basicId;
+    private String authId;
 
     @Column(name = "name")
-    private String names;
+    private String name;
+
+    @Column(name = "auth_type")
+    private int authType;
 
     @Column(name = "create_time")
     private String createTime = PipelineUntil.date;
-
-    @Column(name = "type")
-    private int authType;
 
     @Column(name = "username")
     private String username;
@@ -28,40 +28,31 @@ public class PipelineAuthBasicEntity {
     @Column(name = "password")
     private String password;
 
-    @Column(name = "token")
-    private String token;
+    @Column(name = "private_key")
+    private String privateKey;
 
     //创建人
     @Column(name = "user_id")
     private String userId = LoginContext.getLoginId();
 
-    //是否公开 true：公开， false：不公开
+    //是否公开 1：公开， 2：不公开
     @Column(name = "auth_public")
     private int authPublic;
 
-
-    public String getBasicId() {
-        return basicId;
+    public String getAuthId() {
+        return authId;
     }
 
-    public void setBasicId(String basicId) {
-        this.basicId = basicId;
+    public void setAuthId(String authId) {
+        this.authId = authId;
     }
 
-    public String getNames() {
-        return names;
+    public String getName() {
+        return name;
     }
 
-    public void setNames(String names) {
-        this.names = names;
-    }
-
-    public String getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(String createTime) {
-        this.createTime = createTime;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public int getAuthType() {
@@ -70,6 +61,14 @@ public class PipelineAuthBasicEntity {
 
     public void setAuthType(int authType) {
         this.authType = authType;
+    }
+
+    public String getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(String createTime) {
+        this.createTime = createTime;
     }
 
     public String getUsername() {
@@ -88,12 +87,12 @@ public class PipelineAuthBasicEntity {
         this.password = password;
     }
 
-    public String getToken() {
-        return token;
+    public String getPrivateKey() {
+        return privateKey;
     }
 
-    public void setToken(String token) {
-        this.token = token;
+    public void setPrivateKey(String privateKey) {
+        this.privateKey = privateKey;
     }
 
     public String getUserId() {

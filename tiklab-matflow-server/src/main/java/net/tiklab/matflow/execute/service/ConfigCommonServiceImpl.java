@@ -68,7 +68,7 @@ public class ConfigCommonServiceImpl implements ConfigCommonService {
         while ((s = bufferedReader.readLine()) != null) {
             logRunLog = logRunLog + s +"\n";
             execHistory(pipelineProcess,s);
-            if (logRunLog.contains("BUILD FAILURE")||logRunLog.contains("ERROR")) {
+            if (logRunLog.contains("BUILD FAILURE")||logRunLog.contains("ERROR") || logRunLog.contains("Access denied")) {
                 state = 0 ;
             }
         }
@@ -77,6 +77,9 @@ public class ConfigCommonServiceImpl implements ConfigCommonService {
             bufferedReader = new BufferedReader(inputStreamReader);
             while ((s = bufferedReader.readLine()) != null) {
                 logRunLog = logRunLog + s +"\n";
+                if (logRunLog.contains("BUILD FAILURE")||logRunLog.contains("ERROR") || logRunLog.contains("Access denied")) {
+                    state = 0 ;
+                }
                 execHistory(pipelineProcess,s);
             }
         }

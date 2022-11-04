@@ -17,7 +17,7 @@ import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @RestController
-@RequestMapping("/pipelineAuthorize")
+@RequestMapping("/PipelineThirdAddress")
 @Api(name = "PipelineAuthorizeController",desc = "流水线授权")
 public class PipelineThirdAddressController {
 
@@ -26,7 +26,7 @@ public class PipelineThirdAddressController {
     PipelineThirdAddressService authorizeService;
 
 
-    @RequestMapping(path="/createAuthorize",method = RequestMethod.POST)
+    @RequestMapping(path="/createThirdAddress",method = RequestMethod.POST)
     @ApiMethod(name = "createAuthorize",desc = "创建权限信息")
     @ApiParam(name = "pipelineAuthorize",desc = "权限信息",required = true)
     public Result<String> createAuthorize(@RequestBody @Valid @NotNull PipelineThirdAddress pipelineThirdAddress) {
@@ -35,7 +35,7 @@ public class PipelineThirdAddressController {
     }
 
 
-    @RequestMapping(path="/updateAuthorize",method = RequestMethod.POST)
+    @RequestMapping(path="/updateThirdAddress",method = RequestMethod.POST)
     @ApiMethod(name = "updateAuthorize",desc = "更新权限信息")
     @ApiParam(name = "pipelineAuthorize",desc = "权限信息",required = true)
     public Result<Void> updateAuthorize(@RequestBody @Valid @NotNull PipelineThirdAddress pipelineThirdAddress) {
@@ -43,7 +43,7 @@ public class PipelineThirdAddressController {
         return Result.ok();
     }
 
-    @RequestMapping(path="/deleteAuthorize",method = RequestMethod.POST)
+    @RequestMapping(path="/deleteThirdAddress",method = RequestMethod.POST)
     @ApiMethod(name = "deleteAuthorize",desc = "删除权限信息")
     @ApiParam(name = "authorizeId",desc = "权限信息",required = true)
     public Result<Void> deleteAuthorize(@NotNull String authorizeId) {
@@ -51,7 +51,7 @@ public class PipelineThirdAddressController {
         return Result.ok();
     }
 
-    @RequestMapping(path="/findOneAuthorize",method = RequestMethod.POST)
+    @RequestMapping(path="/findOneThirdAddress",method = RequestMethod.POST)
     @ApiMethod(name = "findOneAuthorize",desc = "删除权限信息")
     @ApiParam(name = "authorizeId",desc = "权限信息",required = true)
     public Result<PipelineThirdAddress> findOneAuthorize(@NotNull String authorizeId) {
@@ -60,7 +60,7 @@ public class PipelineThirdAddressController {
     }
 
 
-    @RequestMapping(path="/findAllAuthorize",method = RequestMethod.POST)
+    @RequestMapping(path="/findAllThirdAddress",method = RequestMethod.POST)
     @ApiMethod(name = "findAllAuthorize",desc = "删除权限信息")
     @ApiParam(name = "authorizeId",desc = "权限信息",required = true)
     public Result<List<PipelineThirdAddress>> findAllAuthorize() {

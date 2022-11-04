@@ -6,10 +6,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Pattern;
 
 /**
@@ -183,6 +180,47 @@ public class PipelineUntil {
         }
     }
 
+    //效验地址是否存在配置文件
+    public static int validFile(String fileAddress, int type){
+        File file = new File(fileAddress);
+        if (!file.isDirectory()){
+            return 1;
+        }
+        File[] files = file.listFiles();
+        if (files == null || files.length == 0){
+            return 2;
+        }
+
+        for (File listFile : Objects.requireNonNull(file.listFiles())) {
+            if (listFile.isDirectory()){
+                continue;
+            }
+            String name = listFile.getName();
+            switch (type) {
+                case 1 -> {
+                    if (name.equals("git") || name.equals("git.exe")) {
+                        return 0;
+                    }
+                }
+                case 5 -> {
+                    if (name.equals("svn") || name.equals("svn.exe")) {
+                        return 0;
+                    }
+                }
+                case 21 -> {
+                    if (name.equals("mvn")) {
+                        return 0;
+                    }
+                }
+                case 22 -> {
+                    if (name.equals("npm")) {
+                        return 0;
+                    }
+                }
+            }
+        }
+        return 2;
+    }
 
 
 }

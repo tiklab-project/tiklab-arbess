@@ -21,6 +21,9 @@ public class PipelineScm {
     @ApiProperty(name = "scmName",desc = "名称")
     private String scmName;
 
+    @ApiProperty(name = "createTime",desc = "创建时间")
+    private String createTime;
+
     @ApiProperty(name = "scmAddress",desc = "地址")
     private String scmAddress;
 
@@ -54,5 +57,13 @@ public class PipelineScm {
 
     public void setScmAddress(String scmAddress) {
         this.scmAddress = scmAddress;
+    }
+
+    public String getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(String createTime) {
+        this.createTime = createTime;
     }
 }

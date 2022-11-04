@@ -7,8 +7,8 @@ import com.alibaba.fastjson.JSONObject;
 import net.tiklab.matflow.execute.model.CodeAuthorizeApi;
 import net.tiklab.matflow.orther.model.PipelineThirdAddress;
 import net.tiklab.matflow.orther.service.PipelineThirdAddressService;
-import net.tiklab.matflow.setting.model.PipelineAuthThird;
-import net.tiklab.matflow.setting.service.PipelineAuthThirdServer;
+import net.tiklab.matflow.setting.model.PipelineAuthCode;
+import net.tiklab.matflow.setting.service.PipelineAuthCodeServer;
 import net.tiklab.rpc.annotation.Exporter;
 import net.tiklab.utils.context.LoginContext;
 import org.slf4j.Logger;
@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -45,20 +46,20 @@ public class CodeAuthorizeServiceImpl implements CodeAuthorizeService {
     CodeAuthorizeApi codeAuthorizeApi;
 
     @Autowired
-    PipelineAuthThirdServer thirdServer;
+    PipelineAuthCodeServer codeServer;
 
     @Autowired
-    PipelineThirdAddressService authorizeService;
+    PipelineThirdAddressService thirdAddressService;
 
     Map<String,Integer> mapState = new HashMap<>();
 
-    public static Map<String,String> userMap = new HashMap<>();
+    public static Map<String, PipelineAuthCode> userMap = new HashMap<>();
 
     private static final Logger logger = LoggerFactory.getLogger(CodeAuthorizeServiceImpl.class);
 
     //获取code
     public String findCode(int type){
-        PipelineThirdAddress oneAuthorize = authorizeService.findOneAuthorize(type);
+        PipelineThirdAddress oneAuthorize = thirdAddressService.findOneAuthorize(type);
         return  codeAuthorizeApi.getCode(oneAuthorize,type);
     }
 
@@ -66,7 +67,7 @@ public class CodeAuthorizeServiceImpl implements CodeAuthorizeService {
     @Override
     public String findAccessToken(String code,int type) throws IOException {
         String loginId = LoginContext.getLoginId();
-        PipelineThirdAddress oneAuthorize = authorizeService.findOneAuthorize(type);
+        PipelineThirdAddress oneAuthorize = thirdAddressService.findOneAuthorize(type);
         if (code.equals("false")){
             mapState.put(loginId, 2);
             return null;
@@ -75,34 +76,19 @@ public class CodeAuthorizeServiceImpl implements CodeAuthorizeService {
         String accessTokenUrl = codeAuthorizeApi.getAccessToken(oneAuthorize,code,type);
         Map<String, String> map;
         switch (type) {
-            case 2 -> {
-                map = giteeAccessToken(accessTokenUrl);
-            }
-            case 3 -> {
-                map = gitHubAccessToken(code, accessTokenUrl);
-            }
-            default -> {
-                return null;
-            }
+            case 2 -> map = giteeAccessToken(accessTokenUrl);
+            case 3 -> map = gitHubAccessToken(code, accessTokenUrl);
+            default -> { return null; }
         }
-
-        PipelineAuthThird authThird = new PipelineAuthThird();
-        authThird.setAccessToken(map.get("accessToken"));
-        authThird.setRefreshToken(map.get("refreshToken"));
-        authThird.setAuthType(type);
-        String authThirdId = thirdServer.createAuthThird(authThird);
-        // Map<String, String> hashMap = new HashMap<>();
-        // hashMap.put("accessToken",map.get("accessToken"));
-        // hashMap.put("refreshToken",map.get("refreshToken"));
-        // hashMap.put("authThirdId",authThirdId);
-        userMap.put(LoginContext.getLoginId(),authThirdId);
-
-        String username = findMessage(authThirdId);
-        PipelineAuthThird oneAuthThird = thirdServer.findOneAuthThird(authThirdId);
-        oneAuthThird.setUsername(username);
-        thirdServer.updateAuthThird(oneAuthThird);
-        mapState.put(loginId, 1);
-        return authThirdId;
+        String accessToken = map.get("accessToken");
+        PipelineAuthCode pipelineAuthCode = new PipelineAuthCode();
+        pipelineAuthCode.setAccessToken(accessToken);
+        pipelineAuthCode.setRefreshToken(map.get("refreshToken"));
+        pipelineAuthCode.setAuthType(type);
+        String username = findMessage(accessToken, type);
+        pipelineAuthCode.setUsername(username);
+        userMap.put(loginId,pipelineAuthCode);
+        return username;
     }
 
     private Map<String, String> giteeAccessToken(String accessTokenUrl) throws IOException {
@@ -116,7 +102,7 @@ public class CodeAuthorizeServiceImpl implements CodeAuthorizeService {
 
     private Map<String, String> gitHubAccessToken(String code,String accessTokenUrl){
         Map<String, String> map = new HashMap<>();
-        PipelineThirdAddress oneAuthorize = authorizeService.findOneAuthorize(2);
+        PipelineThirdAddress oneAuthorize = thirdAddressService.findOneAuthorize(2);
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
         MultiValueMap<String, Object> paramMap = new LinkedMultiValueMap<>();
@@ -135,11 +121,9 @@ public class CodeAuthorizeServiceImpl implements CodeAuthorizeService {
 
     //列出授权用户的所有仓库
     @Override
-    public List<String> findAllStorehouse(String authId,int type) {
-        PipelineAuthThird authThird = thirdServer.findOneAuthThird(authId);
-        String accessToken = authThird.getAccessToken();
-        // Proof oneProof = proofService.findOneProof(proofId);
-        // String accessToken = oneProof.getProofPassword();
+    public List<String> findAllStorehouse(String authCodeId,int type) {
+        PipelineAuthCode authCode = codeServer.findOneAuthCode(authCodeId);
+        String accessToken = authCode.getAccessToken();
 
         String allStorehouseAddress = codeAuthorizeApi.getAllStorehouse(accessToken,type);
         return switch (type) {
@@ -201,11 +185,10 @@ public class CodeAuthorizeServiceImpl implements CodeAuthorizeService {
 
     //获取分支信息
     @Override
-    public List<String> findBranch(String authId,String houseName,int type) {
-        // Proof oneProof = proofService.findOneProof(proofId);
-        // String accessToken = oneProof.getProofPassword();
-        PipelineAuthThird authThird = thirdServer.findOneAuthThird(authId);
-        String accessToken = authThird.getAccessToken();
+    public List<String> findBranch(String authCodeId,String houseName,int type) {
+        PipelineAuthCode authCode = codeServer.findOneAuthCode(authCodeId);
+        String accessToken = authCode.getAccessToken();
+
 
         String house = houseName.split("/")[1];
         String name = houseName.split("/")[0];
@@ -257,12 +240,9 @@ public class CodeAuthorizeServiceImpl implements CodeAuthorizeService {
 
     //获取仓库的url
     @Override
-    public String getHouseUrl(String authId,String houseName,int type){
-        // Proof oneProof = proofService.findOneProof(proofId);
-        // String accessToken = oneProof.getProofPassword();
-
-        PipelineAuthThird authThird = thirdServer.findOneAuthThird(authId);
-        String accessToken = authThird.getAccessToken();
+    public String getHouseUrl(String authCodeId,String houseName,int type){
+        PipelineAuthCode authCode = codeServer.findOneAuthCode(authCodeId);
+        String accessToken = authCode.getAccessToken();
 
         if (houseName == null){
             return null;
@@ -310,13 +290,10 @@ public class CodeAuthorizeServiceImpl implements CodeAuthorizeService {
     }
 
     //获取授权账户名
-    public String findMessage(String authId){
-        PipelineAuthThird oneAuthThird = thirdServer.findOneAuthThird(authId);
-        if (authId == null || oneAuthThird == null ){
+    public String findMessage(String accessToken,int authType){
+        if (accessToken == null ){
             return null;
         }
-        int authType = oneAuthThird.getAuthType();
-        String accessToken = oneAuthThird.getAccessToken();
         String userMessage = codeAuthorizeApi.getUser(accessToken,authType);
         String username = null;
         if (authType == 2){
@@ -352,16 +329,6 @@ public class CodeAuthorizeServiceImpl implements CodeAuthorizeService {
 
     }
 
-    @Override
-    public void updateProof(String authId ,String name){
-        // Proof oneProof = proofService.findOneProof(proofId);
-        PipelineAuthThird authThird = thirdServer.findOneAuthThird(authId);
-        authThird.setNames(name);
-        // oneProof.setProofName(name);
-        // proofService.updateProof(oneProof);
-        thirdServer.updateAuthThird(authThird);
-    }
-
     /**
      * 访问url
      * @param url 访问地址
@@ -393,35 +360,23 @@ public class CodeAuthorizeServiceImpl implements CodeAuthorizeService {
     @Scheduled(cron = "59 59 23 * * ?")
     public void updateAuthorization() {
         logger.info("定时任务");
-        List<PipelineAuthThird> allAuthThird = thirdServer.findAllAuthThird(2);
-        // List<Proof> authorizationProof = proofService.findAuthorizationProof(2);
-        if (allAuthThird == null){
+        List<PipelineAuthCode> allAuthCode = codeServer.findAllAuthCode(2);
+        if (allAuthCode == null){
             return;
         }
-        for (PipelineAuthThird authThird : allAuthThird) {
+        for (PipelineAuthCode authCode : allAuthCode) {
             logger.info("gitee定时任务，时间:" +new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())+"更新授权信息");
-            String refreshToken = codeAuthorizeApi.findRefreshToken(authThird.getRefreshToken());
+            String refreshToken = codeAuthorizeApi.findRefreshToken(authCode.getRefreshToken());
             ResponseEntity<JSONObject> forEntity = restTemplate.postForEntity(refreshToken,String.class, JSONObject.class);
             JSONObject body = forEntity.getBody();
             if (body== null){
                 return;
             }
-            authThird.setRefreshToken(body.getString("access_token"));
-            authThird.setRefreshToken(body.getString("refresh_token"));
-            thirdServer.updateAuthThird(authThird);
+            authCode.setRefreshToken(body.getString("access_token"));
+            authCode.setRefreshToken(body.getString("refresh_token"));
+            codeServer.updateAuthCode(authCode);
         }
-        // for (Proof proof : authorizationProof) {
-        //     logger.info("gitee定时任务，时间:" +new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())+"更新授权信息");
-        //     String refreshToken = codeAuthorizeApi.findRefreshToken(proof.getCallbackUrl());
-        //     ResponseEntity<JSONObject> forEntity = restTemplate.postForEntity(refreshToken,String.class, JSONObject.class);
-        //     JSONObject body = forEntity.getBody();
-        //     if (body== null){
-        //         return;
-        //     }
-        //     proof.setProofPassword(body.getString("access_token"));
-        //     proof.setCallbackUrl( body.getString("refresh_token"));
-        //     proofService.updateProof(proof);
-        // }
+
     }
 
 

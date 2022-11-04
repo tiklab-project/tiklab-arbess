@@ -17,7 +17,7 @@ import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @RestController
-@RequestMapping("/pipelineAuth")
+@RequestMapping("/auth")
 @Api(name = "PipelineAuthController",desc = "流水线授权")
 public class PipelineAuthController {
 
@@ -26,37 +26,47 @@ public class PipelineAuthController {
 
 
     @RequestMapping(path="/createAuth",method = RequestMethod.POST)
-    @ApiMethod(name = "createAuth",desc = "创建权限信息")
-    @ApiParam(name = "pipelineAuth",desc = "认证信息",required = true)
-    public Result<String> createAuth( @RequestBody @Valid @NotNull PipelineAuth pipelineAuth) {
-        String authId = authService.createAuth(pipelineAuth);
-        return Result.ok(authId);
+    @ApiMethod(name = "createPipelineAuth",desc = "创建")
+    @ApiParam(name = "pipelineAuth",desc = "配置信息",required = true)
+    public Result<String> createPipelineAuth(@RequestBody @Valid PipelineAuth pipelineAuth) {
+        String pipelineAuthId = authService.createAuth(pipelineAuth);
+        return Result.ok(pipelineAuthId);
     }
 
+    //删除
+    @RequestMapping(path="/deleteAuth",method = RequestMethod.POST)
+    @ApiMethod(name = "deletePipelineAuth",desc = "删除")
+    @ApiParam(name = "authId",desc = "配置id",required = true)
+    public Result<Void> deletePipelineAuth(@NotNull @Valid String authId) {
+        authService.deleteAuth(authId);
+        return Result.ok();
+    }
 
+    //更新
     @RequestMapping(path="/updateAuth",method = RequestMethod.POST)
-    @ApiMethod(name = "updateAuth",desc = "更新权限信息")
-    @ApiParam(name = "pipelineAuth",desc = "认证信息",required = true)
-    public Result<Void> updateAuth(@RequestBody @Valid @NotNull PipelineAuth pipelineAuth) {
+    @ApiMethod(name = "updatePipelineAuth",desc = "更新")
+    @ApiParam(name = "pipelineAuth",desc = "配置信息",required = true)
+    public Result<Void> updatePipelineAuth(@RequestBody @NotNull @Valid PipelineAuth pipelineAuth) {
         authService.updateAuth(pipelineAuth);
         return Result.ok();
     }
 
-    @RequestMapping(path="/deleteAuth",method = RequestMethod.POST)
-    @ApiMethod(name = "deleteAuth",desc = "删除权限信息")
-    @ApiParam(name = "type",desc = "类型",required = true)
-    public Result<Void> deleteAuth(@NotNull int type, String authId) {
-        authService.deleteAuth(type,authId);
-        return Result.ok();
+    //查询
+    @RequestMapping(path="/findOneAuth",method = RequestMethod.POST)
+    @ApiMethod(name = "findPipelineAuth",desc = "查询")
+    @ApiParam(name = "authId",desc = "配置id",required = true)
+    public Result<PipelineAuth> findPipelineAuth(@NotNull @Valid String authId) {
+        PipelineAuth pipelineAuth = authService.findOneAuth(authId);
+        return Result.ok(pipelineAuth);
     }
 
-
+    //查询所有
     @RequestMapping(path="/findAllAuth",method = RequestMethod.POST)
-    @ApiMethod(name = "findAllAuth",desc = "删除权限信息")
-    @ApiParam(name = "type",desc = "类型",required = true)
-    public Result<List<Object>> findAllAuth(@NotNull int type) {
-        List<Object> allAuth = authService.findAllAuth(type);
-        return Result.ok(allAuth);
+    @ApiMethod(name = "findAllPipelineAuth",desc = "查询所有")
+    public Result<List<PipelineAuth>> findAllPipelineAuth() {
+        List<PipelineAuth> allPipelineAuth = authService.findAllAuth();
+        return Result.ok(allPipelineAuth);
     }
+
     
 }

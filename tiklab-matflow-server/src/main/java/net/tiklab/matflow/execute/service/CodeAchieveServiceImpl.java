@@ -2,15 +2,14 @@ package net.tiklab.matflow.execute.service;
 
 import net.tiklab.core.exception.ApplicationException;
 import net.tiklab.matflow.definition.model.Pipeline;
-import net.tiklab.matflow.execute.service.ConfigCommonService;
 import net.tiklab.matflow.definition.model.PipelineCode;
-import net.tiklab.matflow.execute.service.CodeAchieveService;
 import net.tiklab.matflow.execute.model.PipelineProcess;
 import net.tiklab.matflow.orther.service.PipelineUntil;
-import net.tiklab.matflow.setting.model.Proof;
+import net.tiklab.matflow.setting.model.PipelineAuthCode;
 import net.tiklab.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -50,14 +49,14 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
         commonService.execHistory(pipelineProcess,"空间分配成功。");
 
         //获取凭证
-        Proof proof = pipelineCode.getProof();
-        pipelineProcess.setProof(proof);
+        PipelineAuthCode pipelineAuthCode = pipelineCode.getPipelineAuthCode();
 
-        if (proof == null){
+        if (pipelineAuthCode == null){
             commonService.updateState(pipelineProcess,false);
             commonService.execHistory(pipelineProcess,"凭证为空。");
             return false;
         }
+
         //分支
         String codeBranch = pipelineCode.getCodeBranch();
         if(!PipelineUntil.isNoNull(codeBranch)){
@@ -67,19 +66,23 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
         String s = "开始拉取代码 : " + "\n"
                 + "FileAddress : " + file + "\n"
                 + "Uri : " + pipelineCode.getCodeAddress() + "\n"
-                + "Branch : " + codeBranch + "\n"
-                + "proofType : " +proof.getProofType();
+                + "Branch : " + codeBranch + "\n";
         
         commonService.execHistory(pipelineProcess,s);
 
         try {
-            Process process = codeStart(proof, pipelineCode,pipeline.getPipelineName());
+            Process process = codeStart(pipelineCode,pipeline.getPipelineName());
             if (process == null){
                 commonService.execHistory(pipelineProcess,"代码拉取成功");
                 commonService.updateState(pipelineProcess,true);
                 return true;
             }
-            commonService.log(process.getInputStream(),process.getErrorStream(), pipelineProcess);
+            int log = commonService.log(process.getInputStream(), process.getErrorStream(), pipelineProcess);
+            if (log == 0){
+                commonService.execHistory(pipelineProcess,"代码拉取失败。 \n" );
+                commonService.updateState(pipelineProcess,false);
+                return false;
+            }
         } catch (IOException e) {
             commonService.execHistory(pipelineProcess,"系统执行命令错误 \n" + e);
             commonService.updateState(pipelineProcess,false);
@@ -101,23 +104,19 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
 
     /**
      * 执行命令
-     * @param proof 凭证
      * @param pipelineCode 配置信息
      * @return 命令执行实例
      * @throws IOException 命令错误
      * @throws URISyntaxException git地址错误
      * @throws ApplicationException 不存在配置
      */
-    private Process codeStart(Proof proof, PipelineCode pipelineCode,String pipelineName) throws IOException, URISyntaxException ,ApplicationException{
+    private Process codeStart(PipelineCode pipelineCode,String pipelineName) throws IOException, URISyntaxException ,ApplicationException{
         if (pipelineCode == null){
             return null;
         }
-
-        //系统类型
-        int systemType = PipelineUntil.findSystemType();
         //源码存放位置
         String fileAddress = PipelineUntil.findFileAddress()+pipelineName;
-
+        PipelineAuthCode pipelineAuthCode = pipelineCode.getPipelineAuthCode();
         switch (pipelineCode.getType()) {
             case 1, 2, 3, 4 -> {
                 //git server地址
@@ -125,10 +124,16 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
                 if (gitAddress == null) {
                     throw new ApplicationException("不存在Git配置");
                 }
-                if (proof.getProofType().equals("SSH")) {
+                if (PipelineUntil.validFile(gitAddress,1) == 1){
+                    throw new ApplicationException("Git地址配置错误："+fileAddress +" 不是个目录。");
+                }
+                if (PipelineUntil.validFile(gitAddress,1) == 2){
+                    throw new ApplicationException("Git地址配置错误："+fileAddress +" 找不到git的可执行文件。");
+                }
+                if (pipelineAuthCode.getAuthType() == 2) {
                     return null;
                 } else {
-                    String gitOrder = gitOrder(pipelineCode, fileAddress, systemType);
+                    String gitOrder = gitOrder(pipelineCode, fileAddress);
                     return PipelineUntil.process(gitAddress, gitOrder);
                 }
             }
@@ -138,10 +143,16 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
                 if (svnAddress == null) {
                     throw new ApplicationException("不存在Svn配置");
                 }
-                if (proof.getProofType().equals("SSH")) {
+                if (PipelineUntil.validFile(svnAddress,5) == 1){
+                    throw new ApplicationException("Git地址配置错误："+fileAddress +" 不是个目录。");
+                }
+                if (PipelineUntil.validFile(svnAddress,5) == 2){
+                    throw new ApplicationException("Git地址配置错误："+fileAddress +" 找不到svn的可执行文件。");
+                }
+                if (pipelineAuthCode.getAuthType() == 2) {
                     return null;
                 } else {
-                    String gitOrder = svnOrder(pipelineCode, fileAddress, systemType);
+                    String gitOrder = svnOrder(pipelineCode, fileAddress);
                     return PipelineUntil.process(svnAddress, gitOrder);
                 }
             }
@@ -159,16 +170,23 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
      * @throws URISyntaxException url格式不正确
      * @throws MalformedURLException 不是https或者http
      */
-    private String gitOrder(PipelineCode pipelineCode,String codeDir,int systemType) throws URISyntaxException, MalformedURLException {
+    private String gitOrder(PipelineCode pipelineCode,String codeDir) throws URISyntaxException, MalformedURLException {
 
         //凭证
-        Proof proof = pipelineCode.getProof();
-        String username= proof.getProofUsername();
-        String password = proof.getProofPassword();
+        PipelineAuthCode pipelineAuthCode = pipelineCode.getPipelineAuthCode();
+        String username= pipelineAuthCode.getUsername();
+        String password = pipelineAuthCode.getPassword();
+        if (pipelineCode.getType() == 2 || pipelineCode.getType() == 3){
+            password = pipelineAuthCode.getAccessToken();
+        }
 
         //地址信息
         StringBuilder url = new StringBuilder(pipelineCode.getCodeAddress());
         String branch = pipelineCode.getCodeBranch();
+
+        if (username == null || password == null){
+            throw new ApplicationException("账号或密码不能为空。");
+        }
 
         String up=username.replace("@", "%40")+":"+password+"@";
         //获取url类型
@@ -190,7 +208,7 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
         }
 
         //根据不同系统更新命令
-        if (systemType == 1){
+        if (PipelineUntil.findSystemType() == 1){
             order=".\\git.exe clone"+" " + order;
         }else {
             order="./git clone"+" " + order;
@@ -204,11 +222,14 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
      * @param codeDir 存放位置
      * @return 执行命令
      */
-    private String svnOrder(PipelineCode pipelineCode,String codeDir,int systemType){
+    private String svnOrder(PipelineCode pipelineCode,String codeDir){
         //凭证
-        Proof proof = pipelineCode.getProof();
-        String username= proof.getProofUsername();
-        String password = proof.getProofPassword();
+        PipelineAuthCode pipelineAuthCode = pipelineCode.getPipelineAuthCode();
+        String username= pipelineAuthCode.getUsername();
+        String password = pipelineAuthCode.getPassword();
+        if (pipelineCode.getType() == 2 || pipelineCode.getType() == 3){
+            password = pipelineAuthCode.getAccessToken();
+        }
 
         //地址信息
         StringBuilder url = new StringBuilder(pipelineCode.getCodeAddress());
@@ -226,7 +247,7 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
             order =" -b "+branch+" "+ url+" "+codeDir;
         }
         //根据不同系统更新命令
-        if (systemType == 1){
+        if (PipelineUntil.findSystemType() == 1){
             order=".\\svn.exe checkout"+" "+order;
         }else {
             order="./svn checkout"+" "+order;

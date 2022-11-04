@@ -2,13 +2,12 @@ package net.tiklab.matflow.definition.service;
 
 
 import net.tiklab.beans.BeanMapper;
-import net.tiklab.dal.jpa.annotation.Id;
 import net.tiklab.join.JoinTemplate;
 import net.tiklab.matflow.definition.dao.PipelineCodeDao;
 import net.tiklab.matflow.definition.entity.PipelineCodeEntity;
 import net.tiklab.matflow.definition.model.PipelineCode;
 import net.tiklab.matflow.execute.service.CodeAuthorizeService;
-import net.tiklab.matflow.setting.model.Proof;
+import net.tiklab.matflow.setting.model.PipelineAuthCode;
 import net.tiklab.rpc.annotation.Exporter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,19 +48,11 @@ public class PipelineCodeServiceImpl implements PipelineCodeService {
     @Override
     public void updateCode(PipelineCode pipelineCode) {
         PipelineCode oneCode = findOneCode(pipelineCode.getCodeId());
-        if (pipelineCode.getProof() == null){
-            pipelineCode.setProof(oneCode.getProof());
-        }
-        joinTemplate.joinQuery(pipelineCode);
-        Proof proof = pipelineCode.getProof();
-        if (proof == null){
-            pipelineCodeDao.updateCode(BeanMapper.map(pipelineCode, PipelineCodeEntity.class));
-            return;
-        }
-        int proofScope = proof.getProofScope();
-        switch (proofScope) {
+        joinTemplate.joinQuery(oneCode);
+        PipelineAuthCode pipelineAuthCode = oneCode.getPipelineAuthCode();
+        switch (pipelineCode.getType()) {
             case 2, 3 -> {
-                String houseUrl = codeAuthorizeService.getHouseUrl(proof.getProofId(), pipelineCode.getCodeName(), proofScope);
+                String houseUrl = codeAuthorizeService.getHouseUrl(pipelineAuthCode.getCodeId(), pipelineCode.getCodeName(), pipelineCode.getType());
                 pipelineCode.setCodeAddress(houseUrl);
             }
             default -> pipelineCode.setCodeAddress(pipelineCode.getCodeName());

@@ -4,22 +4,34 @@ import net.tiklab.dal.jpa.annotation.*;
 import net.tiklab.matflow.orther.service.PipelineUntil;
 import net.tiklab.utils.context.LoginContext;
 @Entity
-@Table(name="pipeline_auth_Third")
-public class PipelineAuthThirdEntity {
+@Table(name="pipeline_auth_code")
+public class PipelineAuthCodeEntity {
 
     @Id
     @GeneratorValue
     @Column(name = "id")
-    private String thirdId;
+    private String codeId;
 
     @Column(name = "type")
+    private int type;
+
+    @Column(name = "auth_type")
     private int authType;
 
+    @Column(name = "create_time")
+    private String createTime = PipelineUntil.date;
+
     @Column(name = "name")
-    private String names;
+    private String name;
 
     @Column(name = "username")
     private String username;
+
+    @Column(name = "password")
+    private String password;
+
+    @Column(name = "private_key")
+    private String privateKey;
 
     @Column(name = "access_token")
     private String accessToken;
@@ -27,8 +39,8 @@ public class PipelineAuthThirdEntity {
     @Column(name = "refresh_token")
     private String refreshToken;
 
-    @Column(name = "create_time")
-    private String createTime = PipelineUntil.date;
+    @Column(name = "auth_id")
+    private String authId;
 
     //创建人
     @Column(name = "user_id")
@@ -39,12 +51,20 @@ public class PipelineAuthThirdEntity {
     private int authPublic;
 
 
-    public String getThirdId() {
-        return thirdId;
+    public String getCodeId() {
+        return codeId;
     }
 
-    public void setThirdId(String thirdId) {
-        this.thirdId = thirdId;
+    public void setCodeId(String codeId) {
+        this.codeId = codeId;
+    }
+
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
     }
 
     public int getAuthType() {
@@ -55,12 +75,20 @@ public class PipelineAuthThirdEntity {
         this.authType = authType;
     }
 
-    public String getNames() {
-        return names;
+    public String getCreateTime() {
+        return createTime;
     }
 
-    public void setNames(String names) {
-        this.names = names;
+    public void setCreateTime(String createTime) {
+        this.createTime = createTime;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getUsername() {
@@ -69,6 +97,22 @@ public class PipelineAuthThirdEntity {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getPrivateKey() {
+        return privateKey;
+    }
+
+    public void setPrivateKey(String privateKey) {
+        this.privateKey = privateKey;
     }
 
     public String getAccessToken() {
@@ -87,12 +131,12 @@ public class PipelineAuthThirdEntity {
         this.refreshToken = refreshToken;
     }
 
-    public String getCreateTime() {
-        return createTime;
+    public String getAuthId() {
+        return authId;
     }
 
-    public void setCreateTime(String createTime) {
-        this.createTime = createTime;
+    public void setAuthId(String authId) {
+        this.authId = authId;
     }
 
     public String getUserId() {
@@ -111,3 +155,35 @@ public class PipelineAuthThirdEntity {
         this.authPublic = authPublic;
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
