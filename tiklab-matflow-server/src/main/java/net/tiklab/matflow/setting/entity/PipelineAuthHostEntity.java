@@ -40,9 +40,6 @@ public class PipelineAuthHostEntity {
     @Column(name = "private_key")
     private String privateKey;
 
-    @Column(name = "auth_id")
-    private String authId;
-
     //创建人
     @Column(name = "user_id")
     private String userId = LoginContext.getLoginId();
@@ -129,14 +126,6 @@ public class PipelineAuthHostEntity {
 
     public void setPrivateKey(String privateKey) {
         this.privateKey = privateKey;
-    }
-
-    public String getAuthId() {
-        return authId;
-    }
-
-    public void setAuthId(String authId) {
-        this.authId = authId;
     }
 
     public String getUserId() {

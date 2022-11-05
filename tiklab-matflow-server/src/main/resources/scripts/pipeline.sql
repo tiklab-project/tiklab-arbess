@@ -211,37 +211,18 @@ create table pipeline_auth  (
 -- ----------------------------
 -- Table structure for pipeline_auth_code
 -- ----------------------------
-create table pipeline_auth_code  (
+create table pipeline_auth_server  (
     id varchar(64) COMMENT 'id',
-    type int COMMENT '源码类型 1.通用git 2：gitee 3. github 4.github 5.svn',
+    type int COMMENT '1.gitee 2.github 3.sonar 4.nexus',
     name varchar(32) COMMENT '名称',
     create_time varchar(64) COMMENT '创建时间',
     auth_type int COMMENT '认证方式 1. 自定义 ，2. 统一认证' ,
     username varchar(255) COMMENT '用户名',
     password varchar(255) COMMENT '密码',
     private_key varchar(255) COMMENT '私钥',
-    auth_id varchar(255) COMMENT '凭证id',
+    server_address varchar(255) COMMENT '服务地址',
     access_token varchar(255) COMMENT '认证信息',
     refresh_token varchar(255) COMMENT '刷新认证信息',
-    auth_public int COMMENT '是否公开 1：公开， 2：不公开',
-    user_id varchar(255) COMMENT '用户id' ,
-    PRIMARY KEY (id) USING BTREE
-);
-
--- ----------------------------
--- Table structure for pipeline_auth_code_scan
--- ----------------------------
-create table pipeline_auth_code_scan  (
-    id varchar(64) COMMENT 'id',
-    type int COMMENT '代码扫描类型 1：sonar ',
-    name varchar(32) COMMENT '名称',
-    create_time varchar(64) COMMENT '创建时间',
-    server_address varchar(255) COMMENT '服务地址',
-    auth_type int COMMENT '认证方式 1. 自定义 ，2. 统一认证' ,
-    username varchar(255) COMMENT '用户名',
-    password varchar(255) COMMENT '密码',
-    private_key varchar(255) COMMENT '私钥',
-    auth_id varchar(255) COMMENT '凭证id',
     auth_public int COMMENT '是否公开 1：公开， 2：不公开',
     user_id varchar(255) COMMENT '用户id' ,
     PRIMARY KEY (id) USING BTREE

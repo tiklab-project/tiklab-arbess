@@ -11,26 +11,23 @@ import net.tiklab.user.user.model.User;
 
 @ApiModel
 @Join
-@Mapper(targetAlias = "PipelineAuthCodeScanEntity")
-public class PipelineAuthCodeScan {
+@Mapper(targetAlias = "PipelineAuthThirdEntity")
+public class PipelineAuthThird {
 
-    @ApiProperty(name = "codeScanId",desc="id")
-    private String codeScanId;
+    @ApiProperty(name = "serverId",desc="id")
+    private String serverId;
 
-    @ApiProperty(name = "type",desc="类型")
+    @ApiProperty(name = "type",desc="类型 1. gitee 2. github 3.sonar 4.nexus" )
     private int type;
 
-    @ApiProperty(name = "authType",desc="类型")
+    @ApiProperty(name = "authType",desc="认证类型 1.用户名密码 2. 通用认证")
     private int authType;
 
-    @ApiProperty(name = "name",desc="名称")
+    @ApiProperty(name = "names",desc="服务名称")
     private String name;
 
-    @ApiProperty(name = "create_time")
-    private String createTime;
-
-    @ApiProperty(name = "serverAddress")
-    private String serverAddress;
+    @ApiProperty(name = "createTime")
+    private String createTime ;
 
     @ApiProperty(name = "username",desc="用户名")
     private String username;
@@ -38,8 +35,17 @@ public class PipelineAuthCodeScan {
     @ApiProperty(name = "password",desc="密码")
     private String password;
 
-    @ApiProperty(name = "privateKey",desc="私钥")
+    @ApiProperty(name = "privateKey",desc="token")
     private String privateKey;
+
+    @ApiProperty(name = "serverAddress",desc="服务地址")
+    private String serverAddress;
+
+    @ApiProperty(name = "accessToken",desc="授权信息")
+    private String accessToken;
+
+    @ApiProperty(name = "refreshToken",desc="刷新授权")
+    private String refreshToken;
 
     @Mappings({
             @Mapping(source = "user.id",target = "userId")
@@ -50,19 +56,16 @@ public class PipelineAuthCodeScan {
     @ApiProperty(name = "authPublic",desc="是否公开")
     private int authPublic;
 
-    @Mappings({
-            @Mapping(source = "pipelineAuth.authId",target = "authId")
-    })
-    @JoinQuery(key = "authId")
-    private PipelineAuth pipelineAuth;
+    @ApiProperty(name = "message",desc="授权信息")
+    private String message;
 
 
-    public String getCodeScanId() {
-        return codeScanId;
+    public String getServerId() {
+        return serverId;
     }
 
-    public void setCodeScanId(String codeScanId) {
-        this.codeScanId = codeScanId;
+    public void setServerId(String serverId) {
+        this.serverId = serverId;
     }
 
     public int getType() {
@@ -97,14 +100,6 @@ public class PipelineAuthCodeScan {
         this.createTime = createTime;
     }
 
-    public String getServerAddress() {
-        return serverAddress;
-    }
-
-    public void setServerAddress(String serverAddress) {
-        this.serverAddress = serverAddress;
-    }
-
     public String getUsername() {
         return username;
     }
@@ -129,6 +124,30 @@ public class PipelineAuthCodeScan {
         this.privateKey = privateKey;
     }
 
+    public String getServerAddress() {
+        return serverAddress;
+    }
+
+    public void setServerAddress(String serverAddress) {
+        this.serverAddress = serverAddress;
+    }
+
+    public String getAccessToken() {
+        return accessToken;
+    }
+
+    public void setAccessToken(String accessToken) {
+        this.accessToken = accessToken;
+    }
+
+    public String getRefreshToken() {
+        return refreshToken;
+    }
+
+    public void setRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
+    }
+
     public User getUser() {
         return user;
     }
@@ -145,11 +164,37 @@ public class PipelineAuthCodeScan {
         this.authPublic = authPublic;
     }
 
-    public PipelineAuth getPipelineAuth() {
-        return pipelineAuth;
+    public String getMessage() {
+        return message;
     }
 
-    public void setPipelineAuth(PipelineAuth pipelineAuth) {
-        this.pipelineAuth = pipelineAuth;
+    public void setMessage(String message) {
+        this.message = message;
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

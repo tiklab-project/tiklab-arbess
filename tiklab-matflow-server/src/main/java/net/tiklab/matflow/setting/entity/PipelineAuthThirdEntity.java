@@ -4,16 +4,19 @@ import net.tiklab.dal.jpa.annotation.*;
 import net.tiklab.matflow.orther.service.PipelineUntil;
 import net.tiklab.utils.context.LoginContext;
 @Entity
-@Table(name="pipeline_auth_code")
-public class PipelineAuthCodeEntity {
+@Table(name="pipeline_auth_server")
+public class PipelineAuthThirdEntity {
 
     @Id
     @GeneratorValue
     @Column(name = "id")
-    private String codeId;
+    private String serverId;
 
     @Column(name = "type")
     private int type;
+
+    @Column(name = "name")
+    private String name;
 
     @Column(name = "auth_type")
     private int authType;
@@ -21,14 +24,14 @@ public class PipelineAuthCodeEntity {
     @Column(name = "create_time")
     private String createTime = PipelineUntil.date;
 
-    @Column(name = "name")
-    private String name;
-
     @Column(name = "username")
     private String username;
 
     @Column(name = "password")
     private String password;
+
+    @Column(name = "server_address")
+    private String serverAddress;
 
     @Column(name = "private_key")
     private String privateKey;
@@ -39,9 +42,6 @@ public class PipelineAuthCodeEntity {
     @Column(name = "refresh_token")
     private String refreshToken;
 
-    @Column(name = "auth_id")
-    private String authId;
-
     //创建人
     @Column(name = "user_id")
     private String userId = LoginContext.getLoginId();
@@ -50,13 +50,16 @@ public class PipelineAuthCodeEntity {
     @Column(name = "auth_public")
     private int authPublic;
 
+    @Column(name = "message")
+    private String message;
 
-    public String getCodeId() {
-        return codeId;
+
+    public String getServerId() {
+        return serverId;
     }
 
-    public void setCodeId(String codeId) {
-        this.codeId = codeId;
+    public void setServerId(String serverId) {
+        this.serverId = serverId;
     }
 
     public int getType() {
@@ -65,6 +68,14 @@ public class PipelineAuthCodeEntity {
 
     public void setType(int type) {
         this.type = type;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public int getAuthType() {
@@ -83,14 +94,6 @@ public class PipelineAuthCodeEntity {
         this.createTime = createTime;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public String getUsername() {
         return username;
     }
@@ -105,6 +108,14 @@ public class PipelineAuthCodeEntity {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getServerAddress() {
+        return serverAddress;
+    }
+
+    public void setServerAddress(String serverAddress) {
+        this.serverAddress = serverAddress;
     }
 
     public String getPrivateKey() {
@@ -131,14 +142,6 @@ public class PipelineAuthCodeEntity {
         this.refreshToken = refreshToken;
     }
 
-    public String getAuthId() {
-        return authId;
-    }
-
-    public void setAuthId(String authId) {
-        this.authId = authId;
-    }
-
     public String getUserId() {
         return userId;
     }
@@ -153,6 +156,14 @@ public class PipelineAuthCodeEntity {
 
     public void setAuthPublic(int authPublic) {
         this.authPublic = authPublic;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
     }
 }
 

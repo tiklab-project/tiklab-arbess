@@ -26,8 +26,8 @@ public class PipelineCodeEntity {
     private String codeBranch;
 
     //凭证名称
-    @Column(name = "code_id",notNull = true)
-    private String authCodeId;
+    @Column(name = "auth_id",notNull = true)
+    private String authId;
 
     public String getCodeId() {
         return codeId;
@@ -61,11 +61,11 @@ public class PipelineCodeEntity {
         this.codeBranch = codeBranch;
     }
 
-    public String getAuthCodeId() {
-        return authCodeId;
+    public String getAuthId() {
+        return authId;
     }
 
-    public void setAuthCodeId(String authCodeId) {
-        this.authCodeId = authCodeId;
+    public void setAuthId(String authId) {
+        this.authId = authId;
     }
 }

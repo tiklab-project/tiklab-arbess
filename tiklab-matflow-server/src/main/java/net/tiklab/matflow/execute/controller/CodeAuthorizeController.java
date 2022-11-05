@@ -44,18 +44,18 @@ public class CodeAuthorizeController {
 
     @RequestMapping(path="/findAllStorehouse",method = RequestMethod.POST)
     @ApiMethod(name = "findAllStorehouse",desc = "获取所有仓库")
-    @ApiParam(name = "proofId",desc = "proofId",required = true)
-    public Result<List<String>> findAllStorehouse(@NotNull String proofId,int type) {
-        List<String> allStorehouse = codeAuthorizeService.findAllStorehouse(proofId,type);
+    @ApiParam(name = "authId",desc = "authId",required = true)
+    public Result<List<String>> findAllStorehouse(@NotNull String authId,int type) {
+        List<String> allStorehouse = codeAuthorizeService.findAllStorehouse(authId,type);
         return Result.ok(allStorehouse);
     }
 
 
     @RequestMapping(path="/findBranch",method = RequestMethod.POST)
     @ApiMethod(name = "findBranch",desc = "根据仓库名获取所有分支")
-    @ApiParam(name = "proofId",desc = "proofId",required = true)
-    public Result<List<String>> findBranch(@NotNull String proofId,String houseName,int type){
-        List<String> branch = codeAuthorizeService.findBranch(proofId,houseName,type);
+    @ApiParam(name = "authId",desc = "authId",required = true)
+    public Result<List<String>> findBranch(@NotNull String authId,String houseName,int type){
+        List<String> branch = codeAuthorizeService.findBranch(authId,houseName,type);
         return Result.ok(branch);
     }
 

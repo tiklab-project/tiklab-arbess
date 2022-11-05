@@ -17,11 +17,11 @@ public class PipelineAuthHost {
     @ApiProperty(name = "hostId",desc="id")
     private String hostId;
 
-    @ApiProperty(name = "authType",desc="类型")
-    private int authType;
-
-    @ApiProperty(name = "type",desc="类型")
+    @ApiProperty(name = "type",desc="类型 1. 普通 2. aliyun 3. 腾讯云" )
     private int type;
+
+    @ApiProperty(name = "authType",desc="认证类型 1.用户名密码 2. 通用认证")
+    private int authType;
 
     @ApiProperty(name = "name",desc="名称")
     private String name;
@@ -52,13 +52,6 @@ public class PipelineAuthHost {
 
     @ApiProperty(name = "authPublic",desc="是否公开")
     private int authPublic;
-
-    @Mappings({
-            @Mapping(source = "pipelineAuth.authId",target = "authId")
-    })
-    @JoinQuery(key = "authId")
-    private PipelineAuth pipelineAuth;
-
 
     public String getHostId() {
         return hostId;
@@ -156,11 +149,4 @@ public class PipelineAuthHost {
         this.authPublic = authPublic;
     }
 
-    public PipelineAuth getPipelineAuth() {
-        return pipelineAuth;
-    }
-
-    public void setPipelineAuth(PipelineAuth pipelineAuth) {
-        this.pipelineAuth = pipelineAuth;
-    }
 }

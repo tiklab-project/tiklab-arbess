@@ -22,19 +22,19 @@ public interface CodeAuthorizeService {
     String findAccessToken(String code,int type)  throws IOException ;
     /**
      * 获取用户所有仓库
-     * @param proofId 凭证
+     * @param authId 凭证
      * @return 厂库信息
      */
-    List<String> findAllStorehouse(String proofId,int type);
+    List<String> findAllStorehouse(String authId,int type);
 
 
     /**
      * 获取仓库所有分支
-     * @param proofId 凭证ID
+     * @param authId 凭证ID
      * @param houseName 仓库名
      * @return 所有分支
      */
-    List<String> findBranch(String proofId,String houseName,int type);
+    List<String> findBranch(String authId,String houseName,int type);
 
     /**
      * 获取仓库克隆地址

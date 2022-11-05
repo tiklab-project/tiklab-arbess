@@ -2,11 +2,7 @@ package net.tiklab.matflow.definition.model;
 
 
 import net.tiklab.beans.annotation.Mapper;
-import net.tiklab.beans.annotation.Mapping;
-import net.tiklab.beans.annotation.Mappings;
 import net.tiklab.join.annotation.Join;
-import net.tiklab.join.annotation.JoinQuery;
-import net.tiklab.matflow.setting.model.PipelineAuthCode;
 import net.tiklab.postin.annotation.ApiModel;
 import net.tiklab.postin.annotation.ApiProperty;
 
@@ -32,12 +28,12 @@ public class PipelineCode {
     @ApiProperty(name="codeBranch",desc="分支")
     private String codeBranch;
 
-    //凭证id
-    @Mappings({
-            @Mapping(source = "pipelineAuthCode.codeId",target = "authCodeId")
-    })
-    @JoinQuery(key = "codeId")
-    private PipelineAuthCode pipelineAuthCode;
+    //授权id
+    @ApiProperty(name="authName",desc="授权id")
+    private String authId;
+
+    //授权名称
+    private Object auth;
 
     //顺序
     private int sort;
@@ -89,12 +85,12 @@ public class PipelineCode {
         this.codeBranch = codeBranch;
     }
 
-    public PipelineAuthCode getPipelineAuthCode() {
-        return pipelineAuthCode;
+    public String getAuthId() {
+        return authId;
     }
 
-    public void setPipelineAuthCode(PipelineAuthCode pipelineAuthCode) {
-        this.pipelineAuthCode = pipelineAuthCode;
+    public void setAuthId(String authId) {
+        this.authId = authId;
     }
 
     public int getSort() {
@@ -114,4 +110,11 @@ public class PipelineCode {
         this.codeAlias = codeAlias;
     }
 
+    public Object getAuth() {
+        return auth;
+    }
+
+    public void setAuth(Object auth) {
+        this.auth = auth;
+    }
 }
