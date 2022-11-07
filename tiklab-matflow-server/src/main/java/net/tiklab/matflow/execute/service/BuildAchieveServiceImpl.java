@@ -6,8 +6,6 @@ import net.tiklab.matflow.definition.model.PipelineBuild;
 import net.tiklab.matflow.execute.model.PipelineProcess;
 import net.tiklab.matflow.orther.service.PipelineUntil;
 import net.tiklab.rpc.annotation.Exporter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -54,7 +52,7 @@ public class BuildAchieveServiceImpl implements BuildAchieveService {
             }
 
             //构建失败
-            int state = commonService.log(process.getInputStream(), process.getErrorStream(),pipelineProcess);
+            int state = commonService.log(process.getInputStream(), process.getErrorStream(),pipelineProcess,"GBK");
             process.destroy();
             
             if (state == 0){

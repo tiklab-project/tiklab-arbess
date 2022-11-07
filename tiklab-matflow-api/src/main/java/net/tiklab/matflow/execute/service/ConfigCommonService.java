@@ -8,7 +8,6 @@ import net.tiklab.matflow.execute.model.PipelineProcess;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
 
 /**
  * 执行过程配置的公共方法
@@ -20,10 +19,11 @@ public interface ConfigCommonService {
      * 执行日志
      * @param inputStream 执行信息
      * @param pipelineProcess 执行信息
+     * @param encode 编码
      * @throws IOException 字符流转换异常
      * @return map 执行状态
      */
-     int log(InputStream inputStream,InputStream errInputStream, PipelineProcess pipelineProcess) throws IOException;
+     int log(InputStream inputStream,InputStream errInputStream, PipelineProcess pipelineProcess,String encode) throws IOException;
 
     /**
      * 输出错误信息
@@ -50,7 +50,7 @@ public interface ConfigCommonService {
      * 初始化历史
      * @return 历史
      */
-     PipelineExecHistory initializeHistory(Pipeline pipeline, String userId);
+     PipelineExecHistory initializeHistory(Pipeline pipeline);
 
     /**
      * 初始化日志

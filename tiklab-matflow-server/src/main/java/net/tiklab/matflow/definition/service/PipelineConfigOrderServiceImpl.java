@@ -122,12 +122,12 @@ public class PipelineConfigOrderServiceImpl implements PipelineConfigOrderServic
 
     //获取配置详情
     @Override
-    public PipelineConfigOrder findOneConfig(String pipelineId,int type){
+    public Object findOneConfig(String pipelineId,int type){
         PipelineConfigOrder typeConfig = findTypeConfig(pipelineId, type);
         if (typeConfig == null){
             return null;
         }
-        return pipelineConfigService.findConfig(typeConfig, type);
+        return pipelineConfigService.findOneConfig(typeConfig);
     }
 
     //效验字段

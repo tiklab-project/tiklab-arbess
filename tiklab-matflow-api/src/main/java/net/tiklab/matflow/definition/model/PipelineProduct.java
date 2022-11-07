@@ -28,17 +28,16 @@ public class PipelineProduct {
     @ApiProperty(name = "fileAddress",desc = "文件地址")
     private String fileAddress;
 
-    // @ApiProperty(name="pipelineAuth",desc="授权id",eg="@selectOne")
-    // @Mappings({
-    //         @Mapping(source = "pipelineAuth.authId",target = "authId")
-    // })
-    // @JoinQuery(key = "authId")
-    // private PipelineAuth pipelineAuth;
+    //授权id
+    @ApiProperty(name="authId",desc="授权id")
+    private String authId;
+
+    //授权信息
+    private Object auth;
 
     private int type;
 
     private int sort;
-
 
 
     public String getProductId() {
@@ -103,5 +102,21 @@ public class PipelineProduct {
 
     public void setSort(int sort) {
         this.sort = sort;
+    }
+
+    public String getAuthId() {
+        return authId;
+    }
+
+    public void setAuthId(String authId) {
+        this.authId = authId;
+    }
+
+    public Object getAuth() {
+        return auth;
+    }
+
+    public void setAuth(Object auth) {
+        this.auth = auth;
     }
 }

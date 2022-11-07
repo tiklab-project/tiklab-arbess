@@ -9,6 +9,7 @@ import net.tiklab.matflow.setting.model.PipelineScm;
 import net.tiklab.matflow.setting.service.PipelineScmService;
 import net.tiklab.rpc.annotation.Exporter;
 import net.tiklab.user.user.model.User;
+import net.tiklab.utils.context.LoginContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,13 +51,8 @@ public class ConfigCommonServiceImpl implements ConfigCommonService {
      * @return map 执行状态
      */
     @Override
-    public int log(InputStream inputStream,InputStream errInputStream, PipelineProcess pipelineProcess) throws IOException {
+    public int log(InputStream inputStream,InputStream errInputStream, PipelineProcess pipelineProcess,String encode) throws IOException {
         int state = 1;
-        int taskType = pipelineProcess.getPipelineExecLog().getTaskType();
-        String encode = "GBK";
-        if (taskType >= 30 && taskType<40){
-            encode = "UTF-8";
-        }
 
         InputStreamReader inputStreamReader = PipelineUntil.encode(inputStream, encode);
         
@@ -150,7 +146,7 @@ public class ConfigCommonServiceImpl implements ConfigCommonService {
      * * @return 历史
      */
     @Override
-    public PipelineExecHistory initializeHistory(Pipeline pipeline, String userId) {
+    public PipelineExecHistory initializeHistory(Pipeline pipeline) {
 
         PipelineExecHistory pipelineExecHistory = new PipelineExecHistory();
         String historyId = historyService.createHistory(pipelineExecHistory);
@@ -163,9 +159,9 @@ public class ConfigCommonServiceImpl implements ConfigCommonService {
         pipelineExecHistory.setStatus(0);
         pipelineExecHistory.setPipeline(pipeline);
         pipelineExecHistory.setHistoryId(historyId);
-        pipelineExecHistory.setRunLog("");
+        pipelineExecHistory.setRunLog("流水线"+pipeline.getPipelineName()+"开始执行。");
         User user = new User();
-        user.setId(userId);
+        user.setId(LoginContext.getLoginId());
         pipelineExecHistory.setUser(user);
         pipelineExecHistory.setHistoryId(historyId);
         //构建次数
@@ -232,7 +228,8 @@ public class ConfigCommonServiceImpl implements ConfigCommonService {
         PipelineExecHistory execHistory = null;
         //查询流水线当前历史
         for (PipelineExecHistory pipelineExecHistory : list) {
-            if (!pipelineExecHistory.getPipeline().getPipelineId().equals(pipelineId)){
+            Pipeline pipeline = pipelineExecHistory.getPipeline();
+            if (!pipeline.getPipelineId().equals(pipelineId)){
                 continue;
             }
             execHistory = pipelineExecHistory;
@@ -241,18 +238,12 @@ public class ConfigCommonServiceImpl implements ConfigCommonService {
 
         //更新历史日志
         list.remove(execHistory);
-        if (!PipelineUntil.isNoNull(execHistory.getRunLog())){
-            execHistory.setRunLog(log);
-        }else {
-            execHistory.setRunLog(execHistory.getRunLog()+"\n"+log);
-        }
+        execHistory.setRunLog(execHistory.getRunLog()+"\n"+log);
         list.add(execHistory);
 
         //更新单个配置日志
         pipelineExecLog.setRunLog(pipelineExecLog.getRunLog()+"\n"+log);
         logService.updateLog(pipelineExecLog);
-
-
     }
 
     /**

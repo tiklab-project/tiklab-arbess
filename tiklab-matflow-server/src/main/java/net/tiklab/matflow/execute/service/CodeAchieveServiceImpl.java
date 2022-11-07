@@ -48,8 +48,6 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
         Pipeline pipeline = pipelineProcess.getPipeline();
         pipelineProcess.setBeginTime(beginTime);
 
-        commonService.execHistory(pipelineProcess,"流水线开始执行");
-
         //代码保存路径
         String codeDir = PipelineUntil.findFileAddress() + pipeline.getPipelineName();
         File file = new File(codeDir);
@@ -66,18 +64,21 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
         String s = "开始拉取代码 : " + "\n"
                 + "FileAddress : " + file + "\n"
                 + "Uri : " + pipelineCode.getCodeAddress() + "\n"
-                + "Branch : " + codeBranch + "\n";
-        
+                + "Branch : " + codeBranch + "\n"
+                + "代码拉取中。。。。。。 ";
+
         commonService.execHistory(pipelineProcess,s);
 
         try {
+            //命令执行失败
             Process process = codeStart(pipelineCode,pipeline.getPipelineName());
             if (process == null){
-                commonService.execHistory(pipelineProcess,"代码拉取成功");
-                commonService.updateState(pipelineProcess,true);
-                return true;
+                commonService.execHistory(pipelineProcess,"代码拉取失败。");
+                commonService.updateState(pipelineProcess,false);
+                return false;
             }
-            int log = commonService.log(process.getInputStream(), process.getErrorStream(), pipelineProcess);
+            //项目执行过程失败
+            int log = commonService.log(process.getInputStream(), process.getErrorStream(), pipelineProcess,"UTF-8");
             if (log == 0){
                 commonService.execHistory(pipelineProcess,"代码拉取失败。 \n" );
                 commonService.updateState(pipelineProcess,false);

@@ -70,12 +70,12 @@ public class PipelineAuthThirdController {
     @RequestMapping(path="/findAllAuthServerList",method = RequestMethod.POST)
     @ApiMethod(name = "findAllAuthServerList",desc = "查询所有")
     @ApiParam(name = "type",desc = "类型",required = true)
-    public Result<List<PipelineAuthThird>> findAllAuthServerList(int type) {
+    public Result<List<PipelineAuthThird>> findAllAuthServerList(@NotNull int type) {
         List<PipelineAuthThird> allPipelineAuthThird = authServerService.findAllAuthServerList(type);
         return Result.ok(allPipelineAuthThird);
     }
-    
-    
+
+
 }
 
 

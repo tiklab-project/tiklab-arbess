@@ -80,26 +80,6 @@ public class PipelineAuthThirdServerImpl implements PipelineAuthThirdServer {
     }
 
     /**
-     * 查询说有需要更新的授权信息
-     * @param type 类型
-     * @return 授权信息
-     */
-    @Override
-    public List<PipelineAuthThird> findAllAuthServer(int type) {
-        List<PipelineAuthThird> allAuthServer = findAllAuthServer();
-        if (allAuthServer == null){
-            return null;
-        }
-        List<PipelineAuthThird> list = new ArrayList<>();
-        for (PipelineAuthThird authServer : allAuthServer) {
-            if (authServer.getAuthType() == type){
-                list.add(authServer);
-            }
-        }
-        return list;
-    }
-
-    /**
      * 获取不同授权类型的源码认证
      * @param type 类型  1. gitee 2. github 3.sonar 4.nexus
      * @return 认证信息
@@ -108,6 +88,9 @@ public class PipelineAuthThirdServerImpl implements PipelineAuthThirdServer {
         List<PipelineAuthThird> allAuthServer = findAllAuthServer();
         if (allAuthServer == null){
             return null;
+        }
+        if (type == 0){
+            return allAuthServer;
         }
         List<PipelineAuthThird> list = new ArrayList<>();
         for (PipelineAuthThird authServer : allAuthServer) {
@@ -126,7 +109,18 @@ public class PipelineAuthThirdServerImpl implements PipelineAuthThirdServer {
     @Override
     public List<PipelineAuthThird> findAllAuthServer() {
         List<PipelineAuthThirdEntity> allAuthServer = authServerDao.findAllAuthServer();
-        List<PipelineAuthThird> pipelineAuthThirds = BeanMapper.mapList(allAuthServer, PipelineAuthThird.class);
+        if (allAuthServer == null){
+            return null;
+        }
+        //获取公共的和用户私有的
+        List<PipelineAuthThirdEntity> allAuthServerEntity = new ArrayList<>();
+        String loginId = LoginContext.getLoginId();
+        for (PipelineAuthThirdEntity thirdEntity : allAuthServer) {
+            if (thirdEntity.getUserId().equals(loginId) || thirdEntity.getAuthPublic() == 1){
+                allAuthServerEntity.add(thirdEntity);
+            }
+        }
+        List<PipelineAuthThird> pipelineAuthThirds = BeanMapper.mapList(allAuthServerEntity, PipelineAuthThird.class);
         joinTemplate.joinQuery(pipelineAuthThirds);
         return pipelineAuthThirds;
     }

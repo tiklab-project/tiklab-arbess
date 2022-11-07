@@ -61,10 +61,11 @@ public class PipelineAuthHostController {
     }
 
     //查询所有
-    @RequestMapping(path="/findAllAuthHost",method = RequestMethod.POST)
-    @ApiMethod(name = "findAllPipelineAuthHost",desc = "查询所有")
-    public Result<List<PipelineAuthHost>> findAllPipelineAuthHost() {
-        List<PipelineAuthHost> allPipelineAuthHost = authHost.findAllAuthHost();
+    @RequestMapping(path="/findAllAuthHostList",method = RequestMethod.POST)
+    @ApiMethod(name = "findAllAuthHostList",desc = "查询所有")
+    @ApiParam(name = "type",desc = "类型",required = true)
+    public Result<List<PipelineAuthHost>> findAllAuthHostList(@NotNull int type) {
+        List<PipelineAuthHost> allPipelineAuthHost = authHost.findAllAuthHostList(type);
         return Result.ok(allPipelineAuthHost);
     }
 

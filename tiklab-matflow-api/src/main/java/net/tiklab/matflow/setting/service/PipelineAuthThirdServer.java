@@ -39,13 +39,6 @@ public interface PipelineAuthThirdServer {
     PipelineAuthThird findOneAuthServer(String authServerId);
 
     /**
-     * 查询说有需要更新的授权信息
-     * @param type 类型
-     * @return 授权信息
-     */
-    List<PipelineAuthThird> findAllAuthServer(int type);
-
-    /**
      * 获取不同授权类型的源码认证
      * @param type 类型 1. gitee 2. github 3.sonar 4.nexus
      * @return 认证信息

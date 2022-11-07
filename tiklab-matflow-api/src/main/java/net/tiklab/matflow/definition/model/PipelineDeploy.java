@@ -1,11 +1,7 @@
 package net.tiklab.matflow.definition.model;
 
 import net.tiklab.beans.annotation.Mapper;
-import net.tiklab.beans.annotation.Mapping;
-import net.tiklab.beans.annotation.Mappings;
 import net.tiklab.join.annotation.Join;
-import net.tiklab.join.annotation.JoinQuery;
-import net.tiklab.matflow.setting.model.Proof;
 import net.tiklab.postin.annotation.ApiModel;
 import net.tiklab.postin.annotation.ApiProperty;
 
@@ -31,13 +27,6 @@ public class PipelineDeploy {
     @ApiProperty(name = "startShell" , desc = "启动脚本")
     private String startShell;
 
-    @ApiProperty(name="proof",desc="凭证id",eg="@selectOne")
-    @Mappings({
-            @Mapping(source = "proof.proofId",target = "proofId")
-    })
-    @JoinQuery(key = "proofId")
-    private Proof proof;
-
     @ApiProperty(name = "startPort",desc="启动端口")
     private int startPort;
 
@@ -57,6 +46,14 @@ public class PipelineDeploy {
 
     @ApiProperty(name = "deployOrder",desc = "部署命令" )
     private String deployOrder;
+
+
+    //授权id
+    @ApiProperty(name="authName",desc="授权id")
+    private String authId;
+
+    //授权信息
+    private Object auth;
 
 
     public String getDeployId() {
@@ -107,12 +104,20 @@ public class PipelineDeploy {
         this.startShell = startShell;
     }
 
-    public Proof getProof() {
-        return proof;
+    public String getAuthId() {
+        return authId;
     }
 
-    public void setProof(Proof proof) {
-        this.proof = proof;
+    public void setAuthId(String authId) {
+        this.authId = authId;
+    }
+
+    public Object getAuth() {
+        return auth;
+    }
+
+    public void setAuth(Object auth) {
+        this.auth = auth;
     }
 
     public int getStartPort() {

@@ -92,6 +92,7 @@ public class PipelineCodeServiceImpl implements PipelineCodeService {
         return BeanMapper.mapList(pipelineCodeDao.findAllCodeList(idList), PipelineCode.class);
     }
 
+    //获认证信息
     private Object findAuth(String id){
         PipelineAuthThird oneAuthServer = authServerServer.findOneAuthServer(id);
        if (oneAuthServer != null){

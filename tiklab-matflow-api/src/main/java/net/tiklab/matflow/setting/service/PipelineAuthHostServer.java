@@ -38,6 +38,13 @@ public interface PipelineAuthHostServer {
     PipelineAuthHost findOneAuthHost(String authHostId);
 
     /**
+     * 查询单个类型所有配置
+     * @param type 类型
+     * @return 配置
+     */
+    List<PipelineAuthHost> findAllAuthHostList(int type);
+
+    /**
      * 查询所有流水线主机授权
      * @return 流水线主机授权列表
      */

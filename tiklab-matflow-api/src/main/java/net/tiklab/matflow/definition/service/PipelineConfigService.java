@@ -2,7 +2,6 @@ package net.tiklab.matflow.definition.service;
 
 import net.tiklab.matflow.definition.model.PipelineConfigOrder;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -16,12 +15,11 @@ public interface PipelineConfigService {
     List<Object> findAllConfig(List<PipelineConfigOrder> allPipelineConfig);
 
     /**
-     * 根据类型查询配置
-     * @param typeConfig 配置信息
-     * @param type 类型
-     * @return 配置
+     * 获取配置详情
+     * @param configOrder 配置信息
+     * @return 配置信息
      */
-    PipelineConfigOrder findConfig(PipelineConfigOrder typeConfig,int type);
+    Object findOneConfig(PipelineConfigOrder configOrder);
 
     /**
      * 更新配置

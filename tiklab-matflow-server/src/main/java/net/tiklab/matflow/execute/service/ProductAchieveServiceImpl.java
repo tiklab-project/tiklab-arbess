@@ -6,6 +6,7 @@ import net.tiklab.matflow.definition.model.PipelineProduct;
 import net.tiklab.matflow.definition.service.ProductAchieveService;
 import net.tiklab.matflow.execute.model.PipelineProcess;
 import net.tiklab.matflow.orther.service.PipelineUntil;
+import net.tiklab.matflow.setting.model.PipelineAuthThird;
 import net.tiklab.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -39,7 +40,7 @@ public class ProductAchieveServiceImpl implements ProductAchieveService {
                 commonService.execHistory(pipelineProcess,"推送制品执行失败");
                 return commonService.updateState(pipelineProcess,false);
             }
-            int log = commonService.log(process.getInputStream(), process.getErrorStream(), pipelineProcess);
+            int log = commonService.log(process.getInputStream(), process.getErrorStream(), pipelineProcess,"UTF-8");
             if (log == 0){
                 commonService.execHistory(pipelineProcess,"推送制品失败");
                 return commonService.updateState(pipelineProcess,false);
@@ -61,29 +62,29 @@ public class ProductAchieveServiceImpl implements ProductAchieveService {
             if (mavenAddress == null) {
                 throw new ApplicationException("不存在maven配置");
             }
+            PipelineAuthThird authThird = (PipelineAuthThird)product.getAuth();
 
-            // PipelineAuth pipelineAuth = product.getPipelineAuth();
-            // if (pipelineAuth == null){
-            //     order = mavenOrder(execOrder, path);
-            //     commonService.execHistory(pipelineProcess,"执行推送制品命令："+order);
-            //     return PipelineUntil.process(mavenAddress, order);
-            // }
-            //
-            // execOrder = execOrder +
-            //         " -DgroupId="+product.getGroupId() +
-            //         " -DartifactId="+product.getArtifactId() +
-            //         " -Dversion="+product.getVersion()+
-            //         " -Dpackaging="+product.getFileType() +
-            //         " -Dfile="+product.getFileAddress() +
-            //         " -Durl="+pipelineAuth.getUrl() ;
-            // if (pipelineAuth.getAuthType() == 1){
-            //     execOrder = execOrder +
-            //             " -Dserver.username="+pipelineAuth.getUsername()+
-            //             " -Dserver.password="+pipelineAuth.getPassword();
-            // }else {
-            //     execOrder = execOrder +
-            //             " -DrepositoryId="+pipelineAuth.getToken();
-            // }
+            if (authThird == null){
+                order = mavenOrder(execOrder, path);
+                commonService.execHistory(pipelineProcess,"执行推送制品命令："+order);
+                return PipelineUntil.process(mavenAddress, order);
+            }
+
+            execOrder = execOrder +
+                    " -DgroupId="+product.getGroupId() +
+                    " -DartifactId="+product.getArtifactId() +
+                    " -Dversion="+product.getVersion()+
+                    " -Dpackaging="+product.getFileType() +
+                    " -Dfile="+product.getFileAddress() +
+                    " -Durl="+authThird.getServerAddress() ;
+            if (authThird.getAuthType() == 1){
+                execOrder = execOrder +
+                        " -Dserver.username="+authThird.getUsername()+
+                        " -Dserver.password="+authThird.getPassword();
+            }else {
+                execOrder = execOrder +
+                        " -DrepositoryId="+authThird.getPrivateKey();
+            }
             order = mavenOrder(execOrder, path);
             commonService.execHistory(pipelineProcess,"执行推送制品命令："+order);
             return PipelineUntil.process(mavenAddress, order);

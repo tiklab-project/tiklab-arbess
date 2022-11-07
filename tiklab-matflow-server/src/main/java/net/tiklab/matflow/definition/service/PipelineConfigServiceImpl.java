@@ -40,88 +40,68 @@ public class PipelineConfigServiceImpl implements PipelineConfigService {
      * @param allPipelineConfig 配置关联信息
      * @return 配置集合
      */
+    @Override
     public List<Object> findAllConfig(List<PipelineConfigOrder> allPipelineConfig){
         List<Object> list = new ArrayList<>();
         if (allPipelineConfig == null){
-            return Collections.emptyList();
+            return null;
         }
         for (PipelineConfigOrder pipelineConfigOrder : allPipelineConfig) {
-            String taskId = pipelineConfigOrder.getTaskId();
-            int taskSort = pipelineConfigOrder.getTaskSort();
-            int type = pipelineConfigOrder.getTaskType();
-            if (type < 10){
-                PipelineCode code = pipelineCodeService.findOneCode(taskId);
-                code.setType(type);
-                code.setSort(taskSort);
-                list.add(code);
-            }else if (10<type && type<20){
-                PipelineTest test = pipelineTestService.findOneTest(taskId);
-                test.setType(type);
-                test.setSort(taskSort);
-                list.add(test);
-            }else if (20<type && type<30){
-                PipelineBuild build = pipelineBuildService.findOneBuild(taskId);
-                build.setType(type);
-                build.setSort(taskSort);
-                list.add(build);
-            }else if (30<type && type<40){
-                PipelineDeploy deploy = pipelineDeployService.findOneDeploy(taskId);
-                deploy.setType(type);
-                deploy.setSort(taskSort);
-                list.add(deploy);
-            }else if (40<type && type<50){
-                PipelineCodeScan codeScan = pipelineCodeScanService.findOneCodeScan(taskId);
-                codeScan.setType(type);
-                codeScan.setSort(taskSort);
-                list.add(codeScan);
-            }else if (50<type && type<60){
-                PipelineProduct product = pipelineProductServer.findOneProduct(taskId);
-                product.setType(type);
-                product.setSort(taskSort);
-                list.add(product);
-            }
+            Object oneConfig = findOneConfig(pipelineConfigOrder);
+            list.add(oneConfig);
         }
         return list;
     }
 
     /**
-     * 根据类型获取配置
-     * @param typeConfig 配置信息
-     * @param type 类型
+     * 获取配置详情
+     * @param configOrder 配置信息
      * @return 配置信息
      */
-    public PipelineConfigOrder findConfig(PipelineConfigOrder typeConfig,int type){
-        if (typeConfig == null){
-            return null;
+    @Override
+    public Object findOneConfig(PipelineConfigOrder configOrder){
+        String taskId = configOrder.getTaskId();
+        int taskSort = configOrder.getTaskSort();
+        int type = configOrder.getTaskType();
+        switch (type/10){
+            case 0 -> {
+                PipelineCode code = pipelineCodeService.findOneCode(taskId);
+                code.setType(type);
+                code.setSort(taskSort);
+                return code;
+            }
+            case 1 -> {
+                PipelineTest test = pipelineTestService.findOneTest(taskId);
+                test.setType(type);
+                test.setSort(taskSort);
+                return test;
+            }
+            case 2 -> {
+                PipelineBuild build = pipelineBuildService.findOneBuild(taskId);
+                build.setType(type);
+                build.setSort(taskSort);
+                return build;
+            }
+            case 3 -> {
+                PipelineDeploy deploy = pipelineDeployService.findOneDeploy(taskId);
+                deploy.setType(type);
+                deploy.setSort(taskSort);
+                return deploy;
+            }
+            case 4 -> {
+                PipelineCodeScan codeScan = pipelineCodeScanService.findOneCodeScan(taskId);
+                codeScan.setType(type);
+                codeScan.setSort(taskSort);
+                return codeScan;
+            }
+            case 5 -> {
+                PipelineProduct product = pipelineProductServer.findOneProduct(taskId);
+                product.setType(type);
+                product.setSort(taskSort);
+                return product;
+            }
         }
-        String taskId = typeConfig.getTaskId();
-        int taskType = typeConfig.getTaskType();
-        if (type < 10){
-            PipelineCode oneCode = pipelineCodeService.findOneCode(taskId);
-            oneCode.setType(taskType);
-            typeConfig.setPipelineCode(oneCode);
-        }else if (10<type && type<20){
-            PipelineTest oneTest = pipelineTestService.findOneTest(taskId);
-            oneTest.setType(taskType);
-            typeConfig.setPipelineTest(oneTest);
-        }else if (20<type && type<30){
-            PipelineBuild oneBuild = pipelineBuildService.findOneBuild(taskId);
-            oneBuild.setType(taskType);
-            typeConfig.setPipelineBuild(oneBuild);
-        }else if (30<type && type<40){
-            PipelineDeploy oneDeploy = pipelineDeployService.findOneDeploy(taskId);
-            oneDeploy.setType(taskType);
-            typeConfig.setPipelineDeploy(oneDeploy);
-        }else if (40<type && type<50){
-            PipelineCodeScan codeScan = pipelineCodeScanService.findOneCodeScan(taskId);
-            codeScan.setType(taskType);
-            typeConfig.setPipelineCodeScan(codeScan);
-        }else if (50<type && type<60){
-            PipelineProduct product = pipelineProductServer.findOneProduct(taskId);
-            product.setType(taskType);
-            typeConfig.setPipelineProduct(product);
-        }
-        return typeConfig;
+        return null;
     }
 
     String message = "message";

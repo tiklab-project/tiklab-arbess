@@ -53,7 +53,7 @@ public interface PipelineConfigOrderService {
      * @param type 类型
      * @return 配置详情
      */
-    PipelineConfigOrder findOneConfig(String pipelineId,int type);
+    Object findOneConfig(String pipelineId,int type);
 
     /**
      * 查询单个配置

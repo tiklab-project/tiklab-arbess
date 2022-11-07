@@ -1,22 +1,23 @@
 package net.tiklab.matflow.definition.service;
 
+import net.tiklab.core.exception.ApplicationException;
 import net.tiklab.join.JoinTemplate;
-import net.tiklab.join.annotation.Join;
 import net.tiklab.matflow.definition.model.Pipeline;
 import net.tiklab.matflow.definition.model.PipelineMassage;
 import net.tiklab.matflow.execute.model.PipelineExecHistory;
 import net.tiklab.matflow.execute.model.PipelineExecState;
 import net.tiklab.matflow.execute.service.PipelineExecHistoryService;
-import net.tiklab.matflow.orther.model.PipelineOpen;
-import net.tiklab.matflow.orther.service.PipelineOpenService;
 import net.tiklab.matflow.orther.service.PipelineUntil;
 import net.tiklab.rpc.annotation.Exporter;
 import net.tiklab.user.user.model.DmUser;
 import net.tiklab.user.user.service.DmUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 @Service
 @Exporter
@@ -58,7 +59,10 @@ public class PipelineCommonServerImpl implements PipelineCommonServer{
         String fileAddress = PipelineUntil.findFileAddress();
         File file = new File(fileAddress+lastName);
         if (file.exists()){
-         file.renameTo(new File( fileAddress+newName));
+            boolean b = file.renameTo(new File(fileAddress + newName));
+            if (!b){
+                throw new ApplicationException("文件重命名失败");
+            }
         }
     }
 

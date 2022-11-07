@@ -6,13 +6,15 @@ import net.tiklab.matflow.definition.model.PipelineDeploy;
 import net.tiklab.matflow.execute.model.PipelineExecHistory;
 import net.tiklab.matflow.execute.model.PipelineProcess;
 import net.tiklab.matflow.orther.service.PipelineUntil;
-import net.tiklab.matflow.setting.model.Proof;
+import net.tiklab.matflow.setting.model.PipelineAuthHost;
 import net.tiklab.rpc.annotation.Exporter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -40,8 +42,6 @@ public class DeployAchieveServiceImpl implements DeployAchieveService {
         Pipeline pipeline = pipelineProcess.getPipeline();
         List<PipelineExecHistory> list = PipelineExecServiceImpl.pipelineExecHistoryList;
         pipelineProcess.setBeginTime(beginTime);
-        Proof proof = pipelineDeploy.getProof();
-        pipelineProcess.setProof(proof);
 
         String startShell = pipelineDeploy.getStartShell();
 
@@ -50,7 +50,7 @@ public class DeployAchieveServiceImpl implements DeployAchieveService {
             if (pipelineDeploy.getDeployType() == 1) {
                 commonService.execHistory(pipelineProcess,"执行脚本：" + startShell);
                 Process process = PipelineUntil.process("/", startShell);
-                commonService.log(process.getInputStream(),process.getErrorStream(), pipelineProcess);
+                commonService.log(process.getInputStream(),process.getErrorStream(), pipelineProcess,"UTF-8");
                 commonService.updateState(pipelineProcess,true);
                 return true;
             }
@@ -60,11 +60,6 @@ public class DeployAchieveServiceImpl implements DeployAchieveService {
             return false;
         }
 
-        if (proof == null){
-            commonService.execHistory(pipelineProcess,"凭证为空。");
-            commonService.updateState(pipelineProcess,false);
-            return false;
-        }
 
         commonService.execHistory(pipelineProcess,"获取部署文件......" + startShell);
 
@@ -182,9 +177,9 @@ public class DeployAchieveServiceImpl implements DeployAchieveService {
         String sshIp = pipelineDeploy.getSshIp();
         int sshPort = pipelineDeploy.getSshPort();
 
-        Proof proof = pipelineDeploy.getProof();
-        String proofUsername = proof.getProofUsername();
-        String proofPassword = proof.getProofPassword();
+        PipelineAuthHost authHost = (PipelineAuthHost) pipelineDeploy.getAuth();
+        String proofUsername = authHost.getUsername();
+        String proofPassword = authHost.getPassword();
 
         JSch jsch = new JSch();
 
@@ -208,7 +203,7 @@ public class DeployAchieveServiceImpl implements DeployAchieveService {
         exec.setCommand(orders);
         exec.connect();
         InputStream inputStream = exec.getInputStream();
-        commonService.log(inputStream,exec.getErrStream(),  pipelineProcess);
+        commonService.log(inputStream,exec.getErrStream(),  pipelineProcess,"UTF-8");
         exec.disconnect();
 
     }

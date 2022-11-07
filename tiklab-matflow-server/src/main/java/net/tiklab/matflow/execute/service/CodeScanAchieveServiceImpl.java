@@ -5,9 +5,11 @@ import net.tiklab.matflow.definition.model.Pipeline;
 import net.tiklab.matflow.definition.model.PipelineCodeScan;
 import net.tiklab.matflow.execute.model.PipelineProcess;
 import net.tiklab.matflow.orther.service.PipelineUntil;
+import net.tiklab.matflow.setting.model.PipelineAuthThird;
 import net.tiklab.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.io.IOException;
 import java.sql.Timestamp;
 
@@ -38,7 +40,7 @@ public class CodeScanAchieveServiceImpl implements CodeScanService {
                 commonService.execHistory(pipelineProcess,"代码扫描执行失败");
                 return commonService.updateState(pipelineProcess,false);
             }
-            int log = commonService.log(process.getInputStream(), process.getErrorStream(), pipelineProcess);
+            int log = commonService.log(process.getInputStream(), process.getErrorStream(), pipelineProcess,"GBK");
             if (log == 0){
                 commonService.execHistory(pipelineProcess,"代码扫描失败");
                 return commonService.updateState(pipelineProcess,false);
@@ -54,31 +56,31 @@ public class CodeScanAchieveServiceImpl implements CodeScanService {
     private Process getOrder(PipelineProcess pipelineProcess,PipelineCodeScan pipelineCodeScan, String path) throws ApplicationException, IOException {
         int type = pipelineCodeScan.getType();
         String order ;
-        String execOrder =  "mvn verify sonar:sonar ";
+        String execOrder =  "mvn clean verify sonar:sonar ";
         if (type == 41) {
             String mavenAddress = commonService.getScm(21);
             if (mavenAddress == null) {
                 throw new ApplicationException("不存在maven配置");
             }
+            PipelineAuthThird authThird =(PipelineAuthThird) pipelineCodeScan.getAuth();
 
-            // PipelineAuth pipelineAuth = pipelineCodeScan.getPipelineAuth();
-            // if (pipelineAuth == null){
-            //     commonService.execHistory(pipelineProcess,"执行扫描命令："+execOrder);
-            //     order = mavenOrder(execOrder, path);
-            //     return PipelineUntil.process(mavenAddress, order);
-            // }
-            //
-            // execOrder = execOrder +
-            //         " -Dsonar.projectKey="+pipelineCodeScan.getProjectName()+
-            //         " -Dsonar.host.url="+pipelineAuth.getUrl();
-            // if (pipelineAuth.getAuthType() == 1){
-            //     execOrder = execOrder +
-            //             " -Dsonar.host.username="+pipelineAuth.getUsername()+
-            //             " -Dsonar.host.password="+pipelineAuth.getPassword();
-            // }else {
-            //     execOrder = execOrder +
-            //             " -Dsonar.login="+pipelineAuth.getToken();
-            // }
+            if (authThird == null){
+                commonService.execHistory(pipelineProcess,"执行扫描命令："+execOrder);
+                order = mavenOrder(execOrder, path);
+                return PipelineUntil.process(mavenAddress, order);
+            }
+
+            execOrder = execOrder +
+                    " -Dsonar.projectKey="+pipelineCodeScan.getProjectName()+
+                    " -Dsonar.host.url="+ authThird.getServerAddress();
+            if (authThird.getAuthType() == 1){
+                execOrder = execOrder +
+                        " -Dsonar.login="+authThird.getUsername()+
+                        " -Dsonar.password="+authThird.getPassword();
+            }else {
+                execOrder = execOrder +
+                        " -Dsonar.login="+authThird.getPrivateKey();
+            }
             commonService.execHistory(pipelineProcess,"执行扫描命令："+execOrder);
             order = mavenOrder(execOrder, path);
             return PipelineUntil.process(mavenAddress, order);

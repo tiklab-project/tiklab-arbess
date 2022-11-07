@@ -5,6 +5,9 @@ import net.tiklab.join.JoinTemplate;
 import net.tiklab.matflow.definition.dao.PipelineCodeScanDao;
 import net.tiklab.matflow.definition.entity.PipelineCodeScanEntity;
 import net.tiklab.matflow.definition.model.PipelineCodeScan;
+import net.tiklab.matflow.orther.service.PipelineUntil;
+import net.tiklab.matflow.setting.model.PipelineAuthThird;
+import net.tiklab.matflow.setting.service.PipelineAuthThirdServer;
 import net.tiklab.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,6 +21,9 @@ public class PipelineCodeScanServiceImpl implements PipelineCodeScanService{
 
     @Autowired
     PipelineCodeScanDao CodeScanDao;
+
+    @Autowired
+    PipelineAuthThirdServer thirdServer;
 
     @Autowired
     JoinTemplate joinTemplate;
@@ -61,6 +67,10 @@ public class PipelineCodeScanServiceImpl implements PipelineCodeScanService{
     public PipelineCodeScan findOneCodeScan(String CodeScanId) {
         PipelineCodeScanEntity oneCodeScan = CodeScanDao.findOneCodeScan(CodeScanId);
         PipelineCodeScan codeScan = BeanMapper.map(oneCodeScan, PipelineCodeScan.class);
+        if (PipelineUntil.isNoNull(codeScan.getAuthId())){
+            PipelineAuthThird authServer = thirdServer.findOneAuthServer(codeScan.getAuthId());
+            codeScan.setAuth(authServer);
+        }
         joinTemplate.joinQuery(codeScan);
         return codeScan;
     }

@@ -68,7 +68,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         executorService.submit(() -> {
             beginTime = new Timestamp(System.currentTimeMillis()).getTime();
             Thread.currentThread().setName(pipelineId);
-            begin(pipeline,userId);
+            begin(pipeline);
         });
         return 1;
     }
@@ -154,7 +154,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
     }
 
     // 构建开始
-    private void begin(Pipeline pipeline, String userId) {
+    private void begin(Pipeline pipeline) {
 
         //更新流水线状态为执行
         pipeline.setPipelineState(1);
@@ -162,7 +162,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         String pipelineId = pipeline.getPipelineId();
 
         //初始化历史
-        PipelineExecHistory pipelineExecHistory = commonService.initializeHistory(pipeline,userId);
+        PipelineExecHistory pipelineExecHistory = commonService.initializeHistory(pipeline);
 
         //获取配置信息
         PipelineProcess pipelineProcess = new PipelineProcess();
@@ -189,9 +189,9 @@ public class PipelineExecServiceImpl implements PipelineExecService {
             map.put(pipelineExecLog.getTaskSort(), 1);
 
             int taskType = pipelineConfigOrder.getTaskType();
-            PipelineConfigOrder oneConfig = configOrderService.findOneConfig(pipelineId, taskType);
+            Object config = configOrderService.findOneConfig(pipelineId,taskType);
 
-            boolean state = taskExecService.beginState(pipelineProcess,oneConfig,taskType);
+            boolean state = taskExecService.beginState(pipelineProcess,config,taskType);
 
             if (!state){
                 pipeline.setPipelineState(0);

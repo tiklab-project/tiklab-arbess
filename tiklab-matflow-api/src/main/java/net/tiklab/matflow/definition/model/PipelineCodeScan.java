@@ -16,12 +16,12 @@ public class PipelineCodeScan {
     @ApiProperty(name="projectName",desc="项目名称")
     private String projectName;
 
-    // @ApiProperty(name="pipelineAuth",desc="授权id",eg="@selectOne")
-    // @Mappings({
-    //         @Mapping(source = "pipelineAuth.authId",target = "authId")
-    // })
-    // @JoinQuery(key = "authId")
-    // private PipelineAuth pipelineAuth;
+    //授权id
+    @ApiProperty(name="authName",desc="授权id")
+    private String authId;
+
+    //授权信息
+    private Object auth;
 
     private int sort;
 
@@ -58,5 +58,22 @@ public class PipelineCodeScan {
 
     public void setType(int type) {
         this.type = type;
+    }
+
+
+    public String getAuthId() {
+        return authId;
+    }
+
+    public void setAuthId(String authId) {
+        this.authId = authId;
+    }
+
+    public Object getAuth() {
+        return auth;
+    }
+
+    public void setAuth(Object auth) {
+        this.auth = auth;
     }
 }

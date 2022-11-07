@@ -25,7 +25,7 @@ public class PipelineCodeEntity {
     @Column(name = "code_branch",notNull = true)
     private String codeBranch;
 
-    //凭证名称
+    //凭证信息
     @Column(name = "auth_id",notNull = true)
     private String authId;
 

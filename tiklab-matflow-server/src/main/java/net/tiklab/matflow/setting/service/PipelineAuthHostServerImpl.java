@@ -6,9 +6,11 @@ import net.tiklab.matflow.setting.dao.PipelineAuthHostDao;
 import net.tiklab.matflow.setting.entity.PipelineAuthHostEntity;
 import net.tiklab.matflow.setting.model.PipelineAuthHost;
 import net.tiklab.rpc.annotation.Exporter;
+import net.tiklab.utils.context.LoginContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -65,13 +67,47 @@ public class PipelineAuthHostServerImpl implements PipelineAuthHostServer {
     }
 
     /**
+     * 查询单个类型所有配置
+     * @param type 类型
+     * @return 配置
+     */
+    public List<PipelineAuthHost> findAllAuthHostList(int type) {
+        List<PipelineAuthHost> allAuthHost = findAllAuthHost();
+        if (allAuthHost == null){
+            return null;
+        }
+        if (type == 0){
+            return allAuthHost;
+        }
+        List<PipelineAuthHost> list = new ArrayList<>();
+        for (PipelineAuthHost pipelineAuthHost : allAuthHost) {
+            if (pipelineAuthHost.getType() == type){
+                list.add(pipelineAuthHost);
+            }
+        }
+        return list;
+    }
+
+
+    /**
      * 查询所有流水线授权
      * @return 流水线授权列表
      */
     @Override
     public List<PipelineAuthHost> findAllAuthHost() {
         List<PipelineAuthHostEntity> allAuthHost = authHostDao.findAllAuthHost();
-        List<PipelineAuthHost> pipelineAuthHosts = BeanMapper.mapList(allAuthHost, PipelineAuthHost.class);
+        if (allAuthHost == null){
+            return null;
+        }
+        //获取公共的和用户私有的
+        List<PipelineAuthHostEntity> allAuthHostEntity = new ArrayList<>();
+        String loginId = LoginContext.getLoginId();
+        for (PipelineAuthHostEntity authHostEntity : allAuthHost) {
+            if (authHostEntity.getUserId().equals(loginId) || authHostEntity.getAuthPublic() ==1){
+                allAuthHostEntity.add(authHostEntity);
+            }
+        }
+        List<PipelineAuthHost> pipelineAuthHosts = BeanMapper.mapList(allAuthHostEntity, PipelineAuthHost.class);
         joinTemplate.joinQuery(pipelineAuthHosts);
         return pipelineAuthHosts;
     }

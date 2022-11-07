@@ -29,10 +29,10 @@ public class PipelineCode {
     private String codeBranch;
 
     //授权id
-    @ApiProperty(name="authName",desc="授权id")
+    @ApiProperty(name="authId",desc="授权id")
     private String authId;
 
-    //授权名称
+    //授权信息
     private Object auth;
 
     //顺序

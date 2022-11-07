@@ -7,8 +7,11 @@ import net.tiklab.matflow.setting.dao.PipelineAuthDao;
 import net.tiklab.matflow.setting.entity.PipelineAuthEntity;
 import net.tiklab.matflow.setting.model.*;
 import net.tiklab.rpc.annotation.Exporter;
+import net.tiklab.utils.context.LoginContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -73,7 +76,18 @@ public class PipelineAuthServerImpl implements  PipelineAuthServer {
     @Override
     public List<PipelineAuth> findAllAuth() {
         List<PipelineAuthEntity> allAuth = authDao.findAllAuth();
-        List<PipelineAuth> pipelineAuths = BeanMapper.mapList(allAuth, PipelineAuth.class);
+        if (allAuth == null){
+            return null;
+        }
+        //获取公共的和用户私有的
+        List<PipelineAuthEntity> allAuthEntity = new ArrayList<>();
+        String loginId = LoginContext.getLoginId();
+        for (PipelineAuthEntity authEntity : allAuth) {
+            if (authEntity.getUserId().equals(loginId) || authEntity.getAuthPublic() == 1){
+                allAuthEntity.add(authEntity);
+            }
+        }
+        List<PipelineAuth> pipelineAuths = BeanMapper.mapList(allAuthEntity, PipelineAuth.class);
         joinTemplate.joinQuery(pipelineAuths);
         return pipelineAuths;
     }

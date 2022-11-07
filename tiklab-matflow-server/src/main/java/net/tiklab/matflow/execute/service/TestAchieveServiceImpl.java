@@ -2,10 +2,8 @@ package net.tiklab.matflow.execute.service;
 
 import net.tiklab.core.exception.ApplicationException;
 import net.tiklab.matflow.definition.model.Pipeline;
-import net.tiklab.matflow.execute.service.ConfigCommonService;
 import net.tiklab.matflow.definition.model.PipelineTest;
 import net.tiklab.matflow.execute.model.PipelineExecHistory;
-import net.tiklab.matflow.execute.service.TestAchieveService;
 import net.tiklab.matflow.execute.model.PipelineProcess;
 import net.tiklab.matflow.orther.service.PipelineUntil;
 import net.tiklab.rpc.annotation.Exporter;
@@ -53,10 +51,10 @@ public class TestAchieveServiceImpl implements TestAchieveService {
                 return false;
             }
 
-            int state = commonService.log(process.getInputStream(),process.getErrorStream(),pipelineProcess);
+            int state = commonService.log(process.getInputStream(),process.getErrorStream(),pipelineProcess,"GBk");
 
             if (state == 0){
-                commonService.execHistory(pipelineProcess,"Fail");
+                commonService.execHistory(pipelineProcess,"测试执行失败。");
                 commonService.updateState(pipelineProcess,false);
                 return false;
             }

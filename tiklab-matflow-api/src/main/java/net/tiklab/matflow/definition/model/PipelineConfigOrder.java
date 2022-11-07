@@ -43,17 +43,7 @@ public class PipelineConfigOrder {
     @JoinQuery(key = "pipelineId")
     private Pipeline pipeline;
 
-    private PipelineCode pipelineCode;
-
-    private PipelineTest pipelineTest;
-
-    private PipelineBuild pipelineBuild;
-
-    private PipelineDeploy pipelineDeploy;
-
-    private PipelineCodeScan pipelineCodeScan;
-
-    private PipelineProduct pipelineProduct;
+    private Object config;
 
     //信息
     private String message;
@@ -101,38 +91,6 @@ public class PipelineConfigOrder {
 
     public void setMessage(String message) {
         this.message = message;
-    }
-
-    public PipelineCode getPipelineCode() {
-        return pipelineCode;
-    }
-
-    public void setPipelineCode(PipelineCode pipelineCode) {
-        this.pipelineCode = pipelineCode;
-    }
-
-    public PipelineTest getPipelineTest() {
-        return pipelineTest;
-    }
-
-    public void setPipelineTest(PipelineTest pipelineTest) {
-        this.pipelineTest = pipelineTest;
-    }
-
-    public PipelineBuild getPipelineBuild() {
-        return pipelineBuild;
-    }
-
-    public void setPipelineBuild(PipelineBuild pipelineBuild) {
-        this.pipelineBuild = pipelineBuild;
-    }
-
-    public PipelineDeploy getPipelineDeploy() {
-        return pipelineDeploy;
-    }
-
-    public void setPipelineDeploy(PipelineDeploy pipelineDeploy) {
-        this.pipelineDeploy = pipelineDeploy;
     }
 
     public String getConfigId() {
@@ -183,19 +141,11 @@ public class PipelineConfigOrder {
         this.pipeline = pipeline;
     }
 
-    public PipelineCodeScan getPipelineCodeScan() {
-        return pipelineCodeScan;
+    public Object getConfig() {
+        return config;
     }
 
-    public void setPipelineCodeScan(PipelineCodeScan pipelineCodeScan) {
-        this.pipelineCodeScan = pipelineCodeScan;
-    }
-
-    public PipelineProduct getPipelineProduct() {
-        return pipelineProduct;
-    }
-
-    public void setPipelineProduct(PipelineProduct pipelineProduct) {
-        this.pipelineProduct = pipelineProduct;
+    public void setConfig(Object config) {
+        this.config = config;
     }
 }
