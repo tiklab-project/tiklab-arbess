@@ -223,6 +223,27 @@ public class PipelineUntil {
     }
 
 
+    /**
+     * 拼装测试命令
+     * @param buildOrder 执行命令
+     * @param path 项目地址
+     * @param address 模块地址
+     * @return 命令
+     */
+    private String mavenOrder(String buildOrder,String path,String address){
+        String order;
+        int systemType = PipelineUntil.findSystemType();
+        order = " ./" + buildOrder + " " + "-f" +" " +path ;
+        if (systemType == 1){
+            order = " .\\" + buildOrder + " " + "-f"+" "  +path;
+        }
+        if (!Objects.equals(address, "/")){
+            order = order + address;
+        }
+        return order;
+    }
+
+
 }
 
 

@@ -26,8 +26,8 @@ public class PipelineExecController {
     @RequestMapping(path="/start",method = RequestMethod.POST)
     @ApiMethod(name = "start",desc = "执行")
     @ApiParam(name = "pipelineId",desc = "流水线id",required = true)
-    public Result<Integer> start(@NotNull String pipelineId ,String userId) throws Exception {
-        int start = pipelineExecService.start(pipelineId,userId);
+    public Result<Integer> start(@NotNull String pipelineId ){
+        int start = pipelineExecService.start(pipelineId);
         return Result.ok(start);
     }
 
@@ -51,8 +51,8 @@ public class PipelineExecController {
     @RequestMapping(path="/killInstance",method = RequestMethod.POST)
     @ApiMethod(name = "killInstance",desc = "判断是否执行")
     @ApiParam(name = "pipelineId",desc = "流水线id",required = true)
-    public Result<Void> killInstance(@NotNull String pipelineId,String userId) {
-        pipelineExecService.killInstance(pipelineId,userId);
+    public Result<Void> killInstance(@NotNull String pipelineId) {
+        pipelineExecService.killInstance(pipelineId);
         return Result.ok();
     }
 

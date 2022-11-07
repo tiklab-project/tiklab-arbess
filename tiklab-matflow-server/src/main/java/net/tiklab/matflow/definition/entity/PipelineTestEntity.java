@@ -16,6 +16,9 @@ public class PipelineTestEntity {
     @Column(name = "test_order",notNull = true)
     private String testOrder;
 
+    @Column(name = "address")
+    private String address;
+
     public String getTestId() {
         return testId;
     }
@@ -32,4 +35,11 @@ public class PipelineTestEntity {
         this.testOrder = testOrder;
     }
 
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
 }

@@ -11,6 +11,8 @@ import net.tiklab.postin.annotation.ApiModel;
 import net.tiklab.postin.annotation.ApiProperty;
 import net.tiklab.user.user.model.User;
 
+import java.util.List;
+
 /**
  * 流水线历史
  */
@@ -80,18 +82,8 @@ public class PipelineExecHistory {
     @ApiProperty(name="execTime",desc="运行时间（转换为天，月，日 ，时，分，秒格式）")
     private String execTime;
 
-    //时间
-    @ApiProperty(name="oneTime",desc="第一阶段时间")
-    private String oneTime;
-
-    @ApiProperty(name="twoTime",desc="第二阶段时间")
-    private String twoTime;
-
-    @ApiProperty(name="threeTime",desc="第三阶段时间")
-    private String threeTime;
-
-    @ApiProperty(name="fourTime",desc="第四阶段时间")
-    private String fourTime;
+    //执行时间
+    private List<Integer> timeList;
 
     @ApiProperty(name="allTime",desc="总时间")
     private String allTime;
@@ -103,6 +95,14 @@ public class PipelineExecHistory {
 
     public void setHistoryId(String historyId) {
         this.historyId = historyId;
+    }
+
+    public List<Integer> getTimeList() {
+        return timeList;
+    }
+
+    public void setTimeList(List<Integer> timeList) {
+        this.timeList = timeList;
     }
 
     public int getStatus() {
@@ -183,38 +183,6 @@ public class PipelineExecHistory {
 
     public void setFindNumber(int findNumber) {
         this.findNumber = findNumber;
-    }
-
-    public String getOneTime() {
-        return oneTime;
-    }
-
-    public void setOneTime(String oneTime) {
-        this.oneTime = oneTime;
-    }
-
-    public String getTwoTime() {
-        return twoTime;
-    }
-
-    public void setTwoTime(String twoTime) {
-        this.twoTime = twoTime;
-    }
-
-    public String getThreeTime() {
-        return threeTime;
-    }
-
-    public void setThreeTime(String threeTime) {
-        this.threeTime = threeTime;
-    }
-
-    public String getFourTime() {
-        return fourTime;
-    }
-
-    public void setFourTime(String fourTime) {
-        this.fourTime = fourTime;
     }
 
     public String getAllTime() {

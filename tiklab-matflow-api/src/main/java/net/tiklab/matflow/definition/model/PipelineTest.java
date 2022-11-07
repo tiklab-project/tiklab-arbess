@@ -15,12 +15,15 @@ public class PipelineTest {
     @ApiProperty(name="testId",desc="id",required = true)
     private String testId;
 
-    //测试类型
-    private int type;
-
     //测试内容
     @ApiProperty(name="testOrder",desc="测试内容",required = true)
     private String testOrder;
+
+    @ApiProperty(name="address",desc="测试地址",required = true)
+    private String address;
+
+    //测试类型
+    private int type;
 
     //顺序
     private int sort;
@@ -58,5 +61,11 @@ public class PipelineTest {
         this.sort = sort;
     }
 
+    public String getAddress() {
+        return address;
+    }
 
+    public void setAddress(String address) {
+        this.address = address;
+    }
 }

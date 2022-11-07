@@ -79,9 +79,7 @@ public class TestAchieveServiceImpl implements TestAchieveService {
      */
     private Process getOrder(PipelineTest pipelineTest, String path ) throws ApplicationException, IOException {
         String testOrder = pipelineTest.getTestOrder();
-
         int type = pipelineTest.getType();
-
         String order ;
         if (type == 11) {
             String mavenAddress = commonService.getScm(21);

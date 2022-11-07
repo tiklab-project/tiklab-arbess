@@ -11,9 +11,8 @@ public interface PipelineExecService {
      * 开始构建
      * @param pipelineId 流水线id
      * @return 构建开始
-     * @throws InterruptedException 等待超时
      */
-    int  start(String pipelineId,String userId) throws Exception;
+    int  start(String pipelineId);
 
     /**
      * 查询构建状态
@@ -33,7 +32,7 @@ public interface PipelineExecService {
      * 关闭运行
      * @param pipelineId 流水线id
      */
-    void killInstance(String pipelineId,String userId);
+    void killInstance(String pipelineId);
 
 
 
