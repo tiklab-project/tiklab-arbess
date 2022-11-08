@@ -38,8 +38,8 @@ public class TestAchieveServiceImpl implements TestAchieveService {
         String path = PipelineUntil.findFileAddress()+pipeline.getPipelineName();
         try {
 
-            String a = "------------------------------------" + " \n"
-                    +"开始测试" + " \n"
+            String a = " \n"
+                    +"开始执行测试" + " \n"
                     + "执行 : \"" + testOrder + "\"\n";
             pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+a);
 
@@ -47,27 +47,23 @@ public class TestAchieveServiceImpl implements TestAchieveService {
 
             if (process == null){
                 commonService.execHistory(pipelineProcess,"命令错误。");
-                commonService.updateState(pipelineProcess,false);
                 return false;
             }
 
-            int state = commonService.log(process.getInputStream(),process.getErrorStream(),pipelineProcess,"GBk");
-
+            int state = commonService.log(process.getInputStream(),process.getErrorStream(),pipelineProcess,null);
+            process.destroy();
             if (state == 0){
+                process.destroy();
                 commonService.execHistory(pipelineProcess,"测试执行失败。");
-                commonService.updateState(pipelineProcess,false);
                 return false;
             }
         } catch (IOException e) {
             commonService.execHistory(pipelineProcess,"日志打印失败"+e);
-            commonService.updateState(pipelineProcess,false);
             return false;
         } catch (ApplicationException e) {
             commonService.execHistory(pipelineProcess,e.getMessage());
-            commonService.updateState(pipelineProcess,false);
             return false;
         }
-        commonService.updateState(pipelineProcess,true);
         return true;
     }
 

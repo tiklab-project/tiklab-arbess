@@ -1,6 +1,7 @@
 package net.tiklab.matflow.execute.service;
 
-import net.tiklab.matflow.definition.model.*;
+import net.tiklab.matflow.definition.model.Pipeline;
+import net.tiklab.matflow.definition.model.PipelineConfigOrder;
 import net.tiklab.matflow.execute.model.PipelineExecHistory;
 import net.tiklab.matflow.execute.model.PipelineExecLog;
 import net.tiklab.matflow.execute.model.PipelineProcess;
@@ -14,12 +15,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import java.io.*;
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.text.SimpleDateFormat;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 执行过程公共方法
@@ -41,8 +46,9 @@ public class ConfigCommonServiceImpl implements ConfigCommonService {
     private static final Logger logger = LoggerFactory.getLogger(ConfigCommonServiceImpl.class);
 
 
-    List<PipelineExecHistory> list = PipelineExecServiceImpl.pipelineExecHistoryList;
-    
+    // List<PipelineExecHistory> list = PipelineExecServiceImpl.pipelineExecHistoryList;
+
+    Map<String,PipelineExecHistory> historyMap = PipelineExecServiceImpl.historyMap;
 
     /**
      * 执行日志
@@ -63,17 +69,20 @@ public class ConfigCommonServiceImpl implements ConfigCommonService {
         //更新日志信息
         while ((s = bufferedReader.readLine()) != null) {
             logRunLog = logRunLog + s +"\n";
-            execHistory(pipelineProcess,s);
-            if (logRunLog.contains("BUILD FAILURE")||logRunLog.contains("ERROR") || logRunLog.contains("Access denied")) {
+            if (logRunLog.contains("BUILD FAILURE")) {
                 state = 0 ;
             }
+            execHistory(pipelineProcess,s);
         }
         if (logRunLog == null){
             inputStreamReader = PipelineUntil.encode(errInputStream, encode);
             bufferedReader = new BufferedReader(inputStreamReader);
             while ((s = bufferedReader.readLine()) != null) {
                 logRunLog = logRunLog + s +"\n";
-                if (logRunLog.contains("BUILD FAILURE")||logRunLog.contains("ERROR") || logRunLog.contains("Access denied")) {
+                if (logRunLog.contains("BUILD FAILURE")
+                        || logRunLog.contains("ERROR")
+                        || logRunLog.contains("npm ERR!")
+                        || logRunLog.contains("Access denied")) {
                     state = 0 ;
                 }
                 execHistory(pipelineProcess,s);
@@ -91,15 +100,12 @@ public class ConfigCommonServiceImpl implements ConfigCommonService {
      */
     @Override
     public void error(PipelineExecHistory pipelineExecHistory, String pipelineId){
-        pipelineExecHistory.setStatus(pipelineExecHistory.getStatus()+2);
-        list.add(pipelineExecHistory);
+        // pipelineExecHistory.setStatus(pipelineExecHistory.getStatus()+2);
         pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+ "\nRUN RESULT : FAIL");
         pipelineExecHistory.setRunStatus(1);
         pipelineExecHistory.setFindState(1);
         historyService.updateHistory(pipelineExecHistory);
-        list.add(pipelineExecHistory);
-        // 清空缓存
-        list.removeIf(execHistory -> execHistory.getPipeline().getPipelineId().equals(pipelineId));
+        historyMap.put(pipelineId,pipelineExecHistory);
     }
 
     /**
@@ -113,8 +119,7 @@ public class ConfigCommonServiceImpl implements ConfigCommonService {
         pipelineExecHistory.setRunStatus(30);
         pipelineExecHistory.setFindState(1);
         historyService.updateHistory(pipelineExecHistory);
-        //清空缓存
-        list.removeIf(execHistory -> execHistory.getPipeline().getPipelineId().equals(pipelineId));
+        historyMap.put(pipelineId,pipelineExecHistory);
     }
 
     /**
@@ -124,10 +129,9 @@ public class ConfigCommonServiceImpl implements ConfigCommonService {
      */
     @Override
     public void halt(PipelineProcess pipelineProcess, String pipelineId) {
-
         PipelineExecHistory pipelineExecHistory = pipelineProcess.getPipelineExecHistory();
         PipelineExecLog pipelineExecLog = pipelineProcess.getPipelineExecLog();
-        PipelineExecLog runLog = historyService.getRunLog(pipelineExecHistory.getHistoryId());
+        PipelineExecLog runLog = historyService.findLastRunLog(pipelineExecHistory.getHistoryId());
         pipelineExecLog.setLogId(runLog.getLogId());
 
         //更新信息
@@ -137,8 +141,7 @@ public class ConfigCommonServiceImpl implements ConfigCommonService {
         //更新状态
         logService.updateLog(pipelineExecLog);
         historyService.updateHistory(pipelineExecHistory);
-        //清空缓存
-        list.removeIf(execHistory -> execHistory.getPipeline().getPipelineId().equals(pipelineId));
+        historyMap.put(pipelineId,pipelineExecHistory);
     }
 
     /**
@@ -147,16 +150,13 @@ public class ConfigCommonServiceImpl implements ConfigCommonService {
      */
     @Override
     public PipelineExecHistory initializeHistory(Pipeline pipeline) {
-
         PipelineExecHistory pipelineExecHistory = new PipelineExecHistory();
         String historyId = historyService.createHistory(pipelineExecHistory);
-
         //初始化基本信息
-        String time = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-        pipelineExecHistory.setCreateTime(time);
+        pipelineExecHistory.setCreateTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
         pipelineExecHistory.setRunWay(1);
         pipelineExecHistory.setSort(1);
-        pipelineExecHistory.setStatus(0);
+        // pipelineExecHistory.setStatus(0);
         pipelineExecHistory.setPipeline(pipeline);
         pipelineExecHistory.setHistoryId(historyId);
         pipelineExecHistory.setRunLog("流水线"+pipeline.getPipelineName()+"开始执行。");
@@ -199,9 +199,9 @@ public class ConfigCommonServiceImpl implements ConfigCommonService {
      */
     @Override
     public PipelineExecLog getExecPipelineLog(String historyId){
-        List<PipelineExecLog> allLog = logService.findAllLog(historyId);
-        allLog.sort(Comparator.comparing(PipelineExecLog::getTaskSort));
-        return allLog.get(allLog.size()-1);
+        // List<PipelineExecLog> allLog = logService.findAllLog(historyId);
+        // allLog.sort(Comparator.comparing(PipelineExecLog::getTaskSort));
+        return historyService.findLastRunLog(historyId);
     }
 
     /**
@@ -225,21 +225,11 @@ public class ConfigCommonServiceImpl implements ConfigCommonService {
     public void execHistory(PipelineProcess pipelineProcess,String log){
         String pipelineId = pipelineProcess.getPipeline().getPipelineId();
         PipelineExecLog pipelineExecLog = pipelineProcess.getPipelineExecLog();
-        PipelineExecHistory execHistory = null;
-        //查询流水线当前历史
-        for (PipelineExecHistory pipelineExecHistory : list) {
-            Pipeline pipeline = pipelineExecHistory.getPipeline();
-            if (!pipeline.getPipelineId().equals(pipelineId)){
-                continue;
-            }
-            execHistory = pipelineExecHistory;
-        }
-        if (execHistory == null) return ;
 
-        //更新历史日志
-        list.remove(execHistory);
-        execHistory.setRunLog(execHistory.getRunLog()+"\n"+log);
-        list.add(execHistory);
+        PipelineExecHistory history = historyMap.get(pipelineId);
+
+        history.setRunLog(history.getRunLog()+"\n"+log);
+        historyMap.put(pipelineId,history);
 
         //更新单个配置日志
         pipelineExecLog.setRunLog(pipelineExecLog.getRunLog()+"\n"+log);
@@ -248,25 +238,26 @@ public class ConfigCommonServiceImpl implements ConfigCommonService {
 
     /**
      * 更新状态
-     * @param pipelineProcess 执行信息
-     * @param b 异常
+     * @param historyId 执行信息
+     * @param time 异常
      */
-    public boolean updateState(PipelineProcess pipelineProcess, boolean b){
-        long beginTime = pipelineProcess.getBeginTime();
-        long overTime = new Timestamp(System.currentTimeMillis()).getTime();
-        int time = (int) (overTime - beginTime) / 1000;
-        PipelineExecLog pipelineExecLog = pipelineProcess.getPipelineExecLog();
-        PipelineExecHistory pipelineExecHistory = pipelineProcess.getPipelineExecHistory();
-        pipelineExecLog.setRunTime(time+1);
+    public boolean updateState(String historyId,int time,boolean state){
+        // long beginTime = pipelineProcess.getBeginTime();
+        // long overTime = new Timestamp(System.currentTimeMillis()).getTime();
+        // int time = (int) (overTime - beginTime) / 1000;
+        // PipelineExecLog pipelineExecLog = pipelineProcess.getPipelineExecLog();
+        // PipelineExecHistory pipelineExecHistory = pipelineProcess.getPipelineExecHistory();
+        PipelineExecLog pipelineExecLog = historyService.findLastRunLog(historyId);
+        PipelineExecHistory pipelineExecHistory = historyService.findOneHistory(historyId);
+        pipelineExecLog.setRunTime(time);
         pipelineExecHistory.setRunTime(pipelineExecHistory.getRunTime()+time);
         pipelineExecLog.setRunState(10);
-        pipelineExecLog.setHistoryId(pipelineExecHistory.getHistoryId());
         historyService.updateHistory(pipelineExecHistory);
-        if (!b){
+        if (!state){
             pipelineExecLog.setRunState(1);
         }
         logService.updateLog(pipelineExecLog);
-        return b;
+        return state;
     }
 
 }

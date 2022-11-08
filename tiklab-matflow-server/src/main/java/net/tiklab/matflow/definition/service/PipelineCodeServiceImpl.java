@@ -51,12 +51,14 @@ public class PipelineCodeServiceImpl implements PipelineCodeService {
     //修改
     @Override
     public void updateCode(PipelineCode pipelineCode) {
-        String authId = pipelineCode.getAuthId();
+
         switch (pipelineCode.getType()) {
             case 2, 3 -> {
-                if (!PipelineUntil.isNoNull(authId)){
+                if (!PipelineUntil.isNoNull(pipelineCode.getCodeName())){
                     break;
                 }
+                PipelineCode oneCode = findOneCode(pipelineCode.getCodeId());
+                String authId = oneCode.getAuthId();
                 String houseUrl = codeAuthorizeService.getHouseUrl(authId, pipelineCode.getCodeName(), pipelineCode.getType());
                 pipelineCode.setCodeAddress(houseUrl);
             }
@@ -95,9 +97,9 @@ public class PipelineCodeServiceImpl implements PipelineCodeService {
     //获认证信息
     private Object findAuth(String id){
         PipelineAuthThird oneAuthServer = authServerServer.findOneAuthServer(id);
-       if (oneAuthServer != null){
+        if (oneAuthServer != null){
            return oneAuthServer;
-       }
+        }
         return authServer.findOneAuth(id);
     }
 

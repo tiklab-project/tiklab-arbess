@@ -140,10 +140,15 @@ public class PipelineUntil {
         return list;
     }
 
-    //匹配字符串获取文件全路径
+    /**
+     * 匹配文件路径
+     * @param pipelineName 流水线名称
+     * @param regex 条件
+     * @return 文件全路径
+     */
     public static String getFile(String pipelineName, String regex){
         List<String> list = new ArrayList<>();
-        String  path= findFileAddress() + pipelineName;
+        String path= findFileAddress() + pipelineName;
         List<String> filePath = PipelineUntil.getFilePath(new File(path),new ArrayList<>());
         for (String s : filePath) {
             File file = new File(s);
@@ -173,7 +178,7 @@ public class PipelineUntil {
         if (encode != null){
             return  new InputStreamReader(inputStream, Charset.forName(encode));
         }
-        if (findSystemType()==1){
+        if (findSystemType() == 1){
             return new InputStreamReader(inputStream, Charset.forName("GBK"));
         }else {
             return new InputStreamReader(inputStream, StandardCharsets.UTF_8);
@@ -227,22 +232,17 @@ public class PipelineUntil {
      * 拼装测试命令
      * @param buildOrder 执行命令
      * @param path 项目地址
-     * @param address 模块地址
      * @return 命令
      */
-    private String mavenOrder(String buildOrder,String path,String address){
+    public static String mavenOrder(String buildOrder,String path){
         String order;
         int systemType = PipelineUntil.findSystemType();
         order = " ./" + buildOrder + " " + "-f" +" " +path ;
         if (systemType == 1){
             order = " .\\" + buildOrder + " " + "-f"+" "  +path;
         }
-        if (!Objects.equals(address, "/")){
-            order = order + address;
-        }
         return order;
     }
-
 
 }
 

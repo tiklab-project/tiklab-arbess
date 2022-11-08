@@ -283,12 +283,6 @@ public class PipelineConfigServiceImpl implements PipelineConfigService {
                     map.put("codeName", String.valueOf(type));
                 }
             }
-            if (30<type && type<40){
-                PipelineDeploy deploy = pipelineDeployService.findOneDeploy(taskId);
-                if (!PipelineUntil.isNoNull(deploy.getSshIp()) && deploy.getDeployType() == 0){
-                    map.put("sshIp", String.valueOf(type));
-                }
-            }
         }
         if(map.size() == 0){
             return Collections.emptyMap();

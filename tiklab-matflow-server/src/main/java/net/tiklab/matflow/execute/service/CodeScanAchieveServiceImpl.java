@@ -38,19 +38,19 @@ public class CodeScanAchieveServiceImpl implements CodeScanService {
             Process process = getOrder(pipelineProcess,pipelineCodeScan,fileAddress+pipeline.getPipelineName());
             if (process == null){
                 commonService.execHistory(pipelineProcess,"代码扫描执行失败");
-                return commonService.updateState(pipelineProcess,false);
+                return false;
             }
             int log = commonService.log(process.getInputStream(), process.getErrorStream(), pipelineProcess,"GBK");
             if (log == 0){
                 commonService.execHistory(pipelineProcess,"代码扫描失败");
-                return commonService.updateState(pipelineProcess,false);
+                return false;
             }
         } catch (IOException |ApplicationException e) {
             commonService.execHistory(pipelineProcess,"代码扫描执行错误\n"+e.getMessage());
-            return commonService.updateState(pipelineProcess,false);
+            return false;
         }
         commonService.execHistory(pipelineProcess,"代码扫描完成");
-        return commonService.updateState(pipelineProcess,true);
+        return true;
     }
 
     private Process getOrder(PipelineProcess pipelineProcess,PipelineCodeScan pipelineCodeScan, String path) throws ApplicationException, IOException {

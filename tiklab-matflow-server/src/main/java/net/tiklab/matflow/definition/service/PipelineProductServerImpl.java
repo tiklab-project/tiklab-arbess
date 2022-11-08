@@ -1,13 +1,16 @@
 package net.tiklab.matflow.definition.service;
 
 import net.tiklab.beans.BeanMapper;
-import net.tiklab.join.JoinTemplate;
 import net.tiklab.matflow.definition.dao.PipelineProductDao;
 import net.tiklab.matflow.definition.entity.PipelineProductEntity;
 import net.tiklab.matflow.definition.model.PipelineProduct;
+import net.tiklab.matflow.orther.service.PipelineUntil;
+import net.tiklab.matflow.setting.model.PipelineAuthThird;
+import net.tiklab.matflow.setting.service.PipelineAuthThirdServer;
 import net.tiklab.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 
 @Service
@@ -19,7 +22,7 @@ public class PipelineProductServerImpl implements PipelineProductServer {
     PipelineProductDao productDao;
 
     @Autowired
-    JoinTemplate joinTemplate;
+    PipelineAuthThirdServer thirdServer;
 
     /**
      * 创建流水线推送制品
@@ -60,7 +63,10 @@ public class PipelineProductServerImpl implements PipelineProductServer {
     public PipelineProduct findOneProduct(String ProductId) {
         PipelineProductEntity oneProduct = productDao.findOneProduct(ProductId);
         PipelineProduct product = BeanMapper.map(oneProduct, PipelineProduct.class);
-        joinTemplate.joinQuery(product);
+        if (PipelineUntil.isNoNull(product.getAuthId())){
+            PipelineAuthThird oneAuthServer = thirdServer.findOneAuthServer(product.getAuthId());
+            product.setAuth(oneAuthServer);
+        }
         return product;
     }
 
@@ -77,9 +83,7 @@ public class PipelineProductServerImpl implements PipelineProductServer {
     @Override
     public List<PipelineProduct> findAllProductList(List<String> idList) {
         List<PipelineProductEntity> allProductList = productDao.findAllProductList(idList);
-        List<PipelineProduct> pipelineProducts = BeanMapper.mapList(allProductList, PipelineProduct.class);
-        joinTemplate.joinQuery(pipelineProducts);
-        return pipelineProducts;
+        return BeanMapper.mapList(allProductList, PipelineProduct.class);
     }
 
 

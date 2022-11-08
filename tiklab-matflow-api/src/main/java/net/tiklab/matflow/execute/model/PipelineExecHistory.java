@@ -46,7 +46,7 @@ public class PipelineExecHistory {
     @JoinQuery(key = "id")
     private User user;
 
-    //状态
+    //运行状态
     @ApiProperty(name="runStatus",desc="运行状态")
     private int runStatus;
 
@@ -55,18 +55,17 @@ public class PipelineExecHistory {
     private int runTime;
 
    //流水线
-   @ApiProperty(name="pipeline",desc="流水线id",eg="@selectOne")
-   @Mappings({
-           @Mapping(source = "pipeline.pipelineId",target = "pipelineId")
-   })
-   @JoinQuery(key = "pipelineId")
-   private Pipeline pipeline;
+    @Mappings({
+            @Mapping(source = "pipeline.pipelineId",target = "pipelineId")
+    })
+    @JoinQuery(key = "pipelineId")
+    private Pipeline pipeline;
 
     //执行位置
     @ApiProperty(name="sort",desc="执行过程位置")
     private int sort;
 
-    //执行状态
+    //历史状态
     @ApiProperty(name="status",desc="执行过程状态")
     private int status;
 
@@ -78,16 +77,8 @@ public class PipelineExecHistory {
     @ApiProperty(name="findState",desc="运行状态（1.运行完成，0.运行中）")
     private int findState;
 
-    //运行时间（转换为天，月，日 ，时，分，秒格式）
-    @ApiProperty(name="execTime",desc="运行时间（转换为天，月，日 ，时，分，秒格式）")
-    private String execTime;
-
     //执行时间
     private List<Integer> timeList;
-
-    @ApiProperty(name="allTime",desc="总时间")
-    private String allTime;
-
 
     public String getHistoryId() {
         return historyId;
@@ -161,14 +152,6 @@ public class PipelineExecHistory {
         this.runTime = runTime;
     }
 
-    public String getExecTime() {
-        return execTime;
-    }
-
-    public void setExecTime(String execTime) {
-        this.execTime = execTime;
-    }
-
     public int getSort() {
         return sort;
     }
@@ -185,13 +168,6 @@ public class PipelineExecHistory {
         this.findNumber = findNumber;
     }
 
-    public String getAllTime() {
-        return allTime;
-    }
-
-    public void setAllTime(String allTime) {
-        this.allTime = allTime;
-    }
 
     public int getFindState() {
         return findState;

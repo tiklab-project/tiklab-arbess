@@ -74,31 +74,25 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
             Process process = codeStart(pipelineCode,pipeline.getPipelineName());
             if (process == null){
                 commonService.execHistory(pipelineProcess,"代码拉取失败。");
-                commonService.updateState(pipelineProcess,false);
                 return false;
             }
             //项目执行过程失败
             int log = commonService.log(process.getInputStream(), process.getErrorStream(), pipelineProcess,"UTF-8");
             if (log == 0){
                 commonService.execHistory(pipelineProcess,"代码拉取失败。 \n" );
-                commonService.updateState(pipelineProcess,false);
                 return false;
             }
         } catch (IOException e) {
             commonService.execHistory(pipelineProcess,"系统执行命令错误 \n" + e);
-            commonService.updateState(pipelineProcess,false);
             return false;
         }catch (URISyntaxException e){
             commonService.execHistory(pipelineProcess,"git地址错误 \n" + e);
-            commonService.updateState(pipelineProcess,false);
             return false;
         }catch (ApplicationException e){
             commonService.execHistory(pipelineProcess,"" + e);
-            commonService.updateState(pipelineProcess,false);
             return false;
         }
         commonService.execHistory(pipelineProcess,"代码拉取成功");
-        commonService.updateState(pipelineProcess,true);
         return true;
     }
 

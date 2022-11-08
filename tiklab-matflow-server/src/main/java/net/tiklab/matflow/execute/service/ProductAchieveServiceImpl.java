@@ -32,25 +32,33 @@ public class ProductAchieveServiceImpl implements ProductAchieveService {
         long beginTime = new Timestamp(System.currentTimeMillis()).getTime();
         pipelineProcess.setBeginTime(beginTime);
         Pipeline pipeline = pipelineProcess.getPipeline();
-        String fileAddress = PipelineUntil.findFileAddress();
+
+        String fileAddress = product.getFileAddress();
+        String path = PipelineUntil.getFile(pipeline.getPipelineName(),fileAddress);
+        if (path == null){
+            commonService.execHistory(pipelineProcess,"无法匹配到制品");
+            return false;
+        }
+
         commonService.execHistory(pipelineProcess,"开始推送制品。。。。。。");
         try {
-            Process process = getOrder(pipelineProcess,product,fileAddress+pipeline.getPipelineName());
+            Process process = getOrder(pipelineProcess,product,path);
             if (process == null){
                 commonService.execHistory(pipelineProcess,"推送制品执行失败");
-                return commonService.updateState(pipelineProcess,false);
+                return false;
             }
             int log = commonService.log(process.getInputStream(), process.getErrorStream(), pipelineProcess,"UTF-8");
+
             if (log == 0){
                 commonService.execHistory(pipelineProcess,"推送制品失败");
-                return commonService.updateState(pipelineProcess,false);
+                return false;
             }
         } catch (IOException | ApplicationException e) {
             commonService.execHistory(pipelineProcess,"推送制品执行错误\n"+e.getMessage());
-            return commonService.updateState(pipelineProcess,false);
+            return false;
         }
         commonService.execHistory(pipelineProcess,"推送制品完成");
-        return commonService.updateState(pipelineProcess,true);
+        return true;
     }
 
     private Process getOrder(PipelineProcess pipelineProcess, PipelineProduct product, String path) throws ApplicationException, IOException {
@@ -63,7 +71,6 @@ public class ProductAchieveServiceImpl implements ProductAchieveService {
                 throw new ApplicationException("不存在maven配置");
             }
             PipelineAuthThird authThird = (PipelineAuthThird)product.getAuth();
-
             if (authThird == null){
                 order = mavenOrder(execOrder, path);
                 commonService.execHistory(pipelineProcess,"执行推送制品命令："+order);
@@ -75,7 +82,7 @@ public class ProductAchieveServiceImpl implements ProductAchieveService {
                     " -DartifactId="+product.getArtifactId() +
                     " -Dversion="+product.getVersion()+
                     " -Dpackaging="+product.getFileType() +
-                    " -Dfile="+product.getFileAddress() +
+                    " -Dfile="+path +
                     " -Durl="+authThird.getServerAddress() ;
             if (authThird.getAuthType() == 1){
                 execOrder = execOrder +
@@ -94,9 +101,9 @@ public class ProductAchieveServiceImpl implements ProductAchieveService {
 
 
     private String mavenOrder(String buildOrder,String path){
-        String order = " ./" + buildOrder + " " + "-f" +" " +path ;
+        String order = " ./" + buildOrder  ;
         if (PipelineUntil.findSystemType() == 1){
-            order = " .\\" + buildOrder + " " + "-f"+" "  +path;
+            order = " .\\" + buildOrder ;
         }
         return order;
     }

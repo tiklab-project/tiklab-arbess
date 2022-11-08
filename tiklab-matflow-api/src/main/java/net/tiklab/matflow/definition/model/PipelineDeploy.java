@@ -13,47 +13,33 @@ public class PipelineDeploy {
     @ApiProperty(name = "deployId" , desc = "id")
     private String deployId;
 
-    private int type;
+    @ApiProperty(name = "authType",desc = "认证类型" )
+    private int authType;
 
-    @ApiProperty(name = "deployType",desc = "部署类型" )
-    private int deployType;
+    @ApiProperty(name = "localAddress" , desc = "文件地址")
+    private String localAddress;
 
-    @ApiProperty(name = "deployAddress" , desc = "部署文件地址")
+    @ApiProperty(name="deployAddress",desc="部署地址")
     private String deployAddress;
 
-    @ApiProperty(name="sourceAddress",desc="源文件地址")
-    private String sourceAddress;
-
-    @ApiProperty(name = "startShell" , desc = "启动脚本")
-    private String startShell;
-
-    @ApiProperty(name = "startPort",desc="启动端口")
-    private int startPort;
-
-    @ApiProperty(name = "mappingPort",desc="映射端口")
-    private int mappingPort;
-
-    private int sort;
-
-    @ApiProperty(name = "sshPort" ,desc="ssh连接端口")
-    private int sshPort;
-
-    @ApiProperty(name = "sshIp" ,desc="ssh连接ip")
-    private String sshIp;
-
-    @ApiProperty(name = "startAddress",desc = "启动文件地址" )
-    private String startAddress;
+    @ApiProperty(name = "authId" , desc = "认证id")
+    private String authId;
 
     @ApiProperty(name = "deployOrder",desc = "部署命令" )
     private String deployOrder;
 
+    @ApiProperty(name = "startAddress",desc = "启动文件地址" )
+    private String startAddress;
 
-    //授权id
-    @ApiProperty(name="authName",desc="授权id")
-    private String authId;
+    @ApiProperty(name="startOrder",desc="启动命令")
+    private String startOrder;
 
     //授权信息
     private Object auth;
+
+    private int sort;
+
+    private int type;
 
 
     public String getDeployId() {
@@ -64,20 +50,20 @@ public class PipelineDeploy {
         this.deployId = deployId;
     }
 
-    public int getType() {
-        return type;
+    public int getAuthType() {
+        return authType;
     }
 
-    public void setType(int type) {
-        this.type = type;
+    public void setAuthType(int authType) {
+        this.authType = authType;
     }
 
-    public int getDeployType() {
-        return deployType;
+    public String getLocalAddress() {
+        return localAddress;
     }
 
-    public void setDeployType(int deployType) {
-        this.deployType = deployType;
+    public void setLocalAddress(String localAddress) {
+        this.localAddress = localAddress;
     }
 
     public String getDeployAddress() {
@@ -88,84 +74,12 @@ public class PipelineDeploy {
         this.deployAddress = deployAddress;
     }
 
-    public String getSourceAddress() {
-        return sourceAddress;
-    }
-
-    public void setSourceAddress(String sourceAddress) {
-        this.sourceAddress = sourceAddress;
-    }
-
-    public String getStartShell() {
-        return startShell;
-    }
-
-    public void setStartShell(String startShell) {
-        this.startShell = startShell;
-    }
-
     public String getAuthId() {
         return authId;
     }
 
     public void setAuthId(String authId) {
         this.authId = authId;
-    }
-
-    public Object getAuth() {
-        return auth;
-    }
-
-    public void setAuth(Object auth) {
-        this.auth = auth;
-    }
-
-    public int getStartPort() {
-        return startPort;
-    }
-
-    public void setStartPort(int startPort) {
-        this.startPort = startPort;
-    }
-
-    public int getMappingPort() {
-        return mappingPort;
-    }
-
-    public void setMappingPort(int mappingPort) {
-        this.mappingPort = mappingPort;
-    }
-
-    public int getSort() {
-        return sort;
-    }
-
-    public void setSort(int sort) {
-        this.sort = sort;
-    }
-
-    public int getSshPort() {
-        return sshPort;
-    }
-
-    public void setSshPort(int sshPort) {
-        this.sshPort = sshPort;
-    }
-
-    public String getSshIp() {
-        return sshIp;
-    }
-
-    public void setSshIp(String sshIp) {
-        this.sshIp = sshIp;
-    }
-
-    public String getStartAddress() {
-        return startAddress;
-    }
-
-    public void setStartAddress(String startAddress) {
-        this.startAddress = startAddress;
     }
 
     public String getDeployOrder() {
@@ -176,5 +90,43 @@ public class PipelineDeploy {
         this.deployOrder = deployOrder;
     }
 
+    public String getStartAddress() {
+        return startAddress;
+    }
 
+    public void setStartAddress(String startAddress) {
+        this.startAddress = startAddress;
+    }
+
+    public String getStartOrder() {
+        return startOrder;
+    }
+
+    public void setStartOrder(String startOrder) {
+        this.startOrder = startOrder;
+    }
+
+    public Object getAuth() {
+        return auth;
+    }
+
+    public void setAuth(Object auth) {
+        this.auth = auth;
+    }
+
+    public int getSort() {
+        return sort;
+    }
+
+    public void setSort(int sort) {
+        this.sort = sort;
+    }
+
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
+    }
 }

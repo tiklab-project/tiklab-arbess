@@ -5,12 +5,12 @@ import net.tiklab.beans.BeanMapper;
 import net.tiklab.matflow.execute.dao.PipelineExecLogDao;
 import net.tiklab.matflow.execute.entity.PipelineExecLogEntity;
 import net.tiklab.matflow.execute.model.PipelineExecLog;
-import net.tiklab.matflow.orther.service.PipelineUntil;
 import net.tiklab.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.Comparator;
+import java.util.List;
 
 @Service
 @Exporter
@@ -47,9 +47,6 @@ public class PipelineExecLogServiceImpl implements PipelineExecLogService {
         List<PipelineExecLog> list = BeanMapper.mapList(pipelineExecLogList, PipelineExecLog.class);
         if (list == null){
            return null;
-        }
-        for (PipelineExecLog pipelineExecLog : list) {
-            pipelineExecLog.setExecTime(PipelineUntil.formatDateTime(pipelineExecLog.getRunTime()));
         }
         list.sort(Comparator.comparing(PipelineExecLog::getTaskSort));
         return list;

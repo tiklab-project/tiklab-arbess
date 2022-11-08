@@ -10,7 +10,6 @@ import net.tiklab.matflow.execute.entity.PipelineExecHistoryEntity;
 import net.tiklab.matflow.execute.model.PipelineExecHistory;
 import net.tiklab.matflow.execute.model.PipelineExecLog;
 import net.tiklab.matflow.execute.model.PipelineHistoryQuery;
-import net.tiklab.matflow.orther.service.PipelineUntil;
 import net.tiklab.rpc.annotation.Exporter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -86,9 +85,6 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
             return null;
         }
         List<PipelineExecHistory> allHistory = BeanMapper.mapList(list, PipelineExecHistory.class);
-        for (PipelineExecHistory pipelineExecHistory : allHistory) {
-            pipelineExecHistory.setExecTime(PipelineUntil.formatDateTime(pipelineExecHistory.getRunTime()));
-        }
         allHistory.sort(Comparator.comparing(PipelineExecHistory::getCreateTime,Comparator.reverseOrder()));
         return allHistory;
     }
@@ -128,7 +124,7 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
 
     //获取最后一次的运行日志详情
     @Override
-    public PipelineExecLog getRunLog(String historyId){
+    public PipelineExecLog findLastRunLog(String historyId){
         List<PipelineExecLog> allLog = pipelineExecLogService.findAllLog(historyId);
         if (allLog == null || allLog.size() == 0){
            return null;
@@ -138,7 +134,7 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
         for (PipelineExecLog execLog : allLog) {
             pipelineExecLog.setRunTime(pipelineExecLog.getRunTime()+execLog.getRunTime());
         }
-        return allLog.get(allLog.size()-1);
+        return pipelineExecLog;
     }
 
 

@@ -94,7 +94,7 @@ public interface PipelineExecHistoryService {
      * @param historyId 历史id
      * @return 执行日志
      */
-    PipelineExecLog getRunLog(String historyId);
+    PipelineExecLog findLastRunLog(String historyId);
 
 
     /**

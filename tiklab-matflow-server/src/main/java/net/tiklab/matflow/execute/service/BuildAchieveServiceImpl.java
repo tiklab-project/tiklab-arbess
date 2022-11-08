@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.sql.Timestamp;
-import java.util.Objects;
 
 /**
  * 构建执行方法
@@ -47,25 +46,20 @@ public class BuildAchieveServiceImpl implements BuildAchieveService {
             Process process = getOrder(pipelineBuild, path);
             if (process == null){
                 commonService.execHistory(pipelineProcess,"构建命令执行错误");
-                commonService.updateState(pipelineProcess,false);
                 return false;
             }
 
             //构建失败
-            int state = commonService.log(process.getInputStream(), process.getErrorStream(),pipelineProcess,"GBK");
+            int state = commonService.log(process.getInputStream(), process.getErrorStream(),pipelineProcess,null);
             process.destroy();
-            
             if (state == 0){
                 commonService.execHistory(pipelineProcess,"构建失败");
-                commonService.updateState(pipelineProcess,false);
                 return false;
             }
         } catch (IOException | ApplicationException e) {
             commonService.execHistory(pipelineProcess,e.getMessage());
-            commonService.updateState(pipelineProcess,false);
             return false;
         }
-        commonService.updateState(pipelineProcess,true);
         return true;
     }
 
@@ -77,7 +71,7 @@ public class BuildAchieveServiceImpl implements BuildAchieveService {
      */
     private Process getOrder(PipelineBuild pipelineBuild,String path) throws ApplicationException, IOException {
         String buildOrder = pipelineBuild.getBuildOrder();
-        String buildAddress = pipelineBuild.getBuildAddress();
+        String buildAddress = "/"+ pipelineBuild.getBuildAddress();
         
         int type = pipelineBuild.getType();
         String order ;
@@ -87,7 +81,7 @@ public class BuildAchieveServiceImpl implements BuildAchieveService {
                 if (mavenAddress == null) {
                     throw new ApplicationException("不存在maven配置");
                 }
-                order = mavenOrder(buildOrder, path, buildAddress);
+                order =  PipelineUntil.mavenOrder(buildOrder,path + buildAddress);
                 return PipelineUntil.process(mavenAddress, order);
             }
             case 22 -> {
@@ -95,53 +89,10 @@ public class BuildAchieveServiceImpl implements BuildAchieveService {
                 if (nodeAddress == null) {
                     throw new ApplicationException("不存在node配置");
                 }
-                order = nodeOrder(buildOrder, path, buildAddress);
-                return PipelineUntil.process(nodeAddress, order);
+                return PipelineUntil.process(path+ buildAddress, buildOrder);
             }
             default -> {return null;}
         }
     }
 
-    //系统类型
-    int systemType = PipelineUntil.findSystemType();
-
-    /**
-     * 拼装maven命令
-     * @param buildOrder 执行命令
-     * @param path 项目地址
-     * @param buildAddress 模块地址
-     * @return 命令
-     */
-    private String mavenOrder(String buildOrder,String path,String buildAddress){
-        
-        String order;
-
-        order = " ./" + buildOrder + " " + "-f" +" " +path ;
-        if (systemType == 1){
-            order = " .\\" + buildOrder + " " + "-f"+" "  +path;
-        }
-        if (!Objects.equals(buildAddress, "/")){
-            order = order + buildAddress;
-        }
-        return order;
-    }
-
-    /**
-     * 拼装node命令
-     * @param buildOrder 执行命令
-     * @param path 项目地址
-     * @param buildAddress 模块地址
-     * @return 命令
-     */
-    private String nodeOrder(String buildOrder,String path,String buildAddress ){
-        String order;
-        order = " ./" + buildOrder + " " + "-f" +path ;
-        if (systemType == 1){
-            order = " .\\" + buildOrder + " " + "-f" +path;
-        }
-        if (buildAddress != null){
-            order = order + buildAddress;
-        }
-        return order;
-    }
 }
