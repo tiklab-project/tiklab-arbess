@@ -11,8 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.sql.Timestamp;
-import java.util.Objects;
 
 /**
  * 测试执行方法
@@ -28,10 +26,8 @@ public class TestAchieveServiceImpl implements TestAchieveService {
     // 单元测试
     public boolean test(PipelineProcess pipelineProcess, PipelineTest pipelineTest) {
 
-        long beginTime = new Timestamp(System.currentTimeMillis()).getTime();
         //初始化日志
         PipelineExecHistory pipelineExecHistory = pipelineProcess.getPipelineExecHistory();
-        pipelineProcess.setBeginTime(beginTime);
         Pipeline pipeline = pipelineProcess.getPipeline();
 
         String testOrder = pipelineTest.getTestOrder();
@@ -82,7 +78,8 @@ public class TestAchieveServiceImpl implements TestAchieveService {
             if (mavenAddress == null) {
                 throw new ApplicationException("不存在maven配置");
             }
-            order = testOrder(testOrder, path, "/");
+            PipelineUntil.validFile(mavenAddress,21);
+            order = testOrder(testOrder, path);
             return PipelineUntil.process(mavenAddress, order);
         }
         return null;
@@ -92,19 +89,15 @@ public class TestAchieveServiceImpl implements TestAchieveService {
      * 拼装测试命令
      * @param buildOrder 执行命令
      * @param path 项目地址
-     * @param buildAddress 模块地址
      * @return 命令
      */
-    private String testOrder(String buildOrder,String path,String buildAddress){
+    private String testOrder(String buildOrder,String path){
 
         String order;
         int systemType = PipelineUntil.findSystemType();
         order = " ./" + buildOrder + " " + "-f" +" " +path ;
         if (systemType == 1){
             order = " .\\" + buildOrder + " " + "-f"+" "  +path;
-        }
-        if (!Objects.equals(buildAddress, "/")){
-            order = order + buildAddress;
         }
         return order;
     }

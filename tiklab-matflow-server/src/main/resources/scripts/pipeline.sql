@@ -53,19 +53,15 @@ create table pipeline_config_order  (
 -- Table structure for pipeline_deploy
 -- ----------------------------
 create table pipeline_deploy  (
-  deploy_id varchar(256)  COMMENT '部署id',
-  deploy_type int  COMMENT '部署类型',
-  source_address varchar(255)  COMMENT '打包文件地址',
+  id varchar(256)  COMMENT '部署id',
+  auth_type int  COMMENT '认证类型',
+  local_address varchar(255)  COMMENT '打包文件地址',
+  auth_id varchar(256)  COMMENT '认证id',
   deploy_address varchar(256)  COMMENT '部署文件地址',
-  start_port int  COMMENT 'docker启动端口',
-  proof_id varchar(256)  COMMENT '凭证id',
-  mapping_port int  COMMENT '映射端口',
-  ssh_ip varchar(255)  COMMENT 'IP地址',
-  ssh_port int  COMMENT '端口号',
+  deploy_order varchar(255)  COMMENT '部署命令',
   start_address varchar(255)   COMMENT '启动文件地址',
-  deploy_order varchar(255)   COMMENT '文件操作',
-  start_shell longtext  COMMENT '启动命令',
-  PRIMARY KEY (deploy_id) USING BTREE
+  start_order varchar(255)   COMMENT '启动命令',
+  PRIMARY KEY (id) USING BTREE
 );
 
 -- ----------------------------
@@ -174,6 +170,7 @@ create table pipeline_product  (
     file_type varchar(256)  COMMENT '文件类型',
     file_address varchar(256)  COMMENT '文件地址',
     auth_id varchar(256)  COMMENT '凭证id',
+    put_address varchar(256)  COMMENT '凭证id',
     PRIMARY KEY (id) USING BTREE
 );
 

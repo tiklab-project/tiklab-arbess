@@ -1,8 +1,6 @@
 package net.tiklab.matflow.setting.entity;
 
 import net.tiklab.dal.jpa.annotation.*;
-import net.tiklab.matflow.orther.service.PipelineUntil;
-import net.tiklab.utils.context.LoginContext;
 @Entity
 @Table(name="pipeline_auth_server")
 public class PipelineAuthThirdEntity {
@@ -22,7 +20,7 @@ public class PipelineAuthThirdEntity {
     private int authType;
 
     @Column(name = "create_time")
-    private String createTime = PipelineUntil.date;
+    private String createTime ;
 
     @Column(name = "username")
     private String username;
@@ -44,7 +42,7 @@ public class PipelineAuthThirdEntity {
 
     //创建人
     @Column(name = "user_id")
-    private String userId = LoginContext.getLoginId();
+    private String userId ;
 
     //是否公开 true：公开， false：不公开
     @Column(name = "auth_public")

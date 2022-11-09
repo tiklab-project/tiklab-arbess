@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.sql.Timestamp;
 
 /**
  * 构建执行方法
@@ -26,9 +25,7 @@ public class BuildAchieveServiceImpl implements BuildAchieveService {
 
     // 构建
     public boolean build(PipelineProcess pipelineProcess,  PipelineBuild pipelineBuild)  {
-        long beginTime = new Timestamp(System.currentTimeMillis()).getTime();
         Pipeline pipeline = pipelineProcess.getPipeline();
-        pipelineProcess.setBeginTime(beginTime);
 
         //项目地址
         String path = PipelineUntil.findFileAddress()+ pipeline.getPipelineName();

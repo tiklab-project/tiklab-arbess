@@ -26,6 +26,9 @@ public class PipelineProductEntity {
     @Column(name = "file_address")
     private String fileAddress;
 
+    @Column(name = "put_address")
+    private String putAddress;
+
     @Column(name = "auth_id")
     private String authId;
 
@@ -83,5 +86,14 @@ public class PipelineProductEntity {
 
     public void setAuthId(String authId) {
         this.authId = authId;
+    }
+
+
+    public String getPutAddress() {
+        return putAddress;
+    }
+
+    public void setPutAddress(String putAddress) {
+        this.putAddress = putAddress;
     }
 }

@@ -75,21 +75,17 @@ public class PipelineCommonServerImpl implements PipelineCommonServer{
             PipelineMassage pipelineMassage = new PipelineMassage();
             //成功和构建时间
             PipelineExecHistory latelyHistory = historyService.findLatelyHistory(pipeline.getPipelineId());
-            PipelineExecHistory latelySuccess = historyService.findLatelySuccess(pipeline.getPipelineId());
-
             pipelineMassage.setPipelineId(pipeline.getPipelineId());
             pipelineMassage.setPipelineCollect(pipeline.getPipelineCollect());
             pipelineMassage.setPipelineName(pipeline.getPipelineName());
             pipelineMassage.setPipelineState(pipeline.getPipelineState());
             pipelineMassage.setCreateTime(pipeline.getPipelineCreateTime());
             pipelineMassage.setColor(pipeline.getColor());
-            pipelineMassage.setUserName(pipeline.getUser().getName());
+            pipelineMassage.setUser(pipeline.getUser());
             if (latelyHistory != null){
                 pipelineMassage.setLastBuildTime(latelyHistory.getCreateTime());
                 pipelineMassage.setBuildStatus(latelyHistory.getRunStatus());
-            }
-            if (latelySuccess != null){
-                pipelineMassage.setLastSuccessTime(latelySuccess.getCreateTime());
+                pipelineMassage.setExecUser(latelyHistory.getUser());
             }
             pipelineMassageList.add(pipelineMassage);
         }

@@ -1,12 +1,18 @@
 package net.tiklab.matflow.orther.service;
 
-import java.io.*;
+import net.tiklab.core.exception.ApplicationException;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 /**
@@ -15,9 +21,12 @@ import java.util.regex.Pattern;
 
 public class PipelineUntil {
 
-    public static String date=  new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
-
     public static String appName = "matflow";
+
+    //返回系统当前时间
+    public static String date(){
+        return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+    }
 
     //效验git地址
     public static boolean validGit(String address){
@@ -37,7 +46,10 @@ public class PipelineUntil {
         return Pattern.matches(valid,ip);
     }
 
-    //系统类型
+    /**
+     * 系统类型
+     * @return 1.windows 2.其他
+     */
     public static int findSystemType(){
         String property = System.getProperty("os.name");
         String[] s1 = property.split(" ");
@@ -48,7 +60,13 @@ public class PipelineUntil {
         }
     }
 
-    //执行cmd命令
+    /**
+     * 执行cmd命令
+     * @param path 执行文件夹
+     * @param order 执行命令
+     * @return 执行信息
+     * @throws IOException 调取命令行失败
+     */
     public static Process process(String path,String order) throws IOException {
         Runtime runtime=Runtime.getRuntime();
         Process process;
@@ -80,7 +98,10 @@ public class PipelineUntil {
         return DateTimes;
     }
 
-    //获取系统文件存储地址
+    /**
+     * 系统默认存储位置
+     * @return 位置
+     */
     public static String findFileAddress(){
         String files = "/usr/local/matflow/";
 
@@ -92,7 +113,11 @@ public class PipelineUntil {
         return files;
     }
 
-    //删除文件
+    /**
+     * 删除文件
+     * @param file 文件地址
+     * @return 是否删除 true 删除成功,false 删除失败
+     */
     public static Boolean deleteFile(File file){
         if (file.isDirectory()) {
             String[] children = file.list();
@@ -110,20 +135,6 @@ public class PipelineUntil {
             // 目录此时为空，删除
         }
         return file.delete();
-    }
-
-    //获取文件流
-    public static List<String> readFile(String path) {
-        if (path == null){
-            return Collections.emptyList();
-        }
-        List<String> lines;
-        try {
-            lines = Files.readAllLines(Paths.get(path), StandardCharsets.UTF_8);
-        } catch (IOException e) {
-            return Collections.emptyList();
-        }
-        return lines;
     }
 
     //获取符合条件的文件名
@@ -162,7 +173,11 @@ public class PipelineUntil {
         return null;
     }
 
-    //判断字符串是否为空  true:不为空 false:空
+    /**
+     * 判断字符串是否为空
+     * @param s 字符串
+     * @return true:不为空 false:空
+     */
     public static boolean isNoNull(String s){
         if (s == null){
             return false;
@@ -173,7 +188,12 @@ public class PipelineUntil {
         return !s.isEmpty();
     }
 
-    //格式化输出流  encode:US-ASCII,ISO-8859-1,ISO-8859-1,UTF-16BE ,UTF-16LE, UTF-16,UTF-8
+    /**
+     * 格式化输出流
+     * @param inputStream 流
+     * @param encode  GBK,US-ASCII,ISO-8859-1,ISO-8859-1,UTF-16BE ,UTF-16LE, UTF-16,UTF-8
+     * @return 输出流
+     */
     public static InputStreamReader encode(InputStream inputStream,String encode){
         if (encode != null){
             return  new InputStreamReader(inputStream, Charset.forName(encode));
@@ -185,15 +205,27 @@ public class PipelineUntil {
         }
     }
 
-    //效验地址是否存在配置文件
-    public static int validFile(String fileAddress, int type){
+    /**
+     * 效验地址是否存在配置文件
+     * @param fileAddress 文件地址
+     * @param type 文件类型
+     // * @return 匹配状态  1.不是个目录或不存在这个文件夹  2. 空目录找不到可执行文件 0. 匹配成功
+     */
+    public static void validFile(String fileAddress, int type) throws ApplicationException {
         File file = new File(fileAddress);
-        if (!file.isDirectory()){
-            return 1;
+
+        //不存在这个目录
+        if (!file.exists()){
+           throw new ApplicationException("找不到 "+fileAddress+" 这个目录。");
         }
+        //不是个目录
+        if (!file.isDirectory()){
+            throw new ApplicationException(fileAddress+"不是个目录。");
+        }
+        //不存在可执行文件
         File[] files = file.listFiles();
         if (files == null || files.length == 0){
-            return 2;
+            throw new ApplicationException("在"+fileAddress+"找不到可执行文件。");
         }
 
         for (File listFile : Objects.requireNonNull(file.listFiles())) {
@@ -204,27 +236,26 @@ public class PipelineUntil {
             switch (type) {
                 case 1 -> {
                     if (name.equals("git") || name.equals("git.exe")) {
-                        return 0;
+                        return ;
                     }
                 }
                 case 5 -> {
                     if (name.equals("svn") || name.equals("svn.exe")) {
-                        return 0;
+                        return ;
                     }
                 }
                 case 21 -> {
                     if (name.equals("mvn")) {
-                        return 0;
+                        return ;
                     }
                 }
                 case 22 -> {
                     if (name.equals("npm")) {
-                        return 0;
+                        return ;
                     }
                 }
             }
         }
-        return 2;
     }
 
 

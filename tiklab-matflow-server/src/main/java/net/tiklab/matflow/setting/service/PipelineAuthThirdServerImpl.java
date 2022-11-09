@@ -38,6 +38,7 @@ public class PipelineAuthThirdServerImpl implements PipelineAuthThirdServer {
             Map<String, PipelineAuthThird> userMap = CodeAuthorizeServiceImpl.userMap;
             String loginId = LoginContext.getLoginId();
             PipelineAuthThird authServer = userMap.get(loginId);
+            pipelineAuthThird.setAuthPublic(2);
             pipelineAuthThird.setUsername(authServer.getUsername());
             pipelineAuthThird.setAccessToken(authServer.getAccessToken());
             pipelineAuthThird.setRefreshToken(authServer.getRefreshToken());

@@ -94,7 +94,7 @@ public class PipelineConfigOrderServiceImpl implements PipelineConfigOrderServic
             case 21,22,23,24 -> types = "build";
             case 31,32,33 -> types = "deploy";
             case 41 -> types = "codeScan";
-            case 51 -> types = "product";
+            case 51,52 -> types = "product";
             default ->   throw new ApplicationException(50001, "找不到该类型");
         }
 

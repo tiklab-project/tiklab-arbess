@@ -1,5 +1,6 @@
 package net.tiklab.matflow.execute.service;
 
+import net.tiklab.core.exception.ApplicationException;
 import net.tiklab.matflow.definition.model.Pipeline;
 import net.tiklab.matflow.definition.model.PipelineConfigOrder;
 import net.tiklab.matflow.definition.service.PipelineConfigOrderService;
@@ -14,7 +15,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -41,17 +41,13 @@ public class PipelineExecServiceImpl implements PipelineExecService {
     @Autowired
     PipelineHomeService homeService;
 
+    //运行时间
     Map<String,List<Integer>> map = new HashMap<>();
 
     private static final Logger logger = LoggerFactory.getLogger(PipelineExecServiceImpl.class);
 
-    //存放过程状态
-    // public static final List<PipelineExecHistory> pipelineExecHistoryList = new ArrayList<>();
-
+    //流水线运行历史
     public static Map<String,PipelineExecHistory> historyMap = new HashMap<>();
-
-    //开始执行时间
-    long beginTime = 0;
 
     //创建线程池
     ExecutorService executorService = Executors.newCachedThreadPool();
@@ -64,11 +60,8 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         if (pipeline.getPipelineState() == 1){
             return 100;
         }
-
         homeService.message("matflowExec", "流水线"+pipeline.getPipelineName()+"开始执行");
-
         executorService.submit(() -> {
-            beginTime = new Timestamp(System.currentTimeMillis()).getTime();
             Thread.currentThread().setName(pipelineId);
             begin(pipeline);
         });
@@ -76,7 +69,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+            throw new ApplicationException(e);
         }
 
         return 1;
@@ -90,9 +83,11 @@ public class PipelineExecServiceImpl implements PipelineExecService {
             return null;
         }
         List<Integer> timeList = map.get(pipelineId);
-        Integer integer = timeList.get(timeList.size() - 1);
-        timeList.remove(timeList.size() - 1);
-        timeList.add(integer+1);
+        int time = 0;
+        for (Integer integer1 : timeList) {
+            time = time+ integer1;
+        }
+        pipelineExecHistory.setRunTime(time);
         pipelineExecHistory.setTimeList(timeList);
         return pipelineExecHistory;
     }
@@ -100,7 +95,6 @@ public class PipelineExecServiceImpl implements PipelineExecService {
     //停止运行
     @Override
     public void killInstance(String pipelineId) {
-        PipelineProcess pipelineProcess = new PipelineProcess();
         PipelineExecHistory pipelineExecHistory = findInstanceState(pipelineId);
         if (pipelineExecHistory == null){
             Pipeline pipeline = pipelineService.findOnePipeline(pipelineId);
@@ -108,43 +102,25 @@ public class PipelineExecServiceImpl implements PipelineExecService {
             pipelineService.updatePipeline(pipeline);
             return;
         }
-        PipelineExecLog pipelineExecLog =commonService.getExecPipelineLog(pipelineExecHistory.getHistoryId());
-        pipelineProcess.setPipelineExecLog(pipelineExecLog);
-        pipelineProcess.setPipelineExecHistory(pipelineExecHistory);
         Pipeline pipeline = pipelineExecHistory.getPipeline();
-
-        PipelineExecHistory history = historyMap.get(pipelineId);
-        List<Integer> timeList = history.getTimeList();
-        commonService.updateState(pipelineExecLog.getHistoryId(),timeList.get(timeList.size()-1),false);
-        // long overTime = new Timestamp(System.currentTimeMillis()).getTime();
-        // int time = (int) (overTime - beginTime) / 1000;
-        // pipelineExecLog.setRunTime(time- pipelineExecHistory.getRunTime());
-
-        pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+"\n"+"流水线停止运行......");
+        String historyId = pipelineExecHistory.getHistoryId();
+        commonService.updateState(historyId,map.get(pipelineId),20);
 
         //停止运行
-        ThreadGroup currentGroup = Thread.currentThread().getThreadGroup();
-        int noThreads = currentGroup.activeCount();
-        Thread[] lstThreads = new Thread[noThreads];
-        currentGroup.enumerate(lstThreads);
-        for (int i = 0; i < noThreads; i++) {
-            String nm = lstThreads[i].getName();
-            if (!nm.equals(pipelineId)) {
-               continue;
-            }
-            lstThreads[i].stop();
-            pipeline.setPipelineState(0);
-            pipelineService.updatePipeline(pipeline);
-        }
-        commonService.halt(pipelineProcess,pipelineId);
+        stop(pipelineId);
+
+        pipeline.setPipelineState(0);
+        pipelineService.updatePipeline(pipeline);
+        commonService.halt(pipelineExecHistory,pipelineId);
+        map.remove(pipelineId);
+        historyMap.remove(pipelineId);
+
         HashMap<String, String> map = new HashMap<>();
         map.put("message","停止执行");
         map.put("pipelineId", pipeline.getPipelineId());
         map.put("pipelineName", pipeline.getPipelineName());
         homeService.log("execStatus", "pipelineExec", map);
         homeService.message("matflowExec", "用户停止了流水线"+pipeline.getPipelineName()+"的运行。");
-        map.remove(pipelineId);
-        historyMap.remove(pipelineId);
     }
 
     //判断流水线是否正在执行
@@ -178,19 +154,19 @@ public class PipelineExecServiceImpl implements PipelineExecService {
             historyMap.remove(pipelineId);
             return;
         }
+        List<Integer> integers = map.get(pipelineId);
 
         HashMap<String, String> maps = new HashMap<>();
         maps.put("pipelineId", pipeline.getPipelineId());
         maps.put("pipelineName", pipeline.getPipelineName());
 
         for (PipelineConfigOrder pipelineConfigOrder : allPipelineConfig) {
-            List<Integer> integers = map.get(pipelineId);
             if (integers == null || integers.size() == 0){
                 integers = new ArrayList<>();
             }
-            integers.add(0);
+            integers.add(1);
             map.put(pipelineId,integers);
-
+            time(pipelineId);
             //初始化日志
             PipelineExecLog pipelineExecLog = commonService.initializeLog(historyId, pipelineConfigOrder);
             pipelineProcess.setPipeline(pipeline);
@@ -200,30 +176,82 @@ public class PipelineExecServiceImpl implements PipelineExecService {
             Object config = configOrderService.findOneConfig(pipelineId,taskType);
 
             boolean state = taskExecService.beginState(pipelineProcess,config,taskType);
-            PipelineExecHistory history = historyMap.get(pipelineId);
-            List<Integer> timeList = history.getTimeList();
+
             if (!state){
-                commonService.updateState(historyId,timeList.get(timeList.size()-1),false);
+                commonService.updateState(historyId,map.get(pipelineId),1);
                 pipeline.setPipelineState(0);
                 commonService.error(pipelineExecHistory, pipeline.getPipelineId());
                 pipelineService.updatePipeline(pipeline);
+                //缓存
+                map.remove(pipelineId);
+                historyMap.remove(pipelineId);
+                //消息
                 maps.put("message","执行失败");
                 homeService.log("execStatus", "pipelineExec", maps);
                 homeService.message("matflowExec", "流水线"+pipeline.getPipelineName()+"执行失败。");
-                map.remove(pipelineId);
-                historyMap.remove(pipelineId);
                 return;
             }
-            commonService.updateState(historyId,timeList.get(timeList.size()-1),true);
+            commonService.updateState(historyId,map.get(pipelineId),10);
         }
         commonService.success(pipelineExecHistory, pipeline.getPipelineId());
         pipeline.setPipelineState(0);
         pipelineService.updatePipeline(pipeline);
+        //缓存
+        map.remove(pipelineId);
+        historyMap.remove(pipelineId);
+        //消息
         maps.put("message","执行成功");
         homeService.log("execStatus", "pipelineExec", maps);
         homeService.message("matflowExec", "流水线"+pipeline.getPipelineName()+"执行成功。");
-        map.remove(pipelineId);
-        historyMap.remove(pipelineId);
+    }
+
+    /**
+     * 更新执行时间
+     * @param pipelineId 流水线id
+     */
+    private void time(String pipelineId){
+        List<Integer> integers = map.get(pipelineId);
+        if (integers == null){
+            return;
+        }
+        executorService.submit(() -> {
+            Thread.currentThread().setName(pipelineId+"time");
+            int time = integers.get(integers.size()-1) ;
+            int size = integers.size();
+            boolean state = true;
+            try {
+                while (state){
+                    integers.remove(integers.size()-1);
+                    time = time+1;
+                    integers.add(time);
+                    Thread.sleep(1000);
+                    if (size != map.get(pipelineId).size()){
+                        state = false;
+                        time(pipelineId);
+                    }
+                }
+            } catch (InterruptedException e) {
+                throw new ApplicationException("时间停止异常。");
+            }
+        });
+    }
+
+    /**
+     * 停止线程
+     * @param threadName 线程名称
+     */
+    private void stop(String threadName){
+        ThreadGroup currentGroup = Thread.currentThread().getThreadGroup();
+        int noThreads = currentGroup.activeCount();
+        Thread[] lstThreads = new Thread[noThreads];
+        currentGroup.enumerate(lstThreads);
+        for (int i = 0; i < noThreads; i++) {
+            String nm = lstThreads[i].getName();
+            if (!nm.equals(threadName)) {
+                continue;
+            }
+            lstThreads[i].stop();
+        }
     }
 
 

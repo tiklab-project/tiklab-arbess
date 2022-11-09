@@ -6,6 +6,7 @@ import net.tiklab.matflow.definition.entity.PipelineProductEntity;
 import net.tiklab.matflow.definition.model.PipelineProduct;
 import net.tiklab.matflow.orther.service.PipelineUntil;
 import net.tiklab.matflow.setting.model.PipelineAuthThird;
+import net.tiklab.matflow.setting.service.PipelineAuthHostServer;
 import net.tiklab.matflow.setting.service.PipelineAuthThirdServer;
 import net.tiklab.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,9 @@ public class PipelineProductServerImpl implements PipelineProductServer {
 
     @Autowired
     PipelineAuthThirdServer thirdServer;
+
+    @Autowired
+    PipelineAuthHostServer hostServer;
 
     /**
      * 创建流水线推送制品
@@ -64,8 +68,8 @@ public class PipelineProductServerImpl implements PipelineProductServer {
         PipelineProductEntity oneProduct = productDao.findOneProduct(ProductId);
         PipelineProduct product = BeanMapper.map(oneProduct, PipelineProduct.class);
         if (PipelineUntil.isNoNull(product.getAuthId())){
-            PipelineAuthThird oneAuthServer = thirdServer.findOneAuthServer(product.getAuthId());
-            product.setAuth(oneAuthServer);
+            Object auth = findAuth(product.getAuthId());
+            product.setAuth(auth);
         }
         return product;
     }
@@ -86,5 +90,12 @@ public class PipelineProductServerImpl implements PipelineProductServer {
         return BeanMapper.mapList(allProductList, PipelineProduct.class);
     }
 
+    private Object findAuth(String id){
+        PipelineAuthThird oneAuthServer =thirdServer.findOneAuthServer(id);
+        if (oneAuthServer != null){
+            return oneAuthServer;
+        }
+        return hostServer.findOneAuthHost(id);
+    }
 
 }

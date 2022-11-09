@@ -173,7 +173,7 @@ public class PipelineConfigServiceImpl implements PipelineConfigService {
      */
     public Map<String, String> createConfig(PipelineConfigOrder config, String types, int size){
         Pipeline pipeline = config.getPipeline();
-        String id = null;
+        String id ;
         String object = JSON.toJSONString(config.getValues());
         HashMap<String, String> map = new HashMap<>();
         map.put("pipelineId", pipeline.getPipelineId());
@@ -200,6 +200,7 @@ public class PipelineConfigServiceImpl implements PipelineConfigService {
             case "deploy" -> {
                 PipelineDeploy pipelineDeploy = JSON.parseObject(object, PipelineDeploy.class);
                 if (pipelineDeploy == null) pipelineDeploy = new PipelineDeploy();
+                pipelineDeploy.setAuthType(1);
                 id = pipelineDeployService.createDeploy(pipelineDeploy);
                 map.put(message, "部署配置");
             }
@@ -264,8 +265,6 @@ public class PipelineConfigServiceImpl implements PipelineConfigService {
         }
         return map;
     }
-
-
 
     /**
      * 效验必填字段

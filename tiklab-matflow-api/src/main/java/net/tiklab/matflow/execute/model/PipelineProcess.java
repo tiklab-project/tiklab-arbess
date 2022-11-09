@@ -11,9 +11,6 @@ import net.tiklab.postin.annotation.ApiModel;
 @ApiModel
 public class PipelineProcess {
 
-    //开始时间
-    long beginTime;
-
     //历史
     private PipelineExecHistory pipelineExecHistory;
 
@@ -47,11 +44,4 @@ public class PipelineProcess {
         this.pipeline = pipeline;
     }
 
-    public long getBeginTime() {
-        return beginTime;
-    }
-
-    public void setBeginTime(long beginTime) {
-        this.beginTime = beginTime;
-    }
 }

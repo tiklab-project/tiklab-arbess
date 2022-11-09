@@ -2,7 +2,7 @@ package net.tiklab.matflow.execute.model;
 
 
 import net.tiklab.postin.annotation.ApiModel;
-import net.tiklab.postin.annotation.ApiProperty;
+import net.tiklab.user.user.model.User;
 
 /**
  * 流水线概况统计
@@ -16,6 +16,9 @@ public class PipelineExecState {
 
     //平均执行时长
     private int execTime;
+
+    //执行人
+    private User user;
 
     //成功次数
     private int successNumber;
@@ -76,5 +79,13 @@ public class PipelineExecState {
 
     public void setTime(String time) {
         this.time = time;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }

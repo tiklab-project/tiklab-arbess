@@ -1,10 +1,7 @@
 package net.tiklab.matflow.definition.model;
 
 
-import net.tiklab.beans.annotation.Mapping;
-import net.tiklab.beans.annotation.Mappings;
 import net.tiklab.join.annotation.Join;
-import net.tiklab.join.annotation.JoinQuery;
 import net.tiklab.postin.annotation.ApiModel;
 import net.tiklab.postin.annotation.ApiProperty;
 import net.tiklab.user.user.model.User;
@@ -41,15 +38,9 @@ public class PipelineMassage {
     private int color;
 
 
-    @ApiProperty(name="user",desc="认证配置",required = true)
-    @Mappings({
-            @Mapping(source = "user.id",target = "userId")
-    })
-    @JoinQuery(key = "id")
     private User user;
 
-
-    private String userName;
+    private User execUser;
 
 
     public String getPipelineId() {
@@ -124,19 +115,19 @@ public class PipelineMassage {
         this.color = color;
     }
 
+    public User getExecUser() {
+        return execUser;
+    }
+
+    public void setExecUser(User execUser) {
+        this.execUser = execUser;
+    }
+
     public User getUser() {
         return user;
     }
 
     public void setUser(User user) {
         this.user = user;
-    }
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
     }
 }

@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.sql.Timestamp;
 
 /**
  * 部署执行方法
@@ -37,9 +36,7 @@ public class DeployAchieveServiceImpl implements DeployAchieveService {
      */
     public boolean deploy(PipelineProcess pipelineProcess, PipelineDeploy pipelineDeploy) {
         //开始运行时间
-        long beginTime = new Timestamp(System.currentTimeMillis()).getTime();
         Pipeline pipeline = pipelineProcess.getPipeline();
-        pipelineProcess.setBeginTime(beginTime);
         String startShell = pipelineDeploy.getStartOrder();
 
         //执行自定义脚本

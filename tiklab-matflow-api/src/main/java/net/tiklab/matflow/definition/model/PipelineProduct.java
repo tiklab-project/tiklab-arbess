@@ -28,6 +28,9 @@ public class PipelineProduct {
     @ApiProperty(name = "fileAddress",desc = "文件地址")
     private String fileAddress;
 
+    @ApiProperty(name = "putAddress",desc = "发送地址")
+    private String putAddress;
+
     //授权id
     @ApiProperty(name="authId",desc="授权id")
     private String authId;
@@ -118,5 +121,13 @@ public class PipelineProduct {
 
     public void setAuth(Object auth) {
         this.auth = auth;
+    }
+
+    public String getPutAddress() {
+        return putAddress;
+    }
+
+    public void setPutAddress(String putAddress) {
+        this.putAddress = putAddress;
     }
 }

@@ -83,7 +83,7 @@ public class CodeAuthorizeServiceImpl implements CodeAuthorizeService {
         }
 
         String accessToken = map.get("accessToken");
-        logger.info("授权成功："+accessToken + " time: "+ PipelineUntil.date);
+        logger.info("授权成功："+accessToken + " time: "+ PipelineUntil.date());
         PipelineAuthThird pipelineAuthThird = new PipelineAuthThird();
         pipelineAuthThird.setAccessToken(accessToken);
         pipelineAuthThird.setRefreshToken(map.get("refreshToken"));
@@ -386,7 +386,7 @@ public class CodeAuthorizeServiceImpl implements CodeAuthorizeService {
             boolean token = PipelineUntil.isNoNull(authCode.getAccessToken());
             boolean refresh = PipelineUntil.isNoNull(authCode.getRefreshToken());
             if (!token || !refresh) return;
-            logger.info("gitee定时任务，时间:"+PipelineUntil.date+"更新授权信息");
+            logger.info("gitee定时任务，时间:"+PipelineUntil.date()+"更新授权信息");
             String refreshToken = codeAuthorizeApi.findRefreshToken(authCode.getRefreshToken());
             ResponseEntity<JSONObject> forEntity = restTemplate.postForEntity(refreshToken,String.class, JSONObject.class);
             JSONObject body = forEntity.getBody();

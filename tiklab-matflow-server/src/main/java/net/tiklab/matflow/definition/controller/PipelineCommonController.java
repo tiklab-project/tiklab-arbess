@@ -2,14 +2,12 @@ package net.tiklab.matflow.definition.controller;
 
 
 import net.tiklab.core.Result;
-import net.tiklab.matflow.orther.service.PipelineFileService;
 import net.tiklab.matflow.orther.service.PipelineUntil;
 import net.tiklab.postin.annotation.Api;
 import net.tiklab.postin.annotation.ApiMethod;
 import net.tiklab.postin.annotation.ApiParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,8 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(name = "PipelineCommonController",desc = "流水线文件信息")
 public class PipelineCommonController {
 
-    @Autowired
-    PipelineFileService pipelineFileService;
 
     private static final Logger logger = LoggerFactory.getLogger(PipelineCommonController.class);
 

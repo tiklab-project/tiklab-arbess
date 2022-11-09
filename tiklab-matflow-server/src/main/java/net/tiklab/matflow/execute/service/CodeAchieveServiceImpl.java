@@ -18,7 +18,6 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -43,16 +42,22 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
     // git克隆
     public boolean clone(PipelineProcess pipelineProcess, PipelineCode pipelineCode){
 
-        //开始时间
-        long beginTime = new Timestamp(System.currentTimeMillis()).getTime();
         Pipeline pipeline = pipelineProcess.getPipeline();
-        pipelineProcess.setBeginTime(beginTime);
 
         //代码保存路径
         String codeDir = PipelineUntil.findFileAddress() + pipeline.getPipelineName();
         File file = new File(codeDir);
+
         //删除旧的代码
-        PipelineUntil.deleteFile(file);
+        boolean b = false;
+        while (!b){
+            if (file.exists()){
+                b = PipelineUntil.deleteFile(file);
+            }else {
+                b = true;
+            }
+        }
+
         commonService.execHistory(pipelineProcess,"分配源码空间。\n空间分配成功。");
 
         //分支
@@ -111,14 +116,14 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
             case 1, 2, 3, 4 -> {
                 //git server地址
                 String gitAddress = commonService.getScm(1);
-                validFile(gitAddress,1);
+                PipelineUntil.validFile(gitAddress,1);
                 String gitOrder = gitOrder(pipelineCode, fileAddress);
                 return PipelineUntil.process(gitAddress, gitOrder);
             }
             case 5 -> {
                 //svn server地址
                 String svnAddress = commonService.getScm(5);
-                validFile(svnAddress,2);
+                PipelineUntil.validFile(svnAddress,5);
                 String gitOrder = svnOrder(pipelineCode, fileAddress);
                 return PipelineUntil.process(svnAddress, gitOrder);
             }
@@ -142,6 +147,12 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
         //凭证
         Map<String, String> map = findUserPassword(pipelineCode.getAuthId(), pipelineCode.getType());
 
+        StringBuilder url = new StringBuilder(pipelineCode.getCodeAddress());
+        String branch = pipelineCode.getCodeBranch();
+        if (map == null){
+            return branch(url,branch,codeDir,pipelineCode.getType());
+        }
+
         String username = map.get("username");
         String password = map.get("password");
 
@@ -150,7 +161,7 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
 
         //地址信息
 
-        String up = "";
+        String up ;
         if (userName && passWord){
             up=username.replace("@", "%40")+":"+password+"@";
         }else if (userName && !passWord){
@@ -159,8 +170,6 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
             up = "";
         }
 
-        StringBuilder url = new StringBuilder(pipelineCode.getCodeAddress());
-        String branch = pipelineCode.getCodeBranch();
         //获取url类型
         URL urls = new URL(url.toString());
         String urlType = urls.toURI().getScheme();
@@ -172,22 +181,10 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
             url.insert(8, up);
         }
 
-        //判断是否存在分支
-        String order;
-        if (branch == null || branch.equals("")){
-            order = url+" "+codeDir;
-        }else {
-            order =" -b "+branch+" "+ url+" "+codeDir;
-        }
-
-        //根据不同系统更新命令
-        if (PipelineUntil.findSystemType() == 1){
-            order=".\\git.exe clone"+" " + order;
-        }else {
-            order="./git clone"+" " + order;
-        }
-        return order;
+        return branch(url,branch,codeDir,pipelineCode.getType());
     }
+
+
 
     /**
      * 组装svn命令
@@ -198,65 +195,21 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
     private String svnOrder(PipelineCode pipelineCode,String codeDir){
         //凭证
         Map<String, String> map = findUserPassword(pipelineCode.getAuthId(), pipelineCode.getType());
-
-        String username = map.get("username");
-        String password = map.get("password");
-
+        String branch = pipelineCode.getCodeBranch();
         //地址信息
         StringBuilder url = new StringBuilder(pipelineCode.getCodeAddress());
-        String branch = pipelineCode.getCodeBranch();
+        if (map == null){
+            return branch(url,branch,codeDir,5);
+        }
+        String username = map.get("username");
+        String password = map.get("password");
 
         String up=username.replace("@", "%40")+":"+password+"@";
 
         url.insert(6, up);
 
         //判断是否存在分支
-        String order;
-        if (branch == null || branch.equals("")){
-            order = url+" "+codeDir;
-        }else {
-            order =" -b "+branch+" "+ url+" "+codeDir;
-        }
-        //根据不同系统更新命令
-        if (PipelineUntil.findSystemType() == 1){
-            order=".\\svn.exe checkout"+" "+order;
-        }else {
-            order="./svn checkout"+" "+order;
-        }
-        return order;
-    }
-
-    /**
-     * 效验地址是否存在可执行文件
-     * @param address 地址
-     * @param type 类型 1:git,2:svn
-     * @throws ApplicationException 地址不合法
-     */
-    private void validFile(String address ,int type) throws ApplicationException{
-        int file = PipelineUntil.validFile(address,1);
-        if (type == 1){
-            if (address == null) {
-                throw new ApplicationException("不存在Git配置");
-            }
-            if (file == 1){
-                throw new ApplicationException("Git地址配置错误："+address +" 不是个目录。");
-            }
-            if (file == 2){
-                throw new ApplicationException("Git地址配置错误："+address +" 找不到git的可执行文件。");
-            }
-            return;
-        }
-        file = PipelineUntil.validFile(address, 5);
-        if (address == null) {
-            throw new ApplicationException("不存在Svn配置");
-        }
-        if (file == 1){
-            throw new ApplicationException("Git地址配置错误："+address +" 不是个目录。");
-        }
-        if (file == 2){
-            throw new ApplicationException("Git地址配置错误："+address +" 找不到svn的可执行文件。");
-        }
-
+       return branch(url,branch,codeDir,5);
     }
 
     /**
@@ -269,18 +222,52 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
         Map<String, String> map = new HashMap<>();
         String username;
         String password;
-        if (type == 2 || type == 3){
-            PipelineAuthThird authServer = authServerServer.findOneAuthServer(authId);
-            username= authServer.getUsername();
-            password = authServer.getAccessToken();
-        }else {
-            PipelineAuth auth = authServer.findOneAuth(authId);
-            username= auth.getUsername();
-            password = auth.getPassword();
+        PipelineAuthThird authServerS = authServerServer.findOneAuthServer(authId);
+        PipelineAuth auth = authServer.findOneAuth(authId);
+        if (authServerS == null && auth == null){
+           return null;
         }
+       if (authServerS != null){
+           username= authServerS.getUsername();
+           password = authServerS.getAccessToken();
+       }else {
+           username= auth.getUsername();
+           password = auth.getPassword();
+       }
         map.put("username",username);
         map.put("password",password);
         return map;
     }
+
+
+    private String branch(StringBuilder url ,String branch,String codeDir,int type){
+
+        //判断是否存在分支
+        String order;
+        if (branch == null || branch.equals("")){
+            order = url+" "+codeDir;
+        }else {
+            order =" -b "+branch+" "+ url+" "+codeDir;
+        }
+
+        if (type == 5){
+            //根据不同系统更新命令
+            if (PipelineUntil.findSystemType() == 1){
+                order=".\\svn.exe checkout"+" "+order;
+            }else {
+                order="./svn checkout"+" "+order;
+            }
+            return order;
+        }
+        //根据不同系统更新命令
+        if (PipelineUntil.findSystemType() == 1){
+            order=".\\git.exe clone"+" " + order;
+        }else {
+            order="./git clone"+" " + order;
+        }
+
+        return order;
+    }
+
 
 }

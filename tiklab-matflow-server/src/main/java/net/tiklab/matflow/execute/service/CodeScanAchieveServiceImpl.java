@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.sql.Timestamp;
 
 @Service
 @Exporter
@@ -29,9 +28,9 @@ public class CodeScanAchieveServiceImpl implements CodeScanService {
      */
     @Override
     public boolean codeScan(PipelineProcess pipelineProcess, PipelineCodeScan pipelineCodeScan) {
-        long beginTime = new Timestamp(System.currentTimeMillis()).getTime();
-        pipelineProcess.setBeginTime(beginTime);
+
         Pipeline pipeline = pipelineProcess.getPipeline();
+
         String fileAddress = PipelineUntil.findFileAddress();
         commonService.execHistory(pipelineProcess,"开始扫描代码。。。。。。");
         try {
@@ -62,6 +61,9 @@ public class CodeScanAchieveServiceImpl implements CodeScanService {
             if (mavenAddress == null) {
                 throw new ApplicationException("不存在maven配置");
             }
+
+            PipelineUntil.validFile(mavenAddress, 21);
+
             PipelineAuthThird authThird =(PipelineAuthThird) pipelineCodeScan.getAuth();
 
             if (authThird == null){

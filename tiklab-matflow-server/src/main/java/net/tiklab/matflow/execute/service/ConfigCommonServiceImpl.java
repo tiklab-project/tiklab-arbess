@@ -20,9 +20,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.text.SimpleDateFormat;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -44,9 +42,6 @@ public class ConfigCommonServiceImpl implements ConfigCommonService {
     PipelineExecLogService logService;
 
     private static final Logger logger = LoggerFactory.getLogger(ConfigCommonServiceImpl.class);
-
-
-    // List<PipelineExecHistory> list = PipelineExecServiceImpl.pipelineExecHistoryList;
 
     Map<String,PipelineExecHistory> historyMap = PipelineExecServiceImpl.historyMap;
 
@@ -100,7 +95,6 @@ public class ConfigCommonServiceImpl implements ConfigCommonService {
      */
     @Override
     public void error(PipelineExecHistory pipelineExecHistory, String pipelineId){
-        // pipelineExecHistory.setStatus(pipelineExecHistory.getStatus()+2);
         pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+ "\nRUN RESULT : FAIL");
         pipelineExecHistory.setRunStatus(1);
         pipelineExecHistory.setFindState(1);
@@ -124,24 +118,37 @@ public class ConfigCommonServiceImpl implements ConfigCommonService {
 
     /**
      * 输出停止信息
-     * @param pipelineProcess 历史
+     * @param pipelineExecHistory 历史
      * @param pipelineId 流水线id
      */
     @Override
-    public void halt(PipelineProcess pipelineProcess, String pipelineId) {
-        PipelineExecHistory pipelineExecHistory = pipelineProcess.getPipelineExecHistory();
-        PipelineExecLog pipelineExecLog = pipelineProcess.getPipelineExecLog();
-        PipelineExecLog runLog = historyService.findLastRunLog(pipelineExecHistory.getHistoryId());
-        pipelineExecLog.setLogId(runLog.getLogId());
-
+    public void halt(PipelineExecHistory pipelineExecHistory, String pipelineId) {
         //更新信息
         pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+ "\n" + "RUN RESULT : HALT");
         pipelineExecHistory.setRunStatus(20);
         pipelineExecHistory.setFindState(1);
         //更新状态
-        logService.updateLog(pipelineExecLog);
         historyService.updateHistory(pipelineExecHistory);
         historyMap.put(pipelineId,pipelineExecHistory);
+    }
+
+    /**
+     * 更新状态
+     * @param historyId 执行信息
+     * @param time 异常
+     */
+    public void updateState(String historyId,List<Integer> time,int state){
+        PipelineExecLog pipelineExecLog = historyService.findLastRunLog(historyId);
+        PipelineExecHistory pipelineExecHistory = historyService.findOneHistory(historyId);
+        pipelineExecLog.setRunTime(time.get(time.size()-1));
+        int times = 0;
+        for (Integer integer : time) {
+            times = times+ integer;
+        }
+        pipelineExecHistory.setRunTime(times+1);
+        historyService.updateHistory(pipelineExecHistory);
+        pipelineExecLog.setRunState(state);
+        logService.updateLog(pipelineExecLog);
     }
 
     /**
@@ -153,10 +160,10 @@ public class ConfigCommonServiceImpl implements ConfigCommonService {
         PipelineExecHistory pipelineExecHistory = new PipelineExecHistory();
         String historyId = historyService.createHistory(pipelineExecHistory);
         //初始化基本信息
-        pipelineExecHistory.setCreateTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+        // pipelineExecHistory.setCreateTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+        pipelineExecHistory.setCreateTime(PipelineUntil.date());
         pipelineExecHistory.setRunWay(1);
         pipelineExecHistory.setSort(1);
-        // pipelineExecHistory.setStatus(0);
         pipelineExecHistory.setPipeline(pipeline);
         pipelineExecHistory.setHistoryId(historyId);
         pipelineExecHistory.setRunLog("流水线"+pipeline.getPipelineName()+"开始执行。");
@@ -193,18 +200,6 @@ public class ConfigCommonServiceImpl implements ConfigCommonService {
     }
 
     /**
-     * 获取最后一次的执行日志
-     * @param historyId 历史id
-     * @return 日志
-     */
-    @Override
-    public PipelineExecLog getExecPipelineLog(String historyId){
-        // List<PipelineExecLog> allLog = logService.findAllLog(historyId);
-        // allLog.sort(Comparator.comparing(PipelineExecLog::getTaskSort));
-        return historyService.findLastRunLog(historyId);
-    }
-
-    /**
      * 获取环境配置信息
      * @param type 类型
      * @return 配置信息
@@ -236,28 +231,6 @@ public class ConfigCommonServiceImpl implements ConfigCommonService {
         logService.updateLog(pipelineExecLog);
     }
 
-    /**
-     * 更新状态
-     * @param historyId 执行信息
-     * @param time 异常
-     */
-    public boolean updateState(String historyId,int time,boolean state){
-        // long beginTime = pipelineProcess.getBeginTime();
-        // long overTime = new Timestamp(System.currentTimeMillis()).getTime();
-        // int time = (int) (overTime - beginTime) / 1000;
-        // PipelineExecLog pipelineExecLog = pipelineProcess.getPipelineExecLog();
-        // PipelineExecHistory pipelineExecHistory = pipelineProcess.getPipelineExecHistory();
-        PipelineExecLog pipelineExecLog = historyService.findLastRunLog(historyId);
-        PipelineExecHistory pipelineExecHistory = historyService.findOneHistory(historyId);
-        pipelineExecLog.setRunTime(time);
-        pipelineExecHistory.setRunTime(pipelineExecHistory.getRunTime()+time);
-        pipelineExecLog.setRunState(10);
-        historyService.updateHistory(pipelineExecHistory);
-        if (!state){
-            pipelineExecLog.setRunState(1);
-        }
-        logService.updateLog(pipelineExecLog);
-        return state;
-    }
+
 
 }

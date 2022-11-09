@@ -56,6 +56,9 @@ datapath: ${PROJECT_HOME}/caches
 eas:
   embbed:
     enable: true
+#  address: http://192.168.10.14:8080
+#  web:
+#    address: http://192.168.10.14:3001
 
 mysql:
   embbed:

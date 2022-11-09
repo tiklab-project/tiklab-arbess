@@ -8,6 +8,7 @@ import net.tiklab.matflow.execute.model.PipelineProcess;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 
 /**
  * 执行过程配置的公共方法
@@ -41,10 +42,10 @@ public interface ConfigCommonService {
 
     /**
      * 输出停止信息
-     * @param pipelineProcess 历史
+     * @param pipelineExecHistory 历史
      * @param pipelineId 流水线id
      */
-      void  halt(PipelineProcess pipelineProcess, String pipelineId);
+      void  halt(PipelineExecHistory pipelineExecHistory, String pipelineId);
 
     /**
      * 初始化历史
@@ -60,19 +61,18 @@ public interface ConfigCommonService {
     PipelineExecLog initializeLog(String historyId, PipelineConfigOrder configOrder);
 
     /**
-     * 获取最后一次的执行日志
-     * @param historyId 历史id
-     * @return 日志
-     */
-    PipelineExecLog getExecPipelineLog(String historyId);
-
-    /**
      * 执行过程中的历史
      */
     void execHistory(PipelineProcess pipelineProcess,String log);
 
 
-    boolean updateState(String historyId,int time,boolean state);
+    /**
+     * 更新执行状态
+     * @param historyId 历史id
+     * @param time 时间
+     * @param state 状态
+     */
+    void updateState(String historyId, List<Integer> time, int state);
 
     /**
      * 获取环境配置信息
