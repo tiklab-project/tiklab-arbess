@@ -3,8 +3,8 @@ package net.tiklab.matflow.definition.service;
 import net.tiklab.matflow.definition.model.Pipeline;
 import net.tiklab.matflow.definition.model.PipelineMassage;
 import net.tiklab.matflow.execute.model.PipelineExecState;
-import net.tiklab.matflow.orther.model.PipelineOpen;
 import net.tiklab.user.user.model.DmUser;
+
 import java.util.List;
 
 public interface PipelineCommonServer {
@@ -46,10 +46,31 @@ public interface PipelineCommonServer {
 
 
     /**
-     * 更新项目域权限
+     * 创建流水线关联角色信息
      * @param pipelineId 流水线id
      */
-    void updateDmUser(String pipelineId,DmUser dmUser,boolean b);
+    void createDmRole(String pipelineId);
+
+
+    /**
+     * 创建流水线关联角色信息
+     * @param pipelineId 流水线id
+     */
+    void createDmUser(String pipelineId);
+
+
+    /**
+     * 删除关联用户
+     * @param pipelineId 流水线id
+     */
+    void deleteDmUser(String pipelineId);
+
+
+    /**
+     * 删除关联角色
+     * @param pipelineId 流水线id
+     */
+    void deleteDmRole(String pipelineId);
 
     /**
      * 流水线执行信息统计

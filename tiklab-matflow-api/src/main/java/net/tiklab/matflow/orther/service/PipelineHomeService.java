@@ -30,13 +30,6 @@ public interface PipelineHomeService {
     void message(String messageTemplateId,String messages);
 
 
-    /**
-     * 获取跳转地址
-     * @param type 类型
-     * @param pipelineId 流水线id
-     * @return 地址
-     */
-    String findAddress(String type,String pipelineId);
 
 
 

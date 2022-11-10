@@ -37,6 +37,9 @@ public class PipelineMassage {
     @ApiProperty(name="color",desc="颜色")
     private int color;
 
+    //权限
+    private int pipelinePower;
+
 
     private User user;
 
@@ -129,5 +132,13 @@ public class PipelineMassage {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public int getPipelinePower() {
+        return pipelinePower;
+    }
+
+    public void setPipelinePower(int pipelinePower) {
+        this.pipelinePower = pipelinePower;
     }
 }

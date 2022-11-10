@@ -17,7 +17,7 @@ import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @RestController
-@RequestMapping("/PipelineThirdAddress")
+@RequestMapping("/pipelineThirdAddress")
 @Api(name = "PipelineAuthorizeController",desc = "流水线授权")
 public class PipelineThirdAddressController {
 

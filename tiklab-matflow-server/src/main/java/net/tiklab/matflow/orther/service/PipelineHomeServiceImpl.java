@@ -16,11 +16,8 @@ import net.tiklab.utils.context.LoginContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -95,7 +92,6 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
     public void message(String messageTemplateId,String messages){
         Message message = new Message();
         message.setApplication(appName);
-        message.setSender(appName);
         //模板
         MessageTemplate messageTemplate = new MessageTemplate();
         messageTemplate.setId(messageTemplateId);
@@ -109,44 +105,41 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
         message.setMessageReceiverList(list);
         //消息信息
         message.setData("{\"message\":\" "+messages+" \",\"state\":\" \"}");
-        messageService.sendMessage(message);
-    }
-
-
-    @Value("${server.port:8080}")
-    int port;
-
-
-    public String findAddress(String type,String pipelineId){
-        String ip ;
-        try {
-            ip = InetAddress.getLocalHost().getHostAddress();
-        } catch (UnknownHostException e) {
-            ip = "localhost"  ;
-        }
-        return "http://"+ip+":"+port+"/#"+findRouting(type,pipelineId);
-    }
-
-
-    private  String findRouting(String type,String pipelineId){
-        switch (type) {
-            case "pipeline" -> {
-                return "/index/task/" + pipelineId + "/work";
-            }
-            case "pipelineConfig" -> {
-                return "/index/task/" + pipelineId + "/config";
-            }
-            case "pipelineExec" -> {
-                return "/index/task/" + pipelineId + "/structure";
-            }
-            case "proof" -> {
-                return "/index/system/proof";
-            }
-            case "other" -> {
-                return "/index/pipeline";
-            }
-        }
-        return null;
+        messageService.createMessage(message);
     }
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -154,8 +154,8 @@ public class PipelineConfigOrderServiceImpl implements PipelineConfigOrderServic
         Map<String, String> map = pipelineConfigService.updateConfig(config, typeConfig, types);
         map.put("pipelineId", pipeline.getPipelineId());
         map.put("pipelineName", pipeline.getPipelineName());
-        String address = homeService.findAddress("pipelineConfig", pipelineId);
-        map.put("link", address);
+
+
         homeService.log("update", "pipelineConfig", map);
     }
 
@@ -189,8 +189,7 @@ public class PipelineConfigOrderServiceImpl implements PipelineConfigOrderServic
 
         map.put("pipelineId", pipeline.getPipelineId());
         map.put("pipelineName", pipeline.getPipelineName());
-        String address = homeService.findAddress("pipelineConfig", pipelineId);
-        map.put("link", address);
+
         configOrder.setTaskId(map.get("id"));
         String configure = createConfigure(configOrder);
         homeService.log("create", "pipelineConfig", map);
@@ -216,8 +215,7 @@ public class PipelineConfigOrderServiceImpl implements PipelineConfigOrderServic
         Pipeline pipeline = typeConfig.getPipeline();
         map.put("pipelineId", pipeline.getPipelineId());
         map.put("pipelineName", pipeline.getPipelineName());
-        String address = homeService.findAddress("pipelineConfig", pipelineId);
-        map.put("link", address);
+
         pipelineConfigOrderDao.deleteConfigure(typeConfig.getConfigId());
         homeService.log("delete", "pipelineConfig", map);
     }

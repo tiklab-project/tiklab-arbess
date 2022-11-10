@@ -110,7 +110,7 @@ public class ConfigCommonServiceImpl implements ConfigCommonService {
     @Override
     public void success(PipelineExecHistory pipelineExecHistory, String pipelineId) {
         pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+ "\n" + "RUN RESULT : SUCCESS");
-        pipelineExecHistory.setRunStatus(30);
+        pipelineExecHistory.setRunStatus(10);
         pipelineExecHistory.setFindState(1);
         historyService.updateHistory(pipelineExecHistory);
         historyMap.put(pipelineId,pipelineExecHistory);

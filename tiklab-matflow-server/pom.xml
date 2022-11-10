@@ -64,9 +64,14 @@
             <artifactId>tiklab-message-api</artifactId>
             <version>1.0.0-SNAPSHOT</version>
         </dependency>
+        <dependency>
+            <groupId>net.tiklab</groupId>
+            <artifactId>tiklab-privilege-api</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+        </dependency>
 
 
-<!--        <profile>-->
+        <!--        <profile>-->
 <!--            <id>sonar</id>-->
 <!--            <activation>-->
 <!--                <activeByDefault>true</activeByDefault>-->

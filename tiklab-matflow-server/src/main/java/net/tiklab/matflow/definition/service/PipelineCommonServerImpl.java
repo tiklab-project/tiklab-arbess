@@ -8,9 +8,14 @@ import net.tiklab.matflow.execute.model.PipelineExecHistory;
 import net.tiklab.matflow.execute.model.PipelineExecState;
 import net.tiklab.matflow.execute.service.PipelineExecHistoryService;
 import net.tiklab.matflow.orther.service.PipelineUntil;
+import net.tiklab.privilege.role.model.DmRole;
+import net.tiklab.privilege.role.service.DmRoleService;
+import net.tiklab.privilege.role.service.RoleUserService;
 import net.tiklab.rpc.annotation.Exporter;
 import net.tiklab.user.user.model.DmUser;
+import net.tiklab.user.user.model.User;
 import net.tiklab.user.user.service.DmUserService;
+import net.tiklab.utils.context.LoginContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +30,12 @@ public class PipelineCommonServerImpl implements PipelineCommonServer{
 
     @Autowired
     DmUserService dmUserService;
+
+    @Autowired
+    DmRoleService dmRoleService;
+
+    @Autowired
+    RoleUserService roleUserService;
 
     @Autowired
     JoinTemplate joinTemplate;
@@ -82,6 +93,7 @@ public class PipelineCommonServerImpl implements PipelineCommonServer{
             pipelineMassage.setCreateTime(pipeline.getPipelineCreateTime());
             pipelineMassage.setColor(pipeline.getColor());
             pipelineMassage.setUser(pipeline.getUser());
+            pipelineMassage.setPipelinePower(pipeline.getPipelinePower());
             if (latelyHistory != null){
                 pipelineMassage.setLastBuildTime(latelyHistory.getCreateTime());
                 pipelineMassage.setBuildStatus(latelyHistory.getRunStatus());
@@ -131,6 +143,9 @@ public class PipelineCommonServerImpl implements PipelineCommonServer{
         if (s.toString().equals("")){
             return j;
         }
+        if (j.toString().equals("")){
+            return s;
+        }
         return s.append(",").append(j);
     }
 
@@ -155,19 +170,47 @@ public class PipelineCommonServerImpl implements PipelineCommonServer{
     }
 
     /**
+     * 创建流水线关联角色信息
+     * @param pipelineId 流水线id
+     */
+    public void createDmRole(String pipelineId){
+        // //创建管理员角色
+        // DmRole dmRole = new DmRole();
+        // dmRole.setBgroup(PipelineUntil.appName);
+        // dmRole.setDomainId(pipelineId);
+        // Role role = new Role();
+        // role.setId("matflow");
+        // dmRole.setRole(role);
+        // dmRoleService.createDmRole(dmRole);
+        // //创建用户角色
+        // role.setId("matflowUser");
+        // dmRole.setRole(role);
+        // dmRoleService.createDmRole(dmRole);
+
+        //拉入创建人
+        dmRoleService.initDmRoles(pipelineId,LoginContext.getLoginId(),"matflow");
+    }
+
+    /**
+     * 创建流水线关联用户
+     * @param pipelineId 流水线id
+     */
+    public void createDmUser(String pipelineId){
+        //拉入创建人
+        DmUser dmUser = new DmUser();
+        dmUser.setDomainId(pipelineId);
+        User user = new User();
+        user.setId(LoginContext.getLoginId());
+        dmUser.setUser(user);
+        dmUserService.createDmUser(dmUser);
+    }
+
+    /**
      * 更新项目域权限
      * @param pipelineId 流水线id
-     * @param dmUser 权限域
-     * @param b 类型
      */
     @Override
-    public void updateDmUser(String pipelineId,DmUser dmUser,boolean b){
-
-        if (b){
-            dmUserService.createDmUser(dmUser);
-            return;
-        }
-
+    public void deleteDmUser(String pipelineId){
         List<DmUser> allDmUser = dmUserService.findAllDmUser();
         if (allDmUser == null){
             return ;
@@ -177,6 +220,23 @@ public class PipelineCommonServerImpl implements PipelineCommonServer{
                 continue;
             }
             dmUserService.deleteDmUser(dm.getId());
+        }
+    }
+
+    /**
+     * 删除关联角色
+     * @param pipelineId 流水线id
+     */
+    public void deleteDmRole(String pipelineId){
+        List<DmRole> allDmRole = dmRoleService.findAllDmRole();
+        if (allDmRole == null){
+            return ;
+        }
+        for (DmRole dm : allDmRole) {
+            if (!dm.getDomainId().equals(pipelineId)){
+                continue;
+            }
+            dmRoleService.deleteDmRole(dm.getId());
         }
     }
 

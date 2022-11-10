@@ -28,12 +28,12 @@ create table pipeline_build  (
 -- Table structure for pipeline_code
 -- ----------------------------
 create table pipeline_code  (
-  code_id varchar(256)  COMMENT 'gitId',
+  id varchar(256)  COMMENT 'gitId',
   code_name varchar(255)  COMMENT '地址名',
   code_address varchar(256)  COMMENT 'git地址',
   code_branch varchar(256)  COMMENT '分支',
-  proof_id varchar(256)  COMMENT '凭证id',
-  PRIMARY KEY (code_id) USING BTREE
+  auth_id varchar(256)  COMMENT '凭证id',
+  PRIMARY KEY (id) USING BTREE
 );
 
 -- ----------------------------
@@ -178,7 +178,7 @@ create table pipeline_product  (
 -- ----------------------------
 -- Table structure for pipeline_third_address
 -- ----------------------------
-create table pipeline_third_address  (
+create table pipeline_third_address (
     id varchar(256) ,
     type int ,
     client_id varchar(255) ,
@@ -187,12 +187,10 @@ create table pipeline_third_address  (
     PRIMARY KEY (id) USING BTREE
 );
 
-# 认证信息
-
 -- ----------------------------
 -- Table structure for pipeline_auth
 -- ----------------------------
-create table pipeline_auth  (
+create table pipeline_auth (
     id varchar(64) COMMENT 'id',
     type int COMMENT '类型 1.username&password 2. 公钥私钥',
     name varchar(32) COMMENT '名称',
@@ -208,7 +206,7 @@ create table pipeline_auth  (
 -- ----------------------------
 -- Table structure for pipeline_auth_code
 -- ----------------------------
-create table pipeline_auth_server  (
+create table pipeline_auth_server (
     id varchar(64) COMMENT 'id',
     type int COMMENT '1.gitee 2.github 3.sonar 4.nexus',
     name varchar(32) COMMENT '名称',

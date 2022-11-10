@@ -20,7 +20,7 @@ public class Pipeline {
     private String pipelineId;
 
     //流水线名称
-    @ApiProperty(name="pipelineName",desc="流水线名称",required = true)
+    @ApiProperty(name="pipelineName",desc="流水线名称")
     private String pipelineName;
 
     //流水线创建人

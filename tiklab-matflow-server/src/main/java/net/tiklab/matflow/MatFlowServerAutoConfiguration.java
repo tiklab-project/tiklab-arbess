@@ -10,7 +10,6 @@ import org.springframework.context.annotation.Configuration;
 @SQL(modules = {
         "pipeline",
         "pipeline-authority",
-        "pipeline-authority-1.0.1",
         "pipeline-init-message",
         "pipeline-init-project",
         "pipeline-init-authorize",

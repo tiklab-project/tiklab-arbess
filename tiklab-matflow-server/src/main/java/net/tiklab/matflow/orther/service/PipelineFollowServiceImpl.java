@@ -10,7 +10,7 @@ import net.tiklab.matflow.orther.model.PipelineFollow;
 import net.tiklab.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import java.util.Comparator;
+
 import java.util.List;
 
 /**
@@ -23,7 +23,6 @@ public class PipelineFollowServiceImpl implements PipelineFollowService {
 
     @Autowired
     PipelineFollowDao pipelineFollowDao;
-
 
     @Override
     public String updateFollow(PipelineFollow pipelineFollow) {
