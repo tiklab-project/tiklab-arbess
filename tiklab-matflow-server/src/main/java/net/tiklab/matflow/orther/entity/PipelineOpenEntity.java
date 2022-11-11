@@ -10,7 +10,7 @@ public class PipelineOpenEntity {
     @Id
     @GeneratorValue
     @Column(name = "open_id")
-    private String id;
+    private String openId;
 
     @Column(name = "pipeline_id")
     private String pipelineId;
@@ -21,12 +21,12 @@ public class PipelineOpenEntity {
     @Column(name = "user_id")
     private String userId ;
 
-    public String getId() {
-        return id;
+    public String getOpenId() {
+        return openId;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setOpenId(String openId) {
+        this.openId = openId;
     }
 
     public String getPipelineId() {

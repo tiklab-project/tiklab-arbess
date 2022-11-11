@@ -37,19 +37,30 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
     //创建
     @Override
     public String createHistory(PipelineExecHistory pipelineExecHistory) {
-
         return pipelineExecHistoryDao.createHistory(BeanMapper.map(pipelineExecHistory, PipelineExecHistoryEntity.class));
     }
 
     //删除
     @Override
-    public void deleteHistory(String historyId) {
-        PipelineExecHistory oneHistory = findOneHistory(historyId);
-        if (oneHistory == null){
+    public void deleteAllHistory(String pipelineId) {
+        List<PipelineExecHistory> allHistory = findAllHistory();
+        if (allHistory == null){
             return;
         }
-        pipelineExecLogService.deleteHistoryLog(oneHistory.getHistoryId());
+        for (PipelineExecHistory history : allHistory) {
+            deleteHistory(history.getHistoryId());
+        }
+    }
+
+    /**
+     * 删除单个历史
+     *
+     * @param historyId 历史id
+     */
+    @Override
+    public void deleteHistory(String historyId) {
         pipelineExecHistoryDao.deleteHistory(historyId);
+        pipelineExecLogService.deleteHistoryLog(historyId);
     }
 
     @Override

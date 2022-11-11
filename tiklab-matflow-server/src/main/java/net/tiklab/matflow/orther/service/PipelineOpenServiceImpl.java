@@ -4,7 +4,6 @@ package net.tiklab.matflow.orther.service;
 import net.tiklab.beans.BeanMapper;
 import net.tiklab.join.JoinTemplate;
 import net.tiklab.matflow.definition.model.Pipeline;
-import net.tiklab.matflow.definition.service.PipelineService;
 import net.tiklab.matflow.orther.dao.PipelineOpenDao;
 import net.tiklab.matflow.orther.entity.PipelineOpenEntity;
 import net.tiklab.matflow.orther.model.PipelineOpen;
@@ -13,8 +12,6 @@ import net.tiklab.utils.context.LoginContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -40,7 +37,7 @@ public class PipelineOpenServiceImpl implements PipelineOpenService {
             if (!pipelineOpen.getPipeline().getPipelineId().equals(pipelineId)){
                continue;
             }
-            deleteOpen(pipelineOpen.getId());
+            deleteOpen(pipelineOpen.getOpenId());
         }
     }
 
@@ -111,6 +108,9 @@ public class PipelineOpenServiceImpl implements PipelineOpenService {
     @Override
     public List<PipelineOpen> findAllOpen(StringBuilder s){
         String loginId = LoginContext.getLoginId();
+        if (s.toString().equals("")){
+            return null;
+        }
         List<PipelineOpenEntity> allOpen = pipelineOpenDao.findAllOpen(loginId,s);
         List<PipelineOpen> list = BeanMapper.mapList(allOpen, PipelineOpen.class);
         joinTemplate.joinQuery(list);

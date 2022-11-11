@@ -176,8 +176,6 @@ public class PipelineConfigServiceImpl implements PipelineConfigService {
         String id ;
         String object = JSON.toJSONString(config.getValues());
         HashMap<String, String> map = new HashMap<>();
-        map.put("pipelineId", pipeline.getPipelineId());
-        map.put("pipelineName", pipeline.getPipelineName());
         switch (types) {
             case "code" -> {
                 PipelineCode pipelineCode = JSON.parseObject(object, PipelineCode.class);

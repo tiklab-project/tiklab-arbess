@@ -36,7 +36,13 @@ public interface PipelineExecHistoryService {
 
     /**
      * 删除流水线历史
-     * @param historyId 流水线历史id
+     * @param pipelineId 流水线id
+     */
+    void deleteAllHistory(@NotNull String  pipelineId);
+
+    /**
+     * 删除单个历史
+     * @param historyId 历史id
      */
     void deleteHistory(@NotNull String  historyId);
 

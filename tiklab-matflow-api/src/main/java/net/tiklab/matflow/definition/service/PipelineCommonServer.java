@@ -13,7 +13,7 @@ public interface PipelineCommonServer {
      * 删除关联信息
      * @param pipeline 流水线
      */
-    void delete(Pipeline pipeline);
+    void deleteHistory(Pipeline pipeline);
 
     /**
      * 流水线更改名称时更新源文件名称

@@ -7,11 +7,13 @@ import net.tiklab.message.message.model.Message;
 import net.tiklab.message.message.model.MessageReceiver;
 import net.tiklab.message.message.model.MessageTemplate;
 import net.tiklab.message.message.service.MessageService;
+import net.tiklab.message.message.service.MessageTemplateService;
 import net.tiklab.oplog.log.modal.OpLog;
 import net.tiklab.oplog.log.modal.OpLogTemplate;
 import net.tiklab.oplog.log.service.OpLogService;
 import net.tiklab.rpc.annotation.Exporter;
 import net.tiklab.user.user.model.User;
+import net.tiklab.user.user.service.UserService;
 import net.tiklab.utils.context.LoginContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +37,12 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
 
     @Autowired
     MessageService messageService;
+
+    @Autowired
+    UserService userService;
+
+    @Autowired
+    MessageTemplateService messageTemplateService;
 
     private static final Logger logger = LoggerFactory.getLogger(PipelineHomeServiceImpl.class);
 
@@ -79,7 +87,6 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
         log.setUser(user);
         log.setBgroup(appName);
         log.setOpLogTemplate(opLogTemplate);
-        map.put("type", logMessage(type));
         log.setContent(JSONObject.toJSONString(map));
         logService.createLog(log);
     }
@@ -89,7 +96,7 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
      * 创建消息
      */
     @Override
-    public void message(String messageTemplateId,String messages){
+    public void message(String messageTemplateId,Map<String, String> map){
         Message message = new Message();
         message.setApplication(appName);
         //模板
@@ -100,12 +107,19 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
         ArrayList<MessageReceiver> list = new ArrayList<>();
         MessageReceiver messageReceiver = new MessageReceiver();
         String userId = LoginContext.getLoginId();
+        User user = userService.findOne(userId);
         messageReceiver.setReceiver(userId);
+        messageReceiver.setReceiverName(user.getName());
         list.add(messageReceiver);
+
         message.setMessageReceiverList(list);
+        MessageTemplate template = messageTemplateService.findMessageTemplate(messageTemplateId);
+        String link = template.getLink();
         //消息信息
-        message.setData("{\"message\":\" "+messages+" \",\"state\":\" \"}");
-        messageService.createMessage(message);
+        map.put("link",link);
+        map.put("userName",user.getName());
+        message.setData(JSONObject.toJSONString(map));
+        messageService.sendMessage(message);
     }
 
 }

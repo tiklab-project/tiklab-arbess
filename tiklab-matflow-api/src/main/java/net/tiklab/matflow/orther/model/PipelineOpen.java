@@ -19,8 +19,8 @@ import net.tiklab.postin.annotation.ApiProperty;
 @Mapper(targetAlias = "PipelineOpenEntity")
 public class PipelineOpen {
 
-    @ApiProperty(name="id",desc="日志id")
-    private String id;
+    @ApiProperty(name="openId",desc="日志id")
+    private String openId;
 
     @ApiProperty(name="userId",desc="用户",eg="@selectOne")
     private String userId;
@@ -41,12 +41,12 @@ public class PipelineOpen {
     private String pipelineId;
 
 
-    public String getId() {
-        return id;
+    public String getOpenId() {
+        return openId;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setOpenId(String openId) {
+        this.openId = openId;
     }
 
     public String getUserId() {

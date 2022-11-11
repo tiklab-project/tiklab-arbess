@@ -154,9 +154,7 @@ public class PipelineConfigOrderServiceImpl implements PipelineConfigOrderServic
         Map<String, String> map = pipelineConfigService.updateConfig(config, typeConfig, types);
         map.put("pipelineId", pipeline.getPipelineId());
         map.put("pipelineName", pipeline.getPipelineName());
-
-
-        homeService.log("update", "pipelineConfig", map);
+        homeService.log("update", "pipelineConfigUpdate", map);
     }
 
 
@@ -186,13 +184,12 @@ public class PipelineConfigOrderServiceImpl implements PipelineConfigOrderServic
             configOrder.setTaskSort(1);
         }
         Map<String, String> map = pipelineConfigService.createConfig(config, types, size);
-
         map.put("pipelineId", pipeline.getPipelineId());
         map.put("pipelineName", pipeline.getPipelineName());
 
         configOrder.setTaskId(map.get("id"));
         String configure = createConfigure(configOrder);
-        homeService.log("create", "pipelineConfig", map);
+        homeService.log("create", "pipelineConfigCreate", map);
         if (configure == null){
             throw new ApplicationException(50001,"创建配置顺序信息失败");
         }
@@ -217,7 +214,7 @@ public class PipelineConfigOrderServiceImpl implements PipelineConfigOrderServic
         map.put("pipelineName", pipeline.getPipelineName());
 
         pipelineConfigOrderDao.deleteConfigure(typeConfig.getConfigId());
-        homeService.log("delete", "pipelineConfig", map);
+        homeService.log("delete", "pipelineConfigDelete", map);
     }
 
     /**

@@ -49,10 +49,10 @@ public class PipelineCommonServerImpl implements PipelineCommonServer{
      * @param pipeline 流水线
      */
     @Override
-    public void delete(Pipeline pipeline){
+    public void deleteHistory(Pipeline pipeline){
         String pipelineId = pipeline.getPipelineId();
         //删除对应的历史
-        historyService.deleteHistory(pipelineId);
+        historyService.deleteAllHistory(pipelineId);
         //删除对应文件
         String fileAddress = PipelineUntil.findFileAddress();
         PipelineUntil.deleteFile(new File(fileAddress+ pipeline.getPipelineName()));
@@ -174,20 +174,6 @@ public class PipelineCommonServerImpl implements PipelineCommonServer{
      * @param pipelineId 流水线id
      */
     public void createDmRole(String pipelineId){
-        // //创建管理员角色
-        // DmRole dmRole = new DmRole();
-        // dmRole.setBgroup(PipelineUntil.appName);
-        // dmRole.setDomainId(pipelineId);
-        // Role role = new Role();
-        // role.setId("matflow");
-        // dmRole.setRole(role);
-        // dmRoleService.createDmRole(dmRole);
-        // //创建用户角色
-        // role.setId("matflowUser");
-        // dmRole.setRole(role);
-        // dmRoleService.createDmRole(dmRole);
-
-        //拉入创建人
         dmRoleService.initDmRoles(pipelineId,LoginContext.getLoginId(),"matflow");
     }
 

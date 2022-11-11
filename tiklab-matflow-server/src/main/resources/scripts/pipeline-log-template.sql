@@ -1,33 +1,11 @@
-INSERT INTO pcs_op_log_template
-(id,title,content,link,bgroup)
- VALUES
- ('pipeline', '流水线动态', '${user}${message}<span color="blue"><a href="${link}">${pipelineName}</a></span>', NULL, 'matflow');
-
-INSERT INTO pcs_op_log_template
-(id,title,content,link,bgroup)
- VALUES
- ('deletePipeline', '流水线删除动态', '${user}${message}${pipelineName}', NULL, 'matflow');
-
-INSERT INTO pcs_op_log_template
-(id,title,content,link,bgroup)
- VALUES
-('pipelineExec', '流水线执行动态', '${message}<span color="blue"><a href="${link}">${pipelineName}</a></span>', NULL, 'matflow');
-
-INSERT INTO pcs_op_log_template
-(id,title,content,link,bgroup)
- VALUES
- ('pipelineProof', '流水线凭证动态', '用户${user}${message}', NULL, 'matflow');
-
-INSERT INTO pcs_op_log_template
-(id,title,content,link,bgroup)
-VALUES
-('pipelineOther', '流水线其他动态', '用户${user}${message}', NULL, 'matflow');
-
-INSERT INTO pcs_op_log_template
-(id,title,content,link,bgroup)
-VALUES
-('pipelineConfig', '流水线配置动态', '${user}${type}流水线<span color="blue"><a href="${link}">${pipelineName}</a></span>${message}', NULL, 'matflow');
-
+INSERT INTO `pcs_op_log_template` (`id`, `title`, `content`, `link`, `bgroup`) VALUES ('pipelineConfigCreate', '流水线配置创建动态', '<span><font color=\"blue\">${user}</font></span>创建了流水线<span><font color=\"blue\">${pipelineName}</font></span>的${message}', '${pipelineId}', 'matflow');
+INSERT INTO `pcs_op_log_template` (`id`, `title`, `content`, `link`, `bgroup`) VALUES ('pipelineConfigDelete', '流水线配置删除动态', '<span><font color=\"blue\">${user}</font></span>删除了流水线<span><font color=\"blue\">${pipelineName}</font></span>的${message}', '${pipelineId}', 'matflow');
+INSERT INTO `pcs_op_log_template` (`id`, `title`, `content`, `link`, `bgroup`) VALUES ('pipelineConfigUpdate', '流水线配置更新动态', '<span><font color=\"blue\">${user}</font></span>创建了流水线<span><font color=\"blue\">${pipelineName}</font></span>的${message}', '${pipelineId}', 'matflow');
+INSERT INTO `pcs_op_log_template` (`id`, `title`, `content`, `link`, `bgroup`) VALUES ('pipelineCreate', '流水线创建动态', '<span><font color=\"blue\">${user}</font></span>创建了流水线<span><font color=\"blue\">${pipelineName}</font></span>', '${pipelineId}', 'matflow');
+INSERT INTO `pcs_op_log_template` (`id`, `title`, `content`, `link`, `bgroup`) VALUES ('pipelineDelete', '流水线删除动态', '<span><font color=\"blue\">${user}</font></span>删除了流水线<span><font color=\"blue\">${pipelineName}</font></span>', '${pipelineId}', 'matflow');
+INSERT INTO `pcs_op_log_template` (`id`, `title`, `content`, `link`, `bgroup`) VALUES ('pipelineExec', '流水线执行动态', '<span><font color=\"blue\">${user}</font></span>执行了流水线<span><font color=\"blue\">${pipelineName}</font></span>', '${pipelineId}', 'matflow');
+INSERT INTO `pcs_op_log_template` (`id`, `title`, `content`, `link`, `bgroup`) VALUES ('pipelineRun', '流水线运行动态', '流水线<span><font color=\"blue\">${pipelineName}</font></span>${message}', '${pipelineId}', 'matflow');
+INSERT INTO `pcs_op_log_template` (`id`, `title`, `content`, `link`, `bgroup`) VALUES ('pipelineUpdate', '流水线更新动态', '<span><font color=\"blue\">${user}</font></span>更新流水线\n<span><font color=\"blue\">${pipelineName}</font></span>的${message}', '${pipelineId}', 'matflow');
 
 
 

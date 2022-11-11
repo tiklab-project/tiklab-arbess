@@ -43,7 +43,7 @@ public class Pipeline {
     private int pipelineCollect;
 
     //运行状态
-    @ApiProperty(name="pipelineCollect",desc="运行状态",required = true)
+    @ApiProperty(name="pipelineCollect",desc="运行状态 1.运行中 2.停止中",required = true)
     private int pipelineState;
 
     @ApiProperty(name="pipelinePower",desc="项目作用域",required = true)

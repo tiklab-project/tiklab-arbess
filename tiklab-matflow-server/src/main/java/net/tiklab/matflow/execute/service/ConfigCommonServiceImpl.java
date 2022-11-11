@@ -138,17 +138,21 @@ public class ConfigCommonServiceImpl implements ConfigCommonService {
      * @param time 异常
      */
     public void updateState(String historyId,List<Integer> time,int state){
-        PipelineExecLog pipelineExecLog = historyService.findLastRunLog(historyId);
+
         PipelineExecHistory pipelineExecHistory = historyService.findOneHistory(historyId);
-        pipelineExecLog.setRunTime(time.get(time.size()-1));
         int times = 0;
-        for (Integer integer : time) {
-            times = times+ integer;
+        if (time != null ){
+            PipelineExecLog pipelineExecLog = historyService.findLastRunLog(historyId);
+            pipelineExecLog.setRunTime(time.get(time.size()-1));
+            for (Integer integer : time) {
+                times = times+ integer;
+            }
+            pipelineExecLog.setRunState(state);
+            logService.updateLog(pipelineExecLog);
         }
         pipelineExecHistory.setRunTime(times+1);
         historyService.updateHistory(pipelineExecHistory);
-        pipelineExecLog.setRunState(state);
-        logService.updateLog(pipelineExecLog);
+
     }
 
     /**
