@@ -1,6 +1,7 @@
 package net.tiklab.matflow.orther.service;
 
 import net.tiklab.core.exception.ApplicationException;
+import net.tiklab.matflow.definition.model.Pipeline;
 
 import java.io.File;
 import java.io.IOException;
@@ -9,10 +10,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.regex.Pattern;
 
 /**
@@ -273,6 +271,16 @@ public class PipelineUntil {
             order = " .\\" + buildOrder + " " + "-f"+" "  +path;
         }
         return order;
+    }
+
+
+    public static Map<String,String> initMap(Pipeline pipeline){
+        Map<String,String> map = new HashMap<>();
+        map.put("pipelineId", pipeline.getPipelineId());
+        map.put("pipelineName", pipeline.getPipelineName());
+        map.put("name", pipeline.getPipelineName().substring(0,1));
+        map.put("color", ""+pipeline.getColor());
+        return map;
     }
 
 }

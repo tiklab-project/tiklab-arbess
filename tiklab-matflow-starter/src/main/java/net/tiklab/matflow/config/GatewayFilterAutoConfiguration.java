@@ -51,7 +51,8 @@ public class GatewayFilterAutoConfiguration {
                         ".xml",
                         ".ftl",
                         ".map",
-                        ".gz"
+                        ".gz",
+                        "svg"
                 })
                 .ignoreUrls(new String[]{
                         "/",

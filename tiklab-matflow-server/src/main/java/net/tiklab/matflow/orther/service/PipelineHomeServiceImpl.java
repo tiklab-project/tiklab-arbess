@@ -7,7 +7,6 @@ import net.tiklab.message.message.model.Message;
 import net.tiklab.message.message.model.MessageReceiver;
 import net.tiklab.message.message.model.MessageTemplate;
 import net.tiklab.message.message.service.MessageService;
-import net.tiklab.message.message.service.MessageTemplateService;
 import net.tiklab.oplog.log.modal.OpLog;
 import net.tiklab.oplog.log.modal.OpLogTemplate;
 import net.tiklab.oplog.log.service.OpLogService;
@@ -22,7 +21,6 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 
 @Service
@@ -41,22 +39,8 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
     @Autowired
     UserService userService;
 
-    @Autowired
-    MessageTemplateService messageTemplateService;
 
     private static final Logger logger = LoggerFactory.getLogger(PipelineHomeServiceImpl.class);
-
-    private String logMessage(String type){
-        Map<String ,String> map = new HashMap<>();
-        map.put("update", "更新了");
-        map.put("create", "创建了");
-        map.put("delete", "删除了");
-        String s = map.get(type);
-        if (s == null){
-           return "";
-        }
-        return s;
-    }
 
 
     //更新收藏信息
@@ -69,8 +53,8 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
 
     /**
      * 创建日志
-     * @param type 日志类型 (创建 create，删除 delete，执行 exec，更新 update)
-     * @param templateId 模板id (创建 流水线--pipeline，运行 pipelineExec，凭证--pipelineProof,其他--pipelineOther)
+     * @param type 日志类型
+     * @param templateId 模板id
      * @param map 日志信息
      */
     @Override
@@ -111,12 +95,7 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
         messageReceiver.setReceiver(userId);
         messageReceiver.setReceiverName(user.getName());
         list.add(messageReceiver);
-
         message.setMessageReceiverList(list);
-        MessageTemplate template = messageTemplateService.findMessageTemplate(messageTemplateId);
-        String link = template.getLink();
-        //消息信息
-        map.put("link",link);
         map.put("userName",user.getName());
         message.setData(JSONObject.toJSONString(map));
         messageService.sendMessage(message);

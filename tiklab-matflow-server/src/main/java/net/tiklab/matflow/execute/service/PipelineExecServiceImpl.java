@@ -9,6 +9,7 @@ import net.tiklab.matflow.execute.model.PipelineExecHistory;
 import net.tiklab.matflow.execute.model.PipelineExecLog;
 import net.tiklab.matflow.execute.model.PipelineProcess;
 import net.tiklab.matflow.orther.service.PipelineHomeService;
+import net.tiklab.matflow.orther.service.PipelineUntil;
 import net.tiklab.rpc.annotation.Exporter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,7 +61,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         if (pipeline.getPipelineState() == 1){
             return 100;
         }
-        HashMap<String, String> map1 = new HashMap<>();
+        Map<String, String> map1 = PipelineUntil.initMap(pipeline);
         map1.put("pipelineId",pipelineId);
         map1.put("pipelineName",pipeline.getPipelineName());
         homeService.message("pipelineExec", map1);
@@ -119,10 +120,9 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         map.remove(pipelineId);
         historyMap.remove(pipelineId);
 
-        HashMap<String, String> map = new HashMap<>();
+        Map<String, String> map = PipelineUntil.initMap(pipeline);
         map.put("message","停止执行");
-        map.put("pipelineId", pipeline.getPipelineId());
-        map.put("pipelineName", pipeline.getPipelineName());
+        map.put("image", "/images/cloudy.svg");
         homeService.log("execStatus", "pipelineExec", map);
         homeService.message("pipelineRun", map);
         homeService.log("run","pipelineRun", map);
@@ -153,10 +153,10 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         PipelineProcess pipelineProcess = new PipelineProcess();
         pipelineProcess.setPipelineExecHistory(pipelineExecHistory);
         historyMap.put(pipelineId,pipelineExecHistory);
+
         //消息
-        HashMap<String, String> maps = new HashMap<>();
-        maps.put("pipelineId", pipeline.getPipelineId());
-        maps.put("pipelineName", pipeline.getPipelineName());
+        Map<String, String> maps = PipelineUntil.initMap(pipeline);
+
         //获取所有配置顺序
         List<PipelineConfigOrder> allPipelineConfig = configOrderService.findAllPipelineConfig(pipelineId);
         if (allPipelineConfig == null || allPipelineConfig.size() == 0){
@@ -164,7 +164,8 @@ public class PipelineExecServiceImpl implements PipelineExecService {
             commonService.success(pipelineExecHistory, pipeline.getPipelineId());
             historyMap.remove(pipelineId);
             pipeline.setPipelineState(2);
-            maps.put("message","执行成功");
+            maps.put("message","成功");
+            maps.put("image", "/images/sun.svg");
             pipelineService.updatePipeline(pipeline);
             homeService.message("pipelineRun", maps);
             homeService.log("run","pipelineRun", maps);
@@ -199,7 +200,8 @@ public class PipelineExecServiceImpl implements PipelineExecService {
                 map.remove(pipelineId);
                 historyMap.remove(pipelineId);
                 //消息
-                maps.put("message","执行失败");
+                maps.put("message","失败");
+                maps.put("image", "/images/rain.svg");
                 homeService.log("run","pipelineRun", maps);
                 homeService.message("pipelineRun", maps);
                 return;
@@ -213,7 +215,8 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         map.remove(pipelineId);
         historyMap.remove(pipelineId);
         //消息
-        maps.put("message","执行成功");
+        maps.put("message","成功");
+        maps.put("image", "/images/sun.svg");
         homeService.log("run","pipelineRun", maps);
         homeService.message("pipelineRun", maps);
 
@@ -267,6 +270,8 @@ public class PipelineExecServiceImpl implements PipelineExecService {
             lstThreads[i].stop();
         }
     }
+
+
 
 
 }

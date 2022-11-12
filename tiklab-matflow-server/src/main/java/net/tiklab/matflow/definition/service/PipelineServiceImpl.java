@@ -11,6 +11,7 @@ import net.tiklab.matflow.execute.model.PipelineExecState;
 import net.tiklab.matflow.orther.model.PipelineOpen;
 import net.tiklab.matflow.orther.service.PipelineHomeService;
 import net.tiklab.matflow.orther.service.PipelineOpenService;
+import net.tiklab.matflow.orther.service.PipelineUntil;
 import net.tiklab.rpc.annotation.Exporter;
 import net.tiklab.utils.context.LoginContext;
 import org.slf4j.Logger;
@@ -72,12 +73,9 @@ public class PipelineServiceImpl implements PipelineService {
         }
 
         //流水线关联角色，用户信息
-        commonServer.createDmRole(pipelineId);
         commonServer.createDmUser(pipelineId);
 
-        HashMap<String, String> map = new HashMap<>();
-        map.put("pipelineId", pipelineId);
-        map.put("pipelineName", pipeline.getPipelineName());
+        Map<String, String> map = PipelineUntil.initMap(pipeline);
         //动态
         homeService.log("create", "pipelineCreate", map);
         //消息
@@ -94,6 +92,7 @@ public class PipelineServiceImpl implements PipelineService {
         }
         Pipeline pipeline = findOnePipeline(pipelineId);
         joinTemplate.joinQuery(pipeline);
+
         //删除关联信息
         pipelineDao.deletePipeline(pipelineId);//流水线
         commonServer.deleteDmUser(pipelineId);//关联用户
@@ -102,9 +101,7 @@ public class PipelineServiceImpl implements PipelineService {
         configOrderService.deleteConfig(pipelineId);//配置信息
 
         //动态，消息
-        HashMap<String, String> map = new HashMap<>();
-        map.put("pipelineId", pipelineId);
-        map.put("pipelineName", pipeline.getPipelineName());
+        Map<String, String> map =  PipelineUntil.initMap(pipeline);
         homeService.log("delete", "pipelineDelete", map);
         //消息
         homeService.message("pipelineDelete", map);

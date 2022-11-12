@@ -49,13 +49,6 @@ public interface PipelineCommonServer {
      * 创建流水线关联角色信息
      * @param pipelineId 流水线id
      */
-    void createDmRole(String pipelineId);
-
-
-    /**
-     * 创建流水线关联角色信息
-     * @param pipelineId 流水线id
-     */
     void createDmUser(String pipelineId);
 
 

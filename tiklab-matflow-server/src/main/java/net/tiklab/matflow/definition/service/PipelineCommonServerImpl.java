@@ -169,13 +169,6 @@ public class PipelineCommonServerImpl implements PipelineCommonServer{
         return dmUsers;
     }
 
-    /**
-     * 创建流水线关联角色信息
-     * @param pipelineId 流水线id
-     */
-    public void createDmRole(String pipelineId){
-        dmRoleService.initDmRoles(pipelineId,LoginContext.getLoginId(),"matflow");
-    }
 
     /**
      * 创建流水线关联用户
@@ -189,6 +182,8 @@ public class PipelineCommonServerImpl implements PipelineCommonServer{
         user.setId(LoginContext.getLoginId());
         dmUser.setUser(user);
         dmUserService.createDmUser(dmUser);
+        //关联权限
+        dmRoleService.initDmRoles(pipelineId,LoginContext.getLoginId(),PipelineUntil.appName);
     }
 
     /**
