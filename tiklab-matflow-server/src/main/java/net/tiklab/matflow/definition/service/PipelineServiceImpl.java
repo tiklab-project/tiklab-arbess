@@ -73,7 +73,7 @@ public class PipelineServiceImpl implements PipelineService {
         }
 
         //流水线关联角色，用户信息
-        // commonServer.createDmUser(pipelineId);
+        commonServer.createDmUser(pipelineId);
 
         Map<String, String> map = PipelineUntil.initMap(pipeline);
         // 动态
