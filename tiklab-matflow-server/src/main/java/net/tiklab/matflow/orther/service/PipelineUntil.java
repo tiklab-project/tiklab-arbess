@@ -275,6 +275,7 @@ public class PipelineUntil {
 
 
     public static Map<String,String> initMap(Pipeline pipeline){
+        System.out.println("创建消息。");
         Map<String,String> map = new HashMap<>();
         map.put("pipelineId", pipeline.getPipelineId());
         map.put("pipelineName", pipeline.getPipelineName());
