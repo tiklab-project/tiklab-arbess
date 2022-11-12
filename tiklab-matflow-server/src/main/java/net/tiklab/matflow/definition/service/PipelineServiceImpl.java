@@ -74,12 +74,12 @@ public class PipelineServiceImpl implements PipelineService {
 
         //流水线关联角色，用户信息
         commonServer.createDmUser(pipelineId);
-        System.out.println("创建消息1。");
-        Map<String, String> map = PipelineUntil.initMap(pipeline);
+
+        // Map<String, String> map = PipelineUntil.initMap(pipeline);
         //动态
-        homeService.log("create", "pipelineCreate", map);
+        // homeService.log("create", "pipelineCreate", map);
         //消息
-        homeService.message("pipelineCreate", map);
+        // homeService.message("pipelineCreate", map);
 
         return pipelineId;
     }
