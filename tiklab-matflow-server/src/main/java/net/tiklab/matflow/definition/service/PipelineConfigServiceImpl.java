@@ -109,31 +109,31 @@ public class PipelineConfigServiceImpl implements PipelineConfigService {
      * @return 更新信息
      */
     public Map<String,String> config(String message,String types,PipelineConfigOrder config,PipelineConfigOrder typeConfig){
-        Map<String, String> map ;
+        Map<String, String> map;
         switch (types) {
             case "code" -> {
                 map = codeConfig(message, config, typeConfig);
-                map.put("code","源码管理配置");
+                map.put("message","源码管理配置");
             }
             case "test" -> {
                 map = testConfig(message, config, typeConfig);
-                map.put("test","测试配置");
+                map.put("message","测试配置");
             }
             case "build" -> {
                 map = buildConfig(message, config, typeConfig);
-                map.put("build","构建配置");
+                map.put("message","构建配置");
             }
             case "deploy" -> {
                 map = deployConfig(message, config, typeConfig);
-                map.put("deploy","部署配置");
+                map.put("message","部署配置");
             }
             case "codeScan" -> {
                 map = codeScanConfig(message, config, typeConfig);
-                map.put("codeScan","代码扫描配置");
+                map.put("message","代码扫描配置");
             }
             case "product" -> {
                 map = productConfig(message, config, typeConfig);
-                map.put("product","推送制品配置");
+                map.put("message","推送制品配置");
             }
             default -> {
                 return new HashMap<>();

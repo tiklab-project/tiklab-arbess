@@ -65,12 +65,11 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
         log.setActionType(type);
         log.setModule(module);
         log.setTimestamp(new Timestamp(System.currentTimeMillis()));
-        User user = new User();
-        String loginId = LoginContext.getLoginId();
-        user.setId(loginId);
+        User user = userService.findOne(LoginContext.getLoginId());
         log.setUser(user);
         log.setBgroup(appName);
         log.setOpLogTemplate(opLogTemplate);
+        map.put("user",user.getName());
         log.setContent(JSONObject.toJSONString(map));
         logService.createLog(log);
     }
