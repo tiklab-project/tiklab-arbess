@@ -116,6 +116,9 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
             case 1, 2, 3, 4 -> {
                 //git server地址
                 String gitAddress = commonService.getScm(1);
+                if (gitAddress == null){
+                    throw new ApplicationException(5001,"未配置git源地址");
+                }
                 PipelineUntil.validFile(gitAddress,1);
                 String gitOrder = gitOrder(pipelineCode, fileAddress);
                 return PipelineUntil.process(gitAddress, gitOrder);
@@ -123,6 +126,9 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
             case 5 -> {
                 //svn server地址
                 String svnAddress = commonService.getScm(5);
+                if (svnAddress == null){
+                    throw new ApplicationException(5001,"未配置svn源地址");
+                }
                 PipelineUntil.validFile(svnAddress,5);
                 String gitOrder = svnOrder(pipelineCode, fileAddress);
                 return PipelineUntil.process(svnAddress, gitOrder);
@@ -145,7 +151,7 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
     private String gitOrder(PipelineCode pipelineCode,String codeDir) throws URISyntaxException, MalformedURLException {
 
         //凭证
-        Map<String, String> map = findUserPassword(pipelineCode.getAuthId(), pipelineCode.getType());
+        Map<String, String> map = findUserPassword(pipelineCode.getAuthId());
 
         StringBuilder url = new StringBuilder(pipelineCode.getCodeAddress());
         String branch = pipelineCode.getCodeBranch();
@@ -164,7 +170,7 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
         String up ;
         if (userName && passWord){
             up=username.replace("@", "%40")+":"+password+"@";
-        }else if (userName && !passWord){
+        }else if (userName){
             up=username.replace("@", "%40");
         }else {
             up = "";
@@ -194,7 +200,7 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
      */
     private String svnOrder(PipelineCode pipelineCode,String codeDir){
         //凭证
-        Map<String, String> map = findUserPassword(pipelineCode.getAuthId(), pipelineCode.getType());
+        Map<String, String> map = findUserPassword(pipelineCode.getAuthId());
         String branch = pipelineCode.getCodeBranch();
         //地址信息
         StringBuilder url = new StringBuilder(pipelineCode.getCodeAddress());
@@ -215,10 +221,9 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
     /**
      * 获取不同类型的用户名密码
      * @param authId 授权id
-     * @param type 类型
      * @return 用户名密码
      */
-    private Map<String,String> findUserPassword(String authId,int type){
+    private Map<String,String> findUserPassword(String authId){
         Map<String, String> map = new HashMap<>();
         String username;
         String password;

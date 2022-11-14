@@ -65,7 +65,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         map1.put("pipelineId",pipelineId);
         map1.put("pipelineName",pipeline.getPipelineName());
         homeService.message("pipelineExec", map1);
-        homeService.log("exec","pipelineExec", map1);
+        homeService.log("exec","run","pipelineExec", map1);
         executorService.submit(() -> {
             Thread.currentThread().setName(pipelineId);
             begin(pipeline);
@@ -123,9 +123,8 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         Map<String, String> map = PipelineUntil.initMap(pipeline);
         map.put("message","停止执行");
         map.put("image", "/images/cloudy.svg");
-        homeService.log("execStatus", "pipelineExec", map);
         homeService.message("pipelineRun", map);
-        homeService.log("run","pipelineRun", map);
+        homeService.log("run","run","pipelineRun", map);
     }
 
     //判断流水线是否正在执行
@@ -168,7 +167,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
             maps.put("image", "/images/sun.svg");
             pipelineService.updatePipeline(pipeline);
             homeService.message("pipelineRun", maps);
-            homeService.log("run","pipelineRun", maps);
+            homeService.log("run","run","pipelineRun", maps);
             return;
         }
 
@@ -202,7 +201,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
                 //消息
                 maps.put("message","失败");
                 maps.put("image", "/images/rain.svg");
-                homeService.log("run","pipelineRun", maps);
+                homeService.log("run","run","pipelineRun", maps);
                 homeService.message("pipelineRun", maps);
                 return;
             }
@@ -217,7 +216,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         //消息
         maps.put("message","成功");
         maps.put("image", "/images/sun.svg");
-        homeService.log("run","pipelineRun", maps);
+        homeService.log("run","run","pipelineRun", maps);
         homeService.message("pipelineRun", maps);
 
     }

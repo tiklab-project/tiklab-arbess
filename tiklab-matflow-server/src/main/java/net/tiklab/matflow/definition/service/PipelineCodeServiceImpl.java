@@ -51,7 +51,6 @@ public class PipelineCodeServiceImpl implements PipelineCodeService {
     //修改
     @Override
     public void updateCode(PipelineCode pipelineCode) {
-
         switch (pipelineCode.getType()) {
             case 2, 3 -> {
                 if (!PipelineUntil.isNoNull(pipelineCode.getCodeName())){

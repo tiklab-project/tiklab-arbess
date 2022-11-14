@@ -1,6 +1,7 @@
 package net.tiklab.matflow.execute.service;
 
 import com.jcraft.jsch.*;
+import net.tiklab.core.exception.ApplicationException;
 import net.tiklab.matflow.definition.model.Pipeline;
 import net.tiklab.matflow.definition.model.PipelineDeploy;
 import net.tiklab.matflow.execute.model.PipelineProcess;
@@ -146,17 +147,26 @@ public class DeployAchieveServiceImpl implements DeployAchieveService {
      * @return 实例
      * @throws JSchException 连接失败
      */
-    private Session createSession(PipelineDeploy pipelineDeploy) throws JSchException {
+    private Session createSession(PipelineDeploy pipelineDeploy) throws JSchException,ApplicationException {
 
         PipelineAuthHost authHost = (PipelineAuthHost) pipelineDeploy.getAuth();
         String username = authHost.getUsername();
-        String password = authHost.getPassword();
+
         String sshIp = authHost.getIp();
         int sshPort = authHost.getPort();
         JSch jsch = new JSch();
-
         Session session = jsch.getSession(username, sshIp, sshPort);
-        session.setPassword(password);
+        if (authHost.getAuthType() ==2){
+            String tempFile = PipelineUntil.createTempFile(authHost.getPrivateKey());
+            if (!PipelineUntil.isNoNull(tempFile)){
+                throw new ApplicationException("写入私钥失败。");
+            }
+            jsch.addIdentity(tempFile);
+            PipelineUntil.deleteFile(new File(tempFile));
+        }else {
+            String password = authHost.getPassword();
+            session.setPassword(password);
+        }
         session.setConfig("StrictHostKeyChecking", "no");
         session.connect();
         return session;

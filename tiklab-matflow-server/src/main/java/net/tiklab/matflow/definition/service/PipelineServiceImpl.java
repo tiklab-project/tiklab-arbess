@@ -76,8 +76,9 @@ public class PipelineServiceImpl implements PipelineService {
         commonServer.createDmUser(pipelineId);
 
         Map<String, String> map = PipelineUntil.initMap(pipeline);
+        map.put("pipelineId",pipelineId);
         // 动态
-        homeService.log("create", "pipelineCreate", map);
+        homeService.log("create","pipeline", "pipelineCreate", map);
         // 消息
         homeService.message("pipelineCreate", map);
 
@@ -102,7 +103,7 @@ public class PipelineServiceImpl implements PipelineService {
 
         //动态，消息
         Map<String, String> map =  PipelineUntil.initMap(pipeline);
-        homeService.log("delete", "pipelineDelete", map);
+        homeService.log("delete", "pipeline","pipelineDelete", map);
         //消息
         homeService.message("pipelineDelete", map);
         return 1;
@@ -119,7 +120,7 @@ public class PipelineServiceImpl implements PipelineService {
             map.put("message","名称为"+pipeline.getPipelineName());
             map.put("pipelineId", pipeline.getPipelineId());
             map.put("pipelineName", flow.getPipelineName());
-            homeService.log("update", "pipelineUpdate", map);
+            homeService.log("update", "pipeline","pipelineUpdate", map);
         }
         //更新权限信息
         updatePipeline(pipeline,flow);
@@ -144,12 +145,12 @@ public class PipelineServiceImpl implements PipelineService {
         if (pipelinePower == 2 && flow.getPipelinePower() != 2) {
             commonServer.createDmUser(pipelineId);
             map.put("message","权限为私有");
-            homeService.log("update", "pipelineUpdate", map);
+            homeService.log("update", "pipeline","pipelineUpdate", map);
         }
         if (pipelinePower == 1 && flow.getPipelinePower() != 1 ) {
             commonServer.deleteDmUser(pipelineId);
             map.put("message","权限为全局");
-            homeService.log("update", "pipelineUpdate", map);
+            homeService.log("update","pipeline", "pipelineUpdate", map);
         }
 
         if (pipelinePower == 0){

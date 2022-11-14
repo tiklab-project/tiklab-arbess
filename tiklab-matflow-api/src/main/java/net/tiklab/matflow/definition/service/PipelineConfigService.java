@@ -22,30 +22,15 @@ public interface PipelineConfigService {
     Object findOneConfig(PipelineConfigOrder configOrder);
 
     /**
-     * 更新配置
-     * @param config 原配置
-     * @param typeConfig 新配置
+     * 配置信息
+     * @param message 执行类型 create:创建,update:更新,delete:删除
      * @param types 类型
-     * @return 动态信息
+     * @param config 更新配置
+     * @param typeConfig 原配置
+     * @return 更新信息
      */
-    Map<String, String> updateConfig(PipelineConfigOrder config, PipelineConfigOrder typeConfig, String types);
+    Map<String,String> config(String message,String types,PipelineConfigOrder config,PipelineConfigOrder typeConfig);
 
-    /**
-     * 创建配置
-     * @param config 配置信息
-     * @param types 类型
-     * @param size 已存在的配置数量
-     * @return 动态信息
-     */
-    Map<String, String> createConfig(PipelineConfigOrder config, String types, int size);
-
-    /**
-     * 删除配置
-     * @param typeConfig 配置信息
-     * @param types 类型
-     * @return 动态信息
-     */
-    Map<String, String> deleteConfig( PipelineConfigOrder typeConfig ,String types);
 
     /**
      * 效验配置必填字段

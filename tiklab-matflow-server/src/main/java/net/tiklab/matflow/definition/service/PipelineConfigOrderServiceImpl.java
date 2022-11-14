@@ -88,13 +88,13 @@ public class PipelineConfigOrderServiceImpl implements PipelineConfigOrderServic
         String pipelineId = config.getPipeline().getPipelineId();
         String types ;
         String message = config.getMessage();
-        switch (type) {
-            case 1,2,3,4,5 -> types = "code";
-            case 11,12,13,14 -> types = "test";
-            case 21,22,23,24 -> types = "build";
-            case 31,32,33 -> types = "deploy";
-            case 41 -> types = "codeScan";
-            case 51,52 -> types = "product";
+        switch (type/10) {
+            case 0 -> types = "code";
+            case 1 -> types = "test";
+            case 2 -> types = "build";
+            case 3 -> types = "deploy";
+            case 4 -> types = "codeScan";
+            case 5 -> types = "product";
             default ->   throw new ApplicationException(50001, "找不到该类型");
         }
 
@@ -150,11 +150,11 @@ public class PipelineConfigOrderServiceImpl implements PipelineConfigOrderServic
         PipelineConfigOrder typeConfig = findTypeConfig(pipelineId, config.getTaskType());
         if (typeConfig == null) return;
         joinTemplate.joinQuery(typeConfig);
+        Map<String, String> map = pipelineConfigService.config("update",types,config, typeConfig);
         Pipeline pipeline = typeConfig.getPipeline();
-        Map<String, String> map = pipelineConfigService.updateConfig(config, typeConfig, types);
         map.put("pipelineId", pipeline.getPipelineId());
         map.put("pipelineName", pipeline.getPipelineName());
-        homeService.log("update", "pipelineConfigUpdate", map);
+        homeService.log("update", "pipelineConfig","pipelineConfigUpdate", map);
     }
 
 
@@ -183,13 +183,13 @@ public class PipelineConfigOrderServiceImpl implements PipelineConfigOrderServic
             updateConfigOrder(new PipelineConfigOrder(pipelineId),true);
             configOrder.setTaskSort(1);
         }
-        Map<String, String> map = pipelineConfigService.createConfig(config, types, size);
+        Map<String, String> map = pipelineConfigService.config("create",types,config, null);
         map.put("pipelineId", pipeline.getPipelineId());
         map.put("pipelineName", pipeline.getPipelineName());
 
         configOrder.setTaskId(map.get("id"));
         String configure = createConfigure(configOrder);
-        homeService.log("create", "pipelineConfigCreate", map);
+        homeService.log("create", "pipelineConfig","pipelineConfigCreate", map);
         if (configure == null){
             throw new ApplicationException(50001,"创建配置顺序信息失败");
         }
@@ -207,14 +207,14 @@ public class PipelineConfigOrderServiceImpl implements PipelineConfigOrderServic
         if (typeConfig == null) return;
         updateConfigOrder(typeConfig,false);
 
-        Map<String, String> map = pipelineConfigService.deleteConfig(typeConfig, types);
+        Map<String, String> map = pipelineConfigService.config("delete",types,typeConfig,null);
 
         Pipeline pipeline = typeConfig.getPipeline();
         map.put("pipelineId", pipeline.getPipelineId());
         map.put("pipelineName", pipeline.getPipelineName());
 
         pipelineConfigOrderDao.deleteConfigure(typeConfig.getConfigId());
-        homeService.log("delete", "pipelineConfigDelete", map);
+        homeService.log("delete", "pipelineConfig","pipelineConfigDelete", map);
     }
 
     /**

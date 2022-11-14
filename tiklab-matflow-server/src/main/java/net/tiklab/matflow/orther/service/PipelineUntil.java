@@ -3,10 +3,7 @@ package net.tiklab.matflow.orther.service;
 import net.tiklab.core.exception.ApplicationException;
 import net.tiklab.matflow.definition.model.Pipeline;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
@@ -281,6 +278,28 @@ public class PipelineUntil {
         map.put("name", pipeline.getPipelineName().substring(0,1));
         map.put("color", ""+pipeline.getColor());
         return map;
+    }
+
+    /**
+     * 创建临时文件
+     * @param key 文件内容
+     * @return 文件地址
+     */
+    public static String createTempFile(String key){
+        File tempFile;
+        String path;
+        try {
+            tempFile = File.createTempFile("key", ".txt");
+            path = tempFile.getPath();
+            FileWriter writer;
+            writer = new FileWriter(path);
+            writer.write(key);
+            writer.flush();
+            writer.close();
+        } catch (IOException e) {
+            return null;
+        }
+        return path;
     }
 
 }

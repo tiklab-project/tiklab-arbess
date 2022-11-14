@@ -239,7 +239,7 @@ public class PipelineCommonServerImpl implements PipelineCommonServer{
             if (history.getRunStatus() == 20){
                 state.setRemoveNumber(state.getRemoveNumber() + 1);
             }
-            if (history.getRunStatus() == 30){
+            if (history.getRunStatus() == 10){
                 state.setSuccessNumber(state.getSuccessNumber() + 1);
             }
             state.setExecTime(state.getExecTime()+history.getRunTime());

@@ -58,12 +58,12 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
      * @param map 日志信息
      */
     @Override
-    public void log(String type, String templateId,Map<String, String> map){
+    public void log(String type,String module, String templateId,Map<String, String> map){
         OpLog log = new OpLog();
         OpLogTemplate opLogTemplate = new OpLogTemplate();
         opLogTemplate.setId(templateId);
         log.setActionType(type);
-        log.setModule(appName);
+        log.setModule(module);
         log.setTimestamp(new Timestamp(System.currentTimeMillis()));
         User user = new User();
         String loginId = LoginContext.getLoginId();

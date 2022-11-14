@@ -1,17 +1,13 @@
 package net.tiklab.matflow.definition.service;
 
 import com.alibaba.fastjson.JSON;
-import net.tiklab.core.exception.ApplicationException;
 import net.tiklab.matflow.definition.model.*;
 import net.tiklab.matflow.orther.service.PipelineUntil;
 import net.tiklab.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+
+import java.util.*;
 
 @Service
 @Exporter
@@ -104,161 +100,184 @@ public class PipelineConfigServiceImpl implements PipelineConfigService {
         return null;
     }
 
-    String message = "message";
-
     /**
-     * 更新配置
-     * @param config 更新数据
-     * @param typeConfig 原配置信息
+     * 配置信息
+     * @param message 执行类型 create:创建,update:更新,delete:删除
      * @param types 类型
-     * @return 动态
+     * @param config 更新配置
+     * @param typeConfig 原配置
+     * @return 更新信息
      */
-    public Map<String, String> updateConfig(PipelineConfigOrder config,PipelineConfigOrder typeConfig,String types) {
+    public Map<String,String> config(String message,String types,PipelineConfigOrder config,PipelineConfigOrder typeConfig){
+        Map<String, String> map ;
+        switch (types) {
+            case "code" -> {
+                map = codeConfig(message, config, typeConfig);
+                map.put("code","源码管理配置");
+            }
+            case "test" -> {
+                map = testConfig(message, config, typeConfig);
+                map.put("test","测试配置");
+            }
+            case "build" -> {
+                map = buildConfig(message, config, typeConfig);
+                map.put("build","构建配置");
+            }
+            case "deploy" -> {
+                map = deployConfig(message, config, typeConfig);
+                map.put("deploy","部署配置");
+            }
+            case "codeScan" -> {
+                map = codeScanConfig(message, config, typeConfig);
+                map.put("codeScan","代码扫描配置");
+            }
+            case "product" -> {
+                map = productConfig(message, config, typeConfig);
+                map.put("product","推送制品配置");
+            }
+            default -> {
+                return new HashMap<>();
+            }
+        }
+        return map;
+    }
+
+    //源码
+    private Map<String, String> codeConfig(String message,PipelineConfigOrder config,PipelineConfigOrder typeConfig){
         HashMap<String, String> map = new HashMap<>();
         //把值转换成json字符串
         String object = JSON.toJSONString(config.getValues());
-
-        switch (types) {
-            case "code" -> {
-                //字符串转换成对象
+        String taskId = config.getTaskId();
+        switch (message){
+            case "create"->{
+                PipelineCode pipelineCode = new PipelineCode();
+                String id = pipelineCodeService.createCode(pipelineCode);
+                map.put("id",id);
+            }
+            case "update"->{
                 PipelineCode pipelineCode = JSON.parseObject(object, PipelineCode.class);
                 pipelineCode.setCodeId(typeConfig.getTaskId());
                 pipelineCode.setType(config.getTaskType());
                 pipelineCodeService.updateCode(pipelineCode);
-                map.put(message, "源码管理配置");
             }
-            case "test" -> {
-                PipelineTest pipelineTest = JSON.parseObject(object, PipelineTest.class);
-                pipelineTest.setTestId(typeConfig.getTaskId());
-                pipelineTestService.updateTest(pipelineTest);
-                map.put(message,  "测试配置");
+            case "delete"->{
+                pipelineCodeService.deleteCode(taskId);
             }
-            case "build" -> {
-                PipelineBuild pipelineBuild = JSON.parseObject(object, PipelineBuild.class);
-                pipelineBuild.setBuildId(typeConfig.getTaskId());
-                pipelineBuildService.updateBuild(pipelineBuild);
-                map.put(message,  "构建配置");
+        }
+        return map;
+    }
+
+    //代码扫描
+    private Map<String, String> codeScanConfig(String message,PipelineConfigOrder config,PipelineConfigOrder typeConfig){
+        HashMap<String, String> map = new HashMap<>();
+        //把值转换成json字符串
+        String object = JSON.toJSONString(config.getValues());
+        switch (message){
+            case "create"->{
+                PipelineCodeScan pipelineCodeScan = new PipelineCodeScan();
+                String id = pipelineCodeScanService.createCodeScan(pipelineCodeScan);
+                map.put("id",id);
             }
-            case "deploy" -> {
-                PipelineDeploy pipelineDeploy = JSON.parseObject(object, PipelineDeploy.class);
-                pipelineDeploy.setDeployId(typeConfig.getTaskId());
-                pipelineDeployService.updateDeploy(pipelineDeploy);
-                map.put(message,  "部署配置");
-            }
-            case "codeScan" -> {
+            case "update"->{
                 PipelineCodeScan pipelineCodeScan = JSON.parseObject(object, PipelineCodeScan.class);
                 pipelineCodeScan.setCodeScanId(typeConfig.getTaskId());
                 pipelineCodeScanService.updateCodeScan(pipelineCodeScan);
-                map.put(message,  "代码扫描配置");
             }
-            case "product" -> {
+            case "delete"->{
+                pipelineCodeScanService.deleteCodeScan(config.getTaskId());
+            }
+        }
+        return map;
+    }
+
+    //测试
+    private Map<String, String> testConfig(String message,PipelineConfigOrder config,PipelineConfigOrder typeConfig){
+        HashMap<String, String> map = new HashMap<>();
+        //把值转换成json字符串
+        String object = JSON.toJSONString(config.getValues());
+        switch (message){
+            case "create"->{
+                PipelineTest pipelineTest = new PipelineTest();
+                String id = pipelineTestService.createTest(pipelineTest);
+                map.put("id",id);
+            }
+            case "update"->{
+                PipelineTest pipelineTest = JSON.parseObject(object, PipelineTest.class);
+                pipelineTest.setTestId(typeConfig.getTaskId());
+                pipelineTestService.updateTest(pipelineTest);
+            }
+            case "delete"->{
+                pipelineTestService.deleteTest(config.getTaskId());
+            }
+        }
+        return map;
+    }
+
+    //构建
+    private Map<String, String> buildConfig(String message,PipelineConfigOrder config,PipelineConfigOrder typeConfig){
+        HashMap<String, String> map = new HashMap<>();
+        //把值转换成json字符串
+        String object = JSON.toJSONString(config.getValues());
+        switch (message){
+            case "create"->{
+                PipelineBuild pipelineBuild = new PipelineBuild();
+                String id = pipelineBuildService.createBuild(pipelineBuild);
+                map.put("id",id);
+            }
+            case "update"->{
+                PipelineBuild pipelineBuild = JSON.parseObject(object, PipelineBuild.class);
+                pipelineBuild.setBuildId(typeConfig.getTaskId());
+                pipelineBuildService.updateBuild(pipelineBuild);
+            }
+            case "delete"->{
+                pipelineBuildService.deleteBuild(config.getTaskId());
+            }
+        }
+        return map;
+    }
+
+    //部署
+    private Map<String, String> deployConfig(String message,PipelineConfigOrder config,PipelineConfigOrder typeConfig){
+        HashMap<String, String> map = new HashMap<>();
+        //把值转换成json字符串
+        String object = JSON.toJSONString(config.getValues());
+        switch (message){
+            case "create"->{
+                PipelineDeploy pipelineDeploy = new PipelineDeploy();
+                pipelineDeploy.setAuthType(1);
+                String id = pipelineDeployService.createDeploy(pipelineDeploy);
+                map.put("id",id);
+            }
+            case "update"->{
+                PipelineDeploy pipelineDeploy = JSON.parseObject(object, PipelineDeploy.class);
+                pipelineDeploy.setDeployId(typeConfig.getTaskId());
+                pipelineDeployService.updateDeploy(pipelineDeploy);
+            }
+            case "delete"->{
+                pipelineDeployService.deleteDeploy(config.getTaskId());
+            }
+        }
+        return map;
+    }
+
+    //推送制品
+    private Map<String, String> productConfig(String message,PipelineConfigOrder config,PipelineConfigOrder typeConfig){
+        HashMap<String, String> map = new HashMap<>();
+        //把值转换成json字符串
+        String object = JSON.toJSONString(config.getValues());
+        switch (message){
+            case "create"->{
+                PipelineProduct product = new PipelineProduct();
+                String id = pipelineProductServer.createProduct(product);
+                map.put("id",id);
+            }
+            case "update"->{
                 PipelineProduct product = JSON.parseObject(object, PipelineProduct.class);
                 product.setProductId(typeConfig.getTaskId());
                 pipelineProductServer.updateProduct(product);
-                map.put(message,  "推送制品配置");
             }
-            default -> {
-                return map;
-            }
-        }
-        return map;
-    }
-
-    /**
-     * 创建配置
-     * @param config 配置
-     * @param types 类型
-     * @param size 顺序
-     * @return 动态
-     */
-    public Map<String, String> createConfig(PipelineConfigOrder config, String types, int size){
-        Pipeline pipeline = config.getPipeline();
-        String id ;
-        String object = JSON.toJSONString(config.getValues());
-        HashMap<String, String> map = new HashMap<>();
-        switch (types) {
-            case "code" -> {
-                PipelineCode pipelineCode = JSON.parseObject(object, PipelineCode.class);
-                if (pipelineCode == null) pipelineCode = new PipelineCode();
-                id = pipelineCodeService.createCode(pipelineCode);
-                map.put(message, "源码管理配置");
-            }
-            case "test" -> {
-                PipelineTest pipelineTest = JSON.parseObject(object, PipelineTest.class);
-                if (pipelineTest == null) pipelineTest=new PipelineTest();
-                id = pipelineTestService.createTest(pipelineTest);
-                map.put(message, "测试配置");
-            }
-            case "build" -> {
-                PipelineBuild pipelineBuild = JSON.parseObject(object, PipelineBuild.class);
-                if (pipelineBuild == null) pipelineBuild = new PipelineBuild();
-                id = pipelineBuildService.createBuild(pipelineBuild);
-                map.put(message, "构建配置");
-            }
-            case "deploy" -> {
-                PipelineDeploy pipelineDeploy = JSON.parseObject(object, PipelineDeploy.class);
-                if (pipelineDeploy == null) pipelineDeploy = new PipelineDeploy();
-                pipelineDeploy.setAuthType(1);
-                id = pipelineDeployService.createDeploy(pipelineDeploy);
-                map.put(message, "部署配置");
-            }
-            case "codeScan" -> {
-                PipelineCodeScan pipelineCodeScan = JSON.parseObject(object, PipelineCodeScan.class);
-                if (pipelineCodeScan == null) pipelineCodeScan = new PipelineCodeScan();
-                id = pipelineCodeScanService.createCodeScan(pipelineCodeScan);
-                map.put(message, "代码扫描配置");
-            } case "product" -> {
-                PipelineProduct product = JSON.parseObject(object, PipelineProduct.class);
-                if (product == null) product = new PipelineProduct();
-                id = pipelineProductServer.createProduct(product);
-                map.put(message,  "推送制品配置");
-            }
-            default -> {
-                return map;
-            }
-        }
-        if (id == null){
-            throw new ApplicationException(50001,"添加失败");
-        }
-        map.put("id", id);
-        return map;
-    }
-
-    /**
-     * 删除配置
-     * @param typeConfig 配置信息
-     * @param types 类型
-     * @return 动态
-     */
-    public Map<String, String> deleteConfig( PipelineConfigOrder typeConfig ,String types){
-        HashMap<String, String> map = new HashMap<>();
-        String taskId = typeConfig.getTaskId();
-        switch (types) {
-            case "code" -> {
-                pipelineCodeService.deleteCode(taskId);
-                map.put(message,"源码管理配置");
-            }
-            case "test" -> {
-                pipelineTestService.deleteTest(taskId);
-                map.put(message,"测试配置");
-            }
-            case "build" -> {
-                pipelineBuildService.deleteBuild(taskId);
-                map.put(message,"构建配置");
-            }
-            case "deploy" -> {
-                pipelineDeployService.deleteDeploy(taskId);
-                map.put(message,"部署配置");
-            }
-            case "codeScan" -> {
-                pipelineCodeScanService.deleteCodeScan(taskId);
-                map.put(message,"代码扫描配置");
-            } case "product" -> {
-               pipelineProductServer.deleteProduct(taskId);
-                map.put(message,  "推送制品配置");
-            }
-            default -> {
-                return map;
+            case "delete"->{
+                pipelineProductServer.deleteProduct(config.getTaskId());
             }
         }
         return map;
@@ -286,6 +305,24 @@ public class PipelineConfigServiceImpl implements PipelineConfigService {
         }
         return map;
     }
+
+    public Map<String, String> codeValid(Map<String, String> map,String taskId,int type){
+        PipelineCode code = pipelineCodeService.findOneCode(taskId);
+        if (!PipelineUntil.isNoNull(code.getCodeName())){
+            map.put("codeName", String.valueOf(type));
+        }
+        return map;
+    }
+
+    public Map<String, String> codeScanValid(Map<String, String> map,String taskId,int type){
+        PipelineCodeScan code = pipelineCodeScanService.findOneCodeScan(taskId);
+        if (!PipelineUntil.isNoNull(code.getProjectName())){
+            map.put("projectName", String.valueOf(type));
+        }
+        return map;
+    }
+
+
 }
 
 

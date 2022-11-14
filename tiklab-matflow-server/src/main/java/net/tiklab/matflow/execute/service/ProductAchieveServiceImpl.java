@@ -127,11 +127,23 @@ public class ProductAchieveServiceImpl implements ProductAchieveService {
         commonService.execHistory(pipelineProcess,"制品服务器地址："+sshIp);
         commonService.execHistory(pipelineProcess,"制品服务器端口："+sshPort);
         JSch jsch = new JSch();
-
+        if (!PipelineUntil.isNoNull(username)){
+            username = "root";
+        }
         Session session = jsch.getSession(username, sshIp, sshPort);
-        session.setPassword(password);
+        if (authHost.getAuthType() == 2){
+            String tempFile = PipelineUntil.createTempFile(authHost.getPrivateKey());
+            if (!PipelineUntil.isNoNull(tempFile)){
+                throw new ApplicationException("写入私钥失败。");
+            }
+            jsch.addIdentity(tempFile);
+            PipelineUntil.deleteFile(new File(tempFile));
+        }else {
+            session.setPassword(password);
+        }
         session.setConfig("StrictHostKeyChecking", "no");
         session.connect();
+
         return session;
     }
 
