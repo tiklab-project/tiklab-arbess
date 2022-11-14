@@ -275,7 +275,7 @@ public class PipelineUntil {
         Map<String,String> map = new HashMap<>();
         map.put("pipelineId", pipeline.getPipelineId());
         map.put("pipelineName", pipeline.getPipelineName());
-        map.put("name", pipeline.getPipelineName().substring(0,1));
+        map.put("name", pipeline.getPipelineName().substring(0,1).toUpperCase());
         map.put("color", ""+pipeline.getColor());
         return map;
     }
