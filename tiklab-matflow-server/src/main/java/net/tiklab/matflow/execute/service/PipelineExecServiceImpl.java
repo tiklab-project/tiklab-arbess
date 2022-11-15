@@ -55,29 +55,21 @@ public class PipelineExecServiceImpl implements PipelineExecService {
 
     //启动
     @Override
-    public int start(String pipelineId){
+    public boolean start(String pipelineId){
         // 判断同一任务是否在运行
         Pipeline pipeline = pipelineService.findOnePipeline(pipelineId);
         if (pipeline.getPipelineState() == 1){
-            return 100;
+            return false;
         }
-        Map<String, String> map1 = PipelineUntil.initMap(pipeline);
-        map1.put("pipelineId",pipelineId);
-        map1.put("pipelineName",pipeline.getPipelineName());
-        homeService.message("pipelineExec", map1);
-        homeService.log("exec","run","pipelineExec", map1);
+        updatePipelineStatus(pipeline.getPipelineId(), true);
+        Map<String, String> maps = PipelineUntil.initMap(pipeline);
+        homeService.message("pipelineExec", maps);
+        homeService.log("exec","run","pipelineExec", maps);
         executorService.submit(() -> {
             Thread.currentThread().setName(pipelineId);
             begin(pipeline);
         });
-
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            throw new ApplicationException(e);
-        }
-
-        return 1;
+        return true;
     }
 
     //查询构建中的信息
@@ -102,9 +94,8 @@ public class PipelineExecServiceImpl implements PipelineExecService {
     public void killInstance(String pipelineId) {
         PipelineExecHistory pipelineExecHistory = findInstanceState(pipelineId);
         if (pipelineExecHistory == null){
-            Pipeline pipeline = pipelineService.findOnePipeline(pipelineId);
-            pipeline.setPipelineState(2);
-            pipelineService.updatePipeline(pipeline);
+            updatePipelineStatus(pipelineId, false);
+            stop(pipelineId);
             return;
         }
         Pipeline pipeline = pipelineExecHistory.getPipeline();
@@ -113,18 +104,10 @@ public class PipelineExecServiceImpl implements PipelineExecService {
 
         //停止运行
         stop(pipelineId);
+        updatePipelineStatus(pipelineId, false);
 
-        pipeline.setPipelineState(2);
-        pipelineService.updatePipeline(pipeline);
-        commonService.halt(pipelineExecHistory,pipelineId);
-        map.remove(pipelineId);
-        historyMap.remove(pipelineId);
-
-        Map<String, String> map = PipelineUntil.initMap(pipeline);
-        map.put("message","停止执行");
-        map.put("image", "/images/cloudy.svg");
-        homeService.message("pipelineRun", map);
-        homeService.log("run","run","pipelineRun", map);
+        Map<String, String> maps = PipelineUntil.initMap(pipeline);
+        updateStatus("halt",pipelineId,maps,pipelineExecHistory);
     }
 
     //判断流水线是否正在执行
@@ -140,9 +123,6 @@ public class PipelineExecServiceImpl implements PipelineExecService {
     // 构建开始
     private void begin(Pipeline pipeline) {
 
-        //更新流水线状态为执行
-        pipeline.setPipelineState(1);
-        pipelineService.updatePipeline(pipeline);
         String pipelineId = pipeline.getPipelineId();
 
         //初始化历史
@@ -160,14 +140,8 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         List<PipelineConfigOrder> allPipelineConfig = configOrderService.findAllPipelineConfig(pipelineId);
         if (allPipelineConfig == null || allPipelineConfig.size() == 0){
             commonService.updateState(historyId,map.get(pipelineId),10);
-            commonService.success(pipelineExecHistory, pipeline.getPipelineId());
-            historyMap.remove(pipelineId);
-            pipeline.setPipelineState(2);
-            maps.put("message","成功");
-            maps.put("image", "/images/sun.svg");
-            pipelineService.updatePipeline(pipeline);
-            homeService.message("pipelineRun", maps);
-            homeService.log("run","run","pipelineRun", maps);
+            updatePipelineStatus(pipeline.getPipelineId(), false);
+            updateStatus("success",pipelineId,maps,pipelineExecHistory);
             return;
         }
 
@@ -188,37 +162,70 @@ public class PipelineExecServiceImpl implements PipelineExecService {
             int taskType = pipelineConfigOrder.getTaskType();
             Object config = configOrderService.findOneConfig(pipelineId,taskType);
 
+            //执行不同的实现
             boolean state = taskExecService.beginState(pipelineProcess,config,taskType);
 
+            //当前阶段的执行状态
             if (!state){
                 commonService.updateState(historyId,map.get(pipelineId),1);
-                pipeline.setPipelineState(2);
-                commonService.error(pipelineExecHistory, pipeline.getPipelineId());
-                pipelineService.updatePipeline(pipeline);
-                //缓存
-                map.remove(pipelineId);
-                historyMap.remove(pipelineId);
-                //消息
-                maps.put("message","失败");
-                maps.put("image", "/images/rain.svg");
-                homeService.log("run","run","pipelineRun", maps);
-                homeService.message("pipelineRun", maps);
+                updatePipelineStatus(pipeline.getPipelineId(), false);
+                updateStatus("error",pipelineId,maps,pipelineExecHistory);
                 return;
             }
+            //更新状态
             commonService.updateState(historyId,map.get(pipelineId),10);
         }
-        commonService.success(pipelineExecHistory, pipeline.getPipelineId());
-        pipeline.setPipelineState(2);
-        pipelineService.updatePipeline(pipeline);
-        //缓存
+        //执行结束
+        updatePipelineStatus(pipeline.getPipelineId(), false);
+        updateStatus("success",pipelineId,maps,pipelineExecHistory);
+    }
+
+    /**
+     * 更新运行状态
+     * @param status 状态
+     * @param pipelineId 流水线id
+     * @param maps 执行信息
+     * @param pipelineExecHistory 历史
+     */
+    private void updateStatus(String status,String pipelineId, Map<String, String> maps,PipelineExecHistory pipelineExecHistory){
+        commonService.runEnd(pipelineExecHistory, pipelineId,status);
+        //日志，消息，添加不同的执行图片
+        if (status.equals("success")){
+            maps.put("message","成功");
+            maps.put("image", "/images/success.svg");
+        }
+        if (status.equals("error")){
+            maps.put("message","失败");
+            maps.put("image", "/images/error.svg");
+        }
+        if (status.equals("halt")){
+            maps.put("message","停止执行");
+            maps.put("image", "/images/halt.svg");
+        }
+        
+        //清除流水线缓存
         map.remove(pipelineId);
         historyMap.remove(pipelineId);
-        //消息
-        maps.put("message","成功");
-        maps.put("image", "/images/sun.svg");
+
+        //创建日志
         homeService.log("run","run","pipelineRun", maps);
         homeService.message("pipelineRun", maps);
+    }
 
+    /**
+     * 更新流水线状态
+     * @param pipelineId 流水线id
+     * @param b ture:运行,false:停止
+     */
+    public void updatePipelineStatus(String pipelineId,boolean b){
+        // 判断同一任务是否在运行
+        Pipeline pipeline = pipelineService.findOnePipeline(pipelineId);
+        if (!b){
+            pipeline.setPipelineState(2);
+        }else {
+            pipeline.setPipelineState(1);
+        }
+        pipelineService.updatePipeline(pipeline);
     }
 
     /**
@@ -269,6 +276,10 @@ public class PipelineExecServiceImpl implements PipelineExecService {
             lstThreads[i].stop();
         }
     }
+    
+    
+    
+    
 
 
 

@@ -58,7 +58,7 @@ public class PipelineDeployServiceImpl implements PipelineDeployService {
     @Override
     public void updateDeploy(PipelineDeploy pipelineDeploy) {
         String deployId = pipelineDeploy.getDeployId();
-        if (pipelineDeploy.getAuthType() == 0){
+        if (pipelineDeploy.getAuthType() == 2){
             PipelineDeploy oneDeploy = findOneDeploy(deployId);
             pipelineDeploy.setAuthType(oneDeploy.getAuthType());
         }else {

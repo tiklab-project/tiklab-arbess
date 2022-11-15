@@ -7,6 +7,7 @@ import net.tiklab.matflow.definition.dao.PipelineConfigOrderDao;
 import net.tiklab.matflow.definition.entity.PipelineConfigOrderEntity;
 import net.tiklab.matflow.definition.model.*;
 import net.tiklab.matflow.orther.service.PipelineHomeService;
+import net.tiklab.matflow.orther.service.PipelineUntil;
 import net.tiklab.rpc.annotation.Exporter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -151,9 +152,7 @@ public class PipelineConfigOrderServiceImpl implements PipelineConfigOrderServic
         if (typeConfig == null) return;
         joinTemplate.joinQuery(typeConfig);
         Map<String, String> map = pipelineConfigService.config("update",types,config, typeConfig);
-        Pipeline pipeline = typeConfig.getPipeline();
-        map.put("pipelineId", pipeline.getPipelineId());
-        map.put("pipelineName", pipeline.getPipelineName());
+        map.putAll(PipelineUntil.initMap(typeConfig.getPipeline()));
         homeService.log("update", "pipelineConfig","pipelineConfigUpdate", map);
     }
 
@@ -184,8 +183,8 @@ public class PipelineConfigOrderServiceImpl implements PipelineConfigOrderServic
             configOrder.setTaskSort(1);
         }
         Map<String, String> map = pipelineConfigService.config("create",types,config, null);
-        map.put("pipelineId", pipeline.getPipelineId());
-        map.put("pipelineName", pipeline.getPipelineName());
+
+        map.putAll(PipelineUntil.initMap(pipeline));
 
         configOrder.setTaskId(map.get("id"));
         String configure = createConfigure(configOrder);
@@ -209,9 +208,7 @@ public class PipelineConfigOrderServiceImpl implements PipelineConfigOrderServic
 
         Map<String, String> map = pipelineConfigService.config("delete",types,typeConfig,null);
 
-        Pipeline pipeline = typeConfig.getPipeline();
-        map.put("pipelineId", pipeline.getPipelineId());
-        map.put("pipelineName", pipeline.getPipelineName());
+        map.putAll(PipelineUntil.initMap(typeConfig.getPipeline()));
 
         pipelineConfigOrderDao.deleteConfigure(typeConfig.getConfigId());
         homeService.log("delete", "pipelineConfig","pipelineConfigDelete", map);

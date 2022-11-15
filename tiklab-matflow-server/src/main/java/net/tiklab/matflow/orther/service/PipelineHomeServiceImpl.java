@@ -7,9 +7,11 @@ import net.tiklab.message.message.model.Message;
 import net.tiklab.message.message.model.MessageReceiver;
 import net.tiklab.message.message.model.MessageTemplate;
 import net.tiklab.message.message.service.MessageService;
+import net.tiklab.message.message.service.MessageTemplateService;
 import net.tiklab.oplog.log.modal.OpLog;
 import net.tiklab.oplog.log.modal.OpLogTemplate;
 import net.tiklab.oplog.log.service.OpLogService;
+import net.tiklab.oplog.log.service.OpLogTemplateService;
 import net.tiklab.rpc.annotation.Exporter;
 import net.tiklab.user.user.model.User;
 import net.tiklab.user.user.service.UserService;
@@ -31,10 +33,16 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
     OpLogService logService;
 
     @Autowired
+    OpLogTemplateService opLogTemplateService;
+
+    @Autowired
     PipelineFollowService pipelineFollowService;
 
     @Autowired
     MessageService messageService;
+
+    @Autowired
+    MessageTemplateService messageTemplateService;
 
     @Autowired
     UserService userService;
@@ -54,7 +62,7 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
     /**
      * 创建日志
      * @param type 日志类型
-     * @param templateId 模板id
+     * @param templateId 模板code
      * @param map 日志信息
      */
     @Override
@@ -65,11 +73,12 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
         log.setActionType(type);
         log.setModule(module);
         log.setTimestamp(new Timestamp(System.currentTimeMillis()));
-        User user = userService.findOne(LoginContext.getLoginId());
+        User user = new User();
+        String loginId = LoginContext.getLoginId();
+        user.setId(loginId);
         log.setUser(user);
         log.setBgroup(appName);
         log.setOpLogTemplate(opLogTemplate);
-        map.put("user",user.getName());
         log.setContent(JSONObject.toJSONString(map));
         logService.createLog(log);
     }

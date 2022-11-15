@@ -41,6 +41,7 @@ public class ConfigCommonServiceImpl implements ConfigCommonService {
     @Autowired
     PipelineExecLogService logService;
 
+
     private static final Logger logger = LoggerFactory.getLogger(ConfigCommonServiceImpl.class);
 
     Map<String,PipelineExecHistory> historyMap = PipelineExecServiceImpl.historyMap;
@@ -59,25 +60,25 @@ public class ConfigCommonServiceImpl implements ConfigCommonService {
         
         String s;
         BufferedReader  bufferedReader = new BufferedReader(inputStreamReader);
-        String logRunLog = null;
+        StringBuilder logRunLog = new StringBuilder();
 
         //更新日志信息
         while ((s = bufferedReader.readLine()) != null) {
-            logRunLog = logRunLog + s +"\n";
-            if (logRunLog.contains("BUILD FAILURE")) {
+            logRunLog.append(s).append("\n");
+            if (logRunLog.toString().contains("BUILD FAILURE")) {
                 state = 0 ;
             }
             execHistory(pipelineProcess,s);
         }
-        if (logRunLog == null){
+        if (!PipelineUntil.isNoNull(logRunLog.toString())){
             inputStreamReader = PipelineUntil.encode(errInputStream, encode);
             bufferedReader = new BufferedReader(inputStreamReader);
             while ((s = bufferedReader.readLine()) != null) {
-                logRunLog = logRunLog + s +"\n";
-                if (logRunLog.contains("BUILD FAILURE")
-                        || logRunLog.contains("ERROR")
-                        || logRunLog.contains("npm ERR!")
-                        || logRunLog.contains("Access denied")) {
+                logRunLog.append(s).append("\n");
+                if (logRunLog.toString().contains("BUILD FAILURE")
+                        || logRunLog.toString().contains("ERROR")
+                        || logRunLog.toString().contains("npm ERR!")
+                        || logRunLog.toString().contains("Access denied")) {
                     state = 0 ;
                 }
                 execHistory(pipelineProcess,s);
@@ -88,49 +89,33 @@ public class ConfigCommonServiceImpl implements ConfigCommonService {
         return state;
     }
 
-    /**
-     * 输出错误信息
-     * @param pipelineExecHistory 历史
-     * @param pipelineId 流水线id
-     */
-    @Override
-    public void error(PipelineExecHistory pipelineExecHistory, String pipelineId){
-        pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+ "\nRUN RESULT : FAIL");
-        pipelineExecHistory.setRunStatus(1);
-        pipelineExecHistory.setFindState(1);
-        historyService.updateHistory(pipelineExecHistory);
-        historyMap.put(pipelineId,pipelineExecHistory);
-    }
 
     /**
-     * 输出成功信息
+     * 运行结束更新历史状态
      * @param pipelineExecHistory 历史
      * @param pipelineId 流水线id
+     * @param status 状态 success error halt
      */
-    @Override
-    public void success(PipelineExecHistory pipelineExecHistory, String pipelineId) {
-        pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+ "\n" + "RUN RESULT : SUCCESS");
-        pipelineExecHistory.setRunStatus(10);
-        pipelineExecHistory.setFindState(1);
-        historyService.updateHistory(pipelineExecHistory);
-        historyMap.put(pipelineId,pipelineExecHistory);
-    }
-
-    /**
-     * 输出停止信息
-     * @param pipelineExecHistory 历史
-     * @param pipelineId 流水线id
-     */
-    @Override
-    public void halt(PipelineExecHistory pipelineExecHistory, String pipelineId) {
-        //更新信息
-        pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+ "\n" + "RUN RESULT : HALT");
-        pipelineExecHistory.setRunStatus(20);
-        pipelineExecHistory.setFindState(1);
+    public void runEnd(PipelineExecHistory pipelineExecHistory, String pipelineId ,String status){
+        if (status.equals("success")){
+            pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+ "\n RUN RESULT : SUCCESS");
+            pipelineExecHistory.setRunStatus(10);
+        }
+        if (status.equals("error")){
+            pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+ "\n RUN RESULT : FAIL");
+            pipelineExecHistory.setRunStatus(1);
+        }
+        if (status.equals("halt")){
+            //更新信息
+            pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+ "\n RUN RESULT : HALT");
+            pipelineExecHistory.setRunStatus(20);
+        }
         //更新状态
+        pipelineExecHistory.setFindState(1);
         historyService.updateHistory(pipelineExecHistory);
         historyMap.put(pipelineId,pipelineExecHistory);
     }
+
 
     /**
      * 更新状态
@@ -138,7 +123,6 @@ public class ConfigCommonServiceImpl implements ConfigCommonService {
      * @param time 异常
      */
     public void updateState(String historyId,List<Integer> time,int state){
-
         PipelineExecHistory pipelineExecHistory = historyService.findOneHistory(historyId);
         int times = 0;
         if (time != null ){
@@ -164,7 +148,6 @@ public class ConfigCommonServiceImpl implements ConfigCommonService {
         PipelineExecHistory pipelineExecHistory = new PipelineExecHistory();
         String historyId = historyService.createHistory(pipelineExecHistory);
         //初始化基本信息
-        // pipelineExecHistory.setCreateTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
         pipelineExecHistory.setCreateTime(PipelineUntil.date());
         pipelineExecHistory.setRunWay(1);
         pipelineExecHistory.setSort(1);

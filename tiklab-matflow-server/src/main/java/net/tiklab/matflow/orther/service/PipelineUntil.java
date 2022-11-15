@@ -16,7 +16,30 @@ import java.util.regex.Pattern;
 
 public class PipelineUntil {
 
-    public static String appName = "matflow";
+    public static final String appName = "matflow";
+
+    //消息
+    public static final String MES_PIPELINE = "MES_PIPELINE";
+
+    public static final String MES_PIPELINE_DELETE = "MES_PIPELINE_DELETE";
+
+    public static final String MES_PIPELINE_EXEC = "MES_PIPELINE_EXEC";
+
+    public static final String MES_PIPELINE_RUN = "MES_PIPELINE_RUN";
+
+    //日志
+    public static final String LOG_PIPELINE_CREATE = "LOG_PIPELINE_CREATE";
+    public static final String LOG_PIPELINE_UPDATE = "LOG_PIPELINE_UPDATE";
+    public static final String LOG_PIPELINE_DELETE = "LOG_PIPELINE_DELETE";
+
+    public static final String LOG_PIPELINE_CONFIG_UPDATE = "LOG_PIPELINE_CONFIG_UPDATE";
+    public static final String LOG_PIPELINE_CONFIG_CREATE = "LOG_PIPELINE_CONFIG_CREATE";
+    public static final String LOG_PIPELINE_CONFIG_DELETE = "LOG_PIPELINE_CONFIG_DELETE";
+
+    public static final String LOG_PIPELINE_RUN = "LOG_RUN";
+
+    public static final String LOG_AUTH = "LOG_AUTH";
+
 
     //返回系统当前时间
     public static String date(){

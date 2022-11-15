@@ -87,7 +87,7 @@ public class PipelineServiceImpl implements PipelineService {
 
     //删除
     @Override
-    public Integer deletePipeline(String pipelineId) {
+    public void deletePipeline(String pipelineId) {
         if (pipelineId == null){
             throw new ApplicationException(50001, "pipelineId为空。");
         }
@@ -106,12 +106,12 @@ public class PipelineServiceImpl implements PipelineService {
         homeService.log("delete", "pipeline","pipelineDelete", map);
         //消息
         homeService.message("pipelineDelete", map);
-        return 1;
+
     }
 
     //更新
     @Override
-    public int updatePipeline(Pipeline pipeline) {
+    public void updatePipeline(Pipeline pipeline) {
         //更新名称
         Pipeline flow = findOnePipeline(pipeline.getPipelineId());
         if (pipeline.getPipelineName() != null && !pipeline.getPipelineName().equals(flow.getPipelineName())){
@@ -127,7 +127,6 @@ public class PipelineServiceImpl implements PipelineService {
 
         PipelineEntity pipelineEntity = BeanMapper.map(pipeline, PipelineEntity.class);
         pipelineDao.updatePipeline(pipelineEntity);
-        return 1;
     }
 
     private void updatePipeline(Pipeline pipeline,Pipeline flow){

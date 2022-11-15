@@ -60,11 +60,11 @@ public class PipelineController {
     @RequestMapping(path="/deletePipeline",method = RequestMethod.POST)
     @ApiMethod(name = "deletePipeline",desc = "删除流水线")
     @ApiParam(name = "pipelineId",desc = "流水线id",required = true)
-    public Result<Integer> deletePipeline(@NotNull String pipelineId){
+    public Result<Void> deletePipeline(@NotNull String pipelineId){
 
-        Integer integer = pipelineService.deletePipeline(pipelineId);
+        pipelineService.deletePipeline(pipelineId);
 
-        return Result.ok(integer);
+        return Result.ok();
     }
 
     //查询
@@ -82,11 +82,11 @@ public class PipelineController {
     @RequestMapping(path="/updatePipeline",method = RequestMethod.POST)
     @ApiMethod(name = "updatePipeline",desc = "更新流水线")
     @ApiParam(name = "pipeline",desc = "pipeline",required = true)
-    public Result<String> updatePipeline(@RequestBody @NotNull @Valid Pipeline pipeline){
+    public Result<Void> updatePipeline(@RequestBody @NotNull @Valid Pipeline pipeline){
 
-        int i = pipelineService.updatePipeline(pipeline);
+         pipelineService.updatePipeline(pipeline);
 
-        return Result.ok(i);
+        return Result.ok();
     }
 
     //模糊查询

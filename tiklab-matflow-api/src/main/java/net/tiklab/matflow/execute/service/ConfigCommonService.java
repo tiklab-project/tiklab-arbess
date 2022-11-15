@@ -26,26 +26,14 @@ public interface ConfigCommonService {
      */
      int log(InputStream inputStream,InputStream errInputStream, PipelineProcess pipelineProcess,String encode) throws IOException;
 
-    /**
-     * 输出错误信息
-     * @param pipelineExecHistory 历史
-     * @param pipelineId 流水线id
-     */
-      void  error(PipelineExecHistory pipelineExecHistory, String pipelineId);
 
     /**
-     * 输出成功信息
+     * 运行结束更新历史状态
      * @param pipelineExecHistory 历史
      * @param pipelineId 流水线id
+     * @param status 状态 success error halt
      */
-      void  success(PipelineExecHistory pipelineExecHistory, String pipelineId);
-
-    /**
-     * 输出停止信息
-     * @param pipelineExecHistory 历史
-     * @param pipelineId 流水线id
-     */
-      void  halt(PipelineExecHistory pipelineExecHistory, String pipelineId);
+    void runEnd(PipelineExecHistory pipelineExecHistory, String pipelineId ,String status);
 
     /**
      * 初始化历史

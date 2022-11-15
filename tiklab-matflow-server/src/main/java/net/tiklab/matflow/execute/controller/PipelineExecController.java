@@ -26,8 +26,8 @@ public class PipelineExecController {
     @RequestMapping(path="/start",method = RequestMethod.POST)
     @ApiMethod(name = "start",desc = "执行")
     @ApiParam(name = "pipelineId",desc = "流水线id",required = true)
-    public Result<Integer> start(@NotNull String pipelineId ){
-        int start = pipelineExecService.start(pipelineId);
+    public Result<Boolean> start(@NotNull String pipelineId ){
+        boolean start = pipelineExecService.start(pipelineId);
         return Result.ok(start);
     }
 

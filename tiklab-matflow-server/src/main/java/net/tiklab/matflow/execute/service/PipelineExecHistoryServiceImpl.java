@@ -5,6 +5,7 @@ import net.tiklab.beans.BeanMapper;
 import net.tiklab.core.page.Pagination;
 import net.tiklab.core.page.PaginationBuilder;
 import net.tiklab.join.JoinTemplate;
+import net.tiklab.matflow.definition.model.Pipeline;
 import net.tiklab.matflow.execute.dao.PipelineExecHistoryDao;
 import net.tiklab.matflow.execute.entity.PipelineExecHistoryEntity;
 import net.tiklab.matflow.execute.model.PipelineExecHistory;
@@ -48,7 +49,13 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
             return;
         }
         for (PipelineExecHistory history : allHistory) {
-            deleteHistory(history.getHistoryId());
+            Pipeline pipeline = history.getPipeline();
+            if (pipeline == null){
+                deleteHistory(history.getHistoryId());
+            }
+            if (history.getPipeline().getPipelineId().equals(pipelineId)){
+                deleteHistory(history.getHistoryId());
+            }
         }
     }
 

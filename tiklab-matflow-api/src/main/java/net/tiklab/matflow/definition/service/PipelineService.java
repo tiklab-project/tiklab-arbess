@@ -31,13 +31,13 @@ public interface PipelineService {
      * 删除流水线
      * @param pipelineId 流水线id
      */
-    Integer deletePipeline(@NotNull String pipelineId);
+    void deletePipeline(@NotNull String pipelineId);
 
     /**
      * 更新流水线
      * @param pipeline 更新后流水线信息
      */
-    int updatePipeline(@NotNull @Valid Pipeline pipeline);
+    void updatePipeline(@NotNull @Valid Pipeline pipeline);
 
     /**
      * 查询单个流水线

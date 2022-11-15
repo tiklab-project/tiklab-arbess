@@ -14,22 +14,22 @@ import java.util.*;
 public class PipelineConfigServiceImpl implements PipelineConfigService {
 
     @Autowired
-    PipelineCodeService pipelineCodeService;
+    PipelineCodeService codeService;
 
     @Autowired
-    PipelineBuildService pipelineBuildService;
+    PipelineBuildService buildService;
 
     @Autowired
-    PipelineTestService pipelineTestService;
+    PipelineTestService testService;
 
     @Autowired
-    PipelineDeployService pipelineDeployService;
+    PipelineDeployService deployService;
 
     @Autowired
-    PipelineCodeScanService pipelineCodeScanService;
+    PipelineCodeScanService codeScanService;
 
     @Autowired
-    PipelineProductServer pipelineProductServer;
+    PipelineProductServer productServer;
 
     /**
      * 获取所有配置
@@ -61,37 +61,37 @@ public class PipelineConfigServiceImpl implements PipelineConfigService {
         int type = configOrder.getTaskType();
         switch (type/10){
             case 0 -> {
-                PipelineCode code = pipelineCodeService.findOneCode(taskId);
+                PipelineCode code = codeService.findOneCode(taskId);
                 code.setType(type);
                 code.setSort(taskSort);
                 return code;
             }
             case 1 -> {
-                PipelineTest test = pipelineTestService.findOneTest(taskId);
+                PipelineTest test = testService.findOneTest(taskId);
                 test.setType(type);
                 test.setSort(taskSort);
                 return test;
             }
             case 2 -> {
-                PipelineBuild build = pipelineBuildService.findOneBuild(taskId);
+                PipelineBuild build = buildService.findOneBuild(taskId);
                 build.setType(type);
                 build.setSort(taskSort);
                 return build;
             }
             case 3 -> {
-                PipelineDeploy deploy = pipelineDeployService.findOneDeploy(taskId);
+                PipelineDeploy deploy = deployService.findOneDeploy(taskId);
                 deploy.setType(type);
                 deploy.setSort(taskSort);
                 return deploy;
             }
             case 4 -> {
-                PipelineCodeScan codeScan = pipelineCodeScanService.findOneCodeScan(taskId);
+                PipelineCodeScan codeScan = codeScanService.findOneCodeScan(taskId);
                 codeScan.setType(type);
                 codeScan.setSort(taskSort);
                 return codeScan;
             }
             case 5 -> {
-                PipelineProduct product = pipelineProductServer.findOneProduct(taskId);
+                PipelineProduct product = productServer.findOneProduct(taskId);
                 product.setType(type);
                 product.setSort(taskSort);
                 return product;
@@ -151,17 +151,17 @@ public class PipelineConfigServiceImpl implements PipelineConfigService {
         switch (message){
             case "create"->{
                 PipelineCode pipelineCode = new PipelineCode();
-                String id = pipelineCodeService.createCode(pipelineCode);
+                String id = codeService.createCode(pipelineCode);
                 map.put("id",id);
             }
             case "update"->{
                 PipelineCode pipelineCode = JSON.parseObject(object, PipelineCode.class);
                 pipelineCode.setCodeId(typeConfig.getTaskId());
                 pipelineCode.setType(config.getTaskType());
-                pipelineCodeService.updateCode(pipelineCode);
+                codeService.updateCode(pipelineCode);
             }
             case "delete"->{
-                pipelineCodeService.deleteCode(taskId);
+                codeService.deleteCode(taskId);
             }
         }
         return map;
@@ -175,16 +175,16 @@ public class PipelineConfigServiceImpl implements PipelineConfigService {
         switch (message){
             case "create"->{
                 PipelineCodeScan pipelineCodeScan = new PipelineCodeScan();
-                String id = pipelineCodeScanService.createCodeScan(pipelineCodeScan);
+                String id = codeScanService.createCodeScan(pipelineCodeScan);
                 map.put("id",id);
             }
             case "update"->{
                 PipelineCodeScan pipelineCodeScan = JSON.parseObject(object, PipelineCodeScan.class);
                 pipelineCodeScan.setCodeScanId(typeConfig.getTaskId());
-                pipelineCodeScanService.updateCodeScan(pipelineCodeScan);
+                codeScanService.updateCodeScan(pipelineCodeScan);
             }
             case "delete"->{
-                pipelineCodeScanService.deleteCodeScan(config.getTaskId());
+                codeScanService.deleteCodeScan(config.getTaskId());
             }
         }
         return map;
@@ -198,16 +198,16 @@ public class PipelineConfigServiceImpl implements PipelineConfigService {
         switch (message){
             case "create"->{
                 PipelineTest pipelineTest = new PipelineTest();
-                String id = pipelineTestService.createTest(pipelineTest);
+                String id = testService.createTest(pipelineTest);
                 map.put("id",id);
             }
             case "update"->{
                 PipelineTest pipelineTest = JSON.parseObject(object, PipelineTest.class);
                 pipelineTest.setTestId(typeConfig.getTaskId());
-                pipelineTestService.updateTest(pipelineTest);
+                testService.updateTest(pipelineTest);
             }
             case "delete"->{
-                pipelineTestService.deleteTest(config.getTaskId());
+                testService.deleteTest(config.getTaskId());
             }
         }
         return map;
@@ -221,16 +221,16 @@ public class PipelineConfigServiceImpl implements PipelineConfigService {
         switch (message){
             case "create"->{
                 PipelineBuild pipelineBuild = new PipelineBuild();
-                String id = pipelineBuildService.createBuild(pipelineBuild);
+                String id = buildService.createBuild(pipelineBuild);
                 map.put("id",id);
             }
             case "update"->{
                 PipelineBuild pipelineBuild = JSON.parseObject(object, PipelineBuild.class);
                 pipelineBuild.setBuildId(typeConfig.getTaskId());
-                pipelineBuildService.updateBuild(pipelineBuild);
+                buildService.updateBuild(pipelineBuild);
             }
             case "delete"->{
-                pipelineBuildService.deleteBuild(config.getTaskId());
+                buildService.deleteBuild(config.getTaskId());
             }
         }
         return map;
@@ -245,16 +245,16 @@ public class PipelineConfigServiceImpl implements PipelineConfigService {
             case "create"->{
                 PipelineDeploy pipelineDeploy = new PipelineDeploy();
                 pipelineDeploy.setAuthType(1);
-                String id = pipelineDeployService.createDeploy(pipelineDeploy);
+                String id = deployService.createDeploy(pipelineDeploy);
                 map.put("id",id);
             }
             case "update"->{
                 PipelineDeploy pipelineDeploy = JSON.parseObject(object, PipelineDeploy.class);
                 pipelineDeploy.setDeployId(typeConfig.getTaskId());
-                pipelineDeployService.updateDeploy(pipelineDeploy);
+                deployService.updateDeploy(pipelineDeploy);
             }
             case "delete"->{
-                pipelineDeployService.deleteDeploy(config.getTaskId());
+                deployService.deleteDeploy(config.getTaskId());
             }
         }
         return map;
@@ -268,16 +268,16 @@ public class PipelineConfigServiceImpl implements PipelineConfigService {
         switch (message){
             case "create"->{
                 PipelineProduct product = new PipelineProduct();
-                String id = pipelineProductServer.createProduct(product);
+                String id = productServer.createProduct(product);
                 map.put("id",id);
             }
             case "update"->{
                 PipelineProduct product = JSON.parseObject(object, PipelineProduct.class);
                 product.setProductId(typeConfig.getTaskId());
-                pipelineProductServer.updateProduct(product);
+                productServer.updateProduct(product);
             }
             case "delete"->{
-                pipelineProductServer.deleteProduct(config.getTaskId());
+                productServer.deleteProduct(config.getTaskId());
             }
         }
         return map;
@@ -293,11 +293,13 @@ public class PipelineConfigServiceImpl implements PipelineConfigService {
         for (PipelineConfigOrder pipelineConfigOrder : configOrderList) {
             int type = pipelineConfigOrder.getTaskType();
             String taskId = pipelineConfigOrder.getTaskId();
-            if (type < 10){
-                PipelineCode code = pipelineCodeService.findOneCode(taskId);
-                if (!PipelineUntil.isNoNull(code.getCodeName())){
-                    map.put("codeName", String.valueOf(type));
-                }
+            switch (type / 10) {
+                case 0 -> map = codeValid(map, taskId, type);
+                case 1 -> map = testValid(map, taskId, type);
+                case 2 -> map = buildValid(map, taskId, type);
+                case 3 -> map = deployValid(map, taskId, type);
+                case 4 -> map = codeScanValid(map, taskId, type);
+                case 5 -> map = productValid(map, taskId, type);
             }
         }
         if(map.size() == 0){
@@ -307,7 +309,7 @@ public class PipelineConfigServiceImpl implements PipelineConfigService {
     }
 
     public Map<String, String> codeValid(Map<String, String> map,String taskId,int type){
-        PipelineCode code = pipelineCodeService.findOneCode(taskId);
+        PipelineCode code = codeService.findOneCode(taskId);
         if (!PipelineUntil.isNoNull(code.getCodeName())){
             map.put("codeName", String.valueOf(type));
         }
@@ -315,10 +317,63 @@ public class PipelineConfigServiceImpl implements PipelineConfigService {
     }
 
     public Map<String, String> codeScanValid(Map<String, String> map,String taskId,int type){
-        PipelineCodeScan code = pipelineCodeScanService.findOneCodeScan(taskId);
+        PipelineCodeScan code = codeScanService.findOneCodeScan(taskId);
         if (!PipelineUntil.isNoNull(code.getProjectName())){
             map.put("projectName", String.valueOf(type));
         }
+        return map;
+    }
+
+    public Map<String, String> testValid(Map<String, String> map,String taskId,int type){
+        return map;
+    }
+
+    public Map<String, String> buildValid(Map<String, String> map,String taskId,int type){
+        return map;
+    }
+
+    public Map<String, String> deployValid(Map<String, String> map,String taskId,int type){
+        PipelineDeploy deploy = deployService.findOneDeploy(taskId);
+        if (type == 31){
+            if (deploy.getAuthType() == 1){
+                if (!PipelineUntil.isNoNull(deploy.getDeployAddress())){
+                    map.put("deployAddress", String.valueOf(type));
+                }
+                if (!PipelineUntil.isNoNull(deploy.getStartAddress())){
+                    map.put("startAddress", String.valueOf(type));
+                }
+            }
+        }
+        return map;
+    }
+
+    public Map<String, String> productValid(Map<String, String> map,String taskId,int type){
+        PipelineProduct product = productServer.findOneProduct(taskId);
+        if (type == 51){
+            if (!PipelineUntil.isNoNull(product.getArtifactId())){
+                map.put("artifactId", String.valueOf(type));
+            }
+            if (!PipelineUntil.isNoNull(product.getVersion())){
+                map.put("version", String.valueOf(type));
+            }
+            if (!PipelineUntil.isNoNull(product.getGroupId())){
+                map.put("groupId", String.valueOf(type));
+            }
+            if (!PipelineUntil.isNoNull(product.getFileAddress())){
+                map.put("fileAddress", String.valueOf(type));
+            }
+            if (!PipelineUntil.isNoNull(product.getFileType())){
+                map.put("fileType", String.valueOf(type));
+            }
+        }
+        if (type == 52){
+           if (!PipelineUntil.isNoNull(product.getFileAddress())){
+               map.put("fileAddress", String.valueOf(type));
+           }
+           if (!PipelineUntil.isNoNull(product.getPutAddress())){
+               map.put("putAddress", String.valueOf(type));
+           }
+       }
         return map;
     }
 

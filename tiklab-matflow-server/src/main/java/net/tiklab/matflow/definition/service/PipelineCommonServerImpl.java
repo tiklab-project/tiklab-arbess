@@ -50,13 +50,13 @@ public class PipelineCommonServerImpl implements PipelineCommonServer{
      */
     @Override
     public void deleteHistory(Pipeline pipeline){
+
         String pipelineId = pipeline.getPipelineId();
         //删除对应的历史
         historyService.deleteAllHistory(pipelineId);
         //删除对应文件
         String fileAddress = PipelineUntil.findFileAddress();
         PipelineUntil.deleteFile(new File(fileAddress+ pipeline.getPipelineName()));
-
     }
 
     /**
