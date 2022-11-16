@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.*;
+import static net.tiklab.matflow.orther.service.PipelineUntil.*;
 
 /**
  * 配置顺序表操作
@@ -153,7 +154,7 @@ public class PipelineConfigOrderServiceImpl implements PipelineConfigOrderServic
         joinTemplate.joinQuery(typeConfig);
         Map<String, String> map = pipelineConfigService.config("update",types,config, typeConfig);
         map.putAll(PipelineUntil.initMap(typeConfig.getPipeline()));
-        homeService.log("update", "pipelineConfig","pipelineConfigUpdate", map);
+        homeService.log(LOG_PIPELINE_CONFIG, "pipelineConfig", LOG_TEM_PIPELINE_CONFIG_UPDATE, map);
     }
 
 
@@ -188,7 +189,7 @@ public class PipelineConfigOrderServiceImpl implements PipelineConfigOrderServic
 
         configOrder.setTaskId(map.get("id"));
         String configure = createConfigure(configOrder);
-        homeService.log("create", "pipelineConfig","pipelineConfigCreate", map);
+        homeService.log(LOG_PIPELINE_CONFIG, "pipelineConfig",LOG_TEM_PIPELINE_CONFIG_CREATE, map);
         if (configure == null){
             throw new ApplicationException(50001,"创建配置顺序信息失败");
         }
@@ -211,7 +212,7 @@ public class PipelineConfigOrderServiceImpl implements PipelineConfigOrderServic
         map.putAll(PipelineUntil.initMap(typeConfig.getPipeline()));
 
         pipelineConfigOrderDao.deleteConfigure(typeConfig.getConfigId());
-        homeService.log("delete", "pipelineConfig","pipelineConfigDelete", map);
+        homeService.log(LOG_PIPELINE_CONFIG, "pipelineConfig",LOG_TEM_PIPELINE_CONFIG_DELETE, map);
     }
 
     /**

@@ -78,7 +78,7 @@ public class BuildAchieveServiceImpl implements BuildAchieveService {
                 if (mavenAddress == null) {
                     throw new ApplicationException("不存在maven配置");
                 }
-                order =  PipelineUntil.mavenOrder(buildOrder,path + buildAddress);
+                order =  mavenOrder(buildOrder,path + buildAddress);
                 return PipelineUntil.process(mavenAddress, order);
             }
             case 22 -> {
@@ -91,5 +91,22 @@ public class BuildAchieveServiceImpl implements BuildAchieveService {
             default -> {return null;}
         }
     }
+
+    /**
+     * 拼装测试命令
+     * @param buildOrder 执行命令
+     * @param path 项目地址
+     * @return 命令
+     */
+    public static String mavenOrder(String buildOrder,String path){
+        String order;
+        int systemType = PipelineUntil.findSystemType();
+        order = " ./" + buildOrder + " " + "-f" +" " +path ;
+        if (systemType == 1){
+            order = " .\\" + buildOrder + " " + "-f"+" "  +path;
+        }
+        return order;
+    }
+
 
 }

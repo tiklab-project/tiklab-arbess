@@ -7,11 +7,11 @@ import net.tiklab.message.message.model.Message;
 import net.tiklab.message.message.model.MessageReceiver;
 import net.tiklab.message.message.model.MessageTemplate;
 import net.tiklab.message.message.service.MessageService;
-import net.tiklab.message.message.service.MessageTemplateService;
+import net.tiklab.message.setting.model.MessageType;
 import net.tiklab.oplog.log.modal.OpLog;
 import net.tiklab.oplog.log.modal.OpLogTemplate;
+import net.tiklab.oplog.log.modal.OpLogType;
 import net.tiklab.oplog.log.service.OpLogService;
-import net.tiklab.oplog.log.service.OpLogTemplateService;
 import net.tiklab.rpc.annotation.Exporter;
 import net.tiklab.user.user.model.User;
 import net.tiklab.user.user.service.UserService;
@@ -33,16 +33,10 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
     OpLogService logService;
 
     @Autowired
-    OpLogTemplateService opLogTemplateService;
-
-    @Autowired
     PipelineFollowService pipelineFollowService;
 
     @Autowired
     MessageService messageService;
-
-    @Autowired
-    MessageTemplateService messageTemplateService;
 
     @Autowired
     UserService userService;
@@ -61,24 +55,38 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
 
     /**
      * 创建日志
-     * @param type 日志类型
+     * @param logType 日志类型
      * @param templateId 模板code
      * @param map 日志信息
      */
     @Override
-    public void log(String type,String module, String templateId,Map<String, String> map){
+    public void log(String logType,String module, String templateId,Map<String, String> map){
         OpLog log = new OpLog();
+
+        //消息类型
+        OpLogType opLogType = new OpLogType();
+        opLogType.setId(logType);
+        log.setActionType(opLogType);
+
+        log.setModule(module);
+
+        //模板
         OpLogTemplate opLogTemplate = new OpLogTemplate();
         opLogTemplate.setId(templateId);
-        log.setActionType(type);
-        log.setModule(module);
         log.setTimestamp(new Timestamp(System.currentTimeMillis()));
-        User user = new User();
-        String loginId = LoginContext.getLoginId();
-        user.setId(loginId);
-        log.setUser(user);
-        log.setBgroup(appName);
         log.setOpLogTemplate(opLogTemplate);
+
+        //用户信息
+        String userId = LoginContext.getLoginId();
+        User user = userService.findOne(userId);
+        map.put("userName",user.getName());
+        if(user.getNickname()!= null){
+            map.put("userName",user.getNickname());
+        }
+
+        log.setUser(user);
+
+        log.setBgroup(appName);
         log.setContent(JSONObject.toJSONString(map));
         logService.createLog(log);
     }
@@ -88,23 +96,36 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
      * 创建消息
      */
     @Override
-    public void message(String messageTemplateId,Map<String, String> map){
+    public void message(String messageTemplateId,String mesType,Map<String, String> map){
         Message message = new Message();
-        message.setApplication(appName);
+
+        //消息类型
+        MessageType messageType = new MessageType();
+        messageType.setId(mesType);
+
         //模板
         MessageTemplate messageTemplate = new MessageTemplate();
         messageTemplate.setId(messageTemplateId);
+        messageTemplate.setMsgType(messageType);
         message.setMessageTemplate(messageTemplate);
+
+        //用户信息
+        String userId = LoginContext.getLoginId();
+        User user = userService.findOne(userId);
+        map.put("userName",user.getName());
+        if(user.getNickname()!= null){
+            map.put("userName",user.getNickname());
+        }
+
         //接收人
         ArrayList<MessageReceiver> list = new ArrayList<>();
         MessageReceiver messageReceiver = new MessageReceiver();
-        String userId = LoginContext.getLoginId();
-        User user = userService.findOne(userId);
         messageReceiver.setReceiver(userId);
         messageReceiver.setReceiverName(user.getName());
         list.add(messageReceiver);
         message.setMessageReceiverList(list);
-        map.put("userName",user.getName());
+
+        message.setApplication(appName);
         message.setData(JSONObject.toJSONString(map));
         messageService.sendMessage(message);
     }

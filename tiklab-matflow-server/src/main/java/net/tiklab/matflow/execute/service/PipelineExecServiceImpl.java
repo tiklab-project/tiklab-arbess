@@ -23,6 +23,8 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import static net.tiklab.matflow.orther.service.PipelineUntil.*;
+
 @Service
 @Exporter
 public class PipelineExecServiceImpl implements PipelineExecService {
@@ -62,9 +64,11 @@ public class PipelineExecServiceImpl implements PipelineExecService {
             return false;
         }
         updatePipelineStatus(pipeline.getPipelineId(), true);
-        Map<String, String> maps = PipelineUntil.initMap(pipeline);
-        homeService.message("pipelineExec", maps);
-        homeService.log("exec","run","pipelineExec", maps);
+        Map<String, String> maps = initMap(pipeline);
+
+        homeService.log(LOG_PIPELINE_RUN,"run",LOG_TEM_PIPELINE_EXEC, maps);
+        homeService.message(MES_TEM_PIPELINE_EXEC, MES_PIPELINE_RUN, maps);
+
         executorService.submit(() -> {
             Thread.currentThread().setName(pipelineId);
             begin(pipeline);
@@ -208,8 +212,8 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         historyMap.remove(pipelineId);
 
         //创建日志
-        homeService.log("run","run","pipelineRun", maps);
-        homeService.message("pipelineRun", maps);
+        homeService.log(LOG_PIPELINE_RUN,"run",LOG_TEM_PIPELINE_RUN, maps);
+        homeService.message(MES_TEM_PIPELINE_RUN,MES_PIPELINE_RUN, maps);
     }
 
     /**

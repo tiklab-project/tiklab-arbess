@@ -23,6 +23,8 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.*;
 
+import static net.tiklab.matflow.orther.service.PipelineUntil.*;
+
 /**
  * PipelineServiceImpl
  */
@@ -78,9 +80,9 @@ public class PipelineServiceImpl implements PipelineService {
         Map<String, String> map = PipelineUntil.initMap(pipeline);
         map.put("pipelineId",pipelineId);
         // 动态
-        homeService.log("create","pipeline", "pipelineCreate", map);
+        homeService.log(LOG_PIPELINE,"pipeline", LOG_TEM_PIPELINE_CREATE, map);
         // 消息
-        homeService.message("pipelineCreate", map);
+        homeService.message(MES_TEM_PIPELINE_CREATE,MES_PIPELINE, map);
 
         return pipelineId;
     }
@@ -103,9 +105,9 @@ public class PipelineServiceImpl implements PipelineService {
 
         //动态，消息
         Map<String, String> map =  PipelineUntil.initMap(pipeline);
-        homeService.log("delete", "pipeline","pipelineDelete", map);
+        homeService.log(PipelineUntil.LOG_PIPELINE, "pipeline",PipelineUntil.LOG_TEM_PIPELINE_DELETE, map);
         //消息
-        homeService.message("pipelineDelete", map);
+        homeService.message(PipelineUntil.MES_TEM_PIPELINE_DELETE, MES_PIPELINE, map);
 
     }
 
@@ -120,7 +122,7 @@ public class PipelineServiceImpl implements PipelineService {
             map.put("message","名称为"+pipeline.getPipelineName());
             map.put("pipelineId", pipeline.getPipelineId());
             map.put("pipelineName", flow.getPipelineName());
-            homeService.log("update", "pipeline","pipelineUpdate", map);
+            homeService.log(LOG_PIPELINE, "pipeline",LOG_TEM_PIPELINE_UPDATE, map);
         }
         //更新权限信息
         updatePipeline(pipeline,flow);
@@ -144,12 +146,12 @@ public class PipelineServiceImpl implements PipelineService {
         if (pipelinePower == 2 && flow.getPipelinePower() != 2) {
             commonServer.createDmUser(pipelineId);
             map.put("message","权限为私有");
-            homeService.log("update", "pipeline","pipelineUpdate", map);
+            homeService.log(LOG_PIPELINE, "pipeline",LOG_TEM_PIPELINE_UPDATE, map);
         }
         if (pipelinePower == 1 && flow.getPipelinePower() != 1 ) {
             commonServer.deleteDmUser(pipelineId);
             map.put("message","权限为全局");
-            homeService.log("update","pipeline", "pipelineUpdate", map);
+            homeService.log(LOG_PIPELINE,"pipeline", LOG_TEM_PIPELINE_UPDATE, map);
         }
 
         if (pipelinePower == 0){

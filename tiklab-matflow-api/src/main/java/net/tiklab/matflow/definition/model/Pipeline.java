@@ -10,6 +10,8 @@ import net.tiklab.postin.annotation.ApiModel;
 import net.tiklab.postin.annotation.ApiProperty;
 import net.tiklab.user.user.model.User;
 
+import java.util.List;
+
 @ApiModel
 @Join
 @Mapper(targetAlias = "PipelineEntity")
@@ -51,6 +53,9 @@ public class Pipeline {
 
     @ApiProperty(name="color",desc="颜色",required = true)
     private int color;
+
+    //添加用户
+    private List<String> userList;
 
 
     public Pipeline(String pipelineId) {
@@ -130,5 +135,13 @@ public class Pipeline {
 
     public void setColor(int color) {
         this.color = color;
+    }
+
+    public List<String> getUserList() {
+        return userList;
+    }
+
+    public void setUserList(List<String> userList) {
+        this.userList = userList;
     }
 }

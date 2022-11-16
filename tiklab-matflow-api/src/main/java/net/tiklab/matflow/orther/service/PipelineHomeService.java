@@ -15,11 +15,11 @@ public interface PipelineHomeService {
 
     /**
      * 创建日志
-     * @param type 日志类型 (创建 create，删除 delete，执行 exec，更新 update)
+     * @param logType 日志类型 (创建 create，删除 delete，执行 exec，更新 update)
      * @param templateId 模板id (创建 流水线--pipeline，运行 pipelineExec，凭证--pipelineProof,其他--pipelineOther)
      * @param map 日志信息
      */
-    void log(String type,String module, String templateId, Map<String, String> map);
+    void log(String logType,String module, String templateId, Map<String, String> map);
 
 
     /**
@@ -27,7 +27,7 @@ public interface PipelineHomeService {
      * @param messageTemplateId 消息类型
      * @param map 信息
      */
-    void message(String messageTemplateId,Map<String, String> map);
+    void message(String messageTemplateId,String mesType,Map<String, String> map);
 
 
 

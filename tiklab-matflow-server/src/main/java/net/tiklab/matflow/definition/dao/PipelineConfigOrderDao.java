@@ -1,10 +1,8 @@
 package net.tiklab.matflow.definition.dao;
 
 
-
 import net.tiklab.dal.jdbc.JdbcTemplate;
 import net.tiklab.dal.jpa.JpaTemplate;
-import net.tiklab.join.JoinTemplate;
 import net.tiklab.matflow.definition.entity.PipelineConfigOrderEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,8 +22,6 @@ public class PipelineConfigOrderDao {
     @Autowired
     JpaTemplate jpaTemplate;
 
-    @Autowired
-    JoinTemplate joinTemplate;
 
     private static final Logger logger = LoggerFactory.getLogger(PipelineConfigOrderDao.class);
 

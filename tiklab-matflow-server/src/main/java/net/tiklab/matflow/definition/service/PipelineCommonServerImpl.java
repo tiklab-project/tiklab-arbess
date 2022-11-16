@@ -9,6 +9,7 @@ import net.tiklab.matflow.execute.model.PipelineExecState;
 import net.tiklab.matflow.execute.service.PipelineExecHistoryService;
 import net.tiklab.matflow.orther.service.PipelineUntil;
 import net.tiklab.privilege.role.model.DmRole;
+import net.tiklab.privilege.role.model.DmRoleQuery;
 import net.tiklab.privilege.role.service.DmRoleService;
 import net.tiklab.privilege.role.service.RoleUserService;
 import net.tiklab.rpc.annotation.Exporter;
@@ -202,6 +203,16 @@ public class PipelineCommonServerImpl implements PipelineCommonServer{
             }
             dmUserService.deleteDmUser(dm.getId());
         }
+        DmRoleQuery dmRoleQuery = new DmRoleQuery();
+        dmRoleQuery.setDomainId(pipelineId);
+        List<DmRole> dmRoleList = dmRoleService.findDmRoleList(dmRoleQuery);
+        if (dmRoleList == null){
+            return;
+        }
+        for (DmRole dmRole : dmRoleList) {
+            dmRoleService.deleteDmRole(dmRole.getId());
+        }
+
     }
 
     /**

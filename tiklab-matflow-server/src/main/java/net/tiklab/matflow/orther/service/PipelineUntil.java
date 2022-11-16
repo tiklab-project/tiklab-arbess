@@ -18,27 +18,32 @@ public class PipelineUntil {
 
     public static final String appName = "matflow";
 
-    //消息
-    public static final String MES_PIPELINE = "MES_PIPELINE";
+    //消息类型
+    public static final String MES_PIPELINE = "MES_PIPELINE"; //流水线
+    public static final String MES_PIPELINE_RUN = "MES_PIPELINE_RUN"; //运行
 
-    public static final String MES_PIPELINE_DELETE = "MES_PIPELINE_DELETE";
+    //消息模板
+    public static final String MES_TEM_PIPELINE_CREATE = "MES_TEM_PIPELINE_CREATE"; //流水线创建信息模板
+    public static final String MES_TEM_PIPELINE_DELETE = "MES_TEM_PIPELINE_DELETE"; //流水线删除信息模板
+    public static final String MES_TEM_PIPELINE_RUN = "MES_TEM_PIPELINE_RUN"; //流水线运行信息模板
+    public static final String MES_TEM_PIPELINE_EXEC = "MES_TEM_PIPELINE_EXEC"; //流水线执行信息模板
 
-    public static final String MES_PIPELINE_EXEC = "MES_PIPELINE_EXEC";
+    //日志类型
+    public static final String LOG_PIPELINE = "LOG_PIPELINE"; //流水线
+    public static final String LOG_PIPELINE_CONFIG = "LOG_PIPELINE_CONFIG"; //配置
+    public static final String LOG_PIPELINE_RUN = "LOG_PIPELINE_RUN"; //运行
+    public static final String LOG_PIPELINE_USER = "LOG_PIPELINE_USER"; //成员邀请
+    public static final String LOG_PIPELINE_AUTH = "LOG_PIPELINE_AUTH"; //权限变更
 
-    public static final String MES_PIPELINE_RUN = "MES_PIPELINE_RUN";
-
-    //日志
-    public static final String LOG_PIPELINE_CREATE = "LOG_PIPELINE_CREATE";
-    public static final String LOG_PIPELINE_UPDATE = "LOG_PIPELINE_UPDATE";
-    public static final String LOG_PIPELINE_DELETE = "LOG_PIPELINE_DELETE";
-
-    public static final String LOG_PIPELINE_CONFIG_UPDATE = "LOG_PIPELINE_CONFIG_UPDATE";
-    public static final String LOG_PIPELINE_CONFIG_CREATE = "LOG_PIPELINE_CONFIG_CREATE";
-    public static final String LOG_PIPELINE_CONFIG_DELETE = "LOG_PIPELINE_CONFIG_DELETE";
-
-    public static final String LOG_PIPELINE_RUN = "LOG_RUN";
-
-    public static final String LOG_AUTH = "LOG_AUTH";
+    //日志模板
+    public static final String LOG_TEM_PIPELINE_CREATE = "LOG_TEM_PIPELINE_CREATE";
+    public static final String LOG_TEM_PIPELINE_DELETE = "LOG_TEM_PIPELINE_DELETE";
+    public static final String LOG_TEM_PIPELINE_UPDATE = "LOG_TEM_PIPELINE_UPDATE";
+    public static final String LOG_TEM_PIPELINE_EXEC = "LOG_TEM_PIPELINE_EXEC";
+    public static final String LOG_TEM_PIPELINE_RUN = "LOG_TEM_PIPELINE_RUN";
+    public static final String LOG_TEM_PIPELINE_CONFIG_CREATE = "LOG_TEM_PIPELINE_CONFIG_CREATE";
+    public static final String LOG_TEM_PIPELINE_CONFIG_DELETE = "LOG_TEM_PIPELINE_CONFIG_DELETE";
+    public static final String LOG_TEM_PIPELINE_CONFIG_UPDATE = "LOG_TEM_PIPELINE_CONFIG_UPDATE";
 
 
     //返回系统当前时间
@@ -277,23 +282,6 @@ public class PipelineUntil {
     }
 
 
-    /**
-     * 拼装测试命令
-     * @param buildOrder 执行命令
-     * @param path 项目地址
-     * @return 命令
-     */
-    public static String mavenOrder(String buildOrder,String path){
-        String order;
-        int systemType = PipelineUntil.findSystemType();
-        order = " ./" + buildOrder + " " + "-f" +" " +path ;
-        if (systemType == 1){
-            order = " .\\" + buildOrder + " " + "-f"+" "  +path;
-        }
-        return order;
-    }
-
-
     public static Map<String,String> initMap(Pipeline pipeline){
         Map<String,String> map = new HashMap<>();
         map.put("pipelineId", pipeline.getPipelineId());
@@ -304,8 +292,8 @@ public class PipelineUntil {
     }
 
     /**
-     * 创建临时文件
-     * @param key 文件内容
+     * 创建临时文件写入私钥
+     * @param key 私钥内容
      * @return 文件地址
      */
     public static String createTempFile(String key){
