@@ -10,13 +10,13 @@ import net.tiklab.matflow.execute.service.PipelineExecHistoryService;
 import net.tiklab.matflow.orther.service.PipelineUntil;
 import net.tiklab.privilege.role.model.DmRole;
 import net.tiklab.privilege.role.model.DmRoleQuery;
+import net.tiklab.privilege.role.model.PatchUser;
 import net.tiklab.privilege.role.service.DmRoleService;
 import net.tiklab.privilege.role.service.RoleUserService;
 import net.tiklab.rpc.annotation.Exporter;
 import net.tiklab.user.user.model.DmUser;
 import net.tiklab.user.user.model.User;
 import net.tiklab.user.user.service.DmUserService;
-import net.tiklab.utils.context.LoginContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -30,19 +30,19 @@ import java.util.List;
 public class PipelineCommonServerImpl implements PipelineCommonServer{
 
     @Autowired
-    DmUserService dmUserService;
+    private DmUserService dmUserService;
 
     @Autowired
-    DmRoleService dmRoleService;
+    private DmRoleService dmRoleService;
 
     @Autowired
-    RoleUserService roleUserService;
+    private RoleUserService roleUserService;
 
     @Autowired
-    JoinTemplate joinTemplate;
+    private JoinTemplate joinTemplate;
 
     @Autowired
-    PipelineExecHistoryService historyService;
+    private PipelineExecHistoryService historyService;
 
 
     /**
@@ -175,16 +175,18 @@ public class PipelineCommonServerImpl implements PipelineCommonServer{
      * 创建流水线关联用户
      * @param pipelineId 流水线id
      */
-    public void createDmUser(String pipelineId){
+    public void createDmUser(String pipelineId,List<PatchUser> userList){
         //拉入创建人
         DmUser dmUser = new DmUser();
         dmUser.setDomainId(pipelineId);
-        User user = new User();
-        user.setId(LoginContext.getLoginId());
-        dmUser.setUser(user);
-        dmUserService.createDmUser(dmUser);
+        for (PatchUser patchUser : userList) {
+            User user = new User();
+            user.setId(patchUser.getId());
+            dmUser.setUser(user);
+            dmUserService.createDmUser(dmUser);
+        }
         //关联权限
-        dmRoleService.initDmRoles(pipelineId,LoginContext.getLoginId(),PipelineUntil.appName);
+        dmRoleService.initPatchDmRole(pipelineId,userList,PipelineUntil.appName);
     }
 
     /**

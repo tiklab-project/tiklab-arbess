@@ -45,6 +45,11 @@ public class PipelineUntil {
     public static final String LOG_TEM_PIPELINE_CONFIG_DELETE = "LOG_TEM_PIPELINE_CONFIG_DELETE";
     public static final String LOG_TEM_PIPELINE_CONFIG_UPDATE = "LOG_TEM_PIPELINE_CONFIG_UPDATE";
 
+    //日志module
+    public static final String LOG_MD_PIPELINE_CREATE = "LOG_MD_PIPELINE_CREATE";
+    public static final String LOG_MD_PIPELINE_DELETE = "LOG_MD_PIPELINE_DELETE";
+    public static final String LOG_MD_PIPELINE_UPDATE = "LOG_MD_PIPELINE_UPDATE";
+
 
     //返回系统当前时间
     public static String date(){

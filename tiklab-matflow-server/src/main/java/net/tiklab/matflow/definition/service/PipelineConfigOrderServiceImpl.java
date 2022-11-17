@@ -154,7 +154,7 @@ public class PipelineConfigOrderServiceImpl implements PipelineConfigOrderServic
         joinTemplate.joinQuery(typeConfig);
         Map<String, String> map = pipelineConfigService.config("update",types,config, typeConfig);
         map.putAll(PipelineUntil.initMap(typeConfig.getPipeline()));
-        homeService.log(LOG_PIPELINE_CONFIG, "pipelineConfig", LOG_TEM_PIPELINE_CONFIG_UPDATE, map);
+        homeService.log(LOG_PIPELINE_CONFIG, LOG_MD_PIPELINE_UPDATE, LOG_TEM_PIPELINE_CONFIG_UPDATE, map);
     }
 
 
@@ -189,7 +189,7 @@ public class PipelineConfigOrderServiceImpl implements PipelineConfigOrderServic
 
         configOrder.setTaskId(map.get("id"));
         String configure = createConfigure(configOrder);
-        homeService.log(LOG_PIPELINE_CONFIG, "pipelineConfig",LOG_TEM_PIPELINE_CONFIG_CREATE, map);
+        homeService.log(LOG_PIPELINE_CONFIG, LOG_MD_PIPELINE_CREATE,LOG_TEM_PIPELINE_CONFIG_CREATE, map);
         if (configure == null){
             throw new ApplicationException(50001,"创建配置顺序信息失败");
         }
@@ -212,7 +212,7 @@ public class PipelineConfigOrderServiceImpl implements PipelineConfigOrderServic
         map.putAll(PipelineUntil.initMap(typeConfig.getPipeline()));
 
         pipelineConfigOrderDao.deleteConfigure(typeConfig.getConfigId());
-        homeService.log(LOG_PIPELINE_CONFIG, "pipelineConfig",LOG_TEM_PIPELINE_CONFIG_DELETE, map);
+        homeService.log(LOG_PIPELINE_CONFIG, LOG_MD_PIPELINE_DELETE,LOG_TEM_PIPELINE_CONFIG_DELETE, map);
     }
 
     /**

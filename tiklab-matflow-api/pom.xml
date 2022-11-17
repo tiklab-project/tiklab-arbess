@@ -53,6 +53,11 @@
             <artifactId>tiklab-message-api</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>net.tiklab</groupId>
+            <artifactId>tiklab-privilege-api</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+        </dependency>
 
     </dependencies>
 

@@ -8,6 +8,7 @@ import net.tiklab.join.annotation.Join;
 import net.tiklab.join.annotation.JoinQuery;
 import net.tiklab.postin.annotation.ApiModel;
 import net.tiklab.postin.annotation.ApiProperty;
+import net.tiklab.privilege.role.model.PatchUser;
 import net.tiklab.user.user.model.User;
 
 import java.util.List;
@@ -55,7 +56,8 @@ public class Pipeline {
     private int color;
 
     //添加用户
-    private List<String> userList;
+    @ApiProperty(name="userList",desc="权限",required = true)
+    private List<PatchUser> userList;
 
 
     public Pipeline(String pipelineId) {
@@ -137,11 +139,11 @@ public class Pipeline {
         this.color = color;
     }
 
-    public List<String> getUserList() {
+    public List<PatchUser> getUserList() {
         return userList;
     }
 
-    public void setUserList(List<String> userList) {
+    public void setUserList(List<PatchUser> userList) {
         this.userList = userList;
     }
 }

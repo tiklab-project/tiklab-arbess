@@ -33,23 +33,24 @@ import static net.tiklab.matflow.orther.service.PipelineUntil.*;
 @Exporter
 public class PipelineServiceImpl implements PipelineService {
 
-    @Autowired
-    PipelineDao pipelineDao;
 
     @Autowired
-    PipelineConfigOrderService configOrderService;
+    private PipelineDao pipelineDao;
 
     @Autowired
-    JoinTemplate joinTemplate;
+    private PipelineConfigOrderService configOrderService;
 
     @Autowired
-    PipelineCommonServer commonServer;
+    private JoinTemplate joinTemplate;
 
     @Autowired
-    PipelineHomeService homeService;
+    private PipelineCommonServer commonServer;
 
     @Autowired
-    PipelineOpenService openService;
+    private PipelineHomeService homeService;
+
+    @Autowired
+    private PipelineOpenService openService;
 
 
     private static final Logger logger = LoggerFactory.getLogger(PipelineServiceImpl.class);
@@ -65,7 +66,7 @@ public class PipelineServiceImpl implements PipelineService {
             throw new ApplicationException(e);
         }
         pipeline.setColor((random.nextInt(5) + 1));
-
+        pipeline.setPipelineCreateTime(date());
         PipelineEntity pipelineEntity = BeanMapper.map(pipeline, PipelineEntity.class);
         pipelineEntity.setPipelineState(2);
         String pipelineId = pipelineDao.createPipeline(pipelineEntity);
@@ -75,39 +76,39 @@ public class PipelineServiceImpl implements PipelineService {
         }
 
         //流水线关联角色，用户信息
-        commonServer.createDmUser(pipelineId);
+        commonServer.createDmUser(pipelineId,pipeline.getUserList());
 
         Map<String, String> map = PipelineUntil.initMap(pipeline);
         map.put("pipelineId",pipelineId);
         // 动态
-        homeService.log(LOG_PIPELINE,"pipeline", LOG_TEM_PIPELINE_CREATE, map);
+        homeService.log(LOG_PIPELINE, LOG_MD_PIPELINE_CREATE, LOG_TEM_PIPELINE_CREATE, map);
         // 消息
-        homeService.message(MES_TEM_PIPELINE_CREATE,MES_PIPELINE, map);
+        homeService.message(MES_TEM_PIPELINE_CREATE, MES_PIPELINE, map);
 
         return pipelineId;
     }
 
-    //删除
+    /**
+     * 删除流水线以及关联关系
+     * @param pipelineId 流水线id
+     */
     @Override
     public void deletePipeline(String pipelineId) {
-        if (pipelineId == null){
-            throw new ApplicationException(50001, "pipelineId为空。");
-        }
         Pipeline pipeline = findOnePipeline(pipelineId);
         joinTemplate.joinQuery(pipeline);
 
         //删除关联信息
-        pipelineDao.deletePipeline(pipelineId);//流水线
-        commonServer.deleteDmUser(pipelineId);//关联用户
-        commonServer.deleteHistory(pipeline);//历史，日志信息
-        commonServer.deleteDmRole(pipelineId);//关联角色
-        configOrderService.deleteConfig(pipelineId);//配置信息
+        pipelineDao.deletePipeline(pipelineId); //流水线
+        commonServer.deleteDmUser(pipelineId); //关联用户
+        commonServer.deleteHistory(pipeline); //历史，日志信息
+        commonServer.deleteDmRole(pipelineId); //关联角色
+        configOrderService.deleteConfig(pipelineId); //配置信息
 
         //动态，消息
-        Map<String, String> map =  PipelineUntil.initMap(pipeline);
-        homeService.log(PipelineUntil.LOG_PIPELINE, "pipeline",PipelineUntil.LOG_TEM_PIPELINE_DELETE, map);
+        Map<String, String> map = initMap(pipeline);
+        homeService.log(LOG_PIPELINE, LOG_MD_PIPELINE_DELETE,PipelineUntil.LOG_TEM_PIPELINE_DELETE, map);
         //消息
-        homeService.message(PipelineUntil.MES_TEM_PIPELINE_DELETE, MES_PIPELINE, map);
+        homeService.message(MES_TEM_PIPELINE_DELETE, MES_PIPELINE, map);
 
     }
 
@@ -122,7 +123,7 @@ public class PipelineServiceImpl implements PipelineService {
             map.put("message","名称为"+pipeline.getPipelineName());
             map.put("pipelineId", pipeline.getPipelineId());
             map.put("pipelineName", flow.getPipelineName());
-            homeService.log(LOG_PIPELINE, "pipeline",LOG_TEM_PIPELINE_UPDATE, map);
+            homeService.log(LOG_PIPELINE, LOG_MD_PIPELINE_UPDATE,LOG_TEM_PIPELINE_UPDATE, map);
         }
         //更新权限信息
         updatePipeline(pipeline,flow);
@@ -144,14 +145,14 @@ public class PipelineServiceImpl implements PipelineService {
 
 
         if (pipelinePower == 2 && flow.getPipelinePower() != 2) {
-            commonServer.createDmUser(pipelineId);
+            commonServer.createDmUser(pipelineId,pipeline.getUserList());
             map.put("message","权限为私有");
-            homeService.log(LOG_PIPELINE, "pipeline",LOG_TEM_PIPELINE_UPDATE, map);
+            homeService.log(LOG_PIPELINE, LOG_MD_PIPELINE_UPDATE,LOG_TEM_PIPELINE_UPDATE, map);
         }
         if (pipelinePower == 1 && flow.getPipelinePower() != 1 ) {
             commonServer.deleteDmUser(pipelineId);
             map.put("message","权限为全局");
-            homeService.log(LOG_PIPELINE,"pipeline", LOG_TEM_PIPELINE_UPDATE, map);
+            homeService.log(LOG_PIPELINE,LOG_MD_PIPELINE_UPDATE, LOG_TEM_PIPELINE_UPDATE, map);
         }
 
         if (pipelinePower == 0){
@@ -268,13 +269,16 @@ public class PipelineServiceImpl implements PipelineService {
             return Collections.emptyList();
         }
         List<PipelineEntity> allPipeline = pipelineDao.findAllPipeline(s);
-        if (list == null || allPipeline ==null){
+        if (list == null || allPipeline == null){
             return Collections.emptyList();
         }
         List<Pipeline> userPipeline = BeanMapper.mapList(allPipeline, Pipeline.class);
         ArrayList<Pipeline> pipelines = new ArrayList<>();
         for (Pipeline pipeline : userPipeline) {
-            List<Pipeline> collect = list.stream().filter(pipeline1 -> pipeline.getPipelineId().equals(pipeline1.getPipelineId())).toList();
+            List<Pipeline> collect = list.stream().
+                    filter(pipeline1 -> pipeline.getPipelineId()
+                            .equals(pipeline1.getPipelineId()))
+                    .toList();
             pipelines.addAll(collect);
         }
         if (pipelines.isEmpty()){
@@ -289,13 +293,13 @@ public class PipelineServiceImpl implements PipelineService {
      */
     @Override
     public List<PipelineOpen> findAllOpen() {
-        StringBuilder s = findUserPipelineId(LoginContext.getLoginId());
-        List<PipelineOpen> allOpen = openService.findAllOpen(s);
+        StringBuilder s = findUserPipelineId(LoginContext.getLoginId()) ;
+        List<PipelineOpen> allOpen = openService.findAllOpen(s) ;
         if (allOpen == null){
-            return Collections.emptyList();
+            return Collections.emptyList() ;
         }
-        allOpen.sort(Comparator.comparing(PipelineOpen::getNumber).reversed());
-        int min = Math.min(5, allOpen.size());
+        allOpen.sort(Comparator.comparing(PipelineOpen::getNumber).reversed()) ;
+        int min = Math.min(5, allOpen.size()) ;
         return allOpen.subList(0,min);
     }
 

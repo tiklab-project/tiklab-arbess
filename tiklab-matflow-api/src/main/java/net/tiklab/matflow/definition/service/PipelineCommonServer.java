@@ -3,6 +3,7 @@ package net.tiklab.matflow.definition.service;
 import net.tiklab.matflow.definition.model.Pipeline;
 import net.tiklab.matflow.definition.model.PipelineMassage;
 import net.tiklab.matflow.execute.model.PipelineExecState;
+import net.tiklab.privilege.role.model.PatchUser;
 import net.tiklab.user.user.model.DmUser;
 
 import java.util.List;
@@ -49,7 +50,7 @@ public interface PipelineCommonServer {
      * 创建流水线关联角色信息
      * @param pipelineId 流水线id
      */
-    void createDmUser(String pipelineId);
+    void createDmUser(String pipelineId,List<PatchUser> userList);
 
 
     /**
