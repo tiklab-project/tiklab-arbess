@@ -24,7 +24,8 @@ public interface PipelineHomeService {
 
     /**
      * 创建消息
-     * @param messageTemplateId 消息类型
+     * @param messageTemplateId 消息模板
+     * @param mesType 消息类型
      * @param map 信息
      */
     void message(String messageTemplateId,String mesType,Map<String, String> map);

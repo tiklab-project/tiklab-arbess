@@ -93,7 +93,10 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
 
 
     /**
-     * 创建消息
+     * 发送消息
+     * @param messageTemplateId 消息模板
+     * @param mesType 消息类型
+     * @param map 信息
      */
     @Override
     public void message(String messageTemplateId,String mesType,Map<String, String> map){

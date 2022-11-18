@@ -24,12 +24,11 @@ public interface PipelineConfigService {
     /**
      * 配置信息
      * @param message 执行类型 create:创建,update:更新,delete:删除
-     * @param types 类型
      * @param config 更新配置
      * @param typeConfig 原配置
      * @return 更新信息
      */
-    Map<String,String> config(String message,String types,PipelineConfigOrder config,PipelineConfigOrder typeConfig);
+    Map<String,String> config(String message,PipelineConfigOrder config,PipelineConfigOrder typeConfig);
 
 
     /**

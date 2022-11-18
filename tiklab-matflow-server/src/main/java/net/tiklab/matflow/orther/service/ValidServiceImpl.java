@@ -8,7 +8,7 @@ import java.io.File;
 public class ValidServiceImpl {
 
 
-    public static void main(String[] args) {
+    public  void main(String[] args) {
         PipelineAuthHost authHost = new PipelineAuthHost();
         authHost.setIp("172.11.1.18");
         authHost.setPort(22);

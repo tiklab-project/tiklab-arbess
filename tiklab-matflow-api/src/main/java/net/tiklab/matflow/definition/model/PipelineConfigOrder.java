@@ -29,6 +29,8 @@ public class PipelineConfigOrder {
     @ApiProperty(name="taskType",desc="类型")
     private int taskType;
 
+    private int type;
+
     @ApiProperty(name="taskSort",desc="顺序")
     private int taskSort;
 
@@ -147,5 +149,13 @@ public class PipelineConfigOrder {
 
     public void setConfig(Object config) {
         this.config = config;
+    }
+
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
     }
 }

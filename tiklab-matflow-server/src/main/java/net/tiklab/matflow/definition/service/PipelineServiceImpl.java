@@ -70,13 +70,6 @@ public class PipelineServiceImpl implements PipelineService {
         PipelineEntity pipelineEntity = BeanMapper.map(pipeline, PipelineEntity.class);
         pipelineEntity.setPipelineState(2);
         String pipelineId = pipelineDao.createPipeline(pipelineEntity);
-        //判断是否使用流水线模板配置
-        if (pipeline.getPipelineType() != 1){
-            configOrderService.createTemplate(pipelineId, pipeline.getPipelineType());
-        }
-
-        //流水线关联角色，用户信息
-        commonServer.createDmUser(pipelineId,pipeline.getUserList());
 
         Map<String, String> map = PipelineUntil.initMap(pipeline);
         map.put("pipelineId",pipelineId);
@@ -84,6 +77,15 @@ public class PipelineServiceImpl implements PipelineService {
         homeService.log(LOG_PIPELINE, LOG_MD_PIPELINE_CREATE, LOG_TEM_PIPELINE_CREATE, map);
         // 消息
         homeService.message(MES_TEM_PIPELINE_CREATE, MES_PIPELINE, map);
+
+        //创建模板
+        configOrderService.createTemplate(pipelineId, pipeline.getPipelineType());
+
+        //流水线关联角色，用户信息
+        commonServer.createDmUser(pipelineId,pipeline.getUserList());
+
+
+
 
         return pipelineId;
     }
