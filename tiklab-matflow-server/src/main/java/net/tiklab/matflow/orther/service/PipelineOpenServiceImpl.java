@@ -42,14 +42,14 @@ public class PipelineOpenServiceImpl implements PipelineOpenService {
     }
 
     @Override
-    public void findOpen(String userId, Pipeline pipeline) {
-        PipelineOpen open = findOneOpenNumber(userId, pipeline.getPipelineId());
+    public void updatePipelineOpen(String userId, String pipelineId) {
+        PipelineOpen open = findPipelineOpenNumber(userId, pipelineId);
         if (open != null){
             open.setNumber(open.getNumber()+1);
             updateOpen(open);
         }else {
             PipelineOpen pipelineOpen = new PipelineOpen();
-            pipelineOpen.setPipeline(pipeline);
+            pipelineOpen.setPipeline(new Pipeline(pipelineId));
             pipelineOpen.setUserId(userId);
             pipelineOpen.setNumber(1);
             createOpen(pipelineOpen);
@@ -77,12 +77,14 @@ public class PipelineOpenServiceImpl implements PipelineOpenService {
     }
 
     //获取流水线打开次数
-    private PipelineOpen findOneOpenNumber(String userId , String pipelineId){
+    private PipelineOpen findPipelineOpenNumber(String userId , String pipelineId){
         if ( findAllOpen()==null){
             return null;
         }
         for (PipelineOpen pipelineOpen : findAllOpen()) {
-            if (pipelineOpen.getPipeline().getPipelineId().equals(pipelineId) && pipelineOpen.getUserId().equals(userId)){
+            Pipeline pipeline = pipelineOpen.getPipeline();
+            String user = pipelineOpen.getUserId();
+            if (pipeline.getPipelineId().equals(pipelineId) && user.equals(userId)){
                 return pipelineOpen;
             }
         }

@@ -10,7 +10,7 @@ import net.tiklab.matflow.orther.model.PipelineOpen;
 import net.tiklab.postin.annotation.Api;
 import net.tiklab.postin.annotation.ApiMethod;
 import net.tiklab.postin.annotation.ApiParam;
-import net.tiklab.user.user.model.DmUser;
+import net.tiklab.user.user.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.List;
@@ -126,9 +127,9 @@ public class PipelineController {
     @RequestMapping(path="/findPipelineUser",method = RequestMethod.POST)
     @ApiMethod(name = "findPipelineUser",desc = "查询此拥有流水线的用户")
     @ApiParam(name = "pipelineId",desc = "流水线id",required = true)
-    public Result<List<DmUser>> findPipelineUser(@NotNull String pipelineId){
+    public Result<List<User>> findPipelineUser(@NotNull String pipelineId){
 
-        List<DmUser> dmUser = pipelineCommonServer.findPipelineUser(pipelineId);
+        List<User>  dmUser = pipelineCommonServer.findPipelineUser(pipelineId);
 
         return Result.ok(dmUser);
     }
@@ -138,7 +139,7 @@ public class PipelineController {
     @ApiParam(name = "pipelineId",desc = "流水线id",required = true)
     public Result<PipelineExecState> pipelineCensus(@NotNull String pipelineId){
 
-        PipelineExecState buildStatus = pipelineService.pipelineCensus(pipelineId);
+        PipelineExecState buildStatus = pipelineCommonServer.pipelineCensus(pipelineId);
 
         return Result.ok(buildStatus);
     }

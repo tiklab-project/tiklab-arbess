@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.*;
 import static net.tiklab.matflow.orther.service.PipelineUntil.*;
+import static net.tiklab.matflow.orther.service.PipelineFinal.*;
 
 /**
  * 配置顺序表操作。

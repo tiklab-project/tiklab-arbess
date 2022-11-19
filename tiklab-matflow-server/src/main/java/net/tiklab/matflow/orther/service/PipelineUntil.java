@@ -16,41 +16,6 @@ import java.util.regex.Pattern;
 
 public class PipelineUntil {
 
-    public static final String appName = "matflow";
-
-    //消息类型
-    public static final String MES_PIPELINE = "MES_PIPELINE"; //流水线
-    public static final String MES_PIPELINE_RUN = "MES_PIPELINE_RUN"; //运行
-
-    //消息模板
-    public static final String MES_TEM_PIPELINE_CREATE = "MES_TEM_PIPELINE_CREATE"; //流水线创建信息模板
-    public static final String MES_TEM_PIPELINE_DELETE = "MES_TEM_PIPELINE_DELETE"; //流水线删除信息模板
-    public static final String MES_TEM_PIPELINE_RUN = "MES_TEM_PIPELINE_RUN"; //流水线运行信息模板
-    public static final String MES_TEM_PIPELINE_EXEC = "MES_TEM_PIPELINE_EXEC"; //流水线执行信息模板
-
-    //日志类型
-    public static final String LOG_PIPELINE = "LOG_PIPELINE"; //流水线
-    public static final String LOG_PIPELINE_CONFIG = "LOG_PIPELINE_CONFIG"; //配置
-    public static final String LOG_PIPELINE_RUN = "LOG_PIPELINE_RUN"; //运行
-    public static final String LOG_PIPELINE_USER = "LOG_PIPELINE_USER"; //成员邀请
-    public static final String LOG_PIPELINE_AUTH = "LOG_PIPELINE_AUTH"; //权限变更
-
-    //日志模板
-    public static final String LOG_TEM_PIPELINE_CREATE = "LOG_TEM_PIPELINE_CREATE";
-    public static final String LOG_TEM_PIPELINE_DELETE = "LOG_TEM_PIPELINE_DELETE";
-    public static final String LOG_TEM_PIPELINE_UPDATE = "LOG_TEM_PIPELINE_UPDATE";
-    public static final String LOG_TEM_PIPELINE_EXEC = "LOG_TEM_PIPELINE_EXEC";
-    public static final String LOG_TEM_PIPELINE_RUN = "LOG_TEM_PIPELINE_RUN";
-    public static final String LOG_TEM_PIPELINE_CONFIG_CREATE = "LOG_TEM_PIPELINE_CONFIG_CREATE";
-    public static final String LOG_TEM_PIPELINE_CONFIG_DELETE = "LOG_TEM_PIPELINE_CONFIG_DELETE";
-    public static final String LOG_TEM_PIPELINE_CONFIG_UPDATE = "LOG_TEM_PIPELINE_CONFIG_UPDATE";
-
-    //日志module
-    public static final String LOG_MD_PIPELINE_CREATE = "LOG_MD_PIPELINE_CREATE";
-    public static final String LOG_MD_PIPELINE_DELETE = "LOG_MD_PIPELINE_DELETE";
-    public static final String LOG_MD_PIPELINE_UPDATE = "LOG_MD_PIPELINE_UPDATE";
-
-
     //返回系统当前时间
     public static String date(){
         return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
@@ -213,6 +178,9 @@ public class PipelineUntil {
         if (s.equals(" ")){
             return false;
         }
+        if (s.equals("")){
+            return false;
+        }
         return !s.isEmpty();
     }
 
@@ -262,7 +230,7 @@ public class PipelineUntil {
             }
             String name = listFile.getName();
             switch (type) {
-                case 1 -> {
+                case 1,2,3,4 -> {
                     if (name.equals("git") || name.equals("git.exe")) {
                         return ;
                     }

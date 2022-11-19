@@ -7,22 +7,26 @@ import net.tiklab.matflow.definition.model.PipelineMassage;
 import net.tiklab.matflow.execute.model.PipelineExecHistory;
 import net.tiklab.matflow.execute.model.PipelineExecState;
 import net.tiklab.matflow.execute.service.PipelineExecHistoryService;
+import net.tiklab.matflow.orther.model.PipelineOpen;
+import net.tiklab.matflow.orther.service.PipelineFinal;
+import net.tiklab.matflow.orther.service.PipelineOpenService;
 import net.tiklab.matflow.orther.service.PipelineUntil;
 import net.tiklab.privilege.role.model.DmRole;
 import net.tiklab.privilege.role.model.DmRoleQuery;
 import net.tiklab.privilege.role.model.PatchUser;
 import net.tiklab.privilege.role.service.DmRoleService;
-import net.tiklab.privilege.role.service.RoleUserService;
 import net.tiklab.rpc.annotation.Exporter;
 import net.tiklab.user.user.model.DmUser;
 import net.tiklab.user.user.model.User;
 import net.tiklab.user.user.service.DmUserService;
+import net.tiklab.utils.context.LoginContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -36,13 +40,13 @@ public class PipelineCommonServerImpl implements PipelineCommonServer{
     private DmRoleService dmRoleService;
 
     @Autowired
-    private RoleUserService roleUserService;
-
-    @Autowired
     private JoinTemplate joinTemplate;
 
     @Autowired
     private PipelineExecHistoryService historyService;
+
+    @Autowired
+    private PipelineOpenService openService;
 
 
     /**
@@ -156,20 +160,20 @@ public class PipelineCommonServerImpl implements PipelineCommonServer{
      * @return 用户信息
      */
     @Override
-    public List<DmUser> findPipelineUser(String pipelineId) {
+    public List<User> findPipelineUser(String pipelineId) {
         List<DmUser> allDmUser = dmUserService.findAllDmUser();
+        List<User> userList = new ArrayList<>();
         if (allDmUser == null){
-            return Collections.emptyList();
+            return null;
         }
         List<DmUser> dmUsers = new ArrayList<>();
         for (DmUser dmUser : allDmUser) {
             if (dmUser.getDomainId().equals(pipelineId)){
-                dmUsers.add(dmUser);
+                userList.add(dmUser.getUser());
             }
         }
-        return dmUsers;
+        return userList;
     }
-
 
     /**
      * 创建流水线关联用户
@@ -186,7 +190,7 @@ public class PipelineCommonServerImpl implements PipelineCommonServer{
             dmUserService.createDmUser(dmUser);
         }
         //关联权限
-        dmRoleService.initPatchDmRole(pipelineId,userList,PipelineUntil.appName);
+        dmRoleService.initPatchDmRole(pipelineId,userList, PipelineFinal.appName);
     }
 
     /**
@@ -267,8 +271,26 @@ public class PipelineCommonServerImpl implements PipelineCommonServer{
             return state;
         }
         state.setTime(PipelineUntil.formatDateTime(state.getExecTime()));
-
+        //添加最近打开
+        String loginId = LoginContext.getLoginId();
+        openService.updatePipelineOpen(loginId,pipelineId);
         return state;
+    }
+
+
+    /**
+     * 查询最近打开的流水线
+     * @return 流水线
+     */
+    @Override
+    public List<PipelineOpen> findAllOpen(StringBuilder s) {
+        List<PipelineOpen> allOpen = openService.findAllOpen(s) ;
+        if (allOpen == null){
+            return Collections.emptyList() ;
+        }
+        allOpen.sort(Comparator.comparing(PipelineOpen::getNumber).reversed()) ;
+        int min = Math.min(5, allOpen.size()) ;
+        return allOpen.subList(0,min);
     }
 
 

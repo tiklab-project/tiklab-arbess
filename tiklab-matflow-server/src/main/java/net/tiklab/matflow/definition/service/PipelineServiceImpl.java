@@ -7,12 +7,11 @@ import net.tiklab.matflow.definition.dao.PipelineDao;
 import net.tiklab.matflow.definition.entity.PipelineEntity;
 import net.tiklab.matflow.definition.model.Pipeline;
 import net.tiklab.matflow.definition.model.PipelineMassage;
-import net.tiklab.matflow.execute.model.PipelineExecState;
 import net.tiklab.matflow.orther.model.PipelineOpen;
 import net.tiklab.matflow.orther.service.PipelineHomeService;
-import net.tiklab.matflow.orther.service.PipelineOpenService;
 import net.tiklab.matflow.orther.service.PipelineUntil;
 import net.tiklab.rpc.annotation.Exporter;
+import net.tiklab.user.user.model.User;
 import net.tiklab.utils.context.LoginContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +22,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.*;
 
-import static net.tiklab.matflow.orther.service.PipelineUntil.*;
+import static net.tiklab.matflow.orther.service.PipelineFinal.*;
 
 /**
  * PipelineServiceImpl
@@ -49,10 +48,6 @@ public class PipelineServiceImpl implements PipelineService {
     @Autowired
     private PipelineHomeService homeService;
 
-    @Autowired
-    private PipelineOpenService openService;
-
-
     private static final Logger logger = LoggerFactory.getLogger(PipelineServiceImpl.class);
 
     //创建
@@ -66,7 +61,7 @@ public class PipelineServiceImpl implements PipelineService {
             throw new ApplicationException(e);
         }
         pipeline.setColor((random.nextInt(5) + 1));
-        pipeline.setPipelineCreateTime(date());
+        pipeline.setPipelineCreateTime(PipelineUntil.date());
         PipelineEntity pipelineEntity = BeanMapper.map(pipeline, PipelineEntity.class);
         pipelineEntity.setPipelineState(2);
         String pipelineId = pipelineDao.createPipeline(pipelineEntity);
@@ -75,8 +70,6 @@ public class PipelineServiceImpl implements PipelineService {
         map.put("pipelineId",pipelineId);
         // 动态
         homeService.log(LOG_PIPELINE, LOG_MD_PIPELINE_CREATE, LOG_TEM_PIPELINE_CREATE, map);
-        // 消息
-        homeService.message(MES_TEM_PIPELINE_CREATE, MES_PIPELINE, map);
 
         //创建模板
         configOrderService.createTemplate(pipelineId, pipeline.getPipelineType());
@@ -84,8 +77,9 @@ public class PipelineServiceImpl implements PipelineService {
         //流水线关联角色，用户信息
         commonServer.createDmUser(pipelineId,pipeline.getUserList());
 
-
-
+        // 消息
+        List<User> userList = commonServer.findPipelineUser(pipelineId);
+        homeService.message(MES_TEM_PIPELINE_CREATE, MES_PIPELINE, map,userList);
 
         return pipelineId;
     }
@@ -98,7 +92,7 @@ public class PipelineServiceImpl implements PipelineService {
     public void deletePipeline(String pipelineId) {
         Pipeline pipeline = findOnePipeline(pipelineId);
         joinTemplate.joinQuery(pipeline);
-
+        List<User> userList = commonServer.findPipelineUser(pipelineId);
         //删除关联信息
         pipelineDao.deletePipeline(pipelineId); //流水线
         commonServer.deleteDmUser(pipelineId); //关联用户
@@ -106,11 +100,11 @@ public class PipelineServiceImpl implements PipelineService {
         commonServer.deleteDmRole(pipelineId); //关联角色
         configOrderService.deleteConfig(pipelineId); //配置信息
 
-        //动态，消息
-        Map<String, String> map = initMap(pipeline);
-        homeService.log(LOG_PIPELINE, LOG_MD_PIPELINE_DELETE,PipelineUntil.LOG_TEM_PIPELINE_DELETE, map);
+        //动态
+        Map<String, String> map = PipelineUntil.initMap(pipeline);
+        homeService.log(LOG_PIPELINE, LOG_MD_PIPELINE_DELETE,LOG_TEM_PIPELINE_DELETE, map);
         //消息
-        homeService.message(MES_TEM_PIPELINE_DELETE, MES_PIPELINE, map);
+        homeService.message(MES_TEM_PIPELINE_DELETE, MES_PIPELINE, map,userList);
 
     }
 
@@ -203,7 +197,7 @@ public class PipelineServiceImpl implements PipelineService {
     public StringBuilder findUserPipelineId(String userId){
         List<PipelineEntity> allPipeline = pipelineDao.findUserPipeline();
         List<Pipeline> pipelineList = BeanMapper.mapList(allPipeline, Pipeline.class);
-       return commonServer.findUserPipelineId(userId, pipelineList);
+        return commonServer.findUserPipelineId(userId, pipelineList);
     }
 
     /**
@@ -296,30 +290,11 @@ public class PipelineServiceImpl implements PipelineService {
     @Override
     public List<PipelineOpen> findAllOpen() {
         StringBuilder s = findUserPipelineId(LoginContext.getLoginId()) ;
-        List<PipelineOpen> allOpen = openService.findAllOpen(s) ;
-        if (allOpen == null){
-            return Collections.emptyList() ;
+        if (!PipelineUntil.isNoNull(s.toString())){
+            return null;
         }
-        allOpen.sort(Comparator.comparing(PipelineOpen::getNumber).reversed()) ;
-        int min = Math.min(5, allOpen.size()) ;
-        return allOpen.subList(0,min);
+        return commonServer.findAllOpen(s);
     }
-
-
-    /**
-     * 流水线执行信息统计
-     * @param pipelineId 流水线id
-     * @return 统计信息
-     */
-    @Override
-     public PipelineExecState pipelineCensus(String pipelineId) {
-        Pipeline pipeline = findOnePipeline(pipelineId);
-        String loginId = LoginContext.getLoginId();
-        openService.findOpen(loginId,pipeline);
-        return commonServer.pipelineCensus(pipelineId);
-    }
-
-
 
 }
 

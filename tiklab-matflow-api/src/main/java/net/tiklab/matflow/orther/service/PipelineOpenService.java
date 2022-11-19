@@ -5,7 +5,6 @@ import net.tiklab.join.annotation.FindAll;
 import net.tiklab.join.annotation.FindList;
 import net.tiklab.join.annotation.FindOne;
 import net.tiklab.join.annotation.JoinProvider;
-import net.tiklab.matflow.definition.model.Pipeline;
 import net.tiklab.matflow.orther.model.PipelineOpen;
 
 import java.util.List;
@@ -29,9 +28,9 @@ public interface PipelineOpenService {
     /**
      * 获取打开的流水线
      * @param userId 用户id
-     * @param pipeline 流水线
+     * @param pipelineId 流水线id
      */
-    void findOpen(String userId, Pipeline pipeline);
+    void updatePipelineOpen(String userId, String pipelineId);
 
     /**
      * 查询单个次数信息

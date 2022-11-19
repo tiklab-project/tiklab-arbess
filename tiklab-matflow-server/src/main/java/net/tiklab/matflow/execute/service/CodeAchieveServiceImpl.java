@@ -42,6 +42,11 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
     // git克隆
     public boolean clone(PipelineProcess pipelineProcess, PipelineCode pipelineCode){
 
+        if (PipelineUntil.isNoNull(pipelineCode.getCodeAddress())){
+            commonService.execHistory(pipelineProcess,"代码源地址未配置。");
+            return false;
+        }
+
         Pipeline pipeline = pipelineProcess.getPipeline();
 
         //代码保存路径
@@ -65,6 +70,7 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
         if(!PipelineUntil.isNoNull(codeBranch)){
             codeBranch = "master";
         }
+
         //更新日志
         String s = "开始拉取代码 : " + "\n"
                 + "FileAddress : " + file + "\n"
@@ -109,18 +115,33 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
      * @throws URISyntaxException git地址错误
      * @throws ApplicationException 不存在配置
      */
-    private Process codeStart(PipelineCode pipelineCode,String pipelineName) throws IOException, URISyntaxException ,ApplicationException{
+    private Process codeStart(PipelineCode pipelineCode, String pipelineName) throws IOException, URISyntaxException ,ApplicationException{
+
+
+        //效验地址是否应用程序地址
+        String gitAddress = commonService.getScm(pipelineCode.getType());
+        if (gitAddress == null ){
+            if (pipelineCode.getType() != 5){
+                throw new ApplicationException(5001,"未配置git程序地址");
+            }else {
+                throw new ApplicationException(5001,"未配置SVN程序地址");
+            }
+        }
+        //效验地址应用程序的合法性
+        PipelineUntil.validFile(gitAddress,pipelineCode.getType());
+
         //源码存放位置
         String fileAddress = PipelineUntil.findFileAddress()+pipelineName;
+
         switch (pipelineCode.getType()) {
-            case 1, 2, 3, 4 -> {
-                //git server地址
-                String gitAddress = commonService.getScm(1);
-                if (gitAddress == null){
-                    throw new ApplicationException(5001,"未配置git源地址");
-                }
-                PipelineUntil.validFile(gitAddress,1);
-                String gitOrder = gitOrder(pipelineCode, fileAddress);
+            //账号密码或ssh登录
+            case 1, 4 -> {
+                String gitOrder = gitUpOrder(pipelineCode, fileAddress);
+                return PipelineUntil.process(gitAddress, gitOrder);
+            }
+            //第三方授权
+            case  2, 3 -> {
+                String gitOrder = gitThirdOrder(pipelineCode, fileAddress);
                 return PipelineUntil.process(gitAddress, gitOrder);
             }
             case 5 -> {
@@ -143,113 +164,78 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
     /**
      * 组装http git命令
      * @param pipelineCode 源码信息
-     * @param codeDir 存放位置
+     * @param fileAddress 存放位置
      * @return 执行命令
      * @throws URISyntaxException url格式不正确
      * @throws MalformedURLException 不是https或者http
      */
-    private String gitOrder(PipelineCode pipelineCode,String codeDir) throws URISyntaxException, MalformedURLException {
+    private String gitUpOrder(PipelineCode pipelineCode,String fileAddress) throws URISyntaxException, MalformedURLException {
+        String authId = pipelineCode.getAuthId();
+        PipelineAuth auth = authServer.findOneAuth(authId);
 
-        //凭证
-        Map<String, String> map = findUserPassword(pipelineCode.getAuthId());
+        StringBuilder codeAddress = new StringBuilder(pipelineCode.getCodeAddress());
 
-        StringBuilder url = new StringBuilder(pipelineCode.getCodeAddress());
-        String branch = pipelineCode.getCodeBranch();
-        if (map == null){
-            return branch(url,branch,codeDir,pipelineCode.getType());
+        if (auth.getAuthType() == 1){
+            urlType(auth.getUsername(), auth.getPassword(), codeAddress);
         }
 
-        String username = map.get("username");
-        String password = map.get("password");
+        String s = addBranch(codeAddress, pipelineCode, fileAddress);
 
-        boolean userName = PipelineUntil.isNoNull(username);
-        boolean passWord = PipelineUntil.isNoNull(password);
-
-        //地址信息
-
-        String up ;
-        if (userName && passWord){
-            up=username.replace("@", "%40")+":"+password+"@";
-        }else if (userName){
-            up=username.replace("@", "%40");
-        }else {
-            up = "";
+        if (auth.getAuthType() == 1 ){
+            return s;
         }
+        String tempFile = PipelineUntil.createTempFile(auth.getPrivateKey());
+        String userHome = System.getProperty("user.home");
+        System.out.println(userHome);
+        if (!PipelineUntil.isNoNull(tempFile)){
+            throw new ApplicationException("写入私钥失败。");
+        }
+        String address = tempFile.replace(userHome, "").replace("\\", "/");
+        String orderClean = ".\\git.exe config --global core.sshCommand \"ssh -i ~" + address + "\"";
+        String orderAdd = ".\\git.exe git config --global --unset core.sshCommand";
 
+        return addBranch(codeAddress,pipelineCode,fileAddress);
+    }
+
+    /**
+     * git地址加入账号密码
+     * @param username  用户名
+     * @param password 密码
+     * @param url git地址
+     * @return 地址
+     * @throws URISyntaxException 不是个url
+     * @throws MalformedURLException 不属于http或者https
+     */
+    private StringBuilder urlType(String username,String password,StringBuilder url) throws URISyntaxException, MalformedURLException {
+        String codeAddress = username.replace("@", "%40")+":"+password+"@";
         //获取url类型
         URL urls = new URL(url.toString());
         String urlType = urls.toURI().getScheme();
 
         //根据不同类型拼出不同地址
         if (urlType.equals("http")){
-            url.insert(7, up);
+            url.insert(7, codeAddress);
         }else {
-            url.insert(8, up);
+            url.insert(8, codeAddress);
         }
-
-        return branch(url,branch,codeDir,pipelineCode.getType());
-    }
-
-
-
-    /**
-     * 组装svn命令
-     * @param pipelineCode 源码信息
-     * @param codeDir 存放位置
-     * @return 执行命令
-     */
-    private String svnOrder(PipelineCode pipelineCode,String codeDir){
-        //凭证
-        Map<String, String> map = findUserPassword(pipelineCode.getAuthId());
-        String branch = pipelineCode.getCodeBranch();
-        //地址信息
-        StringBuilder url = new StringBuilder(pipelineCode.getCodeAddress());
-        if (map == null){
-            return branch(url,branch,codeDir,5);
-        }
-        String username = map.get("username");
-        String password = map.get("password");
-
-        String up=username.replace("@", "%40")+":"+password+"@";
-
-        url.insert(6, up);
-
-        //判断是否存在分支
-       return branch(url,branch,codeDir,5);
+        return url;
     }
 
     /**
-     * 获取不同类型的用户名密码
-     * @param authId 授权id
-     * @return 用户名密码
+     * 地址加入分支
+     * @param url 地址
+     * @param code 配置
+     * @param codeDir 拉取地址
+     * @return 地址
      */
-    private Map<String,String> findUserPassword(String authId){
-        Map<String, String> map = new HashMap<>();
-        String username;
-        String password;
-        PipelineAuthThird authServerS = authServerServer.findOneAuthServer(authId);
-        PipelineAuth auth = authServer.findOneAuth(authId);
-        if (authServerS == null && auth == null){
-           return null;
-        }
-       if (authServerS != null){
-           username= authServerS.getUsername();
-           password = authServerS.getAccessToken();
-       }else {
-           username= auth.getUsername();
-           password = auth.getPassword();
-       }
-        map.put("username",username);
-        map.put("password",password);
-        return map;
-    }
+    private String addBranch(StringBuilder url ,PipelineCode code,String codeDir){
 
-
-    private String branch(StringBuilder url ,String branch,String codeDir,int type){
+        String branch = code.getCodeBranch();
+        int type = code.getType();
 
         //判断是否存在分支
         String order;
-        if (branch == null || branch.equals("")){
+        if (!PipelineUntil.isNoNull(branch)){
             order = url+" "+codeDir;
         }else {
             order =" -b "+branch+" "+ url+" "+codeDir;
@@ -264,6 +250,7 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
             }
             return order;
         }
+
         //根据不同系统更新命令
         if (PipelineUntil.findSystemType() == 1){
             order=".\\git.exe clone"+" " + order;
@@ -273,6 +260,86 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
 
         return order;
     }
+
+
+    /**
+     * 第三方认证授权
+     * @param pipelineCode 配置
+     * @param fileAddress 地址
+     * @return 命令
+     * @throws URISyntaxException 不是个url
+     * @throws MalformedURLException 不属于http或者https
+     */
+    private String gitThirdOrder(PipelineCode pipelineCode,String fileAddress) throws MalformedURLException, URISyntaxException {
+        String authId = pipelineCode.getAuthId();
+        PipelineAuthThird auth = authServerServer.findOneAuthServer(authId);
+        StringBuilder codeAddress = new StringBuilder(pipelineCode.getCodeAddress());
+        StringBuilder stringBuilder = urlType(auth.getUsername(), auth.getPassword(), codeAddress);
+        return addBranch(stringBuilder,pipelineCode,fileAddress);
+    }
+
+    /**
+     * 组装svn命令
+     * @param pipelineCode 源码信息
+     * @param codeDir 存放位置
+     * @return 执行命令
+     */
+    private String svnOrder(PipelineCode pipelineCode,String codeDir){
+        //凭证
+        Map<String, String> map = findUserPassword(pipelineCode.getAuthId());
+        //地址信息
+        StringBuilder url = new StringBuilder(pipelineCode.getCodeAddress());
+        if (map == null){
+            return addBranch(url,pipelineCode,codeDir);
+        }
+        String username = map.get("username");
+        String password = map.get("password");
+
+        String up=username.replace("@", "%40")+":"+password+"@";
+
+        url.insert(6, up);
+
+        //判断是否存在分支
+       return addBranch(url,pipelineCode,codeDir);
+    }
+
+    /**
+     * 获取不同类型的用户名密码
+     * @param authId 授权id
+     * @return 用户名密码
+     */
+    private Map<String,String> findUserPassword(String authId){
+        Map<String, String> map = new HashMap<>();
+        String username = null;
+        String password = null;
+        String key = null;
+        String status = "username";
+        PipelineAuthThird authServerThird = authServerServer.findOneAuthServer(authId);
+        PipelineAuth auth = authServer.findOneAuth(authId);
+        if (authServerThird == null && auth == null){
+           return null;
+        }
+       if (authServerThird != null){
+           username= authServerThird.getUsername();
+           password = authServerThird.getAccessToken();
+       }
+       if(auth != null) {
+           if (auth.getAuthType() == 2){
+               key = auth.getPrivateKey();
+               status = "key";
+           }
+           username= auth.getUsername();
+           password = auth.getPassword();
+       }
+        map.put("username",username);
+        map.put("password",password);
+        map.put("key",key);
+        map.put("status",status);
+        return map;
+    }
+
+
+
 
 
 }

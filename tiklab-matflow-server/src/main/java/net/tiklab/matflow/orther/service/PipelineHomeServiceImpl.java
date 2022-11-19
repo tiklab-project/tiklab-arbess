@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -51,7 +52,7 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
       return  pipelineFollowService.updateFollow(pipelineFollow);
     }
 
-    String appName = PipelineUntil.appName;
+    String appName = PipelineFinal.appName;
 
     /**
      * 创建日志
@@ -99,7 +100,7 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
      * @param map 信息
      */
     @Override
-    public void message(String messageTemplateId,String mesType,Map<String, String> map){
+    public void message(String messageTemplateId,String mesType,Map<String, String> map,List<User> userList){
         Message message = new Message();
 
         //消息类型
@@ -121,16 +122,33 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
         }
 
         //接收人
-        ArrayList<MessageReceiver> list = new ArrayList<>();
-        MessageReceiver messageReceiver = new MessageReceiver();
-        messageReceiver.setReceiver(userId);
-        messageReceiver.setReceiverName(user.getName());
-        list.add(messageReceiver);
+        List<MessageReceiver> list = acceptUser(userList);
         message.setMessageReceiverList(list);
 
         message.setApplication(appName);
         message.setData(JSONObject.toJSONString(map));
         messageService.sendMessage(message);
+    }
+
+
+    /**
+     * 添加消息接收人
+     * @param userList 接收人列表
+     * @return 接收人集合
+     */
+    private List<MessageReceiver> acceptUser(List<User> userList){
+        List<MessageReceiver> list = new ArrayList<>();
+        MessageReceiver messageReceiver = new MessageReceiver();
+        for (User user : userList) {
+            messageReceiver.setReceiver(user.getId());
+            messageReceiver.setReceiverName(user.getName());
+            list.add(messageReceiver);
+        }
+        User user = userService.findOne(LoginContext.getLoginId());
+        messageReceiver.setReceiver(user.getId());
+        messageReceiver.setReceiverName(user.getName());
+        list.add(messageReceiver);
+        return list;
     }
 
 }

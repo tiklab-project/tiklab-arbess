@@ -3,8 +3,9 @@ package net.tiklab.matflow.definition.service;
 import net.tiklab.matflow.definition.model.Pipeline;
 import net.tiklab.matflow.definition.model.PipelineMassage;
 import net.tiklab.matflow.execute.model.PipelineExecState;
+import net.tiklab.matflow.orther.model.PipelineOpen;
 import net.tiklab.privilege.role.model.PatchUser;
-import net.tiklab.user.user.model.DmUser;
+import net.tiklab.user.user.model.User;
 
 import java.util.List;
 
@@ -43,7 +44,7 @@ public interface PipelineCommonServer {
      * @param pipelineId 流水线id
      * @return 用户信息
      */
-    List<DmUser> findPipelineUser(String pipelineId);
+    List<User>  findPipelineUser(String pipelineId);
 
 
     /**
@@ -72,6 +73,9 @@ public interface PipelineCommonServer {
      * @return 统计信息
      */
     PipelineExecState pipelineCensus(String pipelineId);
+
+
+    List<PipelineOpen> findAllOpen(StringBuilder s);
 
 
 
