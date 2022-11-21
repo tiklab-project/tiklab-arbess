@@ -18,7 +18,9 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -42,7 +44,7 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
     // git克隆
     public boolean clone(PipelineProcess pipelineProcess, PipelineCode pipelineCode){
 
-        if (PipelineUntil.isNoNull(pipelineCode.getCodeAddress())){
+        if (!PipelineUntil.isNoNull(pipelineCode.getCodeAddress())){
             commonService.execHistory(pipelineProcess,"代码源地址未配置。");
             return false;
         }
@@ -117,47 +119,42 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
      */
     private Process codeStart(PipelineCode pipelineCode, String pipelineName) throws IOException, URISyntaxException ,ApplicationException{
 
-
         //效验地址是否应用程序地址
-        String gitAddress = commonService.getScm(pipelineCode.getType());
-        if (gitAddress == null ){
+        String serverAddress = commonService.getScm(pipelineCode.getType());
+        if (serverAddress == null ){
             if (pipelineCode.getType() != 5){
-                throw new ApplicationException(5001,"未配置git程序地址");
+                throw new ApplicationException(50001,"未配置git程序地址");
             }else {
-                throw new ApplicationException(5001,"未配置SVN程序地址");
+                throw new ApplicationException(50001,"未配置SVN程序地址");
             }
         }
+
         //效验地址应用程序的合法性
-        PipelineUntil.validFile(gitAddress,pipelineCode.getType());
+        PipelineUntil.validFile(serverAddress,pipelineCode.getType());
 
         //源码存放位置
         String fileAddress = PipelineUntil.findFileAddress()+pipelineName;
-
+        String gitOrder;
         switch (pipelineCode.getType()) {
             //账号密码或ssh登录
             case 1, 4 -> {
-                String gitOrder = gitUpOrder(pipelineCode, fileAddress);
-                return PipelineUntil.process(gitAddress, gitOrder);
+                List<String> list = gitUpOrder(pipelineCode, fileAddress);
+                if (list.size() > 1){
+                    PipelineUntil.process(serverAddress, list.get(0));
+                    PipelineUntil.process(serverAddress, list.get(1));
+                }
+                gitOrder = list.get(list.size()-1);
             }
             //第三方授权
-            case  2, 3 -> {
-                String gitOrder = gitThirdOrder(pipelineCode, fileAddress);
-                return PipelineUntil.process(gitAddress, gitOrder);
-            }
-            case 5 -> {
-                //svn server地址
-                String svnAddress = commonService.getScm(5);
-                if (svnAddress == null){
-                    throw new ApplicationException(5001,"未配置svn源地址");
-                }
-                PipelineUntil.validFile(svnAddress,5);
-                String gitOrder = svnOrder(pipelineCode, fileAddress);
-                return PipelineUntil.process(svnAddress, gitOrder);
-            }
-            default -> {
-                return null;
-            }
+            case  2, 3 -> gitOrder = gitThirdOrder(pipelineCode, fileAddress);
+            //svn
+            case 5 -> gitOrder = svnOrder(pipelineCode, fileAddress);
+            //错误
+            default ->
+                throw new ApplicationException(50001,"没有类型为"+pipelineCode.getType()+"的源码配置");
         }
+        return PipelineUntil.process(serverAddress, gitOrder);
+
     }
 
 
@@ -169,7 +166,7 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
      * @throws URISyntaxException url格式不正确
      * @throws MalformedURLException 不是https或者http
      */
-    private String gitUpOrder(PipelineCode pipelineCode,String fileAddress) throws URISyntaxException, MalformedURLException {
+    private List<String> gitUpOrder(PipelineCode pipelineCode, String fileAddress) throws URISyntaxException, MalformedURLException , ApplicationException {
         String authId = pipelineCode.getAuthId();
         PipelineAuth auth = authServer.findOneAuth(authId);
 
@@ -181,20 +178,30 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
 
         String s = addBranch(codeAddress, pipelineCode, fileAddress);
 
+        List<String> list = new ArrayList<>();
+
         if (auth.getAuthType() == 1 ){
-            return s;
+            list.add(s);
+            return list;
         }
+
         String tempFile = PipelineUntil.createTempFile(auth.getPrivateKey());
         String userHome = System.getProperty("user.home");
-        System.out.println(userHome);
         if (!PipelineUntil.isNoNull(tempFile)){
-            throw new ApplicationException("写入私钥失败。");
+            throw new ApplicationException("私钥写入失败。");
         }
+        //匹配私钥地址
         String address = tempFile.replace(userHome, "").replace("\\", "/");
-        String orderClean = ".\\git.exe config --global core.sshCommand \"ssh -i ~" + address + "\"";
-        String orderAdd = ".\\git.exe git config --global --unset core.sshCommand";
 
-        return addBranch(codeAddress,pipelineCode,fileAddress);
+        String orderClean = ".\\git.exe git config --global --unset core.sshCommand";
+
+        String orderAdd = ".\\git.exe config --global core.sshCommand \"ssh -i ~" + address + "\"";
+
+        list.add(orderClean);
+        list.add(orderAdd);
+        list.add(s);
+
+        return list;
     }
 
     /**

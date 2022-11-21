@@ -1,9 +1,8 @@
 package net.tiklab.matflow.orther.service;
 
+import net.tiklab.matflow.definition.model.Pipeline;
 import net.tiklab.matflow.orther.model.PipelineFollow;
-import net.tiklab.user.user.model.User;
 
-import java.util.List;
 import java.util.Map;
 
 public interface PipelineHomeService {
@@ -30,10 +29,21 @@ public interface PipelineHomeService {
      * @param mesType 消息类型
      * @param map 信息
      */
-    void message(String messageTemplateId, String mesType, Map<String, String> map, List<User> userList);
+    void message(String messageTemplateId, String mesType, Map<String, String> map);
 
 
+    /**
+     * 企业微信发送消息
+     * @param map 消息
+     */
+    void wechatMarkdownMessage(Map<String,String> map);
 
+    /**
+     * 初始化消息，日志信息
+     * @param pipeline 流水线
+     * @return 信息
+     */
+    Map<String,String> initMap(Pipeline pipeline);
 
 
 

@@ -166,7 +166,6 @@ public class PipelineCommonServerImpl implements PipelineCommonServer{
         if (allDmUser == null){
             return null;
         }
-        List<DmUser> dmUsers = new ArrayList<>();
         for (DmUser dmUser : allDmUser) {
             if (dmUser.getDomainId().equals(pipelineId)){
                 userList.add(dmUser.getUser());

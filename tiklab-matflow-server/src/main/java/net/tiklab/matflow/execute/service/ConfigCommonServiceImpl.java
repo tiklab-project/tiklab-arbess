@@ -20,6 +20,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -65,9 +66,7 @@ public class ConfigCommonServiceImpl implements ConfigCommonService {
         //更新日志信息
         while ((s = bufferedReader.readLine()) != null) {
             logRunLog.append(s).append("\n");
-            if (logRunLog.toString().contains("BUILD FAILURE")) {
-                state = 0 ;
-            }
+            if (validStatus(s)){state = 0 ;}
             execHistory(pipelineProcess,s);
         }
         if (!PipelineUntil.isNoNull(logRunLog.toString())){
@@ -75,18 +74,31 @@ public class ConfigCommonServiceImpl implements ConfigCommonService {
             bufferedReader = new BufferedReader(inputStreamReader);
             while ((s = bufferedReader.readLine()) != null) {
                 logRunLog.append(s).append("\n");
-                if (logRunLog.toString().contains("BUILD FAILURE")
-                        || logRunLog.toString().contains("ERROR")
-                        || logRunLog.toString().contains("npm ERR!")
-                        || logRunLog.toString().contains("Access denied")) {
-                    state = 0 ;
-                }
+                if (validStatus(s)){state = 0 ;}
                 execHistory(pipelineProcess,s);
             }
         }
         inputStreamReader.close();
         bufferedReader.close();
         return state;
+    }
+
+    private boolean validStatus(String s){
+        List<String> list = new ArrayList<>();
+
+        list.add("BUILD FAILURE");
+        list.add("ERROR");
+        list.add("npm ERR!");
+        list.add("Access denied");
+        list.add("Authentication failed");
+
+        for (String s1 : list) {
+            if (!s.contains(s1)){
+                continue;
+            }
+            return true;
+        }
+        return false;
     }
 
 
@@ -98,16 +110,16 @@ public class ConfigCommonServiceImpl implements ConfigCommonService {
      */
     public void runEnd(PipelineExecHistory pipelineExecHistory, String pipelineId ,String status){
         if (status.equals("success")){
-            pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+ "\n RUN RESULT : SUCCESS");
+            pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+ "\nRUN RESULT : SUCCESS");
             pipelineExecHistory.setRunStatus(10);
         }
         if (status.equals("error")){
-            pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+ "\n RUN RESULT : FAIL");
+            pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+ "\nRUN RESULT : FAIL");
             pipelineExecHistory.setRunStatus(1);
         }
         if (status.equals("halt")){
             //更新信息
-            pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+ "\n RUN RESULT : HALT");
+            pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+ "\nRUN RESULT : HALT");
             pipelineExecHistory.setRunStatus(20);
         }
         //更新状态

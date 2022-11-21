@@ -48,8 +48,8 @@ public class PipelineAuthThirdEntity {
     @Column(name = "auth_public")
     private int authPublic;
 
-    @Column(name = "message")
-    private String message;
+    // @Column(name = "message")
+    // private String message;
 
 
     public String getServerId() {
@@ -156,13 +156,13 @@ public class PipelineAuthThirdEntity {
         this.authPublic = authPublic;
     }
 
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
+    // public String getMessage() {
+    //     return message;
+    // }
+    //
+    // public void setMessage(String message) {
+    //     this.message = message;
+    // }
 }
 
 

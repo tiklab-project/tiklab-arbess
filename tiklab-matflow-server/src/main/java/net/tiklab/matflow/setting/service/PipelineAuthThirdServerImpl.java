@@ -82,7 +82,7 @@ public class PipelineAuthThirdServerImpl implements PipelineAuthThirdServer {
 
     /**
      * 获取不同授权类型的源码认证
-     * @param type 类型  1. gitee 2. github 3.sonar 4.nexus
+     * @param type 类型  1. gitee 2. GitHub 3.sonar 4.nexus
      * @return 认证信息
      */
     public List<PipelineAuthThird> findAllAuthServerList(int type) {

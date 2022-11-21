@@ -9,7 +9,6 @@ import net.tiklab.matflow.execute.model.PipelineExecHistory;
 import net.tiklab.matflow.execute.model.PipelineExecLog;
 import net.tiklab.matflow.execute.model.PipelineProcess;
 import net.tiklab.matflow.orther.service.PipelineHomeService;
-import net.tiklab.matflow.orther.service.PipelineUntil;
 import net.tiklab.rpc.annotation.Exporter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +22,6 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import static net.tiklab.matflow.orther.service.PipelineUntil.*;
 import static net.tiklab.matflow.orther.service.PipelineFinal.*;
 
 @Service
@@ -65,11 +63,11 @@ public class PipelineExecServiceImpl implements PipelineExecService {
             return false;
         }
         updatePipelineStatus(pipeline.getPipelineId(), true);
-        Map<String, String> maps = initMap(pipeline);
+        Map<String, String> maps =homeService.initMap(pipeline);
 
         homeService.log(LOG_PIPELINE_RUN,LOG_MD_PIPELINE_RUN,LOG_TEM_PIPELINE_EXEC, maps);
 
-        homeService.message(MES_TEM_PIPELINE_EXEC, MES_PIPELINE_RUN, maps,null);
+        homeService.message(MES_TEM_PIPELINE_EXEC, MES_PIPELINE_RUN, maps);
 
         executorService.submit(() -> {
             Thread.currentThread().setName(pipelineId);
@@ -112,7 +110,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         stop(pipelineId);
         updatePipelineStatus(pipelineId, false);
 
-        Map<String, String> maps = PipelineUntil.initMap(pipeline);
+        Map<String, String> maps = homeService.initMap(pipeline);
         updateStatus("halt",pipelineId,maps,pipelineExecHistory);
     }
 
@@ -140,7 +138,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         historyMap.put(pipelineId,pipelineExecHistory);
 
         //消息
-        Map<String, String> maps = PipelineUntil.initMap(pipeline);
+        Map<String, String> maps = homeService.initMap(pipeline);
 
         //获取所有配置顺序
         List<PipelineConfigOrder> allPipelineConfig = configOrderService.findAllPipelineConfig(pipelineId);
@@ -195,6 +193,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
      */
     private void updateStatus(String status,String pipelineId, Map<String, String> maps,PipelineExecHistory pipelineExecHistory){
         commonService.runEnd(pipelineExecHistory, pipelineId,status);
+        maps.put("title","流水线运行信息");
         //日志，消息，添加不同的执行图片
         if (status.equals("success")){
             maps.put("message","成功");
@@ -208,14 +207,18 @@ public class PipelineExecServiceImpl implements PipelineExecService {
             maps.put("message","停止执行");
             maps.put("image", "/images/halt.svg");
         }
-        
+
         //清除流水线缓存
         map.remove(pipelineId);
         historyMap.remove(pipelineId);
 
+        //微信消息
+        maps.put("status",status);
+        homeService.wechatMarkdownMessage(maps);
+
         //创建日志
         homeService.log(LOG_PIPELINE_RUN,LOG_MD_PIPELINE_RUN,LOG_TEM_PIPELINE_RUN, maps);
-        homeService.message(MES_TEM_PIPELINE_RUN,MES_PIPELINE_RUN, maps,null);
+        homeService.message(MES_TEM_PIPELINE_RUN,MES_PIPELINE_RUN, maps);
     }
 
     /**

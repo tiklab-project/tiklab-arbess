@@ -5,16 +5,20 @@ import net.tiklab.core.exception.ApplicationException;
 import net.tiklab.join.JoinTemplate;
 import net.tiklab.matflow.definition.dao.PipelineConfigOrderDao;
 import net.tiklab.matflow.definition.entity.PipelineConfigOrderEntity;
-import net.tiklab.matflow.definition.model.*;
+import net.tiklab.matflow.definition.model.Pipeline;
+import net.tiklab.matflow.definition.model.PipelineConfigOrder;
 import net.tiklab.matflow.orther.service.PipelineHomeService;
-import net.tiklab.matflow.orther.service.PipelineUntil;
 import net.tiklab.rpc.annotation.Exporter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import java.util.*;
-import static net.tiklab.matflow.orther.service.PipelineUntil.*;
+
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+
 import static net.tiklab.matflow.orther.service.PipelineFinal.*;
 
 /**
@@ -138,7 +142,7 @@ public class PipelineConfigOrderServiceImpl implements PipelineConfigOrderServic
         if (typeConfig == null) return;
         joinTemplate.joinQuery(typeConfig);
         Map<String, String> map = pipelineConfigService.config(message,config,typeConfig);
-        map.putAll(PipelineUntil.initMap(typeConfig.getPipeline()));
+        map.putAll(homeService.initMap(typeConfig.getPipeline()));
         homeService.log(LOG_PIPELINE_CONFIG, LOG_MD_PIPELINE_UPDATE, LOG_TEM_PIPELINE_CONFIG_UPDATE, map);
     }
 
@@ -152,7 +156,7 @@ public class PipelineConfigOrderServiceImpl implements PipelineConfigOrderServic
         PipelineConfigOrder typeConfig = findTypeConfig(pipeline.getPipelineId(), config.getTaskType());
         joinTemplate.joinQuery(typeConfig);
         Map<String, String> map = pipelineConfigService.config(message,config,typeConfig);
-        map.putAll(initMap(pipeline));
+        map.putAll(homeService.initMap(pipeline));
         typeConfig.setTaskType(config.getType());
         typeConfig.setTaskId(map.get("id"));
         updateConfigOrder(typeConfig);
@@ -191,7 +195,7 @@ public class PipelineConfigOrderServiceImpl implements PipelineConfigOrderServic
         }
 
         Map<String, String> map = pipelineConfigService.config(message,config, null);
-        map.putAll(PipelineUntil.initMap(pipeline));
+        map.putAll(homeService.initMap(pipeline));
 
         configOrder.setTaskId(map.get("id"));
         String configure = createConfigure(configOrder);
@@ -217,7 +221,7 @@ public class PipelineConfigOrderServiceImpl implements PipelineConfigOrderServic
 
         pipelineConfigOrderDao.deleteConfigure(typeConfig.getConfigId());
         Map<String, String> map = pipelineConfigService.config(message,typeConfig,null);
-        map.putAll(PipelineUntil.initMap(typeConfig.getPipeline()));
+        map.putAll(homeService.initMap(typeConfig.getPipeline()));
 
         homeService.log(LOG_PIPELINE_CONFIG, LOG_MD_PIPELINE_DELETE,LOG_TEM_PIPELINE_CONFIG_DELETE, map);
     }

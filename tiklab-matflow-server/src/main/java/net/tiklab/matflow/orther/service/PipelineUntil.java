@@ -1,13 +1,15 @@
 package net.tiklab.matflow.orther.service;
 
 import net.tiklab.core.exception.ApplicationException;
-import net.tiklab.matflow.definition.model.Pipeline;
 
 import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 /**
@@ -254,26 +256,15 @@ public class PipelineUntil {
         }
     }
 
-
-    public static Map<String,String> initMap(Pipeline pipeline){
-        Map<String,String> map = new HashMap<>();
-        map.put("pipelineId", pipeline.getPipelineId());
-        map.put("pipelineName", pipeline.getPipelineName());
-        map.put("name", pipeline.getPipelineName().substring(0,1).toUpperCase());
-        map.put("color", ""+pipeline.getColor());
-        return map;
-    }
-
     /**
      * 创建临时文件写入私钥
      * @param key 私钥内容
      * @return 文件地址
      */
     public static String createTempFile(String key){
-        File tempFile;
         String path;
         try {
-            tempFile = File.createTempFile("key", ".txt");
+            File tempFile = File.createTempFile("key", ".txt");
             path = tempFile.getPath();
             FileWriter writer;
             writer = new FileWriter(path);
