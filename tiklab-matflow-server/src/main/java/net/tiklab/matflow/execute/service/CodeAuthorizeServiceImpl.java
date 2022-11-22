@@ -4,9 +4,8 @@ package net.tiklab.matflow.execute.service;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import net.tiklab.core.exception.ApplicationException;
 import net.tiklab.matflow.execute.model.CodeAuthorizeApi;
-import net.tiklab.matflow.orther.model.PipelineThirdAddress;
-import net.tiklab.matflow.orther.service.PipelineThirdAddressService;
 import net.tiklab.matflow.orther.service.PipelineUntil;
 import net.tiklab.matflow.setting.model.PipelineAuthThird;
 import net.tiklab.matflow.setting.service.PipelineAuthThirdServer;
@@ -29,8 +28,7 @@ import org.springframework.web.client.RestTemplate;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import java.net.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
@@ -49,49 +47,53 @@ public class CodeAuthorizeServiceImpl implements CodeAuthorizeService {
     @Autowired
     PipelineAuthThirdServer serverServer;
 
-    @Autowired
-    PipelineThirdAddressService thirdAddressService;
-
-    Map<String,Integer> mapState = new HashMap<>();
-
     public static Map<String, PipelineAuthThird> userMap = new HashMap<>();
 
     private static final Logger logger = LoggerFactory.getLogger(CodeAuthorizeServiceImpl.class);
 
     //获取code
-    public String findCode(int type){
-        PipelineThirdAddress oneAuthorize = thirdAddressService.findOneAuthorize(type);
-        return  codeAuthorizeApi.getCode(oneAuthorize,type);
+    public String findCode(PipelineAuthThird authThird){
+        String callbackUrl = authThird.getCallbackUrl().trim();
+        String encode = URLEncoder.encode(callbackUrl(callbackUrl), StandardCharsets.UTF_8);
+        authThird.setCallbackUrl(encode);
+        return codeAuthorizeApi.getCode(authThird);
     }
 
     //获取accessToken
     @Override
-    public String findAccessToken(String code,int type) throws IOException {
+    public String findAccessToken(PipelineAuthThird authThird) throws IOException {
         String loginId = LoginContext.getLoginId();
-        PipelineThirdAddress oneAuthorize = thirdAddressService.findOneAuthorize(type);
-        if (code.equals("false")){
-            mapState.put(loginId, 2);
-            return null;
+        int type = authThird.getType();
+        if (!PipelineUntil.isNoNull(authThird.getCode())){
+            throw new ApplicationException("code不能为空。");
         }
+        String callbackUrl = authThird.getCallbackUrl();
+        String encode = URLEncoder.encode(callbackUrl(callbackUrl), StandardCharsets.UTF_8);
+        authThird.setCallbackUrl(encode);
 
-        String accessTokenUrl = codeAuthorizeApi.getAccessToken(oneAuthorize,code,type);
+        String accessTokenUrl = codeAuthorizeApi.getAccessToken(authThird);
         Map<String, String> map;
         switch (type) {
             case 2 -> map = giteeAccessToken(accessTokenUrl);
-            case 3 -> map = gitHubAccessToken(code, accessTokenUrl);
+            case 3 -> map = gitHubAccessToken(authThird,accessTokenUrl);
             default -> { return null; }
         }
 
         String accessToken = map.get("accessToken");
+
+        if (accessToken == null){
+            throw new ApplicationException(50001,"授权失败，accessToken为空。");
+        }
+
         logger.info("授权成功："+accessToken + " time: "+ PipelineUntil.date());
-        PipelineAuthThird pipelineAuthThird = new PipelineAuthThird();
-        pipelineAuthThird.setAccessToken(accessToken);
-        pipelineAuthThird.setRefreshToken(map.get("refreshToken"));
+
+        authThird.setAccessToken(accessToken);
+        authThird.setRefreshToken(map.get("refreshToken"));
         String username = findMessage(accessToken, type);
-        pipelineAuthThird.setUsername(username);
-        userMap.put(loginId, pipelineAuthThird);
+        authThird.setUsername(username);
+        authThird.setAuthType(2);
+        userMap.put(loginId, authThird);
         if (map.get("state") != null && map.get("state").equals("0")){
-            mapState.put(loginId, 2);
             return null;
         }
         if (type == 2){
@@ -100,7 +102,6 @@ public class CodeAuthorizeServiceImpl implements CodeAuthorizeService {
         if (type == 3){
             username = username+"的github的授权";
         }
-        mapState.put(loginId, 1);
         return username;
     }
 
@@ -113,16 +114,15 @@ public class CodeAuthorizeServiceImpl implements CodeAuthorizeService {
         return map;
     }
 
-    private Map<String, String> gitHubAccessToken(String code,String accessTokenUrl){
+    private Map<String, String> gitHubAccessToken(PipelineAuthThird authThird,String accessTokenUrl){
         Map<String, String> map = new HashMap<>();
-        PipelineThirdAddress oneAuthorize = thirdAddressService.findOneAuthorize(3);
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
         MultiValueMap<String, Object> paramMap = new LinkedMultiValueMap<>();
-        paramMap.add("client_id", oneAuthorize.getClientId());
-        paramMap.add("client_secret", oneAuthorize.getClientSecret());
-        paramMap.add("callback_url", oneAuthorize.getCallbackUrl());
-        paramMap.add("code",code);
+        paramMap.add("client_id", authThird.getClientId().trim());
+        paramMap.add("client_secret", authThird.getClientSecret().trim());
+        paramMap.add("callback_url", authThird.getCallbackUrl().trim());
+        paramMap.add("code",authThird.getCode());
         HttpEntity<MultiValueMap<String, Object>> entity = new HttpEntity<>(paramMap, headers);
         ResponseEntity<JSONObject> response ;
         try {
@@ -143,6 +143,9 @@ public class CodeAuthorizeServiceImpl implements CodeAuthorizeService {
     @Override
     public List<String> findAllStorehouse(String authId,int type) {
         PipelineAuthThird authCode = serverServer.findOneAuthServer(authId);
+        if (authCode == null){
+            return null;
+        }
         String accessToken = authCode.getAccessToken();
         String allStorehouseAddress = codeAuthorizeApi.getAllStorehouse(accessToken,type);
         return switch (type) {
@@ -206,7 +209,13 @@ public class CodeAuthorizeServiceImpl implements CodeAuthorizeService {
     @Override
     public List<String> findBranch(String authId,String houseName,int type) {
         PipelineAuthThird authCode = serverServer.findOneAuthServer(authId);
+        if (authCode == null){
+            return null;
+        }
         String accessToken = authCode.getAccessToken();
+        if (!PipelineUntil.isNoNull(houseName) ){
+            throw new ApplicationException(5000,"仓库名称为空。");
+        }
 
         String house = houseName.split("/")[1];
         String name = houseName.split("/")[0];
@@ -294,17 +303,6 @@ public class CodeAuthorizeServiceImpl implements CodeAuthorizeService {
         ResponseEntity<String> response = restTemplate.exchange(oneStorehouse, HttpMethod.GET, entity, String.class);
         JSONObject jsonObject = JSON.parseObject(response.getBody());
         return jsonObject.getString("html_url");
-    }
-
-    @Override
-    public int findState() {
-        String loginId = LoginContext.getLoginId();
-        if (mapState.get(loginId) == null){
-            return 0;
-        }
-        Integer integer = mapState.get(loginId);
-        mapState.remove(loginId);
-        return integer;
     }
 
     //获取授权账户名
@@ -401,6 +399,28 @@ public class CodeAuthorizeServiceImpl implements CodeAuthorizeService {
     }
 
 
+    /**
+     * 回去转码后的回调地址
+     * @param callbackUrl 回调地址
+     * @return 转码后的回调地址
+     */
+    public String callbackUrl(String callbackUrl){
+        boolean b = PipelineUntil.validURL(callbackUrl);
+        if (!b){
+            return null;
+        }
+        String authority;
+        String scheme;
+        try {
+            URL url = new URL(callbackUrl);
+            authority = url.getAuthority();
+            scheme = url.toURI().getScheme();
+        } catch (MalformedURLException | URISyntaxException e) {
+            return null;
+        }
+        callbackUrl =scheme+"://"+authority+"/#/index/authorize";
+        return callbackUrl;
+    }
 
 
 

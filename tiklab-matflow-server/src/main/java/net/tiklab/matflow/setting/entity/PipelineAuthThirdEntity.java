@@ -48,8 +48,17 @@ public class PipelineAuthThirdEntity {
     @Column(name = "auth_public")
     private int authPublic;
 
-    // @Column(name = "message")
-    // private String message;
+    @Column(name = "message")
+    private String message;
+
+    @Column(name = "client_id")
+    private String clientId;
+
+    @Column(name = "client_secret")
+    private String clientSecret;
+
+    @Column(name = "callback_url")
+    private String callbackUrl;
 
 
     public String getServerId() {
@@ -156,13 +165,37 @@ public class PipelineAuthThirdEntity {
         this.authPublic = authPublic;
     }
 
-    // public String getMessage() {
-    //     return message;
-    // }
-    //
-    // public void setMessage(String message) {
-    //     this.message = message;
-    // }
+    public String getClientId() {
+        return clientId;
+    }
+
+    public void setClientId(String clientId) {
+        this.clientId = clientId;
+    }
+
+    public String getClientSecret() {
+        return clientSecret;
+    }
+
+    public void setClientSecret(String clientSecret) {
+        this.clientSecret = clientSecret;
+    }
+
+    public String getCallbackUrl() {
+        return callbackUrl;
+    }
+
+    public void setCallbackUrl(String callbackUrl) {
+        this.callbackUrl = callbackUrl;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
 }
 
 

@@ -182,8 +182,15 @@ public class PipelineCommonServerImpl implements PipelineCommonServer{
         //拉入创建人
         DmUser dmUser = new DmUser();
         dmUser.setDomainId(pipelineId);
+        User user = new User();
+        if (userList == null){
+            user.setId(LoginContext.getLoginId());
+            dmUser.setUser(user);
+            dmUserService.createDmUser(dmUser);
+            return;
+        }
+
         for (PatchUser patchUser : userList) {
-            User user = new User();
             user.setId(patchUser.getId());
             dmUser.setUser(user);
             dmUserService.createDmUser(dmUser);

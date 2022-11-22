@@ -1,6 +1,8 @@
 package net.tiklab.matflow.execute.service;
 
 
+import net.tiklab.matflow.setting.model.PipelineAuthThird;
+
 import java.io.IOException;
 import java.util.List;
 
@@ -13,20 +15,19 @@ public interface CodeAuthorizeService {
      * 获取code
      * @return 获取code的Url
      */
-    String findCode(int type);
+    String findCode(PipelineAuthThird authThird);
 
     /**
      * 根据code获取AccessToken
-     * @param code code
+     * @param authThird code
      */
-    String findAccessToken(String code,int type)  throws IOException ;
+    String findAccessToken(PipelineAuthThird authThird)  throws IOException ;
     /**
      * 获取用户所有仓库
      * @param authId 凭证
      * @return 厂库信息
      */
     List<String> findAllStorehouse(String authId,int type);
-
 
     /**
      * 获取仓库所有分支
@@ -44,11 +45,13 @@ public interface CodeAuthorizeService {
      */
     String getHouseUrl(String proofId,String houseName,int type);
 
+
     /**
-     * 获取授权状态
-     * @return 0.未授权 1.成功授权 2.取消授权
+     * 获取回调地址
+     * @param callbackUrl 地址
+     * @return 回调地址
      */
-    int findState();
+    String callbackUrl(String callbackUrl);
 
 
 

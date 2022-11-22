@@ -23,7 +23,7 @@ public class PipelineAuthThird {
     @ApiProperty(name = "authType",desc="认证类型 1.用户名密码 2. 通用认证")
     private int authType;
 
-    @ApiProperty(name = "names",desc="服务名称")
+    @ApiProperty(name = "name",desc="服务名称")
     private String name;
 
     @ApiProperty(name = "createTime")
@@ -46,6 +46,18 @@ public class PipelineAuthThird {
 
     @ApiProperty(name = "refreshToken",desc="刷新授权")
     private String refreshToken;
+
+
+    private String code;
+
+    @ApiProperty(name = "clientId",desc="授权id")
+    private String clientId;
+
+    @ApiProperty(name = "clientSecret",desc="授权密码")
+    private String clientSecret;
+
+    @ApiProperty(name = "callbackUrl",desc="回调地址")
+    private String callbackUrl;
 
     @Mappings({
             @Mapping(source = "user.id",target = "userId")
@@ -170,6 +182,38 @@ public class PipelineAuthThird {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public String getClientId() {
+        return clientId;
+    }
+
+    public void setClientId(String clientId) {
+        this.clientId = clientId;
+    }
+
+    public String getClientSecret() {
+        return clientSecret;
+    }
+
+    public void setClientSecret(String clientSecret) {
+        this.clientSecret = clientSecret;
+    }
+
+    public String getCallbackUrl() {
+        return callbackUrl;
+    }
+
+    public void setCallbackUrl(String callbackUrl) {
+        this.callbackUrl = callbackUrl;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
     }
 }
 

@@ -155,7 +155,7 @@ public class PipelineConfigOrderServiceImpl implements PipelineConfigOrderServic
         Pipeline pipeline = config.getPipeline();
         PipelineConfigOrder typeConfig = findTypeConfig(pipeline.getPipelineId(), config.getTaskType());
         joinTemplate.joinQuery(typeConfig);
-        Map<String, String> map = pipelineConfigService.config(message,config,typeConfig);
+        Map<String, String> map = pipelineConfigService.config(message,typeConfig,typeConfig);
         map.putAll(homeService.initMap(pipeline));
         typeConfig.setTaskType(config.getType());
         typeConfig.setTaskId(map.get("id"));

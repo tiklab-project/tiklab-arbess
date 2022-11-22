@@ -175,19 +175,6 @@ create table pipeline_product  (
     PRIMARY KEY (id) USING BTREE
 );
 
-
--- ----------------------------
--- Table structure for pipeline_third_address
--- ----------------------------
-create table pipeline_third_address (
-    id varchar(256) ,
-    type int ,
-    client_id varchar(255) ,
-    client_secret varchar(255) ,
-    callback_url varchar(255) ,
-    PRIMARY KEY (id) USING BTREE
-);
-
 -- ----------------------------
 -- Table structure for pipeline_auth
 -- ----------------------------
@@ -221,6 +208,10 @@ create table pipeline_auth_server (
     refresh_token varchar(255) COMMENT '刷新认证信息',
     auth_public int COMMENT '是否公开 1：公开， 2：不公开',
     user_id varchar(255) COMMENT '用户id' ,
+    client_id varchar(255) ,
+    client_secret varchar(255) ,
+    callback_url varchar(255) ,
+    message varchar(255) ,
     PRIMARY KEY (id) USING BTREE
 );
 

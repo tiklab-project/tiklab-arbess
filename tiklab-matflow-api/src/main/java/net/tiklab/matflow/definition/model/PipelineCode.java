@@ -32,6 +32,9 @@ public class PipelineCode {
     @ApiProperty(name="authId",desc="授权id")
     private String authId;
 
+    @ApiProperty(name="svnFile",desc="svn检出文件夹")
+    private String svnFile;
+
     //授权信息
     private Object auth;
 
@@ -116,5 +119,13 @@ public class PipelineCode {
 
     public void setAuth(Object auth) {
         this.auth = auth;
+    }
+
+    public String getSvnFile() {
+        return svnFile;
+    }
+
+    public void setSvnFile(String svnFile) {
+        this.svnFile = svnFile;
     }
 }

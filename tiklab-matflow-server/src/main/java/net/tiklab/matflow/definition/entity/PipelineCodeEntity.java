@@ -29,6 +29,9 @@ public class PipelineCodeEntity {
     @Column(name = "auth_id",notNull = true)
     private String authId;
 
+    @Column(name = "svn_file",notNull = true)
+    private String svnFile;
+
     public String getCodeId() {
         return codeId;
     }
@@ -67,5 +70,13 @@ public class PipelineCodeEntity {
 
     public void setAuthId(String authId) {
         this.authId = authId;
+    }
+
+    public String getSvnFile() {
+        return svnFile;
+    }
+
+    public void setSvnFile(String svnFile) {
+        this.svnFile = svnFile;
     }
 }

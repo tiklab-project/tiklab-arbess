@@ -33,17 +33,14 @@ public class PipelineAuthThirdServerImpl implements PipelineAuthThirdServer {
      * @return 流水线授权id
      */
     public String createAuthServer(PipelineAuthThird pipelineAuthThird) {
-        int authType = pipelineAuthThird.getAuthType();
-        if (authType == 0){
-            Map<String, PipelineAuthThird> userMap = CodeAuthorizeServiceImpl.userMap;
-            String loginId = LoginContext.getLoginId();
-            PipelineAuthThird authServer = userMap.get(loginId);
-            pipelineAuthThird.setAuthPublic(2);
+        Map<String, PipelineAuthThird> userMap = CodeAuthorizeServiceImpl.userMap;
+        PipelineAuthThird authServer = userMap.get(LoginContext.getLoginId());
+        if (authServer != null){
             pipelineAuthThird.setUsername(authServer.getUsername());
-            pipelineAuthThird.setAccessToken(authServer.getAccessToken());
             pipelineAuthThird.setRefreshToken(authServer.getRefreshToken());
+            pipelineAuthThird.setAccessToken(authServer.getAccessToken());
+            userMap.remove(LoginContext.getLoginId());
         }
-
         PipelineAuthThirdEntity pipelineAuthThirdEntity = BeanMapper.map(pipelineAuthThird, PipelineAuthThirdEntity.class);
         return authServerDao.createAuthServer(pipelineAuthThirdEntity);
     }

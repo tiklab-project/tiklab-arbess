@@ -19,9 +19,7 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 源码管理执行方法
@@ -173,10 +171,10 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
         StringBuilder codeAddress = new StringBuilder(pipelineCode.getCodeAddress());
 
         if (auth.getAuthType() == 1){
-            urlType(auth.getUsername(), auth.getPassword(), codeAddress);
+            gitUrl(auth.getUsername(), auth.getPassword(), codeAddress);
         }
 
-        String s = addBranch(codeAddress, pipelineCode, fileAddress);
+        String s = gitBranch(codeAddress, pipelineCode, fileAddress);
 
         List<String> list = new ArrayList<>();
 
@@ -213,7 +211,7 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
      * @throws URISyntaxException 不是个url
      * @throws MalformedURLException 不属于http或者https
      */
-    private StringBuilder urlType(String username,String password,StringBuilder url) throws URISyntaxException, MalformedURLException {
+    private StringBuilder gitUrl(String username,String password,StringBuilder url) throws URISyntaxException, MalformedURLException {
         String codeAddress = username.replace("@", "%40")+":"+password+"@";
         //获取url类型
         URL urls = new URL(url.toString());
@@ -235,11 +233,8 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
      * @param codeDir 拉取地址
      * @return 地址
      */
-    private String addBranch(StringBuilder url ,PipelineCode code,String codeDir){
-
+    private String gitBranch(StringBuilder url ,PipelineCode code,String codeDir){
         String branch = code.getCodeBranch();
-        int type = code.getType();
-
         //判断是否存在分支
         String order;
         if (!PipelineUntil.isNoNull(branch)){
@@ -247,17 +242,6 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
         }else {
             order =" -b "+branch+" "+ url+" "+codeDir;
         }
-
-        if (type == 5){
-            //根据不同系统更新命令
-            if (PipelineUntil.findSystemType() == 1){
-                order=".\\svn.exe checkout"+" "+order;
-            }else {
-                order="./svn checkout"+" "+order;
-            }
-            return order;
-        }
-
         //根据不同系统更新命令
         if (PipelineUntil.findSystemType() == 1){
             order=".\\git.exe clone"+" " + order;
@@ -281,8 +265,8 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
         String authId = pipelineCode.getAuthId();
         PipelineAuthThird auth = authServerServer.findOneAuthServer(authId);
         StringBuilder codeAddress = new StringBuilder(pipelineCode.getCodeAddress());
-        StringBuilder stringBuilder = urlType(auth.getUsername(), auth.getPassword(), codeAddress);
-        return addBranch(stringBuilder,pipelineCode,fileAddress);
+        StringBuilder stringBuilder = gitUrl(auth.getUsername(), auth.getPassword(), codeAddress);
+        return gitBranch(stringBuilder,pipelineCode,fileAddress);
     }
 
     /**
@@ -293,57 +277,43 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
      */
     private String svnOrder(PipelineCode pipelineCode,String codeDir){
         //凭证
-        Map<String, String> map = findUserPassword(pipelineCode.getAuthId());
-        //地址信息
-        StringBuilder url = new StringBuilder(pipelineCode.getCodeAddress());
-        if (map == null){
-            return addBranch(url,pipelineCode,codeDir);
+        String authId = pipelineCode.getAuthId();
+        PipelineAuth auth = authServer.findOneAuth(authId);
+
+        String codeAddress = pipelineCode.getCodeAddress();
+
+        String svnFile = pipelineCode.getSvnFile();
+
+        if (PipelineUntil.isNoNull(svnFile)){
+            codeAddress = codeAddress + "./" +svnFile;
         }
-        String username = map.get("username");
-        String password = map.get("password");
 
-        String up=username.replace("@", "%40")+":"+password+"@";
 
-        url.insert(6, up);
+        int authType = auth.getAuthType();
+        if (authType == 1){
+            String username = auth.getUsername();
+            String password = auth.getPassword();
+            codeAddress  = codeAddress + " --username" +username + " --password" + password + " " +codeDir;
+        }
+        // svn checkout svn://gitee.com/zcamy/car/./car-api --username zcamy --password zhq11191750  D:\桌面\svn测试\dasdas
+
+        // //地址信息
+        // StringBuilder url = new StringBuilder(pipelineCode.getCodeAddress());
+        // if (map == null){
+        //     return addBranch(url,pipelineCode,codeDir);
+        // }
+        // String username = map.get("username");
+        // String password = map.get("password");
+        //
+        // String up=username.replace("@", "%40")+":"+password+"@";
+        //
+        // url.insert(6, up);
 
         //判断是否存在分支
-       return addBranch(url,pipelineCode,codeDir);
+       return null;
     }
 
-    /**
-     * 获取不同类型的用户名密码
-     * @param authId 授权id
-     * @return 用户名密码
-     */
-    private Map<String,String> findUserPassword(String authId){
-        Map<String, String> map = new HashMap<>();
-        String username = null;
-        String password = null;
-        String key = null;
-        String status = "username";
-        PipelineAuthThird authServerThird = authServerServer.findOneAuthServer(authId);
-        PipelineAuth auth = authServer.findOneAuth(authId);
-        if (authServerThird == null && auth == null){
-           return null;
-        }
-       if (authServerThird != null){
-           username= authServerThird.getUsername();
-           password = authServerThird.getAccessToken();
-       }
-       if(auth != null) {
-           if (auth.getAuthType() == 2){
-               key = auth.getPrivateKey();
-               status = "key";
-           }
-           username= auth.getUsername();
-           password = auth.getPassword();
-       }
-        map.put("username",username);
-        map.put("password",password);
-        map.put("key",key);
-        map.put("status",status);
-        return map;
-    }
+
 
 
 

@@ -35,6 +35,12 @@ public class PipelineUntil {
         return Pattern.matches(valid,address);
     }
 
+    //效验URl地址
+    public static boolean validURL(String address){
+        String valid = "^(http|ftp|https):\\/\\/[\\w\\-_]+(\\.[\\w\\-_]+)+([\\w\\-\\.,@?^=%&:/~\\+#]*[\\w\\-\\@?^=%&/~\\+#])?";
+        return Pattern.matches(valid,address);
+    }
+
     //效验ip
     public static boolean validIp(String ip){
         String valid = "^((25[0-5]|2[0-4]\\d|1\\d{2}|[1-9]?\\d)\\.){3}(25[0-5]|2[0-4]\\d|1\\d{2}|[1-9]?\\d)";
@@ -181,6 +187,9 @@ public class PipelineUntil {
             return false;
         }
         if (s.equals("")){
+            return false;
+        }
+        if (s.equals("null")){
             return false;
         }
         return !s.isEmpty();

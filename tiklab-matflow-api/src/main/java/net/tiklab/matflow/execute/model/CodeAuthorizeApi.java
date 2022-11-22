@@ -1,27 +1,33 @@
 package net.tiklab.matflow.execute.model;
 
 
-import net.tiklab.matflow.orther.model.PipelineThirdAddress;
+import net.tiklab.matflow.setting.model.PipelineAuthThird;
 import org.springframework.stereotype.Service;
 
 @Service
 public class CodeAuthorizeApi {
 
     //获取code （get）
-    public  String getCode(PipelineThirdAddress oneAuthorize, int type) {
-        return switch (type) {
+    public  String getCode(PipelineAuthThird authThird) {
+        String callbackUrl = authThird.getCallbackUrl().trim();
+        String clientId = authThird.getClientId().trim();
+        return switch (authThird.getType()) {
             case 2 ->
-                    "https://gitee.com/oauth/authorize?client_id=" + oneAuthorize.getClientId() + "&redirect_uri=" + oneAuthorize.getCallbackUrl() + "&response_type=code";
+                    "https://gitee.com/oauth/authorize?client_id=" + clientId + "&redirect_uri=" + callbackUrl + "&response_type=code";
             case 3 ->
-                    "https://github.com/login/oauth/authorize?client_id=" + oneAuthorize.getClientId() + "&callback_url=" + oneAuthorize.getCallbackUrl() + "&scope=repo repo admin:org_hook user ";
+                    "https://github.com/login/oauth/authorize?client_id=" + clientId + "&callback_url=" + callbackUrl + "&scope=repo repo admin:org_hook user ";
             default -> null;
         };
     }
 
     //获取accessToken
-    public String getAccessToken(PipelineThirdAddress oneAuthorize, String code, Integer type) {
-        return switch (type) {
-            case 2 -> "https://gitee.com/oauth/token?grant_type=authorization_code&code=" + code + "&client_id=" + oneAuthorize.getClientId() + "&redirect_uri=" + oneAuthorize.getCallbackUrl() + "&client_secret=" + oneAuthorize.getClientSecret();
+    public String getAccessToken(PipelineAuthThird authThird) {
+        String code = authThird.getCode().trim();
+        String clientId = authThird.getClientId().trim();
+        String callbackUrl = authThird.getCallbackUrl().trim();
+        String clientSecret = authThird.getClientSecret().trim();
+        return switch (authThird.getType()) {
+            case 2 -> "https://gitee.com/oauth/token?grant_type=authorization_code&code=" + code + "&client_id=" + clientId + "&redirect_uri=" + callbackUrl + "&client_secret=" + clientSecret;
             case 3 -> "https://github.com/login/oauth/access_token";
             default -> null;
         };
@@ -29,7 +35,6 @@ public class CodeAuthorizeApi {
 
     //获取用户信息
     public String getUser (String accessToken ,int type) {
-
         return switch (type) {
             case 2 -> "https://gitee.com/api/v5/user?access_token="+accessToken;
             case 3 ->  "https://api.github.com/user";

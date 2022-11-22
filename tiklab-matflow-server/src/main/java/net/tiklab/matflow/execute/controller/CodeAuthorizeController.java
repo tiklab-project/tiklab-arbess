@@ -3,14 +3,17 @@ package net.tiklab.matflow.execute.controller;
 
 import net.tiklab.core.Result;
 import net.tiklab.matflow.execute.service.CodeAuthorizeService;
+import net.tiklab.matflow.setting.model.PipelineAuthThird;
 import net.tiklab.postin.annotation.Api;
 import net.tiklab.postin.annotation.ApiMethod;
 import net.tiklab.postin.annotation.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.util.List;
@@ -26,9 +29,9 @@ public class CodeAuthorizeController {
     @RequestMapping(path="/findCode",method = RequestMethod.POST)
     @ApiMethod(name = "findCode",desc = "返回获取code的地址")
     @ApiParam(name = "callbackUri",desc = "回调地址",required = true)
-    public Result<String> getCode(int type){
+    public Result<String> getCode(@RequestBody @Valid @NotNull PipelineAuthThird authThird){
 
-        String git = codeAuthorizeService.findCode(type);
+        String git = codeAuthorizeService.findCode(authThird);
 
         return Result.ok(git);
     }
@@ -36,8 +39,8 @@ public class CodeAuthorizeController {
     @RequestMapping(path="/findAccessToken",method = RequestMethod.POST)
     @ApiMethod(name = "findAccessToken",desc = "获取accessToken")
     @ApiParam(name = "code",desc = "code",required = true)
-    public Result<String> getAccessToken(@NotNull String code,int type) throws IOException {
-        String proofId = codeAuthorizeService.findAccessToken(code, type);
+    public Result<String> getAccessToken(@RequestBody @Valid @NotNull  PipelineAuthThird authThird) throws IOException {
+        String proofId = codeAuthorizeService.findAccessToken(authThird);
         return Result.ok(proofId);
     }
 
@@ -59,12 +62,14 @@ public class CodeAuthorizeController {
         return Result.ok(branch);
     }
 
-    @RequestMapping(path="/findState",method = RequestMethod.POST)
-    @ApiMethod(name = "findState",desc = "获取授权状态")
-    public Result<Integer> getState(){
-        int states = codeAuthorizeService.findState();
-        return Result.ok(states);
+    @RequestMapping(path="/callbackUrl",method = RequestMethod.POST)
+    @ApiMethod(name = "callbackUrl",desc = "获取回调地址")
+    @ApiParam(name = "callbackUrl",desc = "callbackUrl",required = true)
+    public Result<String> getState( String callbackUrl){
+        String url= codeAuthorizeService.callbackUrl(callbackUrl);
+        return Result.ok(url);
     }
+
 
 }
 
