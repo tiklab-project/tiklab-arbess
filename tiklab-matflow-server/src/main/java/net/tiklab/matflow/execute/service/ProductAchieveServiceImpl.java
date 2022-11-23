@@ -48,10 +48,9 @@ public class ProductAchieveServiceImpl implements ProductAchieveService {
             if (product.getType() == 51){
                 Process process = getProductOrder(product,path);
 
-                pipelineProcess.setErrInputStream(process.getInputStream());
+                pipelineProcess.setInputStream(process.getInputStream());
                 pipelineProcess.setErrInputStream(process.getErrorStream());
                 pipelineProcess.setError(error(product.getType()));
-
 
                 int log = commonService.log(pipelineProcess);
                 if (log == 0){

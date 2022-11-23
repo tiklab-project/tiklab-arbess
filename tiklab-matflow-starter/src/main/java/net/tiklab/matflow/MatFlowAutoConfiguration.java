@@ -19,6 +19,7 @@ import net.tiklab.web.starter.annotation.EnableWeb;
 import net.tiklab.widget.starter.EnableWidget;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.FilterType;
 
 
 @Configuration
@@ -45,6 +46,8 @@ import org.springframework.context.annotation.Configuration;
 @EnableWidget
 @EnableTodoTask
 @EnableMatFlowServer
-@ComponentScan("net.tiklab.matflow")
+@ComponentScan(value = "net.tiklab.matflow",excludeFilters = {
+        @ComponentScan.Filter(type = FilterType.REGEX,pattern = "net.tiklab.eam.server.util.socket")
+})
 public class MatFlowAutoConfiguration {
 }

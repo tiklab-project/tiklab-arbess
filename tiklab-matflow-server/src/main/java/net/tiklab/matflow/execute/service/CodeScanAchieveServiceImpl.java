@@ -40,7 +40,7 @@ public class CodeScanAchieveServiceImpl implements CodeScanService {
                 return false;
             }
 
-            pipelineProcess.setErrInputStream(process.getInputStream());
+            pipelineProcess.setInputStream(process.getInputStream());
             pipelineProcess.setErrInputStream(process.getErrorStream());
             pipelineProcess.setError(error(pipelineCodeScan.getType()));
 

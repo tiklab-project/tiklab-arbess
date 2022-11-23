@@ -46,7 +46,7 @@ public class TestAchieveServiceImpl implements TestAchieveService {
                 return false;
             }
 
-            pipelineProcess.setErrInputStream(process.getInputStream());
+            pipelineProcess.setInputStream(process.getInputStream());
             pipelineProcess.setErrInputStream(process.getErrorStream());
             pipelineProcess.setError(error(pipelineTest.getType()));
 

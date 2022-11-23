@@ -45,7 +45,7 @@ public class DeployAchieveServiceImpl implements DeployAchieveService {
                 commonService.execHistory(pipelineProcess,"执行脚本：" + startShell);
                 Process process = PipelineUntil.process("/", startShell);
 
-                pipelineProcess.setErrInputStream(process.getInputStream());
+                pipelineProcess.setInputStream(process.getInputStream());
                 pipelineProcess.setErrInputStream(process.getErrorStream());
                 pipelineProcess.setEnCode("GBK");
                 pipelineProcess.setError(error(pipelineDeploy.getType()));
@@ -189,7 +189,7 @@ public class DeployAchieveServiceImpl implements DeployAchieveService {
         commonService.execHistory(pipelineProcess,"执行："+orders );
         exec.setCommand(orders);
         exec.connect();
-        pipelineProcess.setErrInputStream(exec.getInputStream());
+        pipelineProcess.setInputStream(exec.getInputStream());
         pipelineProcess.setErrInputStream(exec.getErrStream());
         pipelineProcess.setEnCode("UTF-8");
         pipelineProcess.setError(error(41));

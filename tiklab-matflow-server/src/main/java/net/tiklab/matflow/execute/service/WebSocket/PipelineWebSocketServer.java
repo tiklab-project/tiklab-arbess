@@ -23,7 +23,7 @@ public class PipelineWebSocketServer implements WebSocketHandler {
     @Autowired
     PipelineExecService pipelineExecService;
 
-    private static Logger logger = LoggerFactory.getLogger(PipelineWebSocketServer.class);
+    private static final Logger logger = LoggerFactory.getLogger(PipelineWebSocketServer.class);
 
     /**
      * userMap:使用线程安全map存储用户连接webscoket信息
