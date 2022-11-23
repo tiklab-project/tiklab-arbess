@@ -21,9 +21,7 @@ public class PipelineWebSocketConfig implements WebSocketConfigurer {
      */
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-//        registry.addHandler(myHandler(), "/ws").addInterceptors(new WebSocketInterceptor()).setAllowedOrigins("*");
         registry.addHandler(pipelineHandler(), "/start").addInterceptors().setAllowedOrigins("*");
-
     }
 
     @Bean

@@ -71,6 +71,7 @@ public class PipelineWebSocketServer implements WebSocketHandler {
     public void handleMessage(WebSocketSession session, WebSocketMessage<?> message) throws Exception {
         String msg = message.getPayload().toString();
         String deviceId = this.getDeviceId(session);
+        logger.info("主机："+deviceId + "   接收到的消息为：" + msg);
         JSONObject params = new JSONObject();
         int state = pipelineExecService.findState(msg);
         if (state == 2){
