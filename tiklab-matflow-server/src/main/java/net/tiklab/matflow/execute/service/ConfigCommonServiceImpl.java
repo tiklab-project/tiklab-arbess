@@ -20,7 +20,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -49,32 +48,43 @@ public class ConfigCommonServiceImpl implements ConfigCommonService {
 
     /**
      * 执行日志
-     * @param inputStream 执行信息
      * @param pipelineProcess 执行信息
      * @return map 执行状态
      */
     @Override
-    public int log(InputStream inputStream,InputStream errInputStream, PipelineProcess pipelineProcess,String encode) throws IOException {
+    public int log(PipelineProcess pipelineProcess) throws IOException {
         int state = 1;
+        String enCode = pipelineProcess.getEnCode();
+        String[] error = pipelineProcess.getError();
 
-        InputStreamReader inputStreamReader = PipelineUntil.encode(inputStream, encode);
+        InputStream inputStream = pipelineProcess.getInputStream();
+        InputStream errInputStream = pipelineProcess.getErrInputStream();
+
+        InputStreamReader inputStreamReader ;
+        BufferedReader  bufferedReader ;
+        if (inputStream == null){
+            inputStreamReader = PipelineUntil.encode(errInputStream, enCode);
+        }else {
+            inputStreamReader = PipelineUntil.encode(inputStream, enCode);
+        }
         
         String s;
-        BufferedReader  bufferedReader = new BufferedReader(inputStreamReader);
+        bufferedReader = new BufferedReader(inputStreamReader);
         StringBuilder logRunLog = new StringBuilder();
 
         //更新日志信息
         while ((s = bufferedReader.readLine()) != null) {
             logRunLog.append(s).append("\n");
-            if (validStatus(s)){state = 0 ;}
+            if (validStatus(s,error)){state = 0 ;}
             execHistory(pipelineProcess,s);
         }
+
         if (!PipelineUntil.isNoNull(logRunLog.toString())){
-            inputStreamReader = PipelineUntil.encode(errInputStream, encode);
+            inputStreamReader = PipelineUntil.encode(errInputStream, enCode);
             bufferedReader = new BufferedReader(inputStreamReader);
             while ((s = bufferedReader.readLine()) != null) {
                 logRunLog.append(s).append("\n");
-                if (validStatus(s)){state = 0 ;}
+                if (validStatus(s,error)){state = 0 ;}
                 execHistory(pipelineProcess,s);
             }
         }
@@ -83,16 +93,11 @@ public class ConfigCommonServiceImpl implements ConfigCommonService {
         return state;
     }
 
-    private boolean validStatus(String s){
-        List<String> list = new ArrayList<>();
-
-        list.add("BUILD FAILURE");
-        list.add("ERROR");
-        list.add("npm ERR!");
-        list.add("Access denied");
-        list.add("Authentication failed");
-
-        for (String s1 : list) {
+    private boolean validStatus(String s,String[] error){
+        if (error.length == 0){
+            return true;
+        }
+        for (String s1 : error) {
             if (!s.contains(s1)){
                 continue;
             }

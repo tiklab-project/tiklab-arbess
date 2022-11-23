@@ -47,7 +47,13 @@ public class ProductAchieveServiceImpl implements ProductAchieveService {
         try {
             if (product.getType() == 51){
                 Process process = getProductOrder(product,path);
-                int log = commonService.log(process.getInputStream(), process.getErrorStream(), pipelineProcess,null);
+
+                pipelineProcess.setErrInputStream(process.getInputStream());
+                pipelineProcess.setErrInputStream(process.getErrorStream());
+                pipelineProcess.setError(error(product.getType()));
+
+
+                int log = commonService.log(pipelineProcess);
                 if (log == 0){
                     commonService.execHistory(pipelineProcess,"推送制品失败");
                     return false;
@@ -174,6 +180,21 @@ public class ProductAchieveServiceImpl implements ProductAchieveService {
             order = " .\\" + buildOrder ;
         }
         return order;
+    }
+
+    private String[] error(int type){
+        String[] strings;
+        if (type == 5){
+            strings = new String[]{
+                    "svn: E170000:",
+                    "invalid option;"
+            };
+            return strings;
+        }
+        strings = new String[]{
+
+        };
+        return strings;
     }
 
 }

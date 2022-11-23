@@ -46,8 +46,14 @@ public class BuildAchieveServiceImpl implements BuildAchieveService {
                 return false;
             }
 
+            pipelineProcess.setErrInputStream(process.getInputStream());
+            pipelineProcess.setErrInputStream(process.getErrorStream());
+            pipelineProcess.setError(error(pipelineBuild.getType()));
+
             //构建失败
-            int state = commonService.log(process.getInputStream(), process.getErrorStream(),pipelineProcess,null);
+            int state = commonService.log(pipelineProcess);
+
+
             process.destroy();
             if (state == 0){
                 commonService.execHistory(pipelineProcess,"构建失败");
@@ -106,6 +112,22 @@ public class BuildAchieveServiceImpl implements BuildAchieveService {
             order = " .\\" + buildOrder + " " + "-f"+" "  +path;
         }
         return order;
+    }
+
+
+    private String[] error(int type){
+        String[] strings;
+        if (type == 5){
+            strings = new String[]{
+                    "svn: E170000:",
+                    "invalid option;"
+            };
+            return strings;
+        }
+        strings = new String[]{
+
+        };
+        return strings;
     }
 
 

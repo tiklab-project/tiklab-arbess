@@ -39,7 +39,13 @@ public class CodeScanAchieveServiceImpl implements CodeScanService {
                 commonService.execHistory(pipelineProcess,"代码扫描执行失败");
                 return false;
             }
-            int log = commonService.log(process.getInputStream(), process.getErrorStream(), pipelineProcess,"GBK");
+
+            pipelineProcess.setErrInputStream(process.getInputStream());
+            pipelineProcess.setErrInputStream(process.getErrorStream());
+            pipelineProcess.setError(error(pipelineCodeScan.getType()));
+
+
+            int log = commonService.log( pipelineProcess);
             if (log == 0){
                 commonService.execHistory(pipelineProcess,"代码扫描失败");
                 return false;
@@ -96,6 +102,21 @@ public class CodeScanAchieveServiceImpl implements CodeScanService {
             order = " .\\" + buildOrder + " " + "-f"+" "  +path;
         }
         return order;
+    }
+
+    private String[] error(int type){
+        String[] strings;
+        if (type == 5){
+            strings = new String[]{
+                    "svn: E170000:",
+                    "invalid option;"
+            };
+            return strings;
+        }
+        strings = new String[]{
+
+        };
+        return strings;
     }
 
 

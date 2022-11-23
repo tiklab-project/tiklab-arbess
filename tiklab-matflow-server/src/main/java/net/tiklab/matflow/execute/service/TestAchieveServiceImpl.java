@@ -46,7 +46,11 @@ public class TestAchieveServiceImpl implements TestAchieveService {
                 return false;
             }
 
-            int state = commonService.log(process.getInputStream(),process.getErrorStream(),pipelineProcess,null);
+            pipelineProcess.setErrInputStream(process.getInputStream());
+            pipelineProcess.setErrInputStream(process.getErrorStream());
+            pipelineProcess.setError(error(pipelineTest.getType()));
+
+            int state = commonService.log(pipelineProcess);
             process.destroy();
             if (state == 0){
                 process.destroy();
@@ -100,6 +104,21 @@ public class TestAchieveServiceImpl implements TestAchieveService {
             order = " .\\" + buildOrder + " " + "-f"+" "  +path;
         }
         return order;
+    }
+
+    private String[] error(int type){
+        String[] strings;
+        if (type == 5){
+            strings = new String[]{
+                    "svn: E170000:",
+                    "invalid option;"
+            };
+            return strings;
+        }
+        strings = new String[]{
+
+        };
+        return strings;
     }
 
 }

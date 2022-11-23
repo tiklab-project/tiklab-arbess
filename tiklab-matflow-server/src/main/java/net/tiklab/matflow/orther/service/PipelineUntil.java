@@ -202,6 +202,11 @@ public class PipelineUntil {
      * @return 输出流
      */
     public static InputStreamReader encode(InputStream inputStream,String encode){
+
+        if (inputStream == null){
+            return null;
+        }
+
         if (encode != null){
             return  new InputStreamReader(inputStream, Charset.forName(encode));
         }

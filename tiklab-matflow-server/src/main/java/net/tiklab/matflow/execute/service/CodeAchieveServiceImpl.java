@@ -88,7 +88,13 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
                 return false;
             }
             //项目执行过程失败
-            int log = commonService.log(process.getInputStream(), process.getErrorStream(), pipelineProcess,"UTF-8");
+            pipelineProcess.setInputStream(process.getInputStream());
+            pipelineProcess.setErrInputStream(process.getErrorStream());
+            pipelineProcess.setError(error(pipelineCode.getType()));
+            if (pipelineCode.getType() != 5){
+                pipelineProcess.setEnCode("UTF-8");
+            }
+            int log = commonService.log(pipelineProcess);
             if (log == 0){
                 commonService.execHistory(pipelineProcess,"代码拉取失败。 \n" );
                 return false;
@@ -190,10 +196,15 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
         }
         //匹配私钥地址
         String address = tempFile.replace(userHome, "").replace("\\", "/");
-
-        String orderClean = ".\\git.exe git config --global --unset core.sshCommand";
-
-        String orderAdd = ".\\git.exe config --global core.sshCommand \"ssh -i ~" + address + "\"";
+        String orderClean;
+        String orderAdd;
+        if (PipelineUntil.findSystemType() == 1){
+             orderClean = ".\\git.exe git config --global --unset core.sshCommand";
+             orderAdd = ".\\git.exe config --global core.sshCommand \"ssh -i ~" + address + "\"";
+        }else {
+            orderClean = "/git git config --global --unset core.sshCommand";
+            orderAdd = "/git config --global core.sshCommand \"ssh -i ~" + address + "\"";
+        }
 
         list.add(orderClean);
         list.add(orderAdd);
@@ -284,37 +295,44 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
 
         String svnFile = pipelineCode.getSvnFile();
 
+        //检出文件夹
         if (PipelineUntil.isNoNull(svnFile)){
-            codeAddress = codeAddress + "./" +svnFile;
+            codeAddress = codeAddress + "/./" +svnFile;
         }
-
-
-        int authType = auth.getAuthType();
-        if (authType == 1){
+        //判断检出类型
+        if (auth.getAuthType() == 1){
             String username = auth.getUsername();
             String password = auth.getPassword();
-            codeAddress  = codeAddress + " --username" +username + " --password" + password + " " +codeDir;
+            codeAddress  = codeAddress + " --username "+ " "  +username + " --password " + " " + password + " " +codeDir;
         }
-        // svn checkout svn://gitee.com/zcamy/car/./car-api --username zcamy --password zhq11191750  D:\桌面\svn测试\dasdas
-
-        // //地址信息
-        // StringBuilder url = new StringBuilder(pipelineCode.getCodeAddress());
-        // if (map == null){
-        //     return addBranch(url,pipelineCode,codeDir);
-        // }
-        // String username = map.get("username");
-        // String password = map.get("password");
-        //
-        // String up=username.replace("@", "%40")+":"+password+"@";
-        //
-        // url.insert(6, up);
+        //不同系统检出
+        if (PipelineUntil.findSystemType() == 1){
+            codeAddress=".\\svn.exe checkout"+" " + codeAddress;
+        }else {
+            codeAddress="./svn checkout"+" " + codeAddress;
+        }
 
         //判断是否存在分支
-       return null;
+       return codeAddress;
     }
 
 
+    private String[] error(int type){
+        String[] strings;
+        if (type == 5){
+            strings = new String[]{
+                "svn: E170000:",
+                "invalid option",
+                    "svn: E204900",
+                    "svn: E170013:"
+            };
+            return strings;
+        }
+        strings = new String[]{
 
+        };
+        return strings;
+    }
 
 
 

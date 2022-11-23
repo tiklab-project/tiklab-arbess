@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 
 /**
  * 部署执行方法
@@ -45,7 +44,13 @@ public class DeployAchieveServiceImpl implements DeployAchieveService {
             if (pipelineDeploy.getAuthType() == 2) {
                 commonService.execHistory(pipelineProcess,"执行脚本：" + startShell);
                 Process process = PipelineUntil.process("/", startShell);
-                commonService.log(process.getInputStream(),process.getErrorStream(), pipelineProcess,"GBK");
+
+                pipelineProcess.setErrInputStream(process.getInputStream());
+                pipelineProcess.setErrInputStream(process.getErrorStream());
+                pipelineProcess.setEnCode("GBK");
+                pipelineProcess.setError(error(pipelineDeploy.getType()));
+
+                commonService.log(pipelineProcess);
                 return true;
             }
         } catch (IOException e) {
@@ -184,8 +189,11 @@ public class DeployAchieveServiceImpl implements DeployAchieveService {
         commonService.execHistory(pipelineProcess,"执行："+orders );
         exec.setCommand(orders);
         exec.connect();
-        InputStream inputStream = exec.getInputStream();
-        commonService.log(inputStream,exec.getErrStream(),  pipelineProcess,"UTF-8");
+        pipelineProcess.setErrInputStream(exec.getInputStream());
+        pipelineProcess.setErrInputStream(exec.getErrStream());
+        pipelineProcess.setEnCode("UTF-8");
+        pipelineProcess.setError(error(41));
+        commonService.log( pipelineProcess);
         exec.disconnect();
     }
 
@@ -261,6 +269,22 @@ public class DeployAchieveServiceImpl implements DeployAchieveService {
         // order = order +"cd"+" "+deployAddress+"/"+startAddress+";"+"docker image build -t"+" "+pipelineName+"  .;"
         //         +"docker run -itd -p"+" "+ pipelineDeploy.getMappingPort()+":"+ pipelineDeploy.getStartPort()+" "+pipelineName;
         sshOrder(session, order, pipelineProcess);
+    }
+
+
+    private String[] error(int type){
+        String[] strings;
+        if (type == 5){
+            strings = new String[]{
+                    "svn: E170000:",
+                    "invalid option;"
+            };
+            return strings;
+        }
+        strings = new String[]{
+
+        };
+        return strings;
     }
 
 }
