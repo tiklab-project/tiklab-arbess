@@ -4,6 +4,10 @@ app:
 APP_HOME: ${APP_HOME}
 application: matflow
 
+spring:
+  main:
+    allow-bean-definition-overriding: true
+
 server:
   port: 8080
 
