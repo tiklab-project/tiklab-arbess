@@ -108,15 +108,8 @@ public class TestAchieveServiceImpl implements TestAchieveService {
 
     private String[] error(int type){
         String[] strings;
-        if (type == 5){
-            strings = new String[]{
-                    "svn: E170000:",
-                    "invalid option;"
-            };
-            return strings;
-        }
         strings = new String[]{
-
+            "BUILD FAILUREl","ERROR"
         };
         return strings;
     }

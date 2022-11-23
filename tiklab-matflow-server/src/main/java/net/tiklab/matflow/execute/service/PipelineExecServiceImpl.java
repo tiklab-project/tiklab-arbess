@@ -84,6 +84,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
             return null;
         }
         List<Integer> timeList = map.get(pipelineId);
+        System.out.println(timeList.get(0));
         int time = 0;
         for (Integer integer1 : timeList) {
             time = time+ integer1;
@@ -132,6 +133,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         //初始化历史
         PipelineExecHistory pipelineExecHistory = commonService.initializeHistory(pipeline);
         String historyId = pipelineExecHistory.getHistoryId();
+
         //获取配置信息
         PipelineProcess pipelineProcess = new PipelineProcess();
         pipelineProcess.setPipelineExecHistory(pipelineExecHistory);
@@ -154,8 +156,10 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         for (PipelineConfigOrder pipelineConfigOrder : allPipelineConfig) {
             if (integers == null || integers.size() == 0){
                 integers = new ArrayList<>();
+                integers.add(-1);
+            }else {
+                integers.add(0);
             }
-            integers.add(1);
             map.put(pipelineId,integers);
             time(pipelineId);
             //初始化日志

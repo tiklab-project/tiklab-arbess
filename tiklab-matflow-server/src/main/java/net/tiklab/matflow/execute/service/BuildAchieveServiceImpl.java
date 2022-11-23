@@ -74,7 +74,10 @@ public class BuildAchieveServiceImpl implements BuildAchieveService {
      */
     private Process getOrder(PipelineBuild pipelineBuild,String path) throws ApplicationException, IOException {
         String buildOrder = pipelineBuild.getBuildOrder();
-        String buildAddress = "/"+ pipelineBuild.getBuildAddress();
+        if(PipelineUntil.isNoNull(pipelineBuild.getBuildAddress())){
+            path = path +"/"+ pipelineBuild.getBuildAddress();
+        }
+
         
         int type = pipelineBuild.getType();
         String order ;
@@ -84,7 +87,7 @@ public class BuildAchieveServiceImpl implements BuildAchieveService {
                 if (mavenAddress == null) {
                     throw new ApplicationException("不存在maven配置");
                 }
-                order =  mavenOrder(buildOrder,path + buildAddress);
+                order =  mavenOrder(buildOrder,path);
                 return PipelineUntil.process(mavenAddress, order);
             }
             case 22 -> {
@@ -92,7 +95,7 @@ public class BuildAchieveServiceImpl implements BuildAchieveService {
                 if (nodeAddress == null) {
                     throw new ApplicationException("不存在node配置");
                 }
-                return PipelineUntil.process(path+ buildAddress, buildOrder);
+                return PipelineUntil.process(path, buildOrder);
             }
             default -> {return null;}
         }
@@ -114,13 +117,11 @@ public class BuildAchieveServiceImpl implements BuildAchieveService {
         return order;
     }
 
-
     private String[] error(int type){
         String[] strings;
-        if (type == 5){
+        if (type == 21){
             strings = new String[]{
-                    "svn: E170000:",
-                    "invalid option;"
+                    "BUILD FAILUREl","ERROR"
             };
             return strings;
         }
@@ -129,6 +130,7 @@ public class BuildAchieveServiceImpl implements BuildAchieveService {
         };
         return strings;
     }
+
 
 
 }
