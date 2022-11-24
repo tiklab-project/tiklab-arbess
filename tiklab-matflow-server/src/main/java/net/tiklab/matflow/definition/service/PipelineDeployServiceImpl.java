@@ -58,17 +58,19 @@ public class PipelineDeployServiceImpl implements PipelineDeployService {
     @Override
     public void updateDeploy(PipelineDeploy pipelineDeploy) {
         String deployId = pipelineDeploy.getDeployId();
-        if (pipelineDeploy.getAuthType() == 1){
-            PipelineDeploy oneDeploy = findOneDeploy(deployId);
+        PipelineDeploy oneDeploy = findOneDeploy(deployId);
+        int authType = pipelineDeploy.getAuthType();
+        if (authType == 0){
+            //重新赋值类型
             pipelineDeploy.setAuthType(oneDeploy.getAuthType());
-        }else {
+        }else if (authType == 2){
             pipelineDeploy.setAuthId("");
             pipelineDeploy.setLocalAddress("");
             pipelineDeploy.setDeployAddress("");
             pipelineDeploy.setDeployOrder("");
             pipelineDeploy.setStartAddress("");
-            pipelineDeploy.setStartOrder("");
         }
+        pipelineDeploy.setStartOrder("");
         pipelineDeployDao.updateDeploy(BeanMapper.map(pipelineDeploy, PipelineDeployEntity.class));
     }
 

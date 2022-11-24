@@ -208,6 +208,8 @@ public class PipelineServiceImpl implements PipelineService {
         return Collections.emptyList();
     }
 
+
+
     //所有的流水线状态
     @Override
     public List<PipelineMassage> findUserPipeline(String userId){

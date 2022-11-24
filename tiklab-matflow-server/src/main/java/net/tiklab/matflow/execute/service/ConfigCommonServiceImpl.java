@@ -95,7 +95,7 @@ public class ConfigCommonServiceImpl implements ConfigCommonService {
 
     private boolean validStatus(String s,String[] error){
         if (error.length == 0){
-            return true;
+            return false;
         }
         for (String s1 : error) {
             if (!s.contains(s1)){

@@ -4,9 +4,8 @@ app:
 APP_HOME: ${APP_HOME}
 application: matflow
 
-spring:
-  main:
-    allow-bean-definition-overriding: true
+setting:
+  address: tiklab-matflow-starter/src/main/resources/settings.xml
 
 server:
   port: 8080

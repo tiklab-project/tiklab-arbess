@@ -84,7 +84,6 @@ public class PipelineExecServiceImpl implements PipelineExecService {
             return null;
         }
         List<Integer> timeList = map.get(pipelineId);
-        System.out.println(timeList.get(0));
         int time = 0;
         for (Integer integer1 : timeList) {
             time = time+ integer1;

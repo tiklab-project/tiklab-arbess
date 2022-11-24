@@ -11,6 +11,7 @@ import net.tiklab.matflow.setting.model.PipelineAuthHost;
 import net.tiklab.matflow.setting.model.PipelineAuthThird;
 import net.tiklab.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -116,6 +117,10 @@ public class ProductAchieveServiceImpl implements ProductAchieveService {
         order = mavenOrder(execOrder, path);
         return PipelineUntil.process(mavenAddress, order);
     }
+
+
+    @Value("${setting.address}")
+    private String settingAddress;
 
     /**
      * 创建连接实例

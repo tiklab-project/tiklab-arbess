@@ -174,15 +174,24 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
         String authId = pipelineCode.getAuthId();
         PipelineAuth auth = authServer.findOneAuth(authId);
 
+        List<String> list = new ArrayList<>();
+
         StringBuilder codeAddress = new StringBuilder(pipelineCode.getCodeAddress());
+
+        //没有凭证
+        if (auth == null){
+            String s = gitBranch(codeAddress, pipelineCode, fileAddress);
+            list.add(s);
+            return list;
+        }
+
+        typeAddress(pipelineCode.getType(),auth.getAuthType(),pipelineCode.getCodeAddress());
 
         if (auth.getAuthType() == 1){
             gitUrl(auth.getUsername(), auth.getPassword(), codeAddress);
         }
 
         String s = gitBranch(codeAddress, pipelineCode, fileAddress);
-
-        List<String> list = new ArrayList<>();
 
         if (auth.getAuthType() == 1 ){
             list.add(s);
@@ -317,19 +326,55 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
     }
 
 
+    /**
+     * 效验地址与认证方式是否一致
+     * @param type 类型
+     * @param address 地址
+      */
+    private void typeAddress(int type,int authType,String address) throws ApplicationException{
+        String substring = address.substring(0, 3);
+        if (type != 5){
+            if (substring.equals("htt") && authType == 1){
+                return;
+            }
+            if (substring.equals("git") && authType == 2){
+                return;
+            }
+            throw new ApplicationException("Git地址类型与凭证认证类型不一致。");
+        }else {
+            if (substring.equals("svn") && authType == 1){
+                return;
+            }
+            substring = address.substring(0, 7);
+            if (substring.equals("svn+ssh") && authType == 2){
+                return;
+            }
+            throw new ApplicationException("SVN地址类型与凭证认证类型不一致。");
+        }
+    }
+
+    /**
+     * 错误
+     * @param type 类型
+     * @return 错误
+     */
     private String[] error(int type){
         String[] strings;
         if (type == 5){
             strings = new String[]{
-                "svn: E170000:",
+                "svn: E170000",
                 "invalid option",
-                    "svn: E204900",
-                    "svn: E170013:"
+                "svn: E204900",
+                "svn: E170013",
+                "svn: E210002",
+                "svn: E205000"
             };
             return strings;
         }
         strings = new String[]{
-
+            "fatal: Could not read from remote repository",
+            "remote: HTTP Basic: Access denied",
+            "fatal: Authentication failed "
         };
         return strings;
     }
