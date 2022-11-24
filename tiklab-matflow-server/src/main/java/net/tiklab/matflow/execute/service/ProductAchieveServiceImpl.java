@@ -119,7 +119,7 @@ public class ProductAchieveServiceImpl implements ProductAchieveService {
     }
 
 
-    @Value("${setting.address}")
+    @Value("${setting.address:null}")
     private String settingAddress;
 
     /**
