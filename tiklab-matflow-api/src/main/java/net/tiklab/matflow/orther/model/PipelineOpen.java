@@ -7,6 +7,8 @@ import net.tiklab.beans.annotation.Mappings;
 import net.tiklab.join.annotation.Join;
 import net.tiklab.join.annotation.JoinQuery;
 import net.tiklab.matflow.definition.model.Pipeline;
+import net.tiklab.matflow.definition.model.PipelineMassage;
+import net.tiklab.matflow.execute.model.PipelineExecState;
 import net.tiklab.postin.annotation.ApiModel;
 import net.tiklab.postin.annotation.ApiProperty;
 
@@ -35,6 +37,13 @@ public class PipelineOpen {
 
     @ApiProperty(name="number",desc="数量")
     private int number;
+
+
+    //流水线执行统计信息
+    private PipelineExecState pipelineExecState;
+
+    //流水线执行信息
+    private PipelineMassage pipelineMassage;
 
     private String pipelineName;
 
@@ -87,5 +96,21 @@ public class PipelineOpen {
 
     public void setPipelineId(String pipelineId) {
         this.pipelineId = pipelineId;
+    }
+
+    public PipelineExecState getPipelineExecState() {
+        return pipelineExecState;
+    }
+
+    public void setPipelineExecState(PipelineExecState pipelineExecState) {
+        this.pipelineExecState = pipelineExecState;
+    }
+
+    public PipelineMassage getPipelineMassage() {
+        return pipelineMassage;
+    }
+
+    public void setPipelineMassage(PipelineMassage pipelineMassage) {
+        this.pipelineMassage = pipelineMassage;
     }
 }

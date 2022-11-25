@@ -49,6 +49,18 @@ public class PipelineAuthHostServerImpl implements PipelineAuthHostServer {
      */
     @Override
     public void updateAuthHost(PipelineAuthHost pipelineAuthHost) {
+        int authPublic = pipelineAuthHost.getAuthPublic();
+        String authId = pipelineAuthHost.getHostId();
+        PipelineAuthHost oneAuth = findOneAuthHost(authId);
+        int hostType = oneAuth.getAuthPublic();
+        if (authPublic == 1 && hostType == 2){
+            pipelineAuthHost.setPrivateKey("");
+        }
+        if (authPublic == 2 && hostType == 1){
+            pipelineAuthHost.setUsername("");
+            pipelineAuthHost.setPassword("");
+        }
+
         PipelineAuthHostEntity authHostEntity = BeanMapper.map(pipelineAuthHost, PipelineAuthHostEntity.class);
         authHostDao.updateAuthHost(authHostEntity);
     }

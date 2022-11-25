@@ -60,6 +60,17 @@ public class PipelineAuthThirdServerImpl implements PipelineAuthThirdServer {
      */
     @Override
     public void updateAuthServer(PipelineAuthThird pipelineAuthThird) {
+        int authPublic = pipelineAuthThird.getAuthPublic();
+        String serverId = pipelineAuthThird.getServerId();
+        PipelineAuthThird oneAuthServer = findOneAuthServer(serverId);
+        int aPublic = oneAuthServer.getAuthPublic();
+        if (authPublic == 1 && aPublic == 2){
+            pipelineAuthThird.setPrivateKey("");
+        }
+        if (authPublic == 2 && aPublic == 1){
+            pipelineAuthThird.setUsername("");
+            pipelineAuthThird.setPassword("");
+        }
         PipelineAuthThirdEntity authServerEntity = BeanMapper.map(pipelineAuthThird, PipelineAuthThirdEntity.class);
         authServerDao.updateAuthServer(authServerEntity);
     }

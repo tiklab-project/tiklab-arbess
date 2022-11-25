@@ -150,7 +150,11 @@ public class PipelineConfigServiceImpl implements PipelineConfigService {
         String object = JSON.toJSONString(config.getValues());
         switch (message){
             case "create"->{
-                String id = codeService.createCode(new PipelineCode());
+                PipelineCode pipelineCode = new PipelineCode();
+                if (config.getTaskType() == 1){
+                    pipelineCode.setCodeBranch("master");
+                }
+                String id = codeService.createCode(pipelineCode);
                 map.put("id",id);
             }
             case "update"->{
@@ -178,7 +182,8 @@ public class PipelineConfigServiceImpl implements PipelineConfigService {
         String object = JSON.toJSONString(config.getValues());
         switch (message){
             case "create"->{
-                String id = codeScanService.createCodeScan(new PipelineCodeScan());
+                PipelineCodeScan pipelineCodeScan = new PipelineCodeScan();
+                String id = codeScanService.createCodeScan(pipelineCodeScan);
                 map.put("id",id);
             }
             case "update"->{
@@ -205,7 +210,11 @@ public class PipelineConfigServiceImpl implements PipelineConfigService {
         String object = JSON.toJSONString(config.getValues());
         switch (message){
             case "create"->{
-                String id = testService.createTest(new PipelineTest());
+                PipelineTest pipelineTest = new PipelineTest();
+                if (config.getTaskType() == 11){
+                    pipelineTest.setTestOrder("mvn test -Dmaven.test.failure.ignore=true");
+                }
+                String id = testService.createTest(pipelineTest);
                 map.put("id",id);
             }
             case "update"->{
@@ -232,7 +241,15 @@ public class PipelineConfigServiceImpl implements PipelineConfigService {
         String object = JSON.toJSONString(config.getValues());
         switch (message){
             case "create"->{
-                String id = buildService.createBuild(new PipelineBuild());
+                PipelineBuild pipelineBuild = new PipelineBuild();
+                int taskType = config.getTaskType();
+                if (taskType == 21){
+                    pipelineBuild.setBuildOrder("mvn clean package");
+                }
+                if (taskType == 22){
+                    pipelineBuild.setBuildOrder("npm install");
+                }
+                String id = buildService.createBuild(pipelineBuild);
                 map.put("id",id);
             }
             case "update"->{

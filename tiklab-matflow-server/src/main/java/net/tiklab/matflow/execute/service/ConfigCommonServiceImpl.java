@@ -76,7 +76,7 @@ public class ConfigCommonServiceImpl implements ConfigCommonService {
         while ((s = bufferedReader.readLine()) != null) {
             logRunLog.append(s).append("\n");
             if (validStatus(s,error)){state = 0 ;}
-            execHistory(pipelineProcess,s);
+            execHistory(pipelineProcess, PipelineUntil.dateLog()+s);
         }
 
         if (!PipelineUntil.isNoNull(logRunLog.toString())){
@@ -85,7 +85,7 @@ public class ConfigCommonServiceImpl implements ConfigCommonService {
             while ((s = bufferedReader.readLine()) != null) {
                 logRunLog.append(s).append("\n");
                 if (validStatus(s,error)){state = 0 ;}
-                execHistory(pipelineProcess,s);
+                execHistory(pipelineProcess, PipelineUntil.dateLog()+s);
             }
         }
         inputStreamReader.close();
@@ -115,16 +115,16 @@ public class ConfigCommonServiceImpl implements ConfigCommonService {
      */
     public void runEnd(PipelineExecHistory pipelineExecHistory, String pipelineId ,String status){
         if (status.equals("success")){
-            pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+ "\nRUN RESULT : SUCCESS");
+            pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+"\n"+ PipelineUntil.dateLog() + "RUN RESULT : SUCCESS");
             pipelineExecHistory.setRunStatus(10);
         }
         if (status.equals("error")){
-            pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+ "\nRUN RESULT : FAIL");
+            pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+"\n"+ PipelineUntil.dateLog()+ "RUN RESULT : FAIL");
             pipelineExecHistory.setRunStatus(1);
         }
         if (status.equals("halt")){
             //更新信息
-            pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+ "\nRUN RESULT : HALT");
+            pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+"\n"+ PipelineUntil.dateLog()+ "RUN RESULT : HALT");
             pipelineExecHistory.setRunStatus(20);
         }
         //更新状态
@@ -156,6 +156,7 @@ public class ConfigCommonServiceImpl implements ConfigCommonService {
 
     }
 
+
     /**
      * 初始化历史
      * * @return 历史
@@ -170,7 +171,7 @@ public class ConfigCommonServiceImpl implements ConfigCommonService {
         pipelineExecHistory.setSort(1);
         pipelineExecHistory.setPipeline(pipeline);
         pipelineExecHistory.setHistoryId(historyId);
-        pipelineExecHistory.setRunLog("流水线"+pipeline.getPipelineName()+"开始执行。");
+        pipelineExecHistory.setRunLog(PipelineUntil.dateLog() +"流水线"+pipeline.getPipelineName()+"开始执行。");
         User user = new User();
         user.setId(LoginContext.getLoginId());
         pipelineExecHistory.setUser(user);

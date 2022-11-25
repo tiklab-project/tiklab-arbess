@@ -22,6 +22,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 
@@ -61,7 +62,7 @@ public class CodeAuthorizeServiceImpl implements CodeAuthorizeService {
 
     //获取accessToken
     @Override
-    public String findAccessToken(PipelineAuthThird authThird) throws IOException {
+    public String findAccessToken(PipelineAuthThird authThird) throws IOException , ApplicationException {
         String loginId = LoginContext.getLoginId();
         int type = authThird.getType();
         if (!PipelineUntil.isNoNull(authThird.getCode())){
@@ -92,6 +93,7 @@ public class CodeAuthorizeServiceImpl implements CodeAuthorizeService {
         String username = findMessage(accessToken, type);
         authThird.setUsername(username);
         authThird.setAuthType(2);
+        userMap.remove(loginId);
         userMap.put(loginId, authThird);
         if (map.get("state") != null && map.get("state").equals("0")){
             return null;
@@ -114,7 +116,7 @@ public class CodeAuthorizeServiceImpl implements CodeAuthorizeService {
         return map;
     }
 
-    private Map<String, String> gitHubAccessToken(PipelineAuthThird authThird,String accessTokenUrl){
+    private Map<String, String> gitHubAccessToken(PipelineAuthThird authThird,String accessTokenUrl) throws ApplicationException{
         Map<String, String> map = new HashMap<>();
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
@@ -124,13 +126,20 @@ public class CodeAuthorizeServiceImpl implements CodeAuthorizeService {
         paramMap.add("callback_url", authThird.getCallbackUrl().trim());
         paramMap.add("code",authThird.getCode());
         HttpEntity<MultiValueMap<String, Object>> entity = new HttpEntity<>(paramMap, headers);
-        ResponseEntity<JSONObject> response ;
+        ResponseEntity<JSONObject> response = null;
         try {
              response = restTemplate.exchange(accessTokenUrl, HttpMethod.POST, entity, JSONObject.class);
-        }catch (ResourceAccessException  e){
-            map.put("status","0") ;
-            return map;
+        }catch (ResourceAccessException e){
+            boolean timedOut = Objects.requireNonNull(e.getMessage()).contains("Read timed out");
+            boolean connectOut = Objects.requireNonNull(e.getMessage()).contains("Connect timed out");
+            if (timedOut || connectOut){
+                throw new ApplicationException(50001,"连接超时，请重新授权。");
+            }
+            System.out.println(e.getMessage());
+            throw new RuntimeException();
         }
+
+        // ResponseEntity<JSONObject> response = restTemplate.exchange(accessTokenUrl, HttpMethod.POST, entity, JSONObject.class);
 
         JSONObject body = response.getBody();
         if (body != null){
@@ -148,34 +157,34 @@ public class CodeAuthorizeServiceImpl implements CodeAuthorizeService {
         }
         String accessToken = authCode.getAccessToken();
         String allStorehouseAddress = codeAuthorizeApi.getAllStorehouse(accessToken,type);
-        return switch (type) {
-            case 2 -> giteeAllStorehouse( allStorehouseAddress);
-            case 3 -> gitHubAllStorehouse(accessToken, allStorehouseAddress);
-            default -> null;
-        };
+
+        List<String> list = new ArrayList<>();
+
+        try {
+            switch (type) {
+                case 2 -> list = giteeAllStorehouse( allStorehouseAddress);
+                case 3 -> list = gitHubAllStorehouse(accessToken, allStorehouseAddress);
+            }
+        }catch (HttpClientErrorException e){
+            throw new ApplicationException(50001,"获取仓库信息失败，该应用无权限，请为该应用赋予读取仓库(projects)权限。");
+        }
+
+        return list;
     }
 
-    private List<String> giteeAllStorehouse(String allStorehouseAddress) {
+    private List<String> giteeAllStorehouse(String allStorehouseAddress) throws HttpClientErrorException {
         List<String> storehouseList = new ArrayList<>();
 
         //消息转换器列表
         List<HttpMessageConverter<?>> messageConverters = restTemplate.getMessageConverters();
         //配置消息转换器StringHttpMessageConverter，并设置utf-8
         messageConverters.set(1, new StringHttpMessageConverter(StandardCharsets.UTF_8));
-
         ResponseEntity<String> returnBody = restTemplate.getForEntity(allStorehouseAddress, String.class, JSONObject.class);
-
-        HttpStatus statusCode = returnBody.getStatusCode();
-        if (statusCode.isError()){
-            return Collections.emptyList();
-        }
-
         String body = returnBody.getBody();
-        if (body == null){
-            return Collections.emptyList();
-        }
-
         JSONArray allStorehouseJson = JSON.parseArray(body);
+        if (allStorehouseJson == null){
+            return null;
+        }
         for (int i = 0; i < allStorehouseJson.size(); i++) {
             JSONObject storehouse=allStorehouseJson.getJSONObject(i);
             storehouseList.add(storehouse.getString("full_name"));
@@ -183,7 +192,7 @@ public class CodeAuthorizeServiceImpl implements CodeAuthorizeService {
         return storehouseList;
     }
 
-    private  List<String> gitHubAllStorehouse( String accessToken, String allStorehouseAddress){
+    private  List<String> gitHubAllStorehouse(String accessToken, String allStorehouseAddress) throws HttpClientErrorException {
 
         List<String> list = new ArrayList<>();
         HttpHeaders headers = new HttpHeaders();

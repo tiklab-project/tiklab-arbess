@@ -22,6 +22,10 @@ public class PipelineUntil {
     public static String date(){
         return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
     }
+    public static String dateLog(){
+        String format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+        return "["+format+"]"+"  ";
+    }
 
     //效验git地址
     public static boolean validGit(String address){
@@ -158,7 +162,7 @@ public class PipelineUntil {
      * @param regex 条件
      * @return 文件全路径
      */
-    public static String getFile(String pipelineName, String regex){
+    public static String getFile(String pipelineName, String regex) throws ApplicationException{
         List<String> list = new ArrayList<>();
         String path= findFileAddress() + pipelineName;
         List<String> filePath = PipelineUntil.getFilePath(new File(path),new ArrayList<>());
@@ -168,7 +172,12 @@ public class PipelineUntil {
                 list.add(s);
             }
         }
-        if (list.size()==1){
+
+        if (list.size() > 1){
+            throw new ApplicationException("匹配到多个文件，请重新输入部署文件信息。");
+        }
+
+        if (list.size()== 1){
             return list.get(0);
         }
         return null;

@@ -38,11 +38,11 @@ public class DeployAchieveServiceImpl implements DeployAchieveService {
         //开始运行时间
         Pipeline pipeline = pipelineProcess.getPipeline();
         String startShell = pipelineDeploy.getStartOrder();
-
+        String log = PipelineUntil.dateLog();
         //执行自定义脚本
         try {
             if (pipelineDeploy.getAuthType() == 2) {
-                commonService.execHistory(pipelineProcess,"执行脚本：" + startShell);
+                commonService.execHistory(pipelineProcess,log+"执行脚本：" + startShell);
                 Process process = PipelineUntil.process("/", startShell);
 
                 pipelineProcess.setInputStream(process.getInputStream());
@@ -54,21 +54,21 @@ public class DeployAchieveServiceImpl implements DeployAchieveService {
                 return true;
             }
         } catch (IOException e) {
-            commonService.execHistory(pipelineProcess, "命令执行错误");
+            commonService.execHistory(pipelineProcess, log+"命令执行错误");
             return false;
         }
 
 
-        commonService.execHistory(pipelineProcess,"获取部署文件......");
+        commonService.execHistory(pipelineProcess,log+"获取部署文件......");
 
         //获取部署文件
         String filePath = PipelineUntil.getFile(pipeline.getPipelineName(), pipelineDeploy.getLocalAddress());
         if (filePath == null){
-            commonService.execHistory(pipelineProcess,"无法匹配到部署文件。");
+            commonService.execHistory(pipelineProcess,log+"无法匹配到部署文件。");
             return false;
         }
 
-        commonService.execHistory(pipelineProcess,"部署文件获取成功："+ filePath );
+        commonService.execHistory(pipelineProcess,log+"部署文件获取成功："+ filePath );
 
         //文件名
         String fileName = new File(filePath).getName();
@@ -76,33 +76,33 @@ public class DeployAchieveServiceImpl implements DeployAchieveService {
         //发送文件位置
         String deployAddress ="/"+ pipelineDeploy.getDeployAddress();
 
-        commonService.execHistory(pipelineProcess,"建立服务器连接：" );
+        commonService.execHistory(pipelineProcess,log+"建立服务器连接：" );
 
         Session session;
         try {
             session = createSession(pipelineDeploy);
         } catch (JSchException e) {
-            commonService.execHistory(pipelineProcess,"连接失败，无法连接到服务器\n"+e.getMessage());
+            commonService.execHistory(pipelineProcess,log+"连接失败，无法连接到服务器\n"+log+e.getMessage());
             return false;
         }
 
-        commonService.execHistory(pipelineProcess,"连接建立成功\n上传部署文件："+ fileName );
+        commonService.execHistory(pipelineProcess,log+"连接建立成功\n上传部署文件："+log+ fileName );
 
         try {
          ftp(session, filePath, deployAddress);
         } catch (JSchException | SftpException e) {
             session.disconnect();
-            commonService.execHistory(pipelineProcess,"部署文件上传失败");
+            commonService.execHistory(pipelineProcess,log+"部署文件上传失败");
             return false;
         }
 
-        commonService.execHistory(pipelineProcess,"部署文件上传成功" );
+        commonService.execHistory(pipelineProcess,log+"部署文件上传成功" );
 
         try {
             linux(session, pipelineProcess,pipelineDeploy);
         } catch (JSchException | IOException e) {
             session.disconnect();
-            commonService.execHistory(pipelineProcess,"命令执行失败");
+            commonService.execHistory(pipelineProcess,log+"命令执行失败");
             return false;
         }
         session.disconnect();
@@ -133,13 +133,13 @@ public class DeployAchieveServiceImpl implements DeployAchieveService {
 
         if (PipelineUntil.isNoNull(deployOrder)){
             String orders = "cd "+" "+ deployAddress + ";" + deployOrder;
-            commonService.execHistory(pipelineProcess,"执行部署命令：" + orders);
+            commonService.execHistory(pipelineProcess,PipelineUntil.dateLog()+"执行部署命令：" + orders);
             sshOrder(session,orders, pipelineProcess);
         }
 
         if (PipelineUntil.isNoNull(startOrder)){
             String orders = "cd "+" "+ startAddress+";" + startOrder;
-            commonService.execHistory(pipelineProcess,"执行启动命令：" + orders );
+            commonService.execHistory(pipelineProcess,PipelineUntil.dateLog()+"执行启动命令：" + orders );
             sshOrder(session,orders, pipelineProcess);
         }
 

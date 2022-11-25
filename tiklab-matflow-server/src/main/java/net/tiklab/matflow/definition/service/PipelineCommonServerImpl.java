@@ -88,25 +88,30 @@ public class PipelineCommonServerImpl implements PipelineCommonServer{
         List<PipelineMassage> pipelineMassageList = new ArrayList<>();
         for (Pipeline pipeline : allPipeline) {
             joinTemplate.joinQuery(pipeline);
-            PipelineMassage pipelineMassage = new PipelineMassage();
-            //成功和构建时间
-            PipelineExecHistory latelyHistory = historyService.findLatelyHistory(pipeline.getPipelineId());
-            pipelineMassage.setPipelineId(pipeline.getPipelineId());
-            pipelineMassage.setPipelineCollect(pipeline.getPipelineCollect());
-            pipelineMassage.setPipelineName(pipeline.getPipelineName());
-            pipelineMassage.setPipelineState(pipeline.getPipelineState());
-            pipelineMassage.setCreateTime(pipeline.getPipelineCreateTime());
-            pipelineMassage.setColor(pipeline.getColor());
-            pipelineMassage.setUser(pipeline.getUser());
-            pipelineMassage.setPipelinePower(pipeline.getPipelinePower());
-            if (latelyHistory != null){
-                pipelineMassage.setLastBuildTime(latelyHistory.getCreateTime());
-                pipelineMassage.setBuildStatus(latelyHistory.getRunStatus());
-                pipelineMassage.setExecUser(latelyHistory.getUser());
-            }
-            pipelineMassageList.add(pipelineMassage);
+            PipelineMassage oneStatus = findOneStatus(pipeline);
+            pipelineMassageList.add(oneStatus);
         }
         return pipelineMassageList;
+    }
+
+    private PipelineMassage findOneStatus(Pipeline pipeline){
+        PipelineMassage pipelineMassage = new PipelineMassage();
+        //成功和构建时间
+        PipelineExecHistory latelyHistory = historyService.findLatelyHistory(pipeline.getPipelineId());
+        pipelineMassage.setPipelineId(pipeline.getPipelineId());
+        pipelineMassage.setPipelineCollect(pipeline.getPipelineCollect());
+        pipelineMassage.setPipelineName(pipeline.getPipelineName());
+        pipelineMassage.setPipelineState(pipeline.getPipelineState());
+        pipelineMassage.setCreateTime(pipeline.getPipelineCreateTime());
+        pipelineMassage.setColor(pipeline.getColor());
+        pipelineMassage.setUser(pipeline.getUser());
+        pipelineMassage.setPipelinePower(pipeline.getPipelinePower());
+        if (latelyHistory != null){
+            pipelineMassage.setLastBuildTime(latelyHistory.getCreateTime());
+            pipelineMassage.setBuildStatus(latelyHistory.getRunStatus());
+            pipelineMassage.setExecUser(latelyHistory.getUser());
+        }
+       return pipelineMassage;
     }
 
     /**
@@ -295,8 +300,18 @@ public class PipelineCommonServerImpl implements PipelineCommonServer{
             return Collections.emptyList() ;
         }
         allOpen.sort(Comparator.comparing(PipelineOpen::getNumber).reversed()) ;
-        int min = Math.min(5, allOpen.size()) ;
-        return allOpen.subList(0,min);
+        int min = Math.min(4, allOpen.size()) ;
+        List<PipelineOpen> pipelineOpens = allOpen.subList(0, min);
+
+        for (PipelineOpen pipelineOpen : pipelineOpens) {
+            Pipeline pipeline = pipelineOpen.getPipeline();
+            joinTemplate.joinQuery(pipeline);
+            PipelineMassage oneStatus = findOneStatus(pipeline);
+            PipelineExecState pipelineExecState = pipelineCensus(pipelineOpen.getPipelineId());
+            pipelineOpen.setPipelineExecState(pipelineExecState);
+            pipelineOpen.setPipelineMassage(oneStatus);
+        }
+        return pipelineOpens;
     }
 
 

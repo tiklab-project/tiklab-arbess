@@ -12,7 +12,6 @@ import net.tiklab.matflow.setting.service.PipelineAuthThirdServer;
 import net.tiklab.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -20,7 +19,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-
 /**
  * 源码管理执行方法
  */
@@ -42,8 +40,10 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
     // git克隆
     public boolean clone(PipelineProcess pipelineProcess, PipelineCode pipelineCode){
 
+        String log = PipelineUntil.dateLog();
+
         if (!PipelineUntil.isNoNull(pipelineCode.getCodeAddress())){
-            commonService.execHistory(pipelineProcess,"代码源地址未配置。");
+            commonService.execHistory(pipelineProcess,log+"代码源地址未配置。");
             return false;
         }
 
@@ -63,7 +63,7 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
             }
         }
 
-        commonService.execHistory(pipelineProcess,"分配源码空间。\n空间分配成功。");
+        commonService.execHistory(pipelineProcess,log+"分配源码空间。" +"\n"+ log+ "空间分配成功。");
 
         //分支
         String codeBranch = pipelineCode.getCodeBranch();
@@ -72,11 +72,11 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
         }
 
         //更新日志
-        String s = "开始拉取代码 : " + "\n"
-                + "FileAddress : " + file + "\n"
-                + "Uri : " + pipelineCode.getCodeAddress() + "\n"
-                + "Branch : " + codeBranch + "\n"
-                + "代码拉取中。。。。。。 ";
+        String s =log + "开始拉取代码 : " + "\n"
+                +log + "FileAddress : " + file + "\n"
+                +log + "Uri : " + pipelineCode.getCodeAddress() + "\n"
+                +log + "Branch : " + codeBranch + "\n"
+                +log + "代码拉取中。。。。。。 ";
 
         commonService.execHistory(pipelineProcess,s);
 
@@ -84,7 +84,7 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
             //命令执行失败
             Process process = codeStart(pipelineCode,pipeline.getPipelineName());
             if (process == null){
-                commonService.execHistory(pipelineProcess,"代码拉取失败。");
+                commonService.execHistory(pipelineProcess,log+"代码拉取失败。");
                 return false;
             }
             //项目执行过程失败
@@ -94,22 +94,22 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
             if (pipelineCode.getType() != 5){
                 pipelineProcess.setEnCode("UTF-8");
             }
-            int log = commonService.log(pipelineProcess);
-            if (log == 0){
-                commonService.execHistory(pipelineProcess,"代码拉取失败。 \n" );
+            int status = commonService.log(pipelineProcess);
+            if (status == 0){
+                commonService.execHistory(pipelineProcess,log+"代码拉取失败。 \n" );
                 return false;
             }
         } catch (IOException e) {
-            commonService.execHistory(pipelineProcess,"系统执行命令错误 \n" + e);
+            commonService.execHistory(pipelineProcess,log+"系统执行命令错误 \n" + e);
             return false;
         }catch (URISyntaxException e){
-            commonService.execHistory(pipelineProcess,"git地址错误 \n" + e);
+            commonService.execHistory(pipelineProcess,log+"git地址错误 \n" + e);
             return false;
         }catch (ApplicationException e){
-            commonService.execHistory(pipelineProcess,"" + e);
+            commonService.execHistory(pipelineProcess,log+ e);
             return false;
         }
-        commonService.execHistory(pipelineProcess,"代码拉取成功");
+        commonService.execHistory(pipelineProcess,log+"代码拉取成功");
         return true;
     }
 

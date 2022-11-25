@@ -52,6 +52,17 @@ public class PipelineAuthServerImpl implements  PipelineAuthServer {
      */
     @Override
     public void updateAuth(PipelineAuth pipelineAuth) {
+        String authId = pipelineAuth.getAuthId();
+        PipelineAuth oneAuth = findOneAuth(authId);
+        int authPublic = pipelineAuth.getAuthPublic();
+        int oneAuthAuth = oneAuth.getAuthPublic();
+        if (authPublic == 2 && oneAuthAuth == 1){
+            pipelineAuth.setUsername("");
+            pipelineAuth.setPassword("");
+        }
+        if (authPublic == 1 && oneAuthAuth == 2){
+            pipelineAuth.setPrivateKey("");
+        }
         PipelineAuthEntity authEntity = BeanMapper.map(pipelineAuth, PipelineAuthEntity.class);
         authDao.updateAuth(authEntity);
     }

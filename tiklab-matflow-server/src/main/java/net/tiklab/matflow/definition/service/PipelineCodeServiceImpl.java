@@ -51,6 +51,7 @@ public class PipelineCodeServiceImpl implements PipelineCodeService {
     //修改
     @Override
     public void updateCode(PipelineCode pipelineCode) {
+
         switch (pipelineCode.getType()) {
             case 2, 3 -> {
                 if (!PipelineUntil.isNoNull(pipelineCode.getCodeName())){
@@ -62,6 +63,9 @@ public class PipelineCodeServiceImpl implements PipelineCodeService {
                 pipelineCode.setCodeAddress(houseUrl);
             }
             default -> pipelineCode.setCodeAddress(pipelineCode.getCodeName());
+        }
+        if (!PipelineUntil.isNoNull(pipelineCode.getCodeName())){
+            pipelineCode.setCodeAddress(" ");
         }
         pipelineCodeDao.updateCode(BeanMapper.map(pipelineCode, PipelineCodeEntity.class));
     }

@@ -26,15 +26,14 @@ public class BuildAchieveServiceImpl implements BuildAchieveService {
     // 构建
     public boolean build(PipelineProcess pipelineProcess,  PipelineBuild pipelineBuild)  {
         Pipeline pipeline = pipelineProcess.getPipeline();
-
+        String log = PipelineUntil.dateLog();
         //项目地址
         String path = PipelineUntil.findFileAddress()+ pipeline.getPipelineName();
 
         try {
-            String a = "------------------------------------" + " \n"
-                    +"开始构建" + " \n"
-                    +"项目地址：" +path + " \n"
-                    +"执行 : \""  + pipelineBuild.getBuildOrder() + "\"\n";
+            String a = log+"开始构建" + " \n"
+                    +log+"项目地址：" +path + " \n"
+                    +log+"执行构建命令:"  + pipelineBuild.getBuildOrder() ;
 
             //更新日志
             commonService.execHistory(pipelineProcess,a);
@@ -42,7 +41,7 @@ public class BuildAchieveServiceImpl implements BuildAchieveService {
             //执行命令
             Process process = getOrder(pipelineBuild, path);
             if (process == null){
-                commonService.execHistory(pipelineProcess,"构建命令执行错误");
+                commonService.execHistory(pipelineProcess,log+"构建命令执行错误");
                 return false;
             }
 
@@ -56,11 +55,11 @@ public class BuildAchieveServiceImpl implements BuildAchieveService {
 
             process.destroy();
             if (state == 0){
-                commonService.execHistory(pipelineProcess,"构建失败");
+                commonService.execHistory(pipelineProcess,log+"构建失败");
                 return false;
             }
         } catch (IOException | ApplicationException e) {
-            commonService.execHistory(pipelineProcess,e.getMessage());
+            commonService.execHistory(pipelineProcess,log+e.getMessage());
             return false;
         }
         return true;
