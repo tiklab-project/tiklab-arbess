@@ -91,7 +91,7 @@ public interface PipelineService {
      *
      * @return 流水线
      */
-    List<PipelineOpen> findAllOpen();
+    List<PipelineOpen> findAllOpen(int number);
 
 
 

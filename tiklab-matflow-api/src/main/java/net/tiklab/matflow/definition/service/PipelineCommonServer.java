@@ -75,7 +75,21 @@ public interface PipelineCommonServer {
     PipelineExecState pipelineCensus(String pipelineId);
 
 
-    List<PipelineOpen> findAllOpen(StringBuilder s);
+    /**
+     * 最近打开
+     * @param pipelineId 流水线id
+     * @return 统计信息
+     */
+    PipelineExecState census(String pipelineId);
+
+
+    /**
+     * 查询最近打开的流水线
+     * @param s 流水线id信息
+     * @param number 数量
+     * @return 最近打开的流水线列表
+     */
+    List<PipelineOpen> findAllOpen(StringBuilder s,int number);
 
 
 

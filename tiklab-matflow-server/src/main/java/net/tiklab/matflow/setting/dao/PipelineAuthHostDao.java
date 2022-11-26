@@ -22,7 +22,7 @@ public class PipelineAuthHostDao {
      * @return 主机认证id
      */
     public  String createAuthHost(PipelineAuthHostEntity pipelineAuthHostEntity){
-        pipelineAuthHostEntity.setCreateTime(PipelineUntil.date());
+        pipelineAuthHostEntity.setCreateTime(PipelineUntil.date(1));
         pipelineAuthHostEntity.setUserId(LoginContext.getLoginId());
         return jpaTemplate.save(pipelineAuthHostEntity, String.class);
     }

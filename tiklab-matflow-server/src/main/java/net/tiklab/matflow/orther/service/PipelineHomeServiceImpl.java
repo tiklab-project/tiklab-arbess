@@ -213,7 +213,7 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
             map.put("userName", user.getNickname());
         }
         map.put("color", ""+pipeline.getColor());
-        map.put("date",PipelineUntil.date());
+        map.put("date",PipelineUntil.date(1));
         return map;
     }
 

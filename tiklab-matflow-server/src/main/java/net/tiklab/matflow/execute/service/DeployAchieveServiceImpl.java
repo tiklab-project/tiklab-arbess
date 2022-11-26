@@ -38,7 +38,7 @@ public class DeployAchieveServiceImpl implements DeployAchieveService {
         //开始运行时间
         Pipeline pipeline = pipelineProcess.getPipeline();
         String startShell = pipelineDeploy.getStartOrder();
-        String log = PipelineUntil.dateLog();
+        String log = PipelineUntil.date(4);
         //执行自定义脚本
         try {
             if (pipelineDeploy.getAuthType() == 2) {
@@ -133,13 +133,13 @@ public class DeployAchieveServiceImpl implements DeployAchieveService {
 
         if (PipelineUntil.isNoNull(deployOrder)){
             String orders = "cd "+" "+ deployAddress + ";" + deployOrder;
-            commonService.execHistory(pipelineProcess,PipelineUntil.dateLog()+"执行部署命令：" + orders);
+            commonService.execHistory(pipelineProcess,PipelineUntil.date(4)+"执行部署命令：" + orders);
             sshOrder(session,orders, pipelineProcess);
         }
 
         if (PipelineUntil.isNoNull(startOrder)){
             String orders = "cd "+" "+ startAddress+";" + startOrder;
-            commonService.execHistory(pipelineProcess,PipelineUntil.dateLog()+"执行启动命令：" + orders );
+            commonService.execHistory(pipelineProcess,PipelineUntil.date(4)+"执行启动命令：" + orders );
             sshOrder(session,orders, pipelineProcess);
         }
 

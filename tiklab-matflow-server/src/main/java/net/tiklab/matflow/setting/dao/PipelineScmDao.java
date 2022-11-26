@@ -2,6 +2,7 @@ package net.tiklab.matflow.setting.dao;
 
 import net.tiklab.dal.jpa.JpaTemplate;
 import net.tiklab.matflow.definition.dao.PipelineDao;
+import net.tiklab.matflow.orther.service.PipelineUntil;
 import net.tiklab.matflow.setting.entity.PipelineScmEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +26,7 @@ public class PipelineScmDao {
      * @return 配置id
      */
     public String createPipelineScm(PipelineScmEntity pipelineScmEntity){
+        pipelineScmEntity.setCreateTime(PipelineUntil.date(1));
         return jpaTemplate.save(pipelineScmEntity, String.class);
     }
 

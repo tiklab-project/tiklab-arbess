@@ -64,9 +64,7 @@ public class PipelineCodeServiceImpl implements PipelineCodeService {
             }
             default -> pipelineCode.setCodeAddress(pipelineCode.getCodeName());
         }
-        if (!PipelineUntil.isNoNull(pipelineCode.getCodeName())){
-            pipelineCode.setCodeAddress(" ");
-        }
+
         pipelineCodeDao.updateCode(BeanMapper.map(pipelineCode, PipelineCodeEntity.class));
     }
 

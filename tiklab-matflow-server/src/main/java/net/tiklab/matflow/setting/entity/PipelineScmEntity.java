@@ -2,7 +2,6 @@ package net.tiklab.matflow.setting.entity;
 
 
 import net.tiklab.dal.jpa.annotation.*;
-import net.tiklab.matflow.orther.service.PipelineUntil;
 
 @Entity
 @Table(name="pipeline_scm")
@@ -19,7 +18,7 @@ public class PipelineScmEntity {
     private int scmType;
 
     @Column(name = "create_time")
-    private String createTime = PipelineUntil.date();
+    private String createTime;
 
     //名称
     @Column(name = "scm_name")

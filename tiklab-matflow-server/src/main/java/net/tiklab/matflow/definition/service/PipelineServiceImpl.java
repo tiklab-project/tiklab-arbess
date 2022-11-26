@@ -60,7 +60,7 @@ public class PipelineServiceImpl implements PipelineService {
             throw new ApplicationException(e);
         }
         pipeline.setColor((random.nextInt(5) + 1));
-        pipeline.setPipelineCreateTime(PipelineUntil.date());
+        pipeline.setPipelineCreateTime(PipelineUntil.date(1));
         PipelineEntity pipelineEntity = BeanMapper.map(pipeline, PipelineEntity.class);
         pipelineEntity.setPipelineState(2);
         String pipelineId = pipelineDao.createPipeline(pipelineEntity);
@@ -96,6 +96,7 @@ public class PipelineServiceImpl implements PipelineService {
         commonServer.deleteHistory(pipeline); //历史，日志信息
         commonServer.deleteDmRole(pipelineId); //关联角色
         configOrderService.deleteConfig(pipelineId); //配置信息
+
 
         //动态
         Map<String, String> map = homeService.initMap(pipeline);
@@ -284,12 +285,12 @@ public class PipelineServiceImpl implements PipelineService {
      * @return 流水线
      */
     @Override
-    public List<PipelineOpen> findAllOpen() {
+    public List<PipelineOpen> findAllOpen(int number) {
         StringBuilder s = findUserPipelineId(LoginContext.getLoginId()) ;
         if (!PipelineUntil.isNoNull(s.toString())){
             return null;
         }
-        return commonServer.findAllOpen(s);
+        return commonServer.findAllOpen(s,number);
     }
 
 }

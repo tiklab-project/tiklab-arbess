@@ -20,7 +20,7 @@ public class PipelineAuthDao {
      * @return 基本认证id
      */
     public  String createAuth(PipelineAuthEntity pipelineAuthEntity){
-        pipelineAuthEntity.setCreateTime(PipelineUntil.date());
+        pipelineAuthEntity.setCreateTime(PipelineUntil.date(1));
         pipelineAuthEntity.setUserId(LoginContext.getLoginId());
         return jpaTemplate.save(pipelineAuthEntity, String.class);
     }

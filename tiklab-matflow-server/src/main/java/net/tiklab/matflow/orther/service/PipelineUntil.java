@@ -18,13 +18,27 @@ import java.util.regex.Pattern;
 
 public class PipelineUntil {
 
-    //返回系统当前时间
-    public static String date(){
-        return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
-    }
-    public static String dateLog(){
-        String format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
-        return "["+format+"]"+"  ";
+    /**
+     * 返回系统时间
+     * @param type 时间类型 1.(yyyy-MM-dd HH:mm:ss) 2.(yyyy-MM-dd) 3.(HH:mm:ss) 4.([format])
+     * @return 时间
+     */
+    public static String date(int type){
+        switch (type) {
+            case 2 -> {
+                return new SimpleDateFormat("yyyy-MM-dd").format(new Date());
+            }
+            case 3 -> {
+                return new SimpleDateFormat("HH:mm:ss").format(new Date());
+            }
+            case 4 -> {
+                String format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+                return "[" + format + "]" + "  ";
+            }
+            default -> {
+                return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+            }
+        }
     }
 
     //效验git地址
@@ -75,10 +89,21 @@ public class PipelineUntil {
     public static Process process(String path,String order) throws IOException {
         Runtime runtime=Runtime.getRuntime();
         Process process;
+        String[] cmd;
         if (findSystemType()==1){
-            process = runtime.exec(" cmd.exe /c cd " + path + " &&" + " " + order);
+            if (path == null){
+                // cmd = new String[] { "cmd.exe"," /c", order };
+                process = runtime.exec(" cmd.exe /c " + " " + order);
+            }else {
+                // cmd = new String[] { "cmd.exe"," /c","cd "+path, order };
+                process = runtime.exec(" cmd.exe /c cd " + path + " &&" + " " + order);
+            }
         }else {
-            String[] cmd = new String[] { "/bin/sh", "-c", "cd "+path+";"+" source /etc/profile;"+ order };
+            if (path == null){
+                cmd = new String[] { "/bin/sh", "-c", " source /etc/profile;"+ order };
+            }else {
+                cmd = new String[] { "/bin/sh", "-c", "cd "+path+";"+" source /etc/profile;"+ order };
+            }
             process = runtime.exec(cmd);
         }
         return process;
@@ -108,14 +133,21 @@ public class PipelineUntil {
      * @return 位置
      */
     public static String findFileAddress(){
-        String files = "/usr/local/matflow/";
-
-        String property = System.getProperty("os.name");
-        String[] s = property.split(" ");
-        if (s[0].equals("Windows")){
-            files = "D:\\clone\\";
+        String userHome = System.getProperty("user.home")+"/.tiklab";
+        File file = new File(userHome+"/matflow/workspace");
+        String path = file.getAbsolutePath();
+        if (!file.exists()){
+            int systemType = findSystemType();
+            createFile(path);
+            try {
+                if (systemType == 1){
+                    process(null," attrib +H " + userHome);
+                }
+            } catch (IOException e) {
+                throw new ApplicationException("更改工作空间为隐藏失败。");
+            }
         }
-        return files;
+        return path+"/";
     }
 
     /**
@@ -140,20 +172,6 @@ public class PipelineUntil {
             // 目录此时为空，删除
         }
         return file.delete();
-    }
-
-    //获取符合条件的文件名
-    public static List<String> getFilePath(File path,List<String> list){
-        File[] fa = path.listFiles();
-        if (fa != null) {
-            for (File file : fa) {
-                if (file.isDirectory()){
-                    getFilePath(file,list);
-                }
-                list.add(file.getPath());
-            }
-        }
-        return list;
     }
 
     /**
@@ -181,6 +199,20 @@ public class PipelineUntil {
             return list.get(0);
         }
         return null;
+    }
+
+    //获取符合条件的文件名
+    public static List<String> getFilePath(File path,List<String> list){
+        File[] fa = path.listFiles();
+        if (fa != null) {
+            for (File file : fa) {
+                if (file.isDirectory()){
+                    getFilePath(file,list);
+                }
+                list.add(file.getPath());
+            }
+        }
+        return list;
     }
 
     /**
@@ -211,7 +243,6 @@ public class PipelineUntil {
      * @return 输出流
      */
     public static InputStreamReader encode(InputStream inputStream,String encode){
-
         if (inputStream == null){
             return null;
         }
@@ -298,6 +329,33 @@ public class PipelineUntil {
             return null;
         }
         return path;
+    }
+
+
+    /**
+     * 创建文件夹
+     * @param address 文件地址
+     * @throws ApplicationException 文件创建失败
+     */
+    public static void createFile(String address) throws ApplicationException {
+        int i = 0;
+        try {
+            File file = new File(address);
+            boolean b = false;
+            if (!file.exists()) {
+                while (!b && i <= 10) {
+                    b = file.mkdirs();
+                    i++;
+                }
+            }
+        }catch (SecurityException e){
+            throw new ApplicationException("项目工作目录创建失败。"+e);
+        }
+
+        if (i >= 10) {
+            throw new ApplicationException("项目工作目录创建失败。");
+        }
+
     }
 
 }

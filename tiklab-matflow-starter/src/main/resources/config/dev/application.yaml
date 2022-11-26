@@ -81,19 +81,6 @@ licences:
 file:
   path: http://file.dev.tiklab.net
 
-git:
-  gitee:
-    client:
-      id: 8a2f94e843f5ad2d0fb7b3e8ce8b8e97d661c1988034059ed3249563070817cf
-      secret: 93b7d9305babc695cdebe5cafa4a24701b14672d212d4daa7aba67df20fbed1c
-    callback:
-      url: http%3A%2F%2F192.168.10.23%3A3004%2F%23%2Findex%2Ftask%2Fconfig
-  github:
-    client:
-      id: 44e35e0891b3b30846eb
-      secret: 2241ab6c5fba11638ed9c4ea70c4a8a5671ef247
-    callback:
-      url: http://192.168.10.23:3004/#/index/task/config
 
 
 

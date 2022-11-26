@@ -30,7 +30,7 @@ public class CodeScanAchieveServiceImpl implements CodeScanService {
     public boolean codeScan(PipelineProcess pipelineProcess, PipelineCodeScan pipelineCodeScan) {
 
         Pipeline pipeline = pipelineProcess.getPipeline();
-        String log = PipelineUntil.dateLog();
+        String log = PipelineUntil.date(4);
         String fileAddress = PipelineUntil.findFileAddress();
         commonService.execHistory(pipelineProcess,log+"开始扫描代码。。。。。。");
         try {
@@ -73,7 +73,7 @@ public class CodeScanAchieveServiceImpl implements CodeScanService {
             PipelineAuthThird authThird =(PipelineAuthThird) pipelineCodeScan.getAuth();
 
             if (authThird == null){
-                commonService.execHistory(pipelineProcess,PipelineUntil.dateLog()+"执行扫描命令："+execOrder);
+                commonService.execHistory(pipelineProcess,PipelineUntil.date(4)+"执行扫描命令："+execOrder);
                 order = mavenOrder(execOrder, path);
                 return PipelineUntil.process(mavenAddress, order);
             }
@@ -89,7 +89,7 @@ public class CodeScanAchieveServiceImpl implements CodeScanService {
                 execOrder = execOrder +
                         " -Dsonar.login="+authThird.getPrivateKey();
             }
-            commonService.execHistory(pipelineProcess,PipelineUntil.dateLog()+"执行扫描命令："+execOrder);
+            commonService.execHistory(pipelineProcess,PipelineUntil.date(4)+"执行扫描命令："+execOrder);
             order = mavenOrder(execOrder, path);
             return PipelineUntil.process(mavenAddress, order);
         }

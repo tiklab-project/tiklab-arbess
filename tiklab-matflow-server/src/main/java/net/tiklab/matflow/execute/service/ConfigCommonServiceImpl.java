@@ -45,6 +45,8 @@ public class ConfigCommonServiceImpl implements ConfigCommonService {
     private static final Logger logger = LoggerFactory.getLogger(ConfigCommonServiceImpl.class);
 
     Map<String,PipelineExecHistory> historyMap = PipelineExecServiceImpl.historyMap;
+    
+    public String date=PipelineUntil.date(4);
 
     /**
      * 执行日志
@@ -76,7 +78,7 @@ public class ConfigCommonServiceImpl implements ConfigCommonService {
         while ((s = bufferedReader.readLine()) != null) {
             logRunLog.append(s).append("\n");
             if (validStatus(s,error)){state = 0 ;}
-            execHistory(pipelineProcess, PipelineUntil.dateLog()+s);
+            execHistory(pipelineProcess, date+s);
         }
 
         if (!PipelineUntil.isNoNull(logRunLog.toString())){
@@ -85,7 +87,7 @@ public class ConfigCommonServiceImpl implements ConfigCommonService {
             while ((s = bufferedReader.readLine()) != null) {
                 logRunLog.append(s).append("\n");
                 if (validStatus(s,error)){state = 0 ;}
-                execHistory(pipelineProcess, PipelineUntil.dateLog()+s);
+                execHistory(pipelineProcess, date+s);
             }
         }
         inputStreamReader.close();
@@ -115,16 +117,16 @@ public class ConfigCommonServiceImpl implements ConfigCommonService {
      */
     public void runEnd(PipelineExecHistory pipelineExecHistory, String pipelineId ,String status){
         if (status.equals("success")){
-            pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+"\n"+ PipelineUntil.dateLog() + "RUN RESULT : SUCCESS");
+            pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+"\n"+ date + "RUN RESULT : SUCCESS");
             pipelineExecHistory.setRunStatus(10);
         }
         if (status.equals("error")){
-            pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+"\n"+ PipelineUntil.dateLog()+ "RUN RESULT : FAIL");
+            pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+"\n"+ date+ "RUN RESULT : FAIL");
             pipelineExecHistory.setRunStatus(1);
         }
         if (status.equals("halt")){
             //更新信息
-            pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+"\n"+ PipelineUntil.dateLog()+ "RUN RESULT : HALT");
+            pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+"\n"+ date+ "RUN RESULT : HALT");
             pipelineExecHistory.setRunStatus(20);
         }
         //更新状态
@@ -166,12 +168,12 @@ public class ConfigCommonServiceImpl implements ConfigCommonService {
         PipelineExecHistory pipelineExecHistory = new PipelineExecHistory();
         String historyId = historyService.createHistory(pipelineExecHistory);
         //初始化基本信息
-        pipelineExecHistory.setCreateTime(PipelineUntil.date());
+        pipelineExecHistory.setCreateTime(PipelineUntil.date(1));
         pipelineExecHistory.setRunWay(1);
         pipelineExecHistory.setSort(1);
         pipelineExecHistory.setPipeline(pipeline);
         pipelineExecHistory.setHistoryId(historyId);
-        pipelineExecHistory.setRunLog(PipelineUntil.dateLog() +"流水线"+pipeline.getPipelineName()+"开始执行。");
+        pipelineExecHistory.setRunLog(date +"流水线"+pipeline.getPipelineName()+"开始执行。");
         User user = new User();
         user.setId(LoginContext.getLoginId());
         pipelineExecHistory.setUser(user);

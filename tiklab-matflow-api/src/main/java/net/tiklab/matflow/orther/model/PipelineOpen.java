@@ -7,7 +7,6 @@ import net.tiklab.beans.annotation.Mappings;
 import net.tiklab.join.annotation.Join;
 import net.tiklab.join.annotation.JoinQuery;
 import net.tiklab.matflow.definition.model.Pipeline;
-import net.tiklab.matflow.definition.model.PipelineMassage;
 import net.tiklab.matflow.execute.model.PipelineExecState;
 import net.tiklab.postin.annotation.ApiModel;
 import net.tiklab.postin.annotation.ApiProperty;
@@ -38,16 +37,11 @@ public class PipelineOpen {
     @ApiProperty(name="number",desc="数量")
     private int number;
 
+    @ApiProperty(name="createTime",desc="创建时间")
+    private String createTime;
 
     //流水线执行统计信息
     private PipelineExecState pipelineExecState;
-
-    //流水线执行信息
-    private PipelineMassage pipelineMassage;
-
-    private String pipelineName;
-
-    private String pipelineId;
 
 
     public String getOpenId() {
@@ -82,22 +76,6 @@ public class PipelineOpen {
         this.number = number;
     }
 
-    public String getPipelineName() {
-        return pipelineName;
-    }
-
-    public void setPipelineName(String pipelineName) {
-        this.pipelineName = pipelineName;
-    }
-
-    public String getPipelineId() {
-        return pipelineId;
-    }
-
-    public void setPipelineId(String pipelineId) {
-        this.pipelineId = pipelineId;
-    }
-
     public PipelineExecState getPipelineExecState() {
         return pipelineExecState;
     }
@@ -106,11 +84,11 @@ public class PipelineOpen {
         this.pipelineExecState = pipelineExecState;
     }
 
-    public PipelineMassage getPipelineMassage() {
-        return pipelineMassage;
+    public String getCreateTime() {
+        return createTime;
     }
 
-    public void setPipelineMassage(PipelineMassage pipelineMassage) {
-        this.pipelineMassage = pipelineMassage;
+    public void setCreateTime(String createTime) {
+        this.createTime = createTime;
     }
 }

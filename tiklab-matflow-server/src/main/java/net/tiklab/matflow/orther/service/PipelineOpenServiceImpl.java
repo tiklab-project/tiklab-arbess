@@ -34,7 +34,8 @@ public class PipelineOpenServiceImpl implements PipelineOpenService {
         }
         for (PipelineOpen pipelineOpen : allOpen) {
             joinTemplate.joinQuery(pipelineOpen);
-            if (!pipelineOpen.getPipeline().getPipelineId().equals(pipelineId)){
+            Pipeline pipeline = pipelineOpen.getPipeline();
+            if (!pipeline.getPipelineId().equals(pipelineId)){
                continue;
             }
             deleteOpen(pipelineOpen.getOpenId());
@@ -49,9 +50,10 @@ public class PipelineOpenServiceImpl implements PipelineOpenService {
             updateOpen(open);
         }else {
             PipelineOpen pipelineOpen = new PipelineOpen();
-            pipelineOpen.setPipeline(new Pipeline(pipelineId));
             pipelineOpen.setUserId(userId);
+            pipelineOpen.setPipeline(new Pipeline(pipelineId));
             pipelineOpen.setNumber(1);
+            pipelineOpen.setCreateTime(PipelineUntil.date(2));
             createOpen(pipelineOpen);
         }
     }
@@ -82,8 +84,8 @@ public class PipelineOpenServiceImpl implements PipelineOpenService {
             return null;
         }
         for (PipelineOpen pipelineOpen : findAllOpen()) {
-            Pipeline pipeline = pipelineOpen.getPipeline();
             String user = pipelineOpen.getUserId();
+            Pipeline pipeline = pipelineOpen.getPipeline();
             if (pipeline.getPipelineId().equals(pipelineId) && user.equals(userId)){
                 return pipelineOpen;
             }
@@ -116,10 +118,6 @@ public class PipelineOpenServiceImpl implements PipelineOpenService {
         List<PipelineOpenEntity> allOpen = pipelineOpenDao.findAllOpen(loginId,s);
         List<PipelineOpen> list = BeanMapper.mapList(allOpen, PipelineOpen.class);
         joinTemplate.joinQuery(list);
-        for (PipelineOpen pipelineOpen : list) {
-            pipelineOpen.setPipelineName(pipelineOpen.getPipeline().getPipelineName());
-            pipelineOpen.setPipelineId(pipelineOpen.getPipeline().getPipelineId());
-        }
         return list;
     }
 

@@ -139,16 +139,17 @@ public class PipelineController {
     @ApiParam(name = "pipelineId",desc = "流水线id",required = true)
     public Result<PipelineExecState> pipelineCensus(@NotNull String pipelineId){
 
-        PipelineExecState buildStatus = pipelineCommonServer.pipelineCensus(pipelineId);
+        PipelineExecState buildStatus = pipelineCommonServer.census(pipelineId);
 
         return Result.ok(buildStatus);
     }
 
     @RequestMapping(path="/findAllOpen",method = RequestMethod.POST)
     @ApiMethod(name = "findAllOpen",desc = "查询流水线最近状态")
-    public Result< List<PipelineOpen>> findAllOpen(){
+    @ApiParam(name = "number",desc = "数量",required = true)
+    public Result< List<PipelineOpen>> findAllOpen(int number){
 
-        List<PipelineOpen> openList = pipelineService.findAllOpen();
+        List<PipelineOpen> openList = pipelineService.findAllOpen(number);
 
         return Result.ok(openList);
     }

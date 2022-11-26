@@ -40,12 +40,13 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
     // git克隆
     public boolean clone(PipelineProcess pipelineProcess, PipelineCode pipelineCode){
 
-        String log = PipelineUntil.dateLog();
+        String log = PipelineUntil.date(4);
 
         if (!PipelineUntil.isNoNull(pipelineCode.getCodeAddress())){
             commonService.execHistory(pipelineProcess,log+"代码源地址未配置。");
             return false;
         }
+
 
         Pipeline pipeline = pipelineProcess.getPipeline();
 
@@ -72,11 +73,11 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
         }
 
         //更新日志
-        String s =log + "开始拉取代码 : " + "\n"
+        String s =log + "开始克隆代码 : " + "\n"
                 +log + "FileAddress : " + file + "\n"
                 +log + "Uri : " + pipelineCode.getCodeAddress() + "\n"
                 +log + "Branch : " + codeBranch + "\n"
-                +log + "代码拉取中。。。。。。 ";
+                +log + "代码克隆中。。。。。。 ";
 
         commonService.execHistory(pipelineProcess,s);
 
@@ -84,7 +85,7 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
             //命令执行失败
             Process process = codeStart(pipelineCode,pipeline.getPipelineName());
             if (process == null){
-                commonService.execHistory(pipelineProcess,log+"代码拉取失败。");
+                commonService.execHistory(pipelineProcess,log+"代码克隆失败。");
                 return false;
             }
             //项目执行过程失败
@@ -96,20 +97,20 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
             }
             int status = commonService.log(pipelineProcess);
             if (status == 0){
-                commonService.execHistory(pipelineProcess,log+"代码拉取失败。 \n" );
+                commonService.execHistory(pipelineProcess,log+"代码克隆失败。 \n" );
                 return false;
             }
         } catch (IOException e) {
             commonService.execHistory(pipelineProcess,log+"系统执行命令错误 \n" + e);
             return false;
         }catch (URISyntaxException e){
-            commonService.execHistory(pipelineProcess,log+"git地址错误 \n" + e);
+            commonService.execHistory(pipelineProcess,log+"Git地址错误 \n" + e);
             return false;
         }catch (ApplicationException e){
             commonService.execHistory(pipelineProcess,log+ e);
             return false;
         }
-        commonService.execHistory(pipelineProcess,log+"代码拉取成功");
+        commonService.execHistory(pipelineProcess,log+"代码克隆成功");
         return true;
     }
 
@@ -139,6 +140,7 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
         //源码存放位置
         String fileAddress = PipelineUntil.findFileAddress()+pipelineName;
         String gitOrder;
+        String path = null;
         switch (pipelineCode.getType()) {
             //账号密码或ssh登录
             case 1, 4 -> {
@@ -147,7 +149,8 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
                     PipelineUntil.process(serverAddress, list.get(0));
                     PipelineUntil.process(serverAddress, list.get(1));
                 }
-                gitOrder = list.get(list.size()-1);
+                gitOrder = list.get(2);
+                path = list.get(3);
             }
             //第三方授权
             case  2, 3 -> gitOrder = gitThirdOrder(pipelineCode, fileAddress);
@@ -157,7 +160,13 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
             default ->
                 throw new ApplicationException(50001,"没有类型为"+pipelineCode.getType()+"的源码配置");
         }
-        return PipelineUntil.process(serverAddress, gitOrder);
+        Process process = PipelineUntil.process(serverAddress, gitOrder);
+
+        if (PipelineUntil.isNoNull(path)){
+            PipelineUntil.deleteFile(new File(path));
+        }
+
+        return process;
 
     }
 
@@ -218,6 +227,7 @@ public class CodeAchieveServiceImpl implements CodeAchieveService {
         list.add(orderClean);
         list.add(orderAdd);
         list.add(s);
+        list.add(address);
 
         return list;
     }

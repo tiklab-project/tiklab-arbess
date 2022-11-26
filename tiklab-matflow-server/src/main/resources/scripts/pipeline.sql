@@ -113,6 +113,7 @@ create table pipeline_open  (
   pipeline_id varchar(255) ,
   number int ,
   user_id varchar(255) ,
+  create_time varchar(255) ,
   PRIMARY KEY (open_id) USING BTREE
 );
 

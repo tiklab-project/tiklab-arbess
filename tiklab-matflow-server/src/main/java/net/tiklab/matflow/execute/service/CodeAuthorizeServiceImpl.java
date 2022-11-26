@@ -86,7 +86,7 @@ public class CodeAuthorizeServiceImpl implements CodeAuthorizeService {
             throw new ApplicationException(50001,"授权失败，accessToken为空。");
         }
 
-        logger.info("授权成功："+accessToken + " time: "+ PipelineUntil.date());
+        logger.info("授权成功："+accessToken + " time: "+ PipelineUntil.date(1));
 
         authThird.setAccessToken(accessToken);
         authThird.setRefreshToken(map.get("refreshToken"));
@@ -393,7 +393,7 @@ public class CodeAuthorizeServiceImpl implements CodeAuthorizeService {
             boolean token = PipelineUntil.isNoNull(authCode.getAccessToken());
             boolean refresh = PipelineUntil.isNoNull(authCode.getRefreshToken());
             if (!token || !refresh) return;
-            logger.info("gitee定时任务，时间:"+PipelineUntil.date()+"更新授权信息");
+            logger.info("gitee定时任务，时间:"+PipelineUntil.date(1)+"更新授权信息");
             String refreshToken = codeAuthorizeApi.findRefreshToken(authCode.getRefreshToken());
             ResponseEntity<JSONObject> forEntity = restTemplate.postForEntity(refreshToken,String.class, JSONObject.class);
             JSONObject body = forEntity.getBody();

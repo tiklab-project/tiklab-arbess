@@ -20,13 +20,13 @@ import java.io.IOException;
 public class BuildAchieveServiceImpl implements BuildAchieveService {
 
     @Autowired
-    ConfigCommonService commonService;
+    private ConfigCommonService commonService;
 
 
     // 构建
     public boolean build(PipelineProcess pipelineProcess,  PipelineBuild pipelineBuild)  {
         Pipeline pipeline = pipelineProcess.getPipeline();
-        String log = PipelineUntil.dateLog();
+        String log = PipelineUntil.date(4);
         //项目地址
         String path = PipelineUntil.findFileAddress()+ pipeline.getPipelineName();
 
@@ -106,7 +106,7 @@ public class BuildAchieveServiceImpl implements BuildAchieveService {
      * @param path 项目地址
      * @return 命令
      */
-    public static String mavenOrder(String buildOrder,String path){
+    public String mavenOrder(String buildOrder,String path){
         String order;
         int systemType = PipelineUntil.findSystemType();
         order = " ./" + buildOrder + " " + "-f" +" " +path ;
@@ -114,6 +114,15 @@ public class BuildAchieveServiceImpl implements BuildAchieveService {
             order = " .\\" + buildOrder + " " + "-f"+" "  +path;
         }
         return order;
+    }
+
+    public String validOrder(String order){
+        String[] split = order.split("\n");
+        for (String s : split) {
+            String substring = s.substring(0, 1);
+            // if (substring)
+        }
+        return null;
     }
 
     private String[] error(int type){

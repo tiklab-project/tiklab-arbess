@@ -29,7 +29,7 @@ public class TestAchieveServiceImpl implements TestAchieveService {
         //初始化日志
         PipelineExecHistory pipelineExecHistory = pipelineProcess.getPipelineExecHistory();
         Pipeline pipeline = pipelineProcess.getPipeline();
-        String log = PipelineUntil.dateLog();
+        String log = PipelineUntil.date(4);
         String testOrder = pipelineTest.getTestOrder();
         String path = PipelineUntil.findFileAddress()+pipeline.getPipelineName();
         try {

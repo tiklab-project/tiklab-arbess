@@ -21,7 +21,7 @@ public class PipelineAuthThirdDao {
      * @return 第三方认证id
      */
     public  String createAuthServer(PipelineAuthThirdEntity pipelineAuthThirdEntity){
-        pipelineAuthThirdEntity.setCreateTime(PipelineUntil.date());
+        pipelineAuthThirdEntity.setCreateTime(PipelineUntil.date(1));
         pipelineAuthThirdEntity.setUserId(LoginContext.getLoginId());
         return jpaTemplate.save(pipelineAuthThirdEntity, String.class);
     }

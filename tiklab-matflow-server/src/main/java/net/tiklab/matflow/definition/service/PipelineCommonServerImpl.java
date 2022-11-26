@@ -59,6 +59,8 @@ public class PipelineCommonServerImpl implements PipelineCommonServer{
         String pipelineId = pipeline.getPipelineId();
         //删除对应的历史
         historyService.deleteAllHistory(pipelineId);
+        //删除最近打开
+        openService.deleteAllOpen(pipelineId);
         //删除对应文件
         String fileAddress = PipelineUntil.findFileAddress();
         PipelineUntil.deleteFile(new File(fileAddress+ pipeline.getPipelineName()));
@@ -282,10 +284,14 @@ public class PipelineCommonServerImpl implements PipelineCommonServer{
             return state;
         }
         state.setTime(PipelineUntil.formatDateTime(state.getExecTime()));
+        return state;
+    }
+
+    public PipelineExecState census(String pipelineId){
         //添加最近打开
         String loginId = LoginContext.getLoginId();
         openService.updatePipelineOpen(loginId,pipelineId);
-        return state;
+        return pipelineCensus(pipelineId);
     }
 
 
@@ -294,22 +300,21 @@ public class PipelineCommonServerImpl implements PipelineCommonServer{
      * @return 流水线
      */
     @Override
-    public List<PipelineOpen> findAllOpen(StringBuilder s) {
+    public List<PipelineOpen> findAllOpen(StringBuilder s,int number) {
         List<PipelineOpen> allOpen = openService.findAllOpen(s) ;
         if (allOpen == null){
             return Collections.emptyList() ;
         }
+        //根据打开次数降序排列
         allOpen.sort(Comparator.comparing(PipelineOpen::getNumber).reversed()) ;
-        int min = Math.min(4, allOpen.size()) ;
+        // 指定返回数量
+        int min = Math.min(number, allOpen.size()) ;
         List<PipelineOpen> pipelineOpens = allOpen.subList(0, min);
-
+        //统计信息
         for (PipelineOpen pipelineOpen : pipelineOpens) {
             Pipeline pipeline = pipelineOpen.getPipeline();
-            joinTemplate.joinQuery(pipeline);
-            PipelineMassage oneStatus = findOneStatus(pipeline);
-            PipelineExecState pipelineExecState = pipelineCensus(pipelineOpen.getPipelineId());
+            PipelineExecState pipelineExecState = pipelineCensus(pipeline.getPipelineId());
             pipelineOpen.setPipelineExecState(pipelineExecState);
-            pipelineOpen.setPipelineMassage(oneStatus);
         }
         return pipelineOpens;
     }

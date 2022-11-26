@@ -35,7 +35,7 @@ public class ProductAchieveServiceImpl implements ProductAchieveService {
     public boolean product(PipelineProcess pipelineProcess, PipelineProduct product) {
 
         Pipeline pipeline = pipelineProcess.getPipeline();
-        String log = PipelineUntil.dateLog();
+        String log = PipelineUntil.date(4);
         String fileAddress = product.getFileAddress();
         String path;
         try {
@@ -118,6 +118,11 @@ public class ProductAchieveServiceImpl implements ProductAchieveService {
                 " -Durl="+authThird.getServerAddress() ;
         if (authThird.getAuthType() == 1){
             String id = PipelineFinal.appName;
+
+            if (!PipelineUntil.isNoNull(settingAddress)){
+                settingAddress = "conf/settings.xml";
+            }
+
             String s = System.getProperty("user.dir") + "/" + settingAddress ;
             execOrder = execOrder +
                     " -Dusername="+authThird.getUsername()+
