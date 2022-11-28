@@ -2,6 +2,7 @@ package net.tiklab.matflow.orther.service;
 
 
 import net.tiklab.beans.BeanMapper;
+import net.tiklab.core.exception.ApplicationException;
 import net.tiklab.matflow.definition.entity.PipelineEntity;
 import net.tiklab.matflow.definition.model.Pipeline;
 import net.tiklab.matflow.orther.dao.PipelineFollowDao;
@@ -25,7 +26,7 @@ public class PipelineFollowServiceImpl implements PipelineFollowService {
     PipelineFollowDao pipelineFollowDao;
 
     @Override
-    public String updateFollow(PipelineFollow pipelineFollow) {
+    public void updateFollow(PipelineFollow pipelineFollow) {
         Pipeline pipeline = pipelineFollow.getPipeline();
         String pipelineId = pipeline.getPipelineId();
         String userId = pipelineFollow.getUserId();
@@ -33,12 +34,11 @@ public class PipelineFollowServiceImpl implements PipelineFollowService {
         if (list.size() == 0){
             String follow = pipelineFollowDao.createFollow(BeanMapper.map(pipelineFollow, PipelineFollowEntity.class));
             if (follow == null){
-                return null;
+                throw new ApplicationException(50001,"收藏失败");
             }
         }else {
             deleteFollow(list.get(0).getId());
         }
-        return "1";
     }
 
     @Override

@@ -1,8 +1,6 @@
 package net.tiklab.matflow.definition.entity;
 
-
 import net.tiklab.dal.jpa.annotation.*;
-import net.tiklab.postin.annotation.ApiProperty;
 
 /**
  * 流水线

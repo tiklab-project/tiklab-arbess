@@ -1,9 +1,9 @@
-package net.tiklab.matflow.execute.service;
+package net.tiklab.matflow.execute.service.achieve;
 
 import net.tiklab.matflow.definition.model.PipelineBuild;
 import net.tiklab.matflow.execute.model.PipelineProcess;
 
-public interface BuildAchieveService {
+public interface BuildService {
 
     /**
      * 构建

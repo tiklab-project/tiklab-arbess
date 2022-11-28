@@ -60,6 +60,10 @@ eas:
   web:
     address: http://eas-ce.test.tiklab.net
 
+message:
+  sms:
+    enabled: true
+
 mysql:
   embbed:
     enable: true

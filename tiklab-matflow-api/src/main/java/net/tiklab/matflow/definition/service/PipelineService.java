@@ -6,7 +6,7 @@ import net.tiklab.join.annotation.FindList;
 import net.tiklab.join.annotation.FindOne;
 import net.tiklab.join.annotation.JoinProvider;
 import net.tiklab.matflow.definition.model.Pipeline;
-import net.tiklab.matflow.definition.model.PipelineMassage;
+import net.tiklab.matflow.definition.model.PipelineExecMessage;
 import net.tiklab.matflow.orther.model.PipelineOpen;
 
 import javax.validation.Valid;
@@ -68,14 +68,14 @@ public interface PipelineService {
      * @param userId 用户id
      * @return 流水线信息
      */
-    List<PipelineMassage> findUserPipeline(String userId);
+    List<PipelineExecMessage> findUserPipeline(String userId);
 
     /**
      * 获取用户收藏的流水线
      * @param userId 用户id
      * @return 流水线信息
      */
-    List<PipelineMassage> findUserFollowPipeline(String userId);
+    List<PipelineExecMessage> findUserFollowPipeline(String userId);
 
     /**
      * 模糊查询流水线
@@ -83,7 +83,7 @@ public interface PipelineService {
      * @param userId 用户id
      * @return 流水线
      */
-    List<PipelineMassage> findLikePipeline(String pipelineName, String userId);
+    List<PipelineExecMessage> findLikePipeline(String pipelineName, String userId);
 
 
     /**

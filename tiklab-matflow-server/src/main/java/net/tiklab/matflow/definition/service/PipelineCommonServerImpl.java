@@ -3,12 +3,14 @@ package net.tiklab.matflow.definition.service;
 import net.tiklab.core.exception.ApplicationException;
 import net.tiklab.join.JoinTemplate;
 import net.tiklab.matflow.definition.model.Pipeline;
-import net.tiklab.matflow.definition.model.PipelineMassage;
+import net.tiklab.matflow.definition.model.PipelineExecMessage;
 import net.tiklab.matflow.execute.model.PipelineExecHistory;
 import net.tiklab.matflow.execute.model.PipelineExecState;
 import net.tiklab.matflow.execute.service.PipelineExecHistoryService;
+import net.tiklab.matflow.orther.model.PipelineFollow;
 import net.tiklab.matflow.orther.model.PipelineOpen;
 import net.tiklab.matflow.orther.service.PipelineFinal;
+import net.tiklab.matflow.orther.service.PipelineFollowService;
 import net.tiklab.matflow.orther.service.PipelineOpenService;
 import net.tiklab.matflow.orther.service.PipelineUntil;
 import net.tiklab.privilege.role.model.DmRole;
@@ -48,6 +50,8 @@ public class PipelineCommonServerImpl implements PipelineCommonServer{
     @Autowired
     private PipelineOpenService openService;
 
+    @Autowired
+    private PipelineFollowService followService;
 
     /**
      * 删除关联信息
@@ -84,36 +88,48 @@ public class PipelineCommonServerImpl implements PipelineCommonServer{
         }
     }
 
-    //获取流水线状态
+
+    /**
+     * 更新流水线收藏状态
+     * @param pipelineFollow 收藏信息
+     * @return 状态
+     */
     @Override
-    public List<PipelineMassage> findAllStatus(List<Pipeline> allPipeline){
-        List<PipelineMassage> pipelineMassageList = new ArrayList<>();
-        for (Pipeline pipeline : allPipeline) {
-            joinTemplate.joinQuery(pipeline);
-            PipelineMassage oneStatus = findOneStatus(pipeline);
-            pipelineMassageList.add(oneStatus);
-        }
-        return pipelineMassageList;
+    public void updateFollow(PipelineFollow pipelineFollow){
+        followService.updateFollow(pipelineFollow);
     }
 
-    private PipelineMassage findOneStatus(Pipeline pipeline){
-        PipelineMassage pipelineMassage = new PipelineMassage();
+
+    //获取流水线状态
+    @Override
+    public List<PipelineExecMessage> findAllStatus(List<Pipeline> allPipeline){
+        List<PipelineExecMessage> pipelineExecMessageList = new ArrayList<>();
+        for (Pipeline pipeline : allPipeline) {
+            joinTemplate.joinQuery(pipeline);
+            PipelineExecMessage oneStatus = findOneStatus(pipeline);
+            pipelineExecMessageList.add(oneStatus);
+        }
+        return pipelineExecMessageList;
+    }
+
+    private PipelineExecMessage findOneStatus(Pipeline pipeline){
+        PipelineExecMessage pipelineExecMessage = new PipelineExecMessage();
         //成功和构建时间
         PipelineExecHistory latelyHistory = historyService.findLatelyHistory(pipeline.getPipelineId());
-        pipelineMassage.setPipelineId(pipeline.getPipelineId());
-        pipelineMassage.setPipelineCollect(pipeline.getPipelineCollect());
-        pipelineMassage.setPipelineName(pipeline.getPipelineName());
-        pipelineMassage.setPipelineState(pipeline.getPipelineState());
-        pipelineMassage.setCreateTime(pipeline.getPipelineCreateTime());
-        pipelineMassage.setColor(pipeline.getColor());
-        pipelineMassage.setUser(pipeline.getUser());
-        pipelineMassage.setPipelinePower(pipeline.getPipelinePower());
+        pipelineExecMessage.setPipelineId(pipeline.getPipelineId());
+        pipelineExecMessage.setPipelineCollect(pipeline.getPipelineCollect());
+        pipelineExecMessage.setPipelineName(pipeline.getPipelineName());
+        pipelineExecMessage.setPipelineState(pipeline.getPipelineState());
+        pipelineExecMessage.setCreateTime(pipeline.getPipelineCreateTime());
+        pipelineExecMessage.setColor(pipeline.getColor());
+        pipelineExecMessage.setUser(pipeline.getUser());
+        pipelineExecMessage.setPipelinePower(pipeline.getPipelinePower());
         if (latelyHistory != null){
-            pipelineMassage.setLastBuildTime(latelyHistory.getCreateTime());
-            pipelineMassage.setBuildStatus(latelyHistory.getRunStatus());
-            pipelineMassage.setExecUser(latelyHistory.getUser());
+            pipelineExecMessage.setLastBuildTime(latelyHistory.getCreateTime());
+            pipelineExecMessage.setBuildStatus(latelyHistory.getRunStatus());
+            pipelineExecMessage.setExecUser(latelyHistory.getUser());
         }
-       return pipelineMassage;
+       return pipelineExecMessage;
     }
 
     /**

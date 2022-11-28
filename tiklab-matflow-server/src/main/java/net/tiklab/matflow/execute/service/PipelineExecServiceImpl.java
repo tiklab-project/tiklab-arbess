@@ -43,10 +43,10 @@ public class PipelineExecServiceImpl implements PipelineExecService {
     @Autowired
     PipelineHomeService homeService;
 
+    private static final Logger logger = LoggerFactory.getLogger(PipelineExecServiceImpl.class);
+
     //运行时间
     Map<String,List<Integer>> map = new HashMap<>();
-
-    private static final Logger logger = LoggerFactory.getLogger(PipelineExecServiceImpl.class);
 
     //流水线运行历史
     public static Map<String,PipelineExecHistory> historyMap = new HashMap<>();
@@ -67,12 +67,17 @@ public class PipelineExecServiceImpl implements PipelineExecService {
 
         homeService.log(LOG_PIPELINE_RUN,LOG_MD_PIPELINE_RUN,LOG_TEM_PIPELINE_EXEC, maps);
 
-        homeService.message(MES_TEM_PIPELINE_EXEC, MES_PIPELINE_RUN, maps);
-
         executorService.submit(() -> {
             Thread.currentThread().setName(pipelineId);
             begin(pipeline);
         });
+
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            throw new ApplicationException(e);
+        }
+
         return true;
     }
 
@@ -216,12 +221,12 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         historyMap.remove(pipelineId);
 
         //微信消息
-        maps.put("status",status);
-        homeService.wechatMarkdownMessage(maps);
+        // maps.put("status",status);
+        // homeService.wechatMarkdownMessage(maps);
 
         //创建日志
         homeService.log(LOG_PIPELINE_RUN,LOG_MD_PIPELINE_RUN,LOG_TEM_PIPELINE_RUN, maps);
-        homeService.message(MES_TEM_PIPELINE_RUN,MES_PIPELINE_RUN, maps);
+        // homeService.message(MES_TEM_PIPELINE_RUN,MES_PIPELINE_RUN, maps);
     }
 
     /**

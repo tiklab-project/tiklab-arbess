@@ -10,9 +10,8 @@ public interface PipelineFollowService {
     /**
      * 创建关注
      * @param pipelineFollow 关注
-     * @return 关注id
      */
-    String updateFollow(PipelineFollow pipelineFollow);
+    void updateFollow(PipelineFollow pipelineFollow);
 
     /**
      * 删除关注

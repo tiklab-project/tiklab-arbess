@@ -1,18 +1,10 @@
 package net.tiklab.matflow.orther.service;
 
 import net.tiklab.matflow.definition.model.Pipeline;
-import net.tiklab.matflow.orther.model.PipelineFollow;
 
 import java.util.Map;
 
 public interface PipelineHomeService {
-
-
-    /**
-     * 收藏流水线
-     * @param pipelineFollow 收藏信息
-     */
-    String updateFollow(PipelineFollow pipelineFollow);
 
     /**
      * 创建日志
@@ -37,6 +29,13 @@ public interface PipelineHomeService {
      * @param map 消息
      */
     void wechatMarkdownMessage(Map<String,String> map);
+
+
+    /**
+     * 发送短信
+     * @param map 短信内容
+     */
+    void smsMessage(Map<String,String> map);
 
     /**
      * 初始化消息，日志信息

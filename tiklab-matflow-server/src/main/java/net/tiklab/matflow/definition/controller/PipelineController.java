@@ -2,10 +2,11 @@ package net.tiklab.matflow.definition.controller;
 
 import net.tiklab.core.Result;
 import net.tiklab.matflow.definition.model.Pipeline;
-import net.tiklab.matflow.definition.model.PipelineMassage;
+import net.tiklab.matflow.definition.model.PipelineExecMessage;
 import net.tiklab.matflow.definition.service.PipelineCommonServer;
 import net.tiklab.matflow.definition.service.PipelineService;
 import net.tiklab.matflow.execute.model.PipelineExecState;
+import net.tiklab.matflow.orther.model.PipelineFollow;
 import net.tiklab.matflow.orther.model.PipelineOpen;
 import net.tiklab.postin.annotation.Api;
 import net.tiklab.postin.annotation.ApiMethod;
@@ -94,9 +95,9 @@ public class PipelineController {
     @RequestMapping(path="/findLikePipeline",method = RequestMethod.POST)
     @ApiMethod(name = "findLikePipeline",desc = "模糊查询")
     @ApiParam(name = "pipelineName",desc = "模糊查询条件",required = true)
-    public Result<List<PipelineMassage>> findLikePipeline(@NotNull String pipelineName, String userId){
+    public Result<List<PipelineExecMessage>> findLikePipeline(@NotNull String pipelineName, String userId){
 
-        List<PipelineMassage> pipelineQueryList = pipelineService.findLikePipeline(pipelineName,userId);
+        List<PipelineExecMessage> pipelineQueryList = pipelineService.findLikePipeline(pipelineName,userId);
 
         return Result.ok(pipelineQueryList);
     }
@@ -105,9 +106,9 @@ public class PipelineController {
     @RequestMapping(path="/findUserPipeline",method = RequestMethod.POST)
     @ApiMethod(name = "findUserPipeline",desc = "查询用户所有流水线")
     @ApiParam(name = "userId",desc = "用户id",required = true)
-    public Result<List<PipelineMassage>> findUserPipeline(@NotNull String userId){
+    public Result<List<PipelineExecMessage>> findUserPipeline(@NotNull String userId){
 
-        List<PipelineMassage> userPipeline = pipelineService.findUserPipeline(userId);
+        List<PipelineExecMessage> userPipeline = pipelineService.findUserPipeline(userId);
 
         return Result.ok(userPipeline);
     }
@@ -116,9 +117,9 @@ public class PipelineController {
     @RequestMapping(path="/findUserFollowPipeline",method = RequestMethod.POST)
     @ApiMethod(name = "findUserFollowPipeline",desc = "查询用户收藏的流水线")
     @ApiParam(name = "userId",desc = "用户id",required = true)
-    public Result<List<PipelineMassage>> findUserFollowPipeline(@NotNull String userId){
+    public Result<List<PipelineExecMessage>> findUserFollowPipeline(@NotNull String userId){
 
-        List<PipelineMassage> userPipeline = pipelineService.findUserFollowPipeline(userId);
+        List<PipelineExecMessage> userPipeline = pipelineService.findUserFollowPipeline(userId);
 
         return Result.ok(userPipeline);
     }
@@ -152,6 +153,15 @@ public class PipelineController {
         List<PipelineOpen> openList = pipelineService.findAllOpen(number);
 
         return Result.ok(openList);
+    }
+
+
+    @RequestMapping(path="/updateFollow",method = RequestMethod.POST)
+    @ApiMethod(name = "updateFollow",desc = "更新收藏")
+    @ApiParam(name = "pipelineFollow",desc = "收藏信息",required = true)
+    public Result<Void>  updateFollow( @RequestBody @Valid @NotNull PipelineFollow pipelineFollow){
+         pipelineCommonServer.updateFollow(pipelineFollow);
+        return Result.ok();
     }
 
 }

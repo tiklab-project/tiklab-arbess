@@ -2,7 +2,7 @@ package net.tiklab.matflow.execute.controller;
 
 
 import net.tiklab.core.Result;
-import net.tiklab.matflow.execute.service.CodeAuthorizeService;
+import net.tiklab.matflow.execute.service.achieve.CodeThirdService;
 import net.tiklab.matflow.setting.model.PipelineAuthThird;
 import net.tiklab.postin.annotation.Api;
 import net.tiklab.postin.annotation.ApiMethod;
@@ -24,14 +24,14 @@ import java.util.List;
 public class CodeAuthorizeController {
 
     @Autowired
-    CodeAuthorizeService codeAuthorizeService;
+    CodeThirdService codeThirdService;
 
     @RequestMapping(path="/findCode",method = RequestMethod.POST)
     @ApiMethod(name = "findCode",desc = "返回获取code的地址")
     @ApiParam(name = "callbackUri",desc = "回调地址",required = true)
     public Result<String> getCode(@RequestBody @Valid @NotNull PipelineAuthThird authThird){
 
-        String git = codeAuthorizeService.findCode(authThird);
+        String git = codeThirdService.findCode(authThird);
 
         return Result.ok(git);
     }
@@ -40,7 +40,7 @@ public class CodeAuthorizeController {
     @ApiMethod(name = "findAccessToken",desc = "获取accessToken")
     @ApiParam(name = "code",desc = "code",required = true)
     public Result<String> getAccessToken(@RequestBody @Valid @NotNull  PipelineAuthThird authThird) throws IOException {
-        String proofId = codeAuthorizeService.findAccessToken(authThird);
+        String proofId = codeThirdService.findAccessToken(authThird);
         return Result.ok(proofId);
     }
 
@@ -49,7 +49,7 @@ public class CodeAuthorizeController {
     @ApiMethod(name = "findAllStorehouse",desc = "获取所有仓库")
     @ApiParam(name = "authId",desc = "authId",required = true)
     public Result<List<String>> findAllStorehouse(@NotNull String authId,int type) {
-        List<String> allStorehouse = codeAuthorizeService.findAllStorehouse(authId,type);
+        List<String> allStorehouse = codeThirdService.findAllStorehouse(authId,type);
         return Result.ok(allStorehouse);
     }
 
@@ -58,7 +58,7 @@ public class CodeAuthorizeController {
     @ApiMethod(name = "findBranch",desc = "根据仓库名获取所有分支")
     @ApiParam(name = "authId",desc = "authId",required = true)
     public Result<List<String>> findBranch(@NotNull String authId,String houseName,int type){
-        List<String> branch = codeAuthorizeService.findBranch(authId,houseName,type);
+        List<String> branch = codeThirdService.findBranch(authId,houseName,type);
         return Result.ok(branch);
     }
 
@@ -66,7 +66,7 @@ public class CodeAuthorizeController {
     @ApiMethod(name = "callbackUrl",desc = "获取回调地址")
     @ApiParam(name = "callbackUrl",desc = "callbackUrl",required = true)
     public Result<String> getState( String callbackUrl){
-        String url= codeAuthorizeService.callbackUrl(callbackUrl);
+        String url= codeThirdService.callbackUrl(callbackUrl);
         return Result.ok(url);
     }
 

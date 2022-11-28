@@ -4,7 +4,7 @@ import net.tiklab.beans.BeanMapper;
 import net.tiklab.matflow.definition.dao.PipelineCodeDao;
 import net.tiklab.matflow.definition.entity.PipelineCodeEntity;
 import net.tiklab.matflow.definition.model.PipelineCode;
-import net.tiklab.matflow.execute.service.CodeAuthorizeService;
+import net.tiklab.matflow.execute.service.achieve.CodeThirdService;
 import net.tiklab.matflow.orther.service.PipelineUntil;
 import net.tiklab.matflow.setting.model.PipelineAuthThird;
 import net.tiklab.matflow.setting.service.PipelineAuthServer;
@@ -31,7 +31,7 @@ public class PipelineCodeServiceImpl implements PipelineCodeService {
     PipelineAuthThirdServer authServerServer;
 
     @Autowired
-    CodeAuthorizeService codeAuthorizeService;
+    CodeThirdService codeThirdService;
 
     private static final Logger logger = LoggerFactory.getLogger(PipelineCodeServiceImpl.class);
 
@@ -59,7 +59,7 @@ public class PipelineCodeServiceImpl implements PipelineCodeService {
                 }
                 PipelineCode oneCode = findOneCode(pipelineCode.getCodeId());
                 String authId = oneCode.getAuthId();
-                String houseUrl = codeAuthorizeService.getHouseUrl(authId, pipelineCode.getCodeName(), pipelineCode.getType());
+                String houseUrl = codeThirdService.getHouseUrl(authId, pipelineCode.getCodeName(), pipelineCode.getType());
                 pipelineCode.setCodeAddress(houseUrl);
             }
             default -> pipelineCode.setCodeAddress(pipelineCode.getCodeName());

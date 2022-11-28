@@ -33,13 +33,12 @@ INSERT INTO `pcs_prc_function` (`id`, `name`, `code`, `parent_function_id`, `sor
 INSERT INTO `pcs_prc_function` (`id`, `name`, `code`, `parent_function_id`, `sort`, `type`, `bgroup`) VALUES ('f6f51f9441339cd20013f4f20c378dc6', '消息通知', 'message', NULL, 6, '1', 'matflow');
 
 
-INSERT INTO pcs_prc_role (`id`,`name`,`description`,`grouper`,`type`,`bgroup`) VALUES ('1', '管理员','管理员','system','1','matflow');
-INSERT INTO pcs_prc_role (`id`,`name`,`description`,`grouper`,`type`,`bgroup`) VALUES ('matflowUser', '项目角色','项目角色','system','1','matflow');
+INSERT INTO pcs_prc_role (`id`,`name`,`description`,`grouper`,`type`,`bgroup`,`scope`,`tag`) VALUES ('1', '管理员','管理员','system','1','matflow',1,1);
+INSERT INTO pcs_prc_role (`id`,`name`,`description`,`grouper`,`type`,`bgroup`,`scope`,`tag`) VALUES ('matflowUser', '项目角色','项目角色','system','1','matflow',1,2);
 
 
 INSERT INTO pcs_prc_role_user (id,role_id,user_id,bgroup) VALUES ('matflow', '1','111111','matflow');
 INSERT INTO pcs_prc_role_user (id,role_id,user_id,bgroup)  VALUES ('matflowUser', 'matflowUser','f7d301865bb64ef21ef88f8cd58a69a5','matflow');
-
 
 
 INSERT INTO `pcs_prc_role_function` (`id`, `role_id`, `function_id`, `bgroup`) VALUES ('0734a8162ef1dc2acdc4b20063a1a682', '1', '585d26bcbdf3047e502e4aa51c816090', 'matflow');
@@ -84,8 +83,8 @@ INSERT INTO `pcs_prc_role_function` (`id`, `role_id`, `function_id`, `bgroup`) V
 INSERT INTO `pcs_prc_role_function` (`id`, `role_id`, `function_id`, `bgroup`) VALUES ('f9ad961dc18f902a64d697a32175b79c', 'matflowUser', 'edb60bf65e4279e46ce21210b3213bd8', 'matflow');
 
 
-INSERT INTO `pcs_prc_role` (`id`, `name`, `description`, `grouper`, `type`, `bgroup`, `scope`) VALUES ('8fa985860fc1205852395b974717a678', '项目角色', '项目角色', 'system', '2', 'matflow', 1);
-INSERT INTO `pcs_prc_role` (`id`, `name`, `description`, `grouper`, `type`, `bgroup`, `scope`) VALUES ('2', '管理员', '管理员', 'system', '2', 'matflow', 1);
+INSERT INTO `pcs_prc_role` (`id`, `name`, `description`, `grouper`, `type`, `bgroup`, `scope`,`tag`) VALUES ('8fa985860fc1205852395b974717a678', '项目角色', '项目角色', 'system', '2', 'matflow', 1,2);
+INSERT INTO `pcs_prc_role` (`id`, `name`, `description`, `grouper`, `type`, `bgroup`, `scope`,`tag`) VALUES ('2', '管理员', '管理员', 'system', '2', 'matflow', 1,1);
 
 
 INSERT INTO `pcs_prc_role_function` (`id`, `role_id`, `function_id`, `bgroup`) VALUES ('45019b81445f9e36605cd43beafa088d', '8fa985860fc1205852395b974717a678', 'c08882dca6ab325b10fb2b7c0cfc8156', 'matflow');

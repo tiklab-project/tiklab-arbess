@@ -1,8 +1,9 @@
 package net.tiklab.matflow.definition.service;
 
 import net.tiklab.matflow.definition.model.Pipeline;
-import net.tiklab.matflow.definition.model.PipelineMassage;
+import net.tiklab.matflow.definition.model.PipelineExecMessage;
 import net.tiklab.matflow.execute.model.PipelineExecState;
+import net.tiklab.matflow.orther.model.PipelineFollow;
 import net.tiklab.matflow.orther.model.PipelineOpen;
 import net.tiklab.privilege.role.model.PatchUser;
 import net.tiklab.user.user.model.User;
@@ -24,12 +25,19 @@ public interface PipelineCommonServer {
      */
     void updatePipeline(String newName, String lastName);
 
+
+    /**
+     * 更新收藏信息
+     * @param pipelineFollow 信息
+     */
+    void updateFollow(PipelineFollow pipelineFollow);
+
     /**
      * 获取流水线状态
      * @param allPipeline 流水线
      * @return 流水线状态
      */
-    List<PipelineMassage> findAllStatus(List<Pipeline> allPipeline);
+    List<PipelineExecMessage> findAllStatus(List<Pipeline> allPipeline);
 
 
     /**

@@ -1,9 +1,9 @@
-package net.tiklab.matflow.definition.service;
+package net.tiklab.matflow.execute.service.achieve;
 
 import net.tiklab.matflow.definition.model.PipelineProduct;
 import net.tiklab.matflow.execute.model.PipelineProcess;
 
-public interface ProductAchieveService {
+public interface ProductService {
 
     /**
      * 推送制品代码

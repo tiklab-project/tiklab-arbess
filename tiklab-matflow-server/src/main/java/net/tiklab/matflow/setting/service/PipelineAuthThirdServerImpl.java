@@ -2,7 +2,7 @@ package net.tiklab.matflow.setting.service;
 
 import net.tiklab.beans.BeanMapper;
 import net.tiklab.join.JoinTemplate;
-import net.tiklab.matflow.execute.service.CodeAuthorizeServiceImpl;
+import net.tiklab.matflow.execute.service.achieve.CodeThirdServiceImpl;
 import net.tiklab.matflow.setting.dao.PipelineAuthThirdDao;
 import net.tiklab.matflow.setting.entity.PipelineAuthThirdEntity;
 import net.tiklab.matflow.setting.model.PipelineAuthThird;
@@ -33,7 +33,7 @@ public class PipelineAuthThirdServerImpl implements PipelineAuthThirdServer {
      * @return 流水线授权id
      */
     public String createAuthServer(PipelineAuthThird pipelineAuthThird) {
-        Map<String, PipelineAuthThird> userMap = CodeAuthorizeServiceImpl.userMap;
+        Map<String, PipelineAuthThird> userMap = CodeThirdServiceImpl.userMap;
         PipelineAuthThird authServer = userMap.get(LoginContext.getLoginId());
         if (authServer != null){
             pipelineAuthThird.setUsername(authServer.getUsername());

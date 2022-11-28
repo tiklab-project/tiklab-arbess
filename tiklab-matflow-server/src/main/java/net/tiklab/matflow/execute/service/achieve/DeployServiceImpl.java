@@ -1,10 +1,11 @@
-package net.tiklab.matflow.execute.service;
+package net.tiklab.matflow.execute.service.achieve;
 
 import com.jcraft.jsch.*;
 import net.tiklab.core.exception.ApplicationException;
 import net.tiklab.matflow.definition.model.Pipeline;
 import net.tiklab.matflow.definition.model.PipelineDeploy;
 import net.tiklab.matflow.execute.model.PipelineProcess;
+import net.tiklab.matflow.execute.service.ConfigCommonService;
 import net.tiklab.matflow.orther.service.PipelineUntil;
 import net.tiklab.matflow.setting.model.PipelineAuthHost;
 import net.tiklab.rpc.annotation.Exporter;
@@ -22,12 +23,12 @@ import java.io.IOException;
 
 @Service
 @Exporter
-public class DeployAchieveServiceImpl implements DeployAchieveService {
+public class DeployServiceImpl implements DeployService {
 
     @Autowired
     ConfigCommonService commonService;
 
-    private static final Logger logger = LoggerFactory.getLogger(DeployAchieveServiceImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(DeployServiceImpl.class);
 
     /**
      * 部署

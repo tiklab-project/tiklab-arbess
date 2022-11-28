@@ -1,8 +1,8 @@
 package net.tiklab.matflow.execute.service;
 
 import net.tiklab.matflow.definition.model.*;
-import net.tiklab.matflow.definition.service.ProductAchieveService;
 import net.tiklab.matflow.execute.model.PipelineProcess;
+import net.tiklab.matflow.execute.service.achieve.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -10,22 +10,25 @@ import org.springframework.stereotype.Service;
 public class PipelineTaskExecServiceImpl implements PipelineTaskExecService {
 
     @Autowired
-    CodeAchieveService code ;
+    CodeService code ;
 
     @Autowired
-    BuildAchieveService build ;
+    BuildService build ;
 
     @Autowired
-    TestAchieveService test;
+    TestService test;
 
     @Autowired
-    DeployAchieveService deploy ;
+    DeployService deploy ;
 
     @Autowired
     CodeScanService codeScan;
 
     @Autowired
-    ProductAchieveService product;
+    ProductService product;
+
+    @Autowired
+    MessageExecService message;
 
     public boolean beginState(PipelineProcess pipelineProcess, Object config, int type){
         boolean state = true;
@@ -36,6 +39,7 @@ public class PipelineTaskExecServiceImpl implements PipelineTaskExecService {
             case 3 -> state = deploy.deploy(pipelineProcess,(PipelineDeploy) config);
             case 4 -> state = codeScan.codeScan(pipelineProcess, (PipelineCodeScan) config);
             case 5 -> state = product.product(pipelineProcess, (PipelineProduct) config);
+            case 6 -> state = message.message(pipelineProcess, (PipelineMessage) config);
         }
         return state;
     }

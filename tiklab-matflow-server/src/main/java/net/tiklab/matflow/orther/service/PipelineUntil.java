@@ -169,6 +169,7 @@ public class PipelineUntil {
                     }
                 }
             }
+
             // 目录此时为空，删除
         }
         return file.delete();
@@ -228,6 +229,9 @@ public class PipelineUntil {
             return false;
         }
         if (s.equals("")){
+            return false;
+        }
+        if (s.equals("\n")){
             return false;
         }
         if (s.equals("null")){

@@ -1,4 +1,4 @@
-package net.tiklab.matflow.execute.service.WebSocket;
+package net.tiklab.matflow.execute.service.webSocket;
 
 import com.alibaba.fastjson.JSONObject;
 import net.tiklab.matflow.execute.model.PipelineExecHistory;

@@ -1,4 +1,4 @@
-package net.tiklab.matflow.execute.service;
+package net.tiklab.matflow.execute.service.achieve;
 
 
 import net.tiklab.matflow.setting.model.PipelineAuthThird;
@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * 码云API
  */
-public interface CodeAuthorizeService {
+public interface CodeThirdService {
 
     /**
      * 获取code

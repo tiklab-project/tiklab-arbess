@@ -54,6 +54,8 @@ public class PipelineDeployServiceImpl implements PipelineDeployService {
     public List<PipelineDeploy> findAllDeployList(List<String> idList) {
         return BeanMapper.mapList(pipelineDeployDao.findAllCodeList(idList), PipelineDeploy.class);
     }
+
+
     //修改
     @Override
     public void updateDeploy(PipelineDeploy pipelineDeploy) {

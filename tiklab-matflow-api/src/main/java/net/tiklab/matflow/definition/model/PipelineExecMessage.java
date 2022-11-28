@@ -8,7 +8,7 @@ import net.tiklab.user.user.model.User;
 
 @ApiModel
 @Join
-public class PipelineMassage {
+public class PipelineExecMessage {
 
     @ApiProperty(name="pipelineId",desc="流水线id")
     private String pipelineId;

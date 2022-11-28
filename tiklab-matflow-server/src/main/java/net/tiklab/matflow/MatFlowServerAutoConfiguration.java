@@ -12,7 +12,6 @@ import org.springframework.context.annotation.Configuration;
         "pipeline-authority",
         "pipeline-init-message",
         "pipeline-init-project",
-        "pipeline-init-authorize",
         "pipeline-log-template"
 },order = 101)
 @ComponentScan({"net.tiklab.matflow"})

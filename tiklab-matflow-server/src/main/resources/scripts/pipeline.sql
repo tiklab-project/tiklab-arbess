@@ -236,6 +236,15 @@ create table pipeline_auth_host  (
     PRIMARY KEY (id) USING BTREE
 );
 
+-- ----------------------------
+-- Table structure for pipeline_message
+-- ----------------------------
+create table pipeline_message  (
+    message_id varchar(255) ,
+    message_type varchar(255) ,
+    date varchar(255) ,
+    PRIMARY KEY (message_id) USING BTREE
+);
 
 
 

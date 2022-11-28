@@ -6,7 +6,7 @@ import net.tiklab.join.JoinTemplate;
 import net.tiklab.matflow.definition.dao.PipelineDao;
 import net.tiklab.matflow.definition.entity.PipelineEntity;
 import net.tiklab.matflow.definition.model.Pipeline;
-import net.tiklab.matflow.definition.model.PipelineMassage;
+import net.tiklab.matflow.definition.model.PipelineExecMessage;
 import net.tiklab.matflow.orther.model.PipelineOpen;
 import net.tiklab.matflow.orther.service.PipelineHomeService;
 import net.tiklab.matflow.orther.service.PipelineUntil;
@@ -64,19 +64,20 @@ public class PipelineServiceImpl implements PipelineService {
         PipelineEntity pipelineEntity = BeanMapper.map(pipeline, PipelineEntity.class);
         pipelineEntity.setPipelineState(2);
         String pipelineId = pipelineDao.createPipeline(pipelineEntity);
-
+        joinTemplate.joinQuery(pipeline);
         Map<String, String> map = homeService.initMap(pipeline);
         map.put("pipelineId",pipelineId);
-        // 动态
+
+        //动态
         homeService.log(LOG_PIPELINE, LOG_MD_PIPELINE_CREATE, LOG_TEM_PIPELINE_CREATE, map);
 
-        //创建模板
+        //创建对应流水线模板
         configOrderService.createTemplate(pipelineId, pipeline.getPipelineType());
 
         //流水线关联角色，用户信息
         commonServer.createDmUser(pipelineId,pipeline.getUserList());
 
-        // 消息
+        //消息
         homeService.message(MES_TEM_PIPELINE_CREATE, MES_PIPELINE, map);
 
         return pipelineId;
@@ -96,7 +97,6 @@ public class PipelineServiceImpl implements PipelineService {
         commonServer.deleteHistory(pipeline); //历史，日志信息
         commonServer.deleteDmRole(pipelineId); //关联角色
         configOrderService.deleteConfig(pipelineId); //配置信息
-
 
         //动态
         Map<String, String> map = homeService.initMap(pipeline);
@@ -213,26 +213,26 @@ public class PipelineServiceImpl implements PipelineService {
 
     //所有的流水线状态
     @Override
-    public List<PipelineMassage> findUserPipeline(String userId){
+    public List<PipelineExecMessage> findUserPipeline(String userId){
         StringBuilder builder = findUserPipelineId(userId);
         if (builder.toString().equals("")){
             return Collections.emptyList();
         }
         List<PipelineEntity> pipelineNotFollowEntity = pipelineDao.findPipelineNotFollow(userId,builder);
         List<Pipeline> pipelineNotFollow = BeanMapper.mapList(pipelineNotFollowEntity, Pipeline.class);
-        List<PipelineMassage> allStatus = commonServer.findAllStatus(pipelineNotFollow);
+        List<PipelineExecMessage> allStatus = commonServer.findAllStatus(pipelineNotFollow);
         joinTemplate.joinQuery(allStatus);
-        List<PipelineMassage> userFollowPipeline = findUserFollowPipeline(userId);
+        List<PipelineExecMessage> userFollowPipeline = findUserFollowPipeline(userId);
         allStatus.addAll(userFollowPipeline);
         //排序
-        allStatus.sort(Comparator.comparing(PipelineMassage::getPipelineName));
+        allStatus.sort(Comparator.comparing(PipelineExecMessage::getPipelineName));
 
         return allStatus;
     }
 
     //获取用户收藏的流水线
     @Override
-    public List<PipelineMassage> findUserFollowPipeline(String userId) {
+    public List<PipelineExecMessage> findUserFollowPipeline(String userId) {
         StringBuilder builder = findUserPipelineId(userId);
         if (builder.toString().equals("")){
             return Collections.emptyList();
@@ -245,14 +245,14 @@ public class PipelineServiceImpl implements PipelineService {
         pipelineFollow.forEach(pipeline -> pipeline.setPipelineCollect(1));
         //排序
         pipelineFollow.sort(Comparator.comparing(Pipeline::getPipelineName));
-        List<PipelineMassage> allStatus = commonServer.findAllStatus(pipelineFollow);
+        List<PipelineExecMessage> allStatus = commonServer.findAllStatus(pipelineFollow);
         joinTemplate.joinQuery(allStatus);
         return allStatus;
     }
     
     //模糊查询
     @Override
-    public List<PipelineMassage> findLikePipeline(String pipelineName, String userId) {
+    public List<PipelineExecMessage> findLikePipeline(String pipelineName, String userId) {
         List<PipelineEntity> pipelineEntityList = pipelineDao.findLikeName(pipelineName);
         List<Pipeline> list = BeanMapper.mapList(pipelineEntityList, Pipeline.class);
 

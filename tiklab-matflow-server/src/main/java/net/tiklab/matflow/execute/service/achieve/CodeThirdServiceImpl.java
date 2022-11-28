@@ -1,4 +1,4 @@
-package net.tiklab.matflow.execute.service;
+package net.tiklab.matflow.execute.service.achieve;
 
 
 import com.alibaba.fastjson.JSON;
@@ -33,11 +33,14 @@ import java.net.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
+/**
+ * gitee , github第三方实现
+ */
 
 @Service
 @Exporter
 @EnableScheduling
-public class CodeAuthorizeServiceImpl implements CodeAuthorizeService {
+public class CodeThirdServiceImpl implements CodeThirdService {
 
     @Autowired
     RestTemplate restTemplate;
@@ -50,7 +53,7 @@ public class CodeAuthorizeServiceImpl implements CodeAuthorizeService {
 
     public static Map<String, PipelineAuthThird> userMap = new HashMap<>();
 
-    private static final Logger logger = LoggerFactory.getLogger(CodeAuthorizeServiceImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(CodeThirdServiceImpl.class);
 
     //获取code
     public String findCode(PipelineAuthThird authThird){
