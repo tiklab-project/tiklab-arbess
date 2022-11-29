@@ -17,7 +17,7 @@ INSERT INTO `pcs_prc_function` (`id`, `name`, `code`, `parent_function_id`, `sor
 INSERT INTO `pcs_prc_function` (`id`, `name`, `code`, `parent_function_id`, `sort`, `type`, `bgroup`) VALUES ('925371be8ec674a06613bf8e37ec356c', '开启', 'user_dir_open', '585d26bcbdf3047e502e4aa51c816090', 20, '1', 'matflow');
 INSERT INTO `pcs_prc_function` (`id`, `name`, `code`, `parent_function_id`, `sort`, `type`, `bgroup`) VALUES ('9314739a13fedc65c948180d7702f518', '操作日志', 'log', NULL, 9, '1', 'matflow');
 INSERT INTO `pcs_prc_function` (`id`, `name`, `code`, `parent_function_id`, `sort`, `type`, `bgroup`) VALUES ('9633d947588684a5881ccff9eaa3aba0', '修改角色', 'user_update_role', '5fb7863b09a8d0c99cef173e18106fb3', 18, '1', 'matflow');
-INSERT INTO `pcs_prc_function` (`id`, `name`, `code`, `parent_function_id`, `sort`, `type`, `bgroup`) VALUES ('96950f6c591db90081a065e619d1645b', '流水线用户', 'pipeline_user', NULL, 38, '2', 'matflow');
+INSERT INTO `pcs_prc_function` (`id`, `name`, `code`, `parent_function_id`, `sort`, `type`, `bgroup`) VALUES ('96950f6c591db90081a065e619d1645b', '流水线成员', 'pipeline_user', NULL, 38, '2', 'matflow');
 INSERT INTO `pcs_prc_function` (`id`, `name`, `code`, `parent_function_id`, `sort`, `type`, `bgroup`) VALUES ('9a85c4041ea9a0e98d86ba7db9ba7539', '服务配置', 'server', NULL, 25, '1', 'matflow');
 INSERT INTO `pcs_prc_function` (`id`, `name`, `code`, `parent_function_id`, `sort`, `type`, `bgroup`) VALUES ('9c57b5343ffed09c5d806a96433b0aca', '认证配置', 'auth', NULL, 1, '1', 'matflow');
 INSERT INTO `pcs_prc_function` (`id`, `name`, `code`, `parent_function_id`, `sort`, `type`, `bgroup`) VALUES ('9c99b8a096c8788bc27be5122d0700e8', '添加组织', 'orga_add_orga', '6b61fbe5091a8e04d2b016f15d598f1f', 11, '1', 'matflow');
