@@ -32,9 +32,6 @@ public class PipelineConfigServiceImpl implements PipelineConfigService {
     @Autowired
     PipelineProductServer productServer;
 
-    @Autowired
-    PipelineMessageServer messageServer;
-
 
     /**
      * 获取所有配置
@@ -101,12 +98,6 @@ public class PipelineConfigServiceImpl implements PipelineConfigService {
                 product.setSort(taskSort);
                 return product;
             }
-            case 6 -> {
-                PipelineMessage message = messageServer.findOneMessage(taskId);
-                message.setType(type);
-                message.setSort(taskSort);
-                return message;
-            }
         }
         return null;
     }
@@ -145,10 +136,6 @@ public class PipelineConfigServiceImpl implements PipelineConfigService {
             case 5 -> {
                 map = productConfig(message, config, typeConfig);
                 map.put("message","推送制品配置");
-            }
-            case 6 -> {
-                map = messageConfig(message, config, typeConfig);
-                map.put("message","消息配置");
             }
             default -> {
                 throw new ApplicationException("无法更新未知的配置类型。");
@@ -342,30 +329,6 @@ public class PipelineConfigServiceImpl implements PipelineConfigService {
         }
         return map;
     }
-
-    //消息
-    private Map<String, String> messageConfig(String message,PipelineConfigOrder config,PipelineConfigOrder typeConfig){
-        HashMap<String, String> map = new HashMap<>();
-        //把值转换成json字符串
-        String object = JSON.toJSONString(config.getValues());
-        switch (message){
-            case "create"->{
-                PipelineMessage messages = new PipelineMessage();
-                String id = messageServer.createMessage(messages);
-                map.put("id",id);
-            }
-            case "update"->{
-                PipelineMessage messages = JSON.parseObject(object, PipelineMessage.class);
-                messages.setMessageId(typeConfig.getTaskId());
-                messageServer.updateMessage(messages);
-            }
-            case "delete"->{
-                messageServer.deleteMessage(config.getTaskId());
-            }
-        }
-        return map;
-    }
-
 
 
     /**

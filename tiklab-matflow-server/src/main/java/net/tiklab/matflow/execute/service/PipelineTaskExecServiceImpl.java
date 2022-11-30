@@ -27,9 +27,6 @@ public class PipelineTaskExecServiceImpl implements PipelineTaskExecService {
     @Autowired
     ProductService product;
 
-    @Autowired
-    MessageExecService message;
-
     public boolean beginState(PipelineProcess pipelineProcess, Object config, int type){
         boolean state = true;
         switch (type/10) {
@@ -39,7 +36,6 @@ public class PipelineTaskExecServiceImpl implements PipelineTaskExecService {
             case 3 -> state = deploy.deploy(pipelineProcess,(PipelineDeploy) config);
             case 4 -> state = codeScan.codeScan(pipelineProcess, (PipelineCodeScan) config);
             case 5 -> state = product.product(pipelineProcess, (PipelineProduct) config);
-            case 6 -> state = message.message(pipelineProcess, (PipelineMessage) config);
         }
         return state;
     }

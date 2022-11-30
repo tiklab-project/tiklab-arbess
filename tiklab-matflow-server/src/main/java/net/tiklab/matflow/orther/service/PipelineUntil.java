@@ -134,7 +134,7 @@ public class PipelineUntil {
      */
     public static String findFileAddress(){
         String userHome = System.getProperty("user.home")+"/.tiklab";
-        File file = new File(userHome+"/matflow/workspace");
+        File file = new File(userHome+"/matflow/workspace/");
         String path = file.getAbsolutePath();
         if (!file.exists()){
             int systemType = findSystemType();
@@ -147,7 +147,7 @@ public class PipelineUntil {
                 throw new ApplicationException("更改工作空间为隐藏失败。");
             }
         }
-        return path+"/";
+        return path ;
     }
 
     /**
@@ -163,7 +163,7 @@ public class PipelineUntil {
                 for (String child : children) {
                     boolean state = deleteFile(new File(file, child));
                     int tryCount = 0;
-                    while (!state && tryCount++ < 10) {
+                    while (!state && tryCount ++ < 10) {
                         System.gc();
                         state = file.delete();
                     }
@@ -202,7 +202,12 @@ public class PipelineUntil {
         return null;
     }
 
-    //获取符合条件的文件名
+    /**
+     * 获取文件夹下所有的文件
+     * @param path 目录地址
+     * @param list new ArrayList<>()
+     * @return 文件夹下的文件集合
+     */
     public static List<String> getFilePath(File path,List<String> list){
         File[] fa = path.listFiles();
         if (fa != null) {

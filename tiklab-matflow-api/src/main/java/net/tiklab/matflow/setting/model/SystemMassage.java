@@ -10,6 +10,9 @@ import java.net.UnknownHostException;
 @ApiModel
 public class SystemMassage {
 
+    @ApiProperty(name="workspace",desc="系统版本")
+    private String workspace;
+
     @ApiProperty(name="JavaVersion",desc="java版本")
     private String JavaVersion = System.getProperty("java.version");
 
@@ -79,5 +82,13 @@ public class SystemMassage {
 
     public void setIp(String ip) {
         this.ip = ip;
+    }
+
+    public String getWorkspace() {
+        return workspace;
+    }
+
+    public void setWorkspace(String workspace) {
+        this.workspace = workspace;
     }
 }

@@ -1,19 +1,16 @@
 package net.tiklab.matflow.execute.service.achieve;
 
 import net.tiklab.core.exception.ApplicationException;
-import net.tiklab.matflow.definition.model.Pipeline;
-import net.tiklab.matflow.definition.model.PipelineMessage;
+import net.tiklab.matflow.definition.model.PipelineMessageType;
 import net.tiklab.matflow.execute.model.PipelineProcess;
 import net.tiklab.matflow.execute.service.ConfigCommonService;
 import net.tiklab.matflow.orther.service.PipelineFinal;
 import net.tiklab.matflow.orther.service.PipelineHomeService;
-import net.tiklab.matflow.orther.service.PipelineUntil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Map;
 
 @Service
@@ -33,26 +30,26 @@ public class MessageExecServiceImpl implements MessageExecService {
      * @param pipelineProcess 配置信息
      * @return 状态
      */
-    public boolean message(PipelineProcess pipelineProcess, PipelineMessage pipelineMessage) {
-        String log = PipelineUntil.date(4);
-        commonService.execHistory(pipelineProcess, log+"开始发送消息");
-        Pipeline pipeline = pipelineProcess.getPipeline();
-        List<String> typeList = pipelineMessage.getTypeList();
-        Map<String, String> map = homeService.initMap(pipeline);
-
-        try {
-            for (String s : typeList) {
-                if (!PipelineUntil.isNoNull(s)){
-                    continue;
-                }
-                messageType(s,map);
-            }
-        }catch (ApplicationException e){
-            String message = e.getMessage();
-            commonService.execHistory(pipelineProcess, log+message);
-            return false;
-        }
-        commonService.execHistory(pipelineProcess, log+"消息发送成功。");
+    public boolean message(PipelineProcess pipelineProcess, PipelineMessageType pipelineMessageType) {
+        // String log = PipelineUntil.date(4);
+        // commonService.execHistory(pipelineProcess, log+"开始发送消息");
+        // Pipeline pipeline = pipelineProcess.getPipeline();
+        // List<String> typeList = pipelineMessageType.getTypeList();
+        // Map<String, String> map = homeService.initMap(pipeline);
+        //
+        // try {
+        //     for (String s : typeList) {
+        //         if (!PipelineUntil.isNoNull(s)){
+        //             continue;
+        //         }
+        //         messageType(s,map);
+        //     }
+        // }catch (ApplicationException e){
+        //     String message = e.getMessage();
+        //     commonService.execHistory(pipelineProcess, log+message);
+        //     return false;
+        // }
+        // commonService.execHistory(pipelineProcess, log+"消息发送成功。");
         return true;
     }
 

@@ -4,19 +4,19 @@ import net.tiklab.join.annotation.FindAll;
 import net.tiklab.join.annotation.FindList;
 import net.tiklab.join.annotation.FindOne;
 import net.tiklab.join.annotation.JoinProvider;
-import net.tiklab.matflow.definition.model.PipelineMessage;
+import net.tiklab.matflow.definition.model.PipelineMessageType;
 
 import java.util.List;
 
-@JoinProvider(model = PipelineMessage.class)
-public interface PipelineMessageServer {
+@JoinProvider(model = PipelineMessageType.class)
+public interface PipelineMessageTypeServer {
 
     /**
      * 创建
-     * @param pipelineMessage message信息
+     * @param pipelineMessageType message信息
      * @return messageId
      */
-    String createMessage(PipelineMessage pipelineMessage) ;
+    String createMessage(PipelineMessageType pipelineMessageType) ;
 
     /**
      * 删除
@@ -27,9 +27,9 @@ public interface PipelineMessageServer {
 
     /**
      * 更新信息
-     * @param pipelineMessage 信息
+     * @param pipelineMessageType 信息
      */
-    void updateMessage(PipelineMessage pipelineMessage);
+    void updateMessage(PipelineMessageType pipelineMessageType);
 
     /**
      * 查询单个信息
@@ -37,17 +37,17 @@ public interface PipelineMessageServer {
      * @return message信息
      */
     @FindOne
-    PipelineMessage findOneMessage(String messageId) ;
+    PipelineMessageType findOneMessage(String messageId) ;
 
     /**
      * 查询所有信息
      * @return message信息集合
      */
     @FindAll
-    List<PipelineMessage> findAllMessage() ;
+    List<PipelineMessageType> findAllMessage() ;
 
     @FindList
-    List<PipelineMessage> findAllMessageList(List<String> idList);
+    List<PipelineMessageType> findAllMessageList(List<String> idList);
     
     
 }
