@@ -1,7 +1,7 @@
 package net.tiklab.matflow.execute.service;
 
 import net.tiklab.matflow.definition.model.Pipeline;
-import net.tiklab.matflow.definition.model.PipelineConfigOrder;
+import net.tiklab.matflow.definition.model.PipelineCourseConfig;
 import net.tiklab.matflow.execute.model.PipelineExecHistory;
 import net.tiklab.matflow.execute.model.PipelineExecLog;
 import net.tiklab.matflow.execute.model.PipelineProcess;
@@ -42,7 +42,7 @@ public interface ConfigCommonService {
      * @param historyId 历史id
      * @return 日志信息
      */
-    PipelineExecLog initializeLog(String historyId, PipelineConfigOrder configOrder);
+    PipelineExecLog initializeLog(String historyId, PipelineCourseConfig configOrder);
 
     /**
      * 执行过程中的历史

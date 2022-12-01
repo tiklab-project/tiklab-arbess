@@ -2,7 +2,7 @@ package net.tiklab.matflow.execute.service.achieve;
 
 import net.tiklab.core.exception.ApplicationException;
 import net.tiklab.matflow.definition.model.Pipeline;
-import net.tiklab.matflow.definition.model.PipelineCodeScan;
+import net.tiklab.matflow.definition.model.task.PipelineCodeScan;
 import net.tiklab.matflow.execute.model.PipelineProcess;
 import net.tiklab.matflow.execute.service.ConfigCommonService;
 import net.tiklab.matflow.orther.service.PipelineUntil;

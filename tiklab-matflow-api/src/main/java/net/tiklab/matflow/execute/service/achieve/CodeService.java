@@ -1,6 +1,6 @@
 package net.tiklab.matflow.execute.service.achieve;
 
-import net.tiklab.matflow.definition.model.PipelineCode;
+import net.tiklab.matflow.definition.model.task.PipelineCode;
 import net.tiklab.matflow.execute.model.PipelineProcess;
 
 public interface CodeService {

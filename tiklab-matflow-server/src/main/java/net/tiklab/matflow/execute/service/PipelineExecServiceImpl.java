@@ -2,8 +2,10 @@ package net.tiklab.matflow.execute.service;
 
 import net.tiklab.core.exception.ApplicationException;
 import net.tiklab.matflow.definition.model.Pipeline;
-import net.tiklab.matflow.definition.model.PipelineConfigOrder;
-import net.tiklab.matflow.definition.service.PipelineConfigOrderService;
+import net.tiklab.matflow.definition.model.PipelineAfterConfig;
+import net.tiklab.matflow.definition.model.PipelineCourseConfig;
+import net.tiklab.matflow.definition.service.PipelineAfterConfigServer;
+import net.tiklab.matflow.definition.service.PipelineCourseConfigService;
 import net.tiklab.matflow.definition.service.PipelineService;
 import net.tiklab.matflow.execute.model.PipelineExecHistory;
 import net.tiklab.matflow.execute.model.PipelineExecLog;
@@ -38,10 +40,13 @@ public class PipelineExecServiceImpl implements PipelineExecService {
     ConfigCommonService commonService;
 
     @Autowired
-    PipelineConfigOrderService configOrderService;
+    PipelineCourseConfigService configOrderService;
 
     @Autowired
     PipelineHomeService homeService;
+
+    @Autowired
+    PipelineAfterConfigServer afterConfigServer;
 
     private static final Logger logger = LoggerFactory.getLogger(PipelineExecServiceImpl.class);
 
@@ -147,8 +152,9 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         Map<String, String> maps = homeService.initMap(pipeline);
 
         //获取所有配置顺序
-        List<PipelineConfigOrder> allPipelineConfig = configOrderService.findAllPipelineConfig(pipelineId);
+        List<PipelineCourseConfig> allPipelineConfig = configOrderService.findAllPipelineConfig(pipelineId);
         if (allPipelineConfig == null || allPipelineConfig.size() == 0){
+            beginAfter(pipelineProcess,pipeline);
             commonService.updateState(historyId,map.get(pipelineId),10);
             updatePipelineStatus(pipeline.getPipelineId(), false);
             updateStatus("success",pipelineId,maps,pipelineExecHistory);
@@ -157,7 +163,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
 
         List<Integer> integers = map.get(pipelineId);
 
-        for (PipelineConfigOrder pipelineConfigOrder : allPipelineConfig) {
+        for (PipelineCourseConfig pipelineCourseConfig : allPipelineConfig) {
             if (integers == null || integers.size() == 0){
                 integers = new ArrayList<>();
                 integers.add(-1);
@@ -167,11 +173,11 @@ public class PipelineExecServiceImpl implements PipelineExecService {
             map.put(pipelineId,integers);
             time(pipelineId);
             //初始化日志
-            PipelineExecLog pipelineExecLog = commonService.initializeLog(historyId, pipelineConfigOrder);
+            PipelineExecLog pipelineExecLog = commonService.initializeLog(historyId, pipelineCourseConfig);
             pipelineProcess.setPipeline(pipeline);
             pipelineProcess.setPipelineExecLog(pipelineExecLog);
 
-            int taskType = pipelineConfigOrder.getTaskType();
+            int taskType = pipelineCourseConfig.getTaskType();
             Object config = configOrderService.findOneConfig(pipelineId,taskType);
 
             //执行不同的实现
@@ -179,6 +185,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
 
             //当前阶段的执行状态
             if (!state){
+                beginAfter(pipelineProcess,pipeline);
                 commonService.updateState(historyId,map.get(pipelineId),1);
                 updatePipelineStatus(pipeline.getPipelineId(), false);
                 updateStatus("error",pipelineId,maps,pipelineExecHistory);
@@ -187,9 +194,25 @@ public class PipelineExecServiceImpl implements PipelineExecService {
             //更新状态
             commonService.updateState(historyId,map.get(pipelineId),10);
         }
+        beginAfter(pipelineProcess,pipeline);
         //执行结束
         updatePipelineStatus(pipeline.getPipelineId(), false);
         updateStatus("success",pipelineId,maps,pipelineExecHistory);
+    }
+
+    //执行后置任务
+    public void beginAfter(PipelineProcess pipelineProcess,Pipeline pipeline){
+        String pipelineId = pipeline.getPipelineId();
+        List<PipelineAfterConfig> allAfterConfig = afterConfigServer.findAllAfterConfig(pipelineId);
+        if (allAfterConfig == null){
+            return;
+        }
+        for (PipelineAfterConfig pipelineAfterConfig : allAfterConfig) {
+            boolean b = taskExecService.beginAfterState(pipelineProcess, pipelineAfterConfig);
+            if (!b){
+                return;
+            }
+        }
     }
 
     /**
@@ -205,28 +228,22 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         //日志，消息，添加不同的执行图片
         if (status.equals("success")){
             maps.put("message","成功");
-            maps.put("image", "/images/success.svg");
         }
         if (status.equals("error")){
             maps.put("message","失败");
-            maps.put("image", "/images/error.svg");
         }
         if (status.equals("halt")){
             maps.put("message","停止执行");
-            maps.put("image", "/images/halt.svg");
         }
 
         //清除流水线缓存
         map.remove(pipelineId);
         historyMap.remove(pipelineId);
 
-        //微信消息
-        // maps.put("status",status);
-        // homeService.wechatMarkdownMessage(maps);
-
         //创建日志
         homeService.log(LOG_PIPELINE_RUN,LOG_MD_PIPELINE_RUN,LOG_TEM_PIPELINE_RUN, maps);
-        // homeService.message(MES_TEM_PIPELINE_RUN,MES_PIPELINE_RUN, maps);
+
+
     }
 
     /**

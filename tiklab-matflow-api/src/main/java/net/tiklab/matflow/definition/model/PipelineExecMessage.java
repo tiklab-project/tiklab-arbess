@@ -6,6 +6,10 @@ import net.tiklab.postin.annotation.ApiModel;
 import net.tiklab.postin.annotation.ApiProperty;
 import net.tiklab.user.user.model.User;
 
+/**
+ * 流水线执行信息
+ */
+
 @ApiModel
 @Join
 public class PipelineExecMessage {

@@ -36,13 +36,13 @@ public class PipelineServiceImpl implements PipelineService {
     private PipelineDao pipelineDao;
 
     @Autowired
-    private PipelineConfigOrderService configOrderService;
+    private PipelineCourseConfigService configOrderService;
 
     @Autowired
     private JoinTemplate joinTemplate;
 
     @Autowired
-    private PipelineCommonServer commonServer;
+    private PipelineRelationServer relationServer;
 
     @Autowired
     private PipelineHomeService homeService;
@@ -75,7 +75,7 @@ public class PipelineServiceImpl implements PipelineService {
         configOrderService.createTemplate(pipelineId, pipeline.getPipelineType());
 
         //流水线关联角色，用户信息
-        commonServer.createDmUser(pipelineId,pipeline.getUserList());
+        relationServer.createDmUser(pipelineId,pipeline.getUserList());
 
         //消息
         homeService.message(MES_TEM_PIPELINE_CREATE, MES_PIPELINE, map);
@@ -93,9 +93,9 @@ public class PipelineServiceImpl implements PipelineService {
         joinTemplate.joinQuery(pipeline);
         //删除关联信息
         pipelineDao.deletePipeline(pipelineId); //流水线
-        commonServer.deleteDmUser(pipelineId); //关联用户
-        commonServer.deleteHistory(pipeline); //历史，日志信息
-        commonServer.deleteDmRole(pipelineId); //关联角色
+        relationServer.deleteDmUser(pipelineId); //关联用户
+        relationServer.deleteHistory(pipeline); //历史，日志信息
+        relationServer.deleteDmRole(pipelineId); //关联角色
         configOrderService.deleteConfig(pipelineId); //配置信息
 
         //动态
@@ -112,7 +112,7 @@ public class PipelineServiceImpl implements PipelineService {
         //更新名称
         Pipeline flow = findOnePipeline(pipeline.getPipelineId());
         if (pipeline.getPipelineName() != null && !pipeline.getPipelineName().equals(flow.getPipelineName())){
-            commonServer.updatePipeline(pipeline.getPipelineName(), flow.getPipelineName());
+            relationServer.updatePipeline(pipeline.getPipelineName(), flow.getPipelineName());
             Map<String, String> map = homeService.initMap(pipeline);
             map.put("message","名称为:"+ flow.getPipelineName());
             homeService.log(LOG_PIPELINE, LOG_MD_PIPELINE_UPDATE,LOG_TEM_PIPELINE_UPDATE, map);
@@ -136,12 +136,12 @@ public class PipelineServiceImpl implements PipelineService {
         int pipelinePower = pipeline.getPipelinePower();
 
         if (pipelinePower == 2 && flow.getPipelinePower() != 2) {
-            commonServer.createDmUser(pipelineId,pipeline.getUserList());
+            relationServer.createDmUser(pipelineId,pipeline.getUserList());
             map.put("message","权限为私有");
             homeService.log(LOG_PIPELINE, LOG_MD_PIPELINE_UPDATE,LOG_TEM_PIPELINE_UPDATE, map);
         }
         if (pipelinePower == 1 && flow.getPipelinePower() != 1 ) {
-            commonServer.deleteDmUser(pipelineId);
+            relationServer.deleteDmUser(pipelineId);
             map.put("message","权限为全局");
             homeService.log(LOG_PIPELINE,LOG_MD_PIPELINE_UPDATE, LOG_TEM_PIPELINE_UPDATE, map);
         }
@@ -192,7 +192,7 @@ public class PipelineServiceImpl implements PipelineService {
     public StringBuilder findUserPipelineId(String userId){
         List<PipelineEntity> allPipeline = pipelineDao.findUserPipeline();
         List<Pipeline> pipelineList = BeanMapper.mapList(allPipeline, Pipeline.class);
-        return commonServer.findUserPipelineId(userId, pipelineList);
+        return relationServer.findUserPipelineId(userId, pipelineList);
     }
 
     /**
@@ -220,7 +220,7 @@ public class PipelineServiceImpl implements PipelineService {
         }
         List<PipelineEntity> pipelineNotFollowEntity = pipelineDao.findPipelineNotFollow(userId,builder);
         List<Pipeline> pipelineNotFollow = BeanMapper.mapList(pipelineNotFollowEntity, Pipeline.class);
-        List<PipelineExecMessage> allStatus = commonServer.findAllStatus(pipelineNotFollow);
+        List<PipelineExecMessage> allStatus = relationServer.findAllStatus(pipelineNotFollow);
         joinTemplate.joinQuery(allStatus);
         List<PipelineExecMessage> userFollowPipeline = findUserFollowPipeline(userId);
         allStatus.addAll(userFollowPipeline);
@@ -245,7 +245,7 @@ public class PipelineServiceImpl implements PipelineService {
         pipelineFollow.forEach(pipeline -> pipeline.setPipelineCollect(1));
         //排序
         pipelineFollow.sort(Comparator.comparing(Pipeline::getPipelineName));
-        List<PipelineExecMessage> allStatus = commonServer.findAllStatus(pipelineFollow);
+        List<PipelineExecMessage> allStatus = relationServer.findAllStatus(pipelineFollow);
         joinTemplate.joinQuery(allStatus);
         return allStatus;
     }
@@ -277,7 +277,7 @@ public class PipelineServiceImpl implements PipelineService {
         if (pipelines.isEmpty()){
             return Collections.emptyList();
         }
-        return commonServer.findAllStatus(pipelines);
+        return relationServer.findAllStatus(pipelines);
     }
 
     /**
@@ -290,7 +290,7 @@ public class PipelineServiceImpl implements PipelineService {
         if (!PipelineUntil.isNoNull(s.toString())){
             return null;
         }
-        return commonServer.findAllOpen(s,number);
+        return relationServer.findAllOpen(s,number);
     }
 
 }

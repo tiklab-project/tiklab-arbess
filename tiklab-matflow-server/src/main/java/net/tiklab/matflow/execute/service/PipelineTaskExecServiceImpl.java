@@ -1,6 +1,7 @@
 package net.tiklab.matflow.execute.service;
 
-import net.tiklab.matflow.definition.model.*;
+import net.tiklab.matflow.definition.model.PipelineAfterConfig;
+import net.tiklab.matflow.definition.model.task.*;
 import net.tiklab.matflow.execute.model.PipelineProcess;
 import net.tiklab.matflow.execute.service.achieve.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,9 @@ public class PipelineTaskExecServiceImpl implements PipelineTaskExecService {
     @Autowired
     ProductService product;
 
+    @Autowired
+    MessageExecService message;
+
     public boolean beginState(PipelineProcess pipelineProcess, Object config, int type){
         boolean state = true;
         switch (type/10) {
@@ -39,6 +43,12 @@ public class PipelineTaskExecServiceImpl implements PipelineTaskExecService {
         }
         return state;
     }
+
+
+    public boolean beginAfterState(PipelineProcess pipelineProcess, PipelineAfterConfig config){
+       return message.message(pipelineProcess, config.getConfigId());
+    }
+
 }
 
 

@@ -1,6 +1,6 @@
 package net.tiklab.matflow.execute.service.achieve;
 
-import net.tiklab.matflow.definition.model.PipelineDeploy;
+import net.tiklab.matflow.definition.model.task.PipelineDeploy;
 import net.tiklab.matflow.execute.model.PipelineProcess;
 
 public interface DeployService {

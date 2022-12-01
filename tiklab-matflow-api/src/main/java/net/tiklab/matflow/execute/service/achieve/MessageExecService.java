@@ -1,6 +1,5 @@
 package net.tiklab.matflow.execute.service.achieve;
 
-import net.tiklab.matflow.definition.model.PipelineMessageType;
 import net.tiklab.matflow.execute.model.PipelineProcess;
 
 public interface MessageExecService {
@@ -11,6 +10,6 @@ public interface MessageExecService {
      * @param pipelineProcess 配置信息
      * @return 状态
      */
-    boolean message(PipelineProcess pipelineProcess, PipelineMessageType pipelineMessageType);
+    boolean message(PipelineProcess pipelineProcess, String configId);
 
 }

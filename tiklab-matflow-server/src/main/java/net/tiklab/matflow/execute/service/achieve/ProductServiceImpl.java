@@ -3,7 +3,7 @@ package net.tiklab.matflow.execute.service.achieve;
 import com.jcraft.jsch.*;
 import net.tiklab.core.exception.ApplicationException;
 import net.tiklab.matflow.definition.model.Pipeline;
-import net.tiklab.matflow.definition.model.PipelineProduct;
+import net.tiklab.matflow.definition.model.task.PipelineProduct;
 import net.tiklab.matflow.execute.model.PipelineProcess;
 import net.tiklab.matflow.execute.service.ConfigCommonService;
 import net.tiklab.matflow.orther.service.PipelineFinal;
@@ -134,8 +134,6 @@ public class ProductServiceImpl implements ProductService {
             execOrder = execOrder +
                     " -DrepositoryId="+authThird.getPrivateKey();
         }
-
-        System.out.println("执行命令："+execOrder);
 
         order = mavenOrder(execOrder, path);
         return PipelineUntil.process(mavenAddress, order);

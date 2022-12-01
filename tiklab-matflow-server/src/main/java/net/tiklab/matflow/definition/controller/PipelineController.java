@@ -3,7 +3,7 @@ package net.tiklab.matflow.definition.controller;
 import net.tiklab.core.Result;
 import net.tiklab.matflow.definition.model.Pipeline;
 import net.tiklab.matflow.definition.model.PipelineExecMessage;
-import net.tiklab.matflow.definition.service.PipelineCommonServer;
+import net.tiklab.matflow.definition.service.PipelineRelationServer;
 import net.tiklab.matflow.definition.service.PipelineService;
 import net.tiklab.matflow.execute.model.PipelineExecState;
 import net.tiklab.matflow.orther.model.PipelineFollow;
@@ -35,7 +35,7 @@ public class PipelineController {
     PipelineService pipelineService;
 
     @Autowired
-    PipelineCommonServer pipelineCommonServer;
+    PipelineRelationServer relationServer;
 
     //创建
     @RequestMapping(path="/createPipeline",method = RequestMethod.POST)
@@ -130,7 +130,7 @@ public class PipelineController {
     @ApiParam(name = "pipelineId",desc = "流水线id",required = true)
     public Result<List<User>> findPipelineUser(@NotNull String pipelineId){
 
-        List<User>  dmUser = pipelineCommonServer.findPipelineUser(pipelineId);
+        List<User>  dmUser = relationServer.findPipelineUser(pipelineId);
 
         return Result.ok(dmUser);
     }
@@ -140,7 +140,7 @@ public class PipelineController {
     @ApiParam(name = "pipelineId",desc = "流水线id",required = true)
     public Result<PipelineExecState> pipelineCensus(@NotNull String pipelineId){
 
-        PipelineExecState buildStatus = pipelineCommonServer.census(pipelineId);
+        PipelineExecState buildStatus = relationServer.census(pipelineId);
 
         return Result.ok(buildStatus);
     }
@@ -160,7 +160,7 @@ public class PipelineController {
     @ApiMethod(name = "updateFollow",desc = "更新收藏")
     @ApiParam(name = "pipelineFollow",desc = "收藏信息",required = true)
     public Result<Void>  updateFollow( @RequestBody @Valid @NotNull PipelineFollow pipelineFollow){
-         pipelineCommonServer.updateFollow(pipelineFollow);
+         relationServer.updateFollow(pipelineFollow);
         return Result.ok();
     }
 
