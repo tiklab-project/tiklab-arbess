@@ -28,6 +28,37 @@ public class PipelineDeployServiceImpl implements PipelineDeployService {
         return pipelineDeployDao.createDeploy(BeanMapper.map(pipelineDeploy, PipelineDeployEntity.class));
     }
 
+
+    /**
+     * 根据配置id删除任务
+     * @param configId 配置id
+     */
+    @Override
+    public void deleteDeployConfig(String configId){
+        PipelineDeploy oneDeployConfig = findOneDeployConfig(configId);
+        deleteDeploy(oneDeployConfig.getDeployId());
+    }
+
+    /**
+     * 根据配置id查询任务
+     * @param configId 配置id
+     * @return 任务
+     */
+    @Override
+    public PipelineDeploy findOneDeployConfig(String configId){
+        List<PipelineDeploy> allDeploy = findAllDeploy();
+        if (allDeploy == null){
+            return null;
+        }
+        for (PipelineDeploy pipelineDeploy : allDeploy) {
+            if (pipelineDeploy.getConfigId().equals(configId)){
+                return pipelineDeploy;
+            }
+        }
+        return null;
+    }
+    
+
     //删除
     @Override
     public void deleteDeploy(String deployId) {

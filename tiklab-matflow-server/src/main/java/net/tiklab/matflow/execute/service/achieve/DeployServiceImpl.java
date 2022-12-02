@@ -3,7 +3,9 @@ package net.tiklab.matflow.execute.service.achieve;
 import com.jcraft.jsch.*;
 import net.tiklab.core.exception.ApplicationException;
 import net.tiklab.matflow.definition.model.Pipeline;
+import net.tiklab.matflow.definition.model.PipelineCourseConfig;
 import net.tiklab.matflow.definition.model.task.PipelineDeploy;
+import net.tiklab.matflow.definition.service.task.PipelineDeployService;
 import net.tiklab.matflow.execute.model.PipelineProcess;
 import net.tiklab.matflow.execute.service.ConfigCommonService;
 import net.tiklab.matflow.orther.service.PipelineUntil;
@@ -28,6 +30,9 @@ public class DeployServiceImpl implements DeployService {
     @Autowired
     ConfigCommonService commonService;
 
+    @Autowired
+    PipelineDeployService deployService;
+
     private static final Logger logger = LoggerFactory.getLogger(DeployServiceImpl.class);
 
     /**
@@ -35,7 +40,11 @@ public class DeployServiceImpl implements DeployService {
      * @param pipelineProcess 配置信息
      * @return 状态
      */
-    public boolean deploy(PipelineProcess pipelineProcess, PipelineDeploy pipelineDeploy) {
+    public boolean deploy(PipelineProcess pipelineProcess, PipelineCourseConfig config) {
+
+        String configId = config.getConfigId();
+        PipelineDeploy pipelineDeploy = deployService.findOneDeployConfig(configId);
+        pipelineDeploy.setType(config.getTaskType());
         //开始运行时间
         Pipeline pipeline = pipelineProcess.getPipeline();
         String startShell = pipelineDeploy.getStartOrder();

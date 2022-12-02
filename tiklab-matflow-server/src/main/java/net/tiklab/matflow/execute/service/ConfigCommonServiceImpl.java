@@ -1,7 +1,6 @@
 package net.tiklab.matflow.execute.service;
 
 import net.tiklab.matflow.definition.model.Pipeline;
-import net.tiklab.matflow.definition.model.PipelineCourseConfig;
 import net.tiklab.matflow.execute.model.PipelineExecHistory;
 import net.tiklab.matflow.execute.model.PipelineExecLog;
 import net.tiklab.matflow.execute.model.PipelineProcess;
@@ -57,6 +56,15 @@ public class ConfigCommonServiceImpl implements ConfigCommonService {
     public int log(PipelineProcess pipelineProcess) throws IOException {
         int state = 1;
         String enCode = pipelineProcess.getEnCode();
+        if (!PipelineUntil.isNoNull(enCode)){
+            int systemType = PipelineUntil.findSystemType();
+            if (systemType == 1){
+                enCode = "GBK";
+            }else {
+                enCode = "UTF-8";
+            }
+        }
+
         String[] error = pipelineProcess.getError();
 
         InputStream inputStream = pipelineProcess.getInputStream();
@@ -195,11 +203,11 @@ public class ConfigCommonServiceImpl implements ConfigCommonService {
      * @return 日志
      */
     @Override
-    public PipelineExecLog initializeLog(String historyId, PipelineCourseConfig configOrder){
+    public PipelineExecLog initializeLog(String historyId,int sort,int type){
         PipelineExecLog pipelineExecLog = new PipelineExecLog();
         pipelineExecLog.setHistoryId(historyId);
-        pipelineExecLog.setTaskSort(configOrder.getTaskSort());
-        pipelineExecLog.setTaskType(configOrder.getTaskType());
+        pipelineExecLog.setTaskSort(sort);
+        pipelineExecLog.setTaskType(type);
         pipelineExecLog.setRunLog("");
         String logId = logService.createLog(pipelineExecLog);
         pipelineExecLog.setLogId(logId);

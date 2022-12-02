@@ -7,7 +7,6 @@ import net.tiklab.join.annotation.FindOne;
 import net.tiklab.join.annotation.JoinProvider;
 import net.tiklab.matflow.definition.model.task.PipelineBuild;
 
-
 import java.util.List;
 
 @JoinProvider(model = PipelineBuild.class)
@@ -31,6 +30,21 @@ public interface PipelineBuildService {
      * @param PipelineBuild 更新信息
      */
     void updateBuild(PipelineBuild PipelineBuild);
+
+
+    /**
+     * 根据配置id删除任务
+     * @param configId 配置id
+     */
+    void deleteBuildConfig(String configId);
+
+    /**
+     * 根据配置id查询任务
+     * @param configId 配置id
+     * @return 任务
+     */
+    PipelineBuild findOneBuildConfig(String configId);
+
 
     /**
      * 查询单个信息

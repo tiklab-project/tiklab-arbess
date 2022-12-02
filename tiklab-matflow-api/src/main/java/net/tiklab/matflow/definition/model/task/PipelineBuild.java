@@ -15,9 +15,6 @@ public class PipelineBuild {
     @ApiProperty(name = "buildId",desc="id")
     private String buildId;
 
-    //构建类型
-    private int type;
-
     //构建文件地址
     @ApiProperty(name="buildAddress",desc="构建文件地址")
     private String buildAddress;
@@ -26,8 +23,22 @@ public class PipelineBuild {
     @ApiProperty(name="buildOrder",desc="构建命令")
     private String buildOrder;
 
+    @ApiProperty(name="configId",desc="配置id")
+    private String configId;
+
     //顺序
     private int sort;
+
+    //构建类型
+    private int type;
+
+    public String getConfigId() {
+        return configId;
+    }
+
+    public void setConfigId(String configId) {
+        this.configId = configId;
+    }
 
     public String getBuildId() {
         return buildId;

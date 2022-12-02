@@ -5,6 +5,7 @@ import net.tiklab.join.annotation.FindList;
 import net.tiklab.join.annotation.FindOne;
 import net.tiklab.join.annotation.JoinProvider;
 import net.tiklab.matflow.definition.model.task.PipelineCodeScan;
+
 import java.util.List;
 
 @JoinProvider(model = PipelineCodeScan.class)
@@ -28,6 +29,20 @@ public interface PipelineCodeScanService {
      * @param pipelineCodeScan 信息
      */
     void updateCodeScan(PipelineCodeScan pipelineCodeScan);
+
+
+    /**
+     * 根据配置id删除任务
+     * @param configId 配置id
+     */
+    void deleteCodeScanConfig(String configId);
+
+    /**
+     * 根据配置id查询任务
+     * @param configId 配置id
+     * @return 任务
+     */
+    PipelineCodeScan findOneCodeScanConfig(String configId);
 
     /**
      * 查询代码扫描信息

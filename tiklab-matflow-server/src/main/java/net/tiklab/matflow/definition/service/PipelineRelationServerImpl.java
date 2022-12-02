@@ -92,7 +92,6 @@ public class PipelineRelationServerImpl implements PipelineRelationServer{
     /**
      * 更新流水线收藏状态
      * @param pipelineFollow 收藏信息
-     * @return 状态
      */
     @Override
     public void updateFollow(PipelineFollow pipelineFollow){
@@ -220,6 +219,7 @@ public class PipelineRelationServerImpl implements PipelineRelationServer{
         }
         //关联权限
         dmRoleService.initPatchDmRole(pipelineId,userList, PipelineFinal.appName);
+
     }
 
     /**

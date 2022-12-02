@@ -41,6 +41,35 @@ public class PipelineCodeServiceImpl implements PipelineCodeService {
         return pipelineCodeDao.createCode(BeanMapper.map(pipelineCode, PipelineCodeEntity.class));
     }
 
+    /**
+     * 根据配置id删除任务
+     * @param configId 配置id
+     */
+    @Override
+    public void deleteCodeConfig(String configId){
+        PipelineCode oneCodeConfig = findOneCodeConfig(configId);
+        deleteCode(oneCodeConfig.getCodeId());
+    }
+
+    /**
+     * 根据配置id查询任务
+     * @param configId 配置id
+     * @return 任务
+     */
+    @Override
+    public PipelineCode findOneCodeConfig(String configId){
+        List<PipelineCode> allCode = findAllCode();
+        if (allCode == null){
+            return null;
+        }
+        for (PipelineCode pipelineCode : allCode) {
+            if (pipelineCode.getConfigId().equals(configId)){
+                return pipelineCode;
+            }
+        }
+        return null;
+    }
+
 
     //删除
     @Override

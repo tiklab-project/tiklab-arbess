@@ -2,7 +2,9 @@ package net.tiklab.matflow.execute.service.achieve;
 
 import net.tiklab.core.exception.ApplicationException;
 import net.tiklab.matflow.definition.model.Pipeline;
+import net.tiklab.matflow.definition.model.PipelineCourseConfig;
 import net.tiklab.matflow.definition.model.task.PipelineBuild;
+import net.tiklab.matflow.definition.service.task.PipelineBuildService;
 import net.tiklab.matflow.execute.model.PipelineProcess;
 import net.tiklab.matflow.execute.service.ConfigCommonService;
 import net.tiklab.matflow.orther.service.PipelineUntil;
@@ -23,9 +25,16 @@ public class BuildServiceImpl implements BuildService {
     @Autowired
     private ConfigCommonService commonService;
 
+    @Autowired
+    PipelineBuildService buildService;
 
     // 构建
-    public boolean build(PipelineProcess pipelineProcess,  PipelineBuild pipelineBuild)  {
+    public boolean build(PipelineProcess pipelineProcess, PipelineCourseConfig config)  {
+
+        PipelineBuild pipelineBuild = buildService.findOneBuildConfig(config.getConfigId());
+
+        pipelineBuild.setType(config.getTaskType());
+
         Pipeline pipeline = pipelineProcess.getPipeline();
         String log = PipelineUntil.date(4);
         //项目地址
@@ -52,7 +61,6 @@ public class BuildServiceImpl implements BuildService {
 
             //构建失败
             int state = commonService.log(pipelineProcess);
-
 
             process.destroy();
             if (state == 0){

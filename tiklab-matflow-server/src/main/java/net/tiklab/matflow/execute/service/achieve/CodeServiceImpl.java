@@ -2,7 +2,9 @@ package net.tiklab.matflow.execute.service.achieve;
 
 import net.tiklab.core.exception.ApplicationException;
 import net.tiklab.matflow.definition.model.Pipeline;
+import net.tiklab.matflow.definition.model.PipelineCourseConfig;
 import net.tiklab.matflow.definition.model.task.PipelineCode;
+import net.tiklab.matflow.definition.service.task.PipelineCodeService;
 import net.tiklab.matflow.execute.model.PipelineProcess;
 import net.tiklab.matflow.execute.service.ConfigCommonService;
 import net.tiklab.matflow.orther.service.PipelineUntil;
@@ -37,11 +39,20 @@ public class CodeServiceImpl implements CodeService {
     @Autowired
     PipelineAuthServer authServer;
 
+    @Autowired
+    PipelineCodeService codeService;
+
 
     // git克隆
-    public boolean clone(PipelineProcess pipelineProcess, PipelineCode pipelineCode){
+    public boolean clone(PipelineProcess pipelineProcess, PipelineCourseConfig config){
 
         String log = PipelineUntil.date(4);
+
+        String configId = config.getConfigId();
+        int taskType = config.getTaskType();
+
+        PipelineCode pipelineCode = codeService.findOneCodeConfig(configId);
+        pipelineCode.setType(taskType);
 
         if (!PipelineUntil.isNoNull(pipelineCode.getCodeAddress())){
             commonService.execHistory(pipelineProcess,log+"代码源地址未配置。");
@@ -111,7 +122,7 @@ public class CodeServiceImpl implements CodeService {
             commonService.execHistory(pipelineProcess,log+ e);
             return false;
         }
-        commonService.execHistory(pipelineProcess,log+"代码克隆成功");
+        commonService.execHistory(pipelineProcess,log+"代码克隆成功\n");
         return true;
     }
 
@@ -146,12 +157,13 @@ public class CodeServiceImpl implements CodeService {
             //账号密码或ssh登录
             case 1, 4 -> {
                 List<String> list = gitUpOrder(pipelineCode, fileAddress);
+                gitOrder = list.get(0);
                 if (list.size() > 1){
                     PipelineUntil.process(serverAddress, list.get(0));
                     PipelineUntil.process(serverAddress, list.get(1));
+                    gitOrder = list.get(2);
+                    path = list.get(3);
                 }
-                gitOrder = list.get(2);
-                path = list.get(3);
             }
             //第三方授权
             case  2, 3 -> gitOrder = gitThirdOrder(pipelineCode, fileAddress);

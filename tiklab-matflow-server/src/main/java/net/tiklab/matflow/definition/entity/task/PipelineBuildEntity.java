@@ -21,6 +21,17 @@ public class PipelineBuildEntity {
     @Column(name = "build_order",notNull = true)
     private String buildOrder;
 
+    @Column(name = "config_id",notNull = true)
+    private String configId;
+
+    public String getConfigId() {
+        return configId;
+    }
+
+    public void setConfigId(String configId) {
+        this.configId = configId;
+    }
+
     public String getBuildId() {
         return buildId;
     }

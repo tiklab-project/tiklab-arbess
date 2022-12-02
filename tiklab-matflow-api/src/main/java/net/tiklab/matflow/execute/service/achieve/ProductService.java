@@ -1,6 +1,6 @@
 package net.tiklab.matflow.execute.service.achieve;
 
-import net.tiklab.matflow.definition.model.task.PipelineProduct;
+import net.tiklab.matflow.definition.model.PipelineCourseConfig;
 import net.tiklab.matflow.execute.model.PipelineProcess;
 
 public interface ProductService {
@@ -11,7 +11,7 @@ public interface ProductService {
      * @param product 配置信息
      * @return 执行状态
      */
-     boolean product(PipelineProcess pipelineProcess, PipelineProduct product);
+     boolean product(PipelineProcess pipelineProcess, PipelineCourseConfig config);
 
 
 }

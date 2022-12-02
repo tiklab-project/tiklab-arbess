@@ -23,9 +23,6 @@ public class PipelineCourseConfig {
     @ApiProperty(name="createTime",desc="创建时间")
     private String createTime;
 
-    @ApiProperty(name="taskId",desc="关联id")
-    private String taskId;
-
     @ApiProperty(name="taskType",desc="类型")
     private int taskType;
 
@@ -43,13 +40,8 @@ public class PipelineCourseConfig {
     @JoinQuery(key = "pipelineId")
     private Pipeline pipeline;
 
-    private int type;
-
     //信息（create update delete）
     private String message;
-
-    //更改顺序的类型
-    private int sort;
 
     public PipelineCourseConfig() {
     }
@@ -109,28 +101,12 @@ public class PipelineCourseConfig {
         this.createTime = createTime;
     }
 
-    public String getTaskId() {
-        return taskId;
-    }
-
-    public void setTaskId(String taskId) {
-        this.taskId = taskId;
-    }
-
     public int getTaskSort() {
         return taskSort;
     }
 
     public void setTaskSort(int taskSort) {
         this.taskSort = taskSort;
-    }
-
-    public int getSort() {
-        return sort;
-    }
-
-    public void setSort(int sort) {
-        this.sort = sort;
     }
 
     public Pipeline getPipeline() {
@@ -141,11 +117,4 @@ public class PipelineCourseConfig {
         this.pipeline = pipeline;
     }
 
-    public int getType() {
-        return type;
-    }
-
-    public void setType(int type) {
-        this.type = type;
-    }
 }

@@ -24,6 +24,20 @@ public interface PipelineTestService {
      */
     void deleteTest(String testId);
 
+
+    /**
+     * 根据配置id删除任务
+     * @param configId 配置id
+     */
+    void deleteTestConfig(String configId);
+
+    /**
+     * 根据配置id查询任务
+     * @param configId 配置id
+     * @return 任务
+     */
+    PipelineTest findOneTestConfig(String configId);
+
     /**
      * 更新
      * @param pipelineTest 更新信息

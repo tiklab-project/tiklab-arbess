@@ -21,6 +21,7 @@ create table pipeline_build  (
   build_id varchar(256)  COMMENT '构建id',
   build_address varchar(256)  COMMENT '文件地址',
   build_order varchar(256)  COMMENT '构建命令',
+  config_id varchar(256)  COMMENT '配置id',
   PRIMARY KEY (build_id) USING BTREE
 );
 
@@ -32,14 +33,16 @@ create table pipeline_code  (
   code_name varchar(255)  COMMENT '地址名',
   code_address varchar(256)  COMMENT 'git地址',
   code_branch varchar(256)  COMMENT '分支',
+  svn_file varchar(256)  COMMENT '签出文件信息',
   auth_id varchar(256)  COMMENT '凭证id',
+  config_id varchar(256)  COMMENT '配置id',
   PRIMARY KEY (id) USING BTREE
 );
 
 -- ----------------------------
 -- Table structure for pipeline_config_order
 -- ----------------------------
-create table pipeline_config_order  (
+create table pipeline_course_config  (
   config_id varchar(255) ,
   create_time datetime ,
   pipeline_id varchar(255) ,
@@ -61,6 +64,7 @@ create table pipeline_deploy  (
   deploy_order varchar(255)  COMMENT '部署命令',
   start_address varchar(255)   COMMENT '启动文件地址',
   start_order varchar(255)   COMMENT '启动命令',
+  config_id varchar(256)  COMMENT '配置id',
   PRIMARY KEY (id) USING BTREE
 );
 
@@ -147,6 +151,7 @@ create table pipeline_test  (
   test_id varchar(256)  COMMENT '测试id',
   test_order varchar(255)  COMMENT '测试命令',
   address varchar(255)  COMMENT '测试地址',
+  config_id varchar(256)  COMMENT '配置id',
   PRIMARY KEY (test_id) USING BTREE
 );
 
@@ -158,6 +163,7 @@ create table pipeline_code_scan  (
     type int  COMMENT '类型',
     auth_id varchar(256)  COMMENT '授权id',
     project_name varchar(256)  COMMENT '授权id',
+    config_id varchar(256)  COMMENT '配置id',
     PRIMARY KEY (id) USING BTREE
 );
 
@@ -173,6 +179,7 @@ create table pipeline_product  (
     file_address varchar(256)  COMMENT '文件地址',
     auth_id varchar(256)  COMMENT '凭证id',
     put_address varchar(256)  COMMENT '凭证id',
+    config_id varchar(256)  COMMENT '配置id',
     PRIMARY KEY (id) USING BTREE
 );
 

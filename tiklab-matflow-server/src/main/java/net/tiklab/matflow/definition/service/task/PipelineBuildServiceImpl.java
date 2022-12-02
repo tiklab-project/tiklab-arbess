@@ -24,6 +24,37 @@ public class PipelineBuildServiceImpl implements PipelineBuildService {
         return pipelineBuildDao.createBuild(BeanMapper.map(pipelineBuild, PipelineBuildEntity.class));
     }
 
+
+    /**
+     * 根据配置id删除任务
+     * @param configId 配置id
+     */
+    @Override
+    public void deleteBuildConfig(String configId){
+        PipelineBuild oneBuildConfig = findOneBuildConfig(configId);
+        deleteBuild(oneBuildConfig.getBuildId());
+    }
+
+    /**
+     * 根据配置id查询任务
+     * @param configId 配置id
+     * @return 任务
+     */
+    @Override
+    public PipelineBuild findOneBuildConfig(String configId){
+        List<PipelineBuild> allBuild = findAllBuild();
+        if (allBuild == null){
+            return null;
+        }
+        for (PipelineBuild pipelineBuild : allBuild) {
+            if (pipelineBuild.getConfigId().equals(configId)){
+                return pipelineBuild;
+            }
+        }
+        return null;
+    }
+    
+
     //删除
     @Override
     public void deleteBuild(String buildId) {

@@ -32,6 +32,17 @@ public class PipelineCodeEntity {
     @Column(name = "svn_file",notNull = true)
     private String svnFile;
 
+    @Column(name = "config_id",notNull = true)
+    private String configId;
+
+    public String getConfigId() {
+        return configId;
+    }
+
+    public void setConfigId(String configId) {
+        this.configId = configId;
+    }
+
     public String getCodeId() {
         return codeId;
     }

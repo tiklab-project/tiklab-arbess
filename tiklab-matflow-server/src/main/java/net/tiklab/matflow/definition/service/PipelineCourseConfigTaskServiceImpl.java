@@ -34,397 +34,316 @@ public class PipelineCourseConfigTaskServiceImpl implements PipelineCourseConfig
     @Autowired
     PipelineProductServer productServer;
 
-
     /**
-     * 获取所有配置
-     * @param allPipelineConfig 配置关联信息
-     * @return 配置集合
+     * 创建任务
+     * @param config 配置信息
+     * @return 任务id
      */
     @Override
-    public List<Object> findAllConfig(List<PipelineCourseConfig> allPipelineConfig){
-        List<Object> list = new ArrayList<>();
-        if (allPipelineConfig == null){
-            return null;
-        }
-        for (PipelineCourseConfig pipelineCourseConfig : allPipelineConfig) {
-            Object oneConfig = findOneConfig(pipelineCourseConfig);
-            list.add(oneConfig);
-        }
-        return list;
-    }
-
-    /**
-     * 获取配置详情
-     * @param configOrder 配置信息
-     * @return 配置信息
-     */
-    @Override
-    public Object findOneConfig(PipelineCourseConfig configOrder){
-        String taskId = configOrder.getTaskId();
-        int taskSort = configOrder.getTaskSort();
-        int type = configOrder.getTaskType();
-        switch (type/10){
-            case 0 -> {
-                PipelineCode code = codeService.findOneCode(taskId);
-                code.setType(type);
-                code.setSort(taskSort);
-                return code;
-            }
-            case 1 -> {
-                PipelineTest test = testService.findOneTest(taskId);
-                test.setType(type);
-                test.setSort(taskSort);
-                return test;
-            }
-            case 2 -> {
-                PipelineBuild build = buildService.findOneBuild(taskId);
-                build.setType(type);
-                build.setSort(taskSort);
-                return build;
-            }
-            case 3 -> {
-                PipelineDeploy deploy = deployService.findOneDeploy(taskId);
-                deploy.setType(type);
-                deploy.setSort(taskSort);
-                return deploy;
-            }
-            case 4 -> {
-                PipelineCodeScan codeScan = codeScanService.findOneCodeScan(taskId);
-                codeScan.setType(type);
-                codeScan.setSort(taskSort);
-                return codeScan;
-            }
-            case 5 -> {
-                PipelineProduct product = productServer.findOneProduct(taskId);
-                product.setType(type);
-                product.setSort(taskSort);
-                return product;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * 配置信息
-     * @param message 执行类型 create:创建,update:更新,delete:删除
-     * @param config 更新配置
-     * @param typeConfig 原配置
-     * @return 更新信息
-     */
-    public Map<String,String> config(String message, PipelineCourseConfig config, PipelineCourseConfig typeConfig){
-        Map<String, String> map;
+    public String createConfig(PipelineCourseConfig config){
+        String configId = config.getConfigId();
         int taskType = config.getTaskType();
         switch (taskType/10) {
             case 0 -> {
-                map = codeConfig(message, config, typeConfig);
-                map.put("message","源码管理配置");
+                PipelineCode pipelineCode = new PipelineCode();
+                pipelineCode.setConfigId(configId);
+                return codeService.createCode(pipelineCode);
             }
             case 1 -> {
-                map = testConfig(message, config, typeConfig);
-                map.put("message","测试配置");
+                PipelineTest pipelineTest = new PipelineTest();
+                pipelineTest.setConfigId(configId);
+                return testService.createTest(pipelineTest);
             }
             case 2 -> {
-                map = buildConfig(message, config, typeConfig);
-                map.put("message","构建配置");
+                PipelineBuild pipelineBuild = new PipelineBuild();
+                pipelineBuild.setConfigId(configId);
+                return buildService.createBuild(pipelineBuild);
             }
             case 3 -> {
-                map = deployConfig(message, config, typeConfig);
-                map.put("message","部署配置");
+                PipelineDeploy pipelineDeploy = new PipelineDeploy();
+                pipelineDeploy.setConfigId(configId);
+                pipelineDeploy.setAuthType(1);
+                return deployService.createDeploy(pipelineDeploy);
             }
             case 4 -> {
-                map = codeScanConfig(message, config, typeConfig);
-                map.put("message","代码扫描配置");
+                PipelineCodeScan pipelineCodeScan = new PipelineCodeScan();
+                pipelineCodeScan.setConfigId(configId);
+                return  codeScanService.createCodeScan(pipelineCodeScan);
             }
             case 5 -> {
-                map = productConfig(message, config, typeConfig);
-                map.put("message","推送制品配置");
+                PipelineProduct pipelineProduct = new PipelineProduct();
+                pipelineProduct.setConfigId(configId);
+                return productServer.createProduct(pipelineProduct);
             }
             default -> {
                 throw new ApplicationException("无法更新未知的配置类型。");
             }
         }
-        return map;
+
+
     }
 
-    //源码
-    private Map<String, String> codeConfig(String message, PipelineCourseConfig config, PipelineCourseConfig typeConfig){
-        HashMap<String, String> map = new HashMap<>();
-        //把值转换成json字符串
-        String object = JSON.toJSONString(config.getValues());
-        switch (message){
-            case "create"->{
-                PipelineCode pipelineCode = new PipelineCode();
-                if (config.getTaskType() == 1){
-                    pipelineCode.setCodeBranch("master");
-                }
-                String id = codeService.createCode(pipelineCode);
-                map.put("id",id);
+    /**
+     * 删除任务
+     * @param config 配置
+     */
+    @Override
+    public void deleteConfig(PipelineCourseConfig config){
+        String configId = config.getConfigId();
+        int taskType = config.getTaskType();
+        switch (taskType/10) {
+            case 0 -> {
+                codeService.deleteCodeConfig(configId);
             }
-            case "update"->{
+            case 1 -> {
+                testService.deleteTestConfig(configId);
+            }
+            case 2 -> {
+                buildService.deleteBuildConfig(configId);
+            }
+            case 3 -> {
+                deployService.deleteDeployConfig(configId);
+            }
+            case 4 -> {
+                codeScanService.deleteCodeScanConfig(configId);
+            }
+            case 5 -> {
+                productServer.deleteProductConfig(configId);
+            }
+            default -> {
+                throw new ApplicationException("无法更新未知的配置类型。");
+            }
+        }
+
+
+    }
+
+    /**
+     * 更新任务
+     * @param config 配置
+     */
+    @Override
+    public void updateConfig(PipelineCourseConfig config){
+        String configId = config.getConfigId();
+        int taskType = config.getTaskType();
+        String object = JSON.toJSONString(config.getValues());
+        switch (taskType/10) {
+            case 0 -> {
                 PipelineCode pipelineCode = JSON.parseObject(object, PipelineCode.class);
-                pipelineCode.setCodeId(typeConfig.getTaskId());
+                PipelineCode oneCodeConfig = codeService.findOneCodeConfig(configId);
+                String id;
+                if (oneCodeConfig == null){
+                    id = codeService.createCode(new PipelineCode());
+                }else {
+                    id = oneCodeConfig.getCodeId();
+                }
+                pipelineCode.setCodeId(id);
                 pipelineCode.setType(config.getTaskType());
                 codeService.updateCode(pipelineCode);
             }
-            case "delete"->{
-                codeService.deleteCode(config.getTaskId());
-            }
-            case "updateType" -> {
-                codeService.deleteCode(config.getTaskId());
-                String id = codeService.createCode(new PipelineCode());
-                map.put("id",id);
-            }
-        }
-        return map;
-    }
-
-    //代码扫描
-    private Map<String, String> codeScanConfig(String message, PipelineCourseConfig config, PipelineCourseConfig typeConfig){
-        HashMap<String, String> map = new HashMap<>();
-        //把值转换成json字符串
-        String object = JSON.toJSONString(config.getValues());
-        switch (message){
-            case "create"->{
-                PipelineCodeScan pipelineCodeScan = new PipelineCodeScan();
-                String id = codeScanService.createCodeScan(pipelineCodeScan);
-                map.put("id",id);
-            }
-            case "update"->{
-                PipelineCodeScan pipelineCodeScan = JSON.parseObject(object, PipelineCodeScan.class);
-                pipelineCodeScan.setCodeScanId(typeConfig.getTaskId());
-                codeScanService.updateCodeScan(pipelineCodeScan);
-            }
-            case "delete"->{
-                codeScanService.deleteCodeScan(config.getTaskId());
-            }
-            case "updateType" -> {
-                codeScanService.deleteCodeScan(config.getTaskId());
-                String id = codeScanService.createCodeScan(new PipelineCodeScan());
-                map.put("id",id);
-            }
-        }
-        return map;
-    }
-
-    //测试
-    private Map<String, String> testConfig(String message, PipelineCourseConfig config, PipelineCourseConfig typeConfig){
-        HashMap<String, String> map = new HashMap<>();
-        //把值转换成json字符串
-        String object = JSON.toJSONString(config.getValues());
-        switch (message){
-            case "create"->{
-                PipelineTest pipelineTest = new PipelineTest();
-                if (config.getTaskType() == 11){
-                    pipelineTest.setTestOrder("mvn test -Dmaven.test.failure.ignore=true");
-                }
-                String id = testService.createTest(pipelineTest);
-                map.put("id",id);
-            }
-            case "update"->{
+            case 1 -> {
                 PipelineTest pipelineTest = JSON.parseObject(object, PipelineTest.class);
-                pipelineTest.setTestId(typeConfig.getTaskId());
+                PipelineTest oneTestConfig = testService.findOneTestConfig(configId);
+                String id;
+                if (oneTestConfig == null){
+                    id = testService.createTest(new PipelineTest());
+                }else {
+                    id = oneTestConfig.getTestId();
+                }
+                pipelineTest.setTestId(id);
                 testService.updateTest(pipelineTest);
             }
-            case "delete"->{
-                testService.deleteTest(config.getTaskId());
-            }
-            case "updateType" -> {
-                testService.deleteTest(config.getTaskId());
-                String id = testService.createTest(new PipelineTest());
-                map.put("id",id);
-            }
-        }
-        return map;
-    }
-
-    //构建
-    private Map<String, String> buildConfig(String message, PipelineCourseConfig config, PipelineCourseConfig typeConfig){
-        HashMap<String, String> map = new HashMap<>();
-        //把值转换成json字符串
-        String object = JSON.toJSONString(config.getValues());
-        switch (message){
-            case "create"->{
-                PipelineBuild pipelineBuild = new PipelineBuild();
-                int taskType = config.getTaskType();
-                if (taskType == 21){
-                    pipelineBuild.setBuildOrder("mvn clean package");
-                }
-                if (taskType == 22){
-                    pipelineBuild.setBuildOrder("npm install");
-                }
-                String id = buildService.createBuild(pipelineBuild);
-                map.put("id",id);
-            }
-            case "update"->{
+            case 2 -> {
                 PipelineBuild pipelineBuild = JSON.parseObject(object, PipelineBuild.class);
-                pipelineBuild.setBuildId(typeConfig.getTaskId());
+                PipelineBuild oneBuildConfig = buildService.findOneBuildConfig(configId);
+                String id;
+                if (oneBuildConfig == null){
+                    id = buildService.createBuild(new PipelineBuild());
+                }else {
+                    id = oneBuildConfig.getBuildId();
+                }
+                pipelineBuild.setBuildId(id);
                 buildService.updateBuild(pipelineBuild);
             }
-            case "delete"->{
-                buildService.deleteBuild(config.getTaskId());
-            }
-            case "updateType" -> {
-                buildService.deleteBuild(config.getTaskId());
-                String id = buildService.createBuild(new PipelineBuild());
-                map.put("id",id);
-            }
-        }
-        return map;
-    }
-
-    //部署
-    private Map<String, String> deployConfig(String message, PipelineCourseConfig config, PipelineCourseConfig typeConfig){
-        HashMap<String, String> map = new HashMap<>();
-        //把值转换成json字符串
-        String object = JSON.toJSONString(config.getValues());
-        switch (message){
-            case "create"->{
-                PipelineDeploy pipelineDeploy = new PipelineDeploy();
-                pipelineDeploy.setAuthType(1);
-                String id = deployService.createDeploy(pipelineDeploy);
-                map.put("id",id);
-            }
-            case "update"->{
+            case 3 -> {
                 PipelineDeploy pipelineDeploy = JSON.parseObject(object, PipelineDeploy.class);
-                pipelineDeploy.setDeployId(typeConfig.getTaskId());
+                PipelineDeploy oneDeployConfig = deployService.findOneDeployConfig(configId);
+                String id;
+                if (oneDeployConfig == null){
+                    id = deployService.createDeploy(new PipelineDeploy());
+                }else {
+                    id = oneDeployConfig.getDeployId();
+                }
+                pipelineDeploy.setDeployId(id);
                 deployService.updateDeploy(pipelineDeploy);
             }
-            case "delete"->{
-                deployService.deleteDeploy(config.getTaskId());
+            case 4 -> {
+                PipelineCodeScan pipelineCodeScan = JSON.parseObject(object, PipelineCodeScan.class);
+                PipelineCodeScan oneCodeScanConfig = codeScanService.findOneCodeScanConfig(configId);
+                String id;
+                if (oneCodeScanConfig == null){
+                    id = codeScanService.createCodeScan(new PipelineCodeScan());
+                }else {
+                    id = oneCodeScanConfig.getCodeScanId();
+                }
+                pipelineCodeScan.setCodeScanId(id);
+                codeScanService.updateCodeScan(pipelineCodeScan);
             }
-            case "updateType" -> {
-                deployService.deleteDeploy(config.getTaskId());
-                PipelineDeploy pipelineDeploy = new PipelineDeploy();
-                pipelineDeploy.setAuthType(1);
-                String id = deployService.createDeploy(pipelineDeploy);
-                map.put("id",id);
+            case 5 -> {
+                PipelineDeploy pipelineDeploy = JSON.parseObject(object, PipelineDeploy.class);
+                PipelineProduct oneProductConfig = productServer.findOneProductConfig(configId);
+                String id;
+                if (oneProductConfig == null){
+                    id = productServer.createProduct(new PipelineProduct());
+                }else {
+                    id = oneProductConfig.getConfigId();
+                }
+                pipelineDeploy.setDeployId(id);
+                deployService.updateDeploy(pipelineDeploy);
             }
-        }
-        return map;
-    }
-
-    //推送制品
-    private Map<String, String> productConfig(String message, PipelineCourseConfig config, PipelineCourseConfig typeConfig){
-        HashMap<String, String> map = new HashMap<>();
-        //把值转换成json字符串
-        String object = JSON.toJSONString(config.getValues());
-        switch (message){
-            case "create"->{
-                PipelineProduct product = new PipelineProduct();
-                String id = productServer.createProduct(product);
-                map.put("id",id);
-            }
-            case "update"->{
-                PipelineProduct product = JSON.parseObject(object, PipelineProduct.class);
-                product.setProductId(typeConfig.getTaskId());
-                productServer.updateProduct(product);
-            }
-            case "delete"->{
-                productServer.deleteProduct(config.getTaskId());
-            }
-            case "updateType" -> {
-                productServer.deleteProduct(config.getTaskId());
-                PipelineProduct product = new PipelineProduct();
-                String id = productServer.createProduct(product);
-                map.put("id",id);
+            default -> {
+                throw new ApplicationException("无法更新未知的配置类型。");
             }
         }
-        return map;
+
+
     }
 
+    /**
+     * 查询任务
+     * @param config 配置
+     * @return 任务信息
+     */
+    @Override
+    public Object findConfig(PipelineCourseConfig config){
+        String configId = config.getConfigId();
+        int taskType = config.getTaskType();
+        int taskSort = config.getTaskSort();
+        switch (taskType/10) {
+            case 0 -> {
+                PipelineCode oneCodeConfig = codeService.findOneCodeConfig(configId);
+                oneCodeConfig.setType(taskType);
+                oneCodeConfig.setSort(taskSort);
+                return oneCodeConfig;
+            }
+            case 1 -> {
+                PipelineTest oneTestConfig = testService.findOneTestConfig(configId);
+                oneTestConfig.setType(taskType);
+                oneTestConfig.setSort(taskSort);
+                return oneTestConfig;
+            }
+            case 2 -> {
+                PipelineBuild oneBuildConfig = buildService.findOneBuildConfig(configId);
+                oneBuildConfig.setType(taskType);
+                oneBuildConfig.setSort(taskSort);
+                return oneBuildConfig;
+            }
+            case 3 -> {
+                PipelineDeploy oneDeployConfig = deployService.findOneDeployConfig(configId);
+                oneDeployConfig.setType(taskType);
+                oneDeployConfig.setSort(taskSort);
+                return oneDeployConfig;
+            }
+            case 4 -> {
+                PipelineCodeScan oneCodeScanConfig = codeScanService.findOneCodeScanConfig(configId);
+                oneCodeScanConfig.setType(taskType);
+                oneCodeScanConfig.setSort(taskSort);
+                return oneCodeScanConfig;
+            }
+            case 5 -> {
+                PipelineProduct oneProductConfig = productServer.findOneProductConfig(configId);
+                oneProductConfig.setType(taskType);
+                oneProductConfig.setSort(taskSort);
+                return oneProductConfig;
+            }
+            default -> {
+                throw new ApplicationException("无法更新未知的配置类型。");
+            }
+        }
+
+
+    }
 
     /**
      * 效验必填字段
-     * @param configOrderList 所有配置
-     * @return 效验信息
+     * @param config 配置
      */
-    public Map<String, String> configValid(List<PipelineCourseConfig> configOrderList){
-        Map<String, String> map = new HashMap<>();
-        for (PipelineCourseConfig pipelineCourseConfig : configOrderList) {
-            int type = pipelineCourseConfig.getTaskType();
-            String taskId = pipelineCourseConfig.getTaskId();
-            switch (type / 10) {
-                case 0 -> map = codeValid(map, taskId, type);
-                case 1 -> map = testValid(map, taskId, type);
-                case 2 -> map = buildValid(map, taskId, type);
-                case 3 -> map = deployValid(map, taskId, type);
-                case 4 -> map = codeScanValid(map, taskId, type);
-                case 5 -> map = productValid(map, taskId, type);
-            }
+    public void configValid(PipelineCourseConfig config,List<String> list){
+        int taskType = config.getTaskType();
+        String configId = config.getConfigId();
+        switch (taskType / 10) {
+            case 0 ->  codeValid(configId, list, taskType);
+            case 1 ->  testValid(configId, list, taskType);
+            case 2 ->  buildValid(configId, list, taskType);
+            case 3 ->  deployValid(configId, list, taskType);
+            case 4 ->  codeScanValid(configId, list, taskType);
+            case 5 ->  productValid(configId, list, taskType);
         }
-        if(map.size() == 0){
-            return Collections.emptyMap();
-        }
-        return map;
     }
 
-    public Map<String, String> codeValid(Map<String, String> map,String taskId,int type){
-        PipelineCode code = codeService.findOneCode(taskId);
-        if (!PipelineUntil.isNoNull(code.getCodeName())){
-            map.put("codeName", String.valueOf(type));
+    public void codeValid(String configId,List<String> list,int taskType){
+        PipelineCode oneCodeConfig = codeService.findOneCodeConfig(configId);
+        if (!PipelineUntil.isNoNull(oneCodeConfig.getCodeName())){
+            list.add(configId+"_"+"codeName");
         }
-        return map;
     }
 
-    public Map<String, String> codeScanValid(Map<String, String> map,String taskId,int type){
-        PipelineCodeScan code = codeScanService.findOneCodeScan(taskId);
+    public void codeScanValid(String configId,List<String> list,int taskType){
+        PipelineCodeScan code = codeScanService.findOneCodeScanConfig(configId);
         if (!PipelineUntil.isNoNull(code.getProjectName())){
-            map.put("projectName", String.valueOf(type));
+            list.add(configId+"_"+"projectName");
         }
-        return map;
     }
 
-    public Map<String, String> testValid(Map<String, String> map,String taskId,int type){
-        return map;
+    public void testValid(String configId,List<String> list,int taskType){
+
     }
 
-    public Map<String, String> buildValid(Map<String, String> map,String taskId,int type){
-        return map;
+    public void buildValid(String configId,List<String> list,int taskType){
+
     }
 
-    public Map<String, String> deployValid(Map<String, String> map,String taskId,int type){
-        PipelineDeploy deploy = deployService.findOneDeploy(taskId);
-        if (type == 31){
+    public void deployValid(String configId,List<String> list,int taskType){
+        PipelineDeploy deploy = deployService.findOneDeployConfig(configId);
+        if (taskType == 31){
             if (deploy.getAuthType() == 1){
                 if (!PipelineUntil.isNoNull(deploy.getDeployAddress())){
-                    map.put("deployAddress", String.valueOf(type));
+                    list.add(configId+"_"+"deployAddress");
                 }
                 if (!PipelineUntil.isNoNull(deploy.getStartAddress())){
-                    map.put("startAddress", String.valueOf(type));
+                    list.add(configId+"_"+"startAddress");
                 }
             }
         }
-        return map;
     }
 
-    public Map<String, String> productValid(Map<String, String> map,String taskId,int type){
-        PipelineProduct product = productServer.findOneProduct(taskId);
-        if (type == 51){
+    public void productValid(String configId,List<String> list,int taskType){
+        PipelineProduct product = productServer.findOneProductConfig(configId);
+        if (taskType == 51){
             if (!PipelineUntil.isNoNull(product.getArtifactId())){
-                map.put("artifactId", String.valueOf(type));
+                list.add(configId+"_"+"artifactId");
             }
             if (!PipelineUntil.isNoNull(product.getVersion())){
-                map.put("version", String.valueOf(type));
+                list.add(configId+"_"+"version");
             }
             if (!PipelineUntil.isNoNull(product.getGroupId())){
-                map.put("groupId", String.valueOf(type));
+                list.add(configId+"_"+"groupId");
             }
             if (!PipelineUntil.isNoNull(product.getFileAddress())){
-                map.put("fileAddress", String.valueOf(type));
+                list.add(configId+"_"+"fileAddress");
             }
             if (!PipelineUntil.isNoNull(product.getFileType())){
-                map.put("fileType", String.valueOf(type));
+                list.add(configId+"_"+"fileType");
             }
         }
-        if (type == 52){
+        if (taskType == 52){
            if (!PipelineUntil.isNoNull(product.getFileAddress())){
-               map.put("fileAddress", String.valueOf(type));
+               list.add(configId+"_"+"fileAddress");
            }
            if (!PipelineUntil.isNoNull(product.getPutAddress())){
-               map.put("putAddress", String.valueOf(type));
+               list.add(configId+"_"+"putAddress");
            }
        }
-        return map;
     }
 
 

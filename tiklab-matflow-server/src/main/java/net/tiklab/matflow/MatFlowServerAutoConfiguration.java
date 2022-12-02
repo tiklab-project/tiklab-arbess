@@ -12,7 +12,9 @@ import org.springframework.context.annotation.Configuration;
         "pipeline-authority",
         "pipeline-init-message",
         "pipeline-init-project",
-        "pipeline-log-template"
+        "pipeline-log-template",
+        "pipeline-after",
+        "pipeline-before"
 },order = 101)
 @ComponentScan({"net.tiklab.matflow"})
 public class MatFlowServerAutoConfiguration {

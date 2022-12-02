@@ -17,6 +17,17 @@ public class PipelineCodeScanEntity {
     @Column(name = "auth_id")
     private String authId;
 
+    @Column(name = "config_id",notNull = true)
+    private String configId;
+
+    public String getConfigId() {
+        return configId;
+    }
+
+    public void setConfigId(String configId) {
+        this.configId = configId;
+    }
+
     public String getCodeScanId() {
         return codeScanId;
     }

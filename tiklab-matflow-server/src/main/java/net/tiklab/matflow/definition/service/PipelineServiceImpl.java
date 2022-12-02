@@ -96,7 +96,7 @@ public class PipelineServiceImpl implements PipelineService {
         relationServer.deleteDmUser(pipelineId); //关联用户
         relationServer.deleteHistory(pipeline); //历史，日志信息
         relationServer.deleteDmRole(pipelineId); //关联角色
-        configOrderService.deleteConfig(pipelineId); //配置信息
+        configOrderService.deleteAllConfig(pipelineId); //配置信息
 
         //动态
         Map<String, String> map = homeService.initMap(pipeline);

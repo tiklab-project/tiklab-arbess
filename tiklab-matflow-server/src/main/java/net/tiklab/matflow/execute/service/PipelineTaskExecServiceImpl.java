@@ -1,7 +1,7 @@
 package net.tiklab.matflow.execute.service;
 
 import net.tiklab.matflow.definition.model.PipelineAfterConfig;
-import net.tiklab.matflow.definition.model.task.*;
+import net.tiklab.matflow.definition.model.PipelineCourseConfig;
 import net.tiklab.matflow.execute.model.PipelineProcess;
 import net.tiklab.matflow.execute.service.achieve.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,15 +31,16 @@ public class PipelineTaskExecServiceImpl implements PipelineTaskExecService {
     @Autowired
     MessageExecService message;
 
-    public boolean beginState(PipelineProcess pipelineProcess, Object config, int type){
+    public boolean beginCourseState(PipelineProcess pipelineProcess, PipelineCourseConfig config){
+        int taskType = config.getTaskType();
         boolean state = true;
-        switch (type/10) {
-            case 0 -> state = code.clone(pipelineProcess,(PipelineCode) config);
-            case 1 -> state = test.test(pipelineProcess,(PipelineTest) config);
-            case 2 -> state = build.build(pipelineProcess, (PipelineBuild) config);
-            case 3 -> state = deploy.deploy(pipelineProcess,(PipelineDeploy) config);
-            case 4 -> state = codeScan.codeScan(pipelineProcess, (PipelineCodeScan) config);
-            case 5 -> state = product.product(pipelineProcess, (PipelineProduct) config);
+        switch (taskType/10) {
+            case 0 -> state = code.clone(pipelineProcess, config);
+            case 1 -> state = test.test(pipelineProcess, config);
+            case 2 -> state = build.build(pipelineProcess, config);
+            case 3 -> state = deploy.deploy(pipelineProcess, config);
+            case 4 -> state = codeScan.codeScan(pipelineProcess, config);
+            case 5 -> state = product.product(pipelineProcess,  config);
         }
         return state;
     }

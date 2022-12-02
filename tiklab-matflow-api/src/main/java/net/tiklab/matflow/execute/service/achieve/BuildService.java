@@ -1,6 +1,6 @@
 package net.tiklab.matflow.execute.service.achieve;
 
-import net.tiklab.matflow.definition.model.task.PipelineBuild;
+import net.tiklab.matflow.definition.model.PipelineCourseConfig;
 import net.tiklab.matflow.execute.model.PipelineProcess;
 
 public interface BuildService {
@@ -10,5 +10,7 @@ public interface BuildService {
      * @param pipelineProcess 构建信息
      * @return 构建状态
      */
-    boolean build(PipelineProcess pipelineProcess,  PipelineBuild pipelineBuild);
+    boolean build(PipelineProcess pipelineProcess,  PipelineCourseConfig config);
+
+
 }

@@ -26,6 +26,20 @@ public interface PipelineDeployService {
      */
      void deleteDeploy(String deployId) ;
 
+
+    /**
+     * 根据配置id删除任务
+     * @param configId 配置id
+     */
+    void deleteDeployConfig(String configId);
+
+    /**
+     * 根据配置id查询任务
+     * @param configId 配置id
+     * @return 任务
+     */
+    PipelineDeploy findOneDeployConfig(String configId);
+
     /**
      * 更新
      * @param pipelineDeploy 更新信息

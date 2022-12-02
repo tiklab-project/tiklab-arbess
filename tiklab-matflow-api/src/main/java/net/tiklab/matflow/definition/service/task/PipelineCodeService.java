@@ -21,6 +21,21 @@ public interface PipelineCodeService {
      */
      String createCode(PipelineCode pipelineCode);
 
+
+    /**
+     * 根据配置id删除任务
+     * @param configId 配置id
+     */
+    void deleteCodeConfig(String configId);
+
+    /**
+     * 根据配置id查询任务
+     * @param configId 配置id
+     * @return 任务
+     */
+    PipelineCode findOneCodeConfig(String configId);
+
+
     /**
      * 删除
      * @param codeId codeId

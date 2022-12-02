@@ -28,6 +28,37 @@ public class PipelineTestServiceImpl implements PipelineTestService {
         return pipelineTestDao.createTest(BeanMapper.map(pipelineTest, PipelineTestEntity.class));
     }
 
+
+    /**
+     * 根据配置id删除任务
+     * @param configId 配置id
+     */
+    @Override
+    public void deleteTestConfig(String configId){
+        PipelineTest oneTestConfig = findOneTestConfig(configId);
+        deleteTest(oneTestConfig.getTestId());
+    }
+
+    /**
+     * 根据配置id查询任务
+     * @param configId 配置id
+     * @return 任务
+     */
+    @Override
+    public PipelineTest findOneTestConfig(String configId){
+        List<PipelineTest> allTest = findAllTest();
+        if (allTest == null){
+            return null;
+        }
+        for (PipelineTest pipelineTest : allTest) {
+            if (pipelineTest.getConfigId().equals(configId)){
+                return pipelineTest;
+            }
+        }
+        return null;
+    }
+    
+
     //删除
     @Override
     public void deleteTest(String testId) {

@@ -23,6 +23,21 @@ public interface PipelineProductServer {
      */
     void deleteProduct(String productId);
 
+
+    /**
+     * 根据配置id删除任务
+     * @param configId 配置id
+     */
+    void deleteProductConfig(String configId);
+
+    /**
+     * 根据配置id查询任务
+     * @param configId 配置id
+     * @return 任务
+     */
+    PipelineProduct findOneProductConfig(String configId);
+
+
     /**
      * 更新推送制品信息
      * @param pipelineProduct 信息

@@ -35,6 +35,10 @@ public class PipelineProduct {
     @ApiProperty(name="authId",desc="授权id")
     private String authId;
 
+
+    @ApiProperty(name="configId",desc="配置id")
+    private String configId;
+
     //授权信息
     private Object auth;
 
@@ -42,6 +46,13 @@ public class PipelineProduct {
 
     private int sort;
 
+    public String getConfigId() {
+        return configId;
+    }
+
+    public void setConfigId(String configId) {
+        this.configId = configId;
+    }
 
     public String getProductId() {
         return productId;

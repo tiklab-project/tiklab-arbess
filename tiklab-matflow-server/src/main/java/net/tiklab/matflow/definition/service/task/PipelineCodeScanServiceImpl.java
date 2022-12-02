@@ -39,6 +39,38 @@ public class PipelineCodeScanServiceImpl implements PipelineCodeScanService {
         return CodeScanDao.createCodeScan(pipelineCodeScanEntity);
     }
 
+
+    /**
+     * 根据配置id删除任务
+     * @param configId 配置id
+     */
+    @Override
+    public void deleteCodeScanConfig(String configId){
+        PipelineCodeScan oneCodeScanConfig = findOneCodeScanConfig(configId);
+        deleteCodeScan(oneCodeScanConfig.getCodeScanId());
+    }
+
+    /**
+     * 根据配置id查询任务
+     * @param configId 配置id
+     * @return 任务
+     */
+    @Override
+    public PipelineCodeScan findOneCodeScanConfig(String configId){
+        List<PipelineCodeScan> allCodeScan = findAllCodeScan();
+        if (allCodeScan == null){
+            return null;
+        }
+        for (PipelineCodeScan pipelineCodeScan : allCodeScan) {
+            if (pipelineCodeScan.getConfigId().equals(configId)){
+                return pipelineCodeScan;
+            }
+        }
+        return null;
+    }
+
+
+
     /**
      * 删除流水线代码扫描
      * @param CodeScanId 流水线代码扫描id

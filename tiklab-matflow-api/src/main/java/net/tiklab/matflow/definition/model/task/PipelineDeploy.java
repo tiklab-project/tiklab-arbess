@@ -34,6 +34,9 @@ public class PipelineDeploy {
     @ApiProperty(name="startOrder",desc="启动命令")
     private String startOrder;
 
+    @ApiProperty(name="configId",desc="配置id")
+    private String configId;
+
     //授权信息
     private Object auth;
 
@@ -41,6 +44,13 @@ public class PipelineDeploy {
 
     private int type;
 
+    public String getConfigId() {
+        return configId;
+    }
+
+    public void setConfigId(String configId) {
+        this.configId = configId;
+    }
 
     public String getDeployId() {
         return deployId;

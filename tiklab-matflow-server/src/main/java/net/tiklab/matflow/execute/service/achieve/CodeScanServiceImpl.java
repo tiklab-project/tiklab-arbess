@@ -2,7 +2,9 @@ package net.tiklab.matflow.execute.service.achieve;
 
 import net.tiklab.core.exception.ApplicationException;
 import net.tiklab.matflow.definition.model.Pipeline;
+import net.tiklab.matflow.definition.model.PipelineCourseConfig;
 import net.tiklab.matflow.definition.model.task.PipelineCodeScan;
+import net.tiklab.matflow.definition.service.task.PipelineCodeScanService;
 import net.tiklab.matflow.execute.model.PipelineProcess;
 import net.tiklab.matflow.execute.service.ConfigCommonService;
 import net.tiklab.matflow.orther.service.PipelineUntil;
@@ -21,14 +23,20 @@ public class CodeScanServiceImpl implements CodeScanService {
     @Autowired
     ConfigCommonService commonService;
 
+    @Autowired
+    PipelineCodeScanService codeScanService;
+
     /**
      * 扫描代码
      * @param pipelineProcess 执行信息
-     * @param pipelineCodeScan 配置信息
      * @return 执行状态
      */
     @Override
-    public boolean codeScan(PipelineProcess pipelineProcess, PipelineCodeScan pipelineCodeScan) {
+    public boolean codeScan(PipelineProcess pipelineProcess, PipelineCourseConfig config) {
+
+        String configId = config.getConfigId();
+        PipelineCodeScan pipelineCodeScan = codeScanService.findOneCodeScanConfig(configId);
+        pipelineCodeScan.setType(config.getTaskType());
 
         Pipeline pipeline = pipelineProcess.getPipeline();
         String log = PipelineUntil.date(4);

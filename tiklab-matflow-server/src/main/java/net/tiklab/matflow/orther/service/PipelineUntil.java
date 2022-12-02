@@ -35,6 +35,9 @@ public class PipelineUntil {
                 String format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
                 return "[" + format + "]" + "  ";
             }
+            case 5 -> {
+                return new SimpleDateFormat("HH:mm").format(new Date());
+            }
             default -> {
                 return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
             }
@@ -147,7 +150,7 @@ public class PipelineUntil {
                 throw new ApplicationException("更改工作空间为隐藏失败。");
             }
         }
-        return path ;
+        return path + "/" ;
     }
 
     /**

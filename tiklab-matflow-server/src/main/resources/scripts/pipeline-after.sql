@@ -21,6 +21,7 @@ create table pipeline_script  (
     name varchar(32) COMMENT '名称',
     type int COMMENT '脚本类型',
     script_order longtext COMMENT '脚本命令',
+    config_id varchar(256)  COMMENT '配置id',
     PRIMARY KEY (script_id) USING BTREE
 );
 
@@ -29,7 +30,8 @@ create table pipeline_script  (
 -- ----------------------------
 create table pipeline_message_type  (
     message_task_id varchar(255) COMMENT '消息',
-    type varchar(255) COMMENT '认证信息',
+    task_type varchar(255) COMMENT '认证信息',
+    config_id varchar(256)  COMMENT '配置id',
     PRIMARY KEY (message_task_id) USING BTREE
 );
 
@@ -41,6 +43,7 @@ create table pipeline_message_user  (
     message_task_id varchar(255) COMMENT '类型信息',
     receive_user varchar(255) COMMENT '接收人信息',
     receive_type int COMMENT '接收类型 1.全部 2.仅成功 3.仅失败',
+    config_id varchar(256)  COMMENT '配置id',
     PRIMARY KEY (message_id) USING BTREE
 );
 

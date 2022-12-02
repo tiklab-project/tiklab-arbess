@@ -16,6 +16,9 @@ public class PipelineCodeScan {
     @ApiProperty(name="projectName",desc="项目名称")
     private String projectName;
 
+    @ApiProperty(name="configId",desc="配置id")
+    private String configId;
+
     //授权id
     @ApiProperty(name="authName",desc="授权id")
     private String authId;
@@ -27,6 +30,14 @@ public class PipelineCodeScan {
 
     private int type;
 
+
+    public String getConfigId() {
+        return configId;
+    }
+
+    public void setConfigId(String configId) {
+        this.configId = configId;
+    }
 
     public String getCodeScanId() {
         return codeScanId;

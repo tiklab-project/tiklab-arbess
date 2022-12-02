@@ -40,7 +40,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
     ConfigCommonService commonService;
 
     @Autowired
-    PipelineCourseConfigService configOrderService;
+    PipelineCourseConfigService courseConfigService;
 
     @Autowired
     PipelineHomeService homeService;
@@ -151,68 +151,84 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         //消息
         Map<String, String> maps = homeService.initMap(pipeline);
 
-        //获取所有配置顺序
-        List<PipelineCourseConfig> allPipelineConfig = configOrderService.findAllPipelineConfig(pipelineId);
-        if (allPipelineConfig == null || allPipelineConfig.size() == 0){
-            beginAfter(pipelineProcess,pipeline);
-            commonService.updateState(historyId,map.get(pipelineId),10);
-            updatePipelineStatus(pipeline.getPipelineId(), false);
-            updateStatus("success",pipelineId,maps,pipelineExecHistory);
-            return;
-        }
+        //执行流程任务
+        beginCourse(pipelineProcess,pipeline,historyId);
 
-        List<Integer> integers = map.get(pipelineId);
+        //执行后置任务
+        beginAfter(pipelineProcess,pipeline,historyId);
 
-        for (PipelineCourseConfig pipelineCourseConfig : allPipelineConfig) {
-            if (integers == null || integers.size() == 0){
-                integers = new ArrayList<>();
-                integers.add(-1);
-            }else {
-                integers.add(0);
-            }
-            map.put(pipelineId,integers);
-            time(pipelineId);
-            //初始化日志
-            PipelineExecLog pipelineExecLog = commonService.initializeLog(historyId, pipelineCourseConfig);
-            pipelineProcess.setPipeline(pipeline);
-            pipelineProcess.setPipelineExecLog(pipelineExecLog);
-
-            int taskType = pipelineCourseConfig.getTaskType();
-            Object config = configOrderService.findOneConfig(pipelineId,taskType);
-
-            //执行不同的实现
-            boolean state = taskExecService.beginState(pipelineProcess,config,taskType);
-
-            //当前阶段的执行状态
-            if (!state){
-                beginAfter(pipelineProcess,pipeline);
-                commonService.updateState(historyId,map.get(pipelineId),1);
-                updatePipelineStatus(pipeline.getPipelineId(), false);
-                updateStatus("error",pipelineId,maps,pipelineExecHistory);
-                return;
-            }
-            //更新状态
-            commonService.updateState(historyId,map.get(pipelineId),10);
-        }
-        beginAfter(pipelineProcess,pipeline);
         //执行结束
         updatePipelineStatus(pipeline.getPipelineId(), false);
         updateStatus("success",pipelineId,maps,pipelineExecHistory);
     }
 
+    //执行任务
+    public void beginCourse(PipelineProcess pipelineProcess,Pipeline pipeline,String historyId){
+        String pipelineId = pipeline.getPipelineId();
+        List<PipelineCourseConfig> allCourseConfig = courseConfigService.findAllCourseConfig(pipelineId);
+        if (allCourseConfig == null){
+            return;
+        }
+
+
+        for (PipelineCourseConfig pipelineCourseConfig : allCourseConfig) {
+
+            updateTime(pipelineId);
+
+            int taskType = pipelineCourseConfig.getTaskType();
+            int taskSort = pipelineCourseConfig.getTaskSort();
+            PipelineExecLog pipelineExecLog = commonService.initializeLog(historyId,taskSort,taskType);
+            pipelineProcess.setPipeline(pipeline);
+            pipelineProcess.setPipelineExecLog(pipelineExecLog);
+            pipelineProcess.setEnCode("");
+
+            boolean b = taskExecService.beginCourseState(pipelineProcess, pipelineCourseConfig);
+
+            if (!b){
+                commonService.updateState(historyId,map.get(pipelineId),1);
+            }
+            commonService.updateState(historyId,map.get(pipelineId),10);
+        }
+    }
+
     //执行后置任务
-    public void beginAfter(PipelineProcess pipelineProcess,Pipeline pipeline){
+    public void beginAfter(PipelineProcess pipelineProcess,Pipeline pipeline,String historyId){
         String pipelineId = pipeline.getPipelineId();
         List<PipelineAfterConfig> allAfterConfig = afterConfigServer.findAllAfterConfig(pipelineId);
         if (allAfterConfig == null){
             return;
         }
+
         for (PipelineAfterConfig pipelineAfterConfig : allAfterConfig) {
+
+            updateTime(pipelineId);
+
+            int taskType = pipelineAfterConfig.getTaskType();
+            int taskSort = pipelineAfterConfig.getTaskSort();
+            PipelineExecLog pipelineExecLog = commonService.initializeLog(historyId,taskSort,taskType);
+            pipelineProcess.setPipeline(pipeline);
+            pipelineProcess.setPipelineExecLog(pipelineExecLog);
+
             boolean b = taskExecService.beginAfterState(pipelineProcess, pipelineAfterConfig);
+
             if (!b){
-                return;
+                commonService.updateState(historyId,map.get(pipelineId),1);
             }
+            commonService.updateState(historyId,map.get(pipelineId),10);
         }
+    }
+
+    //更新阶段时间
+    private void updateTime(String pipelineId){
+        List<Integer> integers = map.get(pipelineId);
+        if (integers == null || integers.size() == 0){
+            integers = new ArrayList<>();
+            integers.add(-1);
+        }else {
+            integers.add(0);
+        }
+        map.put(pipelineId,integers);
+        time(pipelineId);
     }
 
     /**

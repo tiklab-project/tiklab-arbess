@@ -2,7 +2,9 @@ package net.tiklab.matflow.execute.service.achieve;
 
 import net.tiklab.core.exception.ApplicationException;
 import net.tiklab.matflow.definition.model.Pipeline;
+import net.tiklab.matflow.definition.model.PipelineCourseConfig;
 import net.tiklab.matflow.definition.model.task.PipelineTest;
+import net.tiklab.matflow.definition.service.task.PipelineTestService;
 import net.tiklab.matflow.execute.model.PipelineExecHistory;
 import net.tiklab.matflow.execute.model.PipelineProcess;
 import net.tiklab.matflow.execute.service.ConfigCommonService;
@@ -23,9 +25,16 @@ public class TestServiceImpl implements TestService {
 
     @Autowired
     ConfigCommonService commonService;
+
+    @Autowired
+    PipelineTestService testService;
     
     // 单元测试
-    public boolean test(PipelineProcess pipelineProcess, PipelineTest pipelineTest) {
+    public boolean test(PipelineProcess pipelineProcess, PipelineCourseConfig config) {
+
+        String configId = config.getConfigId();
+        PipelineTest pipelineTest = testService.findOneTestConfig(configId);
+        pipelineTest.setType(config.getTaskType());
 
         //初始化日志
         PipelineExecHistory pipelineExecHistory = pipelineProcess.getPipelineExecHistory();

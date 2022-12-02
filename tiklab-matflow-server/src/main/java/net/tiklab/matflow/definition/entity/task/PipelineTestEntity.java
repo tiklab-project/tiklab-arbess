@@ -19,6 +19,17 @@ public class PipelineTestEntity {
     @Column(name = "address")
     private String address;
 
+    @Column(name = "config_id",notNull = true)
+    private String configId;
+
+    public String getConfigId() {
+        return configId;
+    }
+
+    public void setConfigId(String configId) {
+        this.configId = configId;
+    }
+
     public String getTestId() {
         return testId;
     }

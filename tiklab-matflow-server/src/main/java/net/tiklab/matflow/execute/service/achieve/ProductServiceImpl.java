@@ -3,7 +3,9 @@ package net.tiklab.matflow.execute.service.achieve;
 import com.jcraft.jsch.*;
 import net.tiklab.core.exception.ApplicationException;
 import net.tiklab.matflow.definition.model.Pipeline;
+import net.tiklab.matflow.definition.model.PipelineCourseConfig;
 import net.tiklab.matflow.definition.model.task.PipelineProduct;
+import net.tiklab.matflow.definition.service.task.PipelineProductServer;
 import net.tiklab.matflow.execute.model.PipelineProcess;
 import net.tiklab.matflow.execute.service.ConfigCommonService;
 import net.tiklab.matflow.orther.service.PipelineFinal;
@@ -25,15 +27,20 @@ public class ProductServiceImpl implements ProductService {
     @Autowired
     ConfigCommonService commonService;
 
+    @Autowired
+    PipelineProductServer productServer;
+
     /**
      * 推送制品代码
      * @param pipelineProcess 执行信息
-     * @param product 配置信息
+     * @param config 配置信息
      * @return 执行状态
      */
     @Override
-    public boolean product(PipelineProcess pipelineProcess, PipelineProduct product) {
+    public boolean product(PipelineProcess pipelineProcess, PipelineCourseConfig config) {
 
+        PipelineProduct product = productServer.findOneProductConfig(config.getConfigId());
+        product.setType(config.getTaskType());
         Pipeline pipeline = pipelineProcess.getPipeline();
         String log = PipelineUntil.date(4);
         String fileAddress = product.getFileAddress();
@@ -44,7 +51,6 @@ public class ProductServiceImpl implements ProductService {
             commonService.execHistory(pipelineProcess,log+e);
             return false;
         }
-
 
         if (path == null){
             commonService.execHistory(pipelineProcess,log+"匹配不到制品");
@@ -62,6 +68,7 @@ public class ProductServiceImpl implements ProductService {
                 pipelineProcess.setInputStream(process.getInputStream());
                 pipelineProcess.setErrInputStream(process.getErrorStream());
                 pipelineProcess.setError(error(product.getType()));
+                pipelineProcess.setEnCode("UTF-8");
 
                 int status = commonService.log(pipelineProcess);
                 if (status == 0){

@@ -22,12 +22,23 @@ public class PipelineTest {
     @ApiProperty(name="address",desc="测试地址",required = true)
     private String address;
 
+
+    @ApiProperty(name="configId",desc="配置id")
+    private String configId;
+
     //测试类型
     private int type;
 
     //顺序
     private int sort;
 
+    public String getConfigId() {
+        return configId;
+    }
+
+    public void setConfigId(String configId) {
+        this.configId = configId;
+    }
 
     public String getTestId() {
         return testId;

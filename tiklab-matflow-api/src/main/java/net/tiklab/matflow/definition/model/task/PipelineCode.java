@@ -35,6 +35,9 @@ public class PipelineCode {
     @ApiProperty(name="svnFile",desc="svn检出文件夹")
     private String svnFile;
 
+    @ApiProperty(name="configId",desc="配置id")
+    private String configId;
+
     //授权信息
     private Object auth;
 
@@ -47,6 +50,14 @@ public class PipelineCode {
     //别名
     @ApiProperty(name = "codeAlias",desc="别名")
     private String codeAlias;
+
+    public String getConfigId() {
+        return configId;
+    }
+
+    public void setConfigId(String configId) {
+        this.configId = configId;
+    }
 
     public String getCodeId() {
         return codeId;

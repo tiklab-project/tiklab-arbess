@@ -40,6 +40,37 @@ public class PipelineProductServerImpl implements PipelineProductServer {
     }
 
     /**
+     * 根据配置id删除任务
+     * @param configId 配置id
+     */
+    @Override
+    public void deleteProductConfig(String configId){
+        PipelineProduct oneProductConfig = findOneProductConfig(configId);
+        deleteProduct(oneProductConfig.getProductId());
+    }
+
+    /**
+     * 根据配置id查询任务
+     * @param configId 配置id
+     * @return 任务
+     */
+    @Override
+    public PipelineProduct findOneProductConfig(String configId){
+        List<PipelineProduct> allProduct = findAllProduct();
+        if (allProduct == null){
+            return null;
+        }
+        for (PipelineProduct pipelineProduct : allProduct) {
+            if (pipelineProduct.getConfigId().equals(configId)){
+                return pipelineProduct;
+            }
+        }
+        return null;
+    }
+
+
+
+    /**
      * 删除流水线推送制品
      * @param ProductId 流水线推送制品id
      */

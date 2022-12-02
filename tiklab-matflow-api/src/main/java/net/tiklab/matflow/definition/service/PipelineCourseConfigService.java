@@ -5,8 +5,8 @@ import net.tiklab.join.annotation.FindList;
 import net.tiklab.join.annotation.FindOne;
 import net.tiklab.join.annotation.JoinProvider;
 import net.tiklab.matflow.definition.model.PipelineCourseConfig;
+
 import java.util.List;
-import java.util.Map;
 
 /**
  * 流水线流程设计配置
@@ -19,6 +19,12 @@ public interface PipelineCourseConfigService {
      * @param pipelineId 流水线id
      */
     void deleteConfig(String pipelineId);
+
+    /**
+     * 删除流水线所有配置
+     * @param pipelineId 流水线id
+     */
+    void deleteAllConfig(String pipelineId);
 
     /**
      * 创建流水线模板
@@ -41,19 +47,33 @@ public interface PipelineCourseConfigService {
     void updateConfig(PipelineCourseConfig config);
 
     /**
+     * 创建配置
+     * @param config 配置
+     */
+     String createConfig(PipelineCourseConfig config);
+
+
+    /**
+     * 效验配置必填字段
+     * @param pipelineId 流水线id
+     * @return 效验结果
+     */
+    List<String> configValid(String pipelineId);
+
+    /**
+     * 更改顺序
+     * @param config 配置
+     */
+    void updateOrderConfig(PipelineCourseConfig config);
+
+    /**
      * 根据流水线id查询流水线配置顺序
      * @param pipelineId 流水线id
      * @return 配置顺序
      */
-    List<PipelineCourseConfig> findAllPipelineConfig(String pipelineId);
+    List<PipelineCourseConfig> findAllCourseConfig(String pipelineId);
 
-    /**
-     * 获取单个配置详情
-     * @param pipelineId 流水线id
-     * @param type 类型
-     * @return 配置详情
-     */
-    Object findOneConfig(String pipelineId,int type);
+
 
     /**
      * 查询单个配置
@@ -61,24 +81,24 @@ public interface PipelineCourseConfigService {
      * @return 配置
      */
     @FindOne
-    PipelineCourseConfig findOneConfig(String configId);
+    PipelineCourseConfig findOneCourseConfig(String configId);
 
     /**
      * 效验配置信息
      * @param pipelineId 流水线id
      * @return 效验结果
      */
-    Map<String, String> configValid(String pipelineId);
+    // Map<String, String> configValid(String pipelineId);
 
     /**
      * 查询所有配置
      * @return 配置
      */
     @FindAll
-    List<PipelineCourseConfig> findAllConfigOrder();
+    List<PipelineCourseConfig> findAllCourseConfigOrder();
 
     @FindList
-    List<PipelineCourseConfig> findAllConfigOrderList(List<String> idList);
+    List<PipelineCourseConfig> findAllCourseConfigOrderList(List<String> idList);
 
 
 }
