@@ -1,10 +1,10 @@
-package net.tiklab.matflow.definition.entity;
+package net.tiklab.matflow.trigger.entity;
 
 import net.tiklab.dal.jpa.annotation.*;
 
 @Entity
 @Table(name="pipeline_before_config")
-public class PipelineBeforeConfigEntity {
+public class PipelineTriggerConfigEntity {
 
     //id
     @Id

@@ -1,4 +1,4 @@
-package net.tiklab.matflow.definition.model.task;
+package net.tiklab.matflow.trigger.model;
 
 import net.tiklab.beans.annotation.Mapper;
 import net.tiklab.join.annotation.Join;
@@ -27,6 +27,10 @@ public class PipelineTime {
     @ApiProperty(name="configId",desc="配置id")
     private String configId;
 
+    @ApiProperty(name="cron",desc="配置id")
+    private String cron;
+
+    //天数
     private List<Integer> timeList;
 
     private int type;
@@ -86,4 +90,14 @@ public class PipelineTime {
     public void setType(int type) {
         this.type = type;
     }
+
+    public String getCron() {
+        return cron;
+    }
+
+    public void setCron(String cron) {
+        this.cron = cron;
+    }
+
+
 }

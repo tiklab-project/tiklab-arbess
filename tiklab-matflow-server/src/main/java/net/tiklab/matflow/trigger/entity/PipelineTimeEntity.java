@@ -1,4 +1,4 @@
-package net.tiklab.matflow.definition.entity.task;
+package net.tiklab.matflow.trigger.entity;
 
 import net.tiklab.dal.jpa.annotation.*;
 
@@ -11,7 +11,7 @@ public class PipelineTimeEntity {
     @Column(name = "time_id")
     private String timeId;
 
-    // cycle:周期 one:单次
+    // 1:单次 2:周期
     @Column(name = "task_type")
     private String taskType;
 
@@ -19,9 +19,8 @@ public class PipelineTimeEntity {
     @Column(name = "date")
     private int date;
 
-    //详细时间
-    @Column(name = "time")
-    private String time;
+    @Column(name = "cron")
+    private String cron;
 
     //配置id
     @Column(name = "config_id")
@@ -51,19 +50,19 @@ public class PipelineTimeEntity {
         this.date = date;
     }
 
-    public String getTime() {
-        return time;
-    }
-
-    public void setTime(String time) {
-        this.time = time;
-    }
-
     public String getConfigId() {
         return configId;
     }
 
     public void setConfigId(String configId) {
         this.configId = configId;
+    }
+
+    public String getCron() {
+        return cron;
+    }
+
+    public void setCron(String cron) {
+        this.cron = cron;
     }
 }

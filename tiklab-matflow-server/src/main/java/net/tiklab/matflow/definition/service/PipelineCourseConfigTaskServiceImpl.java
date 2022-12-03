@@ -6,6 +6,7 @@ import net.tiklab.matflow.definition.model.*;
 import net.tiklab.matflow.definition.model.task.*;
 import net.tiklab.matflow.definition.service.task.*;
 import net.tiklab.matflow.orther.service.PipelineUntil;
+import net.tiklab.matflow.definition.model.task.PipelineTest;
 import net.tiklab.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

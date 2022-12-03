@@ -1,10 +1,10 @@
-package net.tiklab.matflow.definition.service;
+package net.tiklab.matflow.trigger.server;
 
-import net.tiklab.matflow.definition.model.PipelineBeforeConfig;
+import net.tiklab.matflow.trigger.model.PipelineTriggerConfig;
 
 import java.util.List;
 
-public interface PipelineBeforeConfigServer {
+public interface PipelineTriggerConfigServer {
 
 
     /**
@@ -12,7 +12,7 @@ public interface PipelineBeforeConfigServer {
      * @param config 配置
      * @return 配置id
      */
-     String createConfig(PipelineBeforeConfig config);
+     String createConfig(PipelineTriggerConfig config);
 
 
     /**
@@ -34,7 +34,7 @@ public interface PipelineBeforeConfigServer {
      * 更新配置信息
      * @param config 配置
      */
-    void updateConfig(PipelineBeforeConfig config);
+    void updateConfig(PipelineTriggerConfig config);
 
 
     /**
@@ -42,20 +42,20 @@ public interface PipelineBeforeConfigServer {
      * @param pipelineId 流水线id
      * @return 配置
      */
-     List<PipelineBeforeConfig> findAllBeforeConfig(String pipelineId) ;
+     List<PipelineTriggerConfig> findAllTriggerConfig(String pipelineId) ;
 
 
     //更新
-     void updateBeforeConfig(PipelineBeforeConfig pipelineBeforeConfig) ;
+     void updateTriggerConfig(PipelineTriggerConfig pipelineTriggerConfig) ;
 
     //查询单个
-    PipelineBeforeConfig findOneBeforeConfig(String beforeConfigId) ;
+    PipelineTriggerConfig findOneTriggerConfig(String triggerConfigId) ;
 
     //删除
-    void deleteBeforeConfig(String beforeConfigId) ;
+    void deleteTriggerConfig(String triggerConfigId) ;
     //查询所有
-    List<PipelineBeforeConfig> findAllBeforeConfig() ;
+    List<PipelineTriggerConfig> findAllTriggerConfig() ;
 
-    List<PipelineBeforeConfig> findAllBeforeConfigList(List<String> idList) ;
+    List<PipelineTriggerConfig> findAllTriggerConfigList(List<String> idList) ;
 
 }

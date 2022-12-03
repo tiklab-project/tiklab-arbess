@@ -1,10 +1,9 @@
-package net.tiklab.matflow.definition.service.task;
+package net.tiklab.matflow.trigger.model;
 
 import net.tiklab.join.annotation.FindAll;
 import net.tiklab.join.annotation.FindList;
 import net.tiklab.join.annotation.FindOne;
 import net.tiklab.join.annotation.JoinProvider;
-import net.tiklab.matflow.definition.model.task.PipelineTime;
 
 import java.util.List;
 
@@ -23,7 +22,7 @@ public interface PipelineTimeServer {
      * 创建所有关联时间信息
      * @param pipelineTime 信息
      */
-    String createTimeConfig(PipelineTime pipelineTime);
+    String createTimeConfig(PipelineTime pipelineTime,String pipelineId);
 
 
     /**
@@ -47,13 +46,13 @@ public interface PipelineTimeServer {
      * @param configId 配置id
      * @return 时间集合
      */
-    public List<Integer> findAllDataConfig(String configId);
+    List<Integer> findAllDataConfig(String configId);
 
     /**
      * 删除当前配置下的的所有任务
      * @param configId 配置id
      */
-    void deleteAllTime(String configId);
+    void deleteAllTime(String configId,String pipelineId);
 
     /**
      * 删除

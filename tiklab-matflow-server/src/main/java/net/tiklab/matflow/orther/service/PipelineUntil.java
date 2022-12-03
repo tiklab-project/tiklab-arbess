@@ -6,10 +6,7 @@ import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.regex.Pattern;
 
 /**
@@ -43,6 +40,20 @@ public class PipelineUntil {
             }
         }
     }
+
+    /**
+     * 返回今天星期几
+     * @return 1: 周一 7:周天
+     */
+    public static int week() {
+        Calendar calendar=Calendar.getInstance();
+        int i = calendar.get(Calendar.DAY_OF_WEEK) - 1;
+        if (i == 0){
+            return 7;
+        }
+        return i;
+    }
+
 
     //效验git地址
     public static boolean validGit(String address){

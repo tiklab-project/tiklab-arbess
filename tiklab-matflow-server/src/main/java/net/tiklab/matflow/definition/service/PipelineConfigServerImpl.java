@@ -1,5 +1,8 @@
 package net.tiklab.matflow.definition.service;
 
+import net.tiklab.matflow.trigger.server.PipelineTriggerConfigServer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -9,26 +12,29 @@ import java.util.List;
 public class PipelineConfigServerImpl implements PipelineConfigServer {
 
     @Autowired
-    PipelineBeforeConfigServer beforeConfigServer;
+    PipelineTriggerConfigServer beforeConfigServer;
 
     @Autowired
     PipelineCourseConfigService courseConfigService;
 
+    @Autowired
+    PipelineAfterConfigServer afterConfigServer;
+
+
+    private static final Logger logger = LoggerFactory.getLogger(PipelineConfigServerImpl.class);
+
     public List<Object> findAllConfig(String pipelineId){
 
         List<Object> allCourseConfig = courseConfigService.findAllConfig(pipelineId);
+        List<Object> allAfterConfig = afterConfigServer.findAllConfig(pipelineId);
 
-        List<Object> allBeforeConfig = beforeConfigServer.findAllConfig(pipelineId);
-        if (allBeforeConfig == null || allBeforeConfig.size() == 0){
+        if (allAfterConfig == null || allAfterConfig.size() == 0){
             return allCourseConfig;
         }
-
-        allCourseConfig.add(allBeforeConfig);
+        allCourseConfig.add(allAfterConfig);
 
         return allCourseConfig;
 
     }
-
-
 
 }

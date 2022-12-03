@@ -193,6 +193,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
 
     //执行后置任务
     public void beginAfter(PipelineProcess pipelineProcess,Pipeline pipeline,String historyId){
+
         String pipelineId = pipeline.getPipelineId();
         List<PipelineAfterConfig> allAfterConfig = afterConfigServer.findAllAfterConfig(pipelineId);
         if (allAfterConfig == null){
@@ -203,8 +204,17 @@ public class PipelineExecServiceImpl implements PipelineExecService {
 
             updateTime(pipelineId);
 
+            int taskSort = 0;
+            List<PipelineCourseConfig> courseConfig = courseConfigService.findAllCourseConfig(pipelineId);
+
+            if (courseConfig != null){
+                taskSort = courseConfig.size() ;
+                System.out.println("配置长度："+courseConfig.size());
+            }
+
+
             int taskType = pipelineAfterConfig.getTaskType();
-            int taskSort = pipelineAfterConfig.getTaskSort();
+            taskSort =taskSort + pipelineAfterConfig.getTaskSort();
             PipelineExecLog pipelineExecLog = commonService.initializeLog(historyId,taskSort,taskType);
             pipelineProcess.setPipeline(pipeline);
             pipelineProcess.setPipelineExecLog(pipelineExecLog);

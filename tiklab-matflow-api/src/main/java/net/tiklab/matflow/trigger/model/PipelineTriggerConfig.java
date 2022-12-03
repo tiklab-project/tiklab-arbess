@@ -1,18 +1,19 @@
-package net.tiklab.matflow.definition.model;
+package net.tiklab.matflow.trigger.model;
 
 import net.tiklab.beans.annotation.Mapper;
 import net.tiklab.beans.annotation.Mapping;
 import net.tiklab.beans.annotation.Mappings;
 import net.tiklab.join.annotation.Join;
 import net.tiklab.join.annotation.JoinQuery;
+import net.tiklab.matflow.definition.model.Pipeline;
 import net.tiklab.postin.annotation.ApiModel;
 import net.tiklab.postin.annotation.ApiProperty;
 
 
 @ApiModel
 @Join
-@Mapper(targetAlias = "PipelineBeforeConfigEntity")
-public class PipelineBeforeConfig {
+@Mapper(targetAlias = "PipelineTriggerConfigEntity")
+public class PipelineTriggerConfig {
 
     @ApiProperty(name = "configId",desc="id")
     private String configId;

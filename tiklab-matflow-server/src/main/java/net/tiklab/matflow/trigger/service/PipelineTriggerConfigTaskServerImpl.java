@@ -1,16 +1,18 @@
-package net.tiklab.matflow.definition.service;
+package net.tiklab.matflow.trigger.service;
 
 import com.alibaba.fastjson.JSON;
-import net.tiklab.matflow.definition.model.PipelineBeforeConfig;
-import net.tiklab.matflow.definition.model.task.PipelineTime;
-import net.tiklab.matflow.definition.service.task.PipelineTimeServer;
+import net.tiklab.matflow.definition.model.Pipeline;
+import net.tiklab.matflow.trigger.model.PipelineTime;
+import net.tiklab.matflow.trigger.model.PipelineTimeServer;
+import net.tiklab.matflow.trigger.model.PipelineTriggerConfig;
+import net.tiklab.matflow.trigger.server.PipelineTriggerConfigTaskServer;
 import net.tiklab.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 @Exporter
-public class PipelineBeforeConfigTaskServerImpl implements PipelineBeforeConfigTaskServer {
+public class PipelineTriggerConfigTaskServerImpl implements PipelineTriggerConfigTaskServer {
 
     @Autowired
     PipelineTimeServer timeServer;
@@ -20,13 +22,16 @@ public class PipelineBeforeConfigTaskServerImpl implements PipelineBeforeConfigT
      * @param config 配置信息
      */
     @Override
-    public void createBeforeConfig(PipelineBeforeConfig config){
+    public void createTriggerConfig(PipelineTriggerConfig config){
         String configId = config.getConfigId();
         int taskType = config.getTaskType();
+        Pipeline pipeline = config.getPipeline();
+        String pipelineId = pipeline.getPipelineId();
+        String object = JSON.toJSONString(config.getValues());
         if (taskType == 81){
-            PipelineTime pipelineTime = new PipelineTime();
+            PipelineTime pipelineTime = JSON.parseObject(object, PipelineTime.class);
             pipelineTime.setConfigId(configId);
-            timeServer.createTimeConfig(pipelineTime);
+            timeServer.createTimeConfig(pipelineTime,pipelineId);
         }
     }
 
@@ -35,9 +40,11 @@ public class PipelineBeforeConfigTaskServerImpl implements PipelineBeforeConfigT
      * @param config 配置
      */
     @Override
-    public void deleteBeforeConfig(PipelineBeforeConfig config){
+    public void deleteTriggerConfig(PipelineTriggerConfig config){
         String configId = config.getConfigId();
-        timeServer.deleteAllTime(configId);
+        Pipeline pipeline = config.getPipeline();
+        String pipelineId = pipeline.getPipelineId();
+        timeServer.deleteAllTime(configId,pipelineId);
     }
 
     /**
@@ -45,15 +52,17 @@ public class PipelineBeforeConfigTaskServerImpl implements PipelineBeforeConfigT
      * @param config 配置
      */
     @Override
-    public void updateBeforeConfig(PipelineBeforeConfig config){
+    public void updateTriggerConfig(PipelineTriggerConfig config){
         String configId = config.getConfigId();
         int taskType = config.getTaskType();
+        Pipeline pipeline = config.getPipeline();
+        String pipelineId = pipeline.getPipelineId();
         String object = JSON.toJSONString(config.getValues());
         if (taskType == 81){
             PipelineTime pipelineTime = JSON.parseObject(object, PipelineTime.class);
             pipelineTime.setConfigId(configId);
-            timeServer.deleteAllTime(configId);
-            timeServer.createTimeConfig(pipelineTime);
+            timeServer.deleteAllTime(configId,pipelineId);
+            timeServer.createTimeConfig(pipelineTime,pipelineId);
         }
     }
 
@@ -63,7 +72,7 @@ public class PipelineBeforeConfigTaskServerImpl implements PipelineBeforeConfigT
      * @return 任务
      */
     @Override
-    public PipelineTime findBeforeConfig(PipelineBeforeConfig config){
+    public PipelineTime findTriggerConfig(PipelineTriggerConfig config){
         String configId = config.getConfigId();
         int taskType = config.getTaskType();
         if (taskType == 81){

@@ -1,7 +1,7 @@
-package net.tiklab.matflow.definition.dao.task;
+package net.tiklab.matflow.trigger.dao;
 
 import net.tiklab.dal.jpa.JpaTemplate;
-import net.tiklab.matflow.definition.entity.task.PipelineTimeEntity;
+import net.tiklab.matflow.trigger.entity.PipelineTimeEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
