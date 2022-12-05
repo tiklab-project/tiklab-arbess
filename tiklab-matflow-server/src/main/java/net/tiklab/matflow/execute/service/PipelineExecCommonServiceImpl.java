@@ -29,7 +29,7 @@ import java.util.Map;
 
 @Service
 @Exporter
-public class ConfigCommonServiceImpl implements ConfigCommonService {
+public class PipelineExecCommonServiceImpl implements PipelineExecCommonService {
 
     @Autowired
     PipelineScmService pipelineScmService;
@@ -41,7 +41,7 @@ public class ConfigCommonServiceImpl implements ConfigCommonService {
     PipelineExecLogService logService;
 
 
-    private static final Logger logger = LoggerFactory.getLogger(ConfigCommonServiceImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(PipelineExecCommonServiceImpl.class);
 
     Map<String,PipelineExecHistory> historyMap = PipelineExecServiceImpl.historyMap;
     
@@ -172,12 +172,12 @@ public class ConfigCommonServiceImpl implements ConfigCommonService {
      * * @return 历史
      */
     @Override
-    public PipelineExecHistory initializeHistory(Pipeline pipeline) {
+    public PipelineExecHistory initializeHistory(Pipeline pipeline,int startWAy) {
         PipelineExecHistory pipelineExecHistory = new PipelineExecHistory();
         String historyId = historyService.createHistory(pipelineExecHistory);
         //初始化基本信息
         pipelineExecHistory.setCreateTime(PipelineUntil.date(1));
-        pipelineExecHistory.setRunWay(1);
+        pipelineExecHistory.setRunWay(startWAy);
         pipelineExecHistory.setSort(1);
         pipelineExecHistory.setPipeline(pipeline);
         pipelineExecHistory.setHistoryId(historyId);
