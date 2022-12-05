@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * 执行过程配置的公共方法
  */
-public interface ConfigCommonService {
+public interface PipelineExecCommonService {
 
 
     /**
@@ -34,7 +34,7 @@ public interface ConfigCommonService {
      * 初始化历史
      * @return 历史
      */
-     PipelineExecHistory initializeHistory(Pipeline pipeline);
+     PipelineExecHistory initializeHistory(Pipeline pipeline,int startWAy);
 
     /**
      * 初始化日志

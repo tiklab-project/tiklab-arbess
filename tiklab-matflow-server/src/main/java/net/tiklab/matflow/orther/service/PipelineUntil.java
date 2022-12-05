@@ -17,7 +17,7 @@ public class PipelineUntil {
 
     /**
      * 返回系统时间
-     * @param type 时间类型 1.(yyyy-MM-dd HH:mm:ss) 2.(yyyy-MM-dd) 3.(HH:mm:ss) 4.([format])
+     * @param type 时间类型 1.(yyyy-MM-dd HH:mm:ss) 2.(yyyy-MM-dd) 3.(HH:mm:ss) 4.([format]) 5.(HH:mm)
      * @return 时间
      */
     public static String date(int type){

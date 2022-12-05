@@ -5,7 +5,7 @@ import net.tiklab.matflow.definition.model.Pipeline;
 import net.tiklab.matflow.definition.model.task.PipelineMessage;
 import net.tiklab.matflow.definition.service.task.PipelineMessageTypeServer;
 import net.tiklab.matflow.execute.model.PipelineProcess;
-import net.tiklab.matflow.execute.service.ConfigCommonService;
+import net.tiklab.matflow.execute.service.PipelineExecCommonService;
 import net.tiklab.matflow.orther.service.PipelineFinal;
 import net.tiklab.matflow.orther.service.PipelineHomeService;
 import net.tiklab.matflow.orther.service.PipelineUntil;
@@ -22,7 +22,7 @@ public class MessageExecServiceImpl implements MessageExecService {
 
 
     @Autowired
-    ConfigCommonService commonService;
+    PipelineExecCommonService commonService;
 
     @Autowired
     PipelineHomeService homeService;
@@ -32,6 +32,8 @@ public class MessageExecServiceImpl implements MessageExecService {
 
     private static final Logger logger = LoggerFactory.getLogger(MessageExecServiceImpl.class);
 
+    String log = PipelineUntil.date(4);
+
     /**
      * 部署
      * @param pipelineProcess 配置信息
@@ -39,8 +41,8 @@ public class MessageExecServiceImpl implements MessageExecService {
      */
     public boolean message(PipelineProcess pipelineProcess, String configId) {
 
-        String log = PipelineUntil.date(4);
-        commonService.execHistory(pipelineProcess, log+"开始发送消息");
+        commonService.execHistory(pipelineProcess, log+"执行任务：消息通知.....");
+
         Pipeline pipeline = pipelineProcess.getPipeline();
 
         PipelineMessage configMessage = messageTypeServer.findConfigMessage(configId);
@@ -54,15 +56,13 @@ public class MessageExecServiceImpl implements MessageExecService {
                 if (!PipelineUntil.isNoNull(s)){
                     continue;
                 }
-                messageType(s,map);
+                messageType(pipelineProcess,s,map);
             }
         }catch (ApplicationException e){
             String message = e.getMessage();
             commonService.execHistory(pipelineProcess, log+message);
             return false;
         }
-
-        commonService.execHistory(pipelineProcess, log+"消息发送成功。");
         return true;
     }
 
@@ -72,17 +72,23 @@ public class MessageExecServiceImpl implements MessageExecService {
      * @param map 消息发送内容
      * @throws ApplicationException 消息发送失败
      */
-    private void messageType(String type,Map<String,String> map) throws ApplicationException {
+    private void messageType(PipelineProcess pipelineProcess,String type,Map<String,String> map) throws ApplicationException {
         map.put("message","成功");
         switch (type){
             case "site" ->{
+                commonService.execHistory(pipelineProcess, log+ "发送消息，类型：站内信");
                 homeService.message(PipelineFinal.MES_TEM_PIPELINE_RUN,PipelineFinal.MES_PIPELINE_RUN,map);
+                commonService.execHistory(pipelineProcess, log+ "站内信发送成功");
             }
             case "sms" ->{
+                commonService.execHistory(pipelineProcess, log+ "发送消息，类型：短信");
                 homeService.smsMessage(map);
+                commonService.execHistory(pipelineProcess, log+ "短信发送成功。");
             }
             case "wechat" ->{
+                commonService.execHistory(pipelineProcess, log+ "发送消息，类型：企业微信机器人消息");
                 homeService.wechatMarkdownMessage(map);
+                commonService.execHistory(pipelineProcess, log+ "企业微信机器人消息发送成功。");
             }
             case "mail" ->{
                 return;

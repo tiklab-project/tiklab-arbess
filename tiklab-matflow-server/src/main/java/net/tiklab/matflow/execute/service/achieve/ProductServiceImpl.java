@@ -7,7 +7,7 @@ import net.tiklab.matflow.definition.model.PipelineCourseConfig;
 import net.tiklab.matflow.definition.model.task.PipelineProduct;
 import net.tiklab.matflow.definition.service.task.PipelineProductServer;
 import net.tiklab.matflow.execute.model.PipelineProcess;
-import net.tiklab.matflow.execute.service.ConfigCommonService;
+import net.tiklab.matflow.execute.service.PipelineExecCommonService;
 import net.tiklab.matflow.orther.service.PipelineFinal;
 import net.tiklab.matflow.orther.service.PipelineUntil;
 import net.tiklab.matflow.setting.model.PipelineAuthHost;
@@ -25,7 +25,7 @@ import java.io.IOException;
 public class ProductServiceImpl implements ProductService {
 
     @Autowired
-    ConfigCommonService commonService;
+    PipelineExecCommonService commonService;
 
     @Autowired
     PipelineProductServer productServer;

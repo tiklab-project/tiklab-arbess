@@ -1,6 +1,8 @@
 package net.tiklab.matflow.trigger.service;
 
 import net.tiklab.beans.BeanMapper;
+import net.tiklab.core.exception.ApplicationException;
+import net.tiklab.join.JoinTemplate;
 import net.tiklab.matflow.definition.model.Pipeline;
 import net.tiklab.matflow.orther.service.PipelineUntil;
 import net.tiklab.matflow.trigger.dao.PipelineTriggerConfigDao;
@@ -14,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -23,6 +26,8 @@ public class PipelineTriggerConfigServerImpl implements PipelineTriggerConfigSer
     @Autowired
     PipelineTriggerConfigDao triggerConfigDao;
 
+    @Autowired
+    JoinTemplate joinTemplate;
 
     @Autowired
     PipelineTriggerConfigTaskServer triggerConfigTaskServer;
@@ -34,11 +39,15 @@ public class PipelineTriggerConfigServerImpl implements PipelineTriggerConfigSer
      * @return 配置id
      */
     @Override
-    public String createConfig(PipelineTriggerConfig config){
+    public String createConfig(PipelineTriggerConfig config) {
         config.setCreateTime(PipelineUntil.date(1));
         String triggerConfigId = createTriggerConfig(config);
         config.setConfigId(triggerConfigId);
-        triggerConfigTaskServer.createTriggerConfig(config);
+        try {
+            triggerConfigTaskServer.createTriggerConfig(config);
+        }catch (ApplicationException e){
+            deleteTriggerConfig(triggerConfigId);
+        }
         return triggerConfigId;
     }
 
@@ -49,16 +58,43 @@ public class PipelineTriggerConfigServerImpl implements PipelineTriggerConfigSer
      */
     @Override
     public List<Object> findAllConfig(String pipelineId){
-        List<PipelineTriggerConfig> allTriggerConfig = findAllTriggerConfig(pipelineId);
+        List<PipelineTriggerConfig> allTriggerConfig;
+        allTriggerConfig = findAllTriggerConfig();
+        if (pipelineId != null){
+            allTriggerConfig = findAllTriggerConfig(pipelineId);
+        }
+
         if (allTriggerConfig == null){
             return null;
         }
-        List<Object> list = new ArrayList<>();
+        List<PipelineTime> timeList = new ArrayList<>();
         for (PipelineTriggerConfig pipelineTriggerConfig : allTriggerConfig) {
             PipelineTime triggerConfig = triggerConfigTaskServer.findTriggerConfig(pipelineTriggerConfig);
-            list.add(triggerConfig);
+            if (triggerConfig == null){
+                deleteTriggerConfig(pipelineTriggerConfig.getConfigId());
+                continue;
+            }
+            timeList.add(triggerConfig);
         }
-        return list;
+        timeList.sort(Comparator.comparing(PipelineTime::getWeekTime));
+
+        return new ArrayList<>(timeList);
+    }
+
+    /**
+     * 删除单个定时任务
+     * @param pipelineId 流水线id
+     * @param cron 表达式
+     */
+    public void deleteCronConfig(String pipelineId,String cron){
+        List<PipelineTriggerConfig> allTriggerConfig = findAllTriggerConfig(pipelineId);
+        if (allTriggerConfig == null){
+            return;
+        }
+        for (PipelineTriggerConfig config : allTriggerConfig) {
+            String configId = config.getConfigId();
+            triggerConfigTaskServer.deleteCronConfig(pipelineId,configId,cron);
+        }
     }
 
     /**
@@ -69,7 +105,12 @@ public class PipelineTriggerConfigServerImpl implements PipelineTriggerConfigSer
     @Override
     public Object findOneConfig(String configId){
         PipelineTriggerConfig oneTriggerConfig = findOneTriggerConfig(configId);
-        return triggerConfigTaskServer.findTriggerConfig(oneTriggerConfig);
+        PipelineTime triggerConfig = triggerConfigTaskServer.findTriggerConfig(oneTriggerConfig);
+        if (triggerConfig == null){
+            deleteTriggerConfig(configId);
+            return null;
+        }
+        return triggerConfig;
     }
 
 
@@ -118,7 +159,9 @@ public class PipelineTriggerConfigServerImpl implements PipelineTriggerConfigSer
     @Override
     public PipelineTriggerConfig findOneTriggerConfig(String triggerConfigId) {
         PipelineTriggerConfigEntity triggerConfigEntity = triggerConfigDao.findOneTriggerConfig(triggerConfigId);
-        return BeanMapper.map(triggerConfigEntity, PipelineTriggerConfig.class);
+        PipelineTriggerConfig config = BeanMapper.map(triggerConfigEntity, PipelineTriggerConfig.class);
+        joinTemplate.joinQuery(config);
+        return config;
     }
 
     //删除

@@ -83,12 +83,6 @@ public interface PipelineCourseConfigService {
     @FindOne
     PipelineCourseConfig findOneCourseConfig(String configId);
 
-    /**
-     * 效验配置信息
-     * @param pipelineId 流水线id
-     * @return 效验结果
-     */
-    // Map<String, String> configValid(String pipelineId);
 
     /**
      * 查询所有配置

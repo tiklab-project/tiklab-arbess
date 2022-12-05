@@ -6,7 +6,7 @@ import net.tiklab.matflow.definition.model.PipelineCourseConfig;
 import net.tiklab.matflow.definition.model.task.PipelineCodeScan;
 import net.tiklab.matflow.definition.service.task.PipelineCodeScanService;
 import net.tiklab.matflow.execute.model.PipelineProcess;
-import net.tiklab.matflow.execute.service.ConfigCommonService;
+import net.tiklab.matflow.execute.service.PipelineExecCommonService;
 import net.tiklab.matflow.orther.service.PipelineUntil;
 import net.tiklab.matflow.setting.model.PipelineAuthThird;
 import net.tiklab.rpc.annotation.Exporter;
@@ -21,7 +21,7 @@ public class CodeScanServiceImpl implements CodeScanService {
 
 
     @Autowired
-    ConfigCommonService commonService;
+    PipelineExecCommonService commonService;
 
     @Autowired
     PipelineCodeScanService codeScanService;

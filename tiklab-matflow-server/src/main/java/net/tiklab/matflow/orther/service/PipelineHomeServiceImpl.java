@@ -180,7 +180,7 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
         webHookQuery.setType(2);
         WebHook webHookByType = webHookService.findWebHookByType(webHookQuery);
         if (webHookByType == null){
-            throw new ApplicationException("用户并未配置企业微信消息通知，消息发送失败。");
+            throw new ApplicationException("用户并未配置企业微信消息通知，企业微信机器人消息发送失败。");
         }
         String id = webHookByType.getId();
         WeChatMarkdown weChatMarkdown = new WeChatMarkdown();

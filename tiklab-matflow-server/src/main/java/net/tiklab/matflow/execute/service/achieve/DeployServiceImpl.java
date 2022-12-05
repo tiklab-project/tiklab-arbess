@@ -7,7 +7,7 @@ import net.tiklab.matflow.definition.model.PipelineCourseConfig;
 import net.tiklab.matflow.definition.model.task.PipelineDeploy;
 import net.tiklab.matflow.definition.service.task.PipelineDeployService;
 import net.tiklab.matflow.execute.model.PipelineProcess;
-import net.tiklab.matflow.execute.service.ConfigCommonService;
+import net.tiklab.matflow.execute.service.PipelineExecCommonService;
 import net.tiklab.matflow.orther.service.PipelineUntil;
 import net.tiklab.matflow.setting.model.PipelineAuthHost;
 import net.tiklab.rpc.annotation.Exporter;
@@ -28,7 +28,7 @@ import java.io.IOException;
 public class DeployServiceImpl implements DeployService {
 
     @Autowired
-    ConfigCommonService commonService;
+    PipelineExecCommonService commonService;
 
     @Autowired
     PipelineDeployService deployService;

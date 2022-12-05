@@ -42,6 +42,15 @@ public interface PipelineTimeServer {
 
 
     /**
+     * 根据类型查询定时任务
+     * @param configId 配置id
+     * @param cron 表达式
+     * @return 配置
+     */
+    PipelineTime fondCronConfig(String configId,String cron);
+
+
+    /**
      * 根据配置获取所有时间
      * @param configId 配置id
      * @return 时间集合
@@ -53,6 +62,13 @@ public interface PipelineTimeServer {
      * @param configId 配置id
      */
     void deleteAllTime(String configId,String pipelineId);
+
+
+    /**
+     * 周期任务更新执行时间
+     * @param timeId 任务id
+     */
+    void deleteCronTime(String pipelineId,String timeId);
 
     /**
      * 删除

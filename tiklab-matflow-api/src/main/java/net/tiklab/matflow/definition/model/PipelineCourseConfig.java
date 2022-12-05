@@ -43,6 +43,7 @@ public class PipelineCourseConfig {
     //信息（create update delete）
     private String message;
 
+
     public PipelineCourseConfig() {
     }
 

@@ -1,6 +1,5 @@
 package net.tiklab.matflow.trigger.service.quartz;
 
-import net.tiklab.matflow.execute.service.PipelineExecHistoryServiceImpl;
 import net.tiklab.matflow.trigger.service.PipelineCronUtils;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
@@ -16,9 +15,7 @@ import java.util.Map;
 @Scope("singleton")
 public class PipelineJob {
 
-    // private static final ScheduledThreadPoolExecutor scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(100);
-
-    private static final Logger logger = LoggerFactory.getLogger(PipelineExecHistoryServiceImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(PipelineJob.class);
 
     private static final SchedulerFactory schedulerFactory =  new StdSchedulerFactory();
 
@@ -29,58 +26,53 @@ public class PipelineJob {
      * @param cron   时间设置，参考quartz说明文档
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    public void addJob(String pipelineId, Class jobClass, String cron) {
-        try {
+    public void addJob(String pipelineId, Class jobClass, String cron) throws SchedulerException {
+        Map<String, String> map = PipelineCronUtils.cronWeek(cron);
+        logger.info("添加定时任务，流水线id:"+pipelineId+"    时间："+ map.get("weekTime") +"  cron:" +cron );
 
-            Map<String, String> map = PipelineCronUtils.cronWeek(cron);
-            logger.info("添加定时任务，时间："+ map.get("time") +"  cron:" +cron );
+        //任务名
+        String jobName =pipelineId + "_"+cron;
+        //任务组名
+        // String jobGroupName ="group"+"_"+ pipelineId +"_"+cron;
+        //触发器名
+        String triggerName = pipelineId + "_"+cron;
+        //触发器组名
+        // String triggerGroupName =pipelineId;
 
-            //任务名
-            String jobName =pipelineId + "_"+cron;
-            //任务组名
-            // String jobGroupName ="group"+"_"+ pipelineId +"_"+cron;
-            //触发器名
-            String triggerName = pipelineId + "_"+cron;
-            //触发器组名
-            // String triggerGroupName =pipelineId;
+        // 任务名，任务组，任务执行类
+        Scheduler scheduler = schedulerFactory.getScheduler();
+        JobBuilder jobBuilder = JobBuilder.newJob(jobClass);
 
-            // 任务名，任务组，任务执行类
-            Scheduler scheduler = schedulerFactory.getScheduler();
-            JobBuilder jobBuilder = JobBuilder.newJob(jobClass);
+        //添加pipelineId执行信息
+        JobDataMap jobDataMap = new JobDataMap();
+        jobDataMap.put("pipelineId",pipelineId);
+        jobDataMap.put("cron",cron);
+        jobDataMap.put("weekTime",map.get("weekTime"));
+        jobBuilder.setJobData(jobDataMap);
 
-            //添加pipelineId
-            JobDataMap jobDataMap = new JobDataMap();
-            jobDataMap.put("pipelineId",pipelineId);
-            jobDataMap.put("cron",cron);
-            jobBuilder.setJobData(jobDataMap);
+        //任务
+        // JobDetail jobDetail= jobBuilder.withIdentity(jobName, jobGroupName).build();
+        JobDetail jobDetail= jobBuilder.withIdentity(jobName).build();
+        // JobDetail jobDetail= JobBuilder.newJob(jobClass).withIdentity(jobName, jobGroupName).build();
 
-            //任务
-            // JobDetail jobDetail= jobBuilder.withIdentity(jobName, jobGroupName).build();
-            JobDetail jobDetail= jobBuilder.withIdentity(jobName).build();
-            // JobDetail jobDetail= JobBuilder.newJob(jobClass).withIdentity(jobName, jobGroupName).build();
+        // 触发器
+        TriggerBuilder<Trigger> triggerBuilder = TriggerBuilder.newTrigger();
+        // 触发器名,触发器组
+        triggerBuilder.withIdentity(triggerName, pipelineId);
+        triggerBuilder.startNow();
 
-            // 触发器
-            TriggerBuilder<Trigger> triggerBuilder = TriggerBuilder.newTrigger();
-            // 触发器名,触发器组
-            triggerBuilder.withIdentity(triggerName, pipelineId);
-            triggerBuilder.startNow();
+        // 触发器时间设定
+        triggerBuilder.withSchedule(CronScheduleBuilder.cronSchedule(cron));
 
-            // 触发器时间设定
-            triggerBuilder.withSchedule(CronScheduleBuilder.cronSchedule(cron));
+        // 创建Trigger对象
+        CronTrigger trigger = (CronTrigger) triggerBuilder.build();
 
-            // 创建Trigger对象
-            CronTrigger trigger = (CronTrigger) triggerBuilder.build();
+        // 调度容器设置JobDetail和Trigger
+        scheduler.scheduleJob(jobDetail, trigger);
 
-            // 调度容器设置JobDetail和Trigger
-            scheduler.scheduleJob(jobDetail, trigger);
-
-            // 启动
-            if (!scheduler.isShutdown()) {
-                scheduler.start();
-            }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-
+        // 启动
+        if (!scheduler.isShutdown()) {
+            scheduler.start();
         }
     }
 
@@ -148,13 +140,13 @@ public class PipelineJob {
 
     public void removeJob(String pipelineId ,String cron){
         String jobName =pipelineId + "_"+cron;
-
         try {
             Scheduler scheduler = schedulerFactory.getScheduler();
-
             TriggerKey triggerKey = TriggerKey.triggerKey(jobName);
-            String name = triggerKey.getName();
-            logger.info("移除定时器：" + name );
+            JobKey jobKey = JobKey.jobKey(jobName);
+            scheduler.getJobDetail(jobKey);
+            logger.info("移除触发器，流水线id："+pipelineId+"     时间：" + PipelineCronUtils.weekTime(cron) +"   cron:"+ cron  );
+            scheduler.deleteJob(jobKey);
             scheduler.pauseTrigger(triggerKey);// 停止触发器
             scheduler.unscheduleJob(triggerKey);// 移除触发器
             scheduler.deleteJob(JobKey.jobKey(jobName));// 删除任务

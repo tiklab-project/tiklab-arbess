@@ -23,6 +23,14 @@ public interface PipelineTriggerConfigTaskServer {
      */
     void updateTriggerConfig(PipelineTriggerConfig config);
 
+
+    /**
+     * 删除一个定时任务
+     * @param configId 配置id
+     * @param cron 表达式
+     */
+    void deleteCronConfig(String pipelineId,String configId,String cron);
+
     /**
      * 查询任务
      * @param config 配置

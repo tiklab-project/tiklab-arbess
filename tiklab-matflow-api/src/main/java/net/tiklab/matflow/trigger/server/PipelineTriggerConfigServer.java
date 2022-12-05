@@ -22,6 +22,14 @@ public interface PipelineTriggerConfigServer {
      */
     List<Object> findAllConfig(String pipelineId);
 
+
+    /**
+     * 删除单个定时任务
+     * @param pipelineId 流水线id
+     * @param cron 表达式
+     */
+    void deleteCronConfig(String pipelineId,String cron);
+
     /**
      * 查询单个任务
      * @param configId 配置id

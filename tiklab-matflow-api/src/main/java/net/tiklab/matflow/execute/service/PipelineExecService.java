@@ -12,7 +12,7 @@ public interface PipelineExecService {
      * @param pipelineId 流水线id
      * @return 构建开始
      */
-    boolean  start(String pipelineId);
+    boolean  start(String pipelineId,int startWAy);
 
     /**
      * 查询构建状态

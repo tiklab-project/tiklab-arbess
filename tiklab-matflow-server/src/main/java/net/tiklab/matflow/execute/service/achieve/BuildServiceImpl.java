@@ -6,7 +6,7 @@ import net.tiklab.matflow.definition.model.PipelineCourseConfig;
 import net.tiklab.matflow.definition.model.task.PipelineBuild;
 import net.tiklab.matflow.definition.service.task.PipelineBuildService;
 import net.tiklab.matflow.execute.model.PipelineProcess;
-import net.tiklab.matflow.execute.service.ConfigCommonService;
+import net.tiklab.matflow.execute.service.PipelineExecCommonService;
 import net.tiklab.matflow.orther.service.PipelineUntil;
 import net.tiklab.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +23,7 @@ import java.io.IOException;
 public class BuildServiceImpl implements BuildService {
 
     @Autowired
-    private ConfigCommonService commonService;
+    private PipelineExecCommonService commonService;
 
     @Autowired
     PipelineBuildService buildService;

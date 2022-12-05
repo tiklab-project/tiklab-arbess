@@ -6,7 +6,7 @@ import net.tiklab.matflow.definition.model.PipelineCourseConfig;
 import net.tiklab.matflow.definition.model.task.PipelineCode;
 import net.tiklab.matflow.definition.service.task.PipelineCodeService;
 import net.tiklab.matflow.execute.model.PipelineProcess;
-import net.tiklab.matflow.execute.service.ConfigCommonService;
+import net.tiklab.matflow.execute.service.PipelineExecCommonService;
 import net.tiklab.matflow.orther.service.PipelineUntil;
 import net.tiklab.matflow.setting.model.PipelineAuth;
 import net.tiklab.matflow.setting.model.PipelineAuthThird;
@@ -31,7 +31,7 @@ import java.util.List;
 public class CodeServiceImpl implements CodeService {
 
     @Autowired
-    ConfigCommonService commonService;
+    PipelineExecCommonService commonService;
 
     @Autowired
     PipelineAuthThirdServer authServerServer;
@@ -109,7 +109,7 @@ public class CodeServiceImpl implements CodeService {
             }
             int status = commonService.log(pipelineProcess);
             if (status == 0){
-                commonService.execHistory(pipelineProcess,log+"代码克隆失败。 \n" );
+                commonService.execHistory(pipelineProcess,log+"代码克隆失败。 " );
                 return false;
             }
         } catch (IOException e) {

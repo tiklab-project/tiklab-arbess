@@ -41,14 +41,16 @@ public class PipelineExecMessage {
     @ApiProperty(name="color",desc="颜色")
     private int color;
 
-    //权限
+    //流水线类型(1.单任务 2.多任务)
+    private int pipelineType;
+
+    //权限(1.全局 2.私有)
     private int pipelinePower;
 
-
+    //用户(负责人)
     private User user;
-
+    //用户(执行人)
     private User execUser;
-
 
     public String getPipelineId() {
         return pipelineId;
@@ -144,5 +146,13 @@ public class PipelineExecMessage {
 
     public void setPipelinePower(int pipelinePower) {
         this.pipelinePower = pipelinePower;
+    }
+
+    public int getPipelineType() {
+        return pipelineType;
+    }
+
+    public void setPipelineType(int pipelineType) {
+        this.pipelineType = pipelineType;
     }
 }

@@ -10,6 +10,7 @@ import net.tiklab.matflow.trigger.model.PipelineTimeServer;
 import net.tiklab.matflow.trigger.service.quartz.PipelineRunJob;
 import net.tiklab.matflow.trigger.service.quartz.PipelineJob;
 import net.tiklab.rpc.annotation.Exporter;
+import org.quartz.SchedulerException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -51,14 +52,14 @@ public class PipelineTimeServerImpl implements PipelineTimeServer {
         String time = pipelineTime.getTime();
         String id = null;
         for (Integer integer : timeList) {
-            int week = PipelineUntil.week();
             pipelineTime.setDate(integer);
-            if (week == integer){
-                integer = 0;
-            }
             String cron = PipelineCronUtils.weekCron(time, integer);
             pipelineTime.setCron(cron);
-            manager.addJob(pipelineId, PipelineRunJob.class,cron);
+            try {
+                manager.addJob(pipelineId, PipelineRunJob.class,cron);
+            } catch (SchedulerException e) {
+                throw new ApplicationException(50001,"当前时间已经添加过，无需重复添加。");
+            }
             id = createTime(pipelineTime);
         }
         return id;
@@ -84,8 +85,9 @@ public class PipelineTimeServerImpl implements PipelineTimeServer {
         time.setTimeList(allDataConfig);
         //获取具体时间
         Map<String, String> map = PipelineCronUtils.cronWeek(time.getCron());
-        time.setCron(map.get("cron"));
+        time.setExecTime(map.get("cron"));
         time.setTime(map.get("time"));
+        time.setWeekTime(map.get("weekTime"));
         return time;
     }
 
@@ -109,6 +111,12 @@ public class PipelineTimeServerImpl implements PipelineTimeServer {
         return list;
     }
 
+    /**
+     * 获取最近一次执行任务
+     * @param configId 配置id
+     * @param day 天
+     * @return 任务
+     */
     public PipelineTime findOneConfig(String configId,int day){
         List<PipelineTime> allTime = findAllTime();
         if (allTime == null){
@@ -118,6 +126,28 @@ public class PipelineTimeServerImpl implements PipelineTimeServer {
             String timeConfigId = pipelineTime.getConfigId();
             int date = pipelineTime.getDate();
             if (timeConfigId.equals(configId) && date == day){
+                return pipelineTime;
+            }
+        }
+        return null;
+    }
+
+
+    /**
+     * 根据类型查询定时任务
+     * @param configId 配置id
+     * @param cron 表达式
+     * @return 配置
+     */
+    public PipelineTime fondCronConfig(String configId,String cron){
+        List<PipelineTime> allTime = findAllTimeConfig(configId);
+        if (allTime == null){
+            return null;
+        }
+        for (PipelineTime pipelineTime : allTime) {
+            String configId1 = pipelineTime.getConfigId();
+            String cron1 = pipelineTime.getCron();
+            if (configId1.equals(configId) && cron1.equals(cron)){
                 return pipelineTime;
             }
         }
@@ -169,6 +199,30 @@ public class PipelineTimeServerImpl implements PipelineTimeServer {
             manager.removeJob(pipelineId, cron);
             deleteTime(pipelineTime.getTimeId());
         }
+    }
+
+    /**
+     * 周期任务更新执行时间
+     * @param timeId 任务id
+     */
+    public void deleteCronTime(String pipelineId,String timeId){
+        PipelineTime oneTime = findOneTime(timeId);
+        if (oneTime.getTaskType() == 1){
+            deleteTime(timeId);
+            return;
+        }
+        String cron = oneTime.getCron();
+        String[] s = cron.split(" ");
+        String time = s[2] + ":" + s[1];
+        int date = oneTime.getDate();
+        String weekCron = PipelineCronUtils.weekCron(time, date);
+        oneTime.setCron(weekCron);
+        try {
+            manager.addJob(pipelineId, PipelineRunJob.class,weekCron);
+        } catch (SchedulerException e) {
+            throw new ApplicationException(50001,"当前时间已经添加过，无需重复添加。");
+        }
+        updateTime(oneTime);
     }
 
 

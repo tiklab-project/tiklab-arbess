@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class PipelineTaskExecServiceImpl implements PipelineTaskExecService {
+public class PipelineExecTaskServiceImpl implements PipelineExecTaskService {
 
     @Autowired
     CodeService code ;

@@ -99,7 +99,7 @@ public class PipelineRelationServerImpl implements PipelineRelationServer{
     }
 
 
-    //获取流水线状态
+    //获取流水线状态集合
     @Override
     public List<PipelineExecMessage> findAllStatus(List<Pipeline> allPipeline){
         List<PipelineExecMessage> pipelineExecMessageList = new ArrayList<>();
@@ -111,6 +111,7 @@ public class PipelineRelationServerImpl implements PipelineRelationServer{
         return pipelineExecMessageList;
     }
 
+    //流水线状态
     private PipelineExecMessage findOneStatus(Pipeline pipeline){
         PipelineExecMessage pipelineExecMessage = new PipelineExecMessage();
         //成功和构建时间
@@ -123,6 +124,7 @@ public class PipelineRelationServerImpl implements PipelineRelationServer{
         pipelineExecMessage.setColor(pipeline.getColor());
         pipelineExecMessage.setUser(pipeline.getUser());
         pipelineExecMessage.setPipelinePower(pipeline.getPipelinePower());
+        pipelineExecMessage.setPipelineType(pipeline.getPipelineType());
         if (latelyHistory != null){
             pipelineExecMessage.setLastBuildTime(latelyHistory.getCreateTime());
             pipelineExecMessage.setBuildStatus(latelyHistory.getRunStatus());

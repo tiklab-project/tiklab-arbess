@@ -1,6 +1,5 @@
 package net.tiklab.matflow.definition.service;
 
-import net.tiklab.matflow.trigger.server.PipelineTriggerConfigServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,8 +10,6 @@ import java.util.List;
 @Service
 public class PipelineConfigServerImpl implements PipelineConfigServer {
 
-    @Autowired
-    PipelineTriggerConfigServer beforeConfigServer;
 
     @Autowired
     PipelineCourseConfigService courseConfigService;
@@ -20,9 +17,13 @@ public class PipelineConfigServerImpl implements PipelineConfigServer {
     @Autowired
     PipelineAfterConfigServer afterConfigServer;
 
+    @Autowired
+    PipelineService pipelineService;
+
 
     private static final Logger logger = LoggerFactory.getLogger(PipelineConfigServerImpl.class);
 
+    //查询流水线所有配置（包括后置任务）
     public List<Object> findAllConfig(String pipelineId){
 
         List<Object> allCourseConfig = courseConfigService.findAllConfig(pipelineId);
@@ -37,4 +38,34 @@ public class PipelineConfigServerImpl implements PipelineConfigServer {
 
     }
 
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -88,6 +88,9 @@ public class PipelineCourseConfigServiceImpl implements PipelineCourseConfigServ
         String configId = config.getConfigId();
         int taskType = config.getTaskType();
         PipelineCourseConfig oneConfig = findOneCourseConfig(configId);
+        if (oneConfig == null){
+           throw new ApplicationException(50001,"查询不到配置，配置id："+configId);
+        }
         int oneTaskType = oneConfig.getTaskType();
         if (taskType == oneTaskType){
             courseConfigTaskService.updateConfig(config);
@@ -121,6 +124,16 @@ public class PipelineCourseConfigServiceImpl implements PipelineCourseConfigServ
         return courseConfigTaskService.createConfig(config);
     }
 
+    public void insertConfig(PipelineCourseConfig config){
+        int sort = config.getTaskSort();
+        String pipelineId = config.getPipeline().getPipelineId();
+        List<PipelineCourseConfig> allCourseConfig = findAllCourseConfig(pipelineId);
+
+
+
+    }
+
+    //效验是否存在代码源
     public void validCode(String pipelineId){
         List<PipelineCourseConfig> allCourseConfig = findAllCourseConfig(pipelineId);
         if (allCourseConfig == null){
@@ -153,7 +166,6 @@ public class PipelineCourseConfigServiceImpl implements PipelineCourseConfigServ
         }
         return list;
     }
-
 
     /**
      * 更改顺序

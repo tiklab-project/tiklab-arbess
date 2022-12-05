@@ -1,6 +1,7 @@
 package net.tiklab.matflow.trigger.service;
 
 import com.alibaba.fastjson.JSON;
+import net.tiklab.core.exception.ApplicationException;
 import net.tiklab.matflow.definition.model.Pipeline;
 import net.tiklab.matflow.trigger.model.PipelineTime;
 import net.tiklab.matflow.trigger.model.PipelineTimeServer;
@@ -22,7 +23,7 @@ public class PipelineTriggerConfigTaskServerImpl implements PipelineTriggerConfi
      * @param config 配置信息
      */
     @Override
-    public void createTriggerConfig(PipelineTriggerConfig config){
+    public void createTriggerConfig(PipelineTriggerConfig config)throws ApplicationException {
         String configId = config.getConfigId();
         int taskType = config.getTaskType();
         Pipeline pipeline = config.getPipeline();
@@ -66,6 +67,20 @@ public class PipelineTriggerConfigTaskServerImpl implements PipelineTriggerConfi
         }
     }
 
+
+    /**
+     * 删除一个定时任务
+     * @param configId 配置id
+     * @param cron 表达式
+     */
+    public void deleteCronConfig(String pipelineId,String configId,String cron){
+        PipelineTime pipelineTime = timeServer.fondCronConfig(configId, cron);
+        if (pipelineTime == null){
+            return;
+        }
+        timeServer.deleteCronTime(pipelineId,pipelineTime.getTimeId());
+    }
+
     /**
      * 查询任务
      * @param config 配置
@@ -75,12 +90,12 @@ public class PipelineTriggerConfigTaskServerImpl implements PipelineTriggerConfi
     public PipelineTime findTriggerConfig(PipelineTriggerConfig config){
         String configId = config.getConfigId();
         int taskType = config.getTaskType();
-        if (taskType == 81){
-            PipelineTime timeConfig = timeServer.findTimeConfig(configId);
-            timeConfig.setType(taskType);
-            return timeConfig;
+        PipelineTime timeConfig = timeServer.findTimeConfig(configId);
+        if (timeConfig == null){
+            return null;
         }
-        return null;
+        timeConfig.setType(taskType);
+        return timeConfig;
     }
 
 

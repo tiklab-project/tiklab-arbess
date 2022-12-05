@@ -4,7 +4,7 @@ import net.tiklab.matflow.definition.model.PipelineAfterConfig;
 import net.tiklab.matflow.definition.model.PipelineCourseConfig;
 import net.tiklab.matflow.execute.model.PipelineProcess;
 
-public interface PipelineTaskExecService {
+public interface PipelineExecTaskService {
 
 
     boolean beginCourseState(PipelineProcess pipelineProcess, PipelineCourseConfig config);

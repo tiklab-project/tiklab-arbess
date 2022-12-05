@@ -30,6 +30,12 @@ public class PipelineTime {
     @ApiProperty(name="cron",desc="配置id")
     private String cron;
 
+    //具体执行时间
+    private String weekTime;
+
+    //执行时间
+    private String execTime;
+
     //天数
     private List<Integer> timeList;
 
@@ -99,5 +105,19 @@ public class PipelineTime {
         this.cron = cron;
     }
 
+    public String getWeekTime() {
+        return weekTime;
+    }
 
+    public void setWeekTime(String weekTime) {
+        this.weekTime = weekTime;
+    }
+
+    public String getExecTime() {
+        return execTime;
+    }
+
+    public void setExecTime(String execTime) {
+        this.execTime = execTime;
+    }
 }
