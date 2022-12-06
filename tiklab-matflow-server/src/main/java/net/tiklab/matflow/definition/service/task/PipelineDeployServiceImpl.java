@@ -68,7 +68,8 @@ public class PipelineDeployServiceImpl implements PipelineDeployService {
     //查询单个
     @Override
     public PipelineDeploy findOneDeploy(String deployId) {
-        PipelineDeploy pipelineDeploy = BeanMapper.map(pipelineDeployDao.findOneDeploy(deployId), PipelineDeploy.class);
+        PipelineDeployEntity oneDeploy = pipelineDeployDao.findOneDeploy(deployId);
+        PipelineDeploy pipelineDeploy = BeanMapper.map(oneDeploy, PipelineDeploy.class);
         if (pipelineDeploy.getAuthId() != null){
             pipelineDeploy.setAuth(hostServer.findOneAuthHost(pipelineDeploy.getAuthId()));
         }

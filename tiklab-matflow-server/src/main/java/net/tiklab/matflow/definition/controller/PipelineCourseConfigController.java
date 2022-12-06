@@ -51,13 +51,13 @@ public class PipelineCourseConfigController {
     }
 
 
-    @RequestMapping(path="/",method = RequestMethod.POST)
-    @ApiMethod(name = "updateOrderConfig",desc = "创建配置")
-    @ApiParam(name = "pipelineConfig",desc = "配置信息",required = true)
-    public Result<Void> updateOrderConfig(@RequestBody @NotNull @Valid PipelineCourseConfig config) {
-         pipelineCourseConfigService.updateOrderConfig(config);
-        return Result.ok();
-    }
+    // @RequestMapping(path="/updateOrderConfig",method = RequestMethod.POST)
+    // @ApiMethod(name = "updateOrderConfig",desc = "创建配置")
+    // @ApiParam(name = "pipelineConfig",desc = "配置信息",required = true)
+    // public Result<Void> updateOrderConfig(@RequestBody @NotNull @Valid PipelineCourseConfig config) {
+    //      pipelineCourseConfigService.updateOrderConfig(config);
+    //     return Result.ok();
+    // }
 
 
     //根据流水线id查询配置

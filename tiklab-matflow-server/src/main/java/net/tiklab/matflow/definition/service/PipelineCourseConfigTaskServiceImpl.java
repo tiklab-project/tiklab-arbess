@@ -2,16 +2,14 @@ package net.tiklab.matflow.definition.service;
 
 import com.alibaba.fastjson.JSON;
 import net.tiklab.core.exception.ApplicationException;
-import net.tiklab.matflow.definition.model.*;
 import net.tiklab.matflow.definition.model.task.*;
 import net.tiklab.matflow.definition.service.task.*;
 import net.tiklab.matflow.orther.service.PipelineUntil;
-import net.tiklab.matflow.definition.model.task.PipelineTest;
 import net.tiklab.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.List;
 
 @Service
 @Exporter
@@ -37,13 +35,11 @@ public class PipelineCourseConfigTaskServiceImpl implements PipelineCourseConfig
 
     /**
      * 创建任务
-     * @param config 配置信息
+     * @param configId 配置id
      * @return 任务id
      */
     @Override
-    public String createConfig(PipelineCourseConfig config){
-        String configId = config.getConfigId();
-        int taskType = config.getTaskType();
+    public String createTaskConfig(String configId,int taskType){
         switch (taskType/10) {
             case 0 -> {
                 PipelineCode pipelineCode = new PipelineCode();
@@ -80,18 +76,14 @@ public class PipelineCourseConfigTaskServiceImpl implements PipelineCourseConfig
                 throw new ApplicationException("无法更新未知的配置类型。");
             }
         }
-
-
     }
 
     /**
      * 删除任务
-     * @param config 配置
+     * @param configId 配置
      */
     @Override
-    public void deleteConfig(PipelineCourseConfig config){
-        String configId = config.getConfigId();
-        int taskType = config.getTaskType();
+    public void deleteTaskConfig(String configId,int taskType){
         switch (taskType/10) {
             case 0 -> {
                 codeService.deleteCodeConfig(configId);
@@ -121,13 +113,11 @@ public class PipelineCourseConfigTaskServiceImpl implements PipelineCourseConfig
 
     /**
      * 更新任务
-     * @param config 配置
+     * @param configId 配置
      */
     @Override
-    public void updateConfig(PipelineCourseConfig config){
-        String configId = config.getConfigId();
-        int taskType = config.getTaskType();
-        String object = JSON.toJSONString(config.getValues());
+    public void updateTaskConfig(String configId,int taskType,Object o){
+        String object = JSON.toJSONString(o);
         switch (taskType/10) {
             case 0 -> {
                 PipelineCode pipelineCode = JSON.parseObject(object, PipelineCode.class);
@@ -139,7 +129,7 @@ public class PipelineCourseConfigTaskServiceImpl implements PipelineCourseConfig
                     id = oneCodeConfig.getCodeId();
                 }
                 pipelineCode.setCodeId(id);
-                pipelineCode.setType(config.getTaskType());
+                pipelineCode.setType(taskType);
                 codeService.updateCode(pipelineCode);
             }
             case 1 -> {
@@ -191,35 +181,30 @@ public class PipelineCourseConfigTaskServiceImpl implements PipelineCourseConfig
                 codeScanService.updateCodeScan(pipelineCodeScan);
             }
             case 5 -> {
-                PipelineDeploy pipelineDeploy = JSON.parseObject(object, PipelineDeploy.class);
+                PipelineProduct pipelineProduct = JSON.parseObject(object, PipelineProduct.class);
                 PipelineProduct oneProductConfig = productServer.findOneProductConfig(configId);
                 String id;
                 if (oneProductConfig == null){
                     id = productServer.createProduct(new PipelineProduct());
                 }else {
-                    id = oneProductConfig.getConfigId();
+                    id = oneProductConfig.getProductId();
                 }
-                pipelineDeploy.setDeployId(id);
-                deployService.updateDeploy(pipelineDeploy);
+                pipelineProduct.setProductId(id);
+                productServer.updateProduct(pipelineProduct);
             }
             default -> {
                 throw new ApplicationException("无法更新未知的配置类型。");
             }
         }
-
-
     }
 
     /**
      * 查询任务
-     * @param config 配置
+     * @param configId 配置
      * @return 任务信息
      */
     @Override
-    public Object findConfig(PipelineCourseConfig config){
-        String configId = config.getConfigId();
-        int taskType = config.getTaskType();
-        int taskSort = config.getTaskSort();
+    public Object findOneTaskConfig(String configId,int taskType,int taskSort){
         switch (taskType/10) {
             case 0 -> {
                 PipelineCode oneCodeConfig = codeService.findOneCodeConfig(configId);
@@ -261,17 +246,14 @@ public class PipelineCourseConfigTaskServiceImpl implements PipelineCourseConfig
                 throw new ApplicationException("无法更新未知的配置类型。");
             }
         }
-
-
     }
 
     /**
      * 效验必填字段
-     * @param config 配置
+     * @param configId 配置
      */
-    public void configValid(PipelineCourseConfig config,List<String> list){
-        int taskType = config.getTaskType();
-        String configId = config.getConfigId();
+    @Override
+    public void validTaskConfig(String configId,int taskType,List<String> list){
         switch (taskType / 10) {
             case 0 ->  codeValid(configId, list, taskType);
             case 1 ->  testValid(configId, list, taskType);
@@ -284,6 +266,9 @@ public class PipelineCourseConfigTaskServiceImpl implements PipelineCourseConfig
 
     public void codeValid(String configId,List<String> list,int taskType){
         PipelineCode oneCodeConfig = codeService.findOneCodeConfig(configId);
+        if (oneCodeConfig == null){
+            return;
+        }
         if (!PipelineUntil.isNoNull(oneCodeConfig.getCodeName())){
             list.add(configId+"_"+"codeName");
         }
@@ -291,6 +276,9 @@ public class PipelineCourseConfigTaskServiceImpl implements PipelineCourseConfig
 
     public void codeScanValid(String configId,List<String> list,int taskType){
         PipelineCodeScan code = codeScanService.findOneCodeScanConfig(configId);
+        if (code == null){
+            return;
+        }
         if (!PipelineUntil.isNoNull(code.getProjectName())){
             list.add(configId+"_"+"projectName");
         }
@@ -306,6 +294,9 @@ public class PipelineCourseConfigTaskServiceImpl implements PipelineCourseConfig
 
     public void deployValid(String configId,List<String> list,int taskType){
         PipelineDeploy deploy = deployService.findOneDeployConfig(configId);
+        if (deploy == null){
+            return;
+        }
         if (taskType == 31){
             if (deploy.getAuthType() == 1){
                 if (!PipelineUntil.isNoNull(deploy.getDeployAddress())){
@@ -320,6 +311,9 @@ public class PipelineCourseConfigTaskServiceImpl implements PipelineCourseConfig
 
     public void productValid(String configId,List<String> list,int taskType){
         PipelineProduct product = productServer.findOneProductConfig(configId);
+        if (product == null){
+            return;
+        }
         if (taskType == 51){
             if (!PipelineUntil.isNoNull(product.getArtifactId())){
                 list.add(configId+"_"+"artifactId");

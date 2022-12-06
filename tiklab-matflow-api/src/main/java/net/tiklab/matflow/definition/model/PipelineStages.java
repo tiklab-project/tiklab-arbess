@@ -1,14 +1,23 @@
 package net.tiklab.matflow.definition.model;
 
+import net.tiklab.beans.annotation.Mapper;
 import net.tiklab.beans.annotation.Mapping;
 import net.tiklab.beans.annotation.Mappings;
+import net.tiklab.join.annotation.Join;
 import net.tiklab.join.annotation.JoinQuery;
+import net.tiklab.postin.annotation.ApiModel;
 import net.tiklab.postin.annotation.ApiProperty;
 
+import java.util.List;
+
+
+@ApiModel
+@Join
+@Mapper(targetAlias = "PipelineStagesEntity")
 public class PipelineStages {
 
-    @ApiProperty(name = "configId",desc="id")
-    private String configId;
+    @ApiProperty(name = "stagesId",desc="id")
+    private String stagesId;
 
     @ApiProperty(name = "name",desc="名称")
     private String name;
@@ -36,13 +45,27 @@ public class PipelineStages {
     //更改的数据
     private Object values;
 
+    //阶段任务
+    private List<Object> taskValues;
 
-    public String getConfigId() {
-        return configId;
+    public PipelineStages() {
     }
 
-    public void setConfigId(String configId) {
-        this.configId = configId;
+    public PipelineStages(String stagesId, Pipeline pipeline, int taskSort, int taskType, int taskStage, Object values) {
+        this.stagesId = stagesId;
+        this.pipeline = pipeline;
+        this.taskSort = taskSort;
+        this.taskType = taskType;
+        this.taskStage = taskStage;
+        this.values = values;
+    }
+
+    public String getStagesId() {
+        return stagesId;
+    }
+
+    public void setStagesId(String stagesId) {
+        this.stagesId = stagesId;
     }
 
     public String getName() {
@@ -99,5 +122,13 @@ public class PipelineStages {
 
     public void setValues(Object values) {
         this.values = values;
+    }
+
+    public List<Object> getTaskValues() {
+        return taskValues;
+    }
+
+    public void setTaskValues(List<Object> taskValues) {
+        this.taskValues = taskValues;
     }
 }

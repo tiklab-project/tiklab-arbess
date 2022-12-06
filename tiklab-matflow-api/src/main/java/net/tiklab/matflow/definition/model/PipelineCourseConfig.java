@@ -40,20 +40,23 @@ public class PipelineCourseConfig {
     @JoinQuery(key = "pipelineId")
     private Pipeline pipeline;
 
-    //信息（create update delete）
-    private String message;
+    @ApiProperty(name="stagesId",desc="阶段")
+    private String stagesId;
 
 
     public PipelineCourseConfig() {
     }
 
-    public PipelineCourseConfig(String pipelineId) {
-        this.pipeline = new Pipeline(pipelineId);
+    public PipelineCourseConfig(String configId, int taskType, int taskSort, Object values, Pipeline pipeline) {
+        this.configId = configId;
+        this.taskType = taskType;
+        this.taskSort = taskSort;
+        this.values = values;
+        this.pipeline = pipeline;
     }
 
-    public PipelineCourseConfig(String pipelineId, String message) {
+    public PipelineCourseConfig(String pipelineId) {
         this.pipeline = new Pipeline(pipelineId);
-        this.message = message;
     }
 
     public PipelineCourseConfig(int taskType, int taskSort, String pipelineId) {
@@ -76,14 +79,6 @@ public class PipelineCourseConfig {
 
     public void setTaskType(int taskType) {
         this.taskType = taskType;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
     }
 
     public String getConfigId() {
@@ -116,6 +111,14 @@ public class PipelineCourseConfig {
 
     public void setPipeline(Pipeline pipeline) {
         this.pipeline = pipeline;
+    }
+
+    public String getStagesId() {
+        return stagesId;
+    }
+
+    public void setStagesId(String stagesId) {
+        this.stagesId = stagesId;
     }
 
 }

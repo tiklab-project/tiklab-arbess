@@ -28,10 +28,6 @@ public class PipelineCourseConfigEntity {
     @Column(name = "pipeline_id",notNull = true)
     private String pipelineId;
 
-    //源码
-    @Column(name = "task_id",notNull = true)
-    private String taskId;
-
     //源码类型
     @Column(name = "task_type",notNull = true)
     private int taskType;
@@ -39,6 +35,9 @@ public class PipelineCourseConfigEntity {
     //顺序
     @Column(name = "task_sort",notNull = true)
     private int taskSort;
+
+    @Column(name = "stages_id",notNull = true)
+    private String stagesId;
 
     public String getConfigId() {
         return configId;
@@ -64,14 +63,6 @@ public class PipelineCourseConfigEntity {
         this.pipelineId = pipelineId;
     }
 
-    public String getTaskId() {
-        return taskId;
-    }
-
-    public void setTaskId(String taskId) {
-        this.taskId = taskId;
-    }
-
     public int getTaskType() {
         return taskType;
     }
@@ -86,5 +77,13 @@ public class PipelineCourseConfigEntity {
 
     public void setTaskSort(int taskSort) {
         this.taskSort = taskSort;
+    }
+
+    public String getStagesId() {
+        return stagesId;
+    }
+
+    public void setStagesId(String stagesId) {
+        this.stagesId = stagesId;
     }
 }

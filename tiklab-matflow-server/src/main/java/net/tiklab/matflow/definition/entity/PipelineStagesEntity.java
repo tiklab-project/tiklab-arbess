@@ -6,14 +6,14 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 @Entity
-@Table(name="pipeline_stages")
+@Table(name="pipeline_stages_config")
 public class PipelineStagesEntity {
 
     //流水线配置id
     @Id
     @GeneratorValue
-    @Column(name = "config_id",notNull = true)
-    private String configId;
+    @Column(name = "stages_id",notNull = true)
+    private String stagesId;
 
     @Column(name = "name",notNull = true)
     private String name;
@@ -38,13 +38,20 @@ public class PipelineStagesEntity {
     @Column(name = "task_stage",notNull = true)
     private int taskStage;
 
-
-    public String getConfigId() {
-        return configId;
+    public String getName() {
+        return name;
     }
 
-    public void setConfigId(String configId) {
-        this.configId = configId;
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getStagesId() {
+        return stagesId;
+    }
+
+    public void setStagesId(String stagesId) {
+        this.stagesId = stagesId;
     }
 
     public String getCreateTime() {

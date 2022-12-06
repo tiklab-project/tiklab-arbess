@@ -1,7 +1,5 @@
 package net.tiklab.matflow.definition.service;
 
-import net.tiklab.matflow.definition.model.PipelineCourseConfig;
-
 import java.util.List;
 
 /**
@@ -14,37 +12,37 @@ public interface PipelineCourseConfigTaskService {
 
     /**
      * 创建任务
-     * @param config 配置信息
+     * @param configId 配置信息
      * @return 任务id
      */
-    String createConfig(PipelineCourseConfig config);
+    String createTaskConfig(String configId,int taskType);
 
     /**
      * 删除任务
-     * @param config 配置
+     * @param configId 配置
      */
-    void deleteConfig(PipelineCourseConfig config);
+    void deleteTaskConfig(String configId,int taskType);
 
     /**
      * 更新任务
-     * @param config 配置
+     * @param configId 配置
      */
-    void updateConfig(PipelineCourseConfig config);
+    void updateTaskConfig(String configId,int taskType,Object o);
 
     /**
      * 查询任务
-     * @param config 配置
+     * @param configId 配置
      * @return 任务信息
      */
-    Object findConfig(PipelineCourseConfig config);
+    Object findOneTaskConfig(String configId,int taskType,int taskSort);
 
 
 
     /**
      * 效验配置必填字段
-     * @param config 配置
+     * @param configId 配置
      */
-    void configValid(PipelineCourseConfig config,List<String> list);
+    void validTaskConfig(String configId,int taskType,List<String> list);
 
 
 

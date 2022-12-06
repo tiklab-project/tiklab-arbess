@@ -13,6 +13,26 @@ public interface PipelineStagesServer {
 
 
     /**
+     * 创建阶段及配置信息
+     * @param stages 阶段信息
+     * @return 阶段id
+     */
+    String createStagesConfig(PipelineStages stages);
+
+    /**
+     * 根据流水线id查询配置
+     * @param pipelineId 流水线id
+     * @return 配置
+     */
+    List<PipelineStages> findAllStagesConfig(String pipelineId);
+
+    /**
+     * 删除阶段任务
+     * @param configId 配置id
+     */
+    void deleteStagesConfig(String configId);
+
+    /**
      * 创建阶段
      * @param stages 阶段信息
      * @return 阶段id

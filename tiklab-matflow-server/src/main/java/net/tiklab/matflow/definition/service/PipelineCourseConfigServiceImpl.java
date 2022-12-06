@@ -43,7 +43,7 @@ public class PipelineCourseConfigServiceImpl implements PipelineCourseConfigServ
     //创建流水线模板
     @Override
     public void createTemplate(String pipelineId, int type) {
-        PipelineCourseConfig pipelineCourseConfig = new PipelineCourseConfig(pipelineId,"create");
+        PipelineCourseConfig pipelineCourseConfig = new PipelineCourseConfig(pipelineId);
         int[] ints = switch (type) {
             case 2131 -> new int[]{1,21, 31};
             case 2132 -> new int[]{1,21, 32};
@@ -71,9 +71,11 @@ public class PipelineCourseConfigServiceImpl implements PipelineCourseConfigServ
             return null;
         }
         List<Object> list = new ArrayList<>();
-
         for (PipelineCourseConfig pipelineCourseConfig : allCourseConfig) {
-            Object config = courseConfigTaskService.findConfig(pipelineCourseConfig);
+            String configId = pipelineCourseConfig.getConfigId();
+            int taskType = pipelineCourseConfig.getTaskType();
+            int taskSort = pipelineCourseConfig.getTaskSort();
+            Object config = courseConfigTaskService.findOneTaskConfig(configId,taskType,taskSort);
             list.add(config);
         }
         return list;
@@ -93,61 +95,82 @@ public class PipelineCourseConfigServiceImpl implements PipelineCourseConfigServ
         }
         int oneTaskType = oneConfig.getTaskType();
         if (taskType == oneTaskType){
-            courseConfigTaskService.updateConfig(config);
+            courseConfigTaskService.updateTaskConfig(configId,taskType,config.getValues());
         }else {
-            courseConfigTaskService.deleteConfig(oneConfig);
-            courseConfigTaskService.createConfig(config);
+            courseConfigTaskService.deleteTaskConfig(oneConfig.getConfigId(),oneConfig.getTaskType());
+            courseConfigTaskService.createTaskConfig(configId,taskType);
             oneConfig.setTaskType(taskType);
             updateCourseConfig(oneConfig);
         }
     }
 
     /**
-     * 创建流水线配置
+     * 创建流水线配置及关联任务
      * @param config 配置信息
      * @return 配置id
      */
     @Override
     public String createConfig(PipelineCourseConfig config){
         Pipeline pipeline = config.getPipeline();
-        List<PipelineCourseConfig> allConfigOrder = findAllCourseConfig(pipeline.getPipelineId());
-        config.setTaskSort(1);
-        if (allConfigOrder != null){
-            config.setTaskSort(allConfigOrder.size()+1);
+        String pipelineId = pipeline.getPipelineId();
+        String stagesId = config.getStagesId();
+        //任务顺序
+        int sort;
+        List<PipelineCourseConfig> allCourseConfig;
+        if (stagesId == null){
+            allCourseConfig = findAllCourseConfig(pipelineId);
+        }else {
+            allCourseConfig = findAllStagesCourseConfig(stagesId);
         }
+        sort = insertCourseConfig(allCourseConfig,config.getTaskSort());
+
+        config.setTaskSort(sort);
+
         if (config.getTaskType() < 10){
             config.setTaskSort(1);
             validCode(pipeline.getPipelineId());
         }
         String configId = createCourseConfig(config);
         config.setConfigId(configId);
-        return courseConfigTaskService.createConfig(config);
+        courseConfigTaskService.createTaskConfig(configId,config.getTaskType());
+        return configId;
     }
 
-    public void insertConfig(PipelineCourseConfig config){
-        int sort = config.getTaskSort();
-        String pipelineId = config.getPipeline().getPipelineId();
-        List<PipelineCourseConfig> allCourseConfig = findAllCourseConfig(pipelineId);
+    /**
+     * 插入配置
+     * @param allCourseConfig 配置信息
+     * @return 顺序
+     */
+    public int insertCourseConfig(List<PipelineCourseConfig> allCourseConfig,int sort){
 
-
-
-    }
-
-    //效验是否存在代码源
-    public void validCode(String pipelineId){
-        List<PipelineCourseConfig> allCourseConfig = findAllCourseConfig(pipelineId);
-        if (allCourseConfig == null){
-            return ;
+        if (allCourseConfig == null || allCourseConfig.size() == 0){
+            return 1 ;
         }
-        for (PipelineCourseConfig pipelineCourseConfig : allCourseConfig) {
-            int taskType = pipelineCourseConfig.getTaskType();
-            if (taskType < 10){
-                throw new ApplicationException(50001,"添加错误，无法添加两个代码源");
+
+        int size = allCourseConfig.size();
+
+        if (size < sort){
+            return sort;
+        }
+
+        allCourseConfig.sort(Comparator.comparing(PipelineCourseConfig::getTaskSort));
+
+        if (size == 1){
+            PipelineCourseConfig pipelineCourseConfig = allCourseConfig.get(0);
+            if (pipelineCourseConfig.getTaskType() < 10){
+                return size+1;
             }
-            int sort = pipelineCourseConfig.getTaskSort();
-            pipelineCourseConfig.setTaskSort(sort+1);
-            updateCourseConfig(pipelineCourseConfig);
         }
+
+        for (PipelineCourseConfig pipelineCourseConfig : allCourseConfig) {
+            int taskSort = pipelineCourseConfig.getTaskSort();
+            if (sort <= taskSort){
+                pipelineCourseConfig.setTaskSort(taskSort+1);
+                updateCourseConfig(pipelineCourseConfig);
+            }
+        }
+
+        return sort;
     }
 
     /**
@@ -155,6 +178,7 @@ public class PipelineCourseConfigServiceImpl implements PipelineCourseConfigServ
      * @param pipelineId 流水线id
      * @return 效验结果
      */
+    @Override
     public List<String> configValid(String pipelineId){
         List<PipelineCourseConfig> allCourseConfig = findAllCourseConfig(pipelineId);
         if (allCourseConfig == null){
@@ -162,7 +186,9 @@ public class PipelineCourseConfigServiceImpl implements PipelineCourseConfigServ
         }
         List<String> list = new ArrayList<>();
         for (PipelineCourseConfig pipelineCourseConfig : allCourseConfig) {
-            courseConfigTaskService.configValid(pipelineCourseConfig,list);
+            int taskType = pipelineCourseConfig.getTaskType();
+            String configId = pipelineCourseConfig.getConfigId();
+            courseConfigTaskService.validTaskConfig(configId,taskType,list);
         }
         return list;
     }
@@ -210,7 +236,7 @@ public class PipelineCourseConfigServiceImpl implements PipelineCourseConfigServ
     @Override
     public void deleteConfig(String configId){
         PipelineCourseConfig oneConfig = findOneCourseConfig(configId);
-        courseConfigTaskService.deleteConfig(oneConfig);
+        courseConfigTaskService.deleteTaskConfig(oneConfig.getConfigId(),oneConfig.getTaskType());
         int taskSort = oneConfig.getTaskSort();
         Pipeline pipeline = oneConfig.getPipeline();
         String pipelineId = pipeline.getPipelineId();
@@ -223,9 +249,110 @@ public class PipelineCourseConfigServiceImpl implements PipelineCourseConfigServ
         for (PipelineCourseConfig pipelineCourseConfig : allCourseConfig) {
             int sort = pipelineCourseConfig.getTaskSort();
             if (sort > taskSort){
-                pipelineCourseConfig.setTaskSort(taskSort);
+                pipelineCourseConfig.setTaskSort(sort-1);
                 updateCourseConfig(pipelineCourseConfig);
             }
+        }
+    }
+
+    /**
+     * 删除流水线所有配置
+     * @param pipelineId 流水线id
+     */
+    @Override
+    public void deleteAllConfig(String pipelineId){
+        List<PipelineCourseConfig> allCourseConfig = findAllCourseConfig(pipelineId);
+        if (allCourseConfig == null){
+            return;
+        }
+        for (PipelineCourseConfig pipelineCourseConfig : allCourseConfig) {
+            int taskType = pipelineCourseConfig.getTaskType();
+            String configId = pipelineCourseConfig.getConfigId();
+            courseConfigTaskService.deleteTaskConfig(configId,taskType);
+        }
+    }
+
+    /**
+     * 查询配置
+     * @param pipelineId 流水线id
+     * @return 配置集合
+     */
+    @Override
+    public List<PipelineCourseConfig> findAllCourseConfig(String pipelineId){
+        List<PipelineCourseConfig> allConfigOrder = findAllCourseConfig();
+        if (allConfigOrder == null){
+            return null;
+        }
+        List<PipelineCourseConfig> list = new ArrayList<>();
+        for (PipelineCourseConfig pipelineCourseConfig : allConfigOrder) {
+            Pipeline pipeline = pipelineCourseConfig.getPipeline();
+            if (pipeline.getPipelineId().equals(pipelineId)){
+                list.add(pipelineCourseConfig);
+            }
+        }
+        list.sort(Comparator.comparing(PipelineCourseConfig::getTaskSort));
+        return list;
+    }
+
+    /**
+     * 查询一个阶段下的所有任务
+     * @param stagesId 阶段id
+     * @return 配置集合
+     */
+    @Override
+    public List<Object> findAllStagesConfig(String stagesId){
+        List<PipelineCourseConfig> allStagesCourseConfig = findAllStagesCourseConfig(stagesId);
+        if (allStagesCourseConfig == null){
+            return null;
+        }
+        List<Object> list = new ArrayList<>();
+        for (PipelineCourseConfig pipelineCourseConfig : allStagesCourseConfig) {
+            int taskSort = pipelineCourseConfig.getTaskSort();
+            int taskType = pipelineCourseConfig.getTaskType();
+            String configId = pipelineCourseConfig.getConfigId();
+            Object config = courseConfigTaskService.findOneTaskConfig(configId,taskType,taskSort);
+            list.add(config);
+        }
+        return list;
+    }
+
+    /**
+     * 查询一个阶段下的所有配置
+     * @param stagesId 阶段id
+     * @return 配置
+     */
+    @Override
+    public List<PipelineCourseConfig> findAllStagesCourseConfig(String stagesId){
+        List<PipelineCourseConfig> allCourseConfig = findAllCourseConfig();
+        if (allCourseConfig == null || allCourseConfig.size() == 0){
+            return null;
+        }
+        List<PipelineCourseConfig> list = new ArrayList<>();
+        for (PipelineCourseConfig pipelineCourseConfig : allCourseConfig) {
+            String id = pipelineCourseConfig.getStagesId();
+            if (id == null || !id.equals(stagesId)){
+                continue;
+            }
+            list.add(pipelineCourseConfig);
+        }
+        list.sort(Comparator.comparing(PipelineCourseConfig::getTaskSort));
+        return list;
+    }
+
+    //效验是否存在代码源
+    public void validCode(String pipelineId){
+        List<PipelineCourseConfig> allCourseConfig = findAllCourseConfig(pipelineId);
+        if (allCourseConfig == null){
+            return ;
+        }
+        for (PipelineCourseConfig pipelineCourseConfig : allCourseConfig) {
+            int taskType = pipelineCourseConfig.getTaskType();
+            if (taskType < 10){
+                throw new ApplicationException(50001,"添加错误，无法添加两个代码源");
+            }
+            int sort = pipelineCourseConfig.getTaskSort();
+            pipelineCourseConfig.setTaskSort(sort+1);
+            updateCourseConfig(pipelineCourseConfig);
         }
     }
 
@@ -246,42 +373,6 @@ public class PipelineCourseConfigServiceImpl implements PipelineCourseConfigServ
         pipelineCourseConfigDao.deleteConfigure(configId);
     }
 
-    /**
-     * 删除流水线所有配置
-     * @param pipelineId 流水线id
-     */
-    public void deleteAllConfig(String pipelineId){
-        List<PipelineCourseConfig> allCourseConfig = findAllCourseConfig(pipelineId);
-        if (allCourseConfig == null){
-            return;
-        }
-        for (PipelineCourseConfig pipelineCourseConfig : allCourseConfig) {
-            courseConfigTaskService.deleteConfig(pipelineCourseConfig);
-        }
-    }
-
-    /**
-     * 查询配置
-     * @param pipelineId 流水线id
-     * @return 配置集合
-     */
-    @Override
-    public List<PipelineCourseConfig> findAllCourseConfig(String pipelineId){
-        List<PipelineCourseConfig> allConfigOrder = findAllCourseConfigOrder();
-        if (allConfigOrder == null){
-            return null;
-        }
-        List<PipelineCourseConfig> list = new ArrayList<>();
-        for (PipelineCourseConfig pipelineCourseConfig : allConfigOrder) {
-            Pipeline pipeline = pipelineCourseConfig.getPipeline();
-            if (pipeline.getPipelineId().equals(pipelineId)){
-                list.add(pipelineCourseConfig);
-            }
-        }
-        list.sort(Comparator.comparing(PipelineCourseConfig::getTaskSort));
-        return list;
-    }
-
     @Override
     public PipelineCourseConfig findOneCourseConfig(String configId){
         PipelineCourseConfigEntity oneConfigure = pipelineCourseConfigDao.findOneConfigure(configId);
@@ -289,13 +380,13 @@ public class PipelineCourseConfigServiceImpl implements PipelineCourseConfigServ
     }
 
     @Override
-    public List<PipelineCourseConfig> findAllCourseConfigOrderList(List<String> idList) {
+    public List<PipelineCourseConfig> findAllCourseConfigList(List<String> idList) {
         List<PipelineCourseConfigEntity> allConfigureList = pipelineCourseConfigDao.findAllConfigureList(idList);
         return BeanMapper.mapList(allConfigureList, PipelineCourseConfig.class);
     }
 
     @Override
-    public List<PipelineCourseConfig> findAllCourseConfigOrder(){
+    public List<PipelineCourseConfig> findAllCourseConfig(){
         List<PipelineCourseConfigEntity> allConfigure = pipelineCourseConfigDao.findAllConfigure();
         List<PipelineCourseConfig> pipelineCourseConfigs = BeanMapper.mapList(allConfigure, PipelineCourseConfig.class);
         joinTemplate.joinQuery(pipelineCourseConfigs);

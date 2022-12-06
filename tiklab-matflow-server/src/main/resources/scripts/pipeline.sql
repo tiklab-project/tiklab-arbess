@@ -46,10 +46,24 @@ create table pipeline_course_config  (
   config_id varchar(255) ,
   create_time datetime ,
   pipeline_id varchar(255) ,
-  task_id varchar(255) ,
   task_type int ,
   task_sort int ,
   PRIMARY KEY (config_id) USING BTREE
+);
+
+
+-- ----------------------------
+-- Table structure for pipeline_stages
+-- ----------------------------
+create table pipeline_stages_config  (
+     stages_id varchar(255) ,
+     create_time datetime ,
+     name varchar(255) ,
+     pipeline_id varchar(255) ,
+     task_type int ,
+     task_sort int ,
+     task_stage int ,
+     PRIMARY KEY (stages_id) USING BTREE
 );
 
 -- ----------------------------
