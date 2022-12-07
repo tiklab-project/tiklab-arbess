@@ -15,6 +15,8 @@ public class PipelineRun {
 
     private int runWay;
 
+    private List<Integer> timeList;
+
     private Map<Integer, List<Integer>> stagesTimes;
 
     public String getHistoryId() {
@@ -63,5 +65,13 @@ public class PipelineRun {
 
     public void setStagesTimes(Map<Integer, List<Integer>> stagesTimes) {
         this.stagesTimes = stagesTimes;
+    }
+
+    public List<Integer> getTimeList() {
+        return timeList;
+    }
+
+    public void setTimeList(List<Integer> timeList) {
+        this.timeList = timeList;
     }
 }

@@ -19,8 +19,9 @@ public interface PipelineExecCommonService {
      * @throws IOException 字符流转换异常
      * @return map 执行状态
      */
-     int log( PipelineProcess pipelineProcess) throws IOException;
+    int log( PipelineProcess pipelineProcess) throws IOException;
 
+    List<PipelineExecLog> findAllStagesLog(String historyId,String stagesId);
 
     /**
      * 运行结束更新历史状态

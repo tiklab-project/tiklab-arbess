@@ -44,6 +44,9 @@ public class PipelineServiceImpl implements PipelineService {
     private PipelineRelationServer relationServer;
 
     @Autowired
+    private PipelineStagesServer stagesServer;
+
+    @Autowired
     private PipelineHomeService homeService;
 
     private static final Logger logger = LoggerFactory.getLogger(PipelineServiceImpl.class);
@@ -70,8 +73,15 @@ public class PipelineServiceImpl implements PipelineService {
         //动态
         homeService.log(LOG_PIPELINE, LOG_MD_PIPELINE_CREATE, LOG_TEM_PIPELINE_CREATE, map);
 
-        //创建对应流水线模板
-        configOrderService.createTemplate(pipelineId, pipeline.getPipelineTemplate());
+        if (pipeline.getPipelineType() == 1){
+            //创建对应流水线模板
+            configOrderService.createTemplate(pipelineId, pipeline.getPipelineTemplate());
+        }
+        if (pipeline.getPipelineType() == 2){
+            //创建对应流水线模板
+            stagesServer.createTemplate(pipelineId, pipeline.getPipelineTemplate());
+        }
+
 
         //流水线关联角色，用户信息
         relationServer.createDmUser(pipelineId,pipeline.getUserList());

@@ -45,7 +45,9 @@ public class PipelineExecCommonServiceImpl implements PipelineExecCommonService 
 
     Map<String,PipelineExecHistory> historyMap = PipelineExecServiceImpl.historyMap;
 
-    Map<String,String> logMap = PipelineExecServiceImpl.logMap;
+    Map<String, List<String>> logMap = PipelineExecServiceImpl.logMap;
+
+    Map<String, Integer> runTime = PipelineExecServiceImpl.runTime;
 
     /**
      * 执行日志
@@ -123,6 +125,11 @@ public class PipelineExecCommonServiceImpl implements PipelineExecCommonService 
     }
 
 
+    public List<PipelineExecLog> findAllStagesLog(String historyId,String stagesId){
+        return logService.findAllStagesLog(historyId,stagesId);
+    }
+
+
     /**
      * 运行结束更新历史状态
      * @param pipelineExecHistory 历史
@@ -158,19 +165,22 @@ public class PipelineExecCommonServiceImpl implements PipelineExecCommonService 
     public void updateState(String historyId,List<Integer> time,int state){
         PipelineExecHistory pipelineExecHistory = historyService.findOneHistory(historyId);
         int times = 0;
-        if (time != null ){
-            String logId = logMap.get(historyId);
-            PipelineExecLog pipelineExecLog = logService.findOneLog(logId);
-            pipelineExecLog.setRunTime(time.get(time.size()-1));
-            for (Integer integer : time) {
-                times = times+ integer;
+
+        String logId = logMap.get(historyId).get(logMap.get(historyId).size()-1);
+        PipelineExecLog pipelineExecLog = logService.findOneLog(logId);
+
+        List<String> list = logMap.get(historyId);
+        if (list != null){
+            for (String s : list) {
+                Integer integer = runTime.get(s);
+                times = times +integer;
             }
-            pipelineExecLog.setRunState(state);
-            logService.updateLog(pipelineExecLog);
         }
+        pipelineExecLog.setRunTime(runTime.get(logId));
+        pipelineExecLog.setRunState(state);
+        logService.updateLog(pipelineExecLog);
         pipelineExecHistory.setRunTime(times+1);
         historyService.updateHistory(pipelineExecHistory);
-
     }
 
     /**

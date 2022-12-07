@@ -91,17 +91,8 @@ public interface PipelineExecHistoryService {
     @FindAll
     List<PipelineExecHistory> findAllHistory(String pipelineId);
 
-
     @FindList
     List<PipelineExecHistory> findHistoryList(List<String> idList);
-
-    /**
-     * 获取最后的执行日志
-     * @param historyId 历史id
-     * @return 执行日志
-     */
-    PipelineExecLog findLastRunLog(String historyId);
-
 
     /**
      * 查询历史及日志详情

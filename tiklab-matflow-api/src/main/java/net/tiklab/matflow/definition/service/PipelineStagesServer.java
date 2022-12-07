@@ -20,6 +20,13 @@ public interface PipelineStagesServer {
     String createStagesConfig(PipelineStages stages);
 
     /**
+     * 创建阶段模板
+     * @param pipelineId 流水线id
+     * @param template 模板
+     */
+    void createTemplate(String pipelineId,String template);
+
+    /**
      * 根据流水线id查询配置
      * @param pipelineId 流水线id
      * @return 配置

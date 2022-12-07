@@ -1,6 +1,9 @@
 package net.tiklab.matflow.execute.service;
 
 import net.tiklab.matflow.execute.model.PipelineExecHistory;
+import net.tiklab.matflow.execute.model.PipelineRun;
+
+import java.util.List;
 
 /**
  * 流水线构建
@@ -20,6 +23,10 @@ public interface PipelineExecService {
      * @return 状态信息
      */
     PipelineExecHistory findInstanceState(String pipelineId) ;
+
+
+    List<PipelineRun> pipelineRunStatus(String pipelineId);
+
 
     /**
      * 判断运行状态

@@ -147,31 +147,6 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
         return BeanMapper.mapList(pipelineExecHistoryEntityList, PipelineExecHistory.class);
     }
 
-    //获取最后一次的运行日志详情
-    @Override
-    public PipelineExecLog findLastRunLog(String historyId){
-        PipelineExecHistory oneHistory = findOneHistory(historyId);
-        Pipeline pipeline = oneHistory.getPipeline();
-        int pipelineType = pipeline.getPipelineType();
-
-        if (pipelineType == 1){
-            List<PipelineExecLog> allLog = pipelineExecLogService.findAllLog(historyId);
-            if (allLog == null || allLog.size() == 0){
-                return null;
-            }
-            allLog.sort(Comparator.comparing(PipelineExecLog::getTaskSort));
-            PipelineExecLog pipelineExecLog = allLog.get(allLog.size() - 1);
-            for (PipelineExecLog execLog : allLog) {
-                pipelineExecLog.setRunTime(pipelineExecLog.getRunTime()+execLog.getRunTime());
-            }
-        }
-
-        if (pipelineType == 2){
-
-        }
-
-        return null;
-    }
 
     /**
      * 查询历史及日志详情
@@ -180,8 +155,10 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
      */
     public List<Object> findAllLog(String historyId){
         PipelineExecHistory history = findOneHistory(historyId);
+
         Pipeline pipeline = history.getPipeline();
         String pipelineId = pipeline.getPipelineId();
+
         int pipelineType = pipeline.getPipelineType();
         List<Object> list = new ArrayList<>();
 
@@ -193,6 +170,7 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
         if (pipelineType == 2){
             List<PipelineStagesLog> logs = new ArrayList<>();
             List<PipelineStages> allStagesConfig = stagesServer.findAllStagesConfig(pipelineId);
+
             for (PipelineStages pipelineStages : allStagesConfig) {
                 String stagesId = pipelineStages.getStagesId();
                 PipelineStagesLog pipelineStagesLog = new PipelineStagesLog();
