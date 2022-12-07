@@ -40,17 +40,21 @@ public class PipelineCourseConfigServiceImpl implements PipelineCourseConfigServ
 
     private static final Logger logger = LoggerFactory.getLogger(PipelineCourseConfigServiceImpl.class);
 
-    //创建流水线模板
+    /**
+     * 创建流水线模板
+     * @param pipelineId 流水线id
+     * @param template 模板类型
+     */
     @Override
-    public void createTemplate(String pipelineId, int type) {
+    public void createTemplate(String pipelineId,String template) {
         PipelineCourseConfig pipelineCourseConfig = new PipelineCourseConfig(pipelineId);
-        int[] ints = switch (type) {
-            case 2131 -> new int[]{1,21, 31};
-            case 2132 -> new int[]{1,21, 32};
-            case 112131 -> new int[]{1,11, 21, 31};
-            case 112132 -> new int[]{1,11, 21, 32};
-            case 2231 -> new int[]{1,22, 31};
-            case 2232 -> new int[]{1,22, 32};
+        int[] ints = switch (template) {
+            case "2131" -> new int[]{1,21, 31};
+            case "2132" -> new int[]{1,21, 32};
+            case "112131" -> new int[]{1,11, 21, 31};
+            case "112132" -> new int[]{1,11, 21, 32};
+            case "2231" -> new int[]{1,22, 31};
+            case "2232" -> new int[]{1,22, 32};
             default -> new int[]{1};
         };
         for (int anInt : ints) {
@@ -139,6 +143,7 @@ public class PipelineCourseConfigServiceImpl implements PipelineCourseConfigServ
     /**
      * 插入配置
      * @param allCourseConfig 配置信息
+     * @param sort 插入的顺序
      * @return 顺序
      */
     public int insertCourseConfig(List<PipelineCourseConfig> allCourseConfig,int sort){

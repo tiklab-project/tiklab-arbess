@@ -30,17 +30,34 @@ public class PipelineExecLogServiceImpl implements PipelineExecLogService {
         pipelineExecLogDao.deleteLog(logId);
     }
 
-    @Override
-    public void deleteHistoryLog(String historyId) {
-        pipelineExecLogDao.deleteAllLog(historyId);
-    }
-
     //更新
     @Override
     public void updateLog(PipelineExecLog pipelineExecLog) {
         pipelineExecLogDao.updateLog(BeanMapper.map(pipelineExecLog, PipelineExecLogEntity.class));
     }
 
+    //查询单个
+    @Override
+    public PipelineExecLog findOneLog(String logId){
+        PipelineExecLogEntity execLogEntity = pipelineExecLogDao.findOne(logId);
+        return BeanMapper.map(execLogEntity,PipelineExecLog.class);
+    }
+
+    /**
+     * 删除历史对应的所有日志
+     * @param historyId 历史id
+     */
+    @Override
+    public void deleteHistoryLog(String historyId) {
+        pipelineExecLogDao.deleteAllLog(historyId);
+    }
+
+
+    /**
+     * 查询历史对应的日志
+     * @param historyId 历史id
+     * @return 日志集合
+     */
     @Override
     public List<PipelineExecLog> findAllLog(String historyId){
         List<PipelineExecLogEntity> pipelineExecLogList = pipelineExecLogDao.findAllLog(historyId);
@@ -51,13 +68,23 @@ public class PipelineExecLogServiceImpl implements PipelineExecLogService {
         list.sort(Comparator.comparing(PipelineExecLog::getTaskSort));
         return list;
     }
+
+    /**
+     * 根据阶段查询对应日志
+     * @param stagesId 阶段id
+     * @return 日志
+     */
+    public List<PipelineExecLog> findAllStagesLog(String historyId,String stagesId){
+        List<PipelineExecLogEntity> pipelineExecLogList = pipelineExecLogDao.findAllStagesLog(historyId,stagesId);
+        return BeanMapper.mapList(pipelineExecLogList, PipelineExecLog.class);
+    }
+
     //查询所有
     @Override
     public List<PipelineExecLog> findAllLog() {
         List<PipelineExecLogEntity> allLog = pipelineExecLogDao.findAllLog();
         return BeanMapper.mapList(allLog, PipelineExecLog.class);
     }
-
 
     @Override
     public List<PipelineExecLog> findAllLogList(List<String> idList) {

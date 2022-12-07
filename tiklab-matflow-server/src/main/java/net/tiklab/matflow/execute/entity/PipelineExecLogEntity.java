@@ -21,8 +21,8 @@ public class PipelineExecLogEntity {
     private String historyId;
 
     //运行类型
-    @Column(name = "task_type")
-    private int taskType ;
+    @Column(name = "type")
+    private int type ;
 
     @Column(name = "task_sort")
     private int taskSort ;
@@ -39,9 +39,16 @@ public class PipelineExecLogEntity {
     @Column(name = "run_state")
     private int runState;
 
-    @Column(name = "task_alias")
-    private String taskAlias;
+    @Column(name = "stages_id")
+    private String stagesId;
 
+    public String getStagesId() {
+        return stagesId;
+    }
+
+    public void setStagesId(String stagesId) {
+        this.stagesId = stagesId;
+    }
 
     public String getLogId() {
         return logId;
@@ -59,12 +66,12 @@ public class PipelineExecLogEntity {
         this.historyId = historyId;
     }
 
-    public int getTaskType() {
-        return taskType;
+    public int getType() {
+        return type;
     }
 
-    public void setTaskType(int taskType) {
-        this.taskType = taskType;
+    public void setType(int type) {
+        this.type = type;
     }
 
     public int getTaskSort() {
@@ -99,11 +106,5 @@ public class PipelineExecLogEntity {
         this.runState = runState;
     }
 
-    public String getTaskAlias() {
-        return taskAlias;
-    }
 
-    public void setTaskAlias(String taskAlias) {
-        this.taskAlias = taskAlias;
-    }
 }

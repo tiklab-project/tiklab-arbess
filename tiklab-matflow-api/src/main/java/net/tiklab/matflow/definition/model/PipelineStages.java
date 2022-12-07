@@ -51,6 +51,10 @@ public class PipelineStages {
     public PipelineStages() {
     }
 
+    public PipelineStages(String pipelineId) {
+        this.pipeline = new Pipeline(pipelineId);
+    }
+
     public PipelineStages(String stagesId, Pipeline pipeline, int taskSort, int taskType, int taskStage, Object values) {
         this.stagesId = stagesId;
         this.pipeline = pipeline;

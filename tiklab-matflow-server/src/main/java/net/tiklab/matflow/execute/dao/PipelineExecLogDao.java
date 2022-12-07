@@ -84,4 +84,17 @@ public class PipelineExecLogDao {
         return jdbcTemplate.query(sql,new BeanPropertyRowMapper(PipelineExecLogEntity.class));
     }
 
+    /**
+     * 根据阶段id查询日志
+     * @param stagsId 历史id
+     * @return 历史信息
+     */
+    public List<PipelineExecLogEntity> findAllStagesLog(String historyId,String stagsId){
+        String sql = "select pipeline_log.* from pipeline_log ";
+        sql = sql.concat(" where pipeline_log.stages_id = '"+stagsId +"'"
+                + "and pipeline_log.history_id = '" + historyId +"'" );
+        JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
+        return jdbcTemplate.query(sql,new BeanPropertyRowMapper(PipelineExecLogEntity.class));
+    }
+
 }

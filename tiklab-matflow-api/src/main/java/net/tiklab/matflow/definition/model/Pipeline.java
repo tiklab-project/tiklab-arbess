@@ -55,6 +55,9 @@ public class Pipeline {
     @ApiProperty(name="color",desc="颜色",required = true)
     private int color;
 
+    //流水线模板
+    private String pipelineTemplate;
+
     //添加用户
     @ApiProperty(name="userList",desc="权限",required = true)
     private List<PatchUser> userList;
@@ -145,5 +148,13 @@ public class Pipeline {
 
     public void setUserList(List<PatchUser> userList) {
         this.userList = userList;
+    }
+
+    public String getPipelineTemplate() {
+        return pipelineTemplate;
+    }
+
+    public void setPipelineTemplate(String pipelineTemplate) {
+        this.pipelineTemplate = pipelineTemplate;
     }
 }

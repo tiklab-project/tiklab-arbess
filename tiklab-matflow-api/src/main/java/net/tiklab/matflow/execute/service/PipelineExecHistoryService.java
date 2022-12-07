@@ -104,6 +104,14 @@ public interface PipelineExecHistoryService {
 
 
     /**
+     * 查询历史及日志详情
+     * @param historyId 历史id
+     * @return 日志集合
+     */
+    List<Object> findAllLog(String historyId);
+
+
+    /**
      * 分页查询历史
      * @param PipelineHistoryQuery 条件
      * @return 历史

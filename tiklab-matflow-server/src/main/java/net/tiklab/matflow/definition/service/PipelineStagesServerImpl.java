@@ -69,6 +69,28 @@ public class PipelineStagesServerImpl implements PipelineStagesServer {
     }
 
     /**
+     * 创建阶段模板
+     * @param pipelineId 流水线id
+     * @param template 模板
+     */
+    public void createTemplate(String pipelineId,String template) {
+        PipelineStages pipelineStages = new PipelineStages(pipelineId);
+        int[] ints = switch (template) {
+            case "2131" -> new int[]{1,21, 31};
+            case "2132" -> new int[]{1,21, 32};
+            case "112131" -> new int[]{1,11, 21, 31};
+            case "112132" -> new int[]{1,11, 21, 32};
+            case "2231" -> new int[]{1,22, 31};
+            case "2232" -> new int[]{1,22, 32};
+            default -> new int[]{1};
+        };
+        for (int anInt : ints) {
+            pipelineStages.setTaskType(anInt);
+            createStagesConfig(pipelineStages);
+        }
+    }
+
+    /**
      * 根据流水线id查询所有阶段及任务
      * @param pipelineId 流水线id
      * @return 配置

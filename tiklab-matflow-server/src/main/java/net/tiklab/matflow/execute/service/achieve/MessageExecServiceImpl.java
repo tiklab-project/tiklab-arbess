@@ -32,8 +32,6 @@ public class MessageExecServiceImpl implements MessageExecService {
 
     private static final Logger logger = LoggerFactory.getLogger(MessageExecServiceImpl.class);
 
-    String log = PipelineUntil.date(4);
-
     /**
      * 部署
      * @param pipelineProcess 配置信息
@@ -41,7 +39,7 @@ public class MessageExecServiceImpl implements MessageExecService {
      */
     public boolean message(PipelineProcess pipelineProcess, String configId) {
 
-        commonService.execHistory(pipelineProcess, log+"执行任务：消息通知.....");
+        commonService.execHistory(pipelineProcess, PipelineUntil.date(4)+"执行任务：消息通知.....");
 
         Pipeline pipeline = pipelineProcess.getPipeline();
 
@@ -60,7 +58,7 @@ public class MessageExecServiceImpl implements MessageExecService {
             }
         }catch (ApplicationException e){
             String message = e.getMessage();
-            commonService.execHistory(pipelineProcess, log+message);
+            commonService.execHistory(pipelineProcess, PipelineUntil.date(4)+message);
             return false;
         }
         return true;
@@ -76,19 +74,19 @@ public class MessageExecServiceImpl implements MessageExecService {
         map.put("message","成功");
         switch (type){
             case "site" ->{
-                commonService.execHistory(pipelineProcess, log+ "发送消息，类型：站内信");
+                commonService.execHistory(pipelineProcess, PipelineUntil.date(4)+ "发送消息，类型：站内信");
                 homeService.message(PipelineFinal.MES_TEM_PIPELINE_RUN,PipelineFinal.MES_PIPELINE_RUN,map);
-                commonService.execHistory(pipelineProcess, log+ "站内信发送成功");
+                commonService.execHistory(pipelineProcess, PipelineUntil.date(4)+ "站内信发送成功");
             }
             case "sms" ->{
-                commonService.execHistory(pipelineProcess, log+ "发送消息，类型：短信");
+                commonService.execHistory(pipelineProcess, PipelineUntil.date(4)+ "发送消息，类型：短信");
                 homeService.smsMessage(map);
-                commonService.execHistory(pipelineProcess, log+ "短信发送成功。");
+                commonService.execHistory(pipelineProcess, PipelineUntil.date(4)+ "短信发送成功。");
             }
             case "wechat" ->{
-                commonService.execHistory(pipelineProcess, log+ "发送消息，类型：企业微信机器人消息");
+                commonService.execHistory(pipelineProcess, PipelineUntil.date(4)+ "发送消息，类型：企业微信机器人消息");
                 homeService.wechatMarkdownMessage(map);
-                commonService.execHistory(pipelineProcess, log+ "企业微信机器人消息发送成功。");
+                commonService.execHistory(pipelineProcess, PipelineUntil.date(4)+ "企业微信机器人消息发送成功。");
             }
             case "mail" ->{
                 return;

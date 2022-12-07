@@ -36,7 +36,9 @@ public class BuildServiceImpl implements BuildService {
         pipelineBuild.setType(config.getTaskType());
 
         Pipeline pipeline = pipelineProcess.getPipeline();
+
         String log = PipelineUntil.date(4);
+
         //项目地址
         String path = PipelineUntil.findFileAddress()+ pipeline.getPipelineName();
 

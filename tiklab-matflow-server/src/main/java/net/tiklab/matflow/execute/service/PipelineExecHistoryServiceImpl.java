@@ -6,17 +6,22 @@ import net.tiklab.core.page.Pagination;
 import net.tiklab.core.page.PaginationBuilder;
 import net.tiklab.join.JoinTemplate;
 import net.tiklab.matflow.definition.model.Pipeline;
+import net.tiklab.matflow.definition.model.PipelineStages;
+import net.tiklab.matflow.definition.service.PipelineStagesServer;
 import net.tiklab.matflow.execute.dao.PipelineExecHistoryDao;
 import net.tiklab.matflow.execute.entity.PipelineExecHistoryEntity;
 import net.tiklab.matflow.execute.model.PipelineExecHistory;
 import net.tiklab.matflow.execute.model.PipelineExecLog;
 import net.tiklab.matflow.execute.model.PipelineHistoryQuery;
+import net.tiklab.matflow.execute.model.PipelineStagesLog;
+import net.tiklab.matflow.orther.service.PipelineUntil;
 import net.tiklab.rpc.annotation.Exporter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
@@ -29,6 +34,9 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
 
     @Autowired
     PipelineExecLogService pipelineExecLogService;
+
+    @Autowired
+    PipelineStagesServer stagesServer;
 
     @Autowired
     JoinTemplate joinTemplate;
@@ -60,8 +68,7 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
     }
 
     /**
-     * 删除单个历史
-     *
+     * 删除单个历史以及历史对应日志
      * @param historyId 历史id
      */
     @Override
@@ -85,7 +92,9 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
     @Override
     public PipelineExecHistory findOneHistory(String historyId) {
         PipelineExecHistoryEntity pipelineExecHistoryEntity = pipelineExecHistoryDao.findOneHistory(historyId);
-        return BeanMapper.map(pipelineExecHistoryEntity, PipelineExecHistory.class);
+        PipelineExecHistory history = BeanMapper.map(pipelineExecHistoryEntity, PipelineExecHistory.class);
+        joinTemplate.joinQuery(history);
+        return history;
     }
 
     //查询所有
@@ -106,8 +115,6 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
         allHistory.sort(Comparator.comparing(PipelineExecHistory::getCreateTime,Comparator.reverseOrder()));
         return allHistory;
     }
-
-
 
     //查询最近一次执行历史
     @Override
@@ -143,18 +150,74 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
     //获取最后一次的运行日志详情
     @Override
     public PipelineExecLog findLastRunLog(String historyId){
-        List<PipelineExecLog> allLog = pipelineExecLogService.findAllLog(historyId);
-        if (allLog == null || allLog.size() == 0){
-           return null;
+        PipelineExecHistory oneHistory = findOneHistory(historyId);
+        Pipeline pipeline = oneHistory.getPipeline();
+        int pipelineType = pipeline.getPipelineType();
+
+        if (pipelineType == 1){
+            List<PipelineExecLog> allLog = pipelineExecLogService.findAllLog(historyId);
+            if (allLog == null || allLog.size() == 0){
+                return null;
+            }
+            allLog.sort(Comparator.comparing(PipelineExecLog::getTaskSort));
+            PipelineExecLog pipelineExecLog = allLog.get(allLog.size() - 1);
+            for (PipelineExecLog execLog : allLog) {
+                pipelineExecLog.setRunTime(pipelineExecLog.getRunTime()+execLog.getRunTime());
+            }
         }
-        allLog.sort(Comparator.comparing(PipelineExecLog::getTaskSort));
-        PipelineExecLog pipelineExecLog = allLog.get(allLog.size() - 1);
-        for (PipelineExecLog execLog : allLog) {
-            pipelineExecLog.setRunTime(pipelineExecLog.getRunTime()+execLog.getRunTime());
+
+        if (pipelineType == 2){
+
         }
-        return pipelineExecLog;
+
+        return null;
     }
 
+    /**
+     * 查询历史及日志详情
+     * @param historyId 历史id
+     * @return 日志集合
+     */
+    public List<Object> findAllLog(String historyId){
+        PipelineExecHistory history = findOneHistory(historyId);
+        Pipeline pipeline = history.getPipeline();
+        String pipelineId = pipeline.getPipelineId();
+        int pipelineType = pipeline.getPipelineType();
+        List<Object> list = new ArrayList<>();
+
+        if (pipelineType == 1){
+            List<PipelineExecLog> allLog = pipelineExecLogService.findAllLog(historyId);
+            list.addAll(allLog);
+        }
+
+        if (pipelineType == 2){
+            List<PipelineStagesLog> logs = new ArrayList<>();
+            List<PipelineStages> allStagesConfig = stagesServer.findAllStagesConfig(pipelineId);
+            for (PipelineStages pipelineStages : allStagesConfig) {
+                String stagesId = pipelineStages.getStagesId();
+                PipelineStagesLog pipelineStagesLog = new PipelineStagesLog();
+                List<PipelineExecLog> allStagesLog = pipelineExecLogService.findAllStagesLog(historyId,stagesId);
+                if (allStagesLog == null || allStagesLog.size() == 0){
+                    continue;
+                }
+                pipelineStagesLog.setStages(pipelineStages.getTaskStage());
+                pipelineStagesLog.setLogList(allStagesLog);
+                pipelineStagesLog.setTaskSort(pipelineStages.getTaskSort());
+                logs.add(pipelineStagesLog);
+            }
+
+            //消息
+            PipelineStagesLog pipelineStages = new PipelineStagesLog();
+            List<PipelineExecLog> allLog = pipelineExecLogService.findAllLog(historyId);
+            allLog.removeIf(pipelineExecLog -> PipelineUntil.isNoNull(pipelineExecLog.getStagesId()));
+            pipelineStages.setStages(allStagesConfig.size()+1);
+            pipelineStages.setLogList(allLog);
+
+            list.addAll(logs);
+            list.add(pipelineStages);
+        }
+        return list;
+    }
 
     @Override
     public Pagination<PipelineExecHistory> findPageHistory(PipelineHistoryQuery pipelineHistoryQuery){

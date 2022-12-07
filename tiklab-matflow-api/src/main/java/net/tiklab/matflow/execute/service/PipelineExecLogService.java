@@ -37,12 +37,23 @@ public interface PipelineExecLogService {
      * @param pipelineExecLog 信息
      */
     void updateLog(PipelineExecLog pipelineExecLog);
+
+    //查询单个
+    public PipelineExecLog findOneLog(String logId);
+
     /**
      * 查询日志信息
      * @param historyId 历史id
      * @return 信息集合
      */
     List<PipelineExecLog> findAllLog(String historyId);
+
+    /**
+     * 根据阶段查询对应日志
+     * @param stagesId 阶段id
+     * @return 日志
+     */
+    List<PipelineExecLog> findAllStagesLog(String historyId,String stagesId);
 
     /**
      * 查询所有流水线日志

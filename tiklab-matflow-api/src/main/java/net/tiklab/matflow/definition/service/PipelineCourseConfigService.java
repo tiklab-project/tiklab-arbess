@@ -29,9 +29,9 @@ public interface PipelineCourseConfigService {
     /**
      * 创建流水线模板
      * @param pipelineId 流水线id
-     * @param type 模板类型
+     * @param template 模板类型
      */
-    void createTemplate(String pipelineId, int type);
+    void createTemplate(String pipelineId, String template);
 
     /**
      * 按顺序返回配置

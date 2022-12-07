@@ -6,6 +6,11 @@ import java.util.List;
 
 public interface PipelineConfigServer {
 
+    /**
+     * 查询所有配置（包括后置任务）
+     * @param pipelineId 流水线id
+     * @return 任务
+     */
     List<Object> findAllConfig(String pipelineId);
 
 

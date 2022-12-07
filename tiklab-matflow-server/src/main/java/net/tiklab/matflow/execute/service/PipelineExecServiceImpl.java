@@ -4,9 +4,11 @@ import net.tiklab.core.exception.ApplicationException;
 import net.tiklab.matflow.definition.model.Pipeline;
 import net.tiklab.matflow.definition.model.PipelineAfterConfig;
 import net.tiklab.matflow.definition.model.PipelineCourseConfig;
+import net.tiklab.matflow.definition.model.PipelineStages;
 import net.tiklab.matflow.definition.service.PipelineAfterConfigServer;
 import net.tiklab.matflow.definition.service.PipelineCourseConfigService;
 import net.tiklab.matflow.definition.service.PipelineService;
+import net.tiklab.matflow.definition.service.PipelineStagesServer;
 import net.tiklab.matflow.execute.model.PipelineExecHistory;
 import net.tiklab.matflow.execute.model.PipelineExecLog;
 import net.tiklab.matflow.execute.model.PipelineProcess;
@@ -49,6 +51,9 @@ public class PipelineExecServiceImpl implements PipelineExecService {
     @Autowired
     PipelineAfterConfigServer afterConfigServer;
 
+    @Autowired
+    PipelineStagesServer stagesServer;
+
     private static final Logger logger = LoggerFactory.getLogger(PipelineExecServiceImpl.class);
 
     //运行时间
@@ -56,6 +61,9 @@ public class PipelineExecServiceImpl implements PipelineExecService {
 
     //流水线运行历史
     public static Map<String,PipelineExecHistory> historyMap = new HashMap<>();
+
+    //运行日志信息
+    public static Map<String,String> logMap = new HashMap<>();
 
     //创建线程池
     ExecutorService executorService = Executors.newCachedThreadPool();
@@ -115,7 +123,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         }
         Pipeline pipeline = pipelineExecHistory.getPipeline();
         String historyId = pipelineExecHistory.getHistoryId();
-        commonService.updateState(historyId,map.get(pipelineId),20);
+        commonService.updateState(historyId,map.get(pipelineId),PIPELINE_RUN_HALT);
 
         //停止运行
         stop(pipelineId);
@@ -152,7 +160,6 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         //消息
         Map<String, String> maps = homeService.initMap(pipeline);
 
-        //执行流程任务
         boolean courseState = beginCourse(pipelineProcess, pipeline, historyId);
 
         //执行后置任务
@@ -171,18 +178,71 @@ public class PipelineExecServiceImpl implements PipelineExecService {
     //执行任务
     public boolean beginCourse(PipelineProcess pipelineProcess,Pipeline pipeline,String historyId){
         String pipelineId = pipeline.getPipelineId();
-        List<PipelineCourseConfig> allCourseConfig = courseConfigService.findAllCourseConfig(pipelineId);
-        if (allCourseConfig == null){
-            return true;
+        int pipelineType = pipeline.getPipelineType();
+        //多任务
+        if (pipelineType == 1 ){
+            List<PipelineCourseConfig> allCourseConfig = courseConfigService.findAllCourseConfig(pipelineId);
+            if (allCourseConfig == null){
+                return true;
+            }
+          return execCourse(allCourseConfig, pipelineProcess, historyId, pipeline);
         }
 
+        //多阶段
+        if (pipelineType == 2){
+            List<PipelineStages> allStagesConfig = stagesServer.findAllStagesConfig(pipelineId);
+            if (allStagesConfig == null || allStagesConfig.size() == 0){
+                return true;
+            }
+            for (PipelineStages pipelineStages : allStagesConfig) {
+                String stagesId = pipelineStages.getStagesId();
+                List<PipelineCourseConfig> allStagesCourseConfig = courseConfigService.findAllStagesCourseConfig(stagesId);
+                boolean b = execCourse(allStagesCourseConfig, pipelineProcess, historyId, pipeline);
+                if (!b){
+                    return false;
+                }
+            }
+
+        }
+
+        // for (PipelineCourseConfig pipelineCourseConfig : allCourseConfig) {
+        //
+        //     updateTime(pipelineId);
+        //
+        //     int taskType = pipelineCourseConfig.getTaskType();
+        //     int taskSort = pipelineCourseConfig.getTaskSort();
+        //     String stagesId = pipelineCourseConfig.getStagesId();
+        //     PipelineExecLog pipelineExecLog = commonService.initializeLog(historyId,taskSort,taskType);
+        //     pipelineExecLog.setStagesId(stagesId);
+        //     pipelineProcess.setPipeline(pipeline);
+        //     pipelineProcess.setPipelineExecLog(pipelineExecLog);
+        //     pipelineProcess.setEnCode("");
+        //
+        //     boolean b = taskExecService.beginCourseState(pipelineProcess, pipelineCourseConfig);
+        //
+        //     if (!b){
+        //         commonService.updateState(historyId,map.get(pipelineId),1);
+        //         return false;
+        //     }
+        //     commonService.updateState(historyId,map.get(pipelineId),10);
+        // }
+        return true;
+    }
+
+    //执行任务
+    private boolean execCourse(List<PipelineCourseConfig> allCourseConfig,
+                               PipelineProcess pipelineProcess,String historyId,Pipeline pipeline){
+        String pipelineId = pipeline.getPipelineId();
         for (PipelineCourseConfig pipelineCourseConfig : allCourseConfig) {
-
             updateTime(pipelineId);
-
             int taskType = pipelineCourseConfig.getTaskType();
             int taskSort = pipelineCourseConfig.getTaskSort();
+            String stagesId = pipelineCourseConfig.getStagesId();
             PipelineExecLog pipelineExecLog = commonService.initializeLog(historyId,taskSort,taskType);
+            pipelineExecLog.setStagesId(stagesId);
+
+            logMap.put(historyId,pipelineExecLog.getLogId());
+
             pipelineProcess.setPipeline(pipeline);
             pipelineProcess.setPipelineExecLog(pipelineExecLog);
             pipelineProcess.setEnCode("");
@@ -190,10 +250,10 @@ public class PipelineExecServiceImpl implements PipelineExecService {
             boolean b = taskExecService.beginCourseState(pipelineProcess, pipelineCourseConfig);
 
             if (!b){
-                commonService.updateState(historyId,map.get(pipelineId),1);
+                commonService.updateState(historyId,map.get(pipelineId),PIPELINE_RUN_ERROR);
                 return false;
             }
-            commonService.updateState(historyId,map.get(pipelineId),10);
+            commonService.updateState(historyId,map.get(pipelineId),PIPELINE_RUN_SUCCESS);
         }
         return true;
     }
@@ -219,8 +279,12 @@ public class PipelineExecServiceImpl implements PipelineExecService {
             }
 
             int taskType = pipelineAfterConfig.getTaskType();
+
             taskSort =taskSort + pipelineAfterConfig.getTaskSort();
             PipelineExecLog pipelineExecLog = commonService.initializeLog(historyId,taskSort,taskType);
+
+            logMap.put(historyId,pipelineExecLog.getLogId());
+
             pipelineProcess.setPipeline(pipeline);
             pipelineProcess.setPipelineExecLog(pipelineExecLog);
             commonService.execHistory(pipelineProcess, PipelineUntil.date(4)+"==================================================");
@@ -228,10 +292,10 @@ public class PipelineExecServiceImpl implements PipelineExecService {
             boolean b = taskExecService.beginAfterState(pipelineProcess, pipelineAfterConfig);
 
             if (!b){
-                commonService.updateState(historyId,map.get(pipelineId),1);
+                commonService.updateState(historyId,map.get(pipelineId),PIPELINE_RUN_ERROR);
                 return false;
             }
-            commonService.updateState(historyId,map.get(pipelineId),10);
+            commonService.updateState(historyId,map.get(pipelineId),PIPELINE_RUN_SUCCESS);
         }
         // commonService.execHistory(pipelineProcess, PipelineUntil.date(4)+"后置处理完成。");
         return true;

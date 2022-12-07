@@ -77,6 +77,17 @@ public class PipelineExecHistory {
     @ApiProperty(name="findState",desc="运行状态（1.运行完成，0.运行中）")
     private int findState;
 
+    //阶段
+    private int stages;
+
+    public int getStages() {
+        return stages;
+    }
+
+    public void setStages(int stages) {
+        this.stages = stages;
+    }
+
     //执行时间
     private List<Integer> timeList;
 

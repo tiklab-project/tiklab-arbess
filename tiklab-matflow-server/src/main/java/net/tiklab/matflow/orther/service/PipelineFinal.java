@@ -4,6 +4,12 @@ public class PipelineFinal {
 
     public static final String appName = "matflow";
 
+    public static final int PIPELINE_RUN_SUCCESS=10;
+
+    public static final int PIPELINE_RUN_ERROR=1;
+
+    public static final int PIPELINE_RUN_HALT=20;
+
     //消息类型
     public static final String MES_PIPELINE = "MES_PIPELINE"; //流水线
     public static final String MES_PIPELINE_RUN = "MES_PIPELINE_RUN"; //运行
