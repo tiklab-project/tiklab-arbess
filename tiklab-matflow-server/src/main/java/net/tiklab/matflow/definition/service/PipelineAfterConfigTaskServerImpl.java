@@ -33,7 +33,7 @@ public class PipelineAfterConfigTaskServerImpl implements PipelineAfterConfigTas
     private PipelineScriptServer scriptServer;
 
     /**
-     * 配置信息
+     * 更新后置任务配置信息
      * @param config 配置
      */
     @Override
@@ -61,7 +61,10 @@ public class PipelineAfterConfigTaskServerImpl implements PipelineAfterConfigTas
         }
     }
 
-    //消息
+    /**
+     * 创建后置任务
+     * @param config 配置信息
+     */
     private void createMessage(PipelineAfterConfig config){
         String object = JSON.toJSONString(config.getValues());
         PipelineMessage message = JSON.parseObject(object, PipelineMessage.class);
@@ -109,7 +112,7 @@ public class PipelineAfterConfigTaskServerImpl implements PipelineAfterConfigTas
     }
 
     /**
-     * 查询配置信息
+     * 查询任务信息
      * @param config 配置类型
      * @return 配置
      */
@@ -142,7 +145,7 @@ public class PipelineAfterConfigTaskServerImpl implements PipelineAfterConfigTas
     }
 
     /**
-     * 删除配置
+     * 删除任务
      * @param config 配置
      */
     public void deleteConfig(PipelineAfterConfig config){

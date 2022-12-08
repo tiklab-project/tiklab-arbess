@@ -38,13 +38,21 @@ public class PipelineConfigServerImpl implements PipelineConfigServer {
      */
     @Override
     public List<Object> findAllConfig(String pipelineId){
-
         List<Object> allCourseConfig = findAllTaskConfig(pipelineId);
         List<Object> allAfterConfig = afterConfigServer.findAllConfig(pipelineId);
         if (allAfterConfig == null || allAfterConfig.size() == 0){
             return allCourseConfig;
         }
-        allCourseConfig.addAll(allAfterConfig);
+        Pipeline onePipeline = pipelineService.findOnePipeline(pipelineId);
+        int pipelineType = onePipeline.getPipelineType();
+        if (pipelineType == 1){
+            allCourseConfig.addAll(allAfterConfig);
+            return allCourseConfig;
+        }
+        PipelineStages pipelineStages = new PipelineStages();
+        pipelineStages.setTaskValues(allAfterConfig);
+        pipelineStages.setTaskSort(allCourseConfig.size()+1);
+        allCourseConfig.add(pipelineStages);
         return allCourseConfig;
     }
 

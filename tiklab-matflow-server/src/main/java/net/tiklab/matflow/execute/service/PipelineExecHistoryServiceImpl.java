@@ -162,11 +162,13 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
         int pipelineType = pipeline.getPipelineType();
         List<Object> list = new ArrayList<>();
 
+        //多任务
         if (pipelineType == 1){
             List<PipelineExecLog> allLog = pipelineExecLogService.findAllLog(historyId);
             list.addAll(allLog);
         }
 
+        //多阶段
         if (pipelineType == 2){
             List<PipelineStagesLog> logs = new ArrayList<>();
             List<PipelineStages> allStagesConfig = stagesServer.findAllStagesConfig(pipelineId);
@@ -178,13 +180,14 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
                 if (allStagesLog == null || allStagesLog.size() == 0){
                     continue;
                 }
+                allStagesLog.sort(Comparator.comparing(PipelineExecLog::getTaskSort));
                 pipelineStagesLog.setStages(pipelineStages.getTaskStage());
                 pipelineStagesLog.setLogList(allStagesLog);
                 pipelineStagesLog.setTaskSort(pipelineStages.getTaskSort());
                 logs.add(pipelineStagesLog);
             }
 
-            //消息
+            //添加消息阶段
             PipelineStagesLog pipelineStages = new PipelineStagesLog();
             List<PipelineExecLog> allLog = pipelineExecLogService.findAllLog(historyId);
             allLog.removeIf(pipelineExecLog -> PipelineUntil.isNoNull(pipelineExecLog.getStagesId()));
@@ -194,6 +197,7 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
             list.addAll(logs);
             list.add(pipelineStages);
         }
+
         return list;
     }
 

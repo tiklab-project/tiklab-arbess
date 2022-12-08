@@ -150,8 +150,10 @@ public class PipelineExecCommonServiceImpl implements PipelineExecCommonService 
             pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+"\n"+ PipelineUntil.date(4)+ "RUN RESULT : HALT");
             pipelineExecHistory.setRunStatus(20);
         }
+        PipelineExecHistory oneHistory = historyService.findOneHistory(pipelineExecHistory.getHistoryId());
         //更新状态
         pipelineExecHistory.setFindState(1);
+        pipelineExecHistory.setRunTime(oneHistory.getRunTime()+1);
         historyService.updateHistory(pipelineExecHistory);
         historyMap.put(pipelineId,pipelineExecHistory);
     }
@@ -164,11 +166,11 @@ public class PipelineExecCommonServiceImpl implements PipelineExecCommonService 
      */
     public void updateState(String historyId,List<Integer> time,int state){
         PipelineExecHistory pipelineExecHistory = historyService.findOneHistory(historyId);
-        int times = 0;
 
         String logId = logMap.get(historyId).get(logMap.get(historyId).size()-1);
         PipelineExecLog pipelineExecLog = logService.findOneLog(logId);
 
+        int times = 0;
         List<String> list = logMap.get(historyId);
         if (list != null){
             for (String s : list) {
@@ -176,10 +178,17 @@ public class PipelineExecCommonServiceImpl implements PipelineExecCommonService 
                 times = times +integer;
             }
         }
-        pipelineExecLog.setRunTime(runTime.get(logId));
+        Integer integer = runTime.get(logId);
+        if (integer == 0){
+            integer = integer+1;
+        }
+        pipelineExecLog.setRunTime(integer);
         pipelineExecLog.setRunState(state);
         logService.updateLog(pipelineExecLog);
-        pipelineExecHistory.setRunTime(times+1);
+        if (times == 0){
+            return;
+        }
+        pipelineExecHistory.setRunTime(times);
         historyService.updateHistory(pipelineExecHistory);
     }
 

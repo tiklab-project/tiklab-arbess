@@ -1,23 +1,24 @@
 package net.tiklab.matflow.execute.model;
 
 import java.util.List;
-import java.util.Map;
 
 public class PipelineRun {
 
     private String historyId;
 
+    private String createTime;
+
+    private String execUser;
+
     private int runTime;
+
+    private int stagesTime;
 
     private String runLog;
 
-    private int stagesLength;
-
     private int runWay;
 
-    private List<Integer> timeList;
-
-    private Map<Integer, List<Integer>> stagesTimes;
+    private List<String> timeList;
 
     public String getHistoryId() {
         return historyId;
@@ -43,14 +44,6 @@ public class PipelineRun {
         this.runLog = runLog;
     }
 
-    public int getStagesLength() {
-        return stagesLength;
-    }
-
-    public void setStagesLength(int stagesLength) {
-        this.stagesLength = stagesLength;
-    }
-
     public int getRunWay() {
         return runWay;
     }
@@ -59,19 +52,35 @@ public class PipelineRun {
         this.runWay = runWay;
     }
 
-    public Map<Integer, List<Integer>> getStagesTimes() {
-        return stagesTimes;
+    public int getStagesTime() {
+        return stagesTime;
     }
 
-    public void setStagesTimes(Map<Integer, List<Integer>> stagesTimes) {
-        this.stagesTimes = stagesTimes;
+    public void setStagesTime(int stagesTime) {
+        this.stagesTime = stagesTime;
     }
 
-    public List<Integer> getTimeList() {
+    public List<String> getTimeList() {
         return timeList;
     }
 
-    public void setTimeList(List<Integer> timeList) {
+    public void setTimeList(List<String> timeList) {
         this.timeList = timeList;
+    }
+
+    public String getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(String createTime) {
+        this.createTime = createTime;
+    }
+
+    public String getExecUser() {
+        return execUser;
+    }
+
+    public void setExecUser(String execUser) {
+        this.execUser = execUser;
     }
 }

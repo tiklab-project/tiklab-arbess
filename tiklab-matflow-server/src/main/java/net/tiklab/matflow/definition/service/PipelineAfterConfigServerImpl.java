@@ -22,7 +22,11 @@ public class PipelineAfterConfigServerImpl implements PipelineAfterConfigServer 
     @Autowired
     PipelineAfterConfigTaskServer afterConfigTaskServer;
 
-    //创建
+    /**
+     * 创建后置配置及任务
+     * @param pipelineAfterConfig message信息
+     * @return 配置id
+     */
     @Override
     public String createAfterConfig(PipelineAfterConfig pipelineAfterConfig) {
         Pipeline pipeline = pipelineAfterConfig.getPipeline();
@@ -56,26 +60,15 @@ public class PipelineAfterConfigServerImpl implements PipelineAfterConfigServer 
         return list;
     }
 
-    //删除
+    /**
+     * 删除配置及任务
+     * @param afterConfigId messageId
+     */
     @Override
     public void deleteAfterConfig(String afterConfigId) {
         PipelineAfterConfig oneAfterConfig = findOneAfterConfig(afterConfigId);
         afterConfigTaskServer.deleteConfig(oneAfterConfig);
         pipelineAfterConfigDao.deleteAfterConfig(afterConfigId);
-    }
-
-    //更新
-    @Override
-    public void updateAfterConfig(PipelineAfterConfig pipelineAfterConfig) {
-        afterConfigTaskServer.updateConfig(pipelineAfterConfig);
-    }
-
-    //查询单个
-    @Override
-    public PipelineAfterConfig findOneAfterConfig(String afterConfigId) {
-        PipelineAfterConfigEntity afterConfigEntity = pipelineAfterConfigDao.findOneAfterConfig(afterConfigId);
-        return BeanMapper.map(afterConfigEntity,PipelineAfterConfig.class);
-
     }
 
     /**
@@ -98,6 +91,20 @@ public class PipelineAfterConfigServerImpl implements PipelineAfterConfigServer 
             list.add(pipelineAfterConfig);
         }
         return list;
+    }
+
+    //更新
+    @Override
+    public void updateAfterConfig(PipelineAfterConfig pipelineAfterConfig) {
+        afterConfigTaskServer.updateConfig(pipelineAfterConfig);
+    }
+
+    //查询单个
+    @Override
+    public PipelineAfterConfig findOneAfterConfig(String afterConfigId) {
+        PipelineAfterConfigEntity afterConfigEntity = pipelineAfterConfigDao.findOneAfterConfig(afterConfigId);
+        return BeanMapper.map(afterConfigEntity,PipelineAfterConfig.class);
+
     }
 
     //查询所有
