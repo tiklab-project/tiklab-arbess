@@ -35,7 +35,8 @@ create table pip_pipeline_stages  (
     pipeline_id varchar(255) COMMENT '流水线id',
     task_sort int COMMENT '阶段顺序',
     task_stage int COMMENT '阶段几',
-    code varchar(255) COMMENT '阶段几',
+    main_stage varchar(255) COMMENT '主阶段',
+    code varchar(255) COMMENT '是否为源码',
     PRIMARY KEY (stages_id) USING BTREE
 );
 

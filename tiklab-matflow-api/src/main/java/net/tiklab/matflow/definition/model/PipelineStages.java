@@ -25,7 +25,6 @@ public class PipelineStages {
     @ApiProperty(name = "createTime",desc="创建时间")
     private String createTime;
 
-    //流水线
     @ApiProperty(name="pipeline",desc="流水线id",eg="@selectOne")
     @Mappings({
             @Mapping(source = "pipeline.id",target = "pipelineId")
@@ -42,15 +41,17 @@ public class PipelineStages {
     @ApiProperty(name = "taskStage",desc="阶段")
     private int taskStage;
 
-    //是否是源码
-    @ApiProperty(name = "code",desc="阶段")
-    private boolean code;
+    @ApiProperty(name = "mainStage",desc="主阶段")
+    private boolean mainStage;
 
-    //更改的数据
-    private Object values;
+    @ApiProperty(name = "code",desc="是否是源码")
+    private boolean code;
 
     //阶段任务
     private List<Object> taskValues;
+
+    //阶段
+    private List<PipelineStages> stagesList;
 
     public PipelineStages() {
     }
@@ -63,10 +64,9 @@ public class PipelineStages {
         this.code = code;
     }
 
-    public PipelineStages(String createTime, String pipelineId, int taskSort) {
+    public PipelineStages(String createTime, String pipelineId) {
         this.createTime = createTime;
         this.pipeline = new Pipeline(pipelineId);
-        this.taskSort = taskSort;
     }
 
     public String getStagesId() {
@@ -125,19 +125,27 @@ public class PipelineStages {
         this.taskStage = taskStage;
     }
 
-    public Object getValues() {
-        return values;
-    }
-
-    public void setValues(Object values) {
-        this.values = values;
-    }
-
     public List<Object> getTaskValues() {
         return taskValues;
     }
 
     public void setTaskValues(List<Object> taskValues) {
         this.taskValues = taskValues;
+    }
+
+    public boolean isMainStage() {
+        return mainStage;
+    }
+
+    public void setMainStage(boolean mainStage) {
+        this.mainStage = mainStage;
+    }
+
+    public List<PipelineStages> getStagesList() {
+        return stagesList;
+    }
+
+    public void setStagesList(List<PipelineStages> stagesList) {
+        this.stagesList = stagesList;
     }
 }

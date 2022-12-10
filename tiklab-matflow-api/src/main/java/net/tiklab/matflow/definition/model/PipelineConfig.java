@@ -20,15 +20,14 @@ public class PipelineConfig {
     //配置类型
     private int taskType;
 
-    //配置值
-    private Object values;
-
     //阶段
     private int stages;
 
     //阶段id
     private String stagesId;
 
+    //配置值
+    private Object values;
 
     @ApiProperty(name="pipeline",desc="流水线id",eg="@selectOne")
     @Mappings({

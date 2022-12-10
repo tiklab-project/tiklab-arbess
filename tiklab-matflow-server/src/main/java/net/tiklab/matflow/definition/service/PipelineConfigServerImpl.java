@@ -76,7 +76,7 @@ public class PipelineConfigServerImpl implements PipelineConfigServer {
             return tasksService.findAllTasksTask(pipelineId);
         }
         if (type == 2){
-            List<PipelineStages> allStagesConfig = stagesServer.findAllStagesTasks(pipelineId);
+            List<PipelineStages> allStagesConfig = stagesServer.findAllStagesStageTask(pipelineId);
             if (allStagesConfig == null || allStagesConfig.size() ==0){
                 return null;
             }

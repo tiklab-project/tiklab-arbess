@@ -256,6 +256,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
                 stop(pipelineId);
                 return 1;
             }
+            return 2;
         }else {
             if (state == 2){
                 pipeline.setState(1);
@@ -396,6 +397,8 @@ public class PipelineExecServiceImpl implements PipelineExecService {
             return true;
         }
 
+        commonService.updateExecHistory(pipelineId,PipelineUntil.date(4)+"开始执行后置任务。");
+
         for (PipelinePost pipelinePost : allAfterConfig) {
 
             int taskSort = 0;
@@ -418,8 +421,6 @@ public class PipelineExecServiceImpl implements PipelineExecService {
             pipelineProcess.setPipeline(pipeline);
             pipelineProcess.setPipelineExecLog(pipelineExecLog);
 
-            commonService.execHistory(pipelineProcess, PipelineUntil.date(4)+"执行后置处理");
-
             boolean b = taskExecService.beginAfterState(pipelineProcess, pipelinePost);
             stop(logId);
             if (!b){
@@ -428,7 +429,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
             }
             commonService.updateState(historyId,null,PIPELINE_RUN_SUCCESS);
         }
-        // commonService.execHistory(pipelineProcess, PipelineUntil.date(4)+"后置处理完成。");
+        commonService.updateExecHistory(pipelineId,PipelineUntil.date(4)+"后置任务执行完成。");
         return true;
     }
 

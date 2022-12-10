@@ -179,7 +179,6 @@ public class PipelineExecHistory {
         this.findNumber = findNumber;
     }
 
-
     public int getFindState() {
         return findState;
     }

@@ -122,7 +122,7 @@ public class CodeServiceImpl implements CodeService {
             commonService.execHistory(pipelineProcess,log+ e);
             return false;
         }
-        commonService.execHistory(pipelineProcess,log+"代码克隆成功\n");
+        commonService.execHistory(pipelineProcess,log+"代码克隆成功");
         return true;
     }
 

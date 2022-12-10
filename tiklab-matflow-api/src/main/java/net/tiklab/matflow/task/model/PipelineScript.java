@@ -16,7 +16,7 @@ public class PipelineScript {
     @ApiProperty(name = "name",desc = "名称")
     private String name;
 
-    @ApiProperty(name = "type",desc = "类型")
+    @ApiProperty(name = "type",desc = "类型 71:bat脚本 72:shell脚本")
     private int type;
 
     @ApiProperty(name = "scriptOrder",desc = "命令")

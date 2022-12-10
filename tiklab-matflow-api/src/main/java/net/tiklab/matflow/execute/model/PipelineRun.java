@@ -2,6 +2,9 @@ package net.tiklab.matflow.execute.model;
 
 import java.util.List;
 
+/**
+ * 流水线运行信息
+ */
 public class PipelineRun {
 
     private String historyId;

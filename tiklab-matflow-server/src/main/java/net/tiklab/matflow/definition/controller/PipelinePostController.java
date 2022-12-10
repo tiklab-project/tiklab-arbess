@@ -27,18 +27,18 @@ public class PipelinePostController {
     //更新信息
     @RequestMapping(path="/createPost",method = RequestMethod.POST)
     @ApiMethod(name = "createPost",desc = "创建后置配置")
-    @ApiParam(name = "pipelineConfig",desc = "pipelineConfig",required = true)
-    public Result<String> createPost(@RequestBody @NotNull @Valid PipelinePost pipelineConfig){
-        String post = postServer.createPostTask(pipelineConfig);
-        return Result.ok(post);
+    @ApiParam(name = "post",desc = "post",required = true)
+    public Result<String> createPost(@RequestBody @NotNull @Valid PipelinePost post){
+        String postId = postServer.createPostTask(post);
+        return Result.ok(postId);
     }
 
 
     @RequestMapping(path="/updatePost",method = RequestMethod.POST)
     @ApiMethod(name = "updatePost",desc = "更新后置配置")
-    @ApiParam(name = "pipelineConfig",desc = "pipelineConfig",required = true)
-    public Result<Void> updatePost(@RequestBody @NotNull @Valid PipelinePost pipelineConfig){
-         postServer.updatePostTask(pipelineConfig);
+    @ApiParam(name = "post",desc = "post",required = true)
+    public Result<Void> updatePost(@RequestBody @NotNull @Valid PipelinePost post){
+         postServer.updatePostTask(post);
         return Result.ok();
     }
 

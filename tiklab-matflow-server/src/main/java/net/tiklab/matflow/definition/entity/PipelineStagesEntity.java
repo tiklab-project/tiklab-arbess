@@ -34,6 +34,9 @@ public class PipelineStagesEntity {
     @Column(name = "task_stage",notNull = true)
     private int taskStage;
 
+    @Column(name = "main_stage",notNull = true)
+    private String mainStage;
+
     @Column(name = "code",notNull = true)
     private String code;
 
@@ -91,5 +94,13 @@ public class PipelineStagesEntity {
 
     public void setCode(String code) {
         this.code = code;
+    }
+
+    public String getMainStage() {
+        return mainStage;
+    }
+
+    public void setMainStage(String mainStage) {
+        this.mainStage = mainStage;
     }
 }

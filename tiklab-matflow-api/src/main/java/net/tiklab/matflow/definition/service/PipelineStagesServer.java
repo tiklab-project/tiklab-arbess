@@ -21,6 +21,14 @@ public interface PipelineStagesServer {
      */
     String createStagesTask(PipelineConfig config);
 
+
+    /**
+     * 查询所有阶段任务
+     * @param pipelineId 流水线id
+     * @return 任务
+     */
+    List<PipelineStages> findAllStagesStageTask(String pipelineId);
+
     /**
      * 查询流水线所有阶段
      * @param pipelineId 流水线id
