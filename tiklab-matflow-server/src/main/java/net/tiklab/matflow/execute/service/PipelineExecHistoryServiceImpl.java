@@ -14,7 +14,7 @@ import net.tiklab.matflow.execute.model.PipelineExecHistory;
 import net.tiklab.matflow.execute.model.PipelineExecLog;
 import net.tiklab.matflow.execute.model.PipelineHistoryQuery;
 import net.tiklab.matflow.execute.model.PipelineStagesLog;
-import net.tiklab.matflow.orther.service.PipelineUntil;
+import net.tiklab.matflow.orther.until.PipelineUntil;
 import net.tiklab.rpc.annotation.Exporter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,7 +61,7 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
             if (pipeline == null){
                 deleteHistory(history.getHistoryId());
             }
-            if (history.getPipeline().getPipelineId().equals(pipelineId)){
+            if (history.getPipeline().getId().equals(pipelineId)){
                 deleteHistory(history.getHistoryId());
             }
         }
@@ -157,9 +157,9 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
         PipelineExecHistory history = findOneHistory(historyId);
 
         Pipeline pipeline = history.getPipeline();
-        String pipelineId = pipeline.getPipelineId();
+        String pipelineId = pipeline.getId();
 
-        int pipelineType = pipeline.getPipelineType();
+        int pipelineType = pipeline.getType();
         List<Object> list = new ArrayList<>();
 
         //多任务
@@ -171,7 +171,7 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
         //多阶段
         if (pipelineType == 2){
             List<PipelineStagesLog> logs = new ArrayList<>();
-            List<PipelineStages> allStagesConfig = stagesServer.findAllStagesConfig(pipelineId);
+            List<PipelineStages> allStagesConfig = stagesServer.findAllStage(pipelineId);
 
             for (PipelineStages pipelineStages : allStagesConfig) {
                 String stagesId = pipelineStages.getStagesId();
@@ -188,9 +188,14 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
             }
 
             //添加消息阶段
-            PipelineStagesLog pipelineStages = new PipelineStagesLog();
+
             List<PipelineExecLog> allLog = pipelineExecLogService.findAllLog(historyId);
             allLog.removeIf(pipelineExecLog -> PipelineUntil.isNoNull(pipelineExecLog.getStagesId()));
+            if ( allLog.size() == 0){
+                list.addAll(logs);
+                return list;
+            }
+            PipelineStagesLog pipelineStages = new PipelineStagesLog();
             pipelineStages.setStages(allStagesConfig.size()+1);
             pipelineStages.setLogList(allLog);
 

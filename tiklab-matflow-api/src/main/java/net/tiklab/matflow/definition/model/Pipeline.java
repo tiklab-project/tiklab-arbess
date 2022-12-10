@@ -19,15 +19,14 @@ import java.util.List;
 public class Pipeline {
 
     //流水线id
-    @ApiProperty(name="pipelineId",desc="流水线id")
-    private String pipelineId;
+    @ApiProperty(name="id",desc="流水线id")
+    private String id;
 
     //流水线名称
-    @ApiProperty(name="pipelineName",desc="流水线名称")
-    private String pipelineName;
+    @ApiProperty(name="name",desc="流水线名称")
+    private String name;
 
     //流水线创建人
-    @ApiProperty(name="user",desc="认证配置",required = true)
     @Mappings({
             @Mapping(source = "user.id",target = "userId")
     })
@@ -35,55 +34,53 @@ public class Pipeline {
     private User user;
 
     //流水线创建时间
-    @ApiProperty(name="pipelineCreateTime",desc="流水线创建时间",required = true)
-    private String pipelineCreateTime;
+    @ApiProperty(name="createTime",desc="流水线创建时间")
+    private String createTime;
 
     //流水线类型
-    @ApiProperty(name="pipelineType",desc="流水线类型",required = true)
-    private int pipelineType;
-
-    //收藏状态
-    private int pipelineCollect;
+    @ApiProperty(name="type",desc="流水线类型")
+    private int type;
 
     //运行状态
-    @ApiProperty(name="pipelineCollect",desc="运行状态 1.运行中 2.停止中",required = true)
-    private int pipelineState;
+    @ApiProperty(name="state",desc="运行状态 1.运行中 2.停止中")
+    private int state;
 
-    @ApiProperty(name="pipelinePower",desc="项目作用域",required = true)
-    private int pipelinePower;
+    @ApiProperty(name="power",desc="项目作用域")
+    private int power;
 
-    @ApiProperty(name="color",desc="颜色",required = true)
+    @ApiProperty(name="color",desc="颜色")
     private int color;
 
     //流水线模板
-    private String pipelineTemplate;
+    private String template;
+
+    //收藏状态
+    private int collect;
 
     //添加用户
-    @ApiProperty(name="userList",desc="权限",required = true)
     private List<PatchUser> userList;
-
-
-    public Pipeline(String pipelineId) {
-        this.pipelineId = pipelineId;
-    }
 
     public Pipeline() {
     }
 
-    public String getPipelineId() {
-        return pipelineId;
+    public Pipeline(String id) {
+        this.id = id;
     }
 
-    public void setPipelineId(String pipelineId) {
-        this.pipelineId = pipelineId;
+    public String getId() {
+        return id;
     }
 
-    public String getPipelineName() {
-        return pipelineName;
+    public void setId(String id) {
+        this.id = id;
     }
 
-    public void setPipelineName(String pipelineName) {
-        this.pipelineName = pipelineName;
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public User getUser() {
@@ -94,44 +91,44 @@ public class Pipeline {
         this.user = user;
     }
 
-    public String getPipelineCreateTime() {
-        return pipelineCreateTime;
+    public String getCreateTime() {
+        return createTime;
     }
 
-    public void setPipelineCreateTime(String pipelineCreateTime) {
-        this.pipelineCreateTime = pipelineCreateTime;
+    public void setCreateTime(String createTime) {
+        this.createTime = createTime;
     }
 
-    public int getPipelineType() {
-        return pipelineType;
+    public int getType() {
+        return type;
     }
 
-    public void setPipelineType(int pipelineType) {
-        this.pipelineType = pipelineType;
+    public void setType(int type) {
+        this.type = type;
     }
 
-    public int getPipelineCollect() {
-        return pipelineCollect;
+    public int getCollect() {
+        return collect;
     }
 
-    public void setPipelineCollect(int pipelineCollect) {
-        this.pipelineCollect = pipelineCollect;
+    public void setCollect(int collect) {
+        this.collect = collect;
     }
 
-    public int getPipelineState() {
-        return pipelineState;
+    public int getState() {
+        return state;
     }
 
-    public void setPipelineState(int pipelineState) {
-        this.pipelineState = pipelineState;
+    public void setState(int state) {
+        this.state = state;
     }
 
-    public int getPipelinePower() {
-        return pipelinePower;
+    public int getPower() {
+        return power;
     }
 
-    public void setPipelinePower(int pipelinePower) {
-        this.pipelinePower = pipelinePower;
+    public void setPower(int power) {
+        this.power = power;
     }
 
     public int getColor() {
@@ -142,19 +139,19 @@ public class Pipeline {
         this.color = color;
     }
 
+    public String getTemplate() {
+        return template;
+    }
+
+    public void setTemplate(String template) {
+        this.template = template;
+    }
+
     public List<PatchUser> getUserList() {
         return userList;
     }
 
     public void setUserList(List<PatchUser> userList) {
         this.userList = userList;
-    }
-
-    public String getPipelineTemplate() {
-        return pipelineTemplate;
-    }
-
-    public void setPipelineTemplate(String pipelineTemplate) {
-        this.pipelineTemplate = pipelineTemplate;
     }
 }

@@ -4,7 +4,9 @@ import net.tiklab.join.annotation.FindAll;
 import net.tiklab.join.annotation.FindList;
 import net.tiklab.join.annotation.FindOne;
 import net.tiklab.join.annotation.JoinProvider;
+import net.tiklab.matflow.definition.model.PipelineConfig;
 import net.tiklab.matflow.definition.model.PipelineStages;
+import net.tiklab.matflow.definition.model.PipelineStagesTask;
 
 import java.util.List;
 
@@ -13,31 +15,59 @@ public interface PipelineStagesServer {
 
 
     /**
-     * 创建阶段及配置信息
-     * @param stages 阶段信息
+     * 创建阶段及关联任务
+     * @param config 阶段信息
      * @return 阶段id
      */
-    String createStagesConfig(PipelineStages stages);
+    String createStagesTask(PipelineConfig config);
 
     /**
-     * 创建阶段模板
+     * 查询流水线所有阶段
      * @param pipelineId 流水线id
-     * @param template 模板
+     * @return 阶段集合
      */
-    void createTemplate(String pipelineId,String template);
+    List<PipelineStages> findAllStage(String pipelineId);
 
     /**
-     * 根据流水线id查询配置
+     * 根据流水线id查询所有阶段及任务
      * @param pipelineId 流水线id
      * @return 配置
      */
-    List<PipelineStages> findAllStagesConfig(String pipelineId);
+    List<PipelineStages> findAllStagesTasks(String pipelineId);
 
     /**
      * 删除阶段任务
      * @param configId 配置id
      */
-    void deleteStagesConfig(String configId);
+    void deleteStagesTask(String configId);
+
+    /**
+     * 更新配置及任务
+     * @param config 配置id
+     */
+    void updateStagesTask(PipelineConfig config);
+
+    /**
+     *  删除流水线所有阶段
+     * @param pipelineId 流水线id
+     */
+    void  deleteAllStagesTask(String pipelineId);
+
+    /**
+     * 根据阶段id查询所有任务配置
+     * @param stagesId 阶段id
+     * @return 任务配置
+     */
+    List<PipelineStagesTask> findAllStagesTask(String stagesId);
+
+
+    /**
+     * 效验配置必填字段
+     * @param pipelineId 流水线id
+     * @return 配置id集合
+     */
+    List<String> validAllConfig(String pipelineId);
+
 
     /**
      * 创建阶段

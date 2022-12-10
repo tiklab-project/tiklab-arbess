@@ -22,7 +22,6 @@ public class PipelineExecLogDao {
      */
     public String createLog(PipelineExecLogEntity pipelineExecLogEntity){
         return jpaTemplate.save(pipelineExecLogEntity, String.class);
-
     }
 
     /**
@@ -66,8 +65,8 @@ public class PipelineExecLogDao {
      * @param historyId 历史id
      */
     public void deleteAllLog(String historyId){
-        String sql = "delete from pipeline_log ";
-        sql = sql.concat(" where pipeline_log.history_id = '"+historyId +"'");
+        String sql = "delete from  pip_pipeline_history_log ";
+        sql = sql.concat(" where  pip_pipeline_history_log.history_id = '"+historyId +"'");
         JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
         jdbcTemplate.execute(sql);
     }
@@ -78,8 +77,8 @@ public class PipelineExecLogDao {
      * @return 历史信息
      */
     public List<PipelineExecLogEntity> findAllLog(String historyId){
-        String sql = "select pipeline_log.* from pipeline_log ";
-        sql = sql.concat(" where pipeline_log.history_id = '"+historyId +"'");
+        String sql = "select  pip_pipeline_history_log.* from  pip_pipeline_history_log ";
+        sql = sql.concat(" where  pip_pipeline_history_log.history_id = '"+historyId +"'");
         JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
         return jdbcTemplate.query(sql,new BeanPropertyRowMapper(PipelineExecLogEntity.class));
     }
@@ -90,9 +89,9 @@ public class PipelineExecLogDao {
      * @return 历史信息
      */
     public List<PipelineExecLogEntity> findAllStagesLog(String historyId,String stagsId){
-        String sql = "select pipeline_log.* from pipeline_log ";
-        sql = sql.concat(" where pipeline_log.stages_id = '"+stagsId +"'"
-                + "and pipeline_log.history_id = '" + historyId +"'" );
+        String sql = "select  pip_pipeline_history_log.* from  pip_pipeline_history_log ";
+        sql = sql.concat(" where  pip_pipeline_history_log.stages_id = '"+stagsId +"'"
+                + "and  pip_pipeline_history_log.history_id = '" + historyId +"'" );
         JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
         return jdbcTemplate.query(sql,new BeanPropertyRowMapper(PipelineExecLogEntity.class));
     }

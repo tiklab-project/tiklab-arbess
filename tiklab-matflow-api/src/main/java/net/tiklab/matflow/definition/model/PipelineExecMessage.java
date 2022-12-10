@@ -3,7 +3,6 @@ package net.tiklab.matflow.definition.model;
 
 import net.tiklab.join.annotation.Join;
 import net.tiklab.postin.annotation.ApiModel;
-import net.tiklab.postin.annotation.ApiProperty;
 import net.tiklab.user.user.model.User;
 
 /**
@@ -14,50 +13,57 @@ import net.tiklab.user.user.model.User;
 @Join
 public class PipelineExecMessage {
 
-    @ApiProperty(name="pipelineId",desc="流水线id")
-    private String pipelineId;
+    private String id;
 
-    @ApiProperty(name="pipelineCollect",desc="收藏状态",required = true)
-    private int pipelineCollect;
+    //收藏状态
+    private int collect;
 
-    @ApiProperty(name="logCreateTime",desc="最近构建状态")
+    //最近构建状态
     private int buildStatus;
 
-    @ApiProperty(name="pipelineName",desc="流水线名称")
-    private String pipelineName;
+    //流水线名称
+    private String name;
 
-    @ApiProperty(name="listBuildTime",desc="最近成功时间")
+    //最近成功时间
     private String lastBuildTime;
 
-    @ApiProperty(name="listSuccessStatus",desc="最近构建时间")
+    //最近构建时间
     private String lastSuccessTime;
 
-    @ApiProperty(name="pipelineCollect",desc="运行状态")
-    private int pipelineState;
+    //运行状态
+    private int state;
 
-    @ApiProperty(name="createTime",desc="创建时间")
+    //创建时间
     private String createTime;
 
-    @ApiProperty(name="color",desc="颜色")
+    //颜色
     private int color;
 
     //流水线类型(1.单任务 2.多任务)
-    private int pipelineType;
+    private int type;
 
     //权限(1.全局 2.私有)
-    private int pipelinePower;
+    private int power;
 
     //用户(负责人)
     private User user;
     //用户(执行人)
     private User execUser;
 
-    public String getPipelineId() {
-        return pipelineId;
+    public String getId() {
+        return id;
     }
 
-    public void setPipelineId(String pipelineId) {
-        this.pipelineId = pipelineId;
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public int getCollect() {
+        return collect;
+    }
+
+    public void setCollect(int collect) {
+        this.collect = collect;
     }
 
     public int getBuildStatus() {
@@ -68,12 +74,12 @@ public class PipelineExecMessage {
         this.buildStatus = buildStatus;
     }
 
-    public String getPipelineName() {
-        return pipelineName;
+    public String getName() {
+        return name;
     }
 
-    public void setPipelineName(String pipelineName) {
-        this.pipelineName = pipelineName;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getLastBuildTime() {
@@ -92,20 +98,12 @@ public class PipelineExecMessage {
         this.lastSuccessTime = lastSuccessTime;
     }
 
-    public int getPipelineCollect() {
-        return pipelineCollect;
+    public int getState() {
+        return state;
     }
 
-    public void setPipelineCollect(int pipelineCollect) {
-        this.pipelineCollect = pipelineCollect;
-    }
-
-    public int getPipelineState() {
-        return pipelineState;
-    }
-
-    public void setPipelineState(int pipelineState) {
-        this.pipelineState = pipelineState;
+    public void setState(int state) {
+        this.state = state;
     }
 
     public String getCreateTime() {
@@ -124,12 +122,20 @@ public class PipelineExecMessage {
         this.color = color;
     }
 
-    public User getExecUser() {
-        return execUser;
+    public int getType() {
+        return type;
     }
 
-    public void setExecUser(User execUser) {
-        this.execUser = execUser;
+    public void setType(int type) {
+        this.type = type;
+    }
+
+    public int getPower() {
+        return power;
+    }
+
+    public void setPower(int power) {
+        this.power = power;
     }
 
     public User getUser() {
@@ -140,19 +146,11 @@ public class PipelineExecMessage {
         this.user = user;
     }
 
-    public int getPipelinePower() {
-        return pipelinePower;
+    public User getExecUser() {
+        return execUser;
     }
 
-    public void setPipelinePower(int pipelinePower) {
-        this.pipelinePower = pipelinePower;
-    }
-
-    public int getPipelineType() {
-        return pipelineType;
-    }
-
-    public void setPipelineType(int pipelineType) {
-        this.pipelineType = pipelineType;
+    public void setExecUser(User execUser) {
+        this.execUser = execUser;
     }
 }

@@ -28,7 +28,7 @@ public class PipelineFollowServiceImpl implements PipelineFollowService {
     @Override
     public void updateFollow(PipelineFollow pipelineFollow) {
         Pipeline pipeline = pipelineFollow.getPipeline();
-        String pipelineId = pipeline.getPipelineId();
+        String pipelineId = pipeline.getId();
         String userId = pipelineFollow.getUserId();
         List<PipelineFollow> list = pipelineFollowDao.updateFollow(userId, pipelineId);
         if (list.size() == 0){
@@ -50,7 +50,7 @@ public class PipelineFollowServiceImpl implements PipelineFollowService {
     public  List<Pipeline> findAllFollow(String userId, StringBuilder s){
         List<PipelineEntity> pipelineFollow = pipelineFollowDao.findPipelineFollow(userId,s);
         List<Pipeline> list = BeanMapper.mapList(pipelineFollow, Pipeline.class);
-        list.forEach(pipeline -> pipeline.setPipelineCollect(1));
+        list.forEach(pipeline -> pipeline.setCollect(1));
         return list;
     }
 

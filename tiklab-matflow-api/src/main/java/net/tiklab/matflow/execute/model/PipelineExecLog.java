@@ -24,8 +24,8 @@ public class PipelineExecLog {
     private String historyId;
 
     //运行类型
-    @ApiProperty(name = "type",desc = "运行类型")
-    private int type ;
+    @ApiProperty(name = "taskType",desc = "运行类型")
+    private int taskType ;
 
     //执行顺序
     @ApiProperty(name = "taskSort",desc = "执行顺序")
@@ -76,12 +76,12 @@ public class PipelineExecLog {
         this.historyId = historyId;
     }
 
-    public int getType() {
-        return type;
+    public int getTaskType() {
+        return taskType;
     }
 
-    public void setType(int type) {
-        this.type = type;
+    public void setTaskType(int taskType) {
+        this.taskType = taskType;
     }
 
     public int getTaskSort() {

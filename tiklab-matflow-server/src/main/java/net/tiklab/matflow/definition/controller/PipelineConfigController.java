@@ -44,7 +44,7 @@ public class PipelineConfigController {
     @RequestMapping(path="/createTaskConfig",method = RequestMethod.POST)
     @ApiMethod(name = "findAllTaskConfig",desc = "创建流水线配置")
     @ApiParam(name = "config",desc = "配置",required = true)
-    public Result<String> findAllTaskConfig(@RequestBody @Valid @NotNull PipelineConfig config){
+    public Result<String> createTaskConfig(@RequestBody @Valid @NotNull PipelineConfig config){
        String configId = configServer.createTaskConfig(config);
         return Result.ok(configId);
     }
@@ -63,6 +63,15 @@ public class PipelineConfigController {
     public Result<Void> deleteTaskConfig(@RequestBody @Valid @NotNull PipelineConfig config){
         configServer.deleteTaskConfig(config);
         return Result.ok();
+    }
+
+
+    @RequestMapping(path="/validAllConfig",method = RequestMethod.POST)
+    @ApiMethod(name = "validAllConfig",desc = "更新流水线配置")
+    @ApiParam(name = "pipelineId",desc = "流水线id",required = true)
+    public Result<List<String>> validAllConfig(@NotNull String pipelineId){
+        List<String> list = configServer.validAllConfig(pipelineId);
+        return Result.ok(list);
     }
 
 }

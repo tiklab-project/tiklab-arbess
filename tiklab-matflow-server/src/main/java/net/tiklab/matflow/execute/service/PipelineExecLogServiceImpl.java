@@ -22,7 +22,8 @@ public class PipelineExecLogServiceImpl implements PipelineExecLogService {
     //创建
     @Override
     public String createLog(PipelineExecLog pipelineExecLog) {
-        return pipelineExecLogDao.createLog(BeanMapper.map(pipelineExecLog, PipelineExecLogEntity.class));
+        PipelineExecLogEntity logEntity = BeanMapper.map(pipelineExecLog, PipelineExecLogEntity.class);
+        return pipelineExecLogDao.createLog(logEntity);
     }
 
     //删除
@@ -51,7 +52,6 @@ public class PipelineExecLogServiceImpl implements PipelineExecLogService {
     public void deleteHistoryLog(String historyId) {
         pipelineExecLogDao.deleteAllLog(historyId);
     }
-
 
     /**
      * 查询历史对应的日志

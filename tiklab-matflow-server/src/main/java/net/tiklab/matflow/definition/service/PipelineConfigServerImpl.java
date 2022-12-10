@@ -1,9 +1,10 @@
 package net.tiklab.matflow.definition.service;
 
+import net.tiklab.join.JoinTemplate;
 import net.tiklab.matflow.definition.model.Pipeline;
 import net.tiklab.matflow.definition.model.PipelineConfig;
-import net.tiklab.matflow.definition.model.PipelineCourseConfig;
 import net.tiklab.matflow.definition.model.PipelineStages;
+import net.tiklab.matflow.trigger.server.PipelineTriggerServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,17 +18,19 @@ public class PipelineConfigServerImpl implements PipelineConfigServer {
 
 
     @Autowired
-    PipelineCourseConfigService courseConfigService;
+    private PipelineTasksService tasksService;
 
     @Autowired
-    PipelineStagesServer stagesServer;
+    private PipelineStagesServer stagesServer;
 
     @Autowired
-    PipelineAfterConfigServer afterConfigServer;
+    private PipelinePostServer postServer;
 
     @Autowired
-    PipelineService pipelineService;
+    PipelineTriggerServer triggerServer;
 
+    @Autowired
+    JoinTemplate joinTemplate;
 
     private static final Logger logger = LoggerFactory.getLogger(PipelineConfigServerImpl.class);
 
@@ -38,14 +41,16 @@ public class PipelineConfigServerImpl implements PipelineConfigServer {
      */
     @Override
     public List<Object> findAllConfig(String pipelineId){
+        PipelineConfig pipelineConfig = new PipelineConfig(pipelineId);
+        joinTemplate.joinQuery(pipelineConfig);
+        Pipeline pipeline = pipelineConfig.getPipeline();
+        int type = pipeline.getType();
         List<Object> allCourseConfig = findAllTaskConfig(pipelineId);
-        List<Object> allAfterConfig = afterConfigServer.findAllConfig(pipelineId);
+        List<Object> allAfterConfig = postServer.findAllPostTask(pipelineId);
         if (allAfterConfig == null || allAfterConfig.size() == 0){
             return allCourseConfig;
         }
-        Pipeline onePipeline = pipelineService.findOnePipeline(pipelineId);
-        int pipelineType = onePipeline.getPipelineType();
-        if (pipelineType == 1){
+        if (type == 1){
             allCourseConfig.addAll(allAfterConfig);
             return allCourseConfig;
         }
@@ -63,14 +68,15 @@ public class PipelineConfigServerImpl implements PipelineConfigServer {
      */
     @Override
     public List<Object> findAllTaskConfig(String pipelineId){
-        Pipeline pipeline = pipelineService.findOnePipeline(pipelineId);
-        int pipelineType = pipeline.getPipelineType();
-
-        if (pipelineType == 1){
-            return courseConfigService.findAllConfig(pipelineId);
+        PipelineConfig pipelineConfig = new PipelineConfig(pipelineId);
+        joinTemplate.joinQuery(pipelineConfig);
+        Pipeline pipeline = pipelineConfig.getPipeline();
+        int type = pipeline.getType();
+        if (type == 1){
+            return tasksService.findAllTasksTask(pipelineId);
         }
-        if (pipelineType == 2){
-            List<PipelineStages> allStagesConfig = stagesServer.findAllStagesConfig(pipelineId);
+        if (type == 2){
+            List<PipelineStages> allStagesConfig = stagesServer.findAllStagesTasks(pipelineId);
             if (allStagesConfig == null || allStagesConfig.size() ==0){
                 return null;
             }
@@ -86,17 +92,16 @@ public class PipelineConfigServerImpl implements PipelineConfigServer {
      */
     @Override
     public String createTaskConfig(PipelineConfig config){
-        String pipelineId = config.getPipelineId();
-        Pipeline pipeline = pipelineService.findOnePipeline(pipelineId);
-        int pipelineType = pipeline.getPipelineType();
-        String id = "";
-        if (pipelineType == 1){
-            PipelineCourseConfig pipelineCourseConfig = (PipelineCourseConfig) configMessage(config,pipelineType);
-            id = courseConfigService.createConfig(pipelineCourseConfig);
+        joinTemplate.joinQuery(config);
+        Pipeline pipeline = config.getPipeline();
+        int type = pipeline.getType();
+        String id = null;
+        if (type == 1){
+            id = tasksService.createTasksTask(config);
         }
-        if (pipelineType == 2){
-            PipelineStages pipelineStages = (PipelineStages) configMessage(config,pipelineType);
-            id = stagesServer.createStagesConfig(pipelineStages);
+        if (type == 2){
+
+            id = stagesServer.createStagesTask(config);
         }
         return id;
     }
@@ -107,15 +112,32 @@ public class PipelineConfigServerImpl implements PipelineConfigServer {
      */
     @Override
     public void deleteTaskConfig(PipelineConfig config){
-        String pipelineId = config.getPipelineId();
-        Pipeline pipeline = pipelineService.findOnePipeline(pipelineId);
+        joinTemplate.joinQuery(config);
+        Pipeline pipeline = config.getPipeline();
+        int type = pipeline.getType();
         String configId = config.getConfigId();
-        if (pipeline.getPipelineType() == 1){
-           courseConfigService.deleteConfig(configId);
+        if (type == 1){
+           tasksService.deleteTasksTask(configId);
         }
-        if (pipeline.getPipelineType() == 2){
-            stagesServer.deleteStagesConfig(configId);
+        if (type == 2){
+            stagesServer.deleteStagesTask(configId);
         }
+    }
+
+    /**
+     * 删除流水线所有配置
+     * @param pipelineId 流水线id
+     * @param pipelineType 流水线类型
+     */
+    @Override
+    public void deleteAllTaskConfig(String pipelineId,int pipelineType){
+        if (pipelineType == 1){
+            tasksService.deleteAllTasksTask(pipelineId);
+        }
+        if (pipelineType == 2){
+            stagesServer.deleteAllStagesTask(pipelineId);
+        }
+        triggerServer.deleteAllConfig(pipelineId);
     }
 
     /**
@@ -124,39 +146,68 @@ public class PipelineConfigServerImpl implements PipelineConfigServer {
      */
     @Override
     public void updateTaskConfig(PipelineConfig config){
-        String pipelineId = config.getPipelineId();
-        Pipeline pipeline = pipelineService.findOnePipeline(pipelineId);
-        int pipelineType = pipeline.getPipelineType();
-        if (pipelineType == 1){
-            PipelineCourseConfig pipelineCourseConfig = (PipelineCourseConfig) configMessage(config,pipelineType);
-            courseConfigService.updateConfig(pipelineCourseConfig);
+        joinTemplate.joinQuery(config);
+        Pipeline pipeline = config.getPipeline();
+        int type = pipeline.getType();
+        if (type == 1){
+            tasksService.updateTasksTask(config);
         }
-        if (pipelineType == 2){
-            PipelineCourseConfig pipelineCourseConfig = (PipelineCourseConfig) configMessage(config,1);
-            courseConfigService.updateConfig(pipelineCourseConfig);
+        if (type == 2){
+            stagesServer.updateStagesTask(config);
         }
     }
 
-    //完善配置信息
-    private Object configMessage(PipelineConfig config , int type){
-        String configId = config.getConfigId();
-        int taskSort = config.getTaskSort();
-        int taskType = config.getTaskType();
-        Object values = config.getValues();
-        int stages = config.getStages();
-        String pipelineId = config.getPipelineId();
-        String stagesId = config.getStagesId();
-        Pipeline pipeline = pipelineService.findOnePipeline(pipelineId);
-
+    /**
+     * 效验配置必填字段
+     * @param pipelineId 流水线id
+     * @return 配置id集合
+     */
+    @Override
+    public List<String> validAllConfig(String pipelineId){
+        PipelineConfig pipelineConfig = new PipelineConfig(pipelineId);
+        joinTemplate.joinQuery(pipelineConfig);
+        Pipeline pipeline = pipelineConfig.getPipeline();
+        int type = pipeline.getType();
         if (type == 1){
-            return   new PipelineCourseConfig(configId,taskType,taskSort,values,pipeline);
+          return  tasksService.validAllConfig(pipelineId);
         }
         if (type == 2){
-            return new PipelineStages(stagesId,pipeline,taskSort,taskType,stages,values);
+            return  stagesServer.validAllConfig(pipelineId);
         }
         return null;
     }
 
+    /**
+     * 创建流水线模板
+     * @param pipeline 流水线信息
+     */
+    @Override
+    public void createTemplate(Pipeline pipeline) {
+        String id = pipeline.getId();
+        int type = pipeline.getType();
+        String template = pipeline.getTemplate();
+        int[] ints = switch (template) {
+            case "2131" -> new int[]{1,21, 31};
+            case "2132" -> new int[]{1,21, 32};
+            case "112131" -> new int[]{1,11, 21, 31};
+            case "112132" -> new int[]{1,11, 21, 32};
+            case "2231" -> new int[]{1,22, 31};
+            case "2232" -> new int[]{1,22, 32};
+            default -> new int[]{1};
+        };
+        for (int i = 0; i < ints.length; i++) {
+            PipelineConfig config = new PipelineConfig();
+            config.setPipeline(new Pipeline(id));
+            config.setTaskType(ints[i]);
+            config.setTaskSort(i+1);
+            if (type == 1){
+                tasksService.createTasksTask(config);
+            }
+            if (type == 2){
+                stagesServer.createStagesTask(config);
+            }
+        }
+    }
 
 }
 

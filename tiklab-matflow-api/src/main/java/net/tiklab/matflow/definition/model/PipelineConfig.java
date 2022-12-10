@@ -1,21 +1,48 @@
 package net.tiklab.matflow.definition.model;
 
+import net.tiklab.beans.annotation.Mapping;
+import net.tiklab.beans.annotation.Mappings;
+import net.tiklab.join.annotation.Join;
+import net.tiklab.join.annotation.JoinQuery;
+import net.tiklab.postin.annotation.ApiModel;
+import net.tiklab.postin.annotation.ApiProperty;
+
+@ApiModel
+@Join
 public class PipelineConfig {
 
+    //配置id
     private String configId;
 
+    //配置顺序
     private int taskSort;
 
+    //配置类型
     private int taskType;
 
+    //配置值
     private Object values;
 
+    //阶段
     private int stages;
 
-    private String pipelineId;
+    //阶段id
+    private String stagesId;
 
-    public String stagesId;
 
+    @ApiProperty(name="pipeline",desc="流水线id",eg="@selectOne")
+    @Mappings({
+            @Mapping(source = "pipeline.id",target = "pipelineId")
+    })
+    @JoinQuery(key = "id")
+    private Pipeline pipeline;
+
+    public PipelineConfig() {
+    }
+
+    public PipelineConfig(String pipelineId) {
+        this.pipeline = new Pipeline(pipelineId);
+    }
 
     public String getConfigId() {
         return configId;
@@ -57,19 +84,19 @@ public class PipelineConfig {
         this.stages = stages;
     }
 
-    public String getPipelineId() {
-        return pipelineId;
-    }
-
-    public void setPipelineId(String pipelineId) {
-        this.pipelineId = pipelineId;
-    }
-
     public String getStagesId() {
         return stagesId;
     }
 
     public void setStagesId(String stagesId) {
         this.stagesId = stagesId;
+    }
+
+    public Pipeline getPipeline() {
+        return pipeline;
+    }
+
+    public void setPipeline(Pipeline pipeline) {
+        this.pipeline = pipeline;
     }
 }

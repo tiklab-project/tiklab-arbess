@@ -35,7 +35,7 @@ public interface PipelineExecCommonService {
      * 初始化历史
      * @return 历史
      */
-     PipelineExecHistory initializeHistory(Pipeline pipeline,int startWAy);
+    PipelineExecHistory initializeHistory(Pipeline pipeline,int startWAy);
 
     /**
      * 初始化日志
@@ -48,6 +48,13 @@ public interface PipelineExecCommonService {
      * 执行过程中的历史
      */
     void execHistory(PipelineProcess pipelineProcess,String log);
+
+    /**
+     * 更新执行时历史日志
+     * @param pipelineId 流水线id
+     * @param log 日志
+     */
+    void updateExecHistory(String pipelineId ,String log);
 
 
     /**

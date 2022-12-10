@@ -56,9 +56,9 @@ public class PipelineOpenDao {
     }
 
     public List<PipelineOpenEntity> findAllOpen(String userId, StringBuilder s){
-        String sql = "select pipeline_open.* from pipeline_open ";
-        sql = sql.concat(" where pipeline_open.user_id   = '"+userId+"' "
-                + " and pipeline_open.pipeline_id   "
+        String sql = "select pip_pipeline_other_open.* from pip_pipeline_other_open ";
+        sql = sql.concat(" where pip_pipeline_other_open.user_id   = '"+userId+"' "
+                + " and pip_pipeline_other_open.pipeline_id   "
                 + " in (" + s +" ) ");
         JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
         return  jdbcTemplate.query(sql, new BeanPropertyRowMapper(PipelineOpenEntity.class));

@@ -4,7 +4,7 @@ package net.tiklab.matflow.orther.entity;
 import net.tiklab.dal.jpa.annotation.*;
 
 @Entity
-@Table(name="pipeline_open")
+@Table(name="pip_pipeline_other_open")
 public class PipelineOpenEntity {
 
     @Id

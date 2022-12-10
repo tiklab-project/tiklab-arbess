@@ -1,9 +1,8 @@
 package net.tiklab.matflow.execute.service;
 
-import net.tiklab.matflow.definition.model.PipelineAfterConfig;
-import net.tiklab.matflow.definition.model.PipelineCourseConfig;
+import net.tiklab.matflow.achieve.server.*;
+import net.tiklab.matflow.definition.model.PipelinePost;
 import net.tiklab.matflow.execute.model.PipelineProcess;
-import net.tiklab.matflow.execute.service.achieve.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -31,22 +30,21 @@ public class PipelineExecTaskServiceImpl implements PipelineExecTaskService {
     @Autowired
     MessageExecService message;
 
-    public boolean beginCourseState(PipelineProcess pipelineProcess, PipelineCourseConfig config){
-        int taskType = config.getTaskType();
+    public boolean beginCourseState(PipelineProcess pipelineProcess, String configId ,int taskType){
         boolean state = true;
         switch (taskType/10) {
-            case 0 -> state = code.clone(pipelineProcess, config);
-            case 1 -> state = test.test(pipelineProcess, config);
-            case 2 -> state = build.build(pipelineProcess, config);
-            case 3 -> state = deploy.deploy(pipelineProcess, config);
-            case 4 -> state = codeScan.codeScan(pipelineProcess, config);
-            case 5 -> state = product.product(pipelineProcess,  config);
+            case 0 -> state = code.clone(pipelineProcess, configId,taskType);
+            case 1 -> state = test.test(pipelineProcess, configId,taskType);
+            case 2 -> state = build.build(pipelineProcess, configId,taskType);
+            case 3 -> state = deploy.deploy(pipelineProcess, configId,taskType);
+            case 4 -> state = codeScan.codeScan(pipelineProcess, configId,taskType);
+            case 5 -> state = product.product(pipelineProcess,  configId,taskType);
         }
         return state;
     }
 
-
-    public boolean beginAfterState(PipelineProcess pipelineProcess, PipelineAfterConfig config){
+    //执行后置任务
+    public boolean beginAfterState(PipelineProcess pipelineProcess, PipelinePost config){
        return message.message(pipelineProcess, config.getConfigId());
     }
 

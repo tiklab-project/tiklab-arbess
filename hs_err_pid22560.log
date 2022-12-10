@@ -598,14 +598,14 @@ No events
 Classes redefined (10 events):
 Event: 156.236 Thread 0x000001facd3b5c90 redefined class name=net.tiklab.matflow.definition.service.PipelineStagesServerImpl, count=1
 Event: 175.770 Thread 0x000001facd3b5c90 redefined class name=net.tiklab.matflow.definition.service.PipelineStagesServerImpl, count=2
-Event: 375.817 Thread 0x000001facd3b5c90 redefined class name=net.tiklab.matflow.definition.service.PipelineCourseConfigServiceImpl, count=1
+Event: 375.817 Thread 0x000001facd3b5c90 redefined class name=net.tiklab.matflow.definition.service.PipelineTasksServiceImpl, count=1
 Event: 375.817 Thread 0x000001facd3b5c90 redefined class name=net.tiklab.matflow.definition.service.PipelineStagesServerImpl, count=3
 Event: 534.142 Thread 0x000001facd3b5c90 redefined class name=net.tiklab.matflow.definition.service.PipelineStagesServerImpl, count=4
 Event: 861.218 Thread 0x000001facd3b5c90 redefined class name=net.tiklab.matflow.definition.service.PipelineStagesServerImpl, count=5
 Event: 977.073 Thread 0x000001facd3b5c90 redefined class name=net.tiklab.matflow.definition.service.PipelineStagesServerImpl, count=6
 Event: 1154.354 Thread 0x000001facd3b5c90 redefined class name=net.tiklab.matflow.definition.service.PipelineStagesServerImpl, count=7
-Event: 1195.614 Thread 0x000001facd3b5c90 redefined class name=net.tiklab.matflow.definition.service.PipelineCourseConfigServiceImpl, count=2
-Event: 1240.638 Thread 0x000001facd3b5c90 redefined class name=net.tiklab.matflow.definition.service.PipelineCourseConfigServiceImpl, count=3
+Event: 1195.614 Thread 0x000001facd3b5c90 redefined class name=net.tiklab.matflow.definition.service.PipelineTasksServiceImpl, count=2
+Event: 1240.638 Thread 0x000001facd3b5c90 redefined class name=net.tiklab.matflow.definition.service.PipelineTasksServiceImpl, count=3
 
 Internal exceptions (20 events):
 Event: 58.653 Thread 0x000001fad859bd90 Exception <a 'java/lang/ClassNotFoundException'{0x000000070a2b61b0}: net/tiklab/matflow/definition/entity/task/PipelineProductEntityCustomizer> (0x000000070a2b61b0) 
@@ -781,7 +781,7 @@ Log output configuration:
 
 Environment Variables:
 JAVA_HOME=D:\jdk-16.0.2
-PATH=D:\VMwarework\bin\;C:\Windows\System32;C:\Windows;C:\Windows\System32\wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;D:\Bandzip\Bandizip\;D:\jdk-16.0.2\bin;D:\XShell\Xshell 7\;D:\XShell\Xftp 7\;D:\git\Git\cmd;D:\maven\apache-maven-3.8.3\bin;D:\SVN\bin;C:\Program Files\Docker\Docker\resources\bin;C:\ProgramData\DockerDesktop\version-bin;D:\GnuPG\bin;D:\GnuPG\bin;D:\×ÀÃæ\sonarqube-9.7.0.61563\bin\windows-x86-64;D:\nodeJs;C:\Program Files\MySQL\MySQL Shell 8.0\bin\;C:\Users\admin\AppData\Local\Microsoft\WindowsApps;D:\idea\IntelliJ IDEA Community Edition 2022.1\bin;;D:\VScode\Microsoft VS Code\bin;D:\Webstorm\WebStorm 2022.1\bin;;
+PATH=D:\VMwarework\bin\;C:\Windows\System32;C:\Windows;C:\Windows\System32\wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;D:\Bandzip\Bandizip\;D:\jdk-16.0.2\bin;D:\XShell\Xshell 7\;D:\XShell\Xftp 7\;D:\git\Git\cmd;D:\maven\apache-maven-3.8.3\bin;D:\SVN\bin;C:\Program Files\Docker\Docker\resources\bin;C:\ProgramData\DockerDesktop\version-bin;D:\GnuPG\bin;D:\GnuPG\bin;D:\ï¿½ï¿½ï¿½ï¿½\sonarqube-9.7.0.61563\bin\windows-x86-64;D:\nodeJs;C:\Program Files\MySQL\MySQL Shell 8.0\bin\;C:\Users\admin\AppData\Local\Microsoft\WindowsApps;D:\idea\IntelliJ IDEA Community Edition 2022.1\bin;;D:\VScode\Microsoft VS Code\bin;D:\Webstorm\WebStorm 2022.1\bin;;
 USERNAME=admin
 OS=Windows_NT
 PROCESSOR_IDENTIFIER=Intel64 Family 6 Model 167 Stepping 1, GenuineIntel

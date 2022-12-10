@@ -9,10 +9,10 @@ import net.tiklab.matflow.execute.model.PipelineExecState;
 import net.tiklab.matflow.execute.service.PipelineExecHistoryService;
 import net.tiklab.matflow.orther.model.PipelineFollow;
 import net.tiklab.matflow.orther.model.PipelineOpen;
-import net.tiklab.matflow.orther.service.PipelineFinal;
+import net.tiklab.matflow.orther.until.PipelineFinal;
 import net.tiklab.matflow.orther.service.PipelineFollowService;
 import net.tiklab.matflow.orther.service.PipelineOpenService;
-import net.tiklab.matflow.orther.service.PipelineUntil;
+import net.tiklab.matflow.orther.until.PipelineUntil;
 import net.tiklab.privilege.role.model.DmRole;
 import net.tiklab.privilege.role.model.DmRoleQuery;
 import net.tiklab.privilege.role.model.PatchUser;
@@ -60,14 +60,14 @@ public class PipelineRelationServerImpl implements PipelineRelationServer{
     @Override
     public void deleteHistory(Pipeline pipeline){
 
-        String pipelineId = pipeline.getPipelineId();
+        String pipelineId = pipeline.getId();
         //删除对应的历史
         historyService.deleteAllHistory(pipelineId);
         //删除最近打开
         openService.deleteAllOpen(pipelineId);
         //删除对应文件
         String fileAddress = PipelineUntil.findFileAddress();
-        PipelineUntil.deleteFile(new File(fileAddress+ pipeline.getPipelineName()));
+        PipelineUntil.deleteFile(new File(fileAddress+ pipeline.getName()));
     }
 
     /**
@@ -115,16 +115,16 @@ public class PipelineRelationServerImpl implements PipelineRelationServer{
     private PipelineExecMessage findOneStatus(Pipeline pipeline){
         PipelineExecMessage pipelineExecMessage = new PipelineExecMessage();
         //成功和构建时间
-        PipelineExecHistory latelyHistory = historyService.findLatelyHistory(pipeline.getPipelineId());
-        pipelineExecMessage.setPipelineId(pipeline.getPipelineId());
-        pipelineExecMessage.setPipelineCollect(pipeline.getPipelineCollect());
-        pipelineExecMessage.setPipelineName(pipeline.getPipelineName());
-        pipelineExecMessage.setPipelineState(pipeline.getPipelineState());
-        pipelineExecMessage.setCreateTime(pipeline.getPipelineCreateTime());
+        PipelineExecHistory latelyHistory = historyService.findLatelyHistory(pipeline.getId());
+        pipelineExecMessage.setId(pipeline.getId());
+        pipelineExecMessage.setCollect(pipeline.getCollect());
+        pipelineExecMessage.setName(pipeline.getName());
+        pipelineExecMessage.setState(pipeline.getState());
+        pipelineExecMessage.setCreateTime(pipeline.getCreateTime());
         pipelineExecMessage.setColor(pipeline.getColor());
         pipelineExecMessage.setUser(pipeline.getUser());
-        pipelineExecMessage.setPipelinePower(pipeline.getPipelinePower());
-        pipelineExecMessage.setPipelineType(pipeline.getPipelineType());
+        pipelineExecMessage.setPower(pipeline.getPower());
+        pipelineExecMessage.setType(pipeline.getType());
         if (latelyHistory != null){
             pipelineExecMessage.setLastBuildTime(latelyHistory.getCreateTime());
             pipelineExecMessage.setBuildStatus(latelyHistory.getRunStatus());
@@ -167,7 +167,7 @@ public class PipelineRelationServerImpl implements PipelineRelationServer{
             } else {
                 j.append(",'");
             }
-            j.append(pipeline.getPipelineId()).append("'");
+            j.append(pipeline.getId()).append("'");
         }
         if (s.toString().equals("")){
             return j;
@@ -331,7 +331,7 @@ public class PipelineRelationServerImpl implements PipelineRelationServer{
         //统计信息
         for (PipelineOpen pipelineOpen : pipelineOpens) {
             Pipeline pipeline = pipelineOpen.getPipeline();
-            PipelineExecState pipelineExecState = pipelineCensus(pipeline.getPipelineId());
+            PipelineExecState pipelineExecState = pipelineCensus(pipeline.getId());
             pipelineOpen.setPipelineExecState(pipelineExecState);
         }
         return pipelineOpens;

@@ -33,19 +33,19 @@ public class PipelineExecController {
     }
 
 
-    @RequestMapping(path="/findState",method = RequestMethod.POST)
-    @ApiMethod(name = "findState",desc = "执行")
+    @RequestMapping(path="/pipelineRunStatus",method = RequestMethod.POST)
+    @ApiMethod(name = "pipelineRunStatus",desc = "执行")
     @ApiParam(name = "pipelineId",desc = "流水线id",required = true)
-    public Result<List<PipelineRun>> findState(String pipelineId)  {
+    public Result<List<PipelineRun>> pipelineRunStatus(String pipelineId)  {
         List<PipelineRun> instanceState = pipelineExecService.pipelineRunStatus(pipelineId);
         return Result.ok(instanceState);
     }
 
-    @RequestMapping(path="/findExecState",method = RequestMethod.POST)
-    @ApiMethod(name = "findExecState",desc = "判断是否执行")
+    @RequestMapping(path="/findPipelineState",method = RequestMethod.POST)
+    @ApiMethod(name = "findPipelineState",desc = "判断是否执行")
     @ApiParam(name = "pipelineId",desc = "流水线id",required = true)
-    public Result<Integer> findExecState(@NotNull String pipelineId) {
-        int state = pipelineExecService.findState(pipelineId);
+    public Result<Integer> findState(@NotNull String pipelineId) {
+        int state = pipelineExecService.findPipelineState(pipelineId);
         return Result.ok(state);
     }
 

@@ -4,6 +4,8 @@ package net.tiklab.matflow.orther.service;
 import com.alibaba.fastjson.JSONObject;
 import net.tiklab.core.exception.ApplicationException;
 import net.tiklab.matflow.definition.model.Pipeline;
+import net.tiklab.matflow.orther.until.PipelineFinal;
+import net.tiklab.matflow.orther.until.PipelineUntil;
 import net.tiklab.message.message.model.Message;
 import net.tiklab.message.message.model.MessageReceiver;
 import net.tiklab.message.message.model.MessageTemplate;
@@ -70,16 +72,16 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
     public Map<String,String> initMap(Pipeline pipeline){
         Map<String,String> map = new HashMap<>();
         User user = pipeline.getUser();
-        map.put("pipelineId", pipeline.getPipelineId());
-        map.put("pipelineName", pipeline.getPipelineName());
-        map.put("name", pipeline.getPipelineName().substring(0,1).toUpperCase());
+        map.put("pipelineId", pipeline.getId());
+        map.put("pipelineName", pipeline.getName());
+        map.put("name", pipeline.getName().substring(0,1).toUpperCase());
         map.put("userName", user.getName());
         map.put("rootId",user.getId());
         if (user.getNickname() != null){
             map.put("userName", user.getNickname());
         }
         map.put("color", ""+pipeline.getColor());
-        map.put("date",PipelineUntil.date(1));
+        map.put("date", PipelineUntil.date(1));
         return map;
     }
 

@@ -2,8 +2,8 @@ package net.tiklab.matflow.trigger.controller;
 
 
 import net.tiklab.core.Result;
-import net.tiklab.matflow.trigger.model.PipelineTriggerConfig;
-import net.tiklab.matflow.trigger.server.PipelineTriggerConfigServer;
+import net.tiklab.matflow.trigger.model.PipelineTrigger;
+import net.tiklab.matflow.trigger.server.PipelineTriggerServer;
 import net.tiklab.postin.annotation.Api;
 import net.tiklab.postin.annotation.ApiMethod;
 import net.tiklab.postin.annotation.ApiParam;
@@ -23,13 +23,13 @@ import java.util.List;
 public class PipelineTriggerConfigController {
 
     @Autowired
-    PipelineTriggerConfigServer pipelineTriggerConfigService;
+    PipelineTriggerServer pipelineTriggerConfigService;
 
     //更新信息
     @RequestMapping(path="/updateConfig",method = RequestMethod.POST)
     @ApiMethod(name = "updateConfigure",desc = "更新流水线配置")
     @ApiParam(name = "pipelineConfig",desc = "配置信息",required = true)
-    public Result<Void> updateConfigure(@RequestBody @NotNull @Valid PipelineTriggerConfig config){
+    public Result<Void> updateConfigure(@RequestBody @NotNull @Valid PipelineTrigger config){
         pipelineTriggerConfigService.updateConfig(config);
         return Result.ok();
     }
@@ -45,7 +45,7 @@ public class PipelineTriggerConfigController {
     @RequestMapping(path="/createConfig",method = RequestMethod.POST)
     @ApiMethod(name = "createConfig",desc = "创建配置")
     @ApiParam(name = "pipelineConfig",desc = "配置信息",required = true)
-    public Result<String> createConfig(@RequestBody @NotNull @Valid PipelineTriggerConfig config) {
+    public Result<String> createConfig(@RequestBody @NotNull @Valid PipelineTrigger config) {
         String id = pipelineTriggerConfigService.createConfig(config);
         return Result.ok(id);
     }

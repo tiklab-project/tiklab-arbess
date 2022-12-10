@@ -4,14 +4,12 @@ import net.tiklab.matflow.definition.model.Pipeline;
 import net.tiklab.matflow.execute.model.PipelineExecHistory;
 import net.tiklab.matflow.execute.model.PipelineExecLog;
 import net.tiklab.matflow.execute.model.PipelineProcess;
-import net.tiklab.matflow.orther.service.PipelineUntil;
+import net.tiklab.matflow.orther.until.PipelineUntil;
 import net.tiklab.matflow.setting.model.PipelineScm;
 import net.tiklab.matflow.setting.service.PipelineScmService;
 import net.tiklab.rpc.annotation.Exporter;
 import net.tiklab.user.user.model.User;
 import net.tiklab.utils.context.LoginContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -40,13 +38,13 @@ public class PipelineExecCommonServiceImpl implements PipelineExecCommonService 
     @Autowired
     PipelineExecLogService logService;
 
-
-    private static final Logger logger = LoggerFactory.getLogger(PipelineExecCommonServiceImpl.class);
-
+    //历史
     Map<String,PipelineExecHistory> historyMap = PipelineExecServiceImpl.historyMap;
 
+    //日志
     Map<String, List<String>> logMap = PipelineExecServiceImpl.logMap;
 
+    //运行时间
     Map<String, Integer> runTime = PipelineExecServiceImpl.runTime;
 
     /**
@@ -129,7 +127,6 @@ public class PipelineExecCommonServiceImpl implements PipelineExecCommonService 
         return logService.findAllStagesLog(historyId,stagesId);
     }
 
-
     /**
      * 运行结束更新历史状态
      * @param pipelineExecHistory 历史
@@ -158,15 +155,18 @@ public class PipelineExecCommonServiceImpl implements PipelineExecCommonService 
         historyMap.put(pipelineId,pipelineExecHistory);
     }
 
-
     /**
      * 更新日志执行状态
      * @param historyId 执行信息
      * @param time 时间
      */
     public void updateState(String historyId,List<Integer> time,int state){
-        PipelineExecHistory pipelineExecHistory = historyService.findOneHistory(historyId);
 
+        PipelineExecHistory pipelineExecHistory = historyService.findOneHistory(historyId);
+        List<String> list1 = logMap.get(historyId);
+        if (list1 == null){
+            return;
+        }
         String logId = logMap.get(historyId).get(logMap.get(historyId).size()-1);
         PipelineExecLog pipelineExecLog = logService.findOneLog(logId);
 
@@ -206,13 +206,13 @@ public class PipelineExecCommonServiceImpl implements PipelineExecCommonService 
         pipelineExecHistory.setSort(1);
         pipelineExecHistory.setPipeline(pipeline);
         pipelineExecHistory.setHistoryId(historyId);
-        pipelineExecHistory.setRunLog(PipelineUntil.date(4) +"流水线"+pipeline.getPipelineName()+"开始执行。");
+        pipelineExecHistory.setRunLog(PipelineUntil.date(4) +"流水线"+pipeline.getName()+"开始执行。");
         User user = new User();
         user.setId(LoginContext.getLoginId());
         pipelineExecHistory.setUser(user);
         pipelineExecHistory.setHistoryId(historyId);
         //构建次数
-        List<PipelineExecHistory> allHistory = historyService.findAllHistory(pipeline.getPipelineId());
+        List<PipelineExecHistory> allHistory = historyService.findAllHistory(pipeline.getId());
         allHistory.sort(Comparator.comparing(PipelineExecHistory::getCreateTime));
         pipelineExecHistory.setFindNumber(1);
         if (allHistory.size() >= 1){
@@ -232,7 +232,7 @@ public class PipelineExecCommonServiceImpl implements PipelineExecCommonService 
         PipelineExecLog pipelineExecLog = new PipelineExecLog();
         pipelineExecLog.setHistoryId(historyId);
         pipelineExecLog.setTaskSort(sort);
-        pipelineExecLog.setType(type);
+        pipelineExecLog.setTaskType(type);
         pipelineExecLog.setRunLog("");
         String logId = logService.createLog(pipelineExecLog);
         pipelineExecLog.setLogId(logId);
@@ -254,11 +254,23 @@ public class PipelineExecCommonServiceImpl implements PipelineExecCommonService 
     }
 
     /**
+     * 更新执行时历史日志
+     * @param pipelineId 流水线id
+     * @param log 日志
+     */
+    @Override
+    public void updateExecHistory(String pipelineId ,String log){
+        PipelineExecHistory history = historyMap.get(pipelineId);
+        history.setRunLog(history.getRunLog()+"\n"+log);
+        historyMap.put(pipelineId,history);
+    }
+
+    /**
      * 执行过程中的历史
      */
     @Override
     public void execHistory(PipelineProcess pipelineProcess,String log){
-        String pipelineId = pipelineProcess.getPipeline().getPipelineId();
+        String pipelineId = pipelineProcess.getPipeline().getId();
         PipelineExecLog pipelineExecLog = pipelineProcess.getPipelineExecLog();
 
         PipelineExecHistory history = historyMap.get(pipelineId);

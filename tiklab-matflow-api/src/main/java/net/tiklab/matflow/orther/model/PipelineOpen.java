@@ -29,9 +29,9 @@ public class PipelineOpen {
     //流水线
     @ApiProperty(name="pipeline",desc="流水线id",eg="@selectOne")
     @Mappings({
-            @Mapping(source = "pipeline.pipelineId",target = "pipelineId")
+            @Mapping(source = "pipeline.id",target = "pipelineId")
     })
-    @JoinQuery(key = "pipelineId")
+    @JoinQuery(key = "id")
     private Pipeline pipeline;
 
     @ApiProperty(name="number",desc="数量")

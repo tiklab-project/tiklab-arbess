@@ -28,9 +28,9 @@ public class PipelineStages {
     //流水线
     @ApiProperty(name="pipeline",desc="流水线id",eg="@selectOne")
     @Mappings({
-            @Mapping(source = "pipeline.pipelineId",target = "pipelineId")
+            @Mapping(source = "pipeline.id",target = "pipelineId")
     })
-    @JoinQuery(key = "pipelineId")
+    @JoinQuery(key = "id")
     private Pipeline pipeline;
 
     @ApiProperty(name="taskSort",desc="顺序")
@@ -42,6 +42,10 @@ public class PipelineStages {
     @ApiProperty(name = "taskStage",desc="阶段")
     private int taskStage;
 
+    //是否是源码
+    @ApiProperty(name = "code",desc="阶段")
+    private boolean code;
+
     //更改的数据
     private Object values;
 
@@ -51,17 +55,18 @@ public class PipelineStages {
     public PipelineStages() {
     }
 
-    public PipelineStages(String pipelineId) {
-        this.pipeline = new Pipeline(pipelineId);
+    public boolean isCode() {
+        return code;
     }
 
-    public PipelineStages(String stagesId, Pipeline pipeline, int taskSort, int taskType, int taskStage, Object values) {
-        this.stagesId = stagesId;
-        this.pipeline = pipeline;
+    public void setCode(boolean code) {
+        this.code = code;
+    }
+
+    public PipelineStages(String createTime, String pipelineId, int taskSort) {
+        this.createTime = createTime;
+        this.pipeline = new Pipeline(pipelineId);
         this.taskSort = taskSort;
-        this.taskType = taskType;
-        this.taskStage = taskStage;
-        this.values = values;
     }
 
     public String getStagesId() {

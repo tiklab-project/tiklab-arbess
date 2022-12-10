@@ -7,6 +7,7 @@ import net.tiklab.matflow.definition.model.Pipeline;
 import net.tiklab.matflow.orther.dao.PipelineOpenDao;
 import net.tiklab.matflow.orther.entity.PipelineOpenEntity;
 import net.tiklab.matflow.orther.model.PipelineOpen;
+import net.tiklab.matflow.orther.until.PipelineUntil;
 import net.tiklab.rpc.annotation.Exporter;
 import net.tiklab.utils.context.LoginContext;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +36,7 @@ public class PipelineOpenServiceImpl implements PipelineOpenService {
         for (PipelineOpen pipelineOpen : allOpen) {
             joinTemplate.joinQuery(pipelineOpen);
             Pipeline pipeline = pipelineOpen.getPipeline();
-            if (!pipeline.getPipelineId().equals(pipelineId)){
+            if (!pipeline.getId().equals(pipelineId)){
                continue;
             }
             deleteOpen(pipelineOpen.getOpenId());
@@ -86,7 +87,7 @@ public class PipelineOpenServiceImpl implements PipelineOpenService {
         for (PipelineOpen pipelineOpen : findAllOpen()) {
             String user = pipelineOpen.getUserId();
             Pipeline pipeline = pipelineOpen.getPipeline();
-            if (pipeline.getPipelineId().equals(pipelineId) && user.equals(userId)){
+            if (pipeline.getId().equals(pipelineId) && user.equals(userId)){
                 return pipelineOpen;
             }
         }

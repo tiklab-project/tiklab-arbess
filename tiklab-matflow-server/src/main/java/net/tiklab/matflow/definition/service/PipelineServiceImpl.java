@@ -9,7 +9,7 @@ import net.tiklab.matflow.definition.model.Pipeline;
 import net.tiklab.matflow.definition.model.PipelineExecMessage;
 import net.tiklab.matflow.orther.model.PipelineOpen;
 import net.tiklab.matflow.orther.service.PipelineHomeService;
-import net.tiklab.matflow.orther.service.PipelineUntil;
+import net.tiklab.matflow.orther.until.PipelineUntil;
 import net.tiklab.rpc.annotation.Exporter;
 import net.tiklab.utils.context.LoginContext;
 import org.slf4j.Logger;
@@ -21,7 +21,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.*;
 
-import static net.tiklab.matflow.orther.service.PipelineFinal.*;
+import static net.tiklab.matflow.orther.until.PipelineFinal.*;
 
 /**
  * PipelineServiceImpl
@@ -38,20 +38,21 @@ public class PipelineServiceImpl implements PipelineService {
     private PipelineDao pipelineDao;
 
     @Autowired
-    private PipelineCourseConfigService configOrderService;
-
-    @Autowired
     private PipelineRelationServer relationServer;
 
     @Autowired
-    private PipelineStagesServer stagesServer;
+    private PipelineConfigServer configServer;
 
     @Autowired
     private PipelineHomeService homeService;
 
     private static final Logger logger = LoggerFactory.getLogger(PipelineServiceImpl.class);
 
-    //创建
+    /**
+     * 创建流水线及关联信息
+     * @param pipeline 流水线信息
+     * @return 流水线id
+     */
     @Override
     public String createPipeline(Pipeline pipeline) {
         //随机颜色
@@ -62,26 +63,19 @@ public class PipelineServiceImpl implements PipelineService {
             throw new ApplicationException(e);
         }
         pipeline.setColor((random.nextInt(5) + 1));
-        pipeline.setPipelineCreateTime(PipelineUntil.date(1));
+        pipeline.setCreateTime(PipelineUntil.date(1));
         PipelineEntity pipelineEntity = BeanMapper.map(pipeline, PipelineEntity.class);
-        pipelineEntity.setPipelineState(2);
+        pipelineEntity.setState(2);
         String pipelineId = pipelineDao.createPipeline(pipelineEntity);
         joinTemplate.joinQuery(pipeline);
+        pipeline.setId(pipelineId);
         Map<String, String> map = homeService.initMap(pipeline);
-        map.put("pipelineId",pipelineId);
 
         //动态
         homeService.log(LOG_PIPELINE, LOG_MD_PIPELINE_CREATE, LOG_TEM_PIPELINE_CREATE, map);
 
-        if (pipeline.getPipelineType() == 1){
-            //创建对应流水线模板
-            configOrderService.createTemplate(pipelineId, pipeline.getPipelineTemplate());
-        }
-        if (pipeline.getPipelineType() == 2){
-            //创建对应流水线模板
-            stagesServer.createTemplate(pipelineId, pipeline.getPipelineTemplate());
-        }
-
+        //创建对应流水线模板
+        configServer.createTemplate(pipeline);
 
         //流水线关联角色，用户信息
         relationServer.createDmUser(pipelineId,pipeline.getUserList());
@@ -105,7 +99,7 @@ public class PipelineServiceImpl implements PipelineService {
         relationServer.deleteDmUser(pipelineId); //关联用户
         relationServer.deleteHistory(pipeline); //历史，日志信息
         relationServer.deleteDmRole(pipelineId); //关联角色
-        configOrderService.deleteAllConfig(pipelineId); //配置信息
+        configServer.deleteAllTaskConfig(pipelineId,pipeline.getType()); //配置信息
 
         //动态
         Map<String, String> map = homeService.initMap(pipeline);
@@ -115,57 +109,43 @@ public class PipelineServiceImpl implements PipelineService {
 
     }
 
-    //更新
+    /**
+     * 更新流水线及关联信息
+     * @param pipeline 更新后流水线信息
+     */
     @Override
     public void updatePipeline(Pipeline pipeline) {
         //更新名称
-        Pipeline flow = findOnePipeline(pipeline.getPipelineId());
-        if (pipeline.getPipelineName() != null && !pipeline.getPipelineName().equals(flow.getPipelineName())){
-            relationServer.updatePipeline(pipeline.getPipelineName(), flow.getPipelineName());
-            Map<String, String> map = homeService.initMap(pipeline);
-            map.put("message","名称为:"+ flow.getPipelineName());
+        Pipeline flow = findOnePipeline(pipeline.getId());
+        joinTemplate.joinQuery(flow);
+        //判断名称是否改变
+        if (!pipeline.getName().equals(flow.getName())){
+
+            //更改文件夹名称
+            relationServer.updatePipeline(pipeline.getName(), flow.getName());
+            flow.setName(pipeline.getName());
+
+            Map<String, String> map = homeService.initMap(flow);
+            map.put("message","名称为:"+ flow.getName());
             homeService.log(LOG_PIPELINE, LOG_MD_PIPELINE_UPDATE,LOG_TEM_PIPELINE_UPDATE, map);
         }
 
-        //更新权限信息
-        updatePipeline(pipeline,flow);
+        int pipelinePower = pipeline.getPower();
+        if (pipelinePower != flow.getPower() && pipelinePower != 0){
+            flow.setPower(pipelinePower);
+            Map<String, String> map = homeService.initMap(flow);
+            if (pipelinePower == 1){
+                map.put("message","权限为全局");
+                homeService.log(LOG_PIPELINE,LOG_MD_PIPELINE_UPDATE, LOG_TEM_PIPELINE_UPDATE, map);
+            }
+            if (pipelinePower == 2){
+                map.put("message","权限为私有");
+                homeService.log(LOG_PIPELINE, LOG_MD_PIPELINE_UPDATE,LOG_TEM_PIPELINE_UPDATE, map);
+            }
+        }
 
-        PipelineEntity pipelineEntity = BeanMapper.map(pipeline, PipelineEntity.class);
+        PipelineEntity pipelineEntity = BeanMapper.map(flow, PipelineEntity.class);
         pipelineDao.updatePipeline(pipelineEntity);
-
-    }
-
-    private void updatePipeline(Pipeline pipeline,Pipeline flow){
-        if (pipeline.getPipelineState() == 0){
-            pipeline.setPipelineState(flow.getPipelineState());
-        }
-        Map<String, String> map = homeService.initMap(pipeline);
-
-        String pipelineId = pipeline.getPipelineId();
-        int pipelinePower = pipeline.getPipelinePower();
-
-        if (pipelinePower == 2 && flow.getPipelinePower() != 2) {
-            relationServer.createDmUser(pipelineId,pipeline.getUserList());
-            map.put("message","权限为私有");
-            homeService.log(LOG_PIPELINE, LOG_MD_PIPELINE_UPDATE,LOG_TEM_PIPELINE_UPDATE, map);
-        }
-        if (pipelinePower == 1 && flow.getPipelinePower() != 1 ) {
-            relationServer.deleteDmUser(pipelineId);
-            map.put("message","权限为全局");
-            homeService.log(LOG_PIPELINE,LOG_MD_PIPELINE_UPDATE, LOG_TEM_PIPELINE_UPDATE, map);
-        }
-
-        if (pipelinePower == 0){
-            pipeline.setPipelinePower(flow.getPipelinePower());
-        }
-
-        if (pipeline.getPipelineType() == 0){
-            pipeline.setPipelineType(flow.getPipelineType());
-        }
-
-        if (pipeline.getColor() == 0){
-            pipeline.setColor(flow.getColor());
-        }
 
     }
 
@@ -218,8 +198,6 @@ public class PipelineServiceImpl implements PipelineService {
         return Collections.emptyList();
     }
 
-
-
     //所有的流水线状态
     @Override
     public List<PipelineExecMessage> findUserPipeline(String userId){
@@ -234,7 +212,7 @@ public class PipelineServiceImpl implements PipelineService {
         List<PipelineExecMessage> userFollowPipeline = findUserFollowPipeline(userId);
         allStatus.addAll(userFollowPipeline);
         //排序
-        allStatus.sort(Comparator.comparing(PipelineExecMessage::getPipelineName));
+        allStatus.sort(Comparator.comparing(PipelineExecMessage::getName));
 
         return allStatus;
     }
@@ -251,9 +229,9 @@ public class PipelineServiceImpl implements PipelineService {
         if (pipelineFollow == null){
           return Collections.emptyList();
         }
-        pipelineFollow.forEach(pipeline -> pipeline.setPipelineCollect(1));
+        pipelineFollow.forEach(pipeline -> pipeline.setCollect(1));
         //排序
-        pipelineFollow.sort(Comparator.comparing(Pipeline::getPipelineName));
+        pipelineFollow.sort(Comparator.comparing(Pipeline::getName));
         List<PipelineExecMessage> allStatus = relationServer.findAllStatus(pipelineFollow);
         joinTemplate.joinQuery(allStatus);
         return allStatus;
@@ -278,8 +256,7 @@ public class PipelineServiceImpl implements PipelineService {
         ArrayList<Pipeline> pipelines = new ArrayList<>();
         for (Pipeline pipeline : userPipeline) {
             List<Pipeline> collect = list.stream().
-                    filter(pipeline1 -> pipeline.getPipelineId()
-                            .equals(pipeline1.getPipelineId()))
+                    filter(pipeline1 -> pipeline.getId().equals(pipeline1.getId()))
                     .toList();
             pipelines.addAll(collect);
         }

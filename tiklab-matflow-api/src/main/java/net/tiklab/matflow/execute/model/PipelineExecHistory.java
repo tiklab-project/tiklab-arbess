@@ -56,9 +56,9 @@ public class PipelineExecHistory {
 
    //流水线
     @Mappings({
-            @Mapping(source = "pipeline.pipelineId",target = "pipelineId")
+            @Mapping(source = "pipeline.id",target = "pipelineId")
     })
-    @JoinQuery(key = "pipelineId")
+    @JoinQuery(key = "id")
     private Pipeline pipeline;
 
     //执行位置

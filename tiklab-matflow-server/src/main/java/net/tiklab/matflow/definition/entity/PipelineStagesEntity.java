@@ -6,7 +6,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 @Entity
-@Table(name="pipeline_stages_config")
+@Table(name="pip_pipeline_stages")
 public class PipelineStagesEntity {
 
     //流水线配置id
@@ -26,10 +26,6 @@ public class PipelineStagesEntity {
     @Column(name = "pipeline_id",notNull = true)
     private String pipelineId;
 
-    //源码
-    @Column(name = "task_type",notNull = true)
-    private int taskType;
-
     //顺序
     @Column(name = "task_sort",notNull = true)
     private int taskSort;
@@ -37,6 +33,9 @@ public class PipelineStagesEntity {
     //阶段
     @Column(name = "task_stage",notNull = true)
     private int taskStage;
+
+    @Column(name = "code",notNull = true)
+    private String code;
 
     public String getName() {
         return name;
@@ -70,14 +69,6 @@ public class PipelineStagesEntity {
         this.pipelineId = pipelineId;
     }
 
-    public int getTaskType() {
-        return taskType;
-    }
-
-    public void setTaskType(int taskType) {
-        this.taskType = taskType;
-    }
-
     public int getTaskSort() {
         return taskSort;
     }
@@ -94,4 +85,11 @@ public class PipelineStagesEntity {
         this.taskStage = taskStage;
     }
 
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
 }

@@ -7,7 +7,7 @@ import net.tiklab.dal.jpa.annotation.*;
  */
 
 @Entity
-@Table(name="pipeline_log")
+@Table(name="pip_pipeline_history_log")
 public class PipelineExecLogEntity {
 
     //日志id
@@ -21,8 +21,8 @@ public class PipelineExecLogEntity {
     private String historyId;
 
     //运行类型
-    @Column(name = "type")
-    private int type ;
+    @Column(name = "task_type")
+    private int taskType ;
 
     @Column(name = "task_sort")
     private int taskSort ;
@@ -66,12 +66,12 @@ public class PipelineExecLogEntity {
         this.historyId = historyId;
     }
 
-    public int getType() {
-        return type;
+    public int getTaskType() {
+        return taskType;
     }
 
-    public void setType(int type) {
-        this.type = type;
+    public void setTaskType(int taskType) {
+        this.taskType = taskType;
     }
 
     public int getTaskSort() {

@@ -6,57 +6,58 @@ import net.tiklab.dal.jpa.annotation.*;
  * 流水线
  */
 @Entity
-@Table(name="pipeline")
+@Table(name="pip_pipeline")
 public class PipelineEntity {
 
     //流水线id
     @Id
     @GeneratorValue
-    @Column(name = "pipeline_id")
-    private String pipelineId;
+    @Column(name = "id")
+    private String id;
 
     //流水线名称
-    @Column(name = "pipeline_name",notNull = true)
-    private String pipelineName;
+    @Column(name = "name")
+    private String name;
 
     //流水线创建人
-    @Column(name = "user_id",notNull = true)
+    @Column(name = "user_id")
     private String userId;
 
     //流水线创建时间
-    @Column(name = "pipeline_create_time",notNull = true)
-    private String  pipelineCreateTime;
+    @Column(name = "create_time")
+    private String  createTime;
 
     //流水线类型
-    @Column(name = "pipeline_type")
-    private int pipelineType;
+    @Column(name = "type")
+    private int type;
 
     //运行状态
-    @Column(name = "pipeline_state")
-    private int pipelineState;
+    @Column(name = "state")
+    private int state;
 
-    @Column(name = "pipeline_power")
-    private int pipelinePower;
+    //权限
+    @Column(name = "power")
+    private int power;
 
     //颜色
     @Column(name="color")
     private int color;
 
 
-    public String getPipelineId() {
-        return pipelineId;
+    public String getId() {
+        return id;
     }
 
-    public void setPipelineId(String pipelineId) {
-        this.pipelineId = pipelineId;
+    public void setId(String id) {
+        this.id = id;
     }
 
-    public String getPipelineName() {
-        return pipelineName;
+    public String getName() {
+        return name;
     }
 
-    public void setPipelineName(String pipelineName) {
-        this.pipelineName = pipelineName;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getUserId() {
@@ -67,36 +68,36 @@ public class PipelineEntity {
         this.userId = userId;
     }
 
-    public String getPipelineCreateTime() {
-        return pipelineCreateTime;
+    public String getCreateTime() {
+        return createTime;
     }
 
-    public void setPipelineCreateTime(String pipelineCreateTime) {
-        this.pipelineCreateTime = pipelineCreateTime;
+    public void setCreateTime(String createTime) {
+        this.createTime = createTime;
     }
 
-    public int getPipelineType() {
-        return pipelineType;
+    public int getType() {
+        return type;
     }
 
-    public void setPipelineType(int pipelineType) {
-        this.pipelineType = pipelineType;
+    public void setType(int type) {
+        this.type = type;
     }
 
-    public int getPipelineState() {
-        return pipelineState;
+    public int getState() {
+        return state;
     }
 
-    public void setPipelineState(int pipelineState) {
-        this.pipelineState = pipelineState;
+    public void setState(int state) {
+        this.state = state;
     }
 
-    public int getPipelinePower() {
-        return pipelinePower;
+    public int getPower() {
+        return power;
     }
 
-    public void setPipelinePower(int pipelinePower) {
-        this.pipelinePower = pipelinePower;
+    public void setPower(int power) {
+        this.power = power;
     }
 
     public int getColor() {
