@@ -5,7 +5,7 @@ import net.tiklab.core.exception.ApplicationException;
 import net.tiklab.matflow.orther.until.PipelineUntil;
 import net.tiklab.matflow.task.dao.PipelineTimeDao;
 import net.tiklab.matflow.task.entity.PipelineTimeEntity;
-import net.tiklab.matflow.task.PipelineTime;
+import net.tiklab.matflow.task.model.PipelineTime;
 import net.tiklab.matflow.orther.until.PipelineCronUtils;
 import net.tiklab.matflow.trigger.quartz.PipelineRunJob;
 import net.tiklab.matflow.trigger.quartz.PipelineJob;

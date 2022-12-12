@@ -16,6 +16,14 @@ public interface PipelineHomeService {
 
 
     /**
+     * 配置全局消息
+     * @param templateId 方案id
+     * @param map 信息
+     */
+    void settingMessage(String templateId,Map<String, String> map);
+
+
+    /**
      * 创建消息
      * @param messageTemplateId 消息模板
      * @param mesType 消息类型

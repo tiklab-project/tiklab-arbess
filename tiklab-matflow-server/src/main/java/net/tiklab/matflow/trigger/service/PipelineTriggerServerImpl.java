@@ -7,7 +7,7 @@ import net.tiklab.matflow.definition.model.Pipeline;
 import net.tiklab.matflow.orther.until.PipelineUntil;
 import net.tiklab.matflow.trigger.dao.PipelineTriggerDao;
 import net.tiklab.matflow.trigger.entity.PipelineTriggerEntity;
-import net.tiklab.matflow.task.PipelineTime;
+import net.tiklab.matflow.task.model.PipelineTime;
 import net.tiklab.matflow.trigger.model.PipelineTrigger;
 import net.tiklab.matflow.trigger.server.PipelineTriggerServer;
 import net.tiklab.matflow.trigger.server.PipelineTriggerTaskServer;
@@ -126,6 +126,11 @@ public class PipelineTriggerServerImpl implements PipelineTriggerServer {
 
     @Override
     public void updateConfig(PipelineTrigger config){
+        String configId = config.getConfigId();
+        if (configId == null){
+            configId = createConfig(config);
+        }
+        config.setConfigId(configId);
         triggerConfigTaskServer.updateTriggerConfig(config);
     }
 

@@ -31,28 +31,23 @@ public class TestServiceImpl implements TestService {
     // 单元测试
     public boolean test(PipelineProcess pipelineProcess, String configId ,int taskType) {
 
-        // String configId = config.getConfigId();
         PipelineTest pipelineTest = testService.findOneTestConfig(configId);
         pipelineTest.setType(taskType);
-
-
 
         //初始化日志
         PipelineExecHistory pipelineExecHistory = pipelineProcess.getPipelineExecHistory();
         Pipeline pipeline = pipelineProcess.getPipeline();
-        String log = PipelineUntil.date(4);
         String testOrder = pipelineTest.getTestOrder();
         String path = PipelineUntil.findFileAddress()+pipeline.getName();
         try {
-
-            String a = log+"开始执行测试" + " \n" +
-                    log+ "执行 : \"" + testOrder + "\"";
+            String a = PipelineUntil.date(4)+"开始执行测试" + " \n" +
+                    PipelineUntil.date(4)+ "执行 : \"" + testOrder + "\"";
             pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+a);
 
             Process process = getOrder(pipelineTest,path);
 
             if (process == null){
-                commonService.execHistory(pipelineProcess, log+"命令错误。");
+                commonService.execHistory(pipelineProcess, PipelineUntil.date(4)+"命令错误。");
                 return false;
             }
 
@@ -64,11 +59,11 @@ public class TestServiceImpl implements TestService {
             process.destroy();
             if (state == 0){
                 process.destroy();
-                commonService.execHistory(pipelineProcess, log+"测试执行失败。");
+                commonService.execHistory(pipelineProcess, PipelineUntil.date(4)+"测试执行失败。");
                 return false;
             }
         } catch (IOException e) {
-            commonService.execHistory(pipelineProcess, log+"日志打印失败"+e);
+            commonService.execHistory(pipelineProcess, PipelineUntil.date(4)+"日志打印失败"+e);
             return false;
         } catch (ApplicationException e) {
             commonService.execHistory(pipelineProcess,e.getMessage());
@@ -90,7 +85,7 @@ public class TestServiceImpl implements TestService {
         if (type == 11) {
             String mavenAddress = commonService.getScm(21);
             if (mavenAddress == null) {
-                throw new ApplicationException("不存在maven配置");
+                throw new ApplicationException(PipelineUntil.date(4)+"不存在maven配置");
             }
             PipelineUntil.validFile(mavenAddress,21);
             order = testOrder(testOrder, path);

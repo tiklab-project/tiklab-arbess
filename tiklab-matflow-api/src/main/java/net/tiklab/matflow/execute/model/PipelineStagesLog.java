@@ -2,6 +2,10 @@ package net.tiklab.matflow.execute.model;
 
 import java.util.List;
 
+/**
+ * 阶段日志
+ */
+
 public class PipelineStagesLog {
 
     private int taskSort;

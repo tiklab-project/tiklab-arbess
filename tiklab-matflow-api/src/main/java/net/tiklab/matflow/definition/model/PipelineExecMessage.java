@@ -47,6 +47,7 @@ public class PipelineExecMessage {
 
     //用户(负责人)
     private User user;
+
     //用户(执行人)
     private User execUser;
 

@@ -42,7 +42,7 @@ public interface PipelineExecCommonService {
      * @param historyId 历史id
      * @return 日志信息
      */
-    PipelineExecLog initializeLog(String historyId, int sort,int type);
+    PipelineExecLog initializeLog(String historyId, int sort,int type,String stagesId);
 
     /**
      * 执行过程中的历史
@@ -60,10 +60,9 @@ public interface PipelineExecCommonService {
     /**
      * 更新执行状态
      * @param historyId 历史id
-     * @param time 时间
      * @param state 状态
      */
-    void updateState(String historyId, List<Integer> time, int state);
+    void updateState(String historyId, String logId,int state);
 
     /**
      * 获取环境配置信息

@@ -5,7 +5,7 @@ import net.tiklab.join.JoinTemplate;
 import net.tiklab.matflow.definition.model.Pipeline;
 import net.tiklab.matflow.definition.model.PipelineExecMessage;
 import net.tiklab.matflow.execute.model.PipelineExecHistory;
-import net.tiklab.matflow.execute.model.PipelineExecState;
+import net.tiklab.matflow.execute.model.PipelineOverview;
 import net.tiklab.matflow.execute.service.PipelineExecHistoryService;
 import net.tiklab.matflow.orther.model.PipelineFollow;
 import net.tiklab.matflow.orther.model.PipelineOpen;
@@ -274,12 +274,12 @@ public class PipelineRelationServerImpl implements PipelineRelationServer{
      * @param pipelineId 流水线id
      * @return 统计信息
      */
-    public PipelineExecState pipelineCensus(String pipelineId){
+    public PipelineOverview pipelineCensus(String pipelineId){
         List<PipelineExecHistory> allHistory = historyService.findAllHistory(pipelineId);
         if (allHistory == null){
             return null;
         }
-        PipelineExecState state = new PipelineExecState();
+        PipelineOverview state = new PipelineOverview();
         for (PipelineExecHistory history : allHistory) {
             if (history.getRunStatus() == 1){
                 state.setErrorNumber(state.getErrorNumber() + 1);
@@ -305,7 +305,7 @@ public class PipelineRelationServerImpl implements PipelineRelationServer{
         return state;
     }
 
-    public PipelineExecState census(String pipelineId){
+    public PipelineOverview census(String pipelineId){
         //添加最近打开
         String loginId = LoginContext.getLoginId();
         openService.updatePipelineOpen(loginId,pipelineId);
@@ -331,8 +331,8 @@ public class PipelineRelationServerImpl implements PipelineRelationServer{
         //统计信息
         for (PipelineOpen pipelineOpen : pipelineOpens) {
             Pipeline pipeline = pipelineOpen.getPipeline();
-            PipelineExecState pipelineExecState = pipelineCensus(pipeline.getId());
-            pipelineOpen.setPipelineExecState(pipelineExecState);
+            PipelineOverview pipelineOverview = pipelineCensus(pipeline.getId());
+            pipelineOpen.setPipelineExecState(pipelineOverview);
         }
         return pipelineOpens;
     }

@@ -36,7 +36,6 @@ public class ProductServiceImpl implements ProductService {
      */
     @Override
     public boolean product(PipelineProcess pipelineProcess, String configId ,int taskType) {
-
         PipelineProduct product = productServer.findOneProductConfig(configId);
         product.setType(taskType);
         Pipeline pipeline = pipelineProcess.getPipeline();

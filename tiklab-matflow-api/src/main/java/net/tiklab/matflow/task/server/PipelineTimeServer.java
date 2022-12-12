@@ -4,7 +4,7 @@ import net.tiklab.join.annotation.FindAll;
 import net.tiklab.join.annotation.FindList;
 import net.tiklab.join.annotation.FindOne;
 import net.tiklab.join.annotation.JoinProvider;
-import net.tiklab.matflow.task.PipelineTime;
+import net.tiklab.matflow.task.model.PipelineTime;
 
 import java.util.List;
 

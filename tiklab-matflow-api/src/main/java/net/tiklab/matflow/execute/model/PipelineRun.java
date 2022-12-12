@@ -23,6 +23,8 @@ public class PipelineRun {
 
     private List<String> timeList;
 
+    private List<PipelineRun> runList;
+
     public String getHistoryId() {
         return historyId;
     }
@@ -85,5 +87,13 @@ public class PipelineRun {
 
     public void setExecUser(String execUser) {
         this.execUser = execUser;
+    }
+
+    public List<PipelineRun> getRunList() {
+        return runList;
+    }
+
+    public void setRunList(List<PipelineRun> runList) {
+        this.runList = runList;
     }
 }

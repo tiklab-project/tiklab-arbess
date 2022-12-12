@@ -65,7 +65,7 @@ public class PipelineServiceImpl implements PipelineService {
         pipeline.setColor((random.nextInt(5) + 1));
         pipeline.setCreateTime(PipelineUntil.date(1));
         PipelineEntity pipelineEntity = BeanMapper.map(pipeline, PipelineEntity.class);
-        pipelineEntity.setState(2);
+        pipelineEntity.setState(1);
         String pipelineId = pipelineDao.createPipeline(pipelineEntity);
         joinTemplate.joinQuery(pipeline);
         pipeline.setId(pipelineId);
@@ -81,7 +81,8 @@ public class PipelineServiceImpl implements PipelineService {
         relationServer.createDmUser(pipelineId,pipeline.getUserList());
 
         //消息
-        homeService.message(MES_TEM_PIPELINE_CREATE, MES_PIPELINE, map);
+        map.put("title","流水线创建消息");
+        homeService.settingMessage("ed558817d1327167f4b26076c890cde8", map);
 
         return pipelineId;
     }

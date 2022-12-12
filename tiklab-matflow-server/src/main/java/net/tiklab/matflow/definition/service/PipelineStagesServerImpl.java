@@ -40,6 +40,8 @@ public class PipelineStagesServerImpl implements PipelineStagesServer {
         int taskSort = config.getTaskSort();
         int stages = config.getStages();
 
+        String id  = null;
+
         PipelineStages pipelineStages = new PipelineStages(PipelineUntil.date(1),pipelineId);
 
         //判断新任务是否为代码源
@@ -56,8 +58,8 @@ public class PipelineStagesServerImpl implements PipelineStagesServer {
             pipelineStages.setTaskStage(initStage);
             stagesId = createStages(pipelineStages);
             config.setStagesId(stagesId);
-            stagesTaskServer.createStagesTasksTask(config);
-            return stagesId;
+            id  = stagesTaskServer.createStagesTasksTask(config);
+            return id;
         }
 
         //新任务
@@ -69,14 +71,14 @@ public class PipelineStagesServerImpl implements PipelineStagesServer {
             pipelineStages.setTaskSort(1);
             stagesId = createStages(pipelineStages);
             config.setStagesId(stagesId);
-            stagesTaskServer.createStagesTasksTask(config);
-            return stagesId;
+            id  = stagesTaskServer.createStagesTasksTask(config);
+            return id;
         }
 
         //串行任务
         if (PipelineUntil.isNoNull(stagesId) && stages != 0){
-            stagesTaskServer.createStagesTasksTask(config);
-            return stagesId;
+            id  = stagesTaskServer.createStagesTasksTask(config);
+            return id;
         }
 
         //并行任务
@@ -94,11 +96,11 @@ public class PipelineStagesServerImpl implements PipelineStagesServer {
             pipelineStages.setTaskSort(sort);
             stagesId = createStages(pipelineStages);
             config.setStagesId(stagesId);
-            stagesTaskServer.createStagesTasksTask(config);
-            return stagesId;
+            id  = stagesTaskServer.createStagesTasksTask(config);
+            return id;
         }
 
-        return stagesId;
+        return id;
     }
 
     /**

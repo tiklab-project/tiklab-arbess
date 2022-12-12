@@ -5,7 +5,7 @@ import net.tiklab.matflow.definition.model.Pipeline;
 import net.tiklab.matflow.definition.model.PipelineExecMessage;
 import net.tiklab.matflow.definition.service.PipelineRelationServer;
 import net.tiklab.matflow.definition.service.PipelineService;
-import net.tiklab.matflow.execute.model.PipelineExecState;
+import net.tiklab.matflow.execute.model.PipelineOverview;
 import net.tiklab.matflow.orther.model.PipelineFollow;
 import net.tiklab.matflow.orther.model.PipelineOpen;
 import net.tiklab.postin.annotation.Api;
@@ -138,9 +138,9 @@ public class PipelineController {
     @RequestMapping(path="/pipelineCensus",method = RequestMethod.POST)
     @ApiMethod(name = "pipelineCensus",desc = "查询流水线最近状态")
     @ApiParam(name = "pipelineId",desc = "流水线id",required = true)
-    public Result<PipelineExecState> pipelineCensus(@NotNull String pipelineId){
+    public Result<PipelineOverview> pipelineCensus(@NotNull String pipelineId){
 
-        PipelineExecState buildStatus = relationServer.census(pipelineId);
+        PipelineOverview buildStatus = relationServer.census(pipelineId);
 
         return Result.ok(buildStatus);
     }

@@ -3,7 +3,7 @@ package net.tiklab.matflow.trigger.service;
 import com.alibaba.fastjson.JSON;
 import net.tiklab.core.exception.ApplicationException;
 import net.tiklab.matflow.definition.model.Pipeline;
-import net.tiklab.matflow.task.PipelineTime;
+import net.tiklab.matflow.task.model.PipelineTime;
 import net.tiklab.matflow.task.server.PipelineTimeServer;
 import net.tiklab.matflow.trigger.model.PipelineTrigger;
 import net.tiklab.matflow.trigger.server.PipelineTriggerTaskServer;

@@ -41,6 +41,8 @@ public class PipelineExecCommonServiceImpl implements PipelineExecCommonService 
     //历史
     Map<String,PipelineExecHistory> historyMap = PipelineExecServiceImpl.historyMap;
 
+    Map<String,PipelineExecLog> execMap = PipelineExecServiceImpl.execMap;
+
     //日志
     Map<String, List<String>> logMap = PipelineExecServiceImpl.logMap;
 
@@ -54,8 +56,10 @@ public class PipelineExecCommonServiceImpl implements PipelineExecCommonService 
      */
     @Override
     public int log(PipelineProcess pipelineProcess) throws IOException {
+
         int state = 1;
         String enCode = pipelineProcess.getEnCode();
+        //指定编码
         if (!PipelineUntil.isNoNull(enCode)){
             int systemType = PipelineUntil.findSystemType();
             if (systemType == 1){
@@ -122,7 +126,6 @@ public class PipelineExecCommonServiceImpl implements PipelineExecCommonService 
         return false;
     }
 
-
     public List<PipelineExecLog> findAllStagesLog(String historyId,String stagesId){
         return logService.findAllStagesLog(historyId,stagesId);
     }
@@ -158,17 +161,15 @@ public class PipelineExecCommonServiceImpl implements PipelineExecCommonService 
     /**
      * 更新日志执行状态
      * @param historyId 执行信息
-     * @param time 时间
      */
-    public void updateState(String historyId,List<Integer> time,int state){
-
+    public void updateState(String historyId,String logId,int state){
         PipelineExecHistory pipelineExecHistory = historyService.findOneHistory(historyId);
         List<String> list1 = logMap.get(historyId);
         if (list1 == null){
             return;
         }
-        String logId = logMap.get(historyId).get(logMap.get(historyId).size()-1);
-        PipelineExecLog pipelineExecLog = logService.findOneLog(logId);
+
+        PipelineExecLog pipelineExecLog = execMap.get(logId);
 
         int times = 0;
         List<String> list = logMap.get(historyId);
@@ -190,6 +191,9 @@ public class PipelineExecCommonServiceImpl implements PipelineExecCommonService 
         }
         pipelineExecHistory.setRunTime(times);
         historyService.updateHistory(pipelineExecHistory);
+
+
+
     }
 
     /**
@@ -228,11 +232,12 @@ public class PipelineExecCommonServiceImpl implements PipelineExecCommonService 
      * @return 日志
      */
     @Override
-    public PipelineExecLog initializeLog(String historyId,int sort,int type){
+    public PipelineExecLog initializeLog(String historyId,int sort,int type,String stagesId){
         PipelineExecLog pipelineExecLog = new PipelineExecLog();
         pipelineExecLog.setHistoryId(historyId);
         pipelineExecLog.setTaskSort(sort);
         pipelineExecLog.setTaskType(type);
+        pipelineExecLog.setStagesId(stagesId);
         pipelineExecLog.setRunLog("");
         String logId = logService.createLog(pipelineExecLog);
         pipelineExecLog.setLogId(logId);
@@ -271,16 +276,20 @@ public class PipelineExecCommonServiceImpl implements PipelineExecCommonService 
     @Override
     public void execHistory(PipelineProcess pipelineProcess,String log){
         String pipelineId = pipelineProcess.getPipeline().getId();
+
         PipelineExecLog pipelineExecLog = pipelineProcess.getPipelineExecLog();
 
         PipelineExecHistory history = historyMap.get(pipelineId);
-
         history.setRunLog(history.getRunLog()+"\n"+log);
         historyMap.put(pipelineId,history);
 
         //更新单个配置日志
-        pipelineExecLog.setRunLog(pipelineExecLog.getRunLog()+"\n"+log);
-        logService.updateLog(pipelineExecLog);
+        PipelineExecLog execLog = execMap.get(pipelineExecLog.getLogId());
+        if (execLog == null){
+            return;
+        }
+        execLog.setRunLog(execLog.getRunLog()+"\n"+log);
+        execMap.put(pipelineExecLog.getLogId(),execLog);
     }
 
 

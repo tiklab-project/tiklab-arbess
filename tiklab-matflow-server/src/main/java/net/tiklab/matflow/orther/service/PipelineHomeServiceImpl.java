@@ -7,8 +7,10 @@ import net.tiklab.matflow.definition.model.Pipeline;
 import net.tiklab.matflow.orther.until.PipelineFinal;
 import net.tiklab.matflow.orther.until.PipelineUntil;
 import net.tiklab.message.message.model.Message;
+import net.tiklab.message.message.model.MessageDispatchNotice;
 import net.tiklab.message.message.model.MessageReceiver;
 import net.tiklab.message.message.model.MessageTemplate;
+import net.tiklab.message.message.service.MessageDispatchNoticeService;
 import net.tiklab.message.message.service.MessageService;
 import net.tiklab.message.setting.model.MessageType;
 import net.tiklab.message.sms.modal.Sms;
@@ -58,6 +60,9 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
 
     @Autowired
     private SmsSignCfgService smsSignCfgService;
+
+    @Autowired
+    private MessageDispatchNoticeService dispatchNoticeService;
 
 
     private static final Logger logger = LoggerFactory.getLogger(PipelineHomeServiceImpl.class);
@@ -118,9 +123,27 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
         logService.createLog(log);
     }
 
+    /**
+     * 配置全局消息
+     * @param templateId 方案id
+     * @param map 信息
+     */
+    @Override
+    public void settingMessage(String templateId,Map<String, String> map){
+        MessageDispatchNotice dispatchNotice = new MessageDispatchNotice();
+        dispatchNotice.setId(templateId);
+        String jsonString = JSONObject.toJSONString(map);
+        dispatchNotice.setEmailData(jsonString);
+        dispatchNotice.setDingdingData(jsonString);
+        dispatchNotice.setSiteData(jsonString);
+        dispatchNotice.setQywechatData(jsonString);
+        dispatchNoticeService.createMessageDispatchItem(dispatchNotice);
+
+    }
+
 
     /**
-     * 发送消息
+     * 发送消息（站内信）
      * @param messageTemplateId 消息模板
      * @param mesType 消息类型
      * @param map 信息

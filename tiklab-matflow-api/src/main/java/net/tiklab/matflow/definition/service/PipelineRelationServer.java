@@ -2,7 +2,7 @@ package net.tiklab.matflow.definition.service;
 
 import net.tiklab.matflow.definition.model.Pipeline;
 import net.tiklab.matflow.definition.model.PipelineExecMessage;
-import net.tiklab.matflow.execute.model.PipelineExecState;
+import net.tiklab.matflow.execute.model.PipelineOverview;
 import net.tiklab.matflow.orther.model.PipelineFollow;
 import net.tiklab.matflow.orther.model.PipelineOpen;
 import net.tiklab.privilege.role.model.PatchUser;
@@ -84,7 +84,7 @@ public interface PipelineRelationServer {
      * @param pipelineId 流水线id
      * @return 统计信息
      */
-    PipelineExecState pipelineCensus(String pipelineId);
+    PipelineOverview pipelineCensus(String pipelineId);
 
 
     /**
@@ -92,7 +92,7 @@ public interface PipelineRelationServer {
      * @param pipelineId 流水线id
      * @return 统计信息
      */
-    PipelineExecState census(String pipelineId);
+    PipelineOverview census(String pipelineId);
 
 
     /**

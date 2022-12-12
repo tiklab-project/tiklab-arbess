@@ -1,7 +1,7 @@
 package net.tiklab.matflow.trigger.server;
 
 import net.tiklab.matflow.trigger.model.PipelineTrigger;
-import net.tiklab.matflow.task.PipelineTime;
+import net.tiklab.matflow.task.model.PipelineTime;
 
 public interface PipelineTriggerTaskServer {
 

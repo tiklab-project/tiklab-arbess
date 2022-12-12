@@ -1,7 +1,7 @@
 package net.tiklab.matflow.trigger.quartz;
 
 import net.tiklab.core.exception.ApplicationException;
-import net.tiklab.matflow.task.PipelineTime;
+import net.tiklab.matflow.task.model.PipelineTime;
 import net.tiklab.matflow.trigger.model.PipelineTrigger;
 import net.tiklab.matflow.trigger.server.PipelineTriggerServer;
 import org.quartz.Scheduler;

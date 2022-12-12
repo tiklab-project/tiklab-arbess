@@ -7,7 +7,7 @@ import net.tiklab.beans.annotation.Mappings;
 import net.tiklab.join.annotation.Join;
 import net.tiklab.join.annotation.JoinQuery;
 import net.tiklab.matflow.definition.model.Pipeline;
-import net.tiklab.matflow.execute.model.PipelineExecState;
+import net.tiklab.matflow.execute.model.PipelineOverview;
 import net.tiklab.postin.annotation.ApiModel;
 import net.tiklab.postin.annotation.ApiProperty;
 
@@ -41,7 +41,7 @@ public class PipelineOpen {
     private String createTime;
 
     //流水线执行统计信息
-    private PipelineExecState pipelineExecState;
+    private PipelineOverview pipelineOverview;
 
 
     public String getOpenId() {
@@ -76,12 +76,12 @@ public class PipelineOpen {
         this.number = number;
     }
 
-    public PipelineExecState getPipelineExecState() {
-        return pipelineExecState;
+    public PipelineOverview getPipelineExecState() {
+        return pipelineOverview;
     }
 
-    public void setPipelineExecState(PipelineExecState pipelineExecState) {
-        this.pipelineExecState = pipelineExecState;
+    public void setPipelineExecState(PipelineOverview pipelineOverview) {
+        this.pipelineOverview = pipelineOverview;
     }
 
     public String getCreateTime() {

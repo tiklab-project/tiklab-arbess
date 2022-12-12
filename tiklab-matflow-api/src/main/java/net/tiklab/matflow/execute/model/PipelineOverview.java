@@ -9,7 +9,7 @@ import net.tiklab.user.user.model.User;
  */
 
 @ApiModel
-public class PipelineExecState {
+public class PipelineOverview {
 
     //运行次数
     private int number;

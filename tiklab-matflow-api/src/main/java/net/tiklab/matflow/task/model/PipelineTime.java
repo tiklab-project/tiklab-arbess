@@ -1,4 +1,4 @@
-package net.tiklab.matflow.task;
+package net.tiklab.matflow.task.model;
 
 import net.tiklab.beans.annotation.Mapper;
 import net.tiklab.join.annotation.Join;
