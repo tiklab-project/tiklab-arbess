@@ -82,7 +82,7 @@ public class PipelineServiceImpl implements PipelineService {
 
         //消息
         map.put("title","流水线创建消息");
-        homeService.settingMessage("ed558817d1327167f4b26076c890cde8", map);
+        // homeService.settingMessage("ed558817d1327167f4b26076c890cde8", map);
 
         return pipelineId;
     }
@@ -99,7 +99,6 @@ public class PipelineServiceImpl implements PipelineService {
         pipelineDao.deletePipeline(pipelineId); //流水线
         relationServer.deleteDmUser(pipelineId); //关联用户
         relationServer.deleteHistory(pipeline); //历史，日志信息
-        relationServer.deleteDmRole(pipelineId); //关联角色
         configServer.deleteAllTaskConfig(pipelineId,pipeline.getType()); //配置信息
 
         //动态

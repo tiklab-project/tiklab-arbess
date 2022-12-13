@@ -9,12 +9,11 @@ import net.tiklab.matflow.execute.model.PipelineOverview;
 import net.tiklab.matflow.execute.service.PipelineExecHistoryService;
 import net.tiklab.matflow.orther.model.PipelineFollow;
 import net.tiklab.matflow.orther.model.PipelineOpen;
-import net.tiklab.matflow.orther.until.PipelineFinal;
 import net.tiklab.matflow.orther.service.PipelineFollowService;
 import net.tiklab.matflow.orther.service.PipelineOpenService;
+import net.tiklab.matflow.orther.until.PipelineFinal;
 import net.tiklab.matflow.orther.until.PipelineUntil;
 import net.tiklab.privilege.role.model.DmRole;
-import net.tiklab.privilege.role.model.DmRoleQuery;
 import net.tiklab.privilege.role.model.PatchUser;
 import net.tiklab.privilege.role.service.DmRoleService;
 import net.tiklab.rpc.annotation.Exporter;
@@ -230,25 +229,26 @@ public class PipelineRelationServerImpl implements PipelineRelationServer{
      */
     @Override
     public void deleteDmUser(String pipelineId){
-        List<DmUser> allDmUser = dmUserService.findAllDmUser();
-        if (allDmUser == null){
-            return ;
-        }
-        for (DmUser dm : allDmUser) {
-            if (!dm.getDomainId().equals(pipelineId)){
-                continue;
-            }
-            dmUserService.deleteDmUser(dm.getId());
-        }
-        DmRoleQuery dmRoleQuery = new DmRoleQuery();
-        dmRoleQuery.setDomainId(pipelineId);
-        List<DmRole> dmRoleList = dmRoleService.findDmRoleList(dmRoleQuery);
-        if (dmRoleList == null){
-            return;
-        }
-        for (DmRole dmRole : dmRoleList) {
-            dmRoleService.deleteDmRole(dmRole.getId());
-        }
+        dmRoleService.deleteDmRoleByDomainId(pipelineId);
+        // List<DmUser> allDmUser = dmUserService.findAllDmUser();
+        // if (allDmUser == null){
+        //     return ;
+        // }
+        // for (DmUser dm : allDmUser) {
+        //     if (!dm.getDomainId().equals(pipelineId)){
+        //         continue;
+        //     }
+        //     dmUserService.deleteDmUser(dm.getId());
+        // }
+        // DmRoleQuery dmRoleQuery = new DmRoleQuery();
+        // dmRoleQuery.setDomainId(pipelineId);
+        // List<DmRole> dmRoleList = dmRoleService.findDmRoleList(dmRoleQuery);
+        // if (dmRoleList == null){
+        //     return;
+        // }
+        // for (DmRole dmRole : dmRoleList) {
+        //     dmRoleService.deleteDmRole(dmRole.getId());
+        // }
 
     }
 

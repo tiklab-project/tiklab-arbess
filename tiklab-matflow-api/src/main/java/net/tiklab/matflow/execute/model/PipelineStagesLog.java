@@ -3,7 +3,7 @@ package net.tiklab.matflow.execute.model;
 import java.util.List;
 
 /**
- * 阶段日志
+ * 阶段日志返回值封装
  */
 
 public class PipelineStagesLog {
@@ -15,6 +15,16 @@ public class PipelineStagesLog {
     private int stages;
 
     private List<PipelineExecLog> logList;
+
+    private List<PipelineStagesLog> stagesLogList;
+
+    public List<PipelineStagesLog> getStagesLogList() {
+        return stagesLogList;
+    }
+
+    public void setStagesLogList(List<PipelineStagesLog> stagesLogList) {
+        this.stagesLogList = stagesLogList;
+    }
 
     public int getTaskSort() {
         return taskSort;

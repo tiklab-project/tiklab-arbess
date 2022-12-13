@@ -59,9 +59,16 @@
             <artifactId>tiklab-todotask-api</artifactId>
             <version>1.0.0-SNAPSHOT</version>
         </dependency>
+
+<!--        <dependency>-->
+<!--            <groupId>net.tiklab</groupId>-->
+<!--            <artifactId>tiklab-message-api</artifactId>-->
+<!--            <version>1.0.0-SNAPSHOT</version>-->
+<!--        </dependency>-->
+
         <dependency>
             <groupId>net.tiklab</groupId>
-            <artifactId>tiklab-message-api</artifactId>
+            <artifactId>tiklab-message-spring-boot-starter</artifactId>
             <version>1.0.0-SNAPSHOT</version>
         </dependency>
 
@@ -89,11 +96,8 @@
             <artifactId>quartz</artifactId>
             <version>2.3.2</version>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>org.springframework.boot</groupId>-->
-<!--            <artifactId>spring-boot</artifactId>-->
-<!--            <version>2.7.3</version>-->
-<!--        </dependency>-->
+
+
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context-support</artifactId>
@@ -105,22 +109,6 @@
             <version>9.0.54</version>
             <scope>compile</scope>
         </dependency>
-
-
-        <!--        <profile>-->
-<!--            <id>sonar</id>-->
-<!--            <activation>-->
-<!--                <activeByDefault>true</activeByDefault>-->
-<!--            </activation>-->
-<!--            <properties>-->
-<!--                <sonar.login>admin</sonar.login>-->
-<!--                <sonar.password>123456</sonar.password>-->
-<!--                <sonar.host.url>http://localhost:9000</sonar.host.url>-->
-<!--            </properties>-->
-<!--        </profile>-->
-
-
-
 
 
     </dependencies>

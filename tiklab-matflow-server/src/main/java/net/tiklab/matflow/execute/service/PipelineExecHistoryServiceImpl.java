@@ -170,36 +170,52 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
 
         //多阶段
         if (pipelineType == 2){
-            List<PipelineStagesLog> logs = new ArrayList<>();
             List<PipelineStages> allStagesConfig = stagesServer.findAllStage(pipelineId);
-
-            for (PipelineStages pipelineStages : allStagesConfig) {
-                String stagesId = pipelineStages.getStagesId();
-                PipelineStagesLog pipelineStagesLog = new PipelineStagesLog();
-                List<PipelineExecLog> allStagesLog = pipelineExecLogService.findAllStagesLog(historyId,stagesId);
-                if (allStagesLog == null || allStagesLog.size() == 0){
-                    continue;
+            List<PipelineStagesLog> stagesLogs = new ArrayList<>();
+            List<PipelineStages> stagesStageTask = stagesServer.findAllStagesStageTask(pipelineId);
+            if (stagesStageTask == null || stagesStageTask.size() == 0){
+                return null;
+            }
+            for (PipelineStages pipelineStages : stagesStageTask) {
+                List<PipelineStagesLog> logs = new ArrayList<>();
+                PipelineStagesLog stagesLog = new PipelineStagesLog();
+                //获取并行阶段
+                List<PipelineStages> stagesList = pipelineStages.getStagesList();
+                for (PipelineStages stages : stagesList) {
+                    String stagesId = stages.getStagesId();
+                    PipelineStagesLog pipelineStagesLog = new PipelineStagesLog();
+                    List<PipelineExecLog> allStagesLog = pipelineExecLogService.findAllStagesLog(historyId,stagesId);
+                    if (allStagesLog == null || allStagesLog.size() == 0){
+                        continue;
+                    }
+                    allStagesLog.sort(Comparator.comparing(PipelineExecLog::getTaskSort));
+                    pipelineStagesLog.setStages(stages.getTaskStage());
+                    pipelineStagesLog.setLogList(allStagesLog);
+                    pipelineStagesLog.setTaskSort(stages.getTaskSort());
+                    logs.add(pipelineStagesLog);
                 }
-                allStagesLog.sort(Comparator.comparing(PipelineExecLog::getTaskSort));
-                pipelineStagesLog.setStages(pipelineStages.getTaskStage());
-                pipelineStagesLog.setLogList(allStagesLog);
-                pipelineStagesLog.setTaskSort(pipelineStages.getTaskSort());
-                logs.add(pipelineStagesLog);
+                stagesLog.setStages(pipelineStages.getTaskStage());
+                stagesLog.setTaskSort(pipelineStages.getTaskSort());
+                stagesLog.setStagesLogList(logs);
+                stagesLogs.add(stagesLog);
             }
 
             //添加消息阶段
-
             List<PipelineExecLog> allLog = pipelineExecLogService.findAllLog(historyId);
             allLog.removeIf(pipelineExecLog -> PipelineUntil.isNoNull(pipelineExecLog.getStagesId()));
             if ( allLog.size() == 0){
-                list.addAll(logs);
+                list.addAll(stagesLogs);
                 return list;
             }
+
             PipelineStagesLog pipelineStages = new PipelineStagesLog();
             pipelineStages.setStages(allStagesConfig.size()+1);
-            pipelineStages.setLogList(allLog);
-
-            list.addAll(logs);
+            List<PipelineStagesLog> stagesLogList = new ArrayList<>();
+            PipelineStagesLog stagesLog = new PipelineStagesLog();
+            stagesLog.setLogList(allLog);
+            stagesLogList.add(stagesLog);
+            pipelineStages.setStagesLogList(stagesLogList);
+            list.addAll(stagesLogs);
             list.add(pipelineStages);
         }
 

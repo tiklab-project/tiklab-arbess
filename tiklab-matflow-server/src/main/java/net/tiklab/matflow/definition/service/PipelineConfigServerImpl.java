@@ -55,7 +55,11 @@ public class PipelineConfigServerImpl implements PipelineConfigServer {
             return allCourseConfig;
         }
         PipelineStages pipelineStages = new PipelineStages();
-        pipelineStages.setTaskValues(allAfterConfig);
+        List<PipelineStages> stagesList = new ArrayList<>();
+        PipelineStages stages = new PipelineStages();
+        stages.setTaskValues(allAfterConfig);
+        stagesList.add(stages);
+        pipelineStages.setStagesList(stagesList);
         pipelineStages.setTaskSort(allCourseConfig.size()+1);
         allCourseConfig.add(pipelineStages);
         return allCourseConfig;

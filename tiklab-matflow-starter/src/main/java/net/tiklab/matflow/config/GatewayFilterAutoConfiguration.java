@@ -113,6 +113,22 @@ public class GatewayFilterAutoConfiguration {
     Boolean enableEam;
 
 
+
+    // @Value("${eas.address:null}")
+    // String authServiceUrl;
+    // //rpc配置
+    // RpcClient rpcClient(){
+    //     RpcClientConfig rpcClientConfig = RpcClientConfig.instance();
+    //     RpcClient rpcClient = new RpcClient(rpcClientConfig);
+    //     return rpcClient;
+    // }
+    //
+    // @Bean
+    // Authenticator authenticator(){
+    //     return rpcClient().getBean(Authenticator.class, new FixedLookup(authServiceUrl));
+    // }
+
+
     //gateway路由配置
     @Bean
     RouterConfig routerConfig(){

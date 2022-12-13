@@ -169,8 +169,6 @@ public class PipelineExecCommonServiceImpl implements PipelineExecCommonService 
             return;
         }
 
-        PipelineExecLog pipelineExecLog = execMap.get(logId);
-
         int times = 0;
         List<String> list = logMap.get(historyId);
         if (list != null){
@@ -183,16 +181,19 @@ public class PipelineExecCommonServiceImpl implements PipelineExecCommonService 
         if (integer == 0){
             integer = integer+1;
         }
-        pipelineExecLog.setRunTime(integer);
-        pipelineExecLog.setRunState(state);
-        logService.updateLog(pipelineExecLog);
+
+        PipelineExecLog pipelineExecLog = execMap.get(logId);
+        if (pipelineExecLog != null){
+            pipelineExecLog.setRunTime(integer);
+            pipelineExecLog.setRunState(state);
+            logService.updateLog(pipelineExecLog);
+        }
+
         if (times == 0){
             return;
         }
         pipelineExecHistory.setRunTime(times);
         historyService.updateHistory(pipelineExecHistory);
-
-
 
     }
 

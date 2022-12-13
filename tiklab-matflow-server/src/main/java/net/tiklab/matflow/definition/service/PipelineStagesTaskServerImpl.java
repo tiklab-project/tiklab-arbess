@@ -141,6 +141,7 @@ public class PipelineStagesTaskServerImpl implements PipelineStagesTaskServer {
             }
             list.add(stagesTask);
         }
+        list.sort(Comparator.comparing(PipelineStagesTask::getTaskSort));
         return list;
     }
 
