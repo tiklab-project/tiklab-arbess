@@ -1,12 +1,9 @@
 package net.tiklab.matflow.execute.service;
 
-import net.tiklab.matflow.definition.model.Pipeline;
 import net.tiklab.matflow.execute.model.PipelineExecHistory;
-import net.tiklab.matflow.execute.model.PipelineExecLog;
 import net.tiklab.matflow.execute.model.PipelineProcess;
 
 import java.io.IOException;
-import java.util.List;
 
 /**
  * 执行过程配置的公共方法
@@ -21,28 +18,21 @@ public interface PipelineExecCommonService {
      */
     int log( PipelineProcess pipelineProcess) throws IOException;
 
-    List<PipelineExecLog> findAllStagesLog(String historyId,String stagesId);
+
 
     /**
      * 运行结束更新历史状态
-     * @param pipelineExecHistory 历史
      * @param pipelineId 流水线id
-     * @param status 状态 success error halt
+     * @param status 状态 success:10  error:1 halt:20
      */
-    void runEnd(PipelineExecHistory pipelineExecHistory, String pipelineId ,String status);
+    void runEnd(String pipelineId ,int status);
 
     /**
      * 初始化历史
      * @return 历史
      */
-    PipelineExecHistory initializeHistory(Pipeline pipeline,int startWAy);
+    PipelineExecHistory initializeHistory(String pipelineId,int startWAy);
 
-    /**
-     * 初始化日志
-     * @param historyId 历史id
-     * @return 日志信息
-     */
-    PipelineExecLog initializeLog(String historyId, int sort,int type,String stagesId);
 
     /**
      * 执行过程中的历史

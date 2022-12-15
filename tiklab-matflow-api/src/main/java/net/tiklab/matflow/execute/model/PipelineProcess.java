@@ -49,12 +49,22 @@ public class PipelineProcess {
     //历史id
     private String historyId;
 
+    private String logId;
+
     public String getHistoryId() {
         return historyId;
     }
 
     public void setHistoryId(String historyId) {
         this.historyId = historyId;
+    }
+
+    public String getLogId() {
+        return logId;
+    }
+
+    public void setLogId(String logId) {
+        this.logId = logId;
     }
 
     public PipelineExecHistory getPipelineExecHistory() {

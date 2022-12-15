@@ -77,15 +77,23 @@ public class PipelineExecHistory {
     @ApiProperty(name="findState",desc="运行状态（1.运行完成，0.运行中）")
     private int findState;
 
-    //阶段
-    private int stages;
-
-    public int getStages() {
-        return stages;
+    public PipelineExecHistory() {
     }
 
-    public void setStages(int stages) {
-        this.stages = stages;
+    /**
+     * 初始化信息
+     * @param createTime 时间
+     * @param runWay 运行方式
+     * @param userId 用户id
+     * @param pipelineId 流水线id
+     */
+    public PipelineExecHistory(String createTime, int runWay, String userId,String pipelineId) {
+        this.createTime = createTime;
+        this.runWay = runWay;
+        User user = new User();
+        user.setId(userId);
+        this.user = user;
+        this.pipeline = new Pipeline(pipelineId);
     }
 
     //执行时间

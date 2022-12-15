@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.constraints.NotNull;
-import java.util.List;
 
 @RestController
 @RequestMapping("/pipelineExec")
@@ -36,8 +35,8 @@ public class PipelineExecController {
     @RequestMapping(path="/pipelineRunStatus",method = RequestMethod.POST)
     @ApiMethod(name = "pipelineRunStatus",desc = "执行")
     @ApiParam(name = "pipelineId",desc = "流水线id",required = true)
-    public Result<List<PipelineRun>> pipelineRunStatus(String pipelineId)  {
-        List<PipelineRun> instanceState = pipelineExecService.pipelineRunStatus(pipelineId);
+    public Result<PipelineRun> pipelineRunStatus(String pipelineId)  {
+        PipelineRun instanceState = pipelineExecService.pipelineRunStatus(pipelineId);
         return Result.ok(instanceState);
     }
 

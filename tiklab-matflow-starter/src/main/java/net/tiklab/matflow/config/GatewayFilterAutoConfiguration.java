@@ -112,32 +112,27 @@ public class GatewayFilterAutoConfiguration {
     @Value("${eas.embbed.enable:false}")
     Boolean enableEam;
 
-
-
-    // @Value("${eas.address:null}")
-    // String authServiceUrl;
-    // //rpc配置
-    // RpcClient rpcClient(){
-    //     RpcClientConfig rpcClientConfig = RpcClientConfig.instance();
-    //     RpcClient rpcClient = new RpcClient(rpcClientConfig);
-    //     return rpcClient;
-    // }
-    //
-    // @Bean
-    // Authenticator authenticator(){
-    //     return rpcClient().getBean(Authenticator.class, new FixedLookup(authServiceUrl));
-    // }
-
-
     //gateway路由配置
     @Bean
     RouterConfig routerConfig(){
          String[] s = {
                  "/user",
                  "/eam",
-                 "/message",
-                 "/oplog",
-                 "/todo"
+
+                 "/todo/deletetodo",
+                 "/todo/updatetodo",
+                 "/todo/detailtodo",
+                 "/todo/findtodopage",
+
+                 "/message/message",
+                 "/message/messageDispatchItem",
+                 "/message/messageDispatchNotice",
+                 "/message/messageReceiver",
+
+                 "/oplog/deletelog",
+                 "/oplog/updatelog",
+                 "/oplog/detaillog",
+                 "/oplog/findlogpage",
          };
 
         if (enableEam){

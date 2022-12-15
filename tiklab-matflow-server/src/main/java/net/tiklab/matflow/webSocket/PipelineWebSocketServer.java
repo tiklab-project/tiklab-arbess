@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.socket.*;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -82,7 +81,7 @@ public class PipelineWebSocketServer implements WebSocketHandler {
             session.sendMessage(message);
             return;
         }
-        List<PipelineRun> runList = pipelineExecService.pipelineRunStatus(msg);
+        PipelineRun runList = pipelineExecService.pipelineRunStatus(msg);
         params.put("data", Objects.requireNonNullElse(runList, 0));
         session.sendMessage(new TextMessage(params.toString()));
     }

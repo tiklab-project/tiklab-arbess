@@ -51,6 +51,21 @@ public class PipelineExecLog {
     @ApiProperty(name="stageId",desc="阶段id")
     private String stagesId;
 
+    public PipelineExecLog() {
+    }
+
+    public PipelineExecLog(String historyId, int taskType, int taskSort) {
+        this.historyId = historyId;
+        this.taskType = taskType;
+        this.taskSort = taskSort;
+    }
+
+    public PipelineExecLog(String historyId, int taskType, int taskSort, String stagesId) {
+        this.historyId = historyId;
+        this.taskType = taskType;
+        this.taskSort = taskSort;
+        this.stagesId = stagesId;
+    }
 
     public String getStagesId() {
         return stagesId;

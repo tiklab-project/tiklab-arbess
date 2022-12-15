@@ -3,6 +3,7 @@ package net.tiklab.matflow.definition.controller;
 import net.tiklab.core.Result;
 import net.tiklab.matflow.definition.model.PipelineConfig;
 import net.tiklab.matflow.definition.service.PipelineConfigServer;
+import net.tiklab.matflow.definition.service.PipelineStagesServer;
 import net.tiklab.postin.annotation.Api;
 import net.tiklab.postin.annotation.ApiMethod;
 import net.tiklab.postin.annotation.ApiParam;
@@ -24,6 +25,9 @@ public class PipelineConfigController {
 
     @Autowired
     PipelineConfigServer configServer;
+
+    @Autowired
+    PipelineStagesServer stagesServer;
 
     @RequestMapping(path="/findAllConfig",method = RequestMethod.POST)
     @ApiMethod(name = "updateConfigure",desc = "查询流水线配置")
@@ -72,6 +76,15 @@ public class PipelineConfigController {
     public Result<List<String>> validAllConfig(@NotNull String pipelineId){
         List<String> list = configServer.validAllConfig(pipelineId);
         return Result.ok(list);
+    }
+
+
+    @RequestMapping(path="/updateStageName",method = RequestMethod.POST)
+    @ApiMethod(name = "updateStageName",desc = "更新流水线配置")
+    @ApiParam(name = "stagesId",desc = "阶段id",required = true)
+    public Result<Void> updateStageName(@NotNull String stagesId,String stagesName){
+         stagesServer.updateStageName(stagesId,stagesName);
+        return Result.ok();
     }
 
 }

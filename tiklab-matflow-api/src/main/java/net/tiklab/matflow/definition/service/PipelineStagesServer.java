@@ -29,19 +29,14 @@ public interface PipelineStagesServer {
      */
     List<PipelineStages> findAllStagesStageTask(String pipelineId);
 
-    /**
-     * 查询流水线所有阶段
-     * @param pipelineId 流水线id
-     * @return 阶段集合
-     */
-    List<PipelineStages> findAllStage(String pipelineId);
 
     /**
-     * 根据流水线id查询所有阶段及任务
-     * @param pipelineId 流水线id
-     * @return 配置
+     * 更新阶段名称
+     * @param stageId 阶段id
+     * @param stageName 名称
      */
-    List<PipelineStages> findAllStagesTasks(String pipelineId);
+    void updateStageName(String stageId,String stageName);
+
 
     /**
      * 删除阶段任务

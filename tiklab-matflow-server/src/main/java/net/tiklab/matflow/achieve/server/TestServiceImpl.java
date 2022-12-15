@@ -2,7 +2,6 @@ package net.tiklab.matflow.achieve.server;
 
 import net.tiklab.core.exception.ApplicationException;
 import net.tiklab.matflow.definition.model.Pipeline;
-import net.tiklab.matflow.execute.model.PipelineExecHistory;
 import net.tiklab.matflow.execute.model.PipelineProcess;
 import net.tiklab.matflow.execute.service.PipelineExecCommonService;
 import net.tiklab.matflow.orther.until.PipelineUntil;
@@ -35,14 +34,13 @@ public class TestServiceImpl implements TestService {
         pipelineTest.setType(taskType);
 
         //初始化日志
-        PipelineExecHistory pipelineExecHistory = pipelineProcess.getPipelineExecHistory();
         Pipeline pipeline = pipelineProcess.getPipeline();
         String testOrder = pipelineTest.getTestOrder();
         String path = PipelineUntil.findFileAddress()+pipeline.getName();
         try {
             String a = PipelineUntil.date(4)+"开始执行测试" + " \n" +
                     PipelineUntil.date(4)+ "执行 : \"" + testOrder + "\"";
-            pipelineExecHistory.setRunLog(pipelineExecHistory.getRunLog()+a);
+            commonService.execHistory(pipelineProcess,PipelineUntil.date(4)+a);
 
             Process process = getOrder(pipelineTest,path);
 

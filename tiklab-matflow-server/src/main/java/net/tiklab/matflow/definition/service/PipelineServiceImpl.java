@@ -21,8 +21,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.*;
 
-import static net.tiklab.matflow.orther.until.PipelineFinal.*;
-
 /**
  * PipelineServiceImpl
  */
@@ -69,10 +67,10 @@ public class PipelineServiceImpl implements PipelineService {
         String pipelineId = pipelineDao.createPipeline(pipelineEntity);
         joinTemplate.joinQuery(pipeline);
         pipeline.setId(pipelineId);
-        Map<String, String> map = homeService.initMap(pipeline);
+        HashMap<String,Object> map = homeService.initMap(pipeline);
 
         //动态
-        homeService.log(LOG_PIPELINE, LOG_MD_PIPELINE_CREATE, LOG_TEM_PIPELINE_CREATE, map);
+        // homeService.log(LOG_PIPELINE, LOG_MD_PIPELINE_CREATE, LOG_TEM_PIPELINE_CREATE, map);
 
         //创建对应流水线模板
         configServer.createTemplate(pipeline);
@@ -82,6 +80,7 @@ public class PipelineServiceImpl implements PipelineService {
 
         //消息
         map.put("title","流水线创建消息");
+
         // homeService.settingMessage("ed558817d1327167f4b26076c890cde8", map);
 
         return pipelineId;
@@ -102,10 +101,10 @@ public class PipelineServiceImpl implements PipelineService {
         configServer.deleteAllTaskConfig(pipelineId,pipeline.getType()); //配置信息
 
         //动态
-        Map<String, String> map = homeService.initMap(pipeline);
-        homeService.log(LOG_PIPELINE, LOG_MD_PIPELINE_DELETE,LOG_TEM_PIPELINE_DELETE, map);
+        HashMap<String,Object> map = homeService.initMap(pipeline);
+        // homeService.log(LOG_PIPELINE, LOG_MD_PIPELINE_DELETE,LOG_TEM_PIPELINE_DELETE, map);
+
         //消息
-        homeService.message(MES_TEM_PIPELINE_DELETE, MES_PIPELINE, map);
 
     }
 
@@ -125,22 +124,22 @@ public class PipelineServiceImpl implements PipelineService {
             relationServer.updatePipeline(pipeline.getName(), flow.getName());
             flow.setName(pipeline.getName());
 
-            Map<String, String> map = homeService.initMap(flow);
+            HashMap<String,Object> map = homeService.initMap(flow);
             map.put("message","名称为:"+ flow.getName());
-            homeService.log(LOG_PIPELINE, LOG_MD_PIPELINE_UPDATE,LOG_TEM_PIPELINE_UPDATE, map);
+            // homeService.log(LOG_PIPELINE, LOG_MD_PIPELINE_UPDATE,LOG_TEM_PIPELINE_UPDATE, map);
         }
 
         int pipelinePower = pipeline.getPower();
         if (pipelinePower != flow.getPower() && pipelinePower != 0){
             flow.setPower(pipelinePower);
-            Map<String, String> map = homeService.initMap(flow);
+            HashMap<String,Object> map = homeService.initMap(flow);
             if (pipelinePower == 1){
                 map.put("message","权限为全局");
-                homeService.log(LOG_PIPELINE,LOG_MD_PIPELINE_UPDATE, LOG_TEM_PIPELINE_UPDATE, map);
+                // homeService.log(LOG_PIPELINE,LOG_MD_PIPELINE_UPDATE, LOG_TEM_PIPELINE_UPDATE, map);
             }
             if (pipelinePower == 2){
                 map.put("message","权限为私有");
-                homeService.log(LOG_PIPELINE, LOG_MD_PIPELINE_UPDATE,LOG_TEM_PIPELINE_UPDATE, map);
+                // homeService.log(LOG_PIPELINE, LOG_MD_PIPELINE_UPDATE,LOG_TEM_PIPELINE_UPDATE, map);
             }
         }
 

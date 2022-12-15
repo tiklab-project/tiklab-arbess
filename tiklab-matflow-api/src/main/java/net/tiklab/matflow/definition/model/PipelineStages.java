@@ -42,7 +42,7 @@ public class PipelineStages {
     private int taskStage;
 
     @ApiProperty(name = "mainStage",desc="主阶段")
-    private boolean mainStage;
+    private String mainStage;
 
     @ApiProperty(name = "code",desc="是否是源码")
     private boolean code;
@@ -54,6 +54,10 @@ public class PipelineStages {
     private List<PipelineStages> stagesList;
 
     public PipelineStages() {
+    }
+
+    public PipelineStages(String mainStage) {
+        this.mainStage = mainStage;
     }
 
     public boolean isCode() {
@@ -68,6 +72,8 @@ public class PipelineStages {
         this.createTime = createTime;
         this.pipeline = new Pipeline(pipelineId);
     }
+
+
 
     public String getStagesId() {
         return stagesId;
@@ -133,11 +139,11 @@ public class PipelineStages {
         this.taskValues = taskValues;
     }
 
-    public boolean isMainStage() {
+    public String getMainStage() {
         return mainStage;
     }
 
-    public void setMainStage(boolean mainStage) {
+    public void setMainStage(String mainStage) {
         this.mainStage = mainStage;
     }
 

@@ -10,10 +10,7 @@ import net.tiklab.matflow.definition.model.PipelineStages;
 import net.tiklab.matflow.definition.service.PipelineStagesServer;
 import net.tiklab.matflow.execute.dao.PipelineExecHistoryDao;
 import net.tiklab.matflow.execute.entity.PipelineExecHistoryEntity;
-import net.tiklab.matflow.execute.model.PipelineExecHistory;
-import net.tiklab.matflow.execute.model.PipelineExecLog;
-import net.tiklab.matflow.execute.model.PipelineHistoryQuery;
-import net.tiklab.matflow.execute.model.PipelineStagesLog;
+import net.tiklab.matflow.execute.model.*;
 import net.tiklab.matflow.orther.until.PipelineUntil;
 import net.tiklab.rpc.annotation.Exporter;
 import org.slf4j.Logger;
@@ -153,73 +150,73 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
      * @param historyId 历史id
      * @return 日志集合
      */
-    public List<Object> findAllLog(String historyId){
+    public PipelineRun findAllLog(String historyId){
         PipelineExecHistory history = findOneHistory(historyId);
 
         Pipeline pipeline = history.getPipeline();
         String pipelineId = pipeline.getId();
 
         int pipelineType = pipeline.getType();
-        List<Object> list = new ArrayList<>();
+
+        PipelineRun run = new PipelineRun();
+        run.setRunTime(history.getRunTime());
+        run.setCreateTime(history.getCreateTime());
+        run.setRunWay(history.getRunWay());
 
         //多任务
         if (pipelineType == 1){
             List<PipelineExecLog> allLog = pipelineExecLogService.findAllLog(historyId);
-            list.addAll(allLog);
+            run.setRunLogList(allLog);
         }
 
         //多阶段
         if (pipelineType == 2){
-            List<PipelineStages> allStagesConfig = stagesServer.findAllStage(pipelineId);
-            List<PipelineStagesLog> stagesLogs = new ArrayList<>();
+            List<PipelineRun> runList = new ArrayList<>();
+
             List<PipelineStages> stagesStageTask = stagesServer.findAllStagesStageTask(pipelineId);
             if (stagesStageTask == null || stagesStageTask.size() == 0){
                 return null;
             }
+
             for (PipelineStages pipelineStages : stagesStageTask) {
-                List<PipelineStagesLog> logs = new ArrayList<>();
-                PipelineStagesLog stagesLog = new PipelineStagesLog();
+                PipelineRun execRun = new PipelineRun();
+                List<PipelineRun> runArrayList = new ArrayList<>();
+
                 //获取并行阶段
                 List<PipelineStages> stagesList = pipelineStages.getStagesList();
                 for (PipelineStages stages : stagesList) {
+                    PipelineRun pipelineRun = new PipelineRun();
                     String stagesId = stages.getStagesId();
-                    PipelineStagesLog pipelineStagesLog = new PipelineStagesLog();
+                    //获取日志
                     List<PipelineExecLog> allStagesLog = pipelineExecLogService.findAllStagesLog(historyId,stagesId);
                     if (allStagesLog == null || allStagesLog.size() == 0){
                         continue;
                     }
                     allStagesLog.sort(Comparator.comparing(PipelineExecLog::getTaskSort));
-                    pipelineStagesLog.setStages(stages.getTaskStage());
-                    pipelineStagesLog.setLogList(allStagesLog);
-                    pipelineStagesLog.setTaskSort(stages.getTaskSort());
-                    logs.add(pipelineStagesLog);
+                    pipelineRun.setRunLogList(allStagesLog);
+                    runArrayList.add(pipelineRun);
                 }
-                stagesLog.setStages(pipelineStages.getTaskStage());
-                stagesLog.setTaskSort(pipelineStages.getTaskSort());
-                stagesLog.setStagesLogList(logs);
-                stagesLogs.add(stagesLog);
+                execRun.setRunList(runArrayList);
+                runList.add(execRun);
             }
 
             //添加消息阶段
             List<PipelineExecLog> allLog = pipelineExecLogService.findAllLog(historyId);
             allLog.removeIf(pipelineExecLog -> PipelineUntil.isNoNull(pipelineExecLog.getStagesId()));
             if ( allLog.size() == 0){
-                list.addAll(stagesLogs);
-                return list;
+                run.setRunList(runList);
+                return run;
             }
-
-            PipelineStagesLog pipelineStages = new PipelineStagesLog();
-            pipelineStages.setStages(allStagesConfig.size()+1);
-            List<PipelineStagesLog> stagesLogList = new ArrayList<>();
-            PipelineStagesLog stagesLog = new PipelineStagesLog();
-            stagesLog.setLogList(allLog);
-            stagesLogList.add(stagesLog);
-            pipelineStages.setStagesLogList(stagesLogList);
-            list.addAll(stagesLogs);
-            list.add(pipelineStages);
+            PipelineRun execRun = new PipelineRun();
+            execRun.setRunLogList(allLog);
+            PipelineRun pipelineRun = new PipelineRun();
+            List<PipelineRun> runArrayList = new ArrayList<>();
+            runArrayList.add(execRun);
+            pipelineRun.setRunList(runArrayList);
+            runList.add(pipelineRun);
+            run.setRunList(runList);
         }
-
-        return list;
+        return run;
     }
 
     @Override
@@ -232,7 +229,7 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
         if (pipelineExecHistories == null){
             return null;
         }
-        pipelineExecHistories.removeIf(pipelineExecHistory -> pipelineExecHistory.getFindState() == 0);
+        // pipelineExecHistories.removeIf(pipelineExecHistory -> pipelineExecHistory.getFindState() == 0);
         joinTemplate.joinQuery(pipelineExecHistories);
         return PaginationBuilder.build(pagination,pipelineExecHistories);
     }

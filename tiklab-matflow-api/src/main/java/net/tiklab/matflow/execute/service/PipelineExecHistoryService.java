@@ -9,6 +9,7 @@ import net.tiklab.join.annotation.JoinProvider;
 import net.tiklab.matflow.execute.model.PipelineExecHistory;
 import net.tiklab.matflow.execute.model.PipelineExecLog;
 import net.tiklab.matflow.execute.model.PipelineHistoryQuery;
+import net.tiklab.matflow.execute.model.PipelineRun;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -99,7 +100,7 @@ public interface PipelineExecHistoryService {
      * @param historyId 历史id
      * @return 日志集合
      */
-    List<Object> findAllLog(String historyId);
+    PipelineRun findAllLog(String historyId);
 
 
     /**

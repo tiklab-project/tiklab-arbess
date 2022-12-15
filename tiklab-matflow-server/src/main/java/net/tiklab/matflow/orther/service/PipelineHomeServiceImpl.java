@@ -9,21 +9,16 @@ import net.tiklab.matflow.orther.until.PipelineUntil;
 import net.tiklab.message.message.model.Message;
 import net.tiklab.message.message.model.MessageDispatchNotice;
 import net.tiklab.message.message.model.MessageReceiver;
-import net.tiklab.message.message.model.MessageTemplate;
 import net.tiklab.message.message.service.MessageDispatchNoticeService;
 import net.tiklab.message.message.service.MessageService;
+import net.tiklab.message.message.service.SingleSendMessageService;
 import net.tiklab.message.setting.model.MessageType;
 import net.tiklab.message.sms.modal.Sms;
 import net.tiklab.message.sms.service.SmsSignCfgService;
-import net.tiklab.message.webhook.modal.WeChatMarkdown;
-import net.tiklab.message.webhook.modal.WebHook;
-import net.tiklab.message.webhook.modal.WebHookQuery;
-import net.tiklab.message.webhook.service.WeChatHookService;
-import net.tiklab.message.webhook.service.WebHookService;
 import net.tiklab.oplog.log.modal.OpLog;
 import net.tiklab.oplog.log.modal.OpLogTemplate;
 import net.tiklab.oplog.log.modal.OpLogType;
-import net.tiklab.oplog.log.service.OpLogService;
+import net.tiklab.oplog.log.service.OpLogByTemplService;
 import net.tiklab.rpc.annotation.Exporter;
 import net.tiklab.user.user.model.User;
 import net.tiklab.user.user.service.UserService;
@@ -44,19 +39,16 @@ import java.util.Map;
 public class PipelineHomeServiceImpl implements PipelineHomeService {
 
     @Autowired
-    OpLogService logService;
-
-    @Autowired
     MessageService messageService;
 
     @Autowired
     UserService userService;
 
     @Autowired
-    WebHookService webHookService;
+    private SingleSendMessageService sendMessage;
 
     @Autowired
-    WeChatHookService weChatHookService;
+    private OpLogByTemplService logService;
 
     @Autowired
     private SmsSignCfgService smsSignCfgService;
@@ -74,8 +66,8 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
      * @param pipeline 流水线
      * @return 信息
      */
-    public Map<String,String> initMap(Pipeline pipeline){
-        Map<String,String> map = new HashMap<>();
+    public HashMap<String,Object> initMap(Pipeline pipeline){
+        HashMap<String,Object> map = new HashMap<>();
         User user = pipeline.getUser();
         map.put("pipelineId", pipeline.getId());
         map.put("pipelineName", pipeline.getName());
@@ -111,7 +103,7 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
         OpLogTemplate opLogTemplate = new OpLogTemplate();
         opLogTemplate.setId(templateId);
         log.setTimestamp(new Timestamp(System.currentTimeMillis()));
-        log.setOpLogTemplate(opLogTemplate);
+        // log.setOpLogTemplate(opLogTemplate);
 
         //用户信息
         String userId = LoginContext.getLoginId();
@@ -144,92 +136,36 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
 
     /**
      * 发送消息（站内信）
-     * @param messageTemplateId 消息模板
-     * @param mesType 消息类型
+     * @param receiver 接收信息
      * @param map 信息
      */
     @Override
-    public void message(String messageTemplateId,String mesType,Map<String, String> map){
+    public void message(HashMap<String, Object> map,List<String> receiver){
 
         Message message = new Message();
+
+        String sendWay = (String)map.get("sendWay");
+        String mesType = (String)map.get("mesType");
 
         //消息类型
         MessageType messageType = new MessageType();
         messageType.setId(mesType);
 
-        //模板
-        MessageTemplate messageTemplate = new MessageTemplate();
-        messageTemplate.setId(messageTemplateId);
-        messageTemplate.setMsgType(messageType);
-        message.setMessageTemplate(messageTemplate);
+        message.setMessageType(messageType);
+        //发送方式
+        message.setMessageSendTypeId(sendWay);
+        message.setData(map);
 
-        //接收人
-        List<MessageReceiver> list = findReceiver(map.get("rootId"));
+        List<MessageReceiver> list = new ArrayList<>();
+        for (String s : receiver) {
+            MessageReceiver messageReceiver = new MessageReceiver();
+            messageReceiver.setUserId(s);
+            messageReceiver.setUserId(s);
+            messageReceiver.setEmail(s);
+        }
         message.setMessageReceiverList(list);
 
-        message.setApplication(appName);
-        message.setData(JSONObject.toJSONString(map));
-        messageService.sendMessage(message);
-    }
-
-    /**
-     * 添加消息接收人
-     * @param userId 负责人
-     * @return 接收人集合
-     */
-    private List<MessageReceiver> findReceiver(String userId){
-        List<MessageReceiver> list = new ArrayList<>();
-        String loginId = LoginContext.getLoginId();
-        if (!loginId.equals(userId) ){
-            MessageReceiver messageReceiver = new MessageReceiver();
-            User user = userService.findOne(userId);
-            messageReceiver.setReceiver(user.getId());
-            messageReceiver.setReceiverName(user.getName());
-            list.add(messageReceiver);
-        }
-        MessageReceiver messageReceiver = new MessageReceiver();
-        User user = userService.findOne(LoginContext.getLoginId());
-        messageReceiver.setReceiver(user.getId());
-        messageReceiver.setReceiverName(user.getName());
-        list.add(messageReceiver);
-        return list;
-    }
-
-
-    /**
-     * 企业微信发送消息
-     * @param map 消息
-     */
-    public void wechatMarkdownMessage(Map<String,String> map) throws  ApplicationException {
-        WebHookQuery webHookQuery = new WebHookQuery();
-        webHookQuery.setType(2);
-        WebHook webHookByType = webHookService.findWebHookByType(webHookQuery);
-        if (webHookByType == null){
-            throw new ApplicationException("用户并未配置企业微信消息通知，企业微信机器人消息发送失败。");
-        }
-        String id = webHookByType.getId();
-        WeChatMarkdown weChatMarkdown = new WeChatMarkdown();
-        weChatMarkdown.setHookId(id);
-        String title = map.get("title");
-        String status = map.get("message");
-        String userName = map.get("userName");
-        String pipelineName = map.get("pipelineName");
-        String date = map.get("date");
-        String color = "info";
-        if (status.equals("error")){
-            color = "warning";
-        }
-        if (status.equals("halt")){
-            color = "comment";
-        }
-        String message =
-                title +
-                "\n>流水线名称:<font color=\"info\">"+  pipelineName+"</font>" +
-                "\n>执行人:<font color=\"comment\">"+  userName+"</font>"+
-                "\n>状态:<font color=\""+color+"\">"+status+"</font>" +
-                "\n>执行时间:<font color=\"comment\">"+date+"</font>";
-        weChatMarkdown.setContent(message);
-        weChatHookService.sendWechatMarkdown(weChatMarkdown);
+        sendMessage.sendMessage(message);
     }
 
 

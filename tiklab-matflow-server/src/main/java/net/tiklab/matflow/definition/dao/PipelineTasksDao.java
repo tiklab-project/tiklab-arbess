@@ -1,13 +1,11 @@
 package net.tiklab.matflow.definition.dao;
 
 
-import net.tiklab.dal.jdbc.JdbcTemplate;
 import net.tiklab.dal.jpa.JpaTemplate;
 import net.tiklab.matflow.definition.entity.PipelineTasksEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -57,18 +55,6 @@ public class PipelineTasksDao {
      */
     public PipelineTasksEntity findOneConfigure(String configureId){
         return jpaTemplate.findOne(PipelineTasksEntity.class, configureId);
-    }
-
-    /**
-     * 根据流水线id获取配置
-     * @param pipelineId 流水线id
-     * @return 配置信息
-     */
-    public List<PipelineTasksEntity> findAllConfigure(String pipelineId){
-        String sql = "select pipeline_course_config.* from pipeline_course_config";
-        sql = sql.concat(" where pip_pip_pipeline_tasks.pipeline_id = '"+ pipelineId+"' " );
-        JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
-        return  jdbcTemplate.query(sql, new BeanPropertyRowMapper(PipelineTasksEntity.class));
     }
 
 

@@ -63,9 +63,18 @@ create table pip_pipeline_trigger  (
 );
 
 
-
-
-
+create table pip_pipeline_variable  (
+    var_id varchar(255) COMMENT '变量id',
+    task_type int COMMENT '类型 1.字符串 2.单选' ,
+    create_time varchar(255) COMMENT '创建时间',
+    name varchar(255) COMMENT '名称',
+    value varchar(255) COMMENT '值',
+    task_id varchar(255) COMMENT '任务id',
+    type int COMMENT '类型 1:全局,2:任务',
+    value_list varchar(255) COMMENT '值集合',
+    pipeline_id varchar(255) COMMENT '流水线id',
+    PRIMARY KEY (var_id) USING BTREE
+);
 
 
 

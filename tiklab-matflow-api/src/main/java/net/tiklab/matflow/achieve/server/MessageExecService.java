@@ -10,6 +10,6 @@ public interface MessageExecService {
      * @param pipelineProcess 配置信息
      * @return 状态
      */
-    boolean message(PipelineProcess pipelineProcess, String configId);
+    boolean message(PipelineProcess pipelineProcess, String configId , int taskType);
 
 }

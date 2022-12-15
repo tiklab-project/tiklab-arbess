@@ -39,13 +39,14 @@ public class PipelineExecTaskServiceImpl implements PipelineExecTaskService {
             case 3 -> state = deploy.deploy(pipelineProcess, configId,taskType);
             case 4 -> state = codeScan.codeScan(pipelineProcess, configId,taskType);
             case 5 -> state = product.product(pipelineProcess,  configId,taskType);
+            case 6 -> state = message.message(pipelineProcess, configId,taskType);
         }
         return state;
     }
 
     //执行后置任务
     public boolean beginAfterState(PipelineProcess pipelineProcess, PipelinePost config){
-       return message.message(pipelineProcess, config.getConfigId());
+       return true;
     }
 
 }
