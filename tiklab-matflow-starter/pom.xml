@@ -66,11 +66,6 @@
         </dependency>
         <dependency>
             <groupId>net.tiklab</groupId>
-            <artifactId>tiklab-toolkit-spring-boot-starter</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>net.tiklab</groupId>
             <artifactId>tiklab-gateway-spring-boot-starter</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -94,11 +89,7 @@
             <artifactId>tiklab-dcs-spring-boot-starter</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>net.tiklab</groupId>
-            <artifactId>tiklab-oplog-spring-boot-starter</artifactId>
-            <version>${project.version}</version>
-        </dependency>
+
         <dependency>
             <groupId>net.tiklab</groupId>
             <artifactId>tiklab-upgrade-starter</artifactId>
@@ -106,18 +97,27 @@
         </dependency>
         <dependency>
             <groupId>net.tiklab</groupId>
+            <artifactId>tiklab-integration-spring-boot-starter</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>net.tiklab</groupId>
             <artifactId>tiklab-todotask-spring-boot-stater</artifactId>
             <version>${project.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>net.tiklab</groupId>
+            <artifactId>tiklab-logging-spring-boot-starter</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+
         <dependency>
             <groupId>net.tiklab</groupId>
             <artifactId>tiklab-mysql-starter</artifactId>
             <version>1.0.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>net.tiklab</groupId>
-            <artifactId>tiklab-widget-spring-boot-starter</artifactId>
-            <version>${project.version}</version>
         </dependency>
 
 

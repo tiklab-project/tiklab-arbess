@@ -2,7 +2,7 @@ package net.tiklab.matflow.execute.controller;
 
 
 import net.tiklab.core.Result;
-import net.tiklab.matflow.execute.model.PipelineRun;
+import net.tiklab.matflow.execute.model.PipelineRunLog;
 import net.tiklab.matflow.execute.service.PipelineExecService;
 import net.tiklab.postin.annotation.Api;
 import net.tiklab.postin.annotation.ApiMethod;
@@ -35,9 +35,9 @@ public class PipelineExecController {
     @RequestMapping(path="/pipelineRunStatus",method = RequestMethod.POST)
     @ApiMethod(name = "pipelineRunStatus",desc = "执行")
     @ApiParam(name = "pipelineId",desc = "流水线id",required = true)
-    public Result<PipelineRun> pipelineRunStatus(String pipelineId)  {
-        PipelineRun instanceState = pipelineExecService.pipelineRunStatus(pipelineId);
-        return Result.ok(instanceState);
+    public Result<PipelineRunLog> pipelineRunStatus(String pipelineId)  {
+        PipelineRunLog runState = pipelineExecService.findRunState(pipelineId);
+        return Result.ok(runState);
     }
 
     @RequestMapping(path="/findPipelineState",method = RequestMethod.POST)

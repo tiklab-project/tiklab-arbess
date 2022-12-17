@@ -48,9 +48,6 @@ public class CodeServiceImpl implements CodeService {
 
         String log = PipelineUntil.date(4);
 
-        // String configId = config.getConfigId();
-        // int taskType = config.getTaskType();
-
         PipelineCode pipelineCode = codeService.findOneCodeConfig(configId);
         pipelineCode.setType(taskType);
 

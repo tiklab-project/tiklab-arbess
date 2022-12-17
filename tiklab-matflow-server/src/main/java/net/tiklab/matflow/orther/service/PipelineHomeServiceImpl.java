@@ -1,24 +1,22 @@
 package net.tiklab.matflow.orther.service;
 
-
 import com.alibaba.fastjson.JSONObject;
 import net.tiklab.core.exception.ApplicationException;
+import net.tiklab.logging.modal.Logging;
+import net.tiklab.logging.modal.LoggingType;
+import net.tiklab.logging.service.LoggingByTemplService;
 import net.tiklab.matflow.definition.model.Pipeline;
 import net.tiklab.matflow.orther.until.PipelineFinal;
 import net.tiklab.matflow.orther.until.PipelineUntil;
 import net.tiklab.message.message.model.Message;
-import net.tiklab.message.message.model.MessageDispatchNotice;
 import net.tiklab.message.message.model.MessageReceiver;
-import net.tiklab.message.message.service.MessageDispatchNoticeService;
+import net.tiklab.message.message.model.SendMessageNotice;
 import net.tiklab.message.message.service.MessageService;
+import net.tiklab.message.message.service.SendMessageNoticeService;
 import net.tiklab.message.message.service.SingleSendMessageService;
 import net.tiklab.message.setting.model.MessageType;
 import net.tiklab.message.sms.modal.Sms;
 import net.tiklab.message.sms.service.SmsSignCfgService;
-import net.tiklab.oplog.log.modal.OpLog;
-import net.tiklab.oplog.log.modal.OpLogTemplate;
-import net.tiklab.oplog.log.modal.OpLogType;
-import net.tiklab.oplog.log.service.OpLogByTemplService;
 import net.tiklab.rpc.annotation.Exporter;
 import net.tiklab.user.user.model.User;
 import net.tiklab.user.user.service.UserService;
@@ -48,13 +46,13 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
     private SingleSendMessageService sendMessage;
 
     @Autowired
-    private OpLogByTemplService logService;
+    private LoggingByTemplService logService;
 
     @Autowired
     private SmsSignCfgService smsSignCfgService;
 
     @Autowired
-    private MessageDispatchNoticeService dispatchNoticeService;
+    private SendMessageNoticeService dispatchNoticeService;
 
 
     private static final Logger logger = LoggerFactory.getLogger(PipelineHomeServiceImpl.class);
@@ -89,21 +87,19 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
      * @param map 日志信息
      */
     @Override
-    public void log(String logType,String module, String templateId,Map<String, String> map){
-        OpLog log = new OpLog();
+    public void log(String logType,String module, String templateId,HashMap<String, Object> map){
+
+        Logging log = new Logging();
 
         //消息类型
-        OpLogType opLogType = new OpLogType();
+        LoggingType opLogType = new LoggingType();
         opLogType.setId(logType);
         log.setActionType(opLogType);
-
         log.setModule(module);
 
-        //模板
-        OpLogTemplate opLogTemplate = new OpLogTemplate();
-        opLogTemplate.setId(templateId);
+        log.setLoggingTemplateId(templateId);
+
         log.setTimestamp(new Timestamp(System.currentTimeMillis()));
-        // log.setOpLogTemplate(opLogTemplate);
 
         //用户信息
         String userId = LoginContext.getLoginId();
@@ -121,16 +117,15 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
      * @param map 信息
      */
     @Override
-    public void settingMessage(String templateId,Map<String, String> map){
-        MessageDispatchNotice dispatchNotice = new MessageDispatchNotice();
+    public void settingMessage(String templateId,HashMap<String, Object> map){
+        SendMessageNotice dispatchNotice = new SendMessageNotice();
         dispatchNotice.setId(templateId);
         String jsonString = JSONObject.toJSONString(map);
         dispatchNotice.setEmailData(jsonString);
         dispatchNotice.setDingdingData(jsonString);
         dispatchNotice.setSiteData(jsonString);
         dispatchNotice.setQywechatData(jsonString);
-        dispatchNoticeService.createMessageDispatchItem(dispatchNotice);
-
+        dispatchNoticeService.createMessageItem(dispatchNotice);
     }
 
 

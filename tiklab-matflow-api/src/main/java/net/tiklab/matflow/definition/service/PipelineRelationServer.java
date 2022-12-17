@@ -74,12 +74,6 @@ public interface PipelineRelationServer {
 
 
     /**
-     * 删除关联角色
-     * @param pipelineId 流水线id
-     */
-    void deleteDmRole(String pipelineId);
-
-    /**
      * 流水线执行信息统计
      * @param pipelineId 流水线id
      * @return 统计信息

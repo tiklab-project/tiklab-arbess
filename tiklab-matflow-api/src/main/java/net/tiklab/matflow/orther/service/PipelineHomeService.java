@@ -14,7 +14,7 @@ public interface PipelineHomeService {
      * @param templateId 模板id (创建 流水线--pipeline，运行 pipelineExec，凭证--pipelineProof,其他--pipelineOther)
      * @param map 日志信息
      */
-    void log(String logType,String module, String templateId, Map<String, String> map);
+    void log(String logType,String module, String templateId, HashMap<String, Object> map);
 
 
     /**
@@ -22,7 +22,7 @@ public interface PipelineHomeService {
      * @param templateId 方案id
      * @param map 信息
      */
-    void settingMessage(String templateId,Map<String, String> map);
+    void settingMessage(String templateId, HashMap<String, Object> map);
 
 
     /**

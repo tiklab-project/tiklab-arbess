@@ -1,7 +1,7 @@
 package net.tiklab.matflow.webSocket;
 
 import com.alibaba.fastjson.JSONObject;
-import net.tiklab.matflow.execute.model.PipelineRun;
+import net.tiklab.matflow.execute.model.PipelineRunLog;
 import net.tiklab.matflow.execute.service.PipelineExecService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -81,7 +81,7 @@ public class PipelineWebSocketServer implements WebSocketHandler {
             session.sendMessage(message);
             return;
         }
-        PipelineRun runList = pipelineExecService.pipelineRunStatus(msg);
+        PipelineRunLog runList = pipelineExecService.findRunState(msg);
         params.put("data", Objects.requireNonNullElse(runList, 0));
         session.sendMessage(new TextMessage(params.toString()));
     }

@@ -8,16 +8,12 @@ import net.tiklab.gateway.GatewayFilter;
 import net.tiklab.gateway.router.RouterHandler;
 import net.tiklab.gateway.router.config.RouterConfig;
 import net.tiklab.gateway.router.config.RouterConfigBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class GatewayFilterAutoConfiguration {
-
-    private static final Logger logger = LoggerFactory.getLogger(GatewayFilterAutoConfiguration.class);
 
     //网关filter
     @Bean
@@ -118,17 +114,14 @@ public class GatewayFilterAutoConfiguration {
          String[] s = {
                  "/user",
                  "/eam",
-
+                 "/appLink",
                  "/todo/deletetodo",
                  "/todo/updatetodo",
                  "/todo/detailtodo",
                  "/todo/findtodopage",
-
                  "/message/message",
-                 "/message/messageDispatchItem",
-                 "/message/messageDispatchNotice",
+                 "/message/messageItem",
                  "/message/messageReceiver",
-
                  "/oplog/deletelog",
                  "/oplog/updatelog",
                  "/oplog/detaillog",

@@ -43,6 +43,7 @@ create table pip_pipeline_stages  (
 create table pip_pipeline_stages_task  (
     stages_task_id varchar(255) COMMENT 'id',
     create_time datetime COMMENT '创建时间',
+    name varchar(255) COMMENT '名称',
     stages_id varchar(255) COMMENT '阶段id',
     task_type int COMMENT '任务类型',
     task_sort int COMMENT '任务顺序',

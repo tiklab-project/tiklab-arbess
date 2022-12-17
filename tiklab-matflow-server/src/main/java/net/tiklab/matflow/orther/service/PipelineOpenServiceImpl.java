@@ -13,6 +13,7 @@ import net.tiklab.utils.context.LoginContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -119,7 +120,17 @@ public class PipelineOpenServiceImpl implements PipelineOpenService {
         List<PipelineOpenEntity> allOpen = pipelineOpenDao.findAllOpen(loginId,s);
         List<PipelineOpen> list = BeanMapper.mapList(allOpen, PipelineOpen.class);
         joinTemplate.joinQuery(list);
-        return list;
+        List<PipelineOpen> openList = new ArrayList<>();
+        for (PipelineOpen pipelineOpen : list) {
+            Pipeline pipeline = pipelineOpen.getPipeline();
+            String name = pipeline.getName();
+            if (!PipelineUntil.isNoNull(name)){
+                deleteOpen(pipelineOpen.getOpenId());
+                continue;
+            }
+            openList.add(pipelineOpen);
+        }
+        return openList;
     }
 
 

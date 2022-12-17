@@ -18,9 +18,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 @Service
 @Exporter
@@ -144,80 +142,154 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
         return BeanMapper.mapList(pipelineExecHistoryEntityList, PipelineExecHistory.class);
     }
 
+    /**
+     * 最近一次的构建历史
+     * @param pipelineId 流水线id
+     * @return 历史
+     */
+    @Override
+    public PipelineExecHistory findLastHistory(String pipelineId){
+        List<PipelineExecHistory> allHistory = findAllHistory(pipelineId);
+        if (allHistory == null){
+            return null;
+        }
+        allHistory.sort(Comparator.comparing(PipelineExecHistory::getCreateTime).reversed());
+        return allHistory.get(0);
+    }
 
     /**
-     * 查询历史及日志详情
+     * 查询日志详情
      * @param historyId 历史id
      * @return 日志集合
      */
-    public PipelineRun findAllLog(String historyId){
+    @Override
+    public PipelineRunLog findAll(String historyId){
         PipelineExecHistory history = findOneHistory(historyId);
+
+        if (history == null){
+            return null;
+        }
+
+        PipelineRunLog execRunLog = new PipelineRunLog();
 
         Pipeline pipeline = history.getPipeline();
         String pipelineId = pipeline.getId();
-
         int pipelineType = pipeline.getType();
 
-        PipelineRun run = new PipelineRun();
-        run.setRunTime(history.getRunTime());
-        run.setCreateTime(history.getCreateTime());
-        run.setRunWay(history.getRunWay());
+        List<PipelineRunLog> runLogList = new ArrayList<>();
 
-        //多任务
         if (pipelineType == 1){
             List<PipelineExecLog> allLog = pipelineExecLogService.findAllLog(historyId);
-            run.setRunLogList(allLog);
+            for (PipelineExecLog execLog : allLog) {
+                PipelineRunLog runLog = new PipelineRunLog();
+                runLog.setRunLog(execLog.getRunLog());
+                runLog.setTime(execLog.getRunTime());
+                runLog.setName("1");
+                runLog.setState(execLog.getRunState());
+                runLog.setId(execLog.getLogId());
+                runLogList.add(runLog);
+            }
         }
 
-        //多阶段
         if (pipelineType == 2){
-            List<PipelineRun> runList = new ArrayList<>();
+            //多阶段
+            List<PipelineStages> stagesMainStage = stagesServer.findAllStagesMainStage(pipelineId);
+            for (PipelineStages stages : stagesMainStage) {
+                PipelineRunLog runLog = new PipelineRunLog();
+                runLog.setName(stages.getName());
 
-            List<PipelineStages> stagesStageTask = stagesServer.findAllStagesStageTask(pipelineId);
-            if (stagesStageTask == null || stagesStageTask.size() == 0){
-                return null;
-            }
-
-            for (PipelineStages pipelineStages : stagesStageTask) {
-                PipelineRun execRun = new PipelineRun();
-                List<PipelineRun> runArrayList = new ArrayList<>();
-
-                //获取并行阶段
-                List<PipelineStages> stagesList = pipelineStages.getStagesList();
-                for (PipelineStages stages : stagesList) {
-                    PipelineRun pipelineRun = new PipelineRun();
-                    String stagesId = stages.getStagesId();
-                    //获取日志
-                    List<PipelineExecLog> allStagesLog = pipelineExecLogService.findAllStagesLog(historyId,stagesId);
-                    if (allStagesLog == null || allStagesLog.size() == 0){
-                        continue;
+                String stagesId = stages.getStagesId();
+                //并行阶段
+                List<PipelineRunLog> logList= new ArrayList<>();
+                List<PipelineStages> allMainStage = stagesServer.findAllMainStage(stagesId);
+                for (PipelineStages pipelineStages : allMainStage) {
+                    PipelineRunLog pipelineRunLog = new PipelineRunLog();
+                    pipelineRunLog.setName(pipelineStages.getName());
+                    String stagesStagesId = pipelineStages.getStagesId();
+                    //并行阶段任务
+                    List<PipelineExecLog> allStagesLog = pipelineExecLogService.findAllStagesLog(historyId, stagesStagesId);
+                    List<PipelineRunLog> logs = new ArrayList<>();
+                    for (PipelineExecLog log : allStagesLog) {
+                        PipelineRunLog runLogs = new PipelineRunLog();
+                        runLogs.setName("任务Task");
+                        runLogs.setRunLog(log.getRunLog());
+                        runLogs.setTime(log.getRunTime());
+                        runLogs.setState(log.getRunState());
+                        runLogs.setId(log.getLogId());
+                        logs.add(runLogs);
                     }
-                    allStagesLog.sort(Comparator.comparing(PipelineExecLog::getTaskSort));
-                    pipelineRun.setRunLogList(allStagesLog);
-                    runArrayList.add(pipelineRun);
+                    pipelineRunLog.setRunLogList(logs);
+                    pipelineRunLog.setName(pipelineStages.getName());
+                    pipelineRunLog.setId(pipelineStages.getStagesId());
+                    Map<String, Object> timeState = findTimeState(logs);
+                    pipelineRunLog.setState((Integer) timeState.get("state"));
+                    pipelineRunLog.setTime((Integer) timeState.get("time"));
+                    pipelineRunLog.setRunLog((String) timeState.get("runLog"));
+                    logList.add(pipelineRunLog);
                 }
-                execRun.setRunList(runArrayList);
-                runList.add(execRun);
+                Map<String, Object> timeState = findTimeState(logList);
+                runLog.setState((Integer) timeState.get("state"));
+                runLog.setTime((Integer) timeState.get("time"));
+                runLog.setRunLog((String) timeState.get("runLog"));
+                runLog.setRunLogList(logList);
+                runLog.setId(stagesId);
+                runLog.setName(stages.getName());
+                runLogList.add(runLog);
             }
 
             //添加消息阶段
             List<PipelineExecLog> allLog = pipelineExecLogService.findAllLog(historyId);
             allLog.removeIf(pipelineExecLog -> PipelineUntil.isNoNull(pipelineExecLog.getStagesId()));
-            if ( allLog.size() == 0){
-                run.setRunList(runList);
-                return run;
+            if (allLog.size() == 0){
+                execRunLog.setRunLogList(runLogList);
+                return execRunLog;
             }
-            PipelineRun execRun = new PipelineRun();
-            execRun.setRunLogList(allLog);
-            PipelineRun pipelineRun = new PipelineRun();
-            List<PipelineRun> runArrayList = new ArrayList<>();
-            runArrayList.add(execRun);
-            pipelineRun.setRunList(runArrayList);
-            runList.add(pipelineRun);
-            run.setRunList(runList);
+            PipelineRunLog runLog = new PipelineRunLog();
+            List<PipelineRunLog> logs = new ArrayList<>();
+            for (PipelineExecLog pipelineExecLog : allLog) {
+                PipelineRunLog log = new PipelineRunLog();
+                log.setId(pipelineExecLog.getLogId());
+                log.setState(pipelineExecLog.getRunState());
+                log.setTime(pipelineExecLog.getRunTime());
+                log.setName("312");
+                log.setRunLog(pipelineExecLog.getRunLog());
+                logs.add(log);
+            }
+            Map<String, Object> timeState = findTimeState(logs);
+            runLog.setId("后置任务");
+            runLog.setName("23423");
+            runLog.setRunLog((String) timeState.get("runLog"));
+            runLog.setState((Integer) timeState.get("state"));
+            runLog.setTime((Integer) timeState.get("time"));
+            runLogList.add(runLog);
         }
-        return run;
+        execRunLog.setRunLogList(runLogList);
+        return execRunLog;
     }
+
+
+    public Map<String,Object> findTimeState(List<PipelineRunLog> logs){
+        int time = 0;
+        int state = 10;
+        StringBuilder runLog  = new StringBuilder();
+        Map<String,Object> map = new HashMap<>();
+        for (PipelineRunLog log : logs) {
+            time = time + log.getTime();
+            runLog.append(log.getRunLog());
+            int logState = log.getState();
+            if (logState == 1){
+                state = logState;
+            }
+            if (logState == 20 && state != 1){
+                state = logState;
+            }
+        }
+        map.put("time",time);
+        map.put("state",state);
+        map.put("runLog", runLog.toString());
+        return map;
+    }
+
 
     @Override
     public Pagination<PipelineExecHistory> findPageHistory(PipelineHistoryQuery pipelineHistoryQuery){
@@ -229,7 +301,6 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
         if (pipelineExecHistories == null){
             return null;
         }
-        // pipelineExecHistories.removeIf(pipelineExecHistory -> pipelineExecHistory.getFindState() == 0);
         joinTemplate.joinQuery(pipelineExecHistories);
         return PaginationBuilder.build(pagination,pipelineExecHistories);
     }

@@ -42,9 +42,6 @@ public class PipelineExecCommonServiceImpl implements PipelineExecCommonService 
 
     Map<String,PipelineExecLog> logMap = PipelineExecServiceImpl.logMap;
 
-    //日志
-    Map<String, List<String>> logListMap = PipelineExecServiceImpl.logListMap;
-
     //运行时间
     Map<String, Integer> runTime = PipelineExecServiceImpl.runTime;
 
@@ -55,7 +52,6 @@ public class PipelineExecCommonServiceImpl implements PipelineExecCommonService 
      */
     @Override
     public int log(PipelineProcess pipelineProcess) throws IOException {
-
         int state = 1;
         String enCode = pipelineProcess.getEnCode();
         //指定编码
@@ -160,41 +156,14 @@ public class PipelineExecCommonServiceImpl implements PipelineExecCommonService 
      * @param historyId 执行信息
      */
     public void updateState(String historyId,String logId,int state){
-        PipelineExecHistory pipelineExecHistory = historyService.findOneHistory(historyId);
-        List<String> list1 = logListMap.get(historyId);
-        if (list1 == null){
-            return;
-        }
-
-        int times = 0;
-        List<String> list = logListMap.get(historyId);
-        if (list != null){
-            for (String s : list) {
-                Integer integer = runTime.get(s);
-                if (integer != null){
-                    times = times +integer;
-                }
-            }
-        }
-        Integer integer = runTime.get(logId);
-        if (integer == null){
-            integer = 0 ;
-        }
-        if (integer == 0 ){
-            integer = integer+1;
-        }
+        PipelineExecHistory pipelineExecHistory = historyMap.get(historyId);
 
         PipelineExecLog pipelineExecLog = logMap.get(logId);
         if (pipelineExecLog != null){
-            pipelineExecLog.setRunTime(integer);
             pipelineExecLog.setRunState(state);
             logService.updateLog(pipelineExecLog);
         }
 
-        if (times == 0){
-            return;
-        }
-        pipelineExecHistory.setRunTime(times);
         historyService.updateHistory(pipelineExecHistory);
         logMap.remove(logId);
     }
@@ -254,16 +223,24 @@ public class PipelineExecCommonServiceImpl implements PipelineExecCommonService 
      */
     @Override
     public void execHistory(PipelineProcess pipelineProcess,String log){
+        if(!PipelineUntil.isNoNull(log)){
+            return;
+        }
         String pipelineId = pipelineProcess.getPipeline().getId();
         String logId = pipelineProcess.getLogId();
 
         PipelineExecHistory history = historyMap.get(pipelineId);
+        history.setRunTime(runTime.get(history.getHistoryId()));
         PipelineExecLog pipelineExecLog = logMap.get(logId);
-
+        Integer integer = runTime.get(logId);
+        if (integer == null){
+            integer = 0;
+        }
+        pipelineExecLog.setRunTime(integer);
         history.setRunLog(history.getRunLog()+"\n"+log);
         historyMap.put(pipelineId,history);
-        String runLog = pipelineExecLog.getRunLog();
 
+        String runLog = pipelineExecLog.getRunLog();
         if (PipelineUntil.isNoNull(runLog)){
             pipelineExecLog.setRunLog(pipelineExecLog.getRunLog()+"\n"+log);
         }else {

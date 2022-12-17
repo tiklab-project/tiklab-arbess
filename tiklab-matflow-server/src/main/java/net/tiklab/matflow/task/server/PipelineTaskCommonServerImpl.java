@@ -106,8 +106,6 @@ public class PipelineTaskCommonServerImpl implements PipelineTaskCommonServer {
                 throw new ApplicationException("无法更新未知的配置类型。");
             }
         }
-
-
     }
 
     /**

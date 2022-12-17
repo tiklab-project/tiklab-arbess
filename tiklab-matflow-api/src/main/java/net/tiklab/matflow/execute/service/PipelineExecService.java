@@ -1,6 +1,6 @@
 package net.tiklab.matflow.execute.service;
 
-import net.tiklab.matflow.execute.model.PipelineRun;
+import net.tiklab.matflow.execute.model.PipelineRunLog;
 
 /**
  * 流水线构建
@@ -14,12 +14,8 @@ public interface PipelineExecService {
      */
     boolean  start(String pipelineId,int startWAy);
 
-    /**
-     * 查询流水线正在运行的状态
-     * @param pipelineId 流水线id
-     * @return 运行状态
-     */
-    PipelineRun pipelineRunStatus(String pipelineId);
+
+    PipelineRunLog findRunState(String pipelineId);
 
     /**
      * 判断运行状态

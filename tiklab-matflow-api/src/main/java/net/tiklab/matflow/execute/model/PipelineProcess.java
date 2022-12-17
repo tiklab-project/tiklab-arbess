@@ -13,12 +13,6 @@ import java.io.InputStream;
 @ApiModel
 public class PipelineProcess {
 
-    //执行历史
-    private PipelineExecHistory pipelineExecHistory;
-
-    //执行日志
-    private PipelineExecLog pipelineExecLog;
-
     //运行的流水线
     private Pipeline pipeline;
 
@@ -51,6 +45,13 @@ public class PipelineProcess {
 
     private String logId;
 
+    public PipelineProcess() {
+    }
+
+    public PipelineProcess(String id) {
+        this.pipeline = new Pipeline(id);
+    }
+
     public String getHistoryId() {
         return historyId;
     }
@@ -67,21 +68,6 @@ public class PipelineProcess {
         this.logId = logId;
     }
 
-    public PipelineExecHistory getPipelineExecHistory() {
-        return pipelineExecHistory;
-    }
-
-    public void setPipelineExecHistory(PipelineExecHistory pipelineExecHistory) {
-        this.pipelineExecHistory = pipelineExecHistory;
-    }
-
-    public PipelineExecLog getPipelineExecLog() {
-        return pipelineExecLog;
-    }
-
-    public void setPipelineExecLog(PipelineExecLog pipelineExecLog) {
-        this.pipelineExecLog = pipelineExecLog;
-    }
 
     public Pipeline getPipeline() {
         return pipeline;

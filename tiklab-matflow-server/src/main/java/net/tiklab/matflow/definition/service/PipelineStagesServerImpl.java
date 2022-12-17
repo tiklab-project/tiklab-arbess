@@ -61,6 +61,7 @@ public class PipelineStagesServerImpl implements PipelineStagesServer {
             //从节点
             PipelineStages stages = new PipelineStages(id);
             stages.setTaskSort(1);
+            stages.setName("源码");
             stagesId = createStages(stages);
             config.setStagesId(stagesId);
 
@@ -136,31 +137,6 @@ public class PipelineStagesServerImpl implements PipelineStagesServer {
     }
 
     /**
-     * 查询流水线第stage阶段并行任务
-     * @param pipelineId 流水线id
-     * @param stage 阶段
-     * @return 阶段列表
-     */
-    private List<PipelineStages> findAllStagesStage(String pipelineId,int stage){
-        List<PipelineStages> allStage = findAllPipelineStages(pipelineId);
-        if ( allStage.size() == 0){
-            return Collections.emptyList();
-        }
-        List<PipelineStages> list = new ArrayList<>();
-        for (PipelineStages pipelineStages : allStage) {
-            int taskStage = pipelineStages.getTaskStage();
-            String stagesId = pipelineStages.getStagesId();
-            if (taskStage == stage){
-                List<Object> tasksTask = stagesTaskServer.findAllStagesTasksTask(stagesId);
-                pipelineStages.setTaskValues(tasksTask);
-                list.add(pipelineStages);
-            }
-        }
-        list.sort(Comparator.comparing(PipelineStages::getTaskSort));
-        return list;
-    }
-
-    /**
      * 查询所有阶段任务
      * @param pipelineId 流水线id
      * @return 任务
@@ -198,7 +174,8 @@ public class PipelineStagesServerImpl implements PipelineStagesServer {
      * @param pipelineId 流水线id
      * @return 主分支
      */
-    private List<PipelineStages> findAllStagesMainStage(String pipelineId){
+    @Override
+    public List<PipelineStages> findAllStagesMainStage(String pipelineId){
         List<PipelineStages> allStage = findAllPipelineStages(pipelineId);
         if ( allStage.size() == 0){
             return Collections.emptyList();
@@ -219,7 +196,8 @@ public class PipelineStagesServerImpl implements PipelineStagesServer {
      * @param stages 阶段
      * @return 根节点
      */
-    private PipelineStages findMainStages(String pipelineId,int stages){
+    @Override
+    public PipelineStages findMainStages(String pipelineId,int stages){
         List<PipelineStages> allStage = findAllPipelineStages(pipelineId);
         if (allStage.size() == 0 ){
             return null;
@@ -240,7 +218,8 @@ public class PipelineStagesServerImpl implements PipelineStagesServer {
      * @param stagesId 根节点id
      * @return 从节点
      */
-    private List<PipelineStages> findAllMainStage(String stagesId){
+    @Override
+    public List<PipelineStages> findAllMainStage(String stagesId){
         List<PipelineStages> allStages = findAllStages();
         if (allStages == null || allStages.size() == 0){
             return Collections.emptyList();
@@ -403,14 +382,17 @@ public class PipelineStagesServerImpl implements PipelineStagesServer {
      */
     @Override
     public List<String> validAllConfig(String pipelineId){
-        List<PipelineStages> allStage = findAllPipelineStages(pipelineId);
-        if ( allStage.size() == 0){
+        List<PipelineStages> allStage = findAllStagesMainStage(pipelineId);
+        if (allStage.size() == 0){
             return null;
         }
         List<String> list = new ArrayList<>();
         for (PipelineStages stages : allStage) {
             String stagesId = stages.getStagesId();
-            stagesTaskServer.validAllConfig(stagesId,list);
+            for (PipelineStages pipelineStages : findAllMainStage(stagesId)) {
+                String id = pipelineStages.getStagesId();
+                stagesTaskServer.validAllConfig(id,list);
+            }
         }
         return list;
     }

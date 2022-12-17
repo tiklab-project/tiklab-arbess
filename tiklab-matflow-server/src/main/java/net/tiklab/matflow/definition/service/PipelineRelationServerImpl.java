@@ -13,7 +13,6 @@ import net.tiklab.matflow.orther.service.PipelineFollowService;
 import net.tiklab.matflow.orther.service.PipelineOpenService;
 import net.tiklab.matflow.orther.until.PipelineFinal;
 import net.tiklab.matflow.orther.until.PipelineUntil;
-import net.tiklab.privilege.role.model.DmRole;
 import net.tiklab.privilege.role.model.PatchUser;
 import net.tiklab.privilege.role.service.DmRoleService;
 import net.tiklab.rpc.annotation.Exporter;
@@ -230,44 +229,9 @@ public class PipelineRelationServerImpl implements PipelineRelationServer{
     @Override
     public void deleteDmUser(String pipelineId){
         dmRoleService.deleteDmRoleByDomainId(pipelineId);
-        // List<DmUser> allDmUser = dmUserService.findAllDmUser();
-        // if (allDmUser == null){
-        //     return ;
-        // }
-        // for (DmUser dm : allDmUser) {
-        //     if (!dm.getDomainId().equals(pipelineId)){
-        //         continue;
-        //     }
-        //     dmUserService.deleteDmUser(dm.getId());
-        // }
-        // DmRoleQuery dmRoleQuery = new DmRoleQuery();
-        // dmRoleQuery.setDomainId(pipelineId);
-        // List<DmRole> dmRoleList = dmRoleService.findDmRoleList(dmRoleQuery);
-        // if (dmRoleList == null){
-        //     return;
-        // }
-        // for (DmRole dmRole : dmRoleList) {
-        //     dmRoleService.deleteDmRole(dmRole.getId());
-        // }
-
     }
 
-    /**
-     * 删除关联角色
-     * @param pipelineId 流水线id
-     */
-    public void deleteDmRole(String pipelineId){
-        List<DmRole> allDmRole = dmRoleService.findAllDmRole();
-        if (allDmRole == null){
-            return ;
-        }
-        for (DmRole dm : allDmRole) {
-            if (!dm.getDomainId().equals(pipelineId)){
-                continue;
-            }
-            dmRoleService.deleteDmRole(dm.getId());
-        }
-    }
+
 
     /**
      * 流水线执行信息统计

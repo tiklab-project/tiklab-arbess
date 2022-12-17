@@ -22,6 +22,8 @@ public class PipelineFinal {
     public static final String MES_SENT_DINGDING = "dingding"; //流水线创建信息模板
     public static final String MES_SENT_WECHAT = "qywechat"; //流水线创建信息模板
 
+    public static final String MES_PLAN = "MES_PLAN"; //消息方案
+
 
     //日志类型
     public static final String LOG_PIPELINE = "LOG_PIPELINE"; //流水线

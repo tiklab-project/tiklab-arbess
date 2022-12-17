@@ -21,6 +21,8 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.*;
 
+import static net.tiklab.matflow.orther.until.PipelineFinal.*;
+
 /**
  * PipelineServiceImpl
  */
@@ -69,8 +71,6 @@ public class PipelineServiceImpl implements PipelineService {
         pipeline.setId(pipelineId);
         HashMap<String,Object> map = homeService.initMap(pipeline);
 
-        //动态
-        // homeService.log(LOG_PIPELINE, LOG_MD_PIPELINE_CREATE, LOG_TEM_PIPELINE_CREATE, map);
 
         //创建对应流水线模板
         configServer.createTemplate(pipeline);
@@ -80,8 +80,11 @@ public class PipelineServiceImpl implements PipelineService {
 
         //消息
         map.put("title","流水线创建消息");
+        map.put("message","创建了");
 
-        // homeService.settingMessage("ed558817d1327167f4b26076c890cde8", map);
+        //动态
+        homeService.log(LOG_PIPELINE, LOG_MD_PIPELINE_CREATE, LOG_TEM_PIPELINE_CREATE, map);
+        homeService.settingMessage(MES_PLAN, map);
 
         return pipelineId;
     }
@@ -102,9 +105,11 @@ public class PipelineServiceImpl implements PipelineService {
 
         //动态
         HashMap<String,Object> map = homeService.initMap(pipeline);
-        // homeService.log(LOG_PIPELINE, LOG_MD_PIPELINE_DELETE,LOG_TEM_PIPELINE_DELETE, map);
+        map.put("title","流水线删除消息");
+        map.put("message","删除了");
+        homeService.log(LOG_PIPELINE, LOG_MD_PIPELINE_DELETE,LOG_TEM_PIPELINE_DELETE, map);
+        homeService.settingMessage(MES_PLAN, map);
 
-        //消息
 
     }
 

@@ -2,7 +2,7 @@ package net.tiklab.matflow.execute.controller;
 
 
 import net.tiklab.core.Result;
-import net.tiklab.matflow.execute.model.PipelineRun;
+import net.tiklab.matflow.execute.model.PipelineRunLog;
 import net.tiklab.matflow.execute.service.PipelineExecHistoryService;
 import net.tiklab.postin.annotation.Api;
 import net.tiklab.postin.annotation.ApiMethod;
@@ -26,8 +26,8 @@ public class PipelineExecLogController {
     @RequestMapping(path="/findAllLog",method = RequestMethod.POST)
     @ApiMethod(name = "findAllLog",desc = "查询日志")
     @ApiParam(name = "historyId",desc = "历史id",required = true)
-    public Result<PipelineRun> findAllLog(@NotNull String historyId){
-        PipelineRun allLog = historyService.findAllLog(historyId);
+    public Result<PipelineRunLog> findAllLog(@NotNull String historyId){
+        PipelineRunLog allLog = historyService.findAll(historyId);
         return Result.ok(allLog);
     }
 }
