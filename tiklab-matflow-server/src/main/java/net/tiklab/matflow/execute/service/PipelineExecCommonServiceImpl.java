@@ -153,18 +153,30 @@ public class PipelineExecCommonServiceImpl implements PipelineExecCommonService 
 
     /**
      * 更新日志执行状态
-     * @param historyId 执行信息
+     * @param pipelineId 执行信息
      */
-    public void updateState(String historyId,String logId,int state){
-        PipelineExecHistory pipelineExecHistory = historyMap.get(historyId);
+    public void updateState(String pipelineId,String logId,int state){
 
         PipelineExecLog pipelineExecLog = logMap.get(logId);
         if (pipelineExecLog != null){
             pipelineExecLog.setRunState(state);
+            pipelineExecLog.setLogId(logId);
+            Integer integer = runTime.get(logId);
+            if (integer ==  null){
+                integer = 0;
+            }
+            pipelineExecLog.setRunTime(integer);
             logService.updateLog(pipelineExecLog);
         }
 
-        historyService.updateHistory(pipelineExecHistory);
+        PipelineExecHistory execHistory = historyMap.get(pipelineId);
+        String historyId = execHistory.getHistoryId();
+        Integer integer = runTime.get(historyId);
+        if (integer ==  null){
+            integer = 0;
+        }
+        execHistory.setRunTime(integer);
+        historyService.updateHistory(execHistory);
         logMap.remove(logId);
     }
 

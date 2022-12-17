@@ -30,6 +30,7 @@ create table pip_pipeline_history_log  (
     history_id varchar(256)  COMMENT '历史id',
     task_sort int  COMMENT '运行顺序',
     task_type int  COMMENT '执行类型',
+    task_name varchar(255)  COMMENT '执行类型',
     run_state int  COMMENT '运行状态',
     run_time int  COMMENT '运行时间',
     run_log longtext COMMENT '运行日志',

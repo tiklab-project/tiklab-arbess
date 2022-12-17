@@ -36,6 +36,9 @@ public class PipelineConfig {
     @JoinQuery(key = "id")
     private Pipeline pipeline;
 
+
+    private String name;
+
     public PipelineConfig() {
     }
 
@@ -97,5 +100,13 @@ public class PipelineConfig {
 
     public void setPipeline(Pipeline pipeline) {
         this.pipeline = pipeline;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }

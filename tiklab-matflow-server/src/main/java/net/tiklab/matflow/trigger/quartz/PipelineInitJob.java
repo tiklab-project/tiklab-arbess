@@ -46,7 +46,6 @@ public class PipelineInitJob implements ApplicationListener<ContextRefreshedEven
             String configId = time.getConfigId();
             PipelineTrigger oneTriggerConfig = triggerConfigServer.findOneTriggerConfig(configId);
             String pipelineId = oneTriggerConfig.getPipeline().getId();
-            // logger.info("添加定时任务，时间："+ pipelineId +"  时间："+ time.getWeekTime()+" cron："+time.getCron());
             try {
                 job.addJob(pipelineId, PipelineRunJob.class,time.getCron());
             } catch (SchedulerException e) {
@@ -59,7 +58,6 @@ public class PipelineInitJob implements ApplicationListener<ContextRefreshedEven
     /**
      * 初始注入scheduler
      *
-     * @return
      * @throws SchedulerException
      */
     @Bean

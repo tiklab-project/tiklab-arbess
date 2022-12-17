@@ -66,7 +66,7 @@ eas:
 #    enable: false
 #  address: http://192.168.10.14:8080
 #  web:
-#    address: http://192.168.10.14:3001
+#    address: http://192.168.10.14:30038568
 base:
   url: http://eas-ce.dev.tiklab.net
 

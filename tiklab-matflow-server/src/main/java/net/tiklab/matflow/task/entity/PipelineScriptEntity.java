@@ -24,6 +24,7 @@ public class PipelineScriptEntity {
     @Column(name = "config_id")
     private String configId;
 
+
     public String getScriptId() {
         return scriptId;
     }

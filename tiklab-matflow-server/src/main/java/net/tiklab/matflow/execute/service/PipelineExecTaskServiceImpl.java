@@ -1,7 +1,6 @@
 package net.tiklab.matflow.execute.service;
 
 import net.tiklab.matflow.achieve.server.*;
-import net.tiklab.matflow.definition.model.PipelinePost;
 import net.tiklab.matflow.execute.model.PipelineProcess;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -42,11 +41,6 @@ public class PipelineExecTaskServiceImpl implements PipelineExecTaskService {
             case 6 -> state = message.message(pipelineProcess, configId,taskType);
         }
         return state;
-    }
-
-    //执行后置任务
-    public boolean beginAfterState(PipelineProcess pipelineProcess, PipelinePost config){
-       return true;
     }
 
 }

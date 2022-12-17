@@ -215,12 +215,14 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         int taskType = 0;
         String stagesId = null;
         String configId = null;
+        String name = null;
 
         if (type == 0){
             PipelinePost post = (PipelinePost) o;
             taskSort = post.getTaskSort();
             taskType = post.getTaskType();
             configId = post.getConfigId();
+            name = post.getName();
         }
 
         if (type == 1){
@@ -228,6 +230,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
             taskSort = tasks.getTaskSort();
             taskType = tasks.getTaskType();
             configId = tasks.getConfigId();
+            name = tasks.getName();
         }
 
         if (type == 2){
@@ -236,6 +239,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
             taskType = stagesTask.getTaskType();
             configId = stagesTask.getConfigId();
             stagesId = stagesTask.getStagesId();
+            name = stagesTask.getName();
         }
         PipelineExecLog pipelineExecLog = new PipelineExecLog();
         pipelineExecLog.setHistoryId(historyId);
@@ -243,6 +247,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         pipelineExecLog.setTaskType(taskType);
         pipelineExecLog.setStagesId(stagesId);
         pipelineExecLog.setRunState(3);
+        pipelineExecLog.setTaskName(name);
         pipelineExecLog.setRunLog("");
         String logId = logService.createLog(pipelineExecLog);
         logMap.put(logId,pipelineExecLog);
@@ -415,24 +420,12 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         if (type == 1){
             List<PipelineTasks> allCourseConfig = tasksService.finAllTasks(pipelineId);
             for (PipelineTasks tasks : allCourseConfig) {
-                PipelineRunLog runLog = new PipelineRunLog();
                 String configId = tasks.getConfigId();
-                String logId = configLogMap.get(configId);
-                PipelineExecLog log = logMap.get(logId);
-                if (log == null){
-                    log = logService.findOneLog(logId);
-                }
-                Integer integer = runTime.get(logId);
-                if (integer == null){
-                    integer = 0 ;
-                }
-                runLog.setRunLog(log.getRunLog());
-                runLog.setState(log.getRunState());
-                runLog.setTime(integer);
-                runLog.setName("1");
-                runLog.setId(logId);
+                PipelineRunLog runLog = findOneRunLog(configId);
                 list.add(runLog);
             }
+            Map<String, Object> timeState = findTimeState(list);
+            execRunLog.setRunLog((String) timeState.get("runLog"));
         }
 
         if (type == 2){
@@ -451,22 +444,8 @@ public class PipelineExecServiceImpl implements PipelineExecService {
                     List<PipelineStagesTask> allStagesTask = stagesServer.findAllStagesTask(id);
                     List<PipelineRunLog> taskList = new ArrayList<>();
                     for (PipelineStagesTask stagesTask : allStagesTask) {
-                        PipelineRunLog logs = new PipelineRunLog();
                         String configId = stagesTask.getConfigId();
-                        String logId = configLogMap.get(configId);
-                        PipelineExecLog log = logMap.get(logId);
-                        if (log == null){
-                            log = logService.findOneLog(logId);
-                        }
-                        Integer integer = runTime.get(logId);
-                        if (integer == null){
-                            integer = 0 ;
-                        }
-                        logs.setRunLog(log.getRunLog());
-                        logs.setTime(integer);
-                        logs.setState(log.getRunState());
-                        logs.setName("1");
-                        logs.setId(logId);
+                        PipelineRunLog logs = findOneRunLog(configId);
                         taskList.add(logs);
                     }
                     pipelineRunLog.setName(pipelineStages.getName());
@@ -529,7 +508,6 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         return execRunLog;
     }
 
-
     public Map<String,Object> findTimeState(List<PipelineRunLog> logs){
         int time = 0;
         int runState = 3;
@@ -551,13 +529,31 @@ public class PipelineExecServiceImpl implements PipelineExecService {
 
         if (runState != 0 ){
             runState = state/logs.size();
-            System.out.println("state:"+state);
         }
 
         map.put("state",runState);
         map.put("time",time);
         map.put("runLog", runLog.toString());
         return map;
+    }
+
+    public PipelineRunLog findOneRunLog(String configId){
+        PipelineRunLog runLog = new PipelineRunLog();
+        String logId = configLogMap.get(configId);
+        PipelineExecLog log = logMap.get(logId);
+        if (log == null){
+            log = logService.findOneLog(logId);
+        }
+        Integer integer = runTime.get(logId);
+        if (integer == null){
+            integer = 0 ;
+        }
+        runLog.setName(log.getTaskName());
+        runLog.setRunLog(log.getRunLog());
+        runLog.setState(log.getRunState());
+        runLog.setTime(integer);
+        runLog.setId(logId);
+        return runLog;
     }
 
     /**
@@ -568,12 +564,23 @@ public class PipelineExecServiceImpl implements PipelineExecService {
     public void killInstance(String pipelineId) {
         PipelineExecHistory history = historyMap.get(pipelineId);
         if (history == null){
-            updateStatus(pipelineId,PIPELINE_RUN_HALT);
+            PipelineExecHistory lastHistory = historyService.findLastHistory(pipelineId);
+            lastHistory.setRunStatus(PIPELINE_RUN_HALT);
+            historyService.updateHistory(lastHistory);
             return;
+        }
+        String historyId = history.getHistoryId();
+        List<PipelineExecLog> allLog = logService.findAllLog(historyId);
+        for (PipelineExecLog execLog : allLog) {
+            String logId = execLog.getLogId();
+            PipelineExecLog log = logMap.get(logId);
+            if (log == null){
+                continue;
+            }
+            commonService.updateState(pipelineId,logId,PIPELINE_RUN_HALT);
         }
         updateStatus(pipelineId,PIPELINE_RUN_HALT);
     }
-
 
     //更新运行状态
     private void updateStatus(String pipelineId,int status){

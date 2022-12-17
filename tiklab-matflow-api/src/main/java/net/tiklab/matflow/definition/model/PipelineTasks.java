@@ -40,6 +40,9 @@ public class PipelineTasks {
     @JoinQuery(key = "id")
     private Pipeline pipeline;
 
+    @ApiProperty(name="name",desc="名称")
+    private String name;
+
 
     public PipelineTasks() {
     }
@@ -117,5 +120,11 @@ public class PipelineTasks {
         this.pipeline = pipeline;
     }
 
+    public String getName() {
+        return name;
+    }
 
+    public void setName(String name) {
+        this.name = name;
+    }
 }

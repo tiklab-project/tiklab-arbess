@@ -33,6 +33,9 @@ public class PipelineTasksEntity {
     @Column(name = "task_sort",notNull = true)
     private int taskSort;
 
+    @Column(name = "name",notNull = true)
+    private String name;
+
 
     public String getConfigId() {
         return configId;
@@ -74,4 +77,11 @@ public class PipelineTasksEntity {
         this.taskSort = taskSort;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 }

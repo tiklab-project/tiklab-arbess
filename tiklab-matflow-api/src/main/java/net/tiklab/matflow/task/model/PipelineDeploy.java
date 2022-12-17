@@ -44,6 +44,18 @@ public class PipelineDeploy {
 
     private int type;
 
+
+    @ApiProperty(name="name",desc="名称")
+    private String name;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public String getConfigId() {
         return configId;
     }

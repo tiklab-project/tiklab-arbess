@@ -184,11 +184,13 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
                 PipelineRunLog runLog = new PipelineRunLog();
                 runLog.setRunLog(execLog.getRunLog());
                 runLog.setTime(execLog.getRunTime());
-                runLog.setName("1");
+                runLog.setName(execLog.getTaskName());
                 runLog.setState(execLog.getRunState());
                 runLog.setId(execLog.getLogId());
                 runLogList.add(runLog);
             }
+            Map<String, Object> timeState = findTimeState(runLogList);
+            execRunLog.setRunLog((String) timeState.get("runLog"));
         }
 
         if (pipelineType == 2){
@@ -211,7 +213,7 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
                     List<PipelineRunLog> logs = new ArrayList<>();
                     for (PipelineExecLog log : allStagesLog) {
                         PipelineRunLog runLogs = new PipelineRunLog();
-                        runLogs.setName("任务Task");
+                        runLogs.setName(log.getTaskName());
                         runLogs.setRunLog(log.getRunLog());
                         runLogs.setTime(log.getRunTime());
                         runLogs.setState(log.getRunState());
@@ -251,7 +253,7 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
                 log.setId(pipelineExecLog.getLogId());
                 log.setState(pipelineExecLog.getRunState());
                 log.setTime(pipelineExecLog.getRunTime());
-                log.setName("312");
+                log.setName(pipelineExecLog.getTaskName());
                 log.setRunLog(pipelineExecLog.getRunLog());
                 logs.add(log);
             }

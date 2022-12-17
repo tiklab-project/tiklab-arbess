@@ -42,6 +42,9 @@ public class PipelineExecLogEntity {
     @Column(name = "stages_id")
     private String stagesId;
 
+    @Column(name = "task_name")
+    private String taskName;
+
     public String getStagesId() {
         return stagesId;
     }
@@ -106,5 +109,11 @@ public class PipelineExecLogEntity {
         this.runState = runState;
     }
 
+    public String getTaskName() {
+        return taskName;
+    }
 
+    public void setTaskName(String taskName) {
+        this.taskName = taskName;
+    }
 }

@@ -35,6 +35,8 @@ public class PipelineProductEntity {
     @Column(name = "config_id",notNull = true)
     private String configId;
 
+
+
     public String getConfigId() {
         return configId;
     }

@@ -8,6 +8,7 @@ import net.tiklab.matflow.definition.model.Pipeline;
 import net.tiklab.matflow.orther.dao.PipelineFollowDao;
 import net.tiklab.matflow.orther.entity.PipelineFollowEntity;
 import net.tiklab.matflow.orther.model.PipelineFollow;
+import net.tiklab.matflow.orther.until.PipelineUntil;
 import net.tiklab.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,6 +30,9 @@ public class PipelineFollowServiceImpl implements PipelineFollowService {
     public void updateFollow(PipelineFollow pipelineFollow) {
         Pipeline pipeline = pipelineFollow.getPipeline();
         String pipelineId = pipeline.getId();
+        if (!PipelineUntil.isNoNull(pipelineId)){
+           throw new ApplicationException(50001,"流水线id不能为空。");
+        }
         String userId = pipelineFollow.getUserId();
         List<PipelineFollow> list = pipelineFollowDao.updateFollow(userId, pipelineId);
         if (list.size() == 0){

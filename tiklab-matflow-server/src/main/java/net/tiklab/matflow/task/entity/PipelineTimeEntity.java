@@ -26,6 +26,7 @@ public class PipelineTimeEntity {
     @Column(name = "config_id")
     private String configId;
 
+
     public String getTimeId() {
         return timeId;
     }

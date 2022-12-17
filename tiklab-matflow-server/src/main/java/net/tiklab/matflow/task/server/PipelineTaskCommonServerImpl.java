@@ -201,42 +201,48 @@ public class PipelineTaskCommonServerImpl implements PipelineTaskCommonServer {
      * @return 任务信息
      */
     @Override
-    public Object findOneTaskConfig(String configId,int taskType,int taskSort){
+    public Object findOneTaskConfig(String configId,int taskType,int taskSort,String name){
         switch (taskType/10) {
             case 0 -> {
                 PipelineCode oneCodeConfig = codeService.findOneCodeConfig(configId);
                 oneCodeConfig.setType(taskType);
                 oneCodeConfig.setSort(taskSort);
+                oneCodeConfig.setName(name);
                 return oneCodeConfig;
             }
             case 1 -> {
                 PipelineTest oneTestConfig = testService.findOneTestConfig(configId);
                 oneTestConfig.setType(taskType);
                 oneTestConfig.setSort(taskSort);
+                oneTestConfig.setName(name);
                 return oneTestConfig;
             }
             case 2 -> {
                 PipelineBuild oneBuildConfig = buildService.findOneBuildConfig(configId);
                 oneBuildConfig.setType(taskType);
                 oneBuildConfig.setSort(taskSort);
+                oneBuildConfig.setName(name);
                 return oneBuildConfig;
             }
             case 3 -> {
                 PipelineDeploy oneDeployConfig = deployService.findOneDeployConfig(configId);
                 oneDeployConfig.setType(taskType);
                 oneDeployConfig.setSort(taskSort);
+                oneDeployConfig.setName(name);
                 return oneDeployConfig;
             }
             case 4 -> {
                 PipelineCodeScan oneCodeScanConfig = codeScanService.findOneCodeScanConfig(configId);
                 oneCodeScanConfig.setType(taskType);
                 oneCodeScanConfig.setSort(taskSort);
+                oneCodeScanConfig.setName(name);
                 return oneCodeScanConfig;
             }
             case 5 -> {
                 PipelineProduct oneProductConfig = productServer.findOneProductConfig(configId);
                 oneProductConfig.setType(taskType);
                 oneProductConfig.setSort(taskSort);
+                oneProductConfig.setName(name);
                 return oneProductConfig;
             }
             default -> {

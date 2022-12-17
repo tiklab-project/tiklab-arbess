@@ -19,6 +19,9 @@ public class PipelineMessageTypeEntity {
     @Column(name = "config_id")
     private String configId;
 
+
+
+
     public String getMessageTaskId() {
         return messageTaskId;
     }

@@ -3,9 +3,6 @@ package net.tiklab.matflow.definition.entity;
 
 import net.tiklab.dal.jpa.annotation.*;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 /**
  * 流水线顺序配置
  */
@@ -22,7 +19,7 @@ public class PipelineStagesTaskEntity {
 
     //创建配置时间
     @Column(name = "create_time",notNull = true)
-    private String createTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+    private String createTime;
 
     //流水线
     @Column(name = "stages_id",notNull = true)
@@ -35,6 +32,9 @@ public class PipelineStagesTaskEntity {
     //顺序
     @Column(name = "task_sort",notNull = true)
     private int taskSort;
+
+    @Column(name = "name",notNull = true)
+    private String name;
 
 
     public String getConfigId() {
@@ -75,5 +75,13 @@ public class PipelineStagesTaskEntity {
 
     public void setTaskSort(int taskSort) {
         this.taskSort = taskSort;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }

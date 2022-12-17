@@ -28,7 +28,7 @@ public interface PipelineTaskCommonServer {
      * @param configId 配置
      * @return 任务信息
      */
-    Object findOneTaskConfig(String configId,int taskType,int taskSort);
+    Object findOneTaskConfig(String configId,int taskType,int taskSort,String name);
 
     /**
      * 效验配置必填字段

@@ -19,6 +19,17 @@ public class PipelineMessageType {
     @ApiProperty(name="configId",desc="配置id")
     private String configId;
 
+    @ApiProperty(name="name",desc="名称")
+    private String name;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public String getMessageTaskId() {
         return messageTaskId;
     }

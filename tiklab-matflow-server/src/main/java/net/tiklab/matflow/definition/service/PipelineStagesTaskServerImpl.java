@@ -1,6 +1,8 @@
 package net.tiklab.matflow.definition.service;
 
+import com.alibaba.fastjson.JSON;
 import net.tiklab.beans.BeanMapper;
+import net.tiklab.core.exception.ApplicationException;
 import net.tiklab.matflow.definition.dao.PipelineStagesTaskDao;
 import net.tiklab.matflow.definition.entity.PipelineStagesTaskEntity;
 import net.tiklab.matflow.definition.model.PipelineConfig;
@@ -38,10 +40,40 @@ public class PipelineStagesTaskServerImpl implements PipelineStagesTaskServer {
         String stagesId = config.getStagesId();
         int taskType = config.getTaskType();
         int taskSort = initSort(stagesId,config.getTaskSort()) ;
-        PipelineStagesTask stagesTask = new PipelineStagesTask(PipelineUntil.date(1),taskType,taskSort,stagesId);
+        PipelineStagesTask stagesTask =
+                new PipelineStagesTask(PipelineUntil.date(1),taskType,taskSort,stagesId);
+        String name = getName(taskType);
+        stagesTask.setName(name);
         String taskId = createStagesTask(stagesTask);
         commonServer.createTaskConfig(taskId,taskType);
         return taskId;
+    }
+
+    private String getName(int taskType){
+        switch (taskType/10) {
+            case 0 -> {
+                return "源码";
+            }
+            case 1 -> {
+                return "maven测试";
+            }
+            case 2 -> {
+                return "maven构建";
+            }
+            case 3 -> {
+                return "虚拟机部署";
+            }
+            case 4 -> {
+
+                return "代码扫描";
+            }
+            case 5 -> {
+                return "推送制品";
+            }
+            default -> {
+                throw new ApplicationException("无法更新未知的配置类型。");
+            }
+        }
     }
 
     /**
@@ -119,6 +151,14 @@ public class PipelineStagesTaskServerImpl implements PipelineStagesTaskServer {
         Object values = config.getValues();
         String configId = config.getConfigId();
         int taskType = config.getTaskType();
+        String object = JSON.toJSONString(values);
+        PipelineConfig pipelineConfig =JSON.parseObject(object, PipelineConfig.class);
+        if (PipelineUntil.isNoNull(pipelineConfig.getName())) {
+            PipelineStagesTask task = findOneStagesTask(configId);
+            task.setName(pipelineConfig.getName());
+            updateStagesTask(task);
+            return;
+        }
         commonServer.updateTaskConfig(configId,taskType,values);
     }
 
@@ -159,7 +199,8 @@ public class PipelineStagesTaskServerImpl implements PipelineStagesTaskServer {
             String configId = stagesTask.getConfigId();
             int taskSort = stagesTask.getTaskSort();
             int taskType = stagesTask.getTaskType();
-            Object config = commonServer.findOneTaskConfig(configId, taskType, taskSort);
+            String taskName = stagesTask.getName();
+            Object config = commonServer.findOneTaskConfig(configId, taskType, taskSort,taskName);
             list.add(config);
         }
         return list;

@@ -95,6 +95,7 @@
             <artifactId>tiklab-upgrade-starter</artifactId>
             <version>${project.version}</version>
         </dependency>
+
         <dependency>
             <groupId>net.tiklab</groupId>
             <artifactId>tiklab-integration-spring-boot-starter</artifactId>
@@ -430,5 +431,6 @@
 
         </plugins>
     </build>
+
 </project>
 

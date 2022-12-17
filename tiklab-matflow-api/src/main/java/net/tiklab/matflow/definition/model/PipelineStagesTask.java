@@ -26,6 +26,10 @@ public class PipelineStagesTask {
     @ApiProperty(name="stagesId",desc="阶段")
     private String stagesId;
 
+    @ApiProperty(name="name",desc="名称")
+    private String name;
+
+
     public PipelineStagesTask() {
     }
 
@@ -74,5 +78,13 @@ public class PipelineStagesTask {
 
     public void setStagesId(String stagesId) {
         this.stagesId = stagesId;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }

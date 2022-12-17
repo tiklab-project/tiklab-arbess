@@ -31,6 +31,9 @@ public class PipelineExecLog {
     @ApiProperty(name = "taskSort",desc = "执行顺序")
     private int taskSort ;
 
+    @ApiProperty(name = "taskName",desc = "任务名称")
+    private String taskName;
+
     //执行名称
     @ApiProperty(name = "taskSort",desc = "执行顺序")
     private String taskAlias;
@@ -139,4 +142,11 @@ public class PipelineExecLog {
         this.taskAlias = taskAlias;
     }
 
+    public String getTaskName() {
+        return taskName;
+    }
+
+    public void setTaskName(String taskName) {
+        this.taskName = taskName;
+    }
 }

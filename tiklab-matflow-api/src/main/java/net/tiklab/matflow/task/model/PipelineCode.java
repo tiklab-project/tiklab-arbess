@@ -51,6 +51,17 @@ public class PipelineCode {
     @ApiProperty(name = "codeAlias",desc="别名")
     private String codeAlias;
 
+    @ApiProperty(name="name",desc="名称")
+    private String name;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public String getConfigId() {
         return configId;
     }

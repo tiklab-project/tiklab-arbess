@@ -74,8 +74,8 @@ public class PipelineFollowDao {
         sql = sql.concat(" where p.pipeline_id  "
                 + " in ("+ s +")"
                 + " and p.pipeline_id "
-                + " in (select pipeline_follow.pipeline_id from pipeline_follow"
-                + " where pipeline_follow.user_id  =  '"+userId+"'  )");
+                + " in (select pip_pipeline_other_follow.pipeline_id from pip_pipeline_other_follow"
+                + " where pip_pipeline_other_follow.user_id  =  '"+userId+"'  )");
         JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
         return  jdbcTemplate.query(sql, new BeanPropertyRowMapper(PipelineEntity.class));
     }
@@ -85,8 +85,8 @@ public class PipelineFollowDao {
         sql = sql.concat(" where p.pipeline_id  "
                 + " in ("+ s +")"
                 + " and p.pipeline_id "
-                + " not in (select pipeline_follow.pipeline_id from pipeline_follow"
-                + " where pipeline_follow.user_id  =  '" + userId + "'  )");
+                + " not in (select pip_pipeline_other_follow.pipeline_id from pip_pipeline_other_follow"
+                + " where pip_pipeline_other_follow.user_id  =  '" + userId + "'  )");
         JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
         return  jdbcTemplate.query(sql, new BeanPropertyRowMapper(PipelineEntity.class));
     }
@@ -98,9 +98,9 @@ public class PipelineFollowDao {
      * @return 收藏信息
      */
     public List<PipelineFollow> updateFollow(String userId, String pipelineId){
-        String sql = "select pipeline_follow.* from pipeline_follow ";
-        sql = sql.concat(" where pipeline_follow.user_id  = '"+userId+"' "
-                + " and pipeline_follow.pipeline_id  = '"+pipelineId+"' ");
+        String sql = "select pip_pipeline_other_follow.* from pip_pipeline_other_follow ";
+        sql = sql.concat(" where pip_pipeline_other_follow.user_id  = '"+userId+"' "
+                + " and pip_pipeline_other_follow.pipeline_id  = '"+pipelineId+"' ");
         JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
         return  jdbcTemplate.query(sql, new BeanPropertyRowMapper(PipelineFollow.class));
     }

@@ -1,5 +1,6 @@
 package net.tiklab.matflow.definition.service;
 
+import com.alibaba.fastjson.JSON;
 import net.tiklab.beans.BeanMapper;
 import net.tiklab.core.exception.ApplicationException;
 import net.tiklab.matflow.definition.dao.PipelineTasksDao;
@@ -11,6 +12,7 @@ import net.tiklab.matflow.task.server.PipelineTaskCommonServer;
 import net.tiklab.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -105,6 +107,14 @@ public class PipelineTasksServiceImpl implements PipelineTasksService {
         String configId = config.getConfigId();
         Object values = config.getValues();
         int taskType = config.getTaskType();
+        String object = JSON.toJSONString(values);
+        PipelineConfig pipelineConfig =JSON.parseObject(object, PipelineConfig.class);
+        if (PipelineUntil.isNoNull(pipelineConfig.getName())) {
+            PipelineTasks task = findOneTasks(configId);
+            task.setName(pipelineConfig.getName());
+            updateTasks(task);
+            return;
+        }
         commonServer.updateTaskConfig(configId,taskType,values);
     }
 
@@ -191,11 +201,12 @@ public class PipelineTasksServiceImpl implements PipelineTasksService {
         for (PipelineTasks tasks : list) {
             int taskSort = tasks.getTaskSort();
             String configId = tasks.getConfigId();
+            String tasksName = tasks.getName();
             int taskType = tasks.getTaskType();
             if (configId == null){
                 continue;
             }
-            Object config = commonServer.findOneTaskConfig(configId, taskType, taskSort);
+            Object config = commonServer.findOneTaskConfig(configId, taskType, taskSort,tasksName);
             arrayList.add(config);
         }
         return arrayList;
