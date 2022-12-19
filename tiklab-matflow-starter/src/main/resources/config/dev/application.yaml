@@ -68,7 +68,7 @@ eas:
 #  web:
 #    address: http://192.168.10.14:30038568
 base:
-  url: http://eas-ce.dev.tiklab.net
+  url: http://http://192.168.10.23:3000
 
 mysql:
   embbed:

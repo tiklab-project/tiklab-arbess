@@ -222,6 +222,7 @@ public class CodeServiceImpl implements CodeService {
         if (!PipelineUntil.isNoNull(tempFile)){
             throw new ApplicationException("私钥写入失败。");
         }
+
         //匹配私钥地址
         String address = tempFile.replace(userHome, "").replace("\\", "/");
         String orderClean;
@@ -233,7 +234,6 @@ public class CodeServiceImpl implements CodeService {
             orderClean = "/git git config --global --unset core.sshCommand";
             orderAdd = "/git config --global core.sshCommand \"ssh -i ~" + address + "\"";
         }
-
         list.add(orderClean);
         list.add(orderAdd);
         list.add(s);

@@ -63,6 +63,9 @@ eas:
   embbed:
     enable: true
 
+base:
+  url: http://matflow-ce.tiklab.net
+
 mysql:
   embbed:
     enable: true
