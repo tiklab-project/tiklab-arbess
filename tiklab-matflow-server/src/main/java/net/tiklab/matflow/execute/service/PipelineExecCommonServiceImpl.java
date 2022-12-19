@@ -159,13 +159,19 @@ public class PipelineExecCommonServiceImpl implements PipelineExecCommonService 
 
         PipelineExecLog pipelineExecLog = logMap.get(logId);
         if (pipelineExecLog != null){
+
             pipelineExecLog.setRunState(state);
             pipelineExecLog.setLogId(logId);
+
             Integer integer = runTime.get(logId);
+            if (integer !=  null && integer == 0){
+                integer = 1;
+            }
             if (integer ==  null){
                 integer = 0;
             }
             pipelineExecLog.setRunTime(integer);
+            System.out.println("日志id："+ logId + "   日志状态："+state  );
             logService.updateLog(pipelineExecLog);
         }
 

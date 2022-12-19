@@ -241,6 +241,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
             stagesId = stagesTask.getStagesId();
             name = stagesTask.getName();
         }
+
         PipelineExecLog pipelineExecLog = new PipelineExecLog();
         pipelineExecLog.setHistoryId(historyId);
         pipelineExecLog.setTaskSort(taskSort);
@@ -432,13 +433,12 @@ public class PipelineExecServiceImpl implements PipelineExecService {
             List<PipelineStages> stagesMainStage = stagesServer.findAllStagesMainStage(pipelineId);
             //阶段
             for (PipelineStages stages : stagesMainStage) {
-                PipelineRunLog runLog = new PipelineRunLog();
+
                 List<PipelineRunLog> runLogList = new ArrayList<>();
                 //并行阶段
                 String stagesId = stages.getStagesId();
                 List<PipelineStages> allMainStage = stagesServer.findAllMainStage(stagesId);
                 for (PipelineStages pipelineStages : allMainStage) {
-                    PipelineRunLog pipelineRunLog = new PipelineRunLog();
                     String id = pipelineStages.getStagesId();
                     //并行阶段任务
                     List<PipelineStagesTask> allStagesTask = stagesServer.findAllStagesTask(id);
@@ -448,24 +448,10 @@ public class PipelineExecServiceImpl implements PipelineExecService {
                         PipelineRunLog logs = findOneRunLog(configId);
                         taskList.add(logs);
                     }
-                    pipelineRunLog.setName(pipelineStages.getName());
-                    pipelineRunLog.setId(pipelineStages.getStagesId());
-                    Map<String, Object> timeState = findTimeState(taskList);
-                    pipelineRunLog.setRunLog((String) timeState.get("runLog"));
-                    pipelineRunLog.setTime((Integer) timeState.get("time"));
-                    pipelineRunLog.setState((Integer) timeState.get("state"));
-                    pipelineRunLog.setRunLogList(taskList);
-
+                    PipelineRunLog pipelineRunLog = initRunLog(pipelineStages, taskList);
                     runLogList.add(pipelineRunLog);
                 }
-                Map<String, Object> timeState = findTimeState(runLogList);
-                runLog.setRunLog((String) timeState.get("runLog"));
-                runLog.setTime((Integer) timeState.get("time"));
-                runLog.setState((Integer) timeState.get("state"));
-                runLog.setName(stages.getName());
-                runLog.setId(stagesId);
-                runLog.setRunLogList(runLogList);
-
+                PipelineRunLog runLog = initRunLog(stages, runLogList);
                 list.add(runLog);
             }
 
@@ -477,27 +463,18 @@ public class PipelineExecServiceImpl implements PipelineExecService {
                 execRunLog.setRunLogList(list);
                 return execRunLog;
             }
-            PipelineRunLog runLog = new PipelineRunLog();
+
             List<PipelineRunLog> logs = new ArrayList<>();
             for (PipelinePost post : allPost) {
-                PipelineRunLog pipelineRunLog = new PipelineRunLog();
                 String configId = post.getConfigId();
-                String logId = configLogMap.get(configId);
-                PipelineExecLog log = logMap.get(logId);
-                if (log == null){
-                    log = logService.findOneLog(logId);
-                }
-                pipelineRunLog.setRunLog(log.getRunLog());
-                pipelineRunLog.setState(log.getRunState());
-                pipelineRunLog.setTime(log.getRunTime());
-                pipelineRunLog.setName("1");
+                PipelineRunLog pipelineRunLog = findOneRunLog(configId);
                 logs.add(pipelineRunLog);
             }
-            Map<String, Object> timeState = findTimeState(logs);
-            runLog.setRunLog((String) timeState.get("runLog"));
-            runLog.setTime((Integer) timeState.get("time"));
-            runLog.setState((Integer) timeState.get("state"));
-            runLog.setName("1111");
+            PipelineStages stages = new PipelineStages();
+            stages.setName("后置处理");
+            stages.setStagesId("后置处理");
+            PipelineRunLog runLog = initRunLog(stages, logs);
+
             logs.add(runLog);
         }
 
@@ -508,6 +485,18 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         return execRunLog;
     }
 
+    public PipelineRunLog initRunLog(PipelineStages pipelineStages,List<PipelineRunLog> taskList){
+        PipelineRunLog pipelineRunLog = new PipelineRunLog();
+        pipelineRunLog.setName(pipelineStages.getName());
+        pipelineRunLog.setId(pipelineStages.getStagesId());
+        Map<String, Object> timeState = findTimeState(taskList);
+        pipelineRunLog.setRunLog((String) timeState.get("runLog"));
+        pipelineRunLog.setTime((Integer) timeState.get("time"));
+        pipelineRunLog.setState((Integer) timeState.get("state"));
+        pipelineRunLog.setRunLogList(taskList);
+        return pipelineRunLog;
+    }
+
     public Map<String,Object> findTimeState(List<PipelineRunLog> logs){
         int time = 0;
         int runState = 3;
@@ -516,9 +505,8 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         Map<String,Object> map = new HashMap<>();
         for (PipelineRunLog log : logs) {
             time = time + log.getTime();
-            state = log.getState();
             state = state + log.getState();
-            if (state == 0){
+            if (log.getState() == 0){
                 runState = 0;
             }
             if (!PipelineUntil.isNoNull(log.getRunLog())){
@@ -552,6 +540,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         runLog.setRunLog(log.getRunLog());
         runLog.setState(log.getRunState());
         runLog.setTime(integer);
+        runLog.setType(log.getTaskType());
         runLog.setId(logId);
         return runLog;
     }

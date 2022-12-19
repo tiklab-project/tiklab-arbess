@@ -110,7 +110,6 @@ public class PipelineServiceImpl implements PipelineService {
         homeService.log(LOG_PIPELINE, LOG_MD_PIPELINE_DELETE,LOG_TEM_PIPELINE_DELETE, map);
         homeService.settingMessage(MES_PLAN, map);
 
-
     }
 
     /**

@@ -12,6 +12,8 @@ public class PipelineRunLog {
 
     private int state;
 
+    private int type;
+
     private String runLog;
 
     private int allState;
@@ -85,5 +87,13 @@ public class PipelineRunLog {
 
     public void setAllTime(int allTime) {
         this.allTime = allTime;
+    }
+
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
     }
 }

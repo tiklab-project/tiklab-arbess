@@ -195,6 +195,69 @@ public class PipelineTaskCommonServerImpl implements PipelineTaskCommonServer {
         }
     }
 
+
+    /**
+     * 默认任务名称
+     * @param taskType 任务
+     * @return 任务默认名称
+     */
+    @Override
+    public String initName(int taskType){
+        switch (taskType) {
+            case 1 -> {
+                return "通用Git";
+            }
+            case 2 -> {
+                return "Gitee";
+            }
+            case 3 -> {
+                return "GitHub";
+            }
+            case 4 -> {
+                return "GitLab";
+            }
+            case 5 -> {
+                return "Svn";
+            }
+            case 11 -> {
+                return "Maven单元测试";
+            }
+            case 21 -> {
+                return "Maven构建";
+            }
+            case 22 -> {
+                return "Node.js";
+            }
+            case 31 -> {
+                return "虚拟机";
+            }
+            case 32 -> {
+                return "Docker";
+            }
+            case 41 -> {
+                return "代码扫描";
+            }
+            case 51 -> {
+                return "Nexus";
+            }
+            case 52 -> {
+                return "SSH";
+            }
+            case 61 -> {
+                return "消息通知";
+            }
+            case 71 -> {
+                return "执行Bat脚本";
+            }
+            case 72 -> {
+                return "执行Shell脚本";
+            }
+            default -> {
+                return null;
+            }
+        }
+    }
+
     /**
      * 查询任务
      * @param configId 配置

@@ -23,6 +23,14 @@ public interface PipelineTaskCommonServer {
      */
     void updateTaskConfig(String configId,int taskType,Object o);
 
+
+    /**
+     * 默认任务名称
+     * @param taskType 任务
+     * @return 任务默认名称
+     */
+    String initName(int taskType);
+
     /**
      * 查询任务
      * @param configId 配置

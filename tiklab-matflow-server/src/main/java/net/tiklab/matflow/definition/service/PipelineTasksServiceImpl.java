@@ -42,6 +42,8 @@ public class PipelineTasksServiceImpl implements PipelineTasksService {
         findTypeTasks(pipelineId,taskType);
         int taskSort = initSort(pipelineId, config.getTaskSort(), taskType);
         PipelineTasks tasks = new PipelineTasks(PipelineUntil.date(1),taskType,taskSort,pipelineId);
+        String name = commonServer.initName(taskType);
+        tasks.setName(name);
         String tasksId = createTasks(tasks);
         commonServer.createTaskConfig(tasksId,taskType);
         return tasksId;
