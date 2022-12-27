@@ -66,9 +66,10 @@ eas:
 #    enable: false
 #  address: http://192.168.10.14:8080
 #  web:
-#    address: http://192.168.10.14:30038568
+#    address: http://192.168.10.14:3003
+
 base:
-  url: http://http://192.168.10.23:3000
+  url: http://192.168.10.23:3000
 
 mysql:
   embbed:

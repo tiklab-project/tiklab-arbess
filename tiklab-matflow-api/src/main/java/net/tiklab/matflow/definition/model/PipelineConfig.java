@@ -36,7 +36,6 @@ public class PipelineConfig {
     @JoinQuery(key = "id")
     private Pipeline pipeline;
 
-
     private String name;
 
     public PipelineConfig() {

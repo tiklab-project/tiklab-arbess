@@ -70,7 +70,6 @@ public class PipelineExecHistoryDao {
      * @return 流水线历史列表
      */
     public List<PipelineExecHistoryEntity> findAllHistory() {
-
         return jpaTemplate.findAll(PipelineExecHistoryEntity.class);
     }
 
@@ -120,8 +119,7 @@ public class PipelineExecHistoryDao {
      */
     public List<PipelineExecHistoryEntity> findAllHistory(String pipelineId){
         String sql = "select pip_pipeline_history.* from pip_pipeline_history  ";
-        sql = sql.concat(" where pip_pipeline_history.pipeline_id   = '"+pipelineId+"' " +
-                " and pip_pipeline_history.find_state = 1 ");
+        sql = sql.concat(" where pip_pipeline_history.pipeline_id   = '"+pipelineId+"' ");
         JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
         return  jdbcTemplate.query(sql, new BeanPropertyRowMapper(PipelineExecHistoryEntity.class));
     }

@@ -62,7 +62,7 @@ public class PipelineProductServerImpl implements PipelineProductServer {
         }
         for (PipelineProduct pipelineProduct : allProduct) {
             if (pipelineProduct.getConfigId().equals(configId)){
-                return pipelineProduct;
+                return findOneProduct(pipelineProduct.getProductId());
             }
         }
         return null;

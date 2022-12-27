@@ -20,7 +20,7 @@ public class PipelineCodeScanServiceImpl implements PipelineCodeScanService {
 
 
     @Autowired
-    PipelineCodeScanDao CodeScanDao;
+    PipelineCodeScanDao codeScanDao;
 
     @Autowired
     PipelineAuthThirdServer thirdServer;
@@ -36,7 +36,7 @@ public class PipelineCodeScanServiceImpl implements PipelineCodeScanService {
     @Override
     public String createCodeScan(PipelineCodeScan pipelineCodeScan) {
         PipelineCodeScanEntity pipelineCodeScanEntity = BeanMapper.map(pipelineCodeScan, PipelineCodeScanEntity.class);
-        return CodeScanDao.createCodeScan(pipelineCodeScanEntity);
+        return codeScanDao.createCodeScan(pipelineCodeScanEntity);
     }
 
 
@@ -63,7 +63,7 @@ public class PipelineCodeScanServiceImpl implements PipelineCodeScanService {
         }
         for (PipelineCodeScan pipelineCodeScan : allCodeScan) {
             if (pipelineCodeScan.getConfigId().equals(configId)){
-                return pipelineCodeScan;
+                return findOneCodeScan(pipelineCodeScan.getCodeScanId());
             }
         }
         return null;
@@ -77,7 +77,7 @@ public class PipelineCodeScanServiceImpl implements PipelineCodeScanService {
      */
     @Override
     public void deleteCodeScan(String CodeScanId) {
-        CodeScanDao.deleteCodeScan(CodeScanId);
+        codeScanDao.deleteCodeScan(CodeScanId);
     }
 
     /**
@@ -87,17 +87,17 @@ public class PipelineCodeScanServiceImpl implements PipelineCodeScanService {
     @Override
     public void updateCodeScan(PipelineCodeScan pipelineCodeScan) {
         PipelineCodeScanEntity codeScanEntity = BeanMapper.map(pipelineCodeScan, PipelineCodeScanEntity.class);
-        CodeScanDao.updateCodeScan(codeScanEntity);
+        codeScanDao.updateCodeScan(codeScanEntity);
     }
 
     /**
      * 查询代码扫描信息
-     * @param CodeScanId id
+     * @param codeScanId id
      * @return 信息集合
      */
     @Override
-    public PipelineCodeScan findOneCodeScan(String CodeScanId) {
-        PipelineCodeScanEntity oneCodeScan = CodeScanDao.findOneCodeScan(CodeScanId);
+    public PipelineCodeScan findOneCodeScan(String codeScanId) {
+        PipelineCodeScanEntity oneCodeScan = codeScanDao.findOneCodeScan(codeScanId);
         PipelineCodeScan codeScan = BeanMapper.map(oneCodeScan, PipelineCodeScan.class);
         if (PipelineUntil.isNoNull(codeScan.getAuthId())){
             PipelineAuthThird authServer = thirdServer.findOneAuthServer(codeScan.getAuthId());
@@ -113,13 +113,13 @@ public class PipelineCodeScanServiceImpl implements PipelineCodeScanService {
      */
     @Override
     public List<PipelineCodeScan> findAllCodeScan() {
-        List<PipelineCodeScanEntity> allCodeScan = CodeScanDao.findAllCodeScan();
+        List<PipelineCodeScanEntity> allCodeScan = codeScanDao.findAllCodeScan();
         return BeanMapper.mapList(allCodeScan, PipelineCodeScan.class);
     }
 
     @Override
     public List<PipelineCodeScan> findAllCodeScanList(List<String> idList) {
-        List<PipelineCodeScanEntity> allCodeScanList = CodeScanDao.findAllCodeScanList(idList);
+        List<PipelineCodeScanEntity> allCodeScanList = codeScanDao.findAllCodeScanList(idList);
         List<PipelineCodeScan> pipelineCodeScans = BeanMapper.mapList(allCodeScanList, PipelineCodeScan.class);
         joinTemplate.joinQuery(pipelineCodeScans);
         return pipelineCodeScans;

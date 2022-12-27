@@ -11,6 +11,14 @@ public interface PipelinePostTaskServer {
      */
      void updateConfig(PipelinePost config);
 
+
+    /**
+     * 初始化任务名称
+     * @param taskType 任务类型
+     * @return 名称
+     */
+    String findConfigName(int taskType);
+
     /**
      * 查询配置信息
      * @param config 配置

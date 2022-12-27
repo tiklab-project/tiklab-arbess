@@ -49,6 +49,14 @@ public interface PipelineTasksService {
      */
     List<Object>  findAllTasksTask(String pipelineId);
 
+
+    /**
+     * 获取配置详情
+     * @param configId 配置id
+     * @return 详情
+     */
+    Object findOneTasksTask(String configId);
+
     /**
      * 效验配置必填字段
      * @param pipelineId 流水线id

@@ -2,12 +2,13 @@ package net.tiklab.matflow.achieve.server;
 
 import net.tiklab.core.exception.ApplicationException;
 import net.tiklab.matflow.definition.model.Pipeline;
+import net.tiklab.matflow.definition.service.PipelineStagesTaskServer;
+import net.tiklab.matflow.definition.service.PipelineTasksService;
 import net.tiklab.matflow.execute.model.PipelineProcess;
 import net.tiklab.matflow.execute.service.PipelineExecCommonService;
 import net.tiklab.matflow.orther.until.PipelineUntil;
 import net.tiklab.matflow.setting.model.PipelineAuthThird;
 import net.tiklab.matflow.task.model.PipelineCodeScan;
-import net.tiklab.matflow.task.server.PipelineCodeScanService;
 import net.tiklab.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,7 +28,11 @@ public class CodeScanServiceImpl implements CodeScanService {
     PipelineExecCommonService commonService;
 
     @Autowired
-    PipelineCodeScanService codeScanService;
+    PipelineTasksService tasksService;
+
+    @Autowired
+    PipelineStagesTaskServer stagesTaskServer;
+
 
     /**
      * 扫描代码
@@ -36,19 +41,27 @@ public class CodeScanServiceImpl implements CodeScanService {
      */
     @Override
     public boolean codeScan(PipelineProcess pipelineProcess, String configId ,int taskType) {
+        Pipeline pipeline = pipelineProcess.getPipeline();
+        Object o;
+        if (pipeline.getType() == 1){
+            o = tasksService.findOneTasksTask(configId);
+        }else {
+            o = stagesTaskServer.findOneStagesTasksTask(configId);
+        }
+        PipelineCodeScan pipelineCodeScan = (PipelineCodeScan) o;
+        String name = pipelineCodeScan.getName();
+        commonService.execHistory(pipelineProcess, "\n"+ PipelineUntil.date(4)+"执行任务："+ name);
 
-        // String configId = config.getConfigId();
-        PipelineCodeScan pipelineCodeScan = codeScanService.findOneCodeScanConfig(configId);
+
+
         pipelineCodeScan.setType(taskType);
 
-        Pipeline pipeline = pipelineProcess.getPipeline();
-        String log = PipelineUntil.date(4);
-        String fileAddress = PipelineUntil.findFileAddress();
-        commonService.execHistory(pipelineProcess,log+"开始扫描代码。。。。。。");
+        String fileAddress = PipelineUntil.findFileAddress(pipeline.getId());
+
         try {
-            Process process = getOrder(pipelineProcess,pipelineCodeScan,fileAddress+pipeline.getName());
+            Process process = getOrder(pipelineProcess,pipelineCodeScan,fileAddress);
             if (process == null){
-                commonService.execHistory(pipelineProcess,log+"代码扫描执行失败");
+                commonService.execHistory(pipelineProcess,PipelineUntil.date(4)+"任务"+name+"执行失败");
                 return false;
             }
 
@@ -59,14 +72,14 @@ public class CodeScanServiceImpl implements CodeScanService {
 
             int status = commonService.log( pipelineProcess);
             if (status == 0){
-                commonService.execHistory(pipelineProcess,log+"代码扫描失败");
+                commonService.execHistory(pipelineProcess,PipelineUntil.date(4)+"任务"+name+"执行失败");
                 return false;
             }
         } catch (IOException |ApplicationException e) {
-            commonService.execHistory(pipelineProcess,log+"代码扫描执行错误\n"+log+e.getMessage());
+            commonService.execHistory(pipelineProcess,PipelineUntil.date(4)+"任务"+name+"执行失败\n"+PipelineUntil.date(4)+e.getMessage());
             return false;
         }
-        commonService.execHistory(pipelineProcess,log+"代码扫描完成");
+        commonService.execHistory(pipelineProcess,PipelineUntil.date(4)+"任务"+name+"执行完成");
         return true;
     }
 
@@ -104,8 +117,9 @@ public class CodeScanServiceImpl implements CodeScanService {
             commonService.execHistory(pipelineProcess,PipelineUntil.date(4)+"执行扫描命令："+execOrder);
             order = mavenOrder(execOrder, path);
             return PipelineUntil.process(mavenAddress, order);
+        }else {
+            throw new ApplicationException("未知的任务类型");
         }
-        return null;
     }
 
     private String mavenOrder(String buildOrder,String path){

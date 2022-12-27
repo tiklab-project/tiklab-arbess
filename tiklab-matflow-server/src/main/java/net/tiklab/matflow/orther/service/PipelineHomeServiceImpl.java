@@ -87,7 +87,7 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
      * @param map 日志信息
      */
     @Override
-    public void log(String logType,String module, String templateId,HashMap<String, Object> map){
+    public void log(String logType, String templateId,HashMap<String, Object> map){
 
         Logging log = new Logging();
 
@@ -95,7 +95,24 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
         LoggingType opLogType = new LoggingType();
         opLogType.setId(logType);
         log.setActionType(opLogType);
-        log.setModule(module);
+        String[] s = templateId.split("_");
+        map.put("img","pip_config.svg");
+        map.put("title","流水线");
+        if (logType.contains("RUN")){
+            map.put("title","运行");
+            map.put("img","/images/pip_run.svg");
+        }
+        if (logType.contains("CONFIG")){
+            map.put("title","配置");
+            map.put("img","/images/pip_config.svg");
+        }
+        if (logType.contains("PIPELINE")){
+            map.put("title","流水线");
+            map.put("img","/images/pip_pipeline.svg");
+        }
+
+
+        log.setModule(s[s.length-1]);
 
         log.setLoggingTemplateId(templateId);
 
@@ -109,6 +126,8 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
         log.setBgroup(appName);
         log.setContent(JSONObject.toJSONString(map));
         logService.createLog(log);
+
+
     }
 
     /**

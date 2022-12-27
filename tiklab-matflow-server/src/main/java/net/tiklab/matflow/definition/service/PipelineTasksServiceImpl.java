@@ -215,6 +215,19 @@ public class PipelineTasksServiceImpl implements PipelineTasksService {
     }
 
     /**
+     * 获取配置详情
+     * @param configId 配置id
+     * @return 详情
+     */
+    public Object findOneTasksTask(String configId){
+        PipelineTasks tasks = findOneTasks(configId);
+        int taskSort = tasks.getTaskSort();
+        String tasksName = tasks.getName();
+        int taskType = tasks.getTaskType();
+        return commonServer.findOneTaskConfig(configId, taskType, taskSort,tasksName);
+    }
+
+    /**
      * 效验配置必填字段
      * @param pipelineId 流水线id
      * @return 配置id集合

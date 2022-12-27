@@ -1,5 +1,6 @@
 package net.tiklab.matflow.execute.service;
 
+import net.tiklab.core.exception.ApplicationException;
 import net.tiklab.matflow.execute.model.PipelineExecHistory;
 import net.tiklab.matflow.execute.model.PipelineExecLog;
 import net.tiklab.matflow.execute.model.PipelineProcess;
@@ -16,7 +17,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -88,18 +88,46 @@ public class PipelineExecCommonServiceImpl implements PipelineExecCommonService 
             execHistory(pipelineProcess, PipelineUntil.date(4)+s);
         }
 
-        if (!PipelineUntil.isNoNull(logRunLog.toString())){
-            inputStreamReader = PipelineUntil.encode(errInputStream, enCode);
-            bufferedReader = new BufferedReader(inputStreamReader);
-            while ((s = bufferedReader.readLine()) != null) {
-                logRunLog.append(s).append("\n");
-                if (validStatus(s,error)){state = 0 ;}
-                execHistory(pipelineProcess, PipelineUntil.date(4)+s);
-            }
+        inputStreamReader = PipelineUntil.encode(errInputStream, enCode);
+        bufferedReader = new BufferedReader(inputStreamReader);
+        while ((s = bufferedReader.readLine()) != null) {
+            logRunLog.append(s).append("\n");
+            if (validStatus(s,error)){state = 0 ;}
+            execHistory(pipelineProcess, PipelineUntil.date(4)+s);
         }
+
         inputStreamReader.close();
         bufferedReader.close();
         return state;
+    }
+
+    /**
+     * 获取运行状态
+     * @param pipelineProcess 运行信息
+     * @param process 运行实例
+     * @throws IOException 执行异常
+     * @throws ApplicationException 执行错误
+     */
+    @Override
+    public void execState(PipelineProcess pipelineProcess, Process process,String taskName) throws IOException , ApplicationException {
+
+        pipelineProcess.setInputStream(process.getInputStream());
+        pipelineProcess.setErrInputStream(process.getErrorStream());
+
+        //构建失败
+        int state = log(pipelineProcess);
+        process.destroy();
+
+        int i;
+        try {
+            i = process.waitFor();
+        } catch (InterruptedException e) {
+            throw new ApplicationException("任务"+taskName+"执行失败");
+        }
+
+        if (state == 0 || i != 0){
+            throw new ApplicationException("任务"+taskName+"执行失败");
+        }
     }
 
     /**
@@ -171,7 +199,6 @@ public class PipelineExecCommonServiceImpl implements PipelineExecCommonService 
                 integer = 0;
             }
             pipelineExecLog.setRunTime(integer);
-            System.out.println("日志id："+ logId + "   日志状态："+state  );
             logService.updateLog(pipelineExecLog);
         }
 
@@ -201,11 +228,12 @@ public class PipelineExecCommonServiceImpl implements PipelineExecCommonService 
         pipelineExecHistory.setHistoryId(historyId);
         //构建次数
         List<PipelineExecHistory> allHistory = historyService.findAllHistory(pipelineId);
-        allHistory.sort(Comparator.comparing(PipelineExecHistory::getCreateTime));
+
         pipelineExecHistory.setFindNumber(1);
         if (allHistory.size() >= 1){
-            pipelineExecHistory.setFindNumber(allHistory.get(allHistory.size()-1).getFindNumber()+1);
+            pipelineExecHistory.setFindNumber(allHistory.size());
         }
+
         historyService.updateHistory(pipelineExecHistory);
         return pipelineExecHistory;
     }
@@ -248,7 +276,11 @@ public class PipelineExecCommonServiceImpl implements PipelineExecCommonService 
         String logId = pipelineProcess.getLogId();
 
         PipelineExecHistory history = historyMap.get(pipelineId);
-        history.setRunTime(runTime.get(history.getHistoryId()));
+        Integer historyTime = runTime.get(history.getHistoryId());
+        if (historyTime == null){
+            historyTime = 0;
+        }
+        history.setRunTime(historyTime);
         PipelineExecLog pipelineExecLog = logMap.get(logId);
         Integer integer = runTime.get(logId);
         if (integer == null){

@@ -83,8 +83,9 @@ public class PipelineServiceImpl implements PipelineService {
         map.put("message","创建了");
 
         //动态
-        homeService.log(LOG_PIPELINE, LOG_MD_PIPELINE_CREATE, LOG_TEM_PIPELINE_CREATE, map);
-        homeService.settingMessage(MES_PLAN, map);
+        homeService.log(LOG_PIPELINE, LOG_TEM_CREATE, map);
+
+        homeService.settingMessage(MES_CREATE, map);
 
         return pipelineId;
     }
@@ -107,8 +108,10 @@ public class PipelineServiceImpl implements PipelineService {
         HashMap<String,Object> map = homeService.initMap(pipeline);
         map.put("title","流水线删除消息");
         map.put("message","删除了");
-        homeService.log(LOG_PIPELINE, LOG_MD_PIPELINE_DELETE,LOG_TEM_PIPELINE_DELETE, map);
-        homeService.settingMessage(MES_PLAN, map);
+
+        homeService.log(LOG_PIPELINE,LOG_TEM_DELETE, map);
+
+        homeService.settingMessage(MES_DELETE, map);
 
     }
 
@@ -123,14 +126,14 @@ public class PipelineServiceImpl implements PipelineService {
         joinTemplate.joinQuery(flow);
         //判断名称是否改变
         if (!pipeline.getName().equals(flow.getName())){
+            HashMap<String,Object> map = homeService.initMap(flow);
+            map.put("message", flow.getName()+"名称为:"+pipeline.getName());
 
-            //更改文件夹名称
-            relationServer.updatePipeline(pipeline.getName(), flow.getName());
             flow.setName(pipeline.getName());
 
-            HashMap<String,Object> map = homeService.initMap(flow);
-            map.put("message","名称为:"+ flow.getName());
-            // homeService.log(LOG_PIPELINE, LOG_MD_PIPELINE_UPDATE,LOG_TEM_PIPELINE_UPDATE, map);
+            homeService.log(LOG_PIPELINE,LOG_TEM_UPDATE, map);
+
+            homeService.settingMessage(MES_UPDATE, map);
         }
 
         int pipelinePower = pipeline.getPower();
@@ -138,12 +141,14 @@ public class PipelineServiceImpl implements PipelineService {
             flow.setPower(pipelinePower);
             HashMap<String,Object> map = homeService.initMap(flow);
             if (pipelinePower == 1){
-                map.put("message","权限为全局");
-                // homeService.log(LOG_PIPELINE,LOG_MD_PIPELINE_UPDATE, LOG_TEM_PIPELINE_UPDATE, map);
+                map.put("message",pipeline.getName()+"权限为全局");
+                homeService.log(LOG_PIPELINE,LOG_TEM_UPDATE, map);
+                homeService.settingMessage(MES_UPDATE, map);
             }
             if (pipelinePower == 2){
-                map.put("message","权限为私有");
-                // homeService.log(LOG_PIPELINE, LOG_MD_PIPELINE_UPDATE,LOG_TEM_PIPELINE_UPDATE, map);
+                map.put("message",pipeline.getName()+"权限为私有");
+                homeService.log(LOG_PIPELINE,LOG_TEM_UPDATE, map);
+                homeService.settingMessage(MES_UPDATE, map);
             }
         }
 

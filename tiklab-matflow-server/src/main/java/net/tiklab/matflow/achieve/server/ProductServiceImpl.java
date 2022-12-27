@@ -3,6 +3,8 @@ package net.tiklab.matflow.achieve.server;
 import com.jcraft.jsch.*;
 import net.tiklab.core.exception.ApplicationException;
 import net.tiklab.matflow.definition.model.Pipeline;
+import net.tiklab.matflow.definition.service.PipelineStagesTaskServer;
+import net.tiklab.matflow.definition.service.PipelineTasksService;
 import net.tiklab.matflow.execute.model.PipelineProcess;
 import net.tiklab.matflow.execute.service.PipelineExecCommonService;
 import net.tiklab.matflow.orther.until.PipelineFinal;
@@ -10,7 +12,6 @@ import net.tiklab.matflow.orther.until.PipelineUntil;
 import net.tiklab.matflow.setting.model.PipelineAuthHost;
 import net.tiklab.matflow.setting.model.PipelineAuthThird;
 import net.tiklab.matflow.task.model.PipelineProduct;
-import net.tiklab.matflow.task.server.PipelineProductServer;
 import net.tiklab.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,7 +28,10 @@ public class ProductServiceImpl implements ProductService {
     PipelineExecCommonService commonService;
 
     @Autowired
-    PipelineProductServer productServer;
+    PipelineTasksService tasksService;
+
+    @Autowired
+    PipelineStagesTaskServer stagesTaskServer;
 
     /**
      * 推送制品代码
@@ -36,62 +40,68 @@ public class ProductServiceImpl implements ProductService {
      */
     @Override
     public boolean product(PipelineProcess pipelineProcess, String configId ,int taskType) {
-        PipelineProduct product = productServer.findOneProductConfig(configId);
-        product.setType(taskType);
+
         Pipeline pipeline = pipelineProcess.getPipeline();
-        String log = PipelineUntil.date(4);
+        Object o;
+        if (pipeline.getType() == 1){
+            o = tasksService.findOneTasksTask(configId);
+        }else {
+            o = stagesTaskServer.findOneStagesTasksTask(configId);
+        }
+
+        PipelineProduct product = (PipelineProduct) o;
+        String name = product.getName();
+
+        commonService.execHistory(pipelineProcess, "\n"+ PipelineUntil.date(4)+"执行任务："+name);
+
+        product.setType(taskType);
+
         String fileAddress = product.getFileAddress();
         String path;
         try {
-             path = PipelineUntil.getFile(pipeline.getName(),fileAddress);
+             path = PipelineUntil.getFile(pipeline.getId(),fileAddress);
         }catch (ApplicationException e){
-            commonService.execHistory(pipelineProcess,log+e);
+            commonService.execHistory(pipelineProcess,PipelineUntil.date(4)+e);
             return false;
         }
 
         if (path == null){
-            commonService.execHistory(pipelineProcess,log+"匹配不到制品");
+            commonService.execHistory(pipelineProcess,PipelineUntil.date(4)+"匹配不到制品");
             return false;
         }
 
         commonService.execHistory(pipelineProcess,
-                    log+"制品匹配成功\n"+
-                        log+"制品名称："+ new File(path).getName() + "\n"+
-                        log+"制品地址："+path);
+                PipelineUntil.date(4)+"制品匹配成功\n"+
+                    PipelineUntil.date(4)+"制品名称："+ new File(path).getName() + "\n"+
+                    PipelineUntil.date(4)+"制品地址："+path);
         try {
             if (product.getType() == 51){
-                Process process = getProductOrder(product,path);
 
-                pipelineProcess.setInputStream(process.getInputStream());
-                pipelineProcess.setErrInputStream(process.getErrorStream());
+                Process process = getProductOrder(product,path);
                 pipelineProcess.setError(error(product.getType()));
                 pipelineProcess.setEnCode("UTF-8");
-
-                int status = commonService.log(pipelineProcess);
-                if (status == 0){
-                    commonService.execHistory(pipelineProcess, log+"推送制品失败");
-                    return false;
-                }
+                commonService.execState(pipelineProcess,process,name);
                 process.destroy();
+
             }else {
-                commonService.execHistory(pipelineProcess, log+"连接制品服务器。");
-                Session session = createSession(pipelineProcess,product);
-                commonService.execHistory(pipelineProcess, log+"制品服务器连接成功。");
+                commonService.execHistory(pipelineProcess, PipelineUntil.date(4)+"连接制品服务器。");
+                Session session = createSession(product);
+                commonService.execHistory(pipelineProcess, PipelineUntil.date(4)+"制品服务器连接成功。");
                 String putAddress = product.getPutAddress();
-                commonService.execHistory(pipelineProcess, log+"开始推送制品。");
+                commonService.execHistory(pipelineProcess, PipelineUntil.date(4)+"开始推送制品。");
                 sshPut(session,path,putAddress);
             }
         } catch (IOException | ApplicationException e) {
-            commonService.execHistory(pipelineProcess, log+"推送制品执行错误\n"+ log+e.getMessage());
+            commonService.execHistory(pipelineProcess, PipelineUntil.date(4)+"推送制品执行错误\n"+ PipelineUntil.date(4)+e.getMessage());
             return false;
         } catch (JSchException e) {
-            commonService.execHistory(pipelineProcess, log+"无法连接到服务器\n" +log+e.getMessage());
+            commonService.execHistory(pipelineProcess, PipelineUntil.date(4)+"无法连接到服务器\n" +PipelineUntil.date(4)+e.getMessage());
             return false;
         } catch (SftpException e) {
-            commonService.execHistory(pipelineProcess, log+"文件发送失败\n"+ log+e.getMessage());
+            commonService.execHistory(pipelineProcess, PipelineUntil.date(4)+"文件发送失败\n"+ PipelineUntil.date(4)+e.getMessage());
             return false;
         }
-        commonService.execHistory(pipelineProcess, log+"推送制品完成");
+        commonService.execHistory(pipelineProcess, PipelineUntil.date(4)+"推送制品完成");
         return true;
     }
 
@@ -139,10 +149,11 @@ public class ProductServiceImpl implements ProductService {
                     " -DrepositoryId="+authThird.getPrivateKey();
         }
 
+        System.out.println("命令为："+execOrder);
+
         order = mavenOrder(execOrder, path);
         return PipelineUntil.process(mavenAddress, order);
     }
-
 
     @Value("${setting.address:null}")
     private String settingAddress;
@@ -153,14 +164,12 @@ public class ProductServiceImpl implements ProductService {
      * @return 实例
      * @throws JSchException 连接失败
      */
-    private Session createSession(PipelineProcess pipelineProcess,PipelineProduct product) throws JSchException {
+    private Session createSession(PipelineProduct product) throws JSchException {
         PipelineAuthHost authHost = (PipelineAuthHost) product.getAuth();
         String sshIp = authHost.getIp();
         int sshPort = authHost.getPort();
         String username = authHost.getUsername();
         String password = authHost.getPassword();
-        commonService.execHistory(pipelineProcess,"制品服务器地址："+sshIp);
-        commonService.execHistory(pipelineProcess,"制品服务器端口："+sshPort);
         JSch jsch = new JSch();
         if (!PipelineUntil.isNoNull(username)){
             username = "root";
@@ -218,7 +227,8 @@ public class ProductServiceImpl implements ProductService {
                     "svn: E170000:",
                     "invalid option",
                     "Error executing Maven",
-                    "The specified user settings file does not exist"
+                    "The specified user settings file does not exist",
+                    "405 HTTP method PUT is not supported by this URL"
             };
             return strings;
         }

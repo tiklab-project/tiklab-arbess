@@ -149,12 +149,12 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
      */
     @Override
     public PipelineExecHistory findLastHistory(String pipelineId){
-        List<PipelineExecHistory> allHistory = findAllHistory(pipelineId);
-        if (allHistory == null){
-            return null;
-        }
-        allHistory.sort(Comparator.comparing(PipelineExecHistory::getCreateTime).reversed());
-        return allHistory.get(0);
+        // List<PipelineExecHistory> allHistory = findLatelyHistory(pipelineId);
+        // if (allHistory == null){
+        //     return null;
+        // }
+        // allHistory.sort(Comparator.comparing(PipelineExecHistory::getCreateTime).reversed());
+        return findLatelyHistory(pipelineId);
     }
 
     /**
@@ -171,7 +171,7 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
         }
 
         PipelineRunLog execRunLog = new PipelineRunLog();
-
+        execRunLog.setName(String.valueOf(history.getFindNumber()));
         Pipeline pipeline = history.getPipeline();
         String pipelineId = pipeline.getId();
         int pipelineType = pipeline.getType();

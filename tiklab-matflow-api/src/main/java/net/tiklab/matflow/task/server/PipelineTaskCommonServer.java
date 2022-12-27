@@ -9,7 +9,7 @@ public interface PipelineTaskCommonServer {
      * @param configId 配置信息
      * @return 任务id
      */
-    String createTaskConfig(String configId,int taskType);
+    String createTaskConfig(String configId, int taskType);
 
     /**
      * 删除任务

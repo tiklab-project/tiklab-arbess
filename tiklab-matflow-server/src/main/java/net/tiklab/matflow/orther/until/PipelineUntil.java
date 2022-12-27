@@ -105,23 +105,60 @@ public class PipelineUntil {
         Process process;
         String[] cmd;
         if (findSystemType()==1){
-            if (path == null){
-                // cmd = new String[] { "cmd.exe"," /c", order };
+            if (!PipelineUntil.isNoNull(path)){
                 process = runtime.exec(" cmd.exe /c " + " " + order);
             }else {
-                // cmd = new String[] { "cmd.exe"," /c","cd "+path, order };
-                process = runtime.exec(" cmd.exe /c cd " + path + " &&" + " " + order);
+                // process = runtime.exec(" cmd.exe /c cd " + path + " &&" + " " + order);
+                process = runtime.exec(" cmd.exe /c " + " " + order,null,new File(path));
             }
         }else {
-            if (path == null){
+            if (!PipelineUntil.isNoNull(path)){
                 cmd = new String[] { "/bin/sh", "-c", " source /etc/profile;"+ order };
+                process = runtime.exec(cmd);
             }else {
                 cmd = new String[] { "/bin/sh", "-c", "cd "+path+";"+" source /etc/profile;"+ order };
+                process = runtime.exec(cmd,null,new File(path));
             }
-            process = runtime.exec(cmd);
         }
         return process;
     }
+
+
+    /**
+     * 返回命令集合
+     * @param order 命令
+     * @return 命令集合
+     */
+    public static List<String> execOrder(String order){
+        if (!isNoNull(order)){
+            return Collections.emptyList();
+        }
+        String[] split = order.split("\n");
+        List<String> list = new ArrayList<>();
+        for (String s : split) {
+            if (!isNoNull(s)){
+                continue;
+            }
+            if (s.contains("#")){
+                int i = s.indexOf("#");
+                if (i != -1 && i != 0){
+                    String[] strings = s.split("#");
+                    String string = strings[0];
+                    list.add(string);
+                }
+            }else {
+                list.add(s);
+            }
+        }
+        return list;
+    }
+
+
+
+
+
+
+
 
     //时间转换成时分秒
     public static String formatDateTime(long time) {
@@ -146,13 +183,15 @@ public class PipelineUntil {
      * 系统默认存储位置
      * @return 位置
      */
-    public static String findFileAddress(){
+    public static String findFileAddress(String id){
         String userHome = System.getProperty("user.home")+"/.tiklab";
         File file = new File(userHome+"/matflow/workspace/");
         String path = file.getAbsolutePath();
+
+        int systemType = findSystemType();
         if (!file.exists()){
-            int systemType = findSystemType();
             createFile(path);
+
             try {
                 if (systemType == 1){
                     process(null," attrib +H " + userHome);
@@ -160,8 +199,22 @@ public class PipelineUntil {
             } catch (IOException e) {
                 throw new ApplicationException("更改工作空间为隐藏失败。");
             }
+
         }
-        return path + "/" ;
+
+        if (systemType == 1){
+            if (!PipelineUntil.isNoNull(id)){
+                return path + "\\";
+            }else {
+                return path + "\\" + id + "\\";
+            }
+        }else {
+            if (!PipelineUntil.isNoNull(id)){
+                return path + "/";
+            }else {
+                return path + "/" + id + "\\" ;
+            }
+        }
     }
 
     /**
@@ -183,7 +236,6 @@ public class PipelineUntil {
                     }
                 }
             }
-
             // 目录此时为空，删除
         }
         return file.delete();
@@ -191,13 +243,13 @@ public class PipelineUntil {
 
     /**
      * 匹配文件路径
-     * @param pipelineName 流水线名称
+     * @param pipelineId 流水线id
      * @param regex 条件
      * @return 文件全路径
      */
-    public static String getFile(String pipelineName, String regex) throws ApplicationException{
+    public static String getFile(String pipelineId, String regex) throws ApplicationException{
         List<String> list = new ArrayList<>();
-        String path= findFileAddress() + pipelineName;
+        String path= findFileAddress(pipelineId) ;
         List<String> filePath = PipelineUntil.getFilePath(new File(path),new ArrayList<>());
         for (String s : filePath) {
             File file = new File(s);
@@ -213,7 +265,7 @@ public class PipelineUntil {
         if (list.size()== 1){
             return list.get(0);
         }
-        return null;
+        throw new ApplicationException("没有匹配到部署文件。");
     }
 
     /**
@@ -339,18 +391,27 @@ public class PipelineUntil {
      * @return 文件地址
      */
     public static String createTempFile(String key){
-        String path;
+        FileWriter writer = null;
+        String path = null;
         try {
-            File tempFile = File.createTempFile("key", ".txt");
-            path = tempFile.getPath();
-            FileWriter writer;
-            writer = new FileWriter(path);
-            writer.write(key);
-            writer.flush();
-            writer.close();
-        } catch (IOException e) {
+            try {
+                File tempFile = File.createTempFile("key", ".txt");
+                path = tempFile.getPath();
+                writer = new FileWriter(path);
+                writer.write(key);
+                writer.flush();
+                writer.close();
+            } catch (IOException e) {
+                return null;
+            }finally {
+                if (writer != null) {
+                    writer.close();
+                }
+            }
+        }catch (IOException e){
             return null;
         }
+
         return path;
     }
 

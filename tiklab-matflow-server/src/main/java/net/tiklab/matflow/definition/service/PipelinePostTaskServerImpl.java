@@ -55,8 +55,29 @@ public class PipelinePostTaskServerImpl implements PipelinePostTaskServer {
                 }
                 createScript(config);
             }
+            default -> throw new ApplicationException("未知的操作类型taskType："+ taskType);
+        }
+    }
+
+    /**
+     * 初始化任务名称
+     * @param taskType 任务类型
+     * @return 名称
+     */
+    @Override
+    public String findConfigName(int taskType){
+        switch (taskType) {
+            case 61 -> {
+                return "消息通知";
+            }
+            case 71 -> {
+                return "执行Bat脚本";
+            }
+            case 72 -> {
+                return "执行Shell脚本";
+            }
             default -> {
-                throw new ApplicationException("未知的操作类型taskType："+ taskType);
+                return null;
             }
         }
     }

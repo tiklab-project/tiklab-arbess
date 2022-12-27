@@ -1,6 +1,5 @@
 package net.tiklab.matflow.definition.service;
 
-import net.tiklab.core.exception.ApplicationException;
 import net.tiklab.join.JoinTemplate;
 import net.tiklab.matflow.definition.model.Pipeline;
 import net.tiklab.matflow.definition.model.PipelineExecMessage;
@@ -64,8 +63,8 @@ public class PipelineRelationServerImpl implements PipelineRelationServer{
         //删除最近打开
         openService.deleteAllOpen(pipelineId);
         //删除对应文件
-        String fileAddress = PipelineUntil.findFileAddress();
-        PipelineUntil.deleteFile(new File(fileAddress+ pipeline.getName()));
+        String fileAddress = PipelineUntil.findFileAddress(pipelineId);
+        PipelineUntil.deleteFile(new File(fileAddress));
     }
 
     /**
@@ -73,18 +72,18 @@ public class PipelineRelationServerImpl implements PipelineRelationServer{
      * @param newName 新的名称
      * @param lastName 旧的名称
      */
-    @Override
-    public void updatePipeline(String newName, String lastName) {
-        //更改对应文件名
-        String fileAddress = PipelineUntil.findFileAddress();
-        File file = new File(fileAddress+lastName);
-        if (file.exists()){
-            boolean b = file.renameTo(new File(fileAddress + newName));
-            if (!b){
-                throw new ApplicationException("文件重命名失败");
-            }
-        }
-    }
+    // @Override
+    // public void updatePipeline(String newName, String lastName) {
+    //     //更改对应文件名
+    //     String fileAddress = PipelineUntil.findFileAddress();
+    //     File file = new File(fileAddress+lastName);
+    //     if (file.exists()){
+    //         boolean b = file.renameTo(new File(fileAddress + newName));
+    //         if (!b){
+    //             throw new ApplicationException("文件重命名失败");
+    //         }
+    //     }
+    // }
 
 
     /**

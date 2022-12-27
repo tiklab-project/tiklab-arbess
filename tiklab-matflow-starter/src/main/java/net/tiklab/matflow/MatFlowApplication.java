@@ -23,7 +23,7 @@ public class MatFlowApplication {
 
     public static void main(String[] args) {
         logger.info("初始化项目地址");
-        PipelineUntil.findFileAddress();
+        PipelineUntil.findFileAddress(null);
         logger.info("项目地址初始完成。");
         SpringApplication.run(MatFlowApplication.class, args);
 

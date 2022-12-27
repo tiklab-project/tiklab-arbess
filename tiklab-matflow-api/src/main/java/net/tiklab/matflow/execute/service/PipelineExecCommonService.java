@@ -1,5 +1,6 @@
 package net.tiklab.matflow.execute.service;
 
+import net.tiklab.core.exception.ApplicationException;
 import net.tiklab.matflow.execute.model.PipelineExecHistory;
 import net.tiklab.matflow.execute.model.PipelineProcess;
 
@@ -18,6 +19,15 @@ public interface PipelineExecCommonService {
      */
     int log( PipelineProcess pipelineProcess) throws IOException;
 
+
+    /**
+     * 获取运行状态
+     * @param pipelineProcess 运行信息
+     * @param process 运行实例
+     * @throws IOException 执行异常
+     * @throws ApplicationException 执行错误
+     */
+    void execState(PipelineProcess pipelineProcess, Process process,String taskName) throws IOException , ApplicationException;
 
 
     /**

@@ -41,15 +41,14 @@ public class PipelineStagesServerImpl implements PipelineStagesServer {
         int taskSort = config.getTaskSort();
         int stage = config.getStages();
 
-        String id  = null;
-
         PipelineStages pipelineStages = new PipelineStages(PipelineUntil.date(1),pipelineId);
 
         //判断新任务是否为代码源
         if (taskType < 10){
-            System.out.println("创建代码源");
+
             //判断是否存在代码源
             findTypeTasks(pipelineId);
+
             //创建根节点
             int initStage = initStage(pipelineId,1);
             pipelineStages.setCode(true);
@@ -57,7 +56,7 @@ public class PipelineStagesServerImpl implements PipelineStagesServer {
             pipelineStages.setTaskSort(1);
             pipelineStages.setTaskStage(initStage);
             pipelineStages.setName("阶段-"+initStage);
-            id = createStages(pipelineStages);
+            String id = createStages(pipelineStages);
             //从节点
             PipelineStages stages = new PipelineStages(id);
             stages.setTaskSort(1);
@@ -65,7 +64,7 @@ public class PipelineStagesServerImpl implements PipelineStagesServer {
             stagesId = createStages(stages);
             config.setStagesId(stagesId);
 
-            id  = stagesTaskServer.createStagesTasksTask(config);
+            return stagesTaskServer.createStagesTasksTask(config);
         }
 
         //新任务
@@ -76,7 +75,7 @@ public class PipelineStagesServerImpl implements PipelineStagesServer {
             pipelineStages.setTaskStage(initStage);
             pipelineStages.setTaskSort(1);
             pipelineStages.setName("阶段-"+initStage);
-            id = createStages(pipelineStages);
+            String id = createStages(pipelineStages);
 
             //创建从节点
             PipelineStages stages = new PipelineStages();
@@ -87,19 +86,19 @@ public class PipelineStagesServerImpl implements PipelineStagesServer {
             stagesId = createStages(stages);
 
             config.setStagesId(stagesId);
-            id  = stagesTaskServer.createStagesTasksTask(config);
+            return stagesTaskServer.createStagesTasksTask(config);
         }
 
         //串行任务
         if (PipelineUntil.isNoNull(stagesId) && stage != 0){
-            id  = stagesTaskServer.createStagesTasksTask(config);
+            return stagesTaskServer.createStagesTasksTask(config);
         }
 
         //并行任务
         if (!PipelineUntil.isNoNull(stagesId) && stage != 0){
             PipelineStages mainStages = findMainStages(pipelineId,stage);
             if (mainStages == null){
-                return id;
+                return null;
             }
             PipelineStages stages = new PipelineStages();
             stagesId = mainStages.getStagesId();
@@ -110,9 +109,10 @@ public class PipelineStagesServerImpl implements PipelineStagesServer {
             stages.setName("并行阶段-"+(allMainStage.size()+1));
             stagesId = createStages(stages);
             config.setStagesId(stagesId);
-            id  = stagesTaskServer.createStagesTasksTask(config);
+            return stagesTaskServer.createStagesTasksTask(config);
         }
-        return id;
+
+        return null;
     }
 
     /**
@@ -121,18 +121,14 @@ public class PipelineStagesServerImpl implements PipelineStagesServer {
      * @throws ApplicationException 代码源已存在
      */
     private void findTypeTasks(String pipelineId) throws ApplicationException {
-        List<PipelineStages> allStage = findAllPipelineStages(pipelineId);
+        List<PipelineStages> allStage = findAllStagesMainStage(pipelineId);
         if ( allStage.size() == 0){
             return;
         }
-        String stagesId = allStage.get(0).getStagesId();
-        List<PipelineStagesTask> list = stagesTaskServer.findAllStagesTasks(stagesId);
-        for (PipelineStagesTask stagesTask : list) {
-            int type = stagesTask.getTaskType();
-            if (type > 10){
-                continue;
+        for (PipelineStages stages : allStage) {
+            if (stages.isCode()){
+                throw new ApplicationException(50001,"代码源已存在，无法再次创建。");
             }
-            throw new ApplicationException(50001,"代码源已存在，无法再次创建。");
         }
     }
 
@@ -154,6 +150,7 @@ public class PipelineStagesServerImpl implements PipelineStagesServer {
             stages.setStagesList(allStagesStage);
             list.add(stages);
         }
+        list.sort(Comparator.comparing(PipelineStages::getTaskStage));
        return list;
     }
 
@@ -186,7 +183,7 @@ public class PipelineStagesServerImpl implements PipelineStagesServer {
                 list.add(pipelineStages);
             }
         }
-        list.sort(Comparator.comparing(PipelineStages::getTaskSort));
+        list.sort(Comparator.comparing(PipelineStages::getTaskStage));
         return list;
     }
 
@@ -294,13 +291,19 @@ public class PipelineStagesServerImpl implements PipelineStagesServer {
         String stagesId = stagesTask.getStagesId();
         List<PipelineStagesTask> allStagesTasks = stagesTaskServer.findAllStagesTasks(stagesId);
 
-        //删除配置与任务后阶段为空是删除阶段
+        //删除配置与任务后阶段为空时删除阶段
         if (allStagesTasks == null ||allStagesTasks.size() == 0){
             //获取
             PipelineStages oneStages = findOneStages(stagesId);
+
             deleteStages(stagesId);
+
             //主分支id
             String mainId = oneStages.getMainStage();
+
+            PipelineStages mainStages = findOneStages(mainId);
+
+            int stage = mainStages.getTaskStage();
 
             List<PipelineStages> allMainStage = findAllMainStage(mainId);
             //判断主分支下是否还存在从分支
@@ -317,10 +320,13 @@ public class PipelineStagesServerImpl implements PipelineStagesServer {
                 //更新其他主分支顺序
                 for (PipelineStages stages : allStagesMainStage) {
                     int sort1 = stages.getTaskSort();
-                    if (sort1 < sort){
-                        continue;
+                    int stage1 = stages.getTaskStage();
+                    if (sort1 > sort && sort != 0){
+                        stages.setTaskSort(sort1-1);
                     }
-                    stages.setTaskSort(sort1-1);
+                    if (stage1 > stage && stage != 0 ){
+                        stages.setTaskStage(stage1-1);
+                    }
                     updateStages(stages);
                 }
             }else {

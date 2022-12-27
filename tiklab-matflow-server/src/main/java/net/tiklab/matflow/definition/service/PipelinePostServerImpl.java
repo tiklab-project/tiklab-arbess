@@ -5,6 +5,7 @@ import net.tiklab.matflow.definition.dao.PipelinePostDao;
 import net.tiklab.matflow.definition.entity.PipelinePostEntity;
 import net.tiklab.matflow.definition.model.Pipeline;
 import net.tiklab.matflow.definition.model.PipelinePost;
+import net.tiklab.matflow.orther.until.PipelineUntil;
 import net.tiklab.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -32,10 +33,14 @@ public class PipelinePostServerImpl implements PipelinePostServer {
         Pipeline pipeline = pipelinePost.getPipeline();
         List<PipelinePost> allPost = findAllPost(pipeline.getId());
         pipelinePost.setTaskSort(1);
+        int taskType = pipelinePost.getTaskType();
         if (allPost != null){
             pipelinePost.setTaskSort(allPost.size()+1);
         }
         PipelinePostEntity pipelinePostEntity = BeanMapper.map(pipelinePost, PipelinePostEntity.class);
+        String name = postTaskServer.findConfigName(taskType);
+        pipelinePostEntity.setName(name);
+        pipelinePostEntity.setCreateTime(PipelineUntil.date(1));
         String postId = pipelinePostDao.createPost(pipelinePostEntity);
         pipelinePost.setConfigId(postId);
         postTaskServer.updateConfig(pipelinePost);

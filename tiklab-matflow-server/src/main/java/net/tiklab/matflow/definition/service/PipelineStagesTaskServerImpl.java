@@ -48,7 +48,6 @@ public class PipelineStagesTaskServerImpl implements PipelineStagesTaskServer {
         return taskId;
     }
 
-
     /**
      * 创建时配置顺序
      * @param stagesId 阶段id
@@ -177,6 +176,19 @@ public class PipelineStagesTaskServerImpl implements PipelineStagesTaskServer {
             list.add(config);
         }
         return list;
+    }
+
+    /**
+     * 获取配置详情
+     * @param configId 配置id
+     * @return 详情
+     */
+    public Object findOneStagesTasksTask(String configId){
+        PipelineStagesTask stagesTask = findOneStagesTask(configId);
+        int taskSort = stagesTask.getTaskSort();
+        int taskType = stagesTask.getTaskType();
+        String taskName = stagesTask.getName();
+        return commonServer.findOneTaskConfig(configId, taskType, taskSort,taskName);
     }
 
     /**

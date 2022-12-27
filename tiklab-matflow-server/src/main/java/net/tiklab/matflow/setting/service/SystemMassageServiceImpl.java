@@ -13,7 +13,7 @@ public class SystemMassageServiceImpl implements SystemMassageService {
     @Autowired
     public SystemMassage getSystemMassage(){
         SystemMassage systemMassage = new SystemMassage();
-        systemMassage.setWorkspace(PipelineUntil.findFileAddress());
+        systemMassage.setWorkspace(PipelineUntil.findFileAddress(null));
         return systemMassage;
     }
 

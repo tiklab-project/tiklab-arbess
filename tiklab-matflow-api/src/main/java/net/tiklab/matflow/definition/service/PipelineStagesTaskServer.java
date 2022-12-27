@@ -46,6 +46,14 @@ public interface PipelineStagesTaskServer {
      */
     List<Object> findAllStagesTasksTask (String stagesId) ;
 
+
+    /**
+     * 获取配置详情
+     * @param configId 配置id
+     * @return 详情
+     */
+    Object findOneStagesTasksTask(String configId);
+
     /**
      * 查询单个配置
      * @param stagesTaskId 配置id

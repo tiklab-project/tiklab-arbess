@@ -22,13 +22,6 @@ public interface PipelineRelationServer {
      */
     void deleteHistory(Pipeline pipeline);
 
-    /**
-     * 流水线更改名称时更新源文件名称
-     * @param newName 新的名称
-     * @param lastName 旧的名称
-     */
-    void updatePipeline(String newName, String lastName);
-
 
     /**
      * 更新收藏信息

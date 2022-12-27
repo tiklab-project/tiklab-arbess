@@ -2,6 +2,8 @@ package net.tiklab.matflow.achieve.server;
 
 import net.tiklab.core.exception.ApplicationException;
 import net.tiklab.matflow.definition.model.Pipeline;
+import net.tiklab.matflow.definition.service.PipelineStagesTaskServer;
+import net.tiklab.matflow.definition.service.PipelineTasksService;
 import net.tiklab.matflow.execute.model.PipelineProcess;
 import net.tiklab.matflow.execute.service.PipelineExecCommonService;
 import net.tiklab.matflow.orther.until.PipelineUntil;
@@ -10,7 +12,6 @@ import net.tiklab.matflow.setting.model.PipelineAuthThird;
 import net.tiklab.matflow.setting.service.PipelineAuthServer;
 import net.tiklab.matflow.setting.service.PipelineAuthThirdServer;
 import net.tiklab.matflow.task.model.PipelineCode;
-import net.tiklab.matflow.task.server.PipelineCodeService;
 import net.tiklab.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -40,27 +41,34 @@ public class CodeServiceImpl implements CodeService {
     PipelineAuthServer authServer;
 
     @Autowired
-    PipelineCodeService codeService;
+    PipelineTasksService tasksService;
 
+    @Autowired
+    PipelineStagesTaskServer stagesTaskServer;
 
     // git克隆
     public boolean clone(PipelineProcess pipelineProcess, String configId ,int taskType){
 
-        String log = PipelineUntil.date(4);
+        Pipeline pipeline = pipelineProcess.getPipeline();
+        Object o;
+        if (pipeline.getType() == 1){
+            o = tasksService.findOneTasksTask(configId);
+        }else {
+            o = stagesTaskServer.findOneStagesTasksTask(configId);
+        }
+        PipelineCode pipelineCode = (PipelineCode) o;
+        String name = pipelineCode.getName();
+        commonService.execHistory(pipelineProcess, PipelineUntil.date(4)+"执行任务："+ name);
 
-        PipelineCode pipelineCode = codeService.findOneCodeConfig(configId);
         pipelineCode.setType(taskType);
 
         if (!PipelineUntil.isNoNull(pipelineCode.getCodeAddress())){
-            commonService.execHistory(pipelineProcess,log+"代码源地址未配置。");
+            commonService.execHistory(pipelineProcess,PipelineUntil.date(4)+"代码源地址未配置。");
             return false;
         }
 
-
-        Pipeline pipeline = pipelineProcess.getPipeline();
-
         //代码保存路径
-        String codeDir = PipelineUntil.findFileAddress() + pipeline.getName();
+        String codeDir = PipelineUntil.findFileAddress(pipeline.getId());
         File file = new File(codeDir);
 
         //删除旧的代码
@@ -73,7 +81,7 @@ public class CodeServiceImpl implements CodeService {
             }
         }
 
-        commonService.execHistory(pipelineProcess,log+"分配源码空间。" +"\n"+ log+ "空间分配成功。");
+        commonService.execHistory(pipelineProcess,PipelineUntil.date(4)+"分配源码空间。" +"\n"+ PipelineUntil.date(4)+ "空间分配成功。");
 
         //分支
         String codeBranch = pipelineCode.getCodeBranch();
@@ -82,44 +90,43 @@ public class CodeServiceImpl implements CodeService {
         }
 
         //更新日志
-        String s =log + "开始克隆代码 : " + "\n"
-                +log + "FileAddress : " + file + "\n"
-                +log + "Uri : " + pipelineCode.getCodeAddress() + "\n"
-                +log + "Branch : " + codeBranch + "\n"
-                +log + "代码克隆中。。。。。。 ";
+        String s = PipelineUntil.date(4) + "Uri : " + pipelineCode.getCodeAddress() + "\n"
+                + PipelineUntil.date(4) + "Branch : " + codeBranch ;
 
         commonService.execHistory(pipelineProcess,s);
 
         try {
             //命令执行失败
-            Process process = codeStart(pipelineCode,pipeline.getName());
-            if (process == null){
-                commonService.execHistory(pipelineProcess,log+"代码克隆失败。");
-                return false;
-            }
-            //项目执行过程失败
-            pipelineProcess.setInputStream(process.getInputStream());
-            pipelineProcess.setErrInputStream(process.getErrorStream());
+            Process process = codeStart(pipelineCode,pipeline.getId());
+
             pipelineProcess.setError(error(pipelineCode.getType()));
             if (pipelineCode.getType() != 5){
                 pipelineProcess.setEnCode("UTF-8");
             }
-            int status = commonService.log(pipelineProcess);
-            if (status == 0){
-                commonService.execHistory(pipelineProcess,log+"代码克隆失败。 " );
-                return false;
+            commonService.execState(pipelineProcess,process,name);
+
+            process.destroy();
+
+            //获取提交信息
+            Process message = cloneMessage(pipelineCode.getType(),pipeline.getId());
+            if (message != null){
+                pipelineProcess.setInputStream(message.getInputStream());
+                pipelineProcess.setErrInputStream(message.getErrorStream());
+                commonService.log(pipelineProcess);
+                message.destroy();
             }
+
         } catch (IOException e) {
-            commonService.execHistory(pipelineProcess,log+"系统执行命令错误 \n" + e);
+            commonService.execHistory(pipelineProcess,PipelineUntil.date(4)+"系统执行命令错误 \n" + e);
             return false;
         }catch (URISyntaxException e){
-            commonService.execHistory(pipelineProcess,log+"Git地址错误 \n" + e);
+            commonService.execHistory(pipelineProcess,PipelineUntil.date(4)+"Git地址错误 \n" + e);
             return false;
         }catch (ApplicationException e){
-            commonService.execHistory(pipelineProcess,log+ e);
+            commonService.execHistory(pipelineProcess,PipelineUntil.date(4)+ e);
             return false;
         }
-        commonService.execHistory(pipelineProcess,log+"代码克隆成功");
+        commonService.execHistory(pipelineProcess,PipelineUntil.date(4)+"代码克隆成功");
         return true;
     }
 
@@ -131,7 +138,7 @@ public class CodeServiceImpl implements CodeService {
      * @throws URISyntaxException git地址错误
      * @throws ApplicationException 不存在配置
      */
-    private Process codeStart(PipelineCode pipelineCode, String pipelineName) throws IOException, URISyntaxException ,ApplicationException{
+    private Process codeStart(PipelineCode pipelineCode, String pipelineId) throws IOException, URISyntaxException ,ApplicationException{
 
         //效验地址是否应用程序地址
         String serverAddress = commonService.getScm(pipelineCode.getType());
@@ -147,7 +154,7 @@ public class CodeServiceImpl implements CodeService {
         PipelineUntil.validFile(serverAddress,pipelineCode.getType());
 
         //源码存放位置
-        String fileAddress = PipelineUntil.findFileAddress()+pipelineName;
+        String fileAddress = PipelineUntil.findFileAddress(pipelineId);
         String gitOrder;
         String path = null;
         switch (pipelineCode.getType()) {
@@ -162,14 +169,17 @@ public class CodeServiceImpl implements CodeService {
                     path = list.get(3);
                 }
             }
+
             //第三方授权
             case  2, 3 -> gitOrder = gitThirdOrder(pipelineCode, fileAddress);
+
             //svn
             case 5 -> gitOrder = svnOrder(pipelineCode, fileAddress);
             //错误
             default ->
-                throw new ApplicationException(50001,"没有类型为"+pipelineCode.getType()+"的源码配置");
+                    throw new ApplicationException("未知的任务类型");
         }
+
         Process process = PipelineUntil.process(serverAddress, gitOrder);
 
         if (PipelineUntil.isNoNull(path)){
@@ -345,7 +355,6 @@ public class CodeServiceImpl implements CodeService {
        return codeAddress;
     }
 
-
     /**
      * 效验地址与认证方式是否一致
      * @param type 类型
@@ -371,6 +380,22 @@ public class CodeServiceImpl implements CodeService {
             }
             throw new ApplicationException("SVN地址类型与凭证认证类型不一致。");
         }
+    }
+
+    /**
+     * 获取提交信息
+     * @param taskType 类型
+     * @param pipelineId 流水线id
+     * @return 信息实例
+     * @throws IOException 执行失败
+     */
+    private Process cloneMessage(int taskType,String pipelineId) throws IOException {
+        if (taskType == 5){
+            return null;
+        }
+        String order = "git log --pretty=format:\"commit：%cn email：%ae message：%s date：%ad  %ar \" --date=format:\"%Y-%m-%d %H:%M:%S\" -n 1";
+        String fileAddress = PipelineUntil.findFileAddress(pipelineId);
+        return PipelineUntil.process(fileAddress, order);
     }
 
     /**

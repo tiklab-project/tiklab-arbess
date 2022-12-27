@@ -2,6 +2,8 @@ package net.tiklab.matflow.achieve.server;
 
 import net.tiklab.core.exception.ApplicationException;
 import net.tiklab.matflow.definition.model.Pipeline;
+import net.tiklab.matflow.definition.service.PipelineStagesTaskServer;
+import net.tiklab.matflow.definition.service.PipelineTasksService;
 import net.tiklab.matflow.execute.model.PipelineProcess;
 import net.tiklab.matflow.execute.service.PipelineExecCommonService;
 import net.tiklab.matflow.orther.until.PipelineUntil;
@@ -12,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * 构建执行方法
@@ -27,51 +30,49 @@ public class BuildServiceImpl implements BuildService {
     @Autowired
     PipelineBuildService buildService;
 
+    @Autowired
+    PipelineTasksService tasksService;
+
+    @Autowired
+    PipelineStagesTaskServer stagesTaskServer;
+
+
     // 构建
     public boolean build(PipelineProcess pipelineProcess,String configId ,int taskType)  {
 
-        PipelineBuild pipelineBuild = buildService.findOneBuildConfig(configId);
+        Pipeline pipeline = pipelineProcess.getPipeline();
+        Object o;
+        if (pipeline.getType() == 1){
+            o = tasksService.findOneTasksTask(configId);
+        }else {
+            o = stagesTaskServer.findOneStagesTasksTask(configId);
+        }
+        PipelineBuild pipelineBuild = (PipelineBuild) o;
+        String name = pipelineBuild.getName();
+        commonService.execHistory(pipelineProcess, "\n"+ PipelineUntil.date(4)+"执行任务："+name);
 
         pipelineBuild.setType(taskType);
 
-        Pipeline pipeline = pipelineProcess.getPipeline();
-
-        String log = PipelineUntil.date(4);
-
         //项目地址
-        String path = PipelineUntil.findFileAddress()+ pipeline.getName();
+        String path = PipelineUntil.findFileAddress(pipeline.getId());
 
         try {
-            String a = log+"开始构建" + " \n"
-                    +log+"项目地址：" +path + " \n"
-                    +log+"执行构建命令:"  + pipelineBuild.getBuildOrder() ;
-
-            //更新日志
-            commonService.execHistory(pipelineProcess,a);
 
             //执行命令
-            Process process = getOrder(pipelineBuild, path);
-            if (process == null){
-                commonService.execHistory(pipelineProcess,log+"构建命令执行错误");
-                return false;
+            List<String> list = PipelineUntil.execOrder(pipelineBuild.getBuildOrder());
+            for (String s : list) {
+                commonService.execHistory(pipelineProcess,PipelineUntil.date(4)+s);
+                pipelineProcess.setError(error(pipelineBuild.getType()));
+                Process process = getOrder(s, pipelineBuild, path);
+                commonService.execState(pipelineProcess,process,name);
             }
 
-            pipelineProcess.setInputStream(process.getInputStream());
-            pipelineProcess.setErrInputStream(process.getErrorStream());
-            pipelineProcess.setError(error(pipelineBuild.getType()));
-
-            //构建失败
-            int state = commonService.log(pipelineProcess);
-
-            process.destroy();
-            if (state == 0){
-                commonService.execHistory(pipelineProcess,log+"构建失败");
-                return false;
-            }
         } catch (IOException | ApplicationException e) {
-            commonService.execHistory(pipelineProcess,log+e.getMessage());
+            String s = PipelineUntil.date(4) + e.getMessage();
+            commonService.execHistory(pipelineProcess,s);
             return false;
         }
+        commonService.execHistory(pipelineProcess,PipelineUntil.date(4)+"任务"+name+"执行完成");
         return true;
     }
 
@@ -81,32 +82,26 @@ public class BuildServiceImpl implements BuildService {
      * @param path 项目地址
      * @return 执行命令
      */
-    private Process getOrder(PipelineBuild pipelineBuild,String path) throws ApplicationException, IOException {
-        String buildOrder = pipelineBuild.getBuildOrder();
+    private Process getOrder(String orders,PipelineBuild pipelineBuild,String path) throws ApplicationException, IOException {
+        int type = pipelineBuild.getType();
+        String serverAddress = commonService.getScm(type);
+        if (serverAddress == null) {
+            throw new ApplicationException("不存在maven配置");
+        }
+
         if(PipelineUntil.isNoNull(pipelineBuild.getBuildAddress())){
             path = path +"/"+ pipelineBuild.getBuildAddress();
         }
 
-        
-        int type = pipelineBuild.getType();
-        String order ;
         switch (type){
             case 21 -> {
-                String mavenAddress = commonService.getScm(21);
-                if (mavenAddress == null) {
-                    throw new ApplicationException("不存在maven配置");
-                }
-                order =  mavenOrder(buildOrder,path);
-                return PipelineUntil.process(mavenAddress, order);
+                String order =  mavenOrder(orders,path);
+                return PipelineUntil.process(serverAddress, order);
             }
             case 22 -> {
-                String nodeAddress = commonService.getScm(22);
-                if (nodeAddress == null) {
-                    throw new ApplicationException("不存在node配置");
-                }
-                return PipelineUntil.process(path, buildOrder);
+                return PipelineUntil.process(path, orders);
             }
-            default -> {return null;}
+            default -> throw new  ApplicationException("未知的任务类型");
         }
     }
 
@@ -126,25 +121,19 @@ public class BuildServiceImpl implements BuildService {
         return order;
     }
 
-    public String validOrder(String order){
-        String[] split = order.split("\n");
-        for (String s : split) {
-            String substring = s.substring(0, 1);
-            // if (substring)
-        }
-        return null;
-    }
 
     private String[] error(int type){
         String[] strings;
         if (type == 21){
             strings = new String[]{
-                    "BUILD FAILUREl","ERROR"
+                    "BUILD FAILUREl",
+                    "ERROR"
             };
             return strings;
         }
         strings = new String[]{
-
+                "npm ERR! errno -4058",
+                "npm ERR! code ENOENT"
         };
         return strings;
     }

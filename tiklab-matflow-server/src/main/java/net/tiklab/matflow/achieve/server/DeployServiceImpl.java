@@ -3,12 +3,13 @@ package net.tiklab.matflow.achieve.server;
 import com.jcraft.jsch.*;
 import net.tiklab.core.exception.ApplicationException;
 import net.tiklab.matflow.definition.model.Pipeline;
+import net.tiklab.matflow.definition.service.PipelineStagesTaskServer;
+import net.tiklab.matflow.definition.service.PipelineTasksService;
 import net.tiklab.matflow.execute.model.PipelineProcess;
 import net.tiklab.matflow.execute.service.PipelineExecCommonService;
 import net.tiklab.matflow.orther.until.PipelineUntil;
 import net.tiklab.matflow.setting.model.PipelineAuthHost;
 import net.tiklab.matflow.task.model.PipelineDeploy;
-import net.tiklab.matflow.task.server.PipelineDeployService;
 import net.tiklab.rpc.annotation.Exporter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 /**
  * 部署执行方法
@@ -30,7 +32,10 @@ public class DeployServiceImpl implements DeployService {
     PipelineExecCommonService commonService;
 
     @Autowired
-    PipelineDeployService deployService;
+    PipelineTasksService tasksService;
+
+    @Autowired
+    PipelineStagesTaskServer stagesTaskServer;
 
     private static final Logger logger = LoggerFactory.getLogger(DeployServiceImpl.class);
 
@@ -41,80 +46,88 @@ public class DeployServiceImpl implements DeployService {
      */
     public boolean deploy(PipelineProcess pipelineProcess,String configId ,int taskType) {
 
-        // String configId = config.getConfigId();
-        PipelineDeploy pipelineDeploy = deployService.findOneDeployConfig(configId);
-        pipelineDeploy.setType(taskType);
-        //开始运行时间
         Pipeline pipeline = pipelineProcess.getPipeline();
+        Object o;
+        if (pipeline.getType() == 1){
+            o = tasksService.findOneTasksTask(configId);
+        }else {
+            o = stagesTaskServer.findOneStagesTasksTask(configId);
+        }
+        PipelineDeploy pipelineDeploy = (PipelineDeploy) o;
+        String name = pipelineDeploy.getName();
+
+        commonService.execHistory(pipelineProcess, "\n"+ PipelineUntil.date(4)+"执行任务："+name);
+
+        pipelineDeploy.setType(taskType);
+
+        //部署命令
         String startShell = pipelineDeploy.getStartOrder();
-        String log = PipelineUntil.date(4);
-        //执行自定义脚本
-        try {
-            if (pipelineDeploy.getAuthType() == 2) {
-                commonService.execHistory(pipelineProcess,log+"执行脚本：" + startShell);
-                Process process = PipelineUntil.process("/", startShell);
 
-                pipelineProcess.setInputStream(process.getInputStream());
-                pipelineProcess.setErrInputStream(process.getErrorStream());
-                pipelineProcess.setEnCode("GBK");
-                pipelineProcess.setError(error(pipelineDeploy.getType()));
-
-                commonService.log(pipelineProcess);
-                return true;
-            }
-        } catch (IOException e) {
-            commonService.execHistory(pipelineProcess, log+"命令执行错误");
-            return false;
-        }
-
-
-        commonService.execHistory(pipelineProcess,log+"获取部署文件......");
-
-        //获取部署文件
-        String filePath = PipelineUntil.getFile(pipeline.getName(), pipelineDeploy.getLocalAddress());
-        if (filePath == null){
-            commonService.execHistory(pipelineProcess,log+"无法匹配到部署文件。");
-            return false;
-        }
-
-        commonService.execHistory(pipelineProcess,log+"部署文件获取成功："+ filePath );
-
-        //文件名
-        String fileName = new File(filePath).getName();
-
-        //发送文件位置
-        String deployAddress ="/"+ pipelineDeploy.getDeployAddress();
-
-        commonService.execHistory(pipelineProcess,log+"建立服务器连接：" );
-
+        //连接服务器
         Session session;
         try {
             session = createSession(pipelineDeploy);
         } catch (JSchException e) {
-            commonService.execHistory(pipelineProcess,log+"连接失败，无法连接到服务器\n"+log+e.getMessage());
+            String message = PipelineUntil.date(4)+ e.getMessage();
+            commonService.execHistory(pipelineProcess,PipelineUntil.date(4)+"连接失败，无法连接到服务器\n"+message);
+            return false;
+        }
+        commonService.execHistory(pipelineProcess,PipelineUntil.date(4)+"建立服务器链接：" );
+        commonService.execHistory(pipelineProcess,PipelineUntil.date(4)+"服务器链接建立成功。" );
+
+        //执行自定义脚本
+        try {
+            if (pipelineDeploy.getAuthType() == 2) {
+                List<String> list = PipelineUntil.execOrder(startShell);
+                for (String s : list) {
+                    commonService.execHistory(pipelineProcess,PipelineUntil.date(4)+ s );
+                    sshOrder(session,s,pipelineProcess);
+                }
+                commonService.execHistory(pipelineProcess, "\n"+ PipelineUntil.date(4)+"任务："+name+"执行完成。");
+                session.disconnect();
+                return true;
+            }
+        } catch (IOException | JSchException e) {
+            String s = PipelineUntil.date(4) + "命令执行失败" ;
+            commonService.execHistory(pipelineProcess, s);
+            commonService.execHistory(pipelineProcess, e.getMessage());
             return false;
         }
 
-        commonService.execHistory(pipelineProcess,log+"连接建立成功\n上传部署文件："+log+ fileName );
+        //获取部署文件
+        String filePath;
+        try {
+            commonService.execHistory(pipelineProcess,PipelineUntil.date(4)+"获取部署文件......");
+            filePath = PipelineUntil.getFile(pipeline.getId(), pipelineDeploy.getLocalAddress());
+        } catch (ApplicationException e) {
+            String message = PipelineUntil.date(4) + e.getMessage();
+            commonService.execHistory(pipelineProcess,PipelineUntil.date(4)+"部署文件获取失败，\n"+ message);
+            return false;
+        }
 
+        commonService.execHistory(pipelineProcess,PipelineUntil.date(4)+"部署文件获取成功："+ filePath );
+
+        //发送文件位置
+        String deployAddress ="/"+ pipelineDeploy.getDeployAddress();
         try {
          ftp(session, filePath, deployAddress);
         } catch (JSchException | SftpException e) {
             session.disconnect();
-            commonService.execHistory(pipelineProcess,log+"部署文件上传失败");
+            commonService.execHistory(pipelineProcess,PipelineUntil.date(4)+"部署文件上传失败");
             return false;
         }
 
-        commonService.execHistory(pipelineProcess,log+"部署文件上传成功" );
+        commonService.execHistory(pipelineProcess,PipelineUntil.date(4)+"部署文件上传成功" );
 
         try {
             linux(session, pipelineProcess,pipelineDeploy);
         } catch (JSchException | IOException e) {
             session.disconnect();
-            commonService.execHistory(pipelineProcess,log+"命令执行失败");
+            commonService.execHistory(pipelineProcess,PipelineUntil.date(4)+"命令执行失败");
             return false;
         }
         session.disconnect();
+        commonService.execHistory(pipelineProcess, "\n"+ PipelineUntil.date(4)+"任务："+name+"执行完成。");
         return true;
     }
 
@@ -195,14 +208,13 @@ public class DeployServiceImpl implements DeployService {
      */
     private void sshOrder(Session session,String orders,PipelineProcess pipelineProcess) throws JSchException, IOException {
         ChannelExec exec = (ChannelExec) session.openChannel("exec");
-        commonService.execHistory(pipelineProcess,"执行："+orders );
         exec.setCommand(orders);
         exec.connect();
         pipelineProcess.setInputStream(exec.getInputStream());
         pipelineProcess.setErrInputStream(exec.getErrStream());
         pipelineProcess.setEnCode("UTF-8");
         pipelineProcess.setError(error(41));
-        commonService.log( pipelineProcess);
+        commonService.log(pipelineProcess);
         exec.disconnect();
     }
 

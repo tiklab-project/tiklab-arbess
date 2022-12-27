@@ -52,7 +52,7 @@ public class PipelineDeployServiceImpl implements PipelineDeployService {
         }
         for (PipelineDeploy pipelineDeploy : allDeploy) {
             if (pipelineDeploy.getConfigId().equals(configId)){
-                return pipelineDeploy;
+                return findOneDeploy(pipelineDeploy.getDeployId());
             }
         }
         return null;
@@ -91,13 +91,18 @@ public class PipelineDeployServiceImpl implements PipelineDeployService {
     //修改
     @Override
     public void updateDeploy(PipelineDeploy pipelineDeploy) {
-        String deployId = pipelineDeploy.getDeployId();
-        PipelineDeploy oneDeploy = findOneDeploy(deployId);
         int authType = pipelineDeploy.getAuthType();
+        String deployId = pipelineDeploy.getDeployId();
+
         if (authType == 0){
-            //重新赋值类型
+            PipelineDeploy oneDeploy = findOneDeploy(deployId);
             pipelineDeploy.setAuthType(oneDeploy.getAuthType());
-        }else if (authType == 2){
+            pipelineDeployDao.updateDeploy(BeanMapper.map(pipelineDeploy, PipelineDeployEntity.class));
+            return;
+        }
+
+        if (authType == 2){
+            pipelineDeploy.setAuthId("");
             pipelineDeploy.setAuthId("");
             pipelineDeploy.setLocalAddress("");
             pipelineDeploy.setDeployAddress("");
@@ -105,6 +110,7 @@ public class PipelineDeployServiceImpl implements PipelineDeployService {
             pipelineDeploy.setStartAddress("");
         }
         pipelineDeploy.setStartOrder("");
+
         pipelineDeployDao.updateDeploy(BeanMapper.map(pipelineDeploy, PipelineDeployEntity.class));
     }
 

@@ -2,16 +2,18 @@ package net.tiklab.matflow.achieve.server;
 
 import net.tiklab.core.exception.ApplicationException;
 import net.tiklab.matflow.definition.model.Pipeline;
+import net.tiklab.matflow.definition.service.PipelineStagesTaskServer;
+import net.tiklab.matflow.definition.service.PipelineTasksService;
 import net.tiklab.matflow.execute.model.PipelineProcess;
 import net.tiklab.matflow.execute.service.PipelineExecCommonService;
 import net.tiklab.matflow.orther.until.PipelineUntil;
 import net.tiklab.matflow.task.model.PipelineTest;
-import net.tiklab.matflow.task.server.PipelineTestService;
 import net.tiklab.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * 测试执行方法
@@ -25,40 +27,43 @@ public class TestServiceImpl implements TestService {
     PipelineExecCommonService commonService;
 
     @Autowired
-    PipelineTestService testService;
+    PipelineTasksService tasksService;
+
+    @Autowired
+    PipelineStagesTaskServer stagesTaskServer;
     
     // 单元测试
     public boolean test(PipelineProcess pipelineProcess, String configId ,int taskType) {
+        Pipeline pipeline = pipelineProcess.getPipeline();
+        Object o;
+        if (pipeline.getType() == 1){
+            o = tasksService.findOneTasksTask(configId);
+        }else {
+            o = stagesTaskServer.findOneStagesTasksTask(configId);
+        }
+        PipelineTest pipelineTest = (PipelineTest) o;
+        String name = pipelineTest.getName();
 
-        PipelineTest pipelineTest = testService.findOneTestConfig(configId);
+        commonService.execHistory(pipelineProcess, "\n"+ PipelineUntil.date(4)+"执行任务："+name);
+
+
         pipelineTest.setType(taskType);
 
+        commonService.execHistory(pipelineProcess, "\n"+ PipelineUntil.date(4)+"执行"+ pipelineTest.getName());
+
         //初始化日志
-        Pipeline pipeline = pipelineProcess.getPipeline();
         String testOrder = pipelineTest.getTestOrder();
-        String path = PipelineUntil.findFileAddress()+pipeline.getName();
+
+        String path = PipelineUntil.findFileAddress(pipeline.getId());
         try {
-            String a = PipelineUntil.date(4)+"开始执行测试" + " \n" +
-                    PipelineUntil.date(4)+ "执行 : \"" + testOrder + "\"";
-            commonService.execHistory(pipelineProcess,PipelineUntil.date(4)+a);
 
-            Process process = getOrder(pipelineTest,path);
-
-            if (process == null){
-                commonService.execHistory(pipelineProcess, PipelineUntil.date(4)+"命令错误。");
-                return false;
-            }
-
-            pipelineProcess.setInputStream(process.getInputStream());
-            pipelineProcess.setErrInputStream(process.getErrorStream());
-            pipelineProcess.setError(error(pipelineTest.getType()));
-
-            int state = commonService.log(pipelineProcess);
-            process.destroy();
-            if (state == 0){
+            List<String> list = PipelineUntil.execOrder(testOrder);
+            for (String s : list) {
+                commonService.execHistory(pipelineProcess,PipelineUntil.date(4)+s);
+                Process  process = getOrder(pipelineTest,s,path);
+                pipelineProcess.setError(error(pipelineTest.getType()));
+                commonService.execState(pipelineProcess,process,name);
                 process.destroy();
-                commonService.execHistory(pipelineProcess, PipelineUntil.date(4)+"测试执行失败。");
-                return false;
             }
         } catch (IOException e) {
             commonService.execHistory(pipelineProcess, PipelineUntil.date(4)+"日志打印失败"+e);
@@ -76,8 +81,7 @@ public class TestServiceImpl implements TestService {
      * @param path 项目地址
      * @return 执行命令
      */
-    private Process getOrder(PipelineTest pipelineTest, String path ) throws ApplicationException, IOException {
-        String testOrder = pipelineTest.getTestOrder();
+    private Process getOrder(PipelineTest pipelineTest,String testOrder, String path ) throws ApplicationException, IOException {
         int type = pipelineTest.getType();
         String order ;
         if (type == 11) {
@@ -88,8 +92,9 @@ public class TestServiceImpl implements TestService {
             PipelineUntil.validFile(mavenAddress,21);
             order = testOrder(testOrder, path);
             return PipelineUntil.process(mavenAddress, order);
+        }else {
+            throw  new ApplicationException("未知的任务类型");
         }
-        return null;
     }
 
     /**
