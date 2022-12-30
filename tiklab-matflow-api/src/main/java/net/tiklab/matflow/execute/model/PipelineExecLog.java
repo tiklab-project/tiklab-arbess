@@ -39,8 +39,8 @@ public class PipelineExecLog {
     private String taskAlias;
 
     //运行日志
-    @ApiProperty(name = "runLog",desc = "运行日志")
-    private String runLog;
+    @ApiProperty(name = "logAddress",desc = "运行日志")
+    private String logAddress;
 
     //运行时间
     @ApiProperty(name = "runTime",desc = "运行时间")
@@ -50,9 +50,11 @@ public class PipelineExecLog {
     @ApiProperty(name = "runState",desc = "运行状态")
     private int runState;
 
-
     @ApiProperty(name="stageId",desc="阶段id")
     private String stagesId;
+
+
+    private String runLog;
 
     public PipelineExecLog() {
     }
@@ -110,12 +112,12 @@ public class PipelineExecLog {
         this.taskSort = taskSort;
     }
 
-    public String getRunLog() {
-        return runLog;
+    public String getLogAddress() {
+        return logAddress;
     }
 
-    public void setRunLog(String runLog) {
-        this.runLog = runLog;
+    public void setLogAddress(String logAddress) {
+        this.logAddress = logAddress;
     }
 
     public int getRunTime() {
@@ -148,5 +150,13 @@ public class PipelineExecLog {
 
     public void setTaskName(String taskName) {
         this.taskName = taskName;
+    }
+
+    public String getRunLog() {
+        return runLog;
+    }
+
+    public void setRunLog(String runLog) {
+        this.runLog = runLog;
     }
 }

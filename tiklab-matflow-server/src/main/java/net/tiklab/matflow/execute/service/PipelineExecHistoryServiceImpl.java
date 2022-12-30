@@ -245,7 +245,8 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
         runLog.setType(log.getTaskType());
         runLog.setTime(log.getRunTime());
         runLog.setName(log.getTaskName());
-        runLog.setRunLog(log.getRunLog());
+        String logAddress = log.getLogAddress();
+        runLog.setRunLog(PipelineUntil.readFile(logAddress));
         return runLog;
     }
 

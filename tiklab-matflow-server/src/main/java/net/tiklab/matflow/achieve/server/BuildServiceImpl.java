@@ -49,30 +49,31 @@ public class BuildServiceImpl implements BuildService {
         }
         PipelineBuild pipelineBuild = (PipelineBuild) o;
         String name = pipelineBuild.getName();
-        commonService.execHistory(pipelineProcess, "\n"+ PipelineUntil.date(4)+"执行任务："+name);
+        commonService.updateExecLog(pipelineProcess, PipelineUntil.date(4)+"执行任务："+name);
 
         pipelineBuild.setType(taskType);
 
         //项目地址
-        String path = PipelineUntil.findFileAddress(pipeline.getId());
+        String path = PipelineUntil.findFileAddress(pipeline.getId(),1);
 
         try {
 
             //执行命令
             List<String> list = PipelineUntil.execOrder(pipelineBuild.getBuildOrder());
             for (String s : list) {
-                commonService.execHistory(pipelineProcess,PipelineUntil.date(4)+s);
+                String key = commonService.variableKey(pipeline.getId(), configId, s);
+                commonService.updateExecLog(pipelineProcess,PipelineUntil.date(4)+ key );
                 pipelineProcess.setError(error(pipelineBuild.getType()));
-                Process process = getOrder(s, pipelineBuild, path);
+                Process process = getOrder(key, pipelineBuild, path);
                 commonService.execState(pipelineProcess,process,name);
             }
 
         } catch (IOException | ApplicationException e) {
             String s = PipelineUntil.date(4) + e.getMessage();
-            commonService.execHistory(pipelineProcess,s);
+            commonService.updateExecLog(pipelineProcess,s);
             return false;
         }
-        commonService.execHistory(pipelineProcess,PipelineUntil.date(4)+"任务"+name+"执行完成");
+        commonService.updateExecLog(pipelineProcess,PipelineUntil.date(4)+"任务"+name+"执行完成");
         return true;
     }
 

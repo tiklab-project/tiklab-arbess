@@ -33,7 +33,7 @@ create table pip_pipeline_history_log  (
     task_name varchar(255)  COMMENT '执行类型',
     run_state int  COMMENT '运行状态',
     run_time int  COMMENT '运行时间',
-    run_log longtext COMMENT '运行日志',
+    log_address longtext COMMENT '运行日志',
     stages_id varchar(256)  COMMENT '阶段id',
     PRIMARY KEY (log_id) USING BTREE
 );

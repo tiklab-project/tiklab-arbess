@@ -58,17 +58,17 @@ public class CodeServiceImpl implements CodeService {
         }
         PipelineCode pipelineCode = (PipelineCode) o;
         String name = pipelineCode.getName();
-        commonService.execHistory(pipelineProcess, PipelineUntil.date(4)+"执行任务："+ name);
+        commonService.updateExecLog(pipelineProcess, PipelineUntil.date(4)+"执行任务："+ name);
 
         pipelineCode.setType(taskType);
 
         if (!PipelineUntil.isNoNull(pipelineCode.getCodeAddress())){
-            commonService.execHistory(pipelineProcess,PipelineUntil.date(4)+"代码源地址未配置。");
+            commonService.updateExecLog(pipelineProcess,PipelineUntil.date(4)+"代码源地址未配置。");
             return false;
         }
 
         //代码保存路径
-        String codeDir = PipelineUntil.findFileAddress(pipeline.getId());
+        String codeDir = PipelineUntil.findFileAddress(pipeline.getId(),1);
         File file = new File(codeDir);
 
         //删除旧的代码
@@ -81,7 +81,7 @@ public class CodeServiceImpl implements CodeService {
             }
         }
 
-        commonService.execHistory(pipelineProcess,PipelineUntil.date(4)+"分配源码空间。" +"\n"+ PipelineUntil.date(4)+ "空间分配成功。");
+
 
         //分支
         String codeBranch = pipelineCode.getCodeBranch();
@@ -93,7 +93,9 @@ public class CodeServiceImpl implements CodeService {
         String s = PipelineUntil.date(4) + "Uri : " + pipelineCode.getCodeAddress() + "\n"
                 + PipelineUntil.date(4) + "Branch : " + codeBranch ;
 
-        commonService.execHistory(pipelineProcess,s);
+        commonService.updateExecLog(pipelineProcess,s);
+
+        commonService.updateExecLog(pipelineProcess,PipelineUntil.date(4)+"分配源码空间。" );
 
         try {
             //命令执行失败
@@ -106,7 +108,7 @@ public class CodeServiceImpl implements CodeService {
             commonService.execState(pipelineProcess,process,name);
 
             process.destroy();
-
+            commonService.updateExecLog(pipelineProcess,PipelineUntil.date(4)+ "空间分配成功。" );
             //获取提交信息
             Process message = cloneMessage(pipelineCode.getType(),pipeline.getId());
             if (message != null){
@@ -117,16 +119,16 @@ public class CodeServiceImpl implements CodeService {
             }
 
         } catch (IOException e) {
-            commonService.execHistory(pipelineProcess,PipelineUntil.date(4)+"系统执行命令错误 \n" + e);
+            commonService.updateExecLog(pipelineProcess,PipelineUntil.date(4)+"系统执行命令错误 \n" + e);
             return false;
         }catch (URISyntaxException e){
-            commonService.execHistory(pipelineProcess,PipelineUntil.date(4)+"Git地址错误 \n" + e);
+            commonService.updateExecLog(pipelineProcess,PipelineUntil.date(4)+"Git地址错误 \n" + e);
             return false;
         }catch (ApplicationException e){
-            commonService.execHistory(pipelineProcess,PipelineUntil.date(4)+ e);
+            commonService.updateExecLog(pipelineProcess,PipelineUntil.date(4)+ e);
             return false;
         }
-        commonService.execHistory(pipelineProcess,PipelineUntil.date(4)+"代码克隆成功");
+        commonService.updateExecLog(pipelineProcess,PipelineUntil.date(4)+"任务"+name+"执行成功。");
         return true;
     }
 
@@ -154,7 +156,7 @@ public class CodeServiceImpl implements CodeService {
         PipelineUntil.validFile(serverAddress,pipelineCode.getType());
 
         //源码存放位置
-        String fileAddress = PipelineUntil.findFileAddress(pipelineId);
+        String fileAddress = PipelineUntil.findFileAddress(pipelineId,1);
         String gitOrder;
         String path = null;
         switch (pipelineCode.getType()) {
@@ -189,7 +191,6 @@ public class CodeServiceImpl implements CodeService {
         return process;
 
     }
-
 
     /**
      * 组装http git命令
@@ -394,7 +395,7 @@ public class CodeServiceImpl implements CodeService {
             return null;
         }
         String order = "git log --pretty=format:\"commit：%cn email：%ae message：%s date：%ad  %ar \" --date=format:\"%Y-%m-%d %H:%M:%S\" -n 1";
-        String fileAddress = PipelineUntil.findFileAddress(pipelineId);
+        String fileAddress = PipelineUntil.findFileAddress(pipelineId,1);
         return PipelineUntil.process(fileAddress, order);
     }
 

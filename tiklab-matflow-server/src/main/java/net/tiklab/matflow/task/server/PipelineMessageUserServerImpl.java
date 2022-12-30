@@ -80,7 +80,7 @@ public class PipelineMessageUserServerImpl implements PipelineMessageUserServer 
         List<PipelineMessageUser> allMessage = findAllMessage();
         for (PipelineMessageUser messageUser : allMessage) {
             if (messageUser.getMessageTaskId().equals(taskId)){
-                deleteMessage(taskId);
+                deleteMessage(messageUser.getMessageId());
             }
         }
     }

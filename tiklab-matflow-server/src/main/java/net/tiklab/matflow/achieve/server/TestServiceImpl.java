@@ -44,32 +44,29 @@ public class TestServiceImpl implements TestService {
         PipelineTest pipelineTest = (PipelineTest) o;
         String name = pipelineTest.getName();
 
-        commonService.execHistory(pipelineProcess, "\n"+ PipelineUntil.date(4)+"执行任务："+name);
-
+        commonService.updateExecLog(pipelineProcess, PipelineUntil.date(4)+"执行任务："+name);
 
         pipelineTest.setType(taskType);
-
-        commonService.execHistory(pipelineProcess, "\n"+ PipelineUntil.date(4)+"执行"+ pipelineTest.getName());
 
         //初始化日志
         String testOrder = pipelineTest.getTestOrder();
 
-        String path = PipelineUntil.findFileAddress(pipeline.getId());
+        String path = PipelineUntil.findFileAddress(pipeline.getId(),1);
         try {
 
             List<String> list = PipelineUntil.execOrder(testOrder);
             for (String s : list) {
-                commonService.execHistory(pipelineProcess,PipelineUntil.date(4)+s);
+                commonService.updateExecLog(pipelineProcess,PipelineUntil.date(4)+s);
                 Process  process = getOrder(pipelineTest,s,path);
                 pipelineProcess.setError(error(pipelineTest.getType()));
                 commonService.execState(pipelineProcess,process,name);
                 process.destroy();
             }
         } catch (IOException e) {
-            commonService.execHistory(pipelineProcess, PipelineUntil.date(4)+"日志打印失败"+e);
+            commonService.updateExecLog(pipelineProcess, PipelineUntil.date(4)+"日志打印失败"+e);
             return false;
         } catch (ApplicationException e) {
-            commonService.execHistory(pipelineProcess,e.getMessage());
+            commonService.updateExecLog(pipelineProcess,e.getMessage());
             return false;
         }
         return true;

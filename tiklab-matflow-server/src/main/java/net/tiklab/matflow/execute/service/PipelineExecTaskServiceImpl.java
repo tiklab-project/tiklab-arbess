@@ -29,6 +29,9 @@ public class PipelineExecTaskServiceImpl implements PipelineExecTaskService {
     @Autowired
     MessageExecService message;
 
+    @Autowired
+    ScriptServer scriptServer;
+
     public boolean beginCourseState(PipelineProcess pipelineProcess, String configId ,int taskType){
         boolean state = true;
         switch (taskType/10) {
@@ -39,6 +42,7 @@ public class PipelineExecTaskServiceImpl implements PipelineExecTaskService {
             case 4 -> state = codeScan.codeScan(pipelineProcess, configId,taskType);
             case 5 -> state = product.product(pipelineProcess,  configId,taskType);
             case 6 -> state = message.message(pipelineProcess, configId,taskType);
+            case 7 -> state = scriptServer.scripts(pipelineProcess, configId,taskType);
         }
         return state;
     }

@@ -47,15 +47,7 @@ public interface PipelineExecCommonService {
     /**
      * 执行过程中的历史
      */
-    void execHistory(PipelineProcess pipelineProcess,String log);
-
-    /**
-     * 更新执行时历史日志
-     * @param pipelineId 流水线id
-     * @param log 日志
-     */
-    void updateExecHistory(String pipelineId ,String log);
-
+    void updateExecLog(PipelineProcess pipelineProcess,String log);
 
     /**
      * 更新执行状态
@@ -71,4 +63,43 @@ public interface PipelineExecCommonService {
      */
     String getScm(int type);
 
+
+    /**
+     * 替换命令中的环境变量
+     * @param pipelineId 流水线id
+     * @param configId 任务id
+     * @param order 命令
+     * @return 替换后的环境变量
+     */
+    String variableKey(String pipelineId,String configId,String order);
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

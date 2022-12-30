@@ -13,8 +13,13 @@ public class PipelineFinal {
     //消息类型
     public static final String MES_PIPELINE_RUN = "MES_PIPELINE_RUN"; //流水线运行消息
 
+    public static final String MES_TEM_SITE = "site"; //流水线创建信息模板
+
+
     //消息发送方式
     public static final String MES_SENT_SITE = "site"; //流水线创建信息模板
+
+
     public static final String MES_SENT_EMAIL = "email"; //流水线创建信息模板
     public static final String MES_SENT_DINGDING = "dingding"; //流水线创建信息模板
     public static final String MES_SENT_WECHAT = "qywechat"; //流水线创建信息模板

@@ -176,6 +176,7 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
             messageReceiver.setUserId(s);
             messageReceiver.setUserId(s);
             messageReceiver.setEmail(s);
+            list.add(messageReceiver);
         }
         message.setMessageReceiverList(list);
 
@@ -211,8 +212,6 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
         } catch (Exception e) {
             throw new ApplicationException("消息发送失败:"+e.getMessage());
         }
-
-
     }
 
 

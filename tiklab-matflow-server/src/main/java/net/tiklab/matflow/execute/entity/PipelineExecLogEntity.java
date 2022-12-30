@@ -28,8 +28,8 @@ public class PipelineExecLogEntity {
     private int taskSort ;
 
     //运行日志
-    @Column(name = "run_log")
-    private String runLog;
+    @Column(name = "log_address")
+    private String logAddress;
 
     //运行时间
     @Column(name = "run_time")
@@ -85,12 +85,12 @@ public class PipelineExecLogEntity {
         this.taskSort = taskSort;
     }
 
-    public String getRunLog() {
-        return runLog;
+    public String getLogAddress() {
+        return logAddress;
     }
 
-    public void setRunLog(String runLog) {
-        this.runLog = runLog;
+    public void setLogAddress(String logAddress) {
+        this.logAddress = logAddress;
     }
 
     public int getRunTime() {

@@ -102,14 +102,6 @@ public class PipelineExecServiceImpl implements PipelineExecService {
             result = false;
         } else {
 
-            // pipeline.setState(2);
-            // pipelineService.updatePipeline(pipeline);
-            // PipelineExecHistory pipelineExecHistory = commonService.initializeHistory(pipelineId,startWAy);
-            // String historyId = pipelineExecHistory.getHistoryId();
-            // historyMap.put(pipelineId,pipelineExecHistory);
-            // begin(pipeline,historyId);
-            // time(historyId);
-
             executorService.submit(() -> {
                 pipeline.setState(2);
                 pipelineService.updatePipeline(pipeline);
@@ -222,6 +214,9 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         String configId = null;
         String name = null;
 
+        PipelineExecHistory history = historyService.findOneHistory(historyId);
+        String id = history.getPipeline().getId();
+
         if (type == 0){
             PipelinePost post = (PipelinePost) o;
             taskSort = post.getTaskSort();
@@ -255,7 +250,12 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         pipelineExecLog.setRunState(3);
         pipelineExecLog.setTaskName(name);
         pipelineExecLog.setRunLog("");
+        String address= PipelineUntil.findFileAddress(id, 2);
         String logId = logService.createLog(pipelineExecLog);
+        String logAddress = PipelineUntil.createFile(address + "/" + historyId + "/" + logId + ".log");
+        pipelineExecLog.setLogAddress(logAddress);
+        pipelineExecLog.setLogId(logId);
+        logService.updateLog(pipelineExecLog);
         logMap.put(logId,pipelineExecLog);
         configLogMap.put(configId,logId);
     }
@@ -275,16 +275,8 @@ public class PipelineExecServiceImpl implements PipelineExecService {
             }
             for (PipelineTasks tasks : allCourseConfig) {
                 String configId = tasks.getConfigId();
-                String s = configLogMap.get(configId);
-                PipelineExecLog pipelineExecLog = logMap.get(s);
-                pipelineExecLog.setLogId(s);
-                pipelineExecLog.setRunState(0);
-                logMap.put(s,pipelineExecLog);
-                PipelineProcess process = new PipelineProcess(pipelineId);
-                pipelineExecLog.setLogId(s);
-                process.setConfigId(configId);
-                process.setHistoryId(historyId);
-                boolean b = execTask(process,pipelineExecLog);
+                PipelineProcess process = initProcess(configId, pipelineId, historyId);
+                boolean b = execTask(process,tasks.getTaskType());
                 if (!b){
                     return false;
                 }
@@ -313,16 +305,10 @@ public class PipelineExecServiceImpl implements PipelineExecService {
                         List<PipelineStagesTask> stagesTaskList = stagesServer.findAllStagesTask(stage.getStagesId());
                         for (PipelineStagesTask stagesTask : stagesTaskList) {
                             String configId = stagesTask.getConfigId();
-                            PipelineProcess process = new PipelineProcess(pipelineId);
-                            // commonService.execHistory(process,PipelineUntil.date(4)+"执行"+stagesTask.getName());
-                            String logId = configLogMap.get(configId);
-                            PipelineExecLog pipelineExecLog = logMap.get(logId);
-                            pipelineExecLog.setLogId(logId);
-                            pipelineExecLog.setRunState(0);
-                            logMap.put(logId,pipelineExecLog);
-                            process.setConfigId(configId);
-                            process.setHistoryId(historyId);
-                            boolean state = execTask(process,pipelineExecLog);
+                            PipelineProcess process = initProcess(configId, pipelineId, historyId);
+                            commonService.updateExecLog(process,PipelineUntil.date(4)+"执行"+stages.getName());
+                            commonService.updateExecLog(process,PipelineUntil.date(4)+"执行"+stage.getName());
+                            boolean state = execTask(process,stagesTask.getTaskType());
                             if (!state){
                                 return  false;
                             }
@@ -349,24 +335,31 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         return true;
     }
 
-    public boolean beginAfter(Pipeline pipeline, String historyId){
+    private PipelineProcess initProcess( String configId,String pipelineId,String historyId){
+        PipelineProcess process = new PipelineProcess(pipelineId);
+        String logId = configLogMap.get(configId);
+        PipelineExecLog pipelineExecLog = logMap.get(logId);
+        pipelineExecLog.setLogId(logId);
+        pipelineExecLog.setRunState(0);
+        logMap.put(logId,pipelineExecLog);
+        process.setConfigId(configId);
+        process.setHistoryId(historyId);
+        process.setLogId(logId);
+        return process;
+    }
+
+    private boolean beginAfter(Pipeline pipeline, String historyId){
         String pipelineId = pipeline.getId();
         List<PipelinePost> allAfterConfig = postServer.findAllPost(pipelineId);
         if (allAfterConfig == null){
             return true;
         }
 
-        commonService.updateExecHistory(pipelineId,PipelineUntil.date(4)+"开始执行后置任务。");
-
         for (PipelinePost pipelinePost : allAfterConfig) {
             String configId = pipelinePost.getConfigId();
-            String s = configLogMap.get(configId);
-            PipelineExecLog pipelineExecLog = logMap.get(s);
-            pipelineExecLog.setLogId(s);
-            PipelineProcess process = new PipelineProcess(pipelineId);
-            process.setConfigId(configId);
-            process.setHistoryId(historyId);
-            boolean b = execTask(process,pipelineExecLog);
+            PipelineProcess process =  initProcess(configId,pipelineId,historyId);
+            commonService.updateExecLog(process,"\n"+PipelineUntil.date(4)+"执行后置任务");
+            boolean b = execTask(process,pipelinePost.getTaskType());
             if (!b){
                 return false;
             }
@@ -374,18 +367,14 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         return true;
     }
 
-    private boolean execTask(PipelineProcess pipelineProcess,PipelineExecLog pipelineExecLog){
+    private boolean execTask(PipelineProcess pipelineProcess,int taskType){
 
         String id = pipelineProcess.getPipeline().getId();
         Pipeline pipeline = pipelineService.findOnePipeline(id);
 
         pipelineProcess.setPipeline(pipeline);
         String configId = pipelineProcess.getConfigId();
-
-        String logId = pipelineExecLog.getLogId();
-
-        pipelineProcess.setLogId(logId);
-        int taskType = pipelineExecLog.getTaskType();
+        String logId = pipelineProcess.getLogId();
 
         //执行时间
         time(logId);
@@ -432,6 +421,15 @@ public class PipelineExecServiceImpl implements PipelineExecService {
                 PipelineRunLog runLog = findOneRunLog(configId);
                 list.add(runLog);
             }
+            List<PipelinePost> allPost = postServer.findAllPost(pipelineId);
+            if (allPost.size() != 0){
+                for (PipelinePost post : allPost) {
+                    String configId = post.getConfigId();
+                    PipelineRunLog runLog = findOneRunLog(configId);
+                    list.add(runLog);
+                }
+            }
+
             Map<String, Object> timeState = findTimeState(list);
             execRunLog.setRunLog((String) timeState.get("runLog"));
         }

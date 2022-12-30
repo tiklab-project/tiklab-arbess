@@ -87,6 +87,7 @@ public class PipelineMessageTypeServerImpl implements PipelineMessageTypeServer 
         }
 
     }
+
     /**
      * 根据配置id查询消息类型
      * @param configId 配置id

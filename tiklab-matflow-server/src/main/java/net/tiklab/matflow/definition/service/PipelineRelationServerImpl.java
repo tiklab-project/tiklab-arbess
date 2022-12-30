@@ -63,27 +63,9 @@ public class PipelineRelationServerImpl implements PipelineRelationServer{
         //删除最近打开
         openService.deleteAllOpen(pipelineId);
         //删除对应文件
-        String fileAddress = PipelineUntil.findFileAddress(pipelineId);
+        String fileAddress = PipelineUntil.findFileAddress(pipelineId,1);
         PipelineUntil.deleteFile(new File(fileAddress));
     }
-
-    /**
-     * 流水线更改名称时更新源文件夹名称
-     * @param newName 新的名称
-     * @param lastName 旧的名称
-     */
-    // @Override
-    // public void updatePipeline(String newName, String lastName) {
-    //     //更改对应文件名
-    //     String fileAddress = PipelineUntil.findFileAddress();
-    //     File file = new File(fileAddress+lastName);
-    //     if (file.exists()){
-    //         boolean b = file.renameTo(new File(fileAddress + newName));
-    //         if (!b){
-    //             throw new ApplicationException("文件重命名失败");
-    //         }
-    //     }
-    // }
 
 
     /**
@@ -207,15 +189,20 @@ public class PipelineRelationServerImpl implements PipelineRelationServer{
         if (userList == null){
             user.setId(LoginContext.getLoginId());
             dmUser.setUser(user);
+            dmUser.setType(1);
             dmUserService.createDmUser(dmUser);
             return;
         }
 
         for (PatchUser patchUser : userList) {
             user.setId(patchUser.getId());
+            if (patchUser.getId().equals(LoginContext.getLoginId())){
+                dmUser.setType(1);
+            }
             dmUser.setUser(user);
             dmUserService.createDmUser(dmUser);
         }
+
         //关联权限
         dmRoleService.initPatchDmRole(pipelineId,userList, PipelineFinal.appName);
 

@@ -44,7 +44,7 @@ public class PipelinePostTaskServerImpl implements PipelinePostTaskServer {
             case 6 -> {
                 PipelineMessageType message = messageTypeServer.findMessage(configId);
                 if (message != null){
-                    deleteConfig(config);
+                    messageTypeServer.deleteAllMessage(configId);
                 }
                 createMessage(config);
             }

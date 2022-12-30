@@ -50,18 +50,18 @@ public class CodeScanServiceImpl implements CodeScanService {
         }
         PipelineCodeScan pipelineCodeScan = (PipelineCodeScan) o;
         String name = pipelineCodeScan.getName();
-        commonService.execHistory(pipelineProcess, "\n"+ PipelineUntil.date(4)+"执行任务："+ name);
+        commonService.updateExecLog(pipelineProcess, PipelineUntil.date(4)+"执行任务："+ name);
 
 
 
         pipelineCodeScan.setType(taskType);
 
-        String fileAddress = PipelineUntil.findFileAddress(pipeline.getId());
+        String fileAddress = PipelineUntil.findFileAddress(pipeline.getId(),1);
 
         try {
             Process process = getOrder(pipelineProcess,pipelineCodeScan,fileAddress);
             if (process == null){
-                commonService.execHistory(pipelineProcess,PipelineUntil.date(4)+"任务"+name+"执行失败");
+                commonService.updateExecLog(pipelineProcess,PipelineUntil.date(4)+"任务"+name+"执行失败");
                 return false;
             }
 
@@ -72,14 +72,14 @@ public class CodeScanServiceImpl implements CodeScanService {
 
             int status = commonService.log( pipelineProcess);
             if (status == 0){
-                commonService.execHistory(pipelineProcess,PipelineUntil.date(4)+"任务"+name+"执行失败");
+                commonService.updateExecLog(pipelineProcess,PipelineUntil.date(4)+"任务"+name+"执行失败");
                 return false;
             }
         } catch (IOException |ApplicationException e) {
-            commonService.execHistory(pipelineProcess,PipelineUntil.date(4)+"任务"+name+"执行失败\n"+PipelineUntil.date(4)+e.getMessage());
+            commonService.updateExecLog(pipelineProcess,PipelineUntil.date(4)+"任务"+name+"执行失败\n"+PipelineUntil.date(4)+e.getMessage());
             return false;
         }
-        commonService.execHistory(pipelineProcess,PipelineUntil.date(4)+"任务"+name+"执行完成");
+        commonService.updateExecLog(pipelineProcess,PipelineUntil.date(4)+"任务"+name+"执行完成");
         return true;
     }
 
@@ -98,7 +98,7 @@ public class CodeScanServiceImpl implements CodeScanService {
             PipelineAuthThird authThird =(PipelineAuthThird) pipelineCodeScan.getAuth();
 
             if (authThird == null){
-                commonService.execHistory(pipelineProcess,PipelineUntil.date(4)+"执行扫描命令："+execOrder);
+                commonService.updateExecLog(pipelineProcess,PipelineUntil.date(4)+"执行扫描命令："+execOrder);
                 order = mavenOrder(execOrder, path);
                 return PipelineUntil.process(mavenAddress, order);
             }
@@ -114,7 +114,7 @@ public class CodeScanServiceImpl implements CodeScanService {
                 execOrder = execOrder +
                         " -Dsonar.login="+authThird.getPrivateKey();
             }
-            commonService.execHistory(pipelineProcess,PipelineUntil.date(4)+"执行扫描命令："+execOrder);
+            commonService.updateExecLog(pipelineProcess,PipelineUntil.date(4)+"执行扫描命令："+execOrder);
             order = mavenOrder(execOrder, path);
             return PipelineUntil.process(mavenAddress, order);
         }else {

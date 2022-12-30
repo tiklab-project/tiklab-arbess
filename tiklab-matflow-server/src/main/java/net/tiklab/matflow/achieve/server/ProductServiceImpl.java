@@ -52,7 +52,7 @@ public class ProductServiceImpl implements ProductService {
         PipelineProduct product = (PipelineProduct) o;
         String name = product.getName();
 
-        commonService.execHistory(pipelineProcess, "\n"+ PipelineUntil.date(4)+"执行任务："+name);
+        commonService.updateExecLog(pipelineProcess, PipelineUntil.date(4)+"执行任务："+name);
 
         product.setType(taskType);
 
@@ -61,16 +61,16 @@ public class ProductServiceImpl implements ProductService {
         try {
              path = PipelineUntil.getFile(pipeline.getId(),fileAddress);
         }catch (ApplicationException e){
-            commonService.execHistory(pipelineProcess,PipelineUntil.date(4)+e);
+            commonService.updateExecLog(pipelineProcess,PipelineUntil.date(4)+e);
             return false;
         }
 
         if (path == null){
-            commonService.execHistory(pipelineProcess,PipelineUntil.date(4)+"匹配不到制品");
+            commonService.updateExecLog(pipelineProcess,PipelineUntil.date(4)+"匹配不到制品");
             return false;
         }
 
-        commonService.execHistory(pipelineProcess,
+        commonService.updateExecLog(pipelineProcess,
                 PipelineUntil.date(4)+"制品匹配成功\n"+
                     PipelineUntil.date(4)+"制品名称："+ new File(path).getName() + "\n"+
                     PipelineUntil.date(4)+"制品地址："+path);
@@ -84,24 +84,24 @@ public class ProductServiceImpl implements ProductService {
                 process.destroy();
 
             }else {
-                commonService.execHistory(pipelineProcess, PipelineUntil.date(4)+"连接制品服务器。");
+                commonService.updateExecLog(pipelineProcess, PipelineUntil.date(4)+"连接制品服务器。");
                 Session session = createSession(product);
-                commonService.execHistory(pipelineProcess, PipelineUntil.date(4)+"制品服务器连接成功。");
+                commonService.updateExecLog(pipelineProcess, PipelineUntil.date(4)+"制品服务器连接成功。");
                 String putAddress = product.getPutAddress();
-                commonService.execHistory(pipelineProcess, PipelineUntil.date(4)+"开始推送制品。");
+                commonService.updateExecLog(pipelineProcess, PipelineUntil.date(4)+"开始推送制品。");
                 sshPut(session,path,putAddress);
             }
         } catch (IOException | ApplicationException e) {
-            commonService.execHistory(pipelineProcess, PipelineUntil.date(4)+"推送制品执行错误\n"+ PipelineUntil.date(4)+e.getMessage());
+            commonService.updateExecLog(pipelineProcess, PipelineUntil.date(4)+"推送制品执行错误\n"+ PipelineUntil.date(4)+e.getMessage());
             return false;
         } catch (JSchException e) {
-            commonService.execHistory(pipelineProcess, PipelineUntil.date(4)+"无法连接到服务器\n" +PipelineUntil.date(4)+e.getMessage());
+            commonService.updateExecLog(pipelineProcess, PipelineUntil.date(4)+"无法连接到服务器\n" +PipelineUntil.date(4)+e.getMessage());
             return false;
         } catch (SftpException e) {
-            commonService.execHistory(pipelineProcess, PipelineUntil.date(4)+"文件发送失败\n"+ PipelineUntil.date(4)+e.getMessage());
+            commonService.updateExecLog(pipelineProcess, PipelineUntil.date(4)+"文件发送失败\n"+ PipelineUntil.date(4)+e.getMessage());
             return false;
         }
-        commonService.execHistory(pipelineProcess, PipelineUntil.date(4)+"推送制品完成");
+        commonService.updateExecLog(pipelineProcess, PipelineUntil.date(4)+"推送制品完成");
         return true;
     }
 
