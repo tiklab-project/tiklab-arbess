@@ -43,7 +43,11 @@ public class TestServiceImpl implements TestService {
         }
         PipelineTest pipelineTest = (PipelineTest) o;
         String name = pipelineTest.getName();
-
+        Boolean variableCond = commonService.variableCond(pipeline.getId(), configId);
+        if (!variableCond){
+            commonService.updateExecLog(pipelineProcess, PipelineUntil.date(4)+"任务："+ name+"执行条件不满足,跳过执行。");
+            return true;
+        }
         commonService.updateExecLog(pipelineProcess, PipelineUntil.date(4)+"执行任务："+name);
 
         pipelineTest.setType(taskType);

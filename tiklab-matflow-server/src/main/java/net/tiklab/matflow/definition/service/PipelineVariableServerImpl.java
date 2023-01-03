@@ -16,6 +16,36 @@ public class PipelineVariableServerImpl implements PipelineVariableServer{
     @Autowired
     PipelineVariableDao variableDao;
 
+    /**
+     * 获取全局以及任务变量
+     * @param pipelineId 流水线id
+     * @param taskId 任务id
+     * @return 变量名称
+     */
+    public List<String> findAllTaskValues(String pipelineId,String taskId){
+        //全局变量
+        // LinkedList<String> list = new LinkedList<>();
+        // Set
+        List<PipelineVariable> allVariable = findAllVariable(pipelineId);
+        if (allVariable.size() != 0){
+            for (PipelineVariable variable : allVariable) {
+                String varKey = variable.getVarKey();
+                String varValue = variable.getVarValue();
+
+            }
+        }
+        //局部变量
+        List<PipelineVariable> variableList = findAllVariable(taskId);
+        if (variableList.size() != 0){
+            for (PipelineVariable variable : variableList) {
+                String varValue = variable.getVarValue();
+                String varKey = variable.getVarKey();
+
+            }
+        }
+
+    return Collections.emptyList();
+    }
 
     /**
      * 创建变量

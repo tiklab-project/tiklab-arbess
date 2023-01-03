@@ -54,7 +54,7 @@ public class MessageExecServiceImpl implements MessageExecService {
      */
     public boolean message(PipelineProcess pipelineProcess, String configId,int taskType) {
 
-        commonService.updateExecLog(pipelineProcess, "\n"+PipelineUntil.date(4)+"执行任务：消息通知.....");
+        commonService.updateExecLog(pipelineProcess, PipelineUntil.date(4)+"执行任务：消息通知.....");
 
         String historyId = pipelineProcess.getHistoryId();
         List<PipelineExecLog> allLog = execLogService.findAllLog(historyId);
@@ -75,14 +75,14 @@ public class MessageExecServiceImpl implements MessageExecService {
         List<PipelineUserMessage> userList = configMessage.getUserList();
 
         if (userList == null || userList.size() == 0){
-            commonService.updateExecLog(pipelineProcess, "\n"+PipelineUntil.date(4)+"任务：消息通知执行完成。");
+            commonService.updateExecLog(pipelineProcess, PipelineUntil.date(4)+"任务：消息通知执行完成。");
             return true;
         }
         Pipeline pipeline = pipelineProcess.getPipeline();
         HashMap<String, Object> map = homeService.initMap(pipeline);
 
         for (PipelineUserMessage userMessage : userList) {
-            int type = userMessage.getType();
+            int type = userMessage.getMessageType();
             if (type == 1){
                 list.add(userMessage);
             }
@@ -106,7 +106,7 @@ public class MessageExecServiceImpl implements MessageExecService {
         }
 
         if (list.size() == 0){
-            commonService.updateExecLog(pipelineProcess, "\n"+PipelineUntil.date(4)+"任务：消息通知执行完成。");
+            commonService.updateExecLog(pipelineProcess, PipelineUntil.date(4)+"任务：消息通知执行完成。");
             return true;
         }
 
@@ -126,7 +126,7 @@ public class MessageExecServiceImpl implements MessageExecService {
             commonService.updateExecLog(pipelineProcess, PipelineUntil.date(4)+message);
             return false;
         }
-        commonService.updateExecLog(pipelineProcess, "\n"+PipelineUntil.date(4)+"任务：消息通知执行完成。");
+        commonService.updateExecLog(pipelineProcess, PipelineUntil.date(4)+"任务：消息通知执行完成。");
         return true;
     }
 

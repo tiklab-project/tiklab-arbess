@@ -1,11 +1,14 @@
 package net.tiklab.matflow.execute.service;
 
 import net.tiklab.core.exception.ApplicationException;
+import net.tiklab.matflow.definition.model.PipelineCondition;
 import net.tiklab.matflow.definition.model.PipelineVariable;
+import net.tiklab.matflow.definition.service.PipelineConditionServer;
 import net.tiklab.matflow.definition.service.PipelineVariableServer;
 import net.tiklab.matflow.execute.model.PipelineExecHistory;
 import net.tiklab.matflow.execute.model.PipelineExecLog;
 import net.tiklab.matflow.execute.model.PipelineProcess;
+import net.tiklab.matflow.orther.until.PipelineFinal;
 import net.tiklab.matflow.orther.until.PipelineUntil;
 import net.tiklab.matflow.setting.model.PipelineScm;
 import net.tiklab.matflow.setting.service.PipelineScmService;
@@ -43,8 +46,11 @@ public class PipelineExecCommonServiceImpl implements PipelineExecCommonService 
     @Autowired
     PipelineVariableServer variableServer;
 
+    @Autowired
+    PipelineConditionServer conditionServer;
+
     //历史
-    Map<String,PipelineExecHistory> historyMap = PipelineExecServiceImpl.historyMap;
+    Map<String,String> historyMap = PipelineExecServiceImpl.historyMap;
 
     Map<String,PipelineExecLog> logMap = PipelineExecServiceImpl.logMap;
 
@@ -64,9 +70,9 @@ public class PipelineExecCommonServiceImpl implements PipelineExecCommonService 
         if (!PipelineUntil.isNoNull(enCode)){
             int systemType = PipelineUntil.findSystemType();
             if (systemType == 1){
-                enCode = "GBK";
+                enCode = PipelineFinal.GBK;
             }else {
-                enCode = "UTF-8";
+                enCode = PipelineFinal.UTF_8;
             }
         }
 
@@ -85,11 +91,11 @@ public class PipelineExecCommonServiceImpl implements PipelineExecCommonService 
         
         String s;
         bufferedReader = new BufferedReader(inputStreamReader);
-        StringBuilder logRunLog = new StringBuilder();
+        // StringBuilder logRunLog = new StringBuilder();
 
         //更新日志信息
         while ((s = bufferedReader.readLine()) != null) {
-            logRunLog.append(s).append("\n");
+            // logRunLog.append(s).append("\n");
             if (validStatus(s,error)){
                 state = 0 ;
             }
@@ -99,7 +105,7 @@ public class PipelineExecCommonServiceImpl implements PipelineExecCommonService 
         inputStreamReader = PipelineUntil.encode(errInputStream, enCode);
         bufferedReader = new BufferedReader(inputStreamReader);
         while ((s = bufferedReader.readLine()) != null) {
-            logRunLog.append(s).append("\n");
+            // logRunLog.append(s).append("\n");
             if (validStatus(s,error)){state = 0 ;}
             updateExecLog(pipelineProcess, PipelineUntil.date(4)+s);
         }
@@ -163,19 +169,21 @@ public class PipelineExecCommonServiceImpl implements PipelineExecCommonService 
      * @param status 状态 success error halt
      */
     public void runEnd(String pipelineId , int status){
-        PipelineExecHistory execHistory = historyMap.get(pipelineId);
+        String historyId = historyMap.get(pipelineId);
 
-        String historyId = execHistory.getHistoryId();
+        PipelineExecHistory execHistory = historyService.findOneHistory(historyId);
+
         Integer integer = runTime.get(historyId);
         if (integer ==  null){
             integer = 0;
         }
-        execHistory.setRunTime(integer);
+
+        execHistory.setRunTime(integer+1);
         //更新状态
         execHistory.setFindState(1);
         execHistory.setRunStatus(status);
         historyService.updateHistory(execHistory);
-        historyMap.put(pipelineId,execHistory);
+
     }
 
     /**
@@ -223,12 +231,19 @@ public class PipelineExecCommonServiceImpl implements PipelineExecCommonService 
         pipelineExecHistory.setSort(1);
         pipelineExecHistory.setHistoryId(historyId);
         //构建次数
-        List<PipelineExecHistory> allHistory = historyService.findAllHistory(pipelineId);
-
+        PipelineExecHistory latelyHistory = historyService.findLatelyHistory(pipelineId);
         pipelineExecHistory.setFindNumber(1);
-        if (allHistory.size() >= 1){
-            pipelineExecHistory.setFindNumber(allHistory.size());
+        if (latelyHistory != null){
+            int findNumber = latelyHistory.getFindNumber();
+            pipelineExecHistory.setFindNumber(findNumber+1);
         }
+
+        // List<PipelineExecHistory> allHistory = historyService.findAllHistory(pipelineId);
+        //
+        // pipelineExecHistory.setFindNumber(1);
+        // if (allHistory.size() >= 1){
+        //     pipelineExecHistory.setFindNumber(allHistory.size());
+        // }
 
         historyService.updateHistory(pipelineExecHistory);
         return pipelineExecHistory;
@@ -257,15 +272,6 @@ public class PipelineExecCommonServiceImpl implements PipelineExecCommonService 
             return;
         }
 
-        // String pipelineId = pipelineProcess.getPipeline().getId();
-        // PipelineExecHistory history = historyMap.get(pipelineId);
-        // Integer historyTime = runTime.get(history.getHistoryId());
-        // if (historyTime == null){
-        //     historyTime = 0;
-        // }
-        // history.setRunTime(historyTime);
-        // historyMap.put(pipelineId,history);
-
         String logId = pipelineProcess.getLogId();
         PipelineExecLog pipelineExecLog = logMap.get(logId);
         Integer integer = runTime.get(logId);
@@ -276,17 +282,21 @@ public class PipelineExecCommonServiceImpl implements PipelineExecCommonService 
 
         String execLog = pipelineExecLog.getRunLog();
 
-        pipelineExecLog.setRunLog(execLog +"\n"+ log);
+        if (!PipelineUntil.isNoNull(execLog)){
+            pipelineExecLog.setRunLog(log);
+        }else {
+            pipelineExecLog.setRunLog(execLog +"\n"+ log);
+        }
+
         //长度过长写入文件中
-        if (execLog.length() > 10000){
+        if (pipelineExecLog.getRunLog().length() > 10000){
             String runLog = pipelineExecLog.getLogAddress();
             PipelineUntil.logWriteFile(execLog,runLog);
-            pipelineExecLog.setRunLog("");
+            pipelineExecLog.setRunLog(null);
         }
 
         logMap.put(logId,pipelineExecLog);
     }
-
 
     /**
      * 替换命令中的环境变量
@@ -319,6 +329,33 @@ public class PipelineExecCommonServiceImpl implements PipelineExecCommonService 
 
         StrSubstitutor substitutor = new StrSubstitutor(map);
         return substitutor.replace(order);
+    }
+
+    /**
+     * 效验条件
+     * @param pipelineId 流水线id
+     * @param configId 配置id
+     * @return 状态 true:条件满足 false:条件不满足
+     */
+    @Override
+    public Boolean variableCond(String pipelineId,String configId){
+        List<PipelineCondition> allTaskCond = conditionServer.findAllTaskCond(configId);
+        if (allTaskCond == null || allTaskCond.size() == 0 ){
+            return true;
+        }
+        for (PipelineCondition condition : allTaskCond) {
+            String condKey = "${"+condition.getCondKey()+"}";
+            String condValue = condition.getCondValue();
+            int type = condition.getCondType();
+            String key = variableKey(pipelineId, configId, condKey);
+            if (type == 1 && !key.equals(condValue)){
+                return false;
+            }
+            if (type == 2 && key.equals(condValue)){
+                return false;
+            }
+        }
+        return true;
     }
 
 

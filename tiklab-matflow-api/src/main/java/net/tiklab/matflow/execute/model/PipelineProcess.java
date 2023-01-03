@@ -31,15 +31,6 @@ public class PipelineProcess {
     //配置id
     private String configId;
 
-    //阶段id
-    private String stagesId;
-
-    //任务类型
-    private int taskType;
-
-    //任务顺序
-    private int taskSort;
-
     //历史id
     private String historyId;
 
@@ -118,27 +109,6 @@ public class PipelineProcess {
         this.configId = configId;
     }
 
-    public String getStagesId() {
-        return stagesId;
-    }
 
-    public void setStagesId(String stagesId) {
-        this.stagesId = stagesId;
-    }
 
-    public int getTaskType() {
-        return taskType;
-    }
-
-    public void setTaskType(int taskType) {
-        this.taskType = taskType;
-    }
-
-    public int getTaskSort() {
-        return taskSort;
-    }
-
-    public void setTaskSort(int taskSort) {
-        this.taskSort = taskSort;
-    }
 }

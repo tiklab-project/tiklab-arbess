@@ -63,6 +63,10 @@ eas:
   embbed:
     enable: true
 
+message:
+  sms:
+    enabled: true
+
 base:
   url: http://matflow-ce.tiklab.net
 

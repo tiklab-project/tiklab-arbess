@@ -65,6 +65,9 @@ public class PipelineRelationServerImpl implements PipelineRelationServer{
         //删除对应文件
         String fileAddress = PipelineUntil.findFileAddress(pipelineId,1);
         PipelineUntil.deleteFile(new File(fileAddress));
+        //删除对应日志
+        String logAddress = PipelineUntil.findFileAddress(pipelineId,2);
+        PipelineUntil.deleteFile(new File(logAddress+"/"+pipelineId));
     }
 
 
@@ -124,7 +127,8 @@ public class PipelineRelationServerImpl implements PipelineRelationServer{
         StringBuilder s = new StringBuilder();
         if (allDmUser != null && !allDmUser.isEmpty()){
             for (DmUser dmUser : allDmUser) {
-                if (!dmUser.getUser().getId().equals(userId)){
+                User user = dmUser.getUser();
+                if (user == null  || !user.getId().equals(userId)){
                     continue;
                 }
                 if (s.toString().equals("") ) {
@@ -185,21 +189,22 @@ public class PipelineRelationServerImpl implements PipelineRelationServer{
         //拉入创建人
         DmUser dmUser = new DmUser();
         dmUser.setDomainId(pipelineId);
-        User user = new User();
+
         if (userList == null){
-            user.setId(LoginContext.getLoginId());
-            dmUser.setUser(user);
+            dmUser.setTagValue(LoginContext.getLoginId());
+            dmUser.setTag(0);
             dmUser.setType(1);
             dmUserService.createDmUser(dmUser);
             return;
         }
 
         for (PatchUser patchUser : userList) {
-            user.setId(patchUser.getId());
+            dmUser.setType(0);
+            dmUser.setTagValue(patchUser.getId());
             if (patchUser.getId().equals(LoginContext.getLoginId())){
                 dmUser.setType(1);
             }
-            dmUser.setUser(user);
+            dmUser.setTag(0);
             dmUserService.createDmUser(dmUser);
         }
 

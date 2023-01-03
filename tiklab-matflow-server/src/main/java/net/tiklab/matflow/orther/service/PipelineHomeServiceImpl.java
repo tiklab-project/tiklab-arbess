@@ -125,8 +125,7 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
 
         log.setBgroup(appName);
         log.setContent(JSONObject.toJSONString(map));
-        logService.createLog(log);
-
+        // logService.createLog(log);
 
     }
 

@@ -24,8 +24,8 @@ public class PipelinePostEntity {
     @Column(name = "create_time")
     private String createTime;
 
-    @Column(name = "pipeline_id")
-    private String pipelineId;
+    @Column(name = "task_id")
+    private String taskId;
 
     public String getConfigId() {
         return configId;
@@ -67,11 +67,11 @@ public class PipelinePostEntity {
         this.createTime = createTime;
     }
 
-    public String getPipelineId() {
-        return pipelineId;
+    public String getTaskId() {
+        return taskId;
     }
 
-    public void setPipelineId(String pipelineId) {
-        this.pipelineId = pipelineId;
+    public void setTaskId(String taskId) {
+        this.taskId = taskId;
     }
 }

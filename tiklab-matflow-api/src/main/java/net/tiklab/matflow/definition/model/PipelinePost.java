@@ -1,10 +1,7 @@
 package net.tiklab.matflow.definition.model;
 
 import net.tiklab.beans.annotation.Mapper;
-import net.tiklab.beans.annotation.Mapping;
-import net.tiklab.beans.annotation.Mappings;
 import net.tiklab.join.annotation.Join;
-import net.tiklab.join.annotation.JoinQuery;
 import net.tiklab.postin.annotation.ApiModel;
 import net.tiklab.postin.annotation.ApiProperty;
 
@@ -26,13 +23,8 @@ public class PipelinePost {
     private String createTime;
 
     //流水线
-    @ApiProperty(name="pipeline",desc="流水线id",eg="@selectOne")
-    @Mappings({
-            @Mapping(source = "pipeline.id",target = "pipelineId")
-    })
-    @JoinQuery(key = "id")
-    private Pipeline pipeline;
-
+    @ApiProperty(name="taskId",desc="流水线id")
+    private String taskId;
 
     @ApiProperty(name="taskSort",desc="顺序")
     private int taskSort;
@@ -72,12 +64,12 @@ public class PipelinePost {
         this.createTime = createTime;
     }
 
-    public Pipeline getPipeline() {
-        return pipeline;
+    public String getTaskId() {
+        return taskId;
     }
 
-    public void setPipeline(Pipeline pipeline) {
-        this.pipeline = pipeline;
+    public void setTaskId(String taskId) {
+        this.taskId = taskId;
     }
 
     public int getTaskSort() {

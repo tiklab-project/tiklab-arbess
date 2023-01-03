@@ -4,6 +4,10 @@ public class PipelineFinal {
 
     public static final String appName = "matflow";
 
+    public static final String UTF_8 = "UTF-8";
+
+    public static final String GBK = "GBK";
+
     public static final int PIPELINE_RUN_SUCCESS=10;
 
     public static final int PIPELINE_RUN_ERROR=1;

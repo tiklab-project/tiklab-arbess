@@ -68,24 +68,22 @@ INSERT INTO `pcs_prc_role_function` (`id`, `role_id`, `function_id`) VALUES ('f3
 INSERT INTO `pcs_prc_role_function` (`id`, `role_id`, `function_id`) VALUES ('f83883f4bbaa27ff3c594bf4b2f97c0c', '2', '8700a662f1aebb83f790783c3abe15b5');
 INSERT INTO `pcs_prc_role_function` (`id`, `role_id`, `function_id`) VALUES ('f9011798e8148f225f74e59fe5fc3302', '696e8b4575bbfe842d5a5d534508fa7c', '9a85c4041ea9a0e98d86ba7db9ba7539');
 
-INSERT INTO `pcs_prc_role` (`id`, `name`, `description`, `grouper`, `type`, `scope`, `business_type`, `default_role`) VALUES ('1', '管理员', '管理员', 'system', '1', 1, 1, 1);
-INSERT INTO `pcs_prc_role` (`id`, `name`, `description`, `grouper`, `type`, `scope`, `business_type`, `default_role`) VALUES ('1efcc15ab020858f4907f7ac94128af5', '普通用户', '普通用户', 'system', '2', 1, 0, 0);
-INSERT INTO `pcs_prc_role` (`id`, `name`, `description`, `grouper`, `type`, `scope`, `business_type`, `default_role`) VALUES ('2', '管理员', '管理员', 'system', '2', 1, 1, 1);
-INSERT INTO `pcs_prc_role` (`id`, `name`, `description`, `grouper`, `type`, `scope`, `business_type`, `default_role`) VALUES ('3f22e1a0ff00ae98132fe5d2fe5d0d5d', '管理员', '管理员', 'system', '2', 2, 0, 1);
-INSERT INTO `pcs_prc_role` (`id`, `name`, `description`, `grouper`, `type`, `scope`, `business_type`, `default_role`) VALUES ('696e8b4575bbfe842d5a5d534508fa7c', '普通用户', '普通用户', 'system', '1', 1, 0, 0);
-INSERT INTO `pcs_prc_role` (`id`, `name`, `description`, `grouper`, `type`, `scope`, `business_type`, `default_role`) VALUES ('ae28429ef243647b0c07cd113ef3393c', '普通用户', '普通用户', 'system', '2', 2, 0, 0);
-INSERT INTO `pcs_prc_role` (`id`, `name`, `description`, `grouper`, `type`, `scope`, `business_type`, `default_role`) VALUES ('bf699ba68c8700a9760b79bdf859a092', '普通用户', '普通用户', 'system', '2', 2, 0, 0);
-INSERT INTO `pcs_prc_role` (`id`, `name`, `description`, `grouper`, `type`, `scope`, `business_type`, `default_role`) VALUES ('f51b3e9cdf10968d2f1080c43647eac5', '管理员', '管理员', 'system', '2', 2, 0, 1);
+INSERT INTO `pcs_prc_role` (`id`, `name`, `description`, `grouper`, `type`, `scope`, `business_type`, `default_role`) VALUES ('1', '管理员', '管理员', 'system', '1', 1, 1, 0);
+INSERT INTO `pcs_prc_role` (`id`, `name`, `description`, `grouper`, `type`, `scope`, `business_type`, `default_role`) VALUES ('2', '管理员', '管理员', 'system', '2', 1, 1, 0);
+
+INSERT INTO `pcs_prc_role` (`id`, `name`, `description`, `grouper`, `type`, `scope`, `business_type`, `default_role`) VALUES ('3f22e1a0ff00ae98132fe5d2fe5d0d5d', '管理员', '管理员', 'system', '2', 2, 1, 0);
+INSERT INTO `pcs_prc_role` (`id`, `name`, `description`, `grouper`, `type`, `scope`, `business_type`, `default_role`) VALUES ('f51b3e9cdf10968d2f1080c43647eac5', '管理员', '管理员', 'system', '2', 2, 1, 0);
+
+INSERT INTO `pcs_prc_role` (`id`, `name`, `description`, `grouper`, `type`, `scope`, `business_type`, `default_role`) VALUES ('1efcc15ab020858f4907f7ac94128af5', '普通用户', '普通用户', 'system', '2', 1, 0, 1);
+INSERT INTO `pcs_prc_role` (`id`, `name`, `description`, `grouper`, `type`, `scope`, `business_type`, `default_role`) VALUES ('696e8b4575bbfe842d5a5d534508fa7c', '普通用户', '普通用户', 'system', '1', 1, 0, 1);
+INSERT INTO `pcs_prc_role` (`id`, `name`, `description`, `grouper`, `type`, `scope`, `business_type`, `default_role`) VALUES ('ae28429ef243647b0c07cd113ef3393c', '普通用户', '普通用户', 'system', '2', 2, 0, 1);
+INSERT INTO `pcs_prc_role` (`id`, `name`, `description`, `grouper`, `type`, `scope`, `business_type`, `default_role`) VALUES ('bf699ba68c8700a9760b79bdf859a092', '普通用户', '普通用户', 'system', '2', 2, 0, 1);
 
 
-INSERT INTO `pcs_prc_role_user` (`id`, `role_id`, `tag`, `tag_value`) VALUES ('2b5e4969ec76c86d7853b583fe98426b', '3f22e1a0ff00ae98132fe5d2fe5d0d5d', 1, '111111');
+INSERT INTO `pcs_prc_role_user` (`id`, `role_id`, `tag`, `tag_value`) VALUES ('2adeb79ba186538330a7337ec56a0222', '3f22e1a0ff00ae98132fe5d2fe5d0d5d', 2, '1');
 INSERT INTO `pcs_prc_role_user` (`id`, `role_id`, `tag`, `tag_value`) VALUES ('2e4b7342485b2878ce55b7e57401f76c', '2', 2, '1');
 INSERT INTO `pcs_prc_role_user` (`id`, `role_id`, `tag`, `tag_value`) VALUES ('38d74b4a0a5a7ee2b0b6f56171e4e590', '1', 2, '1');
-INSERT INTO `pcs_prc_role_user` (`id`, `role_id`, `tag`, `tag_value`) VALUES ('4eb8daccc48d1800348fb07de8a99c83', '1', 1, '111111');
-INSERT INTO `pcs_prc_role_user` (`id`, `role_id`, `tag`, `tag_value`) VALUES ('aaad40c0a5cabdc1260da9de5fbbf325', 'f51b3e9cdf10968d2f1080c43647eac5', 1, '111111');
-
-
-
+INSERT INTO `pcs_prc_role_user` (`id`, `role_id`, `tag`, `tag_value`) VALUES ('d0c4e835c7a2d89d56cccbeaccda3fc4', 'f51b3e9cdf10968d2f1080c43647eac5', 2, '1');
 
 
 

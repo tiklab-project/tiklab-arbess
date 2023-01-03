@@ -73,6 +73,14 @@ public interface PipelineExecCommonService {
      */
     String variableKey(String pipelineId,String configId,String order);
 
+    /**
+     * 效验条件
+     * @param pipelineId 流水线id
+     * @param configId 配置id
+     * @return 状态 true:条件满足 false:条件不满足
+     */
+    Boolean variableCond(String pipelineId,String configId);
+
 }
 
 

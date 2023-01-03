@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.util.*;
 
 @Service
@@ -68,8 +69,13 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
      */
     @Override
     public void deleteHistory(String historyId) {
+        PipelineExecHistory history = findOneHistory(historyId);
+        String id = history.getPipeline().getId();
         pipelineExecHistoryDao.deleteHistory(historyId);
         pipelineExecLogService.deleteHistoryLog(historyId);
+        String fileAddress = PipelineUntil.findFileAddress(id,2);
+        //删除对应日志
+        PipelineUntil.deleteFile(new File(fileAddress+"/"+historyId+"/"));
     }
 
     @Override
@@ -132,6 +138,7 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
         if (pipelineExecHistories.size() == 0){
             return null;
         }
+
         joinTemplate.joinQuery(pipelineExecHistories);
         return pipelineExecHistories.get(0);
     }

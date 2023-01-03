@@ -63,6 +63,9 @@ public class PipelineCodeServiceImpl implements PipelineCodeService {
             return null;
         }
         for (PipelineCode pipelineCode : allCode) {
+            if (!PipelineUntil.isNoNull(pipelineCode.getConfigId())){
+                continue;
+            }
             if (pipelineCode.getConfigId().equals(configId)){
                 return pipelineCode;
             }

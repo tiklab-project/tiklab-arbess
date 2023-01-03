@@ -107,7 +107,7 @@ public class PipelinePostTaskServerImpl implements PipelinePostTaskServer {
             User user = new User();
             user.setId(LoginContext.getLoginId());
             pipelineUserMessage.setUser(user);
-            pipelineUserMessage.setType(1);
+            pipelineUserMessage.setMessageType(1);
             userList.add(pipelineUserMessage);
         }
 

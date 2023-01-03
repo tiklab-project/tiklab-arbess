@@ -63,9 +63,9 @@ public class CodeAuthorizeController {
     }
 
     @RequestMapping(path="/callbackUrl",method = RequestMethod.POST)
-    @ApiMethod(name = "callbackUrl",desc = "获取回调地址")
+    @ApiMethod(name = "getState",desc = "获取回调地址")
     @ApiParam(name = "callbackUrl",desc = "callbackUrl",required = true)
-    public Result<String> getState( String callbackUrl){
+    public Result<String> getState(@NotNull  String callbackUrl){
         String url= codeThirdService.callbackUrl(callbackUrl);
         return Result.ok(url);
     }

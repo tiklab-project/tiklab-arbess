@@ -41,14 +41,23 @@ public class BuildServiceImpl implements BuildService {
     public boolean build(PipelineProcess pipelineProcess,String configId ,int taskType)  {
 
         Pipeline pipeline = pipelineProcess.getPipeline();
+
         Object o;
         if (pipeline.getType() == 1){
             o = tasksService.findOneTasksTask(configId);
         }else {
             o = stagesTaskServer.findOneStagesTasksTask(configId);
         }
+
         PipelineBuild pipelineBuild = (PipelineBuild) o;
         String name = pipelineBuild.getName();
+
+        Boolean variableCond = commonService.variableCond(pipeline.getId(), configId);
+        if (!variableCond){
+            commonService.updateExecLog(pipelineProcess, PipelineUntil.date(4)+"任务："+ name+"执行条件不满足,跳过执行。");
+            return true;
+        }
+
         commonService.updateExecLog(pipelineProcess, PipelineUntil.date(4)+"执行任务："+name);
 
         pipelineBuild.setType(taskType);

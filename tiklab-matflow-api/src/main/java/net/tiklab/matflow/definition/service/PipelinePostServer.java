@@ -22,10 +22,10 @@ public interface PipelinePostServer {
 
     /**
      * 查询配置
-     * @param pipelineId 流水线id
+     * @param taskId 流水线id
      * @return 配置
      */
-     List<Object> findAllPostTask(String pipelineId);
+     List<Object> findAllPostTask(String taskId);
 
     /**
      * 删除
@@ -50,10 +50,10 @@ public interface PipelinePostServer {
 
     /**
      * 根据流水线id查询后置配置
-     * @param pipelineId 流水线id
+     * @param taskId 流水线id
      * @return 配置
      */
-     List<PipelinePost> findAllPost(String pipelineId);
+     List<PipelinePost> findAllPost(String taskId);
 
     /**
      * 查询所有信息

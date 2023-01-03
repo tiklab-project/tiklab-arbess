@@ -3,7 +3,6 @@ package net.tiklab.matflow.definition.service;
 import net.tiklab.beans.BeanMapper;
 import net.tiklab.matflow.definition.dao.PipelinePostDao;
 import net.tiklab.matflow.definition.entity.PipelinePostEntity;
-import net.tiklab.matflow.definition.model.Pipeline;
 import net.tiklab.matflow.definition.model.PipelinePost;
 import net.tiklab.matflow.orther.until.PipelineUntil;
 import net.tiklab.rpc.annotation.Exporter;
@@ -11,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -30,8 +30,7 @@ public class PipelinePostServerImpl implements PipelinePostServer {
      */
     @Override
     public String createPostTask(PipelinePost pipelinePost) {
-        Pipeline pipeline = pipelinePost.getPipeline();
-        List<PipelinePost> allPost = findAllPost(pipeline.getId());
+        List<PipelinePost> allPost = findAllPost(pipelinePost.getTaskId());
         pipelinePost.setTaskSort(1);
         int taskType = pipelinePost.getTaskType();
         if (allPost != null){
@@ -49,11 +48,11 @@ public class PipelinePostServerImpl implements PipelinePostServer {
 
     /**
      * 查询配置
-     * @param pipelineId 流水线id
+     * @param taskId 流水线id
      * @return 配置
      */
-    public List<Object> findAllPostTask(String pipelineId){
-        List<PipelinePost> allPost = findAllPost(pipelineId);
+    public List<Object> findAllPostTask(String taskId){
+        List<PipelinePost> allPost = findAllPost(taskId);
         if (allPost == null){
             return null;
         }
@@ -78,19 +77,19 @@ public class PipelinePostServerImpl implements PipelinePostServer {
 
     /**
      * 根据流水线id查询后置配置
-     * @param pipelineId 流水线id
+     * @param taskId 流水线id
      * @return 配置
      */
     @Override
-    public List<PipelinePost> findAllPost(String pipelineId) {
+    public List<PipelinePost> findAllPost(String taskId) {
         List<PipelinePost> allPost = findAllPost();
         if (allPost == null){
-            return null;
+            return Collections.emptyList();
         }
         List<PipelinePost> list = new ArrayList<>();
         for (PipelinePost pipelinePost : allPost) {
-            Pipeline pipeline = pipelinePost.getPipeline();
-            if (!pipeline.getId().equals(pipelineId)){
+            String postTaskId = pipelinePost.getTaskId();
+            if (!postTaskId.equals(taskId)){
                 continue;
             }
             list.add(pipelinePost);

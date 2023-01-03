@@ -51,7 +51,11 @@ public class ProductServiceImpl implements ProductService {
 
         PipelineProduct product = (PipelineProduct) o;
         String name = product.getName();
-
+        Boolean variableCond = commonService.variableCond(pipeline.getId(), configId);
+        if (!variableCond){
+            commonService.updateExecLog(pipelineProcess, PipelineUntil.date(4)+"任务："+ name+"执行条件不满足,跳过执行。");
+            return true;
+        }
         commonService.updateExecLog(pipelineProcess, PipelineUntil.date(4)+"执行任务："+name);
 
         product.setType(taskType);

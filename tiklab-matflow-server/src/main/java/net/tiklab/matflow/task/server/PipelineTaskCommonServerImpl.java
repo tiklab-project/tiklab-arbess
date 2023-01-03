@@ -196,7 +196,6 @@ public class PipelineTaskCommonServerImpl implements PipelineTaskCommonServer {
         }
     }
 
-
     /**
      * 默认任务名称
      * @param taskType 任务
@@ -236,7 +235,7 @@ public class PipelineTaskCommonServerImpl implements PipelineTaskCommonServer {
                 return "Docker";
             }
             case 41 -> {
-                return "代码扫描";
+                return "sonarQuebe";
             }
             case 51 -> {
                 return "Nexus";

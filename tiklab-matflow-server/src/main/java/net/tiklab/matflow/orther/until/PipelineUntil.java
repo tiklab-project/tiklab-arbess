@@ -126,7 +126,6 @@ public class PipelineUntil {
         return process;
     }
 
-
     /**
      * 返回命令集合
      * @param order 命令
@@ -155,13 +154,6 @@ public class PipelineUntil {
         }
         return list;
     }
-
-
-
-
-
-
-
 
     //时间转换成时分秒
     public static String formatDateTime(long time) {
@@ -265,6 +257,8 @@ public class PipelineUntil {
         }
         return file.delete();
     }
+
+
 
     /**
      * 匹配文件路径
@@ -446,12 +440,32 @@ public class PipelineUntil {
      * @throws ApplicationException 写入失败
      */
     public static void logWriteFile(String str, String path) throws ApplicationException {
-        try (FileWriter writer = new FileWriter(path, true)) {
+
+        try {
+            File file1 = new File(path);
+
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(new FileOutputStream(file1), StandardCharsets.UTF_8);
+
+            Writer writer = new BufferedWriter(outputStreamWriter);
+
             writer.write(str);
+
             writer.flush();
-        } catch (Exception e) {
-            throw new ApplicationException("文件写入失败。");
+            writer.close();
+
+        } catch (IOException e) {
+            throw new ApplicationException(e);
         }
+
+
+
+        // try (FileWriter writer = new FileWriter(path, StandardCharsets.UTF_8,true)) {
+        // // try (FileWriter writer = new FileWriter(path, Charset.forName("GBK"),true)) {
+        //     writer.write(str);
+        //     writer.flush();
+        // } catch (Exception e) {
+        //     throw new ApplicationException("文件写入失败。");
+        // }
     }
 
     /**
@@ -482,7 +496,7 @@ public class PipelineUntil {
      * @param address 文件地址
      * @throws ApplicationException 文件创建失败
      */
-    public static String  createFile(String address) throws ApplicationException {
+    public static String createFile(String address) throws ApplicationException {
         File file = new File(address);
         String parent = file.getParent();
         File parentFile = new File(parent);
@@ -499,6 +513,19 @@ public class PipelineUntil {
     }
 
     /**
+     * 获取日志储存位置
+     * @param pipelineId 流水线id
+     * @param historyId 历史id
+     * @param logId 日志id
+     * @return 位置
+     */
+    public static String findExecLogAddress(String pipelineId,String historyId,String logId){
+        String address= findFileAddress(pipelineId, 2);
+        String s = address + "/" + historyId + "/" + logId + ".log";
+        return PipelineUntil.createFile(s);
+    }
+
+    /**
      * 读取文件后100行内容
      * @param fileAddress 文件地址
      * @return 内容
@@ -507,28 +534,26 @@ public class PipelineUntil {
         if (!isNoNull(fileAddress)){
             return null;
         }
+
+        File file = new File(fileAddress);
+
+        if (!file.exists()){
+            return null;
+        }
+
         Path path = Paths.get(fileAddress);
+
         StringBuilder s = new StringBuilder();
         List<String> lines = null;
         try {
-            lines = Files.readAllLines(path);
+            lines = Files.readAllLines(path,StandardCharsets.UTF_8);
+            // lines = Files.readAllLines(path,Charset.forName("GBK"));
             for (int i = Math.max(0, lines.size() - 100); i < lines.size(); i++) {
                 s.append(lines.get(i)).append("\n");
-                // System.out.println(lines.get(i));
             }
         } catch (IOException e) {
             throw new ApplicationException("读取文件信息失败"+ e.getMessage());
         }
-
-        // try {
-        //     Stream<String> f = Files.lines(path);
-        //     f.forEach(s1 -> {
-        //         System.out.println(s);
-        //     });
-        // } catch (IOException e) {
-        //     throw new RuntimeException(e);
-        // }
-
         return s.toString();
     }
 

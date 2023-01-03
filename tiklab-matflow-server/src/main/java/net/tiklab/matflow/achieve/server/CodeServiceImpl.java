@@ -50,6 +50,9 @@ public class CodeServiceImpl implements CodeService {
     public boolean clone(PipelineProcess pipelineProcess, String configId ,int taskType){
 
         Pipeline pipeline = pipelineProcess.getPipeline();
+
+        Boolean variableCond = commonService.variableCond(pipeline.getId(), configId);
+
         Object o;
         if (pipeline.getType() == 1){
             o = tasksService.findOneTasksTask(configId);
@@ -58,6 +61,12 @@ public class CodeServiceImpl implements CodeService {
         }
         PipelineCode pipelineCode = (PipelineCode) o;
         String name = pipelineCode.getName();
+
+        if (!variableCond){
+            commonService.updateExecLog(pipelineProcess, PipelineUntil.date(4)+"任务："+ name+"执行条件不满足,跳过执行。");
+            return true;
+        }
+
         commonService.updateExecLog(pipelineProcess, PipelineUntil.date(4)+"执行任务："+ name);
 
         pipelineCode.setType(taskType);
@@ -80,8 +89,6 @@ public class CodeServiceImpl implements CodeService {
                 b = true;
             }
         }
-
-
 
         //分支
         String codeBranch = pipelineCode.getCodeBranch();

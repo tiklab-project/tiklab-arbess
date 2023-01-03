@@ -8,7 +8,7 @@ public class PipelineUserMessage {
     private User user;
 
     //类型（1.全部 2.仅成功 3.仅失败）
-    private int type;
+    private int messageType;
 
     public User getUser() {
         return user;
@@ -18,11 +18,11 @@ public class PipelineUserMessage {
         this.user = user;
     }
 
-    public int getType() {
-        return type;
+    public int getMessageType() {
+        return messageType;
     }
 
-    public void setType(int type) {
-        this.type = type;
+    public void setMessageType(int messageType) {
+        this.messageType = messageType;
     }
 }

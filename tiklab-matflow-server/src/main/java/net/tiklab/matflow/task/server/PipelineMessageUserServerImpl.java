@@ -42,7 +42,7 @@ public class PipelineMessageUserServerImpl implements PipelineMessageUserServer 
         }
         for (PipelineUserMessage userMessage : userMessages) {
             User user = userMessage.getUser();
-            int type = userMessage.getType();
+            int type = userMessage.getMessageType();
             PipelineMessageUser messageUser = new PipelineMessageUser();
             messageUser.setReceiveType(type);
             messageUser.setUser(user);
@@ -64,7 +64,7 @@ public class PipelineMessageUserServerImpl implements PipelineMessageUserServer 
                 User user = messageUser.getUser();
                 int receiveType = messageUser.getReceiveType();
                 PipelineUserMessage pipelineUserMessage = new PipelineUserMessage();
-                pipelineUserMessage.setType(receiveType);
+                pipelineUserMessage.setMessageType(receiveType);
                 pipelineUserMessage.setUser(user);
                 list.add(pipelineUserMessage);
             }

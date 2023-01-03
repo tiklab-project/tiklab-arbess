@@ -46,9 +46,9 @@ public class PipelinePostController {
     //根据流水线id查询配置
     @RequestMapping(path="/findAllPost",method = RequestMethod.POST)
     @ApiMethod(name = "findAllConfig",desc = "根据流水线id查询后置配置")
-    @ApiParam(name = "pipelineId",desc = "流水线id",required = true)
-    public Result<List<Object>> findAllConfig(@NotNull String pipelineId) {
-        List<Object> list = postServer.findAllPostTask(pipelineId);
+    @ApiParam(name = "taskId",desc = "流水线id",required = true)
+    public Result<List<Object>> findAllConfig(@NotNull String taskId) {
+        List<Object> list = postServer.findAllPostTask(taskId);
         return Result.ok(list);
     }
 
