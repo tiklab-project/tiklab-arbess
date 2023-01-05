@@ -286,7 +286,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
                 String configId = tasks.getConfigId();
                 PipelineProcess process = initProcess(configId, pipelineId, historyId);
 
-                boolean b = execTask(process,tasks.getTaskType());
+                boolean b = execTask(process,tasks.getTaskType(),tasks.getName());
 
                 if (!b){
                     return false;
@@ -318,9 +318,9 @@ public class PipelineExecServiceImpl implements PipelineExecService {
                             for (PipelineStagesTask stagesTask : stagesTaskList) {
                                 String configId = stagesTask.getConfigId();
                                 PipelineProcess process = initProcess(configId, pipelineId, historyId);
-                                commonService.updateExecLog(process,PipelineUntil.date(4)+"执行"+stages.getName());
-                                commonService.updateExecLog(process,PipelineUntil.date(4)+"执行"+stage.getName());
-                                boolean state = execTask(process,stagesTask.getTaskType());
+                                commonService.updateExecLog(process,PipelineUntil.date(4)+"阶段："+stages.getName());
+                                commonService.updateExecLog(process,PipelineUntil.date(4)+"并行阶段："+stage.getName());
+                                boolean state = execTask(process,stagesTask.getTaskType(),stagesTask.getName());
                                 if (!state){
                                     return  false;
                                 }
@@ -374,7 +374,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
             String configId = pipelinePost.getConfigId();
             PipelineProcess process =  initProcess(configId,pipelineId,historyId);
             commonService.updateExecLog(process,PipelineUntil.date(4)+"执行后置任务");
-            boolean b = execTask(process,pipelinePost.getTaskType());
+            boolean b = execTask(process,pipelinePost.getTaskType(),pipelinePost.getName());
             if (!b){
                 return false;
             }
@@ -382,7 +382,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         return true;
     }
 
-    private boolean execTask(PipelineProcess pipelineProcess,int taskType){
+    private boolean execTask(PipelineProcess pipelineProcess,int taskType,String taskName){
 
         String id = pipelineProcess.getPipeline().getId();
         Pipeline pipeline = pipelineService.findOnePipeline(id);
@@ -394,16 +394,24 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         //执行时间
         time(logId);
 
-        boolean b = taskExecService.beginCourseState(pipelineProcess, configId,taskType);
+        boolean b = taskExecService.beginCourseState(pipelineProcess, configId, taskType, new HashMap<>());
 
         List<PipelinePost> allPost = postServer.findAllPost(configId);
+
         Boolean variableCond = commonService.variableCond(pipeline.getId(), configId);
         //任务存在后置任务并且条件满足
         if (allPost.size() != 0 && variableCond){
             for (PipelinePost post : allPost) {
                 commonService.updateExecLog(pipelineProcess,PipelineUntil.date(4)+"后置任务:"+post.getName());
                 String postConfigId = post.getConfigId();
-                boolean state = taskExecService.beginCourseState(pipelineProcess, postConfigId, post.getTaskType());
+                Map<String,String> map = new HashMap<>();
+                map.put("task","true");
+                if (b){
+                    map.put("taskMessage","任务"+taskName+"执行成功。");
+                }else {
+                    map.put("taskMessage","任务"+taskName+"执行失败。");
+                }
+                boolean state = taskExecService.beginCourseState(pipelineProcess, postConfigId, post.getTaskType(),map);
                 if (!state){
                     commonService.updateExecLog(pipelineProcess,PipelineUntil.date(4)+"后置任务:"+post.getName()+"执行失败！");
                     b = false;
@@ -428,6 +436,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
      */
     @Override
     public PipelineRunLog findRunState(String pipelineId){
+
         String execHistoryId = historyMap.get(pipelineId);
 
         PipelineRunLog execRunLog = new PipelineRunLog();

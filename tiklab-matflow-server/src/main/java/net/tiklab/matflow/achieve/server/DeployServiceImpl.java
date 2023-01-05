@@ -103,6 +103,7 @@ public class DeployServiceImpl implements DeployService {
 
         //获取部署文件
         String filePath;
+
         try {
             commonService.updateExecLog(pipelineProcess,PipelineUntil.date(4)+"获取部署文件......");
             filePath = PipelineUntil.getFile(pipeline.getId(), pipelineDeploy.getLocalAddress());

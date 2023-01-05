@@ -5,6 +5,8 @@ import net.tiklab.matflow.execute.model.PipelineProcess;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
+
 @Service
 public class PipelineExecTaskServiceImpl implements PipelineExecTaskService {
 
@@ -32,7 +34,7 @@ public class PipelineExecTaskServiceImpl implements PipelineExecTaskService {
     @Autowired
     ScriptServer scriptServer;
 
-    public boolean beginCourseState(PipelineProcess pipelineProcess, String configId ,int taskType){
+    public boolean beginCourseState(PipelineProcess pipelineProcess, String configId , int taskType, Map<String,String> maps){
         boolean state = true;
         switch (taskType/10) {
             case 0 -> state = code.clone(pipelineProcess, configId,taskType);
@@ -41,7 +43,7 @@ public class PipelineExecTaskServiceImpl implements PipelineExecTaskService {
             case 3 -> state = deploy.deploy(pipelineProcess, configId,taskType);
             case 4 -> state = codeScan.codeScan(pipelineProcess, configId,taskType);
             case 5 -> state = product.product(pipelineProcess,  configId,taskType);
-            case 6 -> state = message.message(pipelineProcess, configId,taskType);
+            case 6 -> state = message.message(pipelineProcess, configId,taskType,maps);
             case 7 -> state = scriptServer.scripts(pipelineProcess, configId,taskType);
         }
         return state;

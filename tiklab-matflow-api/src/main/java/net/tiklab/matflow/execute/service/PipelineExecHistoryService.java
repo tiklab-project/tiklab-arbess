@@ -101,7 +101,12 @@ public interface PipelineExecHistoryService {
      */
     PipelineExecHistory findLastHistory(String pipelineId);
 
-
+    /**
+     * 查询流水线正在运行历史
+     * @param pipelineId 流水线id
+     * @return 运行历史
+     */
+    PipelineExecHistory findRunHistory(String pipelineId);
     /**
      * 查询日志详情
      * @param historyId 历史id

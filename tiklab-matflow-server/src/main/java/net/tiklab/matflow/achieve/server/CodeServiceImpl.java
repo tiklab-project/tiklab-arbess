@@ -401,7 +401,7 @@ public class CodeServiceImpl implements CodeService {
         if (taskType == 5){
             return null;
         }
-        String order = "git log --pretty=format:\"commit：%cn email：%ae message：%s date：%ad  %ar \" --date=format:\"%Y-%m-%d %H:%M:%S\" -n 1";
+        String order = "git log --pretty=format:\"commit：%cn email：%ae message：%s date：%ad time：%ar \" --date=format:\"%Y-%m-%d %H:%M:%S\" -n 1";
         String fileAddress = PipelineUntil.findFileAddress(pipelineId,1);
         return PipelineUntil.process(fileAddress, order);
     }

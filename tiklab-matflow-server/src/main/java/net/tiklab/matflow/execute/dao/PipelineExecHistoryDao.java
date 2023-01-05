@@ -154,4 +154,46 @@ public class PipelineExecHistoryDao {
     }
 
 
+    public List<PipelineExecHistoryEntity> findLastHistory(String pipelineId){
+        String sql = "select pip_pipeline_history.* from pip_pipeline_history  ";
+        sql = sql.concat(" where pip_pipeline_history.pipeline_id = '"+pipelineId+"' " +
+                " and pip_pipeline_history.find_state = '1' "+
+                " order by pip_pipeline_history.create_time desc" +
+                " limit 0 ,1");
+        JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
+        return  jdbcTemplate.query(sql, new BeanPropertyRowMapper(PipelineExecHistoryEntity.class));
+    }
+
+    public List<PipelineExecHistoryEntity> findRunHistory(String pipelineId){
+        String sql = "select pip_pipeline_history.* from pip_pipeline_history  ";
+        sql = sql.concat(" where pip_pipeline_history.pipeline_id = '"+pipelineId+"' " +
+                " and pip_pipeline_history.find_state = '0' "+
+                " order by pip_pipeline_history.create_time desc" +
+                " limit 0 ,1");
+        JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
+        return  jdbcTemplate.query(sql, new BeanPropertyRowMapper(PipelineExecHistoryEntity.class));
+    }
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

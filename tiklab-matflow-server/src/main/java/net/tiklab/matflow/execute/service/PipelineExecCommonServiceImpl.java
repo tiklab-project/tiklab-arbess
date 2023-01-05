@@ -230,20 +230,14 @@ public class PipelineExecCommonServiceImpl implements PipelineExecCommonService 
         //初始化基本信息
         pipelineExecHistory.setSort(1);
         pipelineExecHistory.setHistoryId(historyId);
+
         //构建次数
-        PipelineExecHistory latelyHistory = historyService.findLatelyHistory(pipelineId);
+        PipelineExecHistory latelyHistory = historyService.findLastHistory(pipelineId);
         pipelineExecHistory.setFindNumber(1);
         if (latelyHistory != null){
             int findNumber = latelyHistory.getFindNumber();
             pipelineExecHistory.setFindNumber(findNumber+1);
         }
-
-        // List<PipelineExecHistory> allHistory = historyService.findAllHistory(pipelineId);
-        //
-        // pipelineExecHistory.setFindNumber(1);
-        // if (allHistory.size() >= 1){
-        //     pipelineExecHistory.setFindNumber(allHistory.size());
-        // }
 
         historyService.updateHistory(pipelineExecHistory);
         return pipelineExecHistory;

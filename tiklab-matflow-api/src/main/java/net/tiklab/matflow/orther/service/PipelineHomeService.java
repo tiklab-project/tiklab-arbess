@@ -47,4 +47,12 @@ public interface PipelineHomeService {
 
 
 
+    /**
+     * 判断是否存在消息配置
+     * @return 不存在的消息配置
+     */
+    List<String> messageSendType();
+
+
+
 }

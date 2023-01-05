@@ -8,22 +8,25 @@ import net.tiklab.logging.service.LoggingByTemplService;
 import net.tiklab.matflow.definition.model.Pipeline;
 import net.tiklab.matflow.orther.until.PipelineFinal;
 import net.tiklab.matflow.orther.until.PipelineUntil;
+import net.tiklab.message.mail.modal.MailCfg;
+import net.tiklab.message.mail.service.MailCfgService;
 import net.tiklab.message.message.model.Message;
 import net.tiklab.message.message.model.MessageReceiver;
 import net.tiklab.message.message.model.SendMessageNotice;
-import net.tiklab.message.message.service.MessageService;
 import net.tiklab.message.message.service.SendMessageNoticeService;
 import net.tiklab.message.message.service.SingleSendMessageService;
 import net.tiklab.message.setting.model.MessageType;
 import net.tiklab.message.sms.modal.Sms;
 import net.tiklab.message.sms.service.SmsSignCfgService;
+import net.tiklab.message.webhook.modal.WebHook;
+import net.tiklab.message.webhook.modal.WebHookQuery;
+import net.tiklab.message.webhook.service.WebHookService;
 import net.tiklab.rpc.annotation.Exporter;
 import net.tiklab.user.user.model.User;
 import net.tiklab.user.user.service.UserService;
 import net.tiklab.utils.context.LoginContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
@@ -37,10 +40,7 @@ import java.util.Map;
 public class PipelineHomeServiceImpl implements PipelineHomeService {
 
     @Autowired
-    MessageService messageService;
-
-    @Autowired
-    UserService userService;
+    private UserService userService;
 
     @Autowired
     private SingleSendMessageService sendMessage;
@@ -54,8 +54,15 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
     @Autowired
     private SendMessageNoticeService dispatchNoticeService;
 
+    @Autowired
+    private WebHookService webHookService;
 
-    private static final Logger logger = LoggerFactory.getLogger(PipelineHomeServiceImpl.class);
+    @Autowired
+    private MailCfgService mailCfgService;
+
+
+    @Value("${base.url:null}")
+    String baseUrl;
 
     String appName = PipelineFinal.appName;
 
@@ -64,9 +71,11 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
      * @param pipeline 流水线
      * @return 信息
      */
+    @Override
     public HashMap<String,Object> initMap(Pipeline pipeline){
         HashMap<String,Object> map = new HashMap<>();
-        User user = pipeline.getUser();
+        String userId = LoginContext.getLoginId();
+        User user = userService.findOne(userId);
         map.put("pipelineId", pipeline.getId());
         map.put("pipelineName", pipeline.getName());
         map.put("name", pipeline.getName().substring(0,1).toUpperCase());
@@ -79,6 +88,33 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
         map.put("date", PipelineUntil.date(1));
         return map;
     }
+
+    /**
+     * 判断是否存在消息配置
+     * @return 不存在的消息配置
+     */
+    @Override
+    public List<String> messageSendType(){
+        List<String> list = new ArrayList<>();
+        MailCfg oneMail = mailCfgService.findOneMail();
+        if (oneMail == null){
+            list.add("mail");
+        }
+        WebHookQuery webHookQuery = new WebHookQuery();
+        webHookQuery.setType(1);
+        WebHook hookByType = webHookService.findWebHookByType(webHookQuery);
+        if (hookByType == null){
+            list.add("dingding");
+        }
+        webHookQuery.setType(2);
+        hookByType = webHookService.findWebHookByType(webHookQuery);
+        if (hookByType == null){
+            list.add("wechat");
+        }
+        list.add("sms");
+        return list;
+    }
+
 
     /**
      * 创建日志
@@ -98,6 +134,7 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
         String[] s = templateId.split("_");
         map.put("img","pip_config.svg");
         map.put("title","流水线");
+
         if (logType.contains("RUN")){
             map.put("title","运行");
             map.put("img","/images/pip_run.svg");
@@ -122,10 +159,10 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
         String userId = LoginContext.getLoginId();
         User user = userService.findOne(userId);
         log.setUser(user);
-
+        log.setBaseUrl(baseUrl);
         log.setBgroup(appName);
         log.setContent(JSONObject.toJSONString(map));
-        // logService.createLog(log);
+        logService.createLog(log);
 
     }
 
@@ -143,6 +180,7 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
         dispatchNotice.setDingdingData(jsonString);
         dispatchNotice.setSiteData(jsonString);
         dispatchNotice.setQywechatData(jsonString);
+        dispatchNotice.setBaseUrl(baseUrl);
         dispatchNoticeService.createMessageItem(dispatchNotice);
     }
 
@@ -168,12 +206,13 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
         //发送方式
         message.setMessageSendTypeId(sendWay);
         message.setData(map);
+        message.setBaseUrl(baseUrl);
 
         List<MessageReceiver> list = new ArrayList<>();
         for (String s : receiver) {
             MessageReceiver messageReceiver = new MessageReceiver();
             messageReceiver.setUserId(s);
-            messageReceiver.setUserId(s);
+            messageReceiver.setPhone(s);
             messageReceiver.setEmail(s);
             list.add(messageReceiver);
         }

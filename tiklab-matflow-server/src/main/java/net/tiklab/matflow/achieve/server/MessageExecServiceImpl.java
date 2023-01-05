@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static net.tiklab.matflow.orther.until.PipelineFinal.*;
 
@@ -52,7 +53,7 @@ public class MessageExecServiceImpl implements MessageExecService {
      * @param pipelineProcess 配置信息
      * @return 状态
      */
-    public boolean message(PipelineProcess pipelineProcess, String configId,int taskType) {
+    public boolean message(PipelineProcess pipelineProcess, String configId, int taskType, Map<String,String> maps) {
 
         commonService.updateExecLog(pipelineProcess, PipelineUntil.date(4)+"执行任务：消息通知.....");
 
@@ -78,7 +79,9 @@ public class MessageExecServiceImpl implements MessageExecService {
             commonService.updateExecLog(pipelineProcess, PipelineUntil.date(4)+"任务：消息通知执行完成。");
             return true;
         }
+
         Pipeline pipeline = pipelineProcess.getPipeline();
+
         HashMap<String, Object> map = homeService.initMap(pipeline);
 
         for (PipelineUserMessage userMessage : userList) {
@@ -94,7 +97,6 @@ public class MessageExecServiceImpl implements MessageExecService {
             }
         }
 
-
         if (i == 1){
             map.put("message","执行失败");
         }
@@ -103,6 +105,15 @@ public class MessageExecServiceImpl implements MessageExecService {
         }
         if (i == 20){
             map.put("message","停止执行");
+        }
+
+        String task = maps.get("task");
+
+        if (task == null || task.equals("false")){
+            map.put("mesType",MES_PIPELINE_RUN);
+        }else {
+            map.put("mesType",MES_PIPELINE_TASK_RUN);
+            map.put("taskMessage", maps.get("taskMessage"));
         }
 
         if (list.size() == 0){
@@ -137,7 +148,6 @@ public class MessageExecServiceImpl implements MessageExecService {
      */
     private void messageType(PipelineProcess pipelineProcess, String type, List<PipelineUserMessage> userList,HashMap<String, Object> map) throws ApplicationException {
 
-        map.put("mesType",MES_PIPELINE_RUN);
         switch (type){
             case MES_SENT_SITE ->{
                 commonService.updateExecLog(pipelineProcess, PipelineUntil.date(4)+ "发送消息，类型：站内信");
@@ -176,6 +186,7 @@ public class MessageExecServiceImpl implements MessageExecService {
                 homeService.message(map,new ArrayList<>());
                 commonService.updateExecLog(pipelineProcess, PipelineUntil.date(4)+ "钉钉机器人消息成功");
             }
+
             default -> {
                 throw new ApplicationException("没有该类型的消息提醒:"+ type);
             }

@@ -129,6 +129,39 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
         return pipelineExecHistories.get(0);
     }
 
+    /**
+     * 查询流水线最后一次的运行历史
+     * @param pipelineId 流水线id
+     * @return 运行历史
+     */
+    @Override
+    public PipelineExecHistory findLastHistory(String pipelineId){
+        List<PipelineExecHistoryEntity> latelySuccess = pipelineExecHistoryDao.findLastHistory(pipelineId);
+        List<PipelineExecHistory> pipelineExecHistories = BeanMapper.mapList(latelySuccess, PipelineExecHistory.class);
+        if (pipelineExecHistories.size() == 0){
+            return null;
+        }
+        joinTemplate.joinQuery(pipelineExecHistories);
+        return pipelineExecHistories.get(0);
+    }
+
+    /**
+     * 查询流水线正在运行历史
+     * @param pipelineId 流水线id
+     * @return 运行历史
+     */
+    @Override
+    public PipelineExecHistory findRunHistory(String pipelineId){
+        List<PipelineExecHistoryEntity> latelySuccess = pipelineExecHistoryDao.findRunHistory(pipelineId);
+        List<PipelineExecHistory> pipelineExecHistories = BeanMapper.mapList(latelySuccess, PipelineExecHistory.class);
+        if (pipelineExecHistories.size() == 0){
+            return null;
+        }
+        joinTemplate.joinQuery(pipelineExecHistories);
+        return pipelineExecHistories.get(0);
+    }
+
+
     //查询最近一次成功记录
     @Override
     public PipelineExecHistory findLatelySuccess(String pipelineId){
@@ -149,20 +182,6 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
         return BeanMapper.mapList(pipelineExecHistoryEntityList, PipelineExecHistory.class);
     }
 
-    /**
-     * 最近一次的构建历史
-     * @param pipelineId 流水线id
-     * @return 历史
-     */
-    @Override
-    public PipelineExecHistory findLastHistory(String pipelineId){
-        // List<PipelineExecHistory> allHistory = findLatelyHistory(pipelineId);
-        // if (allHistory == null){
-        //     return null;
-        // }
-        // allHistory.sort(Comparator.comparing(PipelineExecHistory::getCreateTime).reversed());
-        return findLatelyHistory(pipelineId);
-    }
 
     /**
      * 查询日志详情

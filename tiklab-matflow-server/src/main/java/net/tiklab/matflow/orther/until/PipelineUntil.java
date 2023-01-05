@@ -272,13 +272,28 @@ public class PipelineUntil {
         List<String> filePath = PipelineUntil.getFilePath(new File(path),new ArrayList<>());
         for (String s : filePath) {
             File file = new File(s);
-            if (file.getName().matches("^(.*"+regex+".*)") || file.getName().matches(regex)){
+
+            //拼装正则匹配
+            boolean matches = file.getName().matches("^(.*" + regex + ".*)");
+            //正则匹配
+            boolean matches1 = file.getName().matches(regex);
+
+            File file1 = new File(s + "/" + regex);
+            if (file1.exists()){
+                return file1.getAbsolutePath();
+            }
+
+            if (matches || matches1){
                 list.add(s);
             }
         }
 
         if (list.size() > 1){
-            throw new ApplicationException("匹配到多个文件，请重新输入部署文件信息。");
+            StringBuilder s  = new StringBuilder("匹配到多个文件，请重新输入部署文件信息。");
+            for (String s1 : list) {
+                s.append("\n").append(s1);
+            }
+            throw new ApplicationException(s.toString());
         }
 
         if (list.size()== 1){
@@ -441,31 +456,30 @@ public class PipelineUntil {
      */
     public static void logWriteFile(String str, String path) throws ApplicationException {
 
-        try {
-            File file1 = new File(path);
-
-            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(new FileOutputStream(file1), StandardCharsets.UTF_8);
-
-            Writer writer = new BufferedWriter(outputStreamWriter);
-
-            writer.write(str);
-
-            writer.flush();
-            writer.close();
-
-        } catch (IOException e) {
-            throw new ApplicationException(e);
-        }
-
-
-
-        // try (FileWriter writer = new FileWriter(path, StandardCharsets.UTF_8,true)) {
-        // // try (FileWriter writer = new FileWriter(path, Charset.forName("GBK"),true)) {
+        // try {
+        //     File file1 = new File(path);
+        //
+        //     OutputStreamWriter outputStreamWriter = new OutputStreamWriter(new FileOutputStream(file1), StandardCharsets.UTF_8);
+        //
+        //     Writer writer = new BufferedWriter(outputStreamWriter);
+        //
         //     writer.write(str);
+        //
         //     writer.flush();
-        // } catch (Exception e) {
-        //     throw new ApplicationException("文件写入失败。");
+        //     writer.close();
+        //
+        // } catch (IOException e) {
+        //     throw new ApplicationException(e);
         // }
+
+
+
+        try (FileWriter writer = new FileWriter(path, StandardCharsets.UTF_8,true)) {
+            writer.write(str);
+            writer.flush();
+        } catch (Exception e) {
+            throw new ApplicationException("文件写入失败。");
+        }
     }
 
     /**

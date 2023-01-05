@@ -17,6 +17,8 @@ public class PipelineFinal {
     //消息类型
     public static final String MES_PIPELINE_RUN = "MES_PIPELINE_RUN"; //流水线运行消息
 
+    public static final String MES_PIPELINE_TASK_RUN = "MES_PIPELINE_TASK_RUN"; //流水线任务运行消息
+
     public static final String MES_TEM_SITE = "site"; //流水线创建信息模板
 
 
