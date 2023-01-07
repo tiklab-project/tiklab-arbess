@@ -37,3 +37,16 @@ create table pip_pipeline_history_log  (
     stages_id varchar(256)  COMMENT '阶段id',
     PRIMARY KEY (log_id) USING BTREE
 );
+
+-- ---------------------------
+-- 后置
+-- ----------------------------
+create table pip_pipeline_post  (
+    config_id varchar(255) COMMENT '配置',
+    name varchar(32) COMMENT '名称',
+    task_type int COMMENT '任务类型' ,
+    create_time varchar(255) COMMENT '创建时间',
+    task_sort varchar(255) COMMENT '任务顺序',
+    pipeline_id varchar(255) COMMENT '流水线id',
+    PRIMARY KEY (config_id) USING BTREE
+);
