@@ -7,6 +7,7 @@ import net.tiklab.matflow.definition.dao.PipelineDao;
 import net.tiklab.matflow.definition.entity.PipelineEntity;
 import net.tiklab.matflow.definition.model.Pipeline;
 import net.tiklab.matflow.definition.model.PipelineExecMessage;
+import net.tiklab.matflow.execute.model.PipelineExecHistory;
 import net.tiklab.matflow.orther.model.PipelineOpen;
 import net.tiklab.matflow.orther.service.PipelineHomeService;
 import net.tiklab.matflow.orther.until.PipelineUntil;
@@ -290,6 +291,23 @@ public class PipelineServiceImpl implements PipelineService {
         }
         return relationServer.findAllOpen(s,number);
     }
+
+
+    /**
+     * 查询用户所有流水线历史
+     * @return 历史
+     */
+    @Override
+    public List<PipelineExecHistory> findUserAllHistory(){
+        String id = LoginContext.getLoginId();
+        List<Pipeline> allPipeline = findAllPipeline(id);
+        if (allPipeline.isEmpty()){
+            return Collections.emptyList();
+        }
+        return relationServer.findUserAllHistory(allPipeline);
+    }
+
+
 
 }
 

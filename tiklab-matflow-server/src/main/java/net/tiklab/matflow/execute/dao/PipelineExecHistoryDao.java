@@ -6,6 +6,7 @@ import net.tiklab.dal.jdbc.JdbcTemplate;
 import net.tiklab.dal.jpa.JpaTemplate;
 import net.tiklab.dal.jpa.criterial.condition.QueryCondition;
 import net.tiklab.dal.jpa.criterial.conditionbuilder.QueryBuilders;
+import net.tiklab.matflow.definition.model.Pipeline;
 import net.tiklab.matflow.execute.entity.PipelineExecHistoryEntity;
 import net.tiklab.matflow.execute.model.PipelineHistoryQuery;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -123,6 +124,30 @@ public class PipelineExecHistoryDao {
         JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
         return  jdbcTemplate.query(sql, new BeanPropertyRowMapper(PipelineExecHistoryEntity.class));
     }
+
+
+    /**
+     * 查询用户命令所有流水线历史
+     * @param list 所有流水线
+     * @return 历史
+     */
+    public List<PipelineExecHistoryEntity> findUserAllHistory(List<Pipeline> list){
+        String sql = "select pip_pipeline_history.* from pip_pipeline_history  ";
+
+        String pipelineId = list.get(0).getId();
+        sql = sql.concat(" where pip_pipeline_history.pipeline_id   = '"+ pipelineId +"' ");
+
+        for (int i = 1; i < list.size(); i++) {
+            String id = list.get(i).getId();
+            sql = sql.concat(" or pip_pipeline_history.pipeline_id   = '"+ id +"' ");
+        }
+        JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
+        return  jdbcTemplate.query(sql, new BeanPropertyRowMapper(PipelineExecHistoryEntity.class));
+
+    }
+
+
+
 
     /**
      * 获取最近成功的历史信息

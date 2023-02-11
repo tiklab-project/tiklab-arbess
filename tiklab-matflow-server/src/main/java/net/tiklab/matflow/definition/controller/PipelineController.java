@@ -5,6 +5,7 @@ import net.tiklab.matflow.definition.model.Pipeline;
 import net.tiklab.matflow.definition.model.PipelineExecMessage;
 import net.tiklab.matflow.definition.service.PipelineRelationServer;
 import net.tiklab.matflow.definition.service.PipelineService;
+import net.tiklab.matflow.execute.model.PipelineExecHistory;
 import net.tiklab.matflow.execute.model.PipelineOverview;
 import net.tiklab.matflow.orther.model.PipelineFollow;
 import net.tiklab.matflow.orther.model.PipelineOpen;
@@ -162,6 +163,13 @@ public class PipelineController {
     public Result<Void>  updateFollow( @RequestBody @Valid @NotNull PipelineFollow pipelineFollow){
          relationServer.updateFollow(pipelineFollow);
         return Result.ok();
+    }
+
+    @RequestMapping(path="/findUserAllHistory",method = RequestMethod.POST)
+    @ApiMethod(name = "findUserAllHistory",desc = "更新收藏")
+    public Result< List<PipelineExecHistory>>  findUserAllHistory( ){
+        List<PipelineExecHistory> userAllHistory = pipelineService.findUserAllHistory();
+        return Result.ok(userAllHistory);
     }
 
 }

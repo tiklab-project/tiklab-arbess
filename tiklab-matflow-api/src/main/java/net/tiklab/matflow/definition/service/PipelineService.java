@@ -7,6 +7,7 @@ import net.tiklab.join.annotation.FindOne;
 import net.tiklab.join.annotation.JoinProvider;
 import net.tiklab.matflow.definition.model.Pipeline;
 import net.tiklab.matflow.definition.model.PipelineExecMessage;
+import net.tiklab.matflow.execute.model.PipelineExecHistory;
 import net.tiklab.matflow.orther.model.PipelineOpen;
 
 import javax.validation.Valid;
@@ -92,6 +93,14 @@ public interface PipelineService {
      * @return 流水线
      */
     List<PipelineOpen> findAllOpen(int number);
+
+
+
+    /**
+     * 查询用户所有流水线历史
+     * @return 历史
+     */
+    List<PipelineExecHistory> findUserAllHistory();
 
 
 

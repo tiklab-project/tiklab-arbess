@@ -2,6 +2,7 @@ package net.tiklab.matflow.definition.service;
 
 import net.tiklab.matflow.definition.model.Pipeline;
 import net.tiklab.matflow.definition.model.PipelineExecMessage;
+import net.tiklab.matflow.execute.model.PipelineExecHistory;
 import net.tiklab.matflow.execute.model.PipelineOverview;
 import net.tiklab.matflow.orther.model.PipelineFollow;
 import net.tiklab.matflow.orther.model.PipelineOpen;
@@ -89,6 +90,15 @@ public interface PipelineRelationServer {
      * @return 最近打开的流水线列表
      */
     List<PipelineOpen> findAllOpen(StringBuilder s,int number);
+
+
+
+    /**
+     * 查询用户所有历史
+     * @param pipelineList 流水线
+     * @return 历史
+     */
+    List<PipelineExecHistory> findUserAllHistory(List<Pipeline> pipelineList);
 
 
 

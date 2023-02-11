@@ -223,7 +223,6 @@ public class PipelineRelationServerImpl implements PipelineRelationServer{
     }
 
 
-
     /**
      * 流水线执行信息统计
      * @param pipelineId 流水线id
@@ -291,6 +290,32 @@ public class PipelineRelationServerImpl implements PipelineRelationServer{
         }
         return pipelineOpens;
     }
+
+
+    /**
+     * 查询用户所有历史
+     * @param pipelineList 流水线
+     * @return 历史
+     */
+    @Override
+    public List<PipelineExecHistory> findUserAllHistory(List<Pipeline> pipelineList){
+        List<PipelineExecHistory> list = new ArrayList<>();
+        for (Pipeline pipeline : pipelineList) {
+            String id = pipeline.getId();
+            List<PipelineExecHistory> allHistory = historyService.findAllHistory(id);
+            if (allHistory.isEmpty()){
+                continue;
+            }
+            list.addAll(allHistory);
+        }
+        list.sort(Comparator.comparing(PipelineExecHistory::getRunStatus).reversed());
+        joinTemplate.joinQuery(list);
+        return list;
+    }
+
+
+
+
 
 
 }

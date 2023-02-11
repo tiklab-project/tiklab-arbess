@@ -117,6 +117,19 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
         return allHistory;
     }
 
+    //查询用户所有流水线历史
+    @Override
+    public List<PipelineExecHistory> findUserAllHistory(List<Pipeline> list){
+        List<PipelineExecHistoryEntity> userAllHistory = pipelineExecHistoryDao.findUserAllHistory(list);
+
+        if (userAllHistory.isEmpty()){
+            return Collections.emptyList();
+        }
+        List<PipelineExecHistory> execHistories = BeanMapper.mapList(userAllHistory, PipelineExecHistory.class);
+
+        return execHistories;
+    }
+
     //查询最近一次执行历史
     @Override
     public PipelineExecHistory findLatelyHistory(String pipelineId){
@@ -233,7 +246,6 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
                         PipelineRunLog runLogs =  initLog(log);
                         logs.add(runLogs);
                     }
-
                     PipelineRunLog pipelineRunLog = initRunLog(logs, pipelineStages);
                     logList.add(pipelineRunLog);
                 }
