@@ -2,6 +2,9 @@ package net.tiklab.matflow.orther.until;
 
 public class PipelineFinal {
 
+    /**
+     * 项目名称
+     */
     public static final String appName = "matflow";
 
     public static final String UTF_8 = "UTF-8";
@@ -13,6 +16,8 @@ public class PipelineFinal {
     public static final int PIPELINE_RUN_ERROR=1;
 
     public static final int PIPELINE_RUN_HALT=20;
+
+    public static final int PIPELINE_RUN=30;
 
     //消息类型
     public static final String MES_PIPELINE_RUN = "MES_PIPELINE_RUN"; //流水线运行消息

@@ -15,7 +15,12 @@ public interface PipelineExecService {
     boolean  start(String pipelineId,int startWAy);
 
 
-    PipelineRunLog findRunState(String pipelineId);
+    /**
+     * 查询流水线运行状态
+     * @param pipelineId 流水线id
+     * @return 运行状态
+     */
+    PipelineRunLog pipelineRunStatus(String pipelineId);
 
     /**
      * 判断运行状态

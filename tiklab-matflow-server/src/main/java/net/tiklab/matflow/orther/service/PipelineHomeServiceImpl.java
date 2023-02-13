@@ -17,7 +17,6 @@ import net.tiklab.message.message.service.SendMessageNoticeService;
 import net.tiklab.message.message.service.SingleSendMessageService;
 import net.tiklab.message.setting.model.MessageType;
 import net.tiklab.message.sms.modal.Sms;
-import net.tiklab.message.sms.service.SmsSignCfgService;
 import net.tiklab.message.webhook.modal.WebHook;
 import net.tiklab.message.webhook.modal.WebHookQuery;
 import net.tiklab.message.webhook.service.WebHookService;
@@ -48,8 +47,8 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
     @Autowired
     private LoggingByTemplService logService;
 
-    @Autowired
-    private SmsSignCfgService smsSignCfgService;
+    // @Autowired
+    // private SmsSignCfgService smsSignCfgService;
 
     @Autowired
     private SendMessageNoticeService dispatchNoticeService;
@@ -245,11 +244,11 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
         JSONObject jsonObject = new JSONObject();
         jsonObject.putAll(stringMap);
         sms.setTemplateParam(jsonObject);
-        try {
-            smsSignCfgService.generalSms(sms);
-        } catch (Exception e) {
-            throw new ApplicationException("消息发送失败:"+e.getMessage());
-        }
+        // try {
+        //     smsSignCfgService.generalSms(sms);
+        // } catch (Exception e) {
+        //     throw new ApplicationException("消息发送失败:"+e.getMessage());
+        // }
     }
 
 

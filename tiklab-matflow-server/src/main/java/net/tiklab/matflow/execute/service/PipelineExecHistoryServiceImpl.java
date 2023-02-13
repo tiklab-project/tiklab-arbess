@@ -119,15 +119,12 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
 
     //查询用户所有流水线历史
     @Override
-    public List<PipelineExecHistory> findUserAllHistory(List<Pipeline> list){
-        List<PipelineExecHistoryEntity> userAllHistory = pipelineExecHistoryDao.findUserAllHistory(list);
+    public Pagination<PipelineExecHistory> findUserAllHistory(PipelineAllHistoryQuery pipelineHistoryQuery){
+        Pagination<PipelineExecHistoryEntity> pagination = pipelineExecHistoryDao.findAllPageHistory(pipelineHistoryQuery);
+        List<PipelineExecHistory> pipelineExecHistories = BeanMapper.mapList(pagination.getDataList(), PipelineExecHistory.class);
+        joinTemplate.joinQuery(pipelineExecHistories);
+        return PaginationBuilder.build(pagination,pipelineExecHistories);
 
-        if (userAllHistory.isEmpty()){
-            return Collections.emptyList();
-        }
-        List<PipelineExecHistory> execHistories = BeanMapper.mapList(userAllHistory, PipelineExecHistory.class);
-
-        return execHistories;
     }
 
     //查询最近一次执行历史
@@ -149,7 +146,9 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
      */
     @Override
     public PipelineExecHistory findLastHistory(String pipelineId){
+
         List<PipelineExecHistoryEntity> latelySuccess = pipelineExecHistoryDao.findLastHistory(pipelineId);
+
         List<PipelineExecHistory> pipelineExecHistories = BeanMapper.mapList(latelySuccess, PipelineExecHistory.class);
         if (pipelineExecHistories.size() == 0){
             return null;

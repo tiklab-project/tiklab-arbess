@@ -180,7 +180,7 @@ public class PipelineExecCommonServiceImpl implements PipelineExecCommonService 
 
         execHistory.setRunTime(integer+1);
         //更新状态
-        execHistory.setFindState(1);
+        // execHistory.setFindState(1);
         execHistory.setRunStatus(status);
         historyService.updateHistory(execHistory);
 
@@ -225,8 +225,11 @@ public class PipelineExecCommonServiceImpl implements PipelineExecCommonService 
     public PipelineExecHistory initializeHistory(String pipelineId ,int startWAy) {
         String loginId = LoginContext.getLoginId();
         String date = PipelineUntil.date(1);
+
         PipelineExecHistory pipelineExecHistory = new PipelineExecHistory(date,startWAy,loginId,pipelineId);
+        pipelineExecHistory.setRunStatus(30);
         String historyId = historyService.createHistory(pipelineExecHistory);
+
         //初始化基本信息
         pipelineExecHistory.setSort(1);
         pipelineExecHistory.setHistoryId(historyId);
@@ -236,9 +239,8 @@ public class PipelineExecCommonServiceImpl implements PipelineExecCommonService 
         pipelineExecHistory.setFindNumber(1);
         if (latelyHistory != null){
             int findNumber = latelyHistory.getFindNumber();
-            pipelineExecHistory.setFindNumber(findNumber+1);
+            pipelineExecHistory.setFindNumber( findNumber + 1);
         }
-
         historyService.updateHistory(pipelineExecHistory);
         return pipelineExecHistory;
     }

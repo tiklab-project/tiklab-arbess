@@ -396,10 +396,9 @@ public class PipelineExecServiceImpl implements PipelineExecService {
 
         boolean b = taskExecService.beginCourseState(pipelineProcess, configId, taskType, new HashMap<>());
 
-        List<PipelinePost> allPost = postServer.findAllPost(configId);
-
-        Boolean variableCond = commonService.variableCond(pipeline.getId(), configId);
         //任务存在后置任务并且条件满足
+        List<PipelinePost> allPost = postServer.findAllPost(configId);
+        Boolean variableCond = commonService.variableCond(pipeline.getId(), configId);
         if (allPost.size() != 0 && variableCond){
             for (PipelinePost post : allPost) {
                 commonService.updateExecLog(pipelineProcess,PipelineUntil.date(4)+"后置任务:"+post.getName());
@@ -435,7 +434,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
      * @return 运行状态
      */
     @Override
-    public PipelineRunLog findRunState(String pipelineId){
+    public PipelineRunLog pipelineRunStatus(String pipelineId){
 
         String execHistoryId = historyMap.get(pipelineId);
 

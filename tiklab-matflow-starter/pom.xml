@@ -20,12 +20,6 @@
         <dependency>
             <groupId>net.tiklab</groupId>
             <artifactId>tiklab-eam-spring-boot-starter</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.aliyun</groupId>
-                    <artifactId>dysmsapi20170525</artifactId>
-                </exclusion>
-            </exclusions>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -36,12 +30,6 @@
         <dependency>
             <groupId>net.tiklab</groupId>
             <artifactId>tiklab-message-spring-boot-starter</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.aliyun</groupId>
-                    <artifactId>dysmsapi20170525</artifactId>
-                </exclusion>
-            </exclusions>
             <version>${project.version}</version>
         </dependency>
         <dependency>

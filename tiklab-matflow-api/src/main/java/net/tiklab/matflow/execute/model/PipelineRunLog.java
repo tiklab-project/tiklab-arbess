@@ -2,6 +2,9 @@ package net.tiklab.matflow.execute.model;
 
 import java.util.List;
 
+/**
+ * 流水线运行状态
+ */
 public class PipelineRunLog {
 
     private String id;

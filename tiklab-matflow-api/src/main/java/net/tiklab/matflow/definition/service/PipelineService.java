@@ -1,12 +1,14 @@
 package net.tiklab.matflow.definition.service;
 
 
+import net.tiklab.core.page.Pagination;
 import net.tiklab.join.annotation.FindAll;
 import net.tiklab.join.annotation.FindList;
 import net.tiklab.join.annotation.FindOne;
 import net.tiklab.join.annotation.JoinProvider;
 import net.tiklab.matflow.definition.model.Pipeline;
 import net.tiklab.matflow.definition.model.PipelineExecMessage;
+import net.tiklab.matflow.execute.model.PipelineAllHistoryQuery;
 import net.tiklab.matflow.execute.model.PipelineExecHistory;
 import net.tiklab.matflow.orther.model.PipelineOpen;
 
@@ -100,7 +102,7 @@ public interface PipelineService {
      * 查询用户所有流水线历史
      * @return 历史
      */
-    List<PipelineExecHistory> findUserAllHistory();
+    Pagination<PipelineExecHistory> findUserAllHistory(PipelineAllHistoryQuery pipelineHistoryQuery);
 
 
 

@@ -36,7 +36,7 @@ public class PipelineExecController {
     @ApiMethod(name = "pipelineRunStatus",desc = "执行")
     @ApiParam(name = "pipelineId",desc = "流水线id",required = true)
     public Result<PipelineRunLog> pipelineRunStatus(String pipelineId)  {
-        PipelineRunLog runState = pipelineExecService.findRunState(pipelineId);
+        PipelineRunLog runState = pipelineExecService.pipelineRunStatus(pipelineId);
         return Result.ok(runState);
     }
 

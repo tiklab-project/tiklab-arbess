@@ -15,7 +15,7 @@ create table pip_pipeline_history  (
     history_id varchar(255) COMMENT 'id',
     create_time datetime COMMENT '创建时间',
     run_way int  COMMENT '构建方式',
-    run_status int  COMMENT '执行状态',
+    run_status int  COMMENT '执行状态 1:失败 10:成功 20: 停止',
     run_time int  COMMENT '执行时间',
     user_id varchar(255)  COMMENT '执行人',
     run_log longtext COMMENT '日志',

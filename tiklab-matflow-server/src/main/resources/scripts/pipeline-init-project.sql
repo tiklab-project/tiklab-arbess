@@ -19,10 +19,13 @@ INSERT INTO `pcs_prc_dm_role` (`id`, `domain_id`, `role_id`, `business_type`) VA
 INSERT INTO `pcs_prc_dm_role` (`id`, `domain_id`, `role_id`, `business_type`) VALUES ('c33bb5694058082277d4cee24fd3d98d', '3847d6abea9c7853c6a47b093432c30a', '3f22e1a0ff00ae98132fe5d2fe5d0d5d', 1);
 INSERT INTO `pcs_prc_dm_role` (`id`, `domain_id`, `role_id`, `business_type`) VALUES ('e719de1541483f0f8a67bfd6fe0179a7', '16065924e37d72b5364c66451386d79d', 'ae28429ef243647b0c07cd113ef3393c', 0);
 
-INSERT INTO `pcs_ucc_dm_user` (`id`, `domain_id`, `tag_value`, `type`,tag) VALUES ('3eedd5b221aa1c66c207116599244fc0', '3847d6abea9c7853c6a47b093432c30a', '2', 1,1);
-INSERT INTO `pcs_ucc_dm_user` (`id`, `domain_id`, `tag_value`, `type`,tag) VALUES ('e5f0d6a0b33107be61e48b486268fde6', '16065924e37d72b5364c66451386d79d', '2', 1,1);
+
+INSERT INTO `pcs_ucc_dm_user` (`id`, `domain_id`, `user_id`, type) VALUES ('3eedd5b221aa1c66c207116599244fc0', '3847d6abea9c7853c6a47b093432c30a', '111111', 1);
+INSERT INTO `pcs_ucc_dm_user` (`id`, `domain_id`, `user_id`, type) VALUES ('e5f0d6a0b33107be61e48b486268fde6', '16065924e37d72b5364c66451386d79d', '111111', 1);
 
 
+INSERT INTO `pcs_prc_dm_role_user` (id, dmRole_id, domain_id, user_id) VALUES ('asd5dc9765636764bbc9234d9e4767','2eb55dc9765636764bbc9234d9e478ab','16065924e37d72b5364c66451386d79d','111111');
+INSERT INTO `pcs_prc_dm_role_user` (id, dmRole_id, domain_id, user_id) VALUES ('34435s694058082277d4cee24fd3gfh','c33bb5694058082277d4cee24fd3d98d','3847d6abea9c7853c6a47b093432c30a','111111');
 
 
 

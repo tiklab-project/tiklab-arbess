@@ -6,7 +6,6 @@ import net.tiklab.join.annotation.FindAll;
 import net.tiklab.join.annotation.FindList;
 import net.tiklab.join.annotation.FindOne;
 import net.tiklab.join.annotation.JoinProvider;
-import net.tiklab.matflow.definition.model.Pipeline;
 import net.tiklab.matflow.execute.model.*;
 
 import javax.validation.Valid;
@@ -92,7 +91,12 @@ public interface PipelineExecHistoryService {
     List<PipelineExecHistory> findAllHistory(String pipelineId);
 
 
-    List<PipelineExecHistory> findUserAllHistory(List<Pipeline> list);
+    /**
+     * 所有历史分页
+     * @param pipelineHistoryQuery 历史
+     * @return 历史
+     */
+    Pagination<PipelineExecHistory> findUserAllHistory(PipelineAllHistoryQuery pipelineHistoryQuery);
 
     @FindList
     List<PipelineExecHistory> findHistoryList(List<String> idList);

@@ -2,11 +2,13 @@ package net.tiklab.matflow.definition.service;
 
 import net.tiklab.beans.BeanMapper;
 import net.tiklab.core.exception.ApplicationException;
+import net.tiklab.core.page.Pagination;
 import net.tiklab.join.JoinTemplate;
 import net.tiklab.matflow.definition.dao.PipelineDao;
 import net.tiklab.matflow.definition.entity.PipelineEntity;
 import net.tiklab.matflow.definition.model.Pipeline;
 import net.tiklab.matflow.definition.model.PipelineExecMessage;
+import net.tiklab.matflow.execute.model.PipelineAllHistoryQuery;
 import net.tiklab.matflow.execute.model.PipelineExecHistory;
 import net.tiklab.matflow.orther.model.PipelineOpen;
 import net.tiklab.matflow.orther.service.PipelineHomeService;
@@ -71,7 +73,6 @@ public class PipelineServiceImpl implements PipelineService {
         joinTemplate.joinQuery(pipeline);
         pipeline.setId(pipelineId);
         HashMap<String,Object> map = homeService.initMap(pipeline);
-
 
         //创建对应流水线模板
         configServer.createTemplate(pipeline);
@@ -298,13 +299,16 @@ public class PipelineServiceImpl implements PipelineService {
      * @return 历史
      */
     @Override
-    public List<PipelineExecHistory> findUserAllHistory(){
+    public Pagination<PipelineExecHistory> findUserAllHistory(PipelineAllHistoryQuery pipelineHistoryQuery){
         String id = LoginContext.getLoginId();
         List<Pipeline> allPipeline = findAllPipeline(id);
         if (allPipeline.isEmpty()){
-            return Collections.emptyList();
+            return null;
         }
-        return relationServer.findUserAllHistory(allPipeline);
+        if (!PipelineUntil.isNoNull(pipelineHistoryQuery.getPipelineId())){
+            pipelineHistoryQuery.setPipelineList(allPipeline);
+        }
+        return relationServer.findUserAllHistory(pipelineHistoryQuery);
     }
 
 

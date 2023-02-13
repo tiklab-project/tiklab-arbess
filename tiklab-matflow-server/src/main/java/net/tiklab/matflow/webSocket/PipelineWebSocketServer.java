@@ -81,7 +81,7 @@ public class PipelineWebSocketServer implements WebSocketHandler {
             session.sendMessage(message);
             return;
         }
-        PipelineRunLog runList = pipelineExecService.findRunState(msg);
+        PipelineRunLog runList = pipelineExecService.pipelineRunStatus(msg);
         params.put("data", Objects.requireNonNullElse(runList, 0));
         session.sendMessage(new TextMessage(params.toString()));
     }

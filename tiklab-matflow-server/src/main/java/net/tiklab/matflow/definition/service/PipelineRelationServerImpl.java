@@ -1,8 +1,10 @@
 package net.tiklab.matflow.definition.service;
 
+import net.tiklab.core.page.Pagination;
 import net.tiklab.join.JoinTemplate;
 import net.tiklab.matflow.definition.model.Pipeline;
 import net.tiklab.matflow.definition.model.PipelineExecMessage;
+import net.tiklab.matflow.execute.model.PipelineAllHistoryQuery;
 import net.tiklab.matflow.execute.model.PipelineExecHistory;
 import net.tiklab.matflow.execute.model.PipelineOverview;
 import net.tiklab.matflow.execute.service.PipelineExecHistoryService;
@@ -13,11 +15,11 @@ import net.tiklab.matflow.orther.service.PipelineOpenService;
 import net.tiklab.matflow.orther.until.PipelineFinal;
 import net.tiklab.matflow.orther.until.PipelineUntil;
 import net.tiklab.privilege.role.model.PatchUser;
-import net.tiklab.privilege.role.service.DmRoleService;
+import net.tiklab.privilege.roleDmRole.service.DmRoleService;
 import net.tiklab.rpc.annotation.Exporter;
-import net.tiklab.user.user.model.DmUser;
+import net.tiklab.user.dmUser.model.DmUser;
+import net.tiklab.user.dmUser.service.DmUserService;
 import net.tiklab.user.user.model.User;
-import net.tiklab.user.user.service.DmUserService;
 import net.tiklab.utils.context.LoginContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -189,23 +191,24 @@ public class PipelineRelationServerImpl implements PipelineRelationServer{
         //拉入创建人
         DmUser dmUser = new DmUser();
         dmUser.setDomainId(pipelineId);
-
+        User user = new User();
         if (userList == null){
-            dmUser.setTagValue(LoginContext.getLoginId());
-            dmUser.setTag(0);
+            user.setId(LoginContext.getLoginId());
+            dmUser.setUser(user);
             dmUser.setType(1);
-            dmUserService.createDmUser(dmUser);
+            dmRoleService.initDmRoles(pipelineId,LoginContext.getLoginId(),PipelineFinal.appName);
             return;
         }
 
+        //多个用户
         for (PatchUser patchUser : userList) {
             dmUser.setType(0);
-            dmUser.setTagValue(patchUser.getId());
+            user.setId(patchUser.getId());
+            dmUser.setUser(user);
             if (patchUser.getId().equals(LoginContext.getLoginId())){
                 dmUser.setType(1);
             }
-            dmUser.setTag(0);
-            dmUserService.createDmUser(dmUser);
+            // dmUserService.createDmUser(dmUser);
         }
 
         //关联权限
@@ -294,23 +297,14 @@ public class PipelineRelationServerImpl implements PipelineRelationServer{
 
     /**
      * 查询用户所有历史
-     * @param pipelineList 流水线
+     * @param pipelineHistoryQuery 流水线
      * @return 历史
      */
     @Override
-    public List<PipelineExecHistory> findUserAllHistory(List<Pipeline> pipelineList){
-        List<PipelineExecHistory> list = new ArrayList<>();
-        for (Pipeline pipeline : pipelineList) {
-            String id = pipeline.getId();
-            List<PipelineExecHistory> allHistory = historyService.findAllHistory(id);
-            if (allHistory.isEmpty()){
-                continue;
-            }
-            list.addAll(allHistory);
-        }
-        list.sort(Comparator.comparing(PipelineExecHistory::getRunStatus).reversed());
-        joinTemplate.joinQuery(list);
-        return list;
+    public Pagination<PipelineExecHistory> findUserAllHistory(PipelineAllHistoryQuery pipelineHistoryQuery){
+
+        return  historyService.findUserAllHistory(pipelineHistoryQuery);
+
     }
 
 

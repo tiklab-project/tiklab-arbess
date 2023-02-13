@@ -46,11 +46,11 @@ public class PipelineExecHistoryEntity {
     private String pipelineId;
 
     //判断是否正在执行
-    @Column(name = "find_state",notNull = true)
+    @Column(name = "find_state", notNull = true)
     private int findState;
 
     //构建次数
-    @Column(name = "find_number",notNull = true)
+    @Column(name = "find_number", notNull = true)
     private int findNumber;
 
     public String getHistoryId() {

@@ -1,10 +1,12 @@
 package net.tiklab.matflow.definition.controller;
 
 import net.tiklab.core.Result;
+import net.tiklab.core.page.Pagination;
 import net.tiklab.matflow.definition.model.Pipeline;
 import net.tiklab.matflow.definition.model.PipelineExecMessage;
 import net.tiklab.matflow.definition.service.PipelineRelationServer;
 import net.tiklab.matflow.definition.service.PipelineService;
+import net.tiklab.matflow.execute.model.PipelineAllHistoryQuery;
 import net.tiklab.matflow.execute.model.PipelineExecHistory;
 import net.tiklab.matflow.execute.model.PipelineOverview;
 import net.tiklab.matflow.orther.model.PipelineFollow;
@@ -166,9 +168,10 @@ public class PipelineController {
     }
 
     @RequestMapping(path="/findUserAllHistory",method = RequestMethod.POST)
-    @ApiMethod(name = "findUserAllHistory",desc = "更新收藏")
-    public Result< List<PipelineExecHistory>>  findUserAllHistory( ){
-        List<PipelineExecHistory> userAllHistory = pipelineService.findUserAllHistory();
+    @ApiMethod(name = "findUserAllHistory",desc = "分页")
+    @ApiParam(name = "pipelineHistoryQuery",desc = "分页信息",required = true)
+    public Result<Pagination<PipelineExecHistory>>  findUserAllHistory( @RequestBody @Valid @NotNull PipelineAllHistoryQuery pipelineHistoryQuery){
+        Pagination<PipelineExecHistory> userAllHistory = pipelineService.findUserAllHistory(pipelineHistoryQuery);
         return Result.ok(userAllHistory);
     }
 
