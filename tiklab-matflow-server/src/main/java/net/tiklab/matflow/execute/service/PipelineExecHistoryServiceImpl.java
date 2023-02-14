@@ -127,6 +127,17 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
 
     }
 
+    //查询用户所有正在运行的流水线
+    @Override
+    public Pagination<PipelineExecHistory> findUserRunPageHistory(PipelineAllHistoryQuery pipelineHistoryQuery){
+        Pagination<PipelineExecHistoryEntity> pagination = pipelineExecHistoryDao.findUserRunPageHistory(pipelineHistoryQuery);
+        List<PipelineExecHistory> pipelineExecHistories = BeanMapper.mapList(pagination.getDataList(), PipelineExecHistory.class);
+        joinTemplate.joinQuery(pipelineExecHistories);
+        return PaginationBuilder.build(pagination,pipelineExecHistories);
+    }
+
+
+
     //查询最近一次执行历史
     @Override
     public PipelineExecHistory findLatelyHistory(String pipelineId){

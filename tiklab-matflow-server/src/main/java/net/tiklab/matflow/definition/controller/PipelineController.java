@@ -111,7 +111,7 @@ public class PipelineController {
     @ApiParam(name = "userId",desc = "用户id",required = true)
     public Result<List<PipelineExecMessage>> findUserPipeline(@NotNull String userId){
 
-        List<PipelineExecMessage> userPipeline = pipelineService.findUserPipeline(userId);
+        List<PipelineExecMessage> userPipeline = pipelineService.findUserPipelineExecMessage(userId);
 
         return Result.ok(userPipeline);
     }

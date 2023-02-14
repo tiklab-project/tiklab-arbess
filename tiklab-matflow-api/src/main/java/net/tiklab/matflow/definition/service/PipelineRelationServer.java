@@ -25,7 +25,6 @@ public interface PipelineRelationServer {
      */
     void deleteHistory(Pipeline pipeline);
 
-
     /**
      * 更新收藏信息
      * @param pipelineFollow 信息
@@ -33,12 +32,11 @@ public interface PipelineRelationServer {
     void updateFollow(PipelineFollow pipelineFollow);
 
     /**
-     * 获取流水线状态
+     * 查询流水线最近构建信息
      * @param allPipeline 流水线
-     * @return 流水线状态
+     * @return 构建信息
      */
-    List<PipelineExecMessage> findAllStatus(List<Pipeline> allPipeline);
-
+    List<PipelineExecMessage> findAllExecMessage(List<Pipeline> allPipeline);
 
     /**
      * 获取用户名下的流水线
@@ -54,20 +52,17 @@ public interface PipelineRelationServer {
      */
     List<User>  findPipelineUser(String pipelineId);
 
-
     /**
      * 创建流水线关联角色信息
      * @param pipelineId 流水线id
      */
     void createDmUser(String pipelineId,List<PatchUser> userList);
 
-
     /**
      * 删除关联用户
      * @param pipelineId 流水线id
      */
     void deleteDmUser(String pipelineId);
-
 
     /**
      * 流水线执行信息统计
@@ -76,14 +71,12 @@ public interface PipelineRelationServer {
      */
     PipelineOverview pipelineCensus(String pipelineId);
 
-
     /**
      * 最近打开
      * @param pipelineId 流水线id
      * @return 统计信息
      */
     PipelineOverview census(String pipelineId);
-
 
     /**
      * 查询最近打开的流水线
@@ -92,7 +85,6 @@ public interface PipelineRelationServer {
      * @return 最近打开的流水线列表
      */
     List<PipelineOpen> findAllOpen(StringBuilder s,int number);
-
 
 
     /**

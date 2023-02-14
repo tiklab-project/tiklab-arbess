@@ -98,6 +98,14 @@ public interface PipelineExecHistoryService {
      */
     Pagination<PipelineExecHistory> findUserAllHistory(PipelineAllHistoryQuery pipelineHistoryQuery);
 
+
+    /**
+     * 查询用户所有正在运行的流水线
+     * @param pipelineHistoryQuery 分页条件
+     * @return 历史
+     */
+    Pagination<PipelineExecHistory> findUserRunPageHistory(PipelineAllHistoryQuery pipelineHistoryQuery);
+
     @FindList
     List<PipelineExecHistory> findHistoryList(List<String> idList);
 

@@ -203,7 +203,8 @@ public class PipelineServiceImpl implements PipelineService {
      * @param userId 用户id
      * @return 流水线
      */
-    public List<Pipeline> findAllPipeline(String userId){
+    @Override
+    public List<Pipeline> findUserPipeline(String userId){
         StringBuilder userPipelineId = findUserPipelineId(userId);
         List<PipelineEntity> userPipeline = pipelineDao.findUserPipeline(userPipelineId);
         if (userPipeline != null){
@@ -214,14 +215,14 @@ public class PipelineServiceImpl implements PipelineService {
 
     //所有的流水线状态
     @Override
-    public List<PipelineExecMessage> findUserPipeline(String userId){
+    public List<PipelineExecMessage> findUserPipelineExecMessage(String userId){
         StringBuilder builder = findUserPipelineId(userId);
         if (builder.toString().equals("")){
             return Collections.emptyList();
         }
         List<PipelineEntity> pipelineNotFollowEntity = pipelineDao.findPipelineNotFollow(userId,builder);
         List<Pipeline> pipelineNotFollow = BeanMapper.mapList(pipelineNotFollowEntity, Pipeline.class);
-        List<PipelineExecMessage> allStatus = relationServer.findAllStatus(pipelineNotFollow);
+        List<PipelineExecMessage> allStatus = relationServer.findAllExecMessage(pipelineNotFollow);
         joinTemplate.joinQuery(allStatus);
         List<PipelineExecMessage> userFollowPipeline = findUserFollowPipeline(userId);
         allStatus.addAll(userFollowPipeline);
@@ -246,7 +247,7 @@ public class PipelineServiceImpl implements PipelineService {
         pipelineFollow.forEach(pipeline -> pipeline.setCollect(1));
         //排序
         pipelineFollow.sort(Comparator.comparing(Pipeline::getName));
-        List<PipelineExecMessage> allStatus = relationServer.findAllStatus(pipelineFollow);
+        List<PipelineExecMessage> allStatus = relationServer.findAllExecMessage(pipelineFollow);
         joinTemplate.joinQuery(allStatus);
         return allStatus;
     }
@@ -277,7 +278,7 @@ public class PipelineServiceImpl implements PipelineService {
         if (pipelines.isEmpty()){
             return Collections.emptyList();
         }
-        return relationServer.findAllStatus(pipelines);
+        return relationServer.findAllExecMessage(pipelines);
     }
 
     /**
@@ -293,7 +294,6 @@ public class PipelineServiceImpl implements PipelineService {
         return relationServer.findAllOpen(s,number);
     }
 
-
     /**
      * 查询用户所有流水线历史
      * @return 历史
@@ -301,7 +301,7 @@ public class PipelineServiceImpl implements PipelineService {
     @Override
     public Pagination<PipelineExecHistory> findUserAllHistory(PipelineAllHistoryQuery pipelineHistoryQuery){
         String id = LoginContext.getLoginId();
-        List<Pipeline> allPipeline = findAllPipeline(id);
+        List<Pipeline> allPipeline = findUserPipeline(id);
         if (allPipeline.isEmpty()){
             return null;
         }

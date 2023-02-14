@@ -83,39 +83,37 @@ public class PipelineRelationServerImpl implements PipelineRelationServer{
     }
 
 
-    //获取流水线状态集合
+    /**
+     * 查询流水线最近构建信息
+     * @param allPipeline 流水线
+     * @return 构建信息
+     */
     @Override
-    public List<PipelineExecMessage> findAllStatus(List<Pipeline> allPipeline){
+    public List<PipelineExecMessage> findAllExecMessage(List<Pipeline> allPipeline){
         List<PipelineExecMessage> pipelineExecMessageList = new ArrayList<>();
         for (Pipeline pipeline : allPipeline) {
             joinTemplate.joinQuery(pipeline);
-            PipelineExecMessage oneStatus = findOneStatus(pipeline);
-            pipelineExecMessageList.add(oneStatus);
+            PipelineExecMessage pipelineExecMessage = new PipelineExecMessage();
+            //成功和构建时间
+            PipelineExecHistory latelyHistory = historyService.findLatelyHistory(pipeline.getId());
+            pipelineExecMessage.setId(pipeline.getId());
+            pipelineExecMessage.setCollect(pipeline.getCollect());
+            pipelineExecMessage.setName(pipeline.getName());
+            pipelineExecMessage.setState(pipeline.getState());
+            pipelineExecMessage.setColor(pipeline.getColor());
+            pipelineExecMessage.setUser(pipeline.getUser());
+            pipelineExecMessage.setPower(pipeline.getPower());
+            pipelineExecMessage.setType(pipeline.getType());
+            if (latelyHistory != null){
+                pipelineExecMessage.setLastBuildTime(latelyHistory.getCreateTime());
+                pipelineExecMessage.setBuildStatus(latelyHistory.getRunStatus());
+                pipelineExecMessage.setExecUser(latelyHistory.getUser());
+            }
+            pipelineExecMessageList.add(pipelineExecMessage);
         }
         return pipelineExecMessageList;
     }
 
-    //流水线状态
-    private PipelineExecMessage findOneStatus(Pipeline pipeline){
-        PipelineExecMessage pipelineExecMessage = new PipelineExecMessage();
-        //成功和构建时间
-        PipelineExecHistory latelyHistory = historyService.findLatelyHistory(pipeline.getId());
-        pipelineExecMessage.setId(pipeline.getId());
-        pipelineExecMessage.setCollect(pipeline.getCollect());
-        pipelineExecMessage.setName(pipeline.getName());
-        pipelineExecMessage.setState(pipeline.getState());
-        pipelineExecMessage.setCreateTime(pipeline.getCreateTime());
-        pipelineExecMessage.setColor(pipeline.getColor());
-        pipelineExecMessage.setUser(pipeline.getUser());
-        pipelineExecMessage.setPower(pipeline.getPower());
-        pipelineExecMessage.setType(pipeline.getType());
-        if (latelyHistory != null){
-            pipelineExecMessage.setLastBuildTime(latelyHistory.getCreateTime());
-            pipelineExecMessage.setBuildStatus(latelyHistory.getRunStatus());
-            pipelineExecMessage.setExecUser(latelyHistory.getUser());
-        }
-       return pipelineExecMessage;
-    }
 
     /**
      * 拼接数据库查询条件
@@ -208,7 +206,6 @@ public class PipelineRelationServerImpl implements PipelineRelationServer{
             if (patchUser.getId().equals(LoginContext.getLoginId())){
                 dmUser.setType(1);
             }
-            // dmUserService.createDmUser(dmUser);
         }
 
         //关联权限
@@ -224,7 +221,6 @@ public class PipelineRelationServerImpl implements PipelineRelationServer{
     public void deleteDmUser(String pipelineId){
         dmRoleService.deleteDmRoleByDomainId(pipelineId);
     }
-
 
     /**
      * 流水线执行信息统计
@@ -262,13 +258,17 @@ public class PipelineRelationServerImpl implements PipelineRelationServer{
         return state;
     }
 
+    /**
+     * 流水线统计信息
+     * @param pipelineId 流水线id
+     * @return 统计信息
+     */
     public PipelineOverview census(String pipelineId){
         //添加最近打开
         String loginId = LoginContext.getLoginId();
         openService.updatePipelineOpen(loginId,pipelineId);
         return pipelineCensus(pipelineId);
     }
-
 
     /**
      * 查询最近打开的流水线
@@ -302,7 +302,6 @@ public class PipelineRelationServerImpl implements PipelineRelationServer{
      */
     @Override
     public Pagination<PipelineExecHistory> findUserAllHistory(PipelineAllHistoryQuery pipelineHistoryQuery){
-
         return  historyService.findUserAllHistory(pipelineHistoryQuery);
 
     }

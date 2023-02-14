@@ -71,7 +71,14 @@ public interface PipelineService {
      * @param userId 用户id
      * @return 流水线信息
      */
-    List<PipelineExecMessage> findUserPipeline(String userId);
+    List<Pipeline> findUserPipeline(String userId);
+
+    /**
+     * 获取流水线信息
+     * @param userId 用户Id
+     * @return 流水线信息
+     */
+    List<PipelineExecMessage> findUserPipelineExecMessage(String userId);
 
     /**
      * 获取用户收藏的流水线

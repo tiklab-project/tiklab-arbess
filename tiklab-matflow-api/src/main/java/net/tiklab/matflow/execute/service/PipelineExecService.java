@@ -1,5 +1,8 @@
 package net.tiklab.matflow.execute.service;
 
+import net.tiklab.core.page.Pagination;
+import net.tiklab.matflow.execute.model.PipelineAllHistoryQuery;
+import net.tiklab.matflow.execute.model.PipelineExecHistory;
 import net.tiklab.matflow.execute.model.PipelineRunLog;
 
 /**
@@ -20,7 +23,7 @@ public interface PipelineExecService {
      * @param pipelineId 流水线id
      * @return 运行状态
      */
-    PipelineRunLog pipelineRunStatus(String pipelineId);
+    PipelineRunLog findPipelineRunMessage(String pipelineId);
 
     /**
      * 判断运行状态
@@ -36,5 +39,47 @@ public interface PipelineExecService {
     void killInstance(String pipelineId);
 
 
+    /**
+     * 获取正在运行的流水线
+     * @param query 分页
+     * @return 流水线信息
+     */
+    Pagination<PipelineExecHistory> findUserRunPageHistory(PipelineAllHistoryQuery query);
+
+
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

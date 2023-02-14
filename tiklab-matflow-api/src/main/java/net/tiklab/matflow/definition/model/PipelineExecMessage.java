@@ -24,17 +24,11 @@ public class PipelineExecMessage {
     //流水线名称
     private String name;
 
-    //最近成功时间
-    private String lastBuildTime;
-
     //最近构建时间
-    private String lastSuccessTime;
+    private String lastBuildTime;
 
     //运行状态
     private int state;
-
-    //创建时间
-    private String createTime;
 
     //颜色
     private int color;
@@ -91,28 +85,12 @@ public class PipelineExecMessage {
         this.lastBuildTime = lastBuildTime;
     }
 
-    public String getLastSuccessTime() {
-        return lastSuccessTime;
-    }
-
-    public void setLastSuccessTime(String lastSuccessTime) {
-        this.lastSuccessTime = lastSuccessTime;
-    }
-
     public int getState() {
         return state;
     }
 
     public void setState(int state) {
         this.state = state;
-    }
-
-    public String getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(String createTime) {
-        this.createTime = createTime;
     }
 
     public int getColor() {
