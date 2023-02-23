@@ -111,7 +111,6 @@ public class PipelineUntil {
             if (!PipelineUntil.isNoNull(path)){
                 process = runtime.exec(" cmd.exe /c " + " " + order);
             }else {
-                // process = runtime.exec(" cmd.exe /c cd " + path + " &&" + " " + order);
                 process = runtime.exec(" cmd.exe /c " + " " + order,null,new File(path));
             }
         }else {
@@ -377,7 +376,7 @@ public class PipelineUntil {
 
         //不存在这个目录
         if (!file.exists()){
-           throw new ApplicationException("找不到 "+fileAddress+" 这个目录。");
+           throw new ApplicationException("git可执行程序地址错误，找不到 "+fileAddress+" 这个目录。");
         }
         //不是个目录
         if (!file.isDirectory()){
@@ -558,10 +557,9 @@ public class PipelineUntil {
         Path path = Paths.get(fileAddress);
 
         StringBuilder s = new StringBuilder();
-        List<String> lines = null;
+        List<String> lines ;
         try {
             lines = Files.readAllLines(path,StandardCharsets.UTF_8);
-            // lines = Files.readAllLines(path,Charset.forName("GBK"));
             for (int i = Math.max(0, lines.size() - 100); i < lines.size(); i++) {
                 s.append(lines.get(i)).append("\n");
             }

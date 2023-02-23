@@ -7,7 +7,7 @@ import net.tiklab.gateway.starter.EnableGateway;
 import net.tiklab.integration.starter.EnableIntegration;
 import net.tiklab.licence.starter.EnableLicenceServer;
 import net.tiklab.logging.stater.EnableLog;
-import net.tiklab.message.starter.EnableMessage;
+import net.tiklab.messsage.starter.EnableMessage;
 import net.tiklab.mysql.starter.EnableMysql;
 import net.tiklab.pluginx.starter.EnablePluginServer;
 import net.tiklab.privilege.stater.EnablePrivilegeServer;

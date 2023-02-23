@@ -69,7 +69,7 @@ public class ScriptServerImpl implements ScriptServer {
         try {
             for (String s : list) {
                 String key = commonService.variableKey(pipeline.getId(), configId, s);
-                commonService.updateExecLog(pipelineProcess,PipelineUntil.date(4)+ key );
+                commonService.updateExecLog(pipelineProcess,PipelineUntil.date(4)+ "执行："+key );
                 String fileAddress = PipelineUntil.findFileAddress(pipeline.getId(),1);
                 Process process = PipelineUntil.process(fileAddress, key);
                 pipelineProcess.setEnCode(PipelineFinal.UTF_8);

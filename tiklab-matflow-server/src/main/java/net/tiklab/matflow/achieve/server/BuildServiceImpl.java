@@ -61,22 +61,22 @@ public class BuildServiceImpl implements BuildService {
         commonService.updateExecLog(pipelineProcess, PipelineUntil.date(4)+"执行任务："+name);
 
         pipelineBuild.setType(taskType);
+        String buildAddress = pipelineBuild.getBuildAddress();
+        String buildOrder = pipelineBuild.getBuildOrder();
 
         //项目地址
         String path = PipelineUntil.findFileAddress(pipeline.getId(),1);
-
+        int type = pipelineBuild.getType();
         try {
-
             //执行命令
-            List<String> list = PipelineUntil.execOrder(pipelineBuild.getBuildOrder());
+            List<String> list = PipelineUntil.execOrder(buildOrder);
             for (String s : list) {
                 String key = commonService.variableKey(pipeline.getId(), configId, s);
-                commonService.updateExecLog(pipelineProcess,PipelineUntil.date(4)+ key );
-                pipelineProcess.setError(error(pipelineBuild.getType()));
-                Process process = getOrder(key, pipelineBuild, path);
+                commonService.updateExecLog(pipelineProcess, PipelineUntil.date(4)+"执行命令："+ key);
+                pipelineProcess.setError(error(type));
+                Process process = getOrder(key,type,buildAddress, path);
                 commonService.execState(pipelineProcess,process,name);
             }
-
         } catch (IOException | ApplicationException e) {
             String s = PipelineUntil.date(4) + e.getMessage();
             commonService.updateExecLog(pipelineProcess,s);
@@ -88,19 +88,25 @@ public class BuildServiceImpl implements BuildService {
 
     /**
      * 执行build
-     * @param pipelineBuild 执行信息
+     * @param type 任务类型
      * @param path 项目地址
      * @return 执行命令
      */
-    private Process getOrder(String orders,PipelineBuild pipelineBuild,String path) throws ApplicationException, IOException {
-        int type = pipelineBuild.getType();
+    private Process getOrder(String orders,int type,String address,String path) throws ApplicationException, IOException {
+
         String serverAddress = commonService.getScm(type);
+
         if (serverAddress == null) {
-            throw new ApplicationException("不存在maven配置");
+            if (type == 21){
+                throw new ApplicationException("不存在maven配置");
+            }
+            if (type == 22){
+                throw new ApplicationException("不存在npm配置");
+            }
         }
 
-        if(PipelineUntil.isNoNull(pipelineBuild.getBuildAddress())){
-            path = path +"/"+ pipelineBuild.getBuildAddress();
+        if(PipelineUntil.isNoNull(address)){
+            path = path +"/"+ address;
         }
 
         switch (type){
@@ -131,7 +137,11 @@ public class BuildServiceImpl implements BuildService {
         return order;
     }
 
-
+    /**
+     * 错误状态
+     * @param type 任务类型
+     * @return 错误状态
+     */
     private String[] error(int type){
         String[] strings;
         if (type == 21){

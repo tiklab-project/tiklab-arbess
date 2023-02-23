@@ -62,6 +62,12 @@ public class CodeServiceImpl implements CodeService {
         PipelineCode pipelineCode = (PipelineCode) o;
         String name = pipelineCode.getName();
 
+        //替换配置中的变量
+        String key = commonService.variableKey(pipeline.getId(), configId, pipelineCode.getCodeAddress());
+        pipelineCode.setCodeAddress(key);
+        String variableKey = commonService.variableKey(pipeline.getId(), configId, pipelineCode.getCodeBranch());
+        pipelineCode.setCodeBranch(variableKey);
+
         if (!variableCond){
             commonService.updateExecLog(pipelineProcess, PipelineUntil.date(4)+"任务："+ name+"执行条件不满足,跳过执行。");
             return true;
@@ -102,7 +108,7 @@ public class CodeServiceImpl implements CodeService {
 
         commonService.updateExecLog(pipelineProcess,s);
 
-        commonService.updateExecLog(pipelineProcess,PipelineUntil.date(4)+"分配源码空间。" );
+        commonService.updateExecLog(pipelineProcess,PipelineUntil.date(4)+"分配源码空间..." );
 
         try {
             //命令执行失败

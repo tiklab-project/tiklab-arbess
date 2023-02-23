@@ -131,6 +131,7 @@ public interface PipelineExecHistoryService {
      */
     PipelineRunLog findAll(String historyId);
 
+
     Map<String,Object> findTimeState(List<PipelineRunLog> logs);
 
     /**

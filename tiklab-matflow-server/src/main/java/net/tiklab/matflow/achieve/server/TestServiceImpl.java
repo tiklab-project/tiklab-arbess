@@ -42,8 +42,8 @@ public class TestServiceImpl implements TestService {
             o = stagesTaskServer.findOneStagesTasksTask(configId);
         }
         PipelineTest pipelineTest = (PipelineTest) o;
-        String name = pipelineTest.getName();
         Boolean variableCond = commonService.variableCond(pipeline.getId(), configId);
+        String name = pipelineTest.getName();
         if (!variableCond){
             commonService.updateExecLog(pipelineProcess, PipelineUntil.date(4)+"任务："+ name+"执行条件不满足,跳过执行。");
             return true;
@@ -60,7 +60,8 @@ public class TestServiceImpl implements TestService {
 
             List<String> list = PipelineUntil.execOrder(testOrder);
             for (String s : list) {
-                commonService.updateExecLog(pipelineProcess,PipelineUntil.date(4)+s);
+                String key = commonService.variableKey(pipeline.getId(), configId, s);
+                commonService.updateExecLog(pipelineProcess,PipelineUntil.date(4)+"执行："+ key );
                 Process  process = getOrder(pipelineTest,s,path);
                 pipelineProcess.setError(error(pipelineTest.getType()));
                 commonService.execState(pipelineProcess,process,name);

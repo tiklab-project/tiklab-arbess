@@ -13,6 +13,8 @@ import net.tiklab.matflow.setting.model.PipelineAuthHost;
 import net.tiklab.matflow.setting.model.PipelineAuthThird;
 import net.tiklab.matflow.task.model.PipelineProduct;
 import net.tiklab.rpc.annotation.Exporter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -32,6 +34,9 @@ public class ProductServiceImpl implements ProductService {
 
     @Autowired
     PipelineStagesTaskServer stagesTaskServer;
+
+
+    private static final Logger logger = LoggerFactory.getLogger(ProductServiceImpl.class);
 
     /**
      * 推送制品代码
@@ -80,29 +85,38 @@ public class ProductServiceImpl implements ProductService {
                     PipelineUntil.date(4)+"制品地址："+path);
         try {
             if (product.getType() == 51){
+                //替换变量
+                String  artifactId = commonService.variableKey(pipeline.getId(), configId, product.getArtifactId());
+                String  groupId = commonService.variableKey(pipeline.getId(), configId, product.getGroupId());
+                String  version = commonService.variableKey(pipeline.getId(), configId, product.getVersion());
+                String  fileType = commonService.variableKey(pipeline.getId(), configId, product.getFileType());
+                product.setArtifactId(artifactId);
+                product.setGroupId(groupId);
+                product.setVersion(version);
+                product.setFileType(fileType);
 
                 Process process = getProductOrder(product,path);
                 pipelineProcess.setError(error(product.getType()));
                 pipelineProcess.setEnCode("UTF-8");
                 commonService.execState(pipelineProcess,process,name);
                 process.destroy();
-
             }else {
                 commonService.updateExecLog(pipelineProcess, PipelineUntil.date(4)+"连接制品服务器。");
                 Session session = createSession(product);
                 commonService.updateExecLog(pipelineProcess, PipelineUntil.date(4)+"制品服务器连接成功。");
                 String putAddress = product.getPutAddress();
                 commonService.updateExecLog(pipelineProcess, PipelineUntil.date(4)+"开始推送制品。");
-                sshPut(session,path,putAddress);
+
+                //替换变量
+                String key = commonService.variableKey(pipeline.getId(), configId, putAddress);
+                commonService.updateExecLog(pipelineProcess, PipelineUntil.date(4)+"制品推送位置："+key);
+                sshPut(session,path,key);
             }
         } catch (IOException | ApplicationException e) {
             commonService.updateExecLog(pipelineProcess, PipelineUntil.date(4)+"推送制品执行错误\n"+ PipelineUntil.date(4)+e.getMessage());
             return false;
         } catch (JSchException e) {
             commonService.updateExecLog(pipelineProcess, PipelineUntil.date(4)+"无法连接到服务器\n" +PipelineUntil.date(4)+e.getMessage());
-            return false;
-        } catch (SftpException e) {
-            commonService.updateExecLog(pipelineProcess, PipelineUntil.date(4)+"文件发送失败\n"+ PipelineUntil.date(4)+e.getMessage());
             return false;
         }
         commonService.updateExecLog(pipelineProcess, PipelineUntil.date(4)+"推送制品完成");
@@ -137,11 +151,20 @@ public class ProductServiceImpl implements ProductService {
         if (authThird.getAuthType() == 1){
             String id = PipelineFinal.appName;
 
+            String s = System.getProperty("user.dir") + "/" + settingAddress ;
+
+            File file = new File(System.getProperty("user.dir"));
             if (!PipelineUntil.isNoNull(settingAddress)){
+                String parent = file.getParent();
                 settingAddress = "conf/settings.xml";
+                if (!file.getAbsolutePath().endsWith("matflow")){
+                    s = parent +"/"+settingAddress;
+                }
             }
 
-            String s = System.getProperty("user.dir") + "/" + settingAddress ;
+            logger.info("项目地址为："+ System.getProperty("user.dir"));
+            logger.info("模块地址为："+ s);
+
             execOrder = execOrder +
                     " -Dusername="+authThird.getUsername()+
                     " -Dpassword="+authThird.getPassword()+
@@ -153,7 +176,7 @@ public class ProductServiceImpl implements ProductService {
                     " -DrepositoryId="+authThird.getPrivateKey();
         }
 
-        System.out.println("命令为："+execOrder);
+       logger.info("命令为："+execOrder);
 
         order = mavenOrder(execOrder, path);
         return PipelineUntil.process(mavenAddress, order);
@@ -201,17 +224,26 @@ public class ProductServiceImpl implements ProductService {
      * @param localFile 文件
      * @throws JSchException 连接失败
      */
-    private void sshPut(Session session, String localFile, String uploadAddress) throws JSchException, SftpException {
+    private void sshPut(Session session, String localFile, String uploadAddress) throws JSchException {
         ChannelSftp sftp = (ChannelSftp) session.openChannel("sftp");
         sftp.connect();
+
         //判断目录是否存在
         try {
             sftp.lstat(uploadAddress);
         }catch (SftpException e){
-            sftp.mkdir(uploadAddress);
+            try {
+                sftp.mkdir(uploadAddress);
+            } catch (SftpException ex) {
+                throw new ApplicationException("创建文件夹"+uploadAddress+"失败,"+ex);
+            }
         }
         //ChannelSftp.OVERWRITE 覆盖上传
-        sftp.put(localFile,uploadAddress,ChannelSftp.OVERWRITE);
+        try {
+            sftp.put(localFile,uploadAddress,ChannelSftp.OVERWRITE);
+        } catch (SftpException e) {
+            throw new ApplicationException();
+        }
         sftp.disconnect();
     }
 
