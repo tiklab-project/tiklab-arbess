@@ -8,7 +8,6 @@ import net.tiklab.matflow.pipeline.definition.entity.PipelineTasksEntity;
 import net.tiklab.matflow.pipeline.definition.model.PipelineConfig;
 import net.tiklab.matflow.pipeline.definition.model.PipelineTasks;
 import net.tiklab.matflow.support.until.PipelineUntil;
-import net.tiklab.matflow.task.common.service.PipelineTaskCommonService;
 import net.tiklab.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

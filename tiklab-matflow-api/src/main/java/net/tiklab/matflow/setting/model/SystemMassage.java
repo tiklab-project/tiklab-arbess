@@ -1,7 +1,5 @@
 package net.tiklab.matflow.setting.model;
 
-
-
 import net.tiklab.postin.annotation.ApiModel;
 import net.tiklab.postin.annotation.ApiProperty;
 import java.net.InetAddress;

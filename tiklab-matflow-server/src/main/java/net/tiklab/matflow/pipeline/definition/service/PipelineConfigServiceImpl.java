@@ -4,8 +4,8 @@ import net.tiklab.join.JoinTemplate;
 import net.tiklab.matflow.pipeline.definition.model.Pipeline;
 import net.tiklab.matflow.pipeline.definition.model.PipelineConfig;
 import net.tiklab.matflow.pipeline.definition.model.PipelineStages;
-import net.tiklab.matflow.support.post.service.PipelinePostService;
-import net.tiklab.matflow.support.trigger.service.PipelineTriggerService;
+import net.tiklab.matflow.support.post.service.PostService;
+import net.tiklab.matflow.support.trigger.service.TriggerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,10 +25,10 @@ public class PipelineConfigServiceImpl implements PipelineConfigService {
     private PipelineStagesService stagesServer;
 
     @Autowired
-    private PipelinePostService postServer;
+    private PostService postServer;
 
     @Autowired
-    PipelineTriggerService triggerServer;
+    TriggerService triggerServer;
 
     @Autowired
     JoinTemplate joinTemplate;

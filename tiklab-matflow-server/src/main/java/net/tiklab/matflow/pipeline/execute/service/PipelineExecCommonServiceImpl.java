@@ -1,19 +1,19 @@
 package net.tiklab.matflow.pipeline.execute.service;
 
 import net.tiklab.core.exception.ApplicationException;
-import net.tiklab.matflow.pipeline.instance.model.PipelineExecInstance;
-import net.tiklab.matflow.pipeline.instance.service.PipelineExecInstanceService;
-import net.tiklab.matflow.pipeline.instance.service.PipelineExecLogService;
-import net.tiklab.matflow.support.condition.model.PipelineCondition;
-import net.tiklab.matflow.support.variable.model.PipelineVariable;
-import net.tiklab.matflow.support.condition.service.PipelineConditionService;
-import net.tiklab.matflow.support.variable.service.PipelineVariableService;
-import net.tiklab.matflow.pipeline.instance.model.PipelineExecLog;
+import net.tiklab.matflow.pipeline.instance.model.PipelineInstance;
+import net.tiklab.matflow.pipeline.instance.service.PipelineInstanceService;
+import net.tiklab.matflow.pipeline.instance.service.TaskInstanceLogService;
+import net.tiklab.matflow.support.condition.model.Condition;
+import net.tiklab.matflow.support.variable.model.Variable;
+import net.tiklab.matflow.support.condition.service.ConditionService;
+import net.tiklab.matflow.support.variable.service.VariableService;
+import net.tiklab.matflow.pipeline.instance.model.TaskInstanceLog;
 import net.tiklab.matflow.pipeline.execute.model.PipelineProcess;
 import net.tiklab.matflow.support.until.PipelineFinal;
 import net.tiklab.matflow.support.until.PipelineUntil;
-import net.tiklab.matflow.setting.model.PipelineScm;
-import net.tiklab.matflow.setting.service.PipelineScmService;
+import net.tiklab.matflow.setting.model.Scm;
+import net.tiklab.matflow.setting.service.ScmService;
 import net.tiklab.rpc.annotation.Exporter;
 import net.tiklab.utils.context.LoginContext;
 import org.apache.commons.lang.text.StrSubstitutor;
@@ -37,24 +37,24 @@ import java.util.Map;
 public class PipelineExecCommonServiceImpl implements PipelineExecCommonService {
 
     @Autowired
-    PipelineScmService pipelineScmService;
+    ScmService scmService;
 
     @Autowired
-    PipelineExecInstanceService historyService;
+    PipelineInstanceService historyService;
 
     @Autowired
-    PipelineExecLogService logService;
+    TaskInstanceLogService logService;
 
     @Autowired
-    PipelineVariableService variableServer;
+    VariableService variableServer;
 
     @Autowired
-    PipelineConditionService conditionServer;
+    ConditionService conditionServer;
 
     //历史
     Map<String,String> historyMap = PipelineExecServiceImpl.historyMap;
 
-    Map<String,PipelineExecLog> logMap = PipelineExecServiceImpl.logMap;
+    Map<String, TaskInstanceLog> logMap = PipelineExecServiceImpl.logMap;
 
     //运行时间
     Map<String, Integer> runTime = PipelineExecServiceImpl.runTime;
@@ -93,11 +93,9 @@ public class PipelineExecCommonServiceImpl implements PipelineExecCommonService 
         
         String s;
         bufferedReader = new BufferedReader(inputStreamReader);
-        // StringBuilder logRunLog = new StringBuilder();
 
         //更新日志信息
         while ((s = bufferedReader.readLine()) != null) {
-            // logRunLog.append(s).append("\n");
             if (validStatus(s,error)){
                 state = 0 ;
             }
@@ -107,7 +105,6 @@ public class PipelineExecCommonServiceImpl implements PipelineExecCommonService 
         inputStreamReader = PipelineUntil.encode(errInputStream, enCode);
         bufferedReader = new BufferedReader(inputStreamReader);
         while ((s = bufferedReader.readLine()) != null) {
-            // logRunLog.append(s).append("\n");
             if (validStatus(s,error)){state = 0 ;}
             updateExecLog(pipelineProcess, PipelineUntil.date(4)+s);
         }
@@ -173,7 +170,7 @@ public class PipelineExecCommonServiceImpl implements PipelineExecCommonService 
     public void runEnd(String pipelineId , int status){
         String historyId = historyMap.get(pipelineId);
 
-        PipelineExecInstance execHistory = historyService.findOneHistory(historyId);
+        PipelineInstance execHistory = historyService.findOneHistory(historyId);
 
         Integer integer = runTime.get(historyId);
         if (integer ==  null){
@@ -182,7 +179,6 @@ public class PipelineExecCommonServiceImpl implements PipelineExecCommonService 
 
         execHistory.setRunTime(integer+1);
         //更新状态
-        // execHistory.setFindState(1);
         execHistory.setRunStatus(status);
         historyService.updateHistory(execHistory);
 
@@ -193,11 +189,11 @@ public class PipelineExecCommonServiceImpl implements PipelineExecCommonService 
      * @param pipelineId 执行信息
      */
     public void updateState(String pipelineId,String logId,int state){
-        PipelineExecLog pipelineExecLog = logMap.get(logId);
-        if (pipelineExecLog != null){
+        TaskInstanceLog taskInstanceLog = logMap.get(logId);
+        if (taskInstanceLog != null){
             //状态,id
-            pipelineExecLog.setRunState(state);
-            pipelineExecLog.setLogId(logId);
+            taskInstanceLog.setRunState(state);
+            taskInstanceLog.setLogId(logId);
 
             //运行时间
             Integer integer = runTime.get(logId);
@@ -207,14 +203,14 @@ public class PipelineExecCommonServiceImpl implements PipelineExecCommonService 
             if (integer ==  null){
                 integer = 0;
             }
-            pipelineExecLog.setRunTime(integer);
+            taskInstanceLog.setRunTime(integer);
 
-            String execLog = pipelineExecLog.getRunLog();
+            String execLog = taskInstanceLog.getRunLog();
             if (PipelineUntil.isNoNull(execLog)){
-                String runLog = pipelineExecLog.getLogAddress();
+                String runLog = taskInstanceLog.getLogAddress();
                 PipelineUntil.logWriteFile(execLog,runLog);
             }
-            logService.updateLog(pipelineExecLog);
+            logService.updateLog(taskInstanceLog);
         }
         logMap.remove(logId);
     }
@@ -224,27 +220,27 @@ public class PipelineExecCommonServiceImpl implements PipelineExecCommonService 
      * * @return 历史
      */
     @Override
-    public PipelineExecInstance initializeHistory(String pipelineId , int startWAy) {
+    public PipelineInstance initializeHistory(String pipelineId , int startWAy) {
         String loginId = LoginContext.getLoginId();
         String date = PipelineUntil.date(1);
 
-        PipelineExecInstance pipelineExecInstance = new PipelineExecInstance(date,startWAy,loginId,pipelineId);
-        pipelineExecInstance.setRunStatus(30);
-        String historyId = historyService.createHistory(pipelineExecInstance);
+        PipelineInstance pipelineInstance = new PipelineInstance(date,startWAy,loginId,pipelineId);
+        pipelineInstance.setRunStatus(30);
+        String historyId = historyService.createHistory(pipelineInstance);
 
         //初始化基本信息
-        pipelineExecInstance.setSort(1);
-        pipelineExecInstance.setHistoryId(historyId);
+        pipelineInstance.setSort(1);
+        pipelineInstance.setHistoryId(historyId);
 
         //构建次数
-        PipelineExecInstance latelyHistory = historyService.findLastHistory(pipelineId);
-        pipelineExecInstance.setFindNumber(1);
+        PipelineInstance latelyHistory = historyService.findLastHistory(pipelineId);
+        pipelineInstance.setFindNumber(1);
         if (latelyHistory != null){
             int findNumber = latelyHistory.getFindNumber();
-            pipelineExecInstance.setFindNumber( findNumber + 1);
+            pipelineInstance.setFindNumber( findNumber + 1);
         }
-        historyService.updateHistory(pipelineExecInstance);
-        return pipelineExecInstance;
+        historyService.updateHistory(pipelineInstance);
+        return pipelineInstance;
     }
 
     /**
@@ -254,11 +250,11 @@ public class PipelineExecCommonServiceImpl implements PipelineExecCommonService 
      */
     @Override
     public String getScm(int type){
-        PipelineScm pipelineScm = pipelineScmService.findOnePipelineScm(type);
-        if (pipelineScm == null){
+        Scm scm = scmService.findOnePipelineScm(type);
+        if (scm == null){
             return null;
         }
-        return pipelineScm.getScmAddress();
+        return scm.getScmAddress();
     }
 
     /**
@@ -271,29 +267,29 @@ public class PipelineExecCommonServiceImpl implements PipelineExecCommonService 
         }
 
         String logId = pipelineProcess.getLogId();
-        PipelineExecLog pipelineExecLog = logMap.get(logId);
+        TaskInstanceLog taskInstanceLog = logMap.get(logId);
         Integer integer = runTime.get(logId);
         if (integer == null){
             integer = 0;
         }
-        pipelineExecLog.setRunTime(integer);
+        taskInstanceLog.setRunTime(integer);
 
-        String execLog = pipelineExecLog.getRunLog();
+        String execLog = taskInstanceLog.getRunLog();
 
         if (!PipelineUntil.isNoNull(execLog)){
-            pipelineExecLog.setRunLog(log);
+            taskInstanceLog.setRunLog(log);
         }else {
-            pipelineExecLog.setRunLog(execLog +"\n"+ log);
+            taskInstanceLog.setRunLog(execLog +"\n"+ log);
         }
 
         //长度过长写入文件中
-        if (pipelineExecLog.getRunLog().length() > 25000){
-            String runLog = pipelineExecLog.getLogAddress();
+        if (taskInstanceLog.getRunLog().length() > 25000){
+            String runLog = taskInstanceLog.getLogAddress();
             PipelineUntil.logWriteFile(execLog,runLog);
-            pipelineExecLog.setRunLog(null);
+            taskInstanceLog.setRunLog(null);
         }
 
-        logMap.put(logId,pipelineExecLog);
+        logMap.put(logId, taskInstanceLog);
     }
 
     /**
@@ -307,18 +303,18 @@ public class PipelineExecCommonServiceImpl implements PipelineExecCommonService 
     public String variableKey(String pipelineId,String configId,String order){
         Map<String , String > map = new HashMap<>();
         //全局变量
-        List<PipelineVariable> allVariable = variableServer.findAllVariable(pipelineId);
+        List<Variable> allVariable = variableServer.findAllVariable(pipelineId);
         if (allVariable.size() != 0){
-            for (PipelineVariable variable : allVariable) {
+            for (Variable variable : allVariable) {
                 String varKey = variable.getVarKey();
                 String varValue = variable.getVarValue();
                 map.put(varKey,varValue);
             }
         }
         //局部变量
-        List<PipelineVariable> variableList = variableServer.findAllVariable(configId);
+        List<Variable> variableList = variableServer.findAllVariable(configId);
         if (variableList.size() != 0){
-            for (PipelineVariable variable : variableList) {
+            for (Variable variable : variableList) {
                 String varValue = variable.getVarValue();
                 String varKey = variable.getVarKey();
                 map.put(varKey,varValue);
@@ -337,11 +333,11 @@ public class PipelineExecCommonServiceImpl implements PipelineExecCommonService 
      */
     @Override
     public Boolean variableCond(String pipelineId,String configId){
-        List<PipelineCondition> allTaskCond = conditionServer.findAllTaskCond(configId);
+        List<Condition> allTaskCond = conditionServer.findAllTaskCond(configId);
         if (allTaskCond == null || allTaskCond.size() == 0 ){
             return true;
         }
-        for (PipelineCondition condition : allTaskCond) {
+        for (Condition condition : allTaskCond) {
             String condKey = "${"+condition.getCondKey()+"}";
             String condValue = condition.getCondValue();
             int type = condition.getCondType();

@@ -4,8 +4,8 @@ package net.tiklab.matflow.pipeline.execute.controller;
 import net.tiklab.core.Result;
 import net.tiklab.core.page.Pagination;
 import net.tiklab.matflow.pipeline.instance.model.PipelineAllInstanceQuery;
-import net.tiklab.matflow.pipeline.instance.model.PipelineExecInstance;
-import net.tiklab.matflow.pipeline.instance.model.PipelineRunLog;
+import net.tiklab.matflow.pipeline.instance.model.PipelineInstance;
+import net.tiklab.matflow.pipeline.instance.model.TaskRunLog;
 import net.tiklab.matflow.pipeline.execute.service.PipelineExecService;
 import net.tiklab.postin.annotation.Api;
 import net.tiklab.postin.annotation.ApiMethod;
@@ -40,8 +40,8 @@ public class PipelineExecController {
     @RequestMapping(path="/pipelineRunStatus",method = RequestMethod.POST)
     @ApiMethod(name = "pipelineRunStatus",desc = "执行")
     @ApiParam(name = "pipelineId",desc = "流水线id",required = true)
-    public Result<PipelineRunLog> pipelineRunStatus(String pipelineId)  {
-        PipelineRunLog runState = pipelineExecService.findPipelineRunMessage(pipelineId);
+    public Result<TaskRunLog> pipelineRunStatus(String pipelineId)  {
+        TaskRunLog runState = pipelineExecService.findPipelineRunMessage(pipelineId);
         return Result.ok(runState);
     }
 
@@ -64,9 +64,9 @@ public class PipelineExecController {
     @RequestMapping(path="/findUserRunPageHistory",method = RequestMethod.POST)
     @ApiMethod(name = "findUserRunPageHistory",desc = "判断是否执行")
     @ApiParam(name = "query",desc = "分页信息",required = true)
-    public Result<Pagination<PipelineExecInstance>> findUserRunPageHistory(
+    public Result<Pagination<PipelineInstance>> findUserRunPageHistory(
             @RequestBody @Valid @NotNull PipelineAllInstanceQuery query) {
-        Pagination<PipelineExecInstance> userRunPageHistory =
+        Pagination<PipelineInstance> userRunPageHistory =
                 pipelineExecService.findUserRunPageHistory(query);
         return Result.ok(userRunPageHistory);
     }

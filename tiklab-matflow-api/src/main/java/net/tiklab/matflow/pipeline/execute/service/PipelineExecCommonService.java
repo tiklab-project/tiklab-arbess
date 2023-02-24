@@ -1,7 +1,7 @@
 package net.tiklab.matflow.pipeline.execute.service;
 
 import net.tiklab.core.exception.ApplicationException;
-import net.tiklab.matflow.pipeline.instance.model.PipelineExecInstance;
+import net.tiklab.matflow.pipeline.instance.model.PipelineInstance;
 import net.tiklab.matflow.pipeline.execute.model.PipelineProcess;
 
 import java.io.IOException;
@@ -41,7 +41,7 @@ public interface PipelineExecCommonService {
      * 初始化历史
      * @return 历史
      */
-    PipelineExecInstance initializeHistory(String pipelineId, int startWAy);
+    PipelineInstance initializeHistory(String pipelineId, int startWAy);
 
 
     /**

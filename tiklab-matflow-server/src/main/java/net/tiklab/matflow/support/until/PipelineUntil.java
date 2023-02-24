@@ -454,25 +454,6 @@ public class PipelineUntil {
      * @throws ApplicationException 写入失败
      */
     public static void logWriteFile(String str, String path) throws ApplicationException {
-
-        // try {
-        //     File file1 = new File(path);
-        //
-        //     OutputStreamWriter outputStreamWriter = new OutputStreamWriter(new FileOutputStream(file1), StandardCharsets.UTF_8);
-        //
-        //     Writer writer = new BufferedWriter(outputStreamWriter);
-        //
-        //     writer.write(str);
-        //
-        //     writer.flush();
-        //     writer.close();
-        //
-        // } catch (IOException e) {
-        //     throw new ApplicationException(e);
-        // }
-
-
-
         try (FileWriter writer = new FileWriter(path, StandardCharsets.UTF_8,true)) {
             writer.write(str);
             writer.flush();
@@ -526,24 +507,11 @@ public class PipelineUntil {
     }
 
     /**
-     * 获取日志储存位置
-     * @param pipelineId 流水线id
-     * @param historyId 历史id
-     * @param logId 日志id
-     * @return 位置
-     */
-    public static String findExecLogAddress(String pipelineId,String historyId,String logId){
-        String address= findFileAddress(pipelineId, 2);
-        String s = address + "/" + historyId + "/" + logId + ".log";
-        return PipelineUntil.createFile(s);
-    }
-
-    /**
      * 读取文件后100行内容
      * @param fileAddress 文件地址
      * @return 内容
      */
-    public static String readFile(String fileAddress) throws ApplicationException {
+    public static String readFile(String fileAddress,int length) throws ApplicationException {
         if (!isNoNull(fileAddress)){
             return null;
         }
@@ -560,7 +528,7 @@ public class PipelineUntil {
         List<String> lines ;
         try {
             lines = Files.readAllLines(path,StandardCharsets.UTF_8);
-            for (int i = Math.max(0, lines.size() - 100); i < lines.size(); i++) {
+            for (int i = Math.max(0, lines.size() - length); i < lines.size(); i++) {
                 s.append(lines.get(i)).append("\n");
             }
         } catch (IOException e) {

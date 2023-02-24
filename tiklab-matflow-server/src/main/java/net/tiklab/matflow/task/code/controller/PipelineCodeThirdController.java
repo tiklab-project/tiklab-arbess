@@ -2,8 +2,8 @@ package net.tiklab.matflow.task.code.controller;
 
 
 import net.tiklab.core.Result;
-import net.tiklab.matflow.task.code.service.CodeThirdService;
-import net.tiklab.matflow.setting.model.PipelineAuthThird;
+import net.tiklab.matflow.task.code.service.TaskCodeThirdService;
+import net.tiklab.matflow.setting.model.AuthThird;
 import net.tiklab.postin.annotation.Api;
 import net.tiklab.postin.annotation.ApiMethod;
 import net.tiklab.postin.annotation.ApiParam;
@@ -24,14 +24,14 @@ import java.util.List;
 public class PipelineCodeThirdController {
 
     @Autowired
-    CodeThirdService codeThirdService;
+    TaskCodeThirdService taskCodeThirdService;
 
     @RequestMapping(path="/findCode",method = RequestMethod.POST)
     @ApiMethod(name = "findCode",desc = "返回获取code的地址")
     @ApiParam(name = "callbackUri",desc = "回调地址",required = true)
-    public Result<String> getCode(@RequestBody @Valid @NotNull PipelineAuthThird authThird){
+    public Result<String> getCode(@RequestBody @Valid @NotNull AuthThird authThird){
 
-        String git = codeThirdService.findCode(authThird);
+        String git = taskCodeThirdService.findCode(authThird);
 
         return Result.ok(git);
     }
@@ -39,8 +39,8 @@ public class PipelineCodeThirdController {
     @RequestMapping(path="/findAccessToken",method = RequestMethod.POST)
     @ApiMethod(name = "findAccessToken",desc = "获取accessToken")
     @ApiParam(name = "code",desc = "code",required = true)
-    public Result<String> getAccessToken(@RequestBody @Valid @NotNull  PipelineAuthThird authThird) throws IOException {
-        String proofId = codeThirdService.findAccessToken(authThird);
+    public Result<String> getAccessToken(@RequestBody @Valid @NotNull AuthThird authThird) throws IOException {
+        String proofId = taskCodeThirdService.findAccessToken(authThird);
         return Result.ok(proofId);
     }
 
@@ -49,7 +49,7 @@ public class PipelineCodeThirdController {
     @ApiMethod(name = "findAllStorehouse",desc = "获取所有仓库")
     @ApiParam(name = "authId",desc = "authId",required = true)
     public Result<List<String>> findAllStorehouse(@NotNull String authId,int type) {
-        List<String> allStorehouse = codeThirdService.findAllStorehouse(authId,type);
+        List<String> allStorehouse = taskCodeThirdService.findAllStorehouse(authId,type);
         return Result.ok(allStorehouse);
     }
 
@@ -58,7 +58,7 @@ public class PipelineCodeThirdController {
     @ApiMethod(name = "findBranch",desc = "根据仓库名获取所有分支")
     @ApiParam(name = "authId",desc = "authId",required = true)
     public Result<List<String>> findBranch(@NotNull String authId,String houseName,int type){
-        List<String> branch = codeThirdService.findBranch(authId,houseName,type);
+        List<String> branch = taskCodeThirdService.findBranch(authId,houseName,type);
         return Result.ok(branch);
     }
 
@@ -66,7 +66,7 @@ public class PipelineCodeThirdController {
     @ApiMethod(name = "getState",desc = "获取回调地址")
     @ApiParam(name = "callbackUrl",desc = "callbackUrl",required = true)
     public Result<String> getState(@NotNull  String callbackUrl){
-        String url= codeThirdService.callbackUrl(callbackUrl);
+        String url= taskCodeThirdService.callbackUrl(callbackUrl);
         return Result.ok(url);
     }
 

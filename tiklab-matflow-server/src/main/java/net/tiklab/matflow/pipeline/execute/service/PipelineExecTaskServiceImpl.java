@@ -1,14 +1,14 @@
 package net.tiklab.matflow.pipeline.execute.service;
 
 import net.tiklab.matflow.pipeline.execute.model.PipelineProcess;
-import net.tiklab.matflow.task.common.service.TaskAchieveService;
-import net.tiklab.matflow.task.build.service.BuildService;
-import net.tiklab.matflow.task.code.service.CodeService;
-import net.tiklab.matflow.task.codescan.service.CodeScanService;
-import net.tiklab.matflow.task.deploy.service.DeployService;
-import net.tiklab.matflow.task.product.service.ProductService;
-import net.tiklab.matflow.task.script.service.ScriptService;
-import net.tiklab.matflow.task.test.service.TestService;
+import net.tiklab.matflow.task.build.service.TaskBuildExecService;
+import net.tiklab.matflow.task.code.service.TaskCodeExecService;
+import net.tiklab.matflow.task.codescan.service.TaskCodeScanExecService;
+import net.tiklab.matflow.task.deploy.service.TaskDeployExecService;
+import net.tiklab.matflow.task.message.service.TaskMessageExecService;
+import net.tiklab.matflow.task.product.service.TaskProductExecService;
+import net.tiklab.matflow.task.script.service.TaskScriptExecService;
+import net.tiklab.matflow.task.test.service.TaskTestExecService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,28 +18,28 @@ import java.util.Map;
 public class PipelineExecTaskServiceImpl implements PipelineExecTaskService {
 
     @Autowired
-    CodeService code ;
+    TaskCodeExecService code ;
 
     @Autowired
-    BuildService build ;
+    TaskBuildExecService build ;
 
     @Autowired
-    TestService test;
+    TaskTestExecService test;
 
     @Autowired
-    DeployService deploy ;
+    TaskDeployExecService deploy ;
 
     @Autowired
-    CodeScanService codeScan;
+    TaskCodeScanExecService codeScan;
 
     @Autowired
-    ProductService product;
+    TaskProductExecService product;
 
     @Autowired
-    TaskAchieveService message;
+    TaskMessageExecService message;
 
     @Autowired
-    ScriptService scriptService;
+    TaskScriptExecService taskScriptExecService;
 
     public boolean beginCourseState(PipelineProcess pipelineProcess, String configId , int taskType, Map<String,String> maps){
         boolean state = true;
@@ -51,7 +51,7 @@ public class PipelineExecTaskServiceImpl implements PipelineExecTaskService {
             case 4 -> state = codeScan.codeScan(pipelineProcess, configId,taskType);
             case 5 -> state = product.product(pipelineProcess,  configId,taskType);
             case 6 -> state = message.message(pipelineProcess, configId,taskType,maps);
-            case 7 -> state = scriptService.scripts(pipelineProcess, configId,taskType);
+            case 7 -> state = taskScriptExecService.scripts(pipelineProcess, configId,taskType);
         }
         return state;
     }

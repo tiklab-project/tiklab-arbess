@@ -2,8 +2,8 @@ package net.tiklab.matflow.pipeline.instance.controller;
 
 
 import net.tiklab.core.Result;
-import net.tiklab.matflow.pipeline.instance.model.PipelineRunLog;
-import net.tiklab.matflow.pipeline.instance.service.PipelineExecInstanceService;
+import net.tiklab.matflow.pipeline.instance.model.TaskRunLog;
+import net.tiklab.matflow.pipeline.instance.service.PipelineInstanceService;
 import net.tiklab.postin.annotation.Api;
 import net.tiklab.postin.annotation.ApiMethod;
 import net.tiklab.postin.annotation.ApiParam;
@@ -20,14 +20,14 @@ import javax.validation.constraints.NotNull;
 public class PipelineExecLogController {
 
     @Autowired
-    PipelineExecInstanceService historyService;
+    PipelineInstanceService historyService;
 
     //查询日志
     @RequestMapping(path="/findAllLog",method = RequestMethod.POST)
     @ApiMethod(name = "findAllLog",desc = "查询日志")
     @ApiParam(name = "historyId",desc = "历史id",required = true)
-    public Result<PipelineRunLog> findAllLog(@NotNull String historyId){
-        PipelineRunLog allLog = historyService.findAll(historyId);
+    public Result<TaskRunLog> findAllLog(@NotNull String historyId){
+        TaskRunLog allLog = historyService.findAll(historyId);
         return Result.ok(allLog);
     }
 }
