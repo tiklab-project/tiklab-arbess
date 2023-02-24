@@ -8,8 +8,8 @@ import net.tiklab.join.JoinTemplate;
 import net.tiklab.matflow.pipeline.definition.model.Pipeline;
 import net.tiklab.matflow.pipeline.definition.model.PipelineStages;
 import net.tiklab.matflow.pipeline.definition.service.PipelineStagesService;
-import net.tiklab.matflow.pipeline.instance.dao.PipelineExecHistoryDao;
-import net.tiklab.matflow.pipeline.instance.entity.PipelineExecHistoryEntity;
+import net.tiklab.matflow.pipeline.instance.dao.PipelineExecInstanceDao;
+import net.tiklab.matflow.pipeline.instance.entity.PipelineExecInstanceEntity;
 import net.tiklab.matflow.pipeline.instance.model.*;
 import net.tiklab.matflow.support.until.PipelineUntil;
 import net.tiklab.rpc.annotation.Exporter;
@@ -23,10 +23,10 @@ import java.util.*;
 
 @Service
 @Exporter
-public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryService {
+public class PipelineExecInstanceServiceImpl implements PipelineExecInstanceService {
 
     @Autowired
-    PipelineExecHistoryDao pipelineExecHistoryDao;
+    PipelineExecInstanceDao pipelineExecInstanceDao;
 
     @Autowired
     PipelineExecLogService pipelineExecLogService;
@@ -37,22 +37,22 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
     @Autowired
     JoinTemplate joinTemplate;
 
-    private static final Logger logger = LoggerFactory.getLogger(PipelineExecHistoryServiceImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(PipelineExecInstanceServiceImpl.class);
 
     //创建
     @Override
-    public String createHistory(PipelineExecHistory pipelineExecHistory) {
-        return pipelineExecHistoryDao.createHistory(BeanMapper.map(pipelineExecHistory, PipelineExecHistoryEntity.class));
+    public String createHistory(PipelineExecInstance pipelineExecInstance) {
+        return pipelineExecInstanceDao.createHistory(BeanMapper.map(pipelineExecInstance, PipelineExecInstanceEntity.class));
     }
 
     //删除
     @Override
     public void deleteAllHistory(String pipelineId) {
-        List<PipelineExecHistory> allHistory = findAllHistory();
+        List<PipelineExecInstance> allHistory = findAllHistory();
         if (allHistory == null){
             return;
         }
-        for (PipelineExecHistory history : allHistory) {
+        for (PipelineExecInstance history : allHistory) {
             Pipeline pipeline = history.getPipeline();
             if (pipeline == null){
                 deleteHistory(history.getHistoryId());
@@ -69,9 +69,9 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
      */
     @Override
     public void deleteHistory(String historyId) {
-        PipelineExecHistory history = findOneHistory(historyId);
+        PipelineExecInstance history = findOneHistory(historyId);
         String id = history.getPipeline().getId();
-        pipelineExecHistoryDao.deleteHistory(historyId);
+        pipelineExecInstanceDao.deleteHistory(historyId);
         pipelineExecLogService.deleteHistoryLog(historyId);
         String fileAddress = PipelineUntil.findFileAddress(id,2);
         //删除对应日志
@@ -85,43 +85,43 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
 
     //修改
     @Override
-    public void updateHistory(PipelineExecHistory pipelineExecHistory) {
-        pipelineExecHistoryDao.updateHistory(BeanMapper.map(pipelineExecHistory, PipelineExecHistoryEntity.class));
+    public void updateHistory(PipelineExecInstance pipelineExecInstance) {
+        pipelineExecInstanceDao.updateHistory(BeanMapper.map(pipelineExecInstance, PipelineExecInstanceEntity.class));
     }
 
     //查询单个
     @Override
-    public PipelineExecHistory findOneHistory(String historyId) {
-        PipelineExecHistoryEntity pipelineExecHistoryEntity = pipelineExecHistoryDao.findOneHistory(historyId);
-        PipelineExecHistory history = BeanMapper.map(pipelineExecHistoryEntity, PipelineExecHistory.class);
+    public PipelineExecInstance findOneHistory(String historyId) {
+        PipelineExecInstanceEntity pipelineExecInstanceEntity = pipelineExecInstanceDao.findOneHistory(historyId);
+        PipelineExecInstance history = BeanMapper.map(pipelineExecInstanceEntity, PipelineExecInstance.class);
         joinTemplate.joinQuery(history);
         return history;
     }
 
     //查询所有
     @Override
-    public List<PipelineExecHistory> findAllHistory() {
-        List<PipelineExecHistoryEntity> pipelineExecHistoryEntityList = pipelineExecHistoryDao.findAllHistory();
-        return BeanMapper.mapList(pipelineExecHistoryEntityList, PipelineExecHistory.class);
+    public List<PipelineExecInstance> findAllHistory() {
+        List<PipelineExecInstanceEntity> pipelineExecInstanceEntityList = pipelineExecInstanceDao.findAllHistory();
+        return BeanMapper.mapList(pipelineExecInstanceEntityList, PipelineExecInstance.class);
     }
 
     //根据流水线id查询所有历史
     @Override
-    public List<PipelineExecHistory> findAllHistory(String pipelineId) {
-        List<PipelineExecHistoryEntity> list = pipelineExecHistoryDao.findAllHistory(pipelineId);
+    public List<PipelineExecInstance> findAllHistory(String pipelineId) {
+        List<PipelineExecInstanceEntity> list = pipelineExecInstanceDao.findAllHistory(pipelineId);
         if (list == null){
             return null;
         }
-        List<PipelineExecHistory> allHistory = BeanMapper.mapList(list, PipelineExecHistory.class);
-        allHistory.sort(Comparator.comparing(PipelineExecHistory::getCreateTime,Comparator.reverseOrder()));
+        List<PipelineExecInstance> allHistory = BeanMapper.mapList(list, PipelineExecInstance.class);
+        allHistory.sort(Comparator.comparing(PipelineExecInstance::getCreateTime,Comparator.reverseOrder()));
         return allHistory;
     }
 
     //查询用户所有流水线历史
     @Override
-    public Pagination<PipelineExecHistory> findUserAllHistory(PipelineAllHistoryQuery pipelineHistoryQuery){
-        Pagination<PipelineExecHistoryEntity> pagination = pipelineExecHistoryDao.findAllPageHistory(pipelineHistoryQuery);
-        List<PipelineExecHistory> pipelineExecHistories = BeanMapper.mapList(pagination.getDataList(), PipelineExecHistory.class);
+    public Pagination<PipelineExecInstance> findUserAllHistory(PipelineAllInstanceQuery pipelineHistoryQuery){
+        Pagination<PipelineExecInstanceEntity> pagination = pipelineExecInstanceDao.findAllPageHistory(pipelineHistoryQuery);
+        List<PipelineExecInstance> pipelineExecHistories = BeanMapper.mapList(pagination.getDataList(), PipelineExecInstance.class);
         joinTemplate.joinQuery(pipelineExecHistories);
         return PaginationBuilder.build(pagination,pipelineExecHistories);
 
@@ -129,9 +129,9 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
 
     //查询用户所有正在运行的流水线
     @Override
-    public Pagination<PipelineExecHistory> findUserRunPageHistory(PipelineAllHistoryQuery pipelineHistoryQuery){
-        Pagination<PipelineExecHistoryEntity> pagination = pipelineExecHistoryDao.findUserRunPageHistory(pipelineHistoryQuery);
-        List<PipelineExecHistory> pipelineExecHistories = BeanMapper.mapList(pagination.getDataList(), PipelineExecHistory.class);
+    public Pagination<PipelineExecInstance> findUserRunPageHistory(PipelineAllInstanceQuery pipelineHistoryQuery){
+        Pagination<PipelineExecInstanceEntity> pagination = pipelineExecInstanceDao.findUserRunPageHistory(pipelineHistoryQuery);
+        List<PipelineExecInstance> pipelineExecHistories = BeanMapper.mapList(pagination.getDataList(), PipelineExecInstance.class);
         joinTemplate.joinQuery(pipelineExecHistories);
         return PaginationBuilder.build(pagination,pipelineExecHistories);
     }
@@ -140,9 +140,9 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
 
     //查询最近一次执行历史
     @Override
-    public PipelineExecHistory findLatelyHistory(String pipelineId){
-        List<PipelineExecHistoryEntity> latelySuccess = pipelineExecHistoryDao.findLatelyHistory(pipelineId);
-        List<PipelineExecHistory> pipelineExecHistories = BeanMapper.mapList(latelySuccess, PipelineExecHistory.class);
+    public PipelineExecInstance findLatelyHistory(String pipelineId){
+        List<PipelineExecInstanceEntity> latelySuccess = pipelineExecInstanceDao.findLatelyHistory(pipelineId);
+        List<PipelineExecInstance> pipelineExecHistories = BeanMapper.mapList(latelySuccess, PipelineExecInstance.class);
         if (pipelineExecHistories.size() == 0){
             return null;
         }
@@ -156,11 +156,11 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
      * @return 运行历史
      */
     @Override
-    public PipelineExecHistory findLastHistory(String pipelineId){
+    public PipelineExecInstance findLastHistory(String pipelineId){
 
-        List<PipelineExecHistoryEntity> latelySuccess = pipelineExecHistoryDao.findLastHistory(pipelineId);
+        List<PipelineExecInstanceEntity> latelySuccess = pipelineExecInstanceDao.findLastHistory(pipelineId);
 
-        List<PipelineExecHistory> pipelineExecHistories = BeanMapper.mapList(latelySuccess, PipelineExecHistory.class);
+        List<PipelineExecInstance> pipelineExecHistories = BeanMapper.mapList(latelySuccess, PipelineExecInstance.class);
         if (pipelineExecHistories.size() == 0){
             return null;
         }
@@ -174,9 +174,9 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
      * @return 运行历史
      */
     @Override
-    public PipelineExecHistory findRunHistory(String pipelineId){
-        List<PipelineExecHistoryEntity> latelySuccess = pipelineExecHistoryDao.findRunHistory(pipelineId);
-        List<PipelineExecHistory> pipelineExecHistories = BeanMapper.mapList(latelySuccess, PipelineExecHistory.class);
+    public PipelineExecInstance findRunHistory(String pipelineId){
+        List<PipelineExecInstanceEntity> latelySuccess = pipelineExecInstanceDao.findRunHistory(pipelineId);
+        List<PipelineExecInstance> pipelineExecHistories = BeanMapper.mapList(latelySuccess, PipelineExecInstance.class);
         if (pipelineExecHistories.size() == 0){
             return null;
         }
@@ -187,9 +187,9 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
 
     //查询最近一次成功记录
     @Override
-    public PipelineExecHistory findLatelySuccess(String pipelineId){
-        List<PipelineExecHistoryEntity> latelySuccess = pipelineExecHistoryDao.findLatelySuccess(pipelineId);
-        List<PipelineExecHistory> pipelineExecHistories = BeanMapper.mapList(latelySuccess, PipelineExecHistory.class);
+    public PipelineExecInstance findLatelySuccess(String pipelineId){
+        List<PipelineExecInstanceEntity> latelySuccess = pipelineExecInstanceDao.findLatelySuccess(pipelineId);
+        List<PipelineExecInstance> pipelineExecHistories = BeanMapper.mapList(latelySuccess, PipelineExecInstance.class);
 
         if (pipelineExecHistories.size() == 0){
             return null;
@@ -200,9 +200,9 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
     }
 
     @Override
-    public List<PipelineExecHistory> findHistoryList(List<String> idList) {
-        List<PipelineExecHistoryEntity> pipelineExecHistoryEntityList = pipelineExecHistoryDao.findHistoryList(idList);
-        return BeanMapper.mapList(pipelineExecHistoryEntityList, PipelineExecHistory.class);
+    public List<PipelineExecInstance> findHistoryList(List<String> idList) {
+        List<PipelineExecInstanceEntity> pipelineExecInstanceEntityList = pipelineExecInstanceDao.findHistoryList(idList);
+        return BeanMapper.mapList(pipelineExecInstanceEntityList, PipelineExecInstance.class);
     }
 
 
@@ -213,7 +213,7 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
      */
     @Override
     public PipelineRunLog findAll(String historyId){
-        PipelineExecHistory history = findOneHistory(historyId);
+        PipelineExecInstance history = findOneHistory(historyId);
 
         if (history == null){
             return null;
@@ -341,12 +341,12 @@ public class PipelineExecHistoryServiceImpl implements PipelineExecHistoryServic
 
 
     @Override
-    public Pagination<PipelineExecHistory> findPageHistory(PipelineHistoryQuery pipelineHistoryQuery){
-        if (pipelineHistoryQuery.getPipelineId() == null){
+    public Pagination<PipelineExecInstance> findPageHistory(PipelineInstanceQuery pipelineInstanceQuery){
+        if (pipelineInstanceQuery.getPipelineId() == null){
             return null;
         }
-        Pagination<PipelineExecHistoryEntity> pagination = pipelineExecHistoryDao.findPageHistory(pipelineHistoryQuery);
-        List<PipelineExecHistory> pipelineExecHistories = BeanMapper.mapList(pagination.getDataList(), PipelineExecHistory.class);
+        Pagination<PipelineExecInstanceEntity> pagination = pipelineExecInstanceDao.findPageHistory(pipelineInstanceQuery);
+        List<PipelineExecInstance> pipelineExecHistories = BeanMapper.mapList(pagination.getDataList(), PipelineExecInstance.class);
         if (pipelineExecHistories == null){
             return null;
         }

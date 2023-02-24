@@ -15,7 +15,7 @@ import java.util.List;
  */
 
 @ApiModel
-public class PipelineHistoryQuery {
+public class PipelineInstanceQuery {
 
     @ApiProperty(name ="pipelineId",desc = "流水线id")
     private String pipelineId;

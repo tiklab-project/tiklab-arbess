@@ -8,8 +8,8 @@ import net.tiklab.matflow.pipeline.definition.dao.PipelineDao;
 import net.tiklab.matflow.pipeline.definition.entity.PipelineEntity;
 import net.tiklab.matflow.pipeline.definition.model.Pipeline;
 import net.tiklab.matflow.pipeline.definition.model.PipelineMessageList;
-import net.tiklab.matflow.pipeline.instance.model.PipelineAllHistoryQuery;
-import net.tiklab.matflow.pipeline.instance.model.PipelineExecHistory;
+import net.tiklab.matflow.pipeline.instance.model.PipelineAllInstanceQuery;
+import net.tiklab.matflow.pipeline.instance.model.PipelineExecInstance;
 import net.tiklab.matflow.home.model.PipelineOpen;
 import net.tiklab.matflow.home.service.PipelineHomeService;
 import net.tiklab.matflow.support.until.PipelineUntil;
@@ -299,7 +299,7 @@ public class PipelineServiceImpl implements PipelineService {
      * @return 历史
      */
     @Override
-    public Pagination<PipelineExecHistory> findUserAllHistory(PipelineAllHistoryQuery pipelineHistoryQuery){
+    public Pagination<PipelineExecInstance> findUserAllHistory(PipelineAllInstanceQuery pipelineHistoryQuery){
         String id = LoginContext.getLoginId();
         List<Pipeline> allPipeline = findUserPipeline(id);
         if (allPipeline.isEmpty()){

@@ -8,8 +8,8 @@ import net.tiklab.join.annotation.FindOne;
 import net.tiklab.join.annotation.JoinProvider;
 import net.tiklab.matflow.pipeline.definition.model.Pipeline;
 import net.tiklab.matflow.pipeline.definition.model.PipelineMessageList;
-import net.tiklab.matflow.pipeline.instance.model.PipelineAllHistoryQuery;
-import net.tiklab.matflow.pipeline.instance.model.PipelineExecHistory;
+import net.tiklab.matflow.pipeline.instance.model.PipelineAllInstanceQuery;
+import net.tiklab.matflow.pipeline.instance.model.PipelineExecInstance;
 import net.tiklab.matflow.home.model.PipelineOpen;
 
 import javax.validation.Valid;
@@ -109,7 +109,7 @@ public interface PipelineService {
      * 查询用户所有流水线历史
      * @return 历史
      */
-    Pagination<PipelineExecHistory> findUserAllHistory(PipelineAllHistoryQuery pipelineHistoryQuery);
+    Pagination<PipelineExecInstance> findUserAllHistory(PipelineAllInstanceQuery pipelineHistoryQuery);
 
 
 

@@ -5,9 +5,9 @@ import net.tiklab.join.JoinTemplate;
 import net.tiklab.matflow.pipeline.definition.model.Pipeline;
 import net.tiklab.matflow.pipeline.definition.model.PipelineMessageList;
 import net.tiklab.matflow.pipeline.definition.model.PipelineOverview;
-import net.tiklab.matflow.pipeline.instance.model.PipelineAllHistoryQuery;
-import net.tiklab.matflow.pipeline.instance.model.PipelineExecHistory;
-import net.tiklab.matflow.pipeline.instance.service.PipelineExecHistoryService;
+import net.tiklab.matflow.pipeline.instance.model.PipelineAllInstanceQuery;
+import net.tiklab.matflow.pipeline.instance.model.PipelineExecInstance;
+import net.tiklab.matflow.pipeline.instance.service.PipelineExecInstanceService;
 import net.tiklab.matflow.home.model.PipelineFollow;
 import net.tiklab.matflow.home.model.PipelineOpen;
 import net.tiklab.matflow.home.service.PipelineFollowService;
@@ -44,7 +44,7 @@ public class PipelineRelationServiceImpl implements PipelineRelationService {
     private JoinTemplate joinTemplate;
 
     @Autowired
-    private PipelineExecHistoryService historyService;
+    private PipelineExecInstanceService historyService;
 
     @Autowired
     private PipelineOpenService openService;
@@ -95,7 +95,7 @@ public class PipelineRelationServiceImpl implements PipelineRelationService {
             joinTemplate.joinQuery(pipeline);
             PipelineMessageList pipelineMessageList = new PipelineMessageList();
             //成功和构建时间
-            PipelineExecHistory latelyHistory = historyService.findLatelyHistory(pipeline.getId());
+            PipelineExecInstance latelyHistory = historyService.findLatelyHistory(pipeline.getId());
             pipelineMessageList.setId(pipeline.getId());
             pipelineMessageList.setCollect(pipeline.getCollect());
             pipelineMessageList.setName(pipeline.getName());
@@ -228,12 +228,12 @@ public class PipelineRelationServiceImpl implements PipelineRelationService {
      * @return 统计信息
      */
     public PipelineOverview pipelineCensus(String pipelineId){
-        List<PipelineExecHistory> allHistory = historyService.findAllHistory(pipelineId);
+        List<PipelineExecInstance> allHistory = historyService.findAllHistory(pipelineId);
         if (allHistory == null){
             return null;
         }
         PipelineOverview state = new PipelineOverview();
-        for (PipelineExecHistory history : allHistory) {
+        for (PipelineExecInstance history : allHistory) {
             if (history.getRunStatus() == 1){
                 state.setErrorNumber(state.getErrorNumber() + 1);
             }
@@ -301,7 +301,7 @@ public class PipelineRelationServiceImpl implements PipelineRelationService {
      * @return 历史
      */
     @Override
-    public Pagination<PipelineExecHistory> findUserAllHistory(PipelineAllHistoryQuery pipelineHistoryQuery){
+    public Pagination<PipelineExecInstance> findUserAllHistory(PipelineAllInstanceQuery pipelineHistoryQuery){
         return  historyService.findUserAllHistory(pipelineHistoryQuery);
 
     }

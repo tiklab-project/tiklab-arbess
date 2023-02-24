@@ -6,8 +6,8 @@ import net.tiklab.matflow.pipeline.definition.model.Pipeline;
 import net.tiklab.matflow.pipeline.definition.model.PipelineMessageList;
 import net.tiklab.matflow.pipeline.definition.service.PipelineRelationService;
 import net.tiklab.matflow.pipeline.definition.service.PipelineService;
-import net.tiklab.matflow.pipeline.instance.model.PipelineAllHistoryQuery;
-import net.tiklab.matflow.pipeline.instance.model.PipelineExecHistory;
+import net.tiklab.matflow.pipeline.instance.model.PipelineAllInstanceQuery;
+import net.tiklab.matflow.pipeline.instance.model.PipelineExecInstance;
 import net.tiklab.matflow.pipeline.definition.model.PipelineOverview;
 import net.tiklab.matflow.home.model.PipelineOpen;
 import net.tiklab.matflow.home.model.PipelineFollow;
@@ -170,8 +170,8 @@ public class PipelineController {
     @RequestMapping(path="/findUserAllHistory",method = RequestMethod.POST)
     @ApiMethod(name = "findUserAllHistory",desc = "分页")
     @ApiParam(name = "pipelineHistoryQuery",desc = "分页信息",required = true)
-    public Result<Pagination<PipelineExecHistory>>  findUserAllHistory( @RequestBody @Valid @NotNull PipelineAllHistoryQuery pipelineHistoryQuery){
-        Pagination<PipelineExecHistory> userAllHistory = pipelineService.findUserAllHistory(pipelineHistoryQuery);
+    public Result<Pagination<PipelineExecInstance>>  findUserAllHistory(@RequestBody @Valid @NotNull PipelineAllInstanceQuery pipelineHistoryQuery){
+        Pagination<PipelineExecInstance> userAllHistory = pipelineService.findUserAllHistory(pipelineHistoryQuery);
         return Result.ok(userAllHistory);
     }
 

@@ -189,9 +189,9 @@ public class ProductServiceImpl implements ProductService {
      * 创建连接实例
      * @param product 连接配置信息
      * @return 实例
-     * @throws JSchException 连接失败
+     * @throws ApplicationException 连接失败
      */
-    private Session createSession(PipelineProduct product) throws JSchException {
+    private Session createSession(PipelineProduct product) throws ApplicationException {
         PipelineAuthHost authHost = (PipelineAuthHost) product.getAuth();
         String sshIp = authHost.getIp();
         int sshPort = authHost.getPort();
@@ -199,21 +199,41 @@ public class ProductServiceImpl implements ProductService {
         String password = authHost.getPassword();
         JSch jsch = new JSch();
         if (!PipelineUntil.isNoNull(username)){
+            // username = System.getProperty("user.name");
             username = "root";
         }
-        Session session = jsch.getSession(username, sshIp, sshPort);
+
         if (authHost.getAuthType() == 2){
             String tempFile = PipelineUntil.createTempFile(authHost.getPrivateKey());
             if (!PipelineUntil.isNoNull(tempFile)){
-                throw new ApplicationException("写入私钥失败。");
+                throw new ApplicationException("获取私钥失败。");
             }
-            jsch.addIdentity(tempFile);
+            try {
+                jsch.addIdentity(tempFile);
+            } catch (JSchException e) {
+                String message = e.getMessage();
+                throw new ApplicationException("私钥无效："+message);
+            }
             PipelineUntil.deleteFile(new File(tempFile));
-        }else {
+        }
+
+        Session session;
+        try {
+            session = jsch.getSession(username, sshIp, sshPort);
+        } catch (JSchException e) {
+            String message = e.getMessage();
+            throw new ApplicationException("创建连接失败："+message);
+        }
+        if (authHost.getAuthType() == 1){
             session.setPassword(password);
         }
         session.setConfig("StrictHostKeyChecking", "no");
-        session.connect();
+        try {
+            session.connect();
+        } catch (JSchException e) {
+            String message = e.getMessage();
+            throw new ApplicationException("连接服务器失败："+message);
+        }
 
         return session;
     }

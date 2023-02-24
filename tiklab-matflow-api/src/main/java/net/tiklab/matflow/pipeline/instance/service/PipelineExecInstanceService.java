@@ -16,15 +16,15 @@ import java.util.Map;
 /**
  * 流水线历史
  */
-@JoinProvider(model = PipelineExecHistory.class)
-public interface PipelineExecHistoryService {
+@JoinProvider(model = PipelineExecInstance.class)
+public interface PipelineExecInstanceService {
 
     /**
      * 创建流水线历史
-     * @param pipelineExecHistory 流水线历史信息
+     * @param pipelineExecInstance 流水线历史信息
      * @return 流水线id
      */
-    String createHistory(@NotNull @Valid PipelineExecHistory pipelineExecHistory);
+    String createHistory(@NotNull @Valid PipelineExecInstance pipelineExecInstance);
 
     /**
      * 创建日志表
@@ -47,9 +47,9 @@ public interface PipelineExecHistoryService {
 
     /**
      * 更新流水线历史
-     * @param pipelineExecHistory 更新后流水线历史信息
+     * @param pipelineExecInstance 更新后流水线历史信息
      */
-    void updateHistory(@NotNull @Valid PipelineExecHistory pipelineExecHistory);
+    void updateHistory(@NotNull @Valid PipelineExecInstance pipelineExecInstance);
 
     /**
      * 查询单个流水线历史
@@ -57,14 +57,14 @@ public interface PipelineExecHistoryService {
      * @return 流水线历史信息
      */
     @FindOne
-    PipelineExecHistory findOneHistory(String historyId);
+    PipelineExecInstance findOneHistory(String historyId);
 
     /**
      * 查询最近一次历史
      * @param pipelineId 流水线id
      * @return 历史信息
      */
-    PipelineExecHistory findLatelyHistory(String pipelineId);
+    PipelineExecInstance findLatelyHistory(String pipelineId);
 
 
     /**
@@ -72,7 +72,7 @@ public interface PipelineExecHistoryService {
      * @param pipelineId 流水线id
      * @return 成功信息
      */
-    PipelineExecHistory findLatelySuccess(String pipelineId);
+    PipelineExecInstance findLatelySuccess(String pipelineId);
 
 
     /**
@@ -80,7 +80,7 @@ public interface PipelineExecHistoryService {
      * @return 流水线列表历史
      */
     @FindAll
-    List<PipelineExecHistory> findAllHistory();
+    List<PipelineExecInstance> findAllHistory();
 
     /**
      * 根据流水线id查询所有历史信息
@@ -88,7 +88,7 @@ public interface PipelineExecHistoryService {
      * @return 历史信息
      */
     @FindAll
-    List<PipelineExecHistory> findAllHistory(String pipelineId);
+    List<PipelineExecInstance> findAllHistory(String pipelineId);
 
 
     /**
@@ -96,7 +96,7 @@ public interface PipelineExecHistoryService {
      * @param pipelineHistoryQuery 历史
      * @return 历史
      */
-    Pagination<PipelineExecHistory> findUserAllHistory(PipelineAllHistoryQuery pipelineHistoryQuery);
+    Pagination<PipelineExecInstance> findUserAllHistory(PipelineAllInstanceQuery pipelineHistoryQuery);
 
 
     /**
@@ -104,10 +104,10 @@ public interface PipelineExecHistoryService {
      * @param pipelineHistoryQuery 分页条件
      * @return 历史
      */
-    Pagination<PipelineExecHistory> findUserRunPageHistory(PipelineAllHistoryQuery pipelineHistoryQuery);
+    Pagination<PipelineExecInstance> findUserRunPageHistory(PipelineAllInstanceQuery pipelineHistoryQuery);
 
     @FindList
-    List<PipelineExecHistory> findHistoryList(List<String> idList);
+    List<PipelineExecInstance> findHistoryList(List<String> idList);
 
 
     /**
@@ -115,14 +115,14 @@ public interface PipelineExecHistoryService {
      * @param pipelineId 流水线id
      * @return 历史
      */
-    PipelineExecHistory findLastHistory(String pipelineId);
+    PipelineExecInstance findLastHistory(String pipelineId);
 
     /**
      * 查询流水线正在运行历史
      * @param pipelineId 流水线id
      * @return 运行历史
      */
-    PipelineExecHistory findRunHistory(String pipelineId);
+    PipelineExecInstance findRunHistory(String pipelineId);
 
     /**
      * 查询日志详情
@@ -136,8 +136,8 @@ public interface PipelineExecHistoryService {
 
     /**
      * 分页查询历史
-     * @param PipelineHistoryQuery 条件
+     * @param PipelineInstanceQuery 条件
      * @return 历史
      */
-    Pagination<PipelineExecHistory> findPageHistory(PipelineHistoryQuery PipelineHistoryQuery);
+    Pagination<PipelineExecInstance> findPageHistory(PipelineInstanceQuery PipelineInstanceQuery);
 }

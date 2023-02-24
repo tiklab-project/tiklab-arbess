@@ -1,8 +1,8 @@
 package net.tiklab.matflow.pipeline.execute.service;
 
 import net.tiklab.core.page.Pagination;
-import net.tiklab.matflow.pipeline.instance.model.PipelineAllHistoryQuery;
-import net.tiklab.matflow.pipeline.instance.model.PipelineExecHistory;
+import net.tiklab.matflow.pipeline.instance.model.PipelineAllInstanceQuery;
+import net.tiklab.matflow.pipeline.instance.model.PipelineExecInstance;
 import net.tiklab.matflow.pipeline.instance.model.PipelineRunLog;
 
 /**
@@ -44,7 +44,7 @@ public interface PipelineExecService {
      * @param query 分页
      * @return 流水线信息
      */
-    Pagination<PipelineExecHistory> findUserRunPageHistory(PipelineAllHistoryQuery query);
+    Pagination<PipelineExecInstance> findUserRunPageHistory(PipelineAllInstanceQuery query);
 
 
 

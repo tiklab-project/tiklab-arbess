@@ -7,9 +7,9 @@ import net.tiklab.dal.jpa.JpaTemplate;
 import net.tiklab.dal.jpa.criterial.condition.QueryCondition;
 import net.tiklab.dal.jpa.criterial.conditionbuilder.QueryBuilders;
 import net.tiklab.matflow.pipeline.definition.model.Pipeline;
-import net.tiklab.matflow.pipeline.instance.entity.PipelineExecHistoryEntity;
-import net.tiklab.matflow.pipeline.instance.model.PipelineAllHistoryQuery;
-import net.tiklab.matflow.pipeline.instance.model.PipelineHistoryQuery;
+import net.tiklab.matflow.pipeline.instance.entity.PipelineExecInstanceEntity;
+import net.tiklab.matflow.pipeline.instance.model.PipelineAllInstanceQuery;
+import net.tiklab.matflow.pipeline.instance.model.PipelineInstanceQuery;
 import net.tiklab.matflow.support.until.PipelineUntil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
@@ -18,19 +18,19 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public class PipelineExecHistoryDao {
+public class PipelineExecInstanceDao {
 
     @Autowired
     JpaTemplate jpaTemplate;
 
     /**
      * 创建流水线历史
-     * @param pipelineExecHistoryEntity 流水线历史信息
+     * @param pipelineExecInstanceEntity 流水线历史信息
      * @return 流水线id
      */
-    public String createHistory(PipelineExecHistoryEntity pipelineExecHistoryEntity) {
+    public String createHistory(PipelineExecInstanceEntity pipelineExecInstanceEntity) {
 
-        return jpaTemplate.save(pipelineExecHistoryEntity, String.class);
+        return jpaTemplate.save(pipelineExecInstanceEntity, String.class);
 
     }
 
@@ -39,16 +39,16 @@ public class PipelineExecHistoryDao {
      * @param id 流水线历史id
      */
     public void deleteHistory(String id) {
-        jpaTemplate.delete(PipelineExecHistoryEntity.class, id);
+        jpaTemplate.delete(PipelineExecInstanceEntity.class, id);
     }
 
     /**
      * 更新流水线历史
-     * @param pipelineExecHistoryEntity 更新后流水线历史信息
+     * @param pipelineExecInstanceEntity 更新后流水线历史信息
      */
-    public void updateHistory(PipelineExecHistoryEntity pipelineExecHistoryEntity) {
+    public void updateHistory(PipelineExecInstanceEntity pipelineExecInstanceEntity) {
 
-        jpaTemplate.update(pipelineExecHistoryEntity);
+        jpaTemplate.update(pipelineExecInstanceEntity);
 
     }
 
@@ -57,48 +57,48 @@ public class PipelineExecHistoryDao {
      * @param id 查询id
      * @return 流水线历史信息
      */
-    public PipelineExecHistoryEntity findOneHistory(String id) {
+    public PipelineExecInstanceEntity findOneHistory(String id) {
 
-        return jpaTemplate.findOne(PipelineExecHistoryEntity.class, id);
+        return jpaTemplate.findOne(PipelineExecInstanceEntity.class, id);
     }
 
 
-    public List<PipelineExecHistoryEntity> findHistoryList(List<String> idList) {
+    public List<PipelineExecInstanceEntity> findHistoryList(List<String> idList) {
 
-        return jpaTemplate.findList(PipelineExecHistoryEntity.class, idList);
+        return jpaTemplate.findList(PipelineExecInstanceEntity.class, idList);
     }
 
     /**
      * 查询所有流水线历史
      * @return 流水线历史列表
      */
-    public List<PipelineExecHistoryEntity> findAllHistory() {
-        return jpaTemplate.findAll(PipelineExecHistoryEntity.class);
+    public List<PipelineExecInstanceEntity> findAllHistory() {
+        return jpaTemplate.findAll(PipelineExecInstanceEntity.class);
     }
 
     /**
      * 筛选历史
-     * @param pipelineHistoryQuery 筛选条件
+     * @param pipelineInstanceQuery 筛选条件
      * @return 历史
      */
-    public Pagination<PipelineExecHistoryEntity> findPageHistory(PipelineHistoryQuery pipelineHistoryQuery){
-        QueryBuilders builders = QueryBuilders.createQuery(PipelineExecHistoryEntity.class);
-            if (PipelineUntil.isNoNull(pipelineHistoryQuery.getPipelineId())){
-                builders.eq("pipelineId", pipelineHistoryQuery.getPipelineId());
+    public Pagination<PipelineExecInstanceEntity> findPageHistory(PipelineInstanceQuery pipelineInstanceQuery){
+        QueryBuilders builders = QueryBuilders.createQuery(PipelineExecInstanceEntity.class);
+            if (PipelineUntil.isNoNull(pipelineInstanceQuery.getPipelineId())){
+                builders.eq("pipelineId", pipelineInstanceQuery.getPipelineId());
             }
-            if (pipelineHistoryQuery.getState() != 0) {
-                builders.eq("runStatus", pipelineHistoryQuery.getState());
+            if (pipelineInstanceQuery.getState() != 0) {
+                builders.eq("runStatus", pipelineInstanceQuery.getState());
             }
-            if (pipelineHistoryQuery.getType() != 0){
-                builders.eq("runWay", pipelineHistoryQuery.getType() );
+            if (pipelineInstanceQuery.getType() != 0){
+                builders.eq("runWay", pipelineInstanceQuery.getType() );
             }
-            if (pipelineHistoryQuery.getUserId() != null){
-                builders.eq("userId", pipelineHistoryQuery.getUserId() );
+            if (pipelineInstanceQuery.getUserId() != null){
+                builders.eq("userId", pipelineInstanceQuery.getUserId() );
             }
-        QueryCondition pipelineExecHistoryList =  builders.pagination(pipelineHistoryQuery.getPageParam())
-                .orders(pipelineHistoryQuery.getOrderParams())
+        QueryCondition pipelineExecHistoryList =  builders.pagination(pipelineInstanceQuery.getPageParam())
+                .orders(pipelineInstanceQuery.getOrderParams())
                 .get();
-        return jpaTemplate.findPage(pipelineExecHistoryList, PipelineExecHistoryEntity.class);
+        return jpaTemplate.findPage(pipelineExecHistoryList, PipelineExecInstanceEntity.class);
     }
 
     /**
@@ -106,7 +106,7 @@ public class PipelineExecHistoryDao {
      * @param pipelineHistoryQuery 条件
      * @return 历史
      */
-    public Pagination<PipelineExecHistoryEntity> findAllPageHistory(PipelineAllHistoryQuery pipelineHistoryQuery){
+    public Pagination<PipelineExecInstanceEntity> findAllPageHistory(PipelineAllInstanceQuery pipelineHistoryQuery){
         String pipelineId = pipelineHistoryQuery.getPipelineId();
         String sql = "select pip_pipeline_history.* from pip_pipeline_history ";
         sql = sql.concat(" where ( pip_pipeline_history.pipeline_id = ");
@@ -133,7 +133,7 @@ public class PipelineExecHistoryDao {
 
         return jpaTemplate.getJdbcTemplate().findPage(sql, null,
                 pipelineHistoryQuery.getPageParam(),
-                new BeanPropertyRowMapper<>(PipelineExecHistoryEntity.class));
+                new BeanPropertyRowMapper<>(PipelineExecInstanceEntity.class));
     }
 
     /**
@@ -141,7 +141,7 @@ public class PipelineExecHistoryDao {
      * @param pipelineHistoryQuery 条件
      * @return 历史
      */
-    public Pagination<PipelineExecHistoryEntity> findUserRunPageHistory(PipelineAllHistoryQuery pipelineHistoryQuery){
+    public Pagination<PipelineExecInstanceEntity> findUserRunPageHistory(PipelineAllInstanceQuery pipelineHistoryQuery){
 
         String sql = "select pip_pipeline_history.* from pip_pipeline_history ";
         sql = sql.concat(" where ( pip_pipeline_history.pipeline_id = ");
@@ -155,7 +155,7 @@ public class PipelineExecHistoryDao {
 
         return jpaTemplate.getJdbcTemplate().findPage(sql, null,
                 pipelineHistoryQuery.getPageParam(),
-                new BeanPropertyRowMapper<>(PipelineExecHistoryEntity.class));
+                new BeanPropertyRowMapper<>(PipelineExecInstanceEntity.class));
     }
 
 
@@ -163,7 +163,7 @@ public class PipelineExecHistoryDao {
      * 查询一定时间内的用户所有流水线历史
      * @return 流水线历史列表
      */
-    public List<PipelineExecHistoryEntity> findAllUserHistory(String lastTime, String nowTime, StringBuilder s) {
+    public List<PipelineExecInstanceEntity> findAllUserHistory(String lastTime, String nowTime, StringBuilder s) {
         String sql = "select pip_pipeline_history.* from pip_pipeline_history ";
         sql = sql.concat(" where pip_pipeline_history.pipeline_id "
                 + " in("+ s +" )"
@@ -171,7 +171,7 @@ public class PipelineExecHistoryDao {
                 + " and pip_pipeline_history.create_time < '"+ nowTime + "'"
                 + " order by pip_pipeline_history.create_time desc");
         JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
-        return  jdbcTemplate.query(sql, new BeanPropertyRowMapper(PipelineExecHistoryEntity.class));
+        return  jdbcTemplate.query(sql, new BeanPropertyRowMapper(PipelineExecInstanceEntity.class));
     }
 
 
@@ -180,11 +180,11 @@ public class PipelineExecHistoryDao {
      * @param pipelineId 流水线id
      * @return 历史集合
      */
-    public List<PipelineExecHistoryEntity> findAllHistory(String pipelineId){
+    public List<PipelineExecInstanceEntity> findAllHistory(String pipelineId){
         String sql = "select pip_pipeline_history.* from pip_pipeline_history  ";
         sql = sql.concat(" where pip_pipeline_history.pipeline_id   = '"+pipelineId+"' ");
         JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
-        return  jdbcTemplate.query(sql, new BeanPropertyRowMapper(PipelineExecHistoryEntity.class));
+        return  jdbcTemplate.query(sql, new BeanPropertyRowMapper(PipelineExecInstanceEntity.class));
     }
 
 
@@ -193,7 +193,7 @@ public class PipelineExecHistoryDao {
      * @param list 所有流水线
      * @return 历史
      */
-    public List<PipelineExecHistoryEntity> findUserAllHistory(List<Pipeline> list){
+    public List<PipelineExecInstanceEntity> findUserAllHistory(List<Pipeline> list){
         String sql = "select pip_pipeline_history.* from pip_pipeline_history  ";
 
         String pipelineId = list.get(0).getId();
@@ -204,7 +204,7 @@ public class PipelineExecHistoryDao {
             sql = sql.concat(" or pip_pipeline_history.pipeline_id   = '"+ id +"' ");
         }
         JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
-        return  jdbcTemplate.query(sql, new BeanPropertyRowMapper(PipelineExecHistoryEntity.class));
+        return  jdbcTemplate.query(sql, new BeanPropertyRowMapper(PipelineExecInstanceEntity.class));
 
     }
 
@@ -216,14 +216,14 @@ public class PipelineExecHistoryDao {
      * @param pipelineId 流水线id
      * @return 成功列表
      */
-    public List<PipelineExecHistoryEntity> findLatelySuccess(String pipelineId){
+    public List<PipelineExecInstanceEntity> findLatelySuccess(String pipelineId){
         String sql = "select pip_pipeline_history.* from pip_pipeline_history  ";
         sql = sql.concat(" where pip_pipeline_history.pipeline_id   = '"+pipelineId+"' " +
                 " and pip_pipeline_history.run_status != '30'  " +
                 " order by pip_pipeline_history.create_time desc" +
                 " limit 0 ,1");
         JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
-        return  jdbcTemplate.query(sql, new BeanPropertyRowMapper(PipelineExecHistoryEntity.class));
+        return  jdbcTemplate.query(sql, new BeanPropertyRowMapper(PipelineExecInstanceEntity.class));
     }
 
     /**
@@ -231,13 +231,13 @@ public class PipelineExecHistoryDao {
      * @param pipelineId 流水线id
      * @return 构建信息
      */
-    public List<PipelineExecHistoryEntity> findLatelyHistory(String pipelineId){
+    public List<PipelineExecInstanceEntity> findLatelyHistory(String pipelineId){
         String sql = "select pip_pipeline_history.* from pip_pipeline_history  ";
         sql = sql.concat(" where pip_pipeline_history.pipeline_id = '"+pipelineId+"' " +
                 " order by pip_pipeline_history.create_time desc" +
                 " limit 0 ,1");
         JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
-        return  jdbcTemplate.query(sql, new BeanPropertyRowMapper(PipelineExecHistoryEntity.class));
+        return  jdbcTemplate.query(sql, new BeanPropertyRowMapper(PipelineExecInstanceEntity.class));
     }
 
     /**
@@ -245,24 +245,24 @@ public class PipelineExecHistoryDao {
      * @param pipelineId 流水线id
      * @return 执行信息
      */
-    public List<PipelineExecHistoryEntity> findLastHistory(String pipelineId){
+    public List<PipelineExecInstanceEntity> findLastHistory(String pipelineId){
         String sql = "select * from pip_pipeline_history  ";
         sql = sql.concat(" where pip_pipeline_history.pipeline_id = '"+pipelineId+"' " +
                 " and pip_pipeline_history.run_status != 30 "+
                 " order by pip_pipeline_history.create_time desc" +
                 " limit 0 ,1");
         JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
-        return  jdbcTemplate.query(sql, new BeanPropertyRowMapper(PipelineExecHistoryEntity.class));
+        return  jdbcTemplate.query(sql, new BeanPropertyRowMapper(PipelineExecInstanceEntity.class));
     }
 
-    public List<PipelineExecHistoryEntity> findRunHistory(String pipelineId){
+    public List<PipelineExecInstanceEntity> findRunHistory(String pipelineId){
         String sql = "select pip_pipeline_history.* from pip_pipeline_history  ";
         sql = sql.concat(" where pip_pipeline_history.pipeline_id = '"+pipelineId+"' " +
                 " and pip_pipeline_history.find_state = '0' "+
                 " order by pip_pipeline_history.create_time desc" +
                 " limit 0 ,1");
         JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
-        return  jdbcTemplate.query(sql, new BeanPropertyRowMapper(PipelineExecHistoryEntity.class));
+        return  jdbcTemplate.query(sql, new BeanPropertyRowMapper(PipelineExecInstanceEntity.class));
     }
 
 }

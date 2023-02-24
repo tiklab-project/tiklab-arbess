@@ -3,9 +3,9 @@ package net.tiklab.matflow.pipeline.instance.controller;
 
 import net.tiklab.core.Result;
 import net.tiklab.core.page.Pagination;
-import net.tiklab.matflow.pipeline.instance.model.PipelineExecHistory;
-import net.tiklab.matflow.pipeline.instance.model.PipelineHistoryQuery;
-import net.tiklab.matflow.pipeline.instance.service.PipelineExecHistoryService;
+import net.tiklab.matflow.pipeline.instance.model.PipelineExecInstance;
+import net.tiklab.matflow.pipeline.instance.model.PipelineInstanceQuery;
+import net.tiklab.matflow.pipeline.instance.service.PipelineExecInstanceService;
 import net.tiklab.postin.annotation.Api;
 import net.tiklab.postin.annotation.ApiMethod;
 import net.tiklab.postin.annotation.ApiParam;
@@ -24,15 +24,15 @@ import java.util.List;
 public class PipelineExecHistoryController {
 
     @Autowired
-    PipelineExecHistoryService pipelineExecHistoryService;
+    PipelineExecInstanceService pipelineExecInstanceService;
 
     //查询所有历史
     @RequestMapping(path="/findAllHistory",method = RequestMethod.POST)
     @ApiMethod(name = "findAllHistory",desc = "查看所有历史")
     @ApiParam(name = "pipelineId",desc = "流水线id",required = true)
-    public Result<PipelineExecHistory> findAllHistory(@NotNull String pipelineId){
+    public Result<PipelineExecInstance> findAllHistory(@NotNull String pipelineId){
 
-        List<PipelineExecHistory> allHistory = pipelineExecHistoryService.findAllHistory(pipelineId);
+        List<PipelineExecInstance> allHistory = pipelineExecInstanceService.findAllHistory(pipelineId);
         return Result.ok(allHistory);
     }
 
@@ -41,7 +41,7 @@ public class PipelineExecHistoryController {
     @ApiMethod(name = "deleteHistory",desc = "删除历史")
     @ApiParam(name = "historyId",desc = "流水线id",required = true)
     public Result<Void> deleteHistory(@NotNull String historyId){
-       pipelineExecHistoryService.deleteHistory(historyId);
+       pipelineExecInstanceService.deleteHistory(historyId);
         return Result.ok();
     }
 
@@ -49,8 +49,8 @@ public class PipelineExecHistoryController {
     @RequestMapping(path="/findPageHistory",method = RequestMethod.POST)
     @ApiMethod(name = "findPageHistory",desc = "查询历史信息")
     @ApiParam(name = "pipelineHistoryQueryPage",desc = "条件",required = true)
-    public Result<Pagination<PipelineExecHistory>> findPageHistory(@RequestBody @NotNull PipelineHistoryQuery pipelineHistoryQuery){
-        Pagination<PipelineExecHistory> list = pipelineExecHistoryService.findPageHistory(pipelineHistoryQuery);
+    public Result<Pagination<PipelineExecInstance>> findPageHistory(@RequestBody @NotNull PipelineInstanceQuery pipelineInstanceQuery){
+        Pagination<PipelineExecInstance> list = pipelineExecInstanceService.findPageHistory(pipelineInstanceQuery);
         return Result.ok(list);
     }
 

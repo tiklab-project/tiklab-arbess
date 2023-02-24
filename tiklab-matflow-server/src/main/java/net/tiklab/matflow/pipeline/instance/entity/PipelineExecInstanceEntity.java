@@ -9,7 +9,7 @@ import net.tiklab.dal.jpa.annotation.*;
 
 @Entity
 @Table(name="pip_pipeline_history")
-public class PipelineExecHistoryEntity {
+public class PipelineExecInstanceEntity {
 
     //id
     @Id

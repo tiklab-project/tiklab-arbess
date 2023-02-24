@@ -11,7 +11,7 @@ import java.util.List;
  * 首页历史分页
  */
 
-public class PipelineAllHistoryQuery {
+public class PipelineAllInstanceQuery {
 
     /**
      * 流水线id

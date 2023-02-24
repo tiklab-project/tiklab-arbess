@@ -1,13 +1,13 @@
 package net.tiklab.matflow.pipeline.execute.service;
 
 import net.tiklab.core.exception.ApplicationException;
-import net.tiklab.matflow.pipeline.instance.service.PipelineExecHistoryService;
+import net.tiklab.matflow.pipeline.instance.model.PipelineExecInstance;
+import net.tiklab.matflow.pipeline.instance.service.PipelineExecInstanceService;
 import net.tiklab.matflow.pipeline.instance.service.PipelineExecLogService;
 import net.tiklab.matflow.support.condition.model.PipelineCondition;
 import net.tiklab.matflow.support.variable.model.PipelineVariable;
 import net.tiklab.matflow.support.condition.service.PipelineConditionService;
 import net.tiklab.matflow.support.variable.service.PipelineVariableService;
-import net.tiklab.matflow.pipeline.instance.model.PipelineExecHistory;
 import net.tiklab.matflow.pipeline.instance.model.PipelineExecLog;
 import net.tiklab.matflow.pipeline.execute.model.PipelineProcess;
 import net.tiklab.matflow.support.until.PipelineFinal;
@@ -40,7 +40,7 @@ public class PipelineExecCommonServiceImpl implements PipelineExecCommonService 
     PipelineScmService pipelineScmService;
 
     @Autowired
-    PipelineExecHistoryService historyService;
+    PipelineExecInstanceService historyService;
 
     @Autowired
     PipelineExecLogService logService;
@@ -173,7 +173,7 @@ public class PipelineExecCommonServiceImpl implements PipelineExecCommonService 
     public void runEnd(String pipelineId , int status){
         String historyId = historyMap.get(pipelineId);
 
-        PipelineExecHistory execHistory = historyService.findOneHistory(historyId);
+        PipelineExecInstance execHistory = historyService.findOneHistory(historyId);
 
         Integer integer = runTime.get(historyId);
         if (integer ==  null){
@@ -224,27 +224,27 @@ public class PipelineExecCommonServiceImpl implements PipelineExecCommonService 
      * * @return 历史
      */
     @Override
-    public PipelineExecHistory initializeHistory(String pipelineId ,int startWAy) {
+    public PipelineExecInstance initializeHistory(String pipelineId , int startWAy) {
         String loginId = LoginContext.getLoginId();
         String date = PipelineUntil.date(1);
 
-        PipelineExecHistory pipelineExecHistory = new PipelineExecHistory(date,startWAy,loginId,pipelineId);
-        pipelineExecHistory.setRunStatus(30);
-        String historyId = historyService.createHistory(pipelineExecHistory);
+        PipelineExecInstance pipelineExecInstance = new PipelineExecInstance(date,startWAy,loginId,pipelineId);
+        pipelineExecInstance.setRunStatus(30);
+        String historyId = historyService.createHistory(pipelineExecInstance);
 
         //初始化基本信息
-        pipelineExecHistory.setSort(1);
-        pipelineExecHistory.setHistoryId(historyId);
+        pipelineExecInstance.setSort(1);
+        pipelineExecInstance.setHistoryId(historyId);
 
         //构建次数
-        PipelineExecHistory latelyHistory = historyService.findLastHistory(pipelineId);
-        pipelineExecHistory.setFindNumber(1);
+        PipelineExecInstance latelyHistory = historyService.findLastHistory(pipelineId);
+        pipelineExecInstance.setFindNumber(1);
         if (latelyHistory != null){
             int findNumber = latelyHistory.getFindNumber();
-            pipelineExecHistory.setFindNumber( findNumber + 1);
+            pipelineExecInstance.setFindNumber( findNumber + 1);
         }
-        historyService.updateHistory(pipelineExecHistory);
-        return pipelineExecHistory;
+        historyService.updateHistory(pipelineExecInstance);
+        return pipelineExecInstance;
     }
 
     /**

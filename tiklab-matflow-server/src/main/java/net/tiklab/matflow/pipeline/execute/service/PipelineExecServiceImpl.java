@@ -3,11 +3,11 @@ package net.tiklab.matflow.pipeline.execute.service;
 import net.tiklab.core.exception.ApplicationException;
 import net.tiklab.core.page.Pagination;
 import net.tiklab.matflow.pipeline.definition.model.*;
-import net.tiklab.matflow.pipeline.instance.model.PipelineAllHistoryQuery;
-import net.tiklab.matflow.pipeline.instance.model.PipelineExecHistory;
+import net.tiklab.matflow.pipeline.instance.model.PipelineAllInstanceQuery;
+import net.tiklab.matflow.pipeline.instance.model.PipelineExecInstance;
 import net.tiklab.matflow.pipeline.instance.model.PipelineExecLog;
 import net.tiklab.matflow.pipeline.instance.model.PipelineRunLog;
-import net.tiklab.matflow.pipeline.instance.service.PipelineExecHistoryService;
+import net.tiklab.matflow.pipeline.instance.service.PipelineExecInstanceService;
 import net.tiklab.matflow.pipeline.instance.service.PipelineExecLogService;
 import net.tiklab.matflow.support.post.service.PipelinePostService;
 import net.tiklab.matflow.pipeline.definition.service.PipelineService;
@@ -66,7 +66,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
     private PipelineExecLogService logService;
     
     @Autowired
-    private PipelineExecHistoryService historyService;
+    private PipelineExecInstanceService historyService;
 
     private static final Logger logger = LoggerFactory.getLogger(PipelineExecServiceImpl.class);
 
@@ -107,7 +107,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
             // pipeline.setState(2);
             // pipelineService.updatePipeline(pipeline);
             // logger.info(pipeline.getName()+"开始运行。");
-            // PipelineExecHistory pipelineExecHistory = commonService.initializeHistory(pipelineId, startWAy);
+            // PipelineExecInstance pipelineExecHistory = commonService.initializeHistory(pipelineId, startWAy);
             // String historyId = pipelineExecHistory.getHistoryId();
             // historyMap.put(pipelineId, pipelineExecHistory);
             // time(historyId);
@@ -118,8 +118,8 @@ public class PipelineExecServiceImpl implements PipelineExecService {
                 pipelineService.updatePipeline(pipeline);
                 logger.info(pipeline.getName()+"开始运行。");
                 Thread.currentThread().setName(pipelineId);
-                PipelineExecHistory pipelineExecHistory = commonService.initializeHistory(pipelineId, startWAy);
-                String historyId = pipelineExecHistory.getHistoryId();
+                PipelineExecInstance pipelineExecInstance = commonService.initializeHistory(pipelineId, startWAy);
+                String historyId = pipelineExecInstance.getHistoryId();
                 historyMap.put(pipelineId, historyId);
                 time(historyId);
                 begin(pipeline, historyId);
@@ -176,7 +176,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         PipelineRunLog execRunLog = new PipelineRunLog();
 
         if (execHistoryId == null){
-            PipelineExecHistory lastHistory = historyService.findLastHistory(pipelineId);
+            PipelineExecInstance lastHistory = historyService.findLastHistory(pipelineId);
             if (lastHistory == null){
                 return null;
             }
@@ -184,7 +184,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
             return historyService.findAll(historyId);
         }
 
-        PipelineExecHistory history = historyService.findOneHistory(execHistoryId);
+        PipelineExecInstance history = historyService.findOneHistory(execHistoryId);
 
         execRunLog.setName(String.valueOf(history.getFindNumber()));
 
@@ -278,7 +278,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         String historyId  = historyMap.get(pipelineId);
 
         if (historyId == null){
-            PipelineExecHistory lastHistory = historyService.findLastHistory(pipelineId);
+            PipelineExecInstance lastHistory = historyService.findLastHistory(pipelineId);
             lastHistory.setRunStatus(PIPELINE_RUN_HALT);
             historyService.updateHistory(lastHistory);
             return;
@@ -303,16 +303,16 @@ public class PipelineExecServiceImpl implements PipelineExecService {
      * @return 流水线信息
      */
     @Override
-    public Pagination<PipelineExecHistory> findUserRunPageHistory(PipelineAllHistoryQuery pipelineHistoryQuery){
+    public Pagination<PipelineExecInstance> findUserRunPageHistory(PipelineAllInstanceQuery pipelineHistoryQuery){
         List<Pipeline> userPipeline = pipelineService.findUserPipeline(LoginContext.getLoginId());
         if (userPipeline.isEmpty()){
             return null;
         }
         pipelineHistoryQuery.setPipelineList(userPipeline);
-        Pagination<PipelineExecHistory> pageHistory =
+        Pagination<PipelineExecInstance> pageHistory =
                 historyService.findUserAllHistory(pipelineHistoryQuery);
 
-        List<PipelineExecHistory> dataList = pageHistory.getDataList();
+        List<PipelineExecInstance> dataList = pageHistory.getDataList();
         if (dataList.isEmpty()){
             return null;
         }
@@ -321,7 +321,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         if (historyStatus != 30){
             return pageHistory;
         }
-        for (PipelineExecHistory history : dataList) {
+        for (PipelineExecInstance history : dataList) {
             String historyId = history.getHistoryId();
             int status = history.getRunStatus();
             if (status != 30){
@@ -568,7 +568,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         String configId = null;
         String name = null;
 
-        PipelineExecHistory history = historyService.findOneHistory(historyId);
+        PipelineExecInstance history = historyService.findOneHistory(historyId);
         String id = history.getPipeline().getId();
 
         if (type == 0){

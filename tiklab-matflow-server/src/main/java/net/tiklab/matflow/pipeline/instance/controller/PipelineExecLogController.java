@@ -3,7 +3,7 @@ package net.tiklab.matflow.pipeline.instance.controller;
 
 import net.tiklab.core.Result;
 import net.tiklab.matflow.pipeline.instance.model.PipelineRunLog;
-import net.tiklab.matflow.pipeline.instance.service.PipelineExecHistoryService;
+import net.tiklab.matflow.pipeline.instance.service.PipelineExecInstanceService;
 import net.tiklab.postin.annotation.Api;
 import net.tiklab.postin.annotation.ApiMethod;
 import net.tiklab.postin.annotation.ApiParam;
@@ -20,7 +20,7 @@ import javax.validation.constraints.NotNull;
 public class PipelineExecLogController {
 
     @Autowired
-    PipelineExecHistoryService historyService;
+    PipelineExecInstanceService historyService;
 
     //查询日志
     @RequestMapping(path="/findAllLog",method = RequestMethod.POST)

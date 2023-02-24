@@ -4,8 +4,8 @@ import net.tiklab.core.page.Pagination;
 import net.tiklab.matflow.pipeline.definition.model.Pipeline;
 import net.tiklab.matflow.pipeline.definition.model.PipelineMessageList;
 import net.tiklab.matflow.pipeline.definition.model.PipelineOverview;
-import net.tiklab.matflow.pipeline.instance.model.PipelineAllHistoryQuery;
-import net.tiklab.matflow.pipeline.instance.model.PipelineExecHistory;
+import net.tiklab.matflow.pipeline.instance.model.PipelineAllInstanceQuery;
+import net.tiklab.matflow.pipeline.instance.model.PipelineExecInstance;
 import net.tiklab.matflow.home.model.PipelineFollow;
 import net.tiklab.matflow.home.model.PipelineOpen;
 import net.tiklab.privilege.role.model.PatchUser;
@@ -92,7 +92,7 @@ public interface PipelineRelationService {
      * @param pipelineHistoryQuery 流水线
      * @return 历史
      */
-    Pagination<PipelineExecHistory> findUserAllHistory(PipelineAllHistoryQuery pipelineHistoryQuery);
+    Pagination<PipelineExecInstance> findUserAllHistory(PipelineAllInstanceQuery pipelineHistoryQuery);
 
 
 

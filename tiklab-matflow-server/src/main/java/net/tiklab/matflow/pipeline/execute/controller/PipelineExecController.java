@@ -3,8 +3,8 @@ package net.tiklab.matflow.pipeline.execute.controller;
 
 import net.tiklab.core.Result;
 import net.tiklab.core.page.Pagination;
-import net.tiklab.matflow.pipeline.instance.model.PipelineAllHistoryQuery;
-import net.tiklab.matflow.pipeline.instance.model.PipelineExecHistory;
+import net.tiklab.matflow.pipeline.instance.model.PipelineAllInstanceQuery;
+import net.tiklab.matflow.pipeline.instance.model.PipelineExecInstance;
 import net.tiklab.matflow.pipeline.instance.model.PipelineRunLog;
 import net.tiklab.matflow.pipeline.execute.service.PipelineExecService;
 import net.tiklab.postin.annotation.Api;
@@ -64,9 +64,9 @@ public class PipelineExecController {
     @RequestMapping(path="/findUserRunPageHistory",method = RequestMethod.POST)
     @ApiMethod(name = "findUserRunPageHistory",desc = "判断是否执行")
     @ApiParam(name = "query",desc = "分页信息",required = true)
-    public Result<Pagination<PipelineExecHistory>> findUserRunPageHistory(
-            @RequestBody @Valid @NotNull PipelineAllHistoryQuery query) {
-        Pagination<PipelineExecHistory> userRunPageHistory =
+    public Result<Pagination<PipelineExecInstance>> findUserRunPageHistory(
+            @RequestBody @Valid @NotNull PipelineAllInstanceQuery query) {
+        Pagination<PipelineExecInstance> userRunPageHistory =
                 pipelineExecService.findUserRunPageHistory(query);
         return Result.ok(userRunPageHistory);
     }

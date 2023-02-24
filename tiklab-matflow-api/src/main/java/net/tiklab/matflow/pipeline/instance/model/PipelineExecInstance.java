@@ -19,8 +19,8 @@ import java.util.List;
 
 @ApiModel
 @Join
-@Mapper(targetAlias = "PipelineExecHistoryEntity")
-public class PipelineExecHistory {
+@Mapper(targetAlias = "PipelineExecInstanceEntity")
+public class PipelineExecInstance {
 
     //构建历史id
     @ApiProperty(name="historyId",desc="构建历史id")
@@ -77,7 +77,7 @@ public class PipelineExecHistory {
     @ApiProperty(name="findState",desc="运行状态（1.运行完成，0.运行中）")
     private int findState;
 
-    public PipelineExecHistory() {
+    public PipelineExecInstance() {
     }
 
     /**
@@ -87,7 +87,7 @@ public class PipelineExecHistory {
      * @param userId 用户id
      * @param pipelineId 流水线id
      */
-    public PipelineExecHistory(String createTime, int runWay, String userId,String pipelineId) {
+    public PipelineExecInstance(String createTime, int runWay, String userId, String pipelineId) {
         this.createTime = createTime;
         this.runWay = runWay;
         User user = new User();
