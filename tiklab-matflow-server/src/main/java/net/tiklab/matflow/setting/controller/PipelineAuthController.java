@@ -2,7 +2,7 @@ package net.tiklab.matflow.setting.controller;
 
 import net.tiklab.core.Result;
 import net.tiklab.matflow.setting.model.PipelineAuth;
-import net.tiklab.matflow.setting.service.PipelineAuthServer;
+import net.tiklab.matflow.setting.service.PipelineAuthService;
 import net.tiklab.postin.annotation.Api;
 import net.tiklab.postin.annotation.ApiMethod;
 import net.tiklab.postin.annotation.ApiParam;
@@ -22,7 +22,7 @@ import java.util.List;
 public class PipelineAuthController {
 
     @Autowired
-    PipelineAuthServer authService;
+    PipelineAuthService authService;
 
 
     @RequestMapping(path="/createAuth",method = RequestMethod.POST)

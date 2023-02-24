@@ -1,0 +1,153 @@
+package net.tiklab.matflow.task.code.model;
+
+
+import net.tiklab.beans.annotation.Mapper;
+import net.tiklab.join.annotation.Join;
+import net.tiklab.postin.annotation.ApiModel;
+import net.tiklab.postin.annotation.ApiProperty;
+
+
+@ApiModel
+@Join
+@Mapper(targetAlias = "PipelineCodeEntity")
+public class PipelineCode {
+
+    //id
+    @ApiProperty(name="codeId",desc="codeId")
+    private String codeId;
+
+    //地址名
+    @ApiProperty(name="codeName",desc="地址名")
+    private String codeName;
+
+    //代码源地址
+    @ApiProperty(name="codeAddress",desc="代码地址")
+    private String codeAddress;
+
+    //分支
+    @ApiProperty(name="codeBranch",desc="分支")
+    private String codeBranch;
+
+    //授权id
+    @ApiProperty(name="authId",desc="授权id")
+    private String authId;
+
+    @ApiProperty(name="svnFile",desc="svn检出文件夹")
+    private String svnFile;
+
+    @ApiProperty(name="configId",desc="配置id")
+    private String configId;
+
+    //授权信息
+    private Object auth;
+
+    //顺序
+    private int sort;
+
+    //代码类型
+    private int type;
+
+    //别名
+    @ApiProperty(name = "codeAlias",desc="别名")
+    private String codeAlias;
+
+    @ApiProperty(name="name",desc="名称")
+    private String name;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getConfigId() {
+        return configId;
+    }
+
+    public void setConfigId(String configId) {
+        this.configId = configId;
+    }
+
+    public String getCodeId() {
+        return codeId;
+    }
+
+    public void setCodeId(String codeId) {
+        this.codeId = codeId;
+    }
+
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
+    }
+
+    public String getCodeName() {
+        return codeName;
+    }
+
+    public void setCodeName(String codeName) {
+        this.codeName = codeName;
+    }
+
+    public String getCodeAddress() {
+        return codeAddress;
+    }
+
+    public void setCodeAddress(String codeAddress) {
+        this.codeAddress = codeAddress;
+    }
+
+    public String getCodeBranch() {
+        return codeBranch;
+    }
+
+    public void setCodeBranch(String codeBranch) {
+        this.codeBranch = codeBranch;
+    }
+
+    public String getAuthId() {
+        return authId;
+    }
+
+    public void setAuthId(String authId) {
+        this.authId = authId;
+    }
+
+    public int getSort() {
+        return sort;
+    }
+
+    public void setSort(int sort) {
+        this.sort = sort;
+    }
+
+
+    public String getCodeAlias() {
+        return codeAlias;
+    }
+
+    public void setCodeAlias(String codeAlias) {
+        this.codeAlias = codeAlias;
+    }
+
+    public Object getAuth() {
+        return auth;
+    }
+
+    public void setAuth(Object auth) {
+        this.auth = auth;
+    }
+
+    public String getSvnFile() {
+        return svnFile;
+    }
+
+    public void setSvnFile(String svnFile) {
+        this.svnFile = svnFile;
+    }
+}

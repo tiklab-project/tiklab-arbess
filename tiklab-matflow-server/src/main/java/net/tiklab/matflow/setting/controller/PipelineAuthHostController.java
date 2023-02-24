@@ -2,7 +2,7 @@ package net.tiklab.matflow.setting.controller;
 
 import net.tiklab.core.Result;
 import net.tiklab.matflow.setting.model.PipelineAuthHost;
-import net.tiklab.matflow.setting.service.PipelineAuthHostServer;
+import net.tiklab.matflow.setting.service.PipelineAuthHostService;
 import net.tiklab.postin.annotation.Api;
 import net.tiklab.postin.annotation.ApiMethod;
 import net.tiklab.postin.annotation.ApiParam;
@@ -22,7 +22,7 @@ import java.util.List;
 public class PipelineAuthHostController {
 
     @Autowired
-    PipelineAuthHostServer authHost;
+    PipelineAuthHostService authHost;
 
     //创建
     @RequestMapping(path="/createAuthHost",method = RequestMethod.POST)

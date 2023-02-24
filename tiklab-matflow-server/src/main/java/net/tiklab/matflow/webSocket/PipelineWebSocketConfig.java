@@ -27,6 +27,6 @@ public class PipelineWebSocketConfig implements WebSocketConfigurer {
 
     @Bean
     public WebSocketHandler pipelineHandler(){
-        return new PipelineWebSocketServer();
+        return new PipelineWebSocketService();
     }
 }

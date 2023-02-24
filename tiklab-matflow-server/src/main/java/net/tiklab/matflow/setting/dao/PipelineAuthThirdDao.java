@@ -1,7 +1,7 @@
 package net.tiklab.matflow.setting.dao;
 
 import net.tiklab.dal.jpa.JpaTemplate;
-import net.tiklab.matflow.orther.until.PipelineUntil;
+import net.tiklab.matflow.support.until.PipelineUntil;
 import net.tiklab.matflow.setting.entity.PipelineAuthThirdEntity;
 import net.tiklab.utils.context.LoginContext;
 import org.springframework.beans.factory.annotation.Autowired;

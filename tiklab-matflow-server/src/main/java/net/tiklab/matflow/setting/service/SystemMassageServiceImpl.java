@@ -1,7 +1,7 @@
 package net.tiklab.matflow.setting.service;
 
 
-import net.tiklab.matflow.orther.until.PipelineUntil;
+import net.tiklab.matflow.support.until.PipelineUntil;
 import net.tiklab.matflow.setting.model.SystemMassage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

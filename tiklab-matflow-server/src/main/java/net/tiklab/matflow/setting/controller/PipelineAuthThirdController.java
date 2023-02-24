@@ -2,7 +2,7 @@ package net.tiklab.matflow.setting.controller;
 
 import net.tiklab.core.Result;
 import net.tiklab.matflow.setting.model.PipelineAuthThird;
-import net.tiklab.matflow.setting.service.PipelineAuthThirdServer;
+import net.tiklab.matflow.setting.service.PipelineAuthThirdService;
 import net.tiklab.postin.annotation.Api;
 import net.tiklab.postin.annotation.ApiMethod;
 import net.tiklab.postin.annotation.ApiParam;
@@ -21,7 +21,7 @@ import java.util.List;
 public class PipelineAuthThirdController {
 
     @Autowired
-    PipelineAuthThirdServer authServerService;
+    PipelineAuthThirdService authServerService;
 
 
     @RequestMapping(path="/createAuthServer",method = RequestMethod.POST)

@@ -66,6 +66,9 @@ public class PipelineScmServiceImpl implements net.tiklab.matflow.setting.servic
         }
 
         for (PipelineScm pipelineScm : allPipelineScm) {
+            if (type == 2 || type == 3){
+                type = 1;
+            }
             if (type != pipelineScm.getScmType()){
                 continue;
             }

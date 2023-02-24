@@ -1,8 +1,8 @@
 package net.tiklab.matflow.setting.dao;
 
 import net.tiklab.dal.jpa.JpaTemplate;
-import net.tiklab.matflow.definition.dao.PipelineDao;
-import net.tiklab.matflow.orther.until.PipelineUntil;
+import net.tiklab.matflow.pipeline.definition.dao.PipelineDao;
+import net.tiklab.matflow.support.until.PipelineUntil;
 import net.tiklab.matflow.setting.entity.PipelineScmEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
