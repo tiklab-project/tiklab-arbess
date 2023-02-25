@@ -6,8 +6,8 @@ import net.tiklab.matflow.pipeline.definition.model.PipelineMessageList;
 import net.tiklab.matflow.pipeline.definition.model.PipelineOverview;
 import net.tiklab.matflow.pipeline.instance.model.PipelineAllInstanceQuery;
 import net.tiklab.matflow.pipeline.instance.model.PipelineInstance;
-import net.tiklab.matflow.home.model.PipelineFollow;
-import net.tiklab.matflow.home.model.PipelineOpen;
+import net.tiklab.matflow.pipeline.instance.model.PipelineFollow;
+import net.tiklab.matflow.pipeline.instance.model.PipelineOpen;
 import net.tiklab.privilege.role.model.PatchUser;
 import net.tiklab.user.user.model.User;
 

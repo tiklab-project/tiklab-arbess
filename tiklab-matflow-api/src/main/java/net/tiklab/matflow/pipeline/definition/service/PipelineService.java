@@ -10,7 +10,7 @@ import net.tiklab.matflow.pipeline.definition.model.Pipeline;
 import net.tiklab.matflow.pipeline.definition.model.PipelineMessageList;
 import net.tiklab.matflow.pipeline.instance.model.PipelineAllInstanceQuery;
 import net.tiklab.matflow.pipeline.instance.model.PipelineInstance;
-import net.tiklab.matflow.home.model.PipelineOpen;
+import net.tiklab.matflow.pipeline.instance.model.PipelineOpen;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;

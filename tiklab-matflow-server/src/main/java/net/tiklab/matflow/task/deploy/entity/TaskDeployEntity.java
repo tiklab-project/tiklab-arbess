@@ -3,7 +3,7 @@ package net.tiklab.matflow.task.deploy.entity;
 import net.tiklab.dal.jpa.annotation.*;
 
 @Entity
-@Table(name="pip_pipeline_task_deploy")
+@Table(name="pip_task_deploy")
 public class TaskDeployEntity {
 
     //Id

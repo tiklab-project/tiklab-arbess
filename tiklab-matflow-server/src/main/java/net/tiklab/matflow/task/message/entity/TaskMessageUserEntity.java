@@ -3,7 +3,7 @@ package net.tiklab.matflow.task.message.entity;
 import net.tiklab.dal.jpa.annotation.*;
 
 @Entity
-@Table(name="pip_pipeline_task_message_user")
+@Table(name="pip_task_message_user")
 public class TaskMessageUserEntity {
 
     //id

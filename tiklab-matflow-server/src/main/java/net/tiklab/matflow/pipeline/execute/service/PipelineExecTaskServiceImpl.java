@@ -6,7 +6,7 @@ import net.tiklab.matflow.task.code.service.TaskCodeExecService;
 import net.tiklab.matflow.task.codescan.service.TaskCodeScanExecService;
 import net.tiklab.matflow.task.deploy.service.TaskDeployExecService;
 import net.tiklab.matflow.task.message.service.TaskMessageExecService;
-import net.tiklab.matflow.task.product.service.TaskProductExecService;
+import net.tiklab.matflow.task.artifact.service.TaskProductExecService;
 import net.tiklab.matflow.task.script.service.TaskScriptExecService;
 import net.tiklab.matflow.task.test.service.TaskTestExecService;
 import org.springframework.beans.factory.annotation.Autowired;

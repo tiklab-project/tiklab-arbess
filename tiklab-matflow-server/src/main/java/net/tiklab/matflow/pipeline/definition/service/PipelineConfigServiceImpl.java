@@ -4,7 +4,7 @@ import net.tiklab.join.JoinTemplate;
 import net.tiklab.matflow.pipeline.definition.model.Pipeline;
 import net.tiklab.matflow.pipeline.definition.model.PipelineConfig;
 import net.tiklab.matflow.pipeline.definition.model.PipelineStages;
-import net.tiklab.matflow.support.post.service.PostService;
+import net.tiklab.matflow.support.postprocess.service.PostprocessService;
 import net.tiklab.matflow.support.trigger.service.TriggerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +25,7 @@ public class PipelineConfigServiceImpl implements PipelineConfigService {
     private PipelineStagesService stagesServer;
 
     @Autowired
-    private PostService postServer;
+    private PostprocessService postServer;
 
     @Autowired
     TriggerService triggerServer;

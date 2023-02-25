@@ -24,10 +24,10 @@ public class PipelineStagesServiceImpl implements PipelineStagesService {
 
 
     @Autowired
-    PipelineStagesDao stagesDao;
+    private PipelineStagesDao stagesDao;
 
     @Autowired
-    PipelineStagesTaskService stagesTaskServer;
+    private PipelineStagesTaskService stagesTaskServer;
 
 
     /**
@@ -290,12 +290,16 @@ public class PipelineStagesServiceImpl implements PipelineStagesService {
     public void deleteStagesTask(String configId){
 
         PipelineStagesTask stagesTask = stagesTaskServer.findOneStagesTask(configId);
-        stagesTaskServer.deleteStagesTasksTask(configId);
+
+        boolean b = stagesTaskServer.deleteStagesTasksTask(configId);
+
         String stagesId = stagesTask.getStagesId();
-        List<PipelineStagesTask> allStagesTasks = stagesTaskServer.findAllStagesTasks(stagesId);
+
+        // List<PipelineStagesTask> allStagesTasks = stagesTaskServer.findAllStagesTasks(stagesId);
 
         //删除配置与任务后阶段为空时删除阶段
-        if (allStagesTasks == null ||allStagesTasks.size() == 0){
+        // if (allStagesTasks == null || allStagesTasks.size() == 0){
+        if (!b){
             //获取
             PipelineStages oneStages = findOneStages(stagesId);
 
@@ -343,6 +347,9 @@ public class PipelineStagesServiceImpl implements PipelineStagesService {
                 }
             }
         }
+
+
+
     }
 
     /**

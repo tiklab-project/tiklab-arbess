@@ -3,7 +3,7 @@ package net.tiklab.matflow.task.codescan.entity;
 import net.tiklab.dal.jpa.annotation.*;
 
 @Entity
-@Table(name="pip_pipeline_task_code_scan")
+@Table(name="pip_task_code_scan")
 public class TaskCodeScanEntity {
 
     @Id

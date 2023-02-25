@@ -3,7 +3,7 @@ package net.tiklab.matflow.task.script.entity;
 import net.tiklab.dal.jpa.annotation.*;
 
 @Entity
-@Table(name="pip_pipeline_task_script")
+@Table(name="pip_task_script")
 public class TaskScriptEntity {
 
     //id

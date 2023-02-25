@@ -3,7 +3,7 @@ package net.tiklab.matflow.support.trigger.entity;
 import net.tiklab.dal.jpa.annotation.*;
 
 @Entity
-@Table(name="pip_pipeline_task_time")
+@Table(name="pip_pipeline_trigger_time")
 public class TriggerTimeEntity {
 
     @Id

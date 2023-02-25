@@ -2,7 +2,7 @@ package net.tiklab.matflow.setting.entity;
 
 import net.tiklab.dal.jpa.annotation.*;
 @Entity
-@Table(name="pip_pipeline_auth_server")
+@Table(name="pip_auth_server")
 public class AuthThirdEntity {
 
     @Id

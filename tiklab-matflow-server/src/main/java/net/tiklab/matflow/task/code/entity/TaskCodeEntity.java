@@ -4,7 +4,7 @@ package net.tiklab.matflow.task.code.entity;
 import net.tiklab.dal.jpa.annotation.*;
 
 @Entity
-@Table(name="pip_pipeline_task_code")
+@Table(name="pip_task_code")
 public class TaskCodeEntity {
 
     //codeId
@@ -34,8 +34,6 @@ public class TaskCodeEntity {
 
     @Column(name = "config_id",notNull = true)
     private String configId;
-
-
 
     public String getConfigId() {
         return configId;

@@ -4,7 +4,7 @@ package net.tiklab.matflow.task.test.entity;
 import net.tiklab.dal.jpa.annotation.*;
 
 @Entity
-@Table(name="pip_pipeline_task_test")
+@Table(name="pip_task_test")
 public class TaskTestEntity {
 
     @Id

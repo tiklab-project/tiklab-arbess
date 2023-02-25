@@ -16,7 +16,7 @@ import java.util.List;
 public class PipelineStagesTaskDao {
 
     @Autowired
-    JpaTemplate jpaTemplate;
+    private JpaTemplate jpaTemplate;
 
     /**
      * 创建
@@ -29,10 +29,10 @@ public class PipelineStagesTaskDao {
 
     /**
      * 删除StagesTask
-     * @param StagesTaskId StagesTaskId
+     * @param stagesTaskId stagesTaskId
      */
-    public void deleteStagesTask(String StagesTaskId){
-        jpaTemplate.delete(PipelineStagesTaskEntity.class,StagesTaskId);
+    public void deleteStagesTask(String stagesTaskId){
+        jpaTemplate.delete(PipelineStagesTaskEntity.class,stagesTaskId);
     }
 
     /**

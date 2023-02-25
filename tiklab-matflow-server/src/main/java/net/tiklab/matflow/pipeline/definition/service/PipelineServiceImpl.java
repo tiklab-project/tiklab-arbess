@@ -10,7 +10,7 @@ import net.tiklab.matflow.pipeline.definition.model.Pipeline;
 import net.tiklab.matflow.pipeline.definition.model.PipelineMessageList;
 import net.tiklab.matflow.pipeline.instance.model.PipelineAllInstanceQuery;
 import net.tiklab.matflow.pipeline.instance.model.PipelineInstance;
-import net.tiklab.matflow.home.model.PipelineOpen;
+import net.tiklab.matflow.pipeline.instance.model.PipelineOpen;
 import net.tiklab.matflow.home.service.PipelineHomeService;
 import net.tiklab.matflow.support.until.PipelineUntil;
 import net.tiklab.rpc.annotation.Exporter;

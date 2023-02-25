@@ -9,13 +9,13 @@ import net.tiklab.matflow.pipeline.instance.model.TaskInstanceLog;
 import net.tiklab.matflow.pipeline.instance.model.TaskRunLog;
 import net.tiklab.matflow.pipeline.instance.service.PipelineInstanceService;
 import net.tiklab.matflow.pipeline.instance.service.TaskInstanceLogService;
-import net.tiklab.matflow.support.post.service.PostService;
+import net.tiklab.matflow.support.postprocess.model.Postprocess;
+import net.tiklab.matflow.support.postprocess.service.PostprocessService;
 import net.tiklab.matflow.pipeline.definition.service.PipelineService;
 import net.tiklab.matflow.pipeline.definition.service.PipelineStagesService;
 import net.tiklab.matflow.pipeline.definition.service.PipelineTasksService;
 import net.tiklab.matflow.home.service.PipelineHomeService;
 import net.tiklab.matflow.pipeline.execute.model.*;
-import net.tiklab.matflow.support.post.model.Post;
 import net.tiklab.matflow.support.until.PipelineUntil;
 import net.tiklab.rpc.annotation.Exporter;
 import net.tiklab.utils.context.LoginContext;
@@ -57,7 +57,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
     private PipelineTasksService tasksService;
 
     @Autowired
-    private PostService postServer;
+    private PostprocessService postServer;
 
     @Autowired
     private PipelineStagesService stagesServer;
@@ -200,10 +200,10 @@ public class PipelineExecServiceImpl implements PipelineExecService {
                 TaskRunLog runLog = findOneRunLog(configId);
                 list.add(runLog);
             }
-            List<Post> allPost = postServer.findAllPost(pipelineId);
-            if (allPost.size() != 0){
-                for (Post post : allPost) {
-                    String configId = post.getConfigId();
+            List<Postprocess> allPostprocess = postServer.findAllPost(pipelineId);
+            if (allPostprocess.size() != 0){
+                for (Postprocess postprocess : allPostprocess) {
+                    String configId = postprocess.getConfigId();
                     TaskRunLog runLog = findOneRunLog(configId);
                     list.add(runLog);
                 }
@@ -240,8 +240,8 @@ public class PipelineExecServiceImpl implements PipelineExecService {
             }
 
             //添加消息阶段
-            List<Post> allPost = postServer.findAllPost(pipelineId);
-            if (allPost.size() == 0){
+            List<Postprocess> allPostprocess = postServer.findAllPost(pipelineId);
+            if (allPostprocess.size() == 0){
                 execRunLog.setAllState(1);
                 execRunLog.setAllTime(runTime.get(history.getHistoryId()));
                 execRunLog.setRunLogList(list);
@@ -249,8 +249,8 @@ public class PipelineExecServiceImpl implements PipelineExecService {
             }
 
             List<TaskRunLog> logs = new ArrayList<>();
-            for (Post post : allPost) {
-                String configId = post.getConfigId();
+            for (Postprocess postprocess : allPostprocess) {
+                String configId = postprocess.getConfigId();
                 TaskRunLog taskRunLog = findOneRunLog(configId);
                 logs.add(taskRunLog);
             }
@@ -444,15 +444,15 @@ public class PipelineExecServiceImpl implements PipelineExecService {
     //执行后置任务
     private boolean beginAfter(Pipeline pipeline, String historyId){
         String pipelineId = pipeline.getId();
-        List<Post> allAfterConfig = postServer.findAllPost(pipelineId);
+        List<Postprocess> allAfterConfig = postServer.findAllPost(pipelineId);
         if (allAfterConfig == null){
             return true;
         }
-        for (Post post : allAfterConfig) {
-            String configId = post.getConfigId();
+        for (Postprocess postprocess : allAfterConfig) {
+            String configId = postprocess.getConfigId();
             PipelineProcess process =  initProcess(configId,pipelineId,historyId);
             commonService.updateExecLog(process,PipelineUntil.date(4)+"执行后置任务");
-            boolean b = execTask(process, post.getTaskType(), post.getName());
+            boolean b = execTask(process, postprocess.getTaskType(), postprocess.getName());
             if (!b){
                 return false;
             }
@@ -476,12 +476,12 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         boolean b = taskExecService.beginCourseState(pipelineProcess, configId, taskType, new HashMap<>());
 
         //任务存在后置任务并且条件满足
-        List<Post> allPost = postServer.findAllPost(configId);
+        List<Postprocess> allPostprocess = postServer.findAllPost(configId);
         Boolean variableCond = commonService.variableCond(pipeline.getId(), configId);
-        if (allPost.size() != 0 && variableCond){
-            for (Post post : allPost) {
-                commonService.updateExecLog(pipelineProcess,PipelineUntil.date(4)+"后置任务:"+post.getName());
-                String postConfigId = post.getConfigId();
+        if (allPostprocess.size() != 0 && variableCond){
+            for (Postprocess postprocess : allPostprocess) {
+                commonService.updateExecLog(pipelineProcess,PipelineUntil.date(4)+"后置任务:"+ postprocess.getName());
+                String postConfigId = postprocess.getConfigId();
                 Map<String,String> map = new HashMap<>();
                 map.put("task","true");
                 if (b){
@@ -489,9 +489,9 @@ public class PipelineExecServiceImpl implements PipelineExecService {
                 }else {
                     map.put("taskMessage","任务"+taskName+"执行失败。");
                 }
-                boolean state = taskExecService.beginCourseState(pipelineProcess, postConfigId, post.getTaskType(),map);
+                boolean state = taskExecService.beginCourseState(pipelineProcess, postConfigId, postprocess.getTaskType(),map);
                 if (!state){
-                    commonService.updateExecLog(pipelineProcess,PipelineUntil.date(4)+"后置任务:"+post.getName()+"执行失败！");
+                    commonService.updateExecLog(pipelineProcess,PipelineUntil.date(4)+"后置任务:"+ postprocess.getName()+"执行失败！");
                     b = false;
                 }
             }
@@ -550,13 +550,13 @@ public class PipelineExecServiceImpl implements PipelineExecService {
             }
         }
 
-        List<Post> allPost = postServer.findAllPost(pipelineId);
-        if (allPost == null || allPost.size() == 0){
+        List<Postprocess> allPostprocess = postServer.findAllPost(pipelineId);
+        if (allPostprocess == null || allPostprocess.size() == 0){
             return;
         }
-        for (Post post : allPost) {
-            post.setTaskSort(post.getTaskSort()+sort);
-            createPipelineLog(0,post,historyId);
+        for (Postprocess postprocess : allPostprocess) {
+            postprocess.setTaskSort(postprocess.getTaskSort()+sort);
+            createPipelineLog(0, postprocess,historyId);
         }
     }
 
@@ -572,11 +572,11 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         String id = history.getPipeline().getId();
 
         if (type == 0){
-            Post post = (Post) o;
-            taskSort = post.getTaskSort();
-            taskType = post.getTaskType();
-            configId = post.getConfigId();
-            name = post.getName();
+            Postprocess postprocess = (Postprocess) o;
+            taskSort = postprocess.getTaskSort();
+            taskType = postprocess.getTaskType();
+            configId = postprocess.getConfigId();
+            name = postprocess.getName();
         }
 
         if (type == 1){

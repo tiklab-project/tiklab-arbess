@@ -74,17 +74,23 @@ public class PipelineStagesTaskServiceImpl implements PipelineStagesTaskService 
      * @param configId Id
      */
     @Override
-    public void deleteStagesTasksTask(String configId) {
+    public boolean deleteStagesTasksTask(String configId) {
         PipelineStagesTask stagesTask = findOneStagesTask(configId);
         int taskType = stagesTask.getTaskType();
+        //删除任务
         commonServer.deleteTaskConfig(configId,taskType);
         int taskSort = stagesTask.getTaskSort();
         String stagesId = stagesTask.getStagesId();
-        deleteStagesTask(configId);
+
+        //删除阶段
+        stagesTaskDao.deleteStagesTask(configId);
+
+        // this.deleteStagesTask(configId);
         List<PipelineStagesTask> allStagesTasks = findAllStagesTasks(stagesId);
         if (allStagesTasks == null || allStagesTasks.size()==0){
-            return;
+            return false;
         }
+        //更新顺序
         for (PipelineStagesTask task : allStagesTasks) {
             int sort = task.getTaskSort();
             if (sort < taskSort){
@@ -93,6 +99,7 @@ public class PipelineStagesTaskServiceImpl implements PipelineStagesTaskService 
             task.setTaskSort(task.getTaskSort()-1);
             updateStagesTask(task);
         }
+        return true;
     }
 
     /**

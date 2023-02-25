@@ -18,7 +18,7 @@ public interface PipelineStagesTaskService {
      * 删除配置及任务
      * @param configId Id
      */
-    void deleteStagesTasksTask (String configId) ;
+    boolean deleteStagesTasksTask (String configId) ;
 
     /**
      * 删除所有配置及任务
@@ -67,6 +67,11 @@ public interface PipelineStagesTaskService {
      * @param stagesId 流水线id
      */
     void validAllConfig(String stagesId,List<String> list);
+
+
+
+    //删除
+    void deleteStagesTask(String stagesTaskId);
 
 
 }
