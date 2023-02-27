@@ -4,7 +4,7 @@ import net.tiklab.core.exception.ApplicationException;
 import net.tiklab.matflow.pipeline.definition.model.Pipeline;
 import net.tiklab.matflow.pipeline.instance.model.TaskInstanceLog;
 import net.tiklab.matflow.pipeline.execute.model.PipelineProcess;
-import net.tiklab.matflow.pipeline.execute.service.PipelineExecCommonService;
+import net.tiklab.matflow.pipeline.instance.service.PipelineExecLogService;
 import net.tiklab.matflow.pipeline.instance.service.TaskInstanceLogService;
 import net.tiklab.matflow.home.service.PipelineHomeService;
 import net.tiklab.matflow.support.until.PipelineUntil;
@@ -34,7 +34,7 @@ public class TaskMessageExecServiceImpl implements TaskMessageExecService {
 
 
     @Autowired
-    PipelineExecCommonService commonService;
+    PipelineExecLogService commonService;
 
     @Autowired
     PipelineHomeService homeService;

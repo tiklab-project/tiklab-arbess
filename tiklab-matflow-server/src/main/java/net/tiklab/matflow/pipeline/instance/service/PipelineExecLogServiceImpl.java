@@ -1,19 +1,18 @@
-package net.tiklab.matflow.pipeline.execute.service;
+package net.tiklab.matflow.pipeline.instance.service;
 
 import net.tiklab.core.exception.ApplicationException;
-import net.tiklab.matflow.pipeline.instance.model.PipelineInstance;
-import net.tiklab.matflow.pipeline.instance.service.PipelineInstanceService;
-import net.tiklab.matflow.pipeline.instance.service.TaskInstanceLogService;
-import net.tiklab.matflow.support.condition.model.Condition;
-import net.tiklab.matflow.support.variable.model.Variable;
-import net.tiklab.matflow.support.condition.service.ConditionService;
-import net.tiklab.matflow.support.variable.service.VariableService;
-import net.tiklab.matflow.pipeline.instance.model.TaskInstanceLog;
 import net.tiklab.matflow.pipeline.execute.model.PipelineProcess;
-import net.tiklab.matflow.support.until.PipelineFinal;
-import net.tiklab.matflow.support.until.PipelineUntil;
+import net.tiklab.matflow.pipeline.execute.service.PipelineExecServiceImpl;
+import net.tiklab.matflow.pipeline.instance.model.PipelineInstance;
+import net.tiklab.matflow.pipeline.instance.model.TaskInstanceLog;
 import net.tiklab.matflow.setting.model.Scm;
 import net.tiklab.matflow.setting.service.ScmService;
+import net.tiklab.matflow.support.condition.model.Condition;
+import net.tiklab.matflow.support.condition.service.ConditionService;
+import net.tiklab.matflow.support.until.PipelineFinal;
+import net.tiklab.matflow.support.until.PipelineUntil;
+import net.tiklab.matflow.support.variable.model.Variable;
+import net.tiklab.matflow.support.variable.service.VariableService;
 import net.tiklab.rpc.annotation.Exporter;
 import net.tiklab.utils.context.LoginContext;
 import org.apache.commons.lang.text.StrSubstitutor;
@@ -34,7 +33,7 @@ import java.util.Map;
 
 @Service
 @Exporter
-public class PipelineExecCommonServiceImpl implements PipelineExecCommonService {
+public class PipelineExecLogServiceImpl implements PipelineExecLogService {
 
     @Autowired
     ScmService scmService;
@@ -188,7 +187,7 @@ public class PipelineExecCommonServiceImpl implements PipelineExecCommonService 
      * 更新日志执行状态
      * @param pipelineId 执行信息
      */
-    public void updateState(String pipelineId,String logId,int state){
+    public void updateLogState(String pipelineId,String logId,int state){
         TaskInstanceLog taskInstanceLog = logMap.get(logId);
         if (taskInstanceLog != null){
             //状态,id

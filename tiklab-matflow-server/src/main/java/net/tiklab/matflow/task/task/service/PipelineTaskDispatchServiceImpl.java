@@ -1,8 +1,10 @@
-package net.tiklab.matflow.pipeline.definition.service;
+package net.tiklab.matflow.task.task.service;
 
 import com.alibaba.fastjson.JSON;
 import net.tiklab.core.exception.ApplicationException;
 import net.tiklab.matflow.support.until.PipelineUntil;
+import net.tiklab.matflow.task.artifact.model.TaskProduct;
+import net.tiklab.matflow.task.artifact.service.TaskProductService;
 import net.tiklab.matflow.task.build.model.TaskBuild;
 import net.tiklab.matflow.task.build.service.TaskBuildService;
 import net.tiklab.matflow.task.code.model.TaskCode;
@@ -11,8 +13,6 @@ import net.tiklab.matflow.task.codescan.model.TaskCodeScan;
 import net.tiklab.matflow.task.codescan.service.TaskCodeScanService;
 import net.tiklab.matflow.task.deploy.model.TaskDeploy;
 import net.tiklab.matflow.task.deploy.service.TaskDeployService;
-import net.tiklab.matflow.task.artifact.model.TaskProduct;
-import net.tiklab.matflow.task.artifact.service.TaskProductService;
 import net.tiklab.matflow.task.test.model.TaskTest;
 import net.tiklab.matflow.task.test.service.TaskTestService;
 import net.tiklab.rpc.annotation.Exporter;
@@ -23,7 +23,7 @@ import java.util.List;
 
 @Service
 @Exporter
-public class PipelineTaskCommonServiceImpl implements PipelineTaskCommonService {
+public class PipelineTaskDispatchServiceImpl implements PipelineTaskDispatchService {
 
     @Autowired
     TaskCodeService codeService;

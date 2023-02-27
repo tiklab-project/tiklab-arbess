@@ -7,6 +7,7 @@ import net.tiklab.matflow.pipeline.definition.entity.PipelineStagesTaskEntity;
 import net.tiklab.matflow.pipeline.definition.model.PipelineConfig;
 import net.tiklab.matflow.pipeline.definition.model.PipelineStagesTask;
 import net.tiklab.matflow.support.until.PipelineUntil;
+import net.tiklab.matflow.task.task.service.PipelineTaskDispatchService;
 import net.tiklab.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,7 +26,7 @@ public class PipelineStagesTaskServiceImpl implements PipelineStagesTaskService 
     private PipelineStagesTaskDao stagesTaskDao;
 
     @Autowired
-    private PipelineTaskCommonService commonServer;
+    private PipelineTaskDispatchService commonServer;
 
 
     /**

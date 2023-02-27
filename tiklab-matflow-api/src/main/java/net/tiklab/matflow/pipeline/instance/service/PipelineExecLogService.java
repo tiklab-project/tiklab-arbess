@@ -1,4 +1,4 @@
-package net.tiklab.matflow.pipeline.execute.service;
+package net.tiklab.matflow.pipeline.instance.service;
 
 import net.tiklab.core.exception.ApplicationException;
 import net.tiklab.matflow.pipeline.instance.model.PipelineInstance;
@@ -7,9 +7,9 @@ import net.tiklab.matflow.pipeline.execute.model.PipelineProcess;
 import java.io.IOException;
 
 /**
- * 执行过程配置的公共方法
+ * 负责更新任务执行状态
  */
-public interface PipelineExecCommonService {
+public interface PipelineExecLogService {
 
 
     /**
@@ -54,7 +54,7 @@ public interface PipelineExecCommonService {
      * @param historyId 历史id
      * @param state 状态
      */
-    void updateState(String historyId, String logId,int state);
+    void updateLogState(String historyId, String logId,int state);
 
     /**
      * 获取环境配置信息

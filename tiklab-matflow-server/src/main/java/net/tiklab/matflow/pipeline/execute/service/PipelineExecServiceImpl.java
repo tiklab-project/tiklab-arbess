@@ -7,6 +7,7 @@ import net.tiklab.matflow.pipeline.instance.model.PipelineAllInstanceQuery;
 import net.tiklab.matflow.pipeline.instance.model.PipelineInstance;
 import net.tiklab.matflow.pipeline.instance.model.TaskInstanceLog;
 import net.tiklab.matflow.pipeline.instance.model.TaskRunLog;
+import net.tiklab.matflow.pipeline.instance.service.PipelineExecLogService;
 import net.tiklab.matflow.pipeline.instance.service.PipelineInstanceService;
 import net.tiklab.matflow.pipeline.instance.service.TaskInstanceLogService;
 import net.tiklab.matflow.support.postprocess.model.Postprocess;
@@ -17,6 +18,7 @@ import net.tiklab.matflow.pipeline.definition.service.PipelineTasksService;
 import net.tiklab.matflow.home.service.PipelineHomeService;
 import net.tiklab.matflow.pipeline.execute.model.*;
 import net.tiklab.matflow.support.until.PipelineUntil;
+import net.tiklab.matflow.task.task.service.PipelineTaskExecDispatchService;
 import net.tiklab.rpc.annotation.Exporter;
 import net.tiklab.utils.context.LoginContext;
 import org.slf4j.Logger;
@@ -45,10 +47,10 @@ public class PipelineExecServiceImpl implements PipelineExecService {
     private PipelineService pipelineService;
 
     @Autowired
-    private PipelineExecTaskService taskExecService;
+    private PipelineTaskExecDispatchService taskExecService;
 
     @Autowired
-    private PipelineExecCommonService commonService;
+    private PipelineExecLogService commonService;
 
     @Autowired
     private PipelineHomeService homeService;
@@ -291,7 +293,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
             if (log == null){
                 continue;
             }
-            commonService.updateState(pipelineId,logId,PIPELINE_RUN_HALT);
+            commonService.updateLogState(pipelineId,logId,PIPELINE_RUN_HALT);
         }
         updateStatus(pipelineId,PIPELINE_RUN_HALT);
     }
@@ -500,10 +502,10 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         stop(logId);
 
         if (!b){
-            commonService.updateState(pipeline.getId(),logId,PIPELINE_RUN_ERROR);
+            commonService.updateLogState(pipeline.getId(),logId,PIPELINE_RUN_ERROR);
             return false;
         }
-        commonService.updateState(pipeline.getId(),logId,PIPELINE_RUN_SUCCESS);
+        commonService.updateLogState(pipeline.getId(),logId,PIPELINE_RUN_SUCCESS);
         return true;
     }
 

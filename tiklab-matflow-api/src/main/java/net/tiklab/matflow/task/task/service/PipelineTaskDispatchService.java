@@ -1,8 +1,8 @@
-package net.tiklab.matflow.pipeline.definition.service;
+package net.tiklab.matflow.task.task.service;
 
 import java.util.List;
 
-public interface PipelineTaskCommonService {
+public interface PipelineTaskDispatchService {
 
     /**
      * 创建任务

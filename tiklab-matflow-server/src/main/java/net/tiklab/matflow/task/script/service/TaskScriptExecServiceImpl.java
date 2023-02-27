@@ -3,7 +3,7 @@ package net.tiklab.matflow.task.script.service;
 import net.tiklab.core.exception.ApplicationException;
 import net.tiklab.matflow.pipeline.definition.model.Pipeline;
 import net.tiklab.matflow.pipeline.execute.model.PipelineProcess;
-import net.tiklab.matflow.pipeline.execute.service.PipelineExecCommonService;
+import net.tiklab.matflow.pipeline.instance.service.PipelineExecLogService;
 import net.tiklab.matflow.support.until.PipelineFinal;
 import net.tiklab.matflow.support.until.PipelineUntil;
 import net.tiklab.matflow.task.script.model.TaskScript;
@@ -24,7 +24,7 @@ public class TaskScriptExecServiceImpl implements TaskScriptExecService {
 
 
     @Autowired
-    PipelineExecCommonService commonService;
+    PipelineExecLogService commonService;
 
     @Autowired
     TaskScriptService scriptServer;

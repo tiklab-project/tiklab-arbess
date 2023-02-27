@@ -5,7 +5,7 @@ import net.tiklab.matflow.pipeline.definition.model.Pipeline;
 import net.tiklab.matflow.pipeline.definition.service.PipelineStagesTaskService;
 import net.tiklab.matflow.pipeline.definition.service.PipelineTasksService;
 import net.tiklab.matflow.pipeline.execute.model.PipelineProcess;
-import net.tiklab.matflow.pipeline.execute.service.PipelineExecCommonService;
+import net.tiklab.matflow.pipeline.instance.service.PipelineExecLogService;
 import net.tiklab.matflow.setting.model.AuthThird;
 import net.tiklab.matflow.support.until.PipelineUntil;
 import net.tiklab.matflow.task.codescan.model.TaskCodeScan;
@@ -25,7 +25,7 @@ public class TaskCodeScanExecServiceImpl implements TaskCodeScanExecService {
 
 
     @Autowired
-    PipelineExecCommonService commonService;
+    PipelineExecLogService commonService;
 
     @Autowired
     PipelineTasksService tasksService;

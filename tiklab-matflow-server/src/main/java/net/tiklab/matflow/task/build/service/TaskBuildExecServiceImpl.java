@@ -5,7 +5,7 @@ import net.tiklab.matflow.pipeline.definition.model.Pipeline;
 import net.tiklab.matflow.pipeline.definition.service.PipelineStagesTaskService;
 import net.tiklab.matflow.pipeline.definition.service.PipelineTasksService;
 import net.tiklab.matflow.pipeline.execute.model.PipelineProcess;
-import net.tiklab.matflow.pipeline.execute.service.PipelineExecCommonService;
+import net.tiklab.matflow.pipeline.instance.service.PipelineExecLogService;
 import net.tiklab.matflow.support.until.PipelineUntil;
 import net.tiklab.matflow.task.build.model.TaskBuild;
 import net.tiklab.rpc.annotation.Exporter;
@@ -24,7 +24,7 @@ import java.util.List;
 public class TaskBuildExecServiceImpl implements TaskBuildExecService {
 
     @Autowired
-    private PipelineExecCommonService commonService;
+    private PipelineExecLogService commonService;
 
     @Autowired
     TaskBuildService buildService;

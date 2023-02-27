@@ -6,7 +6,7 @@ import net.tiklab.matflow.pipeline.definition.model.Pipeline;
 import net.tiklab.matflow.pipeline.definition.service.PipelineStagesTaskService;
 import net.tiklab.matflow.pipeline.definition.service.PipelineTasksService;
 import net.tiklab.matflow.pipeline.execute.model.PipelineProcess;
-import net.tiklab.matflow.pipeline.execute.service.PipelineExecCommonService;
+import net.tiklab.matflow.pipeline.instance.service.PipelineExecLogService;
 import net.tiklab.matflow.setting.model.AuthHost;
 import net.tiklab.matflow.setting.model.AuthThird;
 import net.tiklab.matflow.support.until.PipelineFinal;
@@ -27,7 +27,7 @@ import java.io.IOException;
 public class TaskProductExecServiceImpl implements TaskProductExecService {
 
     @Autowired
-    PipelineExecCommonService commonService;
+    PipelineExecLogService commonService;
 
     @Autowired
     PipelineTasksService tasksService;
