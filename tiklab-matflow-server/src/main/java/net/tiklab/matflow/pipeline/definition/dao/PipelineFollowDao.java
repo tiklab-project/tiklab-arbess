@@ -1,12 +1,12 @@
-package net.tiklab.matflow.pipeline.instance.dao;
+package net.tiklab.matflow.pipeline.definition.dao;
 
 
 
 import net.tiklab.dal.jdbc.JdbcTemplate;
 import net.tiklab.dal.jpa.JpaTemplate;
 import net.tiklab.matflow.pipeline.definition.entity.PipelineEntity;
-import net.tiklab.matflow.pipeline.instance.entity.PipelineFollowEntity;
-import net.tiklab.matflow.pipeline.instance.model.PipelineFollow;
+import net.tiklab.matflow.pipeline.definition.entity.PipelineFollowEntity;
+import net.tiklab.matflow.pipeline.definition.model.PipelineFollow;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.stereotype.Repository;

@@ -1,7 +1,7 @@
-package net.tiklab.matflow.pipeline.instance.service;
+package net.tiklab.matflow.pipeline.definition.service;
 
 import net.tiklab.matflow.pipeline.definition.model.Pipeline;
-import net.tiklab.matflow.pipeline.instance.model.PipelineFollow;
+import net.tiklab.matflow.pipeline.definition.model.PipelineFollow;
 
 import java.util.List;
 

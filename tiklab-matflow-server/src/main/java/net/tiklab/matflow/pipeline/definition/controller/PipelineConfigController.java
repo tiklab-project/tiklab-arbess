@@ -4,7 +4,7 @@ import net.tiklab.core.Result;
 import net.tiklab.matflow.pipeline.definition.model.PipelineConfig;
 import net.tiklab.matflow.pipeline.definition.service.PipelineConfigService;
 import net.tiklab.matflow.pipeline.definition.service.PipelineStagesService;
-import net.tiklab.matflow.pipeline.definition.service.PipelineStagesTaskService;
+import net.tiklab.matflow.pipeline.definition.service.StagesTaskService;
 import net.tiklab.postin.annotation.Api;
 import net.tiklab.postin.annotation.ApiMethod;
 import net.tiklab.postin.annotation.ApiParam;
@@ -89,7 +89,7 @@ public class PipelineConfigController {
     }
 
     @Autowired
-    PipelineStagesTaskService taskService;
+    StagesTaskService taskService;
 
     @RequestMapping(path="/deleteStagesTask",method = RequestMethod.POST)
     @ApiMethod(name = "updateStageName",desc = "更新流水线配置")

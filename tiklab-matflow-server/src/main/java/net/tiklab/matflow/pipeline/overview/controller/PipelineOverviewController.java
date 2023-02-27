@@ -1,8 +1,8 @@
-package net.tiklab.matflow.pipeline.definition.controller;
+package net.tiklab.matflow.pipeline.overview.controller;
 
 import net.tiklab.core.Result;
-import net.tiklab.matflow.pipeline.definition.service.PipelineRelationService;
 import net.tiklab.matflow.pipeline.definition.model.PipelineOverview;
+import net.tiklab.matflow.pipeline.overview.service.PipelineOverviewService;
 import net.tiklab.postin.annotation.Api;
 import net.tiklab.postin.annotation.ApiMethod;
 import net.tiklab.postin.annotation.ApiParam;
@@ -20,14 +20,14 @@ import javax.validation.constraints.NotNull;
 public class PipelineOverviewController {
 
     @Autowired
-    PipelineRelationService relationServer;
+    PipelineOverviewService overviewService;
 
     @RequestMapping(path="/pipelineCensus",method = RequestMethod.POST)
     @ApiMethod(name = "pipelineCensus",desc = "查询流水线最近状态")
     @ApiParam(name = "pipelineId",desc = "流水线id",required = true)
     public Result<PipelineOverview> pipelineCensus(@NotNull String pipelineId){
 
-        PipelineOverview buildStatus = relationServer.census(pipelineId);
+        PipelineOverview buildStatus = overviewService.pipelineCensus(pipelineId);
 
         return Result.ok(buildStatus);
     }

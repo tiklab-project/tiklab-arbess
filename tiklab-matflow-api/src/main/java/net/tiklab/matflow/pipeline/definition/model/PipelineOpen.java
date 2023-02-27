@@ -1,4 +1,4 @@
-package net.tiklab.matflow.pipeline.instance.model;
+package net.tiklab.matflow.pipeline.definition.model;
 
 
 import net.tiklab.beans.annotation.Mapper;

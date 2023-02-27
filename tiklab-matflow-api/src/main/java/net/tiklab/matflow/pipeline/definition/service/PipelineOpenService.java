@@ -1,11 +1,11 @@
-package net.tiklab.matflow.pipeline.instance.service;
+package net.tiklab.matflow.pipeline.definition.service;
 
 
 import net.tiklab.join.annotation.FindAll;
 import net.tiklab.join.annotation.FindList;
 import net.tiklab.join.annotation.FindOne;
 import net.tiklab.join.annotation.JoinProvider;
-import net.tiklab.matflow.pipeline.instance.model.PipelineOpen;
+import net.tiklab.matflow.pipeline.definition.model.PipelineOpen;
 
 import java.util.List;
 
@@ -18,6 +18,14 @@ public interface PipelineOpenService {
      * @return 列表
      */
     List<PipelineOpen> findAllOpen(StringBuilder s);
+
+
+    /**
+     * 查询流水线最近打开
+     * @param number 查询数量
+     * @return 最近打开的流水线
+     */
+    List<PipelineOpen> findAllOpen(int number);
 
     /**
      * 删除流水线收藏

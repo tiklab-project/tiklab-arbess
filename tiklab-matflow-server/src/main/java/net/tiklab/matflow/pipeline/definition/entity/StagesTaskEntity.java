@@ -9,7 +9,7 @@ import net.tiklab.dal.jpa.annotation.*;
 
 @Entity
 @Table(name="pip_pipeline_stages_task")
-public class PipelineStagesTaskEntity {
+public class StagesTaskEntity {
 
     //流水线配置id
     @Id

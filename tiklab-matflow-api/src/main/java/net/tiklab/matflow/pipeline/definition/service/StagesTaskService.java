@@ -1,11 +1,11 @@
 package net.tiklab.matflow.pipeline.definition.service;
 
 import net.tiklab.matflow.pipeline.definition.model.PipelineConfig;
-import net.tiklab.matflow.pipeline.definition.model.PipelineStagesTask;
+import net.tiklab.matflow.pipeline.definition.model.StagesTask;
 
 import java.util.List;
 
-public interface PipelineStagesTaskService {
+public interface StagesTaskService {
 
     /**
      * 创建配置及任务
@@ -37,7 +37,7 @@ public interface PipelineStagesTaskService {
      * @param stagesId 阶段id
      * @return 配置
      */
-    List<PipelineStagesTask> findAllStagesTasks (String stagesId) ;
+    List<StagesTask> findAllStagesTasks (String stagesId) ;
 
     /**
      * 查询流水线所有配置及任务
@@ -59,7 +59,7 @@ public interface PipelineStagesTaskService {
      * @param stagesTaskId 配置id
      * @return 配置
      */
-    PipelineStagesTask findOneStagesTask(String stagesTaskId);
+    StagesTask findOneStagesTask(String stagesTaskId);
 
 
     /**

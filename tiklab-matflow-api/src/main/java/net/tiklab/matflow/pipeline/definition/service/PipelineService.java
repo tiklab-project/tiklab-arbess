@@ -10,7 +10,7 @@ import net.tiklab.matflow.pipeline.definition.model.Pipeline;
 import net.tiklab.matflow.pipeline.definition.model.PipelineMessageList;
 import net.tiklab.matflow.pipeline.instance.model.PipelineAllInstanceQuery;
 import net.tiklab.matflow.pipeline.instance.model.PipelineInstance;
-import net.tiklab.matflow.pipeline.instance.model.PipelineOpen;
+import net.tiklab.user.user.model.User;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -95,16 +95,6 @@ public interface PipelineService {
      */
     List<PipelineMessageList> findLikePipeline(String pipelineName, String userId);
 
-
-    /**
-     * 查询最近打开的流水线
-     *
-     * @return 流水线
-     */
-    List<PipelineOpen> findAllOpen(int number);
-
-
-
     /**
      * 查询用户所有流水线历史
      * @return 历史
@@ -112,5 +102,45 @@ public interface PipelineService {
     Pagination<PipelineInstance> findUserAllHistory(PipelineAllInstanceQuery pipelineHistoryQuery);
 
 
+    /**
+     * 获取拥有此流水线的用户
+     * @param pipelineId 流水线id
+     * @return 用户信息
+     */
+    List<User> findPipelineUser(String pipelineId);
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

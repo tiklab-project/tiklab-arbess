@@ -1,4 +1,4 @@
-package net.tiklab.matflow.pipeline.instance.model;
+package net.tiklab.matflow.pipeline.definition.model;
 
 
 import net.tiklab.beans.annotation.Mapper;
@@ -6,7 +6,6 @@ import net.tiklab.beans.annotation.Mapping;
 import net.tiklab.beans.annotation.Mappings;
 import net.tiklab.join.annotation.Join;
 import net.tiklab.join.annotation.JoinQuery;
-import net.tiklab.matflow.pipeline.definition.model.Pipeline;
 import net.tiklab.postin.annotation.ApiModel;
 import net.tiklab.postin.annotation.ApiProperty;
 

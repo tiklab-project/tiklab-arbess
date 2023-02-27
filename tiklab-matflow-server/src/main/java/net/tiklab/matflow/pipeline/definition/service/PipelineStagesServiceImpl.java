@@ -7,7 +7,7 @@ import net.tiklab.matflow.pipeline.definition.entity.PipelineStagesEntity;
 import net.tiklab.matflow.pipeline.definition.model.Pipeline;
 import net.tiklab.matflow.pipeline.definition.model.PipelineConfig;
 import net.tiklab.matflow.pipeline.definition.model.PipelineStages;
-import net.tiklab.matflow.pipeline.definition.model.PipelineStagesTask;
+import net.tiklab.matflow.pipeline.definition.model.StagesTask;
 import net.tiklab.matflow.support.util.PipelineUtil;
 import net.tiklab.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +27,7 @@ public class PipelineStagesServiceImpl implements PipelineStagesService {
     private PipelineStagesDao stagesDao;
 
     @Autowired
-    private PipelineStagesTaskService stagesTaskServer;
+    private StagesTaskService stagesTaskServer;
 
 
     /**
@@ -289,13 +289,13 @@ public class PipelineStagesServiceImpl implements PipelineStagesService {
     @Override
     public void deleteStagesTask(String configId){
 
-        PipelineStagesTask stagesTask = stagesTaskServer.findOneStagesTask(configId);
+        StagesTask stagesTask = stagesTaskServer.findOneStagesTask(configId);
 
         boolean b = stagesTaskServer.deleteStagesTasksTask(configId);
 
         String stagesId = stagesTask.getStagesId();
 
-        // List<PipelineStagesTask> allStagesTasks = stagesTaskServer.findAllStagesTasks(stagesId);
+        // List<StagesTask> allStagesTasks = stagesTaskServer.findAllStagesTasks(stagesId);
 
         //删除配置与任务后阶段为空时删除阶段
         // if (allStagesTasks == null || allStagesTasks.size() == 0){
@@ -373,7 +373,7 @@ public class PipelineStagesServiceImpl implements PipelineStagesService {
        }
        for (PipelineStages stages : allStage) {
            String stagesId = stages.getStagesId();
-           List<PipelineStagesTask> allStagesTasks = stagesTaskServer.findAllStagesTasks(stagesId);
+           List<StagesTask> allStagesTasks = stagesTaskServer.findAllStagesTasks(stagesId);
            if (allStagesTasks.size() != 0){
                deleteStages(stagesId);
                stagesTaskServer.deleteAllStagesTasksTask(stagesId);
@@ -387,7 +387,7 @@ public class PipelineStagesServiceImpl implements PipelineStagesService {
      * @return 任务配置
      */
     @Override
-    public List<PipelineStagesTask> findAllStagesTask(String stagesId){
+    public List<StagesTask> findAllStagesTask(String stagesId){
        return stagesTaskServer.findAllStagesTasks(stagesId);
     }
 

@@ -1,9 +1,9 @@
-package net.tiklab.matflow.pipeline.instance.dao;
+package net.tiklab.matflow.pipeline.definition.dao;
 
 
 import net.tiklab.dal.jdbc.JdbcTemplate;
 import net.tiklab.dal.jpa.JpaTemplate;
-import net.tiklab.matflow.pipeline.instance.entity.PipelineOpenEntity;
+import net.tiklab.matflow.pipeline.definition.entity.PipelineOpenEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

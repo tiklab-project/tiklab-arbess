@@ -4,13 +4,15 @@ import net.tiklab.core.Result;
 import net.tiklab.core.page.Pagination;
 import net.tiklab.matflow.pipeline.definition.model.Pipeline;
 import net.tiklab.matflow.pipeline.definition.model.PipelineMessageList;
-import net.tiklab.matflow.pipeline.definition.service.PipelineRelationService;
+import net.tiklab.matflow.pipeline.definition.model.PipelineOverview;
 import net.tiklab.matflow.pipeline.definition.service.PipelineService;
 import net.tiklab.matflow.pipeline.instance.model.PipelineAllInstanceQuery;
+import net.tiklab.matflow.pipeline.definition.model.PipelineFollow;
 import net.tiklab.matflow.pipeline.instance.model.PipelineInstance;
-import net.tiklab.matflow.pipeline.definition.model.PipelineOverview;
-import net.tiklab.matflow.pipeline.instance.model.PipelineOpen;
-import net.tiklab.matflow.pipeline.instance.model.PipelineFollow;
+import net.tiklab.matflow.pipeline.definition.model.PipelineOpen;
+import net.tiklab.matflow.pipeline.definition.service.PipelineFollowService;
+import net.tiklab.matflow.pipeline.definition.service.PipelineOpenService;
+import net.tiklab.matflow.pipeline.overview.service.PipelineOverviewService;
 import net.tiklab.postin.annotation.Api;
 import net.tiklab.postin.annotation.ApiMethod;
 import net.tiklab.postin.annotation.ApiParam;
@@ -38,7 +40,13 @@ public class PipelineController {
     PipelineService pipelineService;
 
     @Autowired
-    PipelineRelationService relationServer;
+    PipelineOpenService openService;
+
+    @Autowired
+    PipelineOverviewService overviewService;
+
+    @Autowired
+    PipelineFollowService followService;
 
     //创建
     @RequestMapping(path="/createPipeline",method = RequestMethod.POST)
@@ -133,7 +141,7 @@ public class PipelineController {
     @ApiParam(name = "pipelineId",desc = "流水线id",required = true)
     public Result<List<User>> findPipelineUser(@NotNull String pipelineId){
 
-        List<User>  dmUser = relationServer.findPipelineUser(pipelineId);
+        List<User>  dmUser = pipelineService.findPipelineUser(pipelineId);
 
         return Result.ok(dmUser);
     }
@@ -143,7 +151,7 @@ public class PipelineController {
     @ApiParam(name = "pipelineId",desc = "流水线id",required = true)
     public Result<PipelineOverview> pipelineCensus(@NotNull String pipelineId){
 
-        PipelineOverview buildStatus = relationServer.census(pipelineId);
+        PipelineOverview buildStatus = overviewService.pipelineCensus(pipelineId);
 
         return Result.ok(buildStatus);
     }
@@ -153,7 +161,7 @@ public class PipelineController {
     @ApiParam(name = "number",desc = "数量",required = true)
     public Result< List<PipelineOpen>> findAllOpen(int number){
 
-        List<PipelineOpen> openList = pipelineService.findAllOpen(number);
+        List<PipelineOpen> openList = openService.findAllOpen(number);
 
         return Result.ok(openList);
     }
@@ -163,7 +171,7 @@ public class PipelineController {
     @ApiMethod(name = "updateFollow",desc = "更新收藏")
     @ApiParam(name = "pipelineFollow",desc = "收藏信息",required = true)
     public Result<Void>  updateFollow( @RequestBody @Valid @NotNull PipelineFollow pipelineFollow){
-         relationServer.updateFollow(pipelineFollow);
+        followService.updateFollow(pipelineFollow);
         return Result.ok();
     }
 

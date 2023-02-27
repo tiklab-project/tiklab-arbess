@@ -1,12 +1,14 @@
-package net.tiklab.matflow.pipeline.instance.service;
+package net.tiklab.matflow.pipeline.definition.service;
 
 
 import net.tiklab.beans.BeanMapper;
 import net.tiklab.join.JoinTemplate;
 import net.tiklab.matflow.pipeline.definition.model.Pipeline;
-import net.tiklab.matflow.pipeline.instance.dao.PipelineOpenDao;
-import net.tiklab.matflow.pipeline.instance.entity.PipelineOpenEntity;
-import net.tiklab.matflow.pipeline.instance.model.PipelineOpen;
+import net.tiklab.matflow.pipeline.definition.model.PipelineOverview;
+import net.tiklab.matflow.pipeline.definition.dao.PipelineOpenDao;
+import net.tiklab.matflow.pipeline.definition.entity.PipelineOpenEntity;
+import net.tiklab.matflow.pipeline.definition.model.PipelineOpen;
+import net.tiklab.matflow.pipeline.overview.service.PipelineOverviewService;
 import net.tiklab.matflow.support.util.PipelineUtil;
 import net.tiklab.rpc.annotation.Exporter;
 import net.tiklab.utils.context.LoginContext;
@@ -14,6 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -22,6 +26,12 @@ public class PipelineOpenServiceImpl implements PipelineOpenService {
 
     @Autowired
     PipelineOpenDao pipelineOpenDao;
+
+    @Autowired
+    PipelineService pipelineService;
+
+    @Autowired
+    PipelineOverviewService overviewService;
 
     @Autowired
     JoinTemplate joinTemplate;
@@ -110,6 +120,35 @@ public class PipelineOpenServiceImpl implements PipelineOpenService {
         pipelineOpenDao.createOpen(BeanMapper.map(pipelineOpen, PipelineOpenEntity.class));
     }
 
+
+    /**
+     * 查询流水线最近打开
+     * @param number 查询数量
+     * @return 最近打开的流水线
+     */
+    @Override
+    public List<PipelineOpen> findAllOpen(int number) {
+        StringBuilder builder = pipelineService.findUserPipelineId(LoginContext.getLoginId());
+        List<PipelineOpen> allOpen = findAllOpen(builder) ;
+        if (allOpen == null){
+            return Collections.emptyList() ;
+        }
+        //根据打开次数降序排列
+        allOpen.sort(Comparator.comparing(PipelineOpen::getNumber).reversed()) ;
+        // 指定返回数量
+        int min = Math.min(number, allOpen.size()) ;
+        List<PipelineOpen> pipelineOpens = allOpen.subList(0, min);
+        //统计信息
+        for (PipelineOpen pipelineOpen : pipelineOpens) {
+            Pipeline pipeline = pipelineOpen.getPipeline();
+            PipelineOverview pipelineOverview = overviewService.pipelineCensus(pipeline.getId());
+            pipelineOpen.setPipelineExecState(pipelineOverview);
+        }
+        return pipelineOpens;
+    }
+
+
+
     //查询流水线最近打开
     @Override
     public List<PipelineOpen> findAllOpen(StringBuilder s){
@@ -132,6 +171,10 @@ public class PipelineOpenServiceImpl implements PipelineOpenService {
         }
         return openList;
     }
+
+
+
+
 
 
 }

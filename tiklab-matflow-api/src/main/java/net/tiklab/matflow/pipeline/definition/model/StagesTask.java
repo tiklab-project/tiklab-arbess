@@ -9,7 +9,7 @@ import net.tiklab.postin.annotation.ApiProperty;
 @ApiModel
 @Join
 @Mapper(targetAlias = "PipelineStagesTaskEntity")
-public class PipelineStagesTask {
+public class StagesTask {
 
     @ApiProperty(name="configId",desc="配置id")
     private String configId;
@@ -30,10 +30,10 @@ public class PipelineStagesTask {
     private String name;
 
 
-    public PipelineStagesTask() {
+    public StagesTask() {
     }
 
-    public PipelineStagesTask(String createTime, int taskType, int taskSort, String stagesId) {
+    public StagesTask(String createTime, int taskType, int taskSort, String stagesId) {
         this.createTime = createTime;
         this.taskType = taskType;
         this.taskSort = taskSort;

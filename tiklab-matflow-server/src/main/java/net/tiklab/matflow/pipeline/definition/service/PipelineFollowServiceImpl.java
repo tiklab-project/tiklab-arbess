@@ -1,13 +1,13 @@
-package net.tiklab.matflow.pipeline.instance.service;
+package net.tiklab.matflow.pipeline.definition.service;
 
 
 import net.tiklab.beans.BeanMapper;
 import net.tiklab.core.exception.ApplicationException;
-import net.tiklab.matflow.pipeline.instance.dao.PipelineFollowDao;
-import net.tiklab.matflow.pipeline.instance.entity.PipelineFollowEntity;
+import net.tiklab.matflow.pipeline.definition.dao.PipelineFollowDao;
+import net.tiklab.matflow.pipeline.definition.entity.PipelineFollowEntity;
 import net.tiklab.matflow.pipeline.definition.entity.PipelineEntity;
 import net.tiklab.matflow.pipeline.definition.model.Pipeline;
-import net.tiklab.matflow.pipeline.instance.model.PipelineFollow;
+import net.tiklab.matflow.pipeline.definition.model.PipelineFollow;
 import net.tiklab.matflow.support.util.PipelineUtil;
 import net.tiklab.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;

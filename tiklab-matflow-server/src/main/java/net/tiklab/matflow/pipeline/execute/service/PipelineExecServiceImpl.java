@@ -227,9 +227,9 @@ public class PipelineExecServiceImpl implements PipelineExecService {
                 for (PipelineStages pipelineStages : allMainStage) {
                     String id = pipelineStages.getStagesId();
                     //并行阶段任务
-                    List<PipelineStagesTask> allStagesTask = stagesServer.findAllStagesTask(id);
+                    List<StagesTask> allStagesTask = stagesServer.findAllStagesTask(id);
                     List<TaskRunLog> taskList = new ArrayList<>();
-                    for (PipelineStagesTask stagesTask : allStagesTask) {
+                    for (StagesTask stagesTask : allStagesTask) {
                         String configId = stagesTask.getConfigId();
                         TaskRunLog logs = findOneRunLog(configId);
                         taskList.add(logs);
@@ -407,8 +407,8 @@ public class PipelineExecServiceImpl implements PipelineExecService {
                         Future<Boolean> future = threadPool.submit(() -> {
                             Thread.currentThread().setName(stage.getStagesId());
                             //获取任务，执行
-                            List<PipelineStagesTask> stagesTaskList = stagesServer.findAllStagesTask(stage.getStagesId());
-                            for (PipelineStagesTask stagesTask : stagesTaskList) {
+                            List<StagesTask> stagesTaskList = stagesServer.findAllStagesTask(stage.getStagesId());
+                            for (StagesTask stagesTask : stagesTaskList) {
                                 String configId = stagesTask.getConfigId();
                                 PipelineProcess process = initProcess(configId, pipelineId, historyId);
                                 commonService.updateExecLog(process, PipelineUtil.date(4)+"阶段："+stages.getName());
@@ -544,8 +544,8 @@ public class PipelineExecServiceImpl implements PipelineExecService {
                 List<PipelineStages> mainStage = stagesServer.findAllMainStage(stagesId);
                 for (PipelineStages pipelineStages : mainStage) {
                     String id = pipelineStages.getStagesId();
-                    List<PipelineStagesTask> allStagesTask = stagesServer.findAllStagesTask(id);
-                    for (PipelineStagesTask stagesTask : allStagesTask) {
+                    List<StagesTask> allStagesTask = stagesServer.findAllStagesTask(id);
+                    for (StagesTask stagesTask : allStagesTask) {
                         createPipelineLog(type,stagesTask,historyId);
                     }
                 }
@@ -590,7 +590,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         }
 
         if (type == 2){
-            PipelineStagesTask stagesTask = (PipelineStagesTask) o;
+            StagesTask stagesTask = (StagesTask) o;
             taskSort = stagesTask.getTaskSort();
             taskType = stagesTask.getTaskType();
             configId = stagesTask.getConfigId();
@@ -703,8 +703,8 @@ public class PipelineExecServiceImpl implements PipelineExecService {
                 List<PipelineStages> allMainStage = stagesServer.findAllMainStage(stagesId);
                 for (PipelineStages pipelineStages : allMainStage) {
                     String id = pipelineStages.getStagesId();
-                    List<PipelineStagesTask> allStagesTask = stagesServer.findAllStagesTask(id);
-                    for (PipelineStagesTask stagesTask : allStagesTask) {
+                    List<StagesTask> allStagesTask = stagesServer.findAllStagesTask(id);
+                    for (StagesTask stagesTask : allStagesTask) {
                         String configId = stagesTask.getConfigId();
                         stop(configId);
                     }

@@ -6,7 +6,7 @@ import net.tiklab.join.annotation.FindOne;
 import net.tiklab.join.annotation.JoinProvider;
 import net.tiklab.matflow.pipeline.definition.model.PipelineConfig;
 import net.tiklab.matflow.pipeline.definition.model.PipelineStages;
-import net.tiklab.matflow.pipeline.definition.model.PipelineStagesTask;
+import net.tiklab.matflow.pipeline.definition.model.StagesTask;
 
 import java.util.List;
 
@@ -84,7 +84,7 @@ public interface PipelineStagesService {
      * @param stagesId 阶段id
      * @return 任务配置
      */
-    List<PipelineStagesTask> findAllStagesTask(String stagesId);
+    List<StagesTask> findAllStagesTask(String stagesId);
 
 
     /**

@@ -1,4 +1,4 @@
-package net.tiklab.matflow.pipeline.instance.entity;
+package net.tiklab.matflow.pipeline.definition.entity;
 
 
 import net.tiklab.dal.jpa.annotation.*;

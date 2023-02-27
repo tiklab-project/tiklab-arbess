@@ -2,10 +2,10 @@ package net.tiklab.matflow.pipeline.definition.service;
 
 import com.alibaba.fastjson.JSON;
 import net.tiklab.beans.BeanMapper;
-import net.tiklab.matflow.pipeline.definition.dao.PipelineStagesTaskDao;
-import net.tiklab.matflow.pipeline.definition.entity.PipelineStagesTaskEntity;
+import net.tiklab.matflow.pipeline.definition.dao.StagesTaskDao;
+import net.tiklab.matflow.pipeline.definition.entity.StagesTaskEntity;
 import net.tiklab.matflow.pipeline.definition.model.PipelineConfig;
-import net.tiklab.matflow.pipeline.definition.model.PipelineStagesTask;
+import net.tiklab.matflow.pipeline.definition.model.StagesTask;
 import net.tiklab.matflow.support.util.PipelineUtil;
 import net.tiklab.matflow.task.task.service.PipelineTaskDispatchService;
 import net.tiklab.rpc.annotation.Exporter;
@@ -20,10 +20,10 @@ import java.util.List;
 
 @Service
 @Exporter
-public class PipelineStagesTaskServiceImpl implements PipelineStagesTaskService {
+public class StagesTaskServiceImpl implements StagesTaskService {
 
     @Autowired
-    private PipelineStagesTaskDao stagesTaskDao;
+    private StagesTaskDao stagesTaskDao;
 
     @Autowired
     private PipelineTaskDispatchService commonServer;
@@ -39,8 +39,8 @@ public class PipelineStagesTaskServiceImpl implements PipelineStagesTaskService 
         String stagesId = config.getStagesId();
         int taskType = config.getTaskType();
         int taskSort = initSort(stagesId,config.getTaskSort()) ;
-        PipelineStagesTask stagesTask =
-                new PipelineStagesTask(PipelineUtil.date(1),taskType,taskSort,stagesId);
+        StagesTask stagesTask =
+                new StagesTask(PipelineUtil.date(1),taskType,taskSort,stagesId);
         String name = commonServer.initName(taskType);
         stagesTask.setName(name);
         String taskId = createStagesTask(stagesTask);
@@ -55,11 +55,11 @@ public class PipelineStagesTaskServiceImpl implements PipelineStagesTaskService 
      * @return 顺序
      */
     private Integer initSort(String stagesId,int taskSort){
-        List<PipelineStagesTask> allStagesTasks = findAllStagesTasks(stagesId);
+        List<StagesTask> allStagesTasks = findAllStagesTasks(stagesId);
         if (allStagesTasks.size() == 0){
             return 1;
         }
-        for (PipelineStagesTask stagesTask : allStagesTasks) {
+        for (StagesTask stagesTask : allStagesTasks) {
             int sort = stagesTask.getTaskSort();
             if (sort < taskSort){
                 continue;
@@ -76,7 +76,7 @@ public class PipelineStagesTaskServiceImpl implements PipelineStagesTaskService 
      */
     @Override
     public boolean deleteStagesTasksTask(String configId) {
-        PipelineStagesTask stagesTask = findOneStagesTask(configId);
+        StagesTask stagesTask = findOneStagesTask(configId);
         int taskType = stagesTask.getTaskType();
         //删除任务
         commonServer.deleteTaskConfig(configId,taskType);
@@ -87,12 +87,12 @@ public class PipelineStagesTaskServiceImpl implements PipelineStagesTaskService 
         stagesTaskDao.deleteStagesTask(configId);
 
         // this.deleteStagesTask(configId);
-        List<PipelineStagesTask> allStagesTasks = findAllStagesTasks(stagesId);
+        List<StagesTask> allStagesTasks = findAllStagesTasks(stagesId);
         if (allStagesTasks == null || allStagesTasks.size()==0){
             return false;
         }
         //更新顺序
-        for (PipelineStagesTask task : allStagesTasks) {
+        for (StagesTask task : allStagesTasks) {
             int sort = task.getTaskSort();
             if (sort < taskSort){
                 continue;
@@ -109,11 +109,11 @@ public class PipelineStagesTaskServiceImpl implements PipelineStagesTaskService 
      */
     @Override
     public void deleteAllStagesTasksTask(String stagesId) {
-        List<PipelineStagesTask> allStagesTasks = findAllStagesTasks(stagesId);
+        List<StagesTask> allStagesTasks = findAllStagesTasks(stagesId);
         if (allStagesTasks.size() == 0){
             return;
         }
-        for (PipelineStagesTask stagesTask : allStagesTasks) {
+        for (StagesTask stagesTask : allStagesTasks) {
             int taskType = stagesTask.getTaskType();
             String configId = stagesTask.getConfigId();
             commonServer.deleteTaskConfig(configId,taskType);
@@ -133,7 +133,7 @@ public class PipelineStagesTaskServiceImpl implements PipelineStagesTaskService 
         String object = JSON.toJSONString(values);
         PipelineConfig pipelineConfig =JSON.parseObject(object, PipelineConfig.class);
         if (PipelineUtil.isNoNull(pipelineConfig.getName())) {
-            PipelineStagesTask task = findOneStagesTask(configId);
+            StagesTask task = findOneStagesTask(configId);
             task.setName(pipelineConfig.getName());
             updateStagesTask(task);
             return;
@@ -147,20 +147,20 @@ public class PipelineStagesTaskServiceImpl implements PipelineStagesTaskService 
      * @return 配置
      */
     @Override
-    public List<PipelineStagesTask> findAllStagesTasks(String stagesId) {
-        List<PipelineStagesTask> allStagesTask = findAllStagesTask();
+    public List<StagesTask> findAllStagesTasks(String stagesId) {
+        List<StagesTask> allStagesTask = findAllStagesTask();
         if (allStagesTask == null){
             return Collections.emptyList();
         }
-        List<PipelineStagesTask> list = new ArrayList<>();
-        for (PipelineStagesTask stagesTask : allStagesTask) {
+        List<StagesTask> list = new ArrayList<>();
+        for (StagesTask stagesTask : allStagesTask) {
             String id = stagesTask.getStagesId();
             if (!id.equals(stagesId)){
                 continue;
             }
             list.add(stagesTask);
         }
-        list.sort(Comparator.comparing(PipelineStagesTask::getTaskSort));
+        list.sort(Comparator.comparing(StagesTask::getTaskSort));
         return list;
     }
 
@@ -171,10 +171,10 @@ public class PipelineStagesTaskServiceImpl implements PipelineStagesTaskService 
      */
     @Override
     public List<Object> findAllStagesTasksTask(String stagesId) {
-        List<PipelineStagesTask> allStagesTasks = findAllStagesTasks(stagesId);
+        List<StagesTask> allStagesTasks = findAllStagesTasks(stagesId);
         List<Object> list = new ArrayList<>();
-        allStagesTasks.sort(Comparator.comparing(PipelineStagesTask::getTaskSort));
-        for (PipelineStagesTask stagesTask : allStagesTasks) {
+        allStagesTasks.sort(Comparator.comparing(StagesTask::getTaskSort));
+        for (StagesTask stagesTask : allStagesTasks) {
             String configId = stagesTask.getConfigId();
             int taskSort = stagesTask.getTaskSort();
             int taskType = stagesTask.getTaskType();
@@ -191,7 +191,7 @@ public class PipelineStagesTaskServiceImpl implements PipelineStagesTaskService 
      * @return 详情
      */
     public Object findOneStagesTasksTask(String configId){
-        PipelineStagesTask stagesTask = findOneStagesTask(configId);
+        StagesTask stagesTask = findOneStagesTask(configId);
         int taskSort = stagesTask.getTaskSort();
         int taskType = stagesTask.getTaskType();
         String taskName = stagesTask.getName();
@@ -204,8 +204,8 @@ public class PipelineStagesTaskServiceImpl implements PipelineStagesTaskService 
      */
     @Override
     public void validAllConfig(String stagesId,List<String> list){
-        List<PipelineStagesTask> allStagesTasks = findAllStagesTasks(stagesId);
-        for (PipelineStagesTask stagesTask : allStagesTasks) {
+        List<StagesTask> allStagesTasks = findAllStagesTasks(stagesId);
+        for (StagesTask stagesTask : allStagesTasks) {
             int taskType = stagesTask.getTaskType();
             String configId = stagesTask.getConfigId();
             commonServer.validTaskConfig(configId,taskType,list);
@@ -213,8 +213,8 @@ public class PipelineStagesTaskServiceImpl implements PipelineStagesTaskService 
     }
 
     //创建
-    public String createStagesTask(PipelineStagesTask pipelineStagesTask) {
-        PipelineStagesTaskEntity stagesTaskEntity = BeanMapper.map(pipelineStagesTask, PipelineStagesTaskEntity.class);
+    public String createStagesTask(StagesTask stagesTask) {
+        StagesTaskEntity stagesTaskEntity = BeanMapper.map(stagesTask, StagesTaskEntity.class);
         return stagesTaskDao.createStagesTask(stagesTaskEntity);
     }
 
@@ -224,21 +224,21 @@ public class PipelineStagesTaskServiceImpl implements PipelineStagesTaskService 
     }
 
     //更新
-    public void updateStagesTask(PipelineStagesTask pipelineStagesTask) {
-        PipelineStagesTaskEntity stagesTaskEntity = BeanMapper.map(pipelineStagesTask, PipelineStagesTaskEntity.class);
+    public void updateStagesTask(StagesTask stagesTask) {
+        StagesTaskEntity stagesTaskEntity = BeanMapper.map(stagesTask, StagesTaskEntity.class);
         stagesTaskDao.updateStagesTask(stagesTaskEntity);
     }
 
     //查询单个
-    public PipelineStagesTask findOneStagesTask(String stagesTaskId) {
-        PipelineStagesTaskEntity stagesTask = stagesTaskDao.findOneStagesTask(stagesTaskId);
-        return BeanMapper.map(stagesTask, PipelineStagesTask.class);
+    public StagesTask findOneStagesTask(String stagesTaskId) {
+        StagesTaskEntity stagesTask = stagesTaskDao.findOneStagesTask(stagesTaskId);
+        return BeanMapper.map(stagesTask, StagesTask.class);
     }
 
     //查询所有
-    public List<PipelineStagesTask> findAllStagesTask() {
-        List<PipelineStagesTaskEntity> allStagesTask = stagesTaskDao.findAllStagesTask();
-        return BeanMapper.mapList(allStagesTask,PipelineStagesTask.class);
+    public List<StagesTask> findAllStagesTask() {
+        List<StagesTaskEntity> allStagesTask = stagesTaskDao.findAllStagesTask();
+        return BeanMapper.mapList(allStagesTask, StagesTask.class);
     }
 
 
