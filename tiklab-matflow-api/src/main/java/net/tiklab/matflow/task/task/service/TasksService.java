@@ -1,13 +1,13 @@
-package net.tiklab.matflow.pipeline.definition.service;
+package net.tiklab.matflow.task.task.service;
 
 import net.tiklab.join.annotation.JoinProvider;
 import net.tiklab.matflow.pipeline.definition.model.Pipeline;
-import net.tiklab.matflow.pipeline.definition.model.PipelineConfig;
+import net.tiklab.matflow.task.task.model.Tasks;
 
 import java.util.List;
 
-@JoinProvider(model = PipelineConfig.class)
-public interface PipelineConfigService {
+@JoinProvider(model = Tasks.class)
+public interface TasksService {
 
     /**
      * 查询所有配置（包括后置任务）
@@ -28,13 +28,13 @@ public interface PipelineConfigService {
      * @param config 配置信息
      * @return 配置id
      */
-    String createTaskConfig(PipelineConfig config);
+    String createTaskConfig(Tasks config);
 
     /**
      * 删除配置及任务
      * @param config 配置信息
      */
-    void deleteTaskConfig(PipelineConfig config);
+    void deleteTaskConfig(Tasks config);
 
     /**
      * 删除流水线所有配置
@@ -47,7 +47,7 @@ public interface PipelineConfigService {
      * 更新配置及任务
      * @param config 配置信息
      */
-    void updateTaskConfig(PipelineConfig config);
+    void updateTaskConfig(Tasks config);
 
 
     /**

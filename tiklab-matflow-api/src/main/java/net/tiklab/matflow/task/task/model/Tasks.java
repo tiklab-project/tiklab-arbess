@@ -1,15 +1,16 @@
-package net.tiklab.matflow.pipeline.definition.model;
+package net.tiklab.matflow.task.task.model;
 
 import net.tiklab.beans.annotation.Mapping;
 import net.tiklab.beans.annotation.Mappings;
 import net.tiklab.join.annotation.Join;
 import net.tiklab.join.annotation.JoinQuery;
+import net.tiklab.matflow.pipeline.definition.model.Pipeline;
 import net.tiklab.postin.annotation.ApiModel;
 import net.tiklab.postin.annotation.ApiProperty;
 
 @ApiModel
 @Join
-public class PipelineConfig {
+public class Tasks {
 
     //配置id
     private String configId;
@@ -38,10 +39,10 @@ public class PipelineConfig {
 
     private String name;
 
-    public PipelineConfig() {
+    public Tasks() {
     }
 
-    public PipelineConfig(String pipelineId) {
+    public Tasks(String pipelineId) {
         this.pipeline = new Pipeline(pipelineId);
     }
 

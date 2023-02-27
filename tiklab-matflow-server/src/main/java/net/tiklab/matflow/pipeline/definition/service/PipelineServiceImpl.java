@@ -14,6 +14,7 @@ import net.tiklab.matflow.pipeline.instance.model.PipelineInstance;
 import net.tiklab.matflow.pipeline.instance.service.PipelineInstanceService;
 import net.tiklab.matflow.support.util.PipelineFinal;
 import net.tiklab.matflow.support.util.PipelineUtil;
+import net.tiklab.matflow.task.task.service.TasksService;
 import net.tiklab.privilege.role.model.PatchUser;
 import net.tiklab.privilege.roleDmRole.service.DmRoleService;
 import net.tiklab.rpc.annotation.Exporter;
@@ -48,7 +49,7 @@ public class PipelineServiceImpl implements PipelineService {
     private PipelineDao pipelineDao;
 
     @Autowired
-    private PipelineConfigService configServer;
+    private TasksService configServer;
 
     @Autowired
     private PipelineInstanceService instanceService;

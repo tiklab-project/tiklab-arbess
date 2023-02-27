@@ -1,8 +1,8 @@
 package net.tiklab.matflow.pipeline.definition.controller;
 
 import net.tiklab.core.Result;
-import net.tiklab.matflow.pipeline.definition.model.PipelineConfig;
-import net.tiklab.matflow.pipeline.definition.service.PipelineConfigService;
+import net.tiklab.matflow.task.task.model.Tasks;
+import net.tiklab.matflow.task.task.service.TasksService;
 import net.tiklab.matflow.pipeline.definition.service.PipelineStagesService;
 import net.tiklab.matflow.pipeline.definition.service.StagesTaskService;
 import net.tiklab.postin.annotation.Api;
@@ -25,7 +25,7 @@ public class PipelineConfigController {
 
 
     @Autowired
-    PipelineConfigService configServer;
+    TasksService configServer;
 
     @Autowired
     PipelineStagesService stagesServer;
@@ -49,7 +49,7 @@ public class PipelineConfigController {
     @RequestMapping(path="/createTaskConfig",method = RequestMethod.POST)
     @ApiMethod(name = "findAllTaskConfig",desc = "创建流水线配置")
     @ApiParam(name = "config",desc = "配置",required = true)
-    public Result<String> createTaskConfig(@RequestBody @Valid @NotNull PipelineConfig config){
+    public Result<String> createTaskConfig(@RequestBody @Valid @NotNull Tasks config){
        String configId = configServer.createTaskConfig(config);
         return Result.ok(configId);
     }
@@ -57,7 +57,7 @@ public class PipelineConfigController {
     @RequestMapping(path="/updateTaskConfig",method = RequestMethod.POST)
     @ApiMethod(name = "updateTaskConfig",desc = "更新流水线配置")
     @ApiParam(name = "config",desc = "配置",required = true)
-    public Result<Void> updateTaskConfig(@RequestBody @Valid @NotNull PipelineConfig config){
+    public Result<Void> updateTaskConfig(@RequestBody @Valid @NotNull Tasks config){
         configServer.updateTaskConfig(config);
         return Result.ok();
     }
@@ -65,7 +65,7 @@ public class PipelineConfigController {
     @RequestMapping(path="/deleteTaskConfig",method = RequestMethod.POST)
     @ApiMethod(name = "deleteTaskConfig",desc = "更新流水线配置")
     @ApiParam(name = "config",desc = "配置",required = true)
-    public Result<Void> deleteTaskConfig(@RequestBody @Valid @NotNull PipelineConfig config){
+    public Result<Void> deleteTaskConfig(@RequestBody @Valid @NotNull Tasks config){
         configServer.deleteTaskConfig(config);
         return Result.ok();
     }

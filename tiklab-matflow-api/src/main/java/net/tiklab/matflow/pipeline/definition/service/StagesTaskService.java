@@ -1,6 +1,6 @@
 package net.tiklab.matflow.pipeline.definition.service;
 
-import net.tiklab.matflow.pipeline.definition.model.PipelineConfig;
+import net.tiklab.matflow.task.task.model.Tasks;
 import net.tiklab.matflow.pipeline.definition.model.StagesTask;
 
 import java.util.List;
@@ -12,7 +12,7 @@ public interface StagesTaskService {
      * @param config 配置
      * @return stagesTaskId
      */
-    String createStagesTasksTask (PipelineConfig config) ;
+    String createStagesTasksTask (Tasks config) ;
 
     /**
      * 删除配置及任务
@@ -30,7 +30,7 @@ public interface StagesTaskService {
      * 更新配置及任务
      * @param config 配置
      */
-    void updateStagesTasksTask (PipelineConfig config);
+    void updateStagesTasksTask (Tasks config);
 
     /**
      * 查询流水线配置

@@ -1,6 +1,6 @@
 package net.tiklab.matflow.pipeline.definition.service;
 
-import net.tiklab.matflow.pipeline.definition.model.PipelineConfig;
+import net.tiklab.matflow.task.task.model.Tasks;
 import net.tiklab.matflow.pipeline.definition.model.PipelineTasks;
 
 import java.util.List;
@@ -15,13 +15,13 @@ public interface PipelineTasksService {
      * @param config 配置信息
      * @return 配置id
      */
-    String createTasksTask(PipelineConfig config);
+    String createTasksTask(Tasks config);
 
     /**
      * 更新配置及任务
      * @param config 配置信息
      */
-    void updateTasksTask(PipelineConfig config);
+    void updateTasksTask(Tasks config);
 
     /**
      * 删除配置及任务

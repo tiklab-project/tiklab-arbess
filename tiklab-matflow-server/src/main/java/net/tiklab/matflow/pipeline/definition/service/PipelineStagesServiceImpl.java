@@ -5,7 +5,7 @@ import net.tiklab.core.exception.ApplicationException;
 import net.tiklab.matflow.pipeline.definition.dao.PipelineStagesDao;
 import net.tiklab.matflow.pipeline.definition.entity.PipelineStagesEntity;
 import net.tiklab.matflow.pipeline.definition.model.Pipeline;
-import net.tiklab.matflow.pipeline.definition.model.PipelineConfig;
+import net.tiklab.matflow.task.task.model.Tasks;
 import net.tiklab.matflow.pipeline.definition.model.PipelineStages;
 import net.tiklab.matflow.pipeline.definition.model.StagesTask;
 import net.tiklab.matflow.support.util.PipelineUtil;
@@ -36,7 +36,7 @@ public class PipelineStagesServiceImpl implements PipelineStagesService {
      * @return 阶段id
      */
     @Override
-    public String createStagesTask(PipelineConfig config){
+    public String createStagesTask(Tasks config){
 
         String stagesId = config.getStagesId();
         String pipelineId = config.getPipeline().getId();
@@ -357,7 +357,7 @@ public class PipelineStagesServiceImpl implements PipelineStagesService {
      * @param config 配置id
      */
     @Override
-    public void updateStagesTask(PipelineConfig config){
+    public void updateStagesTask(Tasks config){
         stagesTaskServer.updateStagesTasksTask(config);
     }
 

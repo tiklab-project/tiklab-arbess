@@ -4,7 +4,7 @@ import net.tiklab.join.annotation.FindAll;
 import net.tiklab.join.annotation.FindList;
 import net.tiklab.join.annotation.FindOne;
 import net.tiklab.join.annotation.JoinProvider;
-import net.tiklab.matflow.pipeline.definition.model.PipelineConfig;
+import net.tiklab.matflow.task.task.model.Tasks;
 import net.tiklab.matflow.pipeline.definition.model.PipelineStages;
 import net.tiklab.matflow.pipeline.definition.model.StagesTask;
 
@@ -19,7 +19,7 @@ public interface PipelineStagesService {
      * @param config 阶段信息
      * @return 阶段id
      */
-    String createStagesTask(PipelineConfig config);
+    String createStagesTask(Tasks config);
 
 
     /**
@@ -71,7 +71,7 @@ public interface PipelineStagesService {
      * 更新配置及任务
      * @param config 配置id
      */
-    void updateStagesTask(PipelineConfig config);
+    void updateStagesTask(Tasks config);
 
     /**
      *  删除流水线所有阶段

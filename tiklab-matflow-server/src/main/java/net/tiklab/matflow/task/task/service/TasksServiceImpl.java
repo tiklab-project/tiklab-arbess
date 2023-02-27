@@ -1,8 +1,10 @@
-package net.tiklab.matflow.pipeline.definition.service;
+package net.tiklab.matflow.task.task.service;
 
 import net.tiklab.join.JoinTemplate;
 import net.tiklab.matflow.pipeline.definition.model.Pipeline;
-import net.tiklab.matflow.pipeline.definition.model.PipelineConfig;
+import net.tiklab.matflow.pipeline.definition.service.PipelineStagesService;
+import net.tiklab.matflow.pipeline.definition.service.PipelineTasksService;
+import net.tiklab.matflow.task.task.model.Tasks;
 import net.tiklab.matflow.pipeline.definition.model.PipelineStages;
 import net.tiklab.matflow.support.postprocess.service.PostprocessService;
 import net.tiklab.matflow.support.trigger.service.TriggerService;
@@ -15,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class PipelineConfigServiceImpl implements PipelineConfigService {
+public class TasksServiceImpl implements TasksService {
 
 
     @Autowired
@@ -33,7 +35,7 @@ public class PipelineConfigServiceImpl implements PipelineConfigService {
     @Autowired
     JoinTemplate joinTemplate;
 
-    private static final Logger logger = LoggerFactory.getLogger(PipelineConfigServiceImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(TasksServiceImpl.class);
 
     /**
      * 查询流水线所有配置（包括后置任务）
@@ -42,9 +44,9 @@ public class PipelineConfigServiceImpl implements PipelineConfigService {
      */
     @Override
     public List<Object> findAllConfig(String pipelineId){
-        PipelineConfig pipelineConfig = new PipelineConfig(pipelineId);
-        joinTemplate.joinQuery(pipelineConfig);
-        Pipeline pipeline = pipelineConfig.getPipeline();
+        Tasks tasks = new Tasks(pipelineId);
+        joinTemplate.joinQuery(tasks);
+        Pipeline pipeline = tasks.getPipeline();
         int type = pipeline.getType();
         List<Object> allCourseConfig = findAllTaskConfig(pipelineId);
         List<Object> allAfterConfig = postServer.findAllPostTask(pipelineId);
@@ -73,9 +75,9 @@ public class PipelineConfigServiceImpl implements PipelineConfigService {
      */
     @Override
     public List<Object> findAllTaskConfig(String pipelineId){
-        PipelineConfig pipelineConfig = new PipelineConfig(pipelineId);
-        joinTemplate.joinQuery(pipelineConfig);
-        Pipeline pipeline = pipelineConfig.getPipeline();
+        Tasks tasks = new Tasks(pipelineId);
+        joinTemplate.joinQuery(tasks);
+        Pipeline pipeline = tasks.getPipeline();
         int type = pipeline.getType();
         if (type == 1){
             return tasksService.findAllTasksTask(pipelineId);
@@ -96,7 +98,7 @@ public class PipelineConfigServiceImpl implements PipelineConfigService {
      * @return 配置id
      */
     @Override
-    public String createTaskConfig(PipelineConfig config){
+    public String createTaskConfig(Tasks config){
         joinTemplate.joinQuery(config);
         Pipeline pipeline = config.getPipeline();
         int type = pipeline.getType();
@@ -116,7 +118,7 @@ public class PipelineConfigServiceImpl implements PipelineConfigService {
      * @param config 配置信息
      */
     @Override
-    public void deleteTaskConfig(PipelineConfig config){
+    public void deleteTaskConfig(Tasks config){
         joinTemplate.joinQuery(config);
         Pipeline pipeline = config.getPipeline();
         int type = pipeline.getType();
@@ -150,7 +152,7 @@ public class PipelineConfigServiceImpl implements PipelineConfigService {
      * @param config 配置信息
      */
     @Override
-    public void updateTaskConfig(PipelineConfig config){
+    public void updateTaskConfig(Tasks config){
         joinTemplate.joinQuery(config);
         Pipeline pipeline = config.getPipeline();
         int type = pipeline.getType();
@@ -169,9 +171,9 @@ public class PipelineConfigServiceImpl implements PipelineConfigService {
      */
     @Override
     public List<String> validAllConfig(String pipelineId){
-        PipelineConfig pipelineConfig = new PipelineConfig(pipelineId);
-        joinTemplate.joinQuery(pipelineConfig);
-        Pipeline pipeline = pipelineConfig.getPipeline();
+        Tasks tasks = new Tasks(pipelineId);
+        joinTemplate.joinQuery(tasks);
+        Pipeline pipeline = tasks.getPipeline();
         int type = pipeline.getType();
         if (type == 1){
           return  tasksService.validAllConfig(pipelineId);
@@ -201,7 +203,7 @@ public class PipelineConfigServiceImpl implements PipelineConfigService {
             default -> new int[]{1};
         };
         for (int i = 0; i < ints.length; i++) {
-            PipelineConfig config = new PipelineConfig();
+            Tasks config = new Tasks();
             config.setPipeline(new Pipeline(id));
             config.setTaskType(ints[i]);
             config.setTaskSort(i+1);
@@ -213,6 +215,8 @@ public class PipelineConfigServiceImpl implements PipelineConfigService {
             }
         }
     }
+
+
 
 }
 

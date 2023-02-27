@@ -5,7 +5,7 @@ import net.tiklab.beans.BeanMapper;
 import net.tiklab.core.exception.ApplicationException;
 import net.tiklab.matflow.pipeline.definition.dao.PipelineTasksDao;
 import net.tiklab.matflow.pipeline.definition.entity.PipelineTasksEntity;
-import net.tiklab.matflow.pipeline.definition.model.PipelineConfig;
+import net.tiklab.matflow.task.task.model.Tasks;
 import net.tiklab.matflow.pipeline.definition.model.PipelineTasks;
 import net.tiklab.matflow.support.util.PipelineUtil;
 import net.tiklab.matflow.task.task.service.PipelineTaskDispatchService;
@@ -35,7 +35,7 @@ public class PipelineTasksServiceImpl implements PipelineTasksService {
      * @return 配置id
      */
     @Override
-    public String createTasksTask(PipelineConfig config) throws ApplicationException {
+    public String createTasksTask(Tasks config) throws ApplicationException {
         String pipelineId = config.getPipeline().getId();
 
         int taskType = config.getTaskType();
@@ -105,15 +105,15 @@ public class PipelineTasksServiceImpl implements PipelineTasksService {
      * @param config 配置信息
      */
     @Override
-    public void updateTasksTask(PipelineConfig config) {
+    public void updateTasksTask(Tasks config) {
         String configId = config.getConfigId();
         Object values = config.getValues();
         int taskType = config.getTaskType();
         String object = JSON.toJSONString(values);
-        PipelineConfig pipelineConfig =JSON.parseObject(object, PipelineConfig.class);
-        if (PipelineUtil.isNoNull(pipelineConfig.getName())) {
+        Tasks tasks =JSON.parseObject(object, Tasks.class);
+        if (PipelineUtil.isNoNull(tasks.getName())) {
             PipelineTasks task = findOneTasks(configId);
-            task.setName(pipelineConfig.getName());
+            task.setName(tasks.getName());
             updateTasks(task);
             return;
         }

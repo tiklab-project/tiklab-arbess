@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSON;
 import net.tiklab.beans.BeanMapper;
 import net.tiklab.matflow.pipeline.definition.dao.StagesTaskDao;
 import net.tiklab.matflow.pipeline.definition.entity.StagesTaskEntity;
-import net.tiklab.matflow.pipeline.definition.model.PipelineConfig;
+import net.tiklab.matflow.task.task.model.Tasks;
 import net.tiklab.matflow.pipeline.definition.model.StagesTask;
 import net.tiklab.matflow.support.util.PipelineUtil;
 import net.tiklab.matflow.task.task.service.PipelineTaskDispatchService;
@@ -35,7 +35,7 @@ public class StagesTaskServiceImpl implements StagesTaskService {
      * @return stagesTaskId
      */
     @Override
-    public String createStagesTasksTask(PipelineConfig config) {
+    public String createStagesTasksTask(Tasks config) {
         String stagesId = config.getStagesId();
         int taskType = config.getTaskType();
         int taskSort = initSort(stagesId,config.getTaskSort()) ;
@@ -126,15 +126,15 @@ public class StagesTaskServiceImpl implements StagesTaskService {
      * @param config 配置
      */
     @Override
-    public void updateStagesTasksTask(PipelineConfig config) {
+    public void updateStagesTasksTask(Tasks config) {
         Object values = config.getValues();
         String configId = config.getConfigId();
         int taskType = config.getTaskType();
         String object = JSON.toJSONString(values);
-        PipelineConfig pipelineConfig =JSON.parseObject(object, PipelineConfig.class);
-        if (PipelineUtil.isNoNull(pipelineConfig.getName())) {
+        Tasks tasks =JSON.parseObject(object, Tasks.class);
+        if (PipelineUtil.isNoNull(tasks.getName())) {
             StagesTask task = findOneStagesTask(configId);
-            task.setName(pipelineConfig.getName());
+            task.setName(tasks.getName());
             updateStagesTask(task);
             return;
         }
