@@ -5,7 +5,7 @@ import net.tiklab.matflow.setting.model.AuthThird;
 import net.tiklab.matflow.task.code.dao.TaskCodeDao;
 import net.tiklab.matflow.task.code.entity.TaskCodeEntity;
 import net.tiklab.matflow.task.code.model.TaskCode;
-import net.tiklab.matflow.support.until.PipelineUntil;
+import net.tiklab.matflow.support.util.PipelineUtil;
 import net.tiklab.matflow.setting.service.AuthService;
 import net.tiklab.matflow.setting.service.AuthThirdService;
 import net.tiklab.rpc.annotation.Exporter;
@@ -62,7 +62,7 @@ public class TaskCodeServiceImpl implements TaskCodeService {
             return null;
         }
         for (TaskCode taskCode : allCode) {
-            if (!PipelineUntil.isNoNull(taskCode.getConfigId())){
+            if (!PipelineUtil.isNoNull(taskCode.getConfigId())){
                 continue;
             }
             if (taskCode.getConfigId().equals(configId)){
@@ -85,7 +85,7 @@ public class TaskCodeServiceImpl implements TaskCodeService {
 
         switch (taskCode.getType()) {
             case 2, 3 -> {
-                if (!PipelineUntil.isNoNull(taskCode.getCodeName())){
+                if (!PipelineUtil.isNoNull(taskCode.getCodeName())){
                     break;
                 }
                 TaskCode oneCode = findOneCode(taskCode.getCodeId());

@@ -7,7 +7,7 @@ import net.tiklab.matflow.pipeline.definition.service.PipelineTasksService;
 import net.tiklab.matflow.pipeline.execute.model.PipelineProcess;
 import net.tiklab.matflow.pipeline.instance.service.PipelineExecLogService;
 import net.tiklab.matflow.setting.model.AuthThird;
-import net.tiklab.matflow.support.until.PipelineUntil;
+import net.tiklab.matflow.support.util.PipelineUtil;
 import net.tiklab.matflow.task.codescan.model.TaskCodeScan;
 import net.tiklab.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,22 +53,22 @@ public class TaskCodeScanExecServiceImpl implements TaskCodeScanExecService {
 
         Boolean variableCond = commonService.variableCond(pipeline.getId(), configId);
         if (!variableCond){
-            commonService.updateExecLog(pipelineProcess, PipelineUntil.date(4)+"任务："+ name+"执行条件不满足,跳过执行。");
+            commonService.updateExecLog(pipelineProcess, PipelineUtil.date(4)+"任务："+ name+"执行条件不满足,跳过执行。");
             return true;
         }
 
-        commonService.updateExecLog(pipelineProcess, PipelineUntil.date(4)+"执行任务："+ name);
+        commonService.updateExecLog(pipelineProcess, PipelineUtil.date(4)+"执行任务："+ name);
 
 
 
         taskCodeScan.setType(taskType);
 
-        String fileAddress = PipelineUntil.findFileAddress(pipeline.getId(),1);
+        String fileAddress = PipelineUtil.findFileAddress(pipeline.getId(),1);
 
         try {
             Process process = getOrder(pipelineProcess, taskCodeScan,fileAddress);
             if (process == null){
-                commonService.updateExecLog(pipelineProcess,PipelineUntil.date(4)+"任务"+name+"执行失败");
+                commonService.updateExecLog(pipelineProcess, PipelineUtil.date(4)+"任务"+name+"执行失败");
                 return false;
             }
 
@@ -79,14 +79,14 @@ public class TaskCodeScanExecServiceImpl implements TaskCodeScanExecService {
 
             int status = commonService.log( pipelineProcess);
             if (status == 0){
-                commonService.updateExecLog(pipelineProcess,PipelineUntil.date(4)+"任务"+name+"执行失败");
+                commonService.updateExecLog(pipelineProcess, PipelineUtil.date(4)+"任务"+name+"执行失败");
                 return false;
             }
         } catch (IOException |ApplicationException e) {
-            commonService.updateExecLog(pipelineProcess,PipelineUntil.date(4)+"任务"+name+"执行失败\n"+PipelineUntil.date(4)+e.getMessage());
+            commonService.updateExecLog(pipelineProcess, PipelineUtil.date(4)+"任务"+name+"执行失败\n"+ PipelineUtil.date(4)+e.getMessage());
             return false;
         }
-        commonService.updateExecLog(pipelineProcess,PipelineUntil.date(4)+"任务"+name+"执行完成");
+        commonService.updateExecLog(pipelineProcess, PipelineUtil.date(4)+"任务"+name+"执行完成");
         return true;
     }
 
@@ -100,14 +100,14 @@ public class TaskCodeScanExecServiceImpl implements TaskCodeScanExecService {
                 throw new ApplicationException("不存在maven配置");
             }
 
-            PipelineUntil.validFile(mavenAddress, 21);
+            PipelineUtil.validFile(mavenAddress, 21);
 
             AuthThird authThird =(AuthThird) taskCodeScan.getAuth();
 
             if (authThird == null){
-                commonService.updateExecLog(pipelineProcess,PipelineUntil.date(4)+"执行扫描命令："+execOrder);
+                commonService.updateExecLog(pipelineProcess, PipelineUtil.date(4)+"执行扫描命令："+execOrder);
                 order = mavenOrder(execOrder, path);
-                return PipelineUntil.process(mavenAddress, order);
+                return PipelineUtil.process(mavenAddress, order);
             }
 
             execOrder = execOrder +
@@ -121,9 +121,9 @@ public class TaskCodeScanExecServiceImpl implements TaskCodeScanExecService {
                 execOrder = execOrder +
                         " -Dsonar.login="+authThird.getPrivateKey();
             }
-            commonService.updateExecLog(pipelineProcess,PipelineUntil.date(4)+"执行扫描命令："+execOrder);
+            commonService.updateExecLog(pipelineProcess, PipelineUtil.date(4)+"执行扫描命令："+execOrder);
             order = mavenOrder(execOrder, path);
-            return PipelineUntil.process(mavenAddress, order);
+            return PipelineUtil.process(mavenAddress, order);
         }else {
             throw new ApplicationException("未知的任务类型");
         }
@@ -131,7 +131,7 @@ public class TaskCodeScanExecServiceImpl implements TaskCodeScanExecService {
 
     private String mavenOrder(String buildOrder,String path){
         String order = " ./" + buildOrder + " " + "-f" +" " +path ;
-        if (PipelineUntil.findSystemType() == 1){
+        if (PipelineUtil.findSystemType() == 1){
             order = " .\\" + buildOrder + " " + "-f"+" "  +path;
         }
         return order;

@@ -6,7 +6,7 @@ import net.tiklab.matflow.pipeline.definition.service.PipelineStagesTaskService;
 import net.tiklab.matflow.pipeline.definition.service.PipelineTasksService;
 import net.tiklab.matflow.pipeline.execute.model.PipelineProcess;
 import net.tiklab.matflow.pipeline.instance.service.PipelineExecLogService;
-import net.tiklab.matflow.support.until.PipelineUntil;
+import net.tiklab.matflow.support.util.PipelineUtil;
 import net.tiklab.matflow.task.test.model.TaskTest;
 import net.tiklab.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,30 +45,30 @@ public class TaskTestExecServiceImpl implements TaskTestExecService {
         Boolean variableCond = commonService.variableCond(pipeline.getId(), configId);
         String name = taskTest.getName();
         if (!variableCond){
-            commonService.updateExecLog(pipelineProcess, PipelineUntil.date(4)+"任务："+ name+"执行条件不满足,跳过执行。");
+            commonService.updateExecLog(pipelineProcess, PipelineUtil.date(4)+"任务："+ name+"执行条件不满足,跳过执行。");
             return true;
         }
-        commonService.updateExecLog(pipelineProcess, PipelineUntil.date(4)+"执行任务："+name);
+        commonService.updateExecLog(pipelineProcess, PipelineUtil.date(4)+"执行任务："+name);
 
         taskTest.setType(taskType);
 
         //初始化日志
         String testOrder = taskTest.getTestOrder();
 
-        String path = PipelineUntil.findFileAddress(pipeline.getId(),1);
+        String path = PipelineUtil.findFileAddress(pipeline.getId(),1);
         try {
 
-            List<String> list = PipelineUntil.execOrder(testOrder);
+            List<String> list = PipelineUtil.execOrder(testOrder);
             for (String s : list) {
                 String key = commonService.variableKey(pipeline.getId(), configId, s);
-                commonService.updateExecLog(pipelineProcess,PipelineUntil.date(4)+"执行："+ key );
+                commonService.updateExecLog(pipelineProcess, PipelineUtil.date(4)+"执行："+ key );
                 Process  process = getOrder(taskTest,s,path);
                 pipelineProcess.setError(error(taskTest.getType()));
                 commonService.execState(pipelineProcess,process,name);
                 process.destroy();
             }
         } catch (IOException e) {
-            commonService.updateExecLog(pipelineProcess, PipelineUntil.date(4)+"日志打印失败"+e);
+            commonService.updateExecLog(pipelineProcess, PipelineUtil.date(4)+"日志打印失败"+e);
             return false;
         } catch (ApplicationException e) {
             commonService.updateExecLog(pipelineProcess,e.getMessage());
@@ -89,11 +89,11 @@ public class TaskTestExecServiceImpl implements TaskTestExecService {
         if (type == 11) {
             String mavenAddress = commonService.getScm(21);
             if (mavenAddress == null) {
-                throw new ApplicationException(PipelineUntil.date(4)+"不存在maven配置");
+                throw new ApplicationException(PipelineUtil.date(4)+"不存在maven配置");
             }
-            PipelineUntil.validFile(mavenAddress,21);
+            PipelineUtil.validFile(mavenAddress,21);
             order = testOrder(testOrder, path);
-            return PipelineUntil.process(mavenAddress, order);
+            return PipelineUtil.process(mavenAddress, order);
         }else {
             throw  new ApplicationException("未知的任务类型");
         }
@@ -108,7 +108,7 @@ public class TaskTestExecServiceImpl implements TaskTestExecService {
     private String testOrder(String buildOrder,String path){
 
         String order;
-        int systemType = PipelineUntil.findSystemType();
+        int systemType = PipelineUtil.findSystemType();
         order = " ./" + buildOrder + " " + "-f" +" " +path ;
         if (systemType == 1){
             order = " .\\" + buildOrder + " " + "-f"+" "  +path;

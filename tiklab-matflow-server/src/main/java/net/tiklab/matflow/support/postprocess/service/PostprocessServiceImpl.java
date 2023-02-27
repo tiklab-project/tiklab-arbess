@@ -4,7 +4,7 @@ import net.tiklab.beans.BeanMapper;
 import net.tiklab.matflow.support.postprocess.dao.PostprocessDao;
 import net.tiklab.matflow.support.postprocess.entity.PostprocessEntity;
 import net.tiklab.matflow.support.postprocess.model.Postprocess;
-import net.tiklab.matflow.support.until.PipelineUntil;
+import net.tiklab.matflow.support.util.PipelineUtil;
 import net.tiklab.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -40,7 +40,7 @@ public class PostprocessServiceImpl implements PostprocessService {
         PostprocessEntity postprocessEntity = BeanMapper.map(postprocess, PostprocessEntity.class);
         String name = postTaskServer.findConfigName(taskType);
         postprocessEntity.setName(name);
-        postprocessEntity.setCreateTime(PipelineUntil.date(1));
+        postprocessEntity.setCreateTime(PipelineUtil.date(1));
         String postId = postprocessDao.createPost(postprocessEntity);
         postprocess.setConfigId(postId);
         postTaskServer.updateConfig(postprocess);

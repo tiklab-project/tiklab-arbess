@@ -6,8 +6,8 @@ import net.tiklab.logging.modal.Logging;
 import net.tiklab.logging.modal.LoggingType;
 import net.tiklab.logging.service.LoggingByTemplService;
 import net.tiklab.matflow.pipeline.definition.model.Pipeline;
-import net.tiklab.matflow.support.until.PipelineFinal;
-import net.tiklab.matflow.support.until.PipelineUntil;
+import net.tiklab.matflow.support.util.PipelineFinal;
+import net.tiklab.matflow.support.util.PipelineUtil;
 import net.tiklab.message.mail.modal.MailCfg;
 import net.tiklab.message.mail.service.MailCfgService;
 import net.tiklab.message.message.model.Message;
@@ -85,7 +85,7 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
             map.put("userName", user.getNickname());
         }
         map.put("color", ""+pipeline.getColor());
-        map.put("date", PipelineUntil.date(1));
+        map.put("date", PipelineUtil.date(1));
         return map;
     }
 
@@ -230,7 +230,7 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
         String rootId = map.get("rootId");
         List<User> allUser = findAllUser(rootId);
         String phones = findUserPhone(allUser);
-        if (!PipelineUntil.isNoNull(phones)){
+        if (!PipelineUtil.isNoNull(phones)){
            throw  new ApplicationException("当前用户与项目负责人都未配置手机号，消息发送失败。");
         }
         Map<String,String> stringMap = new HashMap<>();
@@ -261,7 +261,7 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
         StringBuilder phones = new StringBuilder();
         for (int i = 0; i < list.size(); i++) {
             String phone = list.get(i).getPhone();
-            if (!PipelineUntil.isNoNull(phone)){
+            if (!PipelineUtil.isNoNull(phone)){
                 continue;
             }
             if (i == list.size()-1){

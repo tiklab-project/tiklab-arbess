@@ -1,4 +1,4 @@
-package net.tiklab.matflow.support.until;
+package net.tiklab.matflow.support.util;
 
 import net.tiklab.core.exception.ApplicationException;
 
@@ -16,7 +16,7 @@ import java.util.regex.Pattern;
  * 效验地址，文件操作
  */
 
-public class PipelineUntil {
+public class PipelineUtil {
 
     /**
      * 返回系统时间
@@ -108,13 +108,13 @@ public class PipelineUntil {
         Process process;
         String[] cmd;
         if (findSystemType()==1){
-            if (!PipelineUntil.isNoNull(path)){
+            if (!PipelineUtil.isNoNull(path)){
                 process = runtime.exec(" cmd.exe /c " + " " + order);
             }else {
                 process = runtime.exec(" cmd.exe /c " + " " + order,null,new File(path));
             }
         }else {
-            if (!PipelineUntil.isNoNull(path)){
+            if (!PipelineUtil.isNoNull(path)){
                 cmd = new String[] { "/bin/sh", "-c", " source /etc/profile;"+ order };
                 process = runtime.exec(cmd);
             }else {
@@ -219,13 +219,13 @@ public class PipelineUntil {
         String path = initMatFlowAddress(type);
         int systemType = findSystemType();
         if (systemType == 1){
-            if (!PipelineUntil.isNoNull(id)){
+            if (!PipelineUtil.isNoNull(id)){
                 return path + "\\";
             }else {
                 return path + "\\" + id + "\\";
             }
         }else {
-            if (!PipelineUntil.isNoNull(id)){
+            if (!PipelineUtil.isNoNull(id)){
                 return path + "/";
             }else {
                 return path + "/" + id + "/" ;
@@ -268,7 +268,7 @@ public class PipelineUntil {
     public static String getFile(String pipelineId, String regex) throws ApplicationException{
         List<String> list = new ArrayList<>();
         String path= findFileAddress(pipelineId,1) ;
-        List<String> filePath = PipelineUntil.getFilePath(new File(path),new ArrayList<>());
+        List<String> filePath = PipelineUtil.getFilePath(new File(path),new ArrayList<>());
         for (String s : filePath) {
             File file = new File(s);
 

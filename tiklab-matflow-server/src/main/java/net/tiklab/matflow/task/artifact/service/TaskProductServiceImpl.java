@@ -4,7 +4,7 @@ import net.tiklab.beans.BeanMapper;
 import net.tiklab.matflow.setting.model.AuthThird;
 import net.tiklab.matflow.setting.service.AuthHostService;
 import net.tiklab.matflow.setting.service.AuthThirdService;
-import net.tiklab.matflow.support.until.PipelineUntil;
+import net.tiklab.matflow.support.util.PipelineUtil;
 import net.tiklab.matflow.task.artifact.dao.TaskProductDao;
 import net.tiklab.matflow.task.artifact.entity.TaskProductEntity;
 import net.tiklab.matflow.task.artifact.model.TaskProduct;
@@ -98,7 +98,7 @@ public class TaskProductServiceImpl implements TaskProductService {
     public TaskProduct findOneProduct(String ProductId) {
         TaskProductEntity oneProduct = productDao.findOneProduct(ProductId);
         TaskProduct product = BeanMapper.map(oneProduct, TaskProduct.class);
-        if (PipelineUntil.isNoNull(product.getAuthId())){
+        if (PipelineUtil.isNoNull(product.getAuthId())){
             Object auth = findAuth(product.getAuthId());
             product.setAuth(auth);
         }

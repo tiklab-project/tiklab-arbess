@@ -4,7 +4,7 @@ import net.tiklab.beans.BeanMapper;
 import net.tiklab.join.JoinTemplate;
 import net.tiklab.matflow.setting.model.AuthThird;
 import net.tiklab.matflow.setting.service.AuthThirdService;
-import net.tiklab.matflow.support.until.PipelineUntil;
+import net.tiklab.matflow.support.util.PipelineUtil;
 import net.tiklab.matflow.task.codescan.dao.TaskCodeScanDao;
 import net.tiklab.matflow.task.codescan.entity.TaskCodeScanEntity;
 import net.tiklab.matflow.task.codescan.model.TaskCodeScan;
@@ -99,7 +99,7 @@ public class TaskCodeScanServiceImpl implements TaskCodeScanService {
     public TaskCodeScan findOneCodeScan(String codeScanId) {
         TaskCodeScanEntity oneCodeScan = codeScanDao.findOneCodeScan(codeScanId);
         TaskCodeScan codeScan = BeanMapper.map(oneCodeScan, TaskCodeScan.class);
-        if (PipelineUntil.isNoNull(codeScan.getAuthId())){
+        if (PipelineUtil.isNoNull(codeScan.getAuthId())){
             AuthThird authServer = thirdServer.findOneAuthServer(codeScan.getAuthId());
             codeScan.setAuth(authServer);
         }

@@ -6,7 +6,7 @@ import net.tiklab.matflow.pipeline.definition.service.PipelineStagesTaskService;
 import net.tiklab.matflow.pipeline.definition.service.PipelineTasksService;
 import net.tiklab.matflow.pipeline.execute.model.PipelineProcess;
 import net.tiklab.matflow.pipeline.instance.service.PipelineExecLogService;
-import net.tiklab.matflow.support.until.PipelineUntil;
+import net.tiklab.matflow.support.util.PipelineUtil;
 import net.tiklab.matflow.task.build.model.TaskBuild;
 import net.tiklab.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,35 +53,35 @@ public class TaskBuildExecServiceImpl implements TaskBuildExecService {
 
         Boolean variableCond = commonService.variableCond(pipeline.getId(), configId);
         if (!variableCond){
-            commonService.updateExecLog(pipelineProcess, PipelineUntil.date(4)+"任务："+ name+"执行条件不满足,跳过执行。");
+            commonService.updateExecLog(pipelineProcess, PipelineUtil.date(4)+"任务："+ name+"执行条件不满足,跳过执行。");
             return true;
         }
 
-        commonService.updateExecLog(pipelineProcess, PipelineUntil.date(4)+"执行任务："+name);
+        commonService.updateExecLog(pipelineProcess, PipelineUtil.date(4)+"执行任务："+name);
 
         taskBuild.setType(taskType);
         String buildAddress = taskBuild.getBuildAddress();
         String buildOrder = taskBuild.getBuildOrder();
 
         //项目地址
-        String path = PipelineUntil.findFileAddress(pipeline.getId(),1);
+        String path = PipelineUtil.findFileAddress(pipeline.getId(),1);
         int type = taskBuild.getType();
         try {
             //执行命令
-            List<String> list = PipelineUntil.execOrder(buildOrder);
+            List<String> list = PipelineUtil.execOrder(buildOrder);
             for (String s : list) {
                 String key = commonService.variableKey(pipeline.getId(), configId, s);
-                commonService.updateExecLog(pipelineProcess, PipelineUntil.date(4)+"执行命令："+ key);
+                commonService.updateExecLog(pipelineProcess, PipelineUtil.date(4)+"执行命令："+ key);
                 pipelineProcess.setError(error(type));
                 Process process = getOrder(key,type,buildAddress, path);
                 commonService.execState(pipelineProcess,process,name);
             }
         } catch (IOException | ApplicationException e) {
-            String s = PipelineUntil.date(4) + e.getMessage();
+            String s = PipelineUtil.date(4) + e.getMessage();
             commonService.updateExecLog(pipelineProcess,s);
             return false;
         }
-        commonService.updateExecLog(pipelineProcess,PipelineUntil.date(4)+"任务"+name+"执行完成");
+        commonService.updateExecLog(pipelineProcess, PipelineUtil.date(4)+"任务"+name+"执行完成");
         return true;
     }
 
@@ -104,17 +104,17 @@ public class TaskBuildExecServiceImpl implements TaskBuildExecService {
             }
         }
 
-        if(PipelineUntil.isNoNull(address)){
+        if(PipelineUtil.isNoNull(address)){
             path = path +"/"+ address;
         }
 
         switch (type){
             case 21 -> {
                 String order =  mavenOrder(orders,path);
-                return PipelineUntil.process(serverAddress, order);
+                return PipelineUtil.process(serverAddress, order);
             }
             case 22 -> {
-                return PipelineUntil.process(path, orders);
+                return PipelineUtil.process(path, orders);
             }
             default -> throw new  ApplicationException("未知的任务类型");
         }
@@ -128,7 +128,7 @@ public class TaskBuildExecServiceImpl implements TaskBuildExecService {
      */
     public String mavenOrder(String buildOrder,String path){
         String order;
-        int systemType = PipelineUntil.findSystemType();
+        int systemType = PipelineUtil.findSystemType();
         order = " ./" + buildOrder + " " + "-f" +" " +path ;
         if (systemType == 1){
             order = " .\\" + buildOrder + " " + "-f"+" "  +path;

@@ -1,4 +1,4 @@
-package net.tiklab.matflow.webSocket;
+package net.tiklab.matflow.support.webSocket;
 
 import com.alibaba.fastjson.JSONObject;
 import net.tiklab.matflow.pipeline.instance.model.TaskRunLog;

@@ -1,4 +1,4 @@
-package net.tiklab.matflow.webSocket;
+package net.tiklab.matflow.support.webSocket;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

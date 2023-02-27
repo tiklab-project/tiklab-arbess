@@ -7,7 +7,7 @@ import com.alibaba.fastjson.JSONObject;
 import net.tiklab.core.exception.ApplicationException;
 import net.tiklab.matflow.setting.model.AuthThird;
 import net.tiklab.matflow.task.code.model.TaskCodeThird;
-import net.tiklab.matflow.support.until.PipelineUntil;
+import net.tiklab.matflow.support.util.PipelineUtil;
 import net.tiklab.matflow.setting.service.AuthThirdService;
 import net.tiklab.rpc.annotation.Exporter;
 import net.tiklab.utils.context.LoginContext;
@@ -68,7 +68,7 @@ public class TaskCodeThirdServiceImpl implements TaskCodeThirdService {
     public String findAccessToken(AuthThird authThird) throws IOException , ApplicationException {
         String loginId = LoginContext.getLoginId();
         int type = authThird.getType();
-        if (!PipelineUntil.isNoNull(authThird.getCode())){
+        if (!PipelineUtil.isNoNull(authThird.getCode())){
             throw new ApplicationException("code不能为空。");
         }
         String callbackUrl = authThird.getCallbackUrl();
@@ -89,7 +89,7 @@ public class TaskCodeThirdServiceImpl implements TaskCodeThirdService {
             throw new ApplicationException(50001,"授权失败，accessToken为空。");
         }
 
-        logger.info("授权成功："+accessToken + " time: "+ PipelineUntil.date(1));
+        logger.info("授权成功："+accessToken + " time: "+ PipelineUtil.date(1));
 
         authThird.setAccessToken(accessToken);
         authThird.setRefreshToken(map.get("refreshToken"));
@@ -225,7 +225,7 @@ public class TaskCodeThirdServiceImpl implements TaskCodeThirdService {
             return null;
         }
         String accessToken = authCode.getAccessToken();
-        if (!PipelineUntil.isNoNull(houseName) ){
+        if (!PipelineUtil.isNoNull(houseName) ){
             throw new ApplicationException(5000,"仓库名称为空。");
         }
 
@@ -393,10 +393,10 @@ public class TaskCodeThirdServiceImpl implements TaskCodeThirdService {
             return;
         }
         for (AuthThird authCode : allAuthCode) {
-            boolean token = PipelineUntil.isNoNull(authCode.getAccessToken());
-            boolean refresh = PipelineUntil.isNoNull(authCode.getRefreshToken());
+            boolean token = PipelineUtil.isNoNull(authCode.getAccessToken());
+            boolean refresh = PipelineUtil.isNoNull(authCode.getRefreshToken());
             if (!token || !refresh) return;
-            logger.info("gitee定时任务，时间:"+PipelineUntil.date(1));
+            logger.info("gitee定时任务，时间:"+ PipelineUtil.date(1));
             logger.info("更新授权信息,授权人："+authCode.getUsername());
             String refreshToken = taskCodeThird.findRefreshToken(authCode.getRefreshToken());
             ResponseEntity<JSONObject> forEntity;
@@ -426,7 +426,7 @@ public class TaskCodeThirdServiceImpl implements TaskCodeThirdService {
      * @return 转码后的回调地址
      */
     public String callbackUrl(String callbackUrl){
-        boolean b = PipelineUntil.validURL(callbackUrl);
+        boolean b = PipelineUtil.validURL(callbackUrl);
         if (!b){
             return null;
         }

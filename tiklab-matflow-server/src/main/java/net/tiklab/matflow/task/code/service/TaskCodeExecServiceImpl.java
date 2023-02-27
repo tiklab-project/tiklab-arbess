@@ -10,7 +10,7 @@ import net.tiklab.matflow.setting.model.Auth;
 import net.tiklab.matflow.setting.model.AuthThird;
 import net.tiklab.matflow.setting.service.AuthService;
 import net.tiklab.matflow.setting.service.AuthThirdService;
-import net.tiklab.matflow.support.until.PipelineUntil;
+import net.tiklab.matflow.support.util.PipelineUtil;
 import net.tiklab.matflow.task.code.model.TaskCode;
 import net.tiklab.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,28 +69,28 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
         taskCode.setCodeBranch(variableKey);
 
         if (!variableCond){
-            commonService.updateExecLog(pipelineProcess, PipelineUntil.date(4)+"任务："+ name+"执行条件不满足,跳过执行。");
+            commonService.updateExecLog(pipelineProcess, PipelineUtil.date(4)+"任务："+ name+"执行条件不满足,跳过执行。");
             return true;
         }
 
-        commonService.updateExecLog(pipelineProcess, PipelineUntil.date(4)+"执行任务："+ name);
+        commonService.updateExecLog(pipelineProcess, PipelineUtil.date(4)+"执行任务："+ name);
 
         taskCode.setType(taskType);
 
-        if (!PipelineUntil.isNoNull(taskCode.getCodeAddress())){
-            commonService.updateExecLog(pipelineProcess,PipelineUntil.date(4)+"代码源地址未配置。");
+        if (!PipelineUtil.isNoNull(taskCode.getCodeAddress())){
+            commonService.updateExecLog(pipelineProcess, PipelineUtil.date(4)+"代码源地址未配置。");
             return false;
         }
 
         //代码保存路径
-        String codeDir = PipelineUntil.findFileAddress(pipeline.getId(),1);
+        String codeDir = PipelineUtil.findFileAddress(pipeline.getId(),1);
         File file = new File(codeDir);
 
         //删除旧的代码
         boolean b = false;
         while (!b){
             if (file.exists()){
-                b = PipelineUntil.deleteFile(file);
+                b = PipelineUtil.deleteFile(file);
             }else {
                 b = true;
             }
@@ -98,17 +98,17 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
 
         //分支
         String codeBranch = taskCode.getCodeBranch();
-        if(!PipelineUntil.isNoNull(codeBranch)){
+        if(!PipelineUtil.isNoNull(codeBranch)){
             codeBranch = "master";
         }
 
         //更新日志
-        String s = PipelineUntil.date(4) + "Uri : " + taskCode.getCodeAddress() + "\n"
-                + PipelineUntil.date(4) + "Branch : " + codeBranch ;
+        String s = PipelineUtil.date(4) + "Uri : " + taskCode.getCodeAddress() + "\n"
+                + PipelineUtil.date(4) + "Branch : " + codeBranch ;
 
         commonService.updateExecLog(pipelineProcess,s);
 
-        commonService.updateExecLog(pipelineProcess,PipelineUntil.date(4)+"分配源码空间..." );
+        commonService.updateExecLog(pipelineProcess, PipelineUtil.date(4)+"分配源码空间..." );
 
         try {
             //命令执行失败
@@ -121,7 +121,7 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
             commonService.execState(pipelineProcess,process,name);
 
             process.destroy();
-            commonService.updateExecLog(pipelineProcess,PipelineUntil.date(4)+ "空间分配成功。" );
+            commonService.updateExecLog(pipelineProcess, PipelineUtil.date(4)+ "空间分配成功。" );
             //获取提交信息
             Process message = cloneMessage(taskCode.getType(),pipeline.getId());
             if (message != null){
@@ -132,16 +132,16 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
             }
 
         } catch (IOException e) {
-            commonService.updateExecLog(pipelineProcess,PipelineUntil.date(4)+"系统执行命令错误 \n" + e);
+            commonService.updateExecLog(pipelineProcess, PipelineUtil.date(4)+"系统执行命令错误 \n" + e);
             return false;
         }catch (URISyntaxException e){
-            commonService.updateExecLog(pipelineProcess,PipelineUntil.date(4)+"Git地址错误 \n" + e);
+            commonService.updateExecLog(pipelineProcess, PipelineUtil.date(4)+"Git地址错误 \n" + e);
             return false;
         }catch (ApplicationException e){
-            commonService.updateExecLog(pipelineProcess,PipelineUntil.date(4)+ e);
+            commonService.updateExecLog(pipelineProcess, PipelineUtil.date(4)+ e);
             return false;
         }
-        commonService.updateExecLog(pipelineProcess,PipelineUntil.date(4)+"任务"+name+"执行成功。");
+        commonService.updateExecLog(pipelineProcess, PipelineUtil.date(4)+"任务"+name+"执行成功。");
         return true;
     }
 
@@ -166,10 +166,10 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
         }
 
         //效验地址应用程序的合法性
-        PipelineUntil.validFile(serverAddress, taskCode.getType());
+        PipelineUtil.validFile(serverAddress, taskCode.getType());
 
         //源码存放位置
-        String fileAddress = PipelineUntil.findFileAddress(pipelineId,1);
+        String fileAddress = PipelineUtil.findFileAddress(pipelineId,1);
         String gitOrder;
         String path = null;
         switch (taskCode.getType()) {
@@ -178,8 +178,8 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
                 List<String> list = gitUpOrder(taskCode, fileAddress);
                 gitOrder = list.get(0);
                 if (list.size() > 1){
-                    PipelineUntil.process(serverAddress, list.get(0));
-                    PipelineUntil.process(serverAddress, list.get(1));
+                    PipelineUtil.process(serverAddress, list.get(0));
+                    PipelineUtil.process(serverAddress, list.get(1));
                     gitOrder = list.get(2);
                     path = list.get(3);
                 }
@@ -194,10 +194,10 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
                     throw new ApplicationException("未知的任务类型");
         }
 
-        Process process = PipelineUntil.process(serverAddress, gitOrder);
+        Process process = PipelineUtil.process(serverAddress, gitOrder);
 
-        if (PipelineUntil.isNoNull(path)){
-            PipelineUntil.deleteFile(new File(path));
+        if (PipelineUtil.isNoNull(path)){
+            PipelineUtil.deleteFile(new File(path));
         }
 
         return process;
@@ -241,9 +241,9 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
             return list;
         }
 
-        String tempFile = PipelineUntil.createTempFile(auth.getPrivateKey());
+        String tempFile = PipelineUtil.createTempFile(auth.getPrivateKey());
         String userHome = System.getProperty("user.home");
-        if (!PipelineUntil.isNoNull(tempFile)){
+        if (!PipelineUtil.isNoNull(tempFile)){
             throw new ApplicationException("私钥写入失败。");
         }
 
@@ -251,7 +251,7 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
         String address = tempFile.replace(userHome, "").replace("\\", "/");
         String orderClean;
         String orderAdd;
-        if (PipelineUntil.findSystemType() == 1){
+        if (PipelineUtil.findSystemType() == 1){
              orderClean = ".\\git.exe git config --global --unset core.sshCommand";
              orderAdd = ".\\git.exe config --global core.sshCommand \"ssh -i ~" + address + "\"";
         }else {
@@ -301,13 +301,13 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
         String branch = code.getCodeBranch();
         //判断是否存在分支
         String order;
-        if (!PipelineUntil.isNoNull(branch)){
+        if (!PipelineUtil.isNoNull(branch)){
             order = url+" "+codeDir;
         }else {
             order =" -b "+branch+" "+ url+" "+codeDir;
         }
         //根据不同系统更新命令
-        if (PipelineUntil.findSystemType() == 1){
+        if (PipelineUtil.findSystemType() == 1){
             order=".\\git.exe clone"+" " + order;
         }else {
             order="./git clone"+" " + order;
@@ -348,7 +348,7 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
         String svnFile = taskCode.getSvnFile();
 
         //检出文件夹
-        if (PipelineUntil.isNoNull(svnFile)){
+        if (PipelineUtil.isNoNull(svnFile)){
             codeAddress = codeAddress + "/./" +svnFile;
         }
         //判断检出类型
@@ -358,7 +358,7 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
             codeAddress  = codeAddress + " --username "+ " "  +username + " --password " + " " + password + " " +codeDir;
         }
         //不同系统检出
-        if (PipelineUntil.findSystemType() == 1){
+        if (PipelineUtil.findSystemType() == 1){
             codeAddress=".\\svn.exe checkout"+" " + codeAddress;
         }else {
             codeAddress="./svn checkout"+" " + codeAddress;
@@ -407,8 +407,8 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
             return null;
         }
         String order = "git log --pretty=format:\"commit：%cn email：%ae message：%s date：%ad time：%ar \" --date=format:\"%Y-%m-%d %H:%M:%S\" -n 1";
-        String fileAddress = PipelineUntil.findFileAddress(pipelineId,1);
-        return PipelineUntil.process(fileAddress, order);
+        String fileAddress = PipelineUtil.findFileAddress(pipelineId,1);
+        return PipelineUtil.process(fileAddress, order);
     }
 
     /**

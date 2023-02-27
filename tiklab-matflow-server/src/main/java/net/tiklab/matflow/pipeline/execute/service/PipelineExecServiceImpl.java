@@ -17,7 +17,7 @@ import net.tiklab.matflow.pipeline.definition.service.PipelineStagesService;
 import net.tiklab.matflow.pipeline.definition.service.PipelineTasksService;
 import net.tiklab.matflow.home.service.PipelineHomeService;
 import net.tiklab.matflow.pipeline.execute.model.*;
-import net.tiklab.matflow.support.until.PipelineUntil;
+import net.tiklab.matflow.support.util.PipelineUtil;
 import net.tiklab.matflow.task.task.service.PipelineTaskExecDispatchService;
 import net.tiklab.rpc.annotation.Exporter;
 import net.tiklab.utils.context.LoginContext;
@@ -37,7 +37,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import static net.tiklab.matflow.support.until.PipelineFinal.*;
+import static net.tiklab.matflow.support.util.PipelineFinal.*;
 
 @Service
 @Exporter
@@ -411,8 +411,8 @@ public class PipelineExecServiceImpl implements PipelineExecService {
                             for (PipelineStagesTask stagesTask : stagesTaskList) {
                                 String configId = stagesTask.getConfigId();
                                 PipelineProcess process = initProcess(configId, pipelineId, historyId);
-                                commonService.updateExecLog(process,PipelineUntil.date(4)+"阶段："+stages.getName());
-                                commonService.updateExecLog(process,PipelineUntil.date(4)+"并行阶段："+stage.getName());
+                                commonService.updateExecLog(process, PipelineUtil.date(4)+"阶段："+stages.getName());
+                                commonService.updateExecLog(process, PipelineUtil.date(4)+"并行阶段："+stage.getName());
                                 boolean state = execTask(process,stagesTask.getTaskType(),stagesTask.getName());
                                 if (!state){
                                     return  false;
@@ -453,7 +453,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         for (Postprocess postprocess : allAfterConfig) {
             String configId = postprocess.getConfigId();
             PipelineProcess process =  initProcess(configId,pipelineId,historyId);
-            commonService.updateExecLog(process,PipelineUntil.date(4)+"执行后置任务");
+            commonService.updateExecLog(process, PipelineUtil.date(4)+"执行后置任务");
             boolean b = execTask(process, postprocess.getTaskType(), postprocess.getName());
             if (!b){
                 return false;
@@ -482,7 +482,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         Boolean variableCond = commonService.variableCond(pipeline.getId(), configId);
         if (allPostprocess.size() != 0 && variableCond){
             for (Postprocess postprocess : allPostprocess) {
-                commonService.updateExecLog(pipelineProcess,PipelineUntil.date(4)+"后置任务:"+ postprocess.getName());
+                commonService.updateExecLog(pipelineProcess, PipelineUtil.date(4)+"后置任务:"+ postprocess.getName());
                 String postConfigId = postprocess.getConfigId();
                 Map<String,String> map = new HashMap<>();
                 map.put("task","true");
@@ -493,7 +493,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
                 }
                 boolean state = taskExecService.beginCourseState(pipelineProcess, postConfigId, postprocess.getTaskType(),map);
                 if (!state){
-                    commonService.updateExecLog(pipelineProcess,PipelineUntil.date(4)+"后置任务:"+ postprocess.getName()+"执行失败！");
+                    commonService.updateExecLog(pipelineProcess, PipelineUtil.date(4)+"后置任务:"+ postprocess.getName()+"执行失败！");
                     b = false;
                 }
             }
@@ -605,9 +605,9 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         taskInstanceLog.setStagesId(stagesId);
         taskInstanceLog.setRunState(3);
         taskInstanceLog.setTaskName(name);
-        String address= PipelineUntil.findFileAddress(id, 2);
+        String address= PipelineUtil.findFileAddress(id, 2);
         String logId = logService.createLog(taskInstanceLog);
-        String logAddress = PipelineUntil.createFile(address + "/" + historyId + "/" + logId + ".log");
+        String logAddress = PipelineUtil.createFile(address + "/" + historyId + "/" + logId + ".log");
         taskInstanceLog.setLogAddress(logAddress);
         taskInstanceLog.setLogId(logId);
         logService.updateLog(taskInstanceLog);
@@ -638,9 +638,9 @@ public class PipelineExecServiceImpl implements PipelineExecService {
             log = logService.findOneLog(logId);
         }
         String s = log.getRunLog();
-        if (!PipelineUntil.isNoNull(log.getRunLog())){
+        if (!PipelineUtil.isNoNull(log.getRunLog())){
             String logAddress = log.getLogAddress();
-            s = PipelineUntil.readFile(logAddress, 300);
+            s = PipelineUtil.readFile(logAddress, 300);
         }
 
         Integer integer = runTime.get(logId);
@@ -670,7 +670,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
             if (log.getState() == 0){
                 runState = 0;
             }
-            if (!PipelineUntil.isNoNull(log.getRunLog())){
+            if (!PipelineUtil.isNoNull(log.getRunLog())){
                 continue;
             }
             runLog.append(log.getRunLog());
@@ -753,7 +753,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         currentGroup.enumerate(lstThreads);
         for (int i = 0; i < noThreads; i++) {
             String nm = lstThreads[i].getName();
-            if (!PipelineUntil.isNoNull(nm) ||!nm.equals(threadName)) {
+            if (!PipelineUtil.isNoNull(nm) ||!nm.equals(threadName)) {
                 continue;
             }
             lstThreads[i].stop();

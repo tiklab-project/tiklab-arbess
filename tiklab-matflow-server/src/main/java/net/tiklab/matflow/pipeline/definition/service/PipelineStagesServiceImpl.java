@@ -8,7 +8,7 @@ import net.tiklab.matflow.pipeline.definition.model.Pipeline;
 import net.tiklab.matflow.pipeline.definition.model.PipelineConfig;
 import net.tiklab.matflow.pipeline.definition.model.PipelineStages;
 import net.tiklab.matflow.pipeline.definition.model.PipelineStagesTask;
-import net.tiklab.matflow.support.until.PipelineUntil;
+import net.tiklab.matflow.support.util.PipelineUtil;
 import net.tiklab.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -44,7 +44,7 @@ public class PipelineStagesServiceImpl implements PipelineStagesService {
         int taskSort = config.getTaskSort();
         int stage = config.getStages();
 
-        PipelineStages pipelineStages = new PipelineStages(PipelineUntil.date(1),pipelineId);
+        PipelineStages pipelineStages = new PipelineStages(PipelineUtil.date(1),pipelineId);
 
         //判断新任务是否为代码源
         if (taskType < 10){
@@ -71,7 +71,7 @@ public class PipelineStagesServiceImpl implements PipelineStagesService {
         }
 
         //新任务
-        if (!PipelineUntil.isNoNull(stagesId) && stage == 0){
+        if (!PipelineUtil.isNoNull(stagesId) && stage == 0){
             //创建主节点
             pipelineStages.setMainStage("true");
             int initStage = initStage(pipelineId,taskSort);
@@ -93,12 +93,12 @@ public class PipelineStagesServiceImpl implements PipelineStagesService {
         }
 
         //串行任务
-        if (PipelineUntil.isNoNull(stagesId) && stage != 0){
+        if (PipelineUtil.isNoNull(stagesId) && stage != 0){
             return stagesTaskServer.createStagesTasksTask(config);
         }
 
         //并行任务
-        if (!PipelineUntil.isNoNull(stagesId) && stage != 0){
+        if (!PipelineUtil.isNoNull(stagesId) && stage != 0){
             PipelineStages mainStages = findMainStages(pipelineId,stage);
             if (mainStages == null){
                 return null;

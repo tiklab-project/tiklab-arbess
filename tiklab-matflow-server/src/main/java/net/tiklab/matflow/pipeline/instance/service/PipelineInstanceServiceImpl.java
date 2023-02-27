@@ -11,7 +11,7 @@ import net.tiklab.matflow.pipeline.definition.service.PipelineStagesService;
 import net.tiklab.matflow.pipeline.instance.dao.PipelineInstanceDao;
 import net.tiklab.matflow.pipeline.instance.entity.PipelineInstanceEntity;
 import net.tiklab.matflow.pipeline.instance.model.*;
-import net.tiklab.matflow.support.until.PipelineUntil;
+import net.tiklab.matflow.support.util.PipelineUtil;
 import net.tiklab.rpc.annotation.Exporter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,9 +73,9 @@ public class PipelineInstanceServiceImpl implements PipelineInstanceService {
         String id = history.getPipeline().getId();
         pipelineInstanceDao.deleteHistory(historyId);
         taskInstanceLogService.deleteHistoryLog(historyId);
-        String fileAddress = PipelineUntil.findFileAddress(id,2);
+        String fileAddress = PipelineUtil.findFileAddress(id,2);
         //删除对应日志
-        PipelineUntil.deleteFile(new File(fileAddress+"/"+historyId+"/"));
+        PipelineUtil.deleteFile(new File(fileAddress+"/"+historyId+"/"));
     }
 
     @Override
@@ -265,7 +265,7 @@ public class PipelineInstanceServiceImpl implements PipelineInstanceService {
 
             //添加消息阶段
             List<TaskInstanceLog> allLog = taskInstanceLogService.findAllLog(historyId);
-            allLog.removeIf(pipelineExecLog -> PipelineUntil.isNoNull(pipelineExecLog.getStagesId()));
+            allLog.removeIf(pipelineExecLog -> PipelineUtil.isNoNull(pipelineExecLog.getStagesId()));
             if (allLog.size() == 0){
                 execRunLog.setRunLogList(runLogList);
                 return execRunLog;
@@ -294,7 +294,7 @@ public class PipelineInstanceServiceImpl implements PipelineInstanceService {
         runLog.setTime(log.getRunTime());
         runLog.setName(log.getTaskName());
         String logAddress = log.getLogAddress();
-        runLog.setRunLog(PipelineUntil.readFile(logAddress,500));
+        runLog.setRunLog(PipelineUtil.readFile(logAddress,500));
         return runLog;
     }
 

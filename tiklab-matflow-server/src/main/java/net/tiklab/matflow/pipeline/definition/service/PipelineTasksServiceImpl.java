@@ -7,7 +7,7 @@ import net.tiklab.matflow.pipeline.definition.dao.PipelineTasksDao;
 import net.tiklab.matflow.pipeline.definition.entity.PipelineTasksEntity;
 import net.tiklab.matflow.pipeline.definition.model.PipelineConfig;
 import net.tiklab.matflow.pipeline.definition.model.PipelineTasks;
-import net.tiklab.matflow.support.until.PipelineUntil;
+import net.tiklab.matflow.support.util.PipelineUtil;
 import net.tiklab.matflow.task.task.service.PipelineTaskDispatchService;
 import net.tiklab.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +41,7 @@ public class PipelineTasksServiceImpl implements PipelineTasksService {
         int taskType = config.getTaskType();
         findTypeTasks(pipelineId,taskType);
         int taskSort = initSort(pipelineId, config.getTaskSort(), taskType);
-        PipelineTasks tasks = new PipelineTasks(PipelineUntil.date(1),taskType,taskSort,pipelineId);
+        PipelineTasks tasks = new PipelineTasks(PipelineUtil.date(1),taskType,taskSort,pipelineId);
         String name = commonServer.initName(taskType);
         tasks.setName(name);
         String tasksId = createTasks(tasks);
@@ -111,7 +111,7 @@ public class PipelineTasksServiceImpl implements PipelineTasksService {
         int taskType = config.getTaskType();
         String object = JSON.toJSONString(values);
         PipelineConfig pipelineConfig =JSON.parseObject(object, PipelineConfig.class);
-        if (PipelineUntil.isNoNull(pipelineConfig.getName())) {
+        if (PipelineUtil.isNoNull(pipelineConfig.getName())) {
             PipelineTasks task = findOneTasks(configId);
             task.setName(pipelineConfig.getName());
             updateTasks(task);

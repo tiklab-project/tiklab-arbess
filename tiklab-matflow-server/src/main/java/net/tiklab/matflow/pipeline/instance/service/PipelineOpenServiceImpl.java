@@ -7,7 +7,7 @@ import net.tiklab.matflow.pipeline.definition.model.Pipeline;
 import net.tiklab.matflow.pipeline.instance.dao.PipelineOpenDao;
 import net.tiklab.matflow.pipeline.instance.entity.PipelineOpenEntity;
 import net.tiklab.matflow.pipeline.instance.model.PipelineOpen;
-import net.tiklab.matflow.support.until.PipelineUntil;
+import net.tiklab.matflow.support.util.PipelineUtil;
 import net.tiklab.rpc.annotation.Exporter;
 import net.tiklab.utils.context.LoginContext;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,7 +55,7 @@ public class PipelineOpenServiceImpl implements PipelineOpenService {
             pipelineOpen.setUserId(userId);
             pipelineOpen.setPipeline(new Pipeline(pipelineId));
             pipelineOpen.setNumber(1);
-            pipelineOpen.setCreateTime(PipelineUntil.date(2));
+            pipelineOpen.setCreateTime(PipelineUtil.date(2));
             createOpen(pipelineOpen);
         }
     }
@@ -124,7 +124,7 @@ public class PipelineOpenServiceImpl implements PipelineOpenService {
         for (PipelineOpen pipelineOpen : list) {
             Pipeline pipeline = pipelineOpen.getPipeline();
             String name = pipeline.getName();
-            if (!PipelineUntil.isNoNull(name)){
+            if (!PipelineUtil.isNoNull(name)){
                 deleteOpen(pipelineOpen.getOpenId());
                 continue;
             }

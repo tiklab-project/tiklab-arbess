@@ -2,7 +2,7 @@ package net.tiklab.matflow.task.task.service;
 
 import com.alibaba.fastjson.JSON;
 import net.tiklab.core.exception.ApplicationException;
-import net.tiklab.matflow.support.until.PipelineUntil;
+import net.tiklab.matflow.support.util.PipelineUtil;
 import net.tiklab.matflow.task.artifact.model.TaskProduct;
 import net.tiklab.matflow.task.artifact.service.TaskProductService;
 import net.tiklab.matflow.task.build.model.TaskBuild;
@@ -346,7 +346,7 @@ public class PipelineTaskDispatchServiceImpl implements PipelineTaskDispatchServ
         if (oneCodeConfig == null){
             return;
         }
-        if (!PipelineUntil.isNoNull(oneCodeConfig.getCodeName())){
+        if (!PipelineUtil.isNoNull(oneCodeConfig.getCodeName())){
             list.add(configId);
         }
     }
@@ -356,7 +356,7 @@ public class PipelineTaskDispatchServiceImpl implements PipelineTaskDispatchServ
         if (code == null){
             return;
         }
-        if (!PipelineUntil.isNoNull(code.getProjectName())){
+        if (!PipelineUtil.isNoNull(code.getProjectName())){
             list.add(configId);
         }
     }
@@ -376,10 +376,10 @@ public class PipelineTaskDispatchServiceImpl implements PipelineTaskDispatchServ
         }
         if (taskType == 31){
             if (deploy.getAuthType() == 1){
-                if (!PipelineUntil.isNoNull(deploy.getDeployAddress())){
+                if (!PipelineUtil.isNoNull(deploy.getDeployAddress())){
                     list.add(configId);
                 }
-                if (!PipelineUntil.isNoNull(deploy.getStartAddress())){
+                if (!PipelineUtil.isNoNull(deploy.getStartAddress())){
                     list.add(configId);
                 }
             }
@@ -392,27 +392,27 @@ public class PipelineTaskDispatchServiceImpl implements PipelineTaskDispatchServ
             return;
         }
         if (taskType == 51){
-            if (!PipelineUntil.isNoNull(product.getArtifactId())){
+            if (!PipelineUtil.isNoNull(product.getArtifactId())){
                 list.add(configId);
             }
-            if (!PipelineUntil.isNoNull(product.getVersion())){
+            if (!PipelineUtil.isNoNull(product.getVersion())){
                 list.add(configId);
             }
-            if (!PipelineUntil.isNoNull(product.getGroupId())){
+            if (!PipelineUtil.isNoNull(product.getGroupId())){
                 list.add(configId);
             }
-            if (!PipelineUntil.isNoNull(product.getFileAddress())){
+            if (!PipelineUtil.isNoNull(product.getFileAddress())){
                 list.add(configId);
             }
-            if (!PipelineUntil.isNoNull(product.getFileType())){
+            if (!PipelineUtil.isNoNull(product.getFileType())){
                 list.add(configId);
             }
         }
         if (taskType == 52){
-            if (!PipelineUntil.isNoNull(product.getFileAddress())){
+            if (!PipelineUtil.isNoNull(product.getFileAddress())){
                 list.add(configId);
             }
-            if (!PipelineUntil.isNoNull(product.getPutAddress())){
+            if (!PipelineUtil.isNoNull(product.getPutAddress())){
                 list.add(configId);
             }
         }

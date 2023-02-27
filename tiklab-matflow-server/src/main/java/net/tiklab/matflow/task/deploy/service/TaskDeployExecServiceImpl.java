@@ -8,7 +8,7 @@ import net.tiklab.matflow.pipeline.definition.service.PipelineTasksService;
 import net.tiklab.matflow.pipeline.execute.model.PipelineProcess;
 import net.tiklab.matflow.pipeline.instance.service.PipelineExecLogService;
 import net.tiklab.matflow.setting.model.AuthHost;
-import net.tiklab.matflow.support.until.PipelineUntil;
+import net.tiklab.matflow.support.util.PipelineUtil;
 import net.tiklab.matflow.task.deploy.model.TaskDeploy;
 import net.tiklab.rpc.annotation.Exporter;
 import org.slf4j.Logger;
@@ -58,11 +58,11 @@ public class TaskDeployExecServiceImpl implements TaskDeployExecService {
 
         Boolean variableCond = commonService.variableCond(pipeline.getId(), configId);
         if (!variableCond){
-            commonService.updateExecLog(pipelineProcess, PipelineUntil.date(4)+"任务："+ name+"执行条件不满足,跳过执行。");
+            commonService.updateExecLog(pipelineProcess, PipelineUtil.date(4)+"任务："+ name+"执行条件不满足,跳过执行。");
             return true;
         }
 
-        commonService.updateExecLog(pipelineProcess, PipelineUntil.date(4)+"执行任务："+name);
+        commonService.updateExecLog(pipelineProcess, PipelineUtil.date(4)+"执行任务："+name);
 
         taskDeploy.setType(taskType);
 
@@ -74,28 +74,28 @@ public class TaskDeployExecServiceImpl implements TaskDeployExecService {
         try {
             session = createSession(taskDeploy);
         } catch (JSchException e) {
-            String message = PipelineUntil.date(4)+ e.getMessage();
-            commonService.updateExecLog(pipelineProcess,PipelineUntil.date(4)+"连接失败，无法连接到服务器\n"+message);
+            String message = PipelineUtil.date(4)+ e.getMessage();
+            commonService.updateExecLog(pipelineProcess, PipelineUtil.date(4)+"连接失败，无法连接到服务器\n"+message);
             return false;
         }
-        commonService.updateExecLog(pipelineProcess,PipelineUntil.date(4)+"建立服务器链接：" );
-        commonService.updateExecLog(pipelineProcess,PipelineUntil.date(4)+"服务器链接建立成功。" );
+        commonService.updateExecLog(pipelineProcess, PipelineUtil.date(4)+"建立服务器链接：" );
+        commonService.updateExecLog(pipelineProcess, PipelineUtil.date(4)+"服务器链接建立成功。" );
 
         //执行自定义脚本
         try {
             if (taskDeploy.getAuthType() == 2) {
-                List<String> list = PipelineUntil.execOrder(startShell);
+                List<String> list = PipelineUtil.execOrder(startShell);
                 for (String s : list) {
                     String key = commonService.variableKey(pipeline.getId(), configId, s);
-                    commonService.updateExecLog(pipelineProcess,PipelineUntil.date(4)+ key );
+                    commonService.updateExecLog(pipelineProcess, PipelineUtil.date(4)+ key );
                     sshOrder(session,key,pipelineProcess);
                 }
-                commonService.updateExecLog(pipelineProcess, PipelineUntil.date(4)+"任务："+name+"执行完成。");
+                commonService.updateExecLog(pipelineProcess, PipelineUtil.date(4)+"任务："+name+"执行完成。");
                 session.disconnect();
                 return true;
             }
         } catch (IOException | JSchException e) {
-            String s = PipelineUntil.date(4) + "命令执行失败" ;
+            String s = PipelineUtil.date(4) + "命令执行失败" ;
             commonService.updateExecLog(pipelineProcess, s);
             commonService.updateExecLog(pipelineProcess, e.getMessage());
             return false;
@@ -105,15 +105,15 @@ public class TaskDeployExecServiceImpl implements TaskDeployExecService {
         String filePath;
 
         try {
-            commonService.updateExecLog(pipelineProcess,PipelineUntil.date(4)+"获取部署文件......");
-            filePath = PipelineUntil.getFile(pipeline.getId(), taskDeploy.getLocalAddress());
+            commonService.updateExecLog(pipelineProcess, PipelineUtil.date(4)+"获取部署文件......");
+            filePath = PipelineUtil.getFile(pipeline.getId(), taskDeploy.getLocalAddress());
         } catch (ApplicationException e) {
-            String message = PipelineUntil.date(4) + e.getMessage();
-            commonService.updateExecLog(pipelineProcess,PipelineUntil.date(4)+"部署文件获取失败，\n"+ message);
+            String message = PipelineUtil.date(4) + e.getMessage();
+            commonService.updateExecLog(pipelineProcess, PipelineUtil.date(4)+"部署文件获取失败，\n"+ message);
             return false;
         }
 
-        commonService.updateExecLog(pipelineProcess,PipelineUntil.date(4)+"部署文件获取成功："+ filePath );
+        commonService.updateExecLog(pipelineProcess, PipelineUtil.date(4)+"部署文件获取成功："+ filePath );
 
         //发送文件位置
         String deployAddress ="/"+ taskDeploy.getDeployAddress();
@@ -122,21 +122,21 @@ public class TaskDeployExecServiceImpl implements TaskDeployExecService {
          ftp(session, filePath, deployAddress);
         } catch (JSchException | SftpException e) {
             session.disconnect();
-            commonService.updateExecLog(pipelineProcess,PipelineUntil.date(4)+"部署文件上传失败"+e.getMessage());
+            commonService.updateExecLog(pipelineProcess, PipelineUtil.date(4)+"部署文件上传失败"+e.getMessage());
             return false;
         }
 
-        commonService.updateExecLog(pipelineProcess,PipelineUntil.date(4)+"部署文件上传成功" );
+        commonService.updateExecLog(pipelineProcess, PipelineUtil.date(4)+"部署文件上传成功" );
 
         try {
             linux(session, pipelineProcess, taskDeploy,configId);
         } catch (JSchException | IOException e) {
             session.disconnect();
-            commonService.updateExecLog(pipelineProcess,PipelineUntil.date(4)+"命令执行失败");
+            commonService.updateExecLog(pipelineProcess, PipelineUtil.date(4)+"命令执行失败");
             return false;
         }
         session.disconnect();
-        commonService.updateExecLog(pipelineProcess, PipelineUntil.date(4)+"任务："+name+"执行完成。");
+        commonService.updateExecLog(pipelineProcess, PipelineUtil.date(4)+"任务："+name+"执行完成。");
         return true;
     }
 
@@ -162,26 +162,26 @@ public class TaskDeployExecServiceImpl implements TaskDeployExecService {
         String startOrder = taskDeploy.getStartOrder();
 
         //部署命令和启动命令都为空
-        if (!PipelineUntil.isNoNull(startOrder) && !PipelineUntil.isNoNull(deployOrder)){
+        if (!PipelineUtil.isNoNull(startOrder) && !PipelineUtil.isNoNull(deployOrder)){
            return;
         }
 
-        if (PipelineUntil.isNoNull(deployOrder)){
-            List<String> list = PipelineUntil.execOrder(deployOrder);
+        if (PipelineUtil.isNoNull(deployOrder)){
+            List<String> list = PipelineUtil.execOrder(deployOrder);
             for (String s : list) {
                 String key = commonService.variableKey(pipeline.getId(), configId, s);
                 String orders = "cd "+" "+ deployAddress + ";" + key;
-                commonService.updateExecLog(pipelineProcess,PipelineUntil.date(4)+"执行部署命令：" + key);
+                commonService.updateExecLog(pipelineProcess, PipelineUtil.date(4)+"执行部署命令：" + key);
                 sshOrder(session,orders, pipelineProcess);
             }
         }
 
-        if (PipelineUntil.isNoNull(startOrder)){
-            List<String> list = PipelineUntil.execOrder(startOrder);
+        if (PipelineUtil.isNoNull(startOrder)){
+            List<String> list = PipelineUtil.execOrder(startOrder);
             for (String s : list) {
                 String key = commonService.variableKey(pipeline.getId(), configId, s);
                 String orders = "cd "+" "+ startAddress+";" + key;
-                commonService.updateExecLog(pipelineProcess,PipelineUntil.date(4)+"执行启动命令：" + key );
+                commonService.updateExecLog(pipelineProcess, PipelineUtil.date(4)+"执行启动命令：" + key );
                 sshOrder(session,orders, pipelineProcess);
             }
         }
@@ -205,12 +205,12 @@ public class TaskDeployExecServiceImpl implements TaskDeployExecService {
         JSch jsch = new JSch();
         Session session = jsch.getSession(username, sshIp, sshPort);
         if (authHost.getAuthType() ==2){
-            String tempFile = PipelineUntil.createTempFile(authHost.getPrivateKey());
-            if (!PipelineUntil.isNoNull(tempFile)){
+            String tempFile = PipelineUtil.createTempFile(authHost.getPrivateKey());
+            if (!PipelineUtil.isNoNull(tempFile)){
                 throw new ApplicationException("写入私钥失败。");
             }
             jsch.addIdentity(tempFile);
-            PipelineUntil.deleteFile(new File(tempFile));
+            PipelineUtil.deleteFile(new File(tempFile));
         }else {
             String password = authHost.getPassword();
             session.setPassword(password);

@@ -8,7 +8,7 @@ import net.tiklab.matflow.support.trigger.dao.TriggerDao;
 import net.tiklab.matflow.support.trigger.entity.TriggerEntity;
 import net.tiklab.matflow.support.trigger.model.TriggerTime;
 import net.tiklab.matflow.support.trigger.model.Trigger;
-import net.tiklab.matflow.support.until.PipelineUntil;
+import net.tiklab.matflow.support.util.PipelineUtil;
 import net.tiklab.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -38,7 +38,7 @@ public class TriggerServiceImpl implements TriggerService {
      */
     @Override
     public String createConfig(Trigger config) {
-        config.setCreateTime(PipelineUntil.date(1));
+        config.setCreateTime(PipelineUtil.date(1));
         String triggerId = createTriggerConfig(config);
         config.setConfigId(triggerId);
         try {

@@ -7,7 +7,7 @@ import net.tiklab.matflow.support.trigger.entity.TriggerTimeEntity;
 import net.tiklab.matflow.support.trigger.model.TriggerTime;
 import net.tiklab.matflow.support.trigger.quartz.Job;
 import net.tiklab.matflow.support.trigger.quartz.RunJob;
-import net.tiklab.matflow.support.until.PipelineUntil;
+import net.tiklab.matflow.support.util.PipelineUtil;
 import net.tiklab.rpc.annotation.Exporter;
 import org.quartz.SchedulerException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -169,7 +169,7 @@ public class TriggerTimeServiceImpl implements TriggerTimeService {
         for (TriggerTime triggerTime : allTriggerTime) {
             int date = triggerTime.getDate();
             if (triggerTime.getConfigId().equals(configId) && date != 0){
-                int week = PipelineUntil.week();
+                int week = PipelineUtil.week();
                 if (date > week){
                     list.add(date);
                 }else {

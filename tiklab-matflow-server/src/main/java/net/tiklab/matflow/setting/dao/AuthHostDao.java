@@ -1,7 +1,7 @@
 package net.tiklab.matflow.setting.dao;
 
 import net.tiklab.dal.jpa.JpaTemplate;
-import net.tiklab.matflow.support.until.PipelineUntil;
+import net.tiklab.matflow.support.util.PipelineUtil;
 import net.tiklab.matflow.setting.entity.AuthHostEntity;
 import net.tiklab.utils.context.LoginContext;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +22,7 @@ public class AuthHostDao {
      * @return 主机认证id
      */
     public  String createAuthHost(AuthHostEntity authHostEntity){
-        authHostEntity.setCreateTime(PipelineUntil.date(1));
+        authHostEntity.setCreateTime(PipelineUtil.date(1));
         authHostEntity.setUserId(LoginContext.getLoginId());
         return jpaTemplate.save(authHostEntity, String.class);
     }

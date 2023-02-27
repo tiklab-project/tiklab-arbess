@@ -2,7 +2,7 @@ package net.tiklab.matflow.support.condition.service;
 
 import net.tiklab.matflow.support.condition.dao.ConditionDao;
 import net.tiklab.matflow.support.condition.model.Condition;
-import net.tiklab.matflow.support.until.PipelineUntil;
+import net.tiklab.matflow.support.util.PipelineUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,7 +21,7 @@ public class ConditionServiceImpl implements ConditionService {
      * @return 条件id
      */
     public String createCond(Condition condition){
-        condition.setCreateTime(PipelineUntil.date(1));
+        condition.setCreateTime(PipelineUtil.date(1));
         return conditionDao.createCond(condition);
     }
 

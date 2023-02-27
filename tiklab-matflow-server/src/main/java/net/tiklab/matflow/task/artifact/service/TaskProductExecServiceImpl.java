@@ -9,8 +9,8 @@ import net.tiklab.matflow.pipeline.execute.model.PipelineProcess;
 import net.tiklab.matflow.pipeline.instance.service.PipelineExecLogService;
 import net.tiklab.matflow.setting.model.AuthHost;
 import net.tiklab.matflow.setting.model.AuthThird;
-import net.tiklab.matflow.support.until.PipelineFinal;
-import net.tiklab.matflow.support.until.PipelineUntil;
+import net.tiklab.matflow.support.util.PipelineFinal;
+import net.tiklab.matflow.support.util.PipelineUtil;
 import net.tiklab.matflow.task.artifact.model.TaskProduct;
 import net.tiklab.rpc.annotation.Exporter;
 import org.slf4j.Logger;
@@ -58,31 +58,31 @@ public class TaskProductExecServiceImpl implements TaskProductExecService {
         String name = product.getName();
         Boolean variableCond = commonService.variableCond(pipeline.getId(), configId);
         if (!variableCond){
-            commonService.updateExecLog(pipelineProcess, PipelineUntil.date(4)+"任务："+ name+"执行条件不满足,跳过执行。");
+            commonService.updateExecLog(pipelineProcess, PipelineUtil.date(4)+"任务："+ name+"执行条件不满足,跳过执行。");
             return true;
         }
-        commonService.updateExecLog(pipelineProcess, PipelineUntil.date(4)+"执行任务："+name);
+        commonService.updateExecLog(pipelineProcess, PipelineUtil.date(4)+"执行任务："+name);
 
         product.setType(taskType);
 
         String fileAddress = product.getFileAddress();
         String path;
         try {
-             path = PipelineUntil.getFile(pipeline.getId(),fileAddress);
+             path = PipelineUtil.getFile(pipeline.getId(),fileAddress);
         }catch (ApplicationException e){
-            commonService.updateExecLog(pipelineProcess,PipelineUntil.date(4)+e);
+            commonService.updateExecLog(pipelineProcess, PipelineUtil.date(4)+e);
             return false;
         }
 
         if (path == null){
-            commonService.updateExecLog(pipelineProcess,PipelineUntil.date(4)+"匹配不到制品");
+            commonService.updateExecLog(pipelineProcess, PipelineUtil.date(4)+"匹配不到制品");
             return false;
         }
 
         commonService.updateExecLog(pipelineProcess,
-                PipelineUntil.date(4)+"制品匹配成功\n"+
-                    PipelineUntil.date(4)+"制品名称："+ new File(path).getName() + "\n"+
-                    PipelineUntil.date(4)+"制品地址："+path);
+                PipelineUtil.date(4)+"制品匹配成功\n"+
+                    PipelineUtil.date(4)+"制品名称："+ new File(path).getName() + "\n"+
+                    PipelineUtil.date(4)+"制品地址："+path);
         try {
             if (product.getType() == 51){
                 //替换变量
@@ -101,25 +101,25 @@ public class TaskProductExecServiceImpl implements TaskProductExecService {
                 commonService.execState(pipelineProcess,process,name);
                 process.destroy();
             }else {
-                commonService.updateExecLog(pipelineProcess, PipelineUntil.date(4)+"连接制品服务器。");
+                commonService.updateExecLog(pipelineProcess, PipelineUtil.date(4)+"连接制品服务器。");
                 Session session = createSession(product);
-                commonService.updateExecLog(pipelineProcess, PipelineUntil.date(4)+"制品服务器连接成功。");
+                commonService.updateExecLog(pipelineProcess, PipelineUtil.date(4)+"制品服务器连接成功。");
                 String putAddress = product.getPutAddress();
-                commonService.updateExecLog(pipelineProcess, PipelineUntil.date(4)+"开始推送制品。");
+                commonService.updateExecLog(pipelineProcess, PipelineUtil.date(4)+"开始推送制品。");
 
                 //替换变量
                 String key = commonService.variableKey(pipeline.getId(), configId, putAddress);
-                commonService.updateExecLog(pipelineProcess, PipelineUntil.date(4)+"制品推送位置："+key);
+                commonService.updateExecLog(pipelineProcess, PipelineUtil.date(4)+"制品推送位置："+key);
                 sshPut(session,path,key);
             }
         } catch (IOException | ApplicationException e) {
-            commonService.updateExecLog(pipelineProcess, PipelineUntil.date(4)+"推送制品执行错误\n"+ PipelineUntil.date(4)+e.getMessage());
+            commonService.updateExecLog(pipelineProcess, PipelineUtil.date(4)+"推送制品执行错误\n"+ PipelineUtil.date(4)+e.getMessage());
             return false;
         } catch (JSchException e) {
-            commonService.updateExecLog(pipelineProcess, PipelineUntil.date(4)+"无法连接到服务器\n" +PipelineUntil.date(4)+e.getMessage());
+            commonService.updateExecLog(pipelineProcess, PipelineUtil.date(4)+"无法连接到服务器\n" + PipelineUtil.date(4)+e.getMessage());
             return false;
         }
-        commonService.updateExecLog(pipelineProcess, PipelineUntil.date(4)+"推送制品完成");
+        commonService.updateExecLog(pipelineProcess, PipelineUtil.date(4)+"推送制品完成");
         return true;
     }
 
@@ -133,12 +133,12 @@ public class TaskProductExecServiceImpl implements TaskProductExecService {
             throw new ApplicationException("不存在maven配置");
         }
 
-        PipelineUntil.validFile(mavenAddress, 21);
+        PipelineUtil.validFile(mavenAddress, 21);
 
         AuthThird authThird = (AuthThird)product.getAuth();
         if (authThird == null){
             order = mavenOrder(execOrder, path);
-            return PipelineUntil.process(mavenAddress, order);
+            return PipelineUtil.process(mavenAddress, order);
         }
 
         execOrder = execOrder +
@@ -154,7 +154,7 @@ public class TaskProductExecServiceImpl implements TaskProductExecService {
             String s = System.getProperty("user.dir") + "/" + settingAddress ;
 
             File file = new File(System.getProperty("user.dir"));
-            if (!PipelineUntil.isNoNull(settingAddress)){
+            if (!PipelineUtil.isNoNull(settingAddress)){
                 String parent = file.getParent();
                 settingAddress = "conf/settings.xml";
                 if (!file.getAbsolutePath().endsWith("matflow")){
@@ -179,7 +179,7 @@ public class TaskProductExecServiceImpl implements TaskProductExecService {
        logger.info("命令为："+execOrder);
 
         order = mavenOrder(execOrder, path);
-        return PipelineUntil.process(mavenAddress, order);
+        return PipelineUtil.process(mavenAddress, order);
     }
 
     @Value("${setting.address:null}")
@@ -198,14 +198,14 @@ public class TaskProductExecServiceImpl implements TaskProductExecService {
         String username = authHost.getUsername();
         String password = authHost.getPassword();
         JSch jsch = new JSch();
-        if (!PipelineUntil.isNoNull(username)){
+        if (!PipelineUtil.isNoNull(username)){
             // username = System.getProperty("user.name");
             username = "root";
         }
 
         if (authHost.getAuthType() == 2){
-            String tempFile = PipelineUntil.createTempFile(authHost.getPrivateKey());
-            if (!PipelineUntil.isNoNull(tempFile)){
+            String tempFile = PipelineUtil.createTempFile(authHost.getPrivateKey());
+            if (!PipelineUtil.isNoNull(tempFile)){
                 throw new ApplicationException("获取私钥失败。");
             }
             try {
@@ -214,7 +214,7 @@ public class TaskProductExecServiceImpl implements TaskProductExecService {
                 String message = e.getMessage();
                 throw new ApplicationException("私钥无效："+message);
             }
-            PipelineUntil.deleteFile(new File(tempFile));
+            PipelineUtil.deleteFile(new File(tempFile));
         }
 
         Session session;
@@ -270,7 +270,7 @@ public class TaskProductExecServiceImpl implements TaskProductExecService {
     //拼装maven命令
     private String mavenOrder(String buildOrder,String path){
         String order = " ./" + buildOrder  ;
-        if (PipelineUntil.findSystemType() == 1){
+        if (PipelineUtil.findSystemType() == 1){
             order = " .\\" + buildOrder ;
         }
         return order;

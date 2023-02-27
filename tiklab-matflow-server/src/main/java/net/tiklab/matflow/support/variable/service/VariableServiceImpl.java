@@ -1,7 +1,7 @@
 package net.tiklab.matflow.support.variable.service;
 
 import net.tiklab.matflow.support.variable.dao.VariableDao;
-import net.tiklab.matflow.support.until.PipelineUntil;
+import net.tiklab.matflow.support.util.PipelineUtil;
 import net.tiklab.matflow.support.variable.model.Variable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -55,7 +55,7 @@ public class VariableServiceImpl implements VariableService {
     @Override
     public String createVariable(Variable variable) {
         int taskType = variable.getTaskType();
-        variable.setCreateTime(PipelineUntil.date(1));
+        variable.setCreateTime(PipelineUtil.date(1));
         if (taskType == 2){
             String values = updateValues(variable.getValueList());
             variable.setVarValues(values);
@@ -66,7 +66,7 @@ public class VariableServiceImpl implements VariableService {
     private String updateValues(List<String> list ){
         StringBuilder values = new StringBuilder();
         for (String s : list) {
-            if (!PipelineUntil.isNoNull(values.toString())){
+            if (!PipelineUtil.isNoNull(values.toString())){
                 values = new StringBuilder(s);
             }else {
                 values.append(",").append(s);

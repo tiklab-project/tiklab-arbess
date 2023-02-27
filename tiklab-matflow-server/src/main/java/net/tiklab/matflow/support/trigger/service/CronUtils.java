@@ -1,7 +1,7 @@
 package net.tiklab.matflow.support.trigger.service;
 
 import net.tiklab.core.exception.ApplicationException;
-import net.tiklab.matflow.support.until.PipelineUntil;
+import net.tiklab.matflow.support.util.PipelineUtil;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -39,12 +39,12 @@ public class CronUtils {
         long time1;
         try {
              time = simpleDateFormat.parse(date).getTime();
-             time1 = simpleDateFormat.parse(PipelineUntil.date(5)).getTime();
+             time1 = simpleDateFormat.parse(PipelineUtil.date(5)).getTime();
         } catch (ParseException e) {
             throw new ApplicationException("时间格式转换错误，错误时间："+date);
         }
 
-        if (day == PipelineUntil.week() && time > time1){
+        if (day == PipelineUtil.week() && time > time1){
             week = "*" ;
         }
 
@@ -88,7 +88,7 @@ public class CronUtils {
             day = Integer.parseInt(s[5]);
         }
 
-        int week = PipelineUntil.week();
+        int week = PipelineUtil.week();
         if (day != 0 && day > week){
             day = day - week;
         }else if (day != 0 && day < week){

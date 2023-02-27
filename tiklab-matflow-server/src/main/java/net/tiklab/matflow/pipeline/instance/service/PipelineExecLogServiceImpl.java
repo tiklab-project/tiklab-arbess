@@ -9,8 +9,8 @@ import net.tiklab.matflow.setting.model.Scm;
 import net.tiklab.matflow.setting.service.ScmService;
 import net.tiklab.matflow.support.condition.model.Condition;
 import net.tiklab.matflow.support.condition.service.ConditionService;
-import net.tiklab.matflow.support.until.PipelineFinal;
-import net.tiklab.matflow.support.until.PipelineUntil;
+import net.tiklab.matflow.support.util.PipelineFinal;
+import net.tiklab.matflow.support.util.PipelineUtil;
 import net.tiklab.matflow.support.variable.model.Variable;
 import net.tiklab.matflow.support.variable.service.VariableService;
 import net.tiklab.rpc.annotation.Exporter;
@@ -68,8 +68,8 @@ public class PipelineExecLogServiceImpl implements PipelineExecLogService {
         int state = 1;
         String enCode = pipelineProcess.getEnCode();
         //指定编码
-        if (!PipelineUntil.isNoNull(enCode)){
-            int systemType = PipelineUntil.findSystemType();
+        if (!PipelineUtil.isNoNull(enCode)){
+            int systemType = PipelineUtil.findSystemType();
             if (systemType == 1){
                 enCode = PipelineFinal.GBK;
             }else {
@@ -85,9 +85,9 @@ public class PipelineExecLogServiceImpl implements PipelineExecLogService {
         InputStreamReader inputStreamReader ;
         BufferedReader  bufferedReader ;
         if (inputStream == null){
-            inputStreamReader = PipelineUntil.encode(errInputStream, enCode);
+            inputStreamReader = PipelineUtil.encode(errInputStream, enCode);
         }else {
-            inputStreamReader = PipelineUntil.encode(inputStream, enCode);
+            inputStreamReader = PipelineUtil.encode(inputStream, enCode);
         }
         
         String s;
@@ -98,14 +98,14 @@ public class PipelineExecLogServiceImpl implements PipelineExecLogService {
             if (validStatus(s,error)){
                 state = 0 ;
             }
-            updateExecLog(pipelineProcess, PipelineUntil.date(4)+s);
+            updateExecLog(pipelineProcess, PipelineUtil.date(4)+s);
         }
 
-        inputStreamReader = PipelineUntil.encode(errInputStream, enCode);
+        inputStreamReader = PipelineUtil.encode(errInputStream, enCode);
         bufferedReader = new BufferedReader(inputStreamReader);
         while ((s = bufferedReader.readLine()) != null) {
             if (validStatus(s,error)){state = 0 ;}
-            updateExecLog(pipelineProcess, PipelineUntil.date(4)+s);
+            updateExecLog(pipelineProcess, PipelineUtil.date(4)+s);
         }
 
         inputStreamReader.close();
@@ -205,9 +205,9 @@ public class PipelineExecLogServiceImpl implements PipelineExecLogService {
             taskInstanceLog.setRunTime(integer);
 
             String execLog = taskInstanceLog.getRunLog();
-            if (PipelineUntil.isNoNull(execLog)){
+            if (PipelineUtil.isNoNull(execLog)){
                 String runLog = taskInstanceLog.getLogAddress();
-                PipelineUntil.logWriteFile(execLog,runLog);
+                PipelineUtil.logWriteFile(execLog,runLog);
             }
             logService.updateLog(taskInstanceLog);
         }
@@ -221,7 +221,7 @@ public class PipelineExecLogServiceImpl implements PipelineExecLogService {
     @Override
     public PipelineInstance initializeHistory(String pipelineId , int startWAy) {
         String loginId = LoginContext.getLoginId();
-        String date = PipelineUntil.date(1);
+        String date = PipelineUtil.date(1);
 
         PipelineInstance pipelineInstance = new PipelineInstance(date,startWAy,loginId,pipelineId);
         pipelineInstance.setRunStatus(30);
@@ -261,7 +261,7 @@ public class PipelineExecLogServiceImpl implements PipelineExecLogService {
      */
     @Override
     public void updateExecLog(PipelineProcess pipelineProcess,String log){
-        if(!PipelineUntil.isNoNull(log)){
+        if(!PipelineUtil.isNoNull(log)){
             return;
         }
 
@@ -275,7 +275,7 @@ public class PipelineExecLogServiceImpl implements PipelineExecLogService {
 
         String execLog = taskInstanceLog.getRunLog();
 
-        if (!PipelineUntil.isNoNull(execLog)){
+        if (!PipelineUtil.isNoNull(execLog)){
             taskInstanceLog.setRunLog(log);
         }else {
             taskInstanceLog.setRunLog(execLog +"\n"+ log);
@@ -284,7 +284,7 @@ public class PipelineExecLogServiceImpl implements PipelineExecLogService {
         //长度过长写入文件中
         if (taskInstanceLog.getRunLog().length() > 25000){
             String runLog = taskInstanceLog.getLogAddress();
-            PipelineUntil.logWriteFile(execLog,runLog);
+            PipelineUtil.logWriteFile(execLog,runLog);
             taskInstanceLog.setRunLog(null);
         }
 

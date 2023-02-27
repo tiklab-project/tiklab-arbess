@@ -10,7 +10,7 @@ import net.tiklab.matflow.pipeline.definition.model.Pipeline;
 import net.tiklab.matflow.pipeline.instance.entity.PipelineInstanceEntity;
 import net.tiklab.matflow.pipeline.instance.model.PipelineAllInstanceQuery;
 import net.tiklab.matflow.pipeline.instance.model.PipelineInstanceQuery;
-import net.tiklab.matflow.support.until.PipelineUntil;
+import net.tiklab.matflow.support.util.PipelineUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.stereotype.Repository;
@@ -83,7 +83,7 @@ public class PipelineInstanceDao {
      */
     public Pagination<PipelineInstanceEntity> findPageHistory(PipelineInstanceQuery pipelineInstanceQuery){
         QueryBuilders builders = QueryBuilders.createQuery(PipelineInstanceEntity.class);
-            if (PipelineUntil.isNoNull(pipelineInstanceQuery.getPipelineId())){
+            if (PipelineUtil.isNoNull(pipelineInstanceQuery.getPipelineId())){
                 builders.eq("pipelineId", pipelineInstanceQuery.getPipelineId());
             }
             if (pipelineInstanceQuery.getState() != 0) {
@@ -111,7 +111,7 @@ public class PipelineInstanceDao {
         String sql = "select pip_pipeline_history.* from pip_pipeline_history ";
         sql = sql.concat(" where ( pip_pipeline_history.pipeline_id = ");
 
-        if (PipelineUntil.isNoNull(pipelineId)){
+        if (PipelineUtil.isNoNull(pipelineId)){
             sql = sql.concat("'" + pipelineId + "'");
         }else {
             List<Pipeline> pipelineList = pipelineHistoryQuery.getPipelineList();

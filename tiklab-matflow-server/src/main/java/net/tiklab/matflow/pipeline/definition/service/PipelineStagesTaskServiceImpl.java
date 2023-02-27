@@ -6,7 +6,7 @@ import net.tiklab.matflow.pipeline.definition.dao.PipelineStagesTaskDao;
 import net.tiklab.matflow.pipeline.definition.entity.PipelineStagesTaskEntity;
 import net.tiklab.matflow.pipeline.definition.model.PipelineConfig;
 import net.tiklab.matflow.pipeline.definition.model.PipelineStagesTask;
-import net.tiklab.matflow.support.until.PipelineUntil;
+import net.tiklab.matflow.support.util.PipelineUtil;
 import net.tiklab.matflow.task.task.service.PipelineTaskDispatchService;
 import net.tiklab.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +40,7 @@ public class PipelineStagesTaskServiceImpl implements PipelineStagesTaskService 
         int taskType = config.getTaskType();
         int taskSort = initSort(stagesId,config.getTaskSort()) ;
         PipelineStagesTask stagesTask =
-                new PipelineStagesTask(PipelineUntil.date(1),taskType,taskSort,stagesId);
+                new PipelineStagesTask(PipelineUtil.date(1),taskType,taskSort,stagesId);
         String name = commonServer.initName(taskType);
         stagesTask.setName(name);
         String taskId = createStagesTask(stagesTask);
@@ -132,7 +132,7 @@ public class PipelineStagesTaskServiceImpl implements PipelineStagesTaskService 
         int taskType = config.getTaskType();
         String object = JSON.toJSONString(values);
         PipelineConfig pipelineConfig =JSON.parseObject(object, PipelineConfig.class);
-        if (PipelineUntil.isNoNull(pipelineConfig.getName())) {
+        if (PipelineUtil.isNoNull(pipelineConfig.getName())) {
             PipelineStagesTask task = findOneStagesTask(configId);
             task.setName(pipelineConfig.getName());
             updateStagesTask(task);

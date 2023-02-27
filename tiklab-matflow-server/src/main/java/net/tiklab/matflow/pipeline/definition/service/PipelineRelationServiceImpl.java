@@ -12,8 +12,8 @@ import net.tiklab.matflow.pipeline.instance.model.PipelineFollow;
 import net.tiklab.matflow.pipeline.instance.model.PipelineOpen;
 import net.tiklab.matflow.pipeline.instance.service.PipelineFollowService;
 import net.tiklab.matflow.pipeline.instance.service.PipelineOpenService;
-import net.tiklab.matflow.support.until.PipelineFinal;
-import net.tiklab.matflow.support.until.PipelineUntil;
+import net.tiklab.matflow.support.util.PipelineFinal;
+import net.tiklab.matflow.support.util.PipelineUtil;
 import net.tiklab.privilege.role.model.PatchUser;
 import net.tiklab.privilege.roleDmRole.service.DmRoleService;
 import net.tiklab.rpc.annotation.Exporter;
@@ -65,11 +65,11 @@ public class PipelineRelationServiceImpl implements PipelineRelationService {
         //删除最近打开
         openService.deleteAllOpen(pipelineId);
         //删除对应文件
-        String fileAddress = PipelineUntil.findFileAddress(pipelineId,1);
-        PipelineUntil.deleteFile(new File(fileAddress));
+        String fileAddress = PipelineUtil.findFileAddress(pipelineId,1);
+        PipelineUtil.deleteFile(new File(fileAddress));
         //删除对应日志
-        String logAddress = PipelineUntil.findFileAddress(pipelineId,2);
-        PipelineUntil.deleteFile(new File(logAddress+"/"+pipelineId));
+        String logAddress = PipelineUtil.findFileAddress(pipelineId,2);
+        PipelineUtil.deleteFile(new File(logAddress+"/"+pipelineId));
     }
 
 
@@ -254,7 +254,7 @@ public class PipelineRelationServiceImpl implements PipelineRelationService {
             state.setTime("0 秒");
             return state;
         }
-        state.setTime(PipelineUntil.formatDateTime(state.getExecTime()));
+        state.setTime(PipelineUtil.formatDateTime(state.getExecTime()));
         return state;
     }
 

@@ -12,7 +12,7 @@ import net.tiklab.matflow.pipeline.instance.model.PipelineAllInstanceQuery;
 import net.tiklab.matflow.pipeline.instance.model.PipelineInstance;
 import net.tiklab.matflow.pipeline.instance.model.PipelineOpen;
 import net.tiklab.matflow.home.service.PipelineHomeService;
-import net.tiklab.matflow.support.until.PipelineUntil;
+import net.tiklab.matflow.support.util.PipelineUtil;
 import net.tiklab.rpc.annotation.Exporter;
 import net.tiklab.utils.context.LoginContext;
 import org.slf4j.Logger;
@@ -24,7 +24,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.*;
 
-import static net.tiklab.matflow.support.until.PipelineFinal.*;
+import static net.tiklab.matflow.support.util.PipelineFinal.*;
 
 /**
  * PipelineServiceImpl
@@ -66,7 +66,7 @@ public class PipelineServiceImpl implements PipelineService {
             throw new ApplicationException(e);
         }
         pipeline.setColor((random.nextInt(5) + 1));
-        pipeline.setCreateTime(PipelineUntil.date(1));
+        pipeline.setCreateTime(PipelineUtil.date(1));
         PipelineEntity pipelineEntity = BeanMapper.map(pipeline, PipelineEntity.class);
         pipelineEntity.setState(1);
         String pipelineId = pipelineDao.createPipeline(pipelineEntity);
@@ -288,7 +288,7 @@ public class PipelineServiceImpl implements PipelineService {
     @Override
     public List<PipelineOpen> findAllOpen(int number) {
         StringBuilder s = findUserPipelineId(LoginContext.getLoginId()) ;
-        if (!PipelineUntil.isNoNull(s.toString())){
+        if (!PipelineUtil.isNoNull(s.toString())){
             return null;
         }
         return relationServer.findAllOpen(s,number);
@@ -305,7 +305,7 @@ public class PipelineServiceImpl implements PipelineService {
         if (allPipeline.isEmpty()){
             return null;
         }
-        if (!PipelineUntil.isNoNull(pipelineHistoryQuery.getPipelineId())){
+        if (!PipelineUtil.isNoNull(pipelineHistoryQuery.getPipelineId())){
             pipelineHistoryQuery.setPipelineList(allPipeline);
         }
         return relationServer.findUserAllHistory(pipelineHistoryQuery);
