@@ -14,9 +14,6 @@ public class TaskBuild {
     @ApiProperty(name = "taskId",desc = "id")
     private String taskId;
 
-    @ApiProperty(name = "taskName",desc = "名称")
-    private String taskName;
-
     //构建文件地址
     @ApiProperty(name="buildAddress",desc="构建文件地址")
     private String buildAddress;
@@ -30,14 +27,6 @@ public class TaskBuild {
 
     //构建类型
     private int type;
-
-    public String getTaskName() {
-        return taskName;
-    }
-
-    public void setTaskName(String taskName) {
-        this.taskName = taskName;
-    }
 
     public String getTaskId() {
         return taskId;

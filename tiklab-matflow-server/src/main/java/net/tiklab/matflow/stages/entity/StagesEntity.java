@@ -9,8 +9,8 @@ import java.util.Date;
  * 流水线阶段实体
  */
 @Entity
-@Table(name="pip_pipeline_stages")
-public class PipelineStagesEntity {
+@Table(name="pip_stages")
+public class StagesEntity {
 
     @Id
     @GeneratorValue
@@ -29,13 +29,13 @@ public class PipelineStagesEntity {
     @Column(name = "pipeline_id",notNull = true)
     private String pipelineId;
 
+    //主节点
+    @Column(name = "stage_id",notNull = true)
+    private String stageId;
+
     //阶段顺序
     @Column(name = "stages_sort",notNull = true)
     private int stagesSort;
-
-    //主阶段
-    @Column(name = "main_stage",notNull = true)
-    private String mainStage;
 
     //是否为源码
     @Column(name = "code",notNull = true)
@@ -90,11 +90,11 @@ public class PipelineStagesEntity {
         this.code = code;
     }
 
-    public String getMainStage() {
-        return mainStage;
+    public String getStageId() {
+        return stageId;
     }
 
-    public void setMainStage(String mainStage) {
-        this.mainStage = mainStage;
+    public void setStageId(String stageId) {
+        this.stageId = stageId;
     }
 }

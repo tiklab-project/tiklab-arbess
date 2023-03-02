@@ -1,90 +1,66 @@
 package net.tiklab.matflow.task.task.model;
 
-import net.tiklab.beans.annotation.Mapping;
-import net.tiklab.beans.annotation.Mappings;
+import net.tiklab.beans.annotation.Mapper;
 import net.tiklab.join.annotation.Join;
-import net.tiklab.join.annotation.JoinQuery;
-import net.tiklab.matflow.pipeline.definition.model.Pipeline;
 import net.tiklab.postin.annotation.ApiModel;
 import net.tiklab.postin.annotation.ApiProperty;
 
+/**
+ * 流水线配置顺序模型
+ */
+
 @ApiModel
 @Join
+@Mapper(targetAlias = "TasksEntity")
 public class Tasks {
 
-    @ApiProperty(name="taskId",desc="流水线id",eg="@selectOne")
+    @ApiProperty(name="taskId",desc="配置id")
     private String taskId;
 
-    @ApiProperty(name="taskSort",desc="流水线id",eg="@selectOne")
-    private int taskSort;
+    @ApiProperty(name="createTime",desc="创建时间")
+    private String createTime;
 
-    @ApiProperty(name="taskType",desc="流水线id",eg="@selectOne")
+    @ApiProperty(name="taskType",
+            desc= "类型1-10:源码,10-20:测试,20-30:构建,30-40:部署,40-50:代码扫描,50-60:推送制品")
     private int taskType;
 
-    @ApiProperty(name="stages",desc="流水线id",eg="@selectOne")
-    private int stages;
+    @ApiProperty(name="taskSort",desc="顺序")
+    private int taskSort;
 
-    @ApiProperty(name="stagesId",desc="流水线id",eg="@selectOne")
-    private String stagesId;
+    @ApiProperty(name="taskName",desc="顺序")
+    private String taskName;
 
-    @ApiProperty(name="values",desc="流水线id",eg="@selectOne")
+    @ApiProperty(name="values",desc="任务")
     private Object values;
 
     @ApiProperty(name="pipeline",desc="流水线id",eg="@selectOne")
-    @Mappings({
-            @Mapping(source = "pipeline.id",target = "pipelineId")
-    })
-    @JoinQuery(key = "id")
-    private Pipeline pipeline;
+    private String pipelineId;
 
-    @ApiProperty(name="name",desc="流水线id",eg="@selectOne")
-    private String name;
+    @ApiProperty(name="stages",desc="阶段",eg="@selectOne")
+    private String stagesId;
+
+    public String getTaskName() {
+        return taskName;
+    }
+
+    public void setTaskName(String taskName) {
+        this.taskName = taskName;
+    }
 
     public Tasks() {
     }
 
-    public Tasks(String pipelineId) {
-        this.pipeline = new Pipeline(pipelineId);
-    }
-
-    public String getTaskId() {
-        return taskId;
-    }
-
-    public void setTaskId(String taskId) {
-        this.taskId = taskId;
-    }
-
-    public int getTaskSort() {
-        return taskSort;
-    }
-
-    public void setTaskSort(int taskSort) {
-        this.taskSort = taskSort;
-    }
-
-    public int getTaskType() {
-        return taskType;
-    }
-
-    public void setTaskType(int taskType) {
+    public Tasks(String createTime, int taskType) {
+        this.createTime = createTime;
         this.taskType = taskType;
     }
 
-    public Object getValues() {
-        return values;
+    public String getPipelineId() {
+        return pipelineId;
     }
 
-    public void setValues(Object values) {
-        this.values = values;
-    }
-
-    public int getStages() {
-        return stages;
-    }
-
-    public void setStages(int stages) {
-        this.stages = stages;
+    public void setPipelineId(String pipelineId) {
+        this.pipelineId = pipelineId;
     }
 
     public String getStagesId() {
@@ -95,19 +71,46 @@ public class Tasks {
         this.stagesId = stagesId;
     }
 
-    public Pipeline getPipeline() {
-        return pipeline;
+    public Object getValues() {
+        return values;
     }
 
-    public void setPipeline(Pipeline pipeline) {
-        this.pipeline = pipeline;
+    public void setValues(Object values) {
+        this.values = values;
     }
 
-    public String getName() {
-        return name;
+    public int getTaskType() {
+        return taskType;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setTaskType(int taskType) {
+        this.taskType = taskType;
     }
+
+    public String getTaskId() {
+        return taskId;
+    }
+
+    public void setTaskId(String taskId) {
+        this.taskId = taskId;
+    }
+
+    public String getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(String createTime) {
+        this.createTime = createTime;
+    }
+
+    public int getTaskSort() {
+        return taskSort;
+    }
+
+    public void setTaskSort(int taskSort) {
+        this.taskSort = taskSort;
+    }
+
+
+
 }

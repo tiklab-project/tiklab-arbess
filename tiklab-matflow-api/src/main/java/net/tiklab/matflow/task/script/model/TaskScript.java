@@ -13,9 +13,6 @@ public class TaskScript {
     @ApiProperty(name = "taskId",desc = "id")
     private String taskId;
 
-    @ApiProperty(name = "taskName",desc = "名称")
-    private String taskName;
-
     @ApiProperty(name = "type",desc = "类型 71:bat脚本 72:shell脚本")
     private int type;
 
@@ -38,14 +35,6 @@ public class TaskScript {
 
     public void setTaskId(String taskId) {
         this.taskId = taskId;
-    }
-
-    public String getTaskName() {
-        return taskName;
-    }
-
-    public void setTaskName(String taskName) {
-        this.taskName = taskName;
     }
 
     public int getType() {

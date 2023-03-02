@@ -2,7 +2,7 @@ package net.tiklab.matflow.task.test.service;
 
 import net.tiklab.core.exception.ApplicationException;
 import net.tiklab.matflow.pipeline.definition.model.Pipeline;
-import net.tiklab.matflow.task.task.service.PipelineTasksService;
+import net.tiklab.matflow.task.task.service.TasksService;
 import net.tiklab.matflow.pipeline.execute.model.PipelineProcess;
 import net.tiklab.matflow.pipeline.execute.service.PipelineExecLogService;
 import net.tiklab.matflow.support.util.PipelineUtil;
@@ -26,7 +26,7 @@ public class TaskTestExecServiceImpl implements TaskTestExecService {
     PipelineExecLogService commonService;
 
     @Autowired
-    PipelineTasksService tasksService;
+    TasksService tasksService;
     
     // 单元测试
     public boolean test(PipelineProcess pipelineProcess, String configId ,int taskType) {

@@ -16,8 +16,8 @@ import java.util.List;
  */
 @ApiModel
 @Join
-@Mapper(targetAlias = "PipelineStagesEntity")
-public class PipelineStages {
+@Mapper(targetAlias = "StagesEntity")
+public class Stages {
 
     @ApiProperty(name = "stagesId",desc="id")
     private String stagesId;
@@ -38,8 +38,8 @@ public class PipelineStages {
     @ApiProperty(name="stagesSort",desc="阶段顺序")
     private int stagesSort;
 
-    @ApiProperty(name = "mainStage",desc="主阶段")
-    private String mainStage;
+    @ApiProperty(name = "stageId",desc="主阶段")
+    private String stageId;
 
     @ApiProperty(name = "code",desc="是否是源码")
     private boolean code;
@@ -48,9 +48,9 @@ public class PipelineStages {
     private List<Object> taskValues;
 
     @ApiProperty(name = "stagesList",desc="阶段")
-    private List<PipelineStages> stagesList;
+    private List<Stages> stagesList;
 
-    public PipelineStages() {
+    public Stages() {
     }
 
     public int getStagesSort() {
@@ -69,9 +69,6 @@ public class PipelineStages {
         this.stagesName = stagesName;
     }
 
-    public PipelineStages(String mainStage) {
-        this.mainStage = mainStage;
-    }
 
     public boolean isCode() {
         return code;
@@ -81,9 +78,8 @@ public class PipelineStages {
         this.code = code;
     }
 
-    public PipelineStages(String createTime, String pipelineId) {
+    public Stages(String createTime) {
         this.createTime = createTime;
-        this.pipeline = new Pipeline(pipelineId);
     }
 
     public String getStagesId() {
@@ -118,19 +114,19 @@ public class PipelineStages {
         this.taskValues = taskValues;
     }
 
-    public String getMainStage() {
-        return mainStage;
+    public String getStageId() {
+        return stageId;
     }
 
-    public void setMainStage(String mainStage) {
-        this.mainStage = mainStage;
+    public void setStageId(String stageId) {
+        this.stageId = stageId;
     }
 
-    public List<PipelineStages> getStagesList() {
+    public List<Stages> getStagesList() {
         return stagesList;
     }
 
-    public void setStagesList(List<PipelineStages> stagesList) {
+    public void setStagesList(List<Stages> stagesList) {
         this.stagesList = stagesList;
     }
 }

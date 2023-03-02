@@ -10,9 +10,6 @@ public class TaskCodeScanEntity {
     @Column(name = "task_id" ,notNull = true)
     private String taskId;
 
-    @Column(name = "task_name" ,notNull = true)
-    private String taskName;
-
     @Column(name = "project_name")
     private String projectName;
 
@@ -25,14 +22,6 @@ public class TaskCodeScanEntity {
 
     public void setTaskId(String taskId) {
         this.taskId = taskId;
-    }
-
-    public String getTaskName() {
-        return taskName;
-    }
-
-    public void setTaskName(String taskName) {
-        this.taskName = taskName;
     }
 
     public String getAuthId() {

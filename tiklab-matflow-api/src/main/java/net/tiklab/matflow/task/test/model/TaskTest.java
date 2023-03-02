@@ -14,9 +14,6 @@ public class TaskTest {
     @ApiProperty(name = "taskId",desc = "id")
     private String taskId;
 
-    @ApiProperty(name = "taskName",desc = "名称")
-    private String taskName;
-
     //测试内容
     @ApiProperty(name="testOrder",desc="测试内容",required = true)
     private String testOrder;
@@ -24,20 +21,11 @@ public class TaskTest {
     @ApiProperty(name="address",desc="测试地址",required = true)
     private String address;
 
-
     //测试类型
     private int type;
 
     //顺序
     private int sort;
-
-    public String getTaskName() {
-        return taskName;
-    }
-
-    public void setTaskName(String taskName) {
-        this.taskName = taskName;
-    }
 
     public String getTaskId() {
         return taskId;

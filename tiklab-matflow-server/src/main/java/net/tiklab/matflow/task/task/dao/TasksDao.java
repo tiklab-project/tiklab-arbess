@@ -2,7 +2,7 @@ package net.tiklab.matflow.task.task.dao;
 
 
 import net.tiklab.dal.jpa.JpaTemplate;
-import net.tiklab.matflow.task.task.entity.PipelineTasksEntity;
+import net.tiklab.matflow.task.task.entity.TasksEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,20 +15,20 @@ import java.util.List;
  */
 
 @Repository
-public class PipelineTasksDao {
+public class TasksDao {
 
     @Autowired
     JpaTemplate jpaTemplate;
 
 
-    private static final Logger logger = LoggerFactory.getLogger(PipelineTasksDao.class);
+    private static final Logger logger = LoggerFactory.getLogger(TasksDao.class);
 
     /**
      * 添加流水线配置信息
      * @param pipelineConfigureEntity 配置信息实体
      * @return 配置信息id
      */
-    public String createConfigure(PipelineTasksEntity pipelineConfigureEntity){
+    public String createConfigure(TasksEntity pipelineConfigureEntity){
         return jpaTemplate.save(pipelineConfigureEntity,String.class);
     }
 
@@ -37,14 +37,14 @@ public class PipelineTasksDao {
      * @param id 配置id
      */
     public void deleteConfigure(String id){
-        jpaTemplate.delete(PipelineTasksEntity.class,id);
+        jpaTemplate.delete(TasksEntity.class,id);
     }
 
     /**
      * 更新流水线配置
      * @param pipelineConfigureEntity 配置信息实体
      */
-    public void updateConfigure(PipelineTasksEntity pipelineConfigureEntity){
+    public void updateConfigure(TasksEntity pipelineConfigureEntity){
         jpaTemplate.update(pipelineConfigureEntity);
     }
 
@@ -53,19 +53,19 @@ public class PipelineTasksDao {
      * @param configureId 查询id
      * @return 配置信息
      */
-    public PipelineTasksEntity findOneConfigure(String configureId){
-        return jpaTemplate.findOne(PipelineTasksEntity.class, configureId);
+    public TasksEntity findOneConfigure(String configureId){
+        return jpaTemplate.findOne(TasksEntity.class, configureId);
     }
 
     /**
      * 查询所有配置信息
      * @return 配置信息实体集合
      */
-    public List<PipelineTasksEntity> findAllConfigure(){
-        return jpaTemplate.findAll(PipelineTasksEntity.class);
+    public List<TasksEntity> findAllConfigure(){
+        return jpaTemplate.findAll(TasksEntity.class);
     }
 
-    public List<PipelineTasksEntity> findAllConfigureList(List<String> idList){
-        return jpaTemplate.findList(PipelineTasksEntity.class,idList);
+    public List<TasksEntity> findAllConfigureList(List<String> idList){
+        return jpaTemplate.findList(TasksEntity.class,idList);
     }
 }

@@ -10,9 +10,6 @@ public class TaskDeployEntity {
     @Column(name = "task_id" ,notNull = true)
     private String taskId;
 
-    @Column(name = "task_name" ,notNull = true)
-    private String taskName;
-
     //认证类型
     @Column(name = "auth_type",notNull = true )
     private int authType;
@@ -47,14 +44,6 @@ public class TaskDeployEntity {
 
     public void setTaskId(String taskId) {
         this.taskId = taskId;
-    }
-
-    public String getTaskName() {
-        return taskName;
-    }
-
-    public void setTaskName(String taskName) {
-        this.taskName = taskName;
     }
 
     public int getAuthType() {

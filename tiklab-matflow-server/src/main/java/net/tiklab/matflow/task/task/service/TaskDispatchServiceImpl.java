@@ -23,7 +23,7 @@ import java.util.List;
 
 @Service
 @Exporter
-public class PipelineTaskDispatchServiceImpl implements PipelineTaskDispatchService {
+public class TaskDispatchServiceImpl implements TaskDispatchService {
 
     @Autowired
     TaskCodeService codeService;
@@ -45,43 +45,36 @@ public class PipelineTaskDispatchServiceImpl implements PipelineTaskDispatchServ
 
     @Override
     public void createDifferentTask(String taskId,int taskType){
-        String taskName = initDifferentTaskName(taskType);
         switch (taskType/10) {
             case 0 -> {
                 TaskCode task = new TaskCode();
                 task.setTaskId(taskId);
-                task.setTaskName(taskName);
                 codeService.createCode(task);
             }
             case 1 -> {
                 TaskTest task = new TaskTest();
                 task.setTaskId(taskId);
-                task.setTaskName(taskName);
                 testService.createTest(task);
             }
             case 2 -> {
                 TaskBuild task = new TaskBuild();
                 task.setTaskId(taskId);
-                task.setTaskName(taskName);
                 buildService.createBuild(task);
             }
             case 3 -> {
                 TaskDeploy task = new TaskDeploy();
                 task.setTaskId(taskId);
                 task.setAuthType(1);
-                task.setTaskName(taskName);
                 deployService.createDeploy(task);
             }
             case 4 -> {
                 TaskCodeScan task = new TaskCodeScan();
                 task.setTaskId(taskId);
-                task.setTaskName(taskName);
                 codeScanService.createCodeScan(task);
             }
             case 5 -> {
                 TaskArtifact task = new TaskArtifact();
                 task.setTaskId(taskId);
-                task.setTaskName(taskName);
                 productServer.createProduct(task);
             }
             default -> {

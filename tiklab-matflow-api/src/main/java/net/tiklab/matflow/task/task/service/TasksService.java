@@ -1,67 +1,90 @@
 package net.tiklab.matflow.task.task.service;
 
-import net.tiklab.join.annotation.JoinProvider;
-import net.tiklab.matflow.pipeline.definition.model.Pipeline;
+import net.tiklab.matflow.task.task.model.TaskFacade;
 import net.tiklab.matflow.task.task.model.Tasks;
 
 import java.util.List;
 
-@JoinProvider(model = Tasks.class)
+/**
+ * 流水线流多任务服务接口
+ */
 public interface TasksService {
 
     /**
-     * 查询所有配置（包括后置任务）
-     * @param pipelineId 流水线id
-     * @return 任务
-     */
-    List<Object> findAllConfig(String pipelineId);
-
-    /**
-     * 查询所有任务配置
-     * @param pipelineId 流水线Id
-     * @return 配置
-     */
-    List<Object> findAllTaskConfig(String pipelineId);
-
-    /**
-     * 创建配置及任务配置
-     * @param tasks 配置信息
+     * 创建配置及任务
+     * @param taskFacade 配置信息
      * @return 配置id
      */
-    String createTaskConfig(Tasks tasks);
-
-    /**
-     * 删除配置及任务
-     * @param tasks 配置信息
-     */
-    void deleteTaskConfig(Tasks tasks);
-
-    /**
-     * 删除流水线所有配置
-     * @param pipelineId 流水线id
-     * @param pipelineType 流水线类型
-     */
-    void deleteAllTaskConfig(String pipelineId,int pipelineType);
+    String createTasksOrTask(TaskFacade taskFacade);
 
     /**
      * 更新配置及任务
-     * @param tasks 配置信息
+     * @param taskFacade 配置信息
      */
-    void updateTaskConfig(Tasks tasks);
+    void updateTasksTask(TaskFacade taskFacade);
 
+    /**
+     * 删除配置及任务
+     * @param tasksId 配置id
+     */
+    void deleteTasksOrTask(String tasksId);
+
+    /**
+     * 删除流水线所有配置及任务
+     * @param pipelineId 流水线id
+     */
+    void deleteAllTasksOrTask(String pipelineId,int pipelineType);
+
+    /**
+     * 查询流水线或阶段所有任务
+     * @param id 流水线id或阶段id
+     * @return 配置
+     */
+    List<Tasks> finAllPipOrStages(String id, int pipelineType);
+
+    /**
+     * 查询流水线或阶段的所有任务
+     * @param id 流水线id或阶段id
+     * @return 任务集合
+     */
+    List<Object> findAllTasksOrTask(String id , int type);
+
+    /**
+     * 查询单个任务详情
+     * @param tasksId 配置id
+     * @return 详情
+     */
+    Object findOneTasksTask(String tasksId);
 
     /**
      * 效验配置必填字段
      * @param pipelineId 流水线id
      * @return 配置id集合
      */
-    List<String> validAllConfig(String pipelineId);
-
+    List<String> validTasksMustField(String pipelineId,int type);
 
     /**
-     * 创建流水线模板
-     * @param pipeline 流水线信息
+     * 查询单个任务
+     * @param tasksId 任务id
+     * @return 任务
      */
-    void createTemplate(Pipeline pipeline);
+    Tasks findOneTasks(String tasksId);
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

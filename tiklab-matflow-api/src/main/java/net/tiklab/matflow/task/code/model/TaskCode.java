@@ -15,9 +15,6 @@ public class TaskCode {
     @ApiProperty(name = "taskId",desc = "id")
     private String taskId;
 
-    @ApiProperty(name = "taskName",desc = "名称")
-    private String taskName;
-
     //地址名
     @ApiProperty(name="codeName",desc="地址名")
     private String codeName;
@@ -46,17 +43,6 @@ public class TaskCode {
     //代码类型
     private int type;
 
-    //别名
-    @ApiProperty(name = "codeAlias",desc="别名")
-    private String codeAlias;
-
-    public String getTaskName() {
-        return taskName;
-    }
-
-    public void setTaskName(String taskName) {
-        this.taskName = taskName;
-    }
 
     public String getTaskId() {
         return taskId;
@@ -112,15 +98,6 @@ public class TaskCode {
 
     public void setSort(int sort) {
         this.sort = sort;
-    }
-
-
-    public String getCodeAlias() {
-        return codeAlias;
-    }
-
-    public void setCodeAlias(String codeAlias) {
-        this.codeAlias = codeAlias;
     }
 
     public Object getAuth() {

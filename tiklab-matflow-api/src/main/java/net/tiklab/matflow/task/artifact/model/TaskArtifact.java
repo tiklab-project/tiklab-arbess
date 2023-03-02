@@ -13,9 +13,6 @@ public class TaskArtifact {
     @ApiProperty(name = "taskId",desc = "id")
     private String taskId;
 
-    @ApiProperty(name = "taskName",desc = "名称")
-    private String taskName;
-
     @ApiProperty(name = "groupId",desc = "groupId")
     private String groupId;
 
@@ -44,14 +41,6 @@ public class TaskArtifact {
     private int type;
 
     private int sort;
-
-    public String getTaskName() {
-        return taskName;
-    }
-
-    public void setTaskName(String taskName) {
-        this.taskName = taskName;
-    }
 
     public String getTaskId() {
         return taskId;

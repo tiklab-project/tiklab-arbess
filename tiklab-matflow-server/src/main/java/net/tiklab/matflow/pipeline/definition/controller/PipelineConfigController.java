@@ -1,9 +1,9 @@
 package net.tiklab.matflow.pipeline.definition.controller;
 
 import net.tiklab.core.Result;
-import net.tiklab.matflow.task.task.model.Tasks;
-import net.tiklab.matflow.task.task.service.TasksService;
-import net.tiklab.matflow.stages.service.PipelineStagesService;
+import net.tiklab.matflow.task.task.model.TaskFacade;
+import net.tiklab.matflow.task.task.service.TasksFacadeService;
+import net.tiklab.matflow.stages.service.StagesService;
 import net.tiklab.postin.annotation.Api;
 import net.tiklab.postin.annotation.ApiMethod;
 import net.tiklab.postin.annotation.ApiParam;
@@ -24,10 +24,10 @@ public class PipelineConfigController {
 
 
     @Autowired
-    TasksService configServer;
+    TasksFacadeService configServer;
 
     @Autowired
-    PipelineStagesService stagesServer;
+    StagesService stagesServer;
 
     @RequestMapping(path="/findAllConfig",method = RequestMethod.POST)
     @ApiMethod(name = "updateConfigure",desc = "查询流水线配置")
@@ -48,7 +48,7 @@ public class PipelineConfigController {
     @RequestMapping(path="/createTaskConfig",method = RequestMethod.POST)
     @ApiMethod(name = "findAllTaskConfig",desc = "创建流水线配置")
     @ApiParam(name = "config",desc = "配置",required = true)
-    public Result<String> createTaskConfig(@RequestBody @Valid @NotNull Tasks config){
+    public Result<String> createTaskConfig(@RequestBody @Valid @NotNull TaskFacade config){
        String configId = configServer.createTaskConfig(config);
         return Result.ok(configId);
     }
@@ -56,7 +56,7 @@ public class PipelineConfigController {
     @RequestMapping(path="/updateTaskConfig",method = RequestMethod.POST)
     @ApiMethod(name = "updateTaskConfig",desc = "更新流水线配置")
     @ApiParam(name = "config",desc = "配置",required = true)
-    public Result<Void> updateTaskConfig(@RequestBody @Valid @NotNull Tasks config){
+    public Result<Void> updateTaskConfig(@RequestBody @Valid @NotNull TaskFacade config){
         configServer.updateTaskConfig(config);
         return Result.ok();
     }
@@ -64,8 +64,8 @@ public class PipelineConfigController {
     @RequestMapping(path="/deleteTaskConfig",method = RequestMethod.POST)
     @ApiMethod(name = "deleteTaskConfig",desc = "更新流水线配置")
     @ApiParam(name = "config",desc = "配置",required = true)
-    public Result<Void> deleteTaskConfig(@RequestBody @Valid @NotNull Tasks tasks){
-        configServer.deleteTaskConfig(tasks);
+    public Result<Void> deleteTaskConfig(@RequestBody @Valid @NotNull TaskFacade taskFacade){
+        configServer.deleteTaskConfig(taskFacade);
         return Result.ok();
     }
 

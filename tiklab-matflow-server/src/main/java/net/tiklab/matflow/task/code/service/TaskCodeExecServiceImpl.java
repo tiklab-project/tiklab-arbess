@@ -2,7 +2,7 @@ package net.tiklab.matflow.task.code.service;
 
 import net.tiklab.core.exception.ApplicationException;
 import net.tiklab.matflow.pipeline.definition.model.Pipeline;
-import net.tiklab.matflow.task.task.service.PipelineTasksService;
+import net.tiklab.matflow.task.task.service.TasksService;
 import net.tiklab.matflow.pipeline.execute.model.PipelineProcess;
 import net.tiklab.matflow.pipeline.execute.service.PipelineExecLogService;
 import net.tiklab.matflow.setting.model.Auth;
@@ -40,7 +40,7 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
     AuthService authServer;
 
     @Autowired
-    PipelineTasksService tasksService;
+    TasksService tasksService;
 
 
     // git克隆

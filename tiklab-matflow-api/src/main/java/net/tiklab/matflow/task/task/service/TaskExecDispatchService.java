@@ -4,7 +4,7 @@ import net.tiklab.matflow.pipeline.execute.model.PipelineProcess;
 
 import java.util.Map;
 
-public interface PipelineTaskExecDispatchService {
+public interface TaskExecDispatchService {
 
 
     boolean beginCourseState(PipelineProcess pipelineProcess, String configId , int taskType, Map<String,String> maps);

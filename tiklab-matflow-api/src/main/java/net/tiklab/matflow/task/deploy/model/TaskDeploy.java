@@ -13,9 +13,6 @@ public class TaskDeploy {
     @ApiProperty(name = "taskId",desc = "id")
     private String taskId;
 
-    @ApiProperty(name = "taskName",desc = "名称")
-    private String taskName;
-
     @ApiProperty(name = "authType",desc = "认证类型" )
     private int authType;
 
@@ -43,14 +40,6 @@ public class TaskDeploy {
     private int sort;
 
     private int type;
-
-    public String getTaskName() {
-        return taskName;
-    }
-
-    public void setTaskName(String taskName) {
-        this.taskName = taskName;
-    }
 
     public String getTaskId() {
         return taskId;

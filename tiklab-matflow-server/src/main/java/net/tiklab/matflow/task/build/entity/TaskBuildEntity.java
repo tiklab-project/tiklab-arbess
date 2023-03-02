@@ -10,9 +10,6 @@ public class TaskBuildEntity {
     @Column(name = "task_id" ,notNull = true)
     private String taskId;
 
-    @Column(name = "task_name" ,notNull = true)
-    private String taskName;
-
     //地址
     @Column(name = "build_address",notNull = true)
     private String buildAddress;
@@ -21,13 +18,6 @@ public class TaskBuildEntity {
     @Column(name = "build_order",notNull = true)
     private String buildOrder;
 
-    public String getTaskName() {
-        return taskName;
-    }
-
-    public void setTaskName(String taskName) {
-        this.taskName = taskName;
-    }
 
     public String getTaskId() {
         return taskId;

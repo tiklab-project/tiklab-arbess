@@ -2,7 +2,7 @@ package net.tiklab.matflow.task.build.service;
 
 import net.tiklab.core.exception.ApplicationException;
 import net.tiklab.matflow.pipeline.definition.model.Pipeline;
-import net.tiklab.matflow.task.task.service.PipelineTasksService;
+import net.tiklab.matflow.task.task.service.TasksService;
 import net.tiklab.matflow.pipeline.execute.model.PipelineProcess;
 import net.tiklab.matflow.pipeline.execute.service.PipelineExecLogService;
 import net.tiklab.matflow.support.util.PipelineUtil;
@@ -29,7 +29,7 @@ public class TaskBuildExecServiceImpl implements TaskBuildExecService {
     TaskBuildService buildService;
 
     @Autowired
-    PipelineTasksService tasksService;
+    TasksService tasksService;
 
 
 

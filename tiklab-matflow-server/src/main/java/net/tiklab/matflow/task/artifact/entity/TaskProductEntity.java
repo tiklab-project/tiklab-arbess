@@ -10,9 +10,6 @@ public class TaskProductEntity {
     @Column(name = "task_id" ,notNull = true)
     private String taskId;
 
-    @Column(name = "task_name" ,notNull = true)
-    private String taskName;
-
     @Column(name = "group_id")
     private String groupId;
 
@@ -34,13 +31,6 @@ public class TaskProductEntity {
     @Column(name = "auth_id")
     private String authId;
 
-    public String getTaskName() {
-        return taskName;
-    }
-
-    public void setTaskName(String taskName) {
-        this.taskName = taskName;
-    }
 
     public String getTaskId() {
         return taskId;

@@ -2,7 +2,7 @@ package net.tiklab.matflow.task.task.service;
 
 import java.util.List;
 
-public interface PipelineTaskDispatchService {
+public interface TaskDispatchService {
 
     /**
      * 分发创建不同类型的任务

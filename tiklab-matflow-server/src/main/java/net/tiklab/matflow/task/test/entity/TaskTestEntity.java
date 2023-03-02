@@ -11,9 +11,6 @@ public class TaskTestEntity {
     @Column(name = "task_id" ,notNull = true)
     private String taskId;
 
-    @Column(name = "task_name" ,notNull = true)
-    private String taskName;
-
     //地址
     @Column(name = "test_order",notNull = true)
     private String testOrder;
@@ -21,13 +18,6 @@ public class TaskTestEntity {
     @Column(name = "address")
     private String address;
 
-    public String getTaskName() {
-        return taskName;
-    }
-
-    public void setTaskName(String taskName) {
-        this.taskName = taskName;
-    }
 
     public String getTaskId() {
         return taskId;

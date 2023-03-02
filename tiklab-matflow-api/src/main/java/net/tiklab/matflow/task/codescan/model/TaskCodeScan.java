@@ -13,9 +13,6 @@ public class TaskCodeScan {
     @ApiProperty(name = "taskId",desc = "id")
     private String taskId;
 
-    @ApiProperty(name = "taskName",desc = "名称")
-    private String taskName;
-
     @ApiProperty(name="projectName",desc="项目名称")
     private String projectName;
 
@@ -29,14 +26,6 @@ public class TaskCodeScan {
     private int sort;
 
     private int type;
-
-    public String getTaskName() {
-        return taskName;
-    }
-
-    public void setTaskName(String taskName) {
-        this.taskName = taskName;
-    }
 
     public String getTaskId() {
         return taskId;

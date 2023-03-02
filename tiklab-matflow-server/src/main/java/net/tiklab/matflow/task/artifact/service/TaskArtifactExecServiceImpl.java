@@ -3,7 +3,7 @@ package net.tiklab.matflow.task.artifact.service;
 import com.jcraft.jsch.*;
 import net.tiklab.core.exception.ApplicationException;
 import net.tiklab.matflow.pipeline.definition.model.Pipeline;
-import net.tiklab.matflow.task.task.service.PipelineTasksService;
+import net.tiklab.matflow.task.task.service.TasksService;
 import net.tiklab.matflow.pipeline.execute.model.PipelineProcess;
 import net.tiklab.matflow.pipeline.execute.service.PipelineExecLogService;
 import net.tiklab.matflow.setting.model.AuthHost;
@@ -29,7 +29,7 @@ public class TaskArtifactExecServiceImpl implements TaskArtifactExecService {
     PipelineExecLogService commonService;
 
     @Autowired
-    PipelineTasksService tasksService;
+    TasksService tasksService;
     
 
     private static final Logger logger = LoggerFactory.getLogger(TaskArtifactExecServiceImpl.class);
