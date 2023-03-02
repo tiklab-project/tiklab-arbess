@@ -1,15 +1,12 @@
 package net.tiklab.matflow.pipeline.definition.service;
 
 
-import net.tiklab.core.page.Pagination;
 import net.tiklab.join.annotation.FindAll;
 import net.tiklab.join.annotation.FindList;
 import net.tiklab.join.annotation.FindOne;
 import net.tiklab.join.annotation.JoinProvider;
 import net.tiklab.matflow.pipeline.definition.model.Pipeline;
-import net.tiklab.matflow.pipeline.definition.model.PipelineMessageList;
-import net.tiklab.matflow.pipeline.instance.model.PipelineAllInstanceQuery;
-import net.tiklab.matflow.pipeline.instance.model.PipelineInstance;
+import net.tiklab.matflow.pipeline.definition.model.PipelineExecMessage;
 import net.tiklab.user.user.model.User;
 
 import javax.validation.Valid;
@@ -17,7 +14,7 @@ import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
- * 流水线
+ * 流水线服务接口
  */
 @JoinProvider(model = Pipeline.class)
 public interface PipelineService {
@@ -47,7 +44,7 @@ public interface PipelineService {
      * @return 流水线信息
      */
     @FindOne
-    Pipeline findOnePipeline(@NotNull String pipelineId);
+    Pipeline findPipelineById(@NotNull String pipelineId);
 
     /**
      * 查询所有流水线
@@ -60,14 +57,7 @@ public interface PipelineService {
     List<Pipeline> findAllPipelineList(List<String> idList);
 
     /**
-     * 获取用户拥有的流水线id
-     * @param userId 用户id
-     * @return 流水线id
-     */
-    StringBuilder findUserPipelineId(String userId);
-
-    /**
-     * 获取用户流水线状态
+     * 获取用户流水线
      * @param userId 用户id
      * @return 流水线信息
      */
@@ -78,14 +68,14 @@ public interface PipelineService {
      * @param userId 用户Id
      * @return 流水线信息
      */
-    List<PipelineMessageList> findUserPipelineExecMessage(String userId);
+    List<PipelineExecMessage> findUserPipelineExecMessage(String userId);
 
     /**
      * 获取用户收藏的流水线
      * @param userId 用户id
      * @return 流水线信息
      */
-    List<PipelineMessageList> findUserFollowPipeline(String userId);
+    List<PipelineExecMessage> findUserFollowPipeline(String userId);
 
     /**
      * 模糊查询流水线
@@ -93,17 +83,11 @@ public interface PipelineService {
      * @param userId 用户id
      * @return 流水线
      */
-    List<PipelineMessageList> findLikePipeline(String pipelineName, String userId);
-
-    /**
-     * 查询用户所有流水线历史
-     * @return 历史
-     */
-    Pagination<PipelineInstance> findUserAllHistory(PipelineAllInstanceQuery pipelineHistoryQuery);
+    List<PipelineExecMessage> findPipelineByName(String pipelineName, String userId);
 
 
     /**
-     * 获取拥有此流水线的用户
+     * 查询拥有此流水线的用户
      * @param pipelineId 流水线id
      * @return 用户信息
      */

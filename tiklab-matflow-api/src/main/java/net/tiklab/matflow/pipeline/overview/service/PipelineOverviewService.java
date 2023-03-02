@@ -1,6 +1,10 @@
 package net.tiklab.matflow.pipeline.overview.service;
 
-import net.tiklab.matflow.pipeline.definition.model.PipelineOverview;
+import net.tiklab.matflow.pipeline.overview.model.PipelineOverview;
+
+/**
+ * 流水线统计服务接口
+ */
 
 public interface PipelineOverviewService {
 
@@ -10,7 +14,7 @@ public interface PipelineOverviewService {
      * @param pipelineId 流水线id
      * @return 统计信息
      */
-    PipelineOverview pipelineCensus(String pipelineId);
+    PipelineOverview pipelineOverview(String pipelineId);
 
 
 

@@ -2,6 +2,9 @@ package net.tiklab.matflow.setting.entity;
 
 import net.tiklab.dal.jpa.annotation.*;
 
+/**
+ * 流水线基本认证实体
+ */
 @Entity
 @Table(name="pip_auth")
 public class AuthEntity {
@@ -14,6 +17,7 @@ public class AuthEntity {
     @Column(name = "name")
     private String name;
 
+    //认证类型（1.用户名密码 2.私钥）
     @Column(name = "auth_type")
     private int authType;
 

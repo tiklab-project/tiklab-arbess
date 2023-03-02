@@ -1,8 +1,10 @@
 package net.tiklab.matflow.pipeline.definition.entity;
 
-
 import net.tiklab.dal.jpa.annotation.*;
 
+/**
+ * 流水线最近打开实体
+ */
 @Entity
 @Table(name="pip_pipeline_other_open")
 public class PipelineOpenEntity {
@@ -15,6 +17,7 @@ public class PipelineOpenEntity {
     @Column(name = "pipeline_id")
     private String pipelineId;
 
+    //打开次数
     @Column(name = "number")
     private int number ;
 

@@ -10,8 +10,11 @@ import net.tiklab.postin.annotation.ApiProperty;
 @Mapper(targetAlias = "TaskDeployEntity")
 public class TaskDeploy {
 
-    @ApiProperty(name = "deployId" , desc = "id")
-    private String deployId;
+    @ApiProperty(name = "taskId",desc = "id")
+    private String taskId;
+
+    @ApiProperty(name = "taskName",desc = "名称")
+    private String taskName;
 
     @ApiProperty(name = "authType",desc = "认证类型" )
     private int authType;
@@ -34,9 +37,6 @@ public class TaskDeploy {
     @ApiProperty(name="startOrder",desc="启动命令")
     private String startOrder;
 
-    @ApiProperty(name="configId",desc="配置id")
-    private String configId;
-
     //授权信息
     private Object auth;
 
@@ -44,32 +44,20 @@ public class TaskDeploy {
 
     private int type;
 
-
-    @ApiProperty(name="name",desc="名称")
-    private String name;
-
-    public String getName() {
-        return name;
+    public String getTaskName() {
+        return taskName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setTaskName(String taskName) {
+        this.taskName = taskName;
     }
 
-    public String getConfigId() {
-        return configId;
+    public String getTaskId() {
+        return taskId;
     }
 
-    public void setConfigId(String configId) {
-        this.configId = configId;
-    }
-
-    public String getDeployId() {
-        return deployId;
-    }
-
-    public void setDeployId(String deployId) {
-        this.deployId = deployId;
+    public void setTaskId(String taskId) {
+        this.taskId = taskId;
     }
 
     public int getAuthType() {

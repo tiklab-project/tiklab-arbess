@@ -7,7 +7,7 @@ import net.tiklab.postin.annotation.ApiModel;
 import net.tiklab.postin.annotation.ApiProperty;
 
 /**
- * 流水线日志
+ * 任务实例模型
  */
 
 @ApiModel
@@ -15,39 +15,28 @@ import net.tiklab.postin.annotation.ApiProperty;
 @Mapper(targetAlias = "TaskInstanceLogEntity")
 public class TaskInstanceLog {
 
-    //日志id
     @ApiProperty(name="logId",desc="日志id")
     private String logId;
 
-    //historyId
-    @ApiProperty(name = "historyId",desc = "历史Id")
-    private String historyId;
+    @ApiProperty(name = "instanceId",desc = "历史Id")
+    private String instanceId;
 
-    //运行类型
     @ApiProperty(name = "taskType",desc = "运行类型")
     private int taskType ;
 
-    //执行顺序
     @ApiProperty(name = "taskSort",desc = "执行顺序")
     private int taskSort ;
 
     @ApiProperty(name = "taskName",desc = "任务名称")
     private String taskName;
 
-    //执行名称
-    @ApiProperty(name = "taskSort",desc = "执行顺序")
-    private String taskAlias;
-
-    //运行日志
-    @ApiProperty(name = "logAddress",desc = "运行日志")
+    @ApiProperty(name = "logAddress",desc = "运行日志地址")
     private String logAddress;
 
-    //运行时间
     @ApiProperty(name = "runTime",desc = "运行时间")
     private int runTime;
 
-    //运行状态
-    @ApiProperty(name = "runState",desc = "运行状态")
+    @ApiProperty(name = "runState",desc = "运行状态1.失败 10.成功 20.停止")
     private int runState;
 
     @ApiProperty(name="stageId",desc="阶段id")
@@ -59,14 +48,14 @@ public class TaskInstanceLog {
     public TaskInstanceLog() {
     }
 
-    public TaskInstanceLog(String historyId, int taskType, int taskSort) {
-        this.historyId = historyId;
+    public TaskInstanceLog(String instanceId, int taskType, int taskSort) {
+        this.instanceId = instanceId;
         this.taskType = taskType;
         this.taskSort = taskSort;
     }
 
-    public TaskInstanceLog(String historyId, int taskType, int taskSort, String stagesId) {
-        this.historyId = historyId;
+    public TaskInstanceLog(String instanceId, int taskType, int taskSort, String stagesId) {
+        this.instanceId = instanceId;
         this.taskType = taskType;
         this.taskSort = taskSort;
         this.stagesId = stagesId;
@@ -88,12 +77,12 @@ public class TaskInstanceLog {
         this.logId = logId;
     }
 
-    public String getHistoryId() {
-        return historyId;
+    public String getInstanceId() {
+        return instanceId;
     }
 
-    public void setHistoryId(String historyId) {
-        this.historyId = historyId;
+    public void setInstanceId(String instanceId) {
+        this.instanceId = instanceId;
     }
 
     public int getTaskType() {
@@ -134,14 +123,6 @@ public class TaskInstanceLog {
 
     public void setRunState(int runState) {
         this.runState = runState;
-    }
-
-    public String getTaskAlias() {
-        return taskAlias;
-    }
-
-    public void setTaskAlias(String taskAlias) {
-        this.taskAlias = taskAlias;
     }
 
     public String getTaskName() {

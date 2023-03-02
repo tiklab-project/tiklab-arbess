@@ -1,17 +1,17 @@
 package net.tiklab.matflow.task.build.entity;
 
-
 import net.tiklab.dal.jpa.annotation.*;
 
 @Entity
 @Table(name="pip_task_build")
 public class TaskBuildEntity {
 
-    //id
     @Id
-    @GeneratorValue
-    @Column(name = "build_id")
-    private String buildId;
+    @Column(name = "task_id" ,notNull = true)
+    private String taskId;
+
+    @Column(name = "task_name" ,notNull = true)
+    private String taskName;
 
     //地址
     @Column(name = "build_address",notNull = true)
@@ -21,23 +21,20 @@ public class TaskBuildEntity {
     @Column(name = "build_order",notNull = true)
     private String buildOrder;
 
-    @Column(name = "config_id",notNull = true)
-    private String configId;
-
-    public String getConfigId() {
-        return configId;
+    public String getTaskName() {
+        return taskName;
     }
 
-    public void setConfigId(String configId) {
-        this.configId = configId;
+    public void setTaskName(String taskName) {
+        this.taskName = taskName;
     }
 
-    public String getBuildId() {
-        return buildId;
+    public String getTaskId() {
+        return taskId;
     }
 
-    public void setBuildId(String buildId) {
-        this.buildId = buildId;
+    public void setTaskId(String taskId) {
+        this.taskId = taskId;
     }
 
     public String getBuildAddress() {

@@ -4,18 +4,18 @@ package net.tiklab.matflow.pipeline.instance.entity;
 import net.tiklab.dal.jpa.annotation.*;
 
 /**
- *流水线历史
+ * 流水线实例实体
  */
 
 @Entity
-@Table(name="pip_pipeline_history")
+@Table(name="pip_pipeline_instance")
 public class PipelineInstanceEntity {
 
     //id
     @Id
     @GeneratorValue
-    @Column(name = "history_id")
-    private String historyId;
+    @Column(name = "instance_id")
+    private String instanceId;
 
     //创建构建时间
     @Column(name = "create_time",notNull = true)
@@ -25,15 +25,11 @@ public class PipelineInstanceEntity {
     @Column(name = "run_way",notNull = true)
     private int runWay;
 
-    //运行日志
-    @Column(name = "run_log",notNull = true)
-    private String runLog;
-
     //执行人
     @Column(name = "user_id",notNull = true)
     private String userId;
 
-    //状态
+    //状态 1.失败 10.成功 20:停止
     @Column(name = "run_status",notNull = true)
     private int runStatus;
 
@@ -45,7 +41,7 @@ public class PipelineInstanceEntity {
     @Column(name = "pipeline_id",notNull = true)
     private String pipelineId;
 
-    //判断是否正在执行
+    //判断是否正在执行（0.运行完成，1.运行中）
     @Column(name = "find_state", notNull = true)
     private int findState;
 
@@ -53,12 +49,12 @@ public class PipelineInstanceEntity {
     @Column(name = "find_number", notNull = true)
     private int findNumber;
 
-    public String getHistoryId() {
-        return historyId;
+    public String getInstanceId() {
+        return instanceId;
     }
 
-    public void setHistoryId(String historyId) {
-        this.historyId = historyId;
+    public void setInstanceId(String instanceId) {
+        this.instanceId = instanceId;
     }
 
     public String getCreateTime() {
@@ -75,14 +71,6 @@ public class PipelineInstanceEntity {
 
     public void setRunWay(int runWay) {
         this.runWay = runWay;
-    }
-
-    public String getRunLog() {
-        return runLog;
-    }
-
-    public void setRunLog(String runLog) {
-        this.runLog = runLog;
     }
 
     public String getUserId() {

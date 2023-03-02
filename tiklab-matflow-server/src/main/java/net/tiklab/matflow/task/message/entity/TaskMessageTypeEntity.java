@@ -6,30 +6,16 @@ import net.tiklab.dal.jpa.annotation.*;
 @Table(name="pip_task_message_type")
 public class TaskMessageTypeEntity {
 
-    //id
     @Id
-    @GeneratorValue
-    @Column(name = "message_task_id")
-    private String messageTaskId;
+    @Column(name = "task_id" ,notNull = true)
+    private String taskId;
+
+    @Column(name = "task_name" ,notNull = true)
+    private String taskName;
 
     //消息类型
     @Column(name = "task_type")
     private String taskType;
-
-    @Column(name = "config_id")
-    private String configId;
-
-
-
-
-    public String getMessageTaskId() {
-        return messageTaskId;
-    }
-
-    public void setMessageTaskId(String messageTaskId) {
-        this.messageTaskId = messageTaskId;
-    }
-
 
     public String getTaskType() {
         return taskType;
@@ -39,11 +25,19 @@ public class TaskMessageTypeEntity {
         this.taskType = taskType;
     }
 
-    public String getConfigId() {
-        return configId;
+    public String getTaskId() {
+        return taskId;
     }
 
-    public void setConfigId(String configId) {
-        this.configId = configId;
+    public void setTaskId(String taskId) {
+        this.taskId = taskId;
+    }
+
+    public String getTaskName() {
+        return taskName;
+    }
+
+    public void setTaskName(String taskName) {
+        this.taskName = taskName;
     }
 }

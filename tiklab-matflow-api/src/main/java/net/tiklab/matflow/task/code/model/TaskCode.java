@@ -12,9 +12,11 @@ import net.tiklab.postin.annotation.ApiProperty;
 @Mapper(targetAlias = "TaskCodeEntity")
 public class TaskCode {
 
-    //id
-    @ApiProperty(name="codeId",desc="codeId")
-    private String codeId;
+    @ApiProperty(name = "taskId",desc = "id")
+    private String taskId;
+
+    @ApiProperty(name = "taskName",desc = "名称")
+    private String taskName;
 
     //地址名
     @ApiProperty(name="codeName",desc="地址名")
@@ -35,9 +37,6 @@ public class TaskCode {
     @ApiProperty(name="svnFile",desc="svn检出文件夹")
     private String svnFile;
 
-    @ApiProperty(name="configId",desc="配置id")
-    private String configId;
-
     //授权信息
     private Object auth;
 
@@ -51,31 +50,20 @@ public class TaskCode {
     @ApiProperty(name = "codeAlias",desc="别名")
     private String codeAlias;
 
-    @ApiProperty(name="name",desc="名称")
-    private String name;
-
-    public String getName() {
-        return name;
+    public String getTaskName() {
+        return taskName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setTaskName(String taskName) {
+        this.taskName = taskName;
     }
 
-    public String getConfigId() {
-        return configId;
+    public String getTaskId() {
+        return taskId;
     }
 
-    public void setConfigId(String configId) {
-        this.configId = configId;
-    }
-
-    public String getCodeId() {
-        return codeId;
-    }
-
-    public void setCodeId(String codeId) {
-        this.codeId = codeId;
+    public void setTaskId(String taskId) {
+        this.taskId = taskId;
     }
 
     public int getType() {

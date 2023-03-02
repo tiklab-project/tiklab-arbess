@@ -6,11 +6,12 @@ import net.tiklab.dal.jpa.annotation.*;
 @Table(name="pip_task_deploy")
 public class TaskDeployEntity {
 
-    //Id
     @Id
-    @GeneratorValue
-    @Column(name = "id")
-    private String deployId;
+    @Column(name = "task_id" ,notNull = true)
+    private String taskId;
+
+    @Column(name = "task_name" ,notNull = true)
+    private String taskName;
 
     //认证类型
     @Column(name = "auth_type",notNull = true )
@@ -40,27 +41,20 @@ public class TaskDeployEntity {
     @Column(name = "start_order")
     private String startOrder;
 
-
-    @Column(name = "config_id",notNull = true)
-    private String configId;
-
-
-
-
-    public String getConfigId() {
-        return configId;
+    public String getTaskId() {
+        return taskId;
     }
 
-    public void setConfigId(String configId) {
-        this.configId = configId;
+    public void setTaskId(String taskId) {
+        this.taskId = taskId;
     }
 
-    public String getDeployId() {
-        return deployId;
+    public String getTaskName() {
+        return taskName;
     }
 
-    public void setDeployId(String deployId) {
-        this.deployId = deployId;
+    public void setTaskName(String taskName) {
+        this.taskName = taskName;
     }
 
     public int getAuthType() {

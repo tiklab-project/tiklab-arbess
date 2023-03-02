@@ -7,9 +7,11 @@ import net.tiklab.dal.jpa.annotation.*;
 public class TaskCodeScanEntity {
 
     @Id
-    @GeneratorValue
-    @Column(name = "id")
-    private String codeScanId;
+    @Column(name = "task_id" ,notNull = true)
+    private String taskId;
+
+    @Column(name = "task_name" ,notNull = true)
+    private String taskName;
 
     @Column(name = "project_name")
     private String projectName;
@@ -17,24 +19,20 @@ public class TaskCodeScanEntity {
     @Column(name = "auth_id")
     private String authId;
 
-    @Column(name = "config_id",notNull = true)
-    private String configId;
-
-
-    public String getConfigId() {
-        return configId;
+    public String getTaskId() {
+        return taskId;
     }
 
-    public void setConfigId(String configId) {
-        this.configId = configId;
+    public void setTaskId(String taskId) {
+        this.taskId = taskId;
     }
 
-    public String getCodeScanId() {
-        return codeScanId;
+    public String getTaskName() {
+        return taskName;
     }
 
-    public void setCodeScanId(String codeScanId) {
-        this.codeScanId = codeScanId;
+    public void setTaskName(String taskName) {
+        this.taskName = taskName;
     }
 
     public String getAuthId() {

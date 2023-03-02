@@ -1,6 +1,5 @@
 package net.tiklab.matflow.pipeline.definition.model;
 
-
 import net.tiklab.beans.annotation.Mapper;
 import net.tiklab.beans.annotation.Mapping;
 import net.tiklab.beans.annotation.Mappings;
@@ -13,51 +12,50 @@ import net.tiklab.user.user.model.User;
 
 import java.util.List;
 
+/**
+ * 流水线模型
+ */
+
 @ApiModel
 @Join
 @Mapper(targetAlias = "PipelineEntity")
 public class Pipeline {
 
-    //流水线id
     @ApiProperty(name="id",desc="流水线id")
     private String id;
 
-    //流水线名称
     @ApiProperty(name="name",desc="流水线名称")
     private String name;
 
-    //流水线创建人
+    @ApiProperty(name="user",desc="用户")
     @Mappings({
             @Mapping(source = "user.id",target = "userId")
     })
     @JoinQuery(key = "id")
     private User user;
 
-    //流水线创建时间
     @ApiProperty(name="createTime",desc="流水线创建时间")
     private String createTime;
 
-    //流水线类型
-    @ApiProperty(name="type",desc="流水线类型")
+    @ApiProperty(name="type",desc="流水线类型 1.多任务 2.多阶段")
     private int type;
 
-    //运行状态
     @ApiProperty(name="state",desc="运行状态 1.运行中 2.停止中")
     private int state;
 
-    @ApiProperty(name="power",desc="项目作用域")
+    @ApiProperty(name="power",desc="项目作用域 1.全局 2.项目")
     private int power;
 
-    @ApiProperty(name="color",desc="颜色")
+    @ApiProperty(name="color",desc="颜色 1~5随机生成")
     private int color;
 
-    //流水线模板
+    @ApiProperty(name="template",desc="流水线模板")
     private String template;
 
-    //收藏状态
+    @ApiProperty(name="collect",desc="收藏 0.未收藏 1.收藏")
     private int collect;
 
-    //添加用户
+    @ApiProperty(name="userList",desc="流水线成员")
     private List<PatchUser> userList;
 
     public Pipeline() {

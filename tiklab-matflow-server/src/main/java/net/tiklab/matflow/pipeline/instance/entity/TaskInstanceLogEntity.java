@@ -7,7 +7,7 @@ import net.tiklab.dal.jpa.annotation.*;
  */
 
 @Entity
-@Table(name="pip_pipeline_history_log")
+@Table(name="pip_pipeline_instance_log")
 public class TaskInstanceLogEntity {
 
     //日志id
@@ -16,9 +16,8 @@ public class TaskInstanceLogEntity {
     @Column(name = "log_id")
     private String logId;
 
-    //historyId
-    @Column(name = "history_id")
-    private String historyId;
+    @Column(name = "instance_id")
+    private String instanceId;
 
     //运行类型
     @Column(name = "task_type")
@@ -39,9 +38,11 @@ public class TaskInstanceLogEntity {
     @Column(name = "run_state")
     private int runState;
 
+    //阶段id
     @Column(name = "stages_id")
     private String stagesId;
 
+    //任务名称
     @Column(name = "task_name")
     private String taskName;
 
@@ -61,12 +62,12 @@ public class TaskInstanceLogEntity {
         this.logId = logId;
     }
 
-    public String getHistoryId() {
-        return historyId;
+    public String getInstanceId() {
+        return instanceId;
     }
 
-    public void setHistoryId(String historyId) {
-        this.historyId = historyId;
+    public void setInstanceId(String instanceId) {
+        this.instanceId = instanceId;
     }
 
     public int getTaskType() {

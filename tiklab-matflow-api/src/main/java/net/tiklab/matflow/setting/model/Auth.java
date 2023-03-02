@@ -9,6 +9,10 @@ import net.tiklab.postin.annotation.ApiModel;
 import net.tiklab.postin.annotation.ApiProperty;
 import net.tiklab.user.user.model.User;
 
+/**
+ * 流水线基本认证模型
+ */
+
 @ApiModel
 @Join
 @Mapper(targetAlias = "AuthEntity")
@@ -17,7 +21,7 @@ public class Auth {
     @ApiProperty(name = "authId",desc="id")
     private String authId;
 
-    @ApiProperty(name = "authType",desc="类型")
+    @ApiProperty(name = "authType",desc="类型 1.用户名密码 2.私钥")
     private int authType;
 
     @ApiProperty(name = "name",desc="名称")
@@ -41,7 +45,7 @@ public class Auth {
     @JoinQuery(key = "id")
     private User user;
 
-    @ApiProperty(name = "authPublic",desc="是否公开")
+    @ApiProperty(name = "authPublic",desc="是否公开1.公开,2.不公开")
     private int authPublic;
 
 

@@ -2,21 +2,16 @@ package net.tiklab.matflow.pipeline.execute.controller;
 
 
 import net.tiklab.core.Result;
-import net.tiklab.core.page.Pagination;
-import net.tiklab.matflow.pipeline.instance.model.PipelineAllInstanceQuery;
-import net.tiklab.matflow.pipeline.instance.model.PipelineInstance;
-import net.tiklab.matflow.pipeline.instance.model.TaskRunLog;
+import net.tiklab.matflow.pipeline.execute.model.TaskRunLog;
 import net.tiklab.matflow.pipeline.execute.service.PipelineExecService;
 import net.tiklab.postin.annotation.Api;
 import net.tiklab.postin.annotation.ApiMethod;
 import net.tiklab.postin.annotation.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 @RestController
@@ -61,15 +56,6 @@ public class PipelineExecController {
         return Result.ok();
     }
 
-    @RequestMapping(path="/findUserRunPageHistory",method = RequestMethod.POST)
-    @ApiMethod(name = "findUserRunPageHistory",desc = "判断是否执行")
-    @ApiParam(name = "query",desc = "分页信息",required = true)
-    public Result<Pagination<PipelineInstance>> findUserRunPageHistory(
-            @RequestBody @Valid @NotNull PipelineAllInstanceQuery query) {
-        Pagination<PipelineInstance> userRunPageHistory =
-                pipelineExecService.findUserRunPageHistory(query);
-        return Result.ok(userRunPageHistory);
-    }
 
 
 }

@@ -32,7 +32,7 @@ public class TaskBuildServiceImpl implements TaskBuildService {
     @Override
     public void deleteBuildConfig(String configId){
         TaskBuild oneBuildConfig = findOneBuildConfig(configId);
-        deleteBuild(oneBuildConfig.getBuildId());
+        deleteBuild(oneBuildConfig.getTaskId());
     }
 
     /**
@@ -47,7 +47,7 @@ public class TaskBuildServiceImpl implements TaskBuildService {
             return null;
         }
         for (TaskBuild taskBuild : allBuild) {
-            if (taskBuild.getConfigId().equals(configId)){
+            if (taskBuild.getTaskId().equals(configId)){
                 return taskBuild;
             }
         }

@@ -6,15 +6,13 @@ import net.tiklab.beans.annotation.Mapping;
 import net.tiklab.beans.annotation.Mappings;
 import net.tiklab.join.annotation.Join;
 import net.tiklab.join.annotation.JoinQuery;
-import net.tiklab.matflow.pipeline.definition.model.Pipeline;
-import net.tiklab.matflow.pipeline.definition.model.PipelineOverview;
+import net.tiklab.matflow.pipeline.overview.model.PipelineOverview;
 import net.tiklab.postin.annotation.ApiModel;
 import net.tiklab.postin.annotation.ApiProperty;
 
 /**
- * 流水线最近打开记录
+ * 流水线最近打开模型
  */
-
 @ApiModel
 @Join
 @Mapper(targetAlias = "PipelineOpenEntity")
@@ -26,7 +24,6 @@ public class PipelineOpen {
     @ApiProperty(name="userId",desc="用户",eg="@selectOne")
     private String userId;
 
-    //流水线
     @ApiProperty(name="pipeline",desc="流水线id",eg="@selectOne")
     @Mappings({
             @Mapping(source = "pipeline.id",target = "pipelineId")
@@ -34,13 +31,13 @@ public class PipelineOpen {
     @JoinQuery(key = "id")
     private Pipeline pipeline;
 
-    @ApiProperty(name="number",desc="数量")
+    @ApiProperty(name="number",desc="打开次数")
     private int number;
 
     @ApiProperty(name="createTime",desc="创建时间")
     private String createTime;
 
-    //流水线执行统计信息
+    @ApiProperty(name="pipelineOverview",desc="流水线执行统计信息")
     private PipelineOverview pipelineOverview;
 
 

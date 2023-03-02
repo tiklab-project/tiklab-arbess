@@ -16,6 +16,9 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
+/**
+ * 流水线基本认证控制器
+ */
 @RestController
 @RequestMapping("/auth")
 @Api(name = "AuthController",desc = "流水线授权")

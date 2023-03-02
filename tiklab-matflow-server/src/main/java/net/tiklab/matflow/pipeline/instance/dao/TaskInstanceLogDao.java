@@ -1,6 +1,5 @@
 package net.tiklab.matflow.pipeline.instance.dao;
 
-
 import net.tiklab.dal.jdbc.JdbcTemplate;
 import net.tiklab.dal.jpa.JpaTemplate;
 import net.tiklab.matflow.pipeline.instance.entity.TaskInstanceLogEntity;
@@ -8,6 +7,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.stereotype.Repository;
 import java.util.List;
+
+/**
+ * 任务日志数据访问
+ */
 
 @Repository
 public class TaskInstanceLogDao {

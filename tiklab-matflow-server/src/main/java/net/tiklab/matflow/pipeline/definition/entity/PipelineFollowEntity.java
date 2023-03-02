@@ -4,7 +4,7 @@ package net.tiklab.matflow.pipeline.definition.entity;
 import net.tiklab.dal.jpa.annotation.*;
 
 /**
- * 关注表
+ * 流水线收藏实体
  */
 
 @Entity

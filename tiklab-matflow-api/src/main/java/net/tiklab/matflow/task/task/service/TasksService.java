@@ -25,16 +25,16 @@ public interface TasksService {
 
     /**
      * 创建配置及任务配置
-     * @param config 配置信息
+     * @param tasks 配置信息
      * @return 配置id
      */
-    String createTaskConfig(Tasks config);
+    String createTaskConfig(Tasks tasks);
 
     /**
      * 删除配置及任务
-     * @param config 配置信息
+     * @param tasks 配置信息
      */
-    void deleteTaskConfig(Tasks config);
+    void deleteTaskConfig(Tasks tasks);
 
     /**
      * 删除流水线所有配置
@@ -45,9 +45,9 @@ public interface TasksService {
 
     /**
      * 更新配置及任务
-     * @param config 配置信息
+     * @param tasks 配置信息
      */
-    void updateTaskConfig(Tasks config);
+    void updateTaskConfig(Tasks tasks);
 
 
     /**

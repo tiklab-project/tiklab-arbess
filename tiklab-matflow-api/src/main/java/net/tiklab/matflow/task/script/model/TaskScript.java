@@ -10,11 +10,11 @@ import net.tiklab.postin.annotation.ApiProperty;
 @Mapper(targetAlias = "TaskScriptEntity")
 public class TaskScript {
 
-    @ApiProperty(name = "scriptId",desc = "id")
-    private String scriptId;
+    @ApiProperty(name = "taskId",desc = "id")
+    private String taskId;
 
-    @ApiProperty(name = "name",desc = "名称")
-    private String name;
+    @ApiProperty(name = "taskName",desc = "名称")
+    private String taskName;
 
     @ApiProperty(name = "type",desc = "类型 71:bat脚本 72:shell脚本")
     private int type;
@@ -24,9 +24,6 @@ public class TaskScript {
 
     private int sort;
 
-    @ApiProperty(name = "configId",desc = "命令")
-    private String configId;
-
     public int getSort() {
         return sort;
     }
@@ -35,20 +32,20 @@ public class TaskScript {
         this.sort = sort;
     }
 
-    public String getScriptId() {
-        return scriptId;
+    public String getTaskId() {
+        return taskId;
     }
 
-    public void setScriptId(String scriptId) {
-        this.scriptId = scriptId;
+    public void setTaskId(String taskId) {
+        this.taskId = taskId;
     }
 
-    public String getName() {
-        return name;
+    public String getTaskName() {
+        return taskName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setTaskName(String taskName) {
+        this.taskName = taskName;
     }
 
     public int getType() {
@@ -67,11 +64,21 @@ public class TaskScript {
         this.scriptOrder = scriptOrder;
     }
 
-    public String getConfigId() {
-        return configId;
-    }
 
-    public void setConfigId(String configId) {
-        this.configId = configId;
-    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

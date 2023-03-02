@@ -8,6 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import java.util.List;
 
+/**
+ * 流水线基本认证数据访问
+ */
 @Repository
 public class AuthDao {
 

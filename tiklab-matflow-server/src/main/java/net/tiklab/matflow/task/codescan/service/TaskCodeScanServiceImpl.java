@@ -47,7 +47,7 @@ public class TaskCodeScanServiceImpl implements TaskCodeScanService {
     @Override
     public void deleteCodeScanConfig(String configId){
         TaskCodeScan oneCodeScanConfig = findOneCodeScanConfig(configId);
-        deleteCodeScan(oneCodeScanConfig.getCodeScanId());
+        deleteCodeScan(oneCodeScanConfig.getTaskId());
     }
 
     /**
@@ -62,8 +62,8 @@ public class TaskCodeScanServiceImpl implements TaskCodeScanService {
             return null;
         }
         for (TaskCodeScan taskCodeScan : allCodeScan) {
-            if (taskCodeScan.getConfigId().equals(configId)){
-                return findOneCodeScan(taskCodeScan.getCodeScanId());
+            if (taskCodeScan.getTaskId().equals(configId)){
+                return findOneCodeScan(taskCodeScan.getTaskId());
             }
         }
         return null;

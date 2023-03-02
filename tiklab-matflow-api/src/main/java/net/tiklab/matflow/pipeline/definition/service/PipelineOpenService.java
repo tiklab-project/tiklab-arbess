@@ -12,20 +12,12 @@ import java.util.List;
 @JoinProvider(model = PipelineOpen.class)
 public interface PipelineOpenService {
 
-
     /**
-     * 获取经常打开列表
-     * @return 列表
-     */
-    List<PipelineOpen> findAllOpen(StringBuilder s);
-
-
-    /**
-     * 查询流水线最近打开
+     * 查询用户最近打开流水线
      * @param number 查询数量
      * @return 最近打开的流水线
      */
-    List<PipelineOpen> findAllOpen(int number);
+    List<PipelineOpen> findUserAllOpen(int number);
 
     /**
      * 删除流水线收藏

@@ -8,9 +8,11 @@ import net.tiklab.dal.jpa.annotation.*;
 public class TaskTestEntity {
 
     @Id
-    @GeneratorValue
-    @Column(name = "test_id")
-    private String testId;
+    @Column(name = "task_id" ,notNull = true)
+    private String taskId;
+
+    @Column(name = "task_name" ,notNull = true)
+    private String taskName;
 
     //地址
     @Column(name = "test_order",notNull = true)
@@ -19,26 +21,20 @@ public class TaskTestEntity {
     @Column(name = "address")
     private String address;
 
-    @Column(name = "config_id",notNull = true)
-    private String configId;
-
-
-
-
-    public String getConfigId() {
-        return configId;
+    public String getTaskName() {
+        return taskName;
     }
 
-    public void setConfigId(String configId) {
-        this.configId = configId;
+    public void setTaskName(String taskName) {
+        this.taskName = taskName;
     }
 
-    public String getTestId() {
-        return testId;
+    public String getTaskId() {
+        return taskId;
     }
 
-    public void setTestId(String testId) {
-        this.testId = testId;
+    public void setTaskId(String taskId) {
+        this.taskId = taskId;
     }
 
     public String getTestOrder() {

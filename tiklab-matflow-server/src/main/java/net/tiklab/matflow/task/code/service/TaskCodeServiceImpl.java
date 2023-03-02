@@ -47,7 +47,7 @@ public class TaskCodeServiceImpl implements TaskCodeService {
     @Override
     public void deleteCodeConfig(String configId){
         TaskCode oneCodeConfig = findOneCodeConfig(configId);
-        deleteCode(oneCodeConfig.getCodeId());
+        deleteCode(oneCodeConfig.getTaskId());
     }
 
     /**
@@ -62,10 +62,10 @@ public class TaskCodeServiceImpl implements TaskCodeService {
             return null;
         }
         for (TaskCode taskCode : allCode) {
-            if (!PipelineUtil.isNoNull(taskCode.getConfigId())){
+            if (!PipelineUtil.isNoNull(taskCode.getTaskId())){
                 continue;
             }
-            if (taskCode.getConfigId().equals(configId)){
+            if (taskCode.getTaskId().equals(configId)){
                 return taskCode;
             }
         }
@@ -88,7 +88,7 @@ public class TaskCodeServiceImpl implements TaskCodeService {
                 if (!PipelineUtil.isNoNull(taskCode.getCodeName())){
                     break;
                 }
-                TaskCode oneCode = findOneCode(taskCode.getCodeId());
+                TaskCode oneCode = findOneCode(taskCode.getTaskId());
                 String authId = oneCode.getAuthId();
                 String houseUrl = taskCodeThirdService.getHouseUrl(authId, taskCode.getCodeName(), taskCode.getType());
                 taskCode.setCodeAddress(houseUrl);

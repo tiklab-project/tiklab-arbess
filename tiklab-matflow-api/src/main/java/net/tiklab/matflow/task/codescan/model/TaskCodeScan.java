@@ -10,14 +10,14 @@ import net.tiklab.postin.annotation.ApiProperty;
 @Mapper(targetAlias = "TaskCodeScanEntity")
 public class TaskCodeScan {
 
-    @ApiProperty(name="codeScanId",desc="id")
-    private String codeScanId;
+    @ApiProperty(name = "taskId",desc = "id")
+    private String taskId;
+
+    @ApiProperty(name = "taskName",desc = "名称")
+    private String taskName;
 
     @ApiProperty(name="projectName",desc="项目名称")
     private String projectName;
-
-    @ApiProperty(name="configId",desc="配置id")
-    private String configId;
 
     //授权id
     @ApiProperty(name="authName",desc="授权id")
@@ -30,31 +30,20 @@ public class TaskCodeScan {
 
     private int type;
 
-    @ApiProperty(name="name",desc="名称")
-    private String name;
-
-    public String getName() {
-        return name;
+    public String getTaskName() {
+        return taskName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setTaskName(String taskName) {
+        this.taskName = taskName;
     }
 
-    public String getConfigId() {
-        return configId;
+    public String getTaskId() {
+        return taskId;
     }
 
-    public void setConfigId(String configId) {
-        this.configId = configId;
-    }
-
-    public String getCodeScanId() {
-        return codeScanId;
-    }
-
-    public void setCodeScanId(String codeScanId) {
-        this.codeScanId = codeScanId;
+    public void setTaskId(String taskId) {
+        this.taskId = taskId;
     }
 
     public String getProjectName() {

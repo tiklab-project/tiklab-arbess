@@ -1,7 +1,7 @@
 package net.tiklab.matflow.pipeline.overview.controller;
 
 import net.tiklab.core.Result;
-import net.tiklab.matflow.pipeline.definition.model.PipelineOverview;
+import net.tiklab.matflow.pipeline.overview.model.PipelineOverview;
 import net.tiklab.matflow.pipeline.overview.service.PipelineOverviewService;
 import net.tiklab.postin.annotation.Api;
 import net.tiklab.postin.annotation.ApiMethod;
@@ -13,9 +13,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.constraints.NotNull;
 
-
+/**
+ * 流水线统计服务控制器
+ */
 @RestController
-@RequestMapping("/pipelineOverview")
+@RequestMapping("/overview")
 @Api(name = "PipelineOverviewController",desc = "流水线概况")
 public class PipelineOverviewController {
 
@@ -27,7 +29,7 @@ public class PipelineOverviewController {
     @ApiParam(name = "pipelineId",desc = "流水线id",required = true)
     public Result<PipelineOverview> pipelineCensus(@NotNull String pipelineId){
 
-        PipelineOverview buildStatus = overviewService.pipelineCensus(pipelineId);
+        PipelineOverview buildStatus = overviewService.pipelineOverview(pipelineId);
 
         return Result.ok(buildStatus);
     }

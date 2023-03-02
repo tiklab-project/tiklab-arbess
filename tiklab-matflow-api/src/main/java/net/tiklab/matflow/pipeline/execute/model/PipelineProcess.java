@@ -1,19 +1,18 @@
 package net.tiklab.matflow.pipeline.execute.model;
 
-
 import net.tiklab.matflow.pipeline.definition.model.Pipeline;
 import net.tiklab.postin.annotation.ApiModel;
 
 import java.io.InputStream;
 
 /**
- * 存放执行的信息
+ * 流水线执行过程模型
  */
 
 @ApiModel
 public class PipelineProcess {
 
-    //运行的流水线
+    //流水线
     private Pipeline pipeline;
 
     //运行日志
@@ -34,6 +33,7 @@ public class PipelineProcess {
     //历史id
     private String historyId;
 
+    //日志id
     private String logId;
 
     public PipelineProcess() {

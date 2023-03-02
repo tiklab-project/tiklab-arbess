@@ -3,8 +3,7 @@ package net.tiklab.matflow.pipeline.definition.controller;
 import net.tiklab.core.Result;
 import net.tiklab.matflow.task.task.model.Tasks;
 import net.tiklab.matflow.task.task.service.TasksService;
-import net.tiklab.matflow.pipeline.definition.service.PipelineStagesService;
-import net.tiklab.matflow.pipeline.definition.service.StagesTaskService;
+import net.tiklab.matflow.stages.service.PipelineStagesService;
 import net.tiklab.postin.annotation.Api;
 import net.tiklab.postin.annotation.ApiMethod;
 import net.tiklab.postin.annotation.ApiParam;
@@ -65,8 +64,8 @@ public class PipelineConfigController {
     @RequestMapping(path="/deleteTaskConfig",method = RequestMethod.POST)
     @ApiMethod(name = "deleteTaskConfig",desc = "更新流水线配置")
     @ApiParam(name = "config",desc = "配置",required = true)
-    public Result<Void> deleteTaskConfig(@RequestBody @Valid @NotNull Tasks config){
-        configServer.deleteTaskConfig(config);
+    public Result<Void> deleteTaskConfig(@RequestBody @Valid @NotNull Tasks tasks){
+        configServer.deleteTaskConfig(tasks);
         return Result.ok();
     }
 
@@ -88,14 +87,12 @@ public class PipelineConfigController {
         return Result.ok();
     }
 
-    @Autowired
-    StagesTaskService taskService;
 
     @RequestMapping(path="/deleteStagesTask",method = RequestMethod.POST)
     @ApiMethod(name = "updateStageName",desc = "更新流水线配置")
     @ApiParam(name = "stagesId",desc = "阶段id",required = true)
     public Result<Void> deleteStagesTask(@NotNull String stagesId){
-        taskService.deleteStagesTask(stagesId);
+        // taskService.deleteStagesTask(stagesId);
         return Result.ok();
     }
 

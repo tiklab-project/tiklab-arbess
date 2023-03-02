@@ -36,7 +36,7 @@ public class TaskScriptServiceImpl implements TaskScriptService {
             return null;
         }
         for (TaskScript script : allScript) {
-            if (script.getConfigId().equals(configId)){
+            if (script.getTaskId().equals(configId)){
                 return script;
             }
         }
@@ -53,8 +53,8 @@ public class TaskScriptServiceImpl implements TaskScriptService {
             return ;
         }
         for (TaskScript script : allScript) {
-            if (script.getConfigId().equals(configId)){
-                deleteScript(script.getScriptId());
+            if (script.getTaskId().equals(configId)){
+                deleteScript(script.getTaskId());
             }
         }
     }

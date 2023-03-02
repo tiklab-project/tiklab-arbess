@@ -42,7 +42,7 @@ public class TaskMessageTypeServiceImpl implements TaskMessageTypeService {
         }
         List<String> list = new ArrayList<>();
         for (TaskMessageType messageType : allMessage) {
-            if (messageType.getConfigId().equals(configId)){
+            if (messageType.getTaskId().equals(configId)){
                 list.add(messageType.getTaskType());
             }
         }
@@ -60,7 +60,7 @@ public class TaskMessageTypeServiceImpl implements TaskMessageTypeService {
         message.setTypeList(allMessage);
         TaskMessageType messageType = findMessage(configId);
         if (messageType != null){
-            String taskId = messageType.getMessageTaskId();
+            String taskId = messageType.getTaskId();
             List<TaskUserSendMessageType> allUserMessage = messageUserServer.findAllUserMessage(taskId);
             message.setUserList(allUserMessage);
         }
@@ -79,9 +79,9 @@ public class TaskMessageTypeServiceImpl implements TaskMessageTypeService {
             return;
         }
         for (TaskMessageType messageType : allMessage) {
-            if (messageType.getConfigId().equals(configId)){
-                String messageTaskId = messageType.getMessageTaskId();
-                deleteMessage(messageType.getMessageTaskId());
+            if (messageType.getTaskId().equals(configId)){
+                String messageTaskId = messageType.getTaskId();
+                deleteMessage(messageType.getTaskId());
                 messageUserServer.deleteAllMessage(messageTaskId);
             }
         }
@@ -100,7 +100,7 @@ public class TaskMessageTypeServiceImpl implements TaskMessageTypeService {
         }
 
         for (TaskMessageType messageType : allMessage) {
-            if (messageType.getConfigId().equals(configId)){
+            if (messageType.getTaskId().equals(configId)){
                return messageType;
             }
         }

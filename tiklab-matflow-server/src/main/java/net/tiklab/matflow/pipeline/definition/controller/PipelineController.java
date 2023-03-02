@@ -1,18 +1,10 @@
 package net.tiklab.matflow.pipeline.definition.controller;
 
 import net.tiklab.core.Result;
-import net.tiklab.core.page.Pagination;
 import net.tiklab.matflow.pipeline.definition.model.Pipeline;
-import net.tiklab.matflow.pipeline.definition.model.PipelineMessageList;
-import net.tiklab.matflow.pipeline.definition.model.PipelineOverview;
+import net.tiklab.matflow.pipeline.definition.model.PipelineExecMessage;
 import net.tiklab.matflow.pipeline.definition.service.PipelineService;
-import net.tiklab.matflow.pipeline.instance.model.PipelineAllInstanceQuery;
-import net.tiklab.matflow.pipeline.definition.model.PipelineFollow;
-import net.tiklab.matflow.pipeline.instance.model.PipelineInstance;
-import net.tiklab.matflow.pipeline.definition.model.PipelineOpen;
-import net.tiklab.matflow.pipeline.definition.service.PipelineFollowService;
-import net.tiklab.matflow.pipeline.definition.service.PipelineOpenService;
-import net.tiklab.matflow.pipeline.overview.service.PipelineOverviewService;
+import net.tiklab.matflow.pipeline.overview.model.PipelineOverview;
 import net.tiklab.postin.annotation.Api;
 import net.tiklab.postin.annotation.ApiMethod;
 import net.tiklab.postin.annotation.ApiParam;
@@ -29,6 +21,10 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
+/**
+ * 流水线控制器
+ */
+
 @RestController
 @RequestMapping("/pipeline")
 @Api(name = "PipelineController",desc = "流水线")
@@ -38,15 +34,6 @@ public class PipelineController {
 
     @Autowired
     PipelineService pipelineService;
-
-    @Autowired
-    PipelineOpenService openService;
-
-    @Autowired
-    PipelineOverviewService overviewService;
-
-    @Autowired
-    PipelineFollowService followService;
 
     //创建
     @RequestMapping(path="/createPipeline",method = RequestMethod.POST)
@@ -86,7 +73,7 @@ public class PipelineController {
     @ApiParam(name = "pipelineId",desc = "流水线id",required = true)
     public Result<Pipeline> findOnePipeline(@NotNull String pipelineId){
 
-        Pipeline pipeline = pipelineService.findOnePipeline(pipelineId);
+        Pipeline pipeline = pipelineService.findPipelineById(pipelineId);
 
         return Result.ok(pipeline);
     }
@@ -106,9 +93,9 @@ public class PipelineController {
     @RequestMapping(path="/findLikePipeline",method = RequestMethod.POST)
     @ApiMethod(name = "findLikePipeline",desc = "模糊查询")
     @ApiParam(name = "pipelineName",desc = "模糊查询条件",required = true)
-    public Result<List<PipelineMessageList>> findLikePipeline(@NotNull String pipelineName, String userId){
+    public Result<List<PipelineExecMessage>> findLikePipeline(@NotNull String pipelineName, String userId){
 
-        List<PipelineMessageList> pipelineQueryList = pipelineService.findLikePipeline(pipelineName,userId);
+        List<PipelineExecMessage> pipelineQueryList = pipelineService.findPipelineByName(pipelineName,userId);
 
         return Result.ok(pipelineQueryList);
     }
@@ -119,7 +106,7 @@ public class PipelineController {
     @ApiParam(name = "userId",desc = "用户id",required = true)
     public Result<List<PipelineOverview>> findUserPipeline(@NotNull String userId){
 
-        List<PipelineMessageList> userPipeline = pipelineService.findUserPipelineExecMessage(userId);
+        List<PipelineExecMessage> userPipeline = pipelineService.findUserPipelineExecMessage(userId);
 
         return Result.ok(userPipeline);
     }
@@ -130,7 +117,7 @@ public class PipelineController {
     @ApiParam(name = "userId",desc = "用户id",required = true)
     public Result<List<PipelineOverview>> findUserFollowPipeline(@NotNull String userId){
 
-        List<PipelineMessageList> userPipeline = pipelineService.findUserFollowPipeline(userId);
+        List<PipelineExecMessage> userPipeline = pipelineService.findUserFollowPipeline(userId);
 
         return Result.ok(userPipeline);
     }
@@ -146,42 +133,6 @@ public class PipelineController {
         return Result.ok(dmUser);
     }
 
-    @RequestMapping(path="/pipelineCensus",method = RequestMethod.POST)
-    @ApiMethod(name = "pipelineCensus",desc = "查询流水线最近状态")
-    @ApiParam(name = "pipelineId",desc = "流水线id",required = true)
-    public Result<PipelineOverview> pipelineCensus(@NotNull String pipelineId){
-
-        PipelineOverview buildStatus = overviewService.pipelineCensus(pipelineId);
-
-        return Result.ok(buildStatus);
-    }
-
-    @RequestMapping(path="/findAllOpen",method = RequestMethod.POST)
-    @ApiMethod(name = "findAllOpen",desc = "查询流水线最近状态")
-    @ApiParam(name = "number",desc = "数量",required = true)
-    public Result< List<PipelineOpen>> findAllOpen(int number){
-
-        List<PipelineOpen> openList = openService.findAllOpen(number);
-
-        return Result.ok(openList);
-    }
-
-
-    @RequestMapping(path="/updateFollow",method = RequestMethod.POST)
-    @ApiMethod(name = "updateFollow",desc = "更新收藏")
-    @ApiParam(name = "pipelineFollow",desc = "收藏信息",required = true)
-    public Result<Void>  updateFollow( @RequestBody @Valid @NotNull PipelineFollow pipelineFollow){
-        followService.updateFollow(pipelineFollow);
-        return Result.ok();
-    }
-
-    @RequestMapping(path="/findUserAllHistory",method = RequestMethod.POST)
-    @ApiMethod(name = "findUserAllHistory",desc = "分页")
-    @ApiParam(name = "pipelineHistoryQuery",desc = "分页信息",required = true)
-    public Result<Pagination<PipelineInstance>>  findUserAllHistory(@RequestBody @Valid @NotNull PipelineAllInstanceQuery pipelineHistoryQuery){
-        Pagination<PipelineInstance> userAllHistory = pipelineService.findUserAllHistory(pipelineHistoryQuery);
-        return Result.ok(userAllHistory);
-    }
 
 }
 

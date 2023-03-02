@@ -1,17 +1,16 @@
 package net.tiklab.matflow.pipeline.instance.model;
 
-
-
 import net.tiklab.core.order.Order;
 import net.tiklab.core.order.OrderBuilders;
 import net.tiklab.core.page.Page;
+import net.tiklab.matflow.pipeline.definition.model.Pipeline;
 import net.tiklab.postin.annotation.ApiModel;
 import net.tiklab.postin.annotation.ApiProperty;
 
 import java.util.List;
 
 /**
- * 流水线历史筛选条件
+ * 流水线实例分页筛选模型
  */
 
 @ApiModel
@@ -29,11 +28,22 @@ public class PipelineInstanceQuery {
     @ApiProperty(name ="type",desc = "类型")
     private int type;
 
+    @ApiProperty(name ="userId",desc = "用户流水线")
+    private List<Pipeline> pipelineList;
+
     @ApiProperty(name ="pageParam",desc = "分页参数")
     private Page pageParam= new Page();
 
     @ApiProperty(name ="orderParams",desc = "排序参数")
-    private List<Order> orderParams = OrderBuilders.instance().desc("findNumber").get();
+    private List<Order> orderParams = OrderBuilders.instance().desc("createTime").get();
+
+    public List<Pipeline> getPipelineList() {
+        return pipelineList;
+    }
+
+    public void setPipelineList(List<Pipeline> pipelineList) {
+        this.pipelineList = pipelineList;
+    }
 
     public String getPipelineId() {
         return pipelineId;

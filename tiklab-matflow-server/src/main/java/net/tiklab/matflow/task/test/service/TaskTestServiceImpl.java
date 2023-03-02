@@ -36,7 +36,7 @@ public class TaskTestServiceImpl implements TaskTestService {
     @Override
     public void deleteTestConfig(String configId){
         TaskTest oneTestConfig = findOneTestConfig(configId);
-        deleteTest(oneTestConfig.getTestId());
+        deleteTest(oneTestConfig.getTaskId());
     }
 
     /**
@@ -51,7 +51,7 @@ public class TaskTestServiceImpl implements TaskTestService {
             return null;
         }
         for (TaskTest taskTest : allTest) {
-            if (taskTest.getConfigId().equals(configId)){
+            if (taskTest.getTaskId().equals(configId)){
                 return taskTest;
             }
         }

@@ -12,22 +12,22 @@ import net.tiklab.postin.annotation.ApiProperty;
 @Join
 public class Tasks {
 
-    //配置id
-    private String configId;
+    @ApiProperty(name="taskId",desc="流水线id",eg="@selectOne")
+    private String taskId;
 
-    //配置顺序
+    @ApiProperty(name="taskSort",desc="流水线id",eg="@selectOne")
     private int taskSort;
 
-    //配置类型
+    @ApiProperty(name="taskType",desc="流水线id",eg="@selectOne")
     private int taskType;
 
-    //阶段
+    @ApiProperty(name="stages",desc="流水线id",eg="@selectOne")
     private int stages;
 
-    //阶段id
+    @ApiProperty(name="stagesId",desc="流水线id",eg="@selectOne")
     private String stagesId;
 
-    //配置值
+    @ApiProperty(name="values",desc="流水线id",eg="@selectOne")
     private Object values;
 
     @ApiProperty(name="pipeline",desc="流水线id",eg="@selectOne")
@@ -37,6 +37,7 @@ public class Tasks {
     @JoinQuery(key = "id")
     private Pipeline pipeline;
 
+    @ApiProperty(name="name",desc="流水线id",eg="@selectOne")
     private String name;
 
     public Tasks() {
@@ -46,12 +47,12 @@ public class Tasks {
         this.pipeline = new Pipeline(pipelineId);
     }
 
-    public String getConfigId() {
-        return configId;
+    public String getTaskId() {
+        return taskId;
     }
 
-    public void setConfigId(String configId) {
-        this.configId = configId;
+    public void setTaskId(String taskId) {
+        this.taskId = taskId;
     }
 
     public int getTaskSort() {

@@ -10,32 +10,29 @@ import net.tiklab.postin.annotation.ApiProperty;
 @Mapper(targetAlias = "TaskMessageTypeEntity")
 public class TaskMessageType {
 
-    @ApiProperty(name="messageTaskId",desc="配置id")
-    private String messageTaskId;
+    @ApiProperty(name = "taskId",desc = "id")
+    private String taskId;
+
+    @ApiProperty(name = "taskName",desc = "名称")
+    private String taskName;
 
     @ApiProperty(name="taskType",desc="消息类型")
     private String taskType;
 
-    @ApiProperty(name="configId",desc="配置id")
-    private String configId;
-
-    @ApiProperty(name="name",desc="名称")
-    private String name;
-
-    public String getName() {
-        return name;
+    public String getTaskName() {
+        return taskName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setTaskName(String taskName) {
+        this.taskName = taskName;
     }
 
-    public String getMessageTaskId() {
-        return messageTaskId;
+    public String getTaskId() {
+        return taskId;
     }
 
-    public void setMessageTaskId(String messageTaskId) {
-        this.messageTaskId = messageTaskId;
+    public void setTaskId(String taskId) {
+        this.taskId = taskId;
     }
 
     public String getTaskType() {
@@ -46,11 +43,5 @@ public class TaskMessageType {
         this.taskType = taskType;
     }
 
-    public String getConfigId() {
-        return configId;
-    }
 
-    public void setConfigId(String configId) {
-        this.configId = configId;
-    }
 }

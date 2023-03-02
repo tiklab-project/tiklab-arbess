@@ -7,11 +7,12 @@ import net.tiklab.dal.jpa.annotation.*;
 @Table(name="pip_task_code")
 public class TaskCodeEntity {
 
-    //codeId
     @Id
-    @GeneratorValue
-    @Column(name = "id")
-    private String codeId;
+    @Column(name = "task_id" ,notNull = true)
+    private String taskId;
+
+    @Column(name = "task_name" ,notNull = true)
+    private String taskName;
 
     //地址名
     @Column(name = "code_name",notNull = true)
@@ -32,23 +33,20 @@ public class TaskCodeEntity {
     @Column(name = "svn_file",notNull = true)
     private String svnFile;
 
-    @Column(name = "config_id",notNull = true)
-    private String configId;
-
-    public String getConfigId() {
-        return configId;
+    public String getTaskId() {
+        return taskId;
     }
 
-    public void setConfigId(String configId) {
-        this.configId = configId;
+    public void setTaskId(String taskId) {
+        this.taskId = taskId;
     }
 
-    public String getCodeId() {
-        return codeId;
+    public String getTaskName() {
+        return taskName;
     }
 
-    public void setCodeId(String codeId) {
-        this.codeId = codeId;
+    public void setTaskName(String taskName) {
+        this.taskName = taskName;
     }
 
     public String getCodeName() {

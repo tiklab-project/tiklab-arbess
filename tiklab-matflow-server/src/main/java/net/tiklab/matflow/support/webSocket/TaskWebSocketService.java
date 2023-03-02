@@ -1,7 +1,7 @@
 package net.tiklab.matflow.support.webSocket;
 
 import com.alibaba.fastjson.JSONObject;
-import net.tiklab.matflow.pipeline.instance.model.TaskRunLog;
+import net.tiklab.matflow.pipeline.execute.model.TaskRunLog;
 import net.tiklab.matflow.pipeline.execute.service.PipelineExecService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;

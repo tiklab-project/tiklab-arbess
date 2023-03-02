@@ -2,10 +2,9 @@ package net.tiklab.matflow.task.code.service;
 
 import net.tiklab.core.exception.ApplicationException;
 import net.tiklab.matflow.pipeline.definition.model.Pipeline;
-import net.tiklab.matflow.pipeline.definition.service.StagesTaskService;
-import net.tiklab.matflow.pipeline.definition.service.PipelineTasksService;
+import net.tiklab.matflow.task.task.service.PipelineTasksService;
 import net.tiklab.matflow.pipeline.execute.model.PipelineProcess;
-import net.tiklab.matflow.pipeline.instance.service.PipelineExecLogService;
+import net.tiklab.matflow.pipeline.execute.service.PipelineExecLogService;
 import net.tiklab.matflow.setting.model.Auth;
 import net.tiklab.matflow.setting.model.AuthThird;
 import net.tiklab.matflow.setting.service.AuthService;
@@ -43,42 +42,40 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
     @Autowired
     PipelineTasksService tasksService;
 
-    @Autowired
-    StagesTaskService stagesTaskServer;
 
     // git克隆
     public boolean clone(PipelineProcess pipelineProcess, String configId ,int taskType){
 
         Pipeline pipeline = pipelineProcess.getPipeline();
 
-        Boolean variableCond = commonService.variableCond(pipeline.getId(), configId);
+        Boolean variableCond = commonService.variableCondition(pipeline.getId(), configId);
 
-        Object o;
+        Object o = null;
         if (pipeline.getType() == 1){
             o = tasksService.findOneTasksTask(configId);
         }else {
-            o = stagesTaskServer.findOneStagesTasksTask(configId);
+            // o = stagesTaskServer.findOneStagesTasksTask(configId);
         }
         TaskCode taskCode = (TaskCode) o;
-        String name = taskCode.getName();
+        // String name = taskCode.getName();
 
         //替换配置中的变量
-        String key = commonService.variableKey(pipeline.getId(), configId, taskCode.getCodeAddress());
+        String key = commonService.replaceVariable(pipeline.getId(), configId, taskCode.getCodeAddress());
         taskCode.setCodeAddress(key);
-        String variableKey = commonService.variableKey(pipeline.getId(), configId, taskCode.getCodeBranch());
+        String variableKey = commonService.replaceVariable(pipeline.getId(), configId, taskCode.getCodeBranch());
         taskCode.setCodeBranch(variableKey);
 
-        if (!variableCond){
-            commonService.updateExecLog(pipelineProcess, PipelineUtil.date(4)+"任务："+ name+"执行条件不满足,跳过执行。");
-            return true;
-        }
-
-        commonService.updateExecLog(pipelineProcess, PipelineUtil.date(4)+"执行任务："+ name);
+        // if (!variableCond){
+        //     commonService.writeExecLog(pipelineProcess, PipelineUtil.date(4)+"任务："+ name+"执行条件不满足,跳过执行。");
+        //     return true;
+        // }
+        //
+        // commonService.writeExecLog(pipelineProcess, PipelineUtil.date(4)+"执行任务："+ name);
 
         taskCode.setType(taskType);
 
         if (!PipelineUtil.isNoNull(taskCode.getCodeAddress())){
-            commonService.updateExecLog(pipelineProcess, PipelineUtil.date(4)+"代码源地址未配置。");
+            commonService.writeExecLog(pipelineProcess, PipelineUtil.date(4)+"代码源地址未配置。");
             return false;
         }
 
@@ -106,9 +103,9 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
         String s = PipelineUtil.date(4) + "Uri : " + taskCode.getCodeAddress() + "\n"
                 + PipelineUtil.date(4) + "Branch : " + codeBranch ;
 
-        commonService.updateExecLog(pipelineProcess,s);
+        commonService.writeExecLog(pipelineProcess,s);
 
-        commonService.updateExecLog(pipelineProcess, PipelineUtil.date(4)+"分配源码空间..." );
+        commonService.writeExecLog(pipelineProcess, PipelineUtil.date(4)+"分配源码空间..." );
 
         try {
             //命令执行失败
@@ -118,30 +115,30 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
             if (taskCode.getType() != 5){
                 pipelineProcess.setEnCode("UTF-8");
             }
-            commonService.execState(pipelineProcess,process,name);
+            // commonService.commandExecState(pipelineProcess,process,name);
 
             process.destroy();
-            commonService.updateExecLog(pipelineProcess, PipelineUtil.date(4)+ "空间分配成功。" );
+            commonService.writeExecLog(pipelineProcess, PipelineUtil.date(4)+ "空间分配成功。" );
             //获取提交信息
             Process message = cloneMessage(taskCode.getType(),pipeline.getId());
             if (message != null){
                 pipelineProcess.setInputStream(message.getInputStream());
                 pipelineProcess.setErrInputStream(message.getErrorStream());
-                commonService.log(pipelineProcess);
+                commonService.readRunLog(pipelineProcess);
                 message.destroy();
             }
 
         } catch (IOException e) {
-            commonService.updateExecLog(pipelineProcess, PipelineUtil.date(4)+"系统执行命令错误 \n" + e);
+            commonService.writeExecLog(pipelineProcess, PipelineUtil.date(4)+"系统执行命令错误 \n" + e);
             return false;
         }catch (URISyntaxException e){
-            commonService.updateExecLog(pipelineProcess, PipelineUtil.date(4)+"Git地址错误 \n" + e);
+            commonService.writeExecLog(pipelineProcess, PipelineUtil.date(4)+"Git地址错误 \n" + e);
             return false;
         }catch (ApplicationException e){
-            commonService.updateExecLog(pipelineProcess, PipelineUtil.date(4)+ e);
+            commonService.writeExecLog(pipelineProcess, PipelineUtil.date(4)+ e);
             return false;
         }
-        commonService.updateExecLog(pipelineProcess, PipelineUtil.date(4)+"任务"+name+"执行成功。");
+        // commonService.writeExecLog(pipelineProcess, PipelineUtil.date(4)+"任务"+name+"执行成功。");
         return true;
     }
 

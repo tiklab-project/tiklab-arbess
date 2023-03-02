@@ -2,20 +2,19 @@ package net.tiklab.matflow.task.task.service;
 
 import net.tiklab.join.JoinTemplate;
 import net.tiklab.matflow.pipeline.definition.model.Pipeline;
-import net.tiklab.matflow.pipeline.definition.service.PipelineStagesService;
-import net.tiklab.matflow.pipeline.definition.service.PipelineTasksService;
-import net.tiklab.matflow.task.task.model.Tasks;
-import net.tiklab.matflow.pipeline.definition.model.PipelineStages;
+import net.tiklab.matflow.stages.model.PipelineStages;
+import net.tiklab.matflow.stages.service.PipelineStagesService;
 import net.tiklab.matflow.support.postprocess.service.PostprocessService;
 import net.tiklab.matflow.support.trigger.service.TriggerService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import net.tiklab.matflow.task.task.model.Tasks;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-
+/**
+ * 流水线流多任务服务
+ */
 @Service
 public class TasksServiceImpl implements TasksService {
 
@@ -30,12 +29,10 @@ public class TasksServiceImpl implements TasksService {
     private PostprocessService postServer;
 
     @Autowired
-    TriggerService triggerServer;
+    private TriggerService triggerServer;
 
     @Autowired
     JoinTemplate joinTemplate;
-
-    private static final Logger logger = LoggerFactory.getLogger(TasksServiceImpl.class);
 
     /**
      * 查询流水线所有配置（包括后置任务）
@@ -63,7 +60,7 @@ public class TasksServiceImpl implements TasksService {
         stages.setTaskValues(allAfterConfig);
         stagesList.add(stages);
         pipelineStages.setStagesList(stagesList);
-        pipelineStages.setTaskSort(allCourseConfig.size()+1);
+        pipelineStages.setStagesSort(allCourseConfig.size()+1);
         allCourseConfig.add(pipelineStages);
         return allCourseConfig;
     }
@@ -80,10 +77,10 @@ public class TasksServiceImpl implements TasksService {
         Pipeline pipeline = tasks.getPipeline();
         int type = pipeline.getType();
         if (type == 1){
-            return tasksService.findAllTasksTask(pipelineId);
+            return tasksService.findAllTasksOrTask(pipelineId,type);
         }
         if (type == 2){
-            List<PipelineStages> allStagesConfig = stagesServer.findAllStagesStageTask(pipelineId);
+            List<PipelineStages> allStagesConfig = stagesServer.findAllStagesOrTask(pipelineId);
             if (allStagesConfig == null || allStagesConfig.size() ==0){
                 return null;
             }
@@ -94,40 +91,39 @@ public class TasksServiceImpl implements TasksService {
 
     /**
      * 创建配置及任务配置
-     * @param config 配置信息
+     * @param tasks 配置信息
      * @return 配置id
      */
     @Override
-    public String createTaskConfig(Tasks config){
-        joinTemplate.joinQuery(config);
-        Pipeline pipeline = config.getPipeline();
+    public String createTaskConfig(Tasks tasks){
+        joinTemplate.joinQuery(tasks);
+        Pipeline pipeline = tasks.getPipeline();
         int type = pipeline.getType();
         String id = null;
         if (type == 1){
-            id = tasksService.createTasksTask(config);
+            id = tasksService.createTasksOrTask(tasks);
         }
         if (type == 2){
-
-            id = stagesServer.createStagesTask(config);
+            id = stagesServer.createStagesOrTask(tasks);
         }
         return id;
     }
 
     /**
      * 删除配置及任务
-     * @param config 配置信息
+     * @param tasks 配置信息
      */
     @Override
-    public void deleteTaskConfig(Tasks config){
-        joinTemplate.joinQuery(config);
-        Pipeline pipeline = config.getPipeline();
+    public void deleteTaskConfig(Tasks tasks){
+        joinTemplate.joinQuery(tasks);
+        Pipeline pipeline = tasks.getPipeline();
         int type = pipeline.getType();
-        String configId = config.getConfigId();
+        String taskId = tasks.getTaskId();
         if (type == 1){
-           tasksService.deleteTasksTask(configId);
+           tasksService.deleteTasksOrTask(taskId);
         }
         if (type == 2){
-            stagesServer.deleteStagesTask(configId);
+            stagesServer.deleteStagesOrTask(taskId);
         }
     }
 
@@ -139,10 +135,10 @@ public class TasksServiceImpl implements TasksService {
     @Override
     public void deleteAllTaskConfig(String pipelineId,int pipelineType){
         if (pipelineType == 1){
-            tasksService.deleteAllTasksTask(pipelineId);
+            tasksService.deleteAllTasksOrTask(pipelineId,pipelineType);
         }
         if (pipelineType == 2){
-            stagesServer.deleteAllStagesTask(pipelineId);
+            stagesServer.deleteAllStagesOrTask(pipelineId);
         }
         triggerServer.deleteAllConfig(pipelineId);
     }
@@ -176,10 +172,10 @@ public class TasksServiceImpl implements TasksService {
         Pipeline pipeline = tasks.getPipeline();
         int type = pipeline.getType();
         if (type == 1){
-          return  tasksService.validAllConfig(pipelineId);
+          return  tasksService.validTasksMustField(pipelineId,type);
         }
         if (type == 2){
-            return  stagesServer.validAllConfig(pipelineId);
+            return  stagesServer.validStagesMustField(pipelineId);
         }
         return null;
     }
@@ -208,10 +204,10 @@ public class TasksServiceImpl implements TasksService {
             config.setTaskType(ints[i]);
             config.setTaskSort(i+1);
             if (type == 1){
-                tasksService.createTasksTask(config);
+                tasksService.createTasksOrTask(config);
             }
             if (type == 2){
-                stagesServer.createStagesTask(config);
+                stagesServer.createStagesOrTask(config);
             }
         }
     }

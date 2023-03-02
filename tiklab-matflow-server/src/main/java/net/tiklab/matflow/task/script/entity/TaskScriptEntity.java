@@ -8,9 +8,11 @@ public class TaskScriptEntity {
 
     //id
     @Id
-    @GeneratorValue
-    @Column(name = "script_id")
-    private String scriptId;
+    @Column(name = "task_id" ,notNull = true)
+    private String taskId;
+
+    @Column(name = "task_name" ,notNull = true)
+    private String taskName;
 
     @Column(name = "name")
     private String name;
@@ -21,16 +23,20 @@ public class TaskScriptEntity {
     @Column(name = "script_order")
     private String scriptOrder;
 
-    @Column(name = "config_id")
-    private String configId;
-
-
-    public String getScriptId() {
-        return scriptId;
+    public String getTaskId() {
+        return taskId;
     }
 
-    public void setScriptId(String scriptId) {
-        this.scriptId = scriptId;
+    public void setTaskId(String taskId) {
+        this.taskId = taskId;
+    }
+
+    public String getTaskName() {
+        return taskName;
+    }
+
+    public void setTaskName(String taskName) {
+        this.taskName = taskName;
     }
 
     public String getName() {
@@ -57,11 +63,4 @@ public class TaskScriptEntity {
         this.scriptOrder = scriptOrder;
     }
 
-    public String getConfigId() {
-        return configId;
-    }
-
-    public void setConfigId(String configId) {
-        this.configId = configId;
-    }
 }

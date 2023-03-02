@@ -36,7 +36,7 @@ public class TaskDeployServiceImpl implements TaskDeployService {
     @Override
     public void deleteDeployConfig(String configId){
         TaskDeploy oneDeployConfig = findOneDeployConfig(configId);
-        deleteDeploy(oneDeployConfig.getDeployId());
+        deleteDeploy(oneDeployConfig.getTaskId());
     }
 
     /**
@@ -51,8 +51,8 @@ public class TaskDeployServiceImpl implements TaskDeployService {
             return null;
         }
         for (TaskDeploy taskDeploy : allDeploy) {
-            if (taskDeploy.getConfigId().equals(configId)){
-                return findOneDeploy(taskDeploy.getDeployId());
+            if (taskDeploy.getTaskId().equals(configId)){
+                return findOneDeploy(taskDeploy.getTaskId());
             }
         }
         return null;
@@ -92,7 +92,7 @@ public class TaskDeployServiceImpl implements TaskDeployService {
     @Override
     public void updateDeploy(TaskDeploy taskDeploy) {
         int authType = taskDeploy.getAuthType();
-        String deployId = taskDeploy.getDeployId();
+        String deployId = taskDeploy.getTaskId();
 
         if (authType == 0){
             TaskDeploy oneDeploy = findOneDeploy(deployId);

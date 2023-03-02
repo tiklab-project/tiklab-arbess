@@ -2,10 +2,9 @@ package net.tiklab.matflow.task.test.service;
 
 import net.tiklab.core.exception.ApplicationException;
 import net.tiklab.matflow.pipeline.definition.model.Pipeline;
-import net.tiklab.matflow.pipeline.definition.service.StagesTaskService;
-import net.tiklab.matflow.pipeline.definition.service.PipelineTasksService;
+import net.tiklab.matflow.task.task.service.PipelineTasksService;
 import net.tiklab.matflow.pipeline.execute.model.PipelineProcess;
-import net.tiklab.matflow.pipeline.instance.service.PipelineExecLogService;
+import net.tiklab.matflow.pipeline.execute.service.PipelineExecLogService;
 import net.tiklab.matflow.support.util.PipelineUtil;
 import net.tiklab.matflow.task.test.model.TaskTest;
 import net.tiklab.rpc.annotation.Exporter;
@@ -28,27 +27,24 @@ public class TaskTestExecServiceImpl implements TaskTestExecService {
 
     @Autowired
     PipelineTasksService tasksService;
-
-    @Autowired
-    StagesTaskService stagesTaskServer;
     
     // 单元测试
     public boolean test(PipelineProcess pipelineProcess, String configId ,int taskType) {
         Pipeline pipeline = pipelineProcess.getPipeline();
-        Object o;
+        Object o = null;
         if (pipeline.getType() == 1){
             o = tasksService.findOneTasksTask(configId);
         }else {
-            o = stagesTaskServer.findOneStagesTasksTask(configId);
+            // o = stagesTaskServer.findOneStagesTasksTask(configId);
         }
         TaskTest taskTest = (TaskTest) o;
-        Boolean variableCond = commonService.variableCond(pipeline.getId(), configId);
-        String name = taskTest.getName();
+        Boolean variableCond = commonService.variableCondition(pipeline.getId(), configId);
+        // String name = taskTest.getName();
         if (!variableCond){
-            commonService.updateExecLog(pipelineProcess, PipelineUtil.date(4)+"任务："+ name+"执行条件不满足,跳过执行。");
+            // commonService.writeExecLog(pipelineProcess, PipelineUtil.date(4)+"任务："+ name+"执行条件不满足,跳过执行。");
             return true;
         }
-        commonService.updateExecLog(pipelineProcess, PipelineUtil.date(4)+"执行任务："+name);
+        // commonService.writeExecLog(pipelineProcess, PipelineUtil.date(4)+"执行任务："+name);
 
         taskTest.setType(taskType);
 
@@ -60,18 +56,18 @@ public class TaskTestExecServiceImpl implements TaskTestExecService {
 
             List<String> list = PipelineUtil.execOrder(testOrder);
             for (String s : list) {
-                String key = commonService.variableKey(pipeline.getId(), configId, s);
-                commonService.updateExecLog(pipelineProcess, PipelineUtil.date(4)+"执行："+ key );
+                String key = commonService.replaceVariable(pipeline.getId(), configId, s);
+                commonService.writeExecLog(pipelineProcess, PipelineUtil.date(4)+"执行："+ key );
                 Process  process = getOrder(taskTest,s,path);
                 pipelineProcess.setError(error(taskTest.getType()));
-                commonService.execState(pipelineProcess,process,name);
+                // commonService.commandExecState(pipelineProcess,process,name);
                 process.destroy();
             }
         } catch (IOException e) {
-            commonService.updateExecLog(pipelineProcess, PipelineUtil.date(4)+"日志打印失败"+e);
+            commonService.writeExecLog(pipelineProcess, PipelineUtil.date(4)+"日志打印失败"+e);
             return false;
         } catch (ApplicationException e) {
-            commonService.updateExecLog(pipelineProcess,e.getMessage());
+            commonService.writeExecLog(pipelineProcess,e.getMessage());
             return false;
         }
         return true;

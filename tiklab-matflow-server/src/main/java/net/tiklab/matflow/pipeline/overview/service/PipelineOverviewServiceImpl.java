@@ -1,6 +1,6 @@
 package net.tiklab.matflow.pipeline.overview.service;
 
-import net.tiklab.matflow.pipeline.definition.model.PipelineOverview;
+import net.tiklab.matflow.pipeline.overview.model.PipelineOverview;
 import net.tiklab.matflow.pipeline.instance.model.PipelineInstance;
 import net.tiklab.matflow.pipeline.instance.service.PipelineInstanceService;
 import net.tiklab.matflow.support.util.PipelineUtil;
@@ -8,6 +8,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+
+/**
+ * 流水线统计服务
+ */
 
 @Service
 public class PipelineOverviewServiceImpl implements PipelineOverviewService {
@@ -22,8 +26,8 @@ public class PipelineOverviewServiceImpl implements PipelineOverviewService {
      * @return 统计信息
      */
     @Override
-    public PipelineOverview pipelineCensus(String pipelineId) {
-        List<PipelineInstance> allHistory = historyService.findAllHistory(pipelineId);
+    public PipelineOverview pipelineOverview(String pipelineId) {
+        List<PipelineInstance> allHistory = historyService.findAllInstance(pipelineId);
         if (allHistory == null){
             return null;
         }

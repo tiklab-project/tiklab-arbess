@@ -114,7 +114,7 @@ public class PostprocessTaskServiceImpl implements PostprocessTaskService {
         for (String s : typeList) {
             TaskMessageType messageType = new TaskMessageType();
             messageType.setTaskType(s);
-            messageType.setConfigId(config.getConfigId());
+            messageType.setTaskId(config.getConfigId());
             String messageId = messageTypeServer.createMessage(messageType);
             messageUserServer.createAllMessage(userList,messageId);
         }
@@ -127,7 +127,7 @@ public class PostprocessTaskServiceImpl implements PostprocessTaskService {
         if (script == null){
             script = new TaskScript();
         }
-        script.setConfigId(config.getConfigId());
+        script.setTaskId(config.getConfigId());
         script.setType(config.getTaskType());
         scriptServer.createScript(script);
     }
@@ -154,7 +154,7 @@ public class PostprocessTaskServiceImpl implements PostprocessTaskService {
                 if (oneScript == null){
                     oneScript = new TaskScript();
                 }
-                oneScript.setConfigId(configId);
+                oneScript.setTaskId(configId);
                 oneScript.setType(taskType);
                 oneScript.setSort(taskSort);
                 return oneScript;

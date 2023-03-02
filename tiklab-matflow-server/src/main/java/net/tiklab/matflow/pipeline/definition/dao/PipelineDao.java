@@ -11,7 +11,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 /**
- * pipelineDao
+ * 流水线数据访问
  */
 
 @Repository
@@ -22,7 +22,7 @@ public class PipelineDao {
 
     /**
      * 创建流水线
-     * @param pipelineEntity 流水线信息
+     * @param pipelineEntity 流水线实体
      * @return 流水线id
      */
     public String createPipeline(PipelineEntity pipelineEntity){
@@ -39,12 +39,10 @@ public class PipelineDao {
 
     /**
      * 更新流水线
-     * @param pipelineEntity 更新后流水线信息
+     * @param pipelineEntity 流水线实体
      */
     public void updatePipeline(PipelineEntity pipelineEntity){
-
         jpaTemplate.update(pipelineEntity);
-
     }
 
     /**
@@ -52,7 +50,7 @@ public class PipelineDao {
      * @param id 流水线id
      * @return 流水线信息
      */
-    public PipelineEntity findPipeline(String id){
+    public PipelineEntity findPipelineById(String id){
         return jpaTemplate.findOne(PipelineEntity.class,id);
     }
 
@@ -69,50 +67,57 @@ public class PipelineDao {
         return jpaTemplate.findList(PipelineEntity.class,idList);
     }
 
-    //获取用户拥有的流水线
-    public List<PipelineEntity> findUserPipeline(StringBuilder s){
+    /**
+     * 获取用户拥有的流水线
+     * @param idString 拼装的流水线id
+     * @return 流水线实体集合
+     */
+    public List<PipelineEntity> findUserPipeline(StringBuilder idString){
         String sql = " select p.* from pip_pipeline p";
-        sql = sql.concat(" where p.id in ("+s+")");
+        sql = sql.concat(" where p.id in ("+ idString +")");
         return jpaTemplate.getJdbcTemplate().query(sql, new BeanPropertyRowMapper(PipelineEntity.class));
     }
 
-    //获取所有全局项目
-    public List<PipelineEntity> findUserPipeline(){
+    /**
+     * 查询全局流水线
+     * @return 流水线实体集合
+     */
+    public List<PipelineEntity> findAllPublicPipeline(){
         String sql = " select p.* from pip_pipeline p";
         sql = sql.concat(" where p.power = 1");
         return jpaTemplate.getJdbcTemplate().query(sql, new BeanPropertyRowMapper(PipelineEntity.class));
     }
 
-    //获取用户收藏的流水线
-    public List<PipelineEntity> findPipelineFollow(String userId, StringBuilder s){
+    /**
+     * 获取用户收藏的流水线
+     * @param userId 用户id
+     * @param idString 拼装的流水线id
+     * @return 流水线实体集合
+     */
+    public List<PipelineEntity> findPipelineFollow(String userId, StringBuilder idString){
         String sql = "select p.* from pip_pipeline p ";
         sql = sql.concat(" where p.id  "
-                + " in ("+ s +")"
+                + " in ("+ idString +")"
                 + " and p.id "
-                + " in (select pip_pipeline_other_follow.pipeline_id from pip_pipeline_other_follow"
-                + " where pip_pipeline_other_follow.user_id  =  '"+userId+"'  )");
+                + " in (select pip_other_follow.pipeline_id from pip_other_follow"
+                + " where pip_other_follow.user_id  =  '"+userId+"'  )");
         JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
         return  jdbcTemplate.query(sql, new BeanPropertyRowMapper(PipelineEntity.class));
     }
 
-    //获取用户收藏的流水线
-    public List<PipelineEntity> findAllPipeline(StringBuilder s){
+    /**
+     * 查询用户未收藏的流水线
+     * @param userId 用户id
+     * @param idString 拼装的流水线id
+     * @return 流水线实体集合
+     */
+    public List<PipelineEntity> findPipelineNotFollow(String userId, StringBuilder idString){
         String sql = "select p.* from pip_pipeline p ";
         sql = sql.concat(" where p.id  "
-                + " in ("+ s +")");
-        JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
-        return  jdbcTemplate.query(sql, new BeanPropertyRowMapper(PipelineEntity.class));
-    }
-
-
-    //获取用户未收藏的流水线
-    public List<PipelineEntity> findPipelineNotFollow(String userId, StringBuilder s){
-        String sql = "select p.* from pip_pipeline p ";
-        sql = sql.concat(" where p.id  "
-                + " in ("+ s +")"
+                + " in ("+ idString +")"
                 + " and p.id "
-                + " not in (select pip_pipeline_other_follow.pipeline_id from pip_pipeline_other_follow"
-                + " where pip_pipeline_other_follow.user_id  =  '" + userId + "'  )");
+                + " not in (select pip_other_follow.pipeline_id from pip_other_follow"
+                + " where pip_other_follow.user_id  =  '" + userId + "'  )");
         JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
         return  jdbcTemplate.query(sql, new BeanPropertyRowMapper(PipelineEntity.class));
     }
@@ -122,7 +127,7 @@ public class PipelineDao {
      * @param pipelineName 查询条件
      * @return 流水线集合
      */
-    public List<PipelineEntity> findLikeName(String pipelineName){
+    public List<PipelineEntity> findPipelineByName(String pipelineName){
         QueryCondition queryCondition = QueryBuilders.createQuery(PipelineEntity.class)
                 .like("name", pipelineName).get();
         return jpaTemplate.findList(queryCondition, PipelineEntity.class);

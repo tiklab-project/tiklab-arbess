@@ -1,7 +1,7 @@
 package net.tiklab.matflow.task.task.service;
 
 import net.tiklab.matflow.pipeline.execute.model.PipelineProcess;
-import net.tiklab.matflow.task.artifact.service.TaskProductExecService;
+import net.tiklab.matflow.task.artifact.service.TaskArtifactExecService;
 import net.tiklab.matflow.task.build.service.TaskBuildExecService;
 import net.tiklab.matflow.task.code.service.TaskCodeExecService;
 import net.tiklab.matflow.task.codescan.service.TaskCodeScanExecService;
@@ -33,7 +33,7 @@ public class PipelineTaskExecDispatchServiceImpl implements PipelineTaskExecDisp
     TaskCodeScanExecService codeScan;
 
     @Autowired
-    TaskProductExecService product;
+    TaskArtifactExecService product;
 
     @Autowired
     TaskMessageExecService message;

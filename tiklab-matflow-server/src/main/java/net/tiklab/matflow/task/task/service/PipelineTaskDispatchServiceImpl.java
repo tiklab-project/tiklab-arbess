@@ -3,8 +3,8 @@ package net.tiklab.matflow.task.task.service;
 import com.alibaba.fastjson.JSON;
 import net.tiklab.core.exception.ApplicationException;
 import net.tiklab.matflow.support.util.PipelineUtil;
-import net.tiklab.matflow.task.artifact.model.TaskProduct;
-import net.tiklab.matflow.task.artifact.service.TaskProductService;
+import net.tiklab.matflow.task.artifact.model.TaskArtifact;
+import net.tiklab.matflow.task.artifact.service.TaskArtifactService;
 import net.tiklab.matflow.task.build.model.TaskBuild;
 import net.tiklab.matflow.task.build.service.TaskBuildService;
 import net.tiklab.matflow.task.code.model.TaskCode;
@@ -41,46 +41,48 @@ public class PipelineTaskDispatchServiceImpl implements PipelineTaskDispatchServ
     TaskCodeScanService codeScanService;
 
     @Autowired
-    TaskProductService productServer;
+    TaskArtifactService productServer;
 
-    /**
-     * 创建任务
-     * @param configId 配置id
-     * @return 任务id
-     */
     @Override
-    public String createTaskConfig(String configId,int taskType){
+    public void createDifferentTask(String taskId,int taskType){
+        String taskName = initDifferentTaskName(taskType);
         switch (taskType/10) {
             case 0 -> {
-                TaskCode taskCode = new TaskCode();
-                taskCode.setConfigId(configId);
-                return codeService.createCode(taskCode);
+                TaskCode task = new TaskCode();
+                task.setTaskId(taskId);
+                task.setTaskName(taskName);
+                codeService.createCode(task);
             }
             case 1 -> {
-                TaskTest taskTest = new TaskTest();
-                taskTest.setConfigId(configId);
-                return testService.createTest(taskTest);
+                TaskTest task = new TaskTest();
+                task.setTaskId(taskId);
+                task.setTaskName(taskName);
+                testService.createTest(task);
             }
             case 2 -> {
-                TaskBuild taskBuild = new TaskBuild();
-                taskBuild.setConfigId(configId);
-                return buildService.createBuild(taskBuild);
+                TaskBuild task = new TaskBuild();
+                task.setTaskId(taskId);
+                task.setTaskName(taskName);
+                buildService.createBuild(task);
             }
             case 3 -> {
-                TaskDeploy taskDeploy = new TaskDeploy();
-                taskDeploy.setConfigId(configId);
-                taskDeploy.setAuthType(1);
-                return deployService.createDeploy(taskDeploy);
+                TaskDeploy task = new TaskDeploy();
+                task.setTaskId(taskId);
+                task.setAuthType(1);
+                task.setTaskName(taskName);
+                deployService.createDeploy(task);
             }
             case 4 -> {
-                TaskCodeScan taskCodeScan = new TaskCodeScan();
-                taskCodeScan.setConfigId(configId);
-                return  codeScanService.createCodeScan(taskCodeScan);
+                TaskCodeScan task = new TaskCodeScan();
+                task.setTaskId(taskId);
+                task.setTaskName(taskName);
+                codeScanService.createCodeScan(task);
             }
             case 5 -> {
-                TaskProduct taskProduct = new TaskProduct();
-                taskProduct.setConfigId(configId);
-                return productServer.createProduct(taskProduct);
+                TaskArtifact task = new TaskArtifact();
+                task.setTaskId(taskId);
+                task.setTaskName(taskName);
+                productServer.createProduct(task);
             }
             default -> {
                 throw new ApplicationException("无法更新未知的配置类型。");
@@ -88,118 +90,96 @@ public class PipelineTaskDispatchServiceImpl implements PipelineTaskDispatchServ
         }
     }
 
-    /**
-     * 删除任务
-     * @param configId 配置
-     */
     @Override
-    public void deleteTaskConfig(String configId,int taskType){
+    public void deleteDifferentTask(String taskId,int taskType){
         switch (taskType/10) {
-            case 0 -> {
-                codeService.deleteCodeConfig(configId);
-            }
-            case 1 -> {
-                testService.deleteTestConfig(configId);
-            }
-            case 2 -> {
-                buildService.deleteBuildConfig(configId);
-            }
-            case 3 -> {
-                deployService.deleteDeployConfig(configId);
-            }
-            case 4 -> {
-                codeScanService.deleteCodeScanConfig(configId);
-            }
-            case 5 -> {
-                productServer.deleteProductConfig(configId);
-            }
-            default -> {
-                throw new ApplicationException("无法更新未知的配置类型。");
-            }
+            case 0 -> codeService.deleteCodeConfig(taskId);
+            case 1 -> testService.deleteTestConfig(taskId);
+            case 2 -> buildService.deleteBuildConfig(taskId);
+            case 3 -> deployService.deleteDeployConfig(taskId);
+            case 4 -> codeScanService.deleteCodeScanConfig(taskId);
+            case 5 -> productServer.deleteProductConfig(taskId);
+            default -> throw new ApplicationException("无法更新未知的配置类型。");
         }
 
     }
 
-    /**
-     * 更新任务
-     * @param configId 配置
-     */
     @Override
-    public void updateTaskConfig(String configId,int taskType,Object o){
+    public void updateDifferentTask(String taskId,int taskType,Object o){
         String object = JSON.toJSONString(o);
         switch (taskType/10) {
             case 0 -> {
                 TaskCode taskCode = JSON.parseObject(object, TaskCode.class);
-                TaskCode oneCodeConfig = codeService.findOneCodeConfig(configId);
+                TaskCode oneCodeConfig = codeService.findOneCodeConfig(taskId);
                 String id;
                 if (oneCodeConfig == null){
                     id = codeService.createCode(new TaskCode());
                 }else {
-                    id = oneCodeConfig.getCodeId();
+                    id = oneCodeConfig.getTaskId();
                 }
-                taskCode.setCodeId(id);
+                taskCode.setTaskId(id);
                 taskCode.setType(taskType);
                 codeService.updateCode(taskCode);
             }
             case 1 -> {
                 TaskTest taskTest = JSON.parseObject(object, TaskTest.class);
-                TaskTest oneTestConfig = testService.findOneTestConfig(configId);
+                TaskTest oneTestConfig = testService.findOneTestConfig(taskId);
                 String id;
                 if (oneTestConfig == null){
                     id = testService.createTest(new TaskTest());
                 }else {
-                    id = oneTestConfig.getTestId();
+                    id = oneTestConfig.getTaskId();
                 }
-                taskTest.setTestId(id);
+                taskTest.setTaskId(id);
                 testService.updateTest(taskTest);
             }
             case 2 -> {
                 TaskBuild taskBuild = JSON.parseObject(object, TaskBuild.class);
-                TaskBuild oneBuildConfig = buildService.findOneBuildConfig(configId);
+                TaskBuild oneBuildConfig = buildService.findOneBuildConfig(taskId);
                 String id;
                 if (oneBuildConfig == null){
                     id = buildService.createBuild(new TaskBuild());
                 }else {
-                    id = oneBuildConfig.getBuildId();
+                    id = oneBuildConfig.getTaskId();
                 }
-                taskBuild.setBuildId(id);
+                taskBuild.setTaskId(id);
                 buildService.updateBuild(taskBuild);
             }
             case 3 -> {
                 TaskDeploy taskDeploy = JSON.parseObject(object, TaskDeploy.class);
-                TaskDeploy oneDeployConfig = deployService.findOneDeployConfig(configId);
+                TaskDeploy oneDeployConfig = deployService.findOneDeployConfig(taskId);
                 String id;
                 if (oneDeployConfig == null){
                     id = deployService.createDeploy(new TaskDeploy());
                 }else {
-                    id = oneDeployConfig.getDeployId();
+                    id = oneDeployConfig.getTaskId();
                 }
-                taskDeploy.setDeployId(id);
+                taskDeploy.setTaskId(id);
                 deployService.updateDeploy(taskDeploy);
             }
             case 4 -> {
                 TaskCodeScan taskCodeScan = JSON.parseObject(object, TaskCodeScan.class);
-                TaskCodeScan oneCodeScanConfig = codeScanService.findOneCodeScanConfig(configId);
+                TaskCodeScan oneCodeScanConfig = codeScanService.findOneCodeScanConfig(taskId);
                 String id;
                 if (oneCodeScanConfig == null){
                     id = codeScanService.createCodeScan(new TaskCodeScan());
                 }else {
-                    id = oneCodeScanConfig.getCodeScanId();
+                    id = oneCodeScanConfig.getTaskId();
                 }
-                taskCodeScan.setCodeScanId(id);
+                taskCodeScan.setTaskId(id);
                 codeScanService.updateCodeScan(taskCodeScan);
             }
             case 5 -> {
-                TaskProduct taskProduct = JSON.parseObject(object, TaskProduct.class);
-                TaskProduct oneProductConfig = productServer.findOneProductConfig(configId);
+                TaskArtifact taskArtifact = JSON.parseObject(object, TaskArtifact.class);
+                TaskArtifact oneProductConfig = productServer.findOneProductConfig(taskId);
                 String id;
                 if (oneProductConfig == null){
-                    id = productServer.createProduct(new TaskProduct());
+                    id = productServer.createProduct(new TaskArtifact());
                 }else {
-                    id = oneProductConfig.getProductId();
+                    id = oneProductConfig.getTaskId();
                 }
-                taskProduct.setProductId(id);
-                productServer.updateProduct(taskProduct);
+                taskArtifact.setTaskId(id);
+                productServer.updateProduct(taskArtifact);
             }
             default -> {
                 throw new ApplicationException("无法更新未知的配置类型。");
@@ -207,13 +187,8 @@ public class PipelineTaskDispatchServiceImpl implements PipelineTaskDispatchServ
         }
     }
 
-    /**
-     * 默认任务名称
-     * @param taskType 任务
-     * @return 任务默认名称
-     */
     @Override
-    public String initName(int taskType){
+    public String initDifferentTaskName(int taskType){
         switch (taskType) {
             case 1 -> {
                 return "通用Git";
@@ -269,54 +244,43 @@ public class PipelineTaskDispatchServiceImpl implements PipelineTaskDispatchServ
         }
     }
 
-    /**
-     * 查询任务
-     * @param configId 配置
-     * @return 任务信息
-     */
     @Override
-    public Object findOneTaskConfig(String configId,int taskType,int taskSort,String name){
+    public Object findOneDifferentTask(String configId,int taskType,int taskSort,String name){
         switch (taskType/10) {
             case 0 -> {
                 TaskCode oneCodeConfig = codeService.findOneCodeConfig(configId);
                 oneCodeConfig.setType(taskType);
                 oneCodeConfig.setSort(taskSort);
-                oneCodeConfig.setName(name);
                 return oneCodeConfig;
             }
             case 1 -> {
                 TaskTest oneTestConfig = testService.findOneTestConfig(configId);
                 oneTestConfig.setType(taskType);
                 oneTestConfig.setSort(taskSort);
-                oneTestConfig.setName(name);
                 return oneTestConfig;
             }
             case 2 -> {
                 TaskBuild oneBuildConfig = buildService.findOneBuildConfig(configId);
                 oneBuildConfig.setType(taskType);
                 oneBuildConfig.setSort(taskSort);
-                oneBuildConfig.setName(name);
                 return oneBuildConfig;
             }
             case 3 -> {
                 TaskDeploy oneDeployConfig = deployService.findOneDeployConfig(configId);
                 oneDeployConfig.setType(taskType);
                 oneDeployConfig.setSort(taskSort);
-                oneDeployConfig.setName(name);
                 return oneDeployConfig;
             }
             case 4 -> {
                 TaskCodeScan oneCodeScanConfig = codeScanService.findOneCodeScanConfig(configId);
                 oneCodeScanConfig.setType(taskType);
                 oneCodeScanConfig.setSort(taskSort);
-                oneCodeScanConfig.setName(name);
                 return oneCodeScanConfig;
             }
             case 5 -> {
-                TaskProduct oneProductConfig = productServer.findOneProductConfig(configId);
+                TaskArtifact oneProductConfig = productServer.findOneProductConfig(configId);
                 oneProductConfig.setType(taskType);
                 oneProductConfig.setSort(taskSort);
-                oneProductConfig.setName(name);
                 return oneProductConfig;
             }
             default -> {
@@ -325,12 +289,8 @@ public class PipelineTaskDispatchServiceImpl implements PipelineTaskDispatchServ
         }
     }
 
-    /**
-     * 效验必填字段
-     * @param configId 配置
-     */
     @Override
-    public void validTaskConfig(String configId, int taskType, List<String> list){
+    public void validDifferentTaskMastField(String configId, int taskType, List<String> list){
         switch (taskType / 10) {
             case 0 ->  codeValid(configId, list, taskType);
             case 1 ->  testValid(configId, list, taskType);
@@ -387,7 +347,7 @@ public class PipelineTaskDispatchServiceImpl implements PipelineTaskDispatchServ
     }
 
     public void productValid(String configId,List<String> list,int taskType){
-        TaskProduct product = productServer.findOneProductConfig(configId);
+        TaskArtifact product = productServer.findOneProductConfig(configId);
         if (product == null){
             return;
         }

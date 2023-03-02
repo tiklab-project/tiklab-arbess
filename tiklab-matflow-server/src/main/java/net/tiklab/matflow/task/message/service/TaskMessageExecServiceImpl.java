@@ -4,7 +4,7 @@ import net.tiklab.core.exception.ApplicationException;
 import net.tiklab.matflow.pipeline.definition.model.Pipeline;
 import net.tiklab.matflow.pipeline.instance.model.TaskInstanceLog;
 import net.tiklab.matflow.pipeline.execute.model.PipelineProcess;
-import net.tiklab.matflow.pipeline.instance.service.PipelineExecLogService;
+import net.tiklab.matflow.pipeline.execute.service.PipelineExecLogService;
 import net.tiklab.matflow.pipeline.instance.service.TaskInstanceLogService;
 import net.tiklab.matflow.home.service.PipelineHomeService;
 import net.tiklab.matflow.support.util.PipelineUtil;
@@ -54,7 +54,7 @@ public class TaskMessageExecServiceImpl implements TaskMessageExecService {
      */
     public boolean message(PipelineProcess pipelineProcess, String configId, int taskType, Map<String,String> maps) {
 
-        commonService.updateExecLog(pipelineProcess, PipelineUtil.date(4)+"执行任务：消息通知.....");
+        commonService.writeExecLog(pipelineProcess, PipelineUtil.date(4)+"执行任务：消息通知.....");
 
         String historyId = pipelineProcess.getHistoryId();
         List<TaskInstanceLog> allLog = execLogService.findAllLog(historyId);
@@ -75,7 +75,7 @@ public class TaskMessageExecServiceImpl implements TaskMessageExecService {
         List<TaskUserSendMessageType> userList = configMessage.getUserList();
 
         if (userList == null || userList.size() == 0){
-            commonService.updateExecLog(pipelineProcess, PipelineUtil.date(4)+"任务：消息通知执行完成。");
+            commonService.writeExecLog(pipelineProcess, PipelineUtil.date(4)+"任务：消息通知执行完成。");
             return true;
         }
 
@@ -116,7 +116,7 @@ public class TaskMessageExecServiceImpl implements TaskMessageExecService {
         }
 
         if (list.size() == 0){
-            commonService.updateExecLog(pipelineProcess, PipelineUtil.date(4)+"任务：消息通知执行完成。");
+            commonService.writeExecLog(pipelineProcess, PipelineUtil.date(4)+"任务：消息通知执行完成。");
             return true;
         }
 
@@ -133,10 +133,10 @@ public class TaskMessageExecServiceImpl implements TaskMessageExecService {
             }
         }catch (ApplicationException e){
             String message = e.getMessage();
-            commonService.updateExecLog(pipelineProcess, PipelineUtil.date(4)+message);
+            commonService.writeExecLog(pipelineProcess, PipelineUtil.date(4)+message);
             return false;
         }
-        commonService.updateExecLog(pipelineProcess, PipelineUtil.date(4)+"任务：消息通知执行完成。");
+        commonService.writeExecLog(pipelineProcess, PipelineUtil.date(4)+"任务：消息通知执行完成。");
         return true;
     }
 
@@ -149,41 +149,41 @@ public class TaskMessageExecServiceImpl implements TaskMessageExecService {
 
         switch (type){
             case MES_SENT_SITE ->{
-                commonService.updateExecLog(pipelineProcess, PipelineUtil.date(4)+ "发送消息，类型：站内信");
+                commonService.writeExecLog(pipelineProcess, PipelineUtil.date(4)+ "发送消息，类型：站内信");
                 map.put("sendWay",MES_SENT_SITE);
                 List<String> list = new ArrayList<>();
                 for (TaskUserSendMessageType message : userList) {
                     list.add(message.getUser().getId());
                 }
                 homeService.message(map,list);
-                commonService.updateExecLog(pipelineProcess, PipelineUtil.date(4)+ "站内信发送成功");
+                commonService.writeExecLog(pipelineProcess, PipelineUtil.date(4)+ "站内信发送成功");
             }
             case "sms" ->{
-                commonService.updateExecLog(pipelineProcess, PipelineUtil.date(4)+ "发送消息，类型：短信");
+                commonService.writeExecLog(pipelineProcess, PipelineUtil.date(4)+ "发送消息，类型：短信");
                 homeService.smsMessage(new HashMap<>());
-                commonService.updateExecLog(pipelineProcess, PipelineUtil.date(4)+ "短信发送成功。");
+                commonService.writeExecLog(pipelineProcess, PipelineUtil.date(4)+ "短信发送成功。");
             }
             case "wechat" ->{
-                commonService.updateExecLog(pipelineProcess, PipelineUtil.date(4)+ "发送消息，类型：微信机器人消息");
+                commonService.writeExecLog(pipelineProcess, PipelineUtil.date(4)+ "发送消息，类型：微信机器人消息");
                 map.put("sendWay",MES_SENT_WECHAT);
                 homeService.message(map,new ArrayList<>());
-                commonService.updateExecLog(pipelineProcess, PipelineUtil.date(4)+ "微信机器人消息发送成功");
+                commonService.writeExecLog(pipelineProcess, PipelineUtil.date(4)+ "微信机器人消息发送成功");
             }
             case "mail" ->{
-                commonService.updateExecLog(pipelineProcess, PipelineUtil.date(4)+ "发送消息，类型：邮箱消息");
+                commonService.writeExecLog(pipelineProcess, PipelineUtil.date(4)+ "发送消息，类型：邮箱消息");
                 map.put("sendWay",MES_SENT_EMAIL);
                 List<String> list = new ArrayList<>();
                 for (TaskUserSendMessageType message : userList) {
                     list.add(message.getUser().getEmail());
                 }
                 homeService.message(map,list);
-                commonService.updateExecLog(pipelineProcess, PipelineUtil.date(4)+ "邮箱消息发送成功");
+                commonService.writeExecLog(pipelineProcess, PipelineUtil.date(4)+ "邮箱消息发送成功");
             }
             case MES_SENT_DINGDING ->{
-                commonService.updateExecLog(pipelineProcess, PipelineUtil.date(4)+ "发送消息，类型：钉钉机器人消息");
+                commonService.writeExecLog(pipelineProcess, PipelineUtil.date(4)+ "发送消息，类型：钉钉机器人消息");
                 map.put("sendWay",MES_SENT_DINGDING);
                 homeService.message(map,new ArrayList<>());
-                commonService.updateExecLog(pipelineProcess, PipelineUtil.date(4)+ "钉钉机器人消息成功");
+                commonService.writeExecLog(pipelineProcess, PipelineUtil.date(4)+ "钉钉机器人消息成功");
             }
 
             default -> {

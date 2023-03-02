@@ -11,7 +11,7 @@ import net.tiklab.postin.annotation.ApiProperty;
 
 
 /**
- * 最近收藏记录
+ * 流水线收藏模型
  */
 
 @ApiModel
@@ -22,18 +22,16 @@ public class PipelineFollow {
     @ApiProperty(name="id",desc="日志id")
     private String id;
 
-    @ApiProperty(name="userId",desc="用户",eg="@selectOne")
+    @ApiProperty(name="userId",desc="用户Id",eg="@selectOne")
     private String userId;
 
-    //流水线
-    @ApiProperty(name="pipeline",desc="流水线id",eg="@selectOne")
+    @ApiProperty(name="pipeline",desc="流水线",eg="@selectOne")
     @Mappings({
             @Mapping(source = "pipeline.id",target = "pipelineId")
     })
     @JoinQuery(key = "id")
     private Pipeline pipeline;
 
-    private String pipelineName;
 
     public String getId() {
         return id;
@@ -59,11 +57,6 @@ public class PipelineFollow {
         this.pipeline = pipeline;
     }
 
-    public String getPipelineName() {
-        return pipelineName;
-    }
 
-    public void setPipelineName(String pipelineName) {
-        this.pipelineName = pipelineName;
-    }
+
 }

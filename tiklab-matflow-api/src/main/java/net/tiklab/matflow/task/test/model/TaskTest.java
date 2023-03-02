@@ -11,9 +11,11 @@ import net.tiklab.postin.annotation.ApiProperty;
 @Mapper(targetAlias = "TaskTestEntity")
 public class TaskTest {
 
-    //id
-    @ApiProperty(name="testId",desc="id",required = true)
-    private String testId;
+    @ApiProperty(name = "taskId",desc = "id")
+    private String taskId;
+
+    @ApiProperty(name = "taskName",desc = "名称")
+    private String taskName;
 
     //测试内容
     @ApiProperty(name="testOrder",desc="测试内容",required = true)
@@ -23,40 +25,26 @@ public class TaskTest {
     private String address;
 
 
-    @ApiProperty(name="configId",desc="配置id")
-    private String configId;
-
     //测试类型
     private int type;
 
     //顺序
     private int sort;
 
-    @ApiProperty(name="name",desc="名称")
-    private String name;
-
-    public String getName() {
-        return name;
+    public String getTaskName() {
+        return taskName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setTaskName(String taskName) {
+        this.taskName = taskName;
     }
 
-    public String getConfigId() {
-        return configId;
+    public String getTaskId() {
+        return taskId;
     }
 
-    public void setConfigId(String configId) {
-        this.configId = configId;
-    }
-
-    public String getTestId() {
-        return testId;
-    }
-
-    public void setTestId(String testId) {
-        this.testId = testId;
+    public void setTaskId(String taskId) {
+        this.taskId = taskId;
     }
 
     public int getType() {

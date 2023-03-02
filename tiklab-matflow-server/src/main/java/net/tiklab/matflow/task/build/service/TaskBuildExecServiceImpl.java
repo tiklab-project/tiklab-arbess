@@ -2,10 +2,9 @@ package net.tiklab.matflow.task.build.service;
 
 import net.tiklab.core.exception.ApplicationException;
 import net.tiklab.matflow.pipeline.definition.model.Pipeline;
-import net.tiklab.matflow.pipeline.definition.service.StagesTaskService;
-import net.tiklab.matflow.pipeline.definition.service.PipelineTasksService;
+import net.tiklab.matflow.task.task.service.PipelineTasksService;
 import net.tiklab.matflow.pipeline.execute.model.PipelineProcess;
-import net.tiklab.matflow.pipeline.instance.service.PipelineExecLogService;
+import net.tiklab.matflow.pipeline.execute.service.PipelineExecLogService;
 import net.tiklab.matflow.support.util.PipelineUtil;
 import net.tiklab.matflow.task.build.model.TaskBuild;
 import net.tiklab.rpc.annotation.Exporter;
@@ -32,8 +31,6 @@ public class TaskBuildExecServiceImpl implements TaskBuildExecService {
     @Autowired
     PipelineTasksService tasksService;
 
-    @Autowired
-    StagesTaskService stagesTaskServer;
 
 
     // 构建
@@ -41,23 +38,23 @@ public class TaskBuildExecServiceImpl implements TaskBuildExecService {
 
         Pipeline pipeline = pipelineProcess.getPipeline();
 
-        Object o;
+        Object o = null;
         if (pipeline.getType() == 1){
             o = tasksService.findOneTasksTask(configId);
         }else {
-            o = stagesTaskServer.findOneStagesTasksTask(configId);
+            // o = stagesTaskServer.findOneStagesTasksTask(configId);
         }
 
         TaskBuild taskBuild = (TaskBuild) o;
-        String name = taskBuild.getName();
+        // String name = taskBuild.getName();
 
-        Boolean variableCond = commonService.variableCond(pipeline.getId(), configId);
-        if (!variableCond){
-            commonService.updateExecLog(pipelineProcess, PipelineUtil.date(4)+"任务："+ name+"执行条件不满足,跳过执行。");
-            return true;
-        }
-
-        commonService.updateExecLog(pipelineProcess, PipelineUtil.date(4)+"执行任务："+name);
+        Boolean variableCond = commonService.variableCondition(pipeline.getId(), configId);
+        // if (!variableCond){
+        //     commonService.writeExecLog(pipelineProcess, PipelineUtil.date(4)+"任务："+ name+"执行条件不满足,跳过执行。");
+        //     return true;
+        // }
+        //
+        // commonService.writeExecLog(pipelineProcess, PipelineUtil.date(4)+"执行任务："+name);
 
         taskBuild.setType(taskType);
         String buildAddress = taskBuild.getBuildAddress();
@@ -70,18 +67,18 @@ public class TaskBuildExecServiceImpl implements TaskBuildExecService {
             //执行命令
             List<String> list = PipelineUtil.execOrder(buildOrder);
             for (String s : list) {
-                String key = commonService.variableKey(pipeline.getId(), configId, s);
-                commonService.updateExecLog(pipelineProcess, PipelineUtil.date(4)+"执行命令："+ key);
+                String key = commonService.replaceVariable(pipeline.getId(), configId, s);
+                commonService.writeExecLog(pipelineProcess, PipelineUtil.date(4)+"执行命令："+ key);
                 pipelineProcess.setError(error(type));
                 Process process = getOrder(key,type,buildAddress, path);
-                commonService.execState(pipelineProcess,process,name);
+                // commonService.commandExecState(pipelineProcess,process,name);
             }
         } catch (IOException | ApplicationException e) {
             String s = PipelineUtil.date(4) + e.getMessage();
-            commonService.updateExecLog(pipelineProcess,s);
+            commonService.writeExecLog(pipelineProcess,s);
             return false;
         }
-        commonService.updateExecLog(pipelineProcess, PipelineUtil.date(4)+"任务"+name+"执行完成");
+        // commonService.writeExecLog(pipelineProcess, PipelineUtil.date(4)+"任务"+name+"执行完成");
         return true;
     }
 

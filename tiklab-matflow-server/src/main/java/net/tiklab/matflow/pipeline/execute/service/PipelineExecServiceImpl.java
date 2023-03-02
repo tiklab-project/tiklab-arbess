@@ -1,26 +1,24 @@
 package net.tiklab.matflow.pipeline.execute.service;
 
 import net.tiklab.core.exception.ApplicationException;
-import net.tiklab.core.page.Pagination;
-import net.tiklab.matflow.pipeline.definition.model.*;
-import net.tiklab.matflow.pipeline.instance.model.PipelineAllInstanceQuery;
+import net.tiklab.matflow.home.service.PipelineHomeService;
+import net.tiklab.matflow.pipeline.definition.model.Pipeline;
+import net.tiklab.matflow.pipeline.definition.service.PipelineService;
+import net.tiklab.matflow.pipeline.execute.model.PipelineProcess;
+import net.tiklab.matflow.pipeline.execute.model.TaskRunLog;
 import net.tiklab.matflow.pipeline.instance.model.PipelineInstance;
 import net.tiklab.matflow.pipeline.instance.model.TaskInstanceLog;
-import net.tiklab.matflow.pipeline.instance.model.TaskRunLog;
-import net.tiklab.matflow.pipeline.instance.service.PipelineExecLogService;
 import net.tiklab.matflow.pipeline.instance.service.PipelineInstanceService;
 import net.tiklab.matflow.pipeline.instance.service.TaskInstanceLogService;
+import net.tiklab.matflow.stages.model.PipelineStages;
+import net.tiklab.matflow.stages.service.PipelineStagesService;
 import net.tiklab.matflow.support.postprocess.model.Postprocess;
 import net.tiklab.matflow.support.postprocess.service.PostprocessService;
-import net.tiklab.matflow.pipeline.definition.service.PipelineService;
-import net.tiklab.matflow.pipeline.definition.service.PipelineStagesService;
-import net.tiklab.matflow.pipeline.definition.service.PipelineTasksService;
-import net.tiklab.matflow.home.service.PipelineHomeService;
-import net.tiklab.matflow.pipeline.execute.model.*;
 import net.tiklab.matflow.support.util.PipelineUtil;
+import net.tiklab.matflow.task.task.model.PipelineTasks;
 import net.tiklab.matflow.task.task.service.PipelineTaskExecDispatchService;
+import net.tiklab.matflow.task.task.service.PipelineTasksService;
 import net.tiklab.rpc.annotation.Exporter;
-import net.tiklab.utils.context.LoginContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +37,9 @@ import java.util.concurrent.Future;
 
 import static net.tiklab.matflow.support.util.PipelineFinal.*;
 
+/**
+ * 流水线运行服务
+ */
 @Service
 @Exporter
 public class PipelineExecServiceImpl implements PipelineExecService {
@@ -75,20 +76,20 @@ public class PipelineExecServiceImpl implements PipelineExecService {
     //流水线运行历史(流水线id:历史id)
     public static Map<String,String> historyMap = new HashMap<>();
 
-    //流水线运行历史(日志Id:日志)
+    //流水线运行日志(日志Id:日志)
     public static Map<String, TaskInstanceLog> logMap = new HashMap<>();
 
-    //运行日志时间(日志id:运行时间)
+    //运行任务执行时间(日志id:运行时间)
     public static  Map<String,Integer> runTime = new HashMap<>();
 
-    //流水线运行历史(配置Id:日志Id)
+    //流水线配置(配置Id:日志Id)
     Map<String ,String> configLogMap = new HashMap<>();
 
     //任务线程池
     public static ExecutorService executorService = Executors.newCachedThreadPool();
 
     //时间线程池
-    public static ExecutorService threadPool = Executors.newCachedThreadPool();
+    // public static ExecutorService threadPool = Executors.newCachedThreadPool();
 
     /**
      * 流水线开始运行
@@ -101,7 +102,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         boolean result = true;
 
         // 判断同一任务是否在运行
-        Pipeline pipeline = pipelineService.findOnePipeline(pipelineId);
+        Pipeline pipeline = pipelineService.findPipelineById(pipelineId);
         if (pipeline.getState() == 2) {
             result = false;
         } else {
@@ -120,8 +121,8 @@ public class PipelineExecServiceImpl implements PipelineExecService {
                 pipelineService.updatePipeline(pipeline);
                 logger.info(pipeline.getName()+"开始运行。");
                 Thread.currentThread().setName(pipelineId);
-                PipelineInstance pipelineInstance = commonService.initializeHistory(pipelineId, startWAy);
-                String historyId = pipelineInstance.getHistoryId();
+                PipelineInstance pipelineInstance = historyService.initializeInstance(pipelineId, startWAy);
+                String historyId = pipelineInstance.getInstanceId();
                 historyMap.put(pipelineId, historyId);
                 time(historyId);
                 begin(pipeline, historyId);
@@ -136,17 +137,12 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         return result;
     }
 
-    /**
-     * 查询流水线状态(1.未运行 2.正在运行)
-     * @param pipelineId 流水线Id
-     * @return 结果
-     */
     @Override
     public int findPipelineState(String pipelineId){
         String historyId = historyMap.get(pipelineId);
-        Pipeline pipeline = pipelineService.findOnePipeline(pipelineId);
+        Pipeline pipeline = pipelineService.findPipelineById(pipelineId);
         int state = pipeline.getState();
-
+        //判断内存中改流水线是否正在运行
         if (historyId != null){
             if (state == 1){
                 historyMap.remove(pipelineId);
@@ -165,43 +161,36 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         return 1;
     }
 
-    /**
-     * 查询正在运行的流水线日志信息
-     * @param pipelineId 流水线id
-     * @return 运行状态
-     */
     @Override
     public TaskRunLog findPipelineRunMessage(String pipelineId){
 
         String execHistoryId = historyMap.get(pipelineId);
-
         TaskRunLog execRunLog = new TaskRunLog();
 
         if (execHistoryId == null){
-            PipelineInstance lastHistory = historyService.findLastHistory(pipelineId);
+            PipelineInstance lastHistory = historyService.findLastInstance(pipelineId);
             if (lastHistory == null){
                 return null;
             }
-            String historyId = lastHistory.getHistoryId();
+            String historyId = lastHistory.getInstanceId();
             return historyService.findAll(historyId);
         }
 
-        PipelineInstance history = historyService.findOneHistory(execHistoryId);
-
+        PipelineInstance history = historyService.findOneInstance(execHistoryId);
         execRunLog.setName(String.valueOf(history.getFindNumber()));
-
-        Pipeline pipeline = pipelineService.findOnePipeline(pipelineId);
+        Pipeline pipeline = pipelineService.findPipelineById(pipelineId);
         int type = pipeline.getType();
 
         List<TaskRunLog> list = new ArrayList<>();
-
+        //多任务
         if (type == 1){
-            List<PipelineTasks> allCourseConfig = tasksService.finAllTasks(pipelineId);
+            List<PipelineTasks> allCourseConfig = tasksService.finAllPipOrStageTasks(pipelineId,type);
             for (PipelineTasks tasks : allCourseConfig) {
-                String configId = tasks.getConfigId();
+                String configId = tasks.getTaskId();
                 TaskRunLog runLog = findOneRunLog(configId);
                 list.add(runLog);
             }
+            //后置处理
             List<Postprocess> allPostprocess = postServer.findAllPost(pipelineId);
             if (allPostprocess.size() != 0){
                 for (Postprocess postprocess : allPostprocess) {
@@ -211,45 +200,45 @@ public class PipelineExecServiceImpl implements PipelineExecService {
                 }
             }
 
-            Map<String, Object> timeState = findTimeState(list);
+            Map<String, Object> timeState = findTaskRunState(list);
             execRunLog.setRunLog((String) timeState.get("runLog"));
         }
-
+        //多阶段
         if (type == 2){
-            List<PipelineStages> stagesMainStage = stagesServer.findAllStagesMainStage(pipelineId);
+            List<PipelineStages> stagesMainStage = stagesServer.findAllMainStage(pipelineId);
             //阶段
             for (PipelineStages stages : stagesMainStage) {
-
                 List<TaskRunLog> runLogList = new ArrayList<>();
                 //并行阶段
                 String stagesId = stages.getStagesId();
-                List<PipelineStages> allMainStage = stagesServer.findAllMainStage(stagesId);
+                List<PipelineStages> allMainStage = stagesServer.findOtherStage(stagesId);
                 for (PipelineStages pipelineStages : allMainStage) {
                     String id = pipelineStages.getStagesId();
                     //并行阶段任务
-                    List<StagesTask> allStagesTask = stagesServer.findAllStagesTask(id);
-                    List<TaskRunLog> taskList = new ArrayList<>();
-                    for (StagesTask stagesTask : allStagesTask) {
-                        String configId = stagesTask.getConfigId();
-                        TaskRunLog logs = findOneRunLog(configId);
-                        taskList.add(logs);
-                    }
-                    TaskRunLog taskRunLog = initRunLog(pipelineStages, taskList);
-                    runLogList.add(taskRunLog);
+                    // List<StagesTask> allStagesTask = tasksService.finAllPipOrStageTasks(id,2);
+                    // List<TaskRunLog> taskList = new ArrayList<>();
+                    // for (StagesTask stagesTask : allStagesTask) {
+                    //     String configId = stagesTask.getConfigId();
+                    //     TaskRunLog logs = findOneRunLog(configId);
+                    //     taskList.add(logs);
+                    // }
+                    // TaskRunLog taskRunLog = findStatesRunLog(pipelineStages, taskList);
+                    // runLogList.add(taskRunLog);
                 }
-                TaskRunLog runLog = initRunLog(stages, runLogList);
+                TaskRunLog runLog = findStatesRunLog(stages, runLogList);
                 list.add(runLog);
             }
 
-            //添加消息阶段
+
             List<Postprocess> allPostprocess = postServer.findAllPost(pipelineId);
+            //不存在后置处理
             if (allPostprocess.size() == 0){
                 execRunLog.setAllState(1);
-                execRunLog.setAllTime(runTime.get(history.getHistoryId()));
+                execRunLog.setAllTime(runTime.get(history.getInstanceId()));
                 execRunLog.setRunLogList(list);
                 return execRunLog;
             }
-
+            //后置处理
             List<TaskRunLog> logs = new ArrayList<>();
             for (Postprocess postprocess : allPostprocess) {
                 String configId = postprocess.getConfigId();
@@ -257,35 +246,34 @@ public class PipelineExecServiceImpl implements PipelineExecService {
                 logs.add(taskRunLog);
             }
             PipelineStages stages = new PipelineStages();
-            stages.setName("后置处理");
+            stages.setStagesName("后置处理");
             stages.setStagesId("后置处理");
-            TaskRunLog runLog = initRunLog(stages, logs);
+            TaskRunLog runLog = findStatesRunLog(stages, logs);
 
             list.add(runLog);
         }
 
         execRunLog.setAllState(1);
-        execRunLog.setAllTime(runTime.get(history.getHistoryId()));
+        execRunLog.setAllTime(runTime.get(history.getInstanceId()));
         execRunLog.setRunLogList(list);
 
         return execRunLog;
     }
 
-    /**
-     * 停止流水线运行
-     * @param pipelineId 流水线id
-     */
+
     @Override
     public void killInstance(String pipelineId) {
-        String historyId  = historyMap.get(pipelineId);
 
+        String historyId  = historyMap.get(pipelineId);
+        //（流水线并未运行）更新流水线状态
         if (historyId == null){
-            PipelineInstance lastHistory = historyService.findLastHistory(pipelineId);
+            PipelineInstance lastHistory = historyService.findLatelyInstance(pipelineId);
             lastHistory.setRunStatus(PIPELINE_RUN_HALT);
-            historyService.updateHistory(lastHistory);
+            historyService.updateInstance(lastHistory);
             return;
         }
 
+        //更新日志状态
         List<TaskInstanceLog> allLog = logService.findAllLog(historyId);
         for (TaskInstanceLog execLog : allLog) {
             String logId = execLog.getLogId();
@@ -299,62 +287,14 @@ public class PipelineExecServiceImpl implements PipelineExecService {
     }
 
 
-    /**
-     * 获取正在运行的流水线
-     * @param pipelineHistoryQuery 分页
-     * @return 流水线信息
-     */
-    @Override
-    public Pagination<PipelineInstance> findUserRunPageHistory(PipelineAllInstanceQuery pipelineHistoryQuery){
-        List<Pipeline> userPipeline = pipelineService.findUserPipeline(LoginContext.getLoginId());
-        if (userPipeline.isEmpty()){
-            return null;
-        }
-        pipelineHistoryQuery.setPipelineList(userPipeline);
-        Pagination<PipelineInstance> pageHistory =
-                historyService.findUserAllHistory(pipelineHistoryQuery);
-
-        List<PipelineInstance> dataList = pageHistory.getDataList();
-        if (dataList.isEmpty()){
-            return null;
-        }
-        //判断是否有正在运行的历史
-        int historyStatus = dataList.get(0).getRunStatus();
-        if (historyStatus != 30){
-            return pageHistory;
-        }
-        for (PipelineInstance history : dataList) {
-            String historyId = history.getHistoryId();
-            int status = history.getRunStatus();
-            if (status != 30){
-                continue;
-            }
-            int time = 0;
-            //获取正在运行的历史的时间
-            List<TaskInstanceLog> allLog = logService.findAllLog(historyId);
-            for (TaskInstanceLog log : allLog) {
-                Integer integer = runTime.get(log.getLogId());
-                if (integer != null){
-                    time = time + integer;
-                }
-            }
-            history.setRunTime(time);
-        }
-        pageHistory.setDataList(dataList);
-        return pageHistory;
-    }
-
     //构建开始
     private void begin(Pipeline pipeline,String historyId) {
-
         String pipelineId = pipeline.getId();
 
-        //流程任务
+        //执行流程任务
         boolean courseState = beginCourse(pipeline,historyId);
-
-        //后置任务
+        //执行后置任务
         boolean afterState = beginAfter(pipeline,historyId);
-
         if (courseState && afterState){
             updateStatus(pipelineId,PIPELINE_RUN_SUCCESS);
             return;
@@ -371,26 +311,26 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         initPipelineLog(pipelineId,historyId);
         //多任务
         if (pipelineType == 1 ){
-            List<PipelineTasks> allCourseConfig = tasksService.finAllTasks(pipelineId);
+            List<PipelineTasks> allCourseConfig = tasksService.finAllPipOrStageTasks(pipelineId,pipelineType);
             if (allCourseConfig == null){
                 return true;
             }
             for (PipelineTasks tasks : allCourseConfig) {
-                String configId = tasks.getConfigId();
+                String configId = tasks.getTaskId();
                 PipelineProcess process = initProcess(configId, pipelineId, historyId);
+                //执行任务
+                // boolean b = execTask(process,tasks.getTaskType(),tasks.getName());
 
-                boolean b = execTask(process,tasks.getTaskType(),tasks.getName());
-
-                if (!b){
-                    return false;
-                }
+                // if (!b){
+                //     return false;
+                // }
             }
           return true;
         }
 
         //多阶段
         if (pipelineType == 2){
-            List<PipelineStages> allStagesTask = stagesServer.findAllStagesMainStage(pipelineId);
+            List<PipelineStages> allStagesTask = stagesServer.findAllMainStage(pipelineId);
             if (allStagesTask == null || allStagesTask.size() == 0 ){
                 return true;
             }
@@ -399,25 +339,26 @@ public class PipelineExecServiceImpl implements PipelineExecService {
                 Map<String , Future<Boolean> > map = new HashMap<>();
 
                 //并行阶段
-                List<PipelineStages> stagesList = stagesServer.findAllMainStage(stagesId);
+                List<PipelineStages> stagesList = stagesServer.findOtherStage(stagesId);
                 ExecutorService threadPool = Executors.newCachedThreadPool();
                 for (PipelineStages stage : stagesList) {
                     //放入线程执行
                     try {
                         Future<Boolean> future = threadPool.submit(() -> {
                             Thread.currentThread().setName(stage.getStagesId());
-                            //获取任务，执行
-                            List<StagesTask> stagesTaskList = stagesServer.findAllStagesTask(stage.getStagesId());
-                            for (StagesTask stagesTask : stagesTaskList) {
-                                String configId = stagesTask.getConfigId();
-                                PipelineProcess process = initProcess(configId, pipelineId, historyId);
-                                commonService.updateExecLog(process, PipelineUtil.date(4)+"阶段："+stages.getName());
-                                commonService.updateExecLog(process, PipelineUtil.date(4)+"并行阶段："+stage.getName());
-                                boolean state = execTask(process,stagesTask.getTaskType(),stagesTask.getName());
-                                if (!state){
-                                    return  false;
-                                }
-                            }
+                            // //获取任务，执行
+                            // List<StagesTask> stagesTaskList = stagesServer.findStagesTask(stage.getStagesId());
+                            // for (StagesTask stagesTask : stagesTaskList) {
+                            //     String configId = stagesTask.getConfigId();
+                            //     PipelineProcess process = initProcess(configId, pipelineId, historyId);
+                            //     commonService.writeExecLog(process, PipelineUtil.date(4)+"阶段："+stages.getName());
+                            //     commonService.writeExecLog(process, PipelineUtil.date(4)+"并行阶段："+stage.getName());
+                            //     //执行任务
+                            //     boolean state = execTask(process,stagesTask.getTaskType(),stagesTask.getName());
+                            //     if (!state){
+                            //         return  false;
+                            //     }
+                            // }
                             return true;
                         });
                         map.put(stage.getStagesId(),future);
@@ -453,7 +394,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         for (Postprocess postprocess : allAfterConfig) {
             String configId = postprocess.getConfigId();
             PipelineProcess process =  initProcess(configId,pipelineId,historyId);
-            commonService.updateExecLog(process, PipelineUtil.date(4)+"执行后置任务");
+            commonService.writeExecLog(process, PipelineUtil.date(4)+"执行后置任务");
             boolean b = execTask(process, postprocess.getTaskType(), postprocess.getName());
             if (!b){
                 return false;
@@ -466,7 +407,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
     private boolean execTask(PipelineProcess pipelineProcess,int taskType,String taskName){
 
         String id = pipelineProcess.getPipeline().getId();
-        Pipeline pipeline = pipelineService.findOnePipeline(id);
+        Pipeline pipeline = pipelineService.findPipelineById(id);
 
         pipelineProcess.setPipeline(pipeline);
         String configId = pipelineProcess.getConfigId();
@@ -479,10 +420,10 @@ public class PipelineExecServiceImpl implements PipelineExecService {
 
         //任务存在后置任务并且条件满足
         List<Postprocess> allPostprocess = postServer.findAllPost(configId);
-        Boolean variableCond = commonService.variableCond(pipeline.getId(), configId);
+        Boolean variableCond = commonService.variableCondition(pipeline.getId(), configId);
         if (allPostprocess.size() != 0 && variableCond){
             for (Postprocess postprocess : allPostprocess) {
-                commonService.updateExecLog(pipelineProcess, PipelineUtil.date(4)+"后置任务:"+ postprocess.getName());
+                commonService.writeExecLog(pipelineProcess, PipelineUtil.date(4)+"后置任务:"+ postprocess.getName());
                 String postConfigId = postprocess.getConfigId();
                 Map<String,String> map = new HashMap<>();
                 map.put("task","true");
@@ -492,8 +433,9 @@ public class PipelineExecServiceImpl implements PipelineExecService {
                     map.put("taskMessage","任务"+taskName+"执行失败。");
                 }
                 boolean state = taskExecService.beginCourseState(pipelineProcess, postConfigId, postprocess.getTaskType(),map);
+                //任务执行失败
                 if (!state){
-                    commonService.updateExecLog(pipelineProcess, PipelineUtil.date(4)+"后置任务:"+ postprocess.getName()+"执行失败！");
+                    commonService.writeExecLog(pipelineProcess, PipelineUtil.date(4)+"后置任务:"+ postprocess.getName()+"执行失败！");
                     b = false;
                 }
             }
@@ -510,7 +452,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
     }
 
     //初始化执行任务过程信息
-    private PipelineProcess initProcess( String configId,String pipelineId,String historyId){
+    private PipelineProcess initProcess(String configId,String pipelineId,String historyId){
         PipelineProcess process = new PipelineProcess(pipelineId);
         String logId = configLogMap.get(configId);
         TaskInstanceLog taskInstanceLog = logMap.get(logId);
@@ -525,33 +467,36 @@ public class PipelineExecServiceImpl implements PipelineExecService {
 
     //创建任务对应日志数据
     private void initPipelineLog(String pipelineId,String historyId){
-        Pipeline pipeline = pipelineService.findOnePipeline(pipelineId);
+        Pipeline pipeline = pipelineService.findPipelineById(pipelineId);
         int type = pipeline.getType();
         int sort = 0;
+
+        //多任务
         if (type == 1){
-            List<PipelineTasks> list = tasksService.finAllTasks(pipelineId);
+            List<PipelineTasks> list = tasksService.finAllPipOrStageTasks(pipelineId,type);
             sort = list.size()+1;
             for (PipelineTasks tasks : list) {
                 createPipelineLog(type,tasks,historyId);
             }
         }
-
+        //多阶段
         if (type == 2){
-            List<PipelineStages> stagesMainStage = stagesServer.findAllStagesMainStage(pipelineId);
+            List<PipelineStages> stagesMainStage = stagesServer.findAllMainStage(pipelineId);
             sort = stagesMainStage.size()+1;
             for (PipelineStages stages : stagesMainStage) {
                 String stagesId = stages.getStagesId();
-                List<PipelineStages> mainStage = stagesServer.findAllMainStage(stagesId);
+                List<PipelineStages> mainStage = stagesServer.findOtherStage(stagesId);
                 for (PipelineStages pipelineStages : mainStage) {
                     String id = pipelineStages.getStagesId();
-                    List<StagesTask> allStagesTask = stagesServer.findAllStagesTask(id);
-                    for (StagesTask stagesTask : allStagesTask) {
-                        createPipelineLog(type,stagesTask,historyId);
-                    }
+                    // List<StagesTask> allStagesTask = stagesServer.findStagesTask(id);
+                    // for (StagesTask stagesTask : allStagesTask) {
+                    //     createPipelineLog(type,stagesTask,historyId);
+                    // }
                 }
             }
         }
 
+        //后置处理
         List<Postprocess> allPostprocess = postServer.findAllPost(pipelineId);
         if (allPostprocess == null || allPostprocess.size() == 0){
             return;
@@ -570,9 +515,9 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         String configId = null;
         String name = null;
 
-        PipelineInstance history = historyService.findOneHistory(historyId);
+        PipelineInstance history = historyService.findOneInstance(historyId);
         String id = history.getPipeline().getId();
-
+        //后置任务
         if (type == 0){
             Postprocess postprocess = (Postprocess) o;
             taskSort = postprocess.getTaskSort();
@@ -581,33 +526,38 @@ public class PipelineExecServiceImpl implements PipelineExecService {
             name = postprocess.getName();
         }
 
+        //多任务
         if (type == 1){
             PipelineTasks tasks = (PipelineTasks) o;
             taskSort = tasks.getTaskSort();
             taskType = tasks.getTaskType();
-            configId = tasks.getConfigId();
-            name = tasks.getName();
+            configId = tasks.getTaskId();
+            // name = tasks.getName();
         }
 
+        //多阶段
         if (type == 2){
-            StagesTask stagesTask = (StagesTask) o;
-            taskSort = stagesTask.getTaskSort();
-            taskType = stagesTask.getTaskType();
-            configId = stagesTask.getConfigId();
-            stagesId = stagesTask.getStagesId();
-            name = stagesTask.getName();
+            // StagesTask stagesTask = (StagesTask) o;
+            // taskSort = stagesTask.getTaskSort();
+            // taskType = stagesTask.getTaskType();
+            // configId = stagesTask.getConfigId();
+            // stagesId = stagesTask.getStagesId();
+            // name = stagesTask.getName();
         }
 
+        //添加日志信息
         TaskInstanceLog taskInstanceLog = new TaskInstanceLog();
-        taskInstanceLog.setHistoryId(historyId);
+        taskInstanceLog.setInstanceId(historyId);
         taskInstanceLog.setTaskSort(taskSort);
         taskInstanceLog.setTaskType(taskType);
         taskInstanceLog.setStagesId(stagesId);
         taskInstanceLog.setRunState(3);
         taskInstanceLog.setTaskName(name);
-        String address= PipelineUtil.findFileAddress(id, 2);
         String logId = logService.createLog(taskInstanceLog);
-        String logAddress = PipelineUtil.createFile(address + "/" + historyId + "/" + logId + ".log");
+
+        String address= PipelineUtil.findFileAddress(id, 2);
+        String s = address + "/" + historyId + "/" + logId + ".log";
+        String logAddress = PipelineUtil.createFile(s);
         taskInstanceLog.setLogAddress(logAddress);
         taskInstanceLog.setLogId(logId);
         logService.updateLog(taskInstanceLog);
@@ -615,12 +565,17 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         configLogMap.put(configId,logId);
     }
 
-    //根据任务信息初始化日志
-    public TaskRunLog initRunLog(PipelineStages pipelineStages, List<TaskRunLog> taskList){
+    /**
+     * 获取阶段运行信息
+     * @param pipelineStages 阶段信息
+     * @param taskList 运行日志
+     * @return 运行信息
+     */
+    private TaskRunLog findStatesRunLog(PipelineStages pipelineStages, List<TaskRunLog> taskList){
         TaskRunLog taskRunLog = new TaskRunLog();
-        taskRunLog.setName(pipelineStages.getName());
+        taskRunLog.setName(pipelineStages.getStagesName());
         taskRunLog.setId(pipelineStages.getStagesId());
-        Map<String, Object> timeState = findTimeState(taskList);
+        Map<String, Object> timeState = findTaskRunState(taskList);
         taskRunLog.setRunLog((String) timeState.get("runLog"));
         taskRunLog.setTime((Integer) timeState.get("time"));
         taskRunLog.setState((Integer) timeState.get("state"));
@@ -628,7 +583,11 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         return taskRunLog;
     }
 
-    //根据配置查询日志
+    /**
+     * 根据配置id读取日志信息
+     * @param configId 配置id
+     * @return 日志信息
+     */
     public TaskRunLog findOneRunLog(String configId){
         TaskRunLog runLog = new TaskRunLog();
         String logId = configLogMap.get(configId);
@@ -638,7 +597,9 @@ public class PipelineExecServiceImpl implements PipelineExecService {
             log = logService.findOneLog(logId);
         }
         String s = log.getRunLog();
+        //判断是否存在运行日志
         if (!PipelineUtil.isNoNull(log.getRunLog())){
+            //读取本地文件信息
             String logAddress = log.getLogAddress();
             s = PipelineUtil.readFile(logAddress, 300);
         }
@@ -649,7 +610,6 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         }
         runLog.setName(log.getTaskName());
         runLog.setRunLog(s);
-
         runLog.setState(log.getRunState());
         runLog.setTime(integer);
         runLog.setType(log.getTaskType());
@@ -657,8 +617,12 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         return runLog;
     }
 
-    //查询当前阶段的运行信息
-    public Map<String,Object> findTimeState(List<TaskRunLog> logs){
+    /**
+     * 获取流水线各个任务的运行状态
+     * @param logs 任务日志
+     * @return 运行状态
+     */
+    public Map<String,Object> findTaskRunState(List<TaskRunLog> logs){
         int time = 0;
         int runState = 3;
         int state = 0;
@@ -675,11 +639,9 @@ public class PipelineExecServiceImpl implements PipelineExecService {
             }
             runLog.append(log.getRunLog());
         }
-
         if (runState != 0 ){
             runState = state/logs.size();
         }
-
         map.put("state",runState);
         map.put("time",time);
         map.put("runLog", runLog.toString());
@@ -688,26 +650,25 @@ public class PipelineExecServiceImpl implements PipelineExecService {
 
     //更新运行状态
     private void updateStatus(String pipelineId,int status){
-
         String historyId = historyMap.get(pipelineId);
-
-        Pipeline pipeline = pipelineService.findOnePipeline(pipelineId);
+        Pipeline pipeline = pipelineService.findPipelineById(pipelineId);
+        //更新状态
         commonService.runEnd(pipelineId,status);
-
         int type = pipeline.getType();
 
+        //多阶段停止
         if (type == 2){
-            List<PipelineStages> allStagesMainStage = stagesServer.findAllStagesMainStage(pipelineId);
+            List<PipelineStages> allStagesMainStage = stagesServer.findAllMainStage(pipelineId);
             for (PipelineStages stages : allStagesMainStage) {
                 String stagesId = stages.getStagesId();
-                List<PipelineStages> allMainStage = stagesServer.findAllMainStage(stagesId);
+                List<PipelineStages> allMainStage = stagesServer.findOtherStage(stagesId);
                 for (PipelineStages pipelineStages : allMainStage) {
                     String id = pipelineStages.getStagesId();
-                    List<StagesTask> allStagesTask = stagesServer.findAllStagesTask(id);
-                    for (StagesTask stagesTask : allStagesTask) {
-                        String configId = stagesTask.getConfigId();
-                        stop(configId);
-                    }
+                    // List<StagesTask> allStagesTask = stagesServer.findStagesTask(id);
+                    // for (StagesTask stagesTask : allStagesTask) {
+                    //     String configId = stagesTask.getConfigId();
+                    //     stop(configId);
+                    // }
                 }
             }
         }
@@ -720,7 +681,6 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         pipelineService.updatePipeline(pipeline);
 
         ThreadMXBean bean = ManagementFactory.getThreadMXBean();
-
         int threadCount = bean.getThreadCount();
         logger.info("执行结束，线程池线程数量："+threadCount);
 
@@ -739,13 +699,15 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         if (status == PIPELINE_RUN_HALT){
             maps.put("message","停止执行");
         }
-
         homeService.log(LOG_RUN, LOG_TEM_RUN,maps);
 
         stop(pipelineId);
     }
 
-    //停止线程
+    /**
+     * 停止指定线程
+     * @param threadName 线程名称
+     */
     private void stop(String threadName){
         ThreadGroup currentGroup = Thread.currentThread().getThreadGroup();
         int noThreads = currentGroup.activeCount();
@@ -760,10 +722,13 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         }
     }
 
-    //任务执行时间
+    /**
+     * 任务执行时长
+     * @param logId 日志id
+     */
     private void time(String logId){
         runTime.put(logId,0);
-        threadPool.submit(() -> {
+        executorService.submit(() -> {
             while (true){
                 Thread.currentThread().setName(logId);
                 int integer = runTime.get(logId);

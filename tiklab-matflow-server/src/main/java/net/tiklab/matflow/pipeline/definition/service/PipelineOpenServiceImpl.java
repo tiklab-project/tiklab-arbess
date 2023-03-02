@@ -4,11 +4,12 @@ package net.tiklab.matflow.pipeline.definition.service;
 import net.tiklab.beans.BeanMapper;
 import net.tiklab.join.JoinTemplate;
 import net.tiklab.matflow.pipeline.definition.model.Pipeline;
-import net.tiklab.matflow.pipeline.definition.model.PipelineOverview;
+import net.tiklab.matflow.pipeline.overview.model.PipelineOverview;
 import net.tiklab.matflow.pipeline.definition.dao.PipelineOpenDao;
 import net.tiklab.matflow.pipeline.definition.entity.PipelineOpenEntity;
 import net.tiklab.matflow.pipeline.definition.model.PipelineOpen;
 import net.tiklab.matflow.pipeline.overview.service.PipelineOverviewService;
+import net.tiklab.matflow.support.authority.service.PipelineAuthorityService;
 import net.tiklab.matflow.support.util.PipelineUtil;
 import net.tiklab.rpc.annotation.Exporter;
 import net.tiklab.utils.context.LoginContext;
@@ -28,7 +29,7 @@ public class PipelineOpenServiceImpl implements PipelineOpenService {
     PipelineOpenDao pipelineOpenDao;
 
     @Autowired
-    PipelineService pipelineService;
+    PipelineAuthorityService authorityService;
 
     @Autowired
     PipelineOverviewService overviewService;
@@ -127,9 +128,9 @@ public class PipelineOpenServiceImpl implements PipelineOpenService {
      * @return 最近打开的流水线
      */
     @Override
-    public List<PipelineOpen> findAllOpen(int number) {
-        StringBuilder builder = pipelineService.findUserPipelineId(LoginContext.getLoginId());
-        List<PipelineOpen> allOpen = findAllOpen(builder) ;
+    public List<PipelineOpen> findUserAllOpen(int number) {
+        StringBuilder builder = authorityService.findUserPipelineIdString(LoginContext.getLoginId());
+        List<PipelineOpen> allOpen = findUserAllOpen(builder) ;
         if (allOpen == null){
             return Collections.emptyList() ;
         }
@@ -141,22 +142,19 @@ public class PipelineOpenServiceImpl implements PipelineOpenService {
         //统计信息
         for (PipelineOpen pipelineOpen : pipelineOpens) {
             Pipeline pipeline = pipelineOpen.getPipeline();
-            PipelineOverview pipelineOverview = overviewService.pipelineCensus(pipeline.getId());
+            PipelineOverview pipelineOverview = overviewService.pipelineOverview(pipeline.getId());
             pipelineOpen.setPipelineExecState(pipelineOverview);
         }
         return pipelineOpens;
     }
 
-
-
     //查询流水线最近打开
-    @Override
-    public List<PipelineOpen> findAllOpen(StringBuilder s){
+    private List<PipelineOpen> findUserAllOpen(StringBuilder s){
         String loginId = LoginContext.getLoginId();
         if (s.toString().equals("")){
             return null;
         }
-        List<PipelineOpenEntity> allOpen = pipelineOpenDao.findAllOpen(loginId,s);
+        List<PipelineOpenEntity> allOpen = pipelineOpenDao.findUserAllOpen(loginId,s);
         List<PipelineOpen> list = BeanMapper.mapList(allOpen, PipelineOpen.class);
         joinTemplate.joinQuery(list);
         List<PipelineOpen> openList = new ArrayList<>();

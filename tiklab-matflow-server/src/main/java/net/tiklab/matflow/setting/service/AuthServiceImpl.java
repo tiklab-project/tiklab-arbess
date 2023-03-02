@@ -13,7 +13,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-
+/**
+ * 流水线基本认证服务
+ */
 @Service
 @Exporter
 public class AuthServiceImpl implements AuthService {
@@ -25,37 +27,24 @@ public class AuthServiceImpl implements AuthService {
     @Autowired
     JoinTemplate joinTemplate;
 
-
-    /**
-     * 创建流水线授权
-     * @param auth 流水线授权
-     * @return 流水线授权id
-     */
     public String createAuth(Auth auth) {
         AuthEntity authEntity = BeanMapper.map(auth, AuthEntity.class);
         return authDao.createAuth(authEntity);
     }
 
 
-    /**
-     * 删除流水线授权
-     * @param authId 流水线授权id
-     */
     @Override
     public void deleteAuth(String authId) {
         authDao.deleteAuth(authId);
     }
 
-    /**
-     * 更新授权信息
-     * @param auth 信息
-     */
     @Override
     public void updateAuth(Auth auth) {
         String authId = auth.getAuthId();
         Auth oneAuth = findOneAuth(authId);
         int authPublic = auth.getAuthPublic();
         int oneAuthAuth = oneAuth.getAuthPublic();
+        //判断是否切换类型
         if (authPublic == 2 && oneAuthAuth == 1){
             auth.setUsername("");
             auth.setPassword("");
@@ -67,11 +56,6 @@ public class AuthServiceImpl implements AuthService {
         authDao.updateAuth(authEntity);
     }
 
-    /**
-     * 查询授权信息
-     * @param authId id
-     * @return 信息集合
-     */
     @Override
     public Auth findOneAuth(String authId) {
         AuthEntity oneAuth = authDao.findOneAuth(authId);
@@ -80,10 +64,6 @@ public class AuthServiceImpl implements AuthService {
         return auth;
     }
 
-    /**
-     * 查询所有流水线授权
-     * @return 流水线授权列表
-     */
     @Override
     public List<Auth> findAllAuth() {
         List<AuthEntity> allAuth = authDao.findAllAuth();
@@ -94,7 +74,8 @@ public class AuthServiceImpl implements AuthService {
         List<AuthEntity> allAuthEntity = new ArrayList<>();
         String loginId = LoginContext.getLoginId();
         for (AuthEntity authEntity : allAuth) {
-            if (authEntity.getUserId().equals(loginId) || authEntity.getAuthPublic() == 1){
+            if (authEntity.getUserId().equals(loginId)
+                    || authEntity.getAuthPublic() == 1){
                 allAuthEntity.add(authEntity);
             }
         }

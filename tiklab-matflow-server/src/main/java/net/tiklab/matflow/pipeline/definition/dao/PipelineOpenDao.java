@@ -55,10 +55,10 @@ public class PipelineOpenDao {
         return jpaTemplate.findOne(PipelineOpenEntity.class,openId);
     }
 
-    public List<PipelineOpenEntity> findAllOpen(String userId, StringBuilder s){
-        String sql = "select pip_pipeline_other_open.* from pip_pipeline_other_open ";
-        sql = sql.concat(" where pip_pipeline_other_open.user_id   = '"+userId+"' "
-                + " and pip_pipeline_other_open.pipeline_id   "
+    public List<PipelineOpenEntity> findUserAllOpen(String userId, StringBuilder s){
+        String sql = "select pip_other_open.* from pip_other_open ";
+        sql = sql.concat(" where pip_other_open.user_id   = '"+userId+"' "
+                + " and pip_other_open.pipeline_id   "
                 + " in (" + s +" ) ");
         JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
         return  jdbcTemplate.query(sql, new BeanPropertyRowMapper(PipelineOpenEntity.class));

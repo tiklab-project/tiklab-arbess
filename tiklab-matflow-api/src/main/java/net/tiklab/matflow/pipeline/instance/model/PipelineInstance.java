@@ -14,7 +14,7 @@ import net.tiklab.user.user.model.User;
 import java.util.List;
 
 /**
- * 流水线历史
+ * 流水线实例模型
  */
 
 @ApiModel
@@ -22,59 +22,44 @@ import java.util.List;
 @Mapper(targetAlias = "PipelineInstanceEntity")
 public class PipelineInstance {
 
-    //构建历史id
-    @ApiProperty(name="historyId",desc="构建历史id")
-    private String historyId;
+    @ApiProperty(name="instanceId",desc="构建实例id")
+    private String instanceId;
 
-    //创建时间
     @ApiProperty(name="createTime",desc="创建时间")
     private String createTime;
 
-    //构建方式
-    @ApiProperty(name="runWay",desc="运行方式")
+    @ApiProperty(name="runWay",desc="运行方式(1.手动运行 2.触发器运行)")
     private int runWay;
 
-    //运行日志
-    @ApiProperty(name="runLog",desc="运行日志")
-    private String runLog;
-
-    //执行人
-    @ApiProperty(name="user",desc="认证配置",required = true)
+    @ApiProperty(name="user",desc="用户",required = true)
     @Mappings({
             @Mapping(source = "user.id",target = "userId")
     })
     @JoinQuery(key = "id")
     private User user;
 
-    //运行状态
-    @ApiProperty(name="runStatus",desc="运行状态")
+    @ApiProperty(name="runStatus",desc="运行状态 1.失败 10.成功 20:停止")
     private int runStatus;
 
-    //执行时间
     @ApiProperty(name="runTime",desc="运行时间")
     private int runTime;
 
-   //流水线
     @Mappings({
             @Mapping(source = "pipeline.id",target = "pipelineId")
     })
     @JoinQuery(key = "id")
     private Pipeline pipeline;
 
-    //执行位置
-    @ApiProperty(name="sort",desc="执行过程位置")
+    @ApiProperty(name="sort",desc="顺序")
     private int sort;
 
-    //历史状态
-    @ApiProperty(name="status",desc="执行过程状态")
+    @ApiProperty(name="status",desc="状态 1.失败 10.成功 20:停止")
     private int status;
 
-    //构建次数
     @ApiProperty(name="findNumber",desc="构建次数")
     private int findNumber;
 
-    //运行状态（1.运行完成，0.运行中）
-    @ApiProperty(name="findState",desc="运行状态（1.运行完成，0.运行中）")
+    @ApiProperty(name="findState",desc="运行状态（0.运行完成，1.运行中）")
     private int findState;
 
     public PipelineInstance() {
@@ -99,12 +84,12 @@ public class PipelineInstance {
     //执行时间
     private List<Integer> timeList;
 
-    public String getHistoryId() {
-        return historyId;
+    public String getInstanceId() {
+        return instanceId;
     }
 
-    public void setHistoryId(String historyId) {
-        this.historyId = historyId;
+    public void setInstanceId(String instanceId) {
+        this.instanceId = instanceId;
     }
 
     public List<Integer> getTimeList() {
@@ -137,14 +122,6 @@ public class PipelineInstance {
 
     public void setRunWay(int runWay) {
         this.runWay = runWay;
-    }
-
-    public String getRunLog() {
-        return runLog;
-    }
-
-    public void setRunLog(String runLog) {
-        this.runLog = runLog;
     }
 
     public Pipeline getPipeline() {
