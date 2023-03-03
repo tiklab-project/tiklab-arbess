@@ -2,13 +2,12 @@ package net.tiklab.matflow.task.message.service;
 
 import net.tiklab.core.exception.ApplicationException;
 import net.tiklab.matflow.pipeline.definition.model.Pipeline;
-import net.tiklab.matflow.pipeline.instance.model.TaskInstanceLog;
+import net.tiklab.matflow.task.task.model.TaskInstance;
 import net.tiklab.matflow.pipeline.execute.model.PipelineProcess;
 import net.tiklab.matflow.pipeline.execute.service.PipelineExecLogService;
-import net.tiklab.matflow.pipeline.instance.service.TaskInstanceLogService;
+import net.tiklab.matflow.task.task.service.TaskInstanceService;
 import net.tiklab.matflow.home.service.PipelineHomeService;
 import net.tiklab.matflow.support.util.PipelineUtil;
-import net.tiklab.matflow.task.message.model.TaskMessage;
 import net.tiklab.matflow.task.message.model.TaskUserSendMessageType;
 import net.tiklab.rpc.annotation.Exporter;
 import org.slf4j.Logger;
@@ -43,7 +42,7 @@ public class TaskMessageExecServiceImpl implements TaskMessageExecService {
     TaskMessageTypeService messageTypeServer;
 
     @Autowired
-    TaskInstanceLogService execLogService;
+    TaskInstanceService execLogService;
 
     private static final Logger logger = LoggerFactory.getLogger(TaskMessageExecServiceImpl.class);
 
@@ -57,22 +56,23 @@ public class TaskMessageExecServiceImpl implements TaskMessageExecService {
         commonService.writeExecLog(pipelineProcess, PipelineUtil.date(4)+"执行任务：消息通知.....");
 
         String historyId = pipelineProcess.getHistoryId();
-        List<TaskInstanceLog> allLog = execLogService.findAllLog(historyId);
+        List<TaskInstance> allLog = execLogService.findAllLog(historyId);
 
         //获取项目执行情况
         int i = 10;
-        for (TaskInstanceLog taskInstanceLog : allLog) {
-            int state = taskInstanceLog.getRunState();
+        for (TaskInstance taskInstance : allLog) {
+            int state = taskInstance.getRunState();
             if (state == 1 || state == 20){
                 i = state;
             }
         }
 
-        TaskMessage configMessage = messageTypeServer.findConfigMessage(configId);
+        // TaskMessage configMessage = messageTypeServer.findConfigMessage(configId);
 
         //需要发送消息的人
         List<TaskUserSendMessageType> list = new ArrayList<>();
-        List<TaskUserSendMessageType> userList = configMessage.getUserList();
+        // List<TaskUserSendMessageType> userList = configMessage.getUserList();
+        List<TaskUserSendMessageType> userList = null;
 
         if (userList == null || userList.size() == 0){
             commonService.writeExecLog(pipelineProcess, PipelineUtil.date(4)+"任务：消息通知执行完成。");
@@ -121,7 +121,8 @@ public class TaskMessageExecServiceImpl implements TaskMessageExecService {
         }
 
         //消息发送类型
-        List<String> typeList = configMessage.getTypeList();
+        // List<String> typeList = configMessage.getTypeList();
+        List<String> typeList = null;
 
 
         try {

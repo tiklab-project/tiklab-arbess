@@ -5,7 +5,8 @@
 create table pip_tasks  (
     task_id varchar(255) COMMENT '配置id',
     create_time datetime COMMENT '创建时间',
-    stages_id varchar(255) COMMENT '阶段id',
+    stage_id varchar(255) COMMENT '阶段id',
+    task_name varchar(255) COMMENT '阶段名称',
     pipeline_id varchar(255) COMMENT '流水线id',
     task_type int COMMENT '任务类型',
     task_sort int COMMENT '任务顺序',
@@ -16,14 +17,14 @@ create table pip_tasks  (
 -- 阶段
 -- ----------------------------
 create table pip_stages  (
-    stages_id varchar(255) COMMENT 'id',
+    stage_id varchar(255) COMMENT 'id',
     create_time datetime COMMENT '创建时间',
-    stages_name varchar(255) COMMENT '阶段名称',
+    stage_name varchar(255) COMMENT '阶段名称',
     pipeline_id varchar(255) COMMENT '流水线id',
-    stages_sort int COMMENT '阶段顺序',
-    stage_id varchar(255) COMMENT '主阶段',
+    stage_sort int COMMENT '阶段顺序',
+    parent_id varchar(255) COMMENT '主阶段',
     code varchar(255) COMMENT '是否为源码',
-    PRIMARY KEY (stages_id) USING BTREE
+    PRIMARY KEY (stage_id) USING BTREE
 );
 
 -- ----------------------------

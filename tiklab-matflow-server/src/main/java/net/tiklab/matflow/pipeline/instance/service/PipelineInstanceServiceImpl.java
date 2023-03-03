@@ -6,14 +6,16 @@ import net.tiklab.core.page.PaginationBuilder;
 import net.tiklab.join.JoinTemplate;
 import net.tiklab.matflow.pipeline.definition.model.Pipeline;
 import net.tiklab.matflow.pipeline.execute.service.PipelineExecServiceImpl;
-import net.tiklab.matflow.stages.model.Stages;
-import net.tiklab.matflow.stages.service.StagesService;
+import net.tiklab.matflow.stages.model.Stage;
+import net.tiklab.matflow.stages.service.StageService;
 import net.tiklab.matflow.pipeline.execute.model.TaskRunLog;
 import net.tiklab.matflow.pipeline.instance.dao.PipelineInstanceDao;
 import net.tiklab.matflow.pipeline.instance.entity.PipelineInstanceEntity;
 import net.tiklab.matflow.pipeline.instance.model.*;
 import net.tiklab.matflow.support.authority.service.PipelineAuthorityService;
 import net.tiklab.matflow.support.util.PipelineUtil;
+import net.tiklab.matflow.task.task.model.TaskInstance;
+import net.tiklab.matflow.task.task.service.TaskInstanceService;
 import net.tiklab.rpc.annotation.Exporter;
 import net.tiklab.utils.context.LoginContext;
 import org.slf4j.Logger;
@@ -38,10 +40,10 @@ public class PipelineInstanceServiceImpl implements PipelineInstanceService {
     PipelineAuthorityService authorityService;
 
     @Autowired
-    private TaskInstanceLogService taskInstanceLogService;
+    private TaskInstanceService taskInstanceService;
 
     @Autowired
-    private StagesService stagesServer;
+    private StageService stagesServer;
 
     @Autowired
     private JoinTemplate joinTemplate;
@@ -102,7 +104,7 @@ public class PipelineInstanceServiceImpl implements PipelineInstanceService {
         PipelineInstance instance = findOneInstance(instanceId);
         String id = instance.getPipeline().getId();
         pipelineInstanceDao.deleteInstance(instanceId);
-        taskInstanceLogService.deleteInstanceLog(instanceId);
+        taskInstanceService.deleteInstanceLog(instanceId);
         String fileAddress = PipelineUtil.findFileAddress(id,2);
         //删除对应日志
         PipelineUtil.deleteFile(new File(fileAddress+"/"+instanceId+"/"));
@@ -213,8 +215,8 @@ public class PipelineInstanceServiceImpl implements PipelineInstanceService {
         List<TaskRunLog> runLogList = new ArrayList<>();
 
         if (pipelineType == 1){
-            List<TaskInstanceLog> allLog = taskInstanceLogService.findAllLog(instanceId);
-            for (TaskInstanceLog execLog : allLog) {
+            List<TaskInstance> allLog = taskInstanceService.findAllLog(instanceId);
+            for (TaskInstance execLog : allLog) {
                 TaskRunLog runLog =  initLog(execLog);
                 runLogList.add(runLog);
             }
@@ -224,32 +226,32 @@ public class PipelineInstanceServiceImpl implements PipelineInstanceService {
 
         if (pipelineType == 2){
             //多阶段
-            List<Stages> stagesMainStage = stagesServer.findAllMainStage(pipelineId);
-            for (Stages stages : stagesMainStage) {
+            List<Stage> stageMainStage = stagesServer.findAllMainStage(pipelineId);
+            for (Stage stage : stageMainStage) {
 
-                String stagesId = stages.getStagesId();
+                String stagesId = stage.getStageId();
                 //并行阶段
                 List<TaskRunLog> logList= new ArrayList<>();
-                List<Stages> allMainStage = stagesServer.findOtherStage(stagesId);
-                for (Stages pipelineStages : allMainStage) {
+                List<Stage> allMainStage = stagesServer.findOtherStage(stagesId);
+                for (Stage pipelineStage : allMainStage) {
 
-                    String stagesStagesId = pipelineStages.getStagesId();
+                    String stagesStagesId = pipelineStage.getStageId();
                     //并行阶段任务
-                    List<TaskInstanceLog> allStagesLog = taskInstanceLogService.findAllStagesLog(instanceId, stagesStagesId);
+                    List<TaskInstance> allStagesLog = taskInstanceService.findAllStagesLog(instanceId, stagesStagesId);
                     List<TaskRunLog> logs = new ArrayList<>();
-                    for (TaskInstanceLog log : allStagesLog) {
+                    for (TaskInstance log : allStagesLog) {
                         TaskRunLog runLogs =  initLog(log);
                         logs.add(runLogs);
                     }
-                    TaskRunLog taskRunLog = initRunLog(logs, pipelineStages);
+                    TaskRunLog taskRunLog = initRunLog(logs, pipelineStage);
                     logList.add(taskRunLog);
                 }
-                TaskRunLog runLog = initRunLog(logList, stages);
+                TaskRunLog runLog = initRunLog(logList, stage);
                 runLogList.add(runLog);
             }
 
             //添加消息阶段
-            List<TaskInstanceLog> allLog = taskInstanceLogService.findAllLog(instanceId);
+            List<TaskInstance> allLog = taskInstanceService.findAllLog(instanceId);
             allLog.removeIf(pipelineExecLog -> PipelineUtil.isNoNull(pipelineExecLog.getStagesId()));
             if (allLog.size() == 0){
                 execRunLog.setRunLogList(runLogList);
@@ -257,21 +259,21 @@ public class PipelineInstanceServiceImpl implements PipelineInstanceService {
             }
 
             List<TaskRunLog> logs = new ArrayList<>();
-            for (TaskInstanceLog taskInstanceLog : allLog) {
-                TaskRunLog log =  initLog(taskInstanceLog);
+            for (TaskInstance taskInstance : allLog) {
+                TaskRunLog log =  initLog(taskInstance);
                 logs.add(log);
             }
-            Stages stages = new Stages();
-            stages.setStagesName("后置任务");
-            stages.setStagesId("后置任务");
-            TaskRunLog runLog = initRunLog(logs, stages);
+            Stage stage = new Stage();
+            stage.setStageName("后置任务");
+            stage.setStageId("后置任务");
+            TaskRunLog runLog = initRunLog(logs, stage);
             runLogList.add(runLog);
         }
         execRunLog.setRunLogList(runLogList);
         return execRunLog;
     }
 
-    public TaskRunLog initLog(TaskInstanceLog log){
+    public TaskRunLog initLog(TaskInstance log){
         TaskRunLog runLog = new TaskRunLog();
         runLog.setId(log.getLogId());
         runLog.setState(log.getRunState());
@@ -283,12 +285,12 @@ public class PipelineInstanceServiceImpl implements PipelineInstanceService {
         return runLog;
     }
 
-    public TaskRunLog initRunLog(List<TaskRunLog> logs, Stages stages){
+    public TaskRunLog initRunLog(List<TaskRunLog> logs, Stage stage){
         TaskRunLog taskRunLog = new TaskRunLog();
-        taskRunLog.setName(stages.getStagesName());
+        taskRunLog.setName(stage.getStageName());
         taskRunLog.setRunLogList(logs);
-        taskRunLog.setName(stages.getStagesName());
-        taskRunLog.setId(stages.getStagesId());
+        taskRunLog.setName(stage.getStageName());
+        taskRunLog.setId(stage.getStageId());
         Map<String, Object> timeState = findTimeState(logs);
         taskRunLog.setState((Integer) timeState.get("state"));
         taskRunLog.setTime((Integer) timeState.get("time"));
@@ -384,8 +386,8 @@ public class PipelineInstanceServiceImpl implements PipelineInstanceService {
             }
             int time = 0;
             //获取正在运行的历史的时间
-            List<TaskInstanceLog> allLog = taskInstanceLogService.findAllLog(historyId);
-            for (TaskInstanceLog log : allLog) {
+            List<TaskInstance> allLog = taskInstanceService.findAllLog(historyId);
+            for (TaskInstance log : allLog) {
                 Integer integer = runTime.get(log.getLogId());
                 if (integer != null){
                     time = time + integer;

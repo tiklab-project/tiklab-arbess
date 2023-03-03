@@ -1,50 +1,65 @@
-package net.tiklab.matflow.pipeline.instance.entity;
+package net.tiklab.matflow.task.task.model;
 
-import net.tiklab.dal.jpa.annotation.*;
+
+import net.tiklab.beans.annotation.Mapper;
+import net.tiklab.join.annotation.Join;
+import net.tiklab.postin.annotation.ApiModel;
+import net.tiklab.postin.annotation.ApiProperty;
 
 /**
- * 流水线日志
+ * 任务实例模型
  */
 
-@Entity
-@Table(name="pip_pipeline_instance_log")
-public class TaskInstanceLogEntity {
+@ApiModel
+@Join
+@Mapper(targetAlias = "TaskInstanceEntity")
+public class TaskInstance {
 
-    //日志id
-    @Id
-    @GeneratorValue
-    @Column(name = "log_id")
+    @ApiProperty(name="logId",desc="日志id")
     private String logId;
 
-    @Column(name = "instance_id")
+    @ApiProperty(name = "instanceId",desc = "历史Id")
     private String instanceId;
 
-    //运行类型
-    @Column(name = "task_type")
+    @ApiProperty(name = "taskType",desc = "运行类型")
     private int taskType ;
 
-    @Column(name = "task_sort")
+    @ApiProperty(name = "taskSort",desc = "执行顺序")
     private int taskSort ;
 
-    //运行日志
-    @Column(name = "log_address")
+    @ApiProperty(name = "taskName",desc = "任务名称")
+    private String taskName;
+
+    @ApiProperty(name = "logAddress",desc = "运行日志地址")
     private String logAddress;
 
-    //运行时间
-    @Column(name = "run_time")
+    @ApiProperty(name = "runTime",desc = "运行时间")
     private int runTime;
 
-    //运行状态
-    @Column(name = "run_state")
+    @ApiProperty(name = "runState",desc = "运行状态1.失败 10.成功 20.停止")
     private int runState;
 
-    //阶段id
-    @Column(name = "stages_id")
+    @ApiProperty(name="stageId",desc="阶段id")
     private String stagesId;
 
-    //任务名称
-    @Column(name = "task_name")
-    private String taskName;
+
+    private String runLog;
+
+    public TaskInstance() {
+    }
+
+    public TaskInstance(String instanceId, int taskType, int taskSort) {
+        this.instanceId = instanceId;
+        this.taskType = taskType;
+        this.taskSort = taskSort;
+    }
+
+    public TaskInstance(String instanceId, int taskType, int taskSort, String stagesId) {
+        this.instanceId = instanceId;
+        this.taskType = taskType;
+        this.taskSort = taskSort;
+        this.stagesId = stagesId;
+    }
 
     public String getStagesId() {
         return stagesId;
@@ -116,5 +131,13 @@ public class TaskInstanceLogEntity {
 
     public void setTaskName(String taskName) {
         this.taskName = taskName;
+    }
+
+    public String getRunLog() {
+        return runLog;
+    }
+
+    public void setRunLog(String runLog) {
+        this.runLog = runLog;
     }
 }

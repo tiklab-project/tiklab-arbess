@@ -4,37 +4,35 @@ import net.tiklab.join.annotation.FindAll;
 import net.tiklab.join.annotation.FindList;
 import net.tiklab.join.annotation.FindOne;
 import net.tiklab.join.annotation.JoinProvider;
-import net.tiklab.matflow.task.task.model.TaskFacade;
-import net.tiklab.matflow.stages.model.Stages;
+import net.tiklab.matflow.stages.model.Stage;
 
 import java.util.List;
 
 /**
  * 流水线阶段服务接口
  */
-@JoinProvider(model = Stages.class)
-public interface StagesService {
-
+@JoinProvider(model = Stage.class)
+public interface StageService {
 
     /**
      * 创建阶段及关联任务
-     * @param taskFacade 阶段信息
+     * @param stage 阶段信息
      * @return 阶段id
      */
-    String createStagesOrTask(TaskFacade taskFacade);
+    String createStagesOrTask(Stage stage);
 
     /**
      * 查询所有阶段任务
      * @param pipelineId 流水线id
      * @return 任务
      */
-    List<Stages> findAllStagesOrTask(String pipelineId);
+    List<Stage> findAllStagesOrTask(String pipelineId);
 
     /**
      * 删除阶段及任务
-     * @param configId 配置id
+     * @param taskId 配置id
      */
-    void deleteStagesOrTask(String configId);
+    void deleteStagesOrTask(String taskId);
 
     /**
      *  删除流水线所有阶段
@@ -44,17 +42,16 @@ public interface StagesService {
 
     /**
      * 更新阶段名称
-     * @param stageId 阶段id
-     * @param stageName 名称
+     * @param stage 阶段
      */
-    void updateStageName(String stageId,String stageName);
+    void updateStageName(Stage stage);
 
     /**
      * 获取所有阶段的根节点
      * @param pipelineId 流水线id
      * @return 主分支
      */
-    List<Stages> findAllMainStage(String pipelineId);
+    List<Stage> findAllMainStage(String pipelineId);
 
     /**
      * 获取指定阶段的根节点
@@ -62,20 +59,21 @@ public interface StagesService {
      * @param stages 阶段
      * @return 根节点
      */
-    Stages findMainStages(String pipelineId, int stages);
+    Stage findMainStages(String pipelineId, int stages);
 
     /**
      * 根据根节点查询从节点
      * @param stagesId 根节点id
      * @return 从节点列表
      */
-    List<Stages> findOtherStage(String stagesId);
+    List<Stage> findOtherStage(String stagesId);
 
     /**
      * 更新阶段任务
-     * @param taskFacade 配置
+     * @param taskId 任务id
+     * @param values 更新内容
      */
-    void updateStagesTask(TaskFacade taskFacade);
+    void updateStagesTask( Stage stage);
 
 
     /**
@@ -87,16 +85,16 @@ public interface StagesService {
 
     /**
      * 创建阶段
-     * @param stages 阶段信息
+     * @param stage 阶段信息
      * @return 阶段id
      */
-    String createStages(Stages stages);
+    String createStages(Stage stage);
 
     /**
      * 更新阶段
-     * @param stages 阶段信息
+     * @param stage 阶段信息
      */
-    void updateStages(Stages stages);
+    void updateStages(Stage stage);
 
     /**
      * 删除阶段
@@ -110,17 +108,17 @@ public interface StagesService {
      * @return 阶段信息
      */
     @FindOne
-    Stages findOneStages(String stageId);
+    Stage findOneStages(String stageId);
 
     /**
      * 查询所有阶段
      * @return 阶段信息集合
      */
     @FindAll
-    List<Stages> findAllStages();
+    List<Stage> findAllStages();
 
     @FindList
-    List<Stages> findAllStagesList(List<String> idList);
+    List<Stage> findAllStagesList(List<String> idList);
 
 
 

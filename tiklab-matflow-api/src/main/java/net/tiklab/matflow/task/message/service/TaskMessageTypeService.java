@@ -4,7 +4,6 @@ import net.tiklab.join.annotation.FindAll;
 import net.tiklab.join.annotation.FindList;
 import net.tiklab.join.annotation.FindOne;
 import net.tiklab.join.annotation.JoinProvider;
-import net.tiklab.matflow.task.message.model.TaskMessage;
 import net.tiklab.matflow.task.message.model.TaskMessageType;
 
 import java.util.List;
@@ -17,14 +16,7 @@ public interface TaskMessageTypeService {
      * @param taskMessageType message信息
      * @return messageId
      */
-    String createMessage(TaskMessageType taskMessageType) ;
-
-    /**
-     * 查询消息发送信息
-     * @param configId 配置id
-     * @return 信息
-     */
-    TaskMessage findConfigMessage(String configId);
+    void createMessage(TaskMessageType taskMessageType) ;
 
     /**
      * 删除任务

@@ -4,7 +4,7 @@ import net.tiklab.user.user.model.User;
 
 public class TaskUserSendMessageType {
 
-    //用户id
+    //接收用户
     private User user;
 
     //类型（1.全部 2.仅成功 3.仅失败）

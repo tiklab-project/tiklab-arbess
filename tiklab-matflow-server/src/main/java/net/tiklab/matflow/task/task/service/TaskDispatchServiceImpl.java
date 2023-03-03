@@ -13,6 +13,9 @@ import net.tiklab.matflow.task.codescan.model.TaskCodeScan;
 import net.tiklab.matflow.task.codescan.service.TaskCodeScanService;
 import net.tiklab.matflow.task.deploy.model.TaskDeploy;
 import net.tiklab.matflow.task.deploy.service.TaskDeployService;
+import net.tiklab.matflow.task.message.service.TaskMessageTypeService;
+import net.tiklab.matflow.task.message.service.TaskMessageUserService;
+import net.tiklab.matflow.task.script.service.TaskScriptService;
 import net.tiklab.matflow.task.test.model.TaskTest;
 import net.tiklab.matflow.task.test.service.TaskTestService;
 import net.tiklab.rpc.annotation.Exporter;
@@ -26,25 +29,34 @@ import java.util.List;
 public class TaskDispatchServiceImpl implements TaskDispatchService {
 
     @Autowired
-    TaskCodeService codeService;
+    private TaskCodeService codeService;
 
     @Autowired
-    TaskBuildService buildService;
+    private TaskBuildService buildService;
 
     @Autowired
-    TaskTestService testService;
+    private TaskTestService testService;
 
     @Autowired
-    TaskDeployService deployService;
+    private TaskDeployService deployService;
 
     @Autowired
-    TaskCodeScanService codeScanService;
+    private TaskCodeScanService codeScanService;
 
     @Autowired
-    TaskArtifactService productServer;
+    private TaskArtifactService productServer;
+
+    @Autowired
+    private TaskMessageTypeService messageTypeServer;
+
+    @Autowired
+    private TaskMessageUserService messageUserServer;
+
+    @Autowired
+    private TaskScriptService scriptServer;
 
     @Override
-    public void createDifferentTask(String taskId,int taskType){
+    public void createDifferentTask(String taskId,int taskType,Object values){
         switch (taskType/10) {
             case 0 -> {
                 TaskCode task = new TaskCode();

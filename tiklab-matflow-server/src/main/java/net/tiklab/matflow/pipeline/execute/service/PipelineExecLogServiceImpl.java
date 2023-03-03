@@ -3,9 +3,7 @@ package net.tiklab.matflow.pipeline.execute.service;
 import net.tiklab.core.exception.ApplicationException;
 import net.tiklab.matflow.pipeline.execute.model.PipelineProcess;
 import net.tiklab.matflow.pipeline.instance.model.PipelineInstance;
-import net.tiklab.matflow.pipeline.instance.model.TaskInstanceLog;
 import net.tiklab.matflow.pipeline.instance.service.PipelineInstanceService;
-import net.tiklab.matflow.pipeline.instance.service.TaskInstanceLogService;
 import net.tiklab.matflow.setting.model.Scm;
 import net.tiklab.matflow.setting.service.ScmService;
 import net.tiklab.matflow.support.condition.model.Condition;
@@ -14,6 +12,8 @@ import net.tiklab.matflow.support.util.PipelineFinal;
 import net.tiklab.matflow.support.util.PipelineUtil;
 import net.tiklab.matflow.support.variable.model.Variable;
 import net.tiklab.matflow.support.variable.service.VariableService;
+import net.tiklab.matflow.task.task.model.TaskInstance;
+import net.tiklab.matflow.task.task.service.TaskInstanceService;
 import net.tiklab.rpc.annotation.Exporter;
 import org.apache.commons.lang.text.StrSubstitutor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +42,7 @@ public class PipelineExecLogServiceImpl implements PipelineExecLogService {
     PipelineInstanceService historyService;
 
     @Autowired
-    TaskInstanceLogService logService;
+    TaskInstanceService logService;
 
     @Autowired
     VariableService variableServer;
@@ -53,7 +53,7 @@ public class PipelineExecLogServiceImpl implements PipelineExecLogService {
     //历史
     Map<String,String> historyMap = PipelineExecServiceImpl.historyMap;
 
-    Map<String, TaskInstanceLog> logMap = PipelineExecServiceImpl.logMap;
+    Map<String, TaskInstance> logMap = PipelineExecServiceImpl.logMap;
 
     //运行时间
     Map<String, Integer> runTime = PipelineExecServiceImpl.runTime;
@@ -189,11 +189,11 @@ public class PipelineExecLogServiceImpl implements PipelineExecLogService {
      * @param pipelineId 执行信息
      */
     public void updateLogState(String pipelineId,String logId,int state){
-        TaskInstanceLog taskInstanceLog = logMap.get(logId);
-        if (taskInstanceLog != null){
+        TaskInstance taskInstance = logMap.get(logId);
+        if (taskInstance != null){
             //状态,id
-            taskInstanceLog.setRunState(state);
-            taskInstanceLog.setLogId(logId);
+            taskInstance.setRunState(state);
+            taskInstance.setLogId(logId);
 
             //运行时间
             Integer integer = runTime.get(logId);
@@ -203,14 +203,14 @@ public class PipelineExecLogServiceImpl implements PipelineExecLogService {
             if (integer ==  null){
                 integer = 0;
             }
-            taskInstanceLog.setRunTime(integer);
+            taskInstance.setRunTime(integer);
 
-            String execLog = taskInstanceLog.getRunLog();
+            String execLog = taskInstance.getRunLog();
             if (PipelineUtil.isNoNull(execLog)){
-                String runLog = taskInstanceLog.getLogAddress();
+                String runLog = taskInstance.getLogAddress();
                 PipelineUtil.logWriteFile(execLog,runLog);
             }
-            logService.updateLog(taskInstanceLog);
+            logService.updateLog(taskInstance);
         }
         logMap.remove(logId);
     }
@@ -241,29 +241,29 @@ public class PipelineExecLogServiceImpl implements PipelineExecLogService {
         }
 
         String logId = pipelineProcess.getLogId();
-        TaskInstanceLog taskInstanceLog = logMap.get(logId);
+        TaskInstance taskInstance = logMap.get(logId);
         Integer integer = runTime.get(logId);
         if (integer == null){
             integer = 0;
         }
-        taskInstanceLog.setRunTime(integer);
+        taskInstance.setRunTime(integer);
 
-        String execLog = taskInstanceLog.getRunLog();
+        String execLog = taskInstance.getRunLog();
 
         if (!PipelineUtil.isNoNull(execLog)){
-            taskInstanceLog.setRunLog(log);
+            taskInstance.setRunLog(log);
         }else {
-            taskInstanceLog.setRunLog(execLog +"\n"+ log);
+            taskInstance.setRunLog(execLog +"\n"+ log);
         }
 
         //长度过长写入文件中
-        if (taskInstanceLog.getRunLog().length() > 25000){
-            String runLog = taskInstanceLog.getLogAddress();
+        if (taskInstance.getRunLog().length() > 25000){
+            String runLog = taskInstance.getLogAddress();
             PipelineUtil.logWriteFile(execLog,runLog);
-            taskInstanceLog.setRunLog(null);
+            taskInstance.setRunLog(null);
         }
 
-        logMap.put(logId, taskInstanceLog);
+        logMap.put(logId, taskInstance);
     }
 
 

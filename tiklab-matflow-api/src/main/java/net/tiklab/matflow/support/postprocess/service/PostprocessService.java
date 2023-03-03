@@ -5,6 +5,7 @@ import net.tiklab.join.annotation.FindList;
 import net.tiklab.join.annotation.FindOne;
 import net.tiklab.join.annotation.JoinProvider;
 import net.tiklab.matflow.support.postprocess.model.Postprocess;
+import net.tiklab.matflow.task.task.model.Tasks;
 
 import java.util.List;
 
@@ -22,10 +23,13 @@ public interface PostprocessService {
 
     /**
      * 查询配置
-     * @param taskId 流水线id
-     * @return 配置
+     * @param pipelineId 流水线id
+     * @return 任务配置
      */
-     List<Object> findAllPostTask(String taskId);
+    List<Tasks> findAllPipelinePostTask(String pipelineId);
+
+    List<Tasks> findAllTaskPostTask(String pipelineId);
+
 
     /**
      * 删除

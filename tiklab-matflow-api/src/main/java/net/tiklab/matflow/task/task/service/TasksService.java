@@ -1,6 +1,5 @@
 package net.tiklab.matflow.task.task.service;
 
-import net.tiklab.matflow.task.task.model.TaskFacade;
 import net.tiklab.matflow.task.task.model.Tasks;
 
 import java.util.List;
@@ -10,18 +9,26 @@ import java.util.List;
  */
 public interface TasksService {
 
-    /**
-     * 创建配置及任务
-     * @param taskFacade 配置信息
-     * @return 配置id
-     */
-    String createTasksOrTask(TaskFacade taskFacade);
+
 
     /**
-     * 更新配置及任务
-     * @param taskFacade 配置信息
+     * 创建任务及详情
+     * @param tasks 任务详情
+     * @return 任务id
      */
-    void updateTasksTask(TaskFacade taskFacade);
+    String createTasksOrTask(Tasks tasks);
+
+    /**
+     * 更新任务信息
+     * @param tasks 更新内容
+     */
+    void updateTasksTask(Tasks tasks);
+
+    /**
+     * 更新任务名称
+     * @param tasks 任务id
+     */
+    void updateTaskName(Tasks tasks);
 
     /**
      * 删除配置及任务
@@ -36,18 +43,47 @@ public interface TasksService {
     void deleteAllTasksOrTask(String pipelineId,int pipelineType);
 
     /**
-     * 查询流水线或阶段所有任务
-     * @param id 流水线id或阶段id
-     * @return 配置
+     * 获取流水线任务
+     * @param pipelineId 流水线id
+     * @return 任务列表
      */
-    List<Tasks> finAllPipOrStages(String id, int pipelineType);
+    List<Tasks> finAllPipelineTask(String pipelineId);
 
     /**
-     * 查询流水线或阶段的所有任务
-     * @param id 流水线id或阶段id
-     * @return 任务集合
+     * 获取阶段任务
+     * @param stageId 阶段id
+     * @return 任务列表
      */
-    List<Object> findAllTasksOrTask(String id , int type);
+    List<Tasks> finAllStageTask(String stageId);
+
+    /**
+     * 获取后置任务
+     * @param postId 阶段id
+     * @return 任务列表
+     */
+    Tasks findOnePostTask(String postId);
+
+    /**
+     * 获取后置任务及任务详情
+     * @param postId 阶段id
+     * @return 任务列表
+     */
+    Tasks findOnePostTaskOrTask(String postId);
+
+    /**
+     * 获取流水线任务及任务详情
+     * @param pipelineId 流水线
+     * @return 任务列表
+     */
+    List<Tasks> finAllPipelineTaskOrTask(String pipelineId);
+
+    /**
+     * 获取阶段任务及任务详情
+     * @param stageId 流水线
+     * @return 任务列表
+     */
+    List<Tasks> finAllStageTaskOrTask(String stageId);
+
 
     /**
      * 查询单个任务详情
@@ -58,10 +94,10 @@ public interface TasksService {
 
     /**
      * 效验配置必填字段
-     * @param pipelineId 流水线id
+     * @param id 流水线id或阶段id
      * @return 配置id集合
      */
-    List<String> validTasksMustField(String pipelineId,int type);
+    List<String> validTasksMustField(String id,int type);
 
     /**
      * 查询单个任务

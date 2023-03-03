@@ -25,8 +25,14 @@ public class TasksEntity {
     @Column(name = "pipeline_id",notNull = true)
     private String pipelineId;
 
-    @Column(name = "stages_id",notNull = true)
-    private String stagesId;
+    @Column(name = "stage_id",notNull = true)
+    private String stageId;
+
+    @Column(name = "postprocess_id",notNull = true)
+    private String postprocessId;
+
+    @Column(name = "task_name",notNull = true)
+    private String taskName;
 
     //源码类型
     @Column(name = "task_type",notNull = true)
@@ -36,13 +42,28 @@ public class TasksEntity {
     @Column(name = "task_sort",notNull = true)
     private int taskSort;
 
-
-    public String getStagesId() {
-        return stagesId;
+    public String getTaskName() {
+        return taskName;
     }
 
-    public void setStagesId(String stagesId) {
-        this.stagesId = stagesId;
+    public void setTaskName(String taskName) {
+        this.taskName = taskName;
+    }
+
+    public String getStageId() {
+        return stageId;
+    }
+
+    public void setStageId(String stageId) {
+        this.stageId = stageId;
+    }
+
+    public String getPostprocessId() {
+        return postprocessId;
+    }
+
+    public void setPostprocessId(String postprocessId) {
+        this.postprocessId = postprocessId;
     }
 
     public String getTaskId() {

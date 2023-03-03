@@ -1,10 +1,14 @@
 package net.tiklab.matflow.support.postprocess.service;
 
+import com.alibaba.fastjson.JSON;
 import net.tiklab.beans.BeanMapper;
 import net.tiklab.matflow.support.postprocess.dao.PostprocessDao;
 import net.tiklab.matflow.support.postprocess.entity.PostprocessEntity;
 import net.tiklab.matflow.support.postprocess.model.Postprocess;
 import net.tiklab.matflow.support.util.PipelineUtil;
+import net.tiklab.matflow.task.message.model.TaskMessageType;
+import net.tiklab.matflow.task.task.model.Tasks;
+import net.tiklab.matflow.task.task.service.TasksService;
 import net.tiklab.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,8 +25,9 @@ public class PostprocessServiceImpl implements PostprocessService {
     @Autowired
     private PostprocessDao postprocessDao;
 
+
     @Autowired
-    PostprocessTaskService postTaskServer;
+    private TasksService tasksService;
 
     /**
      * 创建后置配置及任务
@@ -31,36 +36,59 @@ public class PostprocessServiceImpl implements PostprocessService {
      */
     @Override
     public String createPostTask(Postprocess postprocess) {
-        List<Postprocess> allPostprocess = findAllPost(postprocess.getTaskId());
-        postprocess.setTaskSort(1);
-        int taskType = postprocess.getTaskType();
-        if (allPostprocess != null){
-            postprocess.setTaskSort(allPostprocess.size()+1);
-        }
         PostprocessEntity postprocessEntity = BeanMapper.map(postprocess, PostprocessEntity.class);
-        String name = postTaskServer.findConfigName(taskType);
-        postprocessEntity.setName(name);
         postprocessEntity.setCreateTime(PipelineUtil.date(1));
         String postId = postprocessDao.createPost(postprocessEntity);
-        postprocess.setConfigId(postId);
-        postTaskServer.updateConfig(postprocess);
+
+        String object = JSON.toJSONString(postprocess.getValues());
+        TaskMessageType message = JSON.parseObject(object, TaskMessageType.class);
+        Tasks tasks = new Tasks();
+        tasks.setValues(message);
+        tasks.setTaskSort(postprocess.getTaskSort());
+        tasks.setTaskType(postprocess.getTaskType());
+        tasks.setPostprocessId(postId);
+        tasksService.createTasksOrTask(tasks);
         return postId;
     }
 
     /**
-     * 查询配置
-     * @param taskId 流水线id
+     * 查询流水线后置配置
+     * @param pipelineId 流水线id
      * @return 配置
      */
-    public List<Object> findAllPostTask(String taskId){
-        List<Postprocess> allPostprocess = findAllPost(taskId);
-        if (allPostprocess == null){
-            return null;
+    public List<Tasks> findAllPipelinePostTask(String pipelineId){
+        List<Postprocess> allPost = findAllPost();
+
+        if (allPost.isEmpty()){
+           return Collections.emptyList();
         }
-        List<Object> list = new ArrayList<>();
-        for (Postprocess postprocess : allPostprocess) {
-            Object config = postTaskServer.findOneConfig(postprocess);
-            list.add(config);
+        List<Tasks> list = new ArrayList<>();
+        for (Postprocess postprocess : allPost) {
+            String id = postprocess.getPipelineId();
+            if (id == null || !id.equals(pipelineId)){
+                continue;
+            }
+            Tasks tasks = tasksService.findOnePostTaskOrTask(pipelineId);
+            list.add(tasks);
+        }
+        return list;
+    }
+
+    @Override
+    public List<Tasks> findAllTaskPostTask(String pipelineId) {
+        List<Postprocess> allPost = findAllPost();
+
+        if (allPost.isEmpty()){
+            return Collections.emptyList();
+        }
+        List<Tasks> list = new ArrayList<>();
+        for (Postprocess postprocess : allPost) {
+            String id = postprocess.getTaskId();
+            if (id == null || !id.equals(pipelineId)){
+                continue;
+            }
+            Tasks tasks = tasksService.findOnePostTaskOrTask(pipelineId);
+            list.add(tasks);
         }
         return list;
     }
@@ -71,8 +99,9 @@ public class PostprocessServiceImpl implements PostprocessService {
      */
     @Override
     public void deletePostTask(String postId) {
-        Postprocess onePostprocess = findOnePost(postId);
-        postTaskServer.deleteConfig(onePostprocess);
+        Tasks postTask = tasksService.findOnePostTask(postId);
+        String taskId = postTask.getTaskId();
+        tasksService.deleteTasksOrTask(taskId);
         postprocessDao.deletePost(postId);
     }
 
@@ -102,7 +131,7 @@ public class PostprocessServiceImpl implements PostprocessService {
     //更新
     @Override
     public void updatePostTask(Postprocess postprocess) {
-        postTaskServer.updateConfig(postprocess);
+        // postTaskServer.updateConfig(postprocess);
     }
 
     //查询单个

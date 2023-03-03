@@ -1,23 +1,23 @@
-package net.tiklab.matflow.pipeline.instance.service;
+package net.tiklab.matflow.task.task.service;
 
 import net.tiklab.join.annotation.FindAll;
 import net.tiklab.join.annotation.FindList;
 import net.tiklab.join.annotation.JoinProvider;
-import net.tiklab.matflow.pipeline.instance.model.TaskInstanceLog;
+import net.tiklab.matflow.task.task.model.TaskInstance;
 
 import java.util.List;
 /**
  * 任务日志服务接口
  */
-@JoinProvider(model = TaskInstanceLog.class)
-public interface TaskInstanceLogService {
+@JoinProvider(model = TaskInstance.class)
+public interface TaskInstanceService {
 
     /**
      * 创建任务日志
-     * @param taskInstanceLog 日志实体
+     * @param taskInstance 日志实体
      * @return 任务日志id
      */
-     String createLog(TaskInstanceLog taskInstanceLog);
+     String createLog(TaskInstance taskInstance);
 
     /**
      * 根据历史删除日志
@@ -27,39 +27,39 @@ public interface TaskInstanceLogService {
 
     /**
      * 更新日志信息
-     * @param taskInstanceLog 信息
+     * @param taskInstance 信息
      */
-    void updateLog(TaskInstanceLog taskInstanceLog);
+    void updateLog(TaskInstance taskInstance);
 
     /**
      * 查询单个日志
      * @param logId 日志id
      * @return 日志
      */
-    TaskInstanceLog findOneLog(String logId);
+    TaskInstance findOneLog(String logId);
 
     /**
      * 查询日志信息
      * @param instance 历史id
      * @return 信息集合
      */
-    List<TaskInstanceLog> findAllLog(String instance);
+    List<TaskInstance> findAllLog(String instance);
 
     /**
      * 根据阶段查询对应日志
      * @param stagesId 阶段id
      * @return 日志
      */
-    List<TaskInstanceLog> findAllStagesLog(String instance, String stagesId);
+    List<TaskInstance> findAllStagesLog(String instance, String stagesId);
 
     /**
      * 查询所有任务日志
      * @return 任务日志列表
      */
     @FindAll
-     List<TaskInstanceLog> findAllLog();
+     List<TaskInstance> findAllLog();
 
 
     @FindList
-    List<TaskInstanceLog> findAllLogList(List<String> idList);
+    List<TaskInstance> findAllLogList(List<String> idList);
 }

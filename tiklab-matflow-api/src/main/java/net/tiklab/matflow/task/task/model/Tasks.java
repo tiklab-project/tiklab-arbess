@@ -36,8 +36,22 @@ public class Tasks {
     @ApiProperty(name="pipeline",desc="流水线id",eg="@selectOne")
     private String pipelineId;
 
-    @ApiProperty(name="stages",desc="阶段",eg="@selectOne")
-    private String stagesId;
+    @ApiProperty(name="postprocessId",desc="后置处理id",eg="@selectOne")
+    private String postprocessId;;
+
+    @ApiProperty(name="stageId",desc="阶段",eg="@selectOne")
+    private String stageId;
+
+    @ApiProperty(name="task",desc="任务",eg="@selectOne")
+    private Object task;
+
+    public Object getTask() {
+        return task;
+    }
+
+    public void setTask(Object task) {
+        this.task = task;
+    }
 
     public String getTaskName() {
         return taskName;
@@ -48,6 +62,14 @@ public class Tasks {
     }
 
     public Tasks() {
+    }
+
+    public String getPostprocessId() {
+        return postprocessId;
+    }
+
+    public void setPostprocessId(String postprocessId) {
+        this.postprocessId = postprocessId;
     }
 
     public Tasks(String createTime, int taskType) {
@@ -63,12 +85,12 @@ public class Tasks {
         this.pipelineId = pipelineId;
     }
 
-    public String getStagesId() {
-        return stagesId;
+    public String getStageId() {
+        return stageId;
     }
 
-    public void setStagesId(String stagesId) {
-        this.stagesId = stagesId;
+    public void setStageId(String stageId) {
+        this.stageId = stageId;
     }
 
     public Object getValues() {

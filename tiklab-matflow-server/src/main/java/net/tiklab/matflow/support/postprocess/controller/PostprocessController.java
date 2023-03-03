@@ -48,8 +48,8 @@ public class PostprocessController {
     @ApiMethod(name = "findAllConfig",desc = "根据流水线id查询后置配置")
     @ApiParam(name = "taskId",desc = "流水线id",required = true)
     public Result<List<Object>> findAllConfig(@NotNull String taskId) {
-        List<Object> list = postServer.findAllPostTask(taskId);
-        return Result.ok(list);
+        // List<Object> list = postServer.findAllPostTask(taskId);
+        return Result.ok();
     }
 
 

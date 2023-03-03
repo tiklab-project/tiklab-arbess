@@ -12,7 +12,6 @@ import net.tiklab.matflow.pipeline.instance.model.PipelineInstance;
 import net.tiklab.matflow.pipeline.instance.service.PipelineInstanceService;
 import net.tiklab.matflow.support.authority.service.PipelineAuthorityService;
 import net.tiklab.matflow.support.util.PipelineUtil;
-import net.tiklab.matflow.task.task.service.TasksFacadeService;
 import net.tiklab.rpc.annotation.Exporter;
 import net.tiklab.user.user.model.User;
 import org.slf4j.Logger;
@@ -40,9 +39,6 @@ public class PipelineServiceImpl implements PipelineService {
 
     @Autowired
     private PipelineDao pipelineDao;
-
-    @Autowired
-    private TasksFacadeService tasksFacadeService;
 
     @Autowired
     private PipelineInstanceService instanceService;
@@ -73,7 +69,7 @@ public class PipelineServiceImpl implements PipelineService {
         pipeline.setId(pipelineId);
 
         //创建对应流水线模板
-        // tasksFacadeService.createTemplate(pipeline);
+        // taskFacadeService.createTemplate(pipeline);
 
         //流水线关联角色，用户信息
         authorityService.createDmUser(pipelineId,pipeline.getUserList());
@@ -96,7 +92,7 @@ public class PipelineServiceImpl implements PipelineService {
         pipelineDao.deletePipeline(pipelineId); //删除流水线
         authorityService.deleteDmUser(pipelineId); //删除关联用户
         deleteHistory(pipelineId); //删除历史，日志信息
-        tasksFacadeService.deleteAllTaskConfig(pipelineId,pipeline.getType()); //删除配置信息
+        // taskFacadeService.deleteAllTaskConfig(pipelineId,pipeline.getType()); //删除配置信息
 
         //动态与消息
         HashMap<String,Object> map = homeService.initMap(pipeline);

@@ -9,17 +9,17 @@ import java.util.Date;
  * 流水线阶段实体
  */
 @Entity
-@Table(name="pip_stages")
-public class StagesEntity {
+@Table(name="pip_stage")
+public class StageEntity {
 
     @Id
     @GeneratorValue
-    @Column(name = "stages_id",notNull = true)
-    private String stagesId;
+    @Column(name = "stage_id",notNull = true)
+    private String stageId;
 
     //阶段名称
-    @Column(name = "stages_name",notNull = true)
-    private String stagesName;
+    @Column(name = "stage_name",notNull = true)
+    private String stageName;
 
     //创建配置时间
     @Column(name = "create_time",notNull = true)
@@ -30,25 +30,17 @@ public class StagesEntity {
     private String pipelineId;
 
     //主节点
-    @Column(name = "stage_id",notNull = true)
-    private String stageId;
+    @Column(name = "parent_id",notNull = true)
+    private String parentId;
 
     //阶段顺序
-    @Column(name = "stages_sort",notNull = true)
-    private int stagesSort;
+    @Column(name = "stage_sort",notNull = true)
+    private int stageSort;
 
     //是否为源码
     @Column(name = "code",notNull = true)
     private String code;
 
-
-    public String getStagesId() {
-        return stagesId;
-    }
-
-    public void setStagesId(String stagesId) {
-        this.stagesId = stagesId;
-    }
 
     public String getCreateTime() {
         return createTime;
@@ -66,20 +58,28 @@ public class StagesEntity {
         this.pipelineId = pipelineId;
     }
 
-    public String getStagesName() {
-        return stagesName;
+    public String getStageName() {
+        return stageName;
     }
 
-    public void setStagesName(String stagesName) {
-        this.stagesName = stagesName;
+    public void setStageName(String stageName) {
+        this.stageName = stageName;
     }
 
-    public int getStagesSort() {
-        return stagesSort;
+    public String getParentId() {
+        return parentId;
     }
 
-    public void setStagesSort(int stagesSort) {
-        this.stagesSort = stagesSort;
+    public void setParentId(String parentId) {
+        this.parentId = parentId;
+    }
+
+    public int getStageSort() {
+        return stageSort;
+    }
+
+    public void setStageSort(int stageSort) {
+        this.stageSort = stageSort;
     }
 
     public String getCode() {

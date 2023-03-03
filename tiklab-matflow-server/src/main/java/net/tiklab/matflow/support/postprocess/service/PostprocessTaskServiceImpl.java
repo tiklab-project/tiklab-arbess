@@ -3,31 +3,22 @@ package net.tiklab.matflow.support.postprocess.service;
 import com.alibaba.fastjson.JSON;
 import net.tiklab.core.exception.ApplicationException;
 import net.tiklab.matflow.support.postprocess.model.Postprocess;
-import net.tiklab.matflow.task.message.model.TaskMessage;
 import net.tiklab.matflow.task.message.model.TaskMessageType;
 import net.tiklab.matflow.task.script.model.TaskScript;
-import net.tiklab.matflow.task.message.model.TaskUserSendMessageType;
-import net.tiklab.matflow.task.message.service.TaskMessageTypeService;
-import net.tiklab.matflow.task.message.service.TaskMessageUserService;
 import net.tiklab.matflow.task.script.service.TaskScriptService;
+import net.tiklab.matflow.task.task.model.Tasks;
+import net.tiklab.matflow.task.task.service.TasksService;
 import net.tiklab.rpc.annotation.Exporter;
-import net.tiklab.user.user.model.User;
-import net.tiklab.utils.context.LoginContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Service
 @Exporter
 public class PostprocessTaskServiceImpl implements PostprocessTaskService {
 
-    @Autowired
-    private TaskMessageTypeService messageTypeServer;
 
     @Autowired
-    private TaskMessageUserService messageUserServer;
+    private TasksService tasksService;
 
     @Autowired
     private TaskScriptService scriptServer;
@@ -39,14 +30,14 @@ public class PostprocessTaskServiceImpl implements PostprocessTaskService {
     @Override
     public void updateConfig(Postprocess config){
         int taskType = config.getTaskType();
-        String configId = config.getConfigId();
+        String configId = "config.getConfigId()";
         switch (taskType / 10) {
             case 6 -> {
-                TaskMessageType message = messageTypeServer.findMessage(configId);
-                if (message != null){
-                    messageTypeServer.deleteAllMessage(configId);
-                }
-                createMessage(config);
+                // TaskMessageType message = messageTypeServer.findMessage(configId);
+                // if (message != null){
+                //     messageTypeServer.deleteAllMessage(configId);
+                // }
+                // createMessage(config);
             }
             case 7 -> {
                 TaskScript script = scriptServer.findScript(configId);
@@ -84,40 +75,16 @@ public class PostprocessTaskServiceImpl implements PostprocessTaskService {
 
     /**
      * 创建后置任务
-     * @param config 配置信息
+     * @param postprocess 配置信息
      */
-    private void createMessage(Postprocess config){
-        String object = JSON.toJSONString(config.getValues());
-        TaskMessage message = JSON.parseObject(object, TaskMessage.class);
-        List<String> typeList = null;
-        List<TaskUserSendMessageType> userList = null;
-        if (message != null){
-            typeList = message.getTypeList();
-            userList = message.getUserList();
-        }
+    private void createMessage(Postprocess postprocess){
+        String object = JSON.toJSONString(postprocess.getValues());
+        TaskMessageType message = JSON.parseObject(object, TaskMessageType.class);
+        Tasks tasks = new Tasks();
+        tasks.setValues(message);
+        tasks.setTaskSort(postprocess.getTaskSort());
+        tasks.setTaskType(postprocess.getTaskType());
 
-        if (typeList == null){
-            typeList = new ArrayList<>();
-            typeList.add("site");
-        }
-
-        if (userList == null){
-            userList = new ArrayList<>();
-            TaskUserSendMessageType taskUserSendMessageType = new TaskUserSendMessageType();
-            User user = new User();
-            user.setId(LoginContext.getLoginId());
-            taskUserSendMessageType.setUser(user);
-            taskUserSendMessageType.setMessageType(1);
-            userList.add(taskUserSendMessageType);
-        }
-
-        for (String s : typeList) {
-            TaskMessageType messageType = new TaskMessageType();
-            messageType.setTaskType(s);
-            messageType.setTaskId(config.getConfigId());
-            String messageId = messageTypeServer.createMessage(messageType);
-            messageUserServer.createAllMessage(userList,messageId);
-        }
     }
 
     //执行脚本
@@ -127,7 +94,7 @@ public class PostprocessTaskServiceImpl implements PostprocessTaskService {
         if (script == null){
             script = new TaskScript();
         }
-        script.setTaskId(config.getConfigId());
+        // script.setTaskId(config.getConfigId());
         script.setType(config.getTaskType());
         scriptServer.createScript(script);
     }
@@ -140,21 +107,21 @@ public class PostprocessTaskServiceImpl implements PostprocessTaskService {
     @Override
     public Object findOneConfig(Postprocess config){
         int taskType = config.getTaskType();
-        String configId = config.getConfigId();
+        // String configId = config.getConfigId();
         int taskSort = config.getTaskSort();
         switch (taskType / 10) {
             case 6 -> {
-                TaskMessage message = messageTypeServer.findConfigMessage(configId);
-                message.setType(taskType);
-                message.setSort(taskSort);
-                return message;
+                // TaskMessage message = messageTypeServer.findConfigMessage(configId);
+                // message.setType(taskType);
+                // message.setSort(taskSort);
+                // return message;
             }
             case 7 -> {
-                TaskScript oneScript = scriptServer.findScript(configId);
+                TaskScript oneScript = scriptServer.findScript("configId");
                 if (oneScript == null){
                     oneScript = new TaskScript();
                 }
-                oneScript.setTaskId(configId);
+                oneScript.setTaskId("configId");
                 oneScript.setType(taskType);
                 oneScript.setSort(taskSort);
                 return oneScript;
@@ -163,6 +130,7 @@ public class PostprocessTaskServiceImpl implements PostprocessTaskService {
                 throw new ApplicationException(50001,"未知的操作类型taskType："+ taskType);
             }
         }
+        return null;
     }
 
     /**
@@ -171,10 +139,10 @@ public class PostprocessTaskServiceImpl implements PostprocessTaskService {
      */
     public void deleteConfig(Postprocess config){
         int taskType = config.getTaskType();
-        String configId = config.getConfigId();
+        String configId = "config.getConfigId()";
         switch (taskType / 10) {
             case 6 -> {
-                messageTypeServer.deleteAllMessage(configId);
+                // messageTypeServer.deleteAllMessage(configId);
             }
             case 7 -> {
                 scriptServer.deleteOneScript(configId);

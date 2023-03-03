@@ -3,14 +3,14 @@ package net.tiklab.matflow.support.postprocess.entity;
 import net.tiklab.dal.jpa.annotation.*;
 
 @Entity
-@Table(name="pip_pipeline_post")
+@Table(name="pip_postprocess")
 public class PostprocessEntity {
 
     //id
     @Id
     @GeneratorValue
-    @Column(name = "config_id")
-    private String configId;
+    @Column(name = "id")
+    private String id;
 
     @Column(name = "name")
     private String name;
@@ -27,12 +27,23 @@ public class PostprocessEntity {
     @Column(name = "task_id")
     private String taskId;
 
-    public String getConfigId() {
-        return configId;
+    @Column(name = "pipeline_id")
+    private String pipelineId;
+
+    public String getPipelineId() {
+        return pipelineId;
     }
 
-    public void setConfigId(String configId) {
-        this.configId = configId;
+    public void setPipelineId(String pipelineId) {
+        this.pipelineId = pipelineId;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getName() {

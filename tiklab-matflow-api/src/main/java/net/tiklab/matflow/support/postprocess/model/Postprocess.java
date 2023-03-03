@@ -7,11 +7,11 @@ import net.tiklab.postin.annotation.ApiProperty;
 
 @ApiModel
 @Join
-@Mapper(targetAlias = "PostEntity")
+@Mapper(targetAlias = "PostprocessEntity")
 public class Postprocess {
 
-    @ApiProperty(name = "configId",desc="id")
-    private String configId;
+    @ApiProperty(name = "id",desc="id")
+    private String id;
 
     @ApiProperty(name = "name",desc="名称")
     private String name;
@@ -22,22 +22,32 @@ public class Postprocess {
     @ApiProperty(name = "createTime",desc="创建时间")
     private String createTime;
 
-    //流水线
-    @ApiProperty(name="taskId",desc="流水线id")
+    @ApiProperty(name="taskId",desc="任务id")
     private String taskId;
+
+    @ApiProperty(name="pipelineId",desc="流水线id")
+    private String pipelineId;
 
     @ApiProperty(name="taskSort",desc="顺序")
     private int taskSort;
 
-    //更改的数据
+    @ApiProperty(name="values",desc="任务内容")
     private Object values;
 
-    public String getConfigId() {
-        return configId;
+    public String getPipelineId() {
+        return pipelineId;
     }
 
-    public void setConfigId(String configId) {
-        this.configId = configId;
+    public void setPipelineId(String pipelineId) {
+        this.pipelineId = pipelineId;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getName() {

@@ -9,7 +9,7 @@ public interface TaskDispatchService {
      * @param taskId 任务id
      * @param taskType 任务类型
      */
-    void createDifferentTask(String taskId, int taskType);
+    void createDifferentTask(String taskId, int taskType,Object values);
 
     /**
      * 分发删除不同任务

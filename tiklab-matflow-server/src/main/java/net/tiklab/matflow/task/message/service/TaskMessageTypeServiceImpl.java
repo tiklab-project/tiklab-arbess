@@ -3,7 +3,6 @@ package net.tiklab.matflow.task.message.service;
 import net.tiklab.beans.BeanMapper;
 import net.tiklab.matflow.task.message.dao.TaskMessageTypeDao;
 import net.tiklab.matflow.task.message.entity.TaskMessageTypeEntity;
-import net.tiklab.matflow.task.message.model.TaskMessage;
 import net.tiklab.matflow.task.message.model.TaskMessageType;
 import net.tiklab.matflow.task.message.model.TaskUserSendMessageType;
 import net.tiklab.rpc.annotation.Exporter;
@@ -23,11 +22,44 @@ public class TaskMessageTypeServiceImpl implements TaskMessageTypeService {
     @Autowired
     private TaskMessageUserService messageUserServer;
 
+    @Autowired
+    private TaskMessageTypeService messageTypeService;
+
     //创建
     @Override
-    public String createMessage(TaskMessageType taskMessageType) {
-        TaskMessageTypeEntity taskMessageTypeEntity = BeanMapper.map(taskMessageType, TaskMessageTypeEntity.class);
-        return taskMessageTypeDao.createMessage(taskMessageTypeEntity);
+    public void createMessage(TaskMessageType message) {
+
+        List<String> typeList = message.getTypeList() ;
+        List<TaskUserSendMessageType> userList = message.getUserList();
+        // if (message != null){
+        //     typeList = message.getTypeList();
+        //     userList = message.getUserList();
+        // }
+
+        // if (typeList == null){
+        //     typeList = new ArrayList<>();
+        //     typeList.add("site");
+        // }
+
+        // if (userList == null){
+        //     userList = new ArrayList<>();
+        //     TaskUserSendMessageType taskUserSendMessageType = new TaskUserSendMessageType();
+        //     User user = new User();
+        //     user.setId(LoginContext.getLoginId());
+        //     taskUserSendMessageType.setUser(user);
+        //     taskUserSendMessageType.setMessageType(1);
+        //     userList.add(taskUserSendMessageType);
+        // }
+
+        for (String s : typeList) {
+            TaskMessageTypeEntity messageTypeEntity = BeanMapper.map(message, TaskMessageTypeEntity.class);
+            messageTypeEntity.setTaskType(s);
+            String taskId = taskMessageTypeDao.createMessage(messageTypeEntity);
+            messageUserServer.createAllMessage(userList,taskId);
+        }
+
+        // TaskMessageTypeEntity taskMessageTypeEntity = BeanMapper.map(message, TaskMessageTypeEntity.class);
+        // return taskMessageTypeDao.createMessage(taskMessageTypeEntity);
     }
 
     /**
@@ -47,25 +79,6 @@ public class TaskMessageTypeServiceImpl implements TaskMessageTypeService {
             }
         }
         return list;
-    }
-
-    /**
-     * 查询消息发送信息
-     * @param configId 配置id
-     * @return 信息
-     */
-    public TaskMessage findConfigMessage(String configId){
-        List<String> allMessage = findAllMessage(configId);
-        TaskMessage message = new TaskMessage();
-        message.setTypeList(allMessage);
-        TaskMessageType messageType = findMessage(configId);
-        if (messageType != null){
-            String taskId = messageType.getTaskId();
-            List<TaskUserSendMessageType> allUserMessage = messageUserServer.findAllUserMessage(taskId);
-            message.setUserList(allUserMessage);
-        }
-        message.setConfigId(configId);
-        return message;
     }
 
 
