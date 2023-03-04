@@ -3,12 +3,11 @@ package net.tiklab.matflow.support.variable.service;
 import net.tiklab.matflow.support.variable.dao.VariableDao;
 import net.tiklab.matflow.support.util.PipelineUtil;
 import net.tiklab.matflow.support.variable.model.Variable;
+import org.apache.commons.lang.text.StrSubstitutor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class VariableServiceImpl implements VariableService {
@@ -16,42 +15,32 @@ public class VariableServiceImpl implements VariableService {
     @Autowired
     VariableDao variableDao;
 
-    /**
-     * 获取全局以及任务变量
-     * @param pipelineId 流水线id
-     * @param taskId 任务id
-     * @return 变量名称
-     */
-    public List<String> findAllTaskValues(String pipelineId,String taskId){
-        //全局变量
-        // LinkedList<String> list = new LinkedList<>();
-        // Set
+
+    public String replaceVariable(String pipelineId,String taskId,String order){
+        Map<String , String > map = new HashMap<>();
+        //替换全局变量
         List<Variable> allVariable = findAllVariable(pipelineId);
         if (allVariable.size() != 0){
             for (Variable variable : allVariable) {
                 String varKey = variable.getVarKey();
                 String varValue = variable.getVarValue();
-
+                map.put(varKey,varValue);
             }
         }
-        //局部变量
+        //替换局部变量
         List<Variable> variableList = findAllVariable(taskId);
         if (variableList.size() != 0){
             for (Variable variable : variableList) {
                 String varValue = variable.getVarValue();
                 String varKey = variable.getVarKey();
-
+                map.put(varKey,varValue);
             }
         }
 
-    return Collections.emptyList();
+        StrSubstitutor substitutor = new StrSubstitutor(map);
+        return substitutor.replace(order);
     }
 
-    /**
-     * 创建变量
-     * @param variable 变量信息
-     * @return 变量id
-     */
     @Override
     public String createVariable(Variable variable) {
         int taskType = variable.getTaskType();

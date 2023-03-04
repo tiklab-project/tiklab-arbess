@@ -1,16 +1,19 @@
 package net.tiklab.matflow.task.code.service;
 
+import com.alibaba.fastjson.JSON;
 import net.tiklab.core.exception.ApplicationException;
-import net.tiklab.matflow.pipeline.definition.model.Pipeline;
-import net.tiklab.matflow.task.task.service.TasksService;
-import net.tiklab.matflow.pipeline.execute.model.PipelineProcess;
-import net.tiklab.matflow.pipeline.execute.service.PipelineExecLogService;
 import net.tiklab.matflow.setting.model.Auth;
 import net.tiklab.matflow.setting.model.AuthThird;
+import net.tiklab.matflow.setting.model.Scm;
 import net.tiklab.matflow.setting.service.AuthService;
 import net.tiklab.matflow.setting.service.AuthThirdService;
+import net.tiklab.matflow.setting.service.ScmService;
+import net.tiklab.matflow.support.condition.service.ConditionService;
 import net.tiklab.matflow.support.util.PipelineUtil;
+import net.tiklab.matflow.support.variable.service.VariableService;
 import net.tiklab.matflow.task.code.model.TaskCode;
+import net.tiklab.matflow.task.task.model.Tasks;
+import net.tiklab.matflow.task.task.service.TasksInstanceService;
 import net.tiklab.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -31,56 +34,47 @@ import java.util.List;
 public class TaskCodeExecServiceImpl implements TaskCodeExecService {
 
     @Autowired
-    PipelineExecLogService commonService;
+    private TasksInstanceService tasksInstanceService;
 
     @Autowired
-    AuthThirdService authServerServer;
+    private VariableService variableServer;
+
+    @Autowired
+    private ScmService scmService;
+
+    @Autowired
+    private ConditionService conditionService;
 
     @Autowired
     AuthService authServer;
 
     @Autowired
-    TasksService tasksService;
-
+    AuthThirdService thirdService;
 
     // git克隆
-    public boolean clone(PipelineProcess pipelineProcess, String configId ,int taskType){
+    public boolean clone(String pipelineId, Tasks task , int taskType) throws ApplicationException{
 
-        Pipeline pipeline = pipelineProcess.getPipeline();
-
-        Boolean variableCond = commonService.variableCondition(pipeline.getId(), configId);
-
-        Object o = null;
-        if (pipeline.getType() == 1){
-            o = tasksService.findOneTasksTask(configId);
-        }else {
-            // o = stagesTaskServer.findOneStagesTasksTask(configId);
+        String taskId = task.getTaskId();
+        Boolean aBoolean = conditionService.variableCondition(pipelineId, taskId);
+        if (!aBoolean){
+            String s = "任务"+task.getTaskName()+"执行条件不满足，跳过执行\n";
+            tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+s);
+            return true;
         }
-        TaskCode taskCode = (TaskCode) o;
-        // String name = taskCode.getName();
+        
+        String name = task.getTaskName();
 
-        //替换配置中的变量
-        String key = commonService.replaceVariable(pipeline.getId(), configId, taskCode.getCodeAddress());
-        taskCode.setCodeAddress(key);
-        String variableKey = commonService.replaceVariable(pipeline.getId(), configId, taskCode.getCodeBranch());
-        taskCode.setCodeBranch(variableKey);
+        String object = JSON.toJSONString(task.getValues());
+        TaskCode code = JSON.parseObject(object, TaskCode.class);
+        code.setType(taskType);
 
-        // if (!variableCond){
-        //     commonService.writeExecLog(pipelineProcess, PipelineUtil.date(4)+"任务："+ name+"执行条件不满足,跳过执行。");
-        //     return true;
-        // }
-        //
-        // commonService.writeExecLog(pipelineProcess, PipelineUtil.date(4)+"执行任务："+ name);
-
-        taskCode.setType(taskType);
-
-        if (!PipelineUtil.isNoNull(taskCode.getCodeAddress())){
-            commonService.writeExecLog(pipelineProcess, PipelineUtil.date(4)+"代码源地址未配置。");
+        if (!PipelineUtil.isNoNull(code.getCodeAddress())){
+            tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"代码源地址未配置。");
             return false;
         }
 
         //代码保存路径
-        String codeDir = PipelineUtil.findFileAddress(pipeline.getId(),1);
+        String codeDir = PipelineUtil.findFileAddress(pipelineId,1);
         File file = new File(codeDir);
 
         //删除旧的代码
@@ -94,51 +88,49 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
         }
 
         //分支
-        String codeBranch = taskCode.getCodeBranch();
+        String codeBranch = code.getCodeBranch();
         if(!PipelineUtil.isNoNull(codeBranch)){
             codeBranch = "master";
         }
 
         //更新日志
-        String s = PipelineUtil.date(4) + "Uri : " + taskCode.getCodeAddress() + "\n"
+        String s = PipelineUtil.date(4) + "Uri : " + code.getCodeAddress() + "\n"
                 + PipelineUtil.date(4) + "Branch : " + codeBranch ;
 
-        commonService.writeExecLog(pipelineProcess,s);
+        tasksInstanceService.writeExecLog(taskId,s);
 
-        commonService.writeExecLog(pipelineProcess, PipelineUtil.date(4)+"分配源码空间..." );
+        tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"分配源码空间..." );
 
         try {
             //命令执行失败
-            Process process = codeStart(taskCode,pipeline.getId());
-
-            pipelineProcess.setError(error(taskCode.getType()));
-            if (taskCode.getType() != 5){
-                pipelineProcess.setEnCode("UTF-8");
+            Process process = codeStart(code,pipelineId);
+            int type = code.getType();
+            String enCode = null;
+            if (type != 5){
+                enCode = "UTF-8";
             }
-            // commonService.commandExecState(pipelineProcess,process,name);
+            tasksInstanceService.readCommandExecResult(process,enCode,error(type),taskId);
 
             process.destroy();
-            commonService.writeExecLog(pipelineProcess, PipelineUtil.date(4)+ "空间分配成功。" );
+            tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+ "空间分配成功。" );
             //获取提交信息
-            Process message = cloneMessage(taskCode.getType(),pipeline.getId());
+            Process message = cloneMessage(code.getType(),pipelineId);
             if (message != null){
-                pipelineProcess.setInputStream(message.getInputStream());
-                pipelineProcess.setErrInputStream(message.getErrorStream());
-                commonService.readRunLog(pipelineProcess);
+                tasksInstanceService.readCommandExecResult(message,enCode,error(type),taskId);
                 message.destroy();
             }
 
         } catch (IOException e) {
-            commonService.writeExecLog(pipelineProcess, PipelineUtil.date(4)+"系统执行命令错误 \n" + e);
+            tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"系统执行命令错误 \n" + e);
             return false;
         }catch (URISyntaxException e){
-            commonService.writeExecLog(pipelineProcess, PipelineUtil.date(4)+"Git地址错误 \n" + e);
+            tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"Git地址错误 \n" + e);
             return false;
         }catch (ApplicationException e){
-            commonService.writeExecLog(pipelineProcess, PipelineUtil.date(4)+ e);
+            tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+ e);
             return false;
         }
-        // commonService.writeExecLog(pipelineProcess, PipelineUtil.date(4)+"任务"+name+"执行成功。");
+        tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"任务"+name+"执行成功。");
         return true;
     }
 
@@ -153,15 +145,16 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
     private Process codeStart(TaskCode taskCode, String pipelineId) throws IOException, URISyntaxException ,ApplicationException{
 
         //效验地址是否应用程序地址
-        String serverAddress = commonService.getScm(taskCode.getType());
-        if (serverAddress == null ){
+        Scm pipelineScm = scmService.findOnePipelineScm(taskCode.getType());
+
+        if (pipelineScm == null ){
             if (taskCode.getType() != 5){
                 throw new ApplicationException(50001,"未配置git程序地址");
             }else {
                 throw new ApplicationException(50001,"未配置SVN程序地址");
             }
         }
-
+        String serverAddress = pipelineScm.getScmAddress();
         //效验地址应用程序的合法性
         PipelineUtil.validFile(serverAddress, taskCode.getType());
 
@@ -323,7 +316,7 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
      */
     private String gitThirdOrder(TaskCode taskCode, String fileAddress) throws MalformedURLException, URISyntaxException {
         String authId = taskCode.getAuthId();
-        AuthThird auth = authServerServer.findOneAuthServer(authId);
+        AuthThird auth = thirdService.findOneAuthServer(authId);
         StringBuilder codeAddress = new StringBuilder(taskCode.getCodeAddress());
         StringBuilder stringBuilder = gitUrl(auth.getUsername(), auth.getAccessToken(), codeAddress);
         return gitBranch(stringBuilder, taskCode,fileAddress);

@@ -22,13 +22,18 @@ public interface PostprocessService {
 
 
     /**
-     * 查询配置
+     * 查询流水线后置任务
      * @param pipelineId 流水线id
-     * @return 任务配置
+     * @return 任务
      */
     List<Tasks> findAllPipelinePostTask(String pipelineId);
 
-    List<Tasks> findAllTaskPostTask(String pipelineId);
+    /**
+     * 查询任务后置处理
+     * @param taskId 任务id
+     * @return 任务列表
+     */
+    List<Tasks> findAllTaskPostTask(String taskId);
 
 
     /**

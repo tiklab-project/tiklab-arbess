@@ -7,7 +7,7 @@ import net.tiklab.dal.jpa.annotation.*;
  */
 
 @Entity
-@Table(name="pip_pipeline_instance_log")
+@Table(name="pip_task_instance")
 public class TaskInstanceEntity {
 
     //日志id
@@ -36,7 +36,7 @@ public class TaskInstanceEntity {
 
     //运行状态
     @Column(name = "run_state")
-    private int runState;
+    private String runState;
 
     //阶段id
     @Column(name = "stages_id")
@@ -102,11 +102,11 @@ public class TaskInstanceEntity {
         this.runTime = runTime;
     }
 
-    public int getRunState() {
+    public String getRunState() {
         return runState;
     }
 
-    public void setRunState(int runState) {
+    public void setRunState(String runState) {
         this.runState = runState;
     }
 

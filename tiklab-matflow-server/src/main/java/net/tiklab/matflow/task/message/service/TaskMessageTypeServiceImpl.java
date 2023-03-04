@@ -31,25 +31,6 @@ public class TaskMessageTypeServiceImpl implements TaskMessageTypeService {
 
         List<String> typeList = message.getTypeList() ;
         List<TaskUserSendMessageType> userList = message.getUserList();
-        // if (message != null){
-        //     typeList = message.getTypeList();
-        //     userList = message.getUserList();
-        // }
-
-        // if (typeList == null){
-        //     typeList = new ArrayList<>();
-        //     typeList.add("site");
-        // }
-
-        // if (userList == null){
-        //     userList = new ArrayList<>();
-        //     TaskUserSendMessageType taskUserSendMessageType = new TaskUserSendMessageType();
-        //     User user = new User();
-        //     user.setId(LoginContext.getLoginId());
-        //     taskUserSendMessageType.setUser(user);
-        //     taskUserSendMessageType.setMessageType(1);
-        //     userList.add(taskUserSendMessageType);
-        // }
 
         for (String s : typeList) {
             TaskMessageTypeEntity messageTypeEntity = BeanMapper.map(message, TaskMessageTypeEntity.class);
@@ -58,8 +39,6 @@ public class TaskMessageTypeServiceImpl implements TaskMessageTypeService {
             messageUserServer.createAllMessage(userList,taskId);
         }
 
-        // TaskMessageTypeEntity taskMessageTypeEntity = BeanMapper.map(message, TaskMessageTypeEntity.class);
-        // return taskMessageTypeDao.createMessage(taskMessageTypeEntity);
     }
 
     /**
@@ -81,45 +60,51 @@ public class TaskMessageTypeServiceImpl implements TaskMessageTypeService {
         return list;
     }
 
-
     /**
      * 删除任务
-     * @param configId 配置id
+     * @param taskId 配置id
      */
-    public void deleteAllMessage(String configId){
+    public void deleteAllMessage(String taskId){
         List<TaskMessageType> allMessage = findAllMessage();
         if (allMessage == null){
             return;
         }
         for (TaskMessageType messageType : allMessage) {
-            if (messageType.getTaskId().equals(configId)){
-                String messageTaskId = messageType.getTaskId();
-                deleteMessage(messageType.getTaskId());
+            if (messageType.getTaskId().equals(taskId)){
+                String messageTaskId = messageType.getId();
+                deleteMessage(messageTaskId);
                 messageUserServer.deleteAllMessage(messageTaskId);
             }
         }
 
     }
 
-    /**
-     * 根据配置id查询消息类型
-     * @param configId 配置id
-     * @return 消息
-     */
-    public TaskMessageType findMessage(String configId){
+    @Override
+    public TaskMessageType findMessage(String taskId){
         List<TaskMessageType> allMessage = findAllMessage();
         if (allMessage == null){
             return null;
         }
+        TaskMessageType taskMessageType = new TaskMessageType();
+        List<String> list = new ArrayList<>();
 
         for (TaskMessageType messageType : allMessage) {
-            if (messageType.getTaskId().equals(configId)){
-               return messageType;
+            String typeTaskId = messageType.getTaskId();
+            if (!typeTaskId.equals(taskId)){
+                continue;
             }
-        }
-        return null;
-    }
 
+            String taskType = messageType.getTaskType();
+            list.add(taskType);
+        }
+        String id = allMessage.get(0).getId();
+        List<TaskUserSendMessageType>  userList = messageUserServer.findAllUserMessage(id);
+        taskMessageType.setTypeList(list);
+        taskMessageType.setTaskId(taskId);
+        taskMessageType.setUserList(userList);
+
+        return taskMessageType;
+    }
 
     //删除
     @Override

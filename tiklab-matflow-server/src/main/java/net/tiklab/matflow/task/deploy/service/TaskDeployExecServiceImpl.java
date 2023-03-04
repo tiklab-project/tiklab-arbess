@@ -2,13 +2,13 @@ package net.tiklab.matflow.task.deploy.service;
 
 import com.jcraft.jsch.*;
 import net.tiklab.core.exception.ApplicationException;
-import net.tiklab.matflow.pipeline.definition.model.Pipeline;
-import net.tiklab.matflow.task.task.service.TasksService;
-import net.tiklab.matflow.pipeline.execute.model.PipelineProcess;
-import net.tiklab.matflow.pipeline.execute.service.PipelineExecLogService;
 import net.tiklab.matflow.setting.model.AuthHost;
+import net.tiklab.matflow.support.condition.service.ConditionService;
 import net.tiklab.matflow.support.util.PipelineUtil;
+import net.tiklab.matflow.support.variable.service.VariableService;
 import net.tiklab.matflow.task.deploy.model.TaskDeploy;
+import net.tiklab.matflow.task.task.model.Tasks;
+import net.tiklab.matflow.task.task.service.TasksInstanceService;
 import net.tiklab.rpc.annotation.Exporter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +17,8 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.List;
 
 /**
@@ -28,37 +30,29 @@ import java.util.List;
 public class TaskDeployExecServiceImpl implements TaskDeployExecService {
 
     @Autowired
-    PipelineExecLogService commonService;
+    private TasksInstanceService tasksInstanceService;
 
     @Autowired
-    TasksService tasksService;
+    private VariableService variableServer;
+
+    @Autowired
+    private ConditionService conditionService;
 
     private static final Logger logger = LoggerFactory.getLogger(TaskDeployExecServiceImpl.class);
 
-    /**
-     * 部署
-     * @param pipelineProcess 配置信息
-     * @return 状态
-     */
-    public boolean deploy(PipelineProcess pipelineProcess,String configId ,int taskType) {
 
-        Pipeline pipeline = pipelineProcess.getPipeline();
-        Object o = null;
-        if (pipeline.getType() == 1){
-            o = tasksService.findOneTasksTask(configId);
-        }else {
-            // o = stagesTaskServer.findOneStagesTasksTask(configId);
-        }
-        TaskDeploy taskDeploy = (TaskDeploy) o;
-        // String name = taskDeploy.getName();
+    public boolean deploy(String pipelineId, Tasks task , int taskType) {
 
-        Boolean variableCond = commonService.variableCondition(pipeline.getId(), configId);
-        if (!variableCond){
-            // commonService.writeExecLog(pipelineProcess, PipelineUtil.date(4)+"任务："+ name+"执行条件不满足,跳过执行。");
+        String taskId = task.getTaskId();
+        Boolean aBoolean = conditionService.variableCondition(pipelineId, taskId);
+        if (!aBoolean){
+            String s = "任务"+task.getTaskName()+"执行条件不满足，跳过执行\n";
+            tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+s);
             return true;
         }
-
-        // commonService.writeExecLog(pipelineProcess, PipelineUtil.date(4)+"执行任务："+name);
+        
+        TaskDeploy taskDeploy = (TaskDeploy) task.getValues();
+        String name = task.getTaskName();
 
         taskDeploy.setType(taskType);
 
@@ -71,29 +65,29 @@ public class TaskDeployExecServiceImpl implements TaskDeployExecService {
             session = createSession(taskDeploy);
         } catch (JSchException e) {
             String message = PipelineUtil.date(4)+ e.getMessage();
-            commonService.writeExecLog(pipelineProcess, PipelineUtil.date(4)+"连接失败，无法连接到服务器\n"+message);
+            tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"连接失败，无法连接到服务器\n"+message);
             return false;
         }
-        commonService.writeExecLog(pipelineProcess, PipelineUtil.date(4)+"建立服务器链接：" );
-        commonService.writeExecLog(pipelineProcess, PipelineUtil.date(4)+"服务器链接建立成功。" );
+        tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"建立服务器链接：" );
+        tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"服务器链接建立成功。" );
 
         //执行自定义脚本
         try {
             if (taskDeploy.getAuthType() == 2) {
                 List<String> list = PipelineUtil.execOrder(startShell);
                 for (String s : list) {
-                    String key = commonService.replaceVariable(pipeline.getId(), configId, s);
-                    commonService.writeExecLog(pipelineProcess, PipelineUtil.date(4)+ key );
-                    sshOrder(session,key,pipelineProcess);
+                    String key = variableServer.replaceVariable(pipelineId, taskId, s);
+                    tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+ key );
+                    sshOrder(session,key,taskId);
                 }
-                // commonService.writeExecLog(pipelineProcess, PipelineUtil.date(4)+"任务："+name+"执行完成。");
+                tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"任务："+name+"执行完成。");
                 session.disconnect();
                 return true;
             }
         } catch (IOException | JSchException e) {
             String s = PipelineUtil.date(4) + "命令执行失败" ;
-            commonService.writeExecLog(pipelineProcess, s);
-            commonService.writeExecLog(pipelineProcess, e.getMessage());
+            tasksInstanceService.writeExecLog(taskId, s);
+            tasksInstanceService.writeExecLog(taskId, e.getMessage());
             return false;
         }
 
@@ -101,55 +95,54 @@ public class TaskDeployExecServiceImpl implements TaskDeployExecService {
         String filePath;
 
         try {
-            commonService.writeExecLog(pipelineProcess, PipelineUtil.date(4)+"获取部署文件......");
-            filePath = PipelineUtil.getFile(pipeline.getId(), taskDeploy.getLocalAddress());
+            tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"获取部署文件......");
+            filePath = PipelineUtil.getFile(pipelineId, taskDeploy.getLocalAddress());
         } catch (ApplicationException e) {
             String message = PipelineUtil.date(4) + e.getMessage();
-            commonService.writeExecLog(pipelineProcess, PipelineUtil.date(4)+"部署文件获取失败，\n"+ message);
+            tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"部署文件获取失败，\n"+ message);
             return false;
         }
 
-        commonService.writeExecLog(pipelineProcess, PipelineUtil.date(4)+"部署文件获取成功："+ filePath );
+        tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"部署文件获取成功："+ filePath );
 
         //发送文件位置
         String deployAddress ="/"+ taskDeploy.getDeployAddress();
-        deployAddress = commonService.replaceVariable(pipeline.getId(), configId, deployAddress);
+        deployAddress = variableServer.replaceVariable(pipelineId, taskId, deployAddress);
         try {
          ftp(session, filePath, deployAddress);
         } catch (JSchException | SftpException e) {
             session.disconnect();
-            commonService.writeExecLog(pipelineProcess, PipelineUtil.date(4)+"部署文件上传失败"+e.getMessage());
+            tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"部署文件上传失败"+e.getMessage());
             return false;
         }
 
-        commonService.writeExecLog(pipelineProcess, PipelineUtil.date(4)+"部署文件上传成功" );
+        tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"部署文件上传成功" );
 
         try {
-            linux(session, pipelineProcess, taskDeploy,configId);
+            linux(session, pipelineId, taskDeploy,taskId);
         } catch (JSchException | IOException e) {
             session.disconnect();
-            commonService.writeExecLog(pipelineProcess, PipelineUtil.date(4)+"命令执行失败");
+            tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"命令执行失败");
             return false;
         }
         session.disconnect();
-        // commonService.writeExecLog(pipelineProcess, PipelineUtil.date(4)+"任务："+name+"执行完成。");
+        tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"任务："+name+"执行完成。");
         return true;
     }
 
     /**
      * linux部署
-     * @param pipelineProcess 配置信息
+     * @param taskId 配置信息
      */
-    private void linux(Session session, PipelineProcess pipelineProcess, TaskDeploy taskDeploy, String configId) throws JSchException, IOException {
-        Pipeline pipeline = pipelineProcess.getPipeline();
+    private void linux(Session session, String pipelineId, TaskDeploy taskDeploy, String taskId) throws JSchException, IOException {
 
         //部署地址
         String deployAddress = "/"+ taskDeploy.getDeployAddress();
-        deployAddress = commonService.replaceVariable(pipeline.getId(), configId, deployAddress);
+        deployAddress = variableServer.replaceVariable(pipelineId, taskId, deployAddress);
 
         //启动文件地址
         String startAddress = "/"+ taskDeploy.getStartAddress();
-        startAddress = commonService.replaceVariable(pipeline.getId(), configId, startAddress);
+        startAddress = variableServer.replaceVariable(pipelineId, taskId, startAddress);
 
         //部署脚本命令
         String deployOrder= taskDeploy.getDeployOrder();
@@ -165,20 +158,20 @@ public class TaskDeployExecServiceImpl implements TaskDeployExecService {
         if (PipelineUtil.isNoNull(deployOrder)){
             List<String> list = PipelineUtil.execOrder(deployOrder);
             for (String s : list) {
-                String key = commonService.replaceVariable(pipeline.getId(), configId, s);
+                String key = variableServer.replaceVariable(pipelineId, taskId, s);
                 String orders = "cd "+" "+ deployAddress + ";" + key;
-                commonService.writeExecLog(pipelineProcess, PipelineUtil.date(4)+"执行部署命令：" + key);
-                sshOrder(session,orders, pipelineProcess);
+                tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"执行部署命令：" + key);
+                sshOrder(session,orders, taskId);
             }
         }
 
         if (PipelineUtil.isNoNull(startOrder)){
             List<String> list = PipelineUtil.execOrder(startOrder);
             for (String s : list) {
-                String key = commonService.replaceVariable(pipeline.getId(), configId, s);
+                String key = variableServer.replaceVariable(pipelineId, taskId, s);
                 String orders = "cd "+" "+ startAddress+";" + key;
-                commonService.writeExecLog(pipelineProcess, PipelineUtil.date(4)+"执行启动命令：" + key );
-                sshOrder(session,orders, pipelineProcess);
+                tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"执行启动命令：" + key );
+                sshOrder(session,orders, taskId);
             }
         }
 
@@ -219,19 +212,54 @@ public class TaskDeployExecServiceImpl implements TaskDeployExecService {
     /**
      * 连接服务器执行命令
      * @param orders 命令
-     * @param pipelineProcess 配置信息
+     * @param taskId 配置信息
      * @throws JSchException 连接错误
      * @throws IOException 读取执行信息失败
      */
-    private void sshOrder(Session session,String orders,PipelineProcess pipelineProcess) throws JSchException, IOException {
+    private void sshOrder(Session session,String orders,String taskId) throws JSchException, IOException {
         ChannelExec exec = (ChannelExec) session.openChannel("exec");
         exec.setCommand(orders);
         exec.connect();
-        pipelineProcess.setInputStream(exec.getInputStream());
-        pipelineProcess.setErrInputStream(exec.getErrStream());
-        pipelineProcess.setEnCode("UTF-8");
-        pipelineProcess.setError(error(41));
-        commonService.readRunLog(pipelineProcess);
+        Process process = new Process() {
+            @Override
+            public OutputStream getOutputStream() {
+                return null;
+            }
+
+            @Override
+            public InputStream getInputStream() {
+                try {
+                    return exec.getInputStream();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
+            @Override
+            public InputStream getErrorStream() {
+                try {
+                    return exec.getErrStream();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
+            @Override
+            public int waitFor() {
+                return 0;
+            }
+
+            @Override
+            public int exitValue() {
+                return 0;
+            }
+
+            @Override
+            public void destroy() {
+
+            }
+        };
+        tasksInstanceService.readCommandExecResult(process,"UTF-8",error(41),taskId);
         exec.disconnect();
     }
 
@@ -254,12 +282,11 @@ public class TaskDeployExecServiceImpl implements TaskDeployExecService {
 
     /**
      * docker部署
-     * @param pipelineProcess 配置信息
+     * @param pipelineId 配置信息
      */
-    private void docker(Session session, PipelineProcess pipelineProcess, TaskDeploy taskDeploy) throws JSchException, IOException {
-        Pipeline pipeline = pipelineProcess.getPipeline();
+    private void docker(Session session,String pipelineId, TaskDeploy taskDeploy) throws JSchException, IOException {
 
-        String pipelineName = pipeline.getName();
+        // String pipelineName = pipeline.getName();
         //部署位置
         String deployAddress = "/"+  taskDeploy.getDeployAddress();
         //部署文件命令
@@ -268,32 +295,32 @@ public class TaskDeployExecServiceImpl implements TaskDeployExecService {
         String startAddress = taskDeploy.getStartAddress();
 
 
-        String order = "docker stop $(docker ps -a | grep '"+pipelineName+"' | awk '{print $1 }');"
-                +"docker rm $(docker ps -a | grep '"+pipelineName+"' | awk '{print $1 }');"
-                +"docker image rm"+" "+pipelineName+";";
+        // String order = "docker stop $(docker ps -a | grep '"+pipelineName+"' | awk '{print $1 }');"
+        //         +"docker rm $(docker ps -a | grep '"+pipelineName+"' | awk '{print $1 }');"
+        //         +"docker image rm"+" "+pipelineName+";";
 
         // if ((deployOrder == null || deployOrder.equals("")) && (startAddress == null || startAddress.equals("/")) ){
         //
         //      order = order +"cd"+" "+deployAddress+";"+"docker image build -t"+" "+pipelineName+"  .;"
         //             +"docker run -itd -p"+" "+ taskDeploy.getMappingPort()+":"+ taskDeploy.getStartPort()+" "+pipelineName;
-        //     sshOrder(session,order, pipelineProcess);
+        //     sshOrder(session,order, taskId);
         //     return;
         // }
         // if (deployOrder != null && !deployOrder.equals("") ) {
         //     deployOrder = "cd "+" "+ deployAddress +";"+deployOrder;
-        //     sshOrder(session,deployOrder, pipelineProcess);
+        //     sshOrder(session,deployOrder, taskId);
         //     if (startAddress == null || startAddress.equals("/")) {
         //
         //         order = order + "cd" + " " + deployAddress + ";" + "docker image build -t" + " " + pipelineName + "  .;"
         //                 + "docker run -itd -p" + " " + taskDeploy.getMappingPort() + ":" + taskDeploy.getStartPort() + " " + pipelineName;
-        //         sshOrder(session, order, pipelineProcess);
+        //         sshOrder(session, order, taskId);
         //         return;
         //     }
         // }
         //
         // order = order +"cd"+" "+deployAddress+"/"+startAddress+";"+"docker image build -t"+" "+pipelineName+"  .;"
         //         +"docker run -itd -p"+" "+ taskDeploy.getMappingPort()+":"+ taskDeploy.getStartPort()+" "+pipelineName;
-        sshOrder(session, order, pipelineProcess);
+        // sshOrder(session, order, taskId);
     }
 
 

@@ -1,6 +1,6 @@
 package net.tiklab.matflow.task.artifact.service;
 
-import net.tiklab.matflow.pipeline.execute.model.PipelineProcess;
+import net.tiklab.matflow.task.task.model.Tasks;
 
 public interface TaskArtifactExecService {
 
@@ -9,7 +9,7 @@ public interface TaskArtifactExecService {
      * @param pipelineProcess 执行信息
      * @return 执行状态
      */
-     boolean product(PipelineProcess pipelineProcess, String configId ,int taskType);
+     boolean product(String pipelineId, Tasks task , int taskType);
 
 
 }

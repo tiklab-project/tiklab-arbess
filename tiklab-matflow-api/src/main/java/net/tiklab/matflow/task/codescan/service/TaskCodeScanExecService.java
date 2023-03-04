@@ -1,6 +1,6 @@
 package net.tiklab.matflow.task.codescan.service;
 
-import net.tiklab.matflow.pipeline.execute.model.PipelineProcess;
+import net.tiklab.matflow.task.task.model.Tasks;
 
 public interface TaskCodeScanExecService {
 
@@ -9,6 +9,6 @@ public interface TaskCodeScanExecService {
      * @param pipelineProcess 执行信息
      * @return 执行状态
      */
-    boolean codeScan(PipelineProcess pipelineProcess,String configId ,int taskType);
+    boolean codeScan(String pipelineId, Tasks task , int taskType);
 
 }

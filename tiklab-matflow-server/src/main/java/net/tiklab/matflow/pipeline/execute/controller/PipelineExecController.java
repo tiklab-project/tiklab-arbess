@@ -2,7 +2,6 @@ package net.tiklab.matflow.pipeline.execute.controller;
 
 
 import net.tiklab.core.Result;
-import net.tiklab.matflow.pipeline.execute.model.TaskRunLog;
 import net.tiklab.matflow.pipeline.execute.service.PipelineExecService;
 import net.tiklab.postin.annotation.Api;
 import net.tiklab.postin.annotation.ApiMethod;
@@ -15,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.validation.constraints.NotNull;
 
 @RestController
-@RequestMapping("/pipelineExec")
+@RequestMapping("/exec")
 @Api(name = "PipelineExecController",desc = "流水线执行")
 public class PipelineExecController {
 
@@ -31,28 +30,11 @@ public class PipelineExecController {
         return Result.ok(start);
     }
 
-
-    @RequestMapping(path="/pipelineRunStatus",method = RequestMethod.POST)
-    @ApiMethod(name = "pipelineRunStatus",desc = "执行")
-    @ApiParam(name = "pipelineId",desc = "流水线id",required = true)
-    public Result<TaskRunLog> pipelineRunStatus(String pipelineId)  {
-        TaskRunLog runState = pipelineExecService.findPipelineRunMessage(pipelineId);
-        return Result.ok(runState);
-    }
-
-    @RequestMapping(path="/findPipelineState",method = RequestMethod.POST)
-    @ApiMethod(name = "findPipelineState",desc = "判断是否执行")
-    @ApiParam(name = "pipelineId",desc = "流水线id",required = true)
-    public Result<Integer> findState(@NotNull String pipelineId) {
-        int state = pipelineExecService.findPipelineState(pipelineId);
-        return Result.ok(state);
-    }
-
-    @RequestMapping(path="/killInstance",method = RequestMethod.POST)
+    @RequestMapping(path="/stop",method = RequestMethod.POST)
     @ApiMethod(name = "killInstance",desc = "判断是否执行")
     @ApiParam(name = "pipelineId",desc = "流水线id",required = true)
     public Result<Void> killInstance(@NotNull String pipelineId) {
-        pipelineExecService.killInstance(pipelineId);
+        // pipelineExecService.killInstance(pipelineId);
         return Result.ok();
     }
 

@@ -264,28 +264,41 @@ public class StageServiceImpl implements StageService {
 
         //阶段信息
         String taskStagesId = taskTasks.getStageId();
-        Stage stage1 = findOneStages(taskStagesId);
+        Stage stages = findOneStages(taskStagesId);
 
         List<Tasks> tasks = tasksService.finAllStageTask(taskStagesId);
         //该阶段不存在其他任务
         if (tasks == null || tasks.size() == 0){
-
             deleteStages(taskStagesId);
             //主阶段id
-            String mainStageId = stage1.getParentId();
+            String mainStageId = stages.getParentId();
             List<Stage> otherStage = findOtherStage(mainStageId);
-            //获取是否存在从节点
+            //判断是否存在从节点，不存在删除主节点
             if (otherStage == null || otherStage.size() == 0){
                 Stage mainStage = findOneStages(mainStageId);
-                int stageSort = mainStage.getStageSort();
                 deleteStages(mainStageId);
+                String pipelineId = mainStage.getPipelineId();
+                //更新其他主节点顺序
+                List<Stage> allMainStage = findAllMainStage(pipelineId);
+                if (allMainStage == null || allMainStage.size() == 0){
+                    return;
+                }
+                for (Stage stage : allMainStage) {
+                    int sort = mainStage.getStageSort();
+                    int stageSort = stage.getStageSort();
+                    if (sort > stageSort){
+                        continue;
+                    }
+                    stage.setStageSort(stageSort - 1 );
+                    updateStages(stage);
+                }
                 return;
             }
             //存在则更新从节点顺序
             for (Stage stage : otherStage) {
                 int sort = stage.getStageSort();
-                if (stage1.getStageSort() < sort){
-                    stage.setStageSort(sort -1);
+                if (stages.getStageSort() < sort){
+                    stage.setStageSort(sort - 1 );
                     updateStages(stage);
                 }
             }

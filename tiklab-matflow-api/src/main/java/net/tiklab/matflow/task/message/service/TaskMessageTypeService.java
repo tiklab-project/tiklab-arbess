@@ -14,7 +14,6 @@ public interface TaskMessageTypeService {
     /**
      * 创建
      * @param taskMessageType message信息
-     * @return messageId
      */
     void createMessage(TaskMessageType taskMessageType) ;
 
@@ -27,10 +26,10 @@ public interface TaskMessageTypeService {
 
     /**
      * 根据配置id查询消息类型
-     * @param configId 配置id
+     * @param taskId 配置id
      * @return 消息
      */
-    TaskMessageType findMessage(String configId);
+    TaskMessageType findMessage(String taskId);
 
     /**
      * 删除

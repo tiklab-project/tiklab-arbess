@@ -19,7 +19,7 @@ public class PipelineExecMessage {
     private int collect;
 
     //最近构建状态
-    private int buildStatus;
+    private String buildStatus;
 
     //流水线名称
     private String name;
@@ -61,11 +61,12 @@ public class PipelineExecMessage {
         this.collect = collect;
     }
 
-    public int getBuildStatus() {
+
+    public String getBuildStatus() {
         return buildStatus;
     }
 
-    public void setBuildStatus(int buildStatus) {
+    public void setBuildStatus(String buildStatus) {
         this.buildStatus = buildStatus;
     }
 

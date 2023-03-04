@@ -28,7 +28,7 @@ public class PipelineInstanceQuery {
     @ApiProperty(name ="type",desc = "类型")
     private int type;
 
-    @ApiProperty(name ="userId",desc = "用户流水线")
+    @ApiProperty(name ="pipelineList",desc = "用户流水线")
     private List<Pipeline> pipelineList;
 
     @ApiProperty(name ="pageParam",desc = "分页参数")

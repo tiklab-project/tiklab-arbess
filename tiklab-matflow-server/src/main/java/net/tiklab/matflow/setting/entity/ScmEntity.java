@@ -4,7 +4,7 @@ package net.tiklab.matflow.setting.entity;
 import net.tiklab.dal.jpa.annotation.*;
 
 @Entity
-@Table(name="pip_pipeline_setting_scm")
+@Table(name="pip_setting_scm")
 public class ScmEntity {
 
     //凭证id

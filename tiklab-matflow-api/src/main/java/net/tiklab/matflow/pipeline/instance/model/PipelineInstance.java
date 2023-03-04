@@ -39,7 +39,7 @@ public class PipelineInstance {
     private User user;
 
     @ApiProperty(name="runStatus",desc="运行状态 1.失败 10.成功 20:停止")
-    private int runStatus;
+    private String runStatus;
 
     @ApiProperty(name="runTime",desc="运行时间")
     private int runTime;
@@ -50,17 +50,8 @@ public class PipelineInstance {
     @JoinQuery(key = "id")
     private Pipeline pipeline;
 
-    @ApiProperty(name="sort",desc="顺序")
-    private int sort;
-
-    @ApiProperty(name="status",desc="状态 1.失败 10.成功 20:停止")
-    private int status;
-
     @ApiProperty(name="findNumber",desc="构建次数")
     private int findNumber;
-
-    @ApiProperty(name="findState",desc="运行状态（0.运行完成，1.运行中）")
-    private int findState;
 
     public PipelineInstance() {
     }
@@ -100,13 +91,6 @@ public class PipelineInstance {
         this.timeList = timeList;
     }
 
-    public int getStatus() {
-        return status;
-    }
-
-    public void setStatus(int status) {
-        this.status = status;
-    }
 
     public String getCreateTime() {
         return createTime;
@@ -132,11 +116,11 @@ public class PipelineInstance {
         this.pipeline = pipeline;
     }
 
-    public int getRunStatus() {
+    public String getRunStatus() {
         return runStatus;
     }
 
-    public void setRunStatus(int runStatus) {
+    public void setRunStatus(String runStatus) {
         this.runStatus = runStatus;
     }
 
@@ -148,28 +132,12 @@ public class PipelineInstance {
         this.runTime = runTime;
     }
 
-    public int getSort() {
-        return sort;
-    }
-
-    public void setSort(int sort) {
-        this.sort = sort;
-    }
-
     public int getFindNumber() {
         return findNumber;
     }
 
     public void setFindNumber(int findNumber) {
         this.findNumber = findNumber;
-    }
-
-    public int getFindState() {
-        return findState;
-    }
-
-    public void setFindState(int findState) {
-        this.findState = findState;
     }
 
     public User getUser() {

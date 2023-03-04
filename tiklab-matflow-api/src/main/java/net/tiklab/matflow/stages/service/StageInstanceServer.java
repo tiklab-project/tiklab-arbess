@@ -20,13 +20,13 @@ public interface StageInstanceServer {
      * 删除所有流水线实例下的阶段运行实例
      * @param instanceId 流水线实例id
      */
-    void deleteAllStageInstance(String instanceId);
+    void deleteAllStageInstanceInstance(String instanceId);
 
     /**
      * 删除阶段下的所有实例
      * @param stageId 阶段id
      */
-    void deleteStageInstance(String stageId);
+    void deleteAllStageInstance(String stageId);
 
     /**
      * 更新阶段实例内容
@@ -46,7 +46,7 @@ public interface StageInstanceServer {
      * @param instanceId 流水线运行实例id
      * @return 阶段运行实例
      */
-    List<StageInstance> findAllInstanceStageInstance(String instanceId);
+    List<StageInstance> findAllMainStageInstance(String instanceId);
 
     /**
      * 查询阶段下的所有运行实例
@@ -55,7 +55,12 @@ public interface StageInstanceServer {
      */
     List<StageInstance> findAllStageInstance(String stageId);
 
-
+    /**
+     * 查询阶段运行实例
+     * @param instanceId 流水线实例id
+     * @return 阶段运行实例
+     */
+    List<StageInstance> findStageExecInstance(String instanceId);
 
 
 

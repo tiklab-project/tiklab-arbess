@@ -13,6 +13,15 @@ public interface ConditionService {
      */
     String createCond(Condition condition);
 
+
+    /**
+     * 效验条件
+     * @param pipelineId 流水线id
+     * @param taskId 配置id
+     * @return 状态 true:条件满足 false:条件不满足
+     */
+    Boolean variableCondition(String pipelineId,String taskId);
+
     /**
      * 删除条件
      * @param condId 条件id

@@ -84,7 +84,6 @@ public interface TasksService {
      */
     List<Tasks> finAllStageTaskOrTask(String stageId);
 
-
     /**
      * 查询单个任务详情
      * @param tasksId 配置id
@@ -105,6 +104,13 @@ public interface TasksService {
      * @return 任务
      */
     Tasks findOneTasks(String tasksId);
+
+    /**
+     * 查询单个任务及任务详情
+     * @param tasksId 任务id
+     * @return 任务详细信息
+     */
+    Tasks findOneTasksOrTask(String tasksId);
 
 }
 

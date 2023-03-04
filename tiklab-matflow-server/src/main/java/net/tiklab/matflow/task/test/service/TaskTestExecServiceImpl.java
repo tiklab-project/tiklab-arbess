@@ -1,11 +1,13 @@
 package net.tiklab.matflow.task.test.service;
 
 import net.tiklab.core.exception.ApplicationException;
-import net.tiklab.matflow.pipeline.definition.model.Pipeline;
-import net.tiklab.matflow.task.task.service.TasksService;
-import net.tiklab.matflow.pipeline.execute.model.PipelineProcess;
-import net.tiklab.matflow.pipeline.execute.service.PipelineExecLogService;
+import net.tiklab.matflow.setting.model.Scm;
+import net.tiklab.matflow.setting.service.ScmService;
+import net.tiklab.matflow.support.condition.service.ConditionService;
 import net.tiklab.matflow.support.util.PipelineUtil;
+import net.tiklab.matflow.support.variable.service.VariableService;
+import net.tiklab.matflow.task.task.model.Tasks;
+import net.tiklab.matflow.task.task.service.TasksInstanceService;
 import net.tiklab.matflow.task.test.model.TaskTest;
 import net.tiklab.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,51 +25,54 @@ import java.util.List;
 public class TaskTestExecServiceImpl implements TaskTestExecService {
 
     @Autowired
-    PipelineExecLogService commonService;
+    private TasksInstanceService tasksInstanceService;
 
     @Autowired
-    TasksService tasksService;
+    private VariableService variableServer;
+
+    @Autowired
+    private ScmService scmService;
+
+    @Autowired
+    private ConditionService conditionService;
     
     // 单元测试
-    public boolean test(PipelineProcess pipelineProcess, String configId ,int taskType) {
-        Pipeline pipeline = pipelineProcess.getPipeline();
-        Object o = null;
-        if (pipeline.getType() == 1){
-            o = tasksService.findOneTasksTask(configId);
-        }else {
-            // o = stagesTaskServer.findOneStagesTasksTask(configId);
-        }
-        TaskTest taskTest = (TaskTest) o;
-        Boolean variableCond = commonService.variableCondition(pipeline.getId(), configId);
-        // String name = taskTest.getName();
-        if (!variableCond){
-            // commonService.writeExecLog(pipelineProcess, PipelineUtil.date(4)+"任务："+ name+"执行条件不满足,跳过执行。");
+    public boolean test(String pipelineId, Tasks task , int taskType) {
+
+        String taskId = task.getTaskId();
+        Boolean aBoolean = conditionService.variableCondition(pipelineId, taskId);
+        if (!aBoolean){
+            String s = "任务"+task.getTaskName()+"执行条件不满足，跳过执行\n";
+            tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+s);
             return true;
         }
-        // commonService.writeExecLog(pipelineProcess, PipelineUtil.date(4)+"执行任务："+name);
+
+
+        TaskTest taskTest = (TaskTest) task.getValues();
+
+        tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"执行任务："+ task.getTaskName());
 
         taskTest.setType(taskType);
 
         //初始化日志
         String testOrder = taskTest.getTestOrder();
 
-        String path = PipelineUtil.findFileAddress(pipeline.getId(),1);
+        String path = PipelineUtil.findFileAddress(pipelineId,1);
         try {
 
             List<String> list = PipelineUtil.execOrder(testOrder);
             for (String s : list) {
-                String key = commonService.replaceVariable(pipeline.getId(), configId, s);
-                commonService.writeExecLog(pipelineProcess, PipelineUtil.date(4)+"执行："+ key );
-                Process  process = getOrder(taskTest,s,path);
-                pipelineProcess.setError(error(taskTest.getType()));
-                // commonService.commandExecState(pipelineProcess,process,name);
+                String key = variableServer.replaceVariable(pipelineId, "configId", s);
+                tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"执行："+ key );
+                Process process = getOrder(taskTest,key,path);
+                tasksInstanceService.readCommandExecResult(process,null,error(taskTest.getType()),taskId);
                 process.destroy();
             }
         } catch (IOException e) {
-            commonService.writeExecLog(pipelineProcess, PipelineUtil.date(4)+"日志打印失败"+e);
+            tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"日志打印失败"+e);
             return false;
         } catch (ApplicationException e) {
-            commonService.writeExecLog(pipelineProcess,e.getMessage());
+            tasksInstanceService.writeExecLog(taskId,e.getMessage());
             return false;
         }
         return true;
@@ -83,10 +88,12 @@ public class TaskTestExecServiceImpl implements TaskTestExecService {
         int type = taskTest.getType();
         String order ;
         if (type == 11) {
-            String mavenAddress = commonService.getScm(21);
-            if (mavenAddress == null) {
+            Scm pipelineScm = scmService.findOnePipelineScm(21);
+
+            if (pipelineScm == null) {
                 throw new ApplicationException(PipelineUtil.date(4)+"不存在maven配置");
             }
+            String mavenAddress = pipelineScm.getScmAddress();
             PipelineUtil.validFile(mavenAddress,21);
             order = testOrder(testOrder, path);
             return PipelineUtil.process(mavenAddress, order);

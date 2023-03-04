@@ -2,15 +2,17 @@ package net.tiklab.matflow.task.artifact.service;
 
 import com.jcraft.jsch.*;
 import net.tiklab.core.exception.ApplicationException;
-import net.tiklab.matflow.pipeline.definition.model.Pipeline;
-import net.tiklab.matflow.task.task.service.TasksService;
-import net.tiklab.matflow.pipeline.execute.model.PipelineProcess;
-import net.tiklab.matflow.pipeline.execute.service.PipelineExecLogService;
 import net.tiklab.matflow.setting.model.AuthHost;
 import net.tiklab.matflow.setting.model.AuthThird;
+import net.tiklab.matflow.setting.model.Scm;
+import net.tiklab.matflow.setting.service.ScmService;
+import net.tiklab.matflow.support.condition.service.ConditionService;
 import net.tiklab.matflow.support.util.PipelineFinal;
 import net.tiklab.matflow.support.util.PipelineUtil;
+import net.tiklab.matflow.support.variable.service.VariableService;
 import net.tiklab.matflow.task.artifact.model.TaskArtifact;
+import net.tiklab.matflow.task.task.model.Tasks;
+import net.tiklab.matflow.task.task.service.TasksInstanceService;
 import net.tiklab.rpc.annotation.Exporter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,96 +28,92 @@ import java.io.IOException;
 public class TaskArtifactExecServiceImpl implements TaskArtifactExecService {
 
     @Autowired
-    PipelineExecLogService commonService;
+    private TasksInstanceService tasksInstanceService;
 
     @Autowired
-    TasksService tasksService;
+    private VariableService variableService;
+
+    @Autowired
+    private ConditionService conditionService;
+
+    @Autowired
+    private ScmService scmService;
     
 
     private static final Logger logger = LoggerFactory.getLogger(TaskArtifactExecServiceImpl.class);
 
-    /**
-     * 推送制品代码
-     * @param pipelineProcess 执行信息
-     * @return 执行状态
-     */
     @Override
-    public boolean product(PipelineProcess pipelineProcess, String configId ,int taskType) {
-
-        Pipeline pipeline = pipelineProcess.getPipeline();
-        Object o = null;
-        if (pipeline.getType() == 1){
-            o = tasksService.findOneTasksTask(configId);
-        }else {
-            // o = stagesTaskServer.findOneStagesTasksTask(configId);
+    public boolean product(String pipelineId, Tasks task , int taskType) {
+        String taskId = task.getTaskId();
+        Boolean aBoolean = conditionService.variableCondition(pipelineId, taskId);
+        if (!aBoolean){
+            String s = "任务"+task.getTaskName()+"执行条件不满足，跳过执行\n";
+            tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+s);
+            return true;
         }
 
-        TaskArtifact product = (TaskArtifact) o;
-        // String name = product.getName();
-        Boolean variableCond = commonService.variableCondition(pipeline.getId(), configId);
-        // if (!variableCond){
-        //     commonService.writeExecLog(pipelineProcess, PipelineUtil.date(4)+"任务："+ name+"执行条件不满足,跳过执行。");
-        //     return true;
-        // }
-        // commonService.writeExecLog(pipelineProcess, PipelineUtil.date(4)+"执行任务："+name);
 
+        TaskArtifact product = (TaskArtifact) task.getValues();
         product.setType(taskType);
 
         String fileAddress = product.getFileAddress();
         String path;
         try {
-             path = PipelineUtil.getFile(pipeline.getId(),fileAddress);
+             path = PipelineUtil.getFile(pipelineId,fileAddress);
         }catch (ApplicationException e){
-            commonService.writeExecLog(pipelineProcess, PipelineUtil.date(4)+e);
+            tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+e);
             return false;
         }
 
         if (path == null){
-            commonService.writeExecLog(pipelineProcess, PipelineUtil.date(4)+"匹配不到制品");
+            tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"匹配不到制品");
             return false;
         }
 
-        commonService.writeExecLog(pipelineProcess,
+        tasksInstanceService.writeExecLog(taskId,
                 PipelineUtil.date(4)+"制品匹配成功\n"+
                     PipelineUtil.date(4)+"制品名称："+ new File(path).getName() + "\n"+
                     PipelineUtil.date(4)+"制品地址："+path);
         try {
             if (product.getType() == 51){
+                String artifactId = variableService.replaceVariable(pipelineId, taskId, product.getArtifactId());
+                String groupId = variableService.replaceVariable(pipelineId, taskId, product.getGroupId());
+                String version = variableService.replaceVariable(pipelineId, taskId, product.getVersion());
+                String fileType = variableService.replaceVariable(pipelineId, taskId, product.getFileType());
                 //替换变量
-                String  artifactId = commonService.replaceVariable(pipeline.getId(), configId, product.getArtifactId());
-                String  groupId = commonService.replaceVariable(pipeline.getId(), configId, product.getGroupId());
-                String  version = commonService.replaceVariable(pipeline.getId(), configId, product.getVersion());
-                String  fileType = commonService.replaceVariable(pipeline.getId(), configId, product.getFileType());
                 product.setArtifactId(artifactId);
-                product.setGroupId(groupId);
-                product.setVersion(version);
+                product.setGroupId( groupId);
+                product.setVersion( version);
                 product.setFileType(fileType);
 
+                //执行命令
                 Process process = getProductOrder(product,path);
-                pipelineProcess.setError(error(product.getType()));
-                pipelineProcess.setEnCode("UTF-8");
-                // commonService.commandExecState(pipelineProcess,process,name);
-                process.destroy();
+                String[] error = error(product.getType());
+                boolean result = tasksInstanceService.readCommandExecResult(process, "UTF-8", error, taskId);
+                if (!result){
+                    tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+task.getTaskName()+"执行失败\n");
+                    return false;
+                }
             }else {
-                commonService.writeExecLog(pipelineProcess, PipelineUtil.date(4)+"连接制品服务器。");
+                tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"连接制品服务器。");
                 Session session = createSession(product);
-                commonService.writeExecLog(pipelineProcess, PipelineUtil.date(4)+"制品服务器连接成功。");
+                tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"制品服务器连接成功。");
                 String putAddress = product.getPutAddress();
-                commonService.writeExecLog(pipelineProcess, PipelineUtil.date(4)+"开始推送制品。");
+                tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"开始推送制品。");
 
                 //替换变量
-                String key = commonService.replaceVariable(pipeline.getId(), configId, putAddress);
-                commonService.writeExecLog(pipelineProcess, PipelineUtil.date(4)+"制品推送位置："+key);
+                String key = variableService.replaceVariable(pipelineId, taskId, putAddress);
+                tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"制品推送位置："+key);
                 sshPut(session,path,key);
             }
         } catch (IOException | ApplicationException e) {
-            commonService.writeExecLog(pipelineProcess, PipelineUtil.date(4)+"推送制品执行错误\n"+ PipelineUtil.date(4)+e.getMessage());
+            tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"推送制品执行错误\n"+ PipelineUtil.date(4)+e.getMessage());
             return false;
         } catch (JSchException e) {
-            commonService.writeExecLog(pipelineProcess, PipelineUtil.date(4)+"无法连接到服务器\n" + PipelineUtil.date(4)+e.getMessage());
+            tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"无法连接到服务器\n" + PipelineUtil.date(4)+e.getMessage());
             return false;
         }
-        commonService.writeExecLog(pipelineProcess, PipelineUtil.date(4)+"推送制品完成");
+        tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"推送制品完成");
         return true;
     }
 
@@ -123,12 +121,12 @@ public class TaskArtifactExecServiceImpl implements TaskArtifactExecService {
     private Process getProductOrder(TaskArtifact product, String path) throws ApplicationException, IOException {
         String order ;
         String execOrder =  "mvn deploy:deploy-file ";
+        Scm pipelineScm = scmService.findOnePipelineScm(21);
 
-        String mavenAddress = commonService.getScm(21);
-        if (mavenAddress == null) {
+        if (pipelineScm == null) {
             throw new ApplicationException("不存在maven配置");
         }
-
+        String mavenAddress = pipelineScm.getScmAddress();
         PipelineUtil.validFile(mavenAddress, 21);
 
         AuthThird authThird = (AuthThird)product.getAuth();

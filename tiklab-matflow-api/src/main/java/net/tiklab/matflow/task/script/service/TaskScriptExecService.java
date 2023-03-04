@@ -1,10 +1,10 @@
 package net.tiklab.matflow.task.script.service;
 
-import net.tiklab.matflow.pipeline.execute.model.PipelineProcess;
+import net.tiklab.matflow.task.task.model.Tasks;
 
 public interface TaskScriptExecService {
 
 
-    boolean scripts(PipelineProcess pipelineProcess, String configId , int taskType);
+    boolean scripts(String pipelineId, Tasks task , int taskType);
 
 }

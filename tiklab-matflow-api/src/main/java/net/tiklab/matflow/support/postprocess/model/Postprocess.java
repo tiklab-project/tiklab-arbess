@@ -10,8 +10,8 @@ import net.tiklab.postin.annotation.ApiProperty;
 @Mapper(targetAlias = "PostprocessEntity")
 public class Postprocess {
 
-    @ApiProperty(name = "id",desc="id")
-    private String id;
+    @ApiProperty(name = "postprocessId",desc="id")
+    private String postprocessId;
 
     @ApiProperty(name = "name",desc="名称")
     private String name;
@@ -42,12 +42,12 @@ public class Postprocess {
         this.pipelineId = pipelineId;
     }
 
-    public String getId() {
-        return id;
+    public String getPostprocessId() {
+        return postprocessId;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setPostprocessId(String postprocessId) {
+        this.postprocessId = postprocessId;
     }
 
     public String getName() {

@@ -2,8 +2,11 @@ package net.tiklab.matflow.stages.model;
 
 import net.tiklab.beans.annotation.Mapper;
 import net.tiklab.join.annotation.Join;
+import net.tiklab.matflow.task.task.model.TaskInstance;
 import net.tiklab.postin.annotation.ApiModel;
 import net.tiklab.postin.annotation.ApiProperty;
+
+import java.util.List;
 
 /**
  * 阶段运行实例模型
@@ -33,11 +36,33 @@ public class StageInstance {
     private int stageTime;
 
     @ApiProperty(name = "stageState" ,desc = "运行状态")
-    private int stageState;
+    private String stageState;
 
-    @ApiProperty(name = "stagesId" ,desc = "阶段id")
-    private String stagesId;
+    @ApiProperty(name = "parentId" ,desc = "阶段id")
+    private String parentId;
 
+    @ApiProperty(name = "stageInstanceList" ,desc = "阶段实例")
+    private List<StageInstance> stageInstanceList ;
+
+    @ApiProperty(name = "taskInstanceList" ,desc = "任务实例")
+    private List<TaskInstance> taskInstanceList;
+
+
+    public List<StageInstance> getStageInstanceList() {
+        return stageInstanceList;
+    }
+
+    public void setStageInstanceList(List<StageInstance> stageInstanceList) {
+        this.stageInstanceList = stageInstanceList;
+    }
+
+    public List<TaskInstance> getTaskInstanceList() {
+        return taskInstanceList;
+    }
+
+    public void setTaskInstanceList(List<TaskInstance> taskInstanceList) {
+        this.taskInstanceList = taskInstanceList;
+    }
 
     public String getId() {
         return id;
@@ -87,19 +112,19 @@ public class StageInstance {
         this.stageTime = stageTime;
     }
 
-    public int getStageState() {
+    public String getStageState() {
         return stageState;
     }
 
-    public void setStageState(int stageState) {
+    public void setStageState(String stageState) {
         this.stageState = stageState;
     }
 
-    public String getStagesId() {
-        return stagesId;
+    public String getParentId() {
+        return parentId;
     }
 
-    public void setStagesId(String stagesId) {
-        this.stagesId = stagesId;
+    public void setParentId(String parentId) {
+        this.parentId = parentId;
     }
 }

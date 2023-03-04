@@ -44,7 +44,7 @@ public class PostprocessServiceImpl implements PostprocessService {
         TaskMessageType message = JSON.parseObject(object, TaskMessageType.class);
         Tasks tasks = new Tasks();
         tasks.setValues(message);
-        tasks.setTaskSort(postprocess.getTaskSort());
+        tasks.setTaskSort(1);
         tasks.setTaskType(postprocess.getTaskType());
         tasks.setPostprocessId(postId);
         tasksService.createTasksOrTask(tasks);
@@ -68,14 +68,15 @@ public class PostprocessServiceImpl implements PostprocessService {
             if (id == null || !id.equals(pipelineId)){
                 continue;
             }
-            Tasks tasks = tasksService.findOnePostTaskOrTask(pipelineId);
+            String id1 = postprocess.getPostprocessId();
+            Tasks tasks = tasksService.findOnePostTaskOrTask(id1);
             list.add(tasks);
         }
         return list;
     }
 
     @Override
-    public List<Tasks> findAllTaskPostTask(String pipelineId) {
+    public List<Tasks> findAllTaskPostTask(String taskId) {
         List<Postprocess> allPost = findAllPost();
 
         if (allPost.isEmpty()){
@@ -84,10 +85,11 @@ public class PostprocessServiceImpl implements PostprocessService {
         List<Tasks> list = new ArrayList<>();
         for (Postprocess postprocess : allPost) {
             String id = postprocess.getTaskId();
-            if (id == null || !id.equals(pipelineId)){
+            if (id == null || !id.equals(taskId)){
                 continue;
             }
-            Tasks tasks = tasksService.findOnePostTaskOrTask(pipelineId);
+            String id1 = postprocess.getPostprocessId();
+            Tasks tasks = tasksService.findOnePostTaskOrTask(id1);
             list.add(tasks);
         }
         return list;
@@ -106,7 +108,7 @@ public class PostprocessServiceImpl implements PostprocessService {
     }
 
     /**
-     * 根据流水线id查询后置配置
+     * 根据任务id查询后置配置
      * @param taskId 流水线id
      * @return 配置
      */
@@ -128,10 +130,14 @@ public class PostprocessServiceImpl implements PostprocessService {
         return list;
     }
 
-    //更新
     @Override
     public void updatePostTask(Postprocess postprocess) {
-        // postTaskServer.updateConfig(postprocess);
+        Object values = postprocess.getValues();
+        String taskId = postprocess.getTaskId();
+        Tasks tasks = new Tasks();
+        tasks.setTaskId(taskId);
+        tasks.setValues(values);
+        tasksService.updateTasksTask(tasks);
     }
 
     //查询单个

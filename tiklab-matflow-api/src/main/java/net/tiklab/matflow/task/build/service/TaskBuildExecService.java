@@ -1,6 +1,6 @@
 package net.tiklab.matflow.task.build.service;
 
-import net.tiklab.matflow.pipeline.execute.model.PipelineProcess;
+import net.tiklab.matflow.task.task.model.Tasks;
 
 public interface TaskBuildExecService {
 
@@ -9,7 +9,7 @@ public interface TaskBuildExecService {
      * @param pipelineProcess 构建信息
      * @return 构建状态
      */
-    boolean build(PipelineProcess pipelineProcess, String configId ,int taskType);
+    boolean build(String pipelineId, Tasks task , int taskType);
 
 
 }

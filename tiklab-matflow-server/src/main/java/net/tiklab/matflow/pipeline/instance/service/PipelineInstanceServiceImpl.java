@@ -6,16 +6,15 @@ import net.tiklab.core.page.PaginationBuilder;
 import net.tiklab.join.JoinTemplate;
 import net.tiklab.matflow.pipeline.definition.model.Pipeline;
 import net.tiklab.matflow.pipeline.execute.service.PipelineExecServiceImpl;
-import net.tiklab.matflow.stages.model.Stage;
-import net.tiklab.matflow.stages.service.StageService;
-import net.tiklab.matflow.pipeline.execute.model.TaskRunLog;
 import net.tiklab.matflow.pipeline.instance.dao.PipelineInstanceDao;
 import net.tiklab.matflow.pipeline.instance.entity.PipelineInstanceEntity;
-import net.tiklab.matflow.pipeline.instance.model.*;
+import net.tiklab.matflow.pipeline.instance.model.PipelineInstance;
+import net.tiklab.matflow.pipeline.instance.model.PipelineInstanceQuery;
 import net.tiklab.matflow.support.authority.service.PipelineAuthorityService;
+import net.tiklab.matflow.support.util.PipelineFinal;
 import net.tiklab.matflow.support.util.PipelineUtil;
-import net.tiklab.matflow.task.task.model.TaskInstance;
-import net.tiklab.matflow.task.task.service.TaskInstanceService;
+import net.tiklab.matflow.task.task.service.TasksExecServiceImpl;
+import net.tiklab.matflow.task.task.service.TasksInstanceService;
 import net.tiklab.rpc.annotation.Exporter;
 import net.tiklab.utils.context.LoginContext;
 import org.slf4j.Logger;
@@ -24,7 +23,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
-import java.util.*;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 流水线实例服务
@@ -37,19 +38,19 @@ public class PipelineInstanceServiceImpl implements PipelineInstanceService {
     private PipelineInstanceDao pipelineInstanceDao;
 
     @Autowired
-    PipelineAuthorityService authorityService;
+    private PipelineAuthorityService authorityService;
 
     @Autowired
-    private TaskInstanceService taskInstanceService;
-
-    @Autowired
-    private StageService stagesServer;
+    private TasksInstanceService tasksInstanceService;
 
     @Autowired
     private JoinTemplate joinTemplate;
 
     //运行时间
-    Map<String, Integer> runTime = PipelineExecServiceImpl.runTime;
+    private final Map<String, Integer> runTime = TasksExecServiceImpl.runTime;
+
+    //实例id与实例
+    private final Map<String,PipelineInstance> instanceIdOrInstance = PipelineExecServiceImpl.instanceIdOrInstance;
 
     private static final Logger logger = LoggerFactory.getLogger(PipelineInstanceServiceImpl.class);
 
@@ -81,15 +82,12 @@ public class PipelineInstanceServiceImpl implements PipelineInstanceService {
         String date = PipelineUtil.date(1);
 
         PipelineInstance pipelineInstance = new PipelineInstance(date,startWAy,loginId,pipelineId);
-        pipelineInstance.setRunStatus(30);
+        pipelineInstance.setRunStatus(PipelineFinal.RUN_RUN);
         String instanceId = createInstance(pipelineInstance);
-
-        //初始化基本信息
-        pipelineInstance.setSort(1);
         pipelineInstance.setInstanceId(instanceId);
 
         //构建次数
-        PipelineInstance latelyInstance = findLastInstance(pipelineId);
+        PipelineInstance latelyInstance = findLatelyInstance(pipelineId);
         pipelineInstance.setFindNumber(1);
         if (latelyInstance != null){
             int findNumber = latelyInstance.getFindNumber();
@@ -104,7 +102,7 @@ public class PipelineInstanceServiceImpl implements PipelineInstanceService {
         PipelineInstance instance = findOneInstance(instanceId);
         String id = instance.getPipeline().getId();
         pipelineInstanceDao.deleteInstance(instanceId);
-        taskInstanceService.deleteInstanceLog(instanceId);
+        tasksInstanceService.deleteAllInstanceInstance(instanceId);
         String fileAddress = PipelineUtil.findFileAddress(id,2);
         //删除对应日志
         PipelineUtil.deleteFile(new File(fileAddress+"/"+instanceId+"/"));
@@ -141,55 +139,15 @@ public class PipelineInstanceServiceImpl implements PipelineInstanceService {
     }
 
     @Override
-    public Pagination<PipelineInstance> findUserAllInstance(PipelineInstanceQuery pipelineInstanceQuery){
-        Pagination<PipelineInstanceEntity> pagination = pipelineInstanceDao.findAllPageInstance(pipelineInstanceQuery);
-        List<PipelineInstance> pipelineExecHistories = BeanMapper.mapList(pagination.getDataList(), PipelineInstance.class);
-        joinTemplate.joinQuery(pipelineExecHistories);
-        return PaginationBuilder.build(pagination,pipelineExecHistories);
-
-    }
-
-    @Override
-    public Pagination<PipelineInstance> findUserRunPageInstance(PipelineInstanceQuery pipelineInstanceQuery){
-        Pagination<PipelineInstanceEntity> pagination = pipelineInstanceDao.findUserRunPageInstance(pipelineInstanceQuery);
-        List<PipelineInstance> pipelineExecHistories = BeanMapper.mapList(pagination.getDataList(), PipelineInstance.class);
-        joinTemplate.joinQuery(pipelineExecHistories);
-        return PaginationBuilder.build(pagination,pipelineExecHistories);
-    }
-
-    @Override
     public PipelineInstance findLatelyInstance(String pipelineId){
         List<PipelineInstanceEntity> latelySuccess = pipelineInstanceDao.findLatelyInstance(pipelineId);
         List<PipelineInstance> pipelineExecHistories = BeanMapper.mapList(latelySuccess, PipelineInstance.class);
         if (pipelineExecHistories.size() == 0){
             return null;
         }
-        joinTemplate.joinQuery(pipelineExecHistories);
-        return pipelineExecHistories.get(0);
-    }
-
-    @Override
-    public PipelineInstance findLastInstance(String pipelineId){
-
-        List<PipelineInstanceEntity> latelySuccess = pipelineInstanceDao.findLastInstance(pipelineId);
-
-        List<PipelineInstance> pipelineExecHistories = BeanMapper.mapList(latelySuccess, PipelineInstance.class);
-        if (pipelineExecHistories.size() == 0){
-            return null;
-        }
-        joinTemplate.joinQuery(pipelineExecHistories);
-        return pipelineExecHistories.get(0);
-    }
-
-    @Override
-    public PipelineInstance findRunInstance(String pipelineId){
-        List<PipelineInstanceEntity> latelySuccess = pipelineInstanceDao.findRunInstance(pipelineId);
-        List<PipelineInstance> pipelineExecHistories = BeanMapper.mapList(latelySuccess, PipelineInstance.class);
-        if (pipelineExecHistories.size() == 0){
-            return null;
-        }
-        joinTemplate.joinQuery(pipelineExecHistories);
-        return pipelineExecHistories.get(0);
+        PipelineInstance instance = pipelineExecHistories.get(0);
+        joinTemplate.joinQuery(instance);
+        return instance;
     }
 
     @Override
@@ -199,205 +157,63 @@ public class PipelineInstanceServiceImpl implements PipelineInstanceService {
     }
 
     @Override
-    public TaskRunLog findAll(String instanceId){
-        PipelineInstance instance = findOneInstance(instanceId);
-
-        if (instance == null){
-            return null;
-        }
-
-        TaskRunLog execRunLog = new TaskRunLog();
-        execRunLog.setName(String.valueOf(instance.getFindNumber()));
-        Pipeline pipeline = instance.getPipeline();
-        String pipelineId = pipeline.getId();
-        int pipelineType = pipeline.getType();
-
-        List<TaskRunLog> runLogList = new ArrayList<>();
-
-        if (pipelineType == 1){
-            List<TaskInstance> allLog = taskInstanceService.findAllLog(instanceId);
-            for (TaskInstance execLog : allLog) {
-                TaskRunLog runLog =  initLog(execLog);
-                runLogList.add(runLog);
-            }
-            Map<String, Object> timeState = findTimeState(runLogList);
-            execRunLog.setRunLog((String) timeState.get("runLog"));
-        }
-
-        if (pipelineType == 2){
-            //多阶段
-            List<Stage> stageMainStage = stagesServer.findAllMainStage(pipelineId);
-            for (Stage stage : stageMainStage) {
-
-                String stagesId = stage.getStageId();
-                //并行阶段
-                List<TaskRunLog> logList= new ArrayList<>();
-                List<Stage> allMainStage = stagesServer.findOtherStage(stagesId);
-                for (Stage pipelineStage : allMainStage) {
-
-                    String stagesStagesId = pipelineStage.getStageId();
-                    //并行阶段任务
-                    List<TaskInstance> allStagesLog = taskInstanceService.findAllStagesLog(instanceId, stagesStagesId);
-                    List<TaskRunLog> logs = new ArrayList<>();
-                    for (TaskInstance log : allStagesLog) {
-                        TaskRunLog runLogs =  initLog(log);
-                        logs.add(runLogs);
-                    }
-                    TaskRunLog taskRunLog = initRunLog(logs, pipelineStage);
-                    logList.add(taskRunLog);
-                }
-                TaskRunLog runLog = initRunLog(logList, stage);
-                runLogList.add(runLog);
-            }
-
-            //添加消息阶段
-            List<TaskInstance> allLog = taskInstanceService.findAllLog(instanceId);
-            allLog.removeIf(pipelineExecLog -> PipelineUtil.isNoNull(pipelineExecLog.getStagesId()));
-            if (allLog.size() == 0){
-                execRunLog.setRunLogList(runLogList);
-                return execRunLog;
-            }
-
-            List<TaskRunLog> logs = new ArrayList<>();
-            for (TaskInstance taskInstance : allLog) {
-                TaskRunLog log =  initLog(taskInstance);
-                logs.add(log);
-            }
-            Stage stage = new Stage();
-            stage.setStageName("后置任务");
-            stage.setStageId("后置任务");
-            TaskRunLog runLog = initRunLog(logs, stage);
-            runLogList.add(runLog);
-        }
-        execRunLog.setRunLogList(runLogList);
-        return execRunLog;
-    }
-
-    public TaskRunLog initLog(TaskInstance log){
-        TaskRunLog runLog = new TaskRunLog();
-        runLog.setId(log.getLogId());
-        runLog.setState(log.getRunState());
-        runLog.setType(log.getTaskType());
-        runLog.setTime(log.getRunTime());
-        runLog.setName(log.getTaskName());
-        String logAddress = log.getLogAddress();
-        runLog.setRunLog(PipelineUtil.readFile(logAddress,500));
-        return runLog;
-    }
-
-    public TaskRunLog initRunLog(List<TaskRunLog> logs, Stage stage){
-        TaskRunLog taskRunLog = new TaskRunLog();
-        taskRunLog.setName(stage.getStageName());
-        taskRunLog.setRunLogList(logs);
-        taskRunLog.setName(stage.getStageName());
-        taskRunLog.setId(stage.getStageId());
-        Map<String, Object> timeState = findTimeState(logs);
-        taskRunLog.setState((Integer) timeState.get("state"));
-        taskRunLog.setTime((Integer) timeState.get("time"));
-        taskRunLog.setRunLog((String) timeState.get("runLog"));
-        return taskRunLog;
-    }
-
-    public Map<String,Object> findTimeState(List<TaskRunLog> logs){
-        int time = 0;
-        int state = 0;
-        int runState = 0;
-        StringBuilder runLog  = new StringBuilder();
-        Map<String,Object> map = new HashMap<>();
-        for (TaskRunLog log : logs) {
-            time = time + log.getTime();
-            runLog.append(log.getRunLog());
-            state = state + log.getState();
-            if (log.getState() == 1){
-                runState = 1;
-            }
-            if (log.getState() == 20 && runState != 1){
-                runState = 20;
-            }
-        }
-
-        if (runState == 0 ){
-            runState = state/logs.size();
-        }
-
-        map.put("time",time);
-        map.put("state",runState);
-        map.put("runLog", runLog.toString());
-        return map;
-    }
-
-    @Override
-    public Pagination<PipelineInstance> findPageInstance(PipelineInstanceQuery pipelineInstanceQuery){
+    public Pagination<PipelineInstance> findPipelineInstance(PipelineInstanceQuery pipelineInstanceQuery){
         if (pipelineInstanceQuery.getPipelineId() == null){
             return null;
         }
         Pagination<PipelineInstanceEntity> pagination = pipelineInstanceDao.findPageInstance(pipelineInstanceQuery);
-        List<PipelineInstance> pipelineExecHistories = BeanMapper.mapList(pagination.getDataList(), PipelineInstance.class);
-        if (pipelineExecHistories == null){
-            return null;
+        List<PipelineInstance> execInstanceList= BeanMapper.mapList(pagination.getDataList(), PipelineInstance.class);
+
+        int size = execInstanceList.size();
+        for (int i = size -1 ; i >= 0; i--) {
+            PipelineInstance instance = execInstanceList.get(i);
+            String id = instance.getInstanceId();
+            PipelineInstance pipelineInstance = instanceIdOrInstance.get(id);
+            if (pipelineInstance != null){
+                Integer integer = runTime.get(id);
+                pipelineInstance.setRunTime(integer);
+                execInstanceList.remove(i);
+                execInstanceList.add(pipelineInstance);
+            }
         }
-        joinTemplate.joinQuery(pipelineExecHistories);
-        return PaginationBuilder.build(pagination,pipelineExecHistories);
+
+        // for (PipelineInstance instance : execInstanceList) {
+        //     String id = instance.getInstanceId();
+        //     PipelineInstance pipelineInstance = instanceIdOrInstance.get(id);
+        //     if (pipelineInstance != null){
+        //         instance = pipelineInstance;
+        //         Integer integer = runTime.get(id);
+        //         instance.setRunTime(integer);
+        //     }
+        // }
+
+        joinTemplate.joinQuery(execInstanceList);
+        return PaginationBuilder.build(pagination,execInstanceList);
     }
 
     @Override
-    public Pagination<PipelineInstance> findUserAllHistory(PipelineInstanceQuery pipelineHistoryQuery){
-        String id = LoginContext.getLoginId();
-        List<Pipeline> allPipeline = authorityService.findUserPipeline(id);
-        if (allPipeline.isEmpty()){
-            return null;
+    public Pagination<PipelineInstance> findUserInstance(PipelineInstanceQuery pipelineInstanceQuery){
+        String loginId = LoginContext.getLoginId();
+        List<Pipeline> userPipeline = authorityService.findUserPipeline(loginId);
+        pipelineInstanceQuery.setPipelineList(userPipeline);
+        Pagination<PipelineInstanceEntity> pagination = pipelineInstanceDao.findAllPageInstance(pipelineInstanceQuery);
+        List<PipelineInstance> execInstanceList = BeanMapper.mapList(pagination.getDataList(), PipelineInstance.class);
+        joinTemplate.joinQuery(execInstanceList);
+        for (int i = execInstanceList.size() -1 ; i >= 0; i--) {
+            PipelineInstance instance = execInstanceList.get(i);
+            String id = instance.getInstanceId();
+            PipelineInstance pipelineInstance = instanceIdOrInstance.get(id);
+            if (pipelineInstance != null){
+                Integer integer = runTime.get(id);
+                pipelineInstance.setRunTime(integer);
+                execInstanceList.remove(i);
+                execInstanceList.add(pipelineInstance);
+            }
         }
-        if (!PipelineUtil.isNoNull(pipelineHistoryQuery.getPipelineId())){
-            pipelineHistoryQuery.setPipelineList(allPipeline);
-        }
-        return findUserAllInstance(pipelineHistoryQuery);
+        return PaginationBuilder.build(pagination,execInstanceList);
     }
 
 
-    /**
-     * 获取正在运行的流水线
-     * @param pipelineHistoryQuery 分页
-     * @return 流水线信息
-     */
-    @Override
-    public Pagination<PipelineInstance> findUserRunPageHistory(PipelineInstanceQuery pipelineHistoryQuery){
-        List<Pipeline> userPipeline = authorityService.findUserPipeline(LoginContext.getLoginId());
-        if (userPipeline.isEmpty()){
-            return null;
-        }
-        pipelineHistoryQuery.setPipelineList(userPipeline);
-        Pagination<PipelineInstance> pageHistory =
-                findUserAllInstance(pipelineHistoryQuery);
-
-        List<PipelineInstance> dataList = pageHistory.getDataList();
-        if (dataList.isEmpty()){
-            return null;
-        }
-        //判断是否有正在运行的历史
-        int historyStatus = dataList.get(0).getRunStatus();
-        if (historyStatus != 30){
-            return pageHistory;
-        }
-        for (PipelineInstance history : dataList) {
-            String historyId = history.getInstanceId();
-            int status = history.getRunStatus();
-            if (status != 30){
-                continue;
-            }
-            int time = 0;
-            //获取正在运行的历史的时间
-            List<TaskInstance> allLog = taskInstanceService.findAllLog(historyId);
-            for (TaskInstance log : allLog) {
-                Integer integer = runTime.get(log.getLogId());
-                if (integer != null){
-                    time = time + integer;
-                }
-            }
-            history.setRunTime(time);
-        }
-        pageHistory.setDataList(dataList);
-        return pageHistory;
-    }
 
 
 

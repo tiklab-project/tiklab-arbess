@@ -3,6 +3,7 @@ package net.tiklab.matflow.pipeline.overview.service;
 import net.tiklab.matflow.pipeline.overview.model.PipelineOverview;
 import net.tiklab.matflow.pipeline.instance.model.PipelineInstance;
 import net.tiklab.matflow.pipeline.instance.service.PipelineInstanceService;
+import net.tiklab.matflow.support.util.PipelineFinal;
 import net.tiklab.matflow.support.util.PipelineUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,13 +34,13 @@ public class PipelineOverviewServiceImpl implements PipelineOverviewService {
         }
         PipelineOverview state = new PipelineOverview();
         for (PipelineInstance history : allHistory) {
-            if (history.getRunStatus() == 1){
+            if (history.getRunStatus().equals(PipelineFinal.RUN_ERROR) ){
                 state.setErrorNumber(state.getErrorNumber() + 1);
             }
-            if (history.getRunStatus() == 20){
+            if (history.getRunStatus().equals(PipelineFinal.RUN_HALT)){
                 state.setRemoveNumber(state.getRemoveNumber() + 1);
             }
-            if (history.getRunStatus() == 10){
+            if (history.getRunStatus().equals(PipelineFinal.RUN_SUCCESS)){
                 state.setSuccessNumber(state.getSuccessNumber() + 1);
             }
             state.setExecTime(state.getExecTime()+history.getRunTime());

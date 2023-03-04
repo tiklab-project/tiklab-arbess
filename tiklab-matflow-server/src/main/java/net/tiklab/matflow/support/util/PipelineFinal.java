@@ -7,6 +7,16 @@ public class PipelineFinal {
      */
     public static final String appName = "matflow";
 
+    public static final String RUN_SUCCESS = "success";
+
+    public static final String RUN_ERROR = "error";
+
+    public static final String RUN_WAIT = "wait";
+
+    public static final String RUN_HALT = "halt";
+
+    public static final String RUN_RUN = "run";
+
     public static final String UTF_8 = "UTF-8";
 
     public static final String GBK = "GBK";
@@ -25,7 +35,6 @@ public class PipelineFinal {
     public static final String MES_PIPELINE_TASK_RUN = "MES_PIPELINE_TASK_RUN"; //流水线任务运行消息
 
     public static final String MES_TEM_SITE = "site"; //流水线创建信息模板
-
 
     //消息发送方式
     public static final String MES_SENT_SITE = "site"; //流水线创建信息模板
@@ -56,6 +65,13 @@ public class PipelineFinal {
     public static final String LOG_TEM_CONFIG_CREATE = "LOG_TEM_PIPELINE_CONFIG_CREATE";
     public static final String LOG_TEM_CONFIG_DELETE = "LOG_TEM_PIPELINE_CONFIG_DELETE";
     public static final String LOG_TEM_CONFIG_UPDATE = "LOG_TEM_PIPELINE_CONFIG_UPDATE";
+
+
+
+
+
+
+
 
 
 

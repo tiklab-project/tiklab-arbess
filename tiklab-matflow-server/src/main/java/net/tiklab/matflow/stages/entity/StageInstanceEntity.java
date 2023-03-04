@@ -34,7 +34,7 @@ public class StageInstanceEntity {
 
     //运行状态
     @Column(name = "stage_state")
-    private int stageState;
+    private String stageState;
 
     //阶段id
     @Column(name = "stages_id")
@@ -89,11 +89,11 @@ public class StageInstanceEntity {
         this.stageTime = stageTime;
     }
 
-    public int getStageState() {
+    public String getStageState() {
         return stageState;
     }
 
-    public void setStageState(int stageState) {
+    public void setStageState(String stageState) {
         this.stageState = stageState;
     }
 

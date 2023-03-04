@@ -12,7 +12,10 @@ import java.util.List;
 @Mapper(targetAlias = "TaskMessageTypeEntity")
 public class TaskMessageType {
 
-    @ApiProperty(name = "taskId",desc = "id")
+    @ApiProperty(name = "id",desc = "id")
+    private String id;
+
+    @ApiProperty(name = "taskId",desc = "任务id")
     private String taskId;
 
     @ApiProperty(name="taskType",desc="消息类型")
@@ -23,6 +26,14 @@ public class TaskMessageType {
 
     @ApiProperty(name="userList",desc="接收人信息")
     private List<TaskUserSendMessageType> userList;
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
     public List<String> getTypeList() {
         return typeList;

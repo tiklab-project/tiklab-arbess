@@ -36,30 +36,18 @@ public class TaskInstance {
     @ApiProperty(name = "runTime",desc = "运行时间")
     private int runTime;
 
-    @ApiProperty(name = "runState",desc = "运行状态1.失败 10.成功 20.停止")
-    private int runState;
+    @ApiProperty(name = "runState",desc = "运行状态 error.失败 success.成功 halt.停止 wait.等待")
+    private String runState;
 
     @ApiProperty(name="stageId",desc="阶段id")
     private String stagesId;
 
-
+    @ApiProperty(name="runLog",desc="运行日志")
     private String runLog;
 
     public TaskInstance() {
     }
 
-    public TaskInstance(String instanceId, int taskType, int taskSort) {
-        this.instanceId = instanceId;
-        this.taskType = taskType;
-        this.taskSort = taskSort;
-    }
-
-    public TaskInstance(String instanceId, int taskType, int taskSort, String stagesId) {
-        this.instanceId = instanceId;
-        this.taskType = taskType;
-        this.taskSort = taskSort;
-        this.stagesId = stagesId;
-    }
 
     public String getStagesId() {
         return stagesId;
@@ -117,11 +105,11 @@ public class TaskInstance {
         this.runTime = runTime;
     }
 
-    public int getRunState() {
+    public String getRunState() {
         return runState;
     }
 
-    public void setRunState(int runState) {
+    public void setRunState(String runState) {
         this.runState = runState;
     }
 

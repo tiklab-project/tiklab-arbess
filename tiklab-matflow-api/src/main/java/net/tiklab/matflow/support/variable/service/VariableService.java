@@ -25,6 +25,16 @@ public interface VariableService {
      */
     void updateVariable(Variable variable);
 
+
+    /**
+     * 替换变量
+     * @param pipelineId 流水线id
+     * @param taskId 任务id
+     * @param order 需要替换的内容
+     * @return 替换后的内容
+     */
+    String replaceVariable(String pipelineId,String taskId,String order);
+
     /**
      * 查询单个变量
      * @param varId 变量id

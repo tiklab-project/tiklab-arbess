@@ -28,13 +28,13 @@ public class PipelineProcess {
     private String[] error;
 
     //配置id
-    private String configId;
+    private String taskId;
 
     //历史id
-    private String historyId;
+    private String instanceId;
 
     //日志id
-    private String logId;
+    private String taskInstanceId;
 
     public PipelineProcess() {
     }
@@ -42,23 +42,6 @@ public class PipelineProcess {
     public PipelineProcess(String id) {
         this.pipeline = new Pipeline(id);
     }
-
-    public String getHistoryId() {
-        return historyId;
-    }
-
-    public void setHistoryId(String historyId) {
-        this.historyId = historyId;
-    }
-
-    public String getLogId() {
-        return logId;
-    }
-
-    public void setLogId(String logId) {
-        this.logId = logId;
-    }
-
 
     public Pipeline getPipeline() {
         return pipeline;
@@ -101,14 +84,27 @@ public class PipelineProcess {
         this.error = error;
     }
 
-    public String getConfigId() {
-        return configId;
+    public String getTaskId() {
+        return taskId;
     }
 
-    public void setConfigId(String configId) {
-        this.configId = configId;
+    public void setTaskId(String taskId) {
+        this.taskId = taskId;
     }
 
+    public String getInstanceId() {
+        return instanceId;
+    }
 
+    public void setInstanceId(String instanceId) {
+        this.instanceId = instanceId;
+    }
 
+    public String getTaskInstanceId() {
+        return taskInstanceId;
+    }
+
+    public void setTaskInstanceId(String taskInstanceId) {
+        this.taskInstanceId = taskInstanceId;
+    }
 }

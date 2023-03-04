@@ -31,7 +31,7 @@ public class PipelineInstanceEntity {
 
     //状态 1.失败 10.成功 20:停止
     @Column(name = "run_status",notNull = true)
-    private int runStatus;
+    private String runStatus;
 
     //执行时间
     @Column(name = "run_time",notNull = true)
@@ -40,10 +40,6 @@ public class PipelineInstanceEntity {
     //流水线
     @Column(name = "pipeline_id",notNull = true)
     private String pipelineId;
-
-    //判断是否正在执行（0.运行完成，1.运行中）
-    @Column(name = "find_state", notNull = true)
-    private int findState;
 
     //构建次数
     @Column(name = "find_number", notNull = true)
@@ -89,11 +85,11 @@ public class PipelineInstanceEntity {
         this.pipelineId = pipelineId;
     }
 
-    public int getRunStatus() {
+    public String getRunStatus() {
         return runStatus;
     }
 
-    public void setRunStatus(int runStatus) {
+    public void setRunStatus(String runStatus) {
         this.runStatus = runStatus;
     }
 
@@ -103,14 +99,6 @@ public class PipelineInstanceEntity {
 
     public void setRunTime(int runTime) {
         this.runTime = runTime;
-    }
-
-    public int getFindState() {
-        return findState;
-    }
-
-    public void setFindState(int findState) {
-        this.findState = findState;
     }
 
     public int getFindNumber() {

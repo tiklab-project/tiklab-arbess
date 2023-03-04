@@ -59,7 +59,8 @@ public class TaskMessageUserServiceImpl implements TaskMessageUserService {
     public List<TaskUserSendMessageType> findAllUserMessage(String taskId){
         List<TaskUserSendMessageType> list = new ArrayList<>();
         for (TaskMessageUser messageUser : findAllMessage()) {
-            if (messageUser.getMessageTaskId().equals(taskId)){
+            String messageTaskId = messageUser.getMessageTaskId();
+            if (messageTaskId.equals(taskId)){
                 joinTemplate.joinQuery(messageUser);
                 User user = messageUser.getUser();
                 int receiveType = messageUser.getReceiveType();

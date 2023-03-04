@@ -1,7 +1,6 @@
 package net.tiklab.matflow.support.webSocket;
 
 import com.alibaba.fastjson.JSONObject;
-import net.tiklab.matflow.pipeline.execute.model.TaskRunLog;
 import net.tiklab.matflow.pipeline.execute.service.PipelineExecService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -12,7 +11,6 @@ import org.springframework.web.socket.*;
 
 import java.io.IOException;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -73,16 +71,16 @@ public class TaskWebSocketService implements WebSocketHandler {
         String deviceId = this.getDeviceId(session);
         logger.info("主机："+deviceId + "   接收到的消息为：" + msg);
         JSONObject params = new JSONObject();
-        int state = pipelineExecService.findPipelineState(msg);
-        if (state == 1){
-            logger.info("流水线："+msg+"未执行。");
-            params.put("data",0);
-            message = new TextMessage(params.toString());
-            session.sendMessage(message);
-            return;
-        }
-        TaskRunLog runList = pipelineExecService.findPipelineRunMessage(msg);
-        params.put("data", Objects.requireNonNullElse(runList, 0));
+        // int state = pipelineExecService.findPipelineState(msg);
+        // if (state == 1){
+        //     logger.info("流水线："+msg+"未执行。");
+        //     params.put("data",0);
+        //     message = new TextMessage(params.toString());
+        //     session.sendMessage(message);
+        //     return;
+        // }
+        // TaskRunLog runList = pipelineExecService.findPipelineRunMessage(msg);
+        // params.put("data", Objects.requireNonNullElse(runList, 0));
         session.sendMessage(new TextMessage(params.toString()));
     }
 

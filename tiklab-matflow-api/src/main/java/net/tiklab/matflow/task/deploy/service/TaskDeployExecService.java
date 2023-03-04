@@ -1,6 +1,6 @@
 package net.tiklab.matflow.task.deploy.service;
 
-import net.tiklab.matflow.pipeline.execute.model.PipelineProcess;
+import net.tiklab.matflow.task.task.model.Tasks;
 
 public interface TaskDeployExecService {
 
@@ -9,7 +9,7 @@ public interface TaskDeployExecService {
      * @param pipelineProcess 部署信息
      * @return 部署状态
      */
-    boolean deploy(PipelineProcess pipelineProcess,String configId ,int taskType);
+    boolean deploy(String pipelineId, Tasks task , int taskType);
 
 
 }
