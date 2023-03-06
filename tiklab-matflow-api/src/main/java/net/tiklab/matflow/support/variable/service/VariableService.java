@@ -3,7 +3,9 @@ package net.tiklab.matflow.support.variable.service;
 import net.tiklab.matflow.support.variable.model.Variable;
 
 import java.util.List;
-
+/**
+ * 流水线条件服务接口
+ */
 public interface VariableService {
 
     /**

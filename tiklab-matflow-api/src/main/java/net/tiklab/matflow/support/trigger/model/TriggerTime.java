@@ -6,7 +6,9 @@ import net.tiklab.postin.annotation.ApiModel;
 import net.tiklab.postin.annotation.ApiProperty;
 
 import java.util.List;
-
+/**
+ * 流水线触发器时间模型
+ */
 @ApiModel
 @Join
 @Mapper(targetAlias = "TriggerTimeEntity")

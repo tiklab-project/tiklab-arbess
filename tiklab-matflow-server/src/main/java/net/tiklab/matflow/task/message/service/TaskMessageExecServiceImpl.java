@@ -3,14 +3,11 @@ package net.tiklab.matflow.task.message.service;
 import net.tiklab.core.exception.ApplicationException;
 import net.tiklab.matflow.home.service.PipelineHomeService;
 import net.tiklab.matflow.pipeline.definition.model.Pipeline;
-import net.tiklab.matflow.pipeline.execute.model.PipelineProcess;
 import net.tiklab.matflow.support.condition.service.ConditionService;
 import net.tiklab.matflow.support.util.PipelineUtil;
 import net.tiklab.matflow.support.variable.service.VariableService;
-import net.tiklab.matflow.task.deploy.model.TaskDeploy;
 import net.tiklab.matflow.task.message.model.TaskMessageType;
 import net.tiklab.matflow.task.message.model.TaskUserSendMessageType;
-import net.tiklab.matflow.task.task.model.TaskInstance;
 import net.tiklab.matflow.task.task.model.Tasks;
 import net.tiklab.matflow.task.task.service.TasksInstanceService;
 import net.tiklab.rpc.annotation.Exporter;
@@ -22,7 +19,6 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static net.tiklab.matflow.support.util.PipelineFinal.*;
 

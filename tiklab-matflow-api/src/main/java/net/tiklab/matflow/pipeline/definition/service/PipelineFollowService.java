@@ -4,6 +4,9 @@ import net.tiklab.matflow.pipeline.definition.model.PipelineFollow;
 
 import java.util.List;
 
+/**
+ * 流水线收藏服务接口
+ */
 public interface PipelineFollowService {
 
     /**

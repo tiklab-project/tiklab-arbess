@@ -15,10 +15,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 任务执行实例服务接口
@@ -47,12 +44,12 @@ public class TasksInstanceServiceImpl implements TasksInstanceService {
 
     @Override
     public void deleteAllInstanceInstance(String instanceId) {
-        List<TaskInstance> allStageInstance = findAllStageInstance(instanceId);
-        if (allStageInstance.isEmpty()){
+        List<TaskInstance> allInstanceInstance = findAllInstanceInstance(instanceId);
+        if (allInstanceInstance.isEmpty()){
             return;
         }
-        for (TaskInstance instance : allStageInstance) {
-            String taskInstanceId = instance.getInstanceId();
+        for (TaskInstance instance : allInstanceInstance) {
+            String taskInstanceId = instance.getId();
             deleteTaskInstance(taskInstanceId);
         }
     }
@@ -64,7 +61,7 @@ public class TasksInstanceServiceImpl implements TasksInstanceService {
             return;
         }
         for (TaskInstance instance : allStageInstance) {
-            String instanceId = instance.getInstanceId();
+            String instanceId = instance.getId();
             deleteTaskInstance(instanceId);
         }
     }
@@ -89,21 +86,27 @@ public class TasksInstanceServiceImpl implements TasksInstanceService {
         List<TaskInstance> list = new ArrayList<>();
         for (TaskInstance instance : allInstance) {
             String id = instance.getInstanceId();
-            if (!id.equals(instanceId)){
+            if (id == null || !id.equals(instanceId)){
                 continue;
             }
             //任务是否在运行中
-            String taskInstanceId = instance.getInstanceId();
+            String taskInstanceId = instance.getId();
             TaskInstance taskInstance = taskOrTaskInstance.get(taskInstanceId);
             if (taskInstance != null){
                 Integer integer = runTime.get(taskInstanceId);
+                if (integer == null){
+                    integer = 0;
+                }
                 taskInstance.setRunTime(integer);
                 list.add(taskInstance);
             }else {
+                String logAddress = instance.getLogAddress();
+                String readFile = PipelineUtil.readFile(logAddress, 500);
+                instance.setRunLog(readFile);
                 list.add(instance);
             }
         }
-
+        list.sort(Comparator.comparing(TaskInstance::getTaskSort));
         return list;
     }
 
@@ -116,19 +119,26 @@ public class TasksInstanceServiceImpl implements TasksInstanceService {
         List<TaskInstance> list = new ArrayList<>();
         for (TaskInstance instance : allInstance) {
             String stagesId = instance.getStagesId();
-            if (!stagesId.equals(stageId)){
+            if (stagesId == null || !stagesId.equals(stageId)){
                 continue;
             }
             String instanceId = instance.getInstanceId();
             TaskInstance taskInstance = taskOrTaskInstance.get(instanceId);
             if (taskInstance == null){
+                String logAddress = instance.getLogAddress();
+                String readFile = PipelineUtil.readFile(logAddress, 500);
+                instance.setRunLog(readFile);
                 list.add(instance);
             }else {
                 Integer integer = runTime.get(instanceId);
+                if (integer == null){
+                    integer = 0;
+                }
                 taskInstance.setRunTime(integer);
                 list.add(taskInstance);
             }
         }
+        list.sort(Comparator.comparing(TaskInstance::getTaskSort));
         return list;
     }
 
@@ -207,8 +217,8 @@ public class TasksInstanceServiceImpl implements TasksInstanceService {
     }
 
     @Override
-    public void writeExecLog(String taskId, String instance){
-        if(!PipelineUtil.isNoNull(instance)){
+    public void writeExecLog(String taskId, String execLog){
+        if(!PipelineUtil.isNoNull(execLog)){
             return;
         }
         String taskInstanceId = taskIdOrTaskInstanceId.get(taskId);
@@ -222,15 +232,17 @@ public class TasksInstanceServiceImpl implements TasksInstanceService {
         String execInstance = taskInstance.getRunLog();
 
         if (!PipelineUtil.isNoNull(execInstance)){
-            taskInstance.setRunLog(instance);
+            taskInstance.setRunLog(execLog);
         }else {
-            taskInstance.setRunLog(execInstance +"\n"+ instance);
+            taskInstance.setRunLog(execInstance +"\n"+ execLog);
         }
 
         //长度过长写入文件中
-        if (taskInstance.getRunLog().length() > 25000){
-            String runInstance = taskInstance.getRunLog();
-            PipelineUtil.logWriteFile(execInstance,runInstance);
+        String runInstance = taskInstance.getRunLog();
+        if (runInstance.length() > 25000){
+            String logAddress = taskInstance.getLogAddress();
+            System.out.println(logAddress);
+            PipelineUtil.logWriteFile(runInstance,logAddress);
             taskInstance.setRunLog(null);
         }
 

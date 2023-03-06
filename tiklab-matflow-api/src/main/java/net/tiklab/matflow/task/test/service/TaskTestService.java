@@ -7,7 +7,9 @@ import net.tiklab.join.annotation.JoinProvider;
 import net.tiklab.matflow.task.test.model.TaskTest;
 
 import java.util.List;
-
+/**
+ * 任务测试服务接口
+ */
 @JoinProvider(model = TaskTest.class)
 public interface TaskTestService {
     /**

@@ -9,7 +9,9 @@ import net.tiklab.matflow.pipeline.definition.model.Pipeline;
 import net.tiklab.postin.annotation.ApiModel;
 import net.tiklab.postin.annotation.ApiProperty;
 
-
+/**
+ * 流水线触发器模型
+ */
 @ApiModel
 @Join
 @Mapper(targetAlias = "PipelineTriggerEntity")

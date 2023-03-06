@@ -8,7 +8,9 @@ import net.tiklab.matflow.support.postprocess.model.Postprocess;
 import net.tiklab.matflow.task.task.model.Tasks;
 
 import java.util.List;
-
+/**
+ * 流水线后置处理服务接口
+ */
 @JoinProvider(model = Postprocess.class)
 public interface PostprocessService {
 

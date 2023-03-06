@@ -8,7 +8,9 @@ import net.tiklab.join.annotation.JoinProvider;
 import net.tiklab.matflow.task.build.model.TaskBuild;
 
 import java.util.List;
-
+/**
+ * 任务构建服务接口
+ */
 @JoinProvider(model = TaskBuild.class)
 public interface TaskBuildService {
 

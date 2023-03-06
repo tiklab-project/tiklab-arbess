@@ -8,7 +8,9 @@ import net.tiklab.join.annotation.JoinQuery;
 import net.tiklab.postin.annotation.ApiModel;
 import net.tiklab.postin.annotation.ApiProperty;
 import net.tiklab.user.user.model.User;
-
+/**
+ * 任务消息接收人模型
+ */
 @ApiModel
 @Join
 @Mapper(targetAlias = "TaskMessageUserEntity")

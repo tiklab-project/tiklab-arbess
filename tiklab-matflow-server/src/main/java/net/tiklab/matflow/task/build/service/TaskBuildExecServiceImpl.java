@@ -66,7 +66,11 @@ public class TaskBuildExecServiceImpl implements TaskBuildExecService {
                 String key = variableServer.replaceVariable(pipelineId, taskId, s);
                 tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"执行命令："+ key);
                 Process process = getOrder(key,type,buildAddress, path);
-                tasksInstanceService.readCommandExecResult(process,null,error(type),taskId);
+                boolean result = tasksInstanceService.readCommandExecResult(process, null, error(type), taskId);
+                if (!result){
+                    tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"任务："+task.getTaskName()+"执行失败。");
+                    return false;
+                }
             }
         } catch (IOException | ApplicationException e) {
             String s = PipelineUtil.date(4) + e.getMessage();

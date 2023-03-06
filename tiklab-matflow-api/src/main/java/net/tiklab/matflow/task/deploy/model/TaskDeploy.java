@@ -4,7 +4,9 @@ import net.tiklab.beans.annotation.Mapper;
 import net.tiklab.join.annotation.Join;
 import net.tiklab.postin.annotation.ApiModel;
 import net.tiklab.postin.annotation.ApiProperty;
-
+/**
+ * 任务部署模型
+ */
 @ApiModel
 @Join
 @Mapper(targetAlias = "TaskDeployEntity")

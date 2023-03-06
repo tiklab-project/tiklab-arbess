@@ -3,6 +3,7 @@ package net.tiklab.matflow.pipeline.definition.model;
 
 import net.tiklab.join.annotation.Join;
 import net.tiklab.postin.annotation.ApiModel;
+import net.tiklab.postin.annotation.ApiProperty;
 import net.tiklab.user.user.model.User;
 
 /**
@@ -12,38 +13,39 @@ import net.tiklab.user.user.model.User;
 @ApiModel
 @Join
 public class PipelineExecMessage {
-
+    @ApiProperty(name="id",desc="id")
     private String id;
 
-    //收藏状态
+    @ApiProperty(name="collect",desc="收藏状态 0.未收藏 1.收藏")
     private int collect;
 
-    //最近构建状态
+    @ApiProperty(name="buildStatus",desc="最近构建状态")
     private String buildStatus;
 
-    //流水线名称
+    @ApiProperty(name="name",desc="流水线名称")
     private String name;
 
-    //最近构建时间
+    @ApiProperty(name="lastBuildTime",desc="最近构建时间")
     private String lastBuildTime;
 
-    //运行状态 (1.运行中 2.停止中)
+    @ApiProperty(name="state",desc="运行状态 (1.运行中 2.停止中)")
     private int state;
 
-    //颜色
+    @ApiProperty(name="color",desc="颜色")
     private int color;
 
-    //流水线类型(1.单任务 2.多任务)
+    @ApiProperty(name="type",desc="流水线类型(1.单任务 2.多任务)")
     private int type;
 
-    //权限(1.全局 2.私有)
+    @ApiProperty(name="power",desc="权限(1.全局 2.私有)")
     private int power;
 
-    //用户(负责人)
+    @ApiProperty(name="user",desc="用户(负责人)")
     private User user;
 
-    //用户(执行人)
+    @ApiProperty(name="execUser",desc="用户(执行人)")
     private User execUser;
+
 
     public String getId() {
         return id;

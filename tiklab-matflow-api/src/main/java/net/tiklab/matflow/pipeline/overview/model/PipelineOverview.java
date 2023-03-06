@@ -2,6 +2,7 @@ package net.tiklab.matflow.pipeline.overview.model;
 
 
 import net.tiklab.postin.annotation.ApiModel;
+import net.tiklab.postin.annotation.ApiProperty;
 import net.tiklab.user.user.model.User;
 
 /**
@@ -11,25 +12,25 @@ import net.tiklab.user.user.model.User;
 @ApiModel
 public class PipelineOverview {
 
-    //运行次数
+    @ApiProperty(name="number",desc="运行次数")
     private int number;
 
-    //平均执行时长
+    @ApiProperty(name="execTime",desc="平均执行时长")
     private int execTime;
 
-    //执行人
+    @ApiProperty(name="user",desc="执行人")
     private User user;
 
-    //成功次数
+    @ApiProperty(name="successNumber",desc="成功次数")
     private int successNumber;
 
-    //失败次数
+    @ApiProperty(name="errorNumber",desc="失败次数")
     private int errorNumber;
 
-    //停止次数
+    @ApiProperty(name="removeNumber",desc="停止次数")
     private int removeNumber;
 
-    //平均执行时长(转换成时分秒)
+    @ApiProperty(name="time",desc="平均执行时长(转换成时分秒)")
     private String time;
 
 

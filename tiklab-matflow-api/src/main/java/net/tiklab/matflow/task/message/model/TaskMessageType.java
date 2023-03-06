@@ -6,7 +6,9 @@ import net.tiklab.postin.annotation.ApiModel;
 import net.tiklab.postin.annotation.ApiProperty;
 
 import java.util.List;
-
+/**
+ * 任务消息类型模型
+ */
 @ApiModel
 @Join
 @Mapper(targetAlias = "TaskMessageTypeEntity")

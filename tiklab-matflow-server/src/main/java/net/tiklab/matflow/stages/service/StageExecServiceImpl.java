@@ -1,7 +1,6 @@
 package net.tiklab.matflow.stages.service;
 
 import net.tiklab.core.exception.ApplicationException;
-import net.tiklab.matflow.pipeline.execute.service.PipelineExecServiceImpl;
 import net.tiklab.matflow.stages.model.Stage;
 import net.tiklab.matflow.stages.model.StageInstance;
 import net.tiklab.matflow.support.util.PipelineFinal;
@@ -11,14 +10,17 @@ import net.tiklab.matflow.task.task.service.TasksExecServiceImpl;
 import net.tiklab.matflow.task.task.service.TasksService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+/**
+ * 阶段运行服务
+ */
 @Service
 public class StageExecServiceImpl implements  StageExecService {
 
@@ -40,44 +42,56 @@ public class StageExecServiceImpl implements  StageExecService {
     //阶段id及阶段任务实例
     private static final Map<String , String> stageIdOrStageInstanceId = new HashMap<>();
 
+    //运行时间
     private final static Map<String,Integer> runTime = TasksExecServiceImpl.runTime;
+
+    //并行任务线程池
+    private final ExecutorService threadPool = Executors.newCachedThreadPool();
 
     @Override
     public void createStageExecInstance(String pipelineId,String instanceId) {
-
         List<Stage> allMainStage = stageService.findAllMainStage(pipelineId);
         for (Stage mainStage : allMainStage) {
             //创建主阶段日志
-            StageInstance stageInstance = new StageInstance();
-            stageInstance.setInstanceId(instanceId);
-            stageInstance.setStageSort(mainStage.getStageSort());
-            stageInstance.setStageState(PipelineFinal.RUN_WAIT);
-            String stageInstanceId = stageInstanceServer.createStageInstance(stageInstance);
-            stageInstance.setId(stageInstanceId);
-            stageIdOrStageInstanceId.put(mainStage.getStageId(),stageInstanceId);
-            stageInstanceIdOrStageInstance.put(stageInstanceId,stageInstance);
-
+            String stageInstanceId = initStageInstance(mainStage, instanceId, true);
             String stageId = mainStage.getStageId();
             List<Stage> otherStage = stageService.findOtherStage(stageId);
             //获取阶段下的并行任务
             for (Stage stage : otherStage) {
                 String id = stage.getStageId();
+                String otherStageInstanceId = initStageInstance(stage, stageInstanceId, false);
                 List<Tasks> tasks = tasksService.finAllStageTask(id);
                 //获取串行任务
                 for (Tasks task : tasks) {
-                    tasksExecService.createTaskExecInstance(task,id,2);
+                    tasksExecService.createTaskExecInstance(task,otherStageInstanceId,2);
                 }
-                StageInstance instance = new StageInstance();
-                instance.setParentId(stageInstanceId);
-                instance.setStageSort(stage.getStageSort());
-                instance.setStageState(PipelineFinal.RUN_WAIT);
-                String otherStageInstanceId = stageInstanceServer.createStageInstance(instance);
-                instance.setId(otherStageInstanceId);
-                //阶段运行信息放入内存
-                stageIdOrStageInstanceId.put(id,otherStageInstanceId);
-                stageInstanceIdOrStageInstance.put(otherStageInstanceId,instance);
             }
         }
+    }
+
+    /**
+     * 初始化阶段运行实例
+     * @param stage 阶段信息
+     * @param id 主实例id
+     * @param isMain 是否为主阶段
+     * @return 阶段运行实例id
+     */
+    private String initStageInstance(Stage stage , String id,boolean isMain){
+        StageInstance stageInstance = new StageInstance();
+        if (isMain){
+            stageInstance.setInstanceId(id);
+        }else {
+            stageInstance.setParentId(id);
+        }
+        stageInstance.setStageName(stage.getStageName());
+        stageInstance.setStageSort(stage.getStageSort());
+        stageInstance.setStageState(PipelineFinal.RUN_WAIT);
+        String stageInstanceId = stageInstanceServer.createStageInstance(stageInstance);
+        stageInstance.setId(stageInstanceId);
+        //执行信息放入内存
+        stageIdOrStageInstanceId.put(stage.getStageId(),stageInstanceId);
+        stageInstanceIdOrStageInstance.put(stageInstanceId,stageInstance);
+        return stageInstanceId;
     }
 
     @Override
@@ -86,10 +100,10 @@ public class StageExecServiceImpl implements  StageExecService {
         boolean state = true;
         for (Stage mainStage : allMainStage) {
             String mainStageId = mainStage.getStageId();
-            tasksExecService.time(mainStageId);
             //更新主阶段状态阶段
             String stageInstanceId = stageIdOrStageInstanceId.get(mainStageId);
             StageInstance stageInstance = stageInstanceIdOrStageInstance.get(stageInstanceId);
+            tasksExecService.time(stageInstanceId);
             stageInstance.setStageState(PipelineFinal.RUN_RUN);
             stageInstanceIdOrStageInstance.put(stageInstanceId,stageInstance);
 
@@ -104,8 +118,20 @@ public class StageExecServiceImpl implements  StageExecService {
                 StageInstance instance = stageInstanceIdOrStageInstance.get(otherStageInstanceId);
                 instance.setStageState(PipelineFinal.RUN_RUN);
                 stageInstanceIdOrStageInstance.put(otherStageInstanceId,instance);
+                //只有一个并行任务
+                if (otherStage.size() == 1){
+                    //获取阶段任务，执行
+                    List<Tasks> tasks = tasksService.finAllStageTask(stagesId);
+                    for (Tasks task : tasks) {
+                        state =  tasksExecService.execTask(pipelineId, task.getTaskType(), task.getTaskId());
+                        if (!state){
+                            break;
+                        }
+                    }
+                    updateStageExecState(stagesId,state);
+                    break;
+                }
 
-                ExecutorService threadPool = PipelineExecServiceImpl.executorService;
                 //放入线程执行
                 try {
                     Future<Boolean> future = threadPool.submit(() -> {
@@ -130,28 +156,27 @@ public class StageExecServiceImpl implements  StageExecService {
                         String stageId = stage1.getStageId();
                         state = futureMap.get(stageId).get();
                         if (!state){
-                            threadPool.shutdown();
                             break;
                         }
-                        updateStageExecState(stageId,state);
                     } catch (InterruptedException | ExecutionException | ApplicationException e) {
                         throw new ApplicationException(e);
                     }
                 }
-                threadPool.shutdown();
                 //更新并行阶段状态
                 updateStageExecState(stagesId,state);
                 if (!state){
                     break;
                 }
             }
+
             //更新主阶段状态
             updateStageExecState(mainStageId,state);
+
             if (!state){
                 break;
             }
         }
-        return true;
+        return state;
     }
 
     /**
@@ -163,12 +188,17 @@ public class StageExecServiceImpl implements  StageExecService {
         String stageInstanceId = stageIdOrStageInstanceId.get(stageId);
         Integer integer = runTime.get(stageInstanceId);
         StageInstance instance = stageInstanceIdOrStageInstance.get(stageInstanceId);
+        if (integer == null){
+            integer = 0;
+        }
+
         instance.setStageTime(integer);
         if (state){
             instance.setStageState(PipelineFinal.RUN_SUCCESS);
         }else {
             instance.setStageState(PipelineFinal.RUN_ERROR);
         }
+
         //更新数据，移除内存
         tasksExecService.stopThread(stageInstanceId);
         stageInstanceServer.updateStageInstance(instance);
@@ -176,21 +206,63 @@ public class StageExecServiceImpl implements  StageExecService {
         stageInstanceIdOrStageInstance.remove(stageInstanceId);
     }
 
-
-    public void stopStageTask(String instanceId){
-        List<StageInstance> stageInstance = stageInstanceServer.findAllMainStageInstance(instanceId);
-        for (StageInstance instance : stageInstance) {
-            String mainStageId = instance.getId();
-            List<StageInstance> allStageInstance = stageInstanceServer.findAllStageInstance(mainStageId);
-            for (StageInstance otherStageInstance : allStageInstance) {
-                String id = otherStageInstance.getId();
-
-
+    public void stopStage(String pipelineId){
+        //获取所有阶段
+        List<Stage> allMainStage = stageService.findAllMainStage(pipelineId);
+        for (Stage stage : allMainStage) {
+            String stageId = stage.getStageId();
+            List<Stage> otherStageList = stageService.findOtherStage(stageId);
+            //获取并行阶段
+            for (Stage otherStage : otherStageList) {
+                String otherStageId = otherStage.getStageId();
+                stopStageTask(otherStageId);
             }
+            stopStageTask(stageId);
         }
-
-
     }
+
+    /**
+     * 停止阶段运行更新阶段状态
+     * @param stageId 阶段id
+     */
+    private void stopStageTask(String stageId){
+        String otherStageInstanceId = stageIdOrStageInstanceId.get(stageId);
+        StageInstance otherStageInstance = stageInstanceIdOrStageInstance.get(otherStageInstanceId);
+        //该阶段运行完成
+        if (otherStageInstanceId == null || otherStageInstance == null){
+            return;
+        }
+        //停止任务
+        List<Tasks> tasks = tasksService.finAllStageTask(stageId);
+        for (Tasks task : tasks) {
+            String taskId = task.getTaskId();
+            tasksExecService.stopTask(taskId);
+        }
+        //更新并行阶段状态
+        Integer integer = runTime.get(otherStageInstanceId);
+        if (integer == null){
+            integer = 0;
+        }
+        otherStageInstance.setStageTime(integer);
+        otherStageInstance.setStageState(PipelineFinal.RUN_HALT);
+        stageInstanceServer.updateStageInstance(otherStageInstance);
+        //移除内存
+        tasksExecService.stopThread(otherStageInstanceId);
+        tasksExecService.stopThread(stageId);
+        stageIdOrStageInstanceId.remove(stageId);
+        stageInstanceIdOrStageInstance.remove(otherStageInstanceId);
+    }
+
+
+
+
+
+
+
+
+
+
+
 
 }
 

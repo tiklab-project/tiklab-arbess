@@ -9,6 +9,9 @@ import net.tiklab.matflow.task.message.model.TaskUserSendMessageType;
 
 import java.util.List;
 
+/**
+ * 消息接收人服务接口
+ */
 @JoinProvider(model = TaskMessageUser.class)
 public interface TaskMessageUserService {
 

@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * 码云API
+ * 源码第三方服务接口
  */
 public interface TaskCodeThirdService {
 

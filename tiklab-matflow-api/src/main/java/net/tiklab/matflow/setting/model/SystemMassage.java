@@ -4,7 +4,9 @@ import net.tiklab.postin.annotation.ApiModel;
 import net.tiklab.postin.annotation.ApiProperty;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-
+/**
+ * 流水线系统信息模型
+ */
 @ApiModel
 public class SystemMassage {
 

@@ -1,28 +1,6 @@
-
-create table pip_other_follow  (
-    id varchar(255) ,
-    user_id varchar(255) ,
-    pipeline_id varchar(255) ,
-    PRIMARY KEY (id) USING BTREE
-);
-
-create table pip_other_open  (
-    open_id varchar(255) ,
-    pipeline_id varchar(255) ,
-    number int ,
-    user_id varchar(255) ,
-    create_time varchar(255) ,
-    PRIMARY KEY (open_id) USING BTREE
-  );
-
-create table pip_setting_path  (
-    path_id varchar(255) ,
-    path_type int ,
-    path_name varchar(255) ,
-    path_address varchar(255) ,
-    PRIMARY KEY (path_id) USING BTREE
-);
-
+-- ----------------------------
+-- 环境配置
+-- ----------------------------
 create table pip_setting_scm  (
     scm_id varchar(256)  COMMENT 'id' ,
     scm_type int COMMENT '类型' ,
@@ -32,6 +10,9 @@ create table pip_setting_scm  (
     PRIMARY KEY (scm_id) USING BTREE
 );
 
+-- ----------------------------
+-- 基本认证
+-- ----------------------------
 create table pip_auth (
     id varchar(64) COMMENT 'id',
     auth_type int COMMENT '类型 1.username&password 2. 公钥私钥',
@@ -45,6 +26,9 @@ create table pip_auth (
     PRIMARY KEY (id) USING BTREE
 );
 
+-- ----------------------------
+-- 服务认证
+-- ----------------------------
 create table pip_auth_server (
     id varchar(64) COMMENT 'id',
     type int COMMENT '1.gitee 2.github 3.sonar 4.nexus',
@@ -66,6 +50,9 @@ create table pip_auth_server (
     PRIMARY KEY (id) USING BTREE
 );
 
+-- ----------------------------
+-- 主机认证
+-- ----------------------------
 create table pip_auth_host  (
     id varchar(64) COMMENT 'id',
     type int COMMENT '代码扫描类型 1：sonar ',

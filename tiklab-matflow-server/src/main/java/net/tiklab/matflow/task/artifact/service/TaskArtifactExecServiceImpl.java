@@ -91,7 +91,7 @@ public class TaskArtifactExecServiceImpl implements TaskArtifactExecService {
                 String[] error = error(product.getType());
                 boolean result = tasksInstanceService.readCommandExecResult(process, "UTF-8", error, taskId);
                 if (!result){
-                    tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+task.getTaskName()+"执行失败\n");
+                    tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"任务："+task.getTaskName()+"执行失败。");
                     return false;
                 }
             }else {

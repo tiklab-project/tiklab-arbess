@@ -1,13 +1,16 @@
 package net.tiklab.matflow.task.message.model;
 
+import net.tiklab.postin.annotation.ApiProperty;
 import net.tiklab.user.user.model.User;
-
+/**
+ * 任务接收人消息类型模型
+ */
 public class TaskUserSendMessageType {
 
-    //接收用户
+    @ApiProperty(name="user",desc="接收用户")
     private User user;
 
-    //类型（1.全部 2.仅成功 3.仅失败）
+    @ApiProperty(name="messageType",desc="类型（1.全部 2.仅成功 3.仅失败）")
     private int messageType;
 
     public User getUser() {

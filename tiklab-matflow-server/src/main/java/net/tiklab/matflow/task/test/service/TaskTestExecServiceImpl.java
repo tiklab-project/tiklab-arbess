@@ -49,23 +49,23 @@ public class TaskTestExecServiceImpl implements TaskTestExecService {
 
 
         TaskTest taskTest = (TaskTest) task.getValues();
-
         tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"执行任务："+ task.getTaskName());
-
-        taskTest.setType(taskType);
 
         //初始化日志
         String testOrder = taskTest.getTestOrder();
-
+        taskTest.setType(taskType);
         String path = PipelineUtil.findFileAddress(pipelineId,1);
         try {
-
             List<String> list = PipelineUtil.execOrder(testOrder);
             for (String s : list) {
-                String key = variableServer.replaceVariable(pipelineId, "configId", s);
+                String key = variableServer.replaceVariable(pipelineId, taskId, s);
                 tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"执行："+ key );
                 Process process = getOrder(taskTest,key,path);
-                tasksInstanceService.readCommandExecResult(process,null,error(taskTest.getType()),taskId);
+                boolean result = tasksInstanceService.readCommandExecResult(process, null, error(taskType), taskId);
+                if (!result){
+                    tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"任务："+task.getTaskName()+"执行失败。");
+                    return false;
+                }
                 process.destroy();
             }
         } catch (IOException e) {
@@ -98,7 +98,7 @@ public class TaskTestExecServiceImpl implements TaskTestExecService {
             order = testOrder(testOrder, path);
             return PipelineUtil.process(mavenAddress, order);
         }else {
-            throw  new ApplicationException("未知的任务类型");
+            throw  new ApplicationException(PipelineUtil.date(4)+"未知的任务类型");
         }
     }
 
@@ -122,7 +122,7 @@ public class TaskTestExecServiceImpl implements TaskTestExecService {
     private String[] error(int type){
         String[] strings;
         strings = new String[]{
-            "BUILD FAILUREl","ERROR"
+            "BUILD FAILURE","ERROR","Compilation failure"
         };
         return strings;
     }

@@ -3,7 +3,9 @@ package net.tiklab.matflow.support.condition.service;
 import net.tiklab.matflow.support.condition.model.Condition;
 
 import java.util.List;
-
+/**
+ * 流水线变量服务接口
+ */
 public interface ConditionService {
 
     /**

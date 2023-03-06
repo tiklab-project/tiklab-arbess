@@ -15,8 +15,8 @@ import net.tiklab.postin.annotation.ApiProperty;
 @Mapper(targetAlias = "TaskInstanceEntity")
 public class TaskInstance {
 
-    @ApiProperty(name="logId",desc="日志id")
-    private String logId;
+    @ApiProperty(name="id",desc="日志id")
+    private String id;
 
     @ApiProperty(name = "instanceId",desc = "历史Id")
     private String instanceId;
@@ -57,12 +57,12 @@ public class TaskInstance {
         this.stagesId = stagesId;
     }
 
-    public String getLogId() {
-        return logId;
+    public String getId() {
+        return id;
     }
 
-    public void setLogId(String logId) {
-        this.logId = logId;
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getInstanceId() {

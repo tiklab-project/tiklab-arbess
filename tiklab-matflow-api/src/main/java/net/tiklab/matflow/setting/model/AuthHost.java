@@ -9,6 +9,9 @@ import net.tiklab.postin.annotation.ApiModel;
 import net.tiklab.postin.annotation.ApiProperty;
 import net.tiklab.user.user.model.User;
 
+/**
+ * 流水线主机认证模型
+ */
 @ApiModel
 @Join
 @Mapper(targetAlias = "AuthHostEntity")

@@ -1,6 +1,7 @@
 package net.tiklab.matflow.pipeline.execute.service;
 
 import net.tiklab.core.exception.ApplicationException;
+import net.tiklab.join.JoinTemplate;
 import net.tiklab.matflow.home.service.PipelineHomeService;
 import net.tiklab.matflow.pipeline.definition.model.Pipeline;
 import net.tiklab.matflow.pipeline.definition.service.PipelineService;
@@ -55,6 +56,9 @@ public class PipelineExecServiceImpl implements PipelineExecService {
     @Autowired
     private StageExecService stageExecService;
 
+    @Autowired
+    private JoinTemplate joinTemplate;
+
     private static final Logger logger = LoggerFactory.getLogger(PipelineExecServiceImpl.class);
 
     //流水线id:流水线实例id
@@ -76,62 +80,59 @@ public class PipelineExecServiceImpl implements PipelineExecService {
      * @return 是否正在运行
      */
     @Override
-    public boolean start(String pipelineId,int startWAy) {
-        boolean result = true;
+    public PipelineInstance start(String pipelineId,int startWAy) {
 
         // 判断同一任务是否在运行
         Pipeline pipeline = pipelineService.findPipelineById(pipelineId);
-        if (pipeline.getState() == 2) {
-            result = false;
-        } else {
-            executorService.submit((Callable<Object>) () -> {
-                pipeline.setState(2);
-                pipelineService.updatePipeline(pipeline);
-                logger.info(pipeline.getName() + "开始运行。");
-                Thread.currentThread().setName(pipelineId);
-                PipelineInstance pipelineInstance =
-                        instanceService.initializeInstance(pipelineId, startWAy);
-                String instanceId = pipelineInstance.getInstanceId();
-                // 运行实例放入内存中
-                pipelineIdOrInstanceId.put(pipelineId, instanceId);
-                instanceIdOrInstance.put(instanceId, pipelineInstance);
-                tasksExecService.time(instanceId);
 
-                boolean b = true;
-                int type = pipeline.getType();
+        pipeline.setState(2);
+        pipelineService.updatePipeline(pipeline);
+        logger.info(pipeline.getName() + "开始运行。");
+        Thread.currentThread().setName(pipelineId);
+        PipelineInstance pipelineInstance =
+                instanceService.initializeInstance(pipelineId, startWAy);
+        String instanceId = pipelineInstance.getInstanceId();
+        // 运行实例放入内存中
+        pipelineIdOrInstanceId.put(pipelineId, instanceId);
+        instanceIdOrInstance.put(instanceId, pipelineInstance);
+        tasksExecService.time(instanceId);
 
-                if (type == 1) {
-                    // 创建多任务运行实例
-                    List<Tasks> tasks = tasksService.finAllPipelineTask(pipelineId);
-                    for (Tasks task : tasks) {
-                        tasksExecService.createTaskExecInstance(task, instanceId, 1);
-                    }
-                    // 执行任务
-                    for (Tasks task : tasks) {
-                        b = tasksExecService.execTask(pipelineId, task.getTaskType(), task.getTaskId());
-                    }
+        executorService.submit((Callable<Object>) () -> {
+
+            boolean b = true;
+            int type = pipeline.getType();
+
+            if (type == 1) {
+                // 创建多任务运行实例
+                List<Tasks> tasks = tasksService.finAllPipelineTask(pipelineId);
+                for (Tasks task : tasks) {
+                    tasksExecService.createTaskExecInstance(task, instanceId, 1);
                 }
-
-                if (type == 2) {
-                    // 创建多阶段运行实例
-                    stageExecService.createStageExecInstance(pipelineId, instanceId);
-                    b = stageExecService.execStageTask(pipelineId, instanceId);
+                // 执行任务
+                for (Tasks task : tasks) {
+                    b = tasksExecService.execTask(pipelineId, task.getTaskType(), task.getTaskId());
                 }
-
-                tasksExecService.stopThread(instanceId);
-
-                // 执行完成
-                pipelineExecEnd(pipelineId, b);
-                return true;
-            });
-
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                throw new ApplicationException(e);
             }
+
+            if (type == 2) {
+                // 创建多阶段运行实例
+                stageExecService.createStageExecInstance(pipelineId, instanceId);
+                b = stageExecService.execStageTask(pipelineId, instanceId);
+            }
+            tasksExecService.stopThread(instanceId);
+            // 执行完成
+            pipelineExecEnd(pipelineId, b);
+            return true;
+        });
+
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            throw new ApplicationException(e);
         }
-        return result;
+        joinTemplate.joinQuery(pipelineInstance);
+        return pipelineInstance;
+
     }
 
     /**
@@ -159,23 +160,53 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         //移除内存
         pipelineIdOrInstanceId.remove(pipelineId);
         instanceIdOrInstance.remove(instanceId);
+        logger.info(pipeline.getName() + "运行完成...");
+        // tasksExecService.stopThread(pipelineId);
     }
 
 
-    void stop(String pipelineId){
+    public void stop(String pipelineId){
 
         Pipeline pipeline = pipelineService.findPipelineById(pipelineId);
         int type = pipeline.getType();
 
         String instanceId = pipelineIdOrInstanceId.get(pipelineId);
+        //多任务
+        if (type == 1){
+            List<Tasks> tasks = tasksService.finAllPipelineTask(pipelineId);
+            for (Tasks task : tasks) {
+                String taskId = task.getTaskId();
+                tasksExecService.stopTask(taskId);
+            }
+        }
 
+        //多阶段
+        if (type == 2){
+            stageExecService.stopStage(pipelineId);
+        }
 
+        if (instanceId == null){
+            pipeline.setState(1);
+            pipelineService.updatePipeline(pipeline);
+            return;
+        }
 
-
-
-
-
-
+        Integer integer = runTime.get(instanceId);
+        PipelineInstance instance = instanceIdOrInstance.get(instanceId);
+        if (integer == null){
+            integer = 0;
+        }
+        if (instance == null){
+            instance = instanceService.findOneInstance(instanceId);
+        }
+        instance.setRunTime(integer);
+        instance.setRunStatus(PipelineFinal.RUN_HALT);
+        instanceService.updateInstance(instance);
+        tasksExecService.stopThread(instanceId);
+        pipeline.setState(1);
+        pipelineService.updatePipeline(pipeline);
+        instanceIdOrInstance.remove(instanceId);
+        pipelineIdOrInstanceId.remove(pipelineId);
     }
 
 

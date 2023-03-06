@@ -7,6 +7,10 @@ import net.tiklab.join.annotation.JoinProvider;
 import net.tiklab.matflow.task.artifact.model.TaskArtifact;
 
 import java.util.List;
+
+/**
+ * 任务推送制品服务接口
+ */
 @JoinProvider(model = TaskArtifact.class)
 public interface TaskArtifactService {
 

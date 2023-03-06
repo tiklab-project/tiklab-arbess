@@ -7,7 +7,9 @@ import net.tiklab.join.annotation.JoinProvider;
 import net.tiklab.matflow.support.trigger.model.TriggerTime;
 
 import java.util.List;
-
+/**
+ * 流水线触发器时间服务接口
+ */
 @JoinProvider(model = TriggerTime.class)
 public interface TriggerTimeService {
 

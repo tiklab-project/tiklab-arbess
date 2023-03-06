@@ -7,7 +7,9 @@ import net.tiklab.join.annotation.JoinProvider;
 import net.tiklab.matflow.task.codescan.model.TaskCodeScan;
 
 import java.util.List;
-
+/**
+ * 代码扫描服务接口
+ */
 @JoinProvider(model = TaskCodeScan.class)
 public interface TaskCodeScanService {
 

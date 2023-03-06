@@ -6,7 +6,9 @@ import net.tiklab.postin.annotation.ApiModel;
 import net.tiklab.postin.annotation.ApiProperty;
 
 import java.util.List;
-
+/**
+ * 流水线条件模型
+ */
 @ApiModel
 @Join
 @Mapper(targetAlias = "VariableEntity")

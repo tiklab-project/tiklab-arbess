@@ -7,7 +7,7 @@ import net.tiklab.matflow.task.task.model.TaskInstance;
 
 import java.util.List;
 /**
- * 任务日志服务接口
+ * 任务执行实例服务接口
  */
 @JoinProvider(model = TaskInstance.class)
 public interface TasksInstanceService {

@@ -13,8 +13,8 @@ public class TaskInstanceEntity {
     //日志id
     @Id
     @GeneratorValue
-    @Column(name = "log_id")
-    private String logId;
+    @Column(name = "id")
+    private String id;
 
     @Column(name = "instance_id")
     private String instanceId;
@@ -54,12 +54,12 @@ public class TaskInstanceEntity {
         this.stagesId = stagesId;
     }
 
-    public String getLogId() {
-        return logId;
+    public String getId() {
+        return id;
     }
 
-    public void setLogId(String logId) {
-        this.logId = logId;
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getInstanceId() {

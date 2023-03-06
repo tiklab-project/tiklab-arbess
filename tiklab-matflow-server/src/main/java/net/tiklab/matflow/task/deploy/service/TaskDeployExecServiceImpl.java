@@ -259,7 +259,7 @@ public class TaskDeployExecServiceImpl implements TaskDeployExecService {
 
             }
         };
-        tasksInstanceService.readCommandExecResult(process,"UTF-8",error(41),taskId);
+        tasksInstanceService.readCommandExecResult(process, "UTF-8", error(41), taskId);
         exec.disconnect();
     }
 

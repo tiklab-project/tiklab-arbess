@@ -69,12 +69,23 @@ public class TasksExecServiceImpl implements TasksExecService {
     @Override
     public void createTaskExecInstance(Tasks task,String instanceId,int type){
         TaskInstance instance = new TaskInstance();
-        instance.setInstanceId(instanceId);
+        if (type == 1){
+            instance.setInstanceId(instanceId);
+        }else {
+            instance.setStagesId(instanceId);
+        }
         instance.setRunState(RUN_WAIT);
         instance.setTaskName(task.getTaskName());
         instance.setTaskType(task.getTaskType());
+        instance.setTaskSort(task.getTaskSort());
         String taskInstanceId = tasksInstanceService.createTaskInstance(instance);
-        instance.setLogId(taskInstanceId);
+        instance.setId(taskInstanceId);
+        //日志文件地址
+        String fileAddress = PipelineUtil.findFileAddress(instanceId,2);
+        fileAddress = fileAddress + taskInstanceId + ".log";
+        instance.setLogAddress(fileAddress);
+        PipelineUtil.createFile(fileAddress);
+        tasksInstanceService.updateTaskInstance(instance);
         taskOrTaskInstance.put(taskInstanceId,instance);
         taskIdOrTaskInstanceId.put(task.getTaskId(),taskInstanceId);
     }
@@ -148,6 +159,10 @@ public class TasksExecServiceImpl implements TasksExecService {
         }else {
             instance.setRunState(RUN_ERROR);
         }
+        String logAddress = instance.getLogAddress();
+        String runLog = instance.getRunLog();
+        PipelineUtil.logWriteFile(runLog,logAddress);
+
         Integer integer = runTime.get(taskInstanceId);
         instance.setRunTime(integer);
         //更新数据库数据,移除内存中的实例数据
@@ -157,19 +172,21 @@ public class TasksExecServiceImpl implements TasksExecService {
         taskOrTaskInstance.remove(taskInstanceId);
     }
 
-
     public void stopTask(String taskId){
-        String instanceId = taskIdOrTaskInstanceId.get(taskId);
-        TaskInstance taskInstance = taskOrTaskInstance.get(instanceId);
+        String taskInstanceId = taskIdOrTaskInstanceId.get(taskId);
+        TaskInstance taskInstance = taskOrTaskInstance.get(taskInstanceId);
+        //更新任务实例状态
         if (taskInstance == null){
             return;
         }
-        Integer integer = runTime.get(instanceId);
-        taskInstance.setRunState(RUN_HALT);
+        Integer integer = runTime.get(taskInstanceId);
         taskInstance.setRunTime(integer);
-
-
-
+        taskInstance.setRunState(RUN_HALT);
+        tasksInstanceService.updateTaskInstance(taskInstance);
+        //移除内存
+        stopThread(taskInstanceId);
+        taskIdOrTaskInstanceId.remove(taskId);
+        taskOrTaskInstance.remove(taskInstanceId);
     }
 
     //时间线程池

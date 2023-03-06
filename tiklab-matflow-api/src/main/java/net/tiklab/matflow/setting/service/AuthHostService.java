@@ -8,6 +8,9 @@ import net.tiklab.matflow.setting.model.AuthHost;
 
 import java.util.List;
 
+/**
+ * 流水线主机认证服务接口
+ */
 @JoinProvider(model = AuthHost.class)
 public interface AuthHostService {
 

@@ -9,7 +9,9 @@ import net.tiklab.matflow.task.deploy.model.TaskDeploy;
 
 import java.util.List;
 
-
+/**
+ * 部署服务接口
+ */
 @JoinProvider(model = TaskDeploy.class)
 public interface TaskDeployService {
 

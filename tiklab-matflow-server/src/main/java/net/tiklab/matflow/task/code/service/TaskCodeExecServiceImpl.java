@@ -109,14 +109,22 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
             if (type != 5){
                 enCode = "UTF-8";
             }
-            tasksInstanceService.readCommandExecResult(process,enCode,error(type),taskId);
+            boolean result = tasksInstanceService.readCommandExecResult(process, enCode, error(type), taskId);
+            if (!result){
+                tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"任务："+task.getTaskName()+"执行失败。");
+                return false;
+            }
 
             process.destroy();
             tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+ "空间分配成功。" );
             //获取提交信息
             Process message = cloneMessage(code.getType(),pipelineId);
             if (message != null){
-                tasksInstanceService.readCommandExecResult(message,enCode,error(type),taskId);
+                boolean result1 = tasksInstanceService.readCommandExecResult(message, enCode, error(type), taskId);
+                if (!result1){
+                    tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"任务："+task.getTaskName()+"执行失败。");
+                    return false;
+                }
                 message.destroy();
             }
 

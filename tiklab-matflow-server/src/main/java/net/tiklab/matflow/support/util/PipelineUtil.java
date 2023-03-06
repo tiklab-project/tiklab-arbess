@@ -12,6 +12,9 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Pattern;
 
+import static net.tiklab.matflow.support.util.PipelineFinal.MATFLOW_LOGS;
+import static net.tiklab.matflow.support.util.PipelineFinal.MATFLOW_WORKSPACE;
+
 /**
  * 效验地址，文件操作
  */
@@ -180,14 +183,15 @@ public class PipelineUtil {
     public static String initMatFlowAddress(int type){
 
         //根目录
-        String userHome = System.getProperty("user.home")+"/.tiklab";
+        String userHome = System.getProperty("user.home");
 
         //工作空间目录
-        File file = new File(userHome+"/matflow/workspace/");
+        File file = new File(userHome + MATFLOW_WORKSPACE);
         String path = file.getAbsolutePath();
         if (!file.exists()){
             createDirectory(path);
             try {
+                //更改为隐藏文件夹
                 if (findSystemType() == 1){
                     process(null," attrib +H " + userHome);
                 }
@@ -197,7 +201,7 @@ public class PipelineUtil {
         }
 
         //日志目录
-        File logFile = new File(userHome+"/matflow/logs/");
+        File logFile = new File(userHome+ MATFLOW_LOGS);
         String logAddress = logFile.getAbsolutePath();
         if (!logFile.exists()){
             createDirectory(logAddress);

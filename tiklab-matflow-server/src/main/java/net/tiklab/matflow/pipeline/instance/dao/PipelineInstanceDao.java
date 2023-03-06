@@ -233,6 +233,7 @@ public class PipelineInstanceDao {
     public List<PipelineInstanceEntity> findLatelyInstance(String pipelineId){
         String sql = "select pip_pipeline_instance.* from pip_pipeline_instance  ";
         sql = sql.concat(" where pip_pipeline_instance.pipeline_id = '"+pipelineId+"' " +
+                " and pip_pipeline_instance.run_status != 'run'"+
                 " order by pip_pipeline_instance.create_time desc" +
                 " limit 0 ,1");
         JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();

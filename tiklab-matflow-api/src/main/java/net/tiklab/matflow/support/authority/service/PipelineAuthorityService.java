@@ -5,7 +5,9 @@ import net.tiklab.privilege.role.model.PatchUser;
 import net.tiklab.user.user.model.User;
 
 import java.util.List;
-
+/**
+ * 流水线项目权限服务接口
+ */
 public interface PipelineAuthorityService {
 
 

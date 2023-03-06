@@ -9,13 +9,12 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @SQL(modules = {
         "pip-pipeline",
-        "pip-pipeline-config",
-        "pip-pipeline-other",
+        "pip-pipeline-setting",
         "pip-pipeline-task",
-        "pipeline-init-authority",
-        "pipeline-init-message",
-        "pipeline-init-project",
-        "pipeline-init-log",
+        "pip-init-authority",
+        "pip-init-message",
+        "pip-init-project",
+        "pip-init-log",
 },order = 101)
 @ComponentScan({"net.tiklab.matflow"})
 public class MatFlowServerAutoConfiguration {

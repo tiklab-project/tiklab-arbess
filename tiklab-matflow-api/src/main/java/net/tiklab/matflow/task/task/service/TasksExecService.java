@@ -3,6 +3,9 @@ package net.tiklab.matflow.task.task.service;
 import net.tiklab.core.exception.ApplicationException;
 import net.tiklab.matflow.task.task.model.Tasks;
 
+/**
+ * 任务执行服务接口
+ */
 public interface TasksExecService {
 
     /**
@@ -13,6 +16,13 @@ public interface TasksExecService {
      * @return 执行状态
      */
     boolean execTask(String pipelineId , int taskType,String taskId) throws ApplicationException;
+
+
+    /**
+     * 停止任务执行
+     * @param taskId 任务id
+     */
+    void stopTask(String taskId);
 
     /**
      * 创建任务或阶段运行实例

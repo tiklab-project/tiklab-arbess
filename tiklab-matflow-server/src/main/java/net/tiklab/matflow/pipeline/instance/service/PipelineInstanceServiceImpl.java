@@ -10,6 +10,7 @@ import net.tiklab.matflow.pipeline.instance.dao.PipelineInstanceDao;
 import net.tiklab.matflow.pipeline.instance.entity.PipelineInstanceEntity;
 import net.tiklab.matflow.pipeline.instance.model.PipelineInstance;
 import net.tiklab.matflow.pipeline.instance.model.PipelineInstanceQuery;
+import net.tiklab.matflow.stages.service.StageInstanceServer;
 import net.tiklab.matflow.support.authority.service.PipelineAuthorityService;
 import net.tiklab.matflow.support.util.PipelineFinal;
 import net.tiklab.matflow.support.util.PipelineUtil;
@@ -17,8 +18,6 @@ import net.tiklab.matflow.task.task.service.TasksExecServiceImpl;
 import net.tiklab.matflow.task.task.service.TasksInstanceService;
 import net.tiklab.rpc.annotation.Exporter;
 import net.tiklab.utils.context.LoginContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -44,6 +43,9 @@ public class PipelineInstanceServiceImpl implements PipelineInstanceService {
     private TasksInstanceService tasksInstanceService;
 
     @Autowired
+    private StageInstanceServer stageInstanceServer;
+
+    @Autowired
     private JoinTemplate joinTemplate;
 
     //运行时间
@@ -51,8 +53,6 @@ public class PipelineInstanceServiceImpl implements PipelineInstanceService {
 
     //实例id与实例
     private final Map<String,PipelineInstance> instanceIdOrInstance = PipelineExecServiceImpl.instanceIdOrInstance;
-
-    private static final Logger logger = LoggerFactory.getLogger(PipelineInstanceServiceImpl.class);
 
     @Override
     public String createInstance(PipelineInstance pipelineInstance) {
@@ -91,21 +91,42 @@ public class PipelineInstanceServiceImpl implements PipelineInstanceService {
         pipelineInstance.setFindNumber(1);
         if (latelyInstance != null){
             int findNumber = latelyInstance.getFindNumber();
-            pipelineInstance.setFindNumber( findNumber + 1);
+            pipelineInstance.setFindNumber(findNumber + 1);
         }
         updateInstance(pipelineInstance);
         return pipelineInstance;
     }
 
+    public PipelineInstance findPipelineExecInstance(String pipelineId){
+        List<PipelineInstance> allInstance = findPipelineAllInstance(pipelineId);
+        if (allInstance == null){
+            return null;
+        }
+        for (PipelineInstance instance : allInstance) {
+            String runStatus = instance.getRunStatus();
+            if (runStatus.equals(PipelineFinal.RUN_RUN)){
+                continue;
+            }
+            return instance;
+        }
+        return null;
+    }
+
     @Override
     public void deleteInstance(String instanceId) {
         PipelineInstance instance = findOneInstance(instanceId);
-        String id = instance.getPipeline().getId();
+        Pipeline pipeline = instance.getPipeline();
+        int type = pipeline.getType();
+        if (type == 1){
+            tasksInstanceService.deleteAllInstanceInstance(instanceId);
+        }else {
+            stageInstanceServer.deleteAllMainStageInstance(instanceId);
+        }
         pipelineInstanceDao.deleteInstance(instanceId);
-        tasksInstanceService.deleteAllInstanceInstance(instanceId);
-        String fileAddress = PipelineUtil.findFileAddress(id,2);
+
+        String fileAddress = PipelineUtil.findFileAddress(instanceId,2);
         //删除对应日志
-        PipelineUtil.deleteFile(new File(fileAddress+"/"+instanceId+"/"));
+        PipelineUtil.deleteFile(new File(fileAddress));
     }
 
     @Override
@@ -128,7 +149,7 @@ public class PipelineInstanceServiceImpl implements PipelineInstanceService {
     }
 
     @Override
-    public List<PipelineInstance> findAllInstance(String pipelineId) {
+    public List<PipelineInstance> findPipelineAllInstance(String pipelineId) {
         List<PipelineInstanceEntity> list = pipelineInstanceDao.findAllInstance(pipelineId);
         if (list == null){
             return null;
@@ -163,30 +184,20 @@ public class PipelineInstanceServiceImpl implements PipelineInstanceService {
         }
         Pagination<PipelineInstanceEntity> pagination = pipelineInstanceDao.findPageInstance(pipelineInstanceQuery);
         List<PipelineInstance> execInstanceList= BeanMapper.mapList(pagination.getDataList(), PipelineInstance.class);
-
         int size = execInstanceList.size();
         for (int i = size -1 ; i >= 0; i--) {
             PipelineInstance instance = execInstanceList.get(i);
             String id = instance.getInstanceId();
+            //判断内存中是否存在该实例
             PipelineInstance pipelineInstance = instanceIdOrInstance.get(id);
-            if (pipelineInstance != null){
-                Integer integer = runTime.get(id);
-                pipelineInstance.setRunTime(integer);
-                execInstanceList.remove(i);
-                execInstanceList.add(pipelineInstance);
+            if (pipelineInstance == null){
+               continue;
             }
+            Integer integer = runTime.get(id);
+            pipelineInstance.setRunTime(integer);
+            execInstanceList.remove(i);
+            execInstanceList.add(i,pipelineInstance);
         }
-
-        // for (PipelineInstance instance : execInstanceList) {
-        //     String id = instance.getInstanceId();
-        //     PipelineInstance pipelineInstance = instanceIdOrInstance.get(id);
-        //     if (pipelineInstance != null){
-        //         instance = pipelineInstance;
-        //         Integer integer = runTime.get(id);
-        //         instance.setRunTime(integer);
-        //     }
-        // }
-
         joinTemplate.joinQuery(execInstanceList);
         return PaginationBuilder.build(pagination,execInstanceList);
     }
@@ -198,7 +209,7 @@ public class PipelineInstanceServiceImpl implements PipelineInstanceService {
         pipelineInstanceQuery.setPipelineList(userPipeline);
         Pagination<PipelineInstanceEntity> pagination = pipelineInstanceDao.findAllPageInstance(pipelineInstanceQuery);
         List<PipelineInstance> execInstanceList = BeanMapper.mapList(pagination.getDataList(), PipelineInstance.class);
-        joinTemplate.joinQuery(execInstanceList);
+
         for (int i = execInstanceList.size() -1 ; i >= 0; i--) {
             PipelineInstance instance = execInstanceList.get(i);
             String id = instance.getInstanceId();
@@ -207,9 +218,10 @@ public class PipelineInstanceServiceImpl implements PipelineInstanceService {
                 Integer integer = runTime.get(id);
                 pipelineInstance.setRunTime(integer);
                 execInstanceList.remove(i);
-                execInstanceList.add(pipelineInstance);
+                execInstanceList.add(i,pipelineInstance);
             }
         }
+        joinTemplate.joinQuery(execInstanceList);
         return PaginationBuilder.build(pagination,execInstanceList);
     }
 

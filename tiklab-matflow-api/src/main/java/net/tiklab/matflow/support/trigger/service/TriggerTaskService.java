@@ -2,7 +2,9 @@ package net.tiklab.matflow.support.trigger.service;
 
 import net.tiklab.matflow.support.trigger.model.Trigger;
 import net.tiklab.matflow.support.trigger.model.TriggerTime;
-
+/**
+ * 流水线触发器任务服务接口
+ */
 public interface TriggerTaskService {
 
     /**

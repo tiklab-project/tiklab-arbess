@@ -3,7 +3,9 @@ package net.tiklab.matflow.support.trigger.service;
 import net.tiklab.matflow.support.trigger.model.Trigger;
 
 import java.util.List;
-
+/**
+ * 流水线触发器服务接口
+ */
 public interface TriggerService {
 
 

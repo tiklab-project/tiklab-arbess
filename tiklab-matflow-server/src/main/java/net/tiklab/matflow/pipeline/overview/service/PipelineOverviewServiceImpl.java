@@ -28,7 +28,7 @@ public class PipelineOverviewServiceImpl implements PipelineOverviewService {
      */
     @Override
     public PipelineOverview pipelineOverview(String pipelineId) {
-        List<PipelineInstance> allHistory = historyService.findAllInstance(pipelineId);
+        List<PipelineInstance> allHistory = historyService.findPipelineAllInstance(pipelineId);
         if (allHistory == null){
             return null;
         }

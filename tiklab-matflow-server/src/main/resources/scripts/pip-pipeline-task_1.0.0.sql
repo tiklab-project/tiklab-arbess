@@ -1,4 +1,6 @@
-
+-- ----------------------------
+-- 源码
+-- ----------------------------
 create table pip_task_code  (
     task_id varchar(256)  COMMENT 'gitId',
     code_name varchar(255)  COMMENT '地址名',
@@ -8,21 +10,27 @@ create table pip_task_code  (
     auth_id varchar(256)  COMMENT '凭证id',
     PRIMARY KEY (task_id) USING BTREE
 );
-
+-- ----------------------------
+-- 测试
+-- ----------------------------
 create table pip_task_test  (
     task_id varchar(256)  COMMENT '测试id',
     test_order varchar(255)  COMMENT '测试命令',
     address varchar(255)  COMMENT '测试地址',
     PRIMARY KEY (task_id) USING BTREE
 );
-
+-- ----------------------------
+-- 构建
+-- ----------------------------
 create table pip_task_build  (
     task_id varchar(256)  COMMENT '构建id',
     build_address varchar(256)  COMMENT '文件地址',
     build_order varchar(256)  COMMENT '构建命令',
     PRIMARY KEY (task_id) USING BTREE
 );
-
+-- ----------------------------
+-- 部署
+-- ----------------------------
 create table pip_task_deploy  (
     task_id varchar(256)  COMMENT '部署id',
     auth_type int  COMMENT '认证类型',
@@ -34,7 +42,9 @@ create table pip_task_deploy  (
     start_order varchar(255)   COMMENT '启动命令',
     PRIMARY KEY (task_id) USING BTREE
 );
-
+-- ----------------------------
+-- 代码扫描
+-- ----------------------------
 create table pip_task_code_scan  (
     task_id varchar(256)  COMMENT 'id',
     type int  COMMENT '类型',
@@ -42,7 +52,9 @@ create table pip_task_code_scan  (
     project_name varchar(256)  COMMENT '授权id',
     PRIMARY KEY (task_id) USING BTREE
 );
-
+-- ----------------------------
+-- 推送制品
+-- ----------------------------
 create table pip_task_artifact  (
     task_id varchar(256)  COMMENT 'id',
     group_id varchar(255)  COMMENT 'groupId',
@@ -54,7 +66,9 @@ create table pip_task_artifact  (
     put_address varchar(256)  COMMENT '凭证id',
     PRIMARY KEY (task_id) USING BTREE
 );
-
+-- ----------------------------
+-- 脚本
+-- ----------------------------
 create table pip_task_script  (
     task_id varchar(255) COMMENT '脚本',
     name varchar(32) COMMENT '名称',
@@ -62,13 +76,17 @@ create table pip_task_script  (
     script_order longtext COMMENT '脚本命令',
     PRIMARY KEY (task_id) USING BTREE
 );
-
+-- ----------------------------
+-- 消息发送类型
+-- ----------------------------
 create table pip_task_message_type  (
     task_id varchar(255) COMMENT '消息',
     task_type varchar(255) COMMENT '认证信息',
     PRIMARY KEY (task_id) USING BTREE
 );
-
+-- ----------------------------
+-- 消息发送人
+-- ----------------------------
 create table pip_task_message_user  (
     message_id varchar(255) COMMENT '认证信息',
     message_task_id varchar(255) COMMENT '类型信息',
@@ -76,7 +94,9 @@ create table pip_task_message_user  (
     receive_type int COMMENT '接收类型 1.全部 2.仅成功 3.仅失败',
     PRIMARY KEY (message_id) USING BTREE
 );
-
+-- ----------------------------
+-- 触发器时间
+-- ----------------------------
 create table pip_pipeline_trigger_time  (
     time_id varchar(255) COMMENT '配置',
     task_type int COMMENT '1:单次,2:周期' ,

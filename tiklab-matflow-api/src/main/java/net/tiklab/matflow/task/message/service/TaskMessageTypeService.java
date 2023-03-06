@@ -8,6 +8,9 @@ import net.tiklab.matflow.task.message.model.TaskMessageType;
 
 import java.util.List;
 
+/**
+ * 任务消息类型服务接口
+ */
 @JoinProvider(model = TaskMessageType.class)
 public interface TaskMessageTypeService {
 

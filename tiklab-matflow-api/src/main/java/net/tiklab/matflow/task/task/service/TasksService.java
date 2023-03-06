@@ -5,7 +5,7 @@ import net.tiklab.matflow.task.task.model.Tasks;
 import java.util.List;
 
 /**
- * 流水线流多任务服务接口
+ * 流水线流任务服务接口
  */
 public interface TasksService {
 

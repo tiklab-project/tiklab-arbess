@@ -6,7 +6,9 @@ import net.tiklab.join.annotation.Join;
 import net.tiklab.postin.annotation.ApiModel;
 import net.tiklab.postin.annotation.ApiProperty;
 
-
+/**
+ * 任务源码模型
+ */
 @ApiModel
 @Join
 @Mapper(targetAlias = "TaskCodeEntity")

@@ -6,6 +6,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * 流水线首页服务接口
+ */
+
 public interface PipelineHomeService {
 
     /**

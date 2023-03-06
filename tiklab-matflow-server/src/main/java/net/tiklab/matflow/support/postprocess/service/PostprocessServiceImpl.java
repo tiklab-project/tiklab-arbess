@@ -51,11 +51,7 @@ public class PostprocessServiceImpl implements PostprocessService {
         return postId;
     }
 
-    /**
-     * 查询流水线后置配置
-     * @param pipelineId 流水线id
-     * @return 配置
-     */
+
     public List<Tasks> findAllPipelinePostTask(String pipelineId){
         List<Postprocess> allPost = findAllPost();
 

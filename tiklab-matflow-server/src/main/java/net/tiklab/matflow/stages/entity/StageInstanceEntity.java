@@ -37,8 +37,8 @@ public class StageInstanceEntity {
     private String stageState;
 
     //阶段id
-    @Column(name = "stages_id")
-    private String stagesId;
+    @Column(name = "parent_id")
+    private String parentId;
 
 
     public String getId() {
@@ -97,11 +97,11 @@ public class StageInstanceEntity {
         this.stageState = stageState;
     }
 
-    public String getStagesId() {
-        return stagesId;
+    public String getParentId() {
+        return parentId;
     }
 
-    public void setStagesId(String stagesId) {
-        this.stagesId = stagesId;
+    public void setParentId(String parentId) {
+        this.parentId = parentId;
     }
 }

@@ -7,7 +7,9 @@ import net.tiklab.join.annotation.JoinProvider;
 import net.tiklab.matflow.setting.model.AuthThird;
 
 import java.util.List;
-
+/**
+ * 流水线第三方认证服务接口
+ */
 @JoinProvider(model = AuthThird.class)
 public interface AuthThirdService {
 

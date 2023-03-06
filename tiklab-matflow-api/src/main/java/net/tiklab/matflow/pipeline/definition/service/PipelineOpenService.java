@@ -9,6 +9,9 @@ import net.tiklab.matflow.pipeline.definition.model.PipelineOpen;
 
 import java.util.List;
 
+/**
+ * 流水线最近打开服务接口
+ */
 @JoinProvider(model = PipelineOpen.class)
 public interface PipelineOpenService {
 

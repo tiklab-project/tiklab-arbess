@@ -7,7 +7,9 @@ import net.tiklab.join.annotation.JoinProvider;
 import net.tiklab.matflow.task.script.model.TaskScript;
 
 import java.util.List;
-
+/**
+ * 脚本执行服务接口
+ */
 @JoinProvider(model = TaskScript.class)
 public interface TaskScriptService {
 

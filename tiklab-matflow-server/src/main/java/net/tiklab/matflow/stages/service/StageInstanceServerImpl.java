@@ -10,10 +10,7 @@ import net.tiklab.matflow.task.task.service.TasksInstanceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 阶段执行实例服务
@@ -43,18 +40,25 @@ public class StageInstanceServerImpl implements StageInstanceServer{
     }
 
     @Override
-    public void deleteAllStageInstanceInstance(String instanceId) {
+    public void deleteAllMainStageInstance(String instanceId) {
         List<StageInstance> allStageInstance = findAllMainStageInstance(instanceId);
         for (StageInstance stageInstance : allStageInstance) {
             String id = stageInstance.getId();
+
+            List<StageInstance> allOtherStageInstance = findAllOtherStageInstance(id);
+            for (StageInstance instance : allOtherStageInstance) {
+                String otherStageId = instance.getId();
+                tasksInstanceService.deleteAllStageInstance(otherStageId);
+                deleteStageInstance(otherStageId);
+            }
             deleteStageInstance(id);
-            tasksInstanceService.deleteAllStageInstance(id);
+
         }
     }
 
     @Override
     public void deleteAllStageInstance(String stageId) {
-        List<StageInstance> allStageInstance = findAllStageInstance(stageId);
+        List<StageInstance> allStageInstance = findAllOtherStageInstance(stageId);
         for (StageInstance stageInstance : allStageInstance) {
             String id = stageInstance.getId();
             deleteStageInstance(id);
@@ -83,7 +87,7 @@ public class StageInstanceServerImpl implements StageInstanceServer{
         List<StageInstance> list = new ArrayList<>();
         for (StageInstance instance : allStageInstance) {
             String id = instance.getInstanceId();
-            if (!id.equals(instanceId)){
+            if (id == null || !id.equals(instanceId)){
                 continue;
             }
             list.add(instance);
@@ -92,7 +96,7 @@ public class StageInstanceServerImpl implements StageInstanceServer{
     }
 
     @Override
-    public List<StageInstance> findAllStageInstance(String stageId) {
+    public List<StageInstance> findAllOtherStageInstance(String mainStageId) {
         List<StageInstance> allStageInstance = findAllStageInstance();
         if (allStageInstance == null || allStageInstance.size() == 0){
             return Collections.emptyList();
@@ -100,7 +104,7 @@ public class StageInstanceServerImpl implements StageInstanceServer{
         List<StageInstance> list = new ArrayList<>();
         for (StageInstance instance : allStageInstance) {
             String id = instance.getParentId();
-            if (!id.equals(stageId)){
+            if (id == null || !id.equals(mainStageId)){
                 continue;
             }
             list.add(instance);
@@ -111,33 +115,49 @@ public class StageInstanceServerImpl implements StageInstanceServer{
     @Override
     public List<StageInstance> findStageExecInstance(String instanceId){
         List<StageInstance> stageInstanceList = findAllMainStageInstance(instanceId);
-        for (StageInstance stageInstance : stageInstanceList) {
-            String stageId = stageInstance.getId();
+
+        int size1 = stageInstanceList.size();
+        for (int i = size1-1; i >= 0; i--) {
+            String stageId = stageInstanceList.get(i).getId();
             StageInstance instance = stageInstanceMap.get(stageId);
             if (instance == null){
                 instance = findOneStageInstance(stageId);
             }else {
                 Integer integer = runTime.get(stageId);
+                if (integer == null){
+                    integer = 0;
+                }
                 instance.setStageTime(integer);
             }
-            List<StageInstance> allStageInstance = findAllStageInstance(stageId);
+            List<StageInstance> allStageInstance = findAllOtherStageInstance(stageId);
+
             //并行阶段执行实例
-            for (StageInstance otherStageInstance : allStageInstance) {
-                String otherStageInstanceId = otherStageInstance.getId();
+            int size = allStageInstance.size();
+            for (int j = size-1; j >= 0; j--) {
+                String otherStageInstanceId = allStageInstance.get(j).getId();
                 StageInstance otherInstance = stageInstanceMap.get(otherStageInstanceId);
                 if (otherInstance == null){
                     otherInstance = findOneStageInstance(otherStageInstanceId);
                 }else {
                     Integer integer = runTime.get(otherStageInstanceId);
+                    if (integer == null){
+                        integer = 0;
+                    }
                     instance.setStageTime(integer);
                 }
+                allStageInstance.remove(j);
                 //获取任务执行实例
                 List<TaskInstance> allTaskInstance =
                         tasksInstanceService.findAllStageInstance(otherStageInstanceId);
                 otherInstance.setTaskInstanceList(allTaskInstance);
+                allStageInstance.add(j,otherInstance);
+                allStageInstance.sort(Comparator.comparing(StageInstance::getStageSort));
             }
+            stageInstanceList.remove(i);
             instance.setStageInstanceList(allStageInstance);
+            stageInstanceList.add(i,instance);
         }
+        stageInstanceList.sort(Comparator.comparing(StageInstance::getStageSort));
         return stageInstanceList;
     }
 

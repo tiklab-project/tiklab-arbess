@@ -3,6 +3,9 @@ package net.tiklab.matflow.task.message.service;
 import net.tiklab.matflow.pipeline.definition.model.Pipeline;
 import net.tiklab.matflow.task.task.model.Tasks;
 
+/**
+ * 流水线执行消息任务服务接口
+ */
 public interface TaskMessageExecService {
 
 

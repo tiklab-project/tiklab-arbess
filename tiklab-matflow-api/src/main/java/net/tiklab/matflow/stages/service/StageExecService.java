@@ -1,5 +1,8 @@
 package net.tiklab.matflow.stages.service;
 
+/**
+ * 阶段执行服务接口
+ */
 public interface StageExecService {
 
 
@@ -18,6 +21,13 @@ public interface StageExecService {
      * @return 阶段运行状态
      */
     boolean execStageTask(String pipelineId , String instanceId);
+
+
+    /**
+     * 停止阶段运行
+     * @param pipelineId 流水线id
+     */
+    void stopStage(String pipelineId);
 
 
 

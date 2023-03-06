@@ -23,7 +23,7 @@ public class StageInstanceController {
     @Autowired
     StageInstanceServer stageInstanceServer;
 
-    @RequestMapping(path="/findTaskInstance",method = RequestMethod.POST)
+    @RequestMapping(path="/findStageInstance",method = RequestMethod.POST)
     @ApiMethod(name = "findAllLog",desc = "查询日志")
     @ApiParam(name = "instanceId",desc = "流水线实例id",required = true)
     public Result<List<StageInstance>> findAllLog(@NotNull String instanceId){

@@ -40,6 +40,14 @@ public interface PipelineInstanceService {
      */
     PipelineInstance initializeInstance(String pipelineId , int startWAy);
 
+
+    /**
+     * 获取流水线正在执行的实例
+     * @param pipelineId 流水线id
+     * @return 实例
+     */
+    PipelineInstance findPipelineExecInstance(String pipelineId);
+
     /**
      * 删除单个实例
      * @param instanceId 实例id
@@ -80,7 +88,7 @@ public interface PipelineInstanceService {
      * @return 实例信息
      */
     @FindAll
-    List<PipelineInstance> findAllInstance(String pipelineId);
+    List<PipelineInstance> findPipelineAllInstance(String pipelineId);
 
 
     @FindList

@@ -84,7 +84,11 @@ public class TaskScriptExecServiceImpl implements TaskScriptExecService {
                 if (PipelineUtil.findSystemType() == 1){
                     enCode = PipelineFinal.GBK;
                 }
-                tasksInstanceService.readCommandExecResult(process,enCode,list.toArray(new String[0]), name);
+                boolean result = tasksInstanceService.readCommandExecResult(process, enCode, list.toArray(new String[0]), taskId);
+                if (!result){
+                    tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"任务："+task.getTaskName()+"执行失败。");
+                    return false;
+                }
             }
         }catch (IOException | ApplicationException e){
             String s = PipelineUtil.date(4) + e.getMessage();

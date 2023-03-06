@@ -41,12 +41,23 @@ public class StageInstance {
     @ApiProperty(name = "parentId" ,desc = "阶段id")
     private String parentId;
 
+    @ApiProperty(name = "stageRunLog" ,desc = "阶段运行日志")
+    private String stageRunLog;
+
     @ApiProperty(name = "stageInstanceList" ,desc = "阶段实例")
     private List<StageInstance> stageInstanceList ;
 
     @ApiProperty(name = "taskInstanceList" ,desc = "任务实例")
     private List<TaskInstance> taskInstanceList;
 
+
+    public String getStageRunLog() {
+        return stageRunLog;
+    }
+
+    public void setStageRunLog(String stageRunLog) {
+        this.stageRunLog = stageRunLog;
+    }
 
     public List<StageInstance> getStageInstanceList() {
         return stageInstanceList;
