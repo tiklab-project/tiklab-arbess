@@ -1,19 +1,15 @@
 package io.tiklab.matflow.task.message.service;
 
+import io.tiklab.core.exception.ApplicationException;
 import io.tiklab.matflow.home.service.PipelineHomeService;
 import io.tiklab.matflow.pipeline.definition.model.Pipeline;
-import io.tiklab.matflow.support.condition.service.ConditionService;
 import io.tiklab.matflow.support.util.PipelineFinal;
 import io.tiklab.matflow.support.util.PipelineUtil;
-import io.tiklab.matflow.support.variable.service.VariableService;
+import io.tiklab.matflow.task.message.model.TaskMessageType;
 import io.tiklab.matflow.task.message.model.TaskUserSendMessageType;
 import io.tiklab.matflow.task.task.model.Tasks;
 import io.tiklab.matflow.task.task.service.TasksInstanceService;
-import io.tiklab.core.exception.ApplicationException;
-import io.tiklab.matflow.task.message.model.TaskMessageType;
 import io.tiklab.rpc.annotation.Exporter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -34,29 +30,11 @@ public class TaskMessageExecServiceImpl implements TaskMessageExecService {
     private TasksInstanceService tasksInstanceService;
 
     @Autowired
-    private VariableService variableServer;
+    private PipelineHomeService homeService;
 
-    @Autowired
-    private ConditionService conditionService;
-
-    @Autowired
-    PipelineHomeService homeService;
-
-    @Autowired
-    TaskMessageTypeService messageTypeServer;
-
-
-    private static final Logger logger = LoggerFactory.getLogger(TaskMessageExecServiceImpl.class);
 
     public boolean message(Pipeline pipeline, Tasks task, boolean runState, boolean isPipeline) {
-        String pipelineId = pipeline.getId();
         String taskId = task.getTaskId();
-        Boolean aBoolean = conditionService.variableCondition(pipelineId, taskId);
-        if (!aBoolean){
-            String s = "任务"+task.getTaskName()+"执行条件不满足，跳过执行\n";
-            tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+s);
-            return true;
-        }
 
         tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"执行任务：消息通知.....");
         TaskMessageType messageType = (TaskMessageType) task.getValues();
@@ -125,7 +103,8 @@ public class TaskMessageExecServiceImpl implements TaskMessageExecService {
      * @param type 类型
      * @throws ApplicationException 消息发送失败
      */
-    private void messageType(String taskId, String type, List<TaskUserSendMessageType> userList, HashMap<String, Object> map) throws ApplicationException {
+    private void messageType(String taskId, String type, List<TaskUserSendMessageType> userList,
+                             HashMap<String, Object> map) throws ApplicationException {
 
         switch (type){
             case PipelineFinal.MES_SENT_SITE ->{

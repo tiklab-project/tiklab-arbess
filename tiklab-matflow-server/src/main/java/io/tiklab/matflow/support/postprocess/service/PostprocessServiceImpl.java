@@ -64,8 +64,8 @@ public class PostprocessServiceImpl implements PostprocessService {
             if (id == null || !id.equals(pipelineId)){
                 continue;
             }
-            String id1 = postprocess.getPostprocessId();
-            Tasks tasks = tasksService.findOnePostTaskOrTask(id1);
+            String postprocessId = postprocess.getPostprocessId();
+            Tasks tasks = tasksService.findOnePostTaskOrTask(postprocessId);
             list.add(tasks);
         }
         return list;

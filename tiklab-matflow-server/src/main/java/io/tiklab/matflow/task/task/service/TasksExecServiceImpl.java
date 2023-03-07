@@ -1,6 +1,7 @@
 package io.tiklab.matflow.task.task.service;
 
 import io.tiklab.core.exception.ApplicationException;
+import io.tiklab.matflow.pipeline.definition.model.Pipeline;
 import io.tiklab.matflow.support.util.PipelineUtil;
 import io.tiklab.matflow.task.artifact.service.TaskArtifactExecService;
 import io.tiklab.matflow.task.build.service.TaskBuildExecService;
@@ -144,6 +145,10 @@ public class TasksExecServiceImpl implements TasksExecService {
         taskExecEnd(taskId,state);
 
         return state;
+    }
+
+    public boolean execSendMessageTask(Pipeline pipeline,Tasks task , boolean execStatus,boolean isPipeline){
+       return message.message(pipeline, task , execStatus, isPipeline);
     }
 
     /**

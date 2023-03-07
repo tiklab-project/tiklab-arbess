@@ -30,9 +30,6 @@ public class Postprocess {
     @ApiProperty(name="pipelineId",desc="流水线id")
     private String pipelineId;
 
-    @ApiProperty(name="taskSort",desc="顺序")
-    private int taskSort;
-
     @ApiProperty(name="values",desc="任务内容")
     private Object values;
 
@@ -82,14 +79,6 @@ public class Postprocess {
 
     public void setTaskId(String taskId) {
         this.taskId = taskId;
-    }
-
-    public int getTaskSort() {
-        return taskSort;
-    }
-
-    public void setTaskSort(int taskSort) {
-        this.taskSort = taskSort;
     }
 
     public Object getValues() {

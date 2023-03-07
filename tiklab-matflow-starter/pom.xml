@@ -92,7 +92,7 @@
 
         <dependency>
             <groupId>io.tiklab</groupId>
-            <artifactId>tiklab-todotask-spring-boot-stater</artifactId>
+            <artifactId>tiklab-todotask-spring-boot-starter</artifactId>
             <version>${project.version}</version>
         </dependency>
 
@@ -308,7 +308,7 @@
             </properties>
         </profile>
 
-        <!--dasasdas-->
+        <!--test文件夹-->
         <profile>
             <id>env-test</id>
             <properties>
