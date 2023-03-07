@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>net.tiklab</groupId>
+        <groupId>io.tiklab</groupId>
         <artifactId>tiklab-matflow</artifactId>
         <version>1.0.0-SNAPSHOT</version>
     </parent>
@@ -35,22 +35,15 @@
             <version>3.12.0</version>
         </dependency>
         <dependency>
-            <groupId>net.tiklab</groupId>
+            <groupId>io.tiklab</groupId>
             <artifactId>tiklab-dal-jpa</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>net.tiklab</groupId>
+            <groupId>io.tiklab</groupId>
             <artifactId>tiklab-matflow-api</artifactId>
             <version>${project.version}</version>
         </dependency>
-
-<!--        &lt;!&ndash; https://mvnrepository.com/artifact/com.jcraft/jsch &ndash;&gt;-->
-<!--        <dependency>-->
-<!--            <groupId>com.jcraft</groupId>-->
-<!--            <artifactId>jsch</artifactId>-->
-<!--            <version>0.1.54</version>-->
-<!--        </dependency>-->
 
         <!-- https://mvnrepository.com/artifact/com.github.mwiede/jsch -->
         <dependency>
@@ -59,48 +52,32 @@
             <version>0.2.7</version>
         </dependency>
 
-
-
-
-        <!--        <dependency>-->
-<!--            <groupId>net.tiklab</groupId>-->
-<!--            <artifactId>tiklab-logging-spring-boot-starter</artifactId>-->
-<!--            <version>1.0.0-SNAPSHOT</version>-->
-<!--        </dependency>-->
-
         <dependency>
-            <groupId>net.tiklab</groupId>
-            <artifactId>tiklab-logging-api</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-
-        <dependency>
-            <groupId>net.tiklab</groupId>
+            <groupId>io.tiklab</groupId>
             <artifactId>tiklab-todotask-api</artifactId>
             <version>1.0.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>
-            <groupId>net.tiklab</groupId>
+            <groupId>io.tiklab</groupId>
             <artifactId>tiklab-message-api</artifactId>
             <version>1.0.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>
-            <groupId>net.tiklab</groupId>
+            <groupId>io.tiklab</groupId>
             <artifactId>tiklab-message-spring-boot-starter</artifactId>
             <version>1.0.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>
-            <groupId>net.tiklab</groupId>
+            <groupId>io.tiklab</groupId>
             <artifactId>tiklab-message-smssdk</artifactId>
             <version>1.0.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>
-            <groupId>net.tiklab</groupId>
+            <groupId>io.tiklab</groupId>
             <artifactId>tiklab-privilege-api</artifactId>
             <version>1.0.0-SNAPSHOT</version>
         </dependency>
