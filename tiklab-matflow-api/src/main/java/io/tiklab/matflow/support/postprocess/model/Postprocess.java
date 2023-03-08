@@ -2,6 +2,7 @@ package io.tiklab.matflow.support.postprocess.model;
 
 import io.tiklab.beans.annotation.Mapper;
 import io.tiklab.join.annotation.Join;
+import io.tiklab.matflow.task.task.model.Tasks;
 import io.tiklab.postin.annotation.ApiModel;
 import io.tiklab.postin.annotation.ApiProperty;
 /**
@@ -30,8 +31,11 @@ public class Postprocess {
     @ApiProperty(name="pipelineId",desc="流水线id")
     private String pipelineId;
 
-    @ApiProperty(name="values",desc="任务内容")
+    @ApiProperty(name="values",desc="任务详情")
     private Object values;
+
+    @ApiProperty(name="task",desc="任务")
+    private Tasks task;
 
     public String getPipelineId() {
         return pipelineId;
@@ -47,6 +51,14 @@ public class Postprocess {
 
     public void setPostprocessId(String postprocessId) {
         this.postprocessId = postprocessId;
+    }
+
+    public Tasks getTask() {
+        return task;
+    }
+
+    public void setTask(Tasks task) {
+        this.task = task;
     }
 
     public String getName() {

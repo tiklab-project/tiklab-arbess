@@ -42,12 +42,11 @@ public class TaskInstance {
     @ApiProperty(name="stageId",desc="阶段id")
     private String stagesId;
 
+    @ApiProperty(name="postprocessId",desc="后置任务id")
+    private String postprocessId;
+
     @ApiProperty(name="runLog",desc="运行日志")
     private String runLog;
-
-    public TaskInstance() {
-    }
-
 
     public String getStagesId() {
         return stagesId;
@@ -127,5 +126,13 @@ public class TaskInstance {
 
     public void setRunLog(String runLog) {
         this.runLog = runLog;
+    }
+
+    public String getPostprocessId() {
+        return postprocessId;
+    }
+
+    public void setPostprocessId(String postprocessId) {
+        this.postprocessId = postprocessId;
     }
 }

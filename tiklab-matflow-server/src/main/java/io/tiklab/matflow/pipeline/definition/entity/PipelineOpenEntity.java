@@ -6,7 +6,7 @@ import io.tiklab.dal.jpa.annotation.*;
  * 流水线最近打开实体
  */
 @Entity
-@Table(name="pip_pipeline_other_open")
+@Table(name="pip_other_open")
 public class PipelineOpenEntity {
 
     @Id

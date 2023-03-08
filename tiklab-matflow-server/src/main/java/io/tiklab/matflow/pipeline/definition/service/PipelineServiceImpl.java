@@ -1,6 +1,7 @@
 package io.tiklab.matflow.pipeline.definition.service;
 
 import io.tiklab.matflow.pipeline.instance.service.PipelineInstanceService;
+import io.tiklab.matflow.stages.service.StageService;
 import io.tiklab.matflow.support.util.PipelineFinal;
 import io.tiklab.beans.BeanMapper;
 import io.tiklab.core.exception.ApplicationException;
@@ -13,6 +14,7 @@ import io.tiklab.matflow.pipeline.definition.model.PipelineExecMessage;
 import io.tiklab.matflow.pipeline.instance.model.PipelineInstance;
 import io.tiklab.matflow.support.authority.service.PipelineAuthorityService;
 import io.tiklab.matflow.support.util.PipelineUtil;
+import io.tiklab.matflow.task.task.service.TasksService;
 import io.tiklab.rpc.annotation.Exporter;
 import io.tiklab.user.user.model.User;
 import org.slf4j.Logger;
@@ -48,6 +50,13 @@ public class PipelineServiceImpl implements PipelineService {
     @Autowired
     private PipelineAuthorityService authorityService;
 
+    @Autowired
+    private TasksService tasksService;
+
+    @Autowired
+    private StageService stageService;
+
+
     private static final Logger logger = LoggerFactory.getLogger(PipelineServiceImpl.class);
 
     @Override
@@ -61,6 +70,8 @@ public class PipelineServiceImpl implements PipelineService {
         }
         pipeline.setColor((random.nextInt(5) + 1));
         pipeline.setCreateTime(PipelineUtil.date(1));
+
+        //创建流水线
         PipelineEntity pipelineEntity = BeanMapper.map(pipeline, PipelineEntity.class);
         pipelineEntity.setState(1);
         String pipelineId = pipelineDao.createPipeline(pipelineEntity);
@@ -68,7 +79,20 @@ public class PipelineServiceImpl implements PipelineService {
         pipeline.setId(pipelineId);
 
         //创建对应流水线模板
-        // taskFacadeService.createTemplate(pipeline);
+        String template = pipeline.getTemplate();
+        int[] ints;
+        switch (template) {
+            case "12131" -> ints = new int[]{1, 21, 31};
+            case "1112131" -> ints = new int[]{1, 11, 21, 31};
+            case "12231" -> ints = new int[]{1, 22, 31};
+            default -> ints = new int[]{1};
+        }
+        if (pipeline.getType() == 1){
+            tasksService.createTaskTemplate(pipelineId,ints);
+        }
+        if (pipeline.getType() == 2){
+            stageService.createStageTemplate(pipelineId,ints);
+        }
 
         //流水线关联角色，用户信息
         authorityService.createDmUser(pipelineId,pipeline.getUserList());
@@ -91,8 +115,13 @@ public class PipelineServiceImpl implements PipelineService {
         pipelineDao.deletePipeline(pipelineId); //删除流水线
         authorityService.deleteDmUser(pipelineId); //删除关联用户
         deleteHistory(pipelineId); //删除历史，日志信息
-        // taskFacadeService.deleteAllTaskConfig(pipelineId,pipeline.getType()); //删除配置信息
-
+        //删除配置信息
+        if (pipeline.getType() == 1){
+            tasksService.deleteAllTasksOrTask(pipelineId,1);
+        }
+        if (pipeline.getType() == 2){
+            stageService.deleteAllStagesOrTask(pipelineId);
+        }
         //动态与消息
         HashMap<String,Object> map = homeService.initMap(pipeline);
         map.put("title","流水线删除消息");

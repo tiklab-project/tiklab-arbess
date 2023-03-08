@@ -8,7 +8,7 @@ import io.tiklab.dal.jpa.annotation.*;
  */
 
 @Entity
-@Table(name="pip_pipeline_other_follow")
+@Table(name="pip_other_follow")
 public class PipelineFollowEntity {
 
     @Id

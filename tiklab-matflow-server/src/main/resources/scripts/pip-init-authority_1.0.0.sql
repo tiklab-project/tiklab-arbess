@@ -1,3 +1,4 @@
+
 INSERT INTO `pcs_prc_function` (`id`, `name`, `code`, `parent_function_id`, `sort`, `type`) VALUES ('03dd3aa23ce98c638471eec6ce3aaf19', '系统信息', 'pipeline_system', NULL, 1, '1');
 INSERT INTO `pcs_prc_function` (`id`, `name`, `code`, `parent_function_id`, `sort`, `type`) VALUES ('0a783e37206685608ccf9e40865e74a0', '权限', 'pipeline_permission', NULL, 1, '1');
 INSERT INTO `pcs_prc_function` (`id`, `name`, `code`, `parent_function_id`, `sort`, `type`) VALUES ('262b426e2a86fe736480eb4404214f09', '插件', 'pipeline_plugin', NULL, 1, '1');

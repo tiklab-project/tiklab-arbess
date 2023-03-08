@@ -6,7 +6,7 @@ import io.tiklab.matflow.pipeline.definition.model.Pipeline;
 import io.tiklab.matflow.support.util.PipelineFinal;
 import io.tiklab.matflow.support.util.PipelineUtil;
 import io.tiklab.matflow.task.message.model.TaskMessageType;
-import io.tiklab.matflow.task.message.model.TaskUserSendMessageType;
+import io.tiklab.matflow.task.message.model.TaskMessageUser;
 import io.tiklab.matflow.task.task.model.Tasks;
 import io.tiklab.matflow.task.task.service.TasksInstanceService;
 import io.tiklab.rpc.annotation.Exporter;
@@ -40,7 +40,7 @@ public class TaskMessageExecServiceImpl implements TaskMessageExecService {
         TaskMessageType messageType = (TaskMessageType) task.getValues();
 
         //不存在接收人
-        List<TaskUserSendMessageType> userList = messageType.getUserList();
+        List<TaskMessageUser> userList = messageType.getUserList();
         if (userList == null || userList.size() == 0){
             tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"任务：消息通知执行完成。");
             return true;
@@ -49,9 +49,9 @@ public class TaskMessageExecServiceImpl implements TaskMessageExecService {
         HashMap<String, Object> map = homeService.initMap(pipeline);
 
         //添加接收人
-        List<TaskUserSendMessageType> list = new ArrayList<>();
-        for (TaskUserSendMessageType userMessage : userList) {
-            int type = userMessage.getMessageType();
+        List<TaskMessageUser> list = new ArrayList<>();
+        for (TaskMessageUser userMessage : userList) {
+            int type = userMessage.getReceiveType();
             //添加全部通知人
             if (type == 1){
                 list.add(userMessage);
@@ -103,15 +103,15 @@ public class TaskMessageExecServiceImpl implements TaskMessageExecService {
      * @param type 类型
      * @throws ApplicationException 消息发送失败
      */
-    private void messageType(String taskId, String type, List<TaskUserSendMessageType> userList,
+    private void messageType(String taskId, String type, List<TaskMessageUser> userList,
                              HashMap<String, Object> map) throws ApplicationException {
 
         switch (type){
-            case PipelineFinal.MES_SENT_SITE ->{
+            case PipelineFinal.MES_SEND_SITE ->{
                 tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+ "发送消息，类型：站内信");
-                map.put("sendWay", PipelineFinal.MES_SENT_SITE);
+                map.put("sendWay", PipelineFinal.MES_SEND_SITE);
                 List<String> list = new ArrayList<>();
-                for (TaskUserSendMessageType message : userList) {
+                for (TaskMessageUser message : userList) {
                     list.add(message.getUser().getId());
                 }
                 homeService.message(map,list);
@@ -124,23 +124,23 @@ public class TaskMessageExecServiceImpl implements TaskMessageExecService {
             }
             case "wechat" ->{
                 tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+ "发送消息，类型：微信机器人消息");
-                map.put("sendWay", PipelineFinal.MES_SENT_WECHAT);
+                map.put("sendWay", PipelineFinal.MES_SEND_WECHAT);
                 homeService.message(map,new ArrayList<>());
                 tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+ "微信机器人消息发送成功");
             }
             case "mail" ->{
                 tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+ "发送消息，类型：邮箱消息");
-                map.put("sendWay", PipelineFinal.MES_SENT_EMAIL);
+                map.put("sendWay", PipelineFinal.MES_SEND_EMAIL);
                 List<String> list = new ArrayList<>();
-                for (TaskUserSendMessageType message : userList) {
+                for (TaskMessageUser message : userList) {
                     list.add(message.getUser().getEmail());
                 }
                 homeService.message(map,list);
                 tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+ "邮箱消息发送成功");
             }
-            case PipelineFinal.MES_SENT_DINGDING ->{
+            case PipelineFinal.MES_SEND_DINGDING ->{
                 tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+ "发送消息，类型：钉钉机器人消息");
-                map.put("sendWay", PipelineFinal.MES_SENT_DINGDING);
+                map.put("sendWay", PipelineFinal.MES_SEND_DINGDING);
                 homeService.message(map,new ArrayList<>());
                 tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+ "钉钉机器人消息成功");
             }

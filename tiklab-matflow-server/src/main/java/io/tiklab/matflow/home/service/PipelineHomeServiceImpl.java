@@ -54,12 +54,6 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
     @Autowired
     private SendMessageNoticeService dispatchNoticeService;
 
-    @Autowired
-    private WebHookService webHookService;
-
-    @Autowired
-    private MailCfgService mailCfgService;
-
 
     @Value("${base.url:null}")
     String baseUrl;
@@ -87,32 +81,6 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
         map.put("color", ""+pipeline.getColor());
         map.put("date", PipelineUtil.date(1));
         return map;
-    }
-
-    /**
-     * 判断是否存在消息配置
-     * @return 不存在的消息配置
-     */
-    @Override
-    public List<String> messageSendType(){
-        List<String> list = new ArrayList<>();
-        MailCfg oneMail = mailCfgService.findOneMail();
-        if (oneMail == null){
-            list.add("mail");
-        }
-        WebHookQuery webHookQuery = new WebHookQuery();
-        webHookQuery.setType(1);
-        WebHook hookByType = webHookService.findWebHookByType(webHookQuery);
-        if (hookByType == null){
-            list.add("dingding");
-        }
-        webHookQuery.setType(2);
-        hookByType = webHookService.findWebHookByType(webHookQuery);
-        if (hookByType == null){
-            list.add("wechat");
-        }
-        list.add("sms");
-        return list;
     }
 
 

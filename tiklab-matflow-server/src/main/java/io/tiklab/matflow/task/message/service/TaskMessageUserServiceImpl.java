@@ -1,11 +1,10 @@
 package io.tiklab.matflow.task.message.service;
 
-import io.tiklab.matflow.task.message.model.TaskMessageUser;
 import io.tiklab.beans.BeanMapper;
 import io.tiklab.join.JoinTemplate;
 import io.tiklab.matflow.task.message.dao.TaskMessageUserDao;
 import io.tiklab.matflow.task.message.entity.TaskMessageUserEntity;
-import io.tiklab.matflow.task.message.model.TaskUserSendMessageType;
+import io.tiklab.matflow.task.message.model.TaskMessageUser;
 import io.tiklab.rpc.annotation.Exporter;
 import io.tiklab.user.user.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,17 +35,17 @@ public class TaskMessageUserServiceImpl implements TaskMessageUserService {
      * @param userMessages 接收人信息
      * @param taskId 任务id
      */
-    public void createAllMessage(List<TaskUserSendMessageType> userMessages, String taskId){
+    public void createAllMessage(List<TaskMessageUser> userMessages, String taskId){
         if (userMessages == null){
             return;
         }
-        for (TaskUserSendMessageType userMessage : userMessages) {
+        for (TaskMessageUser userMessage : userMessages) {
             User user = userMessage.getUser();
-            int type = userMessage.getMessageType();
+            int type = userMessage.getReceiveType();
             TaskMessageUser messageUser = new TaskMessageUser();
             messageUser.setReceiveType(type);
             messageUser.setUser(user);
-            messageUser.setMessageTaskId(taskId);
+            messageUser.setTaskId(taskId);
             createMessage(messageUser);
         }
     }
@@ -56,16 +55,16 @@ public class TaskMessageUserServiceImpl implements TaskMessageUserService {
      * @param taskId 任务id
      * @return 发送人
      */
-    public List<TaskUserSendMessageType> findAllUserMessage(String taskId){
-        List<TaskUserSendMessageType> list = new ArrayList<>();
+    public List<TaskMessageUser> findAllUserMessage(String taskId){
+        List<TaskMessageUser> list = new ArrayList<>();
         for (TaskMessageUser messageUser : findAllMessage()) {
-            String messageTaskId = messageUser.getMessageTaskId();
+            String messageTaskId = messageUser.getTaskId();
             if (messageTaskId.equals(taskId)){
                 joinTemplate.joinQuery(messageUser);
                 User user = messageUser.getUser();
                 int receiveType = messageUser.getReceiveType();
-                TaskUserSendMessageType taskUserSendMessageType = new TaskUserSendMessageType();
-                taskUserSendMessageType.setMessageType(receiveType);
+                TaskMessageUser taskUserSendMessageType = new TaskMessageUser();
+                taskUserSendMessageType.setReceiveType(receiveType);
                 taskUserSendMessageType.setUser(user);
                 list.add(taskUserSendMessageType);
             }
@@ -80,7 +79,7 @@ public class TaskMessageUserServiceImpl implements TaskMessageUserService {
     public void deleteAllMessage(String taskId){
         List<TaskMessageUser> allMessage = findAllMessage();
         for (TaskMessageUser messageUser : allMessage) {
-            if (messageUser.getMessageTaskId().equals(taskId)){
+            if (messageUser.getTaskId().equals(taskId)){
                 deleteMessage(messageUser.getMessageId());
             }
         }

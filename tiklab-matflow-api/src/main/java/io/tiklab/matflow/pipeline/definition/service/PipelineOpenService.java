@@ -30,10 +30,9 @@ public interface PipelineOpenService {
 
     /**
      * 获取打开的流水线
-     * @param userId 用户id
      * @param pipelineId 流水线id
      */
-    void updatePipelineOpen(String userId, String pipelineId);
+    void updatePipelineOpen(String pipelineId);
 
     /**
      * 查询单个次数信息

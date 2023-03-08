@@ -72,8 +72,12 @@ public class TasksExecServiceImpl implements TasksExecService {
         TaskInstance instance = new TaskInstance();
         if (type == 1){
             instance.setInstanceId(instanceId);
-        }else {
+        }
+        if (type == 2) {
             instance.setStagesId(instanceId);
+        }
+        if (type == 3) {
+            instance.setPostprocessId(instanceId);
         }
         instance.setRunState(RUN_WAIT);
         instance.setTaskName(task.getTaskName());
@@ -107,37 +111,27 @@ public class TasksExecServiceImpl implements TasksExecService {
         boolean state = true;
 
         //分发执行不同任务
-        switch (taskType/10) {
-            case 0 : {
-                state = code.clone(pipelineId, tasks,taskType);
-                break;
+        switch (taskType / 10) {
+            case 0 -> {
+                state = code.clone(pipelineId, tasks, taskType);
             }
-            case 1 : {
-                state = test.test(pipelineId, tasks,taskType);
-                break;
+            case 1 -> {
+                state = test.test(pipelineId, tasks, taskType);
             }
-            case 2 : {
-                state = build.build(pipelineId, tasks,taskType);
-                break;
+            case 2 -> {
+                state = build.build(pipelineId, tasks, taskType);
             }
-            case 3 : {
-                state = deploy.deploy(pipelineId, tasks,taskType);
-                break;
+            case 3 -> {
+                state = deploy.deploy(pipelineId, tasks, taskType);
             }
-            case 4 : {
-                state = codeScan.codeScan(pipelineId, tasks,taskType);
-                break;
+            case 4 -> {
+                state = codeScan.codeScan(pipelineId, tasks, taskType);
             }
-            case 5 : {
-                state = product.product(pipelineId, tasks,taskType);
-                break;
+            case 5 -> {
+                state = product.product(pipelineId, tasks, taskType);
             }
-            case 6 : {
-                // state = message.message(pipelineProcess, task, taskType, maps);
-            }
-            case 7 : {
-                state = scripts.scripts(pipelineId, tasks,taskType);
-                break;
+            case 7 -> {
+                state = scripts.scripts(pipelineId, tasks, taskType);
             }
         }
 

@@ -1,16 +1,23 @@
 package io.tiklab.matflow.task.message.service;
 
+import io.tiklab.beans.BeanMapper;
 import io.tiklab.matflow.task.message.dao.TaskMessageTypeDao;
 import io.tiklab.matflow.task.message.entity.TaskMessageTypeEntity;
 import io.tiklab.matflow.task.message.model.TaskMessageType;
-import io.tiklab.matflow.task.message.model.TaskUserSendMessageType;
-import io.tiklab.beans.BeanMapper;
+import io.tiklab.matflow.task.message.model.TaskMessageUser;
+import io.tiklab.message.mail.modal.MailCfg;
+import io.tiklab.message.mail.service.MailCfgService;
+import io.tiklab.message.webhook.modal.WebHook;
+import io.tiklab.message.webhook.modal.WebHookQuery;
+import io.tiklab.message.webhook.service.WebHookService;
 import io.tiklab.rpc.annotation.Exporter;
+import io.tiklab.user.user.model.User;
+import io.tiklab.utils.context.LoginContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.List;
+import static io.tiklab.matflow.support.util.PipelineFinal.*;
 
 @Service
 @Exporter
@@ -23,47 +30,43 @@ public class TaskMessageTypeServiceImpl implements TaskMessageTypeService {
     private TaskMessageUserService messageUserServer;
 
     @Autowired
-    private TaskMessageTypeService messageTypeService;
+    private WebHookService webHookService;
+
+    @Autowired
+    private MailCfgService mailCfgService;
 
     //创建
     @Override
     public void createMessage(TaskMessageType message) {
-
         List<String> typeList = message.getTypeList() ;
-        List<TaskUserSendMessageType> userList = message.getUserList();
+        List<TaskMessageUser> userList = message.getUserList();
 
+        if (typeList == null){
+            typeList = new ArrayList<>();
+            typeList.add(MES_SEND_SITE);
+        }
+
+        if (userList == null){
+            userList = new ArrayList<>();
+            TaskMessageUser taskMessageUser = new TaskMessageUser();
+            taskMessageUser.setReceiveType(1);
+            User user = new User();
+            user.setId(LoginContext.getLoginId());
+            taskMessageUser.setUser(user);
+            userList.add(taskMessageUser);
+        }
+
+        String taskId = message.getTaskId();
         for (String s : typeList) {
             TaskMessageTypeEntity messageTypeEntity = BeanMapper.map(message, TaskMessageTypeEntity.class);
             messageTypeEntity.setTaskType(s);
-            String taskId = taskMessageTypeDao.createMessage(messageTypeEntity);
+            taskMessageTypeDao.createMessage(messageTypeEntity);
             messageUserServer.createAllMessage(userList,taskId);
         }
 
     }
 
-    /**
-     * 根据配置查询发送方式
-     * @param configId 配置id
-     * @return 发送方式
-     */
-    public List<String> findAllMessage(String configId){
-        List<TaskMessageType> allMessage = findAllMessage();
-        if (allMessage == null){
-            return null;
-        }
-        List<String> list = new ArrayList<>();
-        for (TaskMessageType messageType : allMessage) {
-            if (messageType.getTaskId().equals(configId)){
-                list.add(messageType.getTaskType());
-            }
-        }
-        return list;
-    }
-
-    /**
-     * 删除任务
-     * @param taskId 配置id
-     */
+    @Override
     public void deleteAllMessage(String taskId){
         List<TaskMessageType> allMessage = findAllMessage();
         if (allMessage == null){
@@ -73,10 +76,31 @@ public class TaskMessageTypeServiceImpl implements TaskMessageTypeService {
             if (messageType.getTaskId().equals(taskId)){
                 String messageTaskId = messageType.getId();
                 deleteMessage(messageTaskId);
-                messageUserServer.deleteAllMessage(messageTaskId);
+                messageUserServer.deleteAllMessage(taskId);
             }
         }
+    }
 
+    @Override
+    public List<String> messageSendType(){
+        List<String> list = new ArrayList<>();
+        MailCfg oneMail = mailCfgService.findOneMail();
+        if (oneMail == null){
+            list.add(MES_SEND_EMAIL);
+        }
+        WebHookQuery webHookQuery = new WebHookQuery();
+        webHookQuery.setType(1);
+        WebHook hookByType = webHookService.findWebHookByType(webHookQuery);
+        if (hookByType == null){
+            list.add(MES_SEND_DINGDING);
+        }
+        webHookQuery.setType(2);
+        hookByType = webHookService.findWebHookByType(webHookQuery);
+        if (hookByType == null){
+            list.add(MES_SEND_WECHAT);
+        }
+        list.add(MES_SEND_SMS);
+        return list;
     }
 
     @Override
@@ -86,19 +110,20 @@ public class TaskMessageTypeServiceImpl implements TaskMessageTypeService {
             return null;
         }
         TaskMessageType taskMessageType = new TaskMessageType();
-        List<String> list = new ArrayList<>();
 
+
+        //添加消息发送类型
+        List<String> list = new ArrayList<>();
         for (TaskMessageType messageType : allMessage) {
             String typeTaskId = messageType.getTaskId();
             if (!typeTaskId.equals(taskId)){
                 continue;
             }
-
             String taskType = messageType.getTaskType();
             list.add(taskType);
         }
-        String id = allMessage.get(0).getId();
-        List<TaskUserSendMessageType>  userList = messageUserServer.findAllUserMessage(id);
+
+        List<TaskMessageUser>  userList = messageUserServer.findAllUserMessage(taskId);
         taskMessageType.setTypeList(list);
         taskMessageType.setTaskId(taskId);
         taskMessageType.setUserList(userList);
@@ -106,20 +131,20 @@ public class TaskMessageTypeServiceImpl implements TaskMessageTypeService {
         return taskMessageType;
     }
 
-    //删除
+
     @Override
     public void deleteMessage(String messageId) {
         taskMessageTypeDao.deleteMessage(messageId);
     }
 
-    //更新
+
     @Override
     public void updateMessage(TaskMessageType taskMessageType) {
         TaskMessageTypeEntity taskMessageTypeEntity = BeanMapper.map(taskMessageType, TaskMessageTypeEntity.class);
         taskMessageTypeDao.updateMessage(taskMessageTypeEntity);
     }
 
-    //查询单个
+
     @Override
     public TaskMessageType findOneMessage(String messageId) {
         TaskMessageTypeEntity messageTypeEntity = taskMessageTypeDao.findOneMessage(messageId);
@@ -127,7 +152,6 @@ public class TaskMessageTypeServiceImpl implements TaskMessageTypeService {
 
     }
 
-    //查询所有
     @Override
     public List<TaskMessageType> findAllMessage() {
         return BeanMapper.mapList(taskMessageTypeDao.findAllMessage(), TaskMessageType.class);

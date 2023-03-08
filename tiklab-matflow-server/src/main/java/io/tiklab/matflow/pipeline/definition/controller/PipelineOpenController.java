@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @RestController
@@ -24,13 +25,49 @@ public class PipelineOpenController {
     @RequestMapping(path="/findAllOpen",method = RequestMethod.POST)
     @ApiMethod(name = "findAllOpen",desc = "查询流水线最近状态")
     @ApiParam(name = "number",desc = "数量",required = true)
-    public Result<List<PipelineOpen>> findAllOpen(int number){
+    public Result<List<PipelineOpen>> findAllOpen(@NotNull int number){
 
         List<PipelineOpen> openList = openService.findUserAllOpen(number);
 
         return Result.ok(openList);
     }
 
+    @RequestMapping(path="/updateOpen",method = RequestMethod.POST)
+    @ApiMethod(name = "updatePipelineOpen",desc = "查询流水线最近状态")
+    @ApiParam(name = "pipelineId",desc = "流水线id",required = true)
+    public Result<Void> updatePipelineOpen(@NotNull String pipelineId){
 
+       openService.updatePipelineOpen(pipelineId);
+
+        return Result.ok();
+    }
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

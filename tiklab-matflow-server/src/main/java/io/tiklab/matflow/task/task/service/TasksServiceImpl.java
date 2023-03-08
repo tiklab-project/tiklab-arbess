@@ -116,21 +116,27 @@ public class TasksServiceImpl implements TasksService {
 
         int sort = 0;
         int taskSort = tasks.getTaskSort();
-        String stageId = tasks.getStageId();
-        String postprocessId = tasks.getPostprocessId();
-        String pipelineId = tasks.getPipelineId();
         int taskType = tasks.getTaskType();
+
         //判断多任务是否存在代码源
         if (tasks.getPipelineId() != null && taskType < 10){
             findCode(tasks.getPipelineId());
         }
 
+        //流水线任务
+        String pipelineId = tasks.getPipelineId();
         if (pipelineId != null) {
             sort = initSort(tasks.getPipelineId(), taskSort, taskType,1);
         }
+
+        //阶段任务
+        String stageId = tasks.getStageId();
         if (stageId != null){
             sort = initSort(stageId, taskSort, taskType,2);
         }
+
+        //后置任务
+        String postprocessId = tasks.getPostprocessId();
         if (postprocessId != null){
             sort = initSort(postprocessId, taskSort, taskType,3);
         }
@@ -213,6 +219,7 @@ public class TasksServiceImpl implements TasksService {
     @Override
     public void deleteAllTasksOrTask(String id,int type) {
         List<Tasks> list;
+
         if (type == 1){
             list = finAllPipelineTask(id);
         }else {
@@ -350,6 +357,27 @@ public class TasksServiceImpl implements TasksService {
         return stringList;
     }
 
+    @Override
+    public void createTaskTemplate(String pipelineId,int[] template){
+        // switch (template) {
+        //     case "12131" -> ints = new int[]{1, 21, 31};
+        //     case "1112131" -> ints = new int[]{1, 11, 21, 31};
+        //     case "12231" -> ints = new int[]{1, 22, 31};
+        // }
+        int j = 1;
+        for (int i : template) {
+            Tasks task = new Tasks();
+            task.setTaskSort(j);
+            task.setPipelineId(pipelineId);
+            task.setTaskType(i);
+            createTasks(task);
+            j++;
+        }
+    }
+
+
+
+
     /**
      * 创建任务
      * @param tasks 任务模型
@@ -444,6 +472,9 @@ public class TasksServiceImpl implements TasksService {
             case 6 ->{
                 String object = JSON.toJSONString(values);
                 TaskMessageType task = JSON.parseObject(object, TaskMessageType.class);
+                if (task == null){
+                    task = new TaskMessageType();
+                }
                 task.setTaskId(taskId);
                 messageTypeServer.createMessage(task);
             }

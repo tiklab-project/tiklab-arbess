@@ -30,9 +30,7 @@ public class StageServiceImpl implements StageService {
     @Autowired
     TasksService tasksService;
 
-
     public String createStagesOrTask(Stage stage){
-
         String stagesId = stage.getStageId();
         String pipelineId = stage.getPipelineId();
 
@@ -109,6 +107,19 @@ public class StageServiceImpl implements StageService {
         }
         throw new ApplicationException(50001,"未知的操作类型");
     }
+
+    @Override
+    public void createStageTemplate(String pipelineId,int[] template){
+        int j = 1;
+        for (int i : template) {
+            Stage stage = new Stage();
+            stage.setPipelineId(pipelineId);
+            stage.setStageSort(j);
+            stage.setTaskType(i);
+            createStagesOrTask(stage);
+        }
+    }
+
 
     /**
      * 判断任务是否存在代码源

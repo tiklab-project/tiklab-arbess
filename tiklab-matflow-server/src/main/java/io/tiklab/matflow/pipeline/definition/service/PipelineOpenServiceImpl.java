@@ -56,7 +56,8 @@ public class PipelineOpenServiceImpl implements PipelineOpenService {
     }
 
     @Override
-    public void updatePipelineOpen(String userId, String pipelineId) {
+    public void updatePipelineOpen( String pipelineId) {
+        String userId = LoginContext.getLoginId();
         PipelineOpen open = findPipelineOpenNumber(userId, pipelineId);
         if (open != null){
             open.setNumber(open.getNumber()+1);

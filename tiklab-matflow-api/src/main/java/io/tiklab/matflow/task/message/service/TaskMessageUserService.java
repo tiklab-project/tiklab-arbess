@@ -1,11 +1,10 @@
 package io.tiklab.matflow.task.message.service;
 
-import io.tiklab.matflow.task.message.model.TaskMessageUser;
 import io.tiklab.join.annotation.FindAll;
 import io.tiklab.join.annotation.FindList;
 import io.tiklab.join.annotation.FindOne;
 import io.tiklab.join.annotation.JoinProvider;
-import io.tiklab.matflow.task.message.model.TaskUserSendMessageType;
+import io.tiklab.matflow.task.message.model.TaskMessageUser;
 
 import java.util.List;
 
@@ -28,7 +27,7 @@ public interface TaskMessageUserService {
      * @param userMessages 接收人信息
      * @param taskId 任务id
      */
-    void createAllMessage(List<TaskUserSendMessageType> userMessages, String taskId);
+    void createAllMessage(List<TaskMessageUser> userMessages, String taskId);
 
 
     /**
@@ -36,7 +35,7 @@ public interface TaskMessageUserService {
      * @param taskId 任务id
      * @return 发送人
      */
-    List<TaskUserSendMessageType> findAllUserMessage(String taskId);
+    List<TaskMessageUser> findAllUserMessage(String taskId);
 
 
     /**

@@ -89,7 +89,7 @@ create table pip_task_message_type  (
 -- ----------------------------
 create table pip_task_message_user  (
     message_id varchar(255) COMMENT '认证信息',
-    message_task_id varchar(255) COMMENT '类型信息',
+    task_id varchar(255) COMMENT '类型信息',
     receive_user varchar(255) COMMENT '接收人信息',
     receive_type int COMMENT '接收类型 1.全部 2.仅成功 3.仅失败',
     PRIMARY KEY (message_id) USING BTREE

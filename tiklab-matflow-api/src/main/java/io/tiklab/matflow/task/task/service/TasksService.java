@@ -98,6 +98,14 @@ public interface TasksService {
      */
     List<String> validTasksMustField(String id,int type);
 
+
+    /**
+     * 创建任务模板
+     * @param pipelineId 流水线id
+     * @param template 模板
+     */
+    void createTaskTemplate(String pipelineId,int[] template);
+
     /**
      * 查询单个任务
      * @param tasksId 任务id

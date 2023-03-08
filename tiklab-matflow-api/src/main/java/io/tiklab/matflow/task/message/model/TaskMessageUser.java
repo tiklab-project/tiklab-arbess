@@ -19,10 +19,10 @@ public class TaskMessageUser {
     @ApiProperty(name="messageId",desc="配置id")
     private String messageId;
 
-    @ApiProperty(name="messageTaskId",desc="类型")
-    private String messageTaskId;
+    @ApiProperty(name="taskId",desc="类型")
+    private String taskId;
 
-    @ApiProperty(name="user",desc="认证配置",required = true)
+    @ApiProperty(name="user",desc="用户",required = true)
     @Mappings({
             @Mapping(source = "user.id",target = "userId")
     })
@@ -40,12 +40,12 @@ public class TaskMessageUser {
         this.messageId = messageId;
     }
 
-    public String getMessageTaskId() {
-        return messageTaskId;
+    public String getTaskId() {
+        return taskId;
     }
 
-    public void setMessageTaskId(String messageTaskId) {
-        this.messageTaskId = messageTaskId;
+    public void setTaskId(String taskId) {
+        this.taskId = taskId;
     }
 
     public User getUser() {

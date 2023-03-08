@@ -41,15 +41,17 @@ public class PipelineFinal {
 
     public static final String MES_PIPELINE_TASK_RUN = "MES_PIPELINE_TASK_RUN"; //流水线任务运行消息
 
-    public static final String MES_TEM_SITE = "site"; //流水线创建信息模板
 
     //消息发送方式
-    public static final String MES_SENT_SITE = "site"; //流水线创建信息模板
+    public static final String MES_SEND_SITE = "site";
 
+    public static final String MES_SEND_EMAIL = "email";
 
-    public static final String MES_SENT_EMAIL = "email"; //流水线创建信息模板
-    public static final String MES_SENT_DINGDING = "dingding"; //流水线创建信息模板
-    public static final String MES_SENT_WECHAT = "qywechat"; //流水线创建信息模板
+    public static final String MES_SEND_DINGDING = "dingding";
+
+    public static final String MES_SEND_WECHAT = "qywechat";
+
+    public static final String MES_SEND_SMS = "sms";
 
     //消息方案
     public static final String MES_UPDATE = "MES_UPDATE"; //消息方案

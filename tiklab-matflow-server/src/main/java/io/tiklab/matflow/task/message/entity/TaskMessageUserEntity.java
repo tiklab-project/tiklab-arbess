@@ -13,8 +13,8 @@ public class TaskMessageUserEntity {
     private String messageId;
 
     //类型
-    @Column(name = "message_task_id")
-    private String messageTaskId;
+    @Column(name = "task_id")
+    private String taskId;
 
     //接收人
     @Column(name = "receive_user")
@@ -32,12 +32,12 @@ public class TaskMessageUserEntity {
         this.messageId = messageId;
     }
 
-    public String getMessageTaskId() {
-        return messageTaskId;
+    public String getTaskId() {
+        return taskId;
     }
 
-    public void setMessageTaskId(String messageTaskId) {
-        this.messageTaskId = messageTaskId;
+    public void setTaskId(String taskId) {
+        this.taskId = taskId;
     }
 
     public String getUserId() {

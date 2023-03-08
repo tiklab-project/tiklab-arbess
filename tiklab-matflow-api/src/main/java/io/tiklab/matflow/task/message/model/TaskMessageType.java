@@ -27,7 +27,7 @@ public class TaskMessageType {
     private List<String> typeList;
 
     @ApiProperty(name="userList",desc="接收人信息")
-    private List<TaskUserSendMessageType> userList;
+    private List<TaskMessageUser> userList;
 
     public String getId() {
         return id;
@@ -45,11 +45,11 @@ public class TaskMessageType {
         this.typeList = typeList;
     }
 
-    public List<TaskUserSendMessageType> getUserList() {
+    public List<TaskMessageUser> getUserList() {
         return userList;
     }
 
-    public void setUserList(List<TaskUserSendMessageType> userList) {
+    public void setUserList(List<TaskMessageUser> userList) {
         this.userList = userList;
     }
 

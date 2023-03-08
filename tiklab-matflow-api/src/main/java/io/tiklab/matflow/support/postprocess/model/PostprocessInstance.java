@@ -12,20 +12,31 @@ import io.tiklab.postin.annotation.ApiProperty;
 @Mapper(targetAlias = "PostprocessInstanceEntity")
 public class PostprocessInstance {
 
-    @ApiProperty(name = "postprocessId",desc="id")
-    private String processId;
+    @ApiProperty(name = "id",desc="id")
+    private String id;
 
 
     @ApiProperty(name = "instanceId",desc="实例id")
     private String instanceId;
 
 
-    public String getProcessId() {
-        return processId;
+    @ApiProperty(name = "taskInstanceId",desc="任务实例id")
+    private String taskInstanceId;
+
+    public String getTaskInstanceId() {
+        return taskInstanceId;
     }
 
-    public void setProcessId(String processId) {
-        this.processId = processId;
+    public void setTaskInstanceId(String taskInstanceId) {
+        this.taskInstanceId = taskInstanceId;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getInstanceId() {

@@ -1,11 +1,10 @@
 package io.tiklab.matflow.support.postprocess.service;
 
-import io.tiklab.matflow.support.postprocess.model.Postprocess;
-import io.tiklab.matflow.task.task.model.Tasks;
 import io.tiklab.join.annotation.FindAll;
 import io.tiklab.join.annotation.FindList;
 import io.tiklab.join.annotation.FindOne;
 import io.tiklab.join.annotation.JoinProvider;
+import io.tiklab.matflow.support.postprocess.model.Postprocess;
 
 import java.util.List;
 /**
@@ -28,21 +27,21 @@ public interface PostprocessService {
      * @param pipelineId 流水线id
      * @return 任务
      */
-    List<Tasks> findAllPipelinePostTask(String pipelineId);
+    List<Postprocess> findAllPipelinePostTask(String pipelineId);
 
     /**
      * 查询任务后置处理
      * @param taskId 任务id
      * @return 任务列表
      */
-    List<Tasks> findAllTaskPostTask(String taskId);
+    List<Postprocess> findAllTaskPostTask(String taskId);
 
 
     /**
      * 删除
-     * @param postId messageId
+     * @param postprocessId messageId
      */
-    void deletePostTask(String postId) ;
+    void deletePostTask(String postprocessId) ;
 
 
     /**

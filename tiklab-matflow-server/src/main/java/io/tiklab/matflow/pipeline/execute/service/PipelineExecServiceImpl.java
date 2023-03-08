@@ -96,6 +96,12 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         instanceIdOrInstance.put(instanceId, pipelineInstance);
         tasksExecService.time(instanceId);
 
+        HashMap<String,Object> map = homeService.initMap(pipeline);
+        map.put("title","流水线执行消息");
+        map.put("message","流水线"+pipeline.getName()+"开始执行");
+        homeService.log(PipelineFinal.LOG_PIPELINE, PipelineFinal.LOG_TEM_RUN, map);
+        homeService.settingMessage(PipelineFinal.MES_PIPELINE_RUN, map);
+
         executorService.submit((Callable<Object>) () -> {
 
             boolean b = true;
@@ -122,12 +128,6 @@ public class PipelineExecServiceImpl implements PipelineExecService {
             pipelineExecEnd(pipelineId, b);
             return true;
         });
-
-        // try {
-        //     Thread.sleep(1000);
-        // } catch (InterruptedException e) {
-        //     throw new ApplicationException(e);
-        // }
 
         joinTemplate.joinQuery(pipelineInstance);
         return pipelineInstance;

@@ -22,9 +22,16 @@ public interface TaskMessageTypeService {
 
     /**
      * 删除任务
-     * @param configId 配置id
+     * @param taskId 任务id
      */
-    void deleteAllMessage(String configId);
+    void deleteAllMessage(String taskId);
+
+
+    /**
+     * 判断是否存在消息配置
+     * @return 不存在的消息配置
+     */
+    List<String> messageSendType();
 
 
     /**
