@@ -17,14 +17,12 @@ import java.util.List;
  */
 
 @RestController
-@RequestMapping("/message")
+@RequestMapping("/taskMessage")
 @Api(name = "TaskMessageController",desc = "消息")
 public class TaskMessageController {
 
-
     @Autowired
     TaskMessageTypeService messageTypeService;
-
 
     @RequestMapping(path="/findMessageSendType",method = RequestMethod.POST)
     @ApiMethod(name = "messageSendType",desc = "查询消息发送方式")

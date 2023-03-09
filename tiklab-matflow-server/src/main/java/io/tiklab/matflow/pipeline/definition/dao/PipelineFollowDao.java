@@ -69,7 +69,6 @@ public class PipelineFollowDao {
         return jpaTemplate.findList(PipelineFollowEntity.class,idList);
     }
 
-
     /**
      * 查询用户是否收藏该流水线
      * @param userId 用户id
@@ -77,9 +76,9 @@ public class PipelineFollowDao {
      * @return 收藏信息
      */
     public List<PipelineFollow> findUserFollowPipeline(String userId, String pipelineId){
-        String sql = "select pip_pipeline_other_follow.* from pip_pipeline_other_follow ";
-        sql = sql.concat(" where pip_pipeline_other_follow.user_id  = '"+userId+"' "
-                + " and pip_pipeline_other_follow.pipeline_id  = '"+pipelineId+"' ");
+        String sql = "select pip_other_follow.* from pip_other_follow ";
+        sql = sql.concat(" where pip_other_follow.user_id  = '"+userId+"' "
+                + " and pip_other_follow.pipeline_id  = '"+pipelineId+"' ");
         JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
         return  jdbcTemplate.query(sql, new BeanPropertyRowMapper(PipelineFollow.class));
     }

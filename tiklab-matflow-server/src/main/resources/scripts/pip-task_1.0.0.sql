@@ -66,6 +66,7 @@ create table pip_task_artifact  (
     put_address varchar(256)  COMMENT '凭证id',
     PRIMARY KEY (task_id) USING BTREE
 );
+
 -- ----------------------------
 -- 脚本
 -- ----------------------------
@@ -76,14 +77,17 @@ create table pip_task_script  (
     script_order longtext COMMENT '脚本命令',
     PRIMARY KEY (task_id) USING BTREE
 );
+
 -- ----------------------------
 -- 消息发送类型
 -- ----------------------------
 create table pip_task_message_type  (
-    task_id varchar(255) COMMENT '消息',
-    task_type varchar(255) COMMENT '认证信息',
-    PRIMARY KEY (task_id) USING BTREE
+    id varchar(255) COMMENT 'id',
+    task_id varchar(255) COMMENT '任务id',
+    task_type varchar(255) COMMENT '认证类型',
+    PRIMARY KEY (id) USING BTREE
 );
+
 -- ----------------------------
 -- 消息发送人
 -- ----------------------------

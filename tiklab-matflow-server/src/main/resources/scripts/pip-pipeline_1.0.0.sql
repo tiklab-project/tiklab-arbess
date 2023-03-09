@@ -20,7 +20,7 @@ create table pip_pipeline_instance  (
     instance_id varchar(255) COMMENT 'id',
     create_time datetime COMMENT '创建时间',
     run_way int  COMMENT '构建方式 1。手动触发 2.触发器触发',
-    run_status int  COMMENT '执行状态 成功:success 失败:error 停止:halt 等待运行:wait',
+    run_status varchar(255)  COMMENT '执行状态 成功:success 失败:error 停止:halt 等待运行:wait',
     run_time int  COMMENT '执行时间',
     user_id varchar(255)  COMMENT '执行人',
     pipeline_id varchar(255)  COMMENT '流水线id',
@@ -35,8 +35,8 @@ create table pip_task_instance  (
     id varchar(256)  COMMENT '日志id',
     instance_id varchar(256)  COMMENT '历史id',
     task_sort int  COMMENT '运行顺序',
-    task_type varchar(255)  COMMENT '执行类型',
-    task_name varchar(255)  COMMENT '执行类型',
+    task_type int  COMMENT '执行类型',
+    task_name varchar(255)  COMMENT '执行名称',
     run_state varchar(255)  COMMENT '运行状态,成功:success 失败:error 停止:halt 等待运行:wait',
     run_time int  COMMENT '运行时间',
     log_address longtext COMMENT '运行日志',
@@ -109,6 +109,7 @@ create table pip_stage_instance  (
     stage_address varchar(255) COMMENT '阶段实例运行日志地址',
     stage_state varchar(255) COMMENT '阶段实例运行状态 成功:success 失败:error 停止:halt 等待运行:wait',
     parent_id varchar(255) COMMENT '主阶段',
+    instance_id varchar(255) COMMENT '所属实例',
     PRIMARY KEY (id) USING BTREE
 );
 

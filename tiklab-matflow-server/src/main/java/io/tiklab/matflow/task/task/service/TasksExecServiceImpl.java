@@ -13,6 +13,8 @@ import io.tiklab.matflow.task.script.service.TaskScriptExecService;
 import io.tiklab.matflow.task.task.model.TaskInstance;
 import io.tiklab.matflow.task.task.model.Tasks;
 import io.tiklab.matflow.task.test.service.TaskTestExecService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -56,6 +58,7 @@ public class TasksExecServiceImpl implements TasksExecService {
     @Autowired
     private TasksService tasksService;
 
+    private static final Logger logger = LoggerFactory.getLogger(TasksExecServiceImpl.class);
 
     //任务id与任务实例id关系
     public static Map<String , String> taskIdOrTaskInstanceId = new HashMap<>();
@@ -98,6 +101,7 @@ public class TasksExecServiceImpl implements TasksExecService {
     public boolean execTask(String pipelineId , int taskType,String taskId)  throws ApplicationException {
 
         Tasks tasks = tasksService.findOneTasksOrTask(taskId);
+        logger.info("执行任务："+tasks.getTaskName());
         String taskInstanceId = taskIdOrTaskInstanceId.get(taskId);
         //计算时间
         time(taskInstanceId);

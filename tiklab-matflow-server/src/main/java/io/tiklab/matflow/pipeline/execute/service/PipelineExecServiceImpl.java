@@ -103,10 +103,10 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         //日志文件根路径
         String fileAddress = PipelineUtil.findFileAddress(pipelineId,2)+instanceId;
 
-        // cloud
+        // // cloud
         // boolean b = true;
         // int type = pipeline.getType();
-
+        //
         // if (type == 1) {
         //     // 创建多任务运行实例
         //     List<Tasks> tasks = tasksService.finAllPipelineTask(pipelineId);

@@ -30,21 +30,13 @@ public class TriggerTimeServiceImpl implements TriggerTimeService {
     @Autowired
     Job manager;
 
-
     @Override
-    public String createTime(TriggerTime triggerTime) {
-        TriggerTimeEntity triggerTimeEntity = BeanMapper.map(triggerTime, TriggerTimeEntity.class);
-        return triggerTimeDao.createTime(triggerTimeEntity);
-    }
-
-    @Override
-    public String createTimeConfig(TriggerTime pipelineTriggerTime, String pipelineId){
+    public String createTriggerTime(TriggerTime pipelineTriggerTime, String pipelineId){
         List<Integer> timeList = pipelineTriggerTime.getTimeList();
         if (timeList == null || timeList.size() == 0){
             throw new ApplicationException(50001,"无法获取到执行时间");
         }
         String time = pipelineTriggerTime.getTime();
-        String id = null;
         for (Integer integer : timeList) {
             pipelineTriggerTime.setDate(integer);
             String cron = CronUtils.weekCron(time, integer);
@@ -54,14 +46,15 @@ public class TriggerTimeServiceImpl implements TriggerTimeService {
             } catch (SchedulerException e) {
                 throw new ApplicationException(50001,"当前时间已经添加过，无需重复添加。");
             }
-            id = createTime(pipelineTriggerTime);
+            TriggerTimeEntity triggerTimeEntity = BeanMapper.map(pipelineTriggerTime, TriggerTimeEntity.class);
+            return triggerTimeDao.createTime(triggerTimeEntity);
         }
-        return id;
+        return null;
     }
 
     @Override
-    public TriggerTime findTimeConfig(String configId){
-        List<TriggerTime> allTriggerTime = findAllTimeConfig(configId);
+    public TriggerTime findTriggerTime(String configId){
+        List<TriggerTime> allTriggerTime = findAllTriggerTime(configId);
         if (allTriggerTime == null || allTriggerTime.size() == 0){
             return null;
         }
@@ -81,7 +74,7 @@ public class TriggerTimeServiceImpl implements TriggerTimeService {
     }
 
     @Override
-    public List<TriggerTime> findAllTimeConfig(String configId){
+    public List<TriggerTime> findAllTriggerTime(String configId){
         List<TriggerTime> allTriggerTime = findAllTime();
         if (allTriggerTime == null){
             return null;
@@ -112,7 +105,7 @@ public class TriggerTimeServiceImpl implements TriggerTimeService {
 
     @Override
     public TriggerTime fondCronConfig(String configId, String cron){
-        List<TriggerTime> allTriggerTime = findAllTimeConfig(configId);
+        List<TriggerTime> allTriggerTime = findAllTriggerTime(configId);
         if (allTriggerTime == null){
             return null;
         }
@@ -152,8 +145,8 @@ public class TriggerTimeServiceImpl implements TriggerTimeService {
     }
 
     @Override
-    public void deleteAllTime(String configId,String pipelineId){
-        List<TriggerTime> triggerTimeConfig = findAllTimeConfig(configId);
+    public void deleteAllTime(String triggerId,String pipelineId){
+        List<TriggerTime> triggerTimeConfig = findAllTriggerTime(triggerId);
         if (triggerTimeConfig == null){
             return;
         }
@@ -190,7 +183,6 @@ public class TriggerTimeServiceImpl implements TriggerTimeService {
         triggerTimeDao.deleteTime(timeId);
     }
 
-    @Override
     public void updateTime(TriggerTime triggerTime) {
         TriggerTimeEntity triggerTimeEntity = BeanMapper.map(triggerTime, TriggerTimeEntity.class);
         triggerTimeDao.updateTime(triggerTimeEntity);

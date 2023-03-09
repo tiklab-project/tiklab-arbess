@@ -14,34 +14,26 @@ import java.util.List;
 public interface TriggerTimeService {
 
     /**
-     * 创建
-     * @param triggerTime time信息
-     * @return timeId
-     */
-    String createTime(TriggerTime triggerTime) ;
-
-
-    /**
      * 创建所有关联时间信息
      * @param triggerTime 信息
      */
-    String createTimeConfig(TriggerTime triggerTime, String pipelineId);
+    String createTriggerTime(TriggerTime triggerTime, String pipelineId);
 
 
     /**
      * 根据配置id查询消息类型
-     * @param configId 配置id
+     * @param triggerId 配置id
      * @return 消息
      */
-    TriggerTime findTimeConfig(String configId);
+    TriggerTime findTriggerTime(String triggerId);
 
 
     /**
      * 根据配置查询所有任务
-     * @param configId 配置id
+     * @param triggerId 配置id
      * @return 任务集合
      */
-    List<TriggerTime> findAllTimeConfig(String configId);
+    List<TriggerTime> findAllTriggerTime(String triggerId);
 
 
     /**
@@ -62,9 +54,9 @@ public interface TriggerTimeService {
 
     /**
      * 删除当前配置下的的所有任务
-     * @param configId 配置id
+     * @param triggerId 配置id
      */
-    void deleteAllTime(String configId,String pipelineId);
+    void deleteAllTime(String triggerId,String pipelineId);
 
 
     /**
@@ -78,13 +70,6 @@ public interface TriggerTimeService {
      * @param timeId timeId
      */
     void deleteTime(String timeId) ;
-
-
-    /**
-     * 更新信息
-     * @param triggerTime 信息
-     */
-    void updateTime(TriggerTime triggerTime);
 
     /**
      * 查询单个信息

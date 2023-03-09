@@ -38,13 +38,6 @@ public interface TriggerService {
     void deleteCronConfig(String pipelineId,String cron);
 
     /**
-     * 查询单个任务
-     * @param triggerId 配置id
-     * @return 任务
-     */
-    Object findOneTrigger(String triggerId);
-
-    /**
      * 更新配置信息
      * @param trigger 配置
      */

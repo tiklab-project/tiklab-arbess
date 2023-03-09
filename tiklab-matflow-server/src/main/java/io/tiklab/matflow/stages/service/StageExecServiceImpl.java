@@ -138,7 +138,8 @@ public class StageExecServiceImpl implements  StageExecService {
                     updateStageExecState(stagesId,state);
                     break;
                 }
-                // cloud
+
+                // // cloud
                 // List<Tasks> tasks = tasksService.finAllStageTask(stagesId);
                 // for (Tasks task : tasks) {
                 //     state = tasksExecService.execTask(pipelineId, task.getTaskType(), task.getTaskId());
@@ -149,6 +150,7 @@ public class StageExecServiceImpl implements  StageExecService {
                 // }
 
                 //放入线程执行
+
                 try {
                     Future<Boolean> future = threadPool.submit(() -> {
                         Thread.currentThread().setName(stagesId);

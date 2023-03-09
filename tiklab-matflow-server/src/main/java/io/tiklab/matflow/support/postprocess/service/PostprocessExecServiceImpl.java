@@ -2,6 +2,7 @@ package io.tiklab.matflow.support.postprocess.service;
 
 import io.tiklab.matflow.pipeline.definition.model.Pipeline;
 import io.tiklab.matflow.support.postprocess.model.Postprocess;
+import io.tiklab.matflow.support.postprocess.model.PostprocessInstance;
 import io.tiklab.matflow.task.task.model.Tasks;
 import io.tiklab.matflow.task.task.service.TasksExecService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,13 +14,16 @@ import java.util.List;
 public class PostprocessExecServiceImpl implements PostprocessExecService{
 
     @Autowired
-    PostprocessService postprocessService;
+    private PostprocessService postprocessService;
 
     @Autowired
-    TasksExecService tasksExecService;
+    private TasksExecService tasksExecService;
+
+    @Autowired
+    private PostprocessInstanceService postInstanceService;
 
 
-    public void createPostInstance(String pipelineId){
+    public void createPostInstance(String pipelineId,String id,int type){
         List<Postprocess> postprocessList = postprocessService.findAllPipelinePostTask(pipelineId);
         if (postprocessList.size() == 0){
             return;
@@ -27,9 +31,16 @@ public class PostprocessExecServiceImpl implements PostprocessExecService{
         for (Postprocess postprocess : postprocessList) {
             String postprocessId = postprocess.getPostprocessId();
             Tasks task = postprocess.getTask();
+            PostprocessInstance postInstance = new PostprocessInstance();
+            if (type == 1){
+                postInstance.setInstanceId(id);
+            }
+            if (type == 2){
+                postInstance.setTaskInstanceId(id);
+            }
+            String postInstanceId = postInstanceService.createPostInstance(postInstance);
 
-
-            tasksExecService.createTaskExecInstance(task,"",3,"");
+            tasksExecService.createTaskExecInstance(task,postInstanceId,3,"");
 
 
         }

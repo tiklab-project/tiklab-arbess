@@ -58,13 +58,6 @@ public class TriggerController {
         return Result.ok(list);
     }
 
-    @RequestMapping(path="/findOneTrigger",method = RequestMethod.POST)
-    @ApiMethod(name = "findOneTrigger",desc = "触发器配置信息")
-    @ApiParam(name = "triggerId",desc = "配置id",required = true)
-    public Result<Object> findOneTriggerConfig(@NotNull String triggerId) {
-        Object list = triggerServer.findOneTrigger(triggerId);
-        return Result.ok(list);
-    }
 
 
 

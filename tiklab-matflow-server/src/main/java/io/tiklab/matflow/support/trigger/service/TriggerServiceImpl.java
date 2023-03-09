@@ -1,5 +1,6 @@
 package io.tiklab.matflow.support.trigger.service;
 
+import com.alibaba.fastjson.JSON;
 import io.tiklab.matflow.support.trigger.dao.TriggerDao;
 import io.tiklab.matflow.support.trigger.entity.TriggerEntity;
 import io.tiklab.beans.BeanMapper;
@@ -22,13 +23,13 @@ import java.util.List;
 public class TriggerServiceImpl implements TriggerService {
 
     @Autowired
-    TriggerDao triggerConfigDao;
+    TriggerDao triggerDao;
 
     @Autowired
     JoinTemplate joinTemplate;
-
+    
     @Autowired
-    TriggerTaskService triggerTaskServer;
+    TriggerTimeService timeServer;
 
 
     /**
@@ -41,8 +42,17 @@ public class TriggerServiceImpl implements TriggerService {
         trigger.setCreateTime(PipelineUtil.date(1));
         String triggerId = createTriggerConfig(trigger);
         trigger.setTriggerId(triggerId);
+
+        Pipeline pipeline = trigger.getPipeline();
+        String pipelineId = pipeline.getId();
+        int taskType = trigger.getTaskType();
         try {
-            triggerTaskServer.createTaskTrigger(trigger);
+            String object = JSON.toJSONString(trigger.getValues());
+            if (taskType == 81){
+                TriggerTime triggerTime = JSON.parseObject(object, TriggerTime.class);
+                triggerTime.setTriggerId(triggerId);
+                timeServer.createTriggerTime(triggerTime,pipelineId);
+            }
         }catch (ApplicationException e){
             deleteTrigger(triggerId);
         }
@@ -62,12 +72,15 @@ public class TriggerServiceImpl implements TriggerService {
         }
         List<TriggerTime> triggerTimeList = new ArrayList<>();
         for (Trigger trigger : allTriggerConfig) {
-            TriggerTime triggerConfig = triggerTaskServer.findTrigger(trigger);
-            if (triggerConfig == null){
+            String triggerId = trigger.getTriggerId();
+            TriggerTime triggerTime = timeServer.findTriggerTime(triggerId);
+            if (triggerTime == null){
                 deleteTrigger(trigger.getTriggerId());
                 continue;
             }
-            triggerTimeList.add(triggerConfig);
+            int taskType = trigger.getTaskType();
+            triggerTime.setType(taskType);
+            triggerTimeList.add(triggerTime);
         }
         triggerTimeList.sort(Comparator.comparing(TriggerTime::getWeekTime));
 
@@ -83,9 +96,10 @@ public class TriggerServiceImpl implements TriggerService {
         if (allTriggerConfig == null || allTriggerConfig.size() == 0){
             return;
         }
-        for (Trigger config : allTriggerConfig) {
-            triggerTaskServer.deleteTrigger(config);
-            deleteTrigger(config.getTriggerId());
+        for (Trigger trigger : allTriggerConfig) {
+            String triggerId = trigger.getTriggerId();
+            deleteTrigger(triggerId);
+            timeServer.deleteAllTime(triggerId,pipelineId);
         }
     }
 
@@ -100,36 +114,36 @@ public class TriggerServiceImpl implements TriggerService {
         if (allTriggerConfig == null){
             return;
         }
-        for (Trigger config : allTriggerConfig) {
-            String configId = config.getTriggerId();
-            triggerTaskServer.deleteCron(pipelineId,configId,cron);
+        for (Trigger trigger : allTriggerConfig) {
+            String triggerId = trigger.getTriggerId();
+
+            TriggerTime triggerTime = timeServer.fondCronConfig(triggerId, cron);
+            if (triggerTime == null){
+                return;
+            }
+            timeServer.deleteCronTime(pipelineId, triggerTime.getTimeId());
         }
     }
 
-    /**
-     * 查询单个任务
-     * @param triggerId 配置id
-     * @return 任务
-     */
-    @Override
-    public Object findOneTrigger(String triggerId){
-        Trigger oneTriggerConfig = findOneTriggerConfig(triggerId);
-        TriggerTime triggerConfig = triggerTaskServer.findTrigger(oneTriggerConfig);
-        if (triggerConfig == null){
-            deleteTrigger(triggerId);
-            return null;
-        }
-        return triggerConfig;
-    }
 
     @Override
     public void updateTrigger(Trigger trigger){
-        String configId = trigger.getTriggerId();
-        if (configId == null){
-            configId = createTrigger(trigger);
+        String triggerId = trigger.getTriggerId();
+        if (triggerId == null){
+            triggerId = createTrigger(trigger);
         }
-        trigger.setTriggerId(configId);
-        triggerTaskServer.updateTrigger(trigger);
+        trigger.setTriggerId(triggerId);
+
+        int taskType = trigger.getTaskType();
+        Pipeline pipeline = trigger.getPipeline();
+        String pipelineId = pipeline.getId();
+        String object = JSON.toJSONString(trigger.getValues());
+        if (taskType == 81){
+            TriggerTime triggerTime = JSON.parseObject(object, TriggerTime.class);
+            triggerTime.setTriggerId(triggerId);
+            timeServer.deleteAllTime(triggerId,pipelineId);
+            timeServer.createTriggerTime(triggerTime,pipelineId);
+        }
     }
 
     /**
@@ -159,17 +173,12 @@ public class TriggerServiceImpl implements TriggerService {
     //创建
     public String createTriggerConfig(Trigger trigger){
         TriggerEntity configEntity = BeanMapper.map(trigger, TriggerEntity.class);
-        return triggerConfigDao.createTriggerConfig(configEntity);
-    }
-
-    //更新
-    public void updateTriggerConfig(Trigger trigger) {
-        triggerTaskServer.updateTrigger(trigger);
+        return triggerDao.createTriggerConfig(configEntity);
     }
 
     
-    public Trigger findOneTriggerConfig(String triggerId) {
-        TriggerEntity triggerConfigEntity = triggerConfigDao.findOneTriggerConfig(triggerId);
+    public Trigger findOneTriggerById(String triggerId) {
+        TriggerEntity triggerConfigEntity = triggerDao.findOneTriggerConfig(triggerId);
         Trigger config = BeanMapper.map(triggerConfigEntity, Trigger.class);
         joinTemplate.joinQuery(config);
         return config;
@@ -177,19 +186,21 @@ public class TriggerServiceImpl implements TriggerService {
     
     @Override
     public void deleteTrigger(String triggerId) {
-        Trigger oneTriggerConfig = findOneTriggerConfig(triggerId);
-        triggerTaskServer.deleteTrigger(oneTriggerConfig);
-        triggerConfigDao.deleteTriggerConfig(triggerId);
+        Trigger trigger = findOneTriggerById(triggerId);
+        String pipelineId = trigger.getPipeline().getId();
+        timeServer.deleteAllTime(triggerId,pipelineId);
+        triggerDao.deleteTriggerConfig(triggerId);
+
     }
 
 
     public List<Trigger> findAllTrigger() {
-        return BeanMapper.mapList(triggerConfigDao.findAllTriggerConfig(), Trigger.class);
+        return BeanMapper.mapList(triggerDao.findAllTriggerConfig(), Trigger.class);
     }
 
     @Override
     public List<Trigger> findAllTriggerConfigList(List<String> idList) {
-        return BeanMapper.mapList(triggerConfigDao.findAllTriggerConfigList(idList), Trigger.class);
+        return BeanMapper.mapList(triggerDao.findAllTriggerConfigList(idList), Trigger.class);
     }
 
 }

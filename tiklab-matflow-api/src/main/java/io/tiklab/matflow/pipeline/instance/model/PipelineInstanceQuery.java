@@ -21,7 +21,7 @@ public class PipelineInstanceQuery {
     private String pipelineId;
 
     @ApiProperty(name ="state",desc = "状态")
-    private int state;
+    private String state;
 
     @ApiProperty(name ="userId",desc = "用户id")
     private String userId;
@@ -54,11 +54,11 @@ public class PipelineInstanceQuery {
         this.pipelineId = pipelineId;
     }
 
-    public int getState() {
+    public String getState() {
         return state;
     }
 
-    public void setState(int state) {
+    public void setState(String state) {
         this.state = state;
     }
 
