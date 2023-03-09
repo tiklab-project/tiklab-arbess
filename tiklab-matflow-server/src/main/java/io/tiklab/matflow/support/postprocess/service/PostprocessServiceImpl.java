@@ -118,10 +118,18 @@ public class PostprocessServiceImpl implements PostprocessService {
     }
 
     @Override
-    public Postprocess findOnePost(String postId) {
-        PostprocessEntity postprocessEntity = postprocessDao.findOnePost(postId);
-        return BeanMapper.map(postprocessEntity, Postprocess.class);
+    public Postprocess findOnePostOrTask(String postprocessId) {
+        Postprocess postprocess = findOnePost(postprocessId);
+        String id = postprocess.getPostprocessId();
+        Tasks taskOrTask = tasksService.findOnePostTaskOrTask(id);
+        postprocess.setTask(taskOrTask);
+        return postprocess;
+    }
 
+    @Override
+    public Postprocess findOnePost(String postprocessId) {
+        PostprocessEntity postprocessEntity = postprocessDao.findOnePost(postprocessId);
+        return BeanMapper.map(postprocessEntity, Postprocess.class);
     }
 
     @Override

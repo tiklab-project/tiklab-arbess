@@ -42,12 +42,11 @@ public class TaskCodeServiceImpl implements TaskCodeService {
 
     /**
      * 根据配置id删除任务
-     * @param configId 配置id
+     * @param taskId 配置id
      */
     @Override
-    public void deleteCodeConfig(String configId){
-        TaskCode oneCodeConfig = findOneCodeConfig(configId);
-        deleteCode(oneCodeConfig.getTaskId());
+    public void deleteCodeConfig(String taskId){
+        deleteCode(taskId);
     }
 
     /**

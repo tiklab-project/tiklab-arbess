@@ -75,9 +75,9 @@ public class TaskMessageExecServiceImpl implements TaskMessageExecService {
 
         //任务消息还是流水线消息
         if (isPipeline){
-            map.put("mesType", PipelineFinal.MES_PIPELINE_RUN);
+            map.put("mesType", PipelineFinal.MES_RUN);
         }else {
-            map.put("mesType", PipelineFinal.MES_PIPELINE_TASK_RUN);
+            map.put("mesType", PipelineFinal.MES_RUN);
         }
 
         //消息发送类型

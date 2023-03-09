@@ -122,15 +122,15 @@ public class TasksInstanceServiceImpl implements TasksInstanceService {
             if (stagesId == null || !stagesId.equals(stageId)){
                 continue;
             }
-            String instanceId = instance.getInstanceId();
-            TaskInstance taskInstance = taskOrTaskInstance.get(instanceId);
+            String taskInstanceId = instance.getId();
+            TaskInstance taskInstance = taskOrTaskInstance.get(taskInstanceId);
             if (taskInstance == null){
                 String logAddress = instance.getLogAddress();
                 String readFile = PipelineUtil.readFile(logAddress, 500);
                 instance.setRunLog(readFile);
                 list.add(instance);
             }else {
-                Integer integer = runTime.get(instanceId);
+                Integer integer = runTime.get(taskInstanceId);
                 if (integer == null){
                     integer = 0;
                 }

@@ -94,17 +94,7 @@ create table pip_task_message_user  (
     receive_type int COMMENT '接收类型 1.全部 2.仅成功 3.仅失败',
     PRIMARY KEY (message_id) USING BTREE
 );
--- ----------------------------
--- 触发器时间
--- ----------------------------
-create table pip_pipeline_trigger_time  (
-    time_id varchar(255) COMMENT '配置',
-    task_type int COMMENT '1:单次,2:周期' ,
-    date varchar(255) COMMENT '时间',
-    cron varchar(255) COMMENT '详细时间',
-    trigger_id varchar(255) COMMENT '配置id',
-    PRIMARY KEY (time_id) USING BTREE
-);
+
 
 
 

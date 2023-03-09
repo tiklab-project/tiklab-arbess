@@ -64,9 +64,9 @@ eas:
   embbed:
     enable: true
 #    enable: false
-#  address: http://192.168.10.14:8080
+#  address: http://192.168.10.11:8081
 #  web:
-#    address: http://192.168.10.14:3003
+#    address: http://192.168.10.11:3001
 
 base:
   url: http://192.168.10.23:3000

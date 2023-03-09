@@ -359,24 +359,16 @@ public class TasksServiceImpl implements TasksService {
 
     @Override
     public void createTaskTemplate(String pipelineId,int[] template){
-        // switch (template) {
-        //     case "12131" -> ints = new int[]{1, 21, 31};
-        //     case "1112131" -> ints = new int[]{1, 11, 21, 31};
-        //     case "12231" -> ints = new int[]{1, 22, 31};
-        // }
         int j = 1;
         for (int i : template) {
             Tasks task = new Tasks();
             task.setTaskSort(j);
             task.setPipelineId(pipelineId);
             task.setTaskType(i);
-            createTasks(task);
+            createTasksOrTask(task);
             j++;
         }
     }
-
-
-
 
     /**
      * 创建任务
@@ -429,8 +421,6 @@ public class TasksServiceImpl implements TasksService {
     }
 
 
-
-
     /**
      * 分发创建不同类型的任务
      * @param taskId 任务id
@@ -479,7 +469,11 @@ public class TasksServiceImpl implements TasksService {
                 messageTypeServer.createMessage(task);
             }
             case 7 ->{
-                TaskScript task = new TaskScript();
+                String object = JSON.toJSONString(values);
+                TaskScript task = JSON.parseObject(object, TaskScript.class);
+                if (task == null){
+                    task = new TaskScript();
+                }
                 task.setTaskId(taskId);
                 scriptServer.createScript(task);
             }
@@ -488,6 +482,7 @@ public class TasksServiceImpl implements TasksService {
             }
         }
     }
+
     /**
      * 分发删除不同任务
      * @param taskId 任务id
@@ -507,6 +502,7 @@ public class TasksServiceImpl implements TasksService {
         }
 
     }
+
     /**
      * 分发更新不同任务
      * @param taskId 任务id
@@ -605,6 +601,7 @@ public class TasksServiceImpl implements TasksService {
             }
         }
     }
+
     /**
      * 分发获取默认任务名称
      * @param taskType 任务类型
@@ -711,6 +708,9 @@ public class TasksServiceImpl implements TasksService {
      * @param list 必填字段
      */
     private void validDifferentTaskMastField(String taskId, int taskType, List<String> list){
+
+
+
         switch (taskType / 10) {
             case 0 ->  codeValid(taskId, list, taskType);
             case 1 ->  testValid(taskId, list, taskType);

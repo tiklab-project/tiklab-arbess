@@ -38,10 +38,10 @@ public interface TasksExecService {
     /**
      * 创建任务或阶段运行实例
      * @param task 任务运行信息
-     * @param id 实例id或阶段id
-     * @param type 1.实例id 2.阶段id
+     * @param id 流水线实例id或阶段实例id或后置处理实例id
+     * @param type 1.实例id 2.阶段id 3.后置处理实例id
      */
-    void createTaskExecInstance(Tasks task, String id, int type);
+    void createTaskExecInstance(Tasks task, String id, int type,String logPath);
 
     /**
      * 任务执行时长

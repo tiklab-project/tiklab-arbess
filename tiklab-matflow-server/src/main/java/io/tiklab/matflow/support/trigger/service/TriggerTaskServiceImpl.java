@@ -18,60 +18,60 @@ public class TriggerTaskServiceImpl implements TriggerTaskService {
 
     /**
      * 查询任务
-     * @param config 配置信息
+     * @param trigger 配置信息
      */
     @Override
-    public void createTriggerConfig(Trigger config)throws ApplicationException {
-        String configId = config.getConfigId();
-        int taskType = config.getTaskType();
-        Pipeline pipeline = config.getPipeline();
+    public void createTaskTrigger(Trigger trigger) throws ApplicationException {
+        String triggerId = trigger.getTriggerId();
+        int taskType = trigger.getTaskType();
+        Pipeline pipeline = trigger.getPipeline();
         String pipelineId = pipeline.getId();
-        String object = JSON.toJSONString(config.getValues());
+        String object = JSON.toJSONString(trigger.getValues());
         if (taskType == 81){
             TriggerTime triggerTime = JSON.parseObject(object, TriggerTime.class);
-            triggerTime.setConfigId(configId);
+            triggerTime.setTriggerId(triggerId);
             timeServer.createTimeConfig(triggerTime,pipelineId);
         }
     }
 
     /**
      * 删除任务
-     * @param config 配置
+     * @param trigger 配置
      */
     @Override
-    public void deleteTriggerConfig(Trigger config){
-        String configId = config.getConfigId();
-        Pipeline pipeline = config.getPipeline();
+    public void deleteTrigger(Trigger trigger){
+        String triggerId = trigger.getTriggerId();
+        Pipeline pipeline = trigger.getPipeline();
         String pipelineId = pipeline.getId();
-        timeServer.deleteAllTime(configId,pipelineId);
+        timeServer.deleteAllTime(triggerId,pipelineId);
     }
 
     /**
      * 更新任务
-     * @param config 配置
+     * @param trigger 配置
      */
     @Override
-    public void updateTriggerConfig(Trigger config){
-        String configId = config.getConfigId();
-        int taskType = config.getTaskType();
-        Pipeline pipeline = config.getPipeline();
+    public void updateTrigger(Trigger trigger){
+        String triggerId = trigger.getTriggerId();
+        int taskType = trigger.getTaskType();
+        Pipeline pipeline = trigger.getPipeline();
         String pipelineId = pipeline.getId();
-        String object = JSON.toJSONString(config.getValues());
+        String object = JSON.toJSONString(trigger.getValues());
         if (taskType == 81){
             TriggerTime triggerTime = JSON.parseObject(object, TriggerTime.class);
-            triggerTime.setConfigId(configId);
-            timeServer.deleteAllTime(configId,pipelineId);
+            triggerTime.setTriggerId(triggerId);
+            timeServer.deleteAllTime(triggerId,pipelineId);
             timeServer.createTimeConfig(triggerTime,pipelineId);
         }
     }
 
     /**
      * 删除一个定时任务
-     * @param configId 配置id
+     * @param triggerId 配置id
      * @param cron 表达式
      */
-    public void deleteCronConfig(String pipelineId,String configId,String cron){
-        TriggerTime triggerTime = timeServer.fondCronConfig(configId, cron);
+    public void deleteCron(String pipelineId,String triggerId,String cron){
+        TriggerTime triggerTime = timeServer.fondCronConfig(triggerId, cron);
         if (triggerTime == null){
             return;
         }
@@ -80,13 +80,13 @@ public class TriggerTaskServiceImpl implements TriggerTaskService {
 
     /**
      * 查询任务
-     * @param config 配置
+     * @param trigger 配置
      * @return 任务
      */
     @Override
-    public TriggerTime findTriggerConfig(Trigger config){
-        String configId = config.getConfigId();
-        int taskType = config.getTaskType();
+    public TriggerTime findTrigger(Trigger trigger){
+        String configId = trigger.getTriggerId();
+        int taskType = trigger.getTaskType();
         TriggerTime triggerTimeConfig = timeServer.findTimeConfig(configId);
         if (triggerTimeConfig == null){
             return null;

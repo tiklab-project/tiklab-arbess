@@ -14,11 +14,11 @@ import io.tiklab.postin.annotation.ApiProperty;
  */
 @ApiModel
 @Join
-@Mapper(targetAlias = "PipelineTriggerEntity")
+@Mapper(targetAlias = "TriggerEntity")
 public class Trigger {
 
-    @ApiProperty(name = "configId",desc="id")
-    private String configId;
+    @ApiProperty(name = "triggerId",desc="id")
+    private String triggerId;
 
     @ApiProperty(name = "name",desc="名称")
     private String name;
@@ -41,16 +41,16 @@ public class Trigger {
     @ApiProperty(name="taskSort",desc="顺序")
     private int taskSort;
 
-    //更改的数据
+    @ApiProperty(name="values",desc="更改的数据")
     private Object values;
 
 
-    public String getConfigId() {
-        return configId;
+    public String getTriggerId() {
+        return triggerId;
     }
 
-    public void setConfigId(String configId) {
-        this.configId = configId;
+    public void setTriggerId(String triggerId) {
+        this.triggerId = triggerId;
     }
 
     public String getName() {

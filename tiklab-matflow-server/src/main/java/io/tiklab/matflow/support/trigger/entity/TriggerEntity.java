@@ -3,14 +3,14 @@ package io.tiklab.matflow.support.trigger.entity;
 import io.tiklab.dal.jpa.annotation.*;
 
 @Entity
-@Table(name="pip_pipeline_trigger")
+@Table(name="pip_trigger")
 public class TriggerEntity {
 
     //id
     @Id
     @GeneratorValue
-    @Column(name = "config_id")
-    private String configId;
+    @Column(name = "trigger_id")
+    private String triggerId;
 
     @Column(name = "name")
     private String name;
@@ -27,12 +27,12 @@ public class TriggerEntity {
     @Column(name = "pipeline_id")
     private String pipelineId;
 
-    public String getConfigId() {
-        return configId;
+    public String getTriggerId() {
+        return triggerId;
     }
 
-    public void setConfigId(String configId) {
-        this.configId = configId;
+    public void setTriggerId(String triggerId) {
+        this.triggerId = triggerId;
     }
 
     public String getName() {

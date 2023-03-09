@@ -9,36 +9,36 @@ public interface TriggerTaskService {
 
     /**
      * 查询任务
-     * @param config 配置信息
+     * @param trigger 配置信息
      */
-    void createTriggerConfig(Trigger config);
+    void createTaskTrigger(Trigger trigger);
 
     /**
      * 删除任务
-     * @param config 配置
+     * @param trigger 配置
      */
-    void deleteTriggerConfig(Trigger config);
+    void deleteTrigger(Trigger trigger);
 
     /**
      * 更新任务
-     * @param config 配置
+     * @param trigger 配置
      */
-    void updateTriggerConfig(Trigger config);
+    void updateTrigger(Trigger trigger);
 
 
     /**
      * 删除一个定时任务
-     * @param configId 配置id
+     * @param triggerId 配置id
      * @param cron 表达式
      */
-    void deleteCronConfig(String pipelineId,String configId,String cron);
+    void deleteCron(String pipelineId,String triggerId,String cron);
 
     /**
      * 查询任务
-     * @param config 配置
+     * @param trigger 配置
      * @return 任务
      */
-    TriggerTime findTriggerConfig(Trigger config);
+    TriggerTime findTrigger(Trigger trigger);
 
 
 }

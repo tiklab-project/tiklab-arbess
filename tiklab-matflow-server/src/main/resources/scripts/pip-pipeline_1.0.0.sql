@@ -35,7 +35,7 @@ create table pip_task_instance  (
     id varchar(256)  COMMENT '日志id',
     instance_id varchar(256)  COMMENT '历史id',
     task_sort int  COMMENT '运行顺序',
-    task_type int  COMMENT '执行类型',
+    task_type varchar(255)  COMMENT '执行类型',
     task_name varchar(255)  COMMENT '执行类型',
     run_state varchar(255)  COMMENT '运行状态,成功:success 失败:error 停止:halt 等待运行:wait',
     run_time int  COMMENT '运行时间',
@@ -58,8 +58,6 @@ create table pip_postprocess  (
     PRIMARY KEY (postprocess_id) USING BTREE
 );
 
-
-
 create table pip_condition  (
     cond_id varchar(256)  COMMENT '条件id',
     cond_name varchar(256)  COMMENT '名称',
@@ -70,8 +68,6 @@ create table pip_condition  (
     cond_value varchar(256)  COMMENT '条件value',
     PRIMARY KEY (cond_id) USING BTREE
 );
-
-
 
 -- ---------------------------
 -- 流程设计
@@ -119,14 +115,27 @@ create table pip_stage_instance  (
 -- ----------------------------
 -- 触发器
 -- ----------------------------
-create table pip_pipeline_trigger  (
-    config_id varchar(255) COMMENT '配置',
+create table pip_trigger  (
+    trigger_id varchar(255) COMMENT '配置',
     name varchar(32) COMMENT '名称',
     task_type int COMMENT '任务类型' ,
     create_time varchar(255) COMMENT '创建时间',
     task_sort varchar(255) COMMENT '任务顺序',
     pipeline_id varchar(255) COMMENT '流水线id',
-    PRIMARY KEY (config_id) USING BTREE
+    PRIMARY KEY (trigger_id) USING BTREE
+);
+
+
+-- ----------------------------
+-- 触发器时间
+-- ----------------------------
+create table pip_trigger_time  (
+    time_id varchar(255) COMMENT '配置',
+    task_type int COMMENT '1:单次,2:周期' ,
+    date varchar(255) COMMENT '时间',
+    cron varchar(255) COMMENT '详细时间',
+    trigger_id varchar(255) COMMENT '配置id',
+    PRIMARY KEY (time_id) USING BTREE
 );
 
 -- ----------------------------

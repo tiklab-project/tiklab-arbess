@@ -23,24 +23,25 @@ public class TriggerTime {
     @ApiProperty(name="date",desc="时间")
     private int date;
 
-    @ApiProperty(name="time",desc="详细时间")
+    @ApiProperty(name="time",desc="具体时间")
     private String time;
 
-    @ApiProperty(name="configId",desc="配置id")
-    private String configId;
+    @ApiProperty(name="triggerId",desc="配置id")
+    private String triggerId;
 
     @ApiProperty(name="cron",desc="配置id")
     private String cron;
 
-    //具体执行时间
+    @ApiProperty(name="execTime",desc="具体执行时间")
     private String weekTime;
 
-    //执行时间
+    @ApiProperty(name="execTime",desc="执行时间")
     private String execTime;
 
-    //天数
+    @ApiProperty(name="timeList",desc="天数,周几")
     private List<Integer> timeList;
 
+    @ApiProperty(name="type",desc="类型")
     private int type;
 
     @ApiProperty(name="name",desc="名称")
@@ -94,12 +95,12 @@ public class TriggerTime {
         this.timeList = timeList;
     }
 
-    public String getConfigId() {
-        return configId;
+    public String getTriggerId() {
+        return triggerId;
     }
 
-    public void setConfigId(String configId) {
-        this.configId = configId;
+    public void setTriggerId(String triggerId) {
+        this.triggerId = triggerId;
     }
 
     public int getType() {

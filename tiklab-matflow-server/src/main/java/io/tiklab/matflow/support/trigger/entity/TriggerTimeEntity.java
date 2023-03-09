@@ -3,7 +3,7 @@ package io.tiklab.matflow.support.trigger.entity;
 import io.tiklab.dal.jpa.annotation.*;
 
 @Entity
-@Table(name="pip_pipeline_trigger_time")
+@Table(name="pip_trigger_time")
 public class TriggerTimeEntity {
 
     @Id
@@ -23,8 +23,8 @@ public class TriggerTimeEntity {
     private String cron;
 
     //配置id
-    @Column(name = "config_id")
-    private String configId;
+    @Column(name = "trigger_id")
+    private String triggerId;
 
 
     public String getTimeId() {
@@ -51,12 +51,12 @@ public class TriggerTimeEntity {
         this.date = date;
     }
 
-    public String getConfigId() {
-        return configId;
+    public String getTriggerId() {
+        return triggerId;
     }
 
-    public void setConfigId(String configId) {
-        this.configId = configId;
+    public void setTriggerId(String triggerId) {
+        this.triggerId = triggerId;
     }
 
     public String getCron() {

@@ -67,7 +67,13 @@ public class TasksController {
     }
 
 
-
+    @RequestMapping(path="/validTaskMustField",method = RequestMethod.POST)
+    @ApiMethod(name = "validTaskMustField",desc = "查询流水线配置")
+    @ApiParam(name = "pipelineId",desc = "流水线id",required = true)
+    public Result<List<String>> validTaskMustField(@NotNull String pipelineId){
+        List<String> list = tasksService.validTasksMustField(pipelineId, 1);
+        return Result.ok(list);
+    }
 
 
 }

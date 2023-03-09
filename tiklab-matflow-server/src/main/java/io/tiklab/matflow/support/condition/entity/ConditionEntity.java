@@ -3,7 +3,7 @@ package io.tiklab.matflow.support.condition.entity;
 import io.tiklab.dal.jpa.annotation.*;
 
 @Entity
-@Table(name="pip_pipeline_condition")
+@Table(name="pip_condition")
 public class ConditionEntity {
 
     //流水线id

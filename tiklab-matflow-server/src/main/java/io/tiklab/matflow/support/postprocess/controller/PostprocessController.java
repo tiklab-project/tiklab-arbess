@@ -65,7 +65,13 @@ public class PostprocessController {
         return Result.ok();
     }
 
-
+    @RequestMapping(path="/findOnePost",method = RequestMethod.POST)
+    @ApiMethod(name = "findOnePostOrTask",desc = "根据流水线id查询后置配置")
+    @ApiParam(name = "postprocessId",desc = "后置任务id",required = true)
+    public Result<Postprocess> findOnePostOrTask(@NotNull String postprocessId) {
+        Postprocess postOrTask = postServer.findOnePostOrTask(postprocessId);
+        return Result.ok(postOrTask);
+    }
 
 
 

@@ -68,7 +68,7 @@ public class TasksExecServiceImpl implements TasksExecService {
 
 
     @Override
-    public void createTaskExecInstance(Tasks task,String instanceId,int type){
+    public void createTaskExecInstance(Tasks task,String instanceId,int type, String logPath){
         TaskInstance instance = new TaskInstance();
         if (type == 1){
             instance.setInstanceId(instanceId);
@@ -86,8 +86,7 @@ public class TasksExecServiceImpl implements TasksExecService {
         String taskInstanceId = tasksInstanceService.createTaskInstance(instance);
         instance.setId(taskInstanceId);
         //日志文件地址
-        String fileAddress = PipelineUtil.findFileAddress(instanceId,2);
-        fileAddress = fileAddress + taskInstanceId + ".log";
+        String  fileAddress = logPath +"/"+ taskInstanceId + ".log";
         instance.setLogAddress(fileAddress);
         PipelineUtil.createFile(fileAddress);
         tasksInstanceService.updateTaskInstance(instance);

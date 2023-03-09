@@ -1,15 +1,17 @@
 package io.tiklab.matflow.stages.service;
 
-import io.tiklab.matflow.stages.model.Stage;
 import io.tiklab.core.exception.ApplicationException;
+import io.tiklab.matflow.stages.model.Stage;
 import io.tiklab.matflow.stages.model.StageInstance;
 import io.tiklab.matflow.support.util.PipelineFinal;
+import io.tiklab.matflow.support.util.PipelineUtil;
 import io.tiklab.matflow.task.task.model.Tasks;
 import io.tiklab.matflow.task.task.service.TasksExecService;
 import io.tiklab.matflow.task.task.service.TasksExecServiceImpl;
 import io.tiklab.matflow.task.task.service.TasksService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,20 +52,23 @@ public class StageExecServiceImpl implements  StageExecService {
 
     @Override
     public void createStageExecInstance(String pipelineId,String instanceId) {
+        String fileAddress = PipelineUtil.findFileAddress(pipelineId,2)+instanceId;
         List<Stage> allMainStage = stageService.findAllMainStage(pipelineId);
         for (Stage mainStage : allMainStage) {
             //创建主阶段日志
-            String stageInstanceId = initStageInstance(mainStage, instanceId, true);
             String stageId = mainStage.getStageId();
+            String mainAddress = fileAddress + "/" + stageId;
+            String stageInstanceId = initStageInstance(mainStage, instanceId, true,mainAddress);
             List<Stage> otherStage = stageService.findOtherStage(stageId);
             //获取阶段下的并行任务
             for (Stage stage : otherStage) {
                 String id = stage.getStageId();
-                String otherStageInstanceId = initStageInstance(stage, stageInstanceId, false);
+                String otherStageInstanceId = initStageInstance(stage, stageInstanceId, false,fileAddress);
                 List<Tasks> tasks = tasksService.finAllStageTask(id);
+                String otherAddress = mainAddress + "/"+otherStageInstanceId;
                 //获取串行任务
                 for (Tasks task : tasks) {
-                    tasksExecService.createTaskExecInstance(task,otherStageInstanceId,2);
+                    tasksExecService.createTaskExecInstance(task,otherStageInstanceId,2,otherAddress);
                 }
             }
         }
@@ -74,9 +79,10 @@ public class StageExecServiceImpl implements  StageExecService {
      * @param stage 阶段信息
      * @param id 主实例id
      * @param isMain 是否为主阶段
+     * @param stagePath 日志文件地址
      * @return 阶段运行实例id
      */
-    private String initStageInstance(Stage stage , String id,boolean isMain){
+    private String initStageInstance(Stage stage , String id,boolean isMain,String stagePath){
         StageInstance stageInstance = new StageInstance();
         if (isMain){
             stageInstance.setInstanceId(id);
@@ -84,6 +90,7 @@ public class StageExecServiceImpl implements  StageExecService {
             stageInstance.setParentId(id);
         }
         stageInstance.setStageName(stage.getStageName());
+        stageInstance.setStageAddress(stagePath);
         stageInstance.setStageSort(stage.getStageSort());
         stageInstance.setStageState(PipelineFinal.RUN_WAIT);
         String stageInstanceId = stageInstanceServer.createStageInstance(stageInstance);
@@ -131,6 +138,15 @@ public class StageExecServiceImpl implements  StageExecService {
                     updateStageExecState(stagesId,state);
                     break;
                 }
+                // cloud
+                // List<Tasks> tasks = tasksService.finAllStageTask(stagesId);
+                // for (Tasks task : tasks) {
+                //     state = tasksExecService.execTask(pipelineId, task.getTaskType(), task.getTaskId());
+                //     updateStageExecState(stagesId,state);
+                //     if (!state){
+                //         break;
+                //     }
+                // }
 
                 //放入线程执行
                 try {

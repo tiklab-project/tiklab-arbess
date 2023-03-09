@@ -39,7 +39,7 @@ public interface PostprocessService {
 
     /**
      * 删除
-     * @param postprocessId messageId
+     * @param postprocessId 后置任务id
      */
     void deletePostTask(String postprocessId) ;
 
@@ -51,12 +51,19 @@ public interface PostprocessService {
     void updatePostTask(Postprocess postprocess);
 
     /**
+     * 查询单个后置任务及详情
+     * @param postprocessId 后置任务id
+     * @return 后置任务及详情
+     */
+    Postprocess findOnePostOrTask(String postprocessId);
+
+    /**
      * 查询单个信息
-     * @param messageId pipelineMessageId
+     * @param postprocessId 后置任务id
      * @return message信息
      */
     @FindOne
-    Postprocess findOnePost(String messageId);
+    Postprocess findOnePost(String postprocessId);
 
     /**
      * 根据流水线id查询后置配置

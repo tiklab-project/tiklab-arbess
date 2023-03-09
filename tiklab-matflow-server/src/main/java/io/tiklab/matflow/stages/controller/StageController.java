@@ -67,8 +67,42 @@ public class StageController {
     }
 
 
-
+    @RequestMapping(path="/validStagesMustField",method = RequestMethod.POST)
+    @ApiMethod(name = "validStagesMustField",desc = "查询流水线配置")
+    @ApiParam(name = "pipelineId",desc = "流水线id",required = true)
+    public Result<List<String>> validStagesMustField(@NotNull String pipelineId){
+        List<String> list = stageService.validStagesMustField(pipelineId);
+        return Result.ok(list);
+    }
 
 
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

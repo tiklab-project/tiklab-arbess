@@ -30,18 +30,13 @@ public class TriggerTimeServiceImpl implements TriggerTimeService {
     @Autowired
     Job manager;
 
-    //创建
+
     @Override
     public String createTime(TriggerTime triggerTime) {
         TriggerTimeEntity triggerTimeEntity = BeanMapper.map(triggerTime, TriggerTimeEntity.class);
         return triggerTimeDao.createTime(triggerTimeEntity);
     }
 
-
-    /**
-     * 创建所有关联时间信息
-     * @param pipelineTriggerTime 信息
-     */
     @Override
     public String createTimeConfig(TriggerTime pipelineTriggerTime, String pipelineId){
         List<Integer> timeList = pipelineTriggerTime.getTimeList();
@@ -64,11 +59,6 @@ public class TriggerTimeServiceImpl implements TriggerTimeService {
         return id;
     }
 
-    /**
-     * 根据配置id查询消息类型
-     * @param configId 配置id
-     * @return 消息
-     */
     @Override
     public TriggerTime findTimeConfig(String configId){
         List<TriggerTime> allTriggerTime = findAllTimeConfig(configId);
@@ -85,16 +75,11 @@ public class TriggerTimeServiceImpl implements TriggerTimeService {
         //获取具体时间
         Map<String, String> map = CronUtils.cronWeek(triggerTime.getCron());
         triggerTime.setExecTime(map.get("cron"));
-        triggerTime.setTime(map.get("triggerTime"));
+        triggerTime.setTime(map.get("time"));
         triggerTime.setWeekTime(map.get("weekTime"));
         return triggerTime;
     }
 
-    /**
-     * 根据配置查询所有任务
-     * @param configId 配置id
-     * @return 任务集合
-     */
     @Override
     public List<TriggerTime> findAllTimeConfig(String configId){
         List<TriggerTime> allTriggerTime = findAllTime();
@@ -103,26 +88,20 @@ public class TriggerTimeServiceImpl implements TriggerTimeService {
         }
         List<TriggerTime> list = new ArrayList<>();
         for (TriggerTime triggerTime : allTriggerTime) {
-            if (triggerTime.getConfigId().equals(configId)){
+            if (triggerTime.getTriggerId().equals(configId)){
                 list.add(triggerTime);
             }
         }
         return list;
     }
 
-    /**
-     * 获取最近一次执行任务
-     * @param configId 配置id
-     * @param day 天
-     * @return 任务
-     */
     public TriggerTime findOneConfig(String configId, int day){
         List<TriggerTime> allTriggerTime = findAllTime();
         if (allTriggerTime == null){
             return null;
         }
         for (TriggerTime triggerTime : allTriggerTime) {
-            String timeConfigId = triggerTime.getConfigId();
+            String timeConfigId = triggerTime.getTriggerId();
             int date = triggerTime.getDate();
             if (timeConfigId.equals(configId) && date == day){
                 return triggerTime;
@@ -131,20 +110,14 @@ public class TriggerTimeServiceImpl implements TriggerTimeService {
         return null;
     }
 
-
-    /**
-     * 根据类型查询定时任务
-     * @param configId 配置id
-     * @param cron 表达式
-     * @return 配置
-     */
+    @Override
     public TriggerTime fondCronConfig(String configId, String cron){
         List<TriggerTime> allTriggerTime = findAllTimeConfig(configId);
         if (allTriggerTime == null){
             return null;
         }
         for (TriggerTime triggerTime : allTriggerTime) {
-            String configId1 = triggerTime.getConfigId();
+            String configId1 = triggerTime.getTriggerId();
             String cron1 = triggerTime.getCron();
             if (configId1.equals(configId) && cron1.equals(cron)){
                 return triggerTime;
@@ -153,11 +126,6 @@ public class TriggerTimeServiceImpl implements TriggerTimeService {
         return null;
     }
 
-    /**
-     * 根据配置获取所有时间
-     * @param configId 配置id
-     * @return 时间集合
-     */
     @Override
     public List<Integer> findAllDataConfig(String configId){
         List<TriggerTime> allTriggerTime = findAllTime();
@@ -168,7 +136,7 @@ public class TriggerTimeServiceImpl implements TriggerTimeService {
         List<Integer> afterList = new ArrayList<>();
         for (TriggerTime triggerTime : allTriggerTime) {
             int date = triggerTime.getDate();
-            if (triggerTime.getConfigId().equals(configId) && date != 0){
+            if (triggerTime.getTriggerId().equals(configId) && date != 0){
                 int week = PipelineUtil.week();
                 if (date > week){
                     list.add(date);
@@ -183,10 +151,6 @@ public class TriggerTimeServiceImpl implements TriggerTimeService {
         return list;
     }
 
-    /**
-     * 删除当前配置下的的所有任务
-     * @param configId 配置id
-     */
     @Override
     public void deleteAllTime(String configId,String pipelineId){
         List<TriggerTime> triggerTimeConfig = findAllTimeConfig(configId);
@@ -200,10 +164,7 @@ public class TriggerTimeServiceImpl implements TriggerTimeService {
         }
     }
 
-    /**
-     * 周期任务更新执行时间
-     * @param timeId 任务id
-     */
+    @Override
     public void deleteCronTime(String pipelineId,String timeId){
         TriggerTime oneTriggerTime = findOneTime(timeId);
         if (oneTriggerTime.getTaskType() == 1){
@@ -224,21 +185,17 @@ public class TriggerTimeServiceImpl implements TriggerTimeService {
         updateTime(oneTriggerTime);
     }
 
-
-    //删除
     @Override
     public void deleteTime(String timeId) {
         triggerTimeDao.deleteTime(timeId);
     }
 
-    //更新
     @Override
     public void updateTime(TriggerTime triggerTime) {
         TriggerTimeEntity triggerTimeEntity = BeanMapper.map(triggerTime, TriggerTimeEntity.class);
         triggerTimeDao.updateTime(triggerTimeEntity);
     }
 
-    //查询单个
     @Override
     public TriggerTime findOneTime(String timeId) {
         TriggerTimeEntity timeEntity = triggerTimeDao.findOneTime(timeId);
@@ -246,7 +203,6 @@ public class TriggerTimeServiceImpl implements TriggerTimeService {
 
     }
 
-    //查询所有
     @Override
     public List<TriggerTime> findAllTime() {
         return BeanMapper.mapList(triggerTimeDao.findAllTime(), TriggerTime.class);

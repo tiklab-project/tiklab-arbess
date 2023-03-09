@@ -132,7 +132,7 @@ public class StageInstanceServerImpl implements StageInstanceServer{
 
             //并行阶段执行实例
             int size = allStageInstance.size();
-            for (int j = size-1; j >= 0; j--) {
+            for (int j = size - 1; j >= 0; j--) {
                 String otherStageInstanceId = allStageInstance.get(j).getId();
                 StageInstance otherInstance = stageInstanceMap.get(otherStageInstanceId);
                 if (otherInstance == null){
@@ -142,7 +142,7 @@ public class StageInstanceServerImpl implements StageInstanceServer{
                     if (integer == null){
                         integer = 0;
                     }
-                    instance.setStageTime(integer);
+                    otherInstance.setStageTime(integer);
                 }
                 allStageInstance.remove(j);
                 //获取任务执行实例
