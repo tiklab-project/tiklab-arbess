@@ -145,6 +145,11 @@ public class StageExecServiceImpl implements  StageExecService {
                         }
                     }
                 }else {
+                    try {
+                        Thread.sleep(500);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
                     Future<Boolean> future =  threadPool.submit(() -> {
                         Thread.currentThread().setName(stagesId);
                         List<Tasks> tasks = tasksService.finAllStageTask(stagesId);
@@ -171,8 +176,6 @@ public class StageExecServiceImpl implements  StageExecService {
                 } catch (InterruptedException | ExecutionException | ApplicationException e) {
                     throw new ApplicationException(e);
                 }
-
-
             }
 
             //更新主阶段状态
@@ -203,6 +206,7 @@ public class StageExecServiceImpl implements  StageExecService {
         }
 
         //更新数据，移除内存
+        runTime.remove(stageInstanceId);
         tasksExecService.stopThread(stageInstanceId);
         stageInstanceServer.updateStageInstance(instance);
         stageIdOrStageInstanceId.remove(stageId);
@@ -233,6 +237,8 @@ public class StageExecServiceImpl implements  StageExecService {
         StageInstance otherStageInstance = stageInstanceIdOrStageInstance.get(otherStageInstanceId);
         //该阶段运行完成
         if (otherStageInstanceId == null ){
+            tasksExecService.stopThread(otherStageInstanceId);
+            tasksExecService.stopThread(stageId);
             return;
         }
         //停止任务

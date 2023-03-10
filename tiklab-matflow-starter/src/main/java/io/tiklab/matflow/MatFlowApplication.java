@@ -1,7 +1,7 @@
 package io.tiklab.matflow;
 
+import io.tiklab.core.property.PropertyAndYamlSourceFactory;
 import io.tiklab.matflow.support.util.PipelineUtil;
-import io.tiklab.utils.property.PropertyAndYamlSourceFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;

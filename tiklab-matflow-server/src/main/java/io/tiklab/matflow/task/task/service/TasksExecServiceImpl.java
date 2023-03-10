@@ -157,6 +157,8 @@ public class TasksExecServiceImpl implements TasksExecService {
         //更新数据库数据,移除内存中的实例数据
         tasksInstanceService.updateTaskInstance(instance);
         stopThread(taskInstanceId);
+        stopThread(taskId);
+        runTime.remove(taskInstanceId);
         taskIdOrTaskInstanceId.remove(taskId);
         taskOrTaskInstance.remove(taskInstanceId);
     }
@@ -167,6 +169,8 @@ public class TasksExecServiceImpl implements TasksExecService {
         TaskInstance taskInstance = taskOrTaskInstance.get(taskInstanceId);
         //更新任务实例状态
         if (taskInstance == null){
+            stopThread(taskInstanceId);
+            stopThread(taskId);
             return;
         }
         Integer integer = runTime.get(taskInstanceId);
@@ -175,9 +179,12 @@ public class TasksExecServiceImpl implements TasksExecService {
         }
         taskInstance.setRunTime(integer);
         taskInstance.setRunState(RUN_HALT);
+
         tasksInstanceService.updateTaskInstance(taskInstance);
         //移除内存
+        runTime.remove(taskInstanceId);
         stopThread(taskInstanceId);
+        stopThread(taskId);
         taskIdOrTaskInstanceId.remove(taskId);
         taskOrTaskInstance.remove(taskInstanceId);
     }

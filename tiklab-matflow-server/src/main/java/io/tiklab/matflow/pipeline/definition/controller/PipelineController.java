@@ -93,9 +93,9 @@ public class PipelineController {
     @RequestMapping(path="/findLikePipeline",method = RequestMethod.POST)
     @ApiMethod(name = "findLikePipeline",desc = "模糊查询")
     @ApiParam(name = "pipelineName",desc = "模糊查询条件",required = true)
-    public Result<List<PipelineExecMessage>> findLikePipeline(@NotNull String pipelineName, String userId){
+    public Result<List<PipelineExecMessage>> findLikePipeline(@NotNull String pipelineName){
 
-        List<PipelineExecMessage> pipelineQueryList = pipelineService.findPipelineByName(pipelineName,userId);
+        List<PipelineExecMessage> pipelineQueryList = pipelineService.findPipelineByName(pipelineName);
 
         return Result.ok(pipelineQueryList);
     }
@@ -104,9 +104,9 @@ public class PipelineController {
     @RequestMapping(path="/findUserPipeline",method = RequestMethod.POST)
     @ApiMethod(name = "findUserPipeline",desc = "查询用户所有流水线")
     @ApiParam(name = "userId",desc = "用户id",required = true)
-    public Result<List<PipelineOverview>> findUserPipeline(@NotNull String userId){
+    public Result<List<PipelineOverview>> findUserPipeline(){
 
-        List<PipelineExecMessage> userPipeline = pipelineService.findUserPipelineExecMessage(userId);
+        List<PipelineExecMessage> userPipeline = pipelineService.findUserPipelineExecMessage();
 
         return Result.ok(userPipeline);
     }
@@ -115,9 +115,9 @@ public class PipelineController {
     @RequestMapping(path="/findUserFollowPipeline",method = RequestMethod.POST)
     @ApiMethod(name = "findUserFollowPipeline",desc = "查询用户收藏的流水线")
     @ApiParam(name = "userId",desc = "用户id",required = true)
-    public Result<List<PipelineOverview>> findUserFollowPipeline(@NotNull String userId){
+    public Result<List<PipelineOverview>> findUserFollowPipeline(){
 
-        List<PipelineExecMessage> userPipeline = pipelineService.findUserFollowPipeline(userId);
+        List<PipelineExecMessage> userPipeline = pipelineService.findUserFollowPipeline();
 
         return Result.ok(userPipeline);
     }

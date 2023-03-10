@@ -15,12 +15,12 @@
     <dependencies>
         <dependency>
             <groupId>io.tiklab</groupId>
-            <artifactId>tiklab-tks-core</artifactId>
+            <artifactId>tiklab-beans-annotation</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>io.tiklab</groupId>
-            <artifactId>tiklab-tks-annotation</artifactId>
+            <artifactId>tiklab-join-annotation</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -55,9 +55,10 @@
         </dependency>
         <dependency>
             <groupId>io.tiklab</groupId>
-            <artifactId>tiklab-privilege-api</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
+            <artifactId>tiklab-eam-api</artifactId>
+            <version>${project.version}</version>
         </dependency>
+
 
     </dependencies>
 

@@ -1,5 +1,6 @@
 package io.tiklab.matflow.pipeline.definition.service;
 
+import io.tiklab.eam.common.context.LoginContext;
 import io.tiklab.matflow.pipeline.instance.service.PipelineInstanceService;
 import io.tiklab.matflow.stages.service.StageService;
 import io.tiklab.matflow.support.util.PipelineFinal;
@@ -70,7 +71,7 @@ public class PipelineServiceImpl implements PipelineService {
         }
         pipeline.setColor((random.nextInt(5) + 1));
         pipeline.setCreateTime(PipelineUtil.date(1));
-
+        pipeline.setId(LoginContext.getLoginId());
         //创建流水线
         PipelineEntity pipelineEntity = BeanMapper.map(pipeline, PipelineEntity.class);
         pipelineEntity.setState(1);
@@ -205,18 +206,19 @@ public class PipelineServiceImpl implements PipelineService {
     }
 
     @Override
-    public List<PipelineExecMessage> findUserPipelineExecMessage(String userId){
-        StringBuilder builder = authorityService.findUserPipelineIdString(userId);
+    public List<PipelineExecMessage> findUserPipelineExecMessage(){
+        String loginId = LoginContext.getLoginId();
+        StringBuilder builder = authorityService.findUserPipelineIdString(loginId);
         if (builder.toString().equals("")){
             return Collections.emptyList();
         }
         //未收藏的流水线
-        List<PipelineEntity> pipelineNotFollowEntity = pipelineDao.findPipelineNotFollow(userId,builder);
+        List<PipelineEntity> pipelineNotFollowEntity = pipelineDao.findPipelineNotFollow(loginId,builder);
         List<Pipeline> pipelineNotFollow = BeanMapper.mapList(pipelineNotFollowEntity, Pipeline.class);
         List<PipelineExecMessage> allStatus = findAllExecMessage(pipelineNotFollow);
         joinTemplate.joinQuery(allStatus);
         //收藏的流水线
-        List<PipelineExecMessage> userFollowPipeline = findUserFollowPipeline(userId);
+        List<PipelineExecMessage> userFollowPipeline = findUserFollowPipeline();
         allStatus.addAll(userFollowPipeline);
         //排序
         allStatus.sort(Comparator.comparing(PipelineExecMessage::getName));
@@ -225,7 +227,8 @@ public class PipelineServiceImpl implements PipelineService {
     }
 
     @Override
-    public List<PipelineExecMessage> findUserFollowPipeline(String userId) {
+    public List<PipelineExecMessage> findUserFollowPipeline() {
+        String userId = LoginContext.getLoginId();
         StringBuilder builder = authorityService.findUserPipelineIdString(userId);
         if (builder.toString().equals("")){
             return Collections.emptyList();
@@ -245,11 +248,11 @@ public class PipelineServiceImpl implements PipelineService {
     }
     
     @Override
-    public List<PipelineExecMessage> findPipelineByName(String pipelineName, String userId) {
+    public List<PipelineExecMessage> findPipelineByName(String pipelineName) {
         List<PipelineEntity> pipelineEntityList = pipelineDao.findPipelineByName(pipelineName);
         List<Pipeline> list = BeanMapper.mapList(pipelineEntityList, Pipeline.class);
-
-        StringBuilder s = authorityService.findUserPipelineIdString(userId);
+        String loginId = LoginContext.getLoginId();
+        StringBuilder s = authorityService.findUserPipelineIdString(loginId);
         if (s == null){
             return Collections.emptyList();
         }

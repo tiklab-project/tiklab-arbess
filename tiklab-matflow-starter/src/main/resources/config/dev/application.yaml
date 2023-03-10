@@ -78,7 +78,7 @@ mysql:
 
 #homes
 homes:
-  address: http://192.168.10.19:8080
+  address: http://192.168.10.12:8080
 
 #license
 licences:

@@ -2,6 +2,7 @@ package io.tiklab.matflow.pipeline.definition.service;
 
 import io.tiklab.beans.BeanMapper;
 import io.tiklab.core.exception.ApplicationException;
+import io.tiklab.eam.common.context.LoginContext;
 import io.tiklab.matflow.pipeline.definition.dao.PipelineFollowDao;
 import io.tiklab.matflow.pipeline.definition.entity.PipelineFollowEntity;
 import io.tiklab.matflow.pipeline.definition.model.Pipeline;
@@ -30,7 +31,7 @@ public class PipelineFollowServiceImpl implements PipelineFollowService {
         if (!PipelineUtil.isNoNull(pipelineId)){
            throw new ApplicationException(50001,"流水线id不能为空。");
         }
-        String userId = pipelineFollow.getUserId();
+        String userId = LoginContext.getLoginId();
         List<PipelineFollow> list =
                 pipelineFollowDao.findUserFollowPipeline(userId, pipelineId);
         //用户为收藏该流水线

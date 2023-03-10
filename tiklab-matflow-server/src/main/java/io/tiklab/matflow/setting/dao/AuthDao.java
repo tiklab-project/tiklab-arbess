@@ -1,11 +1,12 @@
 package io.tiklab.matflow.setting.dao;
 
-import io.tiklab.matflow.setting.entity.AuthEntity;
 import io.tiklab.dal.jpa.JpaTemplate;
+import io.tiklab.eam.common.context.LoginContext;
+import io.tiklab.matflow.setting.entity.AuthEntity;
 import io.tiklab.matflow.support.util.PipelineUtil;
-import io.tiklab.utils.context.LoginContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+
 import java.util.List;
 
 /**

@@ -1,6 +1,7 @@
 package io.tiklab.matflow.support.authority.service;
 
 import io.tiklab.beans.BeanMapper;
+import io.tiklab.eam.common.context.LoginContext;
 import io.tiklab.matflow.pipeline.definition.dao.PipelineDao;
 import io.tiklab.matflow.pipeline.definition.entity.PipelineEntity;
 import io.tiklab.matflow.pipeline.definition.model.Pipeline;
@@ -11,7 +12,6 @@ import io.tiklab.privilege.role.model.PatchUser;
 import io.tiklab.user.dmUser.model.DmUser;
 import io.tiklab.user.dmUser.service.DmUserService;
 import io.tiklab.user.user.model.User;
-import io.tiklab.utils.context.LoginContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

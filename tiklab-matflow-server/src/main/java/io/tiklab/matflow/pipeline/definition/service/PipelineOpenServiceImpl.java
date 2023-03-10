@@ -2,20 +2,19 @@ package io.tiklab.matflow.pipeline.definition.service;
 
 
 import io.tiklab.beans.BeanMapper;
+import io.tiklab.eam.common.context.LoginContext;
 import io.tiklab.join.JoinTemplate;
-import io.tiklab.matflow.pipeline.definition.model.Pipeline;
-import io.tiklab.matflow.pipeline.overview.model.PipelineOverview;
 import io.tiklab.matflow.pipeline.definition.dao.PipelineOpenDao;
 import io.tiklab.matflow.pipeline.definition.entity.PipelineOpenEntity;
+import io.tiklab.matflow.pipeline.definition.model.Pipeline;
 import io.tiklab.matflow.pipeline.definition.model.PipelineOpen;
+import io.tiklab.matflow.pipeline.overview.model.PipelineOverview;
 import io.tiklab.matflow.pipeline.overview.service.PipelineOverviewService;
 import io.tiklab.matflow.support.authority.service.PipelineAuthorityService;
 import io.tiklab.matflow.support.util.PipelineUtil;
 import io.tiklab.rpc.annotation.Exporter;
-import io.tiklab.utils.context.LoginContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -38,7 +37,6 @@ public class PipelineOpenServiceImpl implements PipelineOpenService {
     JoinTemplate joinTemplate;
 
 
-    //删除流水线所有最近打开信息
     @Override
     public void deleteAllOpen(String pipelineId){
         List<PipelineOpen> allOpen = findAllOpen();
@@ -130,7 +128,8 @@ public class PipelineOpenServiceImpl implements PipelineOpenService {
      */
     @Override
     public List<PipelineOpen> findUserAllOpen(int number) {
-        StringBuilder builder = authorityService.findUserPipelineIdString(LoginContext.getLoginId());
+        String loginId = LoginContext.getLoginId();
+        StringBuilder builder = authorityService.findUserPipelineIdString(loginId);
         List<PipelineOpen> allOpen = findUserAllOpen(builder) ;
         if (allOpen == null){
             return Collections.emptyList() ;
