@@ -1,5 +1,6 @@
 package io.tiklab.matflow.stages.service;
 
+import io.tiklab.matflow.support.util.PipelineUtil;
 import io.tiklab.matflow.task.task.service.TasksExecServiceImpl;
 import io.tiklab.beans.BeanMapper;
 import io.tiklab.matflow.stages.dao.StageInstanceDao;
@@ -129,7 +130,7 @@ public class StageInstanceServerImpl implements StageInstanceServer{
                 instance.setStageTime(integer);
             }
             List<StageInstance> allStageInstance = findAllOtherStageInstance(stageId);
-
+            String log = "\n\n";
             //并行阶段执行实例
             int size = allStageInstance.size();
             for (int j = size - 1; j >= 0; j--) {
@@ -137,32 +138,41 @@ public class StageInstanceServerImpl implements StageInstanceServer{
                 StageInstance otherInstance = stageInstanceMap.get(otherStageInstanceId);
                 if (otherInstance == null){
                     otherInstance = findOneStageInstance(otherStageInstanceId);
-                }else {
-                    Integer integer = runTime.get(otherStageInstanceId);
-                    if (integer == null){
-                        integer = 0;
-                    }
-                    otherInstance.setStageTime(integer);
                 }
+
                 allStageInstance.remove(j);
                 //获取任务执行实例
                 List<TaskInstance> allTaskInstance =
                         tasksInstanceService.findAllStageInstance(otherStageInstanceId);
                 otherInstance.setTaskInstanceList(allTaskInstance);
+
+                //阶段日志
+                int time = 0;
                 StringBuilder runLog = new StringBuilder();
                 for (TaskInstance taskInstance : allTaskInstance) {
-                    runLog.append(taskInstance.getRunLog());
+                    String instanceRunLog = taskInstance.getRunLog();
+                    if (!PipelineUtil.isNoNull(instanceRunLog)){
+                        continue;
+                    }
+                    runLog.append(instanceRunLog).append(log);
+                    time = time + taskInstance.getRunTime();
                 }
+                otherInstance.setStageTime(time);
+
                 otherInstance.setRunLog(runLog.toString());
                 allStageInstance.add(j,otherInstance);
-
+                //排序
                 allStageInstance.sort(Comparator.comparing(StageInstance::getStageSort));
             }
             stageInstanceList.remove(i);
             StringBuilder runLog = new StringBuilder();
             for (StageInstance stageInstance : allStageInstance) {
-                runLog.append(stageInstance.getRunLog());
+                if (!PipelineUtil.isNoNull(stageInstance.getRunLog())){
+                    continue;
+                }
+                runLog.append(stageInstance.getRunLog()).append(log);
             }
+
             instance.setRunLog(runLog.toString());
             instance.setStageInstanceList(allStageInstance);
             stageInstanceList.add(i,instance);

@@ -241,7 +241,6 @@ public class TasksInstanceServiceImpl implements TasksInstanceService {
         String runInstance = taskInstance.getRunLog();
         if (runInstance.length() > 25000){
             String logAddress = taskInstance.getLogAddress();
-            System.out.println(logAddress);
             PipelineUtil.logWriteFile(runInstance,logAddress);
             taskInstance.setRunLog(null);
         }

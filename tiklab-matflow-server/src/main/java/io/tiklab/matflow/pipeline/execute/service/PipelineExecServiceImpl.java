@@ -140,6 +140,9 @@ public class PipelineExecServiceImpl implements PipelineExecService {
                 // 执行任务
                 for (Tasks task : tasks) {
                     b = tasksExecService.execTask(pipelineId, task.getTaskType(), task.getTaskId());
+                    if (!b){
+                        break;
+                    }
                 }
             }
 
@@ -184,6 +187,12 @@ public class PipelineExecServiceImpl implements PipelineExecService {
             map.put("message","执行成功");
         }else {
             pipelineInstance.setRunStatus(PipelineFinal.RUN_ERROR);
+            //运行失败更改为运行的任务状态
+            List<Tasks> tasks = tasksService.finAllPipelineTask(pipelineId);
+            for (Tasks task : tasks) {
+                String taskId = task.getTaskId();
+                tasksExecService.stopTask(taskId);
+            }
             map.put("message","执行失败");
         }
         //更新状态

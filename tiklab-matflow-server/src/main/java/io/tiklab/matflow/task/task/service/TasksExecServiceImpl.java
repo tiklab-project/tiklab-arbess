@@ -115,27 +115,13 @@ public class TasksExecServiceImpl implements TasksExecService {
 
         //分发执行不同任务
         switch (taskType / 10) {
-            case 0 -> {
-                state = code.clone(pipelineId, tasks, taskType);
-            }
-            case 1 -> {
-                state = test.test(pipelineId, tasks, taskType);
-            }
-            case 2 -> {
-                state = build.build(pipelineId, tasks, taskType);
-            }
-            case 3 -> {
-                state = deploy.deploy(pipelineId, tasks, taskType);
-            }
-            case 4 -> {
-                state = codeScan.codeScan(pipelineId, tasks, taskType);
-            }
-            case 5 -> {
-                state = product.product(pipelineId, tasks, taskType);
-            }
-            case 7 -> {
-                state = scripts.scripts(pipelineId, tasks, taskType);
-            }
+            case 0 -> state = code.clone(pipelineId, tasks, taskType);
+            case 1 -> state = test.test(pipelineId, tasks, taskType);
+            case 2 -> state = build.build(pipelineId, tasks, taskType);
+            case 3 -> state = deploy.deploy(pipelineId, tasks, taskType);
+            case 4 -> state = codeScan.codeScan(pipelineId, tasks, taskType);
+            case 5 -> state = product.product(pipelineId, tasks, taskType);
+            case 7 -> state = scripts.scripts(pipelineId, tasks, taskType);
         }
 
         //更新阶段状态
@@ -173,6 +159,7 @@ public class TasksExecServiceImpl implements TasksExecService {
         taskIdOrTaskInstanceId.remove(taskId);
         taskOrTaskInstance.remove(taskInstanceId);
     }
+
 
     public void stopTask(String taskId){
         String taskInstanceId = taskIdOrTaskInstanceId.get(taskId);

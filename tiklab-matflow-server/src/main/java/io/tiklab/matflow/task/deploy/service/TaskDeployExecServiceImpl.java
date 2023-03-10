@@ -106,18 +106,17 @@ public class TaskDeployExecServiceImpl implements TaskDeployExecService {
         tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"部署文件获取成功："+ filePath );
 
         //发送文件位置
-        String deployAddress ="/"+ taskDeploy.getDeployAddress();
+        String deployAddress = taskDeploy.getDeployAddress();
         deployAddress = variableServer.replaceVariable(pipelineId, taskId, deployAddress);
         try {
-         ftp(session, filePath, deployAddress);
+            tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"部署文件文件上传中..." );
+            ftp(session, filePath, deployAddress);
         } catch (JSchException | SftpException e) {
             session.disconnect();
-            tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"部署文件上传失败"+e.getMessage());
+            tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"部署文件上传失败："+e.getMessage());
             return false;
         }
-
         tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"部署文件上传成功" );
-
         try {
             linux(session, pipelineId, taskDeploy,taskId);
         } catch (JSchException | IOException e) {
@@ -274,7 +273,11 @@ public class TaskDeployExecServiceImpl implements TaskDeployExecService {
         ChannelSftp sftp = (ChannelSftp) session.openChannel("sftp");
         sftp.connect();
         //判断目录是否存在
-        sftp.lstat(uploadAddress);
+        try {
+            sftp.lstat(uploadAddress);
+        } catch (SftpException e) {
+            sftp.mkdir(uploadAddress);
+        }
         //ChannelSftp.OVERWRITE 覆盖上传
         sftp.put(localFile,uploadAddress,ChannelSftp.OVERWRITE);
         sftp.disconnect();

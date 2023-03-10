@@ -121,78 +121,50 @@ public class StageExecServiceImpl implements  StageExecService {
                 String stagesId = stage.getStageId();
                 //更新从阶段状态为运行
                 String otherStageInstanceId = stageIdOrStageInstanceId.get(stagesId);
-                tasksExecService.time(otherStageInstanceId);
                 StageInstance instance = stageInstanceIdOrStageInstance.get(otherStageInstanceId);
                 instance.setStageState(PipelineFinal.RUN_RUN);
                 stageInstanceIdOrStageInstance.put(otherStageInstanceId,instance);
-                //只有一个并行任务
-                if (otherStage.size() == 1){
-                    //获取阶段任务，执行
-                    List<Tasks> tasks = tasksService.finAllStageTask(stagesId);
-                    for (Tasks task : tasks) {
-                        state =  tasksExecService.execTask(pipelineId, task.getTaskType(), task.getTaskId());
-                        if (!state){
-                            break;
-                        }
-                    }
-                    updateStageExecState(stagesId,state);
-                    break;
-                }
 
-                // // cloud
-                // List<Tasks> tasks = tasksService.finAllStageTask(stagesId);
+                //获取阶段任务，执行
+                List<Tasks> tasks = tasksService.finAllStageTask(stagesId);
+
                 // for (Tasks task : tasks) {
-                //     state = tasksExecService.execTask(pipelineId, task.getTaskType(), task.getTaskId());
-                //     updateStageExecState(stagesId,state);
-                //     if (!state){
-                //         break;
+                //     boolean b = tasksExecService.execTask(pipelineId, task.getTaskType(), task.getTaskId());
+                //     if (!b){
+                //         updateStageExecState(mainStageId,state);
+                //         if (!state){ break; }
                 //     }
                 // }
 
-                //放入线程执行
-
-                try {
-                    Future<Boolean> future = threadPool.submit(() -> {
-                        Thread.currentThread().setName(stagesId);
-                        //获取阶段任务，执行
-                        List<Tasks> tasks = tasksService.finAllStageTask(stagesId);
-                        for (Tasks task : tasks) {
-                            boolean b = tasksExecService.execTask(pipelineId, task.getTaskType(), task.getTaskId());
-                            if (!b){
-                                return  false;
-                            }
-                        }
-                        return true;
-                    });
-                    futureMap.put(stagesId,future);
-                }catch (ApplicationException e){
-                    throw new ApplicationException(e);
-                }
-                //等待获取执行结果
-                for (Stage stage1 : otherStage) {
+                for (Tasks task : tasks) {
                     try {
-                        String stageId = stage1.getStageId();
-                        state = futureMap.get(stageId).get();
-                        if (!state){
-                            break;
-                        }
-                    } catch (InterruptedException | ExecutionException | ApplicationException e) {
+                        Future<Boolean> future = threadPool.submit(() -> {
+                            Thread.currentThread().setName(stagesId);
+                            return tasksExecService.execTask(pipelineId, task.getTaskType(), task.getTaskId());
+                        });
+                        futureMap.put(stagesId,future);
+                    }catch (ApplicationException e){
                         throw new ApplicationException(e);
                     }
                 }
-                //更新并行阶段状态
-                updateStageExecState(stagesId,state);
-                if (!state){
-                    break;
+            }
+
+            //等待获取并行阶段执行结果
+            for (Stage stage1 : otherStage) {
+                try {
+                    String stageId = stage1.getStageId();
+                    state = futureMap.get(stageId).get();
+                    updateStageExecState(stageId,state);
+                    if (!state){ break; }
+                } catch (InterruptedException | ExecutionException | ApplicationException e) {
+                    throw new ApplicationException(e);
                 }
             }
 
             //更新主阶段状态
-            updateStageExecState(mainStageId,state);
 
-            if (!state){
-                break;
-            }
+            updateStageExecState(mainStageId,state);
+            if (!state){ break; }
         }
         return state;
     }
