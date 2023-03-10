@@ -1,6 +1,7 @@
 package io.tiklab.matflow.stages.service;
 
 import io.tiklab.core.exception.ApplicationException;
+import io.tiklab.matflow.pipeline.execute.service.PipelineExecServiceImpl;
 import io.tiklab.matflow.stages.model.Stage;
 import io.tiklab.matflow.stages.model.StageInstance;
 import io.tiklab.matflow.support.util.PipelineFinal;
@@ -16,7 +17,9 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 
 /**
  * 阶段运行服务
@@ -46,7 +49,7 @@ public class StageExecServiceImpl implements  StageExecService {
     private final static Map<String,Integer> runTime = TasksExecServiceImpl.runTime;
 
     //并行任务线程池
-    private final ExecutorService threadPool = Executors.newCachedThreadPool();
+    private final ExecutorService threadPool = PipelineExecServiceImpl.executorService;
 
     @Override
     public void createStageExecInstance(String pipelineId,String instanceId) {
@@ -113,23 +116,27 @@ public class StageExecServiceImpl implements  StageExecService {
             StageInstance stageInstance = stageInstanceIdOrStageInstance.get(stageInstanceId);
             tasksExecService.time(stageInstanceId);
             stageInstance.setStageState(PipelineFinal.RUN_RUN);
+            stageInstanceServer.updateStageInstance(stageInstance);
+            stageInstanceIdOrStageInstance.remove(stageInstanceId);
             stageInstanceIdOrStageInstance.put(stageInstanceId,stageInstance);
 
+            //获取并行阶段
             List<Stage> otherStage = stageService.findOtherStage(mainStageId);
-
             Map<String , Future<Boolean>> futureMap = new HashMap<>();
             for (Stage stage : otherStage) {
+
                 String stagesId = stage.getStageId();
-                //更新从阶段状态为运行
+                //更新从阶段实例状态为运行
                 String otherStageInstanceId = stageIdOrStageInstanceId.get(stagesId);
                 StageInstance instance = stageInstanceIdOrStageInstance.get(otherStageInstanceId);
                 instance.setStageState(PipelineFinal.RUN_RUN);
+                stageInstanceServer.updateStageInstance(instance);
+                stageInstanceIdOrStageInstance.remove(otherStageInstanceId);
                 stageInstanceIdOrStageInstance.put(otherStageInstanceId,instance);
 
                 //获取阶段任务，执行
-                List<Tasks> tasks = tasksService.finAllStageTask(stagesId);
-
                 if (!idCe){
+                    List<Tasks> tasks = tasksService.finAllStageTask(stagesId);
                     for (Tasks task : tasks) {
                         state = tasksExecService.execTask(pipelineId, task.getTaskType(), task.getTaskId());
                         updateStageExecState(stagesId,state);
@@ -139,12 +146,10 @@ public class StageExecServiceImpl implements  StageExecService {
                     }
                 }else {
                     Future<Boolean> future =  threadPool.submit(() -> {
+                        Thread.currentThread().setName(stagesId);
+                        List<Tasks> tasks = tasksService.finAllStageTask(stagesId);
                         for (Tasks task : tasks) {
-                            Thread.currentThread().setName(stagesId);
-                            boolean b= tasksExecService.execTask(pipelineId, task.getTaskType(), task.getTaskId());
-                            if (!b){
-                                return false;
-                            }
+                            return tasksExecService.execTask(pipelineId, task.getTaskType(), task.getTaskId());
                         }
                         return true;
                     });
@@ -153,17 +158,21 @@ public class StageExecServiceImpl implements  StageExecService {
             }
 
             if (idCe){
-                //等待获取并行阶段执行结果
-                for (Stage stage1 : otherStage) {
-                    try {
+                try {
+                    //等待获取并行阶段执行结果
+                    for (Stage stage1 : otherStage) {
                         String stageId = stage1.getStageId();
                         state = futureMap.get(stageId).get();
                         updateStageExecState(stageId,state);
-                        if (!state){ break; }
-                    } catch (InterruptedException | ExecutionException | ApplicationException e) {
-                        throw new ApplicationException(e);
+                        if (!state){
+                            break;
+                        }
                     }
+                } catch (InterruptedException | ExecutionException | ApplicationException e) {
+                    throw new ApplicationException(e);
                 }
+
+
             }
 
             //更新主阶段状态
@@ -223,7 +232,7 @@ public class StageExecServiceImpl implements  StageExecService {
         String otherStageInstanceId = stageIdOrStageInstanceId.get(stageId);
         StageInstance otherStageInstance = stageInstanceIdOrStageInstance.get(otherStageInstanceId);
         //该阶段运行完成
-        if (otherStageInstanceId == null || otherStageInstance == null){
+        if (otherStageInstanceId == null ){
             return;
         }
         //停止任务
@@ -240,7 +249,9 @@ public class StageExecServiceImpl implements  StageExecService {
         otherStageInstance.setStageTime(integer);
         otherStageInstance.setStageState(PipelineFinal.RUN_HALT);
         stageInstanceServer.updateStageInstance(otherStageInstance);
+
         //移除内存
+        runTime.remove(otherStageInstanceId);
         tasksExecService.stopThread(otherStageInstanceId);
         tasksExecService.stopThread(stageId);
         stageIdOrStageInstanceId.remove(stageId);

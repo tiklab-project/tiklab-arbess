@@ -2,6 +2,7 @@ package io.tiklab.matflow.task.task.service;
 
 import io.tiklab.core.exception.ApplicationException;
 import io.tiklab.matflow.pipeline.definition.model.Pipeline;
+import io.tiklab.matflow.pipeline.execute.service.PipelineExecServiceImpl;
 import io.tiklab.matflow.support.util.PipelineUtil;
 import io.tiklab.matflow.task.artifact.service.TaskArtifactExecService;
 import io.tiklab.matflow.task.build.service.TaskBuildExecService;
@@ -21,7 +22,6 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import static io.tiklab.matflow.support.util.PipelineFinal.*;
 
@@ -146,6 +146,7 @@ public class TasksExecServiceImpl implements TasksExecService {
             instance.setRunState(RUN_SUCCESS);
         }else {
             instance.setRunState(RUN_ERROR);
+            // stopTask(taskId);
         }
         String logAddress = instance.getLogAddress();
         String runLog = instance.getRunLog();
@@ -182,7 +183,7 @@ public class TasksExecServiceImpl implements TasksExecService {
     }
 
     //时间线程池
-    private static final ExecutorService timeThreadPool = Executors.newCachedThreadPool();
+    private static final ExecutorService timeThreadPool = PipelineExecServiceImpl.executorService;
 
     public void time(String taskInstanceId){
         runTime.put(taskInstanceId,0);
@@ -205,6 +206,9 @@ public class TasksExecServiceImpl implements TasksExecService {
         ThreadGroup currentGroup = Thread.currentThread().getThreadGroup();
         int noThreads = currentGroup.activeCount();
         Thread[] lstThreads = new Thread[noThreads];
+        if (lstThreads == null){
+            return;
+        }
         currentGroup.enumerate(lstThreads);
         for (int i = 0; i < noThreads; i++) {
             String nm = lstThreads[i].getName();

@@ -172,7 +172,6 @@ public class StageInstanceServerImpl implements StageInstanceServer{
                 }
                 runLog.append(stageInstance.getRunLog()).append(log);
             }
-
             instance.setRunLog(runLog.toString());
             instance.setStageInstanceList(allStageInstance);
             stageInstanceList.add(i,instance);

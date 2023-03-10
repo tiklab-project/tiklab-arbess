@@ -40,6 +40,8 @@ public class TaskTestExecServiceImpl implements TaskTestExecService {
     public boolean test(String pipelineId, Tasks task , int taskType) {
 
         String taskId = task.getTaskId();
+        String names = "执行任务："+task.getTaskName();
+        tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+names);
         Boolean aBoolean = conditionService.variableCondition(pipelineId, taskId);
         if (!aBoolean){
             String s = "任务"+task.getTaskName()+"执行条件不满足，跳过执行\n";
@@ -47,9 +49,7 @@ public class TaskTestExecServiceImpl implements TaskTestExecService {
             return true;
         }
 
-
         TaskTest taskTest = (TaskTest) task.getValues();
-        tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"执行任务："+ task.getTaskName());
 
         //初始化日志
         String testOrder = taskTest.getTestOrder();
