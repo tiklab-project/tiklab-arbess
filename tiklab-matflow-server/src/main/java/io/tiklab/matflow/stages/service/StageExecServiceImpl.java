@@ -10,15 +10,13 @@ import io.tiklab.matflow.task.task.service.TasksExecService;
 import io.tiklab.matflow.task.task.service.TasksExecServiceImpl;
 import io.tiklab.matflow.task.task.service.TasksService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 
 /**
  * 阶段运行服务
@@ -101,6 +99,9 @@ public class StageExecServiceImpl implements  StageExecService {
         return stageInstanceId;
     }
 
+    @Value("${matflow.cloud:true}")
+    boolean idCe;
+
     @Override
     public boolean execStageTask(String pipelineId, String instanceId) {
         List<Stage> allMainStage = stageService.findAllMainStage(pipelineId);
@@ -128,41 +129,44 @@ public class StageExecServiceImpl implements  StageExecService {
                 //获取阶段任务，执行
                 List<Tasks> tasks = tasksService.finAllStageTask(stagesId);
 
-                // for (Tasks task : tasks) {
-                //     boolean b = tasksExecService.execTask(pipelineId, task.getTaskType(), task.getTaskId());
-                //     if (!b){
-                //         updateStageExecState(mainStageId,state);
-                //         if (!state){ break; }
-                //     }
-                // }
-
-                for (Tasks task : tasks) {
-                    try {
-                        Future<Boolean> future = threadPool.submit(() -> {
+                if (!idCe){
+                    for (Tasks task : tasks) {
+                        state = tasksExecService.execTask(pipelineId, task.getTaskType(), task.getTaskId());
+                        updateStageExecState(stagesId,state);
+                        if (!state){
+                            break;
+                        }
+                    }
+                }else {
+                    Future<Boolean> future =  threadPool.submit(() -> {
+                        for (Tasks task : tasks) {
                             Thread.currentThread().setName(stagesId);
-                            return tasksExecService.execTask(pipelineId, task.getTaskType(), task.getTaskId());
-                        });
-                        futureMap.put(stagesId,future);
-                    }catch (ApplicationException e){
+                            boolean b= tasksExecService.execTask(pipelineId, task.getTaskType(), task.getTaskId());
+                            if (!b){
+                                return false;
+                            }
+                        }
+                        return true;
+                    });
+                    futureMap.put(stagesId,future);
+                }
+            }
+
+            if (idCe){
+                //等待获取并行阶段执行结果
+                for (Stage stage1 : otherStage) {
+                    try {
+                        String stageId = stage1.getStageId();
+                        state = futureMap.get(stageId).get();
+                        updateStageExecState(stageId,state);
+                        if (!state){ break; }
+                    } catch (InterruptedException | ExecutionException | ApplicationException e) {
                         throw new ApplicationException(e);
                     }
                 }
             }
 
-            //等待获取并行阶段执行结果
-            for (Stage stage1 : otherStage) {
-                try {
-                    String stageId = stage1.getStageId();
-                    state = futureMap.get(stageId).get();
-                    updateStageExecState(stageId,state);
-                    if (!state){ break; }
-                } catch (InterruptedException | ExecutionException | ApplicationException e) {
-                    throw new ApplicationException(e);
-                }
-            }
-
             //更新主阶段状态
-
             updateStageExecState(mainStageId,state);
             if (!state){ break; }
         }

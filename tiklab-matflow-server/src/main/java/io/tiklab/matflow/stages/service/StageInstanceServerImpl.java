@@ -1,12 +1,12 @@
 package io.tiklab.matflow.stages.service;
 
-import io.tiklab.matflow.support.util.PipelineUtil;
-import io.tiklab.matflow.task.task.service.TasksExecServiceImpl;
 import io.tiklab.beans.BeanMapper;
 import io.tiklab.matflow.stages.dao.StageInstanceDao;
 import io.tiklab.matflow.stages.entity.StageInstanceEntity;
 import io.tiklab.matflow.stages.model.StageInstance;
+import io.tiklab.matflow.support.util.PipelineUtil;
 import io.tiklab.matflow.task.task.model.TaskInstance;
+import io.tiklab.matflow.task.task.service.TasksExecServiceImpl;
 import io.tiklab.matflow.task.task.service.TasksInstanceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -130,7 +130,7 @@ public class StageInstanceServerImpl implements StageInstanceServer{
                 instance.setStageTime(integer);
             }
             List<StageInstance> allStageInstance = findAllOtherStageInstance(stageId);
-            String log = "\n\n";
+            String log = "\n";
             //并行阶段执行实例
             int size = allStageInstance.size();
             for (int j = size - 1; j >= 0; j--) {

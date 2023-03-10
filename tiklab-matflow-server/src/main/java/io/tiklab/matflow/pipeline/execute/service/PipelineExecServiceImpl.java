@@ -18,6 +18,7 @@ import io.tiklab.rpc.annotation.Exporter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -71,6 +72,10 @@ public class PipelineExecServiceImpl implements PipelineExecService {
     //运行时间
     private final static Map<String,Integer> runTime = TasksExecServiceImpl.runTime;
 
+
+    @Value("${matflow.cloud:true}")
+    boolean idCe;
+
     /**
      * 流水线开始运行
      * @param pipelineId 流水线id
@@ -103,31 +108,36 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         //日志文件根路径
         String fileAddress = PipelineUtil.findFileAddress(pipelineId,2)+instanceId;
 
-        // // cloud
-        // boolean b = true;
-        // int type = pipeline.getType();
-        //
-        // if (type == 1) {
-        //     // 创建多任务运行实例
-        //     List<Tasks> tasks = tasksService.finAllPipelineTask(pipelineId);
-        //     for (Tasks task : tasks) {
-        //         tasksExecService.createTaskExecInstance(task, instanceId, 1,fileAddress);
-        //     }
-        //     // 执行任务
-        //     for (Tasks task : tasks) {
-        //         b = tasksExecService.execTask(pipelineId, task.getTaskType(), task.getTaskId());
-        //     }
-        // }
-        //
-        // if (type == 2) {
-        //     // 创建多阶段运行实例
-        //     stageExecService.createStageExecInstance(pipelineId, instanceId);
-        //     b = stageExecService.execStageTask(pipelineId, instanceId);
-        // }
-        // // 执行完成
-        // pipelineExecEnd(pipelineId, b);
+        if (idCe){
+            executorService.submit((Callable<Object>) () -> {
+                boolean b = true;
+                int type = pipeline.getType();
 
-        executorService.submit((Callable<Object>) () -> {
+                if (type == 1) {
+                    // 创建多任务运行实例
+                    List<Tasks> tasks = tasksService.finAllPipelineTask(pipelineId);
+                    for (Tasks task : tasks) {
+                        tasksExecService.createTaskExecInstance(task, instanceId, 1,fileAddress);
+                    }
+                    // 执行任务
+                    for (Tasks task : tasks) {
+                        b = tasksExecService.execTask(pipelineId, task.getTaskType(), task.getTaskId());
+                        if (!b){
+                            break;
+                        }
+                    }
+                }
+
+                if (type == 2) {
+                    // 创建多阶段运行实例
+                    stageExecService.createStageExecInstance(pipelineId, instanceId);
+                    b = stageExecService.execStageTask(pipelineId, instanceId);
+                }
+                // 执行完成
+                pipelineExecEnd(pipelineId, b);
+                return true;
+            });
+        }else {
             boolean b = true;
             int type = pipeline.getType();
 
@@ -140,9 +150,6 @@ public class PipelineExecServiceImpl implements PipelineExecService {
                 // 执行任务
                 for (Tasks task : tasks) {
                     b = tasksExecService.execTask(pipelineId, task.getTaskType(), task.getTaskId());
-                    if (!b){
-                        break;
-                    }
                 }
             }
 
@@ -153,8 +160,8 @@ public class PipelineExecServiceImpl implements PipelineExecService {
             }
             // 执行完成
             pipelineExecEnd(pipelineId, b);
-            return true;
-        });
+        }
+
 
         joinTemplate.joinQuery(pipelineInstance);
 
