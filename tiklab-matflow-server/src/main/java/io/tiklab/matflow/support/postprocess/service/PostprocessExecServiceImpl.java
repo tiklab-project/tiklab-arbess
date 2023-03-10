@@ -5,10 +5,12 @@ import io.tiklab.matflow.support.postprocess.model.Postprocess;
 import io.tiklab.matflow.support.postprocess.model.PostprocessInstance;
 import io.tiklab.matflow.task.task.model.Tasks;
 import io.tiklab.matflow.task.task.service.TasksExecService;
+import io.tiklab.matflow.task.task.service.TasksExecServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class PostprocessExecServiceImpl implements PostprocessExecService{
@@ -21,6 +23,9 @@ public class PostprocessExecServiceImpl implements PostprocessExecService{
 
     @Autowired
     private PostprocessInstanceService postInstanceService;
+
+
+    Map<String , String> taskIdOrTaskInstanceId = TasksExecServiceImpl.taskIdOrTaskInstanceId;
 
 
     public void createPostInstance(String pipelineId,String id,int type){
