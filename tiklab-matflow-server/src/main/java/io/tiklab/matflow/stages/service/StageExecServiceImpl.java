@@ -1,7 +1,6 @@
 package io.tiklab.matflow.stages.service;
 
 import io.tiklab.core.exception.ApplicationException;
-import io.tiklab.matflow.pipeline.execute.service.PipelineExecServiceImpl;
 import io.tiklab.matflow.stages.model.Stage;
 import io.tiklab.matflow.stages.model.StageInstance;
 import io.tiklab.matflow.support.util.PipelineFinal;
@@ -19,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 /**
@@ -47,9 +47,6 @@ public class StageExecServiceImpl implements  StageExecService {
 
     //运行时间
     private final static Map<String,Integer> runTime = TasksExecServiceImpl.runTime;
-
-    //并行任务线程池
-    private final ExecutorService threadPool = PipelineExecServiceImpl.executorService;
 
     @Override
     public void createStageExecInstance(String pipelineId,String instanceId) {
@@ -105,8 +102,12 @@ public class StageExecServiceImpl implements  StageExecService {
     @Value("${matflow.cloud:true}")
     boolean idCe;
 
+    Map<String ,ExecutorService > threadExecutor = new HashMap<>();
+
     @Override
     public boolean execStageTask(String pipelineId, String instanceId) {
+        ExecutorService threadPool = Executors.newCachedThreadPool();
+        threadExecutor.put(pipelineId,threadPool);
         List<Stage> allMainStage = stageService.findAllMainStage(pipelineId);
         boolean state = true;
         for (Stage mainStage : allMainStage) {
@@ -145,11 +146,6 @@ public class StageExecServiceImpl implements  StageExecService {
                         }
                     }
                 }else {
-                    try {
-                        Thread.sleep(500);
-                    } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
-                    }
                     Future<Boolean> future =  threadPool.submit(() -> {
                         Thread.currentThread().setName(stagesId);
                         List<Tasks> tasks = tasksService.finAllStageTask(stagesId);
@@ -170,6 +166,7 @@ public class StageExecServiceImpl implements  StageExecService {
                         state = futureMap.get(stageId).get();
                         updateStageExecState(stageId,state);
                         if (!state){
+                            threadPool.shutdown();
                             break;
                         }
                     }
@@ -180,8 +177,12 @@ public class StageExecServiceImpl implements  StageExecService {
 
             //更新主阶段状态
             updateStageExecState(mainStageId,state);
-            if (!state){ break; }
+            if (!state){
+                threadPool.shutdown();
+                break;
+            }
         }
+        threadPool.shutdown();
         return state;
     }
 
@@ -225,6 +226,10 @@ public class StageExecServiceImpl implements  StageExecService {
                 stopStageTask(otherStageId);
             }
             stopStageTask(stageId);
+        }
+        ExecutorService executorService = threadExecutor.get(pipelineId);
+        if (executorService != null){
+            executorService.shutdown();
         }
     }
 

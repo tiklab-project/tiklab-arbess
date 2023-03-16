@@ -101,7 +101,7 @@ public class TasksInstanceServiceImpl implements TasksInstanceService {
                 list.add(taskInstance);
             }else {
                 String logAddress = instance.getLogAddress();
-                String readFile = PipelineUtil.readFile(logAddress, 500);
+                String readFile = PipelineUtil.readFile(logAddress, 100);
                 instance.setRunLog(readFile);
                 list.add(instance);
             }
@@ -126,7 +126,7 @@ public class TasksInstanceServiceImpl implements TasksInstanceService {
             TaskInstance taskInstance = taskOrTaskInstance.get(taskInstanceId);
             if (taskInstance == null){
                 String logAddress = instance.getLogAddress();
-                String readFile = PipelineUtil.readFile(logAddress, 500);
+                String readFile = PipelineUtil.readFile(logAddress, 100);
                 instance.setRunLog(readFile);
                 list.add(instance);
             }else {
@@ -239,7 +239,7 @@ public class TasksInstanceServiceImpl implements TasksInstanceService {
 
         //长度过长写入文件中
         String runInstance = taskInstance.getRunLog();
-        if (runInstance.length() > 25000){
+        if (runInstance.length() > 9000){
             String logAddress = taskInstance.getLogAddress();
             PipelineUtil.logWriteFile(runInstance,logAddress);
             taskInstance.setRunLog(null);

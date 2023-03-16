@@ -8,7 +8,7 @@ setting:
   address: tiklab-matflow-starter/src/main/resources/settings.xml
 
 server:
-  port: 8080
+  port: 8088
 
 jdbc:
   driverClassName: com.mysql.cj.jdbc.Driver

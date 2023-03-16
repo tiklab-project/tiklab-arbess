@@ -115,6 +115,9 @@ public class PipelineInstanceServiceImpl implements PipelineInstanceService {
     @Override
     public void deleteInstance(String instanceId) {
         PipelineInstance instance = findOneInstance(instanceId);
+        if (instance == null){
+            return;
+        }
         Pipeline pipeline = instance.getPipeline();
         int type = pipeline.getType();
         if (type == 1){

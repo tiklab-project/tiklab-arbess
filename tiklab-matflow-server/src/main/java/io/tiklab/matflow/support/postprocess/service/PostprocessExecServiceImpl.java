@@ -3,12 +3,14 @@ package io.tiklab.matflow.support.postprocess.service;
 import io.tiklab.matflow.pipeline.definition.model.Pipeline;
 import io.tiklab.matflow.support.postprocess.model.Postprocess;
 import io.tiklab.matflow.support.postprocess.model.PostprocessInstance;
+import io.tiklab.matflow.support.util.PipelineUtil;
 import io.tiklab.matflow.task.task.model.Tasks;
 import io.tiklab.matflow.task.task.service.TasksExecService;
 import io.tiklab.matflow.task.task.service.TasksExecServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -28,9 +30,19 @@ public class PostprocessExecServiceImpl implements PostprocessExecService{
     Map<String , String> taskIdOrTaskInstanceId = TasksExecServiceImpl.taskIdOrTaskInstanceId;
 
 
-    public void createPostInstance(String pipelineId,String id,int type){
-        List<Postprocess> postprocessList = postprocessService.findAllPipelinePostTask(pipelineId);
-        if (postprocessList.size() == 0){
+    public void createPostInstance(String pipelineId,String instanceId,String id,int type){
+
+        String fileAddress = PipelineUtil.findFileAddress(pipelineId,2) + instanceId;
+
+        List<Postprocess> postprocessList = new ArrayList<>();
+        if (type == 1){
+            postprocessList = postprocessService.findAllPipelinePostTask(id);
+        }
+        if (type == 2){
+            postprocessList = postprocessService.findAllTaskPostTask(id);
+            fileAddress = fileAddress + "/" + id;
+        }
+        if (postprocessList.isEmpty()){
             return;
         }
         for (Postprocess postprocess : postprocessList) {
@@ -45,19 +57,14 @@ public class PostprocessExecServiceImpl implements PostprocessExecService{
             }
             String postInstanceId = postInstanceService.createPostInstance(postInstance);
 
-            tasksExecService.createTaskExecInstance(task,postInstanceId,3,"");
+            tasksExecService.createTaskExecInstance(task,postInstanceId,3,fileAddress);
 
 
         }
     }
 
-
-
-
-
-
     @Override
-    public boolean execPipelinePostTask(Pipeline pipeline , boolean execStatus){
+    public boolean execPipelinePost(Pipeline pipeline , boolean execStatus){
         String pipelineId = pipeline.getId();
         List<Postprocess> postprocessList = postprocessService.findAllPipelinePostTask(pipelineId);
         for (Postprocess postprocess : postprocessList) {

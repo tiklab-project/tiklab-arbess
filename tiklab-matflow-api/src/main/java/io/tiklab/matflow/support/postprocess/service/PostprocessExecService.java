@@ -14,7 +14,7 @@ public interface PostprocessExecService {
      * @param execStatus 流水线执行状态
      * @return 后置任务执行状态
      */
-    boolean execPipelinePostTask(Pipeline pipeline , boolean execStatus);
+    boolean execPipelinePost(Pipeline pipeline , boolean execStatus);
 
     /**
      * 执行任务后置任务
