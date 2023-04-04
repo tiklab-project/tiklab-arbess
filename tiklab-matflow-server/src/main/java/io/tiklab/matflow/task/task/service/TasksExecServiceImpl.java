@@ -183,7 +183,7 @@ public class TasksExecServiceImpl implements TasksExecService {
         ThreadGroup currentGroup = Thread.currentThread().getThreadGroup();
         int noThreads = currentGroup.activeCount();
         Thread[] lstThreads = new Thread[noThreads];
-        if (Objects.isNull(lstThreads)){
+        if (Objects.equals(lstThreads.length,0)){
             return;
         }
         currentGroup.enumerate(lstThreads);
