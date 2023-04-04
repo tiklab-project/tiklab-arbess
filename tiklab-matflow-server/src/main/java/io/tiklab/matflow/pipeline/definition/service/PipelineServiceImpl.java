@@ -1,19 +1,22 @@
 package io.tiklab.matflow.pipeline.definition.service;
 
-import io.tiklab.eam.common.context.LoginContext;
-import io.tiklab.matflow.pipeline.instance.service.PipelineInstanceService;
-import io.tiklab.matflow.stages.service.StageService;
-import io.tiklab.matflow.support.util.PipelineFinal;
 import io.tiklab.beans.BeanMapper;
 import io.tiklab.core.exception.ApplicationException;
+import io.tiklab.core.page.Pagination;
+import io.tiklab.eam.common.context.LoginContext;
 import io.tiklab.join.JoinTemplate;
 import io.tiklab.matflow.home.service.PipelineHomeService;
 import io.tiklab.matflow.pipeline.definition.dao.PipelineDao;
 import io.tiklab.matflow.pipeline.definition.entity.PipelineEntity;
 import io.tiklab.matflow.pipeline.definition.model.Pipeline;
 import io.tiklab.matflow.pipeline.definition.model.PipelineExecMessage;
+import io.tiklab.matflow.pipeline.definition.model.PipelineFollow;
+import io.tiklab.matflow.pipeline.definition.model.PipelineQuery;
 import io.tiklab.matflow.pipeline.instance.model.PipelineInstance;
+import io.tiklab.matflow.pipeline.instance.service.PipelineInstanceService;
+import io.tiklab.matflow.stages.service.StageService;
 import io.tiklab.matflow.support.authority.service.PipelineAuthorityService;
+import io.tiklab.matflow.support.util.PipelineFinal;
 import io.tiklab.matflow.support.util.PipelineUtil;
 import io.tiklab.matflow.task.task.service.TasksService;
 import io.tiklab.rpc.annotation.Exporter;
@@ -57,6 +60,9 @@ public class PipelineServiceImpl implements PipelineService {
     @Autowired
     private StageService stageService;
 
+    @Autowired
+    private PipelineFollowService followService;
+
 
     private static final Logger logger = LoggerFactory.getLogger(PipelineServiceImpl.class);
 
@@ -71,7 +77,8 @@ public class PipelineServiceImpl implements PipelineService {
         }
         pipeline.setColor((random.nextInt(5) + 1));
         pipeline.setCreateTime(PipelineUtil.date(1));
-        pipeline.setId(LoginContext.getLoginId());
+        String loginId = LoginContext.getLoginId();
+        pipeline.setUser(new User(loginId));
         //创建流水线
         PipelineEntity pipelineEntity = BeanMapper.map(pipeline, PipelineEntity.class);
         pipelineEntity.setState(1);
@@ -226,6 +233,70 @@ public class PipelineServiceImpl implements PipelineService {
         return allStatus;
     }
 
+    public Pagination<PipelineExecMessage> findUserPipelinePage(PipelineQuery query){
+        String loginId = LoginContext.getLoginId();
+        StringBuilder builder = authorityService.findUserPipelineIdString(loginId);
+        if (builder.toString().equals("")){
+            return null;
+        }
+
+        List<PipelineFollow> followPipeline = followService.findUserFollowPipeline(loginId);
+        int size = followPipeline.size();
+        Pagination<PipelineEntity> userPipelineQuery;
+        List<Pipeline> list = new ArrayList<>();
+        if (Objects.equals(query.getPipelineFollow(),1)){
+            if (Objects.equals(followPipeline.size(),0)){
+                return null;
+            }
+            String[] strings = new String[size];
+            for (int i = 0; i < size; i++) {
+                strings[i] = followPipeline.get(i).getPipeline().getId();
+            }
+            userPipelineQuery = pipelineDao.findUserPipelineQuery(strings, query);
+            List<PipelineEntity> pipelineEntityList = userPipelineQuery.getDataList();
+            List<Pipeline> pipelineList = BeanMapper.mapList(pipelineEntityList, Pipeline.class);
+            for (Pipeline pipeline : pipelineList) {
+                pipeline.setCollect(1);
+                list.add(pipeline);
+            }
+        } else {
+            String[] split = builder.toString().replace("'", "").split(",");
+            userPipelineQuery =  pipelineDao.findUserPipelineQuery(split, query);
+            List<PipelineEntity> pipelineEntityList = userPipelineQuery.getDataList();
+            List<Pipeline> pipelineList = BeanMapper.mapList(pipelineEntityList, Pipeline.class);
+            if (!Objects.equals(size,0)){
+                for (Pipeline pipeline : pipelineList) {
+                    String id = pipeline.getId();
+                    for (PipelineFollow pipelineFollow : followPipeline) {
+                        String s = pipelineFollow.getPipeline().getId();
+                        if (!Objects.equals(id,s)){
+                            continue;
+                        }
+                        pipeline.setCollect(1);
+                    }
+                    list.add(pipeline);
+                }
+            }else {
+                list.addAll(pipelineList);
+            }
+        }
+
+        if (Objects.isNull(userPipelineQuery.getDataList())){
+            return null;
+        }
+
+        List<PipelineExecMessage> allStatus = findAllExecMessage(list);
+        Pagination<PipelineExecMessage> pagination  = new Pagination<>();
+        pagination.setBeginIndex(userPipelineQuery.getBeginIndex());
+        pagination.setEndIndex(userPipelineQuery.getEndIndex());
+        pagination.setCurrentPage(userPipelineQuery.getCurrentPage());
+        pagination.setPageSize(userPipelineQuery.getPageSize());
+        pagination.setTotalPage(userPipelineQuery.getTotalPage());
+        pagination.setTotalRecord(userPipelineQuery.getTotalRecord());
+        pagination.setDataList(allStatus);
+        return pagination;
+    }
+
     @Override
     public List<PipelineExecMessage> findUserFollowPipeline() {
         String userId = LoginContext.getLoginId();
@@ -315,7 +386,7 @@ public class PipelineServiceImpl implements PipelineService {
             pipelineExecMessage.setType(pipeline.getType());
             //成功和构建时间
             PipelineInstance latelyHistory = instanceService.findLatelyInstance(pipeline.getId());
-            if (latelyHistory != null){
+            if (!Objects.isNull(latelyHistory)){
                 pipelineExecMessage.setLastBuildTime(latelyHistory.getCreateTime());
                 pipelineExecMessage.setBuildStatus(latelyHistory.getRunStatus());
                 pipelineExecMessage.setExecUser(latelyHistory.getUser());

@@ -1,9 +1,8 @@
 package io.tiklab.matflow.pipeline.definition.dao;
 
-import io.tiklab.matflow.pipeline.definition.entity.PipelineFollowEntity;
 import io.tiklab.dal.jdbc.JdbcTemplate;
 import io.tiklab.dal.jpa.JpaTemplate;
-import io.tiklab.matflow.pipeline.definition.model.PipelineFollow;
+import io.tiklab.matflow.pipeline.definition.entity.PipelineFollowEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.stereotype.Repository;
@@ -75,14 +74,25 @@ public class PipelineFollowDao {
      * @param pipelineId 流水线id
      * @return 收藏信息
      */
-    public List<PipelineFollow> findUserFollowPipeline(String userId, String pipelineId){
+    public List<PipelineFollowEntity> findOneUserFollowPipeline(String userId, String pipelineId){
         String sql = "select pip_other_follow.* from pip_other_follow ";
         sql = sql.concat(" where pip_other_follow.user_id  = '"+userId+"' "
                 + " and pip_other_follow.pipeline_id  = '"+pipelineId+"' ");
         JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
-        return  jdbcTemplate.query(sql, new BeanPropertyRowMapper(PipelineFollow.class));
+        return  jdbcTemplate.query(sql, new BeanPropertyRowMapper(PipelineFollowEntity.class));
     }
 
+    /**
+     * 查询用户是藏的流水线
+     * @param userId 用户id
+     * @return 收藏信息
+     */
+    public List<PipelineFollowEntity> findUserFollowPipeline(String userId){
+        String sql = "select pip_other_follow.* from pip_other_follow ";
+        sql = sql.concat(" where pip_other_follow.user_id  = '"+userId+"' ");
+        JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
+        return  jdbcTemplate.query(sql, new BeanPropertyRowMapper(PipelineFollowEntity.class));
+    }
 
 
 

@@ -1,10 +1,12 @@
 package io.tiklab.matflow.pipeline.definition.controller;
 
+import io.tiklab.core.Result;
+import io.tiklab.core.page.Pagination;
+import io.tiklab.matflow.pipeline.definition.model.Pipeline;
 import io.tiklab.matflow.pipeline.definition.model.PipelineExecMessage;
+import io.tiklab.matflow.pipeline.definition.model.PipelineQuery;
 import io.tiklab.matflow.pipeline.definition.service.PipelineService;
 import io.tiklab.matflow.pipeline.overview.model.PipelineOverview;
-import io.tiklab.core.Result;
-import io.tiklab.matflow.pipeline.definition.model.Pipeline;
 import io.tiklab.postin.annotation.Api;
 import io.tiklab.postin.annotation.ApiMethod;
 import io.tiklab.postin.annotation.ApiParam;
@@ -107,6 +109,16 @@ public class PipelineController {
     public Result<List<PipelineOverview>> findUserPipeline(){
 
         List<PipelineExecMessage> userPipeline = pipelineService.findUserPipelineExecMessage();
+
+        return Result.ok(userPipeline);
+    }
+
+    @RequestMapping(path="/findUserPipelinePage",method = RequestMethod.POST)
+    @ApiMethod(name = "findUserPipelinePage",desc = "查询用户所有流水线")
+    @ApiParam(name = "query",desc = "查询条件",required = true)
+    public Result< Pagination<PipelineExecMessage>> findUserPipelinePage(@RequestBody @NotNull @Valid PipelineQuery query){
+
+        Pagination<PipelineExecMessage> userPipeline = pipelineService.findUserPipelinePage(query);
 
         return Result.ok(userPipeline);
     }

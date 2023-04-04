@@ -7,7 +7,6 @@ import io.tiklab.matflow.support.util.PipelineFinal;
 import io.tiklab.matflow.support.util.PipelineUtil;
 import io.tiklab.matflow.task.task.model.Tasks;
 import io.tiklab.matflow.task.task.service.TasksExecService;
-import io.tiklab.matflow.task.task.service.TasksExecServiceImpl;
 import io.tiklab.matflow.task.task.service.TasksService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,25 +27,22 @@ import java.util.concurrent.Future;
 public class StageExecServiceImpl implements  StageExecService {
 
     @Autowired
-    StageService stageService;
+    private StageService stageService;
 
     @Autowired
-    StageInstanceServer stageInstanceServer;
+    private StageInstanceServer stageInstanceServer;
 
     @Autowired
-    TasksExecService tasksExecService;
+    private TasksExecService tasksExecService;
 
     @Autowired
-    TasksService tasksService;
+    private TasksService tasksService;
 
     //阶段任务实例id及阶段任务实例
-    public static  Map<String , StageInstance> stageInstanceIdOrStageInstance = new HashMap<>();
+    public static Map<String , StageInstance> stageInstanceIdOrStageInstance = new HashMap<>();
 
     //阶段id及阶段任务实例
-    private static final Map<String , String> stageIdOrStageInstanceId = new HashMap<>();
-
-    //运行时间
-    private final static Map<String,Integer> runTime = TasksExecServiceImpl.runTime;
+    private final Map<String , String> stageIdOrStageInstanceId = new HashMap<>();
 
     @Override
     public void createStageExecInstance(String pipelineId,String instanceId) {
@@ -102,11 +98,12 @@ public class StageExecServiceImpl implements  StageExecService {
     @Value("${matflow.cloud:true}")
     boolean idCe;
 
-    Map<String ,ExecutorService > threadExecutor = new HashMap<>();
+    private final Map<String ,ExecutorService> threadExecutor = new HashMap<>();
+
+    private final ExecutorService threadPool = Executors.newCachedThreadPool();
 
     @Override
     public boolean execStageTask(String pipelineId, String instanceId) {
-        ExecutorService threadPool = Executors.newCachedThreadPool();
         threadExecutor.put(pipelineId,threadPool);
         List<Stage> allMainStage = stageService.findAllMainStage(pipelineId);
         boolean state = true;
@@ -115,7 +112,7 @@ public class StageExecServiceImpl implements  StageExecService {
             //更新主阶段状态阶段
             String stageInstanceId = stageIdOrStageInstanceId.get(mainStageId);
             StageInstance stageInstance = stageInstanceIdOrStageInstance.get(stageInstanceId);
-            tasksExecService.time(stageInstanceId);
+            stageInstanceServer.stageRunTime(stageInstanceId);
             stageInstance.setStageState(PipelineFinal.RUN_RUN);
             stageInstanceServer.updateStageInstance(stageInstance);
             stageInstanceIdOrStageInstance.remove(stageInstanceId);
@@ -193,7 +190,7 @@ public class StageExecServiceImpl implements  StageExecService {
      */
     private void updateStageExecState(String stageId,boolean state){
         String stageInstanceId = stageIdOrStageInstanceId.get(stageId);
-        Integer integer = runTime.get(stageInstanceId);
+        Integer integer = stageInstanceServer.findStageRunTime(stageInstanceId);
         StageInstance instance = stageInstanceIdOrStageInstance.get(stageInstanceId);
         if (integer == null){
             integer = 0;
@@ -207,7 +204,7 @@ public class StageExecServiceImpl implements  StageExecService {
         }
 
         //更新数据，移除内存
-        runTime.remove(stageInstanceId);
+        stageInstanceServer.removeStageRunTime(stageInstanceId);
         tasksExecService.stopThread(stageInstanceId);
         stageInstanceServer.updateStageInstance(instance);
         stageIdOrStageInstanceId.remove(stageId);
@@ -253,7 +250,7 @@ public class StageExecServiceImpl implements  StageExecService {
             tasksExecService.stopTask(taskId);
         }
         //更新并行阶段状态
-        Integer integer = runTime.get(otherStageInstanceId);
+        Integer integer = stageInstanceServer.findStageRunTime(otherStageInstanceId);
         if (integer == null){
             integer = 0;
         }
@@ -262,13 +259,16 @@ public class StageExecServiceImpl implements  StageExecService {
         stageInstanceServer.updateStageInstance(otherStageInstance);
 
         //移除内存
-        runTime.remove(otherStageInstanceId);
+        stageInstanceServer.removeStageRunTime(otherStageInstanceId);
         tasksExecService.stopThread(otherStageInstanceId);
         tasksExecService.stopThread(stageId);
         stageIdOrStageInstanceId.remove(stageId);
         stageInstanceIdOrStageInstance.remove(otherStageInstanceId);
     }
 
+    public StageInstance findStageInstance(String stageInstanceId){
+       return stageInstanceIdOrStageInstance.get(stageInstanceId);
+    }
 
 
 

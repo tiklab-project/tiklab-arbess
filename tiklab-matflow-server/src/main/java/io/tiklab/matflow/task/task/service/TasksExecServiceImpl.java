@@ -2,7 +2,6 @@ package io.tiklab.matflow.task.task.service;
 
 import io.tiklab.core.exception.ApplicationException;
 import io.tiklab.matflow.pipeline.definition.model.Pipeline;
-import io.tiklab.matflow.pipeline.execute.service.PipelineExecServiceImpl;
 import io.tiklab.matflow.support.util.PipelineUtil;
 import io.tiklab.matflow.task.artifact.service.TaskArtifactExecService;
 import io.tiklab.matflow.task.build.service.TaskBuildExecService;
@@ -21,7 +20,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
+import java.util.Objects;
 
 import static io.tiklab.matflow.support.util.PipelineFinal.*;
 
@@ -29,28 +28,28 @@ import static io.tiklab.matflow.support.util.PipelineFinal.*;
 public class TasksExecServiceImpl implements TasksExecService {
 
     @Autowired
-    TaskCodeExecService code ;
+    private TaskCodeExecService code ;
 
     @Autowired
-    TaskBuildExecService build ;
+    private TaskBuildExecService build ;
 
     @Autowired
-    TaskTestExecService test;
+    private TaskTestExecService test;
 
     @Autowired
-    TaskDeployExecService deploy ;
+    private TaskDeployExecService deploy ;
 
     @Autowired
-    TaskCodeScanExecService codeScan;
+    private TaskCodeScanExecService codeScan;
 
     @Autowired
-    TaskArtifactExecService product;
+    private TaskArtifactExecService product;
 
     @Autowired
-    TaskMessageExecService message;
+    private TaskMessageExecService message;
 
     @Autowired
-    TaskScriptExecService scripts;
+    private TaskScriptExecService scripts;
 
     @Autowired
     private TasksInstanceService tasksInstanceService;
@@ -64,11 +63,7 @@ public class TasksExecServiceImpl implements TasksExecService {
     public static Map<String , String> taskIdOrTaskInstanceId = new HashMap<>();
 
     //任务实例id与任务实例关系
-    public static Map<String , TaskInstance> taskOrTaskInstance = new HashMap<>();
-
-    //运行任务执行时间(任务id:运行时间)
-    public static Map<String,Integer> runTime = new HashMap<>();
-
+    public static  Map<String, TaskInstance> taskOrTaskInstance = new HashMap<>();
 
     @Override
     public void createTaskExecInstance(Tasks task,String instanceId,int type, String logPath){
@@ -99,12 +94,11 @@ public class TasksExecServiceImpl implements TasksExecService {
 
     @Override
     public boolean execTask(String pipelineId , int taskType,String taskId)  throws ApplicationException {
-
         Tasks tasks = tasksService.findOneTasksOrTask(taskId);
         logger.info("执行任务："+tasks.getTaskName());
         String taskInstanceId = taskIdOrTaskInstanceId.get(taskId);
         //计算时间
-        time(taskInstanceId);
+        tasksInstanceService.taskRuntime(taskInstanceId);
         //更改日志为运行运行中
         TaskInstance instance = taskOrTaskInstance.get(taskInstanceId);
         instance.setRunState(RUN_RUN);
@@ -130,6 +124,7 @@ public class TasksExecServiceImpl implements TasksExecService {
         return state;
     }
 
+    @Override
     public boolean execSendMessageTask(Pipeline pipeline,Tasks task , boolean execStatus,boolean isPipeline){
        return message.message(pipeline, task , execStatus, isPipeline);
     }
@@ -146,23 +141,21 @@ public class TasksExecServiceImpl implements TasksExecService {
             instance.setRunState(RUN_SUCCESS);
         }else {
             instance.setRunState(RUN_ERROR);
-            // stopTask(taskId);
         }
         String logAddress = instance.getLogAddress();
         String runLog = instance.getRunLog();
         PipelineUtil.logWriteFile(runLog,logAddress);
 
-        Integer integer = runTime.get(taskInstanceId);
+        Integer integer = tasksInstanceService.findTaskRuntime(taskInstanceId);
         instance.setRunTime(integer);
         //更新数据库数据,移除内存中的实例数据
         tasksInstanceService.updateTaskInstance(instance);
         stopThread(taskInstanceId);
         stopThread(taskId);
-        runTime.remove(taskInstanceId);
+        tasksInstanceService.removeTaskRuntime(taskInstanceId);
         taskIdOrTaskInstanceId.remove(taskId);
         taskOrTaskInstance.remove(taskInstanceId);
     }
-
 
     public void stopTask(String taskId){
         String taskInstanceId = taskIdOrTaskInstanceId.get(taskId);
@@ -173,47 +166,24 @@ public class TasksExecServiceImpl implements TasksExecService {
             stopThread(taskId);
             return;
         }
-        Integer integer = runTime.get(taskInstanceId);
-        if (integer == null){
-            integer = 0;
-        }
+        Integer integer = tasksInstanceService.findTaskRuntime(taskInstanceId);
         taskInstance.setRunTime(integer);
         taskInstance.setRunState(RUN_HALT);
 
         tasksInstanceService.updateTaskInstance(taskInstance);
         //移除内存
-        runTime.remove(taskInstanceId);
+        tasksInstanceService.removeTaskRuntime(taskInstanceId);
         stopThread(taskInstanceId);
         stopThread(taskId);
         taskIdOrTaskInstanceId.remove(taskId);
         taskOrTaskInstance.remove(taskInstanceId);
     }
 
-    //时间线程池
-    private static final ExecutorService timeThreadPool = PipelineExecServiceImpl.executorService;
-
-    public void time(String taskInstanceId){
-        runTime.put(taskInstanceId,0);
-        timeThreadPool.submit(() -> {
-            while (true){
-                Thread.currentThread().setName(taskInstanceId);
-                int integer = runTime.get(taskInstanceId);
-                try {
-                    Thread.sleep(1000);
-                }catch (RuntimeException e){
-                    throw new RuntimeException();
-                }
-                integer = integer +1;
-                runTime.put(taskInstanceId,integer);
-            }
-        });
-    }
-
     public void stopThread(String threadName){
         ThreadGroup currentGroup = Thread.currentThread().getThreadGroup();
         int noThreads = currentGroup.activeCount();
         Thread[] lstThreads = new Thread[noThreads];
-        if (lstThreads == null){
+        if (Objects.isNull(lstThreads)){
             return;
         }
         currentGroup.enumerate(lstThreads);
@@ -226,24 +196,22 @@ public class TasksExecServiceImpl implements TasksExecService {
         }
     }
 
+    public  TaskInstance findTaskInstance(String taskInstanceId){
+        return taskOrTaskInstance.get(taskInstanceId);
+    }
 
+    public  String findTaskInstanceId(String taskId){
+        return taskIdOrTaskInstanceId.get(taskId);
+    }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+    public void setTaskOrTaskInstance(String taskInstanceId ,TaskInstance taskInstance ){
+        taskOrTaskInstance.put(taskInstanceId,taskInstance);
+    }
 
 
 }
+
+
 
 
 

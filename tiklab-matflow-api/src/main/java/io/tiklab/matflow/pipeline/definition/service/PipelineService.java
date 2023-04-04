@@ -1,12 +1,14 @@
 package io.tiklab.matflow.pipeline.definition.service;
 
 
+import io.tiklab.core.page.Pagination;
 import io.tiklab.join.annotation.FindAll;
 import io.tiklab.join.annotation.FindList;
 import io.tiklab.join.annotation.FindOne;
 import io.tiklab.join.annotation.JoinProvider;
 import io.tiklab.matflow.pipeline.definition.model.Pipeline;
 import io.tiklab.matflow.pipeline.definition.model.PipelineExecMessage;
+import io.tiklab.matflow.pipeline.definition.model.PipelineQuery;
 import io.tiklab.user.user.model.User;
 
 import javax.validation.Valid;
@@ -68,6 +70,13 @@ public interface PipelineService {
      * @return 流水线信息
      */
     List<PipelineExecMessage> findUserPipelineExecMessage();
+
+    /**
+     * 分页查询流水线信息
+     * @param query 查询条件
+     * @return 流水线信息
+     */
+    Pagination<PipelineExecMessage> findUserPipelinePage(PipelineQuery query);
 
     /**
      * 获取用户收藏的流水线

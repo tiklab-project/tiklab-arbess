@@ -80,7 +80,24 @@ public interface TasksInstanceService {
      * @return 任务日志列表
      */
     @FindAll
-     List<TaskInstance> findAllTaskInstance();
+    List<TaskInstance> findAllTaskInstance();
+
+
+    /**
+     * 任务开始执行
+     * @param taskInstanceId 任务实例id
+     */
+    void taskRuntime(String taskInstanceId);
+
+    /**
+     * 查询任务执行时长
+     * @param taskInstanceId 任务实例id
+     * @return 执行时长
+     */
+    Integer findTaskRuntime(String taskInstanceId);
+
+
+    void removeTaskRuntime(String taskInstanceId);
 
 
     @FindList

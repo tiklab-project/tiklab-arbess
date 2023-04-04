@@ -65,9 +65,55 @@ public class PipelineAuthorityServiceImpl implements PipelineAuthorityService{
     }
 
 
+    // public StringBuilder findUserPipelineIdString(String userId){
+    //     List<DmUser> allDmUser = dmUserService.findAllDmUser();
+    //     StringBuilder s = new StringBuilder();
+    //     //获取用户拥有权限的流水线，拼装成字符串
+    //     if (allDmUser != null && !allDmUser.isEmpty()){
+    //         for (DmUser dmUser : allDmUser) {
+    //             User user = dmUser.getUser();
+    //             if (user == null  || !user.getId().equals(userId)){
+    //                 continue;
+    //             }
+    //             if (s.toString().equals("") ) {
+    //                 s.append("'");
+    //             } else {
+    //                 s.append(",'");
+    //             }
+    //             s.append(dmUser.getDomainId()).append("'");
+    //         }
+    //     }
+    //
+    //     //获取用户拥有的流水线，拼装成字符串
+    //     List<PipelineEntity> allPipeline = pipelineDao.findAllPublicPipeline();
+    //     List<Pipeline> pipelineList = BeanMapper.mapList(allPipeline, Pipeline.class);
+    //     StringBuilder j = new StringBuilder();
+    //     if (s.toString().equals("") && pipelineList == null){
+    //         return null;
+    //     }
+    //     for (Pipeline pipeline : pipelineList) {
+    //         if (j.toString().equals("") ) {
+    //             j.append("'");
+    //         } else {
+    //             j.append(",'");
+    //         }
+    //         j.append(pipeline.getId()).append("'");
+    //     }
+    //
+    //     //返回拼装后的结果
+    //     if (!PipelineUtil.isNoNull(s.toString())){
+    //         return j;
+    //     }
+    //     if (!PipelineUtil.isNoNull(j.toString())){
+    //         return s;
+    //     }
+    //     return s.append(",").append(j);
+    //
+    // }
     @Override
     public StringBuilder findUserPipelineIdString(String userId){
         List<DmUser> allDmUser = dmUserService.findAllDmUser();
+        List<String> idList = new ArrayList<>();
         StringBuilder s = new StringBuilder();
         //获取用户拥有权限的流水线，拼装成字符串
         if (allDmUser != null && !allDmUser.isEmpty()){

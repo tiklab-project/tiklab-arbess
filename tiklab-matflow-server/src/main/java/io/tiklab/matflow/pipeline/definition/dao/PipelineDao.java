@@ -1,14 +1,18 @@
 package io.tiklab.matflow.pipeline.definition.dao;
-import io.tiklab.matflow.pipeline.definition.entity.PipelineEntity;
+
+import io.tiklab.core.page.Pagination;
 import io.tiklab.dal.jdbc.JdbcTemplate;
 import io.tiklab.dal.jpa.JpaTemplate;
 import io.tiklab.dal.jpa.criterial.condition.QueryCondition;
 import io.tiklab.dal.jpa.criterial.conditionbuilder.QueryBuilders;
+import io.tiklab.matflow.pipeline.definition.entity.PipelineEntity;
+import io.tiklab.matflow.pipeline.definition.model.PipelineQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * 流水线数据访问
@@ -73,9 +77,20 @@ public class PipelineDao {
      * @return 流水线实体集合
      */
     public List<PipelineEntity> findUserPipeline(StringBuilder idString){
+
+        // Object[] objects = ids.toArray();
+        //
+        // QueryCondition queryCondition = QueryBuilders.createQuery(PipelineEntity.class)
+        //         .in("id", objects)
+        //         .get();
+        //
+        // List<PipelineEntity> list = jpaTemplate.findList(queryCondition,PipelineEntity.class);
+        // return list;
+
         String sql = " select p.* from pip_pipeline p";
         sql = sql.concat(" where p.id in ("+ idString +")");
         return jpaTemplate.getJdbcTemplate().query(sql, new BeanPropertyRowMapper(PipelineEntity.class));
+
     }
 
     /**
@@ -100,9 +115,40 @@ public class PipelineDao {
                 + " in ("+ idString +")"
                 + " and p.id "
                 + " in (select pip_other_follow.pipeline_id from pip_other_follow"
-                + " where pip_other_follow.user_id  =  '"+userId+"'  )");
+                + " where pip_other_follow.user_id  =  '" + userId + "'  )");
         JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
         return  jdbcTemplate.query(sql, new BeanPropertyRowMapper(PipelineEntity.class));
+    }
+
+    public Pagination<PipelineEntity> findUserPipelineQuery(String[] idString, PipelineQuery query){
+        QueryBuilders builders = QueryBuilders.createQuery(PipelineEntity.class);
+
+        if (!Objects.isNull(query.getUserId())){
+            builders.eq("userId",query.getUserId());
+        }
+
+        if (!Objects.isNull(query.getPipelineName())){
+            builders.like("name",query.getPipelineName());
+        }
+
+        if (!Objects.isNull(query.getPipelineType())){
+            builders.eq("type",query.getPipelineType());
+        }
+        if (!Objects.isNull(query.getPipelineState())){
+            builders.eq("state",query.getPipelineState());
+        }
+
+        if (!Objects.isNull(query.getPipelinePower())){
+            builders.eq("power",query.getPipelinePower());
+        }
+
+        builders.in("id",idString);
+
+
+        QueryCondition pipelineEntityList =  builders.pagination(query.getPageParam())
+                .orders(query.getOrderParams())
+                .get();
+        return jpaTemplate.findPage(pipelineEntityList, PipelineEntity.class);
     }
 
     /**

@@ -8,6 +8,23 @@ import io.tiklab.matflow.pipeline.definition.model.Pipeline;
  */
 public interface PostprocessExecService {
 
+
+    /**
+     * 创建流水线后置任务实例
+     * @param pipelineId 流水线id
+     * @param instanceId 流水线实例id
+     */
+    void createPipelinePostInstance(String pipelineId,String instanceId);
+
+    /**
+     * 创建流水线任务后置任务实例
+     * @param pipelineId 流水线id
+     * @param instanceId 实例id
+     * @param taskId 任务id
+     */
+    void createTaskPostInstance(String pipelineId,String instanceId,String taskId);
+
+
     /**
      * 执行流水线后置任务
      * @param pipeline 流水线信息

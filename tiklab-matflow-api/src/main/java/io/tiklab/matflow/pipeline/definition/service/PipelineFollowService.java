@@ -16,6 +16,13 @@ public interface PipelineFollowService {
     void updateFollow(PipelineFollow pipelineFollow);
 
     /**
+     * 获取用户收藏的流水线
+     * @param userId 用户id
+     * @return 收藏的流水线
+     */
+    List<PipelineFollow> findUserFollowPipeline(String userId);
+
+    /**
      * 删除收藏
      * @param followId 收藏id
      */

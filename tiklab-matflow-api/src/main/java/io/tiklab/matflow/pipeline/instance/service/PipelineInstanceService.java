@@ -111,6 +111,15 @@ public interface PipelineInstanceService {
     Pagination<PipelineInstance> findPipelineInstance(PipelineInstanceQuery query);
 
 
+    void pipelineRunTime(String instanceId);
+
+
+    Integer findPipelineRunTime(String instanceId);
+
+
+    void removePipelineRunTime(String instanceId);
+
+
 
 }
 

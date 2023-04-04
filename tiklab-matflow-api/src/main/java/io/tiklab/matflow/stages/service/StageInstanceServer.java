@@ -62,6 +62,13 @@ public interface StageInstanceServer {
      */
     List<StageInstance> findStageExecInstance(String instanceId);
 
+    void stageRunTime(String stageInstanceId);
+
+
+    Integer findStageRunTime(String stageInstanceId);
+
+
+    void removeStageRunTime(String stageInstanceId);
 
 
 }

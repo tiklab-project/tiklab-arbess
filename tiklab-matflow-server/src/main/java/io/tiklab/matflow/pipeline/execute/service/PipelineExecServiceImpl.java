@@ -12,7 +12,6 @@ import io.tiklab.matflow.support.util.PipelineFinal;
 import io.tiklab.matflow.support.util.PipelineUtil;
 import io.tiklab.matflow.task.task.model.Tasks;
 import io.tiklab.matflow.task.task.service.TasksExecService;
-import io.tiklab.matflow.task.task.service.TasksExecServiceImpl;
 import io.tiklab.matflow.task.task.service.TasksService;
 import io.tiklab.rpc.annotation.Exporter;
 import org.slf4j.Logger;
@@ -58,20 +57,16 @@ public class PipelineExecServiceImpl implements PipelineExecService {
     @Autowired
     private JoinTemplate joinTemplate;
 
-    private static final Logger logger = LoggerFactory.getLogger(PipelineExecServiceImpl.class);
+    private final Logger logger = LoggerFactory.getLogger(PipelineExecServiceImpl.class);
 
     //流水线id:流水线实例id
-    private final static Map<String,String> pipelineIdOrInstanceId = new HashMap<>();
+    private final  Map<String,String> pipelineIdOrInstanceId = new HashMap<>();
 
     //流水线实例id:流水线实例
-    public  static Map<String,PipelineInstance> instanceIdOrInstance = new HashMap<>();
+    public static  Map<String,PipelineInstance> instanceIdOrInstance = new HashMap<>();
 
     //任务线程池
-    public static ExecutorService executorService = Executors.newCachedThreadPool();
-
-    //运行时间
-    private final static Map<String,Integer> runTime = TasksExecServiceImpl.runTime;
-
+    private final ExecutorService executorService = Executors.newCachedThreadPool();
 
     @Value("${matflow.cloud:true}")
     boolean idCe;
@@ -98,7 +93,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         // 运行实例放入内存中
         pipelineIdOrInstanceId.put(pipelineId, instanceId);
         instanceIdOrInstance.put(instanceId, pipelineInstance);
-        tasksExecService.time(instanceId);
+        instanceService.pipelineRunTime(instanceId);
 
         HashMap<String,Object> map = homeService.initMap(pipeline);
         map.put("title","流水线执行消息");
@@ -183,7 +178,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
      */
     private void pipelineExecEnd(String pipelineId , boolean state){
         String instanceId = pipelineIdOrInstanceId.get(pipelineId);
-        Integer integer = runTime.get(instanceId);
+        Integer integer = instanceService.findPipelineRunTime(instanceId);
         PipelineInstance pipelineInstance = instanceIdOrInstance.get(instanceId);
         pipelineInstance.setRunTime(integer);
 
@@ -212,14 +207,14 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         //移除内存
         pipelineIdOrInstanceId.remove(pipelineId);
         instanceIdOrInstance.remove(instanceId);
-        logger.info("流水线：" +pipeline.getName() + "运行完成...");
+        instanceService.removePipelineRunTime(instanceId);
 
+        logger.info("流水线：" +pipeline.getName() + "运行完成...");
         map.put("title","流水线执行消息");
         homeService.log(PipelineFinal.LOG_PIPELINE, PipelineFinal.LOG_TEM_RUN, map);
         homeService.settingMessage(PipelineFinal.MES_RUN, map);
 
     }
-
 
     public void stop(String pipelineId){
 
@@ -255,22 +250,25 @@ public class PipelineExecServiceImpl implements PipelineExecService {
             return;
         }
 
-        Integer integer = runTime.get(instanceId);
+        Integer integer = instanceService.findPipelineRunTime(instanceId);
         PipelineInstance instance = instanceIdOrInstance.get(instanceId);
-        if (integer == null){
-            integer = 0;
-        }
         if (instance == null){
             instance = instanceService.findOneInstance(instanceId);
         }
         instance.setRunTime(integer);
         instance.setRunStatus(PipelineFinal.RUN_HALT);
         instanceService.updateInstance(instance);
+        instanceService.removePipelineRunTime(instanceId);
         tasksExecService.stopThread(instanceId);
         pipeline.setState(1);
         pipelineService.updatePipeline(pipeline);
         instanceIdOrInstance.remove(instanceId);
         pipelineIdOrInstanceId.remove(pipelineId);
+    }
+
+
+    public PipelineInstance findPipelineInstance(String instanceId){
+      return instanceIdOrInstance.get(instanceId);
     }
 
 

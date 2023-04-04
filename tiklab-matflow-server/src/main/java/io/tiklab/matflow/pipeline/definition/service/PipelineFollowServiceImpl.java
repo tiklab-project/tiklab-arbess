@@ -32,11 +32,12 @@ public class PipelineFollowServiceImpl implements PipelineFollowService {
            throw new ApplicationException(50001,"流水线id不能为空。");
         }
         String userId = LoginContext.getLoginId();
-        List<PipelineFollow> list =
-                pipelineFollowDao.findUserFollowPipeline(userId, pipelineId);
+        List<PipelineFollowEntity> list =
+                pipelineFollowDao.findOneUserFollowPipeline(userId, pipelineId);
         //用户为收藏该流水线
         if (list.size() == 0){
             PipelineFollowEntity followEntity = BeanMapper.map(pipelineFollow, PipelineFollowEntity.class);
+            followEntity.setUserId(userId);
             String follow = pipelineFollowDao.createFollow(followEntity);
             if (!PipelineUtil.isNoNull(follow)){
                 throw new ApplicationException(50001,"收藏失败");
@@ -45,6 +46,12 @@ public class PipelineFollowServiceImpl implements PipelineFollowService {
         }else {
             deleteFollow(list.get(0).getId());
         }
+    }
+
+    public List<PipelineFollow> findUserFollowPipeline(String userId){
+        List<PipelineFollowEntity> list =
+                pipelineFollowDao.findUserFollowPipeline(userId);
+        return BeanMapper.mapList(list, PipelineFollow.class);
     }
 
     @Override

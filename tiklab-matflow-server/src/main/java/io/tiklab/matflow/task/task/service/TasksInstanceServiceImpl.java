@@ -16,6 +16,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * 任务执行实例服务接口
@@ -28,13 +30,9 @@ public class TasksInstanceServiceImpl implements TasksInstanceService {
     @Autowired
     private TaskInstanceDao taskInstanceDao;
 
-    //任务实例id与任务
-    private final  Map<String , TaskInstance> taskOrTaskInstance = TasksExecServiceImpl.taskOrTaskInstance;
-
-    private final  Map<String , String> taskIdOrTaskInstanceId = TasksExecServiceImpl.taskIdOrTaskInstanceId;
 
     //任务运行时间
-    private final Map<String, Integer> runTime = TasksExecServiceImpl.runTime;
+    private final Map<String,Integer> runTime = new HashMap<>();
 
     @Override
     public String createTaskInstance(TaskInstance taskInstance) {
@@ -91,9 +89,10 @@ public class TasksInstanceServiceImpl implements TasksInstanceService {
             }
             //任务是否在运行中
             String taskInstanceId = instance.getId();
-            TaskInstance taskInstance = taskOrTaskInstance.get(taskInstanceId);
+            TasksExecServiceImpl tasksExecService = new TasksExecServiceImpl();
+            TaskInstance taskInstance = tasksExecService.findTaskInstance(taskInstanceId);
             if (taskInstance != null){
-                Integer integer = runTime.get(taskInstanceId);
+                Integer integer = findTaskRuntime(taskInstanceId);
                 if (integer == null){
                     integer = 0;
                 }
@@ -123,14 +122,15 @@ public class TasksInstanceServiceImpl implements TasksInstanceService {
                 continue;
             }
             String taskInstanceId = instance.getId();
-            TaskInstance taskInstance = taskOrTaskInstance.get(taskInstanceId);
+            TasksExecServiceImpl tasksExecService = new TasksExecServiceImpl();
+            TaskInstance taskInstance = tasksExecService.findTaskInstance(taskInstanceId);
             if (taskInstance == null){
                 String logAddress = instance.getLogAddress();
                 String readFile = PipelineUtil.readFile(logAddress, 100);
                 instance.setRunLog(readFile);
                 list.add(instance);
             }else {
-                Integer integer = runTime.get(taskInstanceId);
+                Integer integer = findTaskRuntime(taskInstanceId);
                 if (integer == null){
                     integer = 0;
                 }
@@ -221,14 +221,11 @@ public class TasksInstanceServiceImpl implements TasksInstanceService {
         if(!PipelineUtil.isNoNull(execLog)){
             return;
         }
-        String taskInstanceId = taskIdOrTaskInstanceId.get(taskId);
-        TaskInstance taskInstance = taskOrTaskInstance.get(taskInstanceId);
-        Integer integer = runTime.get(taskInstanceId);
-        if (integer == null){
-            integer = 0;
-        }
+        TasksExecServiceImpl tasksExecService = new TasksExecServiceImpl();
+        String taskInstanceId = tasksExecService.findTaskInstanceId(taskId);
+        TaskInstance taskInstance = tasksExecService.findTaskInstance(taskInstanceId);
+        Integer integer = findTaskRuntime(taskInstanceId);
         taskInstance.setRunTime(integer);
-
         String execInstance = taskInstance.getRunLog();
 
         if (!PipelineUtil.isNoNull(execInstance)){
@@ -244,8 +241,8 @@ public class TasksInstanceServiceImpl implements TasksInstanceService {
             PipelineUtil.logWriteFile(runInstance,logAddress);
             taskInstance.setRunLog(null);
         }
-
-        taskOrTaskInstance.put(taskInstanceId, taskInstance);
+        tasksExecService.setTaskOrTaskInstance(taskInstanceId, taskInstance);
+        // taskOrTaskInstance.put(taskInstanceId, taskInstance);
     }
 
     /**
@@ -268,6 +265,38 @@ public class TasksInstanceServiceImpl implements TasksInstanceService {
         return BeanMapper.mapList(pipelineInstanceList, TaskInstance.class);
     }
 
+    //时间线程池
+    private final ExecutorService timeThreadPool = Executors.newCachedThreadPool();
+
+    public void taskRuntime(String taskInstanceId){
+        runTime.put(taskInstanceId,0);
+        timeThreadPool.submit(() -> {
+            while (true){
+                Thread.currentThread().setName(taskInstanceId);
+                int integer = findTaskRuntime(taskInstanceId);
+                try {
+                    Thread.sleep(1000);
+                }catch (RuntimeException e){
+                    throw new RuntimeException();
+                }
+                integer = integer +1;
+                runTime.put(taskInstanceId,integer);
+            }
+        });
+    }
+
+
+    public Integer findTaskRuntime(String taskInstanceId){
+        Integer integer = runTime.get(taskInstanceId);
+        if (Objects.isNull(integer)){
+            return 0;
+        }
+        return integer;
+    }
+
+    public void removeTaskRuntime(String taskInstanceId){
+        runTime.remove(taskInstanceId);
+    }
 
 
 

@@ -15,16 +15,15 @@ import io.tiklab.matflow.stages.service.StageInstanceServer;
 import io.tiklab.matflow.support.authority.service.PipelineAuthorityService;
 import io.tiklab.matflow.support.util.PipelineFinal;
 import io.tiklab.matflow.support.util.PipelineUtil;
-import io.tiklab.matflow.task.task.service.TasksExecServiceImpl;
 import io.tiklab.matflow.task.task.service.TasksInstanceService;
 import io.tiklab.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * 流水线实例服务
@@ -47,12 +46,6 @@ public class PipelineInstanceServiceImpl implements PipelineInstanceService {
 
     @Autowired
     private JoinTemplate joinTemplate;
-
-    //运行时间
-    private final Map<String, Integer> runTime = TasksExecServiceImpl.runTime;
-
-    //实例id与实例
-    private final Map<String,PipelineInstance> instanceIdOrInstance = PipelineExecServiceImpl.instanceIdOrInstance;
 
     @Override
     public String createInstance(PipelineInstance pipelineInstance) {
@@ -187,22 +180,22 @@ public class PipelineInstanceServiceImpl implements PipelineInstanceService {
         }
         Pagination<PipelineInstanceEntity> pagination = pipelineInstanceDao.findPageInstance(pipelineInstanceQuery);
         List<PipelineInstance> execInstanceList= BeanMapper.mapList(pagination.getDataList(), PipelineInstance.class);
-        int size = execInstanceList.size();
-        for (int i = size -1 ; i >= 0; i--) {
-            PipelineInstance instance = execInstanceList.get(i);
+        List<PipelineInstance> instanceList = new ArrayList<>();
+        for (PipelineInstance instance : execInstanceList) {
             String id = instance.getInstanceId();
             //判断内存中是否存在该实例
-            PipelineInstance pipelineInstance = instanceIdOrInstance.get(id);
-            if (pipelineInstance == null){
-               continue;
+            PipelineExecServiceImpl pipelineExecService = new PipelineExecServiceImpl();
+            PipelineInstance pipelineInstance = pipelineExecService.findPipelineInstance(id);
+            if (Objects.isNull(pipelineInstance)){
+                instanceList.add(instance);
+            }else {
+                Integer integer = findPipelineRunTime(id);
+                pipelineInstance.setRunTime(integer);
+                instanceList.add(pipelineInstance);
             }
-            Integer integer = runTime.get(id);
-            pipelineInstance.setRunTime(integer);
-            execInstanceList.remove(i);
-            execInstanceList.add(i,pipelineInstance);
         }
-        joinTemplate.joinQuery(execInstanceList);
-        return PaginationBuilder.build(pagination,execInstanceList);
+        joinTemplate.joinQuery(instanceList);
+        return PaginationBuilder.build(pagination,instanceList);
     }
 
     @Override
@@ -212,24 +205,56 @@ public class PipelineInstanceServiceImpl implements PipelineInstanceService {
         pipelineInstanceQuery.setPipelineList(userPipeline);
         Pagination<PipelineInstanceEntity> pagination = pipelineInstanceDao.findAllPageInstance(pipelineInstanceQuery);
         List<PipelineInstance> execInstanceList = BeanMapper.mapList(pagination.getDataList(), PipelineInstance.class);
-
-        for (int i = execInstanceList.size() -1 ; i >= 0; i--) {
-            PipelineInstance instance = execInstanceList.get(i);
+        List<PipelineInstance> instanceList = new ArrayList<>();
+        for (PipelineInstance instance : execInstanceList) {
+            PipelineExecServiceImpl pipelineExecService = new PipelineExecServiceImpl();
             String id = instance.getInstanceId();
-            PipelineInstance pipelineInstance = instanceIdOrInstance.get(id);
-            if (pipelineInstance != null){
-                Integer integer = runTime.get(id);
+            PipelineInstance pipelineInstance = pipelineExecService.findPipelineInstance(id);
+            if (Objects.isNull(pipelineInstance)){
+                instanceList.add(instance);
+            }else {
+                Integer integer = findPipelineRunTime(id);
                 pipelineInstance.setRunTime(integer);
-                execInstanceList.remove(i);
-                execInstanceList.add(i,pipelineInstance);
+                instanceList.add(pipelineInstance);
             }
         }
-        joinTemplate.joinQuery(execInstanceList);
-        return PaginationBuilder.build(pagination,execInstanceList);
+        joinTemplate.joinQuery(instanceList);
+        return PaginationBuilder.build(pagination,instanceList);
     }
 
+    public ExecutorService executorService = Executors.newCachedThreadPool();
 
+    //运行时间
+    public  final Map<String,Integer> pipelineRunTime = new HashMap<>();
 
+    public void pipelineRunTime(String instanceId){
+        pipelineRunTime.put(instanceId,0);
+        executorService.submit(() -> {
+            while (true){
+                Thread.currentThread().setName(instanceId);
+                int integer = pipelineRunTime.get(instanceId);
+                try {
+                    Thread.sleep(1000);
+                    integer = integer +1;
+                    pipelineRunTime.put(instanceId,integer);
+                }catch (RuntimeException e){
+                    throw new RuntimeException();
+                }
+            }
+        });
+    }
+
+    public Integer findPipelineRunTime(String instanceId){
+        Integer integer = pipelineRunTime.get(instanceId);
+        if (Objects.isNull(integer)){
+            return 0;
+        }
+        return integer;
+    }
+
+    public void removePipelineRunTime(String instanceId){
+        pipelineRunTime.remove(instanceId);
+    }
 
 
 

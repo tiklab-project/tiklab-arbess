@@ -9,7 +9,6 @@ import io.tiklab.dal.jpa.annotation.*;
 @Table(name="pip_postprocess_instance")
 public class PostprocessInstanceEntity {
 
-
     @Id
     @GeneratorValue
     @Column(name = "id")

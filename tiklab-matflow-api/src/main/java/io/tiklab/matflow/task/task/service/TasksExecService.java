@@ -44,12 +44,6 @@ public interface TasksExecService {
     void createTaskExecInstance(Tasks task, String id, int type,String logPath);
 
     /**
-     * 任务执行时长
-     * @param taskId 任务id
-     */
-    void time(String taskId);
-
-    /**
      * 停止指定线程
      * @param threadName 线程名称
      */

@@ -6,12 +6,13 @@ import io.tiklab.matflow.stages.entity.StageInstanceEntity;
 import io.tiklab.matflow.stages.model.StageInstance;
 import io.tiklab.matflow.support.util.PipelineUtil;
 import io.tiklab.matflow.task.task.model.TaskInstance;
-import io.tiklab.matflow.task.task.service.TasksExecServiceImpl;
 import io.tiklab.matflow.task.task.service.TasksInstanceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * 阶段执行实例服务
@@ -22,16 +23,8 @@ public class StageInstanceServerImpl implements StageInstanceServer{
     @Autowired
     private StageInstanceDao stageInstanceDao;
 
-
     @Autowired
     private TasksInstanceService tasksInstanceService;
-
-    //任务实例id与任务实例
-    private final Map<String , StageInstance> stageInstanceMap =
-            StageExecServiceImpl.stageInstanceIdOrStageInstance;
-
-    //阶段运行时间
-    private final Map<String, Integer> runTime = TasksExecServiceImpl.runTime;
 
     @Override
     public String createStageInstance(StageInstance stageInstance) {
@@ -115,27 +108,25 @@ public class StageInstanceServerImpl implements StageInstanceServer{
     @Override
     public List<StageInstance> findStageExecInstance(String instanceId){
         List<StageInstance> stageInstanceList = findAllMainStageInstance(instanceId);
-
         int size1 = stageInstanceList.size();
         for (int i = size1-1; i >= 0; i--) {
-            String stageId = stageInstanceList.get(i).getId();
-            StageInstance instance = stageInstanceMap.get(stageId);
+            String stageInstanceId = stageInstanceList.get(i).getId();
+            StageExecServiceImpl stageExecService = new StageExecServiceImpl();
+            StageInstance instance = stageExecService.findStageInstance(stageInstanceId);
             if (instance == null){
-                instance = findOneStageInstance(stageId);
+                instance = findOneStageInstance(stageInstanceId);
             }else {
-                Integer integer = runTime.get(stageId);
-                if (integer == null){
-                    integer = 0;
-                }
+                Integer integer = findStageRunTime(stageInstanceId);
                 instance.setStageTime(integer);
             }
-            List<StageInstance> allStageInstance = findAllOtherStageInstance(stageId);
+
+            List<StageInstance> allStageInstance = findAllOtherStageInstance(stageInstanceId);
             String log = "\n";
             //并行阶段执行实例
             int size = allStageInstance.size();
             for (int j = size - 1; j >= 0; j--) {
                 String otherStageInstanceId = allStageInstance.get(j).getId();
-                StageInstance otherInstance = stageInstanceMap.get(otherStageInstanceId);
+                StageInstance otherInstance = stageExecService.findStageInstance(otherStageInstanceId);
                 if (otherInstance == null){
                     otherInstance = findOneStageInstance(otherStageInstanceId);
                 }
@@ -179,6 +170,42 @@ public class StageInstanceServerImpl implements StageInstanceServer{
         stageInstanceList.sort(Comparator.comparing(StageInstance::getStageSort));
         return stageInstanceList;
     }
+
+    //运行时间
+    private final static Map<String,Integer> stageRunTime = new HashMap<>();
+
+    ExecutorService threadPool = Executors.newCachedThreadPool();
+
+    public void stageRunTime(String stageInstanceId){
+        stageRunTime.put(stageInstanceId,0);
+        threadPool.submit(() -> {
+            while (true){
+                Thread.currentThread().setName(stageInstanceId);
+                try {
+                    int integer = stageRunTime.get(stageInstanceId);
+                    Thread.sleep(1000);
+                    integer = integer +1;
+                    stageRunTime.put(stageInstanceId,integer);
+                }catch (RuntimeException e){
+                    throw new RuntimeException();
+                }
+
+            }
+        });
+    }
+
+    public Integer findStageRunTime(String stageInstanceId){
+        Integer integer = stageRunTime.get(stageInstanceId);
+        if (Objects.isNull(integer)){
+            return 0;
+        }
+        return integer;
+    }
+
+    public void removeStageRunTime(String stageInstanceId){
+        stageRunTime.remove(stageInstanceId);
+    }
+
 
     /**
      * 获取所有阶段实例
