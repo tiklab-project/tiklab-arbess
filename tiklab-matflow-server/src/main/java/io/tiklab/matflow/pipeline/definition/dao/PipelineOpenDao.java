@@ -55,11 +55,14 @@ public class PipelineOpenDao {
         return jpaTemplate.findOne(PipelineOpenEntity.class,openId);
     }
 
-    public List<PipelineOpenEntity> findUserAllOpen(String userId, StringBuilder s){
+    /**
+     * 查询用户最近打开的流水线
+     * @param userId 用户id
+     * @return 最近打开信息
+     */
+    public List<PipelineOpenEntity> findUserAllOpen(String userId){
         String sql = "select pip_other_open.* from pip_other_open ";
-        sql = sql.concat(" where pip_other_open.user_id   = '"+userId+"' "
-                + " and pip_other_open.pipeline_id   "
-                + " in (" + s +" ) ");
+        sql = sql.concat(" where pip_other_open.user_id   = '"+userId+"' ");
         JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
         return  jdbcTemplate.query(sql, new BeanPropertyRowMapper(PipelineOpenEntity.class));
     }

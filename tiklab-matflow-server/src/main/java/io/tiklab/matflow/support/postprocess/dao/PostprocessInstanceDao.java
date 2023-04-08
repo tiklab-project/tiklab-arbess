@@ -2,6 +2,8 @@ package io.tiklab.matflow.support.postprocess.dao;
 
 import io.tiklab.beans.BeanMapper;
 import io.tiklab.dal.jpa.JpaTemplate;
+import io.tiklab.dal.jpa.criterial.condition.QueryCondition;
+import io.tiklab.dal.jpa.criterial.conditionbuilder.QueryBuilders;
 import io.tiklab.matflow.support.postprocess.entity.PostprocessInstanceEntity;
 import io.tiklab.matflow.support.postprocess.model.PostprocessInstance;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +44,34 @@ public class PostprocessInstanceDao {
         List<PostprocessInstance> instanceList = jpaTemplate.findAll(PostprocessInstance.class);
         return BeanMapper.mapList(instanceList,PostprocessInstance.class);
     }
+
+
+    /**
+     * 获取流水线的后置任务
+     * @param instanceId 流水线实例id
+     * @return 流水线的后置任务
+     */
+    public List<PostprocessInstanceEntity> findPipelinePostInstance(String instanceId){
+        QueryCondition queryCondition = QueryBuilders.createQuery(PostprocessInstanceEntity.class)
+                .eq("instanceId", instanceId)
+                .get();
+        return jpaTemplate.findList(queryCondition,PostprocessInstanceEntity.class);
+    }
+
+
+    /**
+     * 获取流水线的后置任务
+     * @param taskInstanceId 任务实例id
+     * @return 流水线的后置任务
+     */
+    public List<PostprocessInstanceEntity> findTaskPostInstance(String taskInstanceId){
+        QueryCondition queryCondition = QueryBuilders.createQuery(PostprocessInstanceEntity.class)
+                .eq("taskInstanceId", taskInstanceId)
+                .get();
+        return jpaTemplate.findList(queryCondition,PostprocessInstanceEntity.class);
+    }
+
+
 
 
 }

@@ -46,6 +46,18 @@ public class TaskInstanceEntity {
     @Column(name = "task_name")
     private String taskName;
 
+    @Column(name = "postprocess_id")
+    private String postprocessId;
+
+
+    public String getPostprocessId() {
+        return postprocessId;
+    }
+
+    public void setPostprocessId(String postprocessId) {
+        this.postprocessId = postprocessId;
+    }
+
     public String getStagesId() {
         return stagesId;
     }

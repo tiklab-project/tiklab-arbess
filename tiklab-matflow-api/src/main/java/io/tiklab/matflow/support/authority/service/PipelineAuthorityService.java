@@ -16,7 +16,7 @@ public interface PipelineAuthorityService {
      * @param userId 用户id
      * @return 流水线支付串集合
      */
-    StringBuilder findUserPipelineIdString(String userId);
+    String[] findUserPipelineIdString(String userId);
 
     /**
      * 获取拥有此流水线的用户

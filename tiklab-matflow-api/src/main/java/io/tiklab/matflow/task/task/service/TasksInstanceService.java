@@ -6,6 +6,8 @@ import io.tiklab.join.annotation.JoinProvider;
 import io.tiklab.matflow.task.task.model.TaskInstance;
 
 import java.util.List;
+import java.util.Map;
+
 /**
  * 任务执行实例服务接口
  */
@@ -51,12 +53,74 @@ public interface TasksInstanceService {
      */
     List<TaskInstance> findAllInstanceInstance(String instanceId);
 
+
+    /**
+     * 获取流水线实例的后置任务信息
+     * @param id 流水线实例id或任务实例id
+     * @param b  true流水线实例id  false任务实例id
+     * @return 后置任务信息
+     */
+    TaskInstance findPostPipelineRunMessage(String id,Boolean b);
+
+
+    /**
+     * 获取流水线实例的后置任务
+     * @param id 实例id
+     * @return 任务执行信息
+     */
+    List<TaskInstance> findStagePostRunMessage(String id);
+
+
+    /**
+     * 获取阶段后置任务运行信息
+     * @param id 流水线实例id
+     * @return 运行信息
+     */
+    Map<String ,Object> findPostRunMessage(String id);
+
+
+    /**
+     * 移除阶段后置任务运行信息
+     * @param id 流水线实例id
+     */
+    void removePostRunMessage(String id);
+
+
+
     /**
      * 查询阶段下的任务运行实例
      * @param stageId 阶段id
      * @return 任务运行实例集合
      */
     List<TaskInstance> findAllStageInstance(String stageId);
+
+    /**
+     * 获取保存的阶段运行日志
+     * @param stageId 阶段id
+     * @return 日志
+     */
+    String findStageRunLog(String stageId);
+
+    /**
+     * 删除保存的阶段运行日志
+     * @param stageId 阶段id
+     */
+    void removeStageRunLog(String stageId);
+
+    /**
+     * 获取保存的阶段运行时间
+     * @param stageId 阶段id
+     * @return 日志
+     */
+    Integer findStageRunTime(String stageId);
+
+    /**
+     * 删除保存的阶段运行时间
+     * @param stageId 阶段id
+     */
+    void removeStageRunTime(String stageId);
+
+
 
     /**
      * 添加任务执行日志

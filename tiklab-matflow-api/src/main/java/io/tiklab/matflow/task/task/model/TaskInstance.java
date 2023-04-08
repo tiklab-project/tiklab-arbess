@@ -36,6 +36,9 @@ public class TaskInstance {
     @ApiProperty(name = "runTime",desc = "运行时间")
     private int runTime;
 
+    @ApiProperty(name = "runTimeDate",desc = "运行时间")
+    private String runTimeDate;
+
     @ApiProperty(name = "runState",desc = "运行状态 error.失败 success.成功 halt.停止 wait.等待")
     private String runState;
 
@@ -47,6 +50,7 @@ public class TaskInstance {
 
     @ApiProperty(name="runLog",desc="运行日志")
     private String runLog;
+
 
     public String getStagesId() {
         return stagesId;
@@ -134,5 +138,13 @@ public class TaskInstance {
 
     public void setPostprocessId(String postprocessId) {
         this.postprocessId = postprocessId;
+    }
+
+    public String getRunTimeDate() {
+        return runTimeDate;
+    }
+
+    public void setRunTimeDate(String runTimeDate) {
+        this.runTimeDate = runTimeDate;
     }
 }

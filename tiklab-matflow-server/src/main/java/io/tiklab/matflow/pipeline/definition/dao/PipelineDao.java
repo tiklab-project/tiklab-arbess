@@ -1,5 +1,7 @@
 package io.tiklab.matflow.pipeline.definition.dao;
 
+import io.tiklab.core.order.Order;
+import io.tiklab.core.order.OrderBuilders;
 import io.tiklab.core.page.Pagination;
 import io.tiklab.dal.jdbc.JdbcTemplate;
 import io.tiklab.dal.jpa.JpaTemplate;
@@ -73,24 +75,16 @@ public class PipelineDao {
 
     /**
      * 获取用户拥有的流水线
-     * @param idString 拼装的流水线id
+     * @param strings 拼装的流水线id
      * @return 流水线实体集合
      */
-    public List<PipelineEntity> findUserPipeline(StringBuilder idString){
-
-        // Object[] objects = ids.toArray();
-        //
-        // QueryCondition queryCondition = QueryBuilders.createQuery(PipelineEntity.class)
-        //         .in("id", objects)
-        //         .get();
-        //
-        // List<PipelineEntity> list = jpaTemplate.findList(queryCondition,PipelineEntity.class);
-        // return list;
-
-        String sql = " select p.* from pip_pipeline p";
-        sql = sql.concat(" where p.id in ("+ idString +")");
-        return jpaTemplate.getJdbcTemplate().query(sql, new BeanPropertyRowMapper(PipelineEntity.class));
-
+    public List<PipelineEntity> findUserPipeline(String[] strings){
+        List<Order> orderList = OrderBuilders.instance().desc("createTime").get();
+        QueryCondition queryCondition = QueryBuilders.createQuery(PipelineEntity.class)
+                .in("id", strings)
+                .orders(orderList)
+                .get();
+        return jpaTemplate.findList(queryCondition,PipelineEntity.class);
     }
 
     /**

@@ -63,14 +63,6 @@ public interface StageService {
     List<Stage> findAllMainStage(String pipelineId);
 
     /**
-     * 获取指定阶段的根节点
-     * @param pipelineId 流水线id
-     * @param stages 阶段
-     * @return 根节点
-     */
-    Stage findMainStages(String pipelineId, int stages);
-
-    /**
      * 根据根节点查询从节点
      * @param stagesId 根节点id
      * @return 从节点列表

@@ -105,7 +105,6 @@ public class TaskMessageExecServiceImpl implements TaskMessageExecService {
      */
     private void messageType(String taskId, String type, List<TaskMessageUser> userList,
                              HashMap<String, Object> map) throws ApplicationException {
-
         switch (type){
             case PipelineFinal.MES_SEND_SITE ->{
                 tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+ "发送消息，类型：站内信");

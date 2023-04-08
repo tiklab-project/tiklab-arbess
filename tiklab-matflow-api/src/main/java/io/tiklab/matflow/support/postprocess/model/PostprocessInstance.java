@@ -23,6 +23,17 @@ public class PostprocessInstance {
     @ApiProperty(name = "taskInstanceId",desc="任务实例id")
     private String taskInstanceId;
 
+
+    @ApiProperty(name = "postAddress",desc="日志地址")
+    private String postAddress;
+
+    @ApiProperty(name = "postTime",desc="运行时间")
+    private Integer postTime;
+
+
+    @ApiProperty(name = "postState",desc="运行状态")
+    private String postState;
+
     public String getTaskInstanceId() {
         return taskInstanceId;
     }
@@ -45,5 +56,30 @@ public class PostprocessInstance {
 
     public void setInstanceId(String instanceId) {
         this.instanceId = instanceId;
+    }
+
+
+    public String getPostAddress() {
+        return postAddress;
+    }
+
+    public void setPostAddress(String postAddress) {
+        this.postAddress = postAddress;
+    }
+
+    public Integer getPostTime() {
+        return postTime;
+    }
+
+    public void setPostTime(Integer postTime) {
+        this.postTime = postTime;
+    }
+
+    public String getPostState() {
+        return postState;
+    }
+
+    public void setPostState(String postState) {
+        this.postState = postState;
     }
 }

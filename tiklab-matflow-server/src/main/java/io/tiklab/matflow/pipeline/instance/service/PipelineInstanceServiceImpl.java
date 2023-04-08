@@ -186,16 +186,21 @@ public class PipelineInstanceServiceImpl implements PipelineInstanceService {
             //判断内存中是否存在该实例
             PipelineExecServiceImpl pipelineExecService = new PipelineExecServiceImpl();
             PipelineInstance pipelineInstance = pipelineExecService.findPipelineInstance(id);
+            String time;
             if (Objects.isNull(pipelineInstance)){
                 instanceList.add(instance);
+                time = PipelineUtil.formatDateTime(instance.getRunTime());
+                instance.setRunTimeDate(time);
             }else {
                 Integer integer = findPipelineRunTime(id);
                 pipelineInstance.setRunTime(integer);
                 instanceList.add(pipelineInstance);
+                time = PipelineUtil.formatDateTime(pipelineInstance.getRunTime());
+                pipelineInstance.setRunTimeDate(time);
             }
         }
         joinTemplate.joinQuery(instanceList);
-        return PaginationBuilder.build(pagination,instanceList);
+        return PaginationBuilder.build(pagination, instanceList);
     }
 
     @Override
@@ -210,11 +215,16 @@ public class PipelineInstanceServiceImpl implements PipelineInstanceService {
             PipelineExecServiceImpl pipelineExecService = new PipelineExecServiceImpl();
             String id = instance.getInstanceId();
             PipelineInstance pipelineInstance = pipelineExecService.findPipelineInstance(id);
+            String time;
             if (Objects.isNull(pipelineInstance)){
                 instanceList.add(instance);
+                time = PipelineUtil.formatDateTime(instance.getRunTime());
+                instance.setRunTimeDate(time);
             }else {
                 Integer integer = findPipelineRunTime(id);
                 pipelineInstance.setRunTime(integer);
+                time = PipelineUtil.formatDateTime(pipelineInstance.getRunTime());
+                pipelineInstance.setRunTimeDate(time);
                 instanceList.add(pipelineInstance);
             }
         }

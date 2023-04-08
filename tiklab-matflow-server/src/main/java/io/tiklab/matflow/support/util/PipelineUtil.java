@@ -38,6 +38,9 @@ public class PipelineUtil {
             case 5 -> {
                 return new SimpleDateFormat("HH:mm").format(new Date());
             }
+            case 6 -> {
+                return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS").format(new Date());
+            }
             default -> {
                 return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
             }
@@ -109,16 +112,20 @@ public class PipelineUtil {
         String[] cmd;
         if (findSystemType()==1){
             if (!PipelineUtil.isNoNull(path)){
-                process = runtime.exec(" cmd.exe /c " + " " + order);
+                cmd = new String[] { "cmd.exe", "/c", " "+ order };
+                process = runtime.exec(cmd);
+                // process = runtime.exec(" cmd.exe /c " + " " + order);
             }else {
-                process = runtime.exec(" cmd.exe /c " + " " + order,null,new File(path));
+                cmd = new String[] { "cmd.exe", "/c", " " + order };
+                // process = runtime.exec(" cmd.exe /c " + " " + order,null,new File(path));
+                process = runtime.exec(cmd,null,new File(path));
             }
         }else {
             if (!PipelineUtil.isNoNull(path)){
                 cmd = new String[] { "/bin/sh", "-c", " source /etc/profile;"+ order };
                 process = runtime.exec(cmd);
             }else {
-                cmd = new String[] { "/bin/sh", "-c", "cd "+path+";"+" source /etc/profile;"+ order };
+                cmd = new String[] { "/bin/sh", "-c", "cd " + path + ";" + " source /etc/profile;"+ order };
                 process = runtime.exec(cmd,null,new File(path));
             }
         }

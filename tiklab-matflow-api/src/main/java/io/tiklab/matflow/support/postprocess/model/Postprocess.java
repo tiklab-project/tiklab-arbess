@@ -37,6 +37,18 @@ public class Postprocess {
     @ApiProperty(name="task",desc="任务")
     private Tasks task;
 
+
+    @ApiProperty(name="taskSort",desc="任务")
+    private int taskSort;
+
+    public int getTaskSort() {
+        return taskSort;
+    }
+
+    public void setTaskSort(int taskSort) {
+        this.taskSort = taskSort;
+    }
+
     public String getPipelineId() {
         return pipelineId;
     }

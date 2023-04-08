@@ -1,7 +1,9 @@
 package io.tiklab.matflow.task.task.dao;
 
-import io.tiklab.matflow.task.task.entity.TaskInstanceEntity;
 import io.tiklab.dal.jpa.JpaTemplate;
+import io.tiklab.dal.jpa.criterial.condition.QueryCondition;
+import io.tiklab.dal.jpa.criterial.conditionbuilder.QueryBuilders;
+import io.tiklab.matflow.task.task.entity.TaskInstanceEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -56,6 +58,28 @@ public class TaskInstanceDao {
      * @return 流水线日志列表
      */
     public List<TaskInstanceEntity> findAllInstance(){ return jpaTemplate.findAll(TaskInstanceEntity.class); }
+
+    public List<TaskInstanceEntity> findStageInstance(String stageId){
+        QueryCondition queryCondition = QueryBuilders.createQuery(TaskInstanceEntity.class)
+                .eq("stagesId", stageId)
+                .get();
+        return jpaTemplate.findList(queryCondition,TaskInstanceEntity.class);
+    }
+
+    public List<TaskInstanceEntity> findPipelineInstance(String instanceId){
+        QueryCondition queryCondition = QueryBuilders.createQuery(TaskInstanceEntity.class)
+                .eq("instanceId", instanceId)
+                .get();
+        return jpaTemplate.findList(queryCondition,TaskInstanceEntity.class);
+    }
+
+
+    public List<TaskInstanceEntity> findPostInstance(String postprocessId){
+        QueryCondition queryCondition = QueryBuilders.createQuery(TaskInstanceEntity.class)
+                .eq("postprocessId", postprocessId)
+                .get();
+        return jpaTemplate.findList(queryCondition,TaskInstanceEntity.class);
+    }
 
 
     public List<TaskInstanceEntity> findAllInstanceList(List<String> idList){

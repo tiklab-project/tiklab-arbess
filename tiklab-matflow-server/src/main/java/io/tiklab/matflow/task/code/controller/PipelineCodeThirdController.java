@@ -48,8 +48,8 @@ public class PipelineCodeThirdController {
     @RequestMapping(path="/findAllStorehouse",method = RequestMethod.POST)
     @ApiMethod(name = "findAllStorehouse",desc = "获取所有仓库")
     @ApiParam(name = "authId",desc = "authId",required = true)
-    public Result<List<String>> findAllStorehouse(@NotNull String authId,int type) {
-        List<String> allStorehouse = taskCodeThirdService.findAllStorehouse(authId,type);
+    public Result<List<String>> findAllStorehouse(@NotNull String authId) {
+        List<String> allStorehouse = taskCodeThirdService.findAllStorehouse(authId);
         return Result.ok(allStorehouse);
     }
 
@@ -57,8 +57,8 @@ public class PipelineCodeThirdController {
     @RequestMapping(path="/findBranch",method = RequestMethod.POST)
     @ApiMethod(name = "findBranch",desc = "根据仓库名获取所有分支")
     @ApiParam(name = "authId",desc = "authId",required = true)
-    public Result<List<String>> findBranch(@NotNull String authId,String houseName,int type){
-        List<String> branch = taskCodeThirdService.findBranch(authId,houseName,type);
+    public Result<List<String>> findBranch(@NotNull String authId,String houseName){
+        List<String> branch = taskCodeThirdService.findBranch(authId,houseName);
         return Result.ok(branch);
     }
 

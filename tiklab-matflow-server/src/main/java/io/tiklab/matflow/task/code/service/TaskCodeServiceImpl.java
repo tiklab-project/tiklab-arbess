@@ -81,7 +81,6 @@ public class TaskCodeServiceImpl implements TaskCodeService {
     //修改
     @Override
     public void updateCode(TaskCode taskCode) {
-
         switch (taskCode.getType()) {
             case 2, 3 -> {
                 if (!PipelineUtil.isNoNull(taskCode.getCodeName())){

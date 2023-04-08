@@ -7,7 +7,7 @@ import io.tiklab.matflow.pipeline.definition.service.PipelineService;
 import io.tiklab.matflow.pipeline.instance.model.PipelineInstance;
 import io.tiklab.matflow.pipeline.instance.service.PipelineInstanceService;
 import io.tiklab.matflow.stages.service.StageExecService;
-import io.tiklab.matflow.support.postprocess.service.PostprocessService;
+import io.tiklab.matflow.support.postprocess.service.PostprocessExecService;
 import io.tiklab.matflow.support.util.PipelineFinal;
 import io.tiklab.matflow.support.util.PipelineUtil;
 import io.tiklab.matflow.task.task.model.Tasks;
@@ -38,9 +38,8 @@ public class PipelineExecServiceImpl implements PipelineExecService {
     @Autowired
     private PipelineHomeService homeService;
 
-
     @Autowired
-    private PostprocessService postServer;
+    private PostprocessExecService postExecService;
 
     @Autowired
     private PipelineInstanceService instanceService;
@@ -95,11 +94,11 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         instanceIdOrInstance.put(instanceId, pipelineInstance);
         instanceService.pipelineRunTime(instanceId);
 
-        HashMap<String,Object> map = homeService.initMap(pipeline);
-        map.put("title","流水线执行消息");
-        map.put("message","开始执行");
-        homeService.log(PipelineFinal.LOG_RUN, PipelineFinal.LOG_TEM_RUN, map);
-        homeService.settingMessage(PipelineFinal.MES_RUN, map);
+        // HashMap<String,Object> map = homeService.initMap(pipeline);
+        // map.put("title","流水线执行消息");
+        // map.put("message","开始执行");
+        // homeService.log(PipelineFinal.LOG_RUN, PipelineFinal.LOG_TEM_RUN, map);
+        // homeService.settingMessage(PipelineFinal.MES_RUN, map);
         //日志文件根路径
         String fileAddress = PipelineUtil.findFileAddress(pipelineId,2)+instanceId;
 
@@ -108,26 +107,23 @@ public class PipelineExecServiceImpl implements PipelineExecService {
                 boolean b = true;
                 int type = pipeline.getType();
 
-                if (type == 1) {
-                    // 创建多任务运行实例
-                    List<Tasks> tasks = tasksService.finAllPipelineTask(pipelineId);
-                    for (Tasks task : tasks) {
-                        tasksExecService.createTaskExecInstance(task, instanceId, 1,fileAddress);
-                    }
-                    // 执行任务
-                    for (Tasks task : tasks) {
-                        b = tasksExecService.execTask(pipelineId, task.getTaskType(), task.getTaskId());
-                        if (!b){
-                            break;
-                        }
-                    }
-                }
+                postExecService.createPipelinePostInstance(pipelineId,instanceId);
 
+                if (type == 1) {
+                    execTask(pipeline,instanceId);
+                }
                 if (type == 2) {
                     // 创建多阶段运行实例
                     stageExecService.createStageExecInstance(pipelineId, instanceId);
-                    b = stageExecService.execStageTask(pipelineId, instanceId);
+                    b = stageExecService.execStageTask(pipeline, instanceId);
                 }
+                logger.info("执行后置任务.");
+                boolean postState = postExecService.execPipelinePost(pipeline, b);
+
+                if (!b || !postState){
+                    b = false;
+                }
+
                 // 执行完成
                 pipelineExecEnd(pipelineId, b);
                 return true;
@@ -135,24 +131,24 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         }else {
             boolean b = true;
             int type = pipeline.getType();
-
+            postExecService.createPipelinePostInstance(pipelineId,instanceId);
             if (type == 1) {
-                // 创建多任务运行实例
-                List<Tasks> tasks = tasksService.finAllPipelineTask(pipelineId);
-                for (Tasks task : tasks) {
-                    tasksExecService.createTaskExecInstance(task, instanceId, 1,fileAddress);
-                }
-                // 执行任务
-                for (Tasks task : tasks) {
-                    b = tasksExecService.execTask(pipelineId, task.getTaskType(), task.getTaskId());
-                }
+                b = execTask(pipeline,instanceId);
             }
 
             if (type == 2) {
                 // 创建多阶段运行实例
                 stageExecService.createStageExecInstance(pipelineId, instanceId);
-                b = stageExecService.execStageTask(pipelineId, instanceId);
+                b = stageExecService.execStageTask(pipeline, instanceId);
             }
+
+            logger.info("执行后置任务。。。");
+            boolean postState = postExecService.execPipelinePost(pipeline, b);
+
+            if (!b || !postState){
+                b = false;
+            }
+
             // 执行完成
             pipelineExecEnd(pipelineId, b);
         }
@@ -166,9 +162,30 @@ public class PipelineExecServiceImpl implements PipelineExecService {
             throw new RuntimeException(e);
         }
 
-
         return pipelineInstance;
+    }
 
+
+    private boolean execTask(Pipeline pipeline,String instanceId){
+        String pipelineId = pipeline.getId();
+        boolean b = false;
+        //日志文件根路径
+        String fileAddress = PipelineUtil.findFileAddress(pipelineId,2)+instanceId;
+        // 创建多任务运行实例
+        List<Tasks> tasks = tasksService.finAllPipelineTask(pipelineId);
+        for (Tasks task : tasks) {
+            tasksExecService.createTaskExecInstance(task, instanceId, 1,fileAddress);
+            postExecService.createTaskPostInstance(pipelineId,instanceId ,task.getTaskId());
+        }
+        // 执行任务
+        for (Tasks task : tasks) {
+            b = tasksExecService.execTask(pipelineId, task.getTaskType(), task.getTaskId());
+            boolean b1 = postExecService.execTaskPostTask(pipeline, task.getTaskId(), b);
+            if (!b || !b1){
+                return false;
+            }
+        }
+        return b;
     }
 
     /**
@@ -211,8 +228,8 @@ public class PipelineExecServiceImpl implements PipelineExecService {
 
         logger.info("流水线：" +pipeline.getName() + "运行完成...");
         map.put("title","流水线执行消息");
-        homeService.log(PipelineFinal.LOG_PIPELINE, PipelineFinal.LOG_TEM_RUN, map);
-        homeService.settingMessage(PipelineFinal.MES_RUN, map);
+        // homeService.log(PipelineFinal.LOG_PIPELINE, PipelineFinal.LOG_TEM_RUN, map);
+        // homeService.settingMessage(PipelineFinal.MES_RUN, map);
 
     }
 

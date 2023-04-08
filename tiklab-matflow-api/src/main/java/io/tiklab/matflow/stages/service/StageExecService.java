@@ -1,5 +1,7 @@
 package io.tiklab.matflow.stages.service;
 
+import io.tiklab.matflow.pipeline.definition.model.Pipeline;
+
 /**
  * 阶段执行服务接口
  */
@@ -16,11 +18,11 @@ public interface StageExecService {
 
     /**
      * 运行流水线阶段
-     * @param pipelineId 流水线id
+     * @param pipeline 流水线
      * @param instanceId 流水线实例
      * @return 阶段运行状态
      */
-    boolean execStageTask(String pipelineId , String instanceId);
+    boolean execStageTask(Pipeline pipeline , String instanceId);
 
 
     /**

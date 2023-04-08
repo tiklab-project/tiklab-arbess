@@ -1,8 +1,10 @@
 package io.tiklab.matflow.stages.service;
 
 import io.tiklab.core.exception.ApplicationException;
+import io.tiklab.matflow.pipeline.definition.model.Pipeline;
 import io.tiklab.matflow.stages.model.Stage;
 import io.tiklab.matflow.stages.model.StageInstance;
+import io.tiklab.matflow.support.postprocess.service.PostprocessExecService;
 import io.tiklab.matflow.support.util.PipelineFinal;
 import io.tiklab.matflow.support.util.PipelineUtil;
 import io.tiklab.matflow.task.task.model.Tasks;
@@ -38,6 +40,9 @@ public class StageExecServiceImpl implements  StageExecService {
     @Autowired
     private TasksService tasksService;
 
+    @Autowired
+    private PostprocessExecService postExecService;
+
     //阶段任务实例id及阶段任务实例
     public static Map<String , StageInstance> stageInstanceIdOrStageInstance = new HashMap<>();
 
@@ -63,6 +68,7 @@ public class StageExecServiceImpl implements  StageExecService {
                 //获取串行任务
                 for (Tasks task : tasks) {
                     tasksExecService.createTaskExecInstance(task,otherStageInstanceId,2,otherAddress);
+                    postExecService.createTaskPostInstance(pipelineId,instanceId ,task.getTaskId());
                 }
             }
         }
@@ -100,10 +106,10 @@ public class StageExecServiceImpl implements  StageExecService {
 
     private final Map<String ,ExecutorService> threadExecutor = new HashMap<>();
 
-    private final ExecutorService threadPool = Executors.newCachedThreadPool();
-
     @Override
-    public boolean execStageTask(String pipelineId, String instanceId) {
+    public boolean execStageTask(Pipeline pipeline, String instanceId) {
+        String pipelineId = pipeline.getId();
+        ExecutorService threadPool = Executors.newCachedThreadPool();
         threadExecutor.put(pipelineId,threadPool);
         List<Stage> allMainStage = stageService.findAllMainStage(pipelineId);
         boolean state = true;
@@ -122,7 +128,6 @@ public class StageExecServiceImpl implements  StageExecService {
             List<Stage> otherStage = stageService.findOtherStage(mainStageId);
             Map<String , Future<Boolean>> futureMap = new HashMap<>();
             for (Stage stage : otherStage) {
-
                 String stagesId = stage.getStageId();
                 //更新从阶段实例状态为运行
                 String otherStageInstanceId = stageIdOrStageInstanceId.get(stagesId);
@@ -137,8 +142,9 @@ public class StageExecServiceImpl implements  StageExecService {
                     List<Tasks> tasks = tasksService.finAllStageTask(stagesId);
                     for (Tasks task : tasks) {
                         state = tasksExecService.execTask(pipelineId, task.getTaskType(), task.getTaskId());
+                        boolean b1 = postExecService.execTaskPostTask( pipeline, task.getTaskId(), state);
                         updateStageExecState(stagesId,state);
-                        if (!state){
+                        if (!state || !b1){
                             break;
                         }
                     }
@@ -147,7 +153,11 @@ public class StageExecServiceImpl implements  StageExecService {
                         Thread.currentThread().setName(stagesId);
                         List<Tasks> tasks = tasksService.finAllStageTask(stagesId);
                         for (Tasks task : tasks) {
-                            return tasksExecService.execTask(pipelineId, task.getTaskType(), task.getTaskId());
+                            boolean b =  tasksExecService.execTask(pipelineId, task.getTaskType(), task.getTaskId());
+                             boolean b1 = postExecService.execTaskPostTask( pipeline, task.getTaskId(), b);
+                            if (!b || !b1){
+                                return false;
+                            }
                         }
                         return true;
                     });

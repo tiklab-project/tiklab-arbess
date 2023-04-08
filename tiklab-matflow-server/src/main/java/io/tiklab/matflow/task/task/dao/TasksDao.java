@@ -1,8 +1,12 @@
 package io.tiklab.matflow.task.task.dao;
 
 
-import io.tiklab.matflow.task.task.entity.TasksEntity;
+import io.tiklab.core.order.Order;
+import io.tiklab.core.order.OrderBuilders;
 import io.tiklab.dal.jpa.JpaTemplate;
+import io.tiklab.dal.jpa.criterial.condition.QueryCondition;
+import io.tiklab.dal.jpa.criterial.conditionbuilder.QueryBuilders;
+import io.tiklab.matflow.task.task.entity.TasksEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,7 +69,87 @@ public class TasksDao {
         return jpaTemplate.findAll(TasksEntity.class);
     }
 
+    /**
+     * 查询流水线任务
+     * @param pipelineId 流水线id
+     * @return 任务
+     */
+    public List<TasksEntity> findPipelineTask(String pipelineId){
+        List<Order> orderList = OrderBuilders.instance().asc("taskSort").get();
+        QueryCondition queryCondition = QueryBuilders.createQuery(TasksEntity.class)
+                .eq("pipelineId", pipelineId)
+                .orders(orderList)
+                .get();
+        return jpaTemplate.findList(queryCondition,TasksEntity.class);
+    }
+
+    /**
+     * 查询阶段任务
+     * @param stageId 阶段id
+     * @return 任务
+     */
+    public List<TasksEntity> findStageTask(String stageId){
+        List<Order> orderList = OrderBuilders.instance().asc("taskSort").get();
+        QueryCondition queryCondition = QueryBuilders.createQuery(TasksEntity.class)
+                .eq("stageId", stageId)
+                .orders(orderList)
+                .get();
+        return jpaTemplate.findList(queryCondition,TasksEntity.class);
+    }
+
+    /**
+     * 查询后置任务
+     * @param postId 后置任务id
+     * @return 任务
+     */
+    public List<TasksEntity> findPostTask(String postId){
+        List<Order> orderList = OrderBuilders.instance().asc("taskSort").get();
+        QueryCondition queryCondition = QueryBuilders.createQuery(TasksEntity.class)
+                .eq("postprocessId", postId)
+                .orders(orderList)
+                .get();
+        return jpaTemplate.findList(queryCondition,TasksEntity.class);
+    }
+
+
+
     public List<TasksEntity> findAllConfigureList(List<String> idList){
         return jpaTemplate.findList(TasksEntity.class,idList);
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

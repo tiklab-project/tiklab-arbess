@@ -1,20 +1,22 @@
 package io.tiklab.matflow.support.postprocess.service;
 
+import io.tiklab.beans.BeanMapper;
 import io.tiklab.matflow.support.postprocess.dao.PostprocessInstanceDao;
+import io.tiklab.matflow.support.postprocess.entity.PostprocessInstanceEntity;
 import io.tiklab.matflow.support.postprocess.model.PostprocessInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * 后置处理实例服务实现
  */
 
 @Service
-public class PostprocessInstanceServiceImpl implements PostprocessInstanceService{
+public class PostprocessInstanceServiceImpl implements PostprocessInstanceService {
 
 
     @Autowired
@@ -62,36 +64,20 @@ public class PostprocessInstanceServiceImpl implements PostprocessInstanceServic
 
     @Override
     public List<PostprocessInstance> findTaskPostInstance(String taskInstanceId) {
-        List<PostprocessInstance> allPostInstance = findAllPostInstance();
-        if (allPostInstance.isEmpty()){
+        List<PostprocessInstanceEntity> allPostInstanceEntity = postInstanceDao.findTaskPostInstance(taskInstanceId);
+        if (allPostInstanceEntity.isEmpty()){
             return Collections.emptyList();
         }
-        List<PostprocessInstance> list = new ArrayList<>();
-        for (PostprocessInstance instance : allPostInstance) {
-            String id = instance.getTaskInstanceId();
-            if (!id.equals(taskInstanceId)){
-                continue;
-            }
-            list.add(instance);
-        }
-        return list;
+        return BeanMapper.mapList(allPostInstanceEntity,PostprocessInstance.class);
     }
 
     @Override
     public List<PostprocessInstance> findPipelinePostInstance(String instanceId) {
-        List<PostprocessInstance> allPostInstance = findAllPostInstance();
-        if (allPostInstance.isEmpty()){
+        List<PostprocessInstanceEntity> allPostInstanceEntity = postInstanceDao.findPipelinePostInstance(instanceId);
+        if (allPostInstanceEntity.isEmpty()){
             return Collections.emptyList();
         }
-        List<PostprocessInstance> list = new ArrayList<>();
-        for (PostprocessInstance instance : allPostInstance) {
-            String id = instance.getInstanceId();
-            if (!id.equals(instanceId)){
-                continue;
-            }
-            list.add(instance);
-        }
-        return list;
+        return BeanMapper.mapList(allPostInstanceEntity,PostprocessInstance.class);
     }
 
 
@@ -106,6 +92,72 @@ public class PostprocessInstanceServiceImpl implements PostprocessInstanceServic
         }
         return allPostInstance;
     }
+
+
+    //运行时间
+    private final static Map<String,Integer> postInstanceRunTime = new HashMap<>();
+
+    ExecutorService threadPool = Executors.newCachedThreadPool();
+
+    public void postInstanceRunTime(String postInstanceId){
+        postInstanceRunTime.put(postInstanceId,0);
+        threadPool.submit(() -> {
+            while (true){
+                Thread.currentThread().setName(postInstanceId);
+                try {
+                    int integer = postInstanceRunTime.get(postInstanceId);
+                    Thread.sleep(1000);
+                    integer = integer +1;
+                    postInstanceRunTime.put(postInstanceId,integer);
+                }catch (RuntimeException e){
+                    throw new RuntimeException();
+                }
+
+            }
+        });
+    }
+
+    public Integer findPostInstanceRunTime(String postInstanceId){
+        Integer integer = postInstanceRunTime.get(postInstanceId);
+        if (Objects.isNull(integer)){
+            return 0;
+        }
+        return integer;
+    }
+
+    public void removePostInstanceRunTime(String postInstanceId){
+        postInstanceRunTime.remove(postInstanceId);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 }

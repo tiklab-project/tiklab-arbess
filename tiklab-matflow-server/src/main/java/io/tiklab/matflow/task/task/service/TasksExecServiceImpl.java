@@ -93,7 +93,7 @@ public class TasksExecServiceImpl implements TasksExecService {
     }
 
     @Override
-    public boolean execTask(String pipelineId , int taskType,String taskId)  throws ApplicationException {
+    public boolean execTask(String pipelineId, int taskType,String taskId)  throws ApplicationException {
         Tasks tasks = tasksService.findOneTasksOrTask(taskId);
         logger.info("执行任务："+tasks.getTaskName());
         String taskInstanceId = taskIdOrTaskInstanceId.get(taskId);
@@ -125,8 +125,24 @@ public class TasksExecServiceImpl implements TasksExecService {
     }
 
     @Override
-    public boolean execSendMessageTask(Pipeline pipeline,Tasks task , boolean execStatus,boolean isPipeline){
-       return message.message(pipeline, task , execStatus, isPipeline);
+    public boolean execSendMessageTask(Pipeline pipeline,Tasks task, boolean execStatus,boolean isPipeline){
+
+        String taskId = task.getTaskId();
+        String taskInstanceId = taskIdOrTaskInstanceId.get(taskId);
+        //计算时间
+        tasksInstanceService.taskRuntime(taskInstanceId);
+
+        Tasks tasks = tasksService.findOneTasksOrTask(taskId);
+        logger.info("执行任务：" + tasks.getTaskName());
+        //更改日志为运行运行中
+        TaskInstance instance = taskOrTaskInstance.get(taskInstanceId);
+        instance.setRunState(RUN_RUN);
+        taskOrTaskInstance.put(taskInstanceId,instance);
+        tasksInstanceService.updateTaskInstance(instance);
+        boolean state = message.message(pipeline, task , execStatus, isPipeline);
+        //更新任务状态
+        taskExecEnd(taskId,state);
+        return state;
     }
 
     /**

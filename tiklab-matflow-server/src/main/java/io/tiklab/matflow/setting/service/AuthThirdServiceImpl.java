@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+import java.util.Objects;
 
 @Service
 @Exporter
@@ -33,13 +33,15 @@ public class AuthThirdServiceImpl implements AuthThirdService {
      * @return 流水线授权id
      */
     public String createAuthServer(AuthThird authThird) {
-        Map<String, AuthThird> userMap = TaskCodeThirdServiceImpl.userMap;
-        AuthThird authServer = userMap.get(LoginContext.getLoginId());
-        if (authServer != null){
-            authThird.setUsername(authServer.getUsername());
-            authThird.setRefreshToken(authServer.getRefreshToken());
-            authThird.setAccessToken(authServer.getAccessToken());
-            userMap.remove(LoginContext.getLoginId());
+        if (Objects.equals(authThird.getType(),2) || Objects.equals(authThird.getType(),3)){
+            TaskCodeThirdServiceImpl thirdService = new TaskCodeThirdServiceImpl();
+            AuthThird authServer = thirdService.findUserAuthThird(LoginContext.getLoginId());
+            if (!Objects.isNull(authServer)){
+                authThird.setUsername(authServer.getUsername());
+                authThird.setRefreshToken(authServer.getRefreshToken());
+                authThird.setAccessToken(authServer.getAccessToken());
+                thirdService.removeUserAuthThird(LoginContext.getLoginId());
+            }
         }
         AuthThirdEntity authThirdEntity = BeanMapper.map(authThird, AuthThirdEntity.class);
         return authServerDao.createAuthServer(authThirdEntity);
@@ -67,7 +69,7 @@ public class AuthThirdServiceImpl implements AuthThirdService {
         if (authPublic == 1 && aPublic == 2){
             authThird.setPrivateKey("");
         }
-        if (authPublic == 2 && aPublic == 1){
+        if (aPublic == 2 && authPublic == 1){
             authThird.setUsername("");
             authThird.setPassword("");
         }

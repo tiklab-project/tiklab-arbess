@@ -6,7 +6,6 @@ import io.tiklab.matflow.pipeline.definition.model.Pipeline;
 import io.tiklab.matflow.pipeline.definition.model.PipelineExecMessage;
 import io.tiklab.matflow.pipeline.definition.model.PipelineQuery;
 import io.tiklab.matflow.pipeline.definition.service.PipelineService;
-import io.tiklab.matflow.pipeline.overview.model.PipelineOverview;
 import io.tiklab.postin.annotation.Api;
 import io.tiklab.postin.annotation.ApiMethod;
 import io.tiklab.postin.annotation.ApiParam;
@@ -102,17 +101,6 @@ public class PipelineController {
         return Result.ok(pipelineQueryList);
     }
 
-    //查询用户所有流水线
-    @RequestMapping(path="/findUserPipeline",method = RequestMethod.POST)
-    @ApiMethod(name = "findUserPipeline",desc = "查询用户所有流水线")
-    @ApiParam(name = "userId",desc = "用户id",required = true)
-    public Result<List<PipelineOverview>> findUserPipeline(){
-
-        List<PipelineExecMessage> userPipeline = pipelineService.findUserPipelineExecMessage();
-
-        return Result.ok(userPipeline);
-    }
-
     @RequestMapping(path="/findUserPipelinePage",method = RequestMethod.POST)
     @ApiMethod(name = "findUserPipelinePage",desc = "查询用户所有流水线")
     @ApiParam(name = "query",desc = "查询条件",required = true)
@@ -123,13 +111,22 @@ public class PipelineController {
         return Result.ok(userPipeline);
     }
 
+    @RequestMapping(path="/findUserPipeline",method = RequestMethod.POST)
+    @ApiMethod(name = "findUserPipelinePage",desc = "查询用户所有流水线")
+    // @ApiParam(name = "userId",desc = "用户id",required = true)
+    public Result< List<Pipeline>> findAllUserPipeline(){
+        List<Pipeline> userPipeline = pipelineService.findUserPipeline();
+
+        return Result.ok(userPipeline);
+    }
+
     //查询用户收藏的流水线
     @RequestMapping(path="/findUserFollowPipeline",method = RequestMethod.POST)
     @ApiMethod(name = "findUserFollowPipeline",desc = "查询用户收藏的流水线")
     @ApiParam(name = "userId",desc = "用户id",required = true)
-    public Result<List<PipelineOverview>> findUserFollowPipeline(){
+    public Result<List<Pipeline>> findUserFollowPipeline(){
 
-        List<PipelineExecMessage> userPipeline = pipelineService.findUserFollowPipeline();
+        List<Pipeline> userPipeline = pipelineService.findUserFollowPipeline();
 
         return Result.ok(userPipeline);
     }

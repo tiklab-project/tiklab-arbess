@@ -53,6 +53,12 @@ public class PipelineInstance {
     @ApiProperty(name="findNumber",desc="构建次数")
     private int findNumber;
 
+
+
+    @ApiProperty(name="runTimeDate",desc ="运行时间")
+    private String runTimeDate;
+
+
     public PipelineInstance() {
     }
 
@@ -148,4 +154,11 @@ public class PipelineInstance {
         this.user = user;
     }
 
+    public String getRunTimeDate() {
+        return runTimeDate;
+    }
+
+    public void setRunTimeDate(String runTimeDate) {
+        this.runTimeDate = runTimeDate;
+    }
 }

@@ -11,10 +11,7 @@ import io.tiklab.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 @Service
 @Exporter
@@ -28,6 +25,16 @@ public class PostprocessServiceImpl implements PostprocessService {
 
     @Override
     public String createPostTask(Postprocess postprocess) {
+        String pipelineId = postprocess.getPipelineId();
+        if (Objects.isNull(pipelineId)){
+            List<PostprocessEntity> taskPost = postprocessDao.findTaskPost(postprocess.getTaskId());
+            int size = taskPost.size();
+            postprocess.setTaskSort(size);
+        }else {
+            List<PostprocessEntity> taskPost = postprocessDao.findPipelinePost(pipelineId);
+            int size = taskPost.size();
+            postprocess.setTaskSort(size);
+        }
         PostprocessEntity postprocessEntity = BeanMapper.map(postprocess, PostprocessEntity.class);
         postprocessEntity.setCreateTime(PipelineUtil.date(1));
         String postId = postprocessDao.createPost(postprocessEntity);
@@ -42,17 +49,13 @@ public class PostprocessServiceImpl implements PostprocessService {
 
 
     public List<Postprocess> findAllPipelinePostTask(String pipelineId){
-        List<Postprocess> allPost = findAllPost();
-
-        if (allPost.isEmpty()){
+        List<PostprocessEntity> allPostEntity = postprocessDao.findPipelinePost(pipelineId);
+        List<Postprocess> postprocessList = BeanMapper.mapList(allPostEntity, Postprocess.class);
+        if (postprocessList.isEmpty()){
            return Collections.emptyList();
         }
         List<Postprocess> list = new ArrayList<>();
-        for (Postprocess postprocess : allPost) {
-            String id = postprocess.getPipelineId();
-            if (id == null || !id.equals(pipelineId)){
-                continue;
-            }
+        for (Postprocess postprocess : postprocessList) {
             String postprocessId = postprocess.getPostprocessId();
             Tasks tasks = tasksService.findOnePostTaskOrTask(postprocessId);
             postprocess.setTask(tasks);
@@ -63,19 +66,15 @@ public class PostprocessServiceImpl implements PostprocessService {
 
     @Override
     public  List<Postprocess> findAllTaskPostTask(String taskId) {
-        List<Postprocess> allPost = findAllPost();
-
-        if (allPost.isEmpty()){
+        List<PostprocessEntity> allPostEntity = postprocessDao.findTaskPost(taskId);
+        List<Postprocess> postprocessList = BeanMapper.mapList(allPostEntity, Postprocess.class);
+        if (postprocessList.isEmpty()){
             return Collections.emptyList();
         }
         List<Postprocess> list = new ArrayList<>();
-        for (Postprocess postprocess : allPost) {
-            String id = postprocess.getTaskId();
-            if (id == null || !id.equals(taskId)){
-                continue;
-            }
-            String id1 = postprocess.getPostprocessId();
-            Tasks tasks = tasksService.findOnePostTaskOrTask(id1);
+        for (Postprocess postprocess : postprocessList) {
+            String id = postprocess.getPostprocessId();
+            Tasks tasks = tasksService.findOnePostTaskOrTask(id);
             postprocess.setTask(tasks);
             list.add(postprocess);
         }
@@ -111,9 +110,11 @@ public class PostprocessServiceImpl implements PostprocessService {
     @Override
     public void updatePostTask(Postprocess postprocess) {
         String postprocessId = postprocess.getPostprocessId();
+        // String taskId = postprocess.getTaskId();
         Tasks task = tasksService.findOnePostTask(postprocessId);
         Object values = postprocess.getValues();
         task.setValues(values);
+        task.setTaskType(postprocess.getTaskType());
         tasksService.updateTasksTask(task);
     }
 

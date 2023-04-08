@@ -15,8 +15,8 @@ import io.tiklab.matflow.support.util.PipelineUtil;
 import io.tiklab.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -128,12 +128,7 @@ public class PipelineOpenServiceImpl implements PipelineOpenService {
      */
     @Override
     public List<PipelineOpen> findUserAllOpen(int number) {
-        String loginId = LoginContext.getLoginId();
-        StringBuilder builder = authorityService.findUserPipelineIdString(loginId);
-        List<PipelineOpen> allOpen = findUserAllOpen(builder) ;
-        if (allOpen == null){
-            return Collections.emptyList() ;
-        }
+        List<PipelineOpen> allOpen = findUserAllOpen() ;
         //根据打开次数降序排列
         allOpen.sort(Comparator.comparing(PipelineOpen::getNumber).reversed()) ;
         // 指定返回数量
@@ -149,12 +144,9 @@ public class PipelineOpenServiceImpl implements PipelineOpenService {
     }
 
     //查询流水线最近打开
-    private List<PipelineOpen> findUserAllOpen(StringBuilder s){
+    private List<PipelineOpen> findUserAllOpen(){
         String loginId = LoginContext.getLoginId();
-        if (s.toString().equals("")){
-            return null;
-        }
-        List<PipelineOpenEntity> allOpen = pipelineOpenDao.findUserAllOpen(loginId,s);
+        List<PipelineOpenEntity> allOpen = pipelineOpenDao.findUserAllOpen(loginId);
         List<PipelineOpen> list = BeanMapper.mapList(allOpen, PipelineOpen.class);
         joinTemplate.joinQuery(list);
         List<PipelineOpen> openList = new ArrayList<>();

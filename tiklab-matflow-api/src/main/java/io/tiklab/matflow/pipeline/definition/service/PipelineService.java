@@ -60,16 +60,9 @@ public interface PipelineService {
 
     /**
      * 获取用户流水线
-     * @param userId 用户id
      * @return 流水线信息
      */
-    List<Pipeline> findUserPipeline(String userId);
-
-    /**
-     * 获取流水线信息
-     * @return 流水线信息
-     */
-    List<PipelineExecMessage> findUserPipelineExecMessage();
+    List<Pipeline> findUserPipeline();
 
     /**
      * 分页查询流水线信息
@@ -82,7 +75,7 @@ public interface PipelineService {
      * 获取用户收藏的流水线
      * @return 流水线信息
      */
-    List<PipelineExecMessage> findUserFollowPipeline();
+    List<Pipeline>  findUserFollowPipeline();
 
     /**
      * 模糊查询流水线

@@ -1,7 +1,11 @@
 package io.tiklab.matflow.stages.dao;
 
-import io.tiklab.matflow.stages.entity.StageEntity;
+import io.tiklab.core.order.Order;
+import io.tiklab.core.order.OrderBuilders;
 import io.tiklab.dal.jpa.JpaTemplate;
+import io.tiklab.dal.jpa.criterial.condition.QueryCondition;
+import io.tiklab.dal.jpa.criterial.conditionbuilder.QueryBuilders;
+import io.tiklab.matflow.stages.entity.StageEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -53,6 +57,35 @@ public class StageDao {
      */
     public List<StageEntity> findAllStages(){
         return jpaTemplate.findAll(StageEntity.class);
+    }
+
+
+    /**
+     * 查询流水线阶段
+     * @param pipelineId 流水线id
+     * @return 阶段
+     */
+    public List<StageEntity> findPipelineStage(String pipelineId){
+        List<Order> orderList = OrderBuilders.instance().asc("stageSort").get();
+        QueryCondition queryCondition = QueryBuilders.createQuery(StageEntity.class)
+                .eq("pipelineId", pipelineId)
+                .orders(orderList)
+                .get();
+        return jpaTemplate.findList(queryCondition,StageEntity.class);
+    }
+
+    /**
+     * 根据父级名称查询阶段
+     * @param parentId 父级id
+     * @return 阶段
+     */
+    public List<StageEntity> findOtherStage(String parentId){
+        List<Order> orderList = OrderBuilders.instance().asc("stageSort").get();
+        QueryCondition queryCondition = QueryBuilders.createQuery(StageEntity.class)
+                .eq("parentId", parentId)
+                .orders(orderList)
+                .get();
+        return jpaTemplate.findList(queryCondition,StageEntity.class);
     }
 
 

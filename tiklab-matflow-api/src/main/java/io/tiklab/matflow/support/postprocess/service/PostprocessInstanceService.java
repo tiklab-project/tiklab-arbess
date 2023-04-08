@@ -51,9 +51,24 @@ public interface PostprocessInstanceService {
     List<PostprocessInstance> findPipelinePostInstance(String instanceId);
 
 
+    /**
+     * 后置任务实例开始运行
+     * @param postInstanceId 后置任务实例id
+     */
+    void postInstanceRunTime(String postInstanceId);
 
+    /**
+     * 获取后置任务实例运行时间
+     * @param postInstanceId 后置任务实例id
+     * @return 运行时间
+     */
+    Integer findPostInstanceRunTime(String postInstanceId);
 
-
+    /**
+     * 移除后置任务实例
+     * @param postInstanceId 后置任务实例id
+     */
+    void removePostInstanceRunTime(String postInstanceId);
 
 
 }

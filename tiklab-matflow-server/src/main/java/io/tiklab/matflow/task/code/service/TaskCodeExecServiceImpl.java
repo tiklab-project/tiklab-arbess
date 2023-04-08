@@ -25,6 +25,8 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+
 /**
  * 源码管理执行方法
  */
@@ -46,10 +48,13 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
     private ConditionService conditionService;
 
     @Autowired
-    AuthService authServer;
+    private AuthService authServer;
 
     @Autowired
-    AuthThirdService thirdService;
+    private AuthThirdService thirdService;
+
+    @Autowired
+    private TaskCodeThirdService codeThirdService;
 
     // git克隆
     public boolean clone(String pipelineId, Tasks task , int taskType) throws ApplicationException{
@@ -152,7 +157,7 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
      * @throws URISyntaxException git地址错误
      * @throws ApplicationException 不存在配置
      */
-    private Process codeStart(TaskCode taskCode, String pipelineId) throws IOException, URISyntaxException ,ApplicationException{
+    private Process codeStart(TaskCode taskCode, String pipelineId) throws IOException, URISyntaxException , ApplicationException{
 
         //效验地址是否应用程序地址
         Scm pipelineScm = scmService.findOnePipelineScm(taskCode.getType());
@@ -324,11 +329,16 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
      * @throws URISyntaxException 不是个url
      * @throws MalformedURLException 不属于http或者https
      */
-    private String gitThirdOrder(TaskCode taskCode, String fileAddress) throws MalformedURLException, URISyntaxException {
+    private String gitThirdOrder(TaskCode taskCode, String fileAddress)
+            throws MalformedURLException, URISyntaxException,ApplicationException {
         String authId = taskCode.getAuthId();
         AuthThird auth = thirdService.findOneAuthServer(authId);
         StringBuilder codeAddress = new StringBuilder(taskCode.getCodeAddress());
-        StringBuilder stringBuilder = gitUrl(auth.getUsername(), auth.getAccessToken(), codeAddress);
+        String thirdToken = codeThirdService.findUserAuthThirdToken(authId, auth.getAccessToken());
+        if (Objects.isNull(thirdToken)){
+            throw new ApplicationException("获取第三方Token失败。");
+        }
+        StringBuilder stringBuilder = gitUrl(auth.getUsername(), thirdToken, codeAddress);
         return gitBranch(stringBuilder, taskCode,fileAddress);
     }
 

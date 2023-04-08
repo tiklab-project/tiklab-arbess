@@ -17,7 +17,6 @@ import org.springframework.http.*;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -47,7 +46,9 @@ public class TaskCodeThirdServiceImpl implements TaskCodeThirdService {
     @Autowired
     AuthThirdService serverServer;
 
-    public static Map<String, AuthThird> userMap = new HashMap<>();
+    public static Map<String, AuthThird> userMapToken = new HashMap<>();
+
+    public static Map<String, Long> userAuthThirdTime = new HashMap<>();
 
     private static final Logger logger = LoggerFactory.getLogger(TaskCodeThirdServiceImpl.class);
     
@@ -76,22 +77,25 @@ public class TaskCodeThirdServiceImpl implements TaskCodeThirdService {
             case 3 -> map = gitHubAccessToken(authThird,accessTokenUrl);
             default -> { return null; }
         }
-
         String accessToken = map.get("accessToken");
-
         if (accessToken == null){
             throw new ApplicationException(50001,"授权失败，accessToken为空。");
         }
-
-        logger.info("授权成功："+accessToken + " time: "+ PipelineUtil.date(1));
+        logger.info("授权成功：" + accessToken + " time: "+ PipelineUtil.date(1));
 
         authThird.setAccessToken(accessToken);
         authThird.setRefreshToken(map.get("refreshToken"));
         String username = findMessage(accessToken, type);
         authThird.setUsername(username);
         authThird.setAuthType(2);
-        userMap.remove(loginId);
-        userMap.put(loginId, authThird);
+        userMapToken.put(loginId, authThird);
+
+        //过期时间
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.DAY_OF_MONTH, 1);
+        long date = calendar.getTime().getTime();
+        userAuthThirdTime.put(accessToken,date);
+
         if (map.get("state") != null && map.get("state").equals("0")){
             return null;
         }
@@ -102,6 +106,34 @@ public class TaskCodeThirdServiceImpl implements TaskCodeThirdService {
             username = username+"的github的授权";
         }
         return username;
+    }
+
+    @Override
+    public AuthThird findUserAuthThird(String userId){
+       return userMapToken.get(userId);
+    }
+
+    @Override
+    public void removeUserAuthThird(String userId){
+        userMapToken.remove(userId);
+    }
+
+    @Override
+    public String findUserAuthThirdToken(String authId , String accessToken){
+        Long date= userAuthThirdTime.get(accessToken);
+        if (Objects.isNull(date)){
+            return updateAuthorization(authId);
+        }
+        long time = new Date().getTime();
+        if (date - 20 > time){
+            return accessToken;
+        }
+        return updateAuthorization(authId);
+    }
+
+    @Override
+    public void removeUserAuthThirdToken(String accessToken){
+        userAuthThirdTime.remove(accessToken);
     }
 
     private Map<String, String> giteeAccessToken(String accessTokenUrl) throws IOException {
@@ -143,19 +175,18 @@ public class TaskCodeThirdServiceImpl implements TaskCodeThirdService {
     }
     
     @Override
-    public List<String> findAllStorehouse(String authId,int type) {
+    public List<String> findAllStorehouse(String authId) {
         AuthThird authCode = serverServer.findOneAuthServer(authId);
-        if (authCode == null){
+        if (Objects.isNull(authCode)){
             return null;
         }
+        int type = authCode.getType();
         String accessToken = authCode.getAccessToken();
         String allStorehouseAddress = getAllStorehouse(accessToken,type);
-
         List<String> list = new ArrayList<>();
-
         try {
             switch (type) {
-                case 2 -> list = giteeAllStorehouse( allStorehouseAddress);
+                case 2 -> list = giteeAllStorehouse(allStorehouseAddress);
                 case 3 -> list = gitHubAllStorehouse(accessToken, allStorehouseAddress);
             }
         }catch (HttpClientErrorException e){
@@ -167,7 +198,6 @@ public class TaskCodeThirdServiceImpl implements TaskCodeThirdService {
 
     private List<String> giteeAllStorehouse(String allStorehouseAddress) throws HttpClientErrorException {
         List<String> storehouseList = new ArrayList<>();
-
         //消息转换器列表
         List<HttpMessageConverter<?>> messageConverters = restTemplate.getMessageConverters();
         //配置消息转换器StringHttpMessageConverter，并设置utf-8
@@ -186,7 +216,6 @@ public class TaskCodeThirdServiceImpl implements TaskCodeThirdService {
     }
 
     private  List<String> gitHubAllStorehouse(String accessToken, String allStorehouseAddress) throws HttpClientErrorException {
-
         List<String> list = new ArrayList<>();
         HttpHeaders headers = new HttpHeaders();
         headers.set("Accept", "application/vnd.github.v3+json");
@@ -208,18 +237,21 @@ public class TaskCodeThirdServiceImpl implements TaskCodeThirdService {
     }
     
     @Override
-    public List<String> findBranch(String authId,String houseName,int type) {
+    public List<String> findBranch(String authId,String houseName) {
         AuthThird authCode = serverServer.findOneAuthServer(authId);
-        if (authCode == null){
+        if (Objects.isNull(authCode)){
             return null;
         }
         String accessToken = authCode.getAccessToken();
         if (!PipelineUtil.isNoNull(houseName) ){
             throw new ApplicationException(5000,"仓库名称为空。");
         }
-
+        if (houseName.split("/").length < 1){
+            return null;
+        }
         String house = houseName.split("/")[1];
         String name = houseName.split("/")[0];
+        int type = authCode.getType();
         String url = getBranch(name,house,accessToken,type);
         return switch (type) {
             case 2 -> giteeBranch(url);
@@ -371,39 +403,73 @@ public class TaskCodeThirdServiceImpl implements TaskCodeThirdService {
         return result.toString();
     }
     
-    @Scheduled(cron = "59 59 23 * * ?")
-    public void updateAuthorization() {
+    // @Scheduled(cron = "59 59 23 * * ?")
+    // public void updateAuthorization() {
+    //     List<AuthThird> allAuthCode = serverServer.findAllAuthServerList(2);
+    //     if (allAuthCode == null){
+    //         return;
+    //     }
+    //     for (AuthThird authCode : allAuthCode) {
+    //         boolean token = PipelineUtil.isNoNull(authCode.getAccessToken());
+    //         boolean refresh = PipelineUtil.isNoNull(authCode.getRefreshToken());
+    //         if (!token || !refresh) return;
+    //         logger.info("gitee定时任务，时间:"+ PipelineUtil.date(1));
+    //         logger.info("更新授权信息,授权人："+authCode.getUsername());
+    //         String refreshToken = findRefreshToken(authCode.getRefreshToken());
+    //         ResponseEntity<JSONObject> forEntity;
+    //         try {
+    //             forEntity = restTemplate.postForEntity(refreshToken,String.class, JSONObject.class);
+    //             JSONObject body = forEntity.getBody();
+    //             if (body== null ){
+    //                 logger.info("授权人："+authCode.getUsername()+"授权信息更新失败");
+    //                 continue;
+    //             }
+    //             authCode.setRefreshToken(body.getString("access_token"));
+    //             authCode.setRefreshToken(body.getString("refresh_token"));
+    //             serverServer.updateAuthServer(authCode);
+    //             logger.info("授权人："+authCode.getUsername()+"授权信息更新成功");
+    //         }catch (Exception e){
+    //             String message = e.getMessage();
+    //             logger.info("授权人："+authCode.getUsername()+"授权信息更新失败"+ message);
+    //         }
+    //     }
+    // }
+    public String updateAuthorization(String authId) {
         List<AuthThird> allAuthCode = serverServer.findAllAuthServerList(2);
-        if (allAuthCode == null){
-            return;
+        if (allAuthCode == null) {
+            return null;
         }
-        for (AuthThird authCode : allAuthCode) {
-            boolean token = PipelineUtil.isNoNull(authCode.getAccessToken());
-            boolean refresh = PipelineUtil.isNoNull(authCode.getRefreshToken());
-            if (!token || !refresh) return;
-            logger.info("gitee定时任务，时间:"+ PipelineUtil.date(1));
-            logger.info("更新授权信息,授权人："+authCode.getUsername());
-            String refreshToken = findRefreshToken(authCode.getRefreshToken());
-            ResponseEntity<JSONObject> forEntity;
-            try {
-                forEntity = restTemplate.postForEntity(refreshToken,String.class, JSONObject.class);
-                JSONObject body = forEntity.getBody();
-                if (body== null ){
-                    logger.info("授权人："+authCode.getUsername()+"授权信息更新失败");
-                    continue;
-                }
-                authCode.setRefreshToken(body.getString("access_token"));
-                authCode.setRefreshToken(body.getString("refresh_token"));
-                serverServer.updateAuthServer(authCode);
-                logger.info("授权人："+authCode.getUsername()+"授权信息更新成功");
-            }catch (Exception e){
-                String message = e.getMessage();
-                logger.info("授权人："+authCode.getUsername()+"授权信息更新失败"+ message);
+        AuthThird authCode = serverServer.findOneAuthServer(authId);
+        boolean token = PipelineUtil.isNoNull(authCode.getAccessToken());
+        boolean refresh = PipelineUtil.isNoNull(authCode.getRefreshToken());
+        if (!token || !refresh) return null;
+        logger.info("更新授权信息,授权人：" + authCode.getUsername());
+        String refreshToken = findRefreshToken(authCode.getRefreshToken());
+        ResponseEntity<JSONObject> forEntity;
+        try {
+            forEntity = restTemplate.postForEntity(refreshToken, String.class, JSONObject.class);
+            JSONObject body = forEntity.getBody();
+            if (body == null) {
+                logger.error("授权人：" + authCode.getUsername() + "授权信息更新失败。");
+                return null;
             }
+            String access_token = body.getString("access_token");
+            authCode.setAccessToken(body.getString("access_token"));
+            authCode.setRefreshToken(body.getString("refresh_token"));
+            serverServer.updateAuthServer(authCode);
+            logger.info("授权人：" + authCode.getUsername() + "授权信息更新成功:"+access_token);
+            Calendar calendar = Calendar.getInstance();
+            calendar.add(Calendar.DAY_OF_MONTH, 1);
+            long date = calendar.getTime().getTime();
+            userAuthThirdTime.put(access_token , date);
+            return access_token;
+        } catch (Exception e) {
+            String message = e.getMessage();
+            logger.info("授权人：" + authCode.getUsername() + "授权信息更新失败" + message);
+            return null;
         }
-
     }
-    
+
     /**
      * 获取转码后的回调地址
      * @param callbackUrl 回调地址

@@ -18,11 +18,9 @@ public interface PostprocessExecService {
 
     /**
      * 创建流水线任务后置任务实例
-     * @param pipelineId 流水线id
-     * @param instanceId 实例id
      * @param taskId 任务id
      */
-    void createTaskPostInstance(String pipelineId,String instanceId,String taskId);
+    void createTaskPostInstance(String pipelineId, String instanceId, String taskId);
 
 
     /**
@@ -41,6 +39,13 @@ public interface PostprocessExecService {
      * @return 后置任务执行状态
      */
     boolean execTaskPostTask(Pipeline pipeline , String taskId,boolean execStatus);
+
+
+    /**
+     * 停止后置任务的执行
+     * @param pipelineId 流水线id
+     */
+    void stopTaskPostTask(String pipelineId);
 
 
 

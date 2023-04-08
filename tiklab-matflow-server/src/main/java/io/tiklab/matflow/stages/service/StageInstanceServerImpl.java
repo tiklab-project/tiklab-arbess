@@ -4,7 +4,6 @@ import io.tiklab.beans.BeanMapper;
 import io.tiklab.matflow.stages.dao.StageInstanceDao;
 import io.tiklab.matflow.stages.entity.StageInstanceEntity;
 import io.tiklab.matflow.stages.model.StageInstance;
-import io.tiklab.matflow.support.util.PipelineUtil;
 import io.tiklab.matflow.task.task.model.TaskInstance;
 import io.tiklab.matflow.task.task.service.TasksInstanceService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -107,68 +106,82 @@ public class StageInstanceServerImpl implements StageInstanceServer{
 
     @Override
     public List<StageInstance> findStageExecInstance(String instanceId){
-        List<StageInstance> stageInstanceList = findAllMainStageInstance(instanceId);
-        int size1 = stageInstanceList.size();
-        for (int i = size1-1; i >= 0; i--) {
-            String stageInstanceId = stageInstanceList.get(i).getId();
-            StageExecServiceImpl stageExecService = new StageExecServiceImpl();
-            StageInstance instance = stageExecService.findStageInstance(stageInstanceId);
-            if (instance == null){
-                instance = findOneStageInstance(stageInstanceId);
-            }else {
-                Integer integer = findStageRunTime(stageInstanceId);
-                instance.setStageTime(integer);
-            }
-
-            List<StageInstance> allStageInstance = findAllOtherStageInstance(stageInstanceId);
-            String log = "\n";
-            //并行阶段执行实例
-            int size = allStageInstance.size();
-            for (int j = size - 1; j >= 0; j--) {
-                String otherStageInstanceId = allStageInstance.get(j).getId();
-                StageInstance otherInstance = stageExecService.findStageInstance(otherStageInstanceId);
-                if (otherInstance == null){
-                    otherInstance = findOneStageInstance(otherStageInstanceId);
+        List<StageInstanceEntity> stageInstanceEntityList= stageInstanceDao.findMainStageInstance(instanceId);
+        if (Objects.isNull(stageInstanceEntityList)){
+            return null;
+        }
+        List<StageInstance> stageInstanceList = BeanMapper.mapList(stageInstanceEntityList, StageInstance.class);
+        List<StageInstance> mainStageInstanceList = new ArrayList<>();
+        StringBuilder mainLog = new StringBuilder();
+        for (StageInstance stageInstance : stageInstanceList) {
+                String stageInstanceId = stageInstance.getId();
+                StageExecServiceImpl stageExecService = new StageExecServiceImpl();
+                StageInstance instance = stageExecService.findStageInstance(stageInstanceId);
+                if (Objects.isNull(instance)){
+                    instance = findOneStageInstance(stageInstanceId);
+                }else {
+                    Integer integer = findStageRunTime(stageInstanceId);
+                    instance.setStageTime(integer);
                 }
-
-                allStageInstance.remove(j);
-                //获取任务执行实例
-                List<TaskInstance> allTaskInstance =
-                        tasksInstanceService.findAllStageInstance(otherStageInstanceId);
-                otherInstance.setTaskInstanceList(allTaskInstance);
-
-                //阶段日志
-                int time = 0;
-                StringBuilder runLog = new StringBuilder();
-                for (TaskInstance taskInstance : allTaskInstance) {
-                    String instanceRunLog = taskInstance.getRunLog();
-                    if (!PipelineUtil.isNoNull(instanceRunLog)){
-                        continue;
-                    }
-                    runLog.append(instanceRunLog).append(log);
-                    time = time + taskInstance.getRunTime();
-                }
-                otherInstance.setStageTime(time);
-
-                otherInstance.setRunLog(runLog.toString());
-                allStageInstance.add(j,otherInstance);
-                //排序
-                allStageInstance.sort(Comparator.comparing(StageInstance::getStageSort));
-            }
-            stageInstanceList.remove(i);
-            StringBuilder runLog = new StringBuilder();
-            for (StageInstance stageInstance : allStageInstance) {
-                if (!PipelineUtil.isNoNull(stageInstance.getRunLog())){
+                List<StageInstanceEntity> otherStageInstanceEntityList =
+                        stageInstanceDao.findOtherStageInstance(stageInstanceId);
+                if (Objects.isNull(otherStageInstanceEntityList)){
                     continue;
                 }
-                runLog.append(stageInstance.getRunLog()).append(log);
-            }
-            instance.setRunLog(runLog.toString());
-            instance.setStageInstanceList(allStageInstance);
-            stageInstanceList.add(i,instance);
+                List<StageInstance> allStageInstance = BeanMapper.mapList(otherStageInstanceEntityList, StageInstance.class);
+                String log = "\n";
+                //并行阶段执行实例
+                List<StageInstance> otherStageInstanceList = new ArrayList<>();
+                for (StageInstance otherStageInstance : allStageInstance) {
+                    String otherStageInstanceId = otherStageInstance.getId();
+                    StageInstance otherInstance = stageExecService.findStageInstance(otherStageInstanceId);
+                    if (Objects.isNull(otherInstance)){
+                        otherInstance = findOneStageInstance(otherStageInstanceId);
+                    }
+                    //获取任务执行实例
+                    List<TaskInstance> allTaskInstance =
+                            tasksInstanceService.findAllStageInstance(otherStageInstanceId);
+                    otherInstance.setTaskInstanceList(allTaskInstance);
+                    StringBuilder runLog = new StringBuilder();
+                    String stageRunLog = tasksInstanceService.findStageRunLog(otherStageInstanceId);
+                    Integer stageRunTime = tasksInstanceService.findStageRunTime(otherStageInstanceId);
+                    tasksInstanceService.removeStageRunLog(otherStageInstanceId);
+                    tasksInstanceService.removeStageRunTime(otherStageInstanceId);
+                    runLog.append(stageRunLog).append(log);
+                    otherInstance.setStageTime(stageRunTime);
+                    otherInstance.setRunLog(runLog.toString());
+                    if (!Objects.equals(runLog.toString(),log)){
+                        mainLog.append(runLog).append(log);
+                    }
+                    otherStageInstanceList.add(otherInstance);
+                }
+                instance.setRunLog(mainLog.toString());
+                instance.setStageInstanceList(otherStageInstanceList);
+                mainStageInstanceList.add(instance);
         }
-        stageInstanceList.sort(Comparator.comparing(StageInstance::getStageSort));
-        return stageInstanceList;
+        // TaskInstance postRunMessage = tasksInstanceService.findPostPipelineRunMessage(instanceId, true);
+        List<TaskInstance> list = tasksInstanceService.findStagePostRunMessage(instanceId);
+        if (!Objects.equals(list.size(),0)){
+            Map<String, Object> map = tasksInstanceService.findPostRunMessage(instanceId);
+            StageInstance stageInstance = new StageInstance();
+            stageInstance.setStageName("后置处理");
+            stageInstance.setRunLog((String) map.get("log"));
+            stageInstance.setStageState((String) map.get("state"));
+            stageInstance.setStageTime((Integer) map.get("time"));
+            StageInstance otherStageInstance = new StageInstance();
+            otherStageInstance.setStageName("后置处理");
+            otherStageInstance.setId("1");
+            otherStageInstance.setRunLog((String) map.get("log"));
+            otherStageInstance.setStageState((String) map.get("state"));
+            otherStageInstance.setStageTime((Integer) map.get("time"));
+            otherStageInstance.setTaskInstanceList(list);
+            List<StageInstance> stageInstancesList = new ArrayList<>();
+            stageInstancesList.add(otherStageInstance);
+            stageInstance.setStageInstanceList(stageInstancesList);
+            mainStageInstanceList.add(mainStageInstanceList.size(),stageInstance);
+        }
+
+        return mainStageInstanceList;
     }
 
     //运行时间

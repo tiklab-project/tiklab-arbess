@@ -1,6 +1,10 @@
 package io.tiklab.matflow.support.postprocess.dao;
 
+import io.tiklab.core.order.Order;
+import io.tiklab.core.order.OrderBuilders;
 import io.tiklab.dal.jpa.JpaTemplate;
+import io.tiklab.dal.jpa.criterial.condition.QueryCondition;
+import io.tiklab.dal.jpa.criterial.conditionbuilder.QueryBuilders;
 import io.tiklab.matflow.support.postprocess.entity.PostprocessEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -46,6 +50,38 @@ public class PostprocessDao {
     public PostprocessEntity findOnePost(String postId){
         return jpaTemplate.findOne(PostprocessEntity.class,postId);
     }
+
+
+    /**
+     * 获取流水线的后置任务
+     * @param pipelineId 流水线id
+     * @return 流水线的后置任务
+     */
+    public List<PostprocessEntity> findPipelinePost(String pipelineId){
+        List<Order> orderList = OrderBuilders.instance().desc("taskSort").get();
+        QueryCondition queryCondition = QueryBuilders.createQuery(PostprocessEntity.class)
+                .eq("pipelineId", pipelineId)
+                .orders(orderList)
+                .get();
+        return jpaTemplate.findList(queryCondition,PostprocessEntity.class);
+    }
+
+
+    /**
+     * 获取任务的后置任务
+     * @param taskId 任务id
+     * @return 任务的后置任务
+     */
+    public List<PostprocessEntity> findTaskPost(String taskId){
+        List<Order> orderList = OrderBuilders.instance().desc("taskSort").get();
+        QueryCondition queryCondition = QueryBuilders.createQuery(PostprocessEntity.class)
+                .eq("taskId", taskId)
+                .orders(orderList)
+                .get();
+        return jpaTemplate.findList(queryCondition,PostprocessEntity.class);
+    }
+
+
 
     /**
      * 查询所有后置配置

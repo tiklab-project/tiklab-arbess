@@ -117,6 +117,7 @@ public class StageServiceImpl implements StageService {
             stage.setStageSort(j);
             stage.setTaskType(i);
             createStagesOrTask(stage);
+            j++;
         }
     }
 
@@ -154,7 +155,7 @@ public class StageServiceImpl implements StageService {
             list.add(stage);
         }
         list.sort(Comparator.comparing(Stage::getStageSort));
-       return list;
+        return list;
     }
 
     @Override
@@ -168,58 +169,57 @@ public class StageServiceImpl implements StageService {
 
     @Override
     public List<Stage> findAllMainStage(String pipelineId){
-        List<Stage> allStage = findAllPipelineStages(pipelineId);
-        if ( allStage.size() == 0){
-            return Collections.emptyList();
-        }
-        List<Stage> list = new ArrayList<>();
-        for (Stage stage : allStage) {
-            if (stage.getPipelineId().equals(pipelineId)){
-                list.add(stage);
-            }
-        }
-        list.sort(Comparator.comparing(Stage::getStageSort));
-        return list;
-    }
-
-    @Override
-    public Stage findMainStages(String pipelineId, int stages){
-        List<Stage> allStage = findAllPipelineStages(pipelineId);
-        if (allStage.size() == 0 ){
-            return null;
-        }
-        for (Stage pipelineStage : allStage) {
-            int stage = pipelineStage.getStageSort();
-            if (stage != stages ){
-                continue;
-            }
-            return pipelineStage;
-        }
-        return null;
+        List<StageEntity> pipelineStage = stageDao.findPipelineStage(pipelineId);
+        return BeanMapper.mapList(pipelineStage,Stage.class);
+        // List<Stage> allStage = findAllPipelineStages(pipelineId);
+        // if ( allStage.size() == 0){
+        //     return Collections.emptyList();
+        // }
+        // List<Stage> list = new ArrayList<>();
+        // for (Stage stage : allStage) {
+        //     if (stage.getPipelineId().equals(pipelineId)){
+        //         list.add(stage);
+        //     }
+        // }
+        // list.sort(Comparator.comparing(Stage::getStageSort));
+        // return list;
     }
 
     @Override
     public List<Stage> findOtherStage(String stagesId){
-        List<Stage> allStages = findAllStages();
-        if (allStages == null || allStages.size() == 0){
-            return Collections.emptyList();
-        }
+        List<StageEntity> otherStage = stageDao.findOtherStage(stagesId);
+        List<Stage> stages = BeanMapper.mapList(otherStage, Stage.class);
         List<Stage> list = new ArrayList<>();
-        for (Stage allStage : allStages) {
-            String id = allStage.getParentId();
-            if (id == null || !id.equals(stagesId)){
-                continue;
-            }
+        for (Stage stage : stages) {
             //获取阶段配置及任务
-            String stagesId1 = allStage.getStageId();
-
+            String otherId = stage.getStageId();
             List<Tasks> allStagesConfig =
-                    tasksService.finAllStageTaskOrTask(stagesId1);
-            allStage.setTaskValues(allStagesConfig);
-            list.add(allStage);
+                    tasksService.finAllStageTaskOrTask(otherId);
+            stage.setTaskValues(allStagesConfig);
+            list.add(stage);
         }
-        list.sort(Comparator.comparing(Stage::getStageSort));
         return list;
+
+        // List<Stage> allStages = findAllStages();
+        // if (allStages == null || allStages.size() == 0){
+        //     return Collections.emptyList();
+        // }
+        // List<Stage> list = new ArrayList<>();
+        // for (Stage allStage : allStages) {
+        //     String id = allStage.getParentId();
+        //     if (id == null || !id.equals(stagesId)){
+        //         continue;
+        //     }
+        //     //获取阶段配置及任务
+        //     String stagesId1 = allStage.getStageId();
+        //
+        //     List<Tasks> allStagesConfig =
+        //             tasksService.finAllStageTaskOrTask(stagesId1);
+        //     allStage.setTaskValues(allStagesConfig);
+        //     list.add(allStage);
+        // }
+        // list.sort(Comparator.comparing(Stage::getStageSort));
+        // return list;
     }
 
     /**

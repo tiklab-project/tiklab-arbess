@@ -3,6 +3,7 @@ package io.tiklab.matflow.support.postprocess.service;
 import io.tiklab.matflow.pipeline.definition.model.Pipeline;
 import io.tiklab.matflow.support.postprocess.model.Postprocess;
 import io.tiklab.matflow.support.postprocess.model.PostprocessInstance;
+import io.tiklab.matflow.support.util.PipelineFinal;
 import io.tiklab.matflow.support.util.PipelineUtil;
 import io.tiklab.matflow.task.task.model.Tasks;
 import io.tiklab.matflow.task.task.service.TasksExecService;
@@ -10,9 +11,7 @@ import io.tiklab.matflow.task.task.service.TasksExecServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class PostprocessExecServiceImpl implements PostprocessExecService{
@@ -28,24 +27,33 @@ public class PostprocessExecServiceImpl implements PostprocessExecService{
 
 
     //后置任务id与后置任务实例id之间的关系
-    Map<String , String> postIdOrPostInstanceId = new HashMap<>();
+    public static Map<String , String> postIdOrPostInstanceId = new HashMap<>();
+
+    //后置实例id与后置任务实例之间的关系
+    public static Map<String , PostprocessInstance> postInstanceIdOrPostInstance = new HashMap<>();
+
+
+    private final static Map<String , List<String>> pipelineIdOrPostInstanceId = new HashMap<>();
 
     @Override
     public void createPipelinePostInstance(String pipelineId, String instanceId){
         String fileAddress = PipelineUtil.findFileAddress(pipelineId,2) + instanceId;
         List<Postprocess> postprocessList = postprocessService.findAllPipelinePostTask(pipelineId);
-
         if (postprocessList.isEmpty()){
-            return;
+            return ;
         }
         for (Postprocess postprocess : postprocessList) {
             String postprocessId = postprocess.getPostprocessId();
-            Tasks task = postprocess.getTask();
             PostprocessInstance postInstance = new PostprocessInstance();
             postInstance.setInstanceId(instanceId);
+            postInstance.setPostState(PipelineFinal.RUN_HALT);
             String postInstanceId = postInstanceService.createPostInstance(postInstance);
+            postInstance.setId(postInstanceId);
+            Tasks task = postprocess.getTask();
             tasksExecService.createTaskExecInstance(task,postInstanceId,3,fileAddress);
             postIdOrPostInstanceId.put(postprocessId,postInstanceId);
+            postInstanceIdOrPostInstance.put(postInstanceId,postInstance);
+            updatePipelineOrPostInstanceCache(pipelineId,postInstanceId);
         }
     }
 
@@ -53,21 +61,24 @@ public class PostprocessExecServiceImpl implements PostprocessExecService{
     public void createTaskPostInstance(String pipelineId, String instanceId, String taskId){
         String fileAddress = PipelineUtil.findFileAddress(pipelineId,2) + instanceId;
         List<Postprocess> postprocessList = postprocessService.findAllTaskPostTask(taskId);
-
         if (postprocessList.isEmpty()){
-            return;
+            return ;
         }
         for (Postprocess postprocess : postprocessList) {
-            String postprocessId = postprocess.getPostprocessId();
             PostprocessInstance postInstance = new PostprocessInstance();
-            TasksExecServiceImpl tasksExecService1 = new TasksExecServiceImpl();
-            String taskInstanceId = tasksExecService1.findTaskInstanceId(taskId);
+            postInstance.setPostState(PipelineFinal.RUN_HALT);
+            //获取任务实例id
+            TasksExecServiceImpl tasksService = new TasksExecServiceImpl();
+            String taskInstanceId = tasksService.findTaskInstanceId(taskId);
             postInstance.setTaskInstanceId(taskInstanceId);
             String postInstanceId = postInstanceService.createPostInstance(postInstance);
+            postInstance.setId(postInstanceId);
             fileAddress = fileAddress + "/" + taskInstanceId + "/" +  postInstanceId;
-            Tasks task = postprocess.getTask();
-            tasksExecService.createTaskExecInstance(task,postInstanceId,3,fileAddress);
-            postIdOrPostInstanceId.put(postprocessId,postInstanceId);
+            tasksExecService.createTaskExecInstance(postprocess.getTask(),postInstanceId,3,fileAddress);
+            //缓存
+            // postIdOrPostInstanceId.put(postprocess.getPostprocessId(),postInstanceId);
+            // postInstanceIdOrPostInstance.put(postInstanceId,postInstance);
+            // updatePipelineOrPostInstanceCache(pipelineId,postInstanceId);
         }
     }
 
@@ -75,46 +86,127 @@ public class PostprocessExecServiceImpl implements PostprocessExecService{
     public boolean execPipelinePost(Pipeline pipeline, boolean execStatus){
         String pipelineId = pipeline.getId();
         List<Postprocess> postprocessList = postprocessService.findAllPipelinePostTask(pipelineId);
+        boolean state = true;
         for (Postprocess postprocess : postprocessList) {
-            int taskType = postprocess.getTaskType();
-            Tasks task = postprocess.getTask();
-            boolean b;
-            if (taskType == 61){
-                 b = tasksExecService.execSendMessageTask(pipeline, task, execStatus, true);
-            }else {
-                b = tasksExecService.execTask(pipelineId, taskType, task.getTaskId());
-            }
-            if (!b){
-                return false;
+            if (state){
+                updatePostInstanceCache(postprocess.getPostprocessId());
+                int taskType = postprocess.getTaskType();
+                Tasks task = postprocess.getTask();
+                boolean b;
+                String postprocessId = postprocess.getPostprocessId();
+                if (Objects.equals(taskType,61)){
+                    b = tasksExecService.execSendMessageTask(pipeline, task, execStatus, true);
+                }else {
+                    b = tasksExecService.execTask(pipelineId, taskType, task.getTaskId());
+                }
+                removePostInstanceCache(postprocessId,b);
+                if (!b){
+                    state = false;
+                }
+                String postInstanceId = findPostInstanceId(postprocessId);
+                postIdOrPostInstanceId.remove(postprocessId);
+                postInstanceIdOrPostInstance.remove(postInstanceId);
             }
         }
-        return true;
+        return state;
     }
 
     @Override
     public boolean execTaskPostTask(Pipeline pipeline, String taskId,boolean execStatus){
         String pipelineId = pipeline.getId();
         List<Postprocess> postprocessList = postprocessService.findAllTaskPostTask(taskId);
+        boolean state = true;
         for (Postprocess postprocess : postprocessList) {
             boolean b;
-            int taskType = postprocess.getTaskType();
-            Tasks task = postprocess.getTask();
-            if (taskType == 61){
-                b = tasksExecService.execSendMessageTask(pipeline, task, execStatus, false);
-            }else {
-                b = tasksExecService.execTask(pipelineId, taskType, task.getTaskId());
+            String postprocessId = postprocess.getPostprocessId();
+            if (state){
+                updatePostInstanceCache(postprocessId);
+                int taskType = postprocess.getTaskType();
+                Tasks task = postprocess.getTask();
+                if (taskType == 61){
+                    b = tasksExecService.execSendMessageTask(pipeline, task, execStatus, false);
+                }else {
+                    b = tasksExecService.execTask(pipelineId, taskType, task.getTaskId());
+                }
+                removePostInstanceCache(postprocessId,b);
+                if (!b){
+                    state = false;
+                }
             }
-            if (!b){
-                return false;
-            }
+            String postInstanceId = findPostInstanceId(postprocessId);
+            postIdOrPostInstanceId.remove(postprocessId);
+            postInstanceIdOrPostInstance.remove(postInstanceId);
         }
-        return true;
+        return state;
+    }
+
+    public String findPostInstanceId(String postId){
+        return postIdOrPostInstanceId.get(postId);
+    }
+
+    public PostprocessInstance findPostInstance(String postInstanceId){
+        return postInstanceIdOrPostInstance.get(postInstanceId);
+    }
+
+    public void updatePostInstanceCache(String postId){
+        String postInstanceId = findPostInstanceId(postId);
+        // postInstanceService.postInstanceRunTime(postInstanceId);
+        PostprocessInstance postInstance = findPostInstance(postInstanceId);
+        postInstance.setPostState(PipelineFinal.RUN_RUN);
+        postInstanceService.updatePostInstance(postInstance);
+        postInstanceIdOrPostInstance.put(postInstanceId,postInstance);
+    }
+
+    public void removePostInstanceCache(String postId,boolean runState){
+        String postInstanceId = findPostInstanceId(postId);
+        PostprocessInstance postInstance = findPostInstance(postInstanceId);
+        Integer runTime = postInstanceService.findPostInstanceRunTime(postInstanceId);
+        postInstance.setPostTime(runTime);
+        if (runState){
+            postInstance.setPostState(PipelineFinal.RUN_SUCCESS);
+        }else {
+            postInstance.setPostState(PipelineFinal.RUN_ERROR);
+        }
+        postInstanceService.updatePostInstance(postInstance);
+        postInstanceIdOrPostInstance.remove(postInstanceId);
+        postIdOrPostInstanceId.remove(postId);
+        postInstanceService.removePostInstanceRunTime(postInstanceId);
+    }
+
+    private void updatePipelineOrPostInstanceCache(String pipelineId,String postInstanceId){
+        List<String> stringList = findPipelineOrPostInstanceCache(pipelineId);
+        stringList.add(postInstanceId);
+        pipelineIdOrPostInstanceId.put(postInstanceId,stringList);
+    }
+
+    private List<String> findPipelineOrPostInstanceCache(String pipelineId){
+        List<String> list = pipelineIdOrPostInstanceId.get(pipelineId);
+        if (Objects.isNull(list)){
+            return new ArrayList<>();
+        }
+        return list;
+    }
+
+    public void stopTaskPostTask(String pipelineId){
+        List<String> postInstanceCache = findPipelineOrPostInstanceCache(pipelineId);
+        if (postInstanceCache.size() == 0){
+            return;
+        }
+        for (String s : postInstanceCache) {
+            Integer instanceRunTime = postInstanceService.findPostInstanceRunTime(s);
+            if (!Objects.equals(instanceRunTime,0)){
+                PostprocessInstance postInstance = findPostInstance(s);
+                postInstance.setPostTime(instanceRunTime);
+                postInstanceService.updatePostInstance(postInstance);
+                tasksExecService.stopThread(s);
+            }
+            postIdOrPostInstanceId.remove(s);
+            postInstanceIdOrPostInstance.remove(s);
+        }
     }
 
 
-    public void stopTaskPostTask(){
 
-    }
 
 
 

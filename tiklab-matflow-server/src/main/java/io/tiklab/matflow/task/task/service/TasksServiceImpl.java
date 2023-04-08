@@ -1,6 +1,11 @@
 package io.tiklab.matflow.task.task.service;
 
 import com.alibaba.fastjson.JSON;
+import io.tiklab.beans.BeanMapper;
+import io.tiklab.core.exception.ApplicationException;
+import io.tiklab.matflow.support.util.PipelineUtil;
+import io.tiklab.matflow.task.artifact.model.TaskArtifact;
+import io.tiklab.matflow.task.artifact.service.TaskArtifactService;
 import io.tiklab.matflow.task.build.model.TaskBuild;
 import io.tiklab.matflow.task.build.service.TaskBuildService;
 import io.tiklab.matflow.task.code.model.TaskCode;
@@ -9,19 +14,14 @@ import io.tiklab.matflow.task.codescan.model.TaskCodeScan;
 import io.tiklab.matflow.task.codescan.service.TaskCodeScanService;
 import io.tiklab.matflow.task.deploy.model.TaskDeploy;
 import io.tiklab.matflow.task.deploy.service.TaskDeployService;
-import io.tiklab.matflow.task.task.dao.TasksDao;
-import io.tiklab.matflow.task.task.entity.TasksEntity;
-import io.tiklab.matflow.task.task.model.Tasks;
-import io.tiklab.matflow.task.test.model.TaskTest;
-import io.tiklab.beans.BeanMapper;
-import io.tiklab.core.exception.ApplicationException;
-import io.tiklab.matflow.support.util.PipelineUtil;
-import io.tiklab.matflow.task.artifact.model.TaskArtifact;
-import io.tiklab.matflow.task.artifact.service.TaskArtifactService;
 import io.tiklab.matflow.task.message.model.TaskMessageType;
 import io.tiklab.matflow.task.message.service.TaskMessageTypeService;
 import io.tiklab.matflow.task.script.model.TaskScript;
 import io.tiklab.matflow.task.script.service.TaskScriptService;
+import io.tiklab.matflow.task.task.dao.TasksDao;
+import io.tiklab.matflow.task.task.entity.TasksEntity;
+import io.tiklab.matflow.task.task.model.Tasks;
+import io.tiklab.matflow.task.test.model.TaskTest;
 import io.tiklab.matflow.task.test.service.TaskTestService;
 import io.tiklab.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +29,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -240,52 +239,22 @@ public class TasksServiceImpl implements TasksService {
     
     @Override
     public List<Tasks> finAllPipelineTask(String pipelineId) {
-        List<Tasks> allTasks = findAllTasks();
-        if (allTasks == null){
-            return Collections.emptyList();
-        }
-        List<Tasks> list = new ArrayList<>();
-        for (Tasks tasks : allTasks) {
-            String id = tasks.getPipelineId();
-            if (id == null || !id.equals(pipelineId)){
-                continue;
-            }
-            list.add(tasks);
-        }
-        list.sort(Comparator.comparing(Tasks::getTaskSort));
-        return list;
+        List<TasksEntity> tasksEntityList = tasksDao.findPipelineTask(pipelineId);
+        return BeanMapper.mapList(tasksEntityList, Tasks.class);
     }
     
     @Override
     public List<Tasks> finAllStageTask(String stageId) {
-        List<Tasks> allTasks = findAllTasks();
-        if (allTasks == null){
-            return Collections.emptyList();
-        }
-        List<Tasks> list = new ArrayList<>();
-        for (Tasks tasks : allTasks) {
-            String id = tasks.getStageId();
-            if (id == null || !id.equals(stageId)){
-                continue;
-            }
-            list.add(tasks);
-        }
-        list.sort(Comparator.comparing(Tasks::getTaskSort));
-        return list;
+        List<TasksEntity> tasksEntityList = tasksDao.findStageTask(stageId);
+        return BeanMapper.mapList(tasksEntityList, Tasks.class);
     }
 
     @Override
     public Tasks findOnePostTask(String postId) {
-        List<Tasks> allTasks = findAllTasks();
-        if (allTasks == null){
-            return null;
-        }
-        for (Tasks tasks : allTasks) {
-            String id = tasks.getPostprocessId();
-            if (id == null || !id.equals(postId)){
-                continue;
-            }
-            return tasks;
+        List<TasksEntity> tasksEntityList = tasksDao.findPostTask(postId);
+        List<Tasks> tasksList = BeanMapper.mapList(tasksEntityList, Tasks.class);
+        if (tasksList.size()>0){
+            return tasksList.get(0);
         }
         return null;
     }
@@ -658,7 +627,7 @@ public class TasksServiceImpl implements TasksService {
                 return "执行Shell脚本";
             }
             default -> {
-                return null;
+                return "未匹配到类型："+taskType;
             }
         }
     }
@@ -672,6 +641,8 @@ public class TasksServiceImpl implements TasksService {
     private Object findOneDifferentTask(String taskId,int taskType){
         switch (taskType/10) {
             case 0 -> {
+                TaskCode task = codeService.findOneCodeConfig(taskId);
+                task.setType(taskType);
                 return codeService.findOneCodeConfig(taskId);
             }
             case 1 -> {
@@ -708,9 +679,6 @@ public class TasksServiceImpl implements TasksService {
      * @param list 必填字段
      */
     private void validDifferentTaskMastField(String taskId, int taskType, List<String> list){
-
-
-
         switch (taskType / 10) {
             case 0 ->  codeValid(taskId, list, taskType);
             case 1 ->  testValid(taskId, list, taskType);

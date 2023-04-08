@@ -6,7 +6,6 @@ import io.tiklab.matflow.pipeline.definition.dao.PipelineDao;
 import io.tiklab.matflow.pipeline.definition.entity.PipelineEntity;
 import io.tiklab.matflow.pipeline.definition.model.Pipeline;
 import io.tiklab.matflow.support.util.PipelineFinal;
-import io.tiklab.matflow.support.util.PipelineUtil;
 import io.tiklab.privilege.dmRole.service.DmRoleService;
 import io.tiklab.privilege.role.model.PatchUser;
 import io.tiklab.user.dmUser.model.DmUser;
@@ -17,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class PipelineAuthorityServiceImpl implements PipelineAuthorityService{
@@ -64,97 +64,69 @@ public class PipelineAuthorityServiceImpl implements PipelineAuthorityService{
         dmRoleService.deleteDmRoleByDomainId(pipelineId);
     }
 
-
-    // public StringBuilder findUserPipelineIdString(String userId){
-    //     List<DmUser> allDmUser = dmUserService.findAllDmUser();
-    //     StringBuilder s = new StringBuilder();
-    //     //获取用户拥有权限的流水线，拼装成字符串
-    //     if (allDmUser != null && !allDmUser.isEmpty()){
-    //         for (DmUser dmUser : allDmUser) {
-    //             User user = dmUser.getUser();
-    //             if (user == null  || !user.getId().equals(userId)){
-    //                 continue;
-    //             }
-    //             if (s.toString().equals("") ) {
-    //                 s.append("'");
-    //             } else {
-    //                 s.append(",'");
-    //             }
-    //             s.append(dmUser.getDomainId()).append("'");
-    //         }
-    //     }
-    //
-    //     //获取用户拥有的流水线，拼装成字符串
-    //     List<PipelineEntity> allPipeline = pipelineDao.findAllPublicPipeline();
-    //     List<Pipeline> pipelineList = BeanMapper.mapList(allPipeline, Pipeline.class);
-    //     StringBuilder j = new StringBuilder();
-    //     if (s.toString().equals("") && pipelineList == null){
-    //         return null;
-    //     }
-    //     for (Pipeline pipeline : pipelineList) {
-    //         if (j.toString().equals("") ) {
-    //             j.append("'");
-    //         } else {
-    //             j.append(",'");
-    //         }
-    //         j.append(pipeline.getId()).append("'");
-    //     }
-    //
-    //     //返回拼装后的结果
-    //     if (!PipelineUtil.isNoNull(s.toString())){
-    //         return j;
-    //     }
-    //     if (!PipelineUtil.isNoNull(j.toString())){
-    //         return s;
-    //     }
-    //     return s.append(",").append(j);
-    //
-    // }
     @Override
-    public StringBuilder findUserPipelineIdString(String userId){
+    public String[] findUserPipelineIdString(String userId){
         List<DmUser> allDmUser = dmUserService.findAllDmUser();
-        List<String> idList = new ArrayList<>();
-        StringBuilder s = new StringBuilder();
-        //获取用户拥有权限的流水线，拼装成字符串
-        if (allDmUser != null && !allDmUser.isEmpty()){
+        List<String> list = new ArrayList<>();
+        if (!Objects.isNull(allDmUser)){
             for (DmUser dmUser : allDmUser) {
                 User user = dmUser.getUser();
-                if (user == null  || !user.getId().equals(userId)){
+                if (Objects.isNull(user)){
                     continue;
                 }
-                if (s.toString().equals("") ) {
-                    s.append("'");
-                } else {
-                    s.append(",'");
-                }
-                s.append(dmUser.getDomainId()).append("'");
+                list.add(dmUser.getDomainId());
             }
         }
-
-        //获取用户拥有的流水线，拼装成字符串
         List<PipelineEntity> allPipeline = pipelineDao.findAllPublicPipeline();
-        List<Pipeline> pipelineList = BeanMapper.mapList(allPipeline, Pipeline.class);
-        StringBuilder j = new StringBuilder();
-        if (s.toString().equals("") && pipelineList == null){
-            return null;
-        }
-        for (Pipeline pipeline : pipelineList) {
-            if (j.toString().equals("") ) {
-                j.append("'");
-            } else {
-                j.append(",'");
+        if (!Objects.isNull(allPipeline)){
+            for (PipelineEntity pipelineEntity : allPipeline) {
+                list.add(pipelineEntity.getId());
             }
-            j.append(pipeline.getId()).append("'");
         }
+        return list.toArray(new String[0]);
 
-        //返回拼装后的结果
-        if (!PipelineUtil.isNoNull(s.toString())){
-            return j;
-        }
-        if (!PipelineUtil.isNoNull(j.toString())){
-            return s;
-        }
-        return s.append(",").append(j);
+
+        // StringBuilder s = new StringBuilder();
+        // //获取用户拥有权限的流水线，拼装成字符串
+        // if (allDmUser != null && !allDmUser.isEmpty()){
+        //     for (DmUser dmUser : allDmUser) {
+        //         User user = dmUser.getUser();
+        //         if (user == null  || !user.getId().equals(userId)){
+        //             continue;
+        //         }
+        //         if (s.toString().equals("") ) {
+        //             s.append("'");
+        //         } else {
+        //             s.append(",'");
+        //         }
+        //         s.append(dmUser.getDomainId()).append("'");
+        //     }
+        // }
+        //
+        // //获取用户拥有的流水线，拼装成字符串
+        // List<PipelineEntity> allPipeline = pipelineDao.findAllPublicPipeline();
+        // List<Pipeline> pipelineList = BeanMapper.mapList(allPipeline, Pipeline.class);
+        // StringBuilder j = new StringBuilder();
+        // if (s.toString().equals("") && pipelineList == null){
+        //     return null;
+        // }
+        // for (Pipeline pipeline : pipelineList) {
+        //     if (j.toString().equals("") ) {
+        //         j.append("'");
+        //     } else {
+        //         j.append(",'");
+        //     }
+        //     j.append(pipeline.getId()).append("'");
+        // }
+        //
+        // //返回拼装后的结果
+        // if (!PipelineUtil.isNoNull(s.toString())){
+        //     return j;
+        // }
+        // if (!PipelineUtil.isNoNull(j.toString())){
+        //     return s;
+        // }
+        // return s.append(",").append(j);
 
     }
 
@@ -180,7 +152,8 @@ public class PipelineAuthorityServiceImpl implements PipelineAuthorityService{
 
 
     public List<Pipeline> findUserPipeline(String userId) {
-        StringBuilder idString = findUserPipelineIdString(userId);
+        String[] idString = findUserPipelineIdString(userId);
+        // String[] split = idString.toString().replace("'", "").split(",");
         List<PipelineEntity> pipelineEntities = pipelineDao.findUserPipeline(idString);
         return BeanMapper.mapList(pipelineEntities,Pipeline.class);
 
