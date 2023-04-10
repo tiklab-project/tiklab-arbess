@@ -14,7 +14,7 @@ public class MatFlowServerAutoConfiguration {
     private static final Logger logger = LoggerFactory.getLogger(MatFlowServerAutoConfiguration.class);
 
     @Bean
-    SQL matflowInitSql(){
+    SQL matflowInitSql() {
         logger.info("init matflow project SQL");
         return new SQL(new String[]{
                 "pip-pipeline",
@@ -24,11 +24,8 @@ public class MatFlowServerAutoConfiguration {
                 "pip-init-message",
                 "pip-init-project",
                 "pip-init-log",
-        } ,101);
+        }, 101);
     }
-
-
-
 }
 
 
