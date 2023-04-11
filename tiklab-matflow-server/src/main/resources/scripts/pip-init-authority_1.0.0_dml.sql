@@ -89,6 +89,13 @@ INSERT INTO `pcs_prc_role_user` (`id`, `role_id`, `user_id`) VALUES ('2adeb79ba1
 INSERT INTO `pcs_prc_role_user` (`id`, `role_id`,`user_id`) VALUES ('2e4b7342485b2878ce55b7e57401f76c', '2', '111111');
 -- INSERT INTO `pcs_prc_role_user` (`id`, `role_id`, `user_id`) VALUES ('38d74b4a0a5a7ee2b0b6f56171e4e590', '1', '111111');
 
+-- 用户组信息
+INSERT INTO `pcs_prc_role_function` (`id`, `role_id`, `function_id`) VALUES ('23wa081e7588865a6ab75c14caf8317b', '1', '4235d2624bdf30ye502e4aa51c816090');
+INSERT INTO `pcs_prc_role_function` (`id`, `role_id`, `function_id`) VALUES ('eqw474ad31d1948f35f39313f6496f7b', '1', 'hf43e412151eqwqd27f2ab60d8ff73a0');
+INSERT INTO `pcs_prc_role_function` (`id`, `role_id`, `function_id`) VALUES ('eqw0011966d136925c0895bf5d459bcb', '1', 'hfg5371be8ec674a06613bf8e37ec343');
+INSERT INTO `pcs_prc_role_function` (`id`, `role_id`, `function_id`) VALUES ('eqw8d88e520509822ac64455fff8b59c', '1', 'oug5371be8ec674a06613bf8e37ec343');
+INSERT INTO `pcs_prc_role_function` (`id`, `role_id`, `function_id`) VALUES ('eqwbbaa68277053c89933b73a3b4bbad', '1', '43e7d41decf71cfe3b0e80b0c417976g');
+INSERT INTO `pcs_prc_role_function` (`id`, `role_id`, `function_id`) VALUES ('eqwl1fc798ae06acfc4e2439b2f9236e', '1', 'wqre9998fc00fe64c96c6f09f0d45343');
 
 
 
