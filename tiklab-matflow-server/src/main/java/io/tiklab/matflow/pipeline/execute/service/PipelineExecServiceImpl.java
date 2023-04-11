@@ -95,10 +95,10 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         instanceIdOrInstance.put(instanceId, pipelineInstance);
         instanceService.pipelineRunTime(instanceId);
 
-        // HashMap<String,Object> map = homeService.initMap(pipeline);
-        // map.put("title","流水线执行消息");
-        // map.put("message","开始执行");
-        // homeService.log(PipelineFinal.LOG_RUN, PipelineFinal.LOG_TEM_RUN, map);
+        HashMap<String,Object> map = homeService.initMap(pipeline);
+        map.put("title","流水线执行消息");
+        map.put("message","开始执行");
+        homeService.log(PipelineFinal.LOG_RUN, PipelineFinal.LOG_TEM_RUN, map);
         // homeService.settingMessage(PipelineFinal.MES_RUN, map);
         //日志文件根路径
         String fileAddress = PipelineUtil.findFileAddress(pipelineId,2)+instanceId;
@@ -232,7 +232,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
 
         logger.info("流水线：" +pipeline.getName() + "运行完成...");
         map.put("title","流水线执行消息");
-        // homeService.log(PipelineFinal.LOG_PIPELINE, PipelineFinal.LOG_TEM_RUN, map);
+        homeService.log(PipelineFinal.LOG_PIPELINE, PipelineFinal.LOG_TEM_RUN, map);
         // homeService.settingMessage(PipelineFinal.MES_RUN, map);
 
     }
