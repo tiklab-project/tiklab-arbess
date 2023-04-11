@@ -1,13 +1,13 @@
 package io.tiklab.matflow.task.task.service;
 
 import io.tiklab.core.exception.ApplicationException;
-import io.tiklab.matflow.pipeline.definition.model.Pipeline;
 import io.tiklab.matflow.support.util.PipelineUtil;
 import io.tiklab.matflow.task.artifact.service.TaskArtifactExecService;
 import io.tiklab.matflow.task.build.service.TaskBuildExecService;
 import io.tiklab.matflow.task.code.service.TaskCodeExecService;
 import io.tiklab.matflow.task.codescan.service.TaskCodeScanExecService;
 import io.tiklab.matflow.task.deploy.service.TaskDeployExecService;
+import io.tiklab.matflow.task.message.model.TaskExecMessage;
 import io.tiklab.matflow.task.message.service.TaskMessageExecService;
 import io.tiklab.matflow.task.script.service.TaskScriptExecService;
 import io.tiklab.matflow.task.task.model.TaskInstance;
@@ -125,9 +125,9 @@ public class TasksExecServiceImpl implements TasksExecService {
     }
 
     @Override
-    public boolean execSendMessageTask(Pipeline pipeline,Tasks task, boolean execStatus,boolean isPipeline){
+    public boolean execSendMessageTask(TaskExecMessage taskExecMessage){
 
-        String taskId = task.getTaskId();
+        String taskId = taskExecMessage.getTasks().getTaskId();
         String taskInstanceId = taskIdOrTaskInstanceId.get(taskId);
         //计算时间
         tasksInstanceService.taskRuntime(taskInstanceId);
@@ -139,7 +139,7 @@ public class TasksExecServiceImpl implements TasksExecService {
         instance.setRunState(RUN_RUN);
         taskOrTaskInstance.put(taskInstanceId,instance);
         tasksInstanceService.updateTaskInstance(instance);
-        boolean state = message.message(pipeline, task , execStatus, isPipeline);
+        boolean state = message.message(taskExecMessage);
         //更新任务状态
         taskExecEnd(taskId,state);
         return state;

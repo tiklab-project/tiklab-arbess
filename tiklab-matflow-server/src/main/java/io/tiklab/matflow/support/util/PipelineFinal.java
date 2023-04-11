@@ -53,6 +53,7 @@ public class PipelineFinal {
     public static final String MES_RUN = "MES_RUN";
 
 
+
     //日志类型
     public static final String LOG_PIPELINE = "LOG_PIPELINE"; //流水线
     public static final String LOG_CONFIG = "LOG_CONFIG"; //配置

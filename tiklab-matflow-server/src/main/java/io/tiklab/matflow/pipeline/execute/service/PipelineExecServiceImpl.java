@@ -10,6 +10,7 @@ import io.tiklab.matflow.stages.service.StageExecService;
 import io.tiklab.matflow.support.postprocess.service.PostprocessExecService;
 import io.tiklab.matflow.support.util.PipelineFinal;
 import io.tiklab.matflow.support.util.PipelineUtil;
+import io.tiklab.matflow.task.message.model.TaskExecMessage;
 import io.tiklab.matflow.task.task.model.Tasks;
 import io.tiklab.matflow.task.task.service.TasksExecService;
 import io.tiklab.matflow.task.task.service.TasksService;
@@ -110,7 +111,7 @@ public class PipelineExecServiceImpl implements PipelineExecService {
                 postExecService.createPipelinePostInstance(pipelineId,instanceId);
 
                 if (type == 1) {
-                    execTask(pipeline,instanceId);
+                    b = execTask(pipeline,instanceId);
                 }
                 if (type == 2) {
                     // 创建多阶段运行实例
@@ -118,7 +119,8 @@ public class PipelineExecServiceImpl implements PipelineExecService {
                     b = stageExecService.execStageTask(pipeline, instanceId);
                 }
                 logger.info("执行后置任务.");
-                boolean postState = postExecService.execPipelinePost(pipeline, b);
+                TaskExecMessage taskExecMessage = new TaskExecMessage(pipeline,b);
+                boolean postState = postExecService.execPipelinePost(taskExecMessage);
 
                 if (!b || !postState){
                     b = false;
@@ -143,7 +145,8 @@ public class PipelineExecServiceImpl implements PipelineExecService {
             }
 
             logger.info("执行后置任务。。。");
-            boolean postState = postExecService.execPipelinePost(pipeline, b);
+            TaskExecMessage taskExecMessage = new TaskExecMessage(pipeline,b);
+            boolean postState = postExecService.execPipelinePost(taskExecMessage);
 
             if (!b || !postState){
                 b = false;
@@ -180,7 +183,8 @@ public class PipelineExecServiceImpl implements PipelineExecService {
         // 执行任务
         for (Tasks task : tasks) {
             b = tasksExecService.execTask(pipelineId, task.getTaskType(), task.getTaskId());
-            boolean b1 = postExecService.execTaskPostTask(pipeline, task.getTaskId(), b);
+            TaskExecMessage taskExecMessage = new TaskExecMessage(pipeline,task.getTaskName(),task.getTaskId(),b);
+            boolean b1 = postExecService.execTaskPostTask(taskExecMessage);
             if (!b || !b1){
                 return false;
             }

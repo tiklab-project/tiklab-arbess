@@ -283,6 +283,9 @@ public class PipelineServiceImpl implements PipelineService {
         for (int i = 0; i < size; i++) {
             strings[i] = followPipeline.get(i).getPipeline().getId();
         }
+        if (strings.length == 0){
+            return Collections.emptyList();
+        }
         List<PipelineEntity> pipelineEntityList = pipelineDao.findUserPipeline(strings);
        return BeanMapper.mapList(pipelineEntityList,Pipeline.class);
     }

@@ -5,6 +5,7 @@ import io.tiklab.matflow.home.service.PipelineHomeService;
 import io.tiklab.matflow.pipeline.definition.model.Pipeline;
 import io.tiklab.matflow.support.util.PipelineFinal;
 import io.tiklab.matflow.support.util.PipelineUtil;
+import io.tiklab.matflow.task.message.model.TaskExecMessage;
 import io.tiklab.matflow.task.message.model.TaskMessageType;
 import io.tiklab.matflow.task.message.model.TaskMessageUser;
 import io.tiklab.matflow.task.task.model.Tasks;
@@ -33,8 +34,15 @@ public class TaskMessageExecServiceImpl implements TaskMessageExecService {
     private PipelineHomeService homeService;
 
 
-    public boolean message(Pipeline pipeline, Tasks task, boolean runState, boolean isPipeline) {
+    public boolean message(TaskExecMessage taskExecMessage) {
+        Tasks task = taskExecMessage.getTasks();
         String taskId = task.getTaskId();
+
+        Pipeline pipeline = taskExecMessage.getPipeline();
+
+        boolean runState = taskExecMessage.isExecState();
+
+        boolean isPipeline = taskExecMessage.isExecPipeline();
 
         tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"执行任务：消息通知.....");
         TaskMessageType messageType = (TaskMessageType) task.getValues();
@@ -75,9 +83,10 @@ public class TaskMessageExecServiceImpl implements TaskMessageExecService {
 
         //任务消息还是流水线消息
         if (isPipeline){
-            map.put("mesType", PipelineFinal.MES_RUN);
+            map.put("mesType", PipelineFinal.MES_PIPELINE_RUN);
         }else {
-            map.put("mesType", PipelineFinal.MES_RUN);
+            map.put("mesType", PipelineFinal.MES_PIPELINE_TASK_RUN);
+            map.put("taskName", taskExecMessage.getTaskName());
         }
 
         //消息发送类型

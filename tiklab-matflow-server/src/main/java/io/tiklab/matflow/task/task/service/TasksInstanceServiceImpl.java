@@ -130,13 +130,18 @@ public class TasksInstanceServiceImpl implements TasksInstanceService {
         }else {
             taskPostInstance = postInstanceService.findTaskPostInstance(id);
         }
+
+        if (Objects.isNull(taskPostInstance) || Objects.equals(taskPostInstance.size(),0)){
+            return null;
+        }
+
         int runTime = 0;
         TaskInstance taskInstances = new TaskInstance();
         StringBuilder runLog = new StringBuilder();
         for (PostprocessInstance postprocessInstance : taskPostInstance) {
             String postInstanceId = postprocessInstance.getId();
             List<TaskInstanceEntity> postInstance = taskInstanceDao.findPostInstance(postInstanceId);
-            if (Objects.equals(postInstance.size(),0)){
+            if (Objects.isNull(postInstance) || Objects.equals(postInstance.size(),0)){
                 return null;
             }
             String taskInstanceId = postInstance.get(0).getId();

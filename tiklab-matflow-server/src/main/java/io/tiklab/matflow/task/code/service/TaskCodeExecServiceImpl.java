@@ -1,19 +1,19 @@
 package io.tiklab.matflow.task.code.service;
 
 import com.alibaba.fastjson.JSON;
+import io.tiklab.core.exception.ApplicationException;
 import io.tiklab.matflow.setting.model.Auth;
+import io.tiklab.matflow.setting.model.AuthThird;
 import io.tiklab.matflow.setting.model.Scm;
+import io.tiklab.matflow.setting.service.AuthService;
 import io.tiklab.matflow.setting.service.AuthThirdService;
 import io.tiklab.matflow.setting.service.ScmService;
+import io.tiklab.matflow.support.condition.service.ConditionService;
+import io.tiklab.matflow.support.util.PipelineUtil;
 import io.tiklab.matflow.support.variable.service.VariableService;
 import io.tiklab.matflow.task.code.model.TaskCode;
 import io.tiklab.matflow.task.task.model.Tasks;
 import io.tiklab.matflow.task.task.service.TasksInstanceService;
-import io.tiklab.core.exception.ApplicationException;
-import io.tiklab.matflow.setting.model.AuthThird;
-import io.tiklab.matflow.setting.service.AuthService;
-import io.tiklab.matflow.support.condition.service.ConditionService;
-import io.tiklab.matflow.support.util.PipelineUtil;
 import io.tiklab.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,6 +26,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+
+import static io.tiklab.matflow.support.util.PipelineUtil.findSystemType;
 
 /**
  * 源码管理执行方法
@@ -183,10 +185,13 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
                 List<String> list = gitUpOrder(taskCode, fileAddress);
                 gitOrder = list.get(0);
                 if (list.size() > 1){
-                    PipelineUtil.process(serverAddress, list.get(0));
-                    PipelineUtil.process(serverAddress, list.get(1));
                     gitOrder = list.get(2);
                     path = list.get(3);
+                    Process process = process(serverAddress, gitOrder);
+                    if (PipelineUtil.isNoNull(path)){
+                        PipelineUtil.deleteFile(new File(path));
+                    }
+                    return process;
                 }
             }
             //第三方授权
@@ -198,15 +203,7 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
             default ->
                     throw new ApplicationException("未知的任务类型");
         }
-
-        Process process = PipelineUtil.process(serverAddress, gitOrder);
-
-        if (PipelineUtil.isNoNull(path)){
-            PipelineUtil.deleteFile(new File(path));
-        }
-
-        return process;
-
+        return PipelineUtil.process(serverAddress, gitOrder);
     }
 
     /**
@@ -252,20 +249,34 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
             throw new ApplicationException("私钥写入失败。");
         }
 
-        //匹配私钥地址
+        // 匹配私钥地址
         String address = tempFile.replace(userHome, "").replace("\\", "/");
         String orderClean;
         String orderAdd;
-        if (PipelineUtil.findSystemType() == 1){
+        if (findSystemType() == 1){
              orderClean = ".\\git.exe git config --global --unset core.sshCommand";
              orderAdd = ".\\git.exe config --global core.sshCommand \"ssh -i ~" + address + "\"";
         }else {
             orderClean = "/git git config --global --unset core.sshCommand";
             orderAdd = "/git config --global core.sshCommand \"ssh -i ~" + address + "\"";
         }
+
+        String aa = null;
+        if (s.contains("git.exe clone")){
+            int indexOf = s.indexOf("git.exe clone");
+            String substring = s.substring(indexOf+13);
+            aa = ".\\git.exe -c core.sshCommand=\"ssh -i ~" + address + " -o StrictHostKeyChecking=no \"  clone " + substring;
+        }
+
+        if (s.contains("git clone") ){
+            int indexOf = s.indexOf("git clone");
+            String substring = s.substring(indexOf+10);
+             aa = "git -c core.sshCommand=\"ssh -i ~" + address + " -o StrictHostKeyChecking=no \"  clone " + substring;
+        }
+
         list.add(orderClean);
         list.add(orderAdd);
-        list.add(s);
+        list.add(aa);
         list.add(address);
 
         return list;
@@ -312,7 +323,7 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
             order =" -b "+branch+" "+ url+" "+codeDir;
         }
         //根据不同系统更新命令
-        if (PipelineUtil.findSystemType() == 1){
+        if (findSystemType() == 1){
             order=".\\git.exe clone"+" " + order;
         }else {
             order="./git clone"+" " + order;
@@ -368,7 +379,7 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
             codeAddress  = codeAddress + " --username "+ " "  +username + " --password " + " " + password + " " +codeDir;
         }
         //不同系统检出
-        if (PipelineUtil.findSystemType() == 1){
+        if (findSystemType() == 1){
             codeAddress=".\\svn.exe checkout"+" " + codeAddress;
         }else {
             codeAddress="./svn checkout"+" " + codeAddress;
@@ -448,6 +459,39 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
     }
 
 
+    /**
+     * 执行cmd命令
+     * @param path 执行文件夹
+     * @param order 执行命令
+     * @return 执行信息
+     * @throws IOException 调取命令行失败
+     */
+    public static Process process(String path,String order) throws IOException {
+        Runtime runtime=Runtime.getRuntime();
+        Process process;
+        String[] cmd;
 
+        if (findSystemType()==1){
+            if (!PipelineUtil.isNoNull(path)){
+                cmd = new String[] { "cmd.exe", "/c", order };
+                process = runtime.exec(cmd);
+            }else {
+
+                order = order.substring(0,order.length()-1);
+
+                cmd = new String[] { "cmd.exe", "/c", " " + order  };
+                process = runtime.exec(cmd,null,new File(path));
+            }
+        }else {
+            if (!PipelineUtil.isNoNull(path)){
+                cmd = new String[] { "/bin/sh", "-c", " source /etc/profile;"+ order };
+                process = runtime.exec(cmd);
+            }else {
+                cmd = new String[] { "/bin/sh", "-c", "cd " + path + ";" + " source /etc/profile;" + order };
+                process = runtime.exec(cmd,null,new File(path));
+            }
+        }
+        return process;
+    }
 
 }

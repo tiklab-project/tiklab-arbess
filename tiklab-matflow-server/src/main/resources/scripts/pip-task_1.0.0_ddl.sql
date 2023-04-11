@@ -1,5 +1,6 @@
 -- ----------------------------
 -- 源码
+-- @dsm.cmd.id="1001"
 -- ----------------------------
 create table pip_task_code  (
     task_id varchar(256)  COMMENT 'gitId',
@@ -12,6 +13,7 @@ create table pip_task_code  (
 );
 -- ----------------------------
 -- 测试
+-- @dsm.cmd.id="1002"
 -- ----------------------------
 create table pip_task_test  (
     task_id varchar(256)  COMMENT '测试id',
@@ -21,6 +23,7 @@ create table pip_task_test  (
 );
 -- ----------------------------
 -- 构建
+-- @dsm.cmd.id="1003"
 -- ----------------------------
 create table pip_task_build  (
     task_id varchar(256)  COMMENT '构建id',
@@ -30,6 +33,7 @@ create table pip_task_build  (
 );
 -- ----------------------------
 -- 部署
+-- @dsm.cmd.id="1004"
 -- ----------------------------
 create table pip_task_deploy  (
     task_id varchar(256)  COMMENT '部署id',
@@ -44,6 +48,7 @@ create table pip_task_deploy  (
 );
 -- ----------------------------
 -- 代码扫描
+-- @dsm.cmd.id="1005"
 -- ----------------------------
 create table pip_task_code_scan  (
     task_id varchar(256)  COMMENT 'id',
@@ -54,6 +59,7 @@ create table pip_task_code_scan  (
 );
 -- ----------------------------
 -- 推送制品
+-- @dsm.cmd.id="1006"
 -- ----------------------------
 create table pip_task_artifact  (
     task_id varchar(256)  COMMENT 'id',
@@ -69,6 +75,7 @@ create table pip_task_artifact  (
 
 -- ----------------------------
 -- 脚本
+-- @dsm.cmd.id="1007"
 -- ----------------------------
 create table pip_task_script  (
     task_id varchar(255) COMMENT '脚本',
@@ -80,6 +87,7 @@ create table pip_task_script  (
 
 -- ----------------------------
 -- 消息发送类型
+-- @dsm.cmd.id="1008"
 -- ----------------------------
 create table pip_task_message_type  (
     id varchar(255) COMMENT 'id',
@@ -90,6 +98,7 @@ create table pip_task_message_type  (
 
 -- ----------------------------
 -- 消息发送人
+-- @dsm.cmd.id="1009"
 -- ----------------------------
 create table pip_task_message_user  (
     message_id varchar(255) COMMENT '认证信息',

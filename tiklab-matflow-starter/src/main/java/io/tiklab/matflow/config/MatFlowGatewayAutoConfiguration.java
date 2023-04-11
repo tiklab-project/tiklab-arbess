@@ -1,6 +1,5 @@
 package io.tiklab.matflow.config;
 
-
 import io.tiklab.eam.author.Authenticator;
 import io.tiklab.eam.client.author.config.AuthorConfig;
 import io.tiklab.eam.client.author.config.AuthorConfigBuilder;

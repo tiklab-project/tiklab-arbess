@@ -92,6 +92,12 @@
 
         <dependency>
             <groupId>io.tiklab</groupId>
+            <artifactId>tiklab-dsm-spring-boot-starter</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.tiklab</groupId>
             <artifactId>tiklab-todotask-spring-boot-starter</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -395,14 +401,17 @@
                 </configuration>
             </plugin>
 
-            <!--清理之前的目录-->
+            <!--clean-->
             <plugin>
                 <artifactId>maven-clean-plugin</artifactId>
                 <version>2.5</version>
+                <configuration>
+                    <failOnError>false</failOnError>
+                </configuration>
                 <executions>
                     <execution>
-                        <id>auto-clean</id>
-                        <phase>initialize</phase>
+                        <id>eas-clean</id>
+                        <phase>clean</phase>
                         <goals>
                             <goal>clean</goal>
                         </goals>
@@ -410,12 +419,56 @@
                             <skip>false</skip>
                             <filesets>
                                 <fileset>
+                                    <directory>${basedir}/plugin</directory>
+                                    <followSymlinks>false</followSymlinks>
+                                    <useDefaultExcludes>true</useDefaultExcludes>
+                                    <includes>
+                                        <include>**/*</include>
+                                    </includes>
+                                </fileset>
+                                <fileset>
                                     <directory>${basedir}/embbed</directory>
+                                    <followSymlinks>false</followSymlinks>
+                                    <useDefaultExcludes>true</useDefaultExcludes>
+                                    <includes>
+                                        <include>**/*</include>
+                                    </includes>
                                 </fileset>
                             </filesets>
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+
+            <!--copy插件-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>2.8</version>
+                <executions>
+                    <execution>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <artifactItems>
+                        <artifactItem>
+                            <groupId>io.tiklab</groupId>
+                            <artifactId>tiklab-eam-plugin</artifactId>
+                            <version>${project.version}</version>
+                        </artifactItem>
+                        <artifactItem>
+                            <groupId>io.tiklab</groupId>
+                            <artifactId>tiklab-user-plugin</artifactId>
+                            <version>${project.version}</version>
+                        </artifactItem>
+                    </artifactItems>
+                    <includeTypes>jar</includeTypes>
+                    <outputDirectory>${project.basedir}/plugin</outputDirectory>
+                </configuration>
             </plugin>
 
         </plugins>

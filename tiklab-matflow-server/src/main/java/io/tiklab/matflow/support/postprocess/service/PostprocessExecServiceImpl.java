@@ -1,10 +1,10 @@
 package io.tiklab.matflow.support.postprocess.service;
 
-import io.tiklab.matflow.pipeline.definition.model.Pipeline;
 import io.tiklab.matflow.support.postprocess.model.Postprocess;
 import io.tiklab.matflow.support.postprocess.model.PostprocessInstance;
 import io.tiklab.matflow.support.util.PipelineFinal;
 import io.tiklab.matflow.support.util.PipelineUtil;
+import io.tiklab.matflow.task.message.model.TaskExecMessage;
 import io.tiklab.matflow.task.task.model.Tasks;
 import io.tiklab.matflow.task.task.service.TasksExecService;
 import io.tiklab.matflow.task.task.service.TasksExecServiceImpl;
@@ -76,15 +76,15 @@ public class PostprocessExecServiceImpl implements PostprocessExecService{
             fileAddress = fileAddress + "/" + taskInstanceId + "/" +  postInstanceId;
             tasksExecService.createTaskExecInstance(postprocess.getTask(),postInstanceId,3,fileAddress);
             //缓存
-            // postIdOrPostInstanceId.put(postprocess.getPostprocessId(),postInstanceId);
-            // postInstanceIdOrPostInstance.put(postInstanceId,postInstance);
-            // updatePipelineOrPostInstanceCache(pipelineId,postInstanceId);
+            postIdOrPostInstanceId.put(postprocess.getPostprocessId(),postInstanceId);
+            postInstanceIdOrPostInstance.put(postInstanceId,postInstance);
+            updatePipelineOrPostInstanceCache(pipelineId,postInstanceId);
         }
     }
 
     @Override
-    public boolean execPipelinePost(Pipeline pipeline, boolean execStatus){
-        String pipelineId = pipeline.getId();
+    public boolean execPipelinePost(TaskExecMessage taskExecMessage){
+        String pipelineId = taskExecMessage.getPipeline().getId();
         List<Postprocess> postprocessList = postprocessService.findAllPipelinePostTask(pipelineId);
         boolean state = true;
         for (Postprocess postprocess : postprocessList) {
@@ -95,7 +95,9 @@ public class PostprocessExecServiceImpl implements PostprocessExecService{
                 boolean b;
                 String postprocessId = postprocess.getPostprocessId();
                 if (Objects.equals(taskType,61)){
-                    b = tasksExecService.execSendMessageTask(pipeline, task, execStatus, true);
+                    taskExecMessage.setTasks(task);
+                    taskExecMessage.setExecPipeline(true);
+                    b = tasksExecService.execSendMessageTask(taskExecMessage);
                 }else {
                     b = tasksExecService.execTask(pipelineId, taskType, task.getTaskId());
                 }
@@ -112,9 +114,9 @@ public class PostprocessExecServiceImpl implements PostprocessExecService{
     }
 
     @Override
-    public boolean execTaskPostTask(Pipeline pipeline, String taskId,boolean execStatus){
-        String pipelineId = pipeline.getId();
-        List<Postprocess> postprocessList = postprocessService.findAllTaskPostTask(taskId);
+    public boolean execTaskPostTask(TaskExecMessage taskExecMessage){
+        String pipelineId = taskExecMessage.getPipeline().getId();
+        List<Postprocess> postprocessList = postprocessService.findAllTaskPostTask(taskExecMessage.getTaskId());
         boolean state = true;
         for (Postprocess postprocess : postprocessList) {
             boolean b;
@@ -124,7 +126,9 @@ public class PostprocessExecServiceImpl implements PostprocessExecService{
                 int taskType = postprocess.getTaskType();
                 Tasks task = postprocess.getTask();
                 if (taskType == 61){
-                    b = tasksExecService.execSendMessageTask(pipeline, task, execStatus, false);
+                    taskExecMessage.setTasks(task);
+                    taskExecMessage.setExecPipeline(false);
+                    b = tasksExecService.execSendMessageTask(taskExecMessage);
                 }else {
                     b = tasksExecService.execTask(pipelineId, taskType, task.getTaskId());
                 }

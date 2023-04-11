@@ -1,5 +1,6 @@
 -- ----------------------------
 -- 环境配置
+-- @dsm.cmd.id="1001"
 -- ----------------------------
 create table pip_setting_scm  (
     scm_id varchar(256)  COMMENT 'id' ,
@@ -12,6 +13,7 @@ create table pip_setting_scm  (
 
 -- ----------------------------
 -- 基本认证
+-- @dsm.cmd.id="1002"
 -- ----------------------------
 create table pip_auth (
     id varchar(64) COMMENT 'id',
@@ -28,6 +30,7 @@ create table pip_auth (
 
 -- ----------------------------
 -- 服务认证
+-- @dsm.cmd.id="1003"
 -- ----------------------------
 create table pip_auth_server (
     id varchar(64) COMMENT 'id',
@@ -52,6 +55,7 @@ create table pip_auth_server (
 
 -- ----------------------------
 -- 主机认证
+-- @dsm.cmd.id="1004"
 -- ----------------------------
 create table pip_auth_host  (
     id varchar(64) COMMENT 'id',

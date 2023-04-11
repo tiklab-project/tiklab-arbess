@@ -1,8 +1,8 @@
 package io.tiklab.matflow.task.task.service;
 
-import io.tiklab.matflow.pipeline.definition.model.Pipeline;
-import io.tiklab.matflow.task.task.model.Tasks;
 import io.tiklab.core.exception.ApplicationException;
+import io.tiklab.matflow.task.message.model.TaskExecMessage;
+import io.tiklab.matflow.task.task.model.Tasks;
 
 /**
  * 任务执行服务接口
@@ -20,13 +20,10 @@ public interface TasksExecService {
 
     /**
      * 执行发送消息任务
-     * @param pipeline 流水线id
-     * @param task 任务
-     * @param execStatus 执行状态
-     * @param isPipeline 是否为流水线消息
+     * @param taskExecMessage 执行信息
      * @return 执行状态
      */
-    boolean execSendMessageTask(Pipeline pipeline, Tasks task , boolean execStatus, boolean isPipeline);
+    boolean execSendMessageTask(TaskExecMessage taskExecMessage);
 
 
     /**

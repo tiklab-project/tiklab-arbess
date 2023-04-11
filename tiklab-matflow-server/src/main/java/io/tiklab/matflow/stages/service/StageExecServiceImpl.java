@@ -7,6 +7,7 @@ import io.tiklab.matflow.stages.model.StageInstance;
 import io.tiklab.matflow.support.postprocess.service.PostprocessExecService;
 import io.tiklab.matflow.support.util.PipelineFinal;
 import io.tiklab.matflow.support.util.PipelineUtil;
+import io.tiklab.matflow.task.message.model.TaskExecMessage;
 import io.tiklab.matflow.task.task.model.Tasks;
 import io.tiklab.matflow.task.task.service.TasksExecService;
 import io.tiklab.matflow.task.task.service.TasksService;
@@ -142,7 +143,8 @@ public class StageExecServiceImpl implements  StageExecService {
                     List<Tasks> tasks = tasksService.finAllStageTask(stagesId);
                     for (Tasks task : tasks) {
                         state = tasksExecService.execTask(pipelineId, task.getTaskType(), task.getTaskId());
-                        boolean b1 = postExecService.execTaskPostTask( pipeline, task.getTaskId(), state);
+                        TaskExecMessage taskExecMessage = new TaskExecMessage(pipeline,task.getTaskName(),task.getTaskId(),state);
+                        boolean b1 = postExecService.execTaskPostTask(taskExecMessage);
                         updateStageExecState(stagesId,state);
                         if (!state || !b1){
                             break;
@@ -154,7 +156,8 @@ public class StageExecServiceImpl implements  StageExecService {
                         List<Tasks> tasks = tasksService.finAllStageTask(stagesId);
                         for (Tasks task : tasks) {
                             boolean b =  tasksExecService.execTask(pipelineId, task.getTaskType(), task.getTaskId());
-                             boolean b1 = postExecService.execTaskPostTask( pipeline, task.getTaskId(), b);
+                            TaskExecMessage taskExecMessage = new TaskExecMessage(pipeline,task.getTaskName(),task.getTaskId(),b);
+                            boolean b1 = postExecService.execTaskPostTask(taskExecMessage);
                             if (!b || !b1){
                                 return false;
                             }
