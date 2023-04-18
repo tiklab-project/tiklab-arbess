@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-    <contextListener class="io.tiklab.web.context.LogHomeConfiguration" />
+    <contextListener class="io.tiklab.web.logging.LoggingContextListener" />
     <!-- 应用名称：和统一配置中的项目代码保持一致（小写） -->
     <property name="app.name" value="tiklab-matflow" />
     <property name="log" value="tiklab-matflow-log" />
