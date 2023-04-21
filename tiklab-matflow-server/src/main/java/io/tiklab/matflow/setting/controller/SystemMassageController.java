@@ -28,4 +28,37 @@ public class SystemMassageController {
         SystemMassage systemMassage = systemMassageService.getSystemMassage();
         return Result.ok(systemMassage);
     }
+
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

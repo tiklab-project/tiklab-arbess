@@ -15,6 +15,7 @@ INSERT INTO `pcs_prc_function` (`id`, `name`, `code`, `parent_function_id`, `sor
 INSERT INTO `pcs_prc_function` (`id`, `name`, `code`, `parent_function_id`, `sort`, `type`) VALUES ('f6f51f94413343fs0013f4f20c378dc6', '消息通知类型', 'message_type', NULL, 6, '1');
 INSERT INTO `pcs_prc_function` (`id`, `name`, `code`, `parent_function_id`, `sort`, `type`) VALUES ('f6f51f9441339cd20013f4f20c378dc6', '消息管理', 'message_setting', NULL, 6, '1');
 INSERT INTO `pcs_prc_function` (`id`, `name`, `code`, `parent_function_id`, `sort`, `type`) VALUES ('f79c084575fa3ee8614b3a778edb7e4e', '版本许可证', 'pipeline_version', NULL, 39, '1');
+INSERT INTO `pcs_prc_function` (`id`, `name`, `code`, `parent_function_id`, `sort`, `type`) VALUES ('eqeqw84575fa3ee8614eqwew8edb7e4e', '应用授权', 'product_auth', NULL, 39, '1');
 
 INSERT INTO `pcs_prc_role_function` (`id`, `role_id`, `function_id`) VALUES ('00e840ea5302ec71f77b7f2d4cbf8e88', '1', '890e7d41decf71cfe3b0e80b0c4179cf');
 INSERT INTO `pcs_prc_role_function` (`id`, `role_id`, `function_id`) VALUES ('05d66918b2ddc9786b57e0779084f286', '1', '57a3bcd1e5fedd77824359d06b06fe49');
@@ -96,6 +97,7 @@ INSERT INTO `pcs_prc_role_function` (`id`, `role_id`, `function_id`) VALUES ('eq
 INSERT INTO `pcs_prc_role_function` (`id`, `role_id`, `function_id`) VALUES ('eqw8d88e520509822ac64455fff8b59c', '1', 'oug5371be8ec674a06613bf8e37ec343');
 INSERT INTO `pcs_prc_role_function` (`id`, `role_id`, `function_id`) VALUES ('eqwbbaa68277053c89933b73a3b4bbad', '1', '43e7d41decf71cfe3b0e80b0c417976g');
 INSERT INTO `pcs_prc_role_function` (`id`, `role_id`, `function_id`) VALUES ('eqwl1fc798ae06acfc4e2439b2f9236e', '1', 'wqre9998fc00fe64c96c6f09f0d45343');
+INSERT INTO `pcs_prc_role_function` (`id`, `role_id`, `function_id`) VALUES ('asdas1fc798ae06acfdasdasb2f9236e', '1', 'eqeqw84575fa3ee8614eqwew8edb7e4e');
 
 
 

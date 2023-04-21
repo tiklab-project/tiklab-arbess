@@ -71,7 +71,7 @@ public class PipelineAuthorityServiceImpl implements PipelineAuthorityService{
         if (!Objects.isNull(allDmUser)){
             for (DmUser dmUser : allDmUser) {
                 User user = dmUser.getUser();
-                if (Objects.isNull(user)){
+                if (Objects.isNull(user)|| !Objects.equals(user.getId(),userId)){
                     continue;
                 }
                 list.add(dmUser.getDomainId());

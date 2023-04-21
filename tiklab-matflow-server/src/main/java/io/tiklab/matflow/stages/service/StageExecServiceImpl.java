@@ -11,6 +11,8 @@ import io.tiklab.matflow.task.message.model.TaskExecMessage;
 import io.tiklab.matflow.task.task.model.Tasks;
 import io.tiklab.matflow.task.task.service.TasksExecService;
 import io.tiklab.matflow.task.task.service.TasksService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -49,6 +51,9 @@ public class StageExecServiceImpl implements  StageExecService {
 
     //阶段id及阶段任务实例
     private final Map<String , String> stageIdOrStageInstanceId = new HashMap<>();
+
+
+    private final Logger logger = LoggerFactory.getLogger(StageExecServiceImpl.class);
 
     @Override
     public void createStageExecInstance(String pipelineId,String instanceId) {
@@ -138,34 +143,20 @@ public class StageExecServiceImpl implements  StageExecService {
                 stageInstanceIdOrStageInstance.remove(otherStageInstanceId);
                 stageInstanceIdOrStageInstance.put(otherStageInstanceId,instance);
 
-                //获取阶段任务，执行
-                if (!idCe){
+                Future<Boolean> future =  threadPool.submit(() -> {
+                    Thread.currentThread().setName(stagesId);
                     List<Tasks> tasks = tasksService.finAllStageTask(stagesId);
                     for (Tasks task : tasks) {
-                        state = tasksExecService.execTask(pipelineId, task.getTaskType(), task.getTaskId());
-                        TaskExecMessage taskExecMessage = new TaskExecMessage(pipeline,task.getTaskName(),task.getTaskId(),state);
+                        boolean b =  tasksExecService.execTask(pipelineId, task.getTaskType(), task.getTaskId());
+                        TaskExecMessage taskExecMessage = new TaskExecMessage(pipeline,task.getTaskName(),task.getTaskId(),b);
                         boolean b1 = postExecService.execTaskPostTask(taskExecMessage);
-                        updateStageExecState(stagesId,state);
-                        if (!state || !b1){
-                            break;
+                        if (!b || !b1){
+                            return false;
                         }
                     }
-                }else {
-                    Future<Boolean> future =  threadPool.submit(() -> {
-                        Thread.currentThread().setName(stagesId);
-                        List<Tasks> tasks = tasksService.finAllStageTask(stagesId);
-                        for (Tasks task : tasks) {
-                            boolean b =  tasksExecService.execTask(pipelineId, task.getTaskType(), task.getTaskId());
-                            TaskExecMessage taskExecMessage = new TaskExecMessage(pipeline,task.getTaskName(),task.getTaskId(),b);
-                            boolean b1 = postExecService.execTaskPostTask(taskExecMessage);
-                            if (!b || !b1){
-                                return false;
-                            }
-                        }
-                        return true;
-                    });
-                    futureMap.put(stagesId,future);
-                }
+                    return true;
+                });
+                futureMap.put(stagesId,future);
             }
 
             if (idCe){

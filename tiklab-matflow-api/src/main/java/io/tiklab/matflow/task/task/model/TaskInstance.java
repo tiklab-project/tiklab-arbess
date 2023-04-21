@@ -147,4 +147,22 @@ public class TaskInstance {
     public void setRunTimeDate(String runTimeDate) {
         this.runTimeDate = runTimeDate;
     }
+
+    @Override
+    public String toString() {
+        return "TaskInstance{" +
+                "id='" + id + '\'' +
+                ", instanceId='" + instanceId + '\'' +
+                ", taskType=" + taskType +
+                ", taskSort=" + taskSort +
+                ", taskName='" + taskName + '\'' +
+                ", logAddress='" + logAddress + '\'' +
+                ", runTime=" + runTime +
+                ", runTimeDate='" + runTimeDate + '\'' +
+                ", runState='" + runState + '\'' +
+                ", stagesId='" + stagesId + '\'' +
+                ", postprocessId='" + postprocessId + '\'' +
+                ", runLog='" + runLog + '\'' +
+                '}';
+    }
 }

@@ -112,7 +112,7 @@ public class PipelineController {
     }
 
     @RequestMapping(path="/findUserPipeline",method = RequestMethod.POST)
-    @ApiMethod(name = "findUserPipelinePage",desc = "查询用户所有流水线")
+    @ApiMethod(name = "findUserPipeline",desc = "查询用户所有流水线")
     // @ApiParam(name = "userId",desc = "用户id",required = true)
     public Result< List<Pipeline>> findAllUserPipeline(){
         List<Pipeline> userPipeline = pipelineService.findUserPipeline();

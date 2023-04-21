@@ -97,7 +97,7 @@ public class TaskArtifactExecServiceImpl implements TaskArtifactExecService {
                     return false;
                 }
             }else {
-                tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"连接制品服务器。");
+                tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"开始连接制品服务器...");
                 Session session = createSession(product);
                 tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"制品服务器连接成功。");
                 String putAddress = product.getPutAddress();

@@ -4,6 +4,7 @@ package io.tiklab.matflow.setting.service;
 import io.tiklab.matflow.support.util.PipelineUtil;
 import io.tiklab.matflow.setting.model.SystemMassage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -16,6 +17,10 @@ public class SystemMassageServiceImpl implements SystemMassageService {
         systemMassage.setWorkspace(PipelineUtil.findFileAddress(null,1));
         return systemMassage;
     }
+
+    @Value("${matflow.cloud:true}")
+    boolean idCe;
+
 
 
 }

@@ -76,7 +76,8 @@ public class TasksInstanceServiceImpl implements TasksInstanceService {
 
     @Override
     public void updateTaskInstance(TaskInstance taskInstance) {
-        taskInstanceDao.updateInstance(BeanMapper.map(taskInstance, TaskInstanceEntity.class));
+        TaskInstanceEntity instance = BeanMapper.map(taskInstance, TaskInstanceEntity.class);
+        taskInstanceDao.updateInstance(instance);
     }
 
     @Override

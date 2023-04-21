@@ -15,6 +15,8 @@ import io.tiklab.matflow.task.code.model.TaskCode;
 import io.tiklab.matflow.task.task.model.Tasks;
 import io.tiklab.matflow.task.task.service.TasksInstanceService;
 import io.tiklab.rpc.annotation.Exporter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -57,6 +59,9 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
 
     @Autowired
     private TaskCodeThirdService codeThirdService;
+
+
+    private final Logger logger = LoggerFactory.getLogger(TaskCodeExecServiceImpl.class);
 
     // git克隆
     public boolean clone(String pipelineId, Tasks task , int taskType) throws ApplicationException{
@@ -188,6 +193,7 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
                     gitOrder = list.get(2);
                     path = list.get(3);
                     Process process = process(serverAddress, gitOrder);
+                    logger.info("执行："+gitOrder);
                     if (PipelineUtil.isNoNull(path)){
                         PipelineUtil.deleteFile(new File(path));
                     }
@@ -203,6 +209,7 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
             default ->
                     throw new ApplicationException("未知的任务类型");
         }
+        logger.info("执行："+gitOrder);
         return PipelineUtil.process(serverAddress, gitOrder);
     }
 
@@ -257,8 +264,8 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
              orderClean = ".\\git.exe git config --global --unset core.sshCommand";
              orderAdd = ".\\git.exe config --global core.sshCommand \"ssh -i ~" + address + "\"";
         }else {
-            orderClean = "/git git config --global --unset core.sshCommand";
-            orderAdd = "/git config --global core.sshCommand \"ssh -i ~" + address + "\"";
+            orderClean = "./git git config --global --unset core.sshCommand";
+            orderAdd = "./git config --global core.sshCommand \"ssh -i ~" + address + "\"";
         }
 
         String aa = null;
@@ -270,8 +277,8 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
 
         if (s.contains("git clone") ){
             int indexOf = s.indexOf("git clone");
-            String substring = s.substring(indexOf+10);
-             aa = "git -c core.sshCommand=\"ssh -i ~" + address + " -o StrictHostKeyChecking=no \"  clone " + substring;
+            String substring = s.substring(indexOf+9);
+             aa = "./git -c core.sshCommand=\"ssh -i ~" + address + " -o StrictHostKeyChecking=no \"  clone " + substring;
         }
 
         list.add(orderClean);

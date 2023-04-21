@@ -81,6 +81,7 @@ public class TasksExecServiceImpl implements TasksExecService {
         instance.setTaskName(task.getTaskName());
         instance.setTaskType(task.getTaskType());
         instance.setTaskSort(task.getTaskSort());
+
         String taskInstanceId = tasksInstanceService.createTaskInstance(instance);
         instance.setId(taskInstanceId);
         //日志文件地址
@@ -93,8 +94,14 @@ public class TasksExecServiceImpl implements TasksExecService {
     }
 
     @Override
-    public boolean execTask(String pipelineId, int taskType,String taskId)  throws ApplicationException {
-        Tasks tasks = tasksService.findOneTasksOrTask(taskId);
+    public boolean execTask(String pipelineId, int taskType,String taskId){
+        Tasks tasks ;
+        try {
+            tasks = tasksService.findOneTasksOrTask(taskId);
+        } catch (Exception e){
+            throw new ApplicationException("查询失败："+e.getMessage());
+        }
+
         logger.info("执行任务："+tasks.getTaskName());
         String taskInstanceId = taskIdOrTaskInstanceId.get(taskId);
         //计算时间

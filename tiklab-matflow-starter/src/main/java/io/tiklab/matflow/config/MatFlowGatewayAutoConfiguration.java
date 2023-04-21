@@ -30,27 +30,11 @@ public class MatFlowGatewayAutoConfiguration {
     //路由配置
     @Bean
     RouterConfig routerConfig(){
-        String[] s = {
-                "/user",
-                "/eam",
-                "/appLink",
-                "/todo/deletetodo",
-                "/todo/updatetodo",
-                "/todo/detailtodo",
-                "/todo/findtodopage",
-                "/message/message",
-                "/message/messageItem",
-                "/message/messageReceiver",
-                "/oplog/deletelog",
-                "/oplog/updatelog",
-                "/oplog/detaillog",
-                "/oplog/findlogpage",
-        };
+        String[] s =  new String[]{};
 
-        if (enableEam){
-            s = new String[]{};
-        }
-
+         if (enableEam){
+             s = new String[]{};
+         }
         return RouterConfigBuilder.instance()
                 .preRoute(s, authAddress)
                 .get();
