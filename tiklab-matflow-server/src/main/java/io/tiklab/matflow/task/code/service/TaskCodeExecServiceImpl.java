@@ -194,9 +194,9 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
                     path = list.get(3);
                     Process process = process(serverAddress, gitOrder);
                     logger.info("执行："+gitOrder);
-                    if (PipelineUtil.isNoNull(path)){
-                        PipelineUtil.deleteFile(new File(path));
-                    }
+                    // if (PipelineUtil.isNoNull(path)){
+                    //     PipelineUtil.deleteFile(new File(path));
+                    // }
                     return process;
                 }
             }
@@ -256,6 +256,8 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
             throw new ApplicationException("私钥写入失败。");
         }
 
+        logger.info("tempFile:"+tempFile);
+
         // 匹配私钥地址
         String address = tempFile.replace(userHome, "").replace("\\", "/");
         String orderClean;
@@ -284,7 +286,7 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
         list.add(orderClean);
         list.add(orderAdd);
         list.add(aa);
-        list.add(address);
+        list.add(tempFile);
 
         return list;
     }
