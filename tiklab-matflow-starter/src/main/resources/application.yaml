@@ -15,7 +15,7 @@ server:
 
 jdbc:
   driverClassName: com.mysql.cj.jdbc.Driver
-  url: jdbc:mysql://localhost:3306/tiklab_matflow?characterEncoding=utf8&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+  url: jdbc:mysql://172.12.1.16:3306/tiklab_matflow?characterEncoding=utf8&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
   username: root
   password: darth2020
 
@@ -72,7 +72,7 @@ base:
 
 mysql:
   embbed:
-    enable: true
+    enable: false
   database: tiklab_matflow
 
 #homes
