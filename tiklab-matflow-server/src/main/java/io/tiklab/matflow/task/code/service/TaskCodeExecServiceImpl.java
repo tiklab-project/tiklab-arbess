@@ -194,9 +194,9 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
                     path = list.get(3);
                     Process process = process(serverAddress, gitOrder);
                     logger.info("执行："+gitOrder);
-                    // if (PipelineUtil.isNoNull(path)){
-                    //     PipelineUtil.deleteFile(new File(path));
-                    // }
+                    if (PipelineUtil.isNoNull(path)){
+                        PipelineUtil.deleteFile(new File(path));
+                    }
                     return process;
                 }
             }
@@ -256,7 +256,7 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
             throw new ApplicationException("私钥写入失败。");
         }
 
-        logger.info("tempFile:"+tempFile);
+        logger.info("tempFile:" + tempFile);
 
         // 匹配私钥地址
         String address = tempFile.replace(userHome, "").replace("\\", "/");
@@ -280,7 +280,7 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
         if (s.contains("git clone") ){
             int indexOf = s.indexOf("git clone");
             String substring = s.substring(indexOf+9);
-             aa = "./git -c core.sshCommand=\"ssh -i ~" + address + " -o StrictHostKeyChecking=no \"  clone " + substring;
+             aa = "./git -c core.sshCommand=\"ssh -i " + address + " -o StrictHostKeyChecking=no \"  clone " + substring;
         }
 
         list.add(orderClean);
