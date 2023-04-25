@@ -192,8 +192,13 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
                 if (list.size() > 1){
                     gitOrder = list.get(2);
                     path = list.get(3);
+                   if (findSystemType() != 1){
+                       logger.info("执行更改文件权限" +" chmod 600 "+" "+path);
+                       process(serverAddress, " chmod 600 "+" "+path);
+                   }
+
                     Process process = process(serverAddress, gitOrder);
-                    logger.info("执行："+gitOrder);
+                    logger.info("执行：" + gitOrder);
                     // if (PipelineUtil.isNoNull(path)){
                     //     PipelineUtil.deleteFile(new File(path));
                     // }
