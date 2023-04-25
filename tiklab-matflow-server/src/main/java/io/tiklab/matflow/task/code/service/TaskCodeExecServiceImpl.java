@@ -194,9 +194,9 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
                     path = list.get(3);
                     Process process = process(serverAddress, gitOrder);
                     logger.info("执行："+gitOrder);
-                    if (PipelineUtil.isNoNull(path)){
-                        PipelineUtil.deleteFile(new File(path));
-                    }
+                    // if (PipelineUtil.isNoNull(path)){
+                    //     PipelineUtil.deleteFile(new File(path));
+                    // }
                     return process;
                 }
             }
