@@ -61,7 +61,8 @@ datapath: ${PROJECT_HOME}/caches
 
 eas:
   embbed:
-    enable: true
+    enable: false
+    address: http://bac.eas.tiklab.net
 
 message:
   sms:
