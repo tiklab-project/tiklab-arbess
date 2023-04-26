@@ -193,7 +193,7 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
                     gitOrder = list.get(2);
                     path = list.get(3);
                    if (findSystemType() != 1){
-                       logger.info("执行更改文件权限" +" chmod 600 "+" "+path);
+                       logger.info("执行更改文件权限:" +" chmod 600 "+" "+path);
                        process(serverAddress, " chmod 600 "+" "+path);
                    }
 
