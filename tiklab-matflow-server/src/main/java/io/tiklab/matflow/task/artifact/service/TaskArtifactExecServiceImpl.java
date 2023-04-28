@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Objects;
 
 @Service
 @Exporter
@@ -147,19 +148,29 @@ public class TaskArtifactExecServiceImpl implements TaskArtifactExecService {
         if (authThird.getAuthType() == 1){
             String id = PipelineFinal.appName;
 
-            String s = System.getProperty("user.dir") + "/" + settingAddress ;
+            String s  ;
+
+            if (Objects.isNull(settingAddress)){
+                settingAddress = "conf/settings.xml";
+            }
 
             File file = new File(System.getProperty("user.dir"));
-            if (!PipelineUtil.isNoNull(settingAddress)){
+            if (file.getAbsolutePath().endsWith("bin")){
                 String parent = file.getParent();
-                settingAddress = "conf/settings.xml";
-                if (!file.getAbsolutePath().endsWith("matflow")){
-                    s = parent +"/"+settingAddress;
-                }
+                s = parent +"/"+settingAddress;
+            }else if (file.getAbsolutePath().endsWith("matflow")){
+                s = file.getAbsolutePath() +"/"+settingAddress;
+            }else {
+                s = file.getAbsolutePath() + "/" + settingAddress;
+            }
+            logger.info("模块地址为："+ s);
+            File file1 = new File(s);
+
+            if (!file1.exists()){
+                throw new ApplicationException("系统异常，获取setting文件错误！" + s);
             }
 
             logger.info("项目地址为："+ System.getProperty("user.dir"));
-            logger.info("模块地址为："+ s);
 
             execOrder = execOrder +
                     " -Dusername="+authThird.getUsername()+
