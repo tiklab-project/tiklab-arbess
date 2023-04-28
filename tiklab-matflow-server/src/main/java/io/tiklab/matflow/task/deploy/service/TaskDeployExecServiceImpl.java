@@ -260,11 +260,6 @@ public class TaskDeployExecServiceImpl implements TaskDeployExecService {
 
             }
         };
-        if (process.exitValue() == 0){
-            logger.info(orders + "命令执行完成。。。。");
-            exec.disconnect();
-            return;
-        }
         tasksInstanceService.readCommandExecResult(process, "UTF-8", error(41), taskId);
         exec.disconnect();
     }
