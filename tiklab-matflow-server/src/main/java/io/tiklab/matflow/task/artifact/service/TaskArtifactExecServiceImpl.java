@@ -1,6 +1,7 @@
 package io.tiklab.matflow.task.artifact.service;
 
 import com.jcraft.jsch.*;
+import io.tiklab.core.exception.ApplicationException;
 import io.tiklab.matflow.setting.model.AuthHost;
 import io.tiklab.matflow.setting.model.AuthThird;
 import io.tiklab.matflow.setting.model.Scm;
@@ -9,10 +10,9 @@ import io.tiklab.matflow.support.condition.service.ConditionService;
 import io.tiklab.matflow.support.util.PipelineFinal;
 import io.tiklab.matflow.support.util.PipelineUtil;
 import io.tiklab.matflow.support.variable.service.VariableService;
+import io.tiklab.matflow.task.artifact.model.TaskArtifact;
 import io.tiklab.matflow.task.task.model.Tasks;
 import io.tiklab.matflow.task.task.service.TasksInstanceService;
-import io.tiklab.core.exception.ApplicationException;
-import io.tiklab.matflow.task.artifact.model.TaskArtifact;
 import io.tiklab.rpc.annotation.Exporter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +22,6 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Objects;
 
 @Service
 @Exporter
@@ -150,7 +149,7 @@ public class TaskArtifactExecServiceImpl implements TaskArtifactExecService {
 
             String s  ;
 
-            if (Objects.isNull(settingAddress)){
+            if (!PipelineUtil.isNoNull(settingAddress)){
                 settingAddress = "conf/settings.xml";
             }
 
