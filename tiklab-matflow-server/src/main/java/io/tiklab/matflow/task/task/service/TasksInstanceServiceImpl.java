@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.*;
@@ -329,26 +328,29 @@ public class TasksInstanceServiceImpl implements TasksInstanceService {
         bufferedReader = new BufferedReader(inputStreamReader);
 
         try {
+
             //读取执行信息
             while ((s = bufferedReader.readLine()) != null) {
                 if (validStatus(s,error)){
                     state = false ;
                 }
-                writeExecLog(taskId, PipelineUtil.date(4)+s);
+                writeExecLog(taskId, PipelineUtil.date(4) + s);
             }
+
             //读取err执行信息
             inputStreamReader = PipelineUtil.encode(errInputStream, enCode);
             bufferedReader = new BufferedReader(inputStreamReader);
 
             while ((s = bufferedReader.readLine()) != null) {
                 if (validStatus(s,error)){state = false ;}
-                writeExecLog(taskId, PipelineUtil.date(4)+s);
+                writeExecLog(taskId, PipelineUtil.date(4) + s);
             }
 
+            // 关闭
             inputStreamReader.close();
             bufferedReader.close();
 
-        }catch (IOException e){
+        }catch (Exception e){
             state = false;
         }
         process.destroy();
