@@ -12,7 +12,7 @@ import io.tiklab.dal.jpa.annotation.*;
 public class PipelineFollowEntity {
 
     @Id
-    @GeneratorValue
+    @GeneratorValue(length = 12)
     @Column(name = "id")
     private String id;
 

@@ -13,7 +13,7 @@ public class TasksEntity {
 
     //流水线配置id
     @Id
-    @GeneratorValue
+    @GeneratorValue(length = 12)
     @Column(name = "task_id",notNull = true)
     private String taskId;
 

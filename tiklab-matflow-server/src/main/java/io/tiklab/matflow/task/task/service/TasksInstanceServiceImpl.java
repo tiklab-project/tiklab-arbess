@@ -234,6 +234,8 @@ public class TasksInstanceServiceImpl implements TasksInstanceService {
 
     public static Map<String,Integer> stageIdOrStageRunTime = new HashMap<>();
 
+    public static Map<String,String> stageIdOrStageRunState = new HashMap<>();
+
     @Override
     public List<TaskInstance> findAllStageInstance(String stageId) {
         List<TaskInstanceEntity> pipelineInstance = taskInstanceDao.findStageInstance(stageId);
@@ -243,6 +245,7 @@ public class TasksInstanceServiceImpl implements TasksInstanceService {
         }
         StringBuilder stageRunLog = new StringBuilder();
         int stageRunTime = 0;
+        String runState = PipelineFinal.RUN_SUCCESS;
         List<TaskInstance> list = new ArrayList<>();
         for (TaskInstance instance : allInstance) {
             String taskInstanceId = instance.getId();
@@ -274,9 +277,33 @@ public class TasksInstanceServiceImpl implements TasksInstanceService {
                 list.add(taskInstance);
             }
         }
+
+        for (TaskInstance instance : list) {
+            String state = instance.getRunState();
+            if (state.equals(PipelineFinal.RUN_ERROR)){
+                runState = PipelineFinal.RUN_ERROR;
+                break;
+            }
+            if (state.equals(PipelineFinal.RUN_RUN)){
+                runState = PipelineFinal.RUN_RUN;
+                break;
+            }
+        }
         stageIdOrStageRunTime.put(stageId,stageRunTime);
         stageIdOrStageRunLog.put(stageId, String.valueOf(stageRunLog));
+        stageIdOrStageRunState.put(stageId,runState);
         return list;
+    }
+
+
+    @Override
+    public String findStageRunState(String stageId){
+        return stageIdOrStageRunState.get(stageId);
+    }
+
+    @Override
+    public void removeStageRunState(String stageId){
+        stageIdOrStageRunState.remove(stageId);
     }
 
     @Override

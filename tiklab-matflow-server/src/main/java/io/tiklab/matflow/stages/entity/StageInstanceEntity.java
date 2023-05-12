@@ -8,7 +8,7 @@ public class StageInstanceEntity {
 
     //日志id
     @Id
-    @GeneratorValue
+    @GeneratorValue(length = 12)
     @Column(name = "id")
     private String id;
 

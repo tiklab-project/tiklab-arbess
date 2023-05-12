@@ -9,7 +9,7 @@ public class ScmEntity {
 
     //凭证id
     @Id
-    @GeneratorValue
+    @GeneratorValue(length = 12)
     @Column(name = "scm_id")
     private String scmId;
 

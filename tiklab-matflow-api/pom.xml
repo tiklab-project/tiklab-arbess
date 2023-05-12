@@ -15,12 +15,7 @@
     <dependencies>
         <dependency>
             <groupId>io.tiklab</groupId>
-            <artifactId>tiklab-beans-annotation</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.tiklab</groupId>
-            <artifactId>tiklab-join-annotation</artifactId>
+            <artifactId>tiklab-toolkit-annotation</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

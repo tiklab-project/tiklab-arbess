@@ -8,7 +8,7 @@ public class TriggerEntity {
 
     //id
     @Id
-    @GeneratorValue
+    @GeneratorValue(length = 12)
     @Column(name = "trigger_id")
     private String triggerId;
 

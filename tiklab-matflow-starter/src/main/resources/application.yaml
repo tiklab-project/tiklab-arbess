@@ -69,7 +69,7 @@ message:
     enabled: true
 
 base:
-  url: http://matflow-ce.tiklab.net
+  url: http://bac.matflow.tiklab.net
 
 mysql:
   embbed:

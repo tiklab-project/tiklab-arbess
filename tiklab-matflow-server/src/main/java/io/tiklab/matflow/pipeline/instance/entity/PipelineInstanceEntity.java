@@ -13,7 +13,7 @@ public class PipelineInstanceEntity {
 
     //id
     @Id
-    @GeneratorValue
+    @GeneratorValue(length = 12)
     @Column(name = "instance_id")
     private String instanceId;
 

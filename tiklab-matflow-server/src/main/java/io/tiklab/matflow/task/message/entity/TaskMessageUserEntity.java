@@ -8,7 +8,7 @@ public class TaskMessageUserEntity {
 
     //id
     @Id
-    @GeneratorValue
+    @GeneratorValue(length = 12)
     @Column(name = "message_id")
     private String messageId;
 

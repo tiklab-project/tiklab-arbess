@@ -56,12 +56,10 @@ datapath: ${PROJECT_HOME}/caches
 eas:
   embbed:
     enable: true
-  address: http://eas-ce.test.tiklab.net
-  web:
-    address: http://eas-ce.test.tiklab.net
+  address: http://bac.eas.test.tiklab.net
 
 base:
-  url: http://matflow-ce.test.tiklab.net
+  url: http://bac.matflow.test.tiklab.net
 
 message:
   sms:

@@ -94,6 +94,15 @@ public interface TasksInstanceService {
      */
     List<TaskInstance> findAllStageInstance(String stageId);
 
+
+
+     String findStageRunState(String stageId);
+
+
+
+
+     void removeStageRunState(String stageId);
+
     /**
      * 获取保存的阶段运行日志
      * @param stageId 阶段id

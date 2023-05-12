@@ -8,7 +8,7 @@ public class PostprocessEntity {
 
     //id
     @Id
-    @GeneratorValue
+    @GeneratorValue(length = 12)
     @Column(name = "postprocess_id")
     private String postprocessId;
 

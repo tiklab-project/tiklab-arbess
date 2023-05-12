@@ -14,7 +14,6 @@ import io.tiklab.matflow.task.task.service.TasksService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -107,8 +106,6 @@ public class StageExecServiceImpl implements  StageExecService {
         return stageInstanceId;
     }
 
-    @Value("${matflow.cloud:true}")
-    boolean idCe;
 
     private final Map<String ,ExecutorService> threadExecutor = new HashMap<>();
 
@@ -159,21 +156,19 @@ public class StageExecServiceImpl implements  StageExecService {
                 futureMap.put(stagesId,future);
             }
 
-            if (idCe){
-                try {
-                    //等待获取并行阶段执行结果
-                    for (Stage stage1 : otherStage) {
-                        String stageId = stage1.getStageId();
-                        state = futureMap.get(stageId).get();
-                        updateStageExecState(stageId,state);
-                        if (!state){
-                            threadPool.shutdown();
-                            break;
-                        }
+            try {
+                //等待获取并行阶段执行结果
+                for (Stage stage1 : otherStage) {
+                    String stageId = stage1.getStageId();
+                    state = futureMap.get(stageId).get();
+                    updateStageExecState(stageId,state);
+                    if (!state){
+                        threadPool.shutdown();
+                        break;
                     }
-                } catch (InterruptedException | ExecutionException | ApplicationException e) {
-                    throw new ApplicationException(e);
                 }
+            } catch (InterruptedException | ExecutionException | ApplicationException e) {
+                throw new ApplicationException(e);
             }
 
             //更新主阶段状态

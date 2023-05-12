@@ -106,7 +106,8 @@ public class MatFlowGatewayAutoConfiguration {
                         "/ws",
                         "/socket",
                         "/start",
-                        "/eas"
+                        "/eas",
+                        "/sql"
                 })
                 .get();
     }

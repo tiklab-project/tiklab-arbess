@@ -13,7 +13,7 @@ import java.util.Date;
 public class StageEntity {
 
     @Id
-    @GeneratorValue
+    @GeneratorValue(length = 12)
     @Column(name = "stage_id",notNull = true)
     private String stageId;
 

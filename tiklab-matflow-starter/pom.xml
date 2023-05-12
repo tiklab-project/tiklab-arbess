@@ -12,16 +12,16 @@
     <name>${project.artifactId}</name>
 
     <dependencies>
-        <dependency>
-            <groupId>io.tiklab</groupId>
-            <artifactId>tiklab-beans-spring-boot-starter</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.tiklab</groupId>
-            <artifactId>tiklab-join-spring-boot-starter</artifactId>
-            <version>${project.version}</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>io.tiklab</groupId>-->
+<!--            <artifactId>tiklab-beans-spring-boot-starter</artifactId>-->
+<!--            <version>${project.version}</version>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>io.tiklab</groupId>-->
+<!--            <artifactId>tiklab-join-spring-boot-starter</artifactId>-->
+<!--            <version>${project.version}</version>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>io.tiklab</groupId>
             <artifactId>tiklab-eam-spring-boot-starter</artifactId>
@@ -97,6 +97,11 @@
         <dependency>
             <groupId>io.tiklab</groupId>
             <artifactId>tiklab-dsm-spring-boot-starter</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>io.tiklab</groupId>
+            <artifactId>tiklab-toolkit-spring-boot-starter</artifactId>
             <version>1.0.0-SNAPSHOT</version>
         </dependency>
 

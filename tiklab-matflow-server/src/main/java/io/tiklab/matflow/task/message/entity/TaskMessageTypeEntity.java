@@ -7,7 +7,7 @@ import io.tiklab.dal.jpa.annotation.*;
 public class TaskMessageTypeEntity {
 
     @Id
-    @GeneratorValue
+    @GeneratorValue(length = 12)
     @Column(name = "id" ,notNull = true)
     private String id;
 

@@ -10,7 +10,7 @@ import io.tiklab.dal.jpa.annotation.*;
 public class AuthEntity {
 
     @Id
-    @GeneratorValue
+    @GeneratorValue(length = 12)
     @Column(name = "id")
     private String authId;
 

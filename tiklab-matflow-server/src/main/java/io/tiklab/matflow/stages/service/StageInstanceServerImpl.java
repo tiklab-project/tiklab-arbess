@@ -4,6 +4,7 @@ import io.tiklab.beans.BeanMapper;
 import io.tiklab.matflow.stages.dao.StageInstanceDao;
 import io.tiklab.matflow.stages.entity.StageInstanceEntity;
 import io.tiklab.matflow.stages.model.StageInstance;
+import io.tiklab.matflow.support.util.PipelineFinal;
 import io.tiklab.matflow.task.task.model.TaskInstance;
 import io.tiklab.matflow.task.task.service.TasksInstanceService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -129,6 +130,9 @@ public class StageInstanceServerImpl implements StageInstanceServer{
             if (Objects.isNull(otherStageInstanceEntityList)){
                 continue;
             }
+
+            String stageState = PipelineFinal.RUN_SUCCESS;
+
             List<StageInstance> allStageInstance = BeanMapper.mapList(otherStageInstanceEntityList, StageInstance.class);
             String log = "\n";
             //并行阶段执行实例
@@ -146,11 +150,14 @@ public class StageInstanceServerImpl implements StageInstanceServer{
                 StringBuilder runLog = new StringBuilder();
                 String stageRunLog = tasksInstanceService.findStageRunLog(otherStageInstanceId);
                 Integer stageRunTime = tasksInstanceService.findStageRunTime(otherStageInstanceId);
+                String stageRunState = tasksInstanceService.findStageRunState(otherStageInstanceId);
                 tasksInstanceService.removeStageRunLog(otherStageInstanceId);
                 tasksInstanceService.removeStageRunTime(otherStageInstanceId);
+                tasksInstanceService.removeStageRunState(otherStageInstanceId);
                 runLog.append(stageRunLog).append(log);
                 otherInstance.setStageTime(stageRunTime);
                 otherInstance.setRunLog(runLog.toString());
+                otherInstance.setStageState(stageRunState);
                 if (!Objects.equals(runLog.toString(),log)){
                     mainLog.append(runLog).append(log);
                 }
@@ -158,9 +165,21 @@ public class StageInstanceServerImpl implements StageInstanceServer{
             }
             instance.setRunLog(mainLog.toString());
             instance.setStageInstanceList(otherStageInstanceList);
+            for (StageInstance stageInstance1 : otherStageInstanceList) {
+                String stageStates = stageInstance1.getStageState();
+                if (stageStates.equals(PipelineFinal.RUN_ERROR)){
+                    stageState = PipelineFinal.RUN_ERROR;
+                    break;
+                }
+                if (stageStates.equals(PipelineFinal.RUN_RUN)){
+                    stageState = PipelineFinal.RUN_RUN;
+                    break;
+                }
+            }
+            instance.setStageState(stageState);
             mainStageInstanceList.add(instance);
         }
-        // TaskInstance postRunMessage = tasksInstanceService.findPostPipelineRunMessage(instanceId, true);
+
         List<TaskInstance> list = tasksInstanceService.findStagePostRunMessage(instanceId);
         if (!Objects.equals(list.size(),0)){
             Map<String, Object> map = tasksInstanceService.findPostRunMessage(instanceId);

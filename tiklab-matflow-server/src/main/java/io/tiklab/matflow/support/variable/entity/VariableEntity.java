@@ -8,7 +8,7 @@ public class VariableEntity {
 
     //流水线配置id
     @Id
-    @GeneratorValue
+    @GeneratorValue(length = 12)
     @Column(name = "var_id",notNull = true)
     private String varId;
 

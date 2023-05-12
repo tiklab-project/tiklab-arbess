@@ -11,7 +11,7 @@ public class PipelineEntity {
 
     //流水线id
     @Id
-    @GeneratorValue
+    @GeneratorValue(length = 12)
     @Column(name = "id")
     private String id;
 
