@@ -13,10 +13,16 @@ spring:
 server:
   port: 8080
 
+#jdbc:
+#  driverClassName: com.mysql.cj.jdbc.Driver
+#  url: jdbc:mysql://172.12.1.16:3306/tiklab_matflow?characterEncoding=utf8&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+#  username: root
+#  password: darth2020
+
 jdbc:
-  driverClassName: com.mysql.cj.jdbc.Driver
-  url: jdbc:mysql://172.12.1.16:3306/tiklab_matflow?characterEncoding=utf8&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-  username: root
+  driverClassName: org.postgresql.Driver
+  url: jdbc:postgresql://172.12.1.16:5432/tiklab_matflow?stringtype=unspecified
+  username: postgres
   password: darth2020
 
 #plugin config
