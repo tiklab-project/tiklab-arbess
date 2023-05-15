@@ -108,7 +108,7 @@ public class PipelineInstanceDao {
     public Pagination<PipelineInstanceEntity> findAllPageInstance(PipelineInstanceQuery pipelineInstanceQuery){
         String pipelineId = pipelineInstanceQuery.getPipelineId();
         String sql = "select pip_pipeline_instance.* from pip_pipeline_instance ";
-        sql = sql.concat(" where ( pip_pipeline_instance.pipeline_id = ");
+        sql = sql.concat(" where ( pipeline_id = ");
 
         if (PipelineUtil.isNoNull(pipelineId)){
             sql = sql.concat("'" + pipelineId + "'");
@@ -116,20 +116,20 @@ public class PipelineInstanceDao {
             List<Pipeline> pipelineList = pipelineInstanceQuery.getPipelineList();
             sql = sql.concat("'" +pipelineList.get(0).getId()+ "'");
             for (int i = 1; i < pipelineList.size(); i++) {
-                sql = sql.concat(" or pip_pipeline_instance.pipeline_id = '" + pipelineList.get(i).getId()+ "'");
+                sql = sql.concat(" or pipeline_id = '" + pipelineList.get(i).getId()+ "'");
             }
         }
         sql = sql.concat(")");
         if (pipelineInstanceQuery.getType() != 0){
-            sql = sql.concat(" and pip_pipeline_instance.run_way = " + pipelineInstanceQuery.getType());
+            sql = sql.concat(" and run_way = " + pipelineInstanceQuery.getType());
         }
 
         if (PipelineUtil.isNoNull(pipelineInstanceQuery.getState())){
-            sql = sql.concat(" and pip_pipeline_instance.run_status = '" + pipelineInstanceQuery.getState()+ "'");
+            sql = sql.concat(" and run_status = '" + pipelineInstanceQuery.getState()+ "'");
         }
 
-        sql = sql.concat(" order by pip_pipeline_instance.create_time desc " +
-                ", case 'pip_pipeline_instance.run_status' when 'run' then 1 end");//run排在第一
+        sql = sql.concat(" order by create_time desc " +
+                ", case 'run_status' when 'run' then 1 end");//run排在第一
 
         return jpaTemplate.getJdbcTemplate().findPage(sql, null,
                 pipelineInstanceQuery.getPageParam(),
@@ -144,7 +144,7 @@ public class PipelineInstanceDao {
      */
     public List<PipelineInstanceEntity> findAllInstance(String pipelineId){
         String sql = "select pip_pipeline_instance.* from pip_pipeline_instance  ";
-        sql = sql.concat(" where pip_pipeline_instance.pipeline_id   = '"+pipelineId+"' ");
+        sql = sql.concat(" where pipeline_id   = '"+pipelineId+"' ");
         JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
         return  jdbcTemplate.query(sql, new BeanPropertyRowMapper(PipelineInstanceEntity.class));
     }
@@ -156,10 +156,10 @@ public class PipelineInstanceDao {
      */
     public List<PipelineInstanceEntity> findLatelyInstance(String pipelineId){
         String sql = "select pip_pipeline_instance.* from pip_pipeline_instance  ";
-        sql = sql.concat(" where pip_pipeline_instance.pipeline_id = '"+pipelineId+"' " +
-                " and pip_pipeline_instance.run_status != 'run'"+
-                " order by pip_pipeline_instance.create_time desc" +
-                " limit 0 ,1");
+        sql = sql.concat(" where pipeline_id = '"+pipelineId+"' " +
+                " and run_status != 'run'"+
+                " order by create_time desc" +
+                " OFFSET 0 limit 1");
         JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
         return  jdbcTemplate.query(sql, new BeanPropertyRowMapper(PipelineInstanceEntity.class));
     }

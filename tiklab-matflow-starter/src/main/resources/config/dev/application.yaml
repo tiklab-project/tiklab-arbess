@@ -10,10 +10,17 @@ setting:
 server:
   port: 8089
 
+#jdbc:
+#  driverClassName: com.mysql.cj.jdbc.Driver
+#  url: jdbc:mysql://172.10.1.10:3306/tiklab_matflow?characterEncoding=utf8&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+#  username: root
+#  password: darth2020
+
 jdbc:
-  driverClassName: com.mysql.cj.jdbc.Driver
-  url: jdbc:mysql://172.10.1.10:3306/tiklab_matflow?characterEncoding=utf8&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-  username: root
+  driverClassName: org.postgresql.Driver
+#  url: jdbc:postgresql://172.10.1.10:5432/tiklab_matflow?currentSchema=tiklab_matflow&stringtype=unspecified
+  url: jdbc:postgresql://172.10.1.10:5432/tiklab_matflow?stringtype=unspecified
+  username: postgres
   password: darth2020
 
 #plugin config
@@ -62,11 +69,11 @@ message:
 
 eas:
   embbed:
-    enable: true
-#    enable: false
-#  address: http://eas.dev.tiklab.net
-#  web:
-#    address: http://eas.local.tiklab.net
+#    enable: true
+    enable: false
+  address: http://eas.dev.tiklab.net
+  web:
+    address: http://eas.local.tiklab.net
 
 base:
   url: http://192.168.10.23:3000

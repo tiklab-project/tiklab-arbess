@@ -3,15 +3,14 @@
 -- @dsm.cmd.id="1001"
 -- ----------------------------
 create table IF NOT EXISTS pip_pipeline  (
-   id varchar(256)  COMMENT '流水线id',
-   name varchar(256)  COMMENT '流水线名称',
-   user_id varchar(256)  COMMENT '用户id',
-   create_time datetime  COMMENT '创建时间',
-   type int  COMMENT '流水线类型',
-   state int  COMMENT '运行状态（1.正常 2.运行中）',
-   power int  COMMENT '项目权限（1.公共的 2.私有）',
-   color int  COMMENT '颜色（1-5随机数）',
-   PRIMARY KEY (id) USING BTREE
+   id varchar(256) PRIMARY KEY ,
+   name varchar(256)  ,
+   user_id varchar(256) ,
+   create_time timestamp ,
+   type int  ,
+   state int  ,
+   power int  ,
+   color int
 );
 
 -- ---------------------------
@@ -19,15 +18,14 @@ create table IF NOT EXISTS pip_pipeline  (
 -- @dsm.cmd.id="1002"
 -- ----------------------------
 create table IF NOT EXISTS pip_pipeline_instance  (
-    instance_id varchar(255) COMMENT 'id',
-    create_time datetime COMMENT '创建时间',
-    run_way int  COMMENT '构建方式 1。手动触发 2.触发器触发',
-    run_status varchar(255)  COMMENT '执行状态 成功:success 失败:error 停止:halt 等待运行:wait',
-    run_time int  COMMENT '执行时间',
-    user_id varchar(255)  COMMENT '执行人',
-    pipeline_id varchar(255)  COMMENT '流水线id',
-    find_number int  COMMENT '构建次数',
-    PRIMARY KEY (instance_id) USING BTREE
+    instance_id varchar(255)  PRIMARY KEY,
+    create_time timestamp  ,
+    run_way int  ,
+    run_status varchar(255) ,
+    run_time int  ,
+    user_id varchar(255)  ,
+    pipeline_id varchar(255)  ,
+    find_number int
 );
 
 -- ---------------------------
@@ -35,17 +33,16 @@ create table IF NOT EXISTS pip_pipeline_instance  (
 -- @dsm.cmd.id="1003"
 -- ----------------------------
 create table IF NOT EXISTS pip_task_instance  (
-    id varchar(256)  COMMENT '日志id',
-    instance_id varchar(256)  COMMENT '历史id',
-    task_sort int  COMMENT '运行顺序',
-    task_type int  COMMENT '执行类型',
-    task_name varchar(255)  COMMENT '执行名称',
-    run_state varchar(255)  COMMENT '运行状态,成功:success 失败:error 停止:halt 等待运行:wait',
-    run_time int  COMMENT '运行时间',
-    log_address longtext COMMENT '运行日志',
-    stages_id varchar(256)  COMMENT '阶段id',
-    postprocess_id varchar(256) COMMENT '后置处理id',
-    PRIMARY KEY (id) USING BTREE
+    id varchar(256)  PRIMARY KEY,
+    instance_id varchar(256) ,
+    task_sort int  ,
+    task_type int  ,
+    task_name varchar(255)  ,
+    run_state varchar(255) ,
+    run_time int ,
+    log_address TEXT,
+    stages_id varchar(256),
+    postprocess_id varchar(256)
 );
 
 -- ---------------------------
@@ -53,26 +50,24 @@ create table IF NOT EXISTS pip_task_instance  (
 -- @dsm.cmd.id="1004"
 -- ----------------------------
 create table IF NOT EXISTS pip_postprocess  (
-    postprocess_id varchar(255) COMMENT 'id',
-    task_id varchar(255) COMMENT '任务配置',
-    name varchar(32) COMMENT '名称',
-    task_type int COMMENT '任务类型' ,
-    create_time varchar(255) COMMENT '创建时间',
-    task_sort varchar(255) COMMENT '任务顺序',
-    pipeline_id varchar(255) COMMENT '流水线id',
-    PRIMARY KEY (postprocess_id) USING BTREE
+    postprocess_id varchar(255) PRIMARY KEY ,
+    task_id varchar(255) ,
+    name varchar(32) ,
+    task_type int ,
+    create_time varchar(255) ,
+    task_sort varchar(255) ,
+    pipeline_id varchar(255)
 );
 
 -- @dsm.cmd.id="1005"
 create table IF NOT EXISTS pip_condition  (
-    cond_id varchar(256)  COMMENT '条件id',
-    cond_name varchar(256)  COMMENT '名称',
-    task_id varchar(256)  COMMENT '任务id',
-    create_time datetime  COMMENT '创建时间',
-    cond_type int  COMMENT '流水线类型',
-    cond_key varchar(256)  COMMENT '条件key',
-    cond_value varchar(256)  COMMENT '条件value',
-    PRIMARY KEY (cond_id) USING BTREE
+    cond_id varchar(256) PRIMARY KEY ,
+    cond_name varchar(256) ,
+    task_id varchar(256) ,
+    create_time timestamp   ,
+    cond_type int  ,
+    cond_key varchar(256)  ,
+    cond_value varchar(256)
 );
 
 -- ---------------------------
@@ -80,15 +75,14 @@ create table IF NOT EXISTS pip_condition  (
 -- @dsm.cmd.id="1006"
 -- ----------------------------
 create table IF NOT EXISTS pip_task  (
-    task_id varchar(255) COMMENT '配置id',
-    create_time datetime COMMENT '创建时间',
-    stage_id varchar(255) COMMENT '阶段id',
-    task_name varchar(255) COMMENT '阶段名称',
-    pipeline_id varchar(255) COMMENT '流水线id',
-    task_type int COMMENT '任务类型',
-    task_sort int COMMENT '任务顺序',
-    postprocess_id varchar(255) COMMENT 'id',
-    PRIMARY KEY (task_id) USING BTREE
+    task_id varchar(255) PRIMARY KEY ,
+    create_time timestamp  ,
+    stage_id varchar(255) ,
+    task_name varchar(255) ,
+    pipeline_id varchar(255) ,
+    task_type int ,
+    task_sort int ,
+    postprocess_id varchar(255)
 );
 
 -- ---------------------------
@@ -96,14 +90,13 @@ create table IF NOT EXISTS pip_task  (
 -- @dsm.cmd.id="1007"
 -- ----------------------------
 create table IF NOT EXISTS pip_stage  (
-    stage_id varchar(255) COMMENT 'id',
-    create_time datetime COMMENT '创建时间',
-    stage_name varchar(255) COMMENT '阶段名称',
-    pipeline_id varchar(255) COMMENT '流水线id',
-    stage_sort int COMMENT '阶段顺序',
-    parent_id varchar(255) COMMENT '主阶段',
-    code varchar(255) COMMENT '是否为源码',
-    PRIMARY KEY (stage_id) USING BTREE
+    stage_id varchar(255) PRIMARY KEY,
+    create_time timestamp  ,
+    stage_name varchar(255) ,
+    pipeline_id varchar(255) ,
+    stage_sort int ,
+    parent_id varchar(255) ,
+    code varchar(255)
 );
 
 -- ---------------------------
@@ -111,15 +104,14 @@ create table IF NOT EXISTS pip_stage  (
 -- @dsm.cmd.id="1008"
 -- ----------------------------
 create table IF NOT EXISTS pip_stage_instance  (
-    id varchar(255) COMMENT 'id',
-    stage_name varchar(255) COMMENT '阶段实例名称',
-    stage_sort int COMMENT '阶段实例顺序',
-    stage_time int COMMENT '阶段实例顺序',
-    stage_address varchar(255) COMMENT '阶段实例运行日志地址',
-    stage_state varchar(255) COMMENT '阶段实例运行状态 成功:success 失败:error 停止:halt 等待运行:wait',
-    parent_id varchar(255) COMMENT '主阶段',
-    instance_id varchar(255) COMMENT '所属实例',
-    PRIMARY KEY (id) USING BTREE
+    id varchar(255) PRIMARY KEY ,
+    stage_name varchar(255),
+    stage_sort int ,
+    stage_time int ,
+    stage_address varchar(255) ,
+    stage_state varchar(255) ,
+    parent_id varchar(255),
+    instance_id varchar(255)
 );
 
 -- ----------------------------
@@ -127,13 +119,12 @@ create table IF NOT EXISTS pip_stage_instance  (
 -- @dsm.cmd.id="1009"
 -- ----------------------------
 create table IF NOT EXISTS pip_trigger  (
-    trigger_id varchar(255) COMMENT '配置',
-    name varchar(32) COMMENT '名称',
-    task_type int COMMENT '任务类型' ,
-    create_time varchar(255) COMMENT '创建时间',
-    task_sort varchar(255) COMMENT '任务顺序',
-    pipeline_id varchar(255) COMMENT '流水线id',
-    PRIMARY KEY (trigger_id) USING BTREE
+    trigger_id varchar(255) PRIMARY KEY ,
+    name varchar(32) ,
+    task_type int  ,
+    create_time varchar(255) ,
+    task_sort varchar(255) ,
+    pipeline_id varchar(255)
 );
 
 
@@ -142,12 +133,11 @@ create table IF NOT EXISTS pip_trigger  (
 -- @dsm.cmd.id="1010"
 -- ----------------------------
 create table IF NOT EXISTS pip_trigger_time  (
-    time_id varchar(255) COMMENT '配置',
-    task_type int COMMENT '1:单次,2:周期' ,
-    date varchar(255) COMMENT '时间',
-    cron varchar(255) COMMENT '详细时间',
-    trigger_id varchar(255) COMMENT '配置id',
-    PRIMARY KEY (time_id) USING BTREE
+    time_id varchar(255)  PRIMARY KEY ,
+    task_type int ,
+    date varchar(255),
+    cron varchar(255) ,
+    trigger_id varchar(255)
 );
 
 -- ----------------------------
@@ -155,16 +145,15 @@ create table IF NOT EXISTS pip_trigger_time  (
 -- @dsm.cmd.id="1011"
 -- ----------------------------
 create table IF NOT EXISTS pip_pipeline_variable  (
-    var_id varchar(255) COMMENT '变量id',
-    task_type int COMMENT '类型 1.字符串 2.单选' ,
-    create_time varchar(255) COMMENT '创建时间',
-    var_key varchar(255) COMMENT '名称',
-    var_value varchar(255) COMMENT '值',
-    task_id varchar(255) COMMENT '任务id',
-    type int COMMENT '类型 1:全局,2:任务',
-    var_values varchar(255) COMMENT '值集合',
-    pipeline_id varchar(255) COMMENT '流水线id',
-    PRIMARY KEY (var_id) USING BTREE
+    var_id varchar(255)  PRIMARY KEY,
+    task_type int ,
+    create_time varchar(255) ,
+    var_key varchar(255),
+    var_value varchar(255) ,
+    task_id varchar(255) ,
+    type int ,
+    var_values varchar(255) ,
+    pipeline_id varchar(255)
 );
 
 -- ----------------------------
@@ -172,10 +161,9 @@ create table IF NOT EXISTS pip_pipeline_variable  (
 -- @dsm.cmd.id="1012"
 -- ----------------------------
 create table IF NOT EXISTS pip_other_follow  (
-    id varchar(255) ,
+    id varchar(255) PRIMARY KEY,
     user_id varchar(255) ,
-    pipeline_id varchar(255) ,
-    PRIMARY KEY (id) USING BTREE
+    pipeline_id varchar(255)
 );
 
 -- ----------------------------
@@ -183,12 +171,11 @@ create table IF NOT EXISTS pip_other_follow  (
 -- @dsm.cmd.id="1013"
 -- ----------------------------
 create table IF NOT EXISTS pip_other_open  (
-    open_id varchar(255) ,
+    open_id varchar(255) PRIMARY KEY,
     pipeline_id varchar(255) ,
     number int ,
     user_id varchar(255) ,
-    create_time varchar(255) ,
-    PRIMARY KEY (open_id) USING BTREE
+    create_time varchar(255)
 );
 
 -- ---------------------------
@@ -196,13 +183,12 @@ create table IF NOT EXISTS pip_other_open  (
 -- @dsm.cmd.id="1014"
 -- ----------------------------
 create table pip_postprocess_instance  (
-    id varchar(256)  COMMENT '流水线id',
-    instance_id varchar(256)  COMMENT '流水线名称',
-    taskInstance_id varchar(256)  COMMENT '用户id',
-    post_address varchar(256)  COMMENT '创建时间',
-    post_time int  COMMENT '流水线类型',
-    post_state varchar(256)  COMMENT '运行状态（1.正常 2.运行中）',
-    PRIMARY KEY (id) USING BTREE
+    id varchar(256) PRIMARY KEY ,
+    instance_id varchar(256) ,
+    taskInstance_id varchar(256)  ,
+    post_address varchar(256) ,
+    post_time int  ,
+    post_state varchar(256)
 );
 
 
