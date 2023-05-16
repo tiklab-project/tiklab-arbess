@@ -53,6 +53,9 @@ public class MatFlowDsmAutoConfiguration {
                 "user_1.0.1_dml",
                 "oplog_1.0.1_dml"
         });
+        dsmConfig.newVersion("1.0.2", new String[]{
+                "oplog_1.0.2_dml"
+        });
         return dsmConfig;
     }
 
