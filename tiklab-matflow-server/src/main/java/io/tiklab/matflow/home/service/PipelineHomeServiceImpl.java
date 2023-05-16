@@ -115,7 +115,7 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
         log.setModule(s[s.length-1]);
 
         log.setLoggingTemplateId(templateId);
-        log.setTimestamp(new Timestamp(System.currentTimeMillis()));
+        log.setCreateTime(new Timestamp(System.currentTimeMillis()));
 
         //用户信息
         String userId = LoginContext.getLoginId();
