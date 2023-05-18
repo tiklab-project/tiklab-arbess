@@ -27,6 +27,17 @@ public class PipelineRecently {
 
     private Integer color;
 
+    private Integer lastRunType;
+
+
+    public Integer getLastRunType() {
+        return lastRunType;
+    }
+
+    public void setLastRunType(Integer lastRunType) {
+        this.lastRunType = lastRunType;
+    }
+
     public String getInstanceId() {
         return instanceId;
     }
