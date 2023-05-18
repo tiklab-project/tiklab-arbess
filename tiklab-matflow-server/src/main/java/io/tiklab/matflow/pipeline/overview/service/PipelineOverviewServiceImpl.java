@@ -7,6 +7,8 @@ import io.tiklab.matflow.support.util.PipelineUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Objects;
+
 /**
  * 流水线统计服务
  */
@@ -42,7 +44,7 @@ public class PipelineOverviewServiceImpl implements PipelineOverviewService {
 
         Integer runTime = overviewDao.findPipelineRunTime(pipelineId);
 
-        if (runTime == 0){
+        if (Objects.isNull(runTime) || runTime == 0){
             overview.setTime("0 秒");
         }else {
             int i = runTime / allNumber;

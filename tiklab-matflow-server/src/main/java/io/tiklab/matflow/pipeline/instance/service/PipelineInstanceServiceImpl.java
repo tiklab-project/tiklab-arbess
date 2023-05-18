@@ -159,6 +159,9 @@ public class PipelineInstanceServiceImpl implements PipelineInstanceService {
     @Override
     public PipelineInstance findLastInstance(String pipelineId){
         PipelineInstanceEntity instanceEntity = pipelineInstanceDao.findLastInstance(pipelineId);
+        if (Objects.isNull(instanceEntity)){
+            return null;
+        }
         String createTime = instanceEntity.getCreateTime();
         Date date = PipelineUtil.StringChengeDate(createTime);
         String dateTime = PipelineUtil.findDateTime(date, 7);
