@@ -345,6 +345,7 @@ public class PipelineServiceImpl implements PipelineService {
             recently.setLastRunTime(formatted);
             recently.setColor(pipeline.getColor());
             recently.setInstanceId(lastInstance.getInstanceId());
+            recently.setLastRunType(lastInstance.getRunWay());
             list.add(recently);
         }
         list.sort(Comparator.comparing(PipelineRecently::getCreateTime).reversed());
