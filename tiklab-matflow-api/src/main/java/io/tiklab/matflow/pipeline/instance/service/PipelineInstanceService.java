@@ -90,6 +90,13 @@ public interface PipelineInstanceService {
     @FindAll
     List<PipelineInstance> findPipelineAllInstance(String pipelineId);
 
+    /**
+     * 获取流水线最近一次的历史
+     * @param pipelineId 流水线id
+     * @return 历史实例
+     */
+    PipelineInstance findLastInstance(String pipelineId);
+
 
     @FindList
     List<PipelineInstance> findInstanceList(List<String> idList);

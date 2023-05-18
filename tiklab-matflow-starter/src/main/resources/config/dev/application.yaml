@@ -69,8 +69,8 @@ message:
 
 eas:
   embbed:
-#    enable: true
-    enable: false
+    enable: true
+#    enable: false
   address: http://eas.dev.tiklab.net
   web:
     address: http://eas.local.tiklab.net

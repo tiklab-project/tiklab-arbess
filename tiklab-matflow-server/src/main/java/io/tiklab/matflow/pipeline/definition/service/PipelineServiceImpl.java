@@ -8,10 +8,7 @@ import io.tiklab.join.JoinTemplate;
 import io.tiklab.matflow.home.service.PipelineHomeService;
 import io.tiklab.matflow.pipeline.definition.dao.PipelineDao;
 import io.tiklab.matflow.pipeline.definition.entity.PipelineEntity;
-import io.tiklab.matflow.pipeline.definition.model.Pipeline;
-import io.tiklab.matflow.pipeline.definition.model.PipelineExecMessage;
-import io.tiklab.matflow.pipeline.definition.model.PipelineFollow;
-import io.tiklab.matflow.pipeline.definition.model.PipelineQuery;
+import io.tiklab.matflow.pipeline.definition.model.*;
 import io.tiklab.matflow.pipeline.instance.model.PipelineInstance;
 import io.tiklab.matflow.pipeline.instance.service.PipelineInstanceService;
 import io.tiklab.matflow.stages.service.StageService;
@@ -320,6 +317,40 @@ public class PipelineServiceImpl implements PipelineService {
         return authorityService.findPipelineUser(pipelineId);
     }
 
+
+    public List<PipelineRecently> findPipelineRecently(){
+        List<Pipeline> userPipeline = findUserPipeline();
+
+        if (userPipeline.isEmpty()){
+            return Collections.emptyList();
+        }
+        List<PipelineRecently> list = new ArrayList<>();
+        for (Pipeline pipeline : userPipeline) {
+            String pipelineId = pipeline.getId();
+            PipelineInstance lastInstance = instanceService.findLastInstance(pipelineId);
+            if (Objects.isNull(lastInstance)){
+                continue;
+            }
+            PipelineRecently recently = new PipelineRecently();
+            recently.setPipelineId(pipelineId);
+            recently.setPipelineName(pipeline.getName());
+            recently.setLastRunState(lastInstance.getRunStatus());
+            recently.setNumber(lastInstance.getFindNumber());
+            String createTime = lastInstance.getCreateTime();
+            recently.setCreateTime(createTime);
+            Date date = PipelineUtil.StringChengeDate(createTime);
+            String dateTime = PipelineUtil.findDateTime(date, 7);
+            recently.setExecTime(dateTime);
+            String formatted = PipelineUtil.formatDateTime(lastInstance.getRunTime());
+            recently.setLastRunTime(formatted);
+            recently.setColor(pipeline.getColor());
+            recently.setInstanceId(lastInstance.getInstanceId());
+            list.add(recently);
+        }
+        list.sort(Comparator.comparing(PipelineRecently::getCreateTime).reversed());
+        return list;
+    }
+
     /**
      * 删除关联信息
      * @param pipelineId 流水线Id
@@ -356,9 +387,14 @@ public class PipelineServiceImpl implements PipelineService {
             //成功和构建时间
             PipelineInstance latelyHistory = instanceService.findLatelyInstance(pipeline.getId());
             if (!Objects.isNull(latelyHistory)){
-                pipelineExecMessage.setLastBuildTime(latelyHistory.getCreateTime());
+                String createTime = latelyHistory.getCreateTime();
+                Date date = PipelineUtil.StringChengeDate(createTime);
+                String dateTime = PipelineUtil.findDateTime(date, 7);
+                pipelineExecMessage.setLastBuildTime(dateTime);
                 pipelineExecMessage.setBuildStatus(latelyHistory.getRunStatus());
                 pipelineExecMessage.setExecUser(latelyHistory.getUser());
+                pipelineExecMessage.setNumber(latelyHistory.getFindNumber());
+                pipelineExecMessage.setInstanceId(latelyHistory.getInstanceId());
             }
             pipelineExecMessageList.add(pipelineExecMessage);
         }

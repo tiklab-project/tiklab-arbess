@@ -46,6 +46,28 @@ public class PipelineExecMessage {
     @ApiProperty(name="execUser",desc="用户(执行人)")
     private User execUser;
 
+    @ApiProperty(name="number",desc="执行次数")
+    private Integer number;
+
+    @ApiProperty(name="instanceId",desc="实例id")
+    private String instanceId;
+
+
+    public Integer getNumber() {
+        return number;
+    }
+
+    public void setNumber(Integer number) {
+        this.number = number;
+    }
+
+    public String getInstanceId() {
+        return instanceId;
+    }
+
+    public void setInstanceId(String instanceId) {
+        this.instanceId = instanceId;
+    }
 
     public String getId() {
         return id;

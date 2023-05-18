@@ -1,9 +1,9 @@
 package io.tiklab.matflow.pipeline.definition.dao;
 
 
-import io.tiklab.matflow.pipeline.definition.entity.PipelineOpenEntity;
 import io.tiklab.dal.jdbc.JdbcTemplate;
 import io.tiklab.dal.jpa.JpaTemplate;
+import io.tiklab.matflow.pipeline.definition.entity.PipelineOpenEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,6 +65,31 @@ public class PipelineOpenDao {
         sql = sql.concat(" where pip_other_open.user_id   = '"+userId+"' ");
         JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
         return  jdbcTemplate.query(sql, new BeanPropertyRowMapper(PipelineOpenEntity.class));
+    }
+
+    public Integer findUserOpenPipelineNumber(String userId,String pipelineId,String time){
+        String sql = "SELECT count(*) FROM pip_other_open WHERE \"user_id\" = '" + userId +
+                "' and  pipeline_id = '" +pipelineId +
+                "' and create_time >= '"+ time +"'";
+        JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
+        List<Integer> list = jdbcTemplate.queryForList(sql, Integer.class);
+        if (list.isEmpty()){
+            return 0;
+        }
+        return  list.get(0);
+    }
+
+    public String findUserLastOpenPipeline(String userId,String pipelineId){
+        String sql = "SELECT create_time FROM pip_other_open " +
+                " WHERE \"user_id\" = '" + userId +
+                "' and  pipeline_id = '" +pipelineId +
+                "' ORDER BY create_time desc";
+        JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
+        List<String> list = jdbcTemplate.queryForList(sql, String.class);
+        if (list.isEmpty()){
+            return null;
+        }
+        return  list.get(0);
     }
 
     /**

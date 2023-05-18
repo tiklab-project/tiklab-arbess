@@ -9,6 +9,7 @@ import io.tiklab.join.annotation.JoinProvider;
 import io.tiklab.matflow.pipeline.definition.model.Pipeline;
 import io.tiklab.matflow.pipeline.definition.model.PipelineExecMessage;
 import io.tiklab.matflow.pipeline.definition.model.PipelineQuery;
+import io.tiklab.matflow.pipeline.definition.model.PipelineRecently;
 import io.tiklab.user.user.model.User;
 
 import javax.validation.Valid;
@@ -91,6 +92,15 @@ public interface PipelineService {
      * @return 用户信息
      */
     List<User> findPipelineUser(String pipelineId);
+
+
+    /**
+     * 查询当前用户最近构建的流水线
+     * @return 流水线信息
+     */
+    List<PipelineRecently> findPipelineRecently();
+
+
 
 }
 

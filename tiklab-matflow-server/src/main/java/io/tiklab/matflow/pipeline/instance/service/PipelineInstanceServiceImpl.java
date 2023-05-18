@@ -155,6 +155,22 @@ public class PipelineInstanceServiceImpl implements PipelineInstanceService {
         return allInstance;
     }
 
+
+    @Override
+    public PipelineInstance findLastInstance(String pipelineId){
+        PipelineInstanceEntity instanceEntity = pipelineInstanceDao.findLastInstance(pipelineId);
+        String createTime = instanceEntity.getCreateTime();
+        Date date = PipelineUtil.StringChengeDate(createTime);
+        String dateTime = PipelineUtil.findDateTime(date, 7);
+        if (Objects.isNull(dateTime)){
+            return null;
+        }
+        PipelineInstance pipelineInstance = BeanMapper.map(instanceEntity, PipelineInstance.class);
+        joinTemplate.joinQuery(pipelineInstance);
+        return pipelineInstance;
+    }
+
+
     @Override
     public PipelineInstance findLatelyInstance(String pipelineId){
         List<PipelineInstanceEntity> latelySuccess = pipelineInstanceDao.findLatelyInstance(pipelineId);

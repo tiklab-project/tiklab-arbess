@@ -8,9 +8,9 @@ server:
   port: 8080
 
 jdbc:
-  driverClassName: com.mysql.cj.jdbc.Driver
-  url: jdbc:mysql://localhost:3306/tiklab_matflow?characterEncoding=utf8&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-  username: root
+  driverClassName: org.postgresql.Driver
+  url: jdbc:postgresql://172.11.1.10:5432/tiklab_matflow?stringtype=unspecified
+  username: postgres
   password: darth2020
 
 #plugin config

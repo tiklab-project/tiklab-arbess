@@ -3,7 +3,6 @@ package io.tiklab.matflow.pipeline.overview.model;
 
 import io.tiklab.postin.annotation.ApiModel;
 import io.tiklab.postin.annotation.ApiProperty;
-import io.tiklab.user.user.model.User;
 
 /**
  * 流水线概况统计模型
@@ -12,14 +11,11 @@ import io.tiklab.user.user.model.User;
 @ApiModel
 public class PipelineOverview {
 
-    @ApiProperty(name="number",desc="运行次数")
-    private int number;
+    @ApiProperty(name="allNumber",desc="运行次数")
+    private int allNumber;
 
     @ApiProperty(name="execTime",desc="平均执行时长")
     private int execTime;
-
-    @ApiProperty(name="user",desc="执行人")
-    private User user;
 
     @ApiProperty(name="successNumber",desc="成功次数")
     private int successNumber;
@@ -27,8 +23,8 @@ public class PipelineOverview {
     @ApiProperty(name="errorNumber",desc="失败次数")
     private int errorNumber;
 
-    @ApiProperty(name="removeNumber",desc="停止次数")
-    private int removeNumber;
+    @ApiProperty(name="haltNumber",desc="停止次数")
+    private int haltNumber;
 
     @ApiProperty(name="time",desc="平均执行时长(转换成时分秒)")
     private String time;
@@ -50,20 +46,20 @@ public class PipelineOverview {
         this.errorNumber = errorNumber;
     }
 
-    public int getRemoveNumber() {
-        return removeNumber;
+    public int getHaltNumber() {
+        return haltNumber;
     }
 
-    public void setRemoveNumber(int removeNumber) {
-        this.removeNumber = removeNumber;
+    public void setHaltNumber(int haltNumber) {
+        this.haltNumber = haltNumber;
     }
 
-    public int getNumber() {
-        return number;
+    public int getAllNumber() {
+        return allNumber;
     }
 
-    public void setNumber(int number) {
-        this.number = number;
+    public void setAllNumber(int allNumber) {
+        this.allNumber = allNumber;
     }
 
     public int getExecTime() {
@@ -82,11 +78,4 @@ public class PipelineOverview {
         this.time = time;
     }
 
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
 }

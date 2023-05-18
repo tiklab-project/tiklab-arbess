@@ -16,9 +16,8 @@ import io.tiklab.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @Service
 @Exporter
@@ -54,20 +53,27 @@ public class PipelineOpenServiceImpl implements PipelineOpenService {
     }
 
     @Override
-    public void updatePipelineOpen( String pipelineId) {
+    public void updatePipelineOpen(String pipelineId) {
         String userId = LoginContext.getLoginId();
-        PipelineOpen open = findPipelineOpenNumber(userId, pipelineId);
-        if (open != null){
-            open.setNumber(open.getNumber()+1);
-            updateOpen(open);
-        }else {
-            PipelineOpen pipelineOpen = new PipelineOpen();
-            pipelineOpen.setUserId(userId);
-            pipelineOpen.setPipeline(new Pipeline(pipelineId));
-            pipelineOpen.setNumber(1);
-            pipelineOpen.setCreateTime(PipelineUtil.date(2));
-            createOpen(pipelineOpen);
-        }
+
+        PipelineOpen pipelineOpen = new PipelineOpen();
+        pipelineOpen.setPipeline(new Pipeline(pipelineId));
+        pipelineOpen.setCreateTime(PipelineUtil.date(1));
+        pipelineOpen.setUserId(userId);
+        createOpen(pipelineOpen);
+
+        // PipelineOpen open = findPipelineOpenNumber(userId, pipelineId);
+        // if (open != null){
+        //     open.setNumber(open.getNumber()+1);
+        //     updateOpen(open);
+        // }else {
+        //     PipelineOpen pipelineOpen = new PipelineOpen();
+        //     pipelineOpen.setUserId(userId);
+        //     pipelineOpen.setPipeline(new Pipeline(pipelineId));
+        //     pipelineOpen.setNumber(1);
+        //     pipelineOpen.setCreateTime(PipelineUtil.date(2));
+        //     createOpen(pipelineOpen);
+        // }
     }
 
     @Override
@@ -128,19 +134,51 @@ public class PipelineOpenServiceImpl implements PipelineOpenService {
      */
     @Override
     public List<PipelineOpen> findUserAllOpen(int number) {
-        List<PipelineOpen> allOpen = findUserAllOpen() ;
-        //根据打开次数降序排列
-        allOpen.sort(Comparator.comparing(PipelineOpen::getNumber).reversed()) ;
-        // 指定返回数量
-        int min = Math.min(number, allOpen.size()) ;
-        List<PipelineOpen> pipelineOpens = allOpen.subList(0, min);
-        //统计信息
-        for (PipelineOpen pipelineOpen : pipelineOpens) {
-            Pipeline pipeline = pipelineOpen.getPipeline();
-            PipelineOverview pipelineOverview = overviewService.pipelineOverview(pipeline.getId());
-            pipelineOpen.setPipelineExecState(pipelineOverview);
+        String userId = LoginContext.getLoginId();
+        List<Pipeline> userPipeline = authorityService.findUserPipeline(userId);
+        if (userPipeline.isEmpty()){
+            return Collections.emptyList();
         }
-        return pipelineOpens;
+
+        List<PipelineOpen> openList = new ArrayList<>();
+        for (Pipeline pipeline : userPipeline) {
+            String pipelineId = pipeline.getId();
+            // 判断天数是否超过7天
+            String openTime = pipelineOpenDao.findUserLastOpenPipeline(userId, pipelineId);
+            if (openTime.length() < 11){
+                openTime = openTime +" 00:00:00";
+            }
+
+            PipelineOpen pipelineOpen = new PipelineOpen();
+
+            Date date = PipelineUtil.findDate(Calendar.DATE, -7);
+
+            String format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date);
+            Integer openNumber = pipelineOpenDao.findUserOpenPipelineNumber(userId, pipelineId, format);
+            pipelineOpen.setNumber(openNumber);
+
+            PipelineOverview pipelineOverview = overviewService.pipelineOverview(pipelineId);
+            pipelineOpen.setPipelineExecState(pipelineOverview);
+            pipelineOpen.setPipeline(pipeline);
+
+            openList.add(pipelineOpen);
+        }
+        openList.sort(Comparator.comparing(PipelineOpen::getNumber).reversed());
+        return openList;
+
+        // List<PipelineOpen> allOpen = findUserAllOpen() ;
+        // //根据打开次数降序排列
+        // allOpen.sort(Comparator.comparing(PipelineOpen::getNumber).reversed()) ;
+        // // 指定返回数量
+        // int min = Math.min(number, allOpen.size()) ;
+        // List<PipelineOpen> pipelineOpens = allOpen.subList(0, min);
+        // //统计信息
+        // for (PipelineOpen pipelineOpen : pipelineOpens) {
+        //     Pipeline pipeline = pipelineOpen.getPipeline();
+        //     PipelineOverview pipelineOverview = overviewService.pipelineOverview(pipeline.getId());
+        //     pipelineOpen.setPipelineExecState(pipelineOverview);
+        // }
+        // return pipelineOpens;
     }
 
     //查询流水线最近打开

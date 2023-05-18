@@ -67,6 +67,7 @@ public class PipelineAuthorityServiceImpl implements PipelineAuthorityService{
     @Override
     public String[] findUserPipelineIdString(String userId){
         List<DmUser> allDmUser = dmUserService.findAllDmUser();
+
         List<String> list = new ArrayList<>();
         if (!Objects.isNull(allDmUser)){
             for (DmUser dmUser : allDmUser) {

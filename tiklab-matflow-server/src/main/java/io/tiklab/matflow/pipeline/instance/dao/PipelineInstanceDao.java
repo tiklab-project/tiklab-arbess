@@ -1,13 +1,13 @@
 package io.tiklab.matflow.pipeline.instance.dao;
 
 
-import io.tiklab.matflow.pipeline.instance.entity.PipelineInstanceEntity;
 import io.tiklab.core.page.Pagination;
 import io.tiklab.dal.jdbc.JdbcTemplate;
 import io.tiklab.dal.jpa.JpaTemplate;
 import io.tiklab.dal.jpa.criterial.condition.QueryCondition;
 import io.tiklab.dal.jpa.criterial.conditionbuilder.QueryBuilders;
 import io.tiklab.matflow.pipeline.definition.model.Pipeline;
+import io.tiklab.matflow.pipeline.instance.entity.PipelineInstanceEntity;
 import io.tiklab.matflow.pipeline.instance.model.PipelineInstanceQuery;
 import io.tiklab.matflow.support.util.PipelineUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -150,7 +150,28 @@ public class PipelineInstanceDao {
     }
 
     /**
-     * 获取最近一次构建信息
+     * 根据流水线id最近一次的构建历史
+     * @param pipelineId 流水线id
+     * @return 最近一次的构建历史
+     */
+    public PipelineInstanceEntity findLastInstance(String pipelineId){
+        String sql = "select pip_pipeline_instance.* from pip_pipeline_instance  ";
+        sql = sql.concat(" where pipeline_id   = '" + pipelineId + "' ");
+        sql = sql.concat(" order by create_time desc ");
+        JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
+        BeanPropertyRowMapper rowMapper = new BeanPropertyRowMapper(PipelineInstanceEntity.class);
+        List<PipelineInstanceEntity> list = jdbcTemplate.query(sql, rowMapper);
+        if (list.isEmpty()){
+            return null;
+        }
+        return  list.get(0);
+    }
+
+
+
+
+    /**
+     * 获取最近一次构建信息不包括正在运行的
      * @param pipelineId 流水线id
      * @return 构建信息
      */

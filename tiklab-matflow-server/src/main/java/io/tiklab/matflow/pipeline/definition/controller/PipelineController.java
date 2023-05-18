@@ -5,6 +5,7 @@ import io.tiklab.core.page.Pagination;
 import io.tiklab.matflow.pipeline.definition.model.Pipeline;
 import io.tiklab.matflow.pipeline.definition.model.PipelineExecMessage;
 import io.tiklab.matflow.pipeline.definition.model.PipelineQuery;
+import io.tiklab.matflow.pipeline.definition.model.PipelineRecently;
 import io.tiklab.matflow.pipeline.definition.service.PipelineService;
 import io.tiklab.postin.annotation.Api;
 import io.tiklab.postin.annotation.ApiMethod;
@@ -140,6 +141,15 @@ public class PipelineController {
         List<User>  dmUser = pipelineService.findPipelineUser(pipelineId);
 
         return Result.ok(dmUser);
+    }
+
+    @RequestMapping(path="/findPipelineRecently",method = RequestMethod.POST)
+    @ApiMethod(name = "findPipelineRecently",desc = "查询用户最近构建的流水线")
+    public Result<List<PipelineRecently>> findPipelineRecently(){
+
+        List<PipelineRecently> userPipeline = pipelineService.findPipelineRecently();
+
+        return Result.ok(userPipeline);
     }
 
 

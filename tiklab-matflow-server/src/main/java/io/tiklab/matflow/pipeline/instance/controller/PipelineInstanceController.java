@@ -56,6 +56,15 @@ public class PipelineInstanceController {
         return Result.ok(userAllInstance);
     }
 
+
+    @RequestMapping(path="/findOneInstance",method = RequestMethod.POST)
+    @ApiMethod(name = "findOneInstance",desc = "查询用户实例")
+    @ApiParam(name = "instanceId",desc = "查询条件",required = true)
+    public Result<Pagination<PipelineInstance>>  findOneInstance( @NotNull String instanceId){
+        PipelineInstance lastInstance = instanceService.findOneInstance(instanceId);
+        return Result.ok(lastInstance);
+    }
+
     
     
     

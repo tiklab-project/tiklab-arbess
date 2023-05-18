@@ -8,6 +8,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -46,6 +47,114 @@ public class PipelineUtil {
             }
         }
     }
+
+    /**
+     * 获取当前时间的指定的时间 如：获取前一个月，一天，一年，或后一天，一年等
+     * @param field Calendar.MONTH 月 ；Calendar.DATE 天；Calendar.YEAR 年，等
+     * @param number 1 往后 ，-1 往前
+     * @return 时间
+     */
+    public static Date findDate(int field,int number){
+        //获取当前日期
+        Date date = new Date();
+        //创建Calendar实例
+        Calendar cal = Calendar.getInstance();
+        //设置当前时间
+        cal.setTime(date);
+        //在当前时间基础上减一月
+        // cal.add(Calendar.MONTH,-1);
+        // 同理增加一天的方法：
+        // cal.add(Calendar.DATE, 1);
+        cal.add(field, number);
+        return cal.getTime();
+    }
+
+    /**
+     * 字符串转换成时间
+     * @param time 时间字符串
+     * @return 时间
+     */
+    public static Date StringChengeDate(String time){
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date targetTime;
+        try {
+            targetTime = sdf.parse(time);
+        } catch (ParseException e) {
+            throw new ApplicationException("时间转换失败，不是yyyy-MM-dd HH:mm:ss格式:"+time);
+        }
+        return targetTime;
+    }
+
+
+    /**
+     * 获取指定指定时间与现在时间是否相差在指定天数内
+     * @param targetTime 指定时间
+     * @param dayNumber 天数
+     * @return 相差
+     */
+    public static String findDateTime(Date targetTime,Integer dayNumber){
+
+        Date currentDate = new Date();
+
+        // 将Date类型转换为Calendar类型
+        Calendar targetCalendar = Calendar.getInstance();
+        targetCalendar.setTime(targetTime);
+
+        // 计算时间差
+        long diffMillis =currentDate.getTime() - targetCalendar.getTimeInMillis() ;
+        long diffSeconds = diffMillis / 1000;
+        long diffMinutes = diffSeconds / 60;
+        long diffHours = diffMinutes / 60;
+        long diffDays = diffHours / 24;
+
+        int day = (int) diffDays;
+        int hours = (int) diffHours % 24;
+        int minutes = (int) diffMinutes % 60;
+        int seconds = (int) diffSeconds % 60;
+
+        String time = "";
+
+        if (day > dayNumber){
+            return null;
+        }
+
+        if (seconds != 0){
+            time = seconds+" 秒";
+        }
+
+        if (minutes != 0){
+            time = minutes + " 分 " +  time;
+        }
+
+        if (hours != 0){
+            if (minutes != 0){
+                time = hours + " 小时 "+minutes + " 分";
+            }else {
+                time = hours + " 小时";
+            }
+        }
+
+
+
+
+        if (day != 0){
+            if (day == 1 && hours == 0){
+                return " 昨天";
+            }
+            if (hours != 0){
+                time = day +" 天 "+hours + " 小时";
+            }else {
+                time = day +" 天";
+            }
+        }
+
+        if (time.equals("")){
+            return null;
+        }
+        return time;
+
+    }
+
 
     /**
      * 返回今天星期几
@@ -264,7 +373,6 @@ public class PipelineUtil {
         }
         return file.delete();
     }
-
 
 
     /**
