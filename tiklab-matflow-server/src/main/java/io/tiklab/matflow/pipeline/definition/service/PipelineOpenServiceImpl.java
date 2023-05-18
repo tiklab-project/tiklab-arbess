@@ -148,7 +148,6 @@ public class PipelineOpenServiceImpl implements PipelineOpenService {
             if (openTime.length() < 11){
                 openTime = openTime +" 00:00:00";
             }
-
             PipelineOpen pipelineOpen = new PipelineOpen();
 
             Date date = PipelineUtil.findDate(Calendar.DATE, -7);
@@ -165,20 +164,6 @@ public class PipelineOpenServiceImpl implements PipelineOpenService {
         }
         openList.sort(Comparator.comparing(PipelineOpen::getNumber).reversed());
         return openList;
-
-        // List<PipelineOpen> allOpen = findUserAllOpen() ;
-        // //根据打开次数降序排列
-        // allOpen.sort(Comparator.comparing(PipelineOpen::getNumber).reversed()) ;
-        // // 指定返回数量
-        // int min = Math.min(number, allOpen.size()) ;
-        // List<PipelineOpen> pipelineOpens = allOpen.subList(0, min);
-        // //统计信息
-        // for (PipelineOpen pipelineOpen : pipelineOpens) {
-        //     Pipeline pipeline = pipelineOpen.getPipeline();
-        //     PipelineOverview pipelineOverview = overviewService.pipelineOverview(pipeline.getId());
-        //     pipelineOpen.setPipelineExecState(pipelineOverview);
-        // }
-        // return pipelineOpens;
     }
 
     //查询流水线最近打开
