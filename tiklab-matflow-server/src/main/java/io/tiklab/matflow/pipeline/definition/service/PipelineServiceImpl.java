@@ -210,7 +210,7 @@ public class PipelineServiceImpl implements PipelineService {
         return Collections.emptyList();
     }
 
-
+    @Override
     public Pagination<PipelineExecMessage> findUserPipelinePage(PipelineQuery query){
         String loginId = LoginContext.getLoginId();
         List<PipelineFollow> followPipeline = followService.findUserFollowPipeline(loginId);
@@ -317,8 +317,8 @@ public class PipelineServiceImpl implements PipelineService {
         return authorityService.findPipelineUser(pipelineId);
     }
 
-
-    public List<PipelineRecently> findPipelineRecently(){
+    @Override
+    public List<PipelineRecently> findPipelineRecently(int number){
         List<Pipeline> userPipeline = findUserPipeline();
 
         if (userPipeline.isEmpty()){
@@ -349,14 +349,23 @@ public class PipelineServiceImpl implements PipelineService {
             list.add(recently);
         }
         list.sort(Comparator.comparing(PipelineRecently::getCreateTime).reversed());
-        return list;
+        List<PipelineRecently> recentlyList = new ArrayList<>();
+
+        for (int i = 0; i < list.size(); i++) {
+            PipelineRecently recently = list.get(i);
+            if (i >= number){
+                continue;
+            }
+            recentlyList.add(recently);
+        }
+        return recentlyList;
     }
 
     /**
      * 删除关联信息
      * @param pipelineId 流水线Id
      */
-    public void deleteHistory( String pipelineId){
+    public void deleteHistory ( String pipelineId){
         //删除对应的历史
         instanceService.deleteAllInstance(pipelineId);
         //删除对应源码文件

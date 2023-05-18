@@ -145,9 +145,10 @@ public class PipelineController {
 
     @RequestMapping(path="/findPipelineRecently",method = RequestMethod.POST)
     @ApiMethod(name = "findPipelineRecently",desc = "查询用户最近构建的流水线")
-    public Result<List<PipelineRecently>> findPipelineRecently(){
+    @ApiParam(name = "number",desc = "流水线id",required = true)
+    public Result<List<PipelineRecently>> findPipelineRecently(int number){
 
-        List<PipelineRecently> userPipeline = pipelineService.findPipelineRecently();
+        List<PipelineRecently> userPipeline = pipelineService.findPipelineRecently(number);
 
         return Result.ok(userPipeline);
     }

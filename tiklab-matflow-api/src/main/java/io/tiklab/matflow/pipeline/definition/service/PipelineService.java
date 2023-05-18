@@ -98,7 +98,7 @@ public interface PipelineService {
      * 查询当前用户最近构建的流水线
      * @return 流水线信息
      */
-    List<PipelineRecently> findPipelineRecently();
+    List<PipelineRecently> findPipelineRecently(int number);
 
 
 

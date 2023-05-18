@@ -163,7 +163,15 @@ public class PipelineOpenServiceImpl implements PipelineOpenService {
             openList.add(pipelineOpen);
         }
         openList.sort(Comparator.comparing(PipelineOpen::getNumber).reversed());
-        return openList;
+
+        List<PipelineOpen> list = new ArrayList<>();
+        for (int i = 0; i < openList.size(); i++) {
+            if (i >= number){
+                continue;
+            }
+            list.add(openList.get(i));
+        }
+        return list;
     }
 
     //查询流水线最近打开

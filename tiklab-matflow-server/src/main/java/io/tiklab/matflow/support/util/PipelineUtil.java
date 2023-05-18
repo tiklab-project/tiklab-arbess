@@ -134,9 +134,6 @@ public class PipelineUtil {
             }
         }
 
-
-
-
         if (day != 0){
             if (day == 1 && hours == 0){
                 return " 昨天";
