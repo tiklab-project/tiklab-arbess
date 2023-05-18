@@ -143,11 +143,11 @@ public class PipelineOpenServiceImpl implements PipelineOpenService {
         List<PipelineOpen> openList = new ArrayList<>();
         for (Pipeline pipeline : userPipeline) {
             String pipelineId = pipeline.getId();
-            // 判断天数是否超过7天
-            String openTime = pipelineOpenDao.findUserLastOpenPipeline(userId, pipelineId);
-            if (openTime.length() < 11){
-                openTime = openTime +" 00:00:00";
-            }
+            // // 判断天数是否超过7天
+            // String openTime = pipelineOpenDao.findUserLastOpenPipeline(userId, pipelineId);
+            // if (openTime.length() < 11){
+            //     openTime = openTime +" 00:00:00";
+            // }
             PipelineOpen pipelineOpen = new PipelineOpen();
 
             Date date = PipelineUtil.findDate(Calendar.DATE, -7);
