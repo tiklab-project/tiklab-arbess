@@ -22,7 +22,7 @@ public class TaskInstance {
     private String instanceId;
 
     @ApiProperty(name = "taskType",desc = "运行类型")
-    private int taskType ;
+    private String taskType ;
 
     @ApiProperty(name = "taskSort",desc = "执行顺序")
     private int taskSort ;
@@ -76,11 +76,11 @@ public class TaskInstance {
         this.instanceId = instanceId;
     }
 
-    public int getTaskType() {
+    public String getTaskType() {
         return taskType;
     }
 
-    public void setTaskType(int taskType) {
+    public void setTaskType(String taskType) {
         this.taskType = taskType;
     }
 

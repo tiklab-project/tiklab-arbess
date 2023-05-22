@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @Exporter
@@ -62,7 +63,14 @@ public class TaskArtifactServiceImpl implements TaskArtifactService {
         }
         for (TaskArtifact taskArtifact : allProduct) {
             if (taskArtifact.getTaskId().equals(configId)){
-                return findOneProduct(taskArtifact.getTaskId());
+                TaskArtifact product = findOneProduct(taskArtifact.getTaskId());
+                String authId = product.getAuthId();
+                if (Objects.isNull(authId)){
+                    return product;
+                }
+                AuthThird authServer = thirdServer.findOneAuthServer(authId);
+                product.setAuth(authServer);
+                return product;
             }
         }
         return null;

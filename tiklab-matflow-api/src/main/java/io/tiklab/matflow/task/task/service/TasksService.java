@@ -104,7 +104,7 @@ public interface TasksService {
      * @param pipelineId 流水线id
      * @param template 模板
      */
-    void createTaskTemplate(String pipelineId,int[] template);
+    void createTaskTemplate(String pipelineId,String[] template);
 
     /**
      * 查询单个任务

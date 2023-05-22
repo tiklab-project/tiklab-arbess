@@ -37,7 +37,7 @@ public class TaskBuildExecServiceImpl implements TaskBuildExecService {
     private ScmService scmService;
 
     // 构建
-    public boolean build(String pipelineId, Tasks task , int taskType)  {
+    public boolean build(String pipelineId, Tasks task , String taskType)  {
 
         String taskId = task.getTaskId();
         String names = "执行任务："+task.getTaskName();
@@ -60,7 +60,7 @@ public class TaskBuildExecServiceImpl implements TaskBuildExecService {
 
         //项目地址
         String path = PipelineUtil.findFileAddress(pipelineId,1);
-        int type = taskBuild.getType();
+        String  type = taskBuild.getType();
         try {
             //执行命令
             List<String> list = PipelineUtil.execOrder(buildOrder);
@@ -89,13 +89,13 @@ public class TaskBuildExecServiceImpl implements TaskBuildExecService {
      * @param path 项目地址
      * @return 执行命令
      */
-    private Process getOrder(String orders,int type,String address,String path) throws ApplicationException, IOException {
+    private Process getOrder(String orders,String type,String address,String path) throws ApplicationException, IOException {
         Scm pipelineScm = scmService.findOnePipelineScm(type);
         if (pipelineScm == null) {
-            if (type == 21){
+            if (type.equals("21") || type.equals("maven")){
                 throw new ApplicationException("不存在maven配置");
             }
-            if (type == 22){
+            if (type.equals("22") || type.equals("nodejs")){
                 throw new ApplicationException("不存在npm配置");
             }
         }
@@ -107,11 +107,11 @@ public class TaskBuildExecServiceImpl implements TaskBuildExecService {
         }
 
         switch (type){
-            case 21 -> {
+            case "21","maven" -> {
                 String order =  mavenOrder(orders,path);
                 return PipelineUtil.process(serverAddress, order);
             }
-            case 22 -> {
+            case "22","nodejs" -> {
                 return PipelineUtil.process(path, orders);
             }
             default -> throw new  ApplicationException("未知的任务类型");
@@ -139,9 +139,9 @@ public class TaskBuildExecServiceImpl implements TaskBuildExecService {
      * @param type 任务类型
      * @return 错误状态
      */
-    private String[] error(int type){
+    private String[] error(String type){
         String[] strings;
-        if (type == 21){
+        if (type.equals("21") || type.equals("maven")){
             strings = new String[]{
                     "BUILD FAILUREl",
                     "ERROR"

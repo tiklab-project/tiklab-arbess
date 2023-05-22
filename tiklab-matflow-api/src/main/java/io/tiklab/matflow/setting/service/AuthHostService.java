@@ -47,7 +47,7 @@ public interface AuthHostService {
      * @param type 类型
      * @return 配置
      */
-    List<AuthHost> findAllAuthHostList(int type);
+    List<AuthHost> findAllAuthHostList(String type);
 
     /**
      * 查询所有流水线主机授权

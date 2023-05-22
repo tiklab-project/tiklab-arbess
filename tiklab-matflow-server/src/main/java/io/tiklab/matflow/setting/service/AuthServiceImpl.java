@@ -5,7 +5,7 @@ import io.tiklab.beans.BeanMapper;
 import io.tiklab.eam.common.context.LoginContext;
 import io.tiklab.join.JoinTemplate;
 import io.tiklab.matflow.setting.dao.AuthDao;
-import io.tiklab.matflow.setting.entity.AuthEntity;
+import io.tiklab.matflow.setting.entity.AuthMatFlowEntity;
 import io.tiklab.matflow.setting.model.Auth;
 import io.tiklab.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,8 +28,8 @@ public class AuthServiceImpl implements AuthService {
     JoinTemplate joinTemplate;
 
     public String createAuth(Auth auth) {
-        AuthEntity authEntity = BeanMapper.map(auth, AuthEntity.class);
-        return authDao.createAuth(authEntity);
+        AuthMatFlowEntity authMatFlowEntity = BeanMapper.map(auth, AuthMatFlowEntity.class);
+        return authDao.createAuth(authMatFlowEntity);
     }
 
 
@@ -52,13 +52,13 @@ public class AuthServiceImpl implements AuthService {
         if (authPublic == 1 && oneAuthAuth == 2){
             auth.setPrivateKey("");
         }
-        AuthEntity authEntity = BeanMapper.map(auth, AuthEntity.class);
-        authDao.updateAuth(authEntity);
+        AuthMatFlowEntity authMatFlowEntity = BeanMapper.map(auth, AuthMatFlowEntity.class);
+        authDao.updateAuth(authMatFlowEntity);
     }
 
     @Override
     public Auth findOneAuth(String authId) {
-        AuthEntity oneAuth = authDao.findOneAuth(authId);
+        AuthMatFlowEntity oneAuth = authDao.findOneAuth(authId);
         Auth auth = BeanMapper.map(oneAuth, Auth.class);
         joinTemplate.joinQuery(auth);
         return auth;
@@ -66,27 +66,27 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public List<Auth> findAllAuth() {
-        List<AuthEntity> allAuth = authDao.findAllAuth();
+        List<AuthMatFlowEntity> allAuth = authDao.findAllAuth();
         if (allAuth == null){
             return null;
         }
         //获取公共的和用户私有的
-        List<AuthEntity> allAuthEntity = new ArrayList<>();
+        List<AuthMatFlowEntity> allAuthMatFlowEntity = new ArrayList<>();
         String loginId = LoginContext.getLoginId();
-        for (AuthEntity authEntity : allAuth) {
-            if (authEntity.getUserId().equals(loginId)
-                    || authEntity.getAuthPublic() == 1){
-                allAuthEntity.add(authEntity);
+        for (AuthMatFlowEntity authMatFlowEntity : allAuth) {
+            if (authMatFlowEntity.getUserId().equals(loginId)
+                    || authMatFlowEntity.getAuthPublic() == 1){
+                allAuthMatFlowEntity.add(authMatFlowEntity);
             }
         }
-        List<Auth> auths = BeanMapper.mapList(allAuthEntity, Auth.class);
+        List<Auth> auths = BeanMapper.mapList(allAuthMatFlowEntity, Auth.class);
         joinTemplate.joinQuery(auths);
         return auths;
     }
 
     @Override
     public List<Auth> findAllAuthList(List<String> idList) {
-        List<AuthEntity> allAuthList = authDao.findAllAuthList(idList);
+        List<AuthMatFlowEntity> allAuthList = authDao.findAllAuthList(idList);
         return  BeanMapper.mapList(allAuthList, Auth.class);
     }
    

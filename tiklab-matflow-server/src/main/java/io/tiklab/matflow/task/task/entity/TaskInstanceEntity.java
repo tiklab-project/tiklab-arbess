@@ -21,7 +21,7 @@ public class TaskInstanceEntity {
 
     //运行类型
     @Column(name = "task_type")
-    private int taskType ;
+    private String taskType ;
 
     @Column(name = "task_sort")
     private int taskSort ;
@@ -82,11 +82,11 @@ public class TaskInstanceEntity {
         this.instanceId = instanceId;
     }
 
-    public int getTaskType() {
+    public String getTaskType() {
         return taskType;
     }
 
-    public void setTaskType(int taskType) {
+    public void setTaskType(String taskType) {
         this.taskType = taskType;
     }
 

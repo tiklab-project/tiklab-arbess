@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @Exporter
@@ -83,17 +84,17 @@ public class AuthHostServiceImpl implements AuthHostService {
      * @param type 类型
      * @return 配置
      */
-    public List<AuthHost> findAllAuthHostList(int type) {
+    public List<AuthHost> findAllAuthHostList(String type) {
         List<AuthHost> allAuthHost = findAllAuthHost();
         if (allAuthHost == null){
             return null;
         }
-        if (type == 0){
+        if (Objects.isNull(type) || type.equals("all")){
             return allAuthHost;
         }
         List<AuthHost> list = new ArrayList<>();
         for (AuthHost authHost : allAuthHost) {
-            if (authHost.getType() == type){
+            if (authHost.getType().equals(type)){
                 list.add(authHost);
             }
         }

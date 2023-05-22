@@ -21,16 +21,19 @@ import java.util.List;
 public class TaskCodeServiceImpl implements TaskCodeService {
 
     @Autowired
-    TaskCodeDao taskCodeDao;
+    private TaskCodeDao taskCodeDao;
 
     @Autowired
-    AuthService authServer;
+    private AuthService authServer;
 
     @Autowired
-    AuthThirdService authServerServer;
+    private AuthThirdService authServerServer;
 
     @Autowired
-    TaskCodeThirdService taskCodeThirdService;
+    private TaskCodeThirdService taskCodeThirdService;
+
+    @Autowired
+    private TaskCodeXcodeService taskCodeXcodeService;
 
     private static final Logger logger = LoggerFactory.getLogger(TaskCodeServiceImpl.class);
 
@@ -81,15 +84,21 @@ public class TaskCodeServiceImpl implements TaskCodeService {
     //修改
     @Override
     public void updateCode(TaskCode taskCode) {
+
+        TaskCode oneCode = findOneCode(taskCode.getTaskId());
+        String authId = oneCode.getAuthId();
+        String codeName = taskCode.getCodeName();
         switch (taskCode.getType()) {
-            case 2, 3 -> {
+            case "2", "3","gitee","github" -> {
                 if (!PipelineUtil.isNoNull(taskCode.getCodeName())){
                     break;
                 }
-                TaskCode oneCode = findOneCode(taskCode.getTaskId());
-                String authId = oneCode.getAuthId();
                 String houseUrl = taskCodeThirdService.getHouseUrl(authId, taskCode.getCodeName(), taskCode.getType());
                 taskCode.setCodeAddress(houseUrl);
+            }
+            case "xcode" -> {
+                String repository = taskCodeXcodeService.findRepository(authId, codeName);
+                taskCode.setCodeAddress(repository);
             }
             default -> taskCode.setCodeAddress(taskCode.getCodeName());
         }

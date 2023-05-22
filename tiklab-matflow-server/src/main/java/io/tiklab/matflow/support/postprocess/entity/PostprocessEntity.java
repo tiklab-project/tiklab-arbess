@@ -19,7 +19,7 @@ public class PostprocessEntity {
     private int taskSort;
 
     @Column(name = "task_type")
-    private int taskType;
+    private String taskType;
 
     @Column(name = "create_time")
     private String createTime;
@@ -62,11 +62,11 @@ public class PostprocessEntity {
         this.taskSort = taskSort;
     }
 
-    public int getTaskType() {
+    public String getTaskType() {
         return taskType;
     }
 
-    public void setTaskType(int taskType) {
+    public void setTaskType(String taskType) {
         this.taskType = taskType;
     }
 

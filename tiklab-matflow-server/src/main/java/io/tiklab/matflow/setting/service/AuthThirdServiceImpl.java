@@ -33,7 +33,9 @@ public class AuthThirdServiceImpl implements AuthThirdService {
      * @return 流水线授权id
      */
     public String createAuthServer(AuthThird authThird) {
-        if (Objects.equals(authThird.getType(),2) || Objects.equals(authThird.getType(),3)){
+        String thirdType = authThird.getType();
+        boolean b = thirdType.equals("2") || thirdType.equals("3")|| thirdType.equals("gitee")|| thirdType.equals("github");
+        if (b){
             TaskCodeThirdServiceImpl thirdService = new TaskCodeThirdServiceImpl();
             AuthThird authServer = thirdService.findUserAuthThird(LoginContext.getLoginId());
             if (!Objects.isNull(authServer)){
@@ -95,17 +97,17 @@ public class AuthThirdServiceImpl implements AuthThirdService {
      * @param type 类型  1. gitee 2. GitHub 3.sonar 4.nexus
      * @return 认证信息
      */
-    public List<AuthThird> findAllAuthServerList(int type) {
+    public List<AuthThird> findAllAuthServerList(String type) {
         List<AuthThird> allAuthServer = findAllAuthServer();
         if (allAuthServer == null){
             return null;
         }
-        if (type == 0){
+        if (Objects.isNull(type) || type.equals("all")){
             return allAuthServer;
         }
         List<AuthThird> list = new ArrayList<>();
         for (AuthThird authServer : allAuthServer) {
-            if (authServer.getType() != type ){
+            if (!authServer.getType().equals(type) ){
                 continue;
             }
             list.add(authServer);

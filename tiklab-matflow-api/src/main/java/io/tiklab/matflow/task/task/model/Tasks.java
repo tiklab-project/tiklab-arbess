@@ -22,7 +22,7 @@ public class Tasks {
 
     @ApiProperty(name="taskType",
             desc= "类型1-10:源码,10-20:测试,20-30:构建,30-40:部署,40-50:代码扫描,50-60:推送制品")
-    private int taskType;
+    private String taskType;
 
     @ApiProperty(name="taskSort",desc="顺序")
     private int taskSort;
@@ -72,7 +72,7 @@ public class Tasks {
         this.postprocessId = postprocessId;
     }
 
-    public Tasks(String createTime, int taskType) {
+    public Tasks(String createTime, String taskType) {
         this.createTime = createTime;
         this.taskType = taskType;
     }
@@ -101,11 +101,11 @@ public class Tasks {
         this.values = values;
     }
 
-    public int getTaskType() {
+    public String getTaskType() {
         return taskType;
     }
 
-    public void setTaskType(int taskType) {
+    public void setTaskType(String taskType) {
         this.taskType = taskType;
     }
 

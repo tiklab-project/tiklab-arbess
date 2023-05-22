@@ -41,7 +41,7 @@ public class TaskDeployExecServiceImpl implements TaskDeployExecService {
     private static final Logger logger = LoggerFactory.getLogger(TaskDeployExecServiceImpl.class);
 
 
-    public boolean deploy(String pipelineId, Tasks task , int taskType) {
+    public boolean deploy(String pipelineId, Tasks task , String taskType) {
 
         String taskId = task.getTaskId();
         String names = "执行任务："+task.getTaskName();

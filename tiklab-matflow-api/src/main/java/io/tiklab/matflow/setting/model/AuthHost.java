@@ -21,8 +21,8 @@ public class AuthHost {
     @ApiProperty(name = "hostId",desc="id")
     private String hostId;
 
-    @ApiProperty(name = "type",desc="类型 1. 普通 2. aliyun 3. 腾讯云" )
-    private int type;
+    @ApiProperty(name = "type",desc="类型 common 普通  aliyun  阿里云； tencent. 腾讯云" )
+    private String type;
 
     @ApiProperty(name = "authType",desc="认证类型 1.用户名密码 2. 通用认证")
     private int authType;
@@ -73,11 +73,11 @@ public class AuthHost {
         this.authType = authType;
     }
 
-    public int getType() {
+    public String getType() {
         return type;
     }
 
-    public void setType(int type) {
+    public void setType(String type) {
         this.type = type;
     }
 

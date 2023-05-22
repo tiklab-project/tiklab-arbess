@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Objects;
 
 @Service
 @Exporter
@@ -38,12 +39,14 @@ public class TaskArtifactExecServiceImpl implements TaskArtifactExecService {
 
     @Autowired
     private ScmService scmService;
-    
+
+    @Autowired
+    private TaskArtifactXpackService taskArtifactXpackService;
 
     private static final Logger logger = LoggerFactory.getLogger(TaskArtifactExecServiceImpl.class);
 
     @Override
-    public boolean product(String pipelineId, Tasks task , int taskType) {
+    public boolean product(String pipelineId, Tasks task , String taskType) {
         String taskId = task.getTaskId();
         String names = "执行任务："+task.getTaskName();
         tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+names);
@@ -53,7 +56,6 @@ public class TaskArtifactExecServiceImpl implements TaskArtifactExecService {
             tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+s);
             return true;
         }
-
 
         TaskArtifact product = (TaskArtifact) task.getValues();
         product.setType(taskType);
@@ -76,37 +78,41 @@ public class TaskArtifactExecServiceImpl implements TaskArtifactExecService {
                 PipelineUtil.date(4)+"制品匹配成功\n"+
                     PipelineUtil.date(4)+"制品名称："+ new File(path).getName() + "\n"+
                     PipelineUtil.date(4)+"制品地址："+path);
+
         try {
-            if (product.getType() == 51){
-                String artifactId = variableService.replaceVariable(pipelineId, taskId, product.getArtifactId());
-                String groupId = variableService.replaceVariable(pipelineId, taskId, product.getGroupId());
-                String version = variableService.replaceVariable(pipelineId, taskId, product.getVersion());
-                String fileType = variableService.replaceVariable(pipelineId, taskId, product.getFileType());
-                //替换变量
-                product.setArtifactId(artifactId);
-                product.setGroupId( groupId);
-                product.setVersion( version);
-                product.setFileType(fileType);
+            switch (product.getType()){
+                case "nexus","51","xpack" ->{
+                    String artifactId = variableService.replaceVariable(pipelineId, taskId, product.getArtifactId());
+                    String groupId = variableService.replaceVariable(pipelineId, taskId, product.getGroupId());
+                    String version = variableService.replaceVariable(pipelineId, taskId, product.getVersion());
+                    String fileType = variableService.replaceVariable(pipelineId, taskId, product.getFileType());
+                    //替换变量
+                    product.setArtifactId(artifactId);
+                    product.setGroupId( groupId);
+                    product.setVersion( version);
+                    product.setFileType(fileType);
 
-                //执行命令
-                Process process = getProductOrder(product,path);
-                String[] error = error(product.getType());
-                boolean result = tasksInstanceService.readCommandExecResult(process, "UTF-8", error, taskId);
-                if (!result){
-                    tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"任务："+task.getTaskName()+"执行失败。");
-                    return false;
+                    //执行命令
+                    Process process = getProductOrder(product,path);
+                    String[] error = error(product.getType());
+                    boolean result = tasksInstanceService.readCommandExecResult(process, "UTF-8", error, taskId);
+                    if (!result){
+                        tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"任务："+task.getTaskName()+"执行失败。");
+                        return false;
+                    }
                 }
-            }else {
-                tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"开始连接制品服务器...");
-                Session session = createSession(product);
-                tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"制品服务器连接成功。");
-                String putAddress = product.getPutAddress();
-                tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"开始推送制品。");
+                case "ssh" ,"52"->{
+                    tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"开始连接制品服务器...");
+                    Session session = createSession(product);
+                    tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"制品服务器连接成功。");
+                    String putAddress = product.getPutAddress();
+                    tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"开始推送制品。");
 
-                //替换变量
-                String key = variableService.replaceVariable(pipelineId, taskId, putAddress);
-                tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"制品推送位置："+key);
-                sshPut(session,path,key);
+                    //替换变量
+                    String key = variableService.replaceVariable(pipelineId, taskId, putAddress);
+                    tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"制品推送位置："+key);
+                    sshPut(session,path,key);
+                }
             }
         } catch (IOException | ApplicationException e) {
             tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"推送制品执行错误\n"+ PipelineUtil.date(4)+e.getMessage());
@@ -129,12 +135,20 @@ public class TaskArtifactExecServiceImpl implements TaskArtifactExecService {
             throw new ApplicationException("不存在maven配置");
         }
         String mavenAddress = pipelineScm.getScmAddress();
-        PipelineUtil.validFile(mavenAddress, 21);
+        PipelineUtil.validFile(mavenAddress, "maven");
 
-        AuthThird authThird = (AuthThird)product.getAuth();
+        AuthThird authThird = (AuthThird) product.getAuth();
         if (authThird == null){
             order = mavenOrder(execOrder, path);
             return PipelineUtil.process(mavenAddress, order);
+        }
+
+        if (product.getType().equals("xpack")){
+            String repository = taskArtifactXpackService.findRepository(authThird.getServerId(), product.getPutAddress());
+            if (Objects.isNull(repository)){
+                throw new ApplicationException("获取制品库信息失败！");
+            }
+            authThird.setServerAddress(repository);
         }
 
         execOrder = execOrder +
@@ -282,22 +296,24 @@ public class TaskArtifactExecServiceImpl implements TaskArtifactExecService {
         return order;
     }
 
-    private String[] error(int type){
-        String[] strings;
-        if (type == 5){
-            strings = new String[]{
-                    "svn: E170000:",
-                    "invalid option",
+    private String[] error(String type){
+
+        String[] strings = new String[]{};
+        switch (type){
+            case "xpack","nexus","51" ->{
+             return new String[]{
                     "Error executing Maven",
                     "The specified user settings file does not exist",
-                    "405 HTTP method PUT is not supported by this URL"
-            };
-            return strings;
+                    "405 HTTP method PUT is not supported by this URL",
+                    "[INFO] BUILD FAILURE",
+                    "BUILD FAILURE"
+                };
+            }
+            default -> {
+                return strings;
+            }
         }
-        strings = new String[]{
 
-        };
-        return strings;
     }
 
 }

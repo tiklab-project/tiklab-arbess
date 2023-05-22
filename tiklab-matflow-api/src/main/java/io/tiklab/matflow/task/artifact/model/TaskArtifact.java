@@ -37,12 +37,14 @@ public class TaskArtifact {
     @ApiProperty(name="authId",desc="授权id")
     private String authId;
 
+
     //授权信息
     private Object auth;
 
-    private int type;
+    private String type;
 
     private int sort;
+
 
     public String getTaskId() {
         return taskId;
@@ -92,11 +94,11 @@ public class TaskArtifact {
         this.fileAddress = fileAddress;
     }
 
-    public int getType() {
+    public String getType() {
         return type;
     }
 
-    public void setType(int type) {
+    public void setType(String type) {
         this.type = type;
     }
 

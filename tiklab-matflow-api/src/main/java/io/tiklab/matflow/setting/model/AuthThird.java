@@ -22,7 +22,7 @@ public class AuthThird {
     private String serverId;
 
     @ApiProperty(name = "type",desc="类型 1. gitee 2. github 3.sonar 4.nexus" )
-    private int type;
+    private String type;
 
     @ApiProperty(name = "authType",desc="认证类型 1.用户名密码 2. 通用认证")
     private int authType;
@@ -50,7 +50,6 @@ public class AuthThird {
 
     @ApiProperty(name = "refreshToken",desc="刷新授权")
     private String refreshToken;
-
 
     private String code;
 
@@ -84,11 +83,11 @@ public class AuthThird {
         this.serverId = serverId;
     }
 
-    public int getType() {
+    public String getType() {
         return type;
     }
 
-    public void setType(int type) {
+    public void setType(String type) {
         this.type = type;
     }
 

@@ -45,7 +45,7 @@ public class Stage {
     private List<Stage> stageList;
 
     @ApiProperty(name = "taskType",desc="任务类型")
-    private int taskType;
+    private String taskType;
 
     @ApiProperty(name = "taskId",desc="任务id")
     private String taskId;
@@ -91,11 +91,11 @@ public class Stage {
         this.stageList = stageList;
     }
 
-    public int getTaskType() {
+    public String getTaskType() {
         return taskType;
     }
 
-    public void setTaskType(int taskType) {
+    public void setTaskType(String taskType) {
         this.taskType = taskType;
     }
 

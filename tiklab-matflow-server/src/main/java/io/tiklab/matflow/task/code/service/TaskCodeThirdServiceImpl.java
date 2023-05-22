@@ -62,7 +62,7 @@ public class TaskCodeThirdServiceImpl implements TaskCodeThirdService {
     @Override
     public String findAccessToken(AuthThird authThird) throws IOException , ApplicationException {
         String loginId = LoginContext.getLoginId();
-        int type = authThird.getType();
+        String type = authThird.getType();
         if (!PipelineUtil.isNoNull(authThird.getCode())){
             throw new ApplicationException("code不能为空。");
         }
@@ -73,8 +73,8 @@ public class TaskCodeThirdServiceImpl implements TaskCodeThirdService {
         String accessTokenUrl = getAccessToken(authThird);
         Map<String, String> map;
         switch (type) {
-            case 2 -> map = giteeAccessToken(accessTokenUrl);
-            case 3 -> map = gitHubAccessToken(authThird,accessTokenUrl);
+            case "2" ,"gitee" -> map = giteeAccessToken(accessTokenUrl);
+            case "3","github" -> map = gitHubAccessToken(authThird,accessTokenUrl);
             default -> { return null; }
         }
         String accessToken = map.get("accessToken");
@@ -99,10 +99,10 @@ public class TaskCodeThirdServiceImpl implements TaskCodeThirdService {
         if (map.get("state") != null && map.get("state").equals("0")){
             return null;
         }
-        if (type == 2){
+        if (type.equals("2") || type.equals("gitee")){
             username = username+"的gitee的授权";
         }
-        if (type == 3){
+        if (type.equals("3") || type.equals("github")){
             username = username+"的github的授权";
         }
         return username;
@@ -180,14 +180,14 @@ public class TaskCodeThirdServiceImpl implements TaskCodeThirdService {
         if (Objects.isNull(authCode)){
             return null;
         }
-        int type = authCode.getType();
+        String type = authCode.getType();
         String accessToken = authCode.getAccessToken();
         String allStorehouseAddress = getAllStorehouse(accessToken,type);
         List<String> list = new ArrayList<>();
         try {
             switch (type) {
-                case 2 -> list = giteeAllStorehouse(allStorehouseAddress);
-                case 3 -> list = gitHubAllStorehouse(accessToken, allStorehouseAddress);
+                case  "2" , "gitee" -> list = giteeAllStorehouse(allStorehouseAddress);
+                case "3" , "github" -> list = gitHubAllStorehouse(accessToken, allStorehouseAddress);
             }
         }catch (HttpClientErrorException e){
             throw new ApplicationException(50001,"获取仓库信息失败，该应用无权限，请为该应用赋予读取仓库(projects)权限。");
@@ -251,11 +251,11 @@ public class TaskCodeThirdServiceImpl implements TaskCodeThirdService {
         }
         String house = houseName.split("/")[1];
         String name = houseName.split("/")[0];
-        int type = authCode.getType();
+        String type = authCode.getType();
         String url = getBranch(name,house,accessToken,type);
         return switch (type) {
-            case 2 -> giteeBranch(url);
-            case 3 -> gitHubBranch(accessToken, url);
+            case "2" , "gitee" -> giteeBranch(url);
+            case "3" , "github" -> gitHubBranch(accessToken, url);
             default -> null;
         };
 
@@ -300,7 +300,7 @@ public class TaskCodeThirdServiceImpl implements TaskCodeThirdService {
 
     //获取仓库的url
     @Override
-    public String getHouseUrl(String authCodeId,String houseName,int type){
+    public String getHouseUrl(String authCodeId,String houseName,String type){
         AuthThird authCode = serverServer.findOneAuthServer(authCodeId);
         String accessToken = authCode.getAccessToken();
 
@@ -313,8 +313,8 @@ public class TaskCodeThirdServiceImpl implements TaskCodeThirdService {
         //获取仓库URl
         String oneStorehouse = getOneHouse(name,house,accessToken,type);
         return switch (type) {
-            case 2 -> giteeHouseUrl(oneStorehouse);
-            case 3 -> gitHubHouseUrl(accessToken, oneStorehouse);
+            case "2" , "gitee" -> giteeHouseUrl(oneStorehouse);
+            case "3" , "github" -> gitHubHouseUrl(accessToken, oneStorehouse);
             default -> null;
         };
     }
@@ -339,16 +339,16 @@ public class TaskCodeThirdServiceImpl implements TaskCodeThirdService {
     }
 
     //获取授权账户名
-    public String findMessage(String accessToken,int authType){
+    public String findMessage(String accessToken,String authType){
         if (accessToken == null ){
             return null;
         }
         String userMessage = getUser(accessToken,authType);
         String username = null;
-        if (authType == 2){
+        if (authType.equals("2") || authType.equals("gitee")){
             username = giteeMessage(userMessage);
         }
-        if (authType == 3){
+        if (authType.equals("3") || authType.equals("github")){
             username =  gitHubUserMessage(accessToken,userMessage);
         }
         return username;
@@ -402,40 +402,9 @@ public class TaskCodeThirdServiceImpl implements TaskCodeThirdService {
         in.close();
         return result.toString();
     }
-    
-    // @Scheduled(cron = "59 59 23 * * ?")
-    // public void updateAuthorization() {
-    //     List<AuthThird> allAuthCode = serverServer.findAllAuthServerList(2);
-    //     if (allAuthCode == null){
-    //         return;
-    //     }
-    //     for (AuthThird authCode : allAuthCode) {
-    //         boolean token = PipelineUtil.isNoNull(authCode.getAccessToken());
-    //         boolean refresh = PipelineUtil.isNoNull(authCode.getRefreshToken());
-    //         if (!token || !refresh) return;
-    //         logger.info("gitee定时任务，时间:"+ PipelineUtil.date(1));
-    //         logger.info("更新授权信息,授权人："+authCode.getUsername());
-    //         String refreshToken = findRefreshToken(authCode.getRefreshToken());
-    //         ResponseEntity<JSONObject> forEntity;
-    //         try {
-    //             forEntity = restTemplate.postForEntity(refreshToken,String.class, JSONObject.class);
-    //             JSONObject body = forEntity.getBody();
-    //             if (body== null ){
-    //                 logger.info("授权人："+authCode.getUsername()+"授权信息更新失败");
-    //                 continue;
-    //             }
-    //             authCode.setRefreshToken(body.getString("access_token"));
-    //             authCode.setRefreshToken(body.getString("refresh_token"));
-    //             serverServer.updateAuthServer(authCode);
-    //             logger.info("授权人："+authCode.getUsername()+"授权信息更新成功");
-    //         }catch (Exception e){
-    //             String message = e.getMessage();
-    //             logger.info("授权人："+authCode.getUsername()+"授权信息更新失败"+ message);
-    //         }
-    //     }
-    // }
+
     public String updateAuthorization(String authId) {
-        List<AuthThird> allAuthCode = serverServer.findAllAuthServerList(2);
+        List<AuthThird> allAuthCode = serverServer.findAllAuthServerList("gitee");
         if (allAuthCode == null) {
             return null;
         }
@@ -502,9 +471,9 @@ public class TaskCodeThirdServiceImpl implements TaskCodeThirdService {
         String callbackUrl = authThird.getCallbackUrl().trim();
         String clientId = authThird.getClientId().trim();
         return switch (authThird.getType()) {
-            case 2 ->
+            case "2" , "gitee" ->
                     "https://gitee.com/oauth/authorize?client_id=" + clientId + "&redirect_uri=" + callbackUrl + "&response_type=code";
-            case 3 ->
+            case "3" , "github" ->
                     "https://github.com/login/oauth/authorize?client_id=" + clientId + "&callback_url=" + callbackUrl + "&scope=repo repo admin:org_hook user ";
             default -> null;
         };
@@ -521,8 +490,8 @@ public class TaskCodeThirdServiceImpl implements TaskCodeThirdService {
         String callbackUrl = authThird.getCallbackUrl().trim();
         String clientSecret = authThird.getClientSecret().trim();
         return switch (authThird.getType()) {
-            case 2 -> "https://gitee.com/oauth/token?grant_type=authorization_code&code=" + code + "&client_id=" + clientId + "&redirect_uri=" + callbackUrl + "&client_secret=" + clientSecret;
-            case 3 -> "https://github.com/login/oauth/access_token";
+            case "2" , "gitee" -> "https://gitee.com/oauth/token?grant_type=authorization_code&code=" + code + "&client_id=" + clientId + "&redirect_uri=" + callbackUrl + "&client_secret=" + clientSecret;
+            case "3" , "github" -> "https://github.com/login/oauth/access_token";
             default -> null;
         };
     }
@@ -533,10 +502,10 @@ public class TaskCodeThirdServiceImpl implements TaskCodeThirdService {
      * @param type 第三方类型
      * @return 请求地址
      */
-    private String getUser (String accessToken ,int type) {
+    private String getUser (String accessToken ,String type) {
         return switch (type) {
-            case 2 -> "https://gitee.com/api/v5/user?access_token="+accessToken;
-            case 3 ->  "https://api.github.com/user";
+            case "2" , "gitee" -> "https://gitee.com/api/v5/user?access_token="+accessToken;
+            case "3" , "github" ->  "https://api.github.com/user";
             default -> null;
         };
     }
@@ -549,10 +518,10 @@ public class TaskCodeThirdServiceImpl implements TaskCodeThirdService {
      * @param type 第三方类型
      * @return 请求地址
      */
-    private String getOneHouse (String username, String houseName, String accessToken,int type){
+    private String getOneHouse (String username, String houseName, String accessToken,String type){
         return switch (type) {
-            case 2 -> "https://gitee.com/api/v5/repos/"+username+"/"+houseName+"?access_token="+accessToken;
-            case 3 -> "https://api.github.com/repos/" + username + "/" + houseName;
+            case "2" , "gitee" -> "https://gitee.com/api/v5/repos/"+username+"/"+houseName+"?access_token="+accessToken;
+            case "3" , "github" -> "https://api.github.com/repos/" + username + "/" + houseName;
             default -> null;
         };
     }
@@ -563,10 +532,10 @@ public class TaskCodeThirdServiceImpl implements TaskCodeThirdService {
      * @param type 第三方类型
      * @return 仓库请求地址
      */
-    private String getAllStorehouse (String accessToken,int type) {
+    private String getAllStorehouse (String accessToken,String type) {
         return switch (type) {
-            case 2 -> "https://gitee.com/api/v5/user/repos?access_token="+accessToken+"&sort=full_name&page=1&per_page=20";
-            case 3 -> "https://api.github.com/user/repos";
+            case "2" , "gitee" -> "https://gitee.com/api/v5/user/repos?access_token="+accessToken+"&sort=full_name&page=1&per_page=20";
+            case "3" , "github" -> "https://api.github.com/user/repos";
             default -> null;
         };
     }
@@ -579,10 +548,10 @@ public class TaskCodeThirdServiceImpl implements TaskCodeThirdService {
      * @param type 第三方类型
      * @return 请求地址
      */
-    private String getBranch (String username, String houseName, String accessToken,int type){
+    private String getBranch (String username, String houseName, String accessToken,String type){
         return switch (type) {
-            case 2 -> "https://gitee.com/api/v5/repos/"+username+"/"+houseName+"/branches?access_token="+accessToken;
-            case 3 ->  "https://api.github.com/repos/" + username + "/" + houseName + "/branches";
+            case "2" , "gitee" -> "https://gitee.com/api/v5/repos/"+username+"/"+houseName+"/branches?access_token="+accessToken;
+            case "3" , "github" ->  "https://api.github.com/repos/" + username + "/" + houseName + "/branches";
             default -> null;
         };
     }

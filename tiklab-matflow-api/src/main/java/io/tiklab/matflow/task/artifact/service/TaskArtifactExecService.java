@@ -16,7 +16,7 @@ public interface TaskArtifactExecService {
      * @return 执行状态 true:成功 false:失败
      * @throws ApplicationException 运行失败
      */
-     boolean product(String pipelineId, Tasks task , int taskType);
+     boolean product(String pipelineId, Tasks task , String taskType);
 
 
 }

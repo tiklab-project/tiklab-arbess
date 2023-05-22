@@ -101,42 +101,6 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
         map.put("message","开始执行");
         homeService.log(PipelineFinal.LOG_RUN, PipelineFinal.LOG_TEM_RUN, map);
 
-        // homeService.settingMessage(PipelineFinal.MES_RUN, map);
-        //日志文件根路径
-        // new Thread() {
-        //     public void run() {
-        //         try {
-        //             Thread.currentThread().setName(pipelineId);
-        //             String s1 = TenantHolder.get();
-        //             System.out.println("线程内："+s1);
-        //             boolean b = true;
-        //             int type = pipeline.getType();
-        //             postExecService.createPipelinePostInstance(pipelineId,instanceId);
-        //
-        //             if (type == 1) {
-        //                 b = execTask(pipeline,instanceId);
-        //             }
-        //             if (type == 2) {
-        //                 // 创建多阶段运行实例
-        //                 stageExecService.createStageExecInstance(pipelineId, instanceId);
-        //                 b = stageExecService.execStageTask(pipeline, instanceId);
-        //             }
-        //             logger.info("执行后置任务.");
-        //             TaskExecMessage taskExecMessage = new TaskExecMessage(pipeline,b);
-        //             boolean postState = postExecService.execPipelinePost(taskExecMessage);
-        //
-        //             if (!b || !postState){
-        //                 b = false;
-        //             }
-        //
-        //             // 执行完成
-        //             pipelineExecEnd(pipelineId, b);
-        //         }catch (Exception e){
-        //             logger.info("执行错误了。。。。。。。"+e.getMessage());
-        //         }
-        //     };
-        // }.start();
-
         executorService.submit((Callable<Object>) () -> {
             try {
                 Thread.currentThread().setName(pipelineId);
@@ -165,72 +129,11 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
                 pipelineExecEnd(pipelineId, b);
             }catch (Exception e){
                 logger.info("流水线执行出错了："+e.getMessage());
+                stop(pipelineId);
                 return false;
             }
             return true;
         });
-
-
-        // if (idCe){
-        //     logger.info("ce");
-        //     // executorService.submit((Callable<Object>) () -> {
-        //     //     try {
-        //     //         String s1 = TenantHolder.get();
-        //     //         System.out.println("线程内："+s1);
-        //     //         boolean b = true;
-        //     //         int type = pipeline.getType();
-        //     //
-        //     //         postExecService.createPipelinePostInstance(pipelineId,instanceId);
-        //     //
-        //     //         if (type == 1) {
-        //     //             b = execTask(pipeline,instanceId);
-        //     //         }
-        //     //         if (type == 2) {
-        //     //             // 创建多阶段运行实例
-        //     //             stageExecService.createStageExecInstance(pipelineId, instanceId);
-        //     //             b = stageExecService.execStageTask(pipeline, instanceId);
-        //     //         }
-        //     //         logger.info("执行后置任务.");
-        //     //         TaskExecMessage taskExecMessage = new TaskExecMessage(pipeline,b);
-        //     //         boolean postState = postExecService.execPipelinePost(taskExecMessage);
-        //     //
-        //     //         if (!b || !postState){
-        //     //             b = false;
-        //     //         }
-        //     //
-        //     //         // 执行完成
-        //     //         pipelineExecEnd(pipelineId, b);
-        //     //     }catch (Exception e){
-        //     //         logger.info("执行错误了。。。。。。。"+e.getMessage());
-        //     //     }
-        //     //     return true;
-        //     // });
-        // }else {
-        //     logger.info("cloud");
-        //     boolean b = true;
-        //     int type = pipeline.getType();
-        //     postExecService.createPipelinePostInstance(pipelineId,instanceId);
-        //     if (type == 1) {
-        //         b = execTask(pipeline,instanceId);
-        //     }
-        //
-        //     if (type == 2) {
-        //         // 创建多阶段运行实例
-        //         stageExecService.createStageExecInstance(pipelineId, instanceId);
-        //         b = stageExecService.execStageTask(pipeline, instanceId);
-        //     }
-        //
-        //     logger.info("执行后置任务。。。");
-        //     TaskExecMessage taskExecMessage = new TaskExecMessage(pipeline,b);
-        //     boolean postState = postExecService.execPipelinePost(taskExecMessage);
-        //
-        //     if (!b || !postState){
-        //         b = false;
-        //     }
-        //     // 执行完成
-        //     pipelineExecEnd(pipelineId, b);
-        // }
-
 
         joinTemplate.joinQuery(pipelineInstance);
 

@@ -16,7 +16,7 @@ import io.tiklab.user.user.model.User;
 
 @ApiModel
 @Join
-@Mapper(targetAlias = "AuthEntity")
+@Mapper(targetAlias = "AuthMatFlowEntity")
 public class Auth {
 
     @ApiProperty(name = "authId",desc="id")

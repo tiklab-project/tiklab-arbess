@@ -20,7 +20,7 @@ public class Postprocess {
     private String name;
 
     @ApiProperty(name = "taskType",desc="类型 61:消息通知 71:bat脚本 72:sh脚本")
-    private int taskType;
+    private String taskType;
 
     @ApiProperty(name = "createTime",desc="创建时间")
     private String createTime;
@@ -81,11 +81,11 @@ public class Postprocess {
         this.name = name;
     }
 
-    public int getTaskType() {
+    public String getTaskType() {
         return taskType;
     }
 
-    public void setTaskType(int taskType) {
+    public void setTaskType(String taskType) {
         this.taskType = taskType;
     }
 

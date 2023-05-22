@@ -64,7 +64,7 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
     private final Logger logger = LoggerFactory.getLogger(TaskCodeExecServiceImpl.class);
 
     // git克隆
-    public boolean clone(String pipelineId, Tasks task , int taskType) throws ApplicationException{
+    public boolean clone(String pipelineId, Tasks task , String taskType) throws ApplicationException {
 
         String taskId = task.getTaskId();
         String names = "执行任务："+task.getTaskName();
@@ -118,9 +118,9 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
         try {
             //命令执行失败
             Process process = codeStart(code,pipelineId);
-            int type = code.getType();
+            String  type = code.getType();
             String enCode = null;
-            if (type != 5){
+            if (!type.equals("5") || !type.equals("svn")){
                 enCode = "UTF-8";
             }
             boolean result = tasksInstanceService.readCommandExecResult(process, enCode, error(type), taskId);
@@ -165,12 +165,18 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
      * @throws ApplicationException 不存在配置
      */
     private Process codeStart(TaskCode taskCode, String pipelineId) throws IOException, URISyntaxException , ApplicationException{
+        boolean b = !taskCode.getType().equals("5") || !taskCode.getType().equals("svn");
+        Scm pipelineScm ;
+
+        if (b){
+            pipelineScm = scmService.findOnePipelineScm(1);
+        }else {
+            pipelineScm = scmService.findOnePipelineScm(2);
+        }
 
         //效验地址是否应用程序地址
-        Scm pipelineScm = scmService.findOnePipelineScm(taskCode.getType());
-
         if (pipelineScm == null ){
-            if (taskCode.getType() != 5){
+            if (b){
                 throw new ApplicationException(50001,"未配置git程序地址");
             }else {
                 throw new ApplicationException(50001,"未配置SVN程序地址");
@@ -186,7 +192,7 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
         String path = null;
         switch (taskCode.getType()) {
             //账号密码或ssh登录
-            case 1, 4 -> {
+            case "1", "4","git","gitlab" -> {
                 List<String> list = gitUpOrder(taskCode, fileAddress);
                 gitOrder = list.get(0);
                 if (list.size() > 1){
@@ -210,18 +216,42 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
                     return process;
                 }
             }
+            case "xcode" ->{
+                gitOrder = gitXcodeOrder(taskCode, fileAddress);
+            }
             //第三方授权
-            case  2, 3 -> gitOrder = gitThirdOrder(taskCode, fileAddress);
+            case  "2", "3","gitee","github" -> gitOrder = gitThirdOrder(taskCode, fileAddress);
 
             //svn
-            case 5 -> gitOrder = svnOrder(taskCode, fileAddress);
+            case "5","svn" -> gitOrder = svnOrder(taskCode, fileAddress);
             //错误
             default ->
                     throw new ApplicationException("未知的任务类型");
         }
-        logger.info("执行："+gitOrder);
+        logger.info("执行："+ gitOrder);
         return PipelineUtil.process(serverAddress, gitOrder);
     }
+
+    /**
+     * 组装xcode git命令
+     * @param taskCode 源码信息
+     * @param fileAddress 存放位置
+     * @return 执行命令
+     * @throws URISyntaxException url格式不正确
+     * @throws MalformedURLException 不是https或者http
+     */
+    private String gitXcodeOrder(TaskCode taskCode, String fileAddress) throws MalformedURLException, URISyntaxException {
+        String authId = taskCode.getAuthId();
+        StringBuilder codeAddress = new StringBuilder(taskCode.getCodeAddress());
+        AuthThird auth = thirdService.findOneAuthServer(authId);
+        if (Objects.isNull(auth)){
+            return gitBranch(codeAddress, taskCode, fileAddress);
+        }
+
+        StringBuilder stringBuilder = gitUrl(auth.getUsername(), auth.getPassword(), codeAddress);
+        return gitBranch(stringBuilder, taskCode, fileAddress);
+    }
+
 
     /**
      * 组装http git命令
@@ -252,7 +282,6 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
         if (auth.getAuthType() == 1){
             gitUrl(auth.getUsername(), auth.getPassword(), codeAddress);
         }
-
         String s = gitBranch(codeAddress, taskCode, fileAddress);
 
         if (auth.getAuthType() == 1 ){
@@ -413,9 +442,9 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
      * @param type 类型
      * @param address 地址
       */
-    private void typeAddress(int type,int authType,String address) throws ApplicationException{
+    private void typeAddress(String type,int authType,String address) throws ApplicationException{
         String substring = address.substring(0, 3);
-        if (type != 5){
+        if (type.equals("5") || type.equals("svn")){
             if (substring.equals("htt") && authType == 1){
                 return;
             }
@@ -442,8 +471,8 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
      * @return 信息实例
      * @throws IOException 执行失败
      */
-    private Process cloneMessage(int taskType,String pipelineId) throws IOException {
-        if (taskType == 5){
+    private Process cloneMessage(String taskType,String pipelineId) throws IOException {
+        if (taskType.equals("5") || taskType.equals("svn")){
             return null;
         }
         String order = "git log --pretty=format:\"commit：%cn email：%ae message：%s date：%ad time：%ar \" --date=format:\"%Y-%m-%d %H:%M:%S\" -n 1";
@@ -456,9 +485,9 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
      * @param type 类型
      * @return 错误
      */
-    private String[] error(int type){
+    private String[] error(String type){
         String[] strings;
-        if (type == 5){
+        if (type.equals("5") || type.equals("svn")){
             strings = new String[]{
                 "svn: E170000",
                 "invalid option",

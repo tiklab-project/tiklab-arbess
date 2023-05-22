@@ -34,7 +34,7 @@ public class StageServiceImpl implements StageService {
         String stagesId = stage.getStageId();
         String pipelineId = stage.getPipelineId();
 
-        int taskType = stage.getTaskType();
+        String taskType = stage.getTaskType();
         int stageSort = stage.getStageSort();
 
         stage.setCreateTime(PipelineUtil.date(1));
@@ -42,9 +42,10 @@ public class StageServiceImpl implements StageService {
         Tasks tasks = new Tasks();
         tasks.setTaskType(taskType);
         tasks.setTaskSort(1);
+        boolean b = taskType.equals("git") || taskType.equals("gitlab") || taskType.equals("gitee") || taskType.equals("github") || taskType.equals("xcode");
 
         //是否为源码
-        if (taskType < 10){
+        if (b){
             //判断是否存在代码源
             findTypeTasks(pipelineId);
 
@@ -109,9 +110,9 @@ public class StageServiceImpl implements StageService {
     }
 
     @Override
-    public void createStageTemplate(String pipelineId,int[] template){
+    public void createStageTemplate(String pipelineId,String[] template){
         int j = 1;
-        for (int i : template) {
+        for (String i : template) {
             Stage stage = new Stage();
             stage.setPipelineId(pipelineId);
             stage.setStageSort(j);

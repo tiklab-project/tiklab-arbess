@@ -47,7 +47,7 @@ public interface AuthThirdService {
      * @param type 类型 1. gitee 2. github 3.sonar 4.nexus
      * @return 认证信息
      */
-    List<AuthThird> findAllAuthServerList(int type);
+    List<AuthThird> findAllAuthServerList(String type);
 
     /**
      * 查询所有流水线第三方授权

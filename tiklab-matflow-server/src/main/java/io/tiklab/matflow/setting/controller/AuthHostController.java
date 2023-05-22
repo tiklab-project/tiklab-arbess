@@ -64,7 +64,7 @@ public class AuthHostController {
     @RequestMapping(path="/findAllAuthHostList",method = RequestMethod.POST)
     @ApiMethod(name = "findAllAuthHostList",desc = "查询所有")
     @ApiParam(name = "type",desc = "类型",required = true)
-    public Result<List<AuthHost>> findAllAuthHostList(@NotNull int type) {
+    public Result<List<AuthHost>> findAllAuthHostList(@NotNull String type) {
         List<AuthHost> allAuthHost = authHost.findAllAuthHostList(type);
         return Result.ok(allAuthHost);
     }

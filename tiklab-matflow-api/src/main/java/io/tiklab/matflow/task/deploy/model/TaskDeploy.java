@@ -41,7 +41,7 @@ public class TaskDeploy {
 
     private int sort;
 
-    private int type;
+    private String type;
 
     public String getTaskId() {
         return taskId;
@@ -123,11 +123,11 @@ public class TaskDeploy {
         this.sort = sort;
     }
 
-    public int getType() {
+    public String getType() {
         return type;
     }
 
-    public void setType(int type) {
+    public void setType(String type) {
         this.type = type;
     }
 }

@@ -39,7 +39,7 @@ public class TaskCodeScanExecServiceImpl implements TaskCodeScanExecService {
 
 
     @Override
-    public boolean codeScan(String pipelineId, Tasks task , int taskType) {
+    public boolean codeScan(String pipelineId, Tasks task , String taskType) {
         String taskId = task.getTaskId();
         String names = "执行任务："+task.getTaskName();
         tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+names);
@@ -79,17 +79,17 @@ public class TaskCodeScanExecServiceImpl implements TaskCodeScanExecService {
     }
 
     private Process getOrder(String taskId, TaskCodeScan taskCodeScan, String path) throws ApplicationException, IOException {
-        int type = taskCodeScan.getType();
+        String type = taskCodeScan.getType();
         String order ;
         String execOrder =  "mvn clean verify sonar:sonar ";
-        if (type == 41) {
+        if ( type.equals("41")|| type.equals("sonar")) {
             Scm pipelineScm = scmService.findOnePipelineScm(21);
 
             if (pipelineScm == null) {
                 throw new ApplicationException("不存在maven配置");
             }
             String mavenAddress = pipelineScm.getScmAddress();
-            PipelineUtil.validFile(mavenAddress, 21);
+            PipelineUtil.validFile(mavenAddress, "maven");
 
             AuthThird authThird =(AuthThird) taskCodeScan.getAuth();
 
@@ -126,9 +126,9 @@ public class TaskCodeScanExecServiceImpl implements TaskCodeScanExecService {
         return order;
     }
 
-    private String[] error(int type){
+    private String[] error(String type){
         String[] strings;
-        if (type == 5){
+        if (type.equals("5")){
             strings = new String[]{
                     "svn: E170000:",
                     "invalid option;"

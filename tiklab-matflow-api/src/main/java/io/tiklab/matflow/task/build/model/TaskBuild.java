@@ -28,7 +28,7 @@ public class TaskBuild {
     private int sort;
 
     //构建类型
-    private int type;
+    private String type;
 
     public String getTaskId() {
         return taskId;
@@ -38,11 +38,11 @@ public class TaskBuild {
         this.taskId = taskId;
     }
 
-    public int getType() {
+    public String getType() {
         return type;
     }
 
-    public void setType(int type) {
+    public void setType(String type) {
         this.type = type;
     }
 

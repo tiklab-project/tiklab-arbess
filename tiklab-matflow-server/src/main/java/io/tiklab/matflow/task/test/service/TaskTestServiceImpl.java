@@ -3,6 +3,9 @@ package io.tiklab.matflow.task.test.service;
 
 import io.tiklab.beans.BeanMapper;
 import io.tiklab.join.JoinTemplate;
+import io.tiklab.matflow.setting.model.AuthThird;
+import io.tiklab.matflow.setting.service.AuthHostService;
+import io.tiklab.matflow.setting.service.AuthThirdService;
 import io.tiklab.matflow.task.test.dao.TaskTestDao;
 import io.tiklab.matflow.task.test.entity.TaskTestEntity;
 import io.tiklab.matflow.task.test.model.TaskTest;
@@ -11,16 +14,27 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @Exporter
 public class TaskTestServiceImpl implements TaskTestService {
 
     @Autowired
-    TaskTestDao taskTestDao;
+    private TaskTestDao taskTestDao;
+
 
     @Autowired
-    JoinTemplate joinTemplate;
+    private AuthThirdService thirdServer;
+
+    @Autowired
+    private AuthHostService hostServer;
+
+    @Autowired
+    private JoinTemplate joinTemplate;
+
+
+
 
     //创建
     @Override
@@ -52,6 +66,13 @@ public class TaskTestServiceImpl implements TaskTestService {
         }
         for (TaskTest taskTest : allTest) {
             if (taskTest.getTaskId().equals(configId)){
+                String authId = taskTest.getAuthId();
+                if (Objects.isNull(authId)){
+                    return taskTest;
+                }
+                AuthThird authServer = thirdServer.findOneAuthServer(authId);
+                taskTest.setAuth(authServer);
+                // joinTemplate.joinQuery(taskTest);
                 return taskTest;
             }
         }
@@ -82,7 +103,9 @@ public class TaskTestServiceImpl implements TaskTestService {
     //查询所有
     @Override
     public List<TaskTest> findAllTest() {
-        return  BeanMapper.mapList(taskTestDao.findAllTest(), TaskTest.class);
+        List<TaskTest> taskTests = BeanMapper.mapList(taskTestDao.findAllTest(), TaskTest.class);
+        // joinTemplate.joinQuery(taskTests);
+        return taskTests;
     }
 
     @Override

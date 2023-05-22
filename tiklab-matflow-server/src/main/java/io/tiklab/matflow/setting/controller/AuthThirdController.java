@@ -70,7 +70,7 @@ public class AuthThirdController {
     @RequestMapping(path="/findAllAuthServerList",method = RequestMethod.POST)
     @ApiMethod(name = "findAllAuthServerList",desc = "查询所有")
     @ApiParam(name = "type",desc = "类型",required = true)
-    public Result<List<AuthThird>> findAllAuthServerList(@NotNull int type) {
+    public Result<List<AuthThird>> findAllAuthServerList(@NotNull String type) {
         List<AuthThird> allAuthThird = authServerService.findAllAuthServerList(type);
         return Result.ok(allAuthThird);
     }

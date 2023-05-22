@@ -72,7 +72,7 @@ public interface TaskCodeThirdService {
      * @param houseName 仓库名称
      * @return 克隆地址
      */
-    String getHouseUrl(String proofId,String houseName,int type);
+    String getHouseUrl(String proofId,String houseName,String type);
 
 
     /**

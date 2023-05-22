@@ -16,7 +16,7 @@ public interface TaskTestExecService {
      * @return 执行状态 true:成功 false:失败
      * @throws ApplicationException 运行失败
      */
-    boolean test(String pipelineId, Tasks task , int taskType);
+    boolean test(String pipelineId, Tasks task , String taskType);
 
 
 }

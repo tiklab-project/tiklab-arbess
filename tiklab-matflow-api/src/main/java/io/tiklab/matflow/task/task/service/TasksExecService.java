@@ -16,7 +16,7 @@ public interface TasksExecService {
      * @param taskId 任务id
      * @return 执行状态
      */
-    boolean execTask(String pipelineId , int taskType,String taskId) throws ApplicationException;
+    boolean execTask(String pipelineId , String taskType,String taskId) throws ApplicationException;
 
     /**
      * 执行发送消息任务

@@ -32,7 +32,7 @@ public class TaskScriptExecServiceImpl implements TaskScriptExecService {
     @Autowired
     private ConditionService conditionService;
 
-    public boolean scripts(String pipelineId, Tasks task , int taskType) {
+    public boolean scripts(String pipelineId, Tasks task , String taskType) {
 
         String taskId = task.getTaskId();
         String names = "执行任务："+task.getTaskName();
@@ -47,23 +47,23 @@ public class TaskScriptExecServiceImpl implements TaskScriptExecService {
         TaskScript script = (TaskScript) task.getValues();
         script.setType(taskType);
         String name = task.getTaskName();
-        int type = script.getType();
-        if (type == 71){
+        String type = script.getType();
+        if (type.equals("71")|| type.equals("bat")){
             name = "Bat脚本";
         }
-        if (type == 72){
+        if (type.equals("72")|| type.equals("shell")){
             name = "Shell脚本";
         }
         tasksInstanceService.writeExecLog(taskId,  PipelineUtil.date(4)+"执行任务："+name);
 
         int systemType = PipelineUtil.findSystemType();
 
-        if (systemType == 1 && type == 72 ){
+        if (systemType == 1 && (type.equals("72")|| type.equals("shell")) ){
             tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+ "Windows系统无法执行Shell脚本。");
             return false;
         }
 
-        if (systemType == 2 && type == 71){
+        if (systemType == 2 &&  (type.equals("71")|| type.equals("bat") )){
             tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+ "Linux系统无法执行Bat脚本。");
             return false;
         }

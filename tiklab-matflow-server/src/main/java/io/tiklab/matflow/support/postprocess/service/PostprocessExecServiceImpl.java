@@ -90,11 +90,11 @@ public class PostprocessExecServiceImpl implements PostprocessExecService{
         for (Postprocess postprocess : postprocessList) {
             if (state){
                 updatePostInstanceCache(postprocess.getPostprocessId());
-                int taskType = postprocess.getTaskType();
+                String taskType = postprocess.getTaskType();
                 Tasks task = postprocess.getTask();
                 boolean b;
                 String postprocessId = postprocess.getPostprocessId();
-                if (Objects.equals(taskType,61)){
+                if (taskType.equals("61")|| taskType.equals("message")){
                     taskExecMessage.setTasks(task);
                     taskExecMessage.setExecPipeline(true);
                     b = tasksExecService.execSendMessageTask(taskExecMessage);
@@ -123,9 +123,9 @@ public class PostprocessExecServiceImpl implements PostprocessExecService{
             String postprocessId = postprocess.getPostprocessId();
             if (state){
                 updatePostInstanceCache(postprocessId);
-                int taskType = postprocess.getTaskType();
+                String taskType = postprocess.getTaskType();
                 Tasks task = postprocess.getTask();
-                if (taskType == 61){
+                if (taskType.equals("61")|| taskType.equals("message")){
                     taskExecMessage.setTasks(task);
                     taskExecMessage.setExecPipeline(false);
                     b = tasksExecService.execSendMessageTask(taskExecMessage);

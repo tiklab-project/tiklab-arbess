@@ -16,7 +16,7 @@ public class TaskScript {
     private String taskId;
 
     @ApiProperty(name = "type",desc = "类型 71:bat脚本 72:shell脚本")
-    private int type;
+    private String type;
 
     @ApiProperty(name = "scriptOrder",desc = "命令")
     private String scriptOrder;
@@ -39,11 +39,11 @@ public class TaskScript {
         this.taskId = taskId;
     }
 
-    public int getType() {
+    public String getType() {
         return type;
     }
 
-    public void setType(int type) {
+    public void setType(String type) {
         this.type = type;
     }
 

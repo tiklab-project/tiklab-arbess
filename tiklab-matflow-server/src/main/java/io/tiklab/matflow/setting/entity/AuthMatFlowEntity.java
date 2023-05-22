@@ -7,7 +7,7 @@ import io.tiklab.dal.jpa.annotation.*;
  */
 @Entity
 @Table(name="pip_auth")
-public class AuthEntity {
+public class AuthMatFlowEntity {
 
     @Id
     @GeneratorValue(length = 12)

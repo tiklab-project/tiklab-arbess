@@ -94,7 +94,7 @@ public class TasksExecServiceImpl implements TasksExecService {
     }
 
     @Override
-    public boolean execTask(String pipelineId, int taskType,String taskId){
+    public boolean execTask(String pipelineId, String taskType,String taskId){
         Tasks tasks ;
         try {
             tasks = tasksService.findOneTasksOrTask(taskId);
@@ -115,14 +115,14 @@ public class TasksExecServiceImpl implements TasksExecService {
         boolean state = true;
 
         //分发执行不同任务
-        switch (taskType / 10) {
-            case 0 -> state = code.clone(pipelineId, tasks, taskType);
-            case 1 -> state = test.test(pipelineId, tasks, taskType);
-            case 2 -> state = build.build(pipelineId, tasks, taskType);
-            case 3 -> state = deploy.deploy(pipelineId, tasks, taskType);
-            case 4 -> state = codeScan.codeScan(pipelineId, tasks, taskType);
-            case 5 -> state = product.product(pipelineId, tasks, taskType);
-            case 7 -> state = scripts.scripts(pipelineId, tasks, taskType);
+        switch (taskType) {
+            case "1","2","3","4","5","git","gitee","github","svn","xcode" -> state = code.clone(pipelineId, tasks, taskType);
+            case "11","maventest","teston" -> state = test.test(pipelineId, tasks, taskType);
+            case "21","maven" -> state = build.build(pipelineId, tasks, taskType);
+            case "31","32","liunx","docker" -> state = deploy.deploy(pipelineId, tasks, taskType);
+            case "41","sonar" -> state = codeScan.codeScan(pipelineId, tasks, taskType);
+            case "51","52","nexus","ssh","xpack" -> state = product.product(pipelineId, tasks, taskType);
+            case "71","bat","shell" -> state = scripts.scripts(pipelineId, tasks, taskType);
         }
 
         //更新阶段状态

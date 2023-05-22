@@ -28,7 +28,7 @@ public interface StageService {
      * @param pipelineId 流水线id
      * @param template 模板
      */
-    void createStageTemplate(String pipelineId,int[] template);
+    void createStageTemplate(String pipelineId,String[] template);
 
     /**
      * 查询所有阶段任务

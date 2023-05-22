@@ -85,12 +85,12 @@ public class PipelineServiceImpl implements PipelineService {
 
         //创建对应流水线模板
         String template = pipeline.getTemplate();
-        int[] ints;
+        String[] ints;
         switch (template) {
-            case "2131" -> ints = new int[]{1, 21, 31};
-            case "112131" -> ints = new int[]{1, 11, 21, 31};
-            case "2231" -> ints = new int[]{1, 22, 31};
-            default -> ints = new int[]{1};
+            case "2131" -> ints = new String[]{"git", "maven", "liunx"};
+            case "112131" -> ints = new String[]{"git", "maventest",  "maven", "liunx"};
+            case "2231" -> ints = new String[]{"git",  "nodejs", "liunx"};
+            default -> ints = new String[]{"git"};
         }
         if (pipeline.getType() == 1){
             tasksService.createTaskTemplate(pipelineId,ints);

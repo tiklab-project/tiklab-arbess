@@ -36,7 +36,7 @@ public class TasksEntity {
 
     //源码类型
     @Column(name = "task_type",notNull = true)
-    private int taskType;
+    private String taskType;
 
     //顺序
     @Column(name = "task_sort",notNull = true)
@@ -90,11 +90,11 @@ public class TasksEntity {
         this.pipelineId = pipelineId;
     }
 
-    public int getTaskType() {
+    public String getTaskType() {
         return taskType;
     }
 
-    public void setTaskType(int taskType) {
+    public void setTaskType(String taskType) {
         this.taskType = taskType;
     }
 

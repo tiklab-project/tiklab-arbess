@@ -11,7 +11,7 @@ public class AuthThirdEntity {
     private String serverId;
 
     @Column(name = "type")
-    private int type;
+    private String type;
 
     @Column(name = "name")
     private String name;
@@ -60,7 +60,6 @@ public class AuthThirdEntity {
     @Column(name = "callback_url")
     private String callbackUrl;
 
-
     public String getServerId() {
         return serverId;
     }
@@ -69,11 +68,11 @@ public class AuthThirdEntity {
         this.serverId = serverId;
     }
 
-    public int getType() {
+    public String getType() {
         return type;
     }
 
-    public void setType(int type) {
+    public void setType(String type) {
         this.type = type;
     }
 

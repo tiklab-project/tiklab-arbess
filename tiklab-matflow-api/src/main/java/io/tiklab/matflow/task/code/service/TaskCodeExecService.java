@@ -16,7 +16,7 @@ public interface TaskCodeExecService {
      * @return 执行状态 true:成功 false:失败
      * @throws ApplicationException 运行失败
      */
-    boolean clone(String pipelineId, Tasks task , int taskType) throws ApplicationException;
+    boolean clone(String pipelineId, Tasks task , String taskType) throws ApplicationException;
 
 
 }

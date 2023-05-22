@@ -484,7 +484,7 @@ public class PipelineUtil {
      * @param type 文件类型
      // * @return 匹配状态  1.不是个目录或不存在这个文件夹  2. 空目录找不到可执行文件 0. 匹配成功
      */
-    public static void validFile(String fileAddress, int type) throws ApplicationException {
+    public static void validFile(String fileAddress, String type) throws ApplicationException {
         File file = new File(fileAddress);
 
         //不存在这个目录
@@ -507,22 +507,22 @@ public class PipelineUtil {
             }
             String name = listFile.getName();
             switch (type) {
-                case 1,2,3,4 -> {
+                case "1","2","3","4","git","gitee","github","gitlab","xcode" -> {
                     if (name.equals("git") || name.equals("git.exe")) {
                         return ;
                     }
                 }
-                case 5 -> {
+                case "5","svn" -> {
                     if (name.equals("svn") || name.equals("svn.exe")) {
                         return ;
                     }
                 }
-                case 21 -> {
+                case "21","maven" -> {
                     if (name.equals("mvn")) {
                         return ;
                     }
                 }
-                case 22 -> {
+                case "22","nodejs" -> {
                     if (name.equals("npm")) {
                         return ;
                     }

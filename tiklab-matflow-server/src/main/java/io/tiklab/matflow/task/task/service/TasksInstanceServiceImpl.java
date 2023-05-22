@@ -391,7 +391,7 @@ public class TasksInstanceServiceImpl implements TasksInstanceService {
      * @return true 正确 false：错误
      */
     private boolean validStatus(String s,String[] error){
-        if (error == null || error.length == 0){
+        if (error == null){
             return false;
         }
         for (String s1 : error) {
