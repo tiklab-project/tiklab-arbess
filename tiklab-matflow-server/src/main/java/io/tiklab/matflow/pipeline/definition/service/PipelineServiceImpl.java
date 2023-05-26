@@ -339,7 +339,7 @@ public class PipelineServiceImpl implements PipelineService {
             String createTime = lastInstance.getCreateTime();
             recently.setCreateTime(createTime);
             Date date = PipelineUtil.StringChengeDate(createTime);
-            String dateTime = PipelineUtil.findDateTime(date, 7);
+            String dateTime = PipelineUtil.findDateTime(date, 30);
             recently.setExecTime(dateTime);
             String formatted = PipelineUtil.formatDateTime(lastInstance.getRunTime());
             recently.setLastRunTime(formatted);
@@ -399,7 +399,7 @@ public class PipelineServiceImpl implements PipelineService {
             if (!Objects.isNull(latelyHistory)){
                 String createTime = latelyHistory.getCreateTime();
                 Date date = PipelineUtil.StringChengeDate(createTime);
-                String dateTime = PipelineUtil.findDateTime(date, 7);
+                String dateTime = PipelineUtil.findDateTime(date, 30);
                 pipelineExecMessage.setLastBuildTime(dateTime);
                 pipelineExecMessage.setBuildStatus(latelyHistory.getRunStatus());
                 pipelineExecMessage.setExecUser(latelyHistory.getUser());

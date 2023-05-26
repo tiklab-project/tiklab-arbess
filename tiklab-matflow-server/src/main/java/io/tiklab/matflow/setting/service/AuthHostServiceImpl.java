@@ -89,47 +89,51 @@ public class AuthHostServiceImpl implements AuthHostService {
         if (allAuthHost == null){
             return null;
         }
-
-        if (Objects.isNull(type) || type.equals("all")){
-            return allAuthHost;
-        }
         List<AuthHost> list = new ArrayList<>();
+        if (Objects.isNull(type) || type.equals("all")){
+            for (AuthHost authHost : allAuthHost) {
+                String oneType = findOneType(authHost.getType());
+                authHost.setType(oneType);
+                list.add(authHost);
+            }
+            return list;
+        }
+
         for (AuthHost authHost : allAuthHost) {
             String type1 = authHost.getType();
             boolean b = findType(type, type1);
             if (b){
+                authHost.setType(type);
                 list.add(authHost);
             }
         }
         return list;
     }
 
+    private String findOneType(String type){
+        if (type.equals("31")) {
+            return "common";
+        }
+        return type;
+    }
+
     private boolean findType(String type,String taskType){
         switch (type){
-            case "gitee"  ->{
-                if (taskType.equals("2")|| taskType.equals("gitee")){
+            case "common"  ->{
+                if (taskType.equals("31")|| taskType.equals("common")){
                     return true;
                 }
             }
-            case "github"  ->{
-                if (taskType.equals("3")|| taskType.equals("github")){
+            case "aliyun"  ->{
+                if (taskType.equals("aliyun")){
                     return true;
                 }
             }
-            case "sonar"  ->{
-                if (taskType.equals("41")|| taskType.equals("sonar")){
+            case "tencent"  ->{
+                if (taskType.equals("tencent")){
                     return true;
                 }
             }
-            case "nexus"  ->{
-                if (taskType.equals("51")|| taskType.equals("nexus")){
-                    return true;
-                }
-            }
-            default -> {
-                return false;
-            }
-
         }
         return false;
     }

@@ -102,17 +102,82 @@ public class AuthThirdServiceImpl implements AuthThirdService {
         if (allAuthServer == null){
             return null;
         }
-        if (Objects.isNull(type) || type.equals("all")){
-            return allAuthServer;
-        }
+
         List<AuthThird> list = new ArrayList<>();
+
+        if (Objects.isNull(type) || type.equals("all")){
+
+            for (AuthThird authThird : allAuthServer) {
+                String oneType = findOneType(authThird.getType());
+                authThird.setType(oneType);
+                list.add(authThird);
+            }
+            return list;
+        }
+
         for (AuthThird authServer : allAuthServer) {
-            if (!authServer.getType().equals(type) ){
+
+            String type1 = authServer.getType();
+
+            boolean type2 = findType(type, type1);
+            if (!type2 ){
                 continue;
             }
+            authServer.setType(type);
             list.add(authServer);
         }
         return list;
+    }
+
+    private String findOneType(String type){
+        switch (type){
+            case "2"  ->{
+                return "gitee";
+            }
+            case "3"  ->{
+                return "github";
+            }
+            case "41"  ->{
+                return "sonar";
+            }
+            case "51"  ->{
+                return "nexus";
+            }
+            default -> {
+                return type;
+            }
+        }
+    }
+
+
+    private boolean findType(String type,String taskType){
+        switch (type){
+            case "gitee"  ->{
+                if (taskType.equals("2")|| taskType.equals("gitee")){
+                    return true;
+                }
+            }
+            case "github"  ->{
+                if (taskType.equals("3")|| taskType.equals("github")){
+                    return true;
+                }
+            }
+            case "sonar"  ->{
+                if (taskType.equals("41")|| taskType.equals("sonar")){
+                    return true;
+                }
+            }
+            case "nexus"  ->{
+                if (taskType.equals("51")|| taskType.equals("nexus")){
+                    return true;
+                }
+            }
+            default -> {
+                return false;
+            }
+
+        }
+        return false;
     }
 
     /**
