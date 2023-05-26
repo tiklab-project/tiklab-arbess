@@ -89,16 +89,49 @@ public class AuthHostServiceImpl implements AuthHostService {
         if (allAuthHost == null){
             return null;
         }
+
         if (Objects.isNull(type) || type.equals("all")){
             return allAuthHost;
         }
         List<AuthHost> list = new ArrayList<>();
         for (AuthHost authHost : allAuthHost) {
-            if (authHost.getType().equals(type)){
+            String type1 = authHost.getType();
+            boolean b = findType(type, type1);
+            if (b){
                 list.add(authHost);
             }
         }
         return list;
+    }
+
+    private boolean findType(String type,String taskType){
+        switch (type){
+            case "gitee"  ->{
+                if (taskType.equals("2")|| taskType.equals("gitee")){
+                    return true;
+                }
+            }
+            case "github"  ->{
+                if (taskType.equals("3")|| taskType.equals("github")){
+                    return true;
+                }
+            }
+            case "sonar"  ->{
+                if (taskType.equals("41")|| taskType.equals("sonar")){
+                    return true;
+                }
+            }
+            case "nexus"  ->{
+                if (taskType.equals("51")|| taskType.equals("nexus")){
+                    return true;
+                }
+            }
+            default -> {
+                return false;
+            }
+
+        }
+        return false;
     }
 
 
