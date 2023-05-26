@@ -101,6 +101,10 @@ public class AuthHostServiceImpl implements AuthHostService {
 
         for (AuthHost authHost : allAuthHost) {
             String type1 = authHost.getType();
+            if (type.equals(type1)){
+                list.add(authHost);
+                continue;
+            }
             boolean b = findType(type, type1);
             if (b){
                 authHost.setType(type);

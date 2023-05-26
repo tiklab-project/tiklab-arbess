@@ -116,9 +116,11 @@ public class AuthThirdServiceImpl implements AuthThirdService {
         }
 
         for (AuthThird authServer : allAuthServer) {
-
             String type1 = authServer.getType();
-
+            if (type.equals(type1)){
+                list.add(authServer);
+                continue;
+            }
             boolean type2 = findType(type, type1);
             if (!type2 ){
                 continue;
