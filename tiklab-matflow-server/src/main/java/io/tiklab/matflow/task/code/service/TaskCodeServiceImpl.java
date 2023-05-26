@@ -84,7 +84,7 @@ public class TaskCodeServiceImpl implements TaskCodeService {
             return taskCode;
         }
 
-        String codeBranch = oneCodeEntity.getCodeBranch();
+        String codeBranch = oneCodeEntity.getBranchId();
         if (Objects.isNull(codeBranch)){
             return taskCode;
         }

@@ -27,7 +27,6 @@ import io.tiklab.teston.testplan.instance.service.TestPlanInstanceService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.remoting.RemoteAccessException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -99,11 +98,15 @@ public class TaskTestOnServiceImpl implements TaskTestOnService {
             Repository repository = repositoryServer(serverAddress).findOne(rpyId);
             return bindTestOnRepository(repository);
         }catch (Throwable throwable){
-            if (throwable instanceof RemoteAccessException){
-                logger.error(throwable.getMessage());
-                throw new ApplicationException("无法连接到:" + serverAddress);
+            String message = throwable.getMessage();
+            logger.error(message);
+            if (throwable instanceof ApplicationException){
+                throw new ApplicationException(message);
             }
-            throw new ApplicationException(throwable.getMessage());
+            if (message.contains("未订阅")){
+                throw new ApplicationException(message);
+            }
+            throw new ApplicationException("无法连接到："+serverAddress);
         }
     }
 
@@ -114,11 +117,15 @@ public class TaskTestOnServiceImpl implements TaskTestOnService {
             TestPlan testPlan = testPlanService(serverAddress).findOne(planId);
             return bindTestOnTestPlan(testPlan);
         }catch (Throwable throwable){
-            if (throwable instanceof RemoteAccessException){
-                logger.error(throwable.getMessage());
-                throw new ApplicationException("无法连接到:" + serverAddress);
+            String message = throwable.getMessage();
+            logger.error(message);
+            if (throwable instanceof ApplicationException){
+                throw new ApplicationException(message);
             }
-            throw new ApplicationException(throwable.getMessage());
+            if (message.contains("未订阅")){
+                throw new ApplicationException(message);
+            }
+            throw new ApplicationException("无法连接到："+serverAddress);
         }
     }
 
@@ -132,11 +139,15 @@ public class TaskTestOnServiceImpl implements TaskTestOnService {
         try {
             allRepository = repositoryServer(serverAddress).findAllRepository();
         }catch (Throwable throwable){
-            if (throwable instanceof RemoteAccessException){
-                logger.error(throwable.getMessage());
-                throw new ApplicationException("无法连接到:" + serverAddress);
+            String message = throwable.getMessage();
+            logger.error(message);
+            if (throwable instanceof ApplicationException){
+                throw new ApplicationException(message);
             }
-            throw new ApplicationException(throwable.getMessage());
+            if (message.contains("未订阅")){
+                throw new ApplicationException(message);
+            }
+            throw new ApplicationException("无法连接到："+serverAddress);
         }
 
         if (allRepository == null || allRepository.isEmpty()){
@@ -166,11 +177,15 @@ public class TaskTestOnServiceImpl implements TaskTestOnService {
             testPlanQuery.setRepositoryId(repository.getId());
             testPlanList = testPlanService(serverAddress).findTestPlanList(testPlanQuery);
         }catch (Throwable throwable){
-            if (throwable instanceof RemoteAccessException){
-                logger.error(throwable.getMessage());
-                throw new ApplicationException("无法连接到:" + serverAddress);
+            String message = throwable.getMessage();
+            logger.error(message);
+            if (throwable instanceof ApplicationException){
+                throw new ApplicationException(message);
             }
-            throw new ApplicationException(throwable.getMessage());
+            if (message.contains("未订阅")){
+                throw new ApplicationException(message);
+            }
+            throw new ApplicationException("无法连接到："+serverAddress);
         }
 
         if (testPlanList == null || testPlanList.isEmpty()){
@@ -219,11 +234,15 @@ public class TaskTestOnServiceImpl implements TaskTestOnService {
                 default -> throw new ApplicationException("未知的类型："+env);
             }
         }catch (Throwable throwable){
-            if (throwable instanceof RemoteAccessException){
-                logger.error(throwable.getMessage());
-                throw new ApplicationException("无法连接到:" + serverAddress);
+            String message = throwable.getMessage();
+            logger.error(message);
+            if (throwable instanceof ApplicationException){
+                throw new ApplicationException(message);
             }
-            throw new ApplicationException(throwable.getMessage());
+            if (message.contains("未订阅")){
+                throw new ApplicationException(message);
+            }
+            throw new ApplicationException("无法连接到："+serverAddress);
         }
     }
 
@@ -235,15 +254,20 @@ public class TaskTestOnServiceImpl implements TaskTestOnService {
             throw new ApplicationException("TestOn远程地址不能为空！");
         }
 
+        TestPlanTestData testData = bindTestPlanTestData(testPlanTestData);
+
         try {
-            TestPlanTestData testData = bindTestPlanTestData(testPlanTestData);
             testPlanExecuteService(serverAddress).execute(testData);
         }catch (Throwable throwable){
-            if (throwable instanceof RemoteAccessException){
-                logger.error(throwable.getMessage());
-                throw new ApplicationException("无法连接到:" + serverAddress);
+            String message = throwable.getMessage();
+            logger.error(message);
+            if (throwable instanceof ApplicationException){
+                throw new ApplicationException(message);
             }
-            throw new ApplicationException(throwable.getMessage());
+            if (message.contains("未订阅")){
+                throw new ApplicationException(message);
+            }
+            throw new ApplicationException("无法连接到："+serverAddress);
         }
     }
 
@@ -253,16 +277,26 @@ public class TaskTestOnServiceImpl implements TaskTestOnService {
         if (Objects.isNull(serverAddress)){
             throw new ApplicationException("TestOn远程地址不能为空！");
         }
+        TestPlanTestResponse testPlanTestResponse;
         try {
-            TestPlanTestResponse testPlanTestResponse = testPlanExecuteService(serverAddress).exeResult();
-            return bindTestPlanExecResult(testPlanTestResponse);
-        }catch (Throwable throwable){
-            if (throwable instanceof RemoteAccessException){
-                logger.error(throwable.getMessage());
-                throw new ApplicationException("获取测试结果失败:" + serverAddress);
+            testPlanTestResponse = testPlanExecuteService(serverAddress).exeResult();
+        } catch (Throwable throwable){
+            String message = throwable.getMessage();
+            logger.error(message);
+            if (throwable instanceof ApplicationException){
+                throw new ApplicationException(message);
             }
-            throw new ApplicationException(throwable.getMessage());
+            if (message.contains("未订阅")){
+                throw new ApplicationException(message);
+            }
+            throw new ApplicationException("无法连接到："+serverAddress);
         }
+
+        if (Objects.isNull(testPlanTestResponse)){
+            throw new ApplicationException("获取测试结果为空！");
+        }
+
+        return bindTestPlanExecResult(testPlanTestResponse);
     }
 
     @Override
@@ -305,8 +339,22 @@ public class TaskTestOnServiceImpl implements TaskTestOnService {
         }
         TestPlanCaseInstanceBindQuery testPlanCaseInstanceBindQuery = new TestPlanCaseInstanceBindQuery();
         testPlanCaseInstanceBindQuery.setTestPlanInstanceId(instanceId);
-        List<TestPlanCaseInstanceBind> instanceBindList = testPlanCaseInstanceBindService(serverAddress)
-                .findTestPlanCaseInstanceBindList(testPlanCaseInstanceBindQuery);
+        List<TestPlanCaseInstanceBind> instanceBindList;
+        try {
+             instanceBindList = testPlanCaseInstanceBindService(serverAddress)
+                    .findTestPlanCaseInstanceBindList(testPlanCaseInstanceBindQuery);
+
+        }catch (Throwable throwable){
+            String message = throwable.getMessage();
+            logger.error(message);
+            if (throwable instanceof ApplicationException){
+                throw new ApplicationException(message);
+            }
+            if (message.contains("未订阅")){
+                throw new ApplicationException(message);
+            }
+            throw new ApplicationException("无法连接到："+serverAddress);
+        }
 
         if (instanceBindList== null || instanceBindList.isEmpty()){
             return Collections.emptyList();
@@ -324,7 +372,21 @@ public class TaskTestOnServiceImpl implements TaskTestOnService {
         if (serverAddress == null){
             return null;
         }
-        ApiEnv apiEnv = apiEnvService(serverAddress).findOne(id);
+        ApiEnv apiEnv;
+        try {
+             apiEnv = apiEnvService(serverAddress).findOne(id);
+        } catch (Throwable throwable){
+            String message = throwable.getMessage();
+            logger.error(message);
+            if (throwable instanceof ApplicationException){
+                throw new ApplicationException(message);
+            }
+            if (message.contains("未订阅")){
+                throw new ApplicationException(message);
+            }
+            throw new ApplicationException("无法连接到："+serverAddress);
+        }
+
         if (Objects.isNull(apiEnv)){
             return null;
         }
@@ -341,7 +403,22 @@ public class TaskTestOnServiceImpl implements TaskTestOnService {
         if (serverAddress == null){
             return null;
         }
-        AppEnv appEnv = appEnvService(serverAddress).findOne(id);
+        AppEnv appEnv;
+        try {
+             appEnv = appEnvService(serverAddress).findOne(id);
+        }catch (Throwable throwable){
+            String message = throwable.getMessage();
+            logger.error(message);
+            if (throwable instanceof ApplicationException){
+                throw new ApplicationException(message);
+            }
+            if (message.contains("未订阅")){
+                throw new ApplicationException(message);
+            }
+            throw new ApplicationException("无法连接到："+serverAddress);
+        }
+
+
         if (Objects.isNull(appEnv)){
             return null;
         }
@@ -358,7 +435,21 @@ public class TaskTestOnServiceImpl implements TaskTestOnService {
         if (serverAddress == null){
             return null;
         }
-        WebEnv webEnv = webEnvService(serverAddress).findOne(id);
+        WebEnv webEnv;
+        try {
+             webEnv = webEnvService(serverAddress).findOne(id);
+        }catch (Throwable throwable){
+            String message = throwable.getMessage();
+            logger.error(message);
+            if (throwable instanceof ApplicationException){
+                throw new ApplicationException(message);
+            }
+            if (message.contains("未订阅")){
+                throw new ApplicationException(message);
+            }
+            throw new ApplicationException("无法连接到："+serverAddress);
+        }
+
         if (Objects.isNull(webEnv)){
             return null;
         }

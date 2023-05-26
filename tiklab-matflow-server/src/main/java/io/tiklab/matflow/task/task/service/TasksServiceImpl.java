@@ -3,6 +3,7 @@ package io.tiklab.matflow.task.task.service;
 import com.alibaba.fastjson.JSON;
 import io.tiklab.beans.BeanMapper;
 import io.tiklab.core.exception.ApplicationException;
+import io.tiklab.matflow.setting.service.AuthHostService;
 import io.tiklab.matflow.setting.service.AuthService;
 import io.tiklab.matflow.setting.service.AuthThirdService;
 import io.tiklab.matflow.support.util.PipelineUtil;
@@ -74,6 +75,9 @@ public class TasksServiceImpl implements TasksService {
 
     @Autowired
     private AuthThirdService authServerServer;
+
+    @Autowired
+    private AuthHostService authHostService;
 
     private final ExecutorService executorService = Executors.newCachedThreadPool();
 
@@ -388,18 +392,37 @@ public class TasksServiceImpl implements TasksService {
                     object = buildService.findOneBuild(taskId);
                 }
                 case "31","32","liunx","docker" -> {
-                    object = deployService.findOneDeployConfig(taskId);
+                    TaskDeploy taskDeploy = deployService.findOneDeployConfig(taskId);
+                    String authId = taskDeploy.getAuthId();
+                    if (!Objects.isNull(authId)){
+                        Object auth = authHostService.findOneAuthHost(authId);
+                        taskDeploy.setAuth(auth);
+                    }
+                    object = taskDeploy;
                 }
                 case "41","sonar" -> {
-                    object = codeScanService.findOneCodeScanConfig(taskId);
+                    TaskCodeScan codeScanConfig = codeScanService.findOneCodeScanConfig(taskId);
+                    String authId = codeScanConfig.getAuthId();
+                    if (!Objects.isNull(authId)){
+                        Object auth = authHostService.findOneAuthHost(authId);
+                        codeScanConfig.setAuth(auth);
+                    }
+                    object = codeScanConfig;
                 }
-                case "51","nexus","ssh","xpack" -> {
+                case "51","52","nexus","ssh","xpack" -> {
                     TaskArtifact taskArtifact = productServer.findOneProduct(taskId);
                     String authId = taskArtifact.getAuthId();
-                    if (taskType.equals("xpack")){
-                        Object auth = authServerServer.findOneAuthServer(authId);
-                        taskArtifact.setAuth(auth);
+                    if (!Objects.isNull(authId)){
+                        if (taskType.equals("xpack") || taskType.equals("nexus")|| taskType.equals("51")){
+                            Object auth = authServerServer.findOneAuthServer(authId);
+                            taskArtifact.setAuth(auth);
+                        }
+                        if (taskType.equals("ssh")|| taskType.equals("52")){
+                            Object auth = authHostService.findOneAuthHost(authId);
+                            taskArtifact.setAuth(auth);
+                        }
                     }
+
                     object = taskArtifact;
                 }
                 case "61","message" -> {
@@ -490,14 +513,6 @@ public class TasksServiceImpl implements TasksService {
         if (tasks.isEmpty()){
             return Collections.emptyList();
         }
-        // for (Tasks task : tasks) {
-        //     String taskType = task.getTaskType();
-        //     String taskId = task.getTaskId();
-        //     String initTaskType = initTaskType(taskType);
-        //     task.setTaskType(initTaskType);
-        //     Object differentTask = findOneDifferentTask(taskId, taskType);
-        //     task.setTask(differentTask);
-        // }
         return bindAllTaskOrTask(findAllTaskOrTask(tasks));
     }
 
@@ -848,8 +863,6 @@ public class TasksServiceImpl implements TasksService {
     private Object findOneDifferentTask(String taskId,String taskType){
         switch (taskType) {
            case "1","2","3","4","5","git","gitee","github","gitlab","xcode" -> {
-                TaskCode task = codeService.findOneCodeConfig(taskId,taskType);
-                task.setType(taskType);
                 return codeService.findOneCodeConfig(taskId,taskType);
             }
              case "11","maventest","teston" -> {
@@ -970,7 +983,7 @@ public class TasksServiceImpl implements TasksService {
     private Boolean productValid(String taskType,Object object){
         TaskArtifact product = (TaskArtifact) object;
 
-        if (taskType.equals("51") || taskType.equals("nexus")){
+        if (taskType.equals("51") || taskType.equals("nexus")|| taskType.equals("xpack")){
             if (!PipelineUtil.isNoNull(product.getArtifactId())){
                 return false;
             }
@@ -987,7 +1000,7 @@ public class TasksServiceImpl implements TasksService {
                 return false;
             }
         }
-        if ( taskType.equals("51")||  taskType.equals("ssh")){
+        if ( taskType.equals("52")||  taskType.equals("ssh")){
             if (!PipelineUtil.isNoNull(product.getFileAddress())){
                 return false;
             }

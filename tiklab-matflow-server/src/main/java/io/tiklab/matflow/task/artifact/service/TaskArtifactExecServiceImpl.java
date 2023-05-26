@@ -95,6 +95,7 @@ public class TaskArtifactExecServiceImpl implements TaskArtifactExecService {
 
                     //执行命令
                     Process process = getProductOrder(product,path);
+
                     String[] error = error(product.getType());
                     boolean result = tasksInstanceService.readCommandExecResult(process, "UTF-8", error, taskId);
                     if (!result){

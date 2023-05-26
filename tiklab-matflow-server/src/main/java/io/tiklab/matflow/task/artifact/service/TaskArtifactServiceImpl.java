@@ -74,9 +74,10 @@ public class TaskArtifactServiceImpl implements TaskArtifactService {
                 }
                 AuthThird authServer = thirdServer.findOneAuthServer(authId);
                 product.setAuth(authServer);
-                String putAddress = taskArtifact.getPutAddress();
-                if (taskType.equals("xpack")){
-                    XpackRepository repository = taskArtifactXpackService.findRepository(authId, putAddress);
+
+                XpackRepository repositorys = taskArtifact.getRepository();
+                if (taskType.equals("xpack") && !Objects.isNull(repositorys)){
+                    XpackRepository repository = taskArtifactXpackService.findRepository(authId, taskArtifact.getRepository().getId());
                     if (!Objects.isNull(repository)){
                         product.setPutAddress(repository.getName());
                         product.setRepository(repository);

@@ -63,27 +63,46 @@ public class TaskArtifactXpackServiceImpl implements TaskArtifactXpackService {
                 list.add(bindXpackRepository(repository));
             }
             return list;
-        }catch (Exception throwable){
-            logger.error(throwable.fillInStackTrace().toString());
-            throw new ApplicationException("无法连接到:" + serverAddress);
+        } catch (Throwable throwable){
+            String message = throwable.getMessage();
+            logger.error(message);
+            if (message.contains("未订阅")){
+                throw new ApplicationException("当前企业为订阅Xpack");
+            }
+            if (throwable instanceof ApplicationException){
+                throw new ApplicationException(message);
+            }
+            throw new ApplicationException("无法连接到："+serverAddress);
         }
     }
 
     public XpackRepository findRepository(String authId,String rpyId){
         AuthThird authServer = authThirdService.findOneAuthServer(authId);
-        if (Objects.isNull(authServer)){
+        if (Objects.isNull(authServer) || Objects.isNull(rpyId)){
             return null;
         }
         String serverAddress = authServer.getServerAddress();
-
+        Repository repository ;
         try {
-            Repository repository = repositoryServer(serverAddress).findRepository(rpyId);
-            return bindXpackRepository(repository);
-        }catch (Throwable throwable){
-            throwable.fillInStackTrace();
-            return null;
+             repository = repositoryServer(serverAddress).findRepository(rpyId);
+
+        } catch (Throwable throwable){
+            String message = throwable.getMessage();
+            logger.error(message);
+            if (throwable instanceof ApplicationException){
+                throw new ApplicationException(message);
+            }
+            if (message.contains("未订阅")){
+                throw new ApplicationException("当前企业为订阅Xpack");
+            }
+            throw new ApplicationException("无法连接到："+serverAddress);
         }
 
+        if (repository == null){
+            throw new ApplicationException("获取仓库信息为空！");
+        }
+
+        return bindXpackRepository(repository);
     }
 
 

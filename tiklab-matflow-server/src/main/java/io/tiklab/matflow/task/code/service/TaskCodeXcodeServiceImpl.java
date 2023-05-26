@@ -56,8 +56,16 @@ public class TaskCodeXcodeServiceImpl implements TaskCodeXcodeService {
         String serverAddress =  authServer.getServerAddress();
         try {
             allRpy = repositoryServer(serverAddress).findAllRpy();
-        }catch (Exception throwable){
-            logger.error(throwable.getMessage());
+        }catch (Throwable throwable){
+            String message = throwable.getMessage();
+            logger.error(message);
+            if (message.contains("未订阅")){
+                throw new ApplicationException("当前企业未订阅Xcode");
+            }
+            if (throwable instanceof ApplicationException){
+                throw new ApplicationException(message);
+            }
+
             throw new ApplicationException("无法连接到："+serverAddress);
         }
 
@@ -90,7 +98,15 @@ public class TaskCodeXcodeServiceImpl implements TaskCodeXcodeService {
         try {
             allBranch = branchServer(serverAddress).findAllBranch(rpyId);
         }catch (Throwable throwable){
-            logger.error(throwable.getMessage());
+            String message = throwable.getMessage();
+            logger.error(message);
+            if (message.contains("未订阅")){
+                throw new ApplicationException("当前企业未订阅Xcode");
+            }
+            if (throwable instanceof ApplicationException){
+                throw new ApplicationException(message);
+            }
+
             throw new ApplicationException("无法连接到："+serverAddress);
         }
 
@@ -145,8 +161,15 @@ public class TaskCodeXcodeServiceImpl implements TaskCodeXcodeService {
         Repository repository ;
         try {
             repository = repositoryServer(serverAddress).findOneRpy(rpyId);
-        }catch (Exception e){
-            logger.error(e.getMessage());
+        }catch (Throwable throwable){
+            String message = throwable.getMessage();
+            logger.error(message);
+            if (message.contains("未订阅")){
+                throw new ApplicationException("当前企业未订阅Xcode");
+            }
+            if (throwable instanceof ApplicationException){
+                throw new ApplicationException(message);
+            }
             throw new ApplicationException("无法连接到："+serverAddress);
         }
 
