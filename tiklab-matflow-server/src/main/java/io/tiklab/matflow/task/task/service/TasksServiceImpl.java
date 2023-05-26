@@ -904,7 +904,7 @@ public class TasksServiceImpl implements TasksService {
            case "21","22","maven","nodejs" -> { return buildValid(taskType, object); }
            case "31","32","liunx","docker" -> { return deployValid(taskType, object); }
            case "41","sonar" -> { return codeScanValid(taskType, object); }
-           case "51","nexus","ssh" -> { return productValid(taskType, object); }
+           case "51","nexus","ssh","xpack" -> { return productValid(taskType, object); }
             default -> {
                 return true;
             }
@@ -983,7 +983,7 @@ public class TasksServiceImpl implements TasksService {
     private Boolean productValid(String taskType,Object object){
         TaskArtifact product = (TaskArtifact) object;
 
-        if (taskType.equals("51") || taskType.equals("nexus")|| taskType.equals("xpack")){
+        if (taskType.equals("51") || taskType.equals("nexus") || taskType.equals("xpack")){
             if (!PipelineUtil.isNoNull(product.getArtifactId())){
                 return false;
             }
