@@ -8,11 +8,6 @@ import io.tiklab.join.annotation.Join;
 import io.tiklab.join.annotation.JoinQuery;
 import io.tiklab.postin.annotation.ApiModel;
 import io.tiklab.postin.annotation.ApiProperty;
-import io.tiklab.teston.repository.model.Repository;
-import io.tiklab.teston.support.environment.model.ApiEnv;
-import io.tiklab.teston.support.environment.model.AppEnv;
-import io.tiklab.teston.support.environment.model.WebEnv;
-import io.tiklab.teston.testplan.cases.model.TestPlan;
 
 /**
  * 任务测试模型
@@ -32,40 +27,35 @@ public class TaskTest {
     @ApiProperty(name="address",desc="测试地址",required = true)
     private String address;
 
-    @ApiProperty(name = "testSpace",desc="测试空间")
     @Mappings({
             @Mapping(source = "testSpace.id",target = "testSpace")
     })
     @JoinQuery(key = "testSpace")
-    private Repository testSpace;
+    private TestOnRepository testSpace;
 
-    @ApiProperty(name = "testPlan",desc="测试计划")
     @Mappings({
             @Mapping(source = "testPlan.id",target = "testPlan")
     })
     @JoinQuery(key = "testPlan")
-    private TestPlan testPlan;
+    private TestOnTestPlan testPlan;
 
-    @ApiProperty(name = "apiEnv",desc="api环境")
     @Mappings({
             @Mapping(source = "apiEnv.id",target = "apiEnv")
     })
-    @JoinQuery(key = "id")
-    private ApiEnv apiEnv;
+    @JoinQuery(key = "apiEnv")
+    private TestOnApiEnv apiEnv;
 
-    @ApiProperty(name = "appEnv",desc="app环境")
     @Mappings({
             @Mapping(source = "appEnv.id",target = "appEnv")
     })
     @JoinQuery(key = "appEnv")
-    private AppEnv appEnv;
+    private TestOnAppEnv appEnv;
 
-    @ApiProperty(name = "webEnv",desc="web环境")
     @Mappings({
             @Mapping(source = "webEnv.id",target = "webEnv")
     })
     @JoinQuery(key = "webEnv")
-    private WebEnv webEnv;
+    private TestOnWebEnv webEnv;
 
     @ApiProperty(name = "authId",desc="认证id")
     private String authId;
@@ -94,48 +84,50 @@ public class TaskTest {
         this.authId = authId;
     }
 
-    public ApiEnv getApiEnv() {
-        return apiEnv;
+    public String getTaskId() {
+        return taskId;
     }
 
-    public void setApiEnv(ApiEnv apiEnv) {
-        this.apiEnv = apiEnv;
-    }
 
-    public AppEnv getAppEnv() {
-        return appEnv;
-    }
-
-    public void setAppEnv(AppEnv appEnv) {
-        this.appEnv = appEnv;
-    }
-
-    public WebEnv getWebEnv() {
-        return webEnv;
-    }
-
-    public void setWebEnv(WebEnv webEnv) {
-        this.webEnv = webEnv;
-    }
-
-    public Repository getTestSpace() {
+    public TestOnRepository getTestSpace() {
         return testSpace;
     }
 
-    public void setTestSpace(Repository testSpace) {
+    public void setTestSpace(TestOnRepository testSpace) {
         this.testSpace = testSpace;
     }
 
-    public TestPlan getTestPlan() {
+
+    public TestOnTestPlan getTestPlan() {
         return testPlan;
     }
 
-    public void setTestPlan(TestPlan testPlan) {
+    public void setTestPlan(TestOnTestPlan testPlan) {
         this.testPlan = testPlan;
     }
 
-    public String getTaskId() {
-        return taskId;
+    public TestOnApiEnv getApiEnv() {
+        return apiEnv;
+    }
+
+    public void setApiEnv(TestOnApiEnv apiEnv) {
+        this.apiEnv = apiEnv;
+    }
+
+    public TestOnAppEnv getAppEnv() {
+        return appEnv;
+    }
+
+    public void setAppEnv(TestOnAppEnv appEnv) {
+        this.appEnv = appEnv;
+    }
+
+    public TestOnWebEnv getWebEnv() {
+        return webEnv;
+    }
+
+    public void setWebEnv(TestOnWebEnv webEnv) {
+        this.webEnv = webEnv;
     }
 
     public void setTaskId(String taskId) {

@@ -50,7 +50,7 @@ public class TaskCodeScanExecServiceImpl implements TaskCodeScanExecService {
             return true;
         }
         
-        TaskCodeScan taskCodeScan = (TaskCodeScan) task.getValues();
+        TaskCodeScan taskCodeScan = (TaskCodeScan) task.getTask();
         String name = task.getTaskName();
 
 
@@ -128,7 +128,7 @@ public class TaskCodeScanExecServiceImpl implements TaskCodeScanExecService {
 
     private String[] error(String type){
         String[] strings;
-        if (type.equals("5")){
+        if (type.equals("sonar")){
             strings = new String[]{
                     "svn: E170000:",
                     "invalid option;"

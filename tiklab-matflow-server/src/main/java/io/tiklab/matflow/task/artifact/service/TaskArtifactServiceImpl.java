@@ -1,13 +1,14 @@
 package io.tiklab.matflow.task.artifact.service;
 
+import io.tiklab.beans.BeanMapper;
 import io.tiklab.matflow.setting.model.AuthThird;
 import io.tiklab.matflow.setting.service.AuthHostService;
 import io.tiklab.matflow.setting.service.AuthThirdService;
 import io.tiklab.matflow.support.util.PipelineUtil;
 import io.tiklab.matflow.task.artifact.dao.TaskProductDao;
 import io.tiklab.matflow.task.artifact.entity.TaskProductEntity;
-import io.tiklab.beans.BeanMapper;
 import io.tiklab.matflow.task.artifact.model.TaskArtifact;
+import io.tiklab.matflow.task.artifact.model.XpackRepository;
 import io.tiklab.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,13 +22,16 @@ public class TaskArtifactServiceImpl implements TaskArtifactService {
 
 
     @Autowired
-    TaskProductDao productDao;
+    private TaskProductDao productDao;
 
     @Autowired
-    AuthThirdService thirdServer;
+    private AuthThirdService thirdServer;
 
     @Autowired
-    AuthHostService hostServer;
+    private AuthHostService hostServer;
+
+    @Autowired
+    private TaskArtifactXpackService taskArtifactXpackService;
 
     /**
      * 创建流水线推送制品
@@ -46,7 +50,7 @@ public class TaskArtifactServiceImpl implements TaskArtifactService {
      */
     @Override
     public void deleteProductConfig(String configId){
-        TaskArtifact oneProductConfig = findOneProductConfig(configId);
+        TaskArtifact oneProductConfig = findOneProductConfig(configId,"");
         deleteProduct(oneProductConfig.getTaskId());
     }
 
@@ -56,7 +60,7 @@ public class TaskArtifactServiceImpl implements TaskArtifactService {
      * @return 任务
      */
     @Override
-    public TaskArtifact findOneProductConfig(String configId){
+    public TaskArtifact findOneProductConfig(String configId,String taskType){
         List<TaskArtifact> allProduct = findAllProduct();
         if (allProduct == null){
             return null;
@@ -70,6 +74,14 @@ public class TaskArtifactServiceImpl implements TaskArtifactService {
                 }
                 AuthThird authServer = thirdServer.findOneAuthServer(authId);
                 product.setAuth(authServer);
+                String putAddress = taskArtifact.getPutAddress();
+                if (taskType.equals("xpack")){
+                    XpackRepository repository = taskArtifactXpackService.findRepository(authId, putAddress);
+                    if (!Objects.isNull(repository)){
+                        product.setPutAddress(repository.getName());
+                        product.setRepository(repository);
+                    }
+                }
                 return product;
             }
         }

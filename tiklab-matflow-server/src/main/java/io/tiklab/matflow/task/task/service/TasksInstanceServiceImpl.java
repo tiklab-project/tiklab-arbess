@@ -284,10 +284,15 @@ public class TasksInstanceServiceImpl implements TasksInstanceService {
                 runState = PipelineFinal.RUN_ERROR;
                 break;
             }
+            if (state.equals(PipelineFinal.RUN_WAIT)){
+                runState = PipelineFinal.RUN_WAIT;
+                break;
+            }
             if (state.equals(PipelineFinal.RUN_RUN)){
                 runState = PipelineFinal.RUN_RUN;
                 break;
             }
+
         }
         stageIdOrStageRunTime.put(stageId,stageRunTime);
         stageIdOrStageRunLog.put(stageId, String.valueOf(stageRunLog));

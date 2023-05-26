@@ -30,6 +30,28 @@ public class TaskCodeEntity {
     @Column(name = "svn_file",notNull = true)
     private String svnFile;
 
+    @Column(name = "xcode_id",notNull = true)
+    private String xcodeId;
+
+    @Column(name = "branch_id",notNull = true)
+    private String branchId;
+
+    public String getXcodeId() {
+        return xcodeId;
+    }
+
+    public void setXcodeId(String xcodeId) {
+        this.xcodeId = xcodeId;
+    }
+
+    public String getBranchId() {
+        return branchId;
+    }
+
+    public void setBranchId(String branchId) {
+        this.branchId = branchId;
+    }
+
     public String getTaskId() {
         return taskId;
     }

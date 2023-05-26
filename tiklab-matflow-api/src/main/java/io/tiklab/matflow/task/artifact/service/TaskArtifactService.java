@@ -39,7 +39,7 @@ public interface TaskArtifactService {
      * @param configId 配置id
      * @return 任务
      */
-    TaskArtifact findOneProductConfig(String configId);
+    TaskArtifact findOneProductConfig(String configId,String taskType);
 
 
     /**

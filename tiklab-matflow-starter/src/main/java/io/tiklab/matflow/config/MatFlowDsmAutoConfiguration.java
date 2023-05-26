@@ -53,7 +53,8 @@ public class MatFlowDsmAutoConfiguration {
                 "user_1.0.1_dml",
                 "oplog_1.0.1_dml",
                 "pip-init-project_1.0.1_dml",
-                "pip-pipeline_1.0.1_dml"
+                "pip-pipeline_1.0.1_dml",
+                "pip-pipeline_1.0.1_ddl"
         });
         dsmConfig.newVersion("1.0.2", new String[]{
                 "oplog_1.0.2_dml"

@@ -24,10 +24,8 @@ public class TaskTestEntity {
     @Column(name = "test_plan")
     private String testPlan;
 
-
     @Column(name = "api_env")
     private String apiEnv;
-
 
     @Column(name = "app_env")
     private String appEnv;

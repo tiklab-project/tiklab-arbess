@@ -114,7 +114,7 @@ public class PipelineUtil {
 
         String time = "";
 
-        if (day > dayNumber){
+        if (day > dayNumber && dayNumber != 0){
             return null;
         }
 
@@ -136,7 +136,7 @@ public class PipelineUtil {
 
         if (day != 0){
             if (day == 1 && hours == 0){
-                return " 昨天";
+                return (hours + 24) + " 小时 " + minutes + " 分前 " ;
             }
             if (hours != 0){
                 time = day +" 天 "+hours + " 小时";

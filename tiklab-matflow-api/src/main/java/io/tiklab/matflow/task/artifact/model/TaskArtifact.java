@@ -1,9 +1,13 @@
 package io.tiklab.matflow.task.artifact.model;
 
 import io.tiklab.beans.annotation.Mapper;
+import io.tiklab.beans.annotation.Mapping;
+import io.tiklab.beans.annotation.Mappings;
 import io.tiklab.join.annotation.Join;
+import io.tiklab.join.annotation.JoinQuery;
 import io.tiklab.postin.annotation.ApiModel;
 import io.tiklab.postin.annotation.ApiProperty;
+
 /**
  * 任务推送制品模型
  */
@@ -38,6 +42,12 @@ public class TaskArtifact {
     private String authId;
 
 
+    @Mappings({
+            @Mapping(source = "repository.id",target = "xpackId")
+    })
+    @JoinQuery(key = "xpackId")
+    private XpackRepository repository;
+
     //授权信息
     private Object auth;
 
@@ -45,6 +55,14 @@ public class TaskArtifact {
 
     private int sort;
 
+
+    public XpackRepository getRepository() {
+        return repository;
+    }
+
+    public void setRepository(XpackRepository repository) {
+        this.repository = repository;
+    }
 
     public String getTaskId() {
         return taskId;

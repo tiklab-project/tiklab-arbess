@@ -323,6 +323,7 @@ public class StageServiceImpl implements StageService {
         String taskId = stage.getTaskId();
         Tasks tasks = new Tasks();
         tasks.setTaskId(taskId);
+        tasks.setTask(values);
         tasks.setValues(values);
         tasksService.updateTasksTask(tasks);
     }

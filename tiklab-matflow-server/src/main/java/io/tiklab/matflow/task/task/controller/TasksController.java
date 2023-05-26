@@ -67,6 +67,15 @@ public class TasksController {
     }
 
 
+    @RequestMapping(path="/findOneTasksOrTask",method = RequestMethod.POST)
+    @ApiMethod(name = "findOneTasksOrTask",desc = "查询流水线配置")
+    @ApiParam(name = "taskId",desc = "任务id",required = true)
+    public Result<Tasks> findOneTasksOrTask(@NotNull String taskId){
+        Tasks tasksOrTask = tasksService.findOneTasksOrTask(taskId);
+        return Result.ok(tasksOrTask);
+    }
+
+
     @RequestMapping(path="/validTaskMustField",method = RequestMethod.POST)
     @ApiMethod(name = "validTaskMustField",desc = "查询流水线配置")
     @ApiParam(name = "pipelineId",desc = "流水线id",required = true)

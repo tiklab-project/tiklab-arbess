@@ -3,12 +3,15 @@ package io.tiklab.matflow.task.task.service;
 import com.alibaba.fastjson.JSON;
 import io.tiklab.beans.BeanMapper;
 import io.tiklab.core.exception.ApplicationException;
+import io.tiklab.matflow.setting.service.AuthService;
+import io.tiklab.matflow.setting.service.AuthThirdService;
 import io.tiklab.matflow.support.util.PipelineUtil;
 import io.tiklab.matflow.task.artifact.model.TaskArtifact;
 import io.tiklab.matflow.task.artifact.service.TaskArtifactService;
 import io.tiklab.matflow.task.build.model.TaskBuild;
 import io.tiklab.matflow.task.build.service.TaskBuildService;
 import io.tiklab.matflow.task.code.model.TaskCode;
+import io.tiklab.matflow.task.code.model.XcodeRepository;
 import io.tiklab.matflow.task.code.service.TaskCodeService;
 import io.tiklab.matflow.task.codescan.model.TaskCodeScan;
 import io.tiklab.matflow.task.codescan.service.TaskCodeScanService;
@@ -24,12 +27,16 @@ import io.tiklab.matflow.task.task.model.Tasks;
 import io.tiklab.matflow.task.test.model.TaskTest;
 import io.tiklab.matflow.task.test.service.TaskTestService;
 import io.tiklab.rpc.annotation.Exporter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 @Service
 @Exporter
@@ -61,6 +68,16 @@ public class TasksServiceImpl implements TasksService {
 
     @Autowired
     private TaskScriptService scriptServer;
+
+    @Autowired
+    private AuthService authServer;
+
+    @Autowired
+    private AuthThirdService authServerServer;
+
+    private final ExecutorService executorService = Executors.newCachedThreadPool();
+
+    private static final Logger logger = LoggerFactory.getLogger(TasksServiceImpl.class);
     
 
     /**
@@ -276,8 +293,10 @@ public class TasksServiceImpl implements TasksService {
         Tasks postTask = findOnePostTask(postId);
         String  taskType = postTask.getTaskType();
         String taskId = postTask.getTaskId();
+        String initTaskType = initTaskType(taskType);
         Object task = findOneDifferentTask(taskId, taskType);
         postTask.setValues(task);
+        postTask.setTaskType(initTaskType);
         return postTask;
     }
 
@@ -287,15 +306,117 @@ public class TasksServiceImpl implements TasksService {
         if (tasks.isEmpty()){
             return Collections.emptyList();
         }
+        return bindAllTaskOrTask(findAllTaskOrTask(tasks));
+    }
+
+    private List<Tasks> findAllTaskOrTask(List<Tasks> tasks){
+
+        Map<String , Future<Object>> futureMap = new HashMap<>();
+
         for (Tasks task : tasks) {
             String taskId = task.getTaskId();
             String taskType = task.getTaskType();
             String initTaskType = initTaskType(taskType);
-            Object differentTask = findOneDifferentTask(taskId, initTaskType);
-            task.setTask(differentTask);
+            Future<Object> future = executorService.submit(() -> {
+                Object object;
+                try {
+                    object = findOneDifferentTask(taskId, initTaskType);
+                }catch (Exception e){
+                    logger.error("获取配置信息失败："+e.getMessage() + "   initTaskType:"+initTaskType);
+                    return  null;
+                }
+                return object;
+            });
             task.setTaskType(initTaskType);
+            futureMap.put(taskId,future);
         }
-        return tasks;
+        List<Tasks> list = new ArrayList<>();
+
+        for (Tasks task : tasks) {
+            String taskId = task.getTaskId();
+            Future<Object> objectFuture = futureMap.get(taskId);
+            Object object;
+            try {
+                object = objectFuture.get();
+            } catch (InterruptedException | ExecutionException e) {
+                throw new RuntimeException(e);
+            }
+            task.setTask(object);
+            list.add(task);
+        }
+        return list;
+    }
+
+    private List<Tasks> bindAllTaskOrTask(List<Tasks> tasks){
+        List<Tasks> list = new ArrayList<>();
+        for (Tasks task : tasks) {
+            Object object = task.getTask();
+            if (!Objects.isNull(object)){
+                list.add(task);
+                continue;
+            }
+            String taskType = task.getTaskType();
+            String taskId = task.getTaskId();
+            switch (taskType) {
+                case "1","2","3","4","5","git","gitee","github","gitlab","xcode" -> {
+                    TaskCode taskCode = codeService.findOneCode(taskId);
+                    String authId = taskCode.getAuthId();
+                    if (!Objects.isNull(authId)){
+                        Object auth ;
+                        switch (taskType) {
+                            case "gitee","github","xcode" ->{
+                                auth = authServerServer.findOneAuthServer(authId);
+                            }
+                            default -> {
+                                auth = authServer.findOneAuth(authId);
+                            }
+                        }
+                        taskCode.setAuth(auth);
+                    }
+                    object =  taskCode;
+                }
+                case "11","maventest","teston" -> {
+                    TaskTest taskTest = testService.findOneTest(taskId);
+                    String authId = taskTest.getAuthId();
+                    if (taskType.equals("teston")){
+                        Object auth = authServerServer.findOneAuthServer(authId);
+                        taskTest.setAuth(auth);
+                    }
+                    object = taskTest;
+                }
+                case "21","22","maven","nodejs" -> {
+                    object = buildService.findOneBuild(taskId);
+                }
+                case "31","32","liunx","docker" -> {
+                    object = deployService.findOneDeployConfig(taskId);
+                }
+                case "41","sonar" -> {
+                    object = codeScanService.findOneCodeScanConfig(taskId);
+                }
+                case "51","nexus","ssh","xpack" -> {
+                    TaskArtifact taskArtifact = productServer.findOneProduct(taskId);
+                    String authId = taskArtifact.getAuthId();
+                    if (taskType.equals("xpack")){
+                        Object auth = authServerServer.findOneAuthServer(authId);
+                        taskArtifact.setAuth(auth);
+                    }
+                    object = taskArtifact;
+                }
+                case "61","message" -> {
+                    object = messageTypeServer.findMessage(taskId);
+                }
+                case "71","72","bat","shell" -> {
+                    object = scriptServer.findScript(taskId);
+                }
+                default -> {
+                    throw new ApplicationException("无法更新未知的配置类型。");
+                }
+            }
+            task.setValues(object);
+            task.setTask(object);
+            list.add(task);
+        }
+        return list;
     }
 
 
@@ -369,15 +490,15 @@ public class TasksServiceImpl implements TasksService {
         if (tasks.isEmpty()){
             return Collections.emptyList();
         }
-        for (Tasks task : tasks) {
-            String taskType = task.getTaskType();
-            String taskId = task.getTaskId();
-            String initTaskType = initTaskType(taskType);
-            task.setTaskType(initTaskType);
-            Object differentTask = findOneDifferentTask(taskId, taskType);
-            task.setTask(differentTask);
-        }
-        return tasks;
+        // for (Tasks task : tasks) {
+        //     String taskType = task.getTaskType();
+        //     String taskId = task.getTaskId();
+        //     String initTaskType = initTaskType(taskType);
+        //     task.setTaskType(initTaskType);
+        //     Object differentTask = findOneDifferentTask(taskId, taskType);
+        //     task.setTask(differentTask);
+        // }
+        return bindAllTaskOrTask(findAllTaskOrTask(tasks));
     }
 
     @Override
@@ -391,18 +512,21 @@ public class TasksServiceImpl implements TasksService {
     public List<String> validTasksMustField(String id , int type){
         List<Tasks> list ;
         if (type == 1){
-            list = finAllPipelineTask(id);
+            list = finAllPipelineTaskOrTask(id);
         }else {
-            list = finAllStageTask(id);
+            list = finAllStageTaskOrTask(id);
         }
-        if (list == null || list.size() == 0){
+        if (list == null || list.isEmpty()){
             return null;
         }
         List<String> stringList = new ArrayList<>();
         for (Tasks tasks : list) {
-            String configId = tasks.getTaskId();
+            String taskId = tasks.getTaskId();
             String taskType = tasks.getTaskType();
-            validDifferentTaskMastField(configId,taskType,stringList);
+            Boolean aBoolean = validDifferentTaskMastField(taskType, tasks.getTask());
+            if (!aBoolean){
+                stringList.add(taskId);
+            }
         }
         return stringList;
     }
@@ -458,6 +582,7 @@ public class TasksServiceImpl implements TasksService {
         Tasks tasks = findOneTasks(tasksId);
         Object task = findOneDifferentTask(tasksId, tasks.getTaskType());
         tasks.setValues(task);
+        tasks.setTask(task);
         return tasks;
     }
     
@@ -565,7 +690,7 @@ public class TasksServiceImpl implements TasksService {
         switch (taskType) {
            case "1","2","3","4","5","git","gitee","github","gitlab","xcode" -> {
                 TaskCode taskCode = JSON.parseObject(object, TaskCode.class);
-                TaskCode oneCodeConfig = codeService.findOneCodeConfig(taskId);
+                TaskCode oneCodeConfig = codeService.findOneCode(taskId);
                 String id;
                 if (oneCodeConfig == null){
                     id = codeService.createCode(new TaskCode());
@@ -626,7 +751,7 @@ public class TasksServiceImpl implements TasksService {
             }
              case "51","nexus","ssh","xpack" -> {
                 TaskArtifact taskArtifact = JSON.parseObject(object, TaskArtifact.class);
-                TaskArtifact oneProductConfig = productServer.findOneProductConfig(taskId);
+                TaskArtifact oneProductConfig = productServer.findOneProductConfig(taskId,"");
                 String id;
                 if (oneProductConfig == null){
                     id = productServer.createProduct(new TaskArtifact());
@@ -723,9 +848,9 @@ public class TasksServiceImpl implements TasksService {
     private Object findOneDifferentTask(String taskId,String taskType){
         switch (taskType) {
            case "1","2","3","4","5","git","gitee","github","gitlab","xcode" -> {
-                TaskCode task = codeService.findOneCodeConfig(taskId);
+                TaskCode task = codeService.findOneCodeConfig(taskId,taskType);
                 task.setType(taskType);
-                return codeService.findOneCodeConfig(taskId);
+                return codeService.findOneCodeConfig(taskId,taskType);
             }
              case "11","maventest","teston" -> {
                 return testService.findOneTestConfig(taskId);
@@ -740,7 +865,7 @@ public class TasksServiceImpl implements TasksService {
                 return codeScanService.findOneCodeScanConfig(taskId);
             }
              case "51","nexus","ssh","xpack" -> {
-                return productServer.findOneProductConfig(taskId);
+                return productServer.findOneProductConfig(taskId,taskType);
             }
              case "61","message" -> {
                 return messageTypeServer.findMessage(taskId);
@@ -756,96 +881,119 @@ public class TasksServiceImpl implements TasksService {
     
     /**
      * 效验不同任务配置必填字段
-     * @param taskId 任务id
      * @param taskType 任务类型
-     * @param list 必填字段
+     * @param object 任务信息
      */
-    private void validDifferentTaskMastField(String taskId, String taskType, List<String> list){
+    private Boolean validDifferentTaskMastField(String taskType,Object object){
         switch (taskType) {
-           case "1","2","3","4","5","git","gitee","github","gitlab","xcode" ->  codeValid(taskId, list);
-           case "11","maventest","teston" ->  testValid(taskId, list);
-           case "21","22","maven","nodejs" ->  buildValid(taskId, list);
-           case "31","32","liunx","docker" ->  deployValid(taskId, list, taskType);
-           case "41","sonar" ->  codeScanValid(taskId, list);
-           case "51","nexus","ssh" ->  productValid(taskId, list,taskType);
+           case "1","2","3","4","5","git","gitee","github","gitlab","xcode" ->  { return codeValid(taskType, object); }
+           case "11","maventest","teston" ->  { return testValid(taskType, object); }
+           case "21","22","maven","nodejs" -> { return buildValid(taskType, object); }
+           case "31","32","liunx","docker" -> { return deployValid(taskType, object); }
+           case "41","sonar" -> { return codeScanValid(taskType, object); }
+           case "51","nexus","ssh" -> { return productValid(taskType, object); }
+            default -> {
+                return true;
+            }
         }
     }
 
-    private void codeValid(String configId,List<String> list){
-        TaskCode oneCodeConfig = codeService.findOneCodeConfig(configId);
-        if (oneCodeConfig == null){
-            return;
+    private Boolean codeValid(String taskType,Object object){
+        TaskCode code = (TaskCode) object;
+        switch (taskType){
+            case "1","4","git","github","svn" -> {
+                String codeAddress = code.getCodeAddress();
+                if (Objects.isNull(codeAddress)){
+                    return false;
+                }
+            }
+            case "xcode" -> {
+                XcodeRepository repository = code.getRepository();
+                if (Objects.isNull(repository)){
+                    return false;
+                }
+                if (Objects.isNull(repository.getName())){
+                    return false;
+                }
+
+            }
         }
-        if (!PipelineUtil.isNoNull(oneCodeConfig.getCodeName())){
-            list.add(configId);
+        return true;
+    }
+
+    private Boolean codeScanValid(String taskType,Object object){
+        TaskCodeScan code = (TaskCodeScan)object;
+        if (taskType.equals("sonar")) {
+            String projectName = code.getProjectName();
+            return !Objects.isNull(projectName);
+        } else {
+            return true;
         }
     }
 
-    private void codeScanValid(String configId,List<String> list){
-        TaskCodeScan code = codeScanService.findOneCodeScanConfig(configId);
-        if (code == null){
-            return;
+    private Boolean testValid(String taskType,Object object){
+        TaskTest taskTest = (TaskTest) object;
+
+        if (taskType.equals("teston")){
+            if (Objects.isNull(taskTest.getTestSpace())|| Objects.isNull(taskTest.getTestSpace().getName())){
+                return false;
+            }
+            if (Objects.isNull(taskTest.getTestPlan())|| Objects.isNull(taskTest.getTestPlan().getName())){
+                return false;
+            }
+           boolean b  = Objects.isNull(taskTest.getApiEnv()) && Objects.isNull(taskTest.getAppEnv())&&  Objects.isNull(taskTest.getWebEnv());
+           boolean b1  = Objects.isNull(taskTest.getApiEnv().getName()) && Objects.isNull(taskTest.getAppEnv().getName())&&  Objects.isNull(taskTest.getWebEnv().getName());
+            return !b && !b1;
         }
-        if (!PipelineUtil.isNoNull(code.getProjectName())){
-            list.add(configId);
-        }
+        return true;
     }
 
-    private void testValid(String configId,List<String> list){
-
+    private Boolean buildValid(String taskType,Object object){
+        TaskBuild build = (TaskBuild) object;
+        return true;
     }
 
-    private void buildValid(String configId,List<String> list){
+    private Boolean deployValid(String taskType,Object object){
+        TaskDeploy deploy =(TaskDeploy) object;;
 
-    }
-
-    private void deployValid(String configId,List<String> list,String taskType){
-        TaskDeploy deploy = deployService.findOneDeployConfig(configId);
-        if (deploy == null){
-            return;
-        }
         if (taskType.equals("31") || taskType.equals("liunx")){
             if (deploy.getAuthType() == 1){
                 if (!PipelineUtil.isNoNull(deploy.getDeployAddress())){
-                    list.add(configId);
+                   return false;
                 }
-                if (!PipelineUtil.isNoNull(deploy.getStartAddress())){
-                    list.add(configId);
-                }
+                return PipelineUtil.isNoNull(deploy.getStartAddress());
             }
         }
+        return true;
     }
 
-    private void productValid(String configId,List<String> list,String taskType){
-        TaskArtifact product = productServer.findOneProductConfig(configId);
-        if (product == null){
-            return;
-        }
+    private Boolean productValid(String taskType,Object object){
+        TaskArtifact product = (TaskArtifact) object;
+
         if (taskType.equals("51") || taskType.equals("nexus")){
             if (!PipelineUtil.isNoNull(product.getArtifactId())){
-                list.add(configId);
+                return false;
             }
             if (!PipelineUtil.isNoNull(product.getVersion())){
-                list.add(configId);
+                return false;
             }
             if (!PipelineUtil.isNoNull(product.getGroupId())){
-                list.add(configId);
+                return false;
             }
             if (!PipelineUtil.isNoNull(product.getFileAddress())){
-                list.add(configId);
+                return false;
             }
             if (!PipelineUtil.isNoNull(product.getFileType())){
-                list.add(configId);
+                return false;
             }
         }
         if ( taskType.equals("51")||  taskType.equals("ssh")){
             if (!PipelineUtil.isNoNull(product.getFileAddress())){
-                list.add(configId);
+                return false;
             }
-            if (!PipelineUtil.isNoNull(product.getPutAddress())){
-                list.add(configId);
-            }
+            return PipelineUtil.isNoNull(product.getPutAddress());
         }
+        return true;
     }
 
 

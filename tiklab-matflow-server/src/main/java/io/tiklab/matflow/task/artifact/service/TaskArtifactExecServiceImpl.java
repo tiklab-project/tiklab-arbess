@@ -11,6 +11,7 @@ import io.tiklab.matflow.support.util.PipelineFinal;
 import io.tiklab.matflow.support.util.PipelineUtil;
 import io.tiklab.matflow.support.variable.service.VariableService;
 import io.tiklab.matflow.task.artifact.model.TaskArtifact;
+import io.tiklab.matflow.task.artifact.model.XpackRepository;
 import io.tiklab.matflow.task.task.model.Tasks;
 import io.tiklab.matflow.task.task.service.TasksInstanceService;
 import io.tiklab.rpc.annotation.Exporter;
@@ -57,7 +58,7 @@ public class TaskArtifactExecServiceImpl implements TaskArtifactExecService {
             return true;
         }
 
-        TaskArtifact product = (TaskArtifact) task.getValues();
+        TaskArtifact product = (TaskArtifact) task.getTask();
         product.setType(taskType);
 
         String fileAddress = product.getFileAddress();
@@ -101,7 +102,7 @@ public class TaskArtifactExecServiceImpl implements TaskArtifactExecService {
                         return false;
                     }
                 }
-                case "ssh" ,"52"->{
+                case "ssh" ,"52" ->{
                     tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"开始连接制品服务器...");
                     Session session = createSession(product);
                     tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"制品服务器连接成功。");
@@ -144,11 +145,11 @@ public class TaskArtifactExecServiceImpl implements TaskArtifactExecService {
         }
 
         if (product.getType().equals("xpack")){
-            String repository = taskArtifactXpackService.findRepository(authThird.getServerId(), product.getPutAddress());
+            XpackRepository repository = product.getRepository();
             if (Objects.isNull(repository)){
                 throw new ApplicationException("获取制品库信息失败！");
             }
-            authThird.setServerAddress(repository);
+            authThird.setServerAddress(repository.getAddress());
         }
 
         execOrder = execOrder +

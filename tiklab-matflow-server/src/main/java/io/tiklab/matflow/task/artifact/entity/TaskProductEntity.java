@@ -28,9 +28,20 @@ public class TaskProductEntity {
     @Column(name = "put_address")
     private String putAddress;
 
+    @Column(name = "xpack_id")
+    private String xpackId;
+
     @Column(name = "auth_id")
     private String authId;
 
+
+    public String getXpackId() {
+        return xpackId;
+    }
+
+    public void setXpackId(String xpackId) {
+        this.xpackId = xpackId;
+    }
 
     public String getTaskId() {
         return taskId;

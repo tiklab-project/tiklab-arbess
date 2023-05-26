@@ -2,7 +2,10 @@ package io.tiklab.matflow.task.code.model;
 
 
 import io.tiklab.beans.annotation.Mapper;
+import io.tiklab.beans.annotation.Mapping;
+import io.tiklab.beans.annotation.Mappings;
 import io.tiklab.join.annotation.Join;
+import io.tiklab.join.annotation.JoinQuery;
 import io.tiklab.postin.annotation.ApiModel;
 import io.tiklab.postin.annotation.ApiProperty;
 
@@ -36,6 +39,20 @@ public class TaskCode {
     @ApiProperty(name="svnFile",desc="svn检出文件夹")
     private String svnFile;
 
+
+    @Mappings({
+            @Mapping(source = "repository.id",target = "xcodeId")
+    })
+    @JoinQuery(key = "xcodeId")
+    private XcodeRepository repository;
+
+
+    @Mappings({
+            @Mapping(source = "branch.id",target = "branchId")
+    })
+    @JoinQuery(key = "branchId")
+    private XcodeBranch branch;
+
     //授权信息
     private Object auth;
 
@@ -45,6 +62,22 @@ public class TaskCode {
     //代码类型
     private String type;
 
+
+    public XcodeRepository getRepository() {
+        return repository;
+    }
+
+    public void setRepository(XcodeRepository repository) {
+        this.repository = repository;
+    }
+
+    public XcodeBranch getBranch() {
+        return branch;
+    }
+
+    public void setBranch(XcodeBranch branch) {
+        this.branch = branch;
+    }
 
     public String getTaskId() {
         return taskId;

@@ -1,6 +1,6 @@
 package io.tiklab.matflow.task.artifact.service;
 
-import io.tiklab.xpack.repository.model.Repository;
+import io.tiklab.matflow.task.artifact.model.XpackRepository;
 
 import java.util.List;
 
@@ -11,7 +11,7 @@ public interface TaskArtifactXpackService {
      * @param authId 认证id
      * @return 仓库
      */
-    List<Repository> findAllRepository(String authId);
+    List<XpackRepository> findAllRepository(String authId);
 
 
     /**
@@ -20,7 +20,7 @@ public interface TaskArtifactXpackService {
      * @param rpyName 仓库名称
      * @return 仓库地址
      */
-    String findRepository(String authId,String rpyName);
+    XpackRepository findRepository(String authId,String rpyName);
 
 
 

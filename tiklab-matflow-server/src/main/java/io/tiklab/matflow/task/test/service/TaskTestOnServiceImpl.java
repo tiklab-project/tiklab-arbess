@@ -3,11 +3,11 @@ package io.tiklab.matflow.task.test.service;
 import io.tiklab.core.exception.ApplicationException;
 import io.tiklab.matflow.setting.model.AuthThird;
 import io.tiklab.matflow.setting.service.AuthThirdService;
+import io.tiklab.matflow.task.test.model.*;
 import io.tiklab.rpc.client.RpcClient;
 import io.tiklab.rpc.client.config.RpcClientConfig;
 import io.tiklab.rpc.client.router.lookup.FixedLookup;
 import io.tiklab.teston.repository.model.Repository;
-import io.tiklab.teston.repository.model.RepositoryQuery;
 import io.tiklab.teston.repository.service.RepositoryService;
 import io.tiklab.teston.support.environment.model.*;
 import io.tiklab.teston.support.environment.service.ApiEnvService;
@@ -17,7 +17,13 @@ import io.tiklab.teston.testplan.cases.model.TestPlan;
 import io.tiklab.teston.testplan.cases.model.TestPlanQuery;
 import io.tiklab.teston.testplan.cases.service.TestPlanService;
 import io.tiklab.teston.testplan.execute.model.TestPlanTestData;
+import io.tiklab.teston.testplan.execute.model.TestPlanTestResponse;
 import io.tiklab.teston.testplan.execute.service.TestPlanExecuteDispatchService;
+import io.tiklab.teston.testplan.instance.model.TestPlanCaseInstanceBind;
+import io.tiklab.teston.testplan.instance.model.TestPlanCaseInstanceBindQuery;
+import io.tiklab.teston.testplan.instance.model.TestPlanInstance;
+import io.tiklab.teston.testplan.instance.service.TestPlanCaseInstanceBindService;
+import io.tiklab.teston.testplan.instance.service.TestPlanInstanceService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +31,7 @@ import org.springframework.remoting.RemoteAccessException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -43,70 +50,36 @@ public class TaskTestOnServiceImpl implements TaskTestOnService {
     }
 
     // @Bean
-    RepositoryService repositoryServer(String testOnAddress){
+    private RepositoryService repositoryServer(String testOnAddress){
         return rpcClient().getBean(RepositoryService.class, new FixedLookup(testOnAddress));
     }
 
-
-    TestPlanService testPlanService(String testOnAddress){
+    private TestPlanService testPlanService(String testOnAddress){
         return rpcClient().getBean(TestPlanService.class, new FixedLookup(testOnAddress));
     }
 
-    ApiEnvService apiEnvService(String testOnAddress){
+    private ApiEnvService apiEnvService(String testOnAddress){
         return rpcClient().getBean(ApiEnvService.class, new FixedLookup(testOnAddress));
     }
 
-
-    AppEnvService appEnvService(String testOnAddress){
+    private  AppEnvService appEnvService(String testOnAddress){
         return rpcClient().getBean(AppEnvService.class, new FixedLookup(testOnAddress));
     }
 
-    WebEnvService webEnvService(String testOnAddress){
+    private WebEnvService webEnvService(String testOnAddress){
         return rpcClient().getBean(WebEnvService.class, new FixedLookup(testOnAddress));
     }
 
-    TestPlanExecuteDispatchService testPlanExecuteService(String testOnAddress){
+    private TestPlanCaseInstanceBindService testPlanCaseInstanceBindService(String testOnAddress){
+        return rpcClient().getBean(TestPlanCaseInstanceBindService.class, new FixedLookup(testOnAddress));
+    }
+
+    private TestPlanExecuteDispatchService testPlanExecuteService(String testOnAddress){
         return rpcClient().getBean(TestPlanExecuteDispatchService.class, new FixedLookup(testOnAddress));
     }
 
-    public Object findEnvUrl(String authId,String rpyName,String env){
-        String serverAddress = findServerAddress(authId);
-        Repository repository = findOneRepository(authId,rpyName);
-        String repositoryId = repository.getId();
-        List<Object> list = new ArrayList<>();
-        try {
-            switch (env){
-                case "api" ->{
-                    ApiEnvQuery apiEnvQuery = new ApiEnvQuery();
-                    apiEnvQuery.setRepositoryId(repositoryId);
-                    // apiEnvQuery.set
-                    List<ApiEnv> apiEnvList = apiEnvService(serverAddress).findApiEnvList(apiEnvQuery);
-                    list.addAll(apiEnvList);
-                    return list;
-                }
-                case "app" ->{
-                    AppEnvQuery appEnvQuery = new AppEnvQuery();
-                    appEnvQuery.setRepositoryId(repositoryId);
-                    List<AppEnv> appEnvList = appEnvService(serverAddress).findAppEnvList(appEnvQuery);
-                    list.addAll(appEnvList);
-                    return list;
-                }
-                case "web" ->{
-                    WebEnvQuery webEnvQuery = new WebEnvQuery();
-                    webEnvQuery.setRepositoryId(repositoryId);
-                    List<WebEnv> webEnvList = webEnvService(serverAddress).findWebEnvList(webEnvQuery);
-                    list.addAll(webEnvList);
-                    return list;
-                }
-                default -> throw new ApplicationException("未知的类型："+env);
-            }
-        }catch (Throwable throwable){
-            if (throwable instanceof RemoteAccessException){
-                logger.error(throwable.getMessage());
-                throw new ApplicationException("无法连接到:" + serverAddress);
-            }
-            throw new ApplicationException(throwable.getMessage());
-        }
+    private TestPlanInstanceService testPlanInstanceService(String testOnAddress){
+        return rpcClient().getBean(TestPlanInstanceService.class, new FixedLookup(testOnAddress));
     }
 
     private String findServerAddress(String authId){
@@ -118,17 +91,13 @@ public class TaskTestOnServiceImpl implements TaskTestOnService {
         return authServer.getServerAddress();
     }
 
+
     @Override
-    public Repository findOneRepository(String authId,String rpyName){
+    public TestOnRepository findOneRepository(String authId, String rpyId){
         String serverAddress = findServerAddress(authId);
-        RepositoryQuery repositoryQuery = new RepositoryQuery();
-        repositoryQuery.setName(rpyName);
-        List<Repository> repositoryList;
         try {
-             repositoryList = repositoryServer(serverAddress).findRepositoryList(repositoryQuery);
-            if (repositoryList == null || repositoryList.isEmpty()){
-                throw new ApplicationException("仓库查询失败："+ rpyName);
-            }
+            Repository repository = repositoryServer(serverAddress).findOne(rpyId);
+            return bindTestOnRepository(repository);
         }catch (Throwable throwable){
             if (throwable instanceof RemoteAccessException){
                 logger.error(throwable.getMessage());
@@ -136,59 +105,66 @@ public class TaskTestOnServiceImpl implements TaskTestOnService {
             }
             throw new ApplicationException(throwable.getMessage());
         }
-       return repositoryList.get(0);
     }
 
-
-    public TestPlan findOneTestPlan(String authId,String planName){
+    @Override
+    public TestOnTestPlan findOneTestPlan(String authId, String planId){
         String serverAddress = findServerAddress(authId);
-        TestPlanQuery testPlanQuery = new TestPlanQuery();
-        testPlanQuery.setName(planName);
+        try {
+            TestPlan testPlan = testPlanService(serverAddress).findOne(planId);
+            return bindTestOnTestPlan(testPlan);
+        }catch (Throwable throwable){
+            if (throwable instanceof RemoteAccessException){
+                logger.error(throwable.getMessage());
+                throw new ApplicationException("无法连接到:" + serverAddress);
+            }
+            throw new ApplicationException(throwable.getMessage());
+        }
+    }
+
+    @Override
+    public List<TestOnRepository> findAllRepository(String authId){
+        String serverAddress = findServerAddress(authId);
+        if (Objects.isNull(serverAddress)){
+            return null;
+        }
+        List<Repository> allRepository;
+        try {
+            allRepository = repositoryServer(serverAddress).findAllRepository();
+        }catch (Throwable throwable){
+            if (throwable instanceof RemoteAccessException){
+                logger.error(throwable.getMessage());
+                throw new ApplicationException("无法连接到:" + serverAddress);
+            }
+            throw new ApplicationException(throwable.getMessage());
+        }
+
+        if (allRepository == null || allRepository.isEmpty()){
+            return Collections.emptyList();
+        }
+
+        List<TestOnRepository> list = new ArrayList<>();
+        for (Repository repository : allRepository) {
+            list.add(bindTestOnRepository(repository));
+        }
+        return list;
+    }
+
+    @Override
+    public List<TestOnTestPlan> findAllTestPlan(String authId,String rpyId){
+
+        String serverAddress = findServerAddress(authId);
+
+        if (Objects.isNull(serverAddress)){
+            return null;
+        }
+
+        TestOnRepository repository = findOneRepository(authId,rpyId);
         List<TestPlan> testPlanList;
-        try {
-            testPlanList = testPlanService(serverAddress).findTestPlanList(testPlanQuery);
-            if (testPlanList == null || testPlanList.isEmpty()){
-                throw new ApplicationException("测试查询失败："+ planName);
-            }
-        }catch (Throwable throwable){
-            if (throwable instanceof RemoteAccessException){
-                logger.error(throwable.getMessage());
-                throw new ApplicationException("无法连接到:" + serverAddress);
-            }
-            throw new ApplicationException(throwable.getMessage());
-        }
-       return testPlanList.get(0);
-    }
-
-
-    @Override
-    public List<Repository> findAllRepository(String authId){
-
-        String serverAddress = findServerAddress(authId);
-
-        try {
-          return repositoryServer(serverAddress).findAllRepository();
-
-        }catch (Throwable throwable){
-            if (throwable instanceof RemoteAccessException){
-                logger.error(throwable.getMessage());
-                throw new ApplicationException("无法连接到:" + serverAddress);
-            }
-            throw new ApplicationException(throwable.getMessage());
-        }
-    }
-
-    @Override
-    public List<TestPlan> findAllTestPlan(String authId,String rpyName){
-
-        String serverAddress = findServerAddress(authId);
-
-        Repository repository = findOneRepository(authId,rpyName);
-
         try {
             TestPlanQuery testPlanQuery = new TestPlanQuery();
             testPlanQuery.setRepositoryId(repository.getId());
-            return testPlanService(serverAddress).findTestPlanList(testPlanQuery);
+            testPlanList = testPlanService(serverAddress).findTestPlanList(testPlanQuery);
         }catch (Throwable throwable){
             if (throwable instanceof RemoteAccessException){
                 logger.error(throwable.getMessage());
@@ -196,13 +172,25 @@ public class TaskTestOnServiceImpl implements TaskTestOnService {
             }
             throw new ApplicationException(throwable.getMessage());
         }
+
+        if (testPlanList == null || testPlanList.isEmpty()){
+            return Collections.emptyList();
+        }
+        List<TestOnTestPlan> list = new ArrayList<>();
+
+        for (TestPlan testPlan : testPlanList) {
+            list.add(bindTestOnTestPlan(testPlan));
+        }
+        return list;
     }
 
-
     @Override
-    public List<Object> findAllEnv(String authId,String rpyName,String env){
+    public List<Object> findAllEnv(String authId,String rpyId,String env){
         String serverAddress = findServerAddress(authId);
-        Repository repository = findOneRepository(authId,rpyName);
+        if (Objects.isNull(serverAddress)){
+            return null;
+        }
+        TestOnRepository repository = findOneRepository(authId,rpyId);
         String repositoryId = repository.getId();
         List<Object> list = new ArrayList<>();
         try {
@@ -239,14 +227,17 @@ public class TaskTestOnServiceImpl implements TaskTestOnService {
         }
     }
 
-
     @Override
-    public void execTestPlan(String authId, TestPlanTestData testPlanTestData){
+    public void execTestPlan(String authId, TestOnPlanTestData testPlanTestData){
 
         String serverAddress = findServerAddress(authId);
+        if (Objects.isNull(serverAddress)){
+            throw new ApplicationException("TestOn远程地址不能为空！");
+        }
 
         try {
-            testPlanExecuteService(serverAddress).execute(testPlanTestData);
+            TestPlanTestData testData = bindTestPlanTestData(testPlanTestData);
+            testPlanExecuteService(serverAddress).execute(testData);
         }catch (Throwable throwable){
             if (throwable instanceof RemoteAccessException){
                 logger.error(throwable.getMessage());
@@ -255,6 +246,191 @@ public class TaskTestOnServiceImpl implements TaskTestOnService {
             throw new ApplicationException(throwable.getMessage());
         }
     }
+
+    @Override
+    public TestPlanExecResult findTestPlanExecResult(String authId){
+        String serverAddress = findServerAddress(authId);
+        if (Objects.isNull(serverAddress)){
+            throw new ApplicationException("TestOn远程地址不能为空！");
+        }
+        try {
+            TestPlanTestResponse testPlanTestResponse = testPlanExecuteService(serverAddress).exeResult();
+            return bindTestPlanExecResult(testPlanTestResponse);
+        }catch (Throwable throwable){
+            if (throwable instanceof RemoteAccessException){
+                logger.error(throwable.getMessage());
+                throw new ApplicationException("获取测试结果失败:" + serverAddress);
+            }
+            throw new ApplicationException(throwable.getMessage());
+        }
+    }
+
+    @Override
+    public TestOnPlanInstance findAllTestPlanInstance(String authId,String instanceId){
+
+        String serverAddress = findServerAddress(authId);
+
+        if (serverAddress == null){
+            return null;
+        }
+
+        try {
+            TestPlanInstance testPlanInstance = testPlanInstanceService(serverAddress).findOne(instanceId);
+            if (Objects.isNull(testPlanInstance)){
+                return null;
+            }
+
+
+            String testPlanId = testPlanInstance.getTestPlanId();
+            TestOnPlanInstance testOnPlanInstance = bindTestOnPlanInstance(testPlanInstance);
+            TestPlan testPlan = testPlanService(serverAddress).findOne(testPlanId);
+
+            if (!Objects.isNull(testPlan)){
+                testOnPlanInstance.setTestPlanName(testPlan.getName());
+            }else {
+                testOnPlanInstance.setTestPlanName("测试计划已被删除！");
+            }
+            testOnPlanInstance.setUrl(serverAddress);
+            return testOnPlanInstance;
+        }catch (Throwable throwable){
+            return null;
+        }
+    }
+
+    @Override
+    public List<TestOnPlanCaseInstance> findTestPlanExecResult(String authId,String instanceId){
+        String serverAddress = findServerAddress(authId);
+        if (Objects.isNull(serverAddress)){
+            return Collections.emptyList();
+        }
+        TestPlanCaseInstanceBindQuery testPlanCaseInstanceBindQuery = new TestPlanCaseInstanceBindQuery();
+        testPlanCaseInstanceBindQuery.setTestPlanInstanceId(instanceId);
+        List<TestPlanCaseInstanceBind> instanceBindList = testPlanCaseInstanceBindService(serverAddress)
+                .findTestPlanCaseInstanceBindList(testPlanCaseInstanceBindQuery);
+
+        if (instanceBindList== null || instanceBindList.isEmpty()){
+            return Collections.emptyList();
+        }
+        List<TestOnPlanCaseInstance> list = new ArrayList<>();
+        for (TestPlanCaseInstanceBind testPlanCaseInstanceBind : instanceBindList) {
+            list.add(bindTestOnPlanCaseInstance(testPlanCaseInstanceBind));
+        }
+        return list;
+    }
+
+    @Override
+    public TestOnApiEnv findOneTestOnApiEnv(String authId,String id){
+        String serverAddress = findServerAddress(authId);
+        if (serverAddress == null){
+            return null;
+        }
+        ApiEnv apiEnv = apiEnvService(serverAddress).findOne(id);
+        if (Objects.isNull(apiEnv)){
+            return null;
+        }
+        TestOnApiEnv testOnApiEnv = new TestOnApiEnv();
+        testOnApiEnv.setId(apiEnv.getId());
+        testOnApiEnv.setName(apiEnv.getName());
+        testOnApiEnv.setUrl(apiEnv.getPreUrl());
+        return testOnApiEnv;
+    }
+
+    @Override
+    public TestOnAppEnv findOneTestOnAppEnv(String authId, String id){
+        String serverAddress = findServerAddress(authId);
+        if (serverAddress == null){
+            return null;
+        }
+        AppEnv appEnv = appEnvService(serverAddress).findOne(id);
+        if (Objects.isNull(appEnv)){
+            return null;
+        }
+        TestOnAppEnv testOnAppEnv = new TestOnAppEnv();
+        testOnAppEnv.setId(appEnv.getId());
+        testOnAppEnv.setName(appEnv.getName());
+        testOnAppEnv.setUrl(appEnv.getAppiumSever());
+        return testOnAppEnv;
+    }
+
+    @Override
+    public TestOnWebEnv findOneTestOnWebEnv(String authId, String id){
+        String serverAddress = findServerAddress(authId);
+        if (serverAddress == null){
+            return null;
+        }
+        WebEnv webEnv = webEnvService(serverAddress).findOne(id);
+        if (Objects.isNull(webEnv)){
+            return null;
+        }
+        TestOnWebEnv testOnWebEnv = new TestOnWebEnv();
+        testOnWebEnv.setId(webEnv.getId());
+        testOnWebEnv.setName(webEnv.getName());
+        testOnWebEnv.setUrl(webEnv.getWebDriver());
+        return testOnWebEnv;
+    }
+
+    private TestOnRepository bindTestOnRepository(Repository repository){
+        TestOnRepository testOnRepository = new TestOnRepository();
+        testOnRepository.setId(repository.getId());
+        testOnRepository.setName(repository.getName());
+        return testOnRepository;
+
+    }
+
+    private TestOnTestPlan bindTestOnTestPlan(TestPlan testPlan){
+        TestOnTestPlan testOnTestPlan = new TestOnTestPlan();
+        testOnTestPlan.setId(testPlan.getId());
+        testOnTestPlan.setName(testPlan.getName());
+        return testOnTestPlan;
+    }
+
+    private TestPlanTestData bindTestPlanTestData(TestOnPlanTestData testPlanTestData){
+        TestPlanTestData testData = new TestPlanTestData();
+        testData.setRepositoryId(testPlanTestData.getRepositoryId());
+        testData.setTestPlanId(testPlanTestData.getTestPlanId());
+        testData.setWebEnv(testPlanTestData.getWebEnv());
+        testData.setAppEnv(testPlanTestData.getAppEnv());
+        testData.setApiEnv(testPlanTestData.getApiEnv());
+        return testData;
+    }
+
+    private TestOnPlanInstance bindTestOnPlanInstance(TestPlanInstance testPlanInstance){
+        TestOnPlanInstance testOnPlanInstance = new TestOnPlanInstance();
+        testOnPlanInstance.setId(testPlanInstance.getId());
+        testOnPlanInstance.setTestPlanId(testPlanInstance.getTestPlanId());
+        testOnPlanInstance.setRepositoryId(testPlanInstance.getRepositoryId());
+        testOnPlanInstance.setCreateTime(testPlanInstance.getCreateTime());
+        testOnPlanInstance.setCreateUser(testPlanInstance.getCreateUser());
+        testOnPlanInstance.setErrorRate(testPlanInstance.getErrorRate());
+        testOnPlanInstance.setExecuteNumber(testPlanInstance.getExecuteNumber());
+        testOnPlanInstance.setFailNum(testPlanInstance.getFailNum());
+        testOnPlanInstance.setPassNum(testPlanInstance.getPassNum());
+        testOnPlanInstance.setTotal(testPlanInstance.getTotal());
+        testOnPlanInstance.setResult(testPlanInstance.getResult());
+        testOnPlanInstance.setPassRate(testPlanInstance.getPassRate());
+        return testOnPlanInstance;
+    }
+
+    private TestPlanExecResult bindTestPlanExecResult(TestPlanTestResponse testPlanTestResponse){
+        TestPlanExecResult testPlanExecResult = new TestPlanExecResult();
+        TestPlanInstance testPlanInstance = testPlanTestResponse.getTestPlanInstance();
+        testPlanExecResult.setTestPlanInstance(bindTestOnPlanInstance(testPlanInstance));
+        testPlanExecResult.setStatus(testPlanTestResponse.getStatus());
+        return testPlanExecResult;
+    }
+
+    private TestOnPlanCaseInstance bindTestOnPlanCaseInstance(TestPlanCaseInstanceBind testPlanCaseInstanceBind){
+        TestOnPlanCaseInstance testOnPlanCaseInstance = new TestOnPlanCaseInstance();
+        testOnPlanCaseInstance.setCaseInstanceId(testPlanCaseInstanceBind.getCaseInstanceId());
+        testOnPlanCaseInstance.setCaseType(testPlanCaseInstanceBind.getCaseType());
+        testOnPlanCaseInstance.setTestType(testPlanCaseInstanceBind.getTestType());
+        testOnPlanCaseInstance.setId(testPlanCaseInstanceBind.getId());
+        testOnPlanCaseInstance.setName(testPlanCaseInstanceBind.getName());
+        testOnPlanCaseInstance.setTestPlanInstanceId(testPlanCaseInstanceBind.getTestPlanInstanceId());
+        testOnPlanCaseInstance.setResult(testPlanCaseInstanceBind.getResult());
+        return testOnPlanCaseInstance;
+    }
+
 
 
 

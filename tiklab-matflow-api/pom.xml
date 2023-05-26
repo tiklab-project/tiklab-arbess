@@ -54,23 +54,23 @@
             <version>${project.version}</version>
         </dependency>
 
-        <dependency>
-            <groupId>io.tiklab</groupId>
-            <artifactId>tiklab-xcode-api</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>io.tiklab</groupId>-->
+<!--            <artifactId>tiklab-xcode-api</artifactId>-->
+<!--            <version>1.0.0-SNAPSHOT</version>-->
+<!--        </dependency>-->
 
-        <dependency>
-            <groupId>io.tiklab</groupId>
-            <artifactId>tiklab-xpack-api</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>io.tiklab</groupId>-->
+<!--            <artifactId>tiklab-xpack-api</artifactId>-->
+<!--            <version>1.0.0-SNAPSHOT</version>-->
+<!--        </dependency>-->
 
-        <dependency>
-            <groupId>io.tiklab</groupId>
-            <artifactId>tiklab-teston-api</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>io.tiklab</groupId>-->
+<!--            <artifactId>tiklab-teston-api</artifactId>-->
+<!--            <version>1.0.0-SNAPSHOT</version>-->
+<!--        </dependency>-->
 
 
 

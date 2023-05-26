@@ -2,13 +2,12 @@ package io.tiklab.matflow.task.test.service;
 
 
 import io.tiklab.beans.BeanMapper;
-import io.tiklab.join.JoinTemplate;
 import io.tiklab.matflow.setting.model.AuthThird;
 import io.tiklab.matflow.setting.service.AuthHostService;
 import io.tiklab.matflow.setting.service.AuthThirdService;
 import io.tiklab.matflow.task.test.dao.TaskTestDao;
 import io.tiklab.matflow.task.test.entity.TaskTestEntity;
-import io.tiklab.matflow.task.test.model.TaskTest;
+import io.tiklab.matflow.task.test.model.*;
 import io.tiklab.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -31,9 +30,7 @@ public class TaskTestServiceImpl implements TaskTestService {
     private AuthHostService hostServer;
 
     @Autowired
-    private JoinTemplate joinTemplate;
-
-
+    TaskTestOnService taskTestOnService;
 
 
     //创建
@@ -59,7 +56,7 @@ public class TaskTestServiceImpl implements TaskTestService {
      * @return 任务
      */
     @Override
-    public TaskTest findOneTestConfig(String configId){
+    public TaskTest findOneTestConfig (String configId){
         List<TaskTest> allTest = findAllTest();
         if (allTest == null){
             return null;
@@ -72,7 +69,35 @@ public class TaskTestServiceImpl implements TaskTestService {
                 }
                 AuthThird authServer = thirdServer.findOneAuthServer(authId);
                 taskTest.setAuth(authServer);
-                // joinTemplate.joinQuery(taskTest);
+
+                if (!Objects.isNull(taskTest.getApiEnv())){
+                    String id = taskTest.getApiEnv().getId();
+                    TestOnApiEnv apiEnv = taskTestOnService.findOneTestOnApiEnv(authId,id);
+                    taskTest.setApiEnv(apiEnv);
+                }
+
+                if (!Objects.isNull(taskTest.getAppEnv())){
+                    String id = taskTest.getAppEnv().getId();
+                    TestOnAppEnv apiEnv = taskTestOnService.findOneTestOnAppEnv(authId,id);
+                    taskTest.setAppEnv(apiEnv);
+                }
+
+                if (!Objects.isNull(taskTest.getWebEnv())){
+                    String id = taskTest.getWebEnv().getId();
+                    TestOnWebEnv webEnv = taskTestOnService.findOneTestOnWebEnv(authId,id);
+                    taskTest.setWebEnv(webEnv);
+                }
+
+                if (!Objects.isNull(taskTest.getTestSpace())){
+                    String id = taskTest.getTestSpace().getId();
+                    TestOnRepository repository = taskTestOnService.findOneRepository(authId,id);
+                    taskTest.setTestSpace(repository);
+                }
+                if (!Objects.isNull(taskTest.getTestPlan())){
+                    String id = taskTest.getTestPlan().getId();
+                    TestOnTestPlan testPlan = taskTestOnService.findOneTestPlan(authId,id);
+                    taskTest.setTestPlan(testPlan);
+                }
                 return taskTest;
             }
         }
@@ -103,9 +128,7 @@ public class TaskTestServiceImpl implements TaskTestService {
     //查询所有
     @Override
     public List<TaskTest> findAllTest() {
-        List<TaskTest> taskTests = BeanMapper.mapList(taskTestDao.findAllTest(), TaskTest.class);
-        // joinTemplate.joinQuery(taskTests);
-        return taskTests;
+        return BeanMapper.mapList(taskTestDao.findAllTest(), TaskTest.class);
     }
 
     @Override

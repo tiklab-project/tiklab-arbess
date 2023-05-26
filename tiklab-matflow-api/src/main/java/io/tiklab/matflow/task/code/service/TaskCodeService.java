@@ -32,10 +32,10 @@ public interface TaskCodeService {
 
     /**
      * 根据配置id查询任务
-     * @param configId 配置id
+     * @param taskId 配置id
      * @return 任务
      */
-    TaskCode findOneCodeConfig(String configId);
+    TaskCode findOneCodeConfig(String taskId,String taskType);
 
 
     /**

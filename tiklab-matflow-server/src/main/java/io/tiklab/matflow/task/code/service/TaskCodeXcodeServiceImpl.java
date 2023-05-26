@@ -3,6 +3,8 @@ package io.tiklab.matflow.task.code.service;
 import io.tiklab.core.exception.ApplicationException;
 import io.tiklab.matflow.setting.model.AuthThird;
 import io.tiklab.matflow.setting.service.AuthThirdService;
+import io.tiklab.matflow.task.code.model.XcodeBranch;
+import io.tiklab.matflow.task.code.model.XcodeRepository;
 import io.tiklab.rpc.client.RpcClient;
 import io.tiklab.rpc.client.config.RpcClientConfig;
 import io.tiklab.rpc.client.router.lookup.FixedLookup;
@@ -13,7 +15,6 @@ import io.tiklab.xcode.repository.service.RepositoryServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.remoting.RemoteAccessException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -44,9 +45,9 @@ public class TaskCodeXcodeServiceImpl implements TaskCodeXcodeService {
     }
 
     @Override
-    public List<Repository> findAllRepository(String authId){
+    public List<XcodeRepository> findAllRepository(String authId){
 
-        List<Repository> allRpy ;
+        List<Repository> allRpy  ;
         AuthThird authServer = serverServer.findOneAuthServer(authId);
 
         if (Objects.isNull(authServer)){
@@ -54,73 +55,121 @@ public class TaskCodeXcodeServiceImpl implements TaskCodeXcodeService {
         }
         String serverAddress =  authServer.getServerAddress();
         try {
-
             allRpy = repositoryServer(serverAddress).findAllRpy();
-
-            if (allRpy == null){
-                return Collections.emptyList();
-            }
-
-        }catch (Throwable throwable){
-            if (throwable instanceof RemoteAccessException){
-                logger.error(throwable.getMessage());
-                throw new ApplicationException("无法连接到:" + serverAddress);
-            }
-            throw new ApplicationException(throwable.getMessage());
+        }catch (Exception throwable){
+            logger.error(throwable.getMessage());
+            throw new ApplicationException("无法连接到："+serverAddress);
         }
-        return allRpy;
+
+        if (allRpy == null){
+            return Collections.emptyList();
+        }
+
+        List<XcodeRepository> list = new ArrayList<>();
+
+        for (Repository repository : allRpy) {
+            list.add(bindXcodeRepository(repository));
+        }
+
+        return list;
     }
 
     @Override
-    public List<Branch> findAllBranch(String authId,String rpyName){
+    public List<XcodeBranch> findAllBranch(String authId, String rpyId){
         List<Branch> allBranch;
 
         AuthThird authServer = serverServer.findOneAuthServer(authId);
         String  serverAddress = authServer.getServerAddress();
 
-        Repository repository = repositoryServer(serverAddress).findNameRpy(rpyName);
+        Repository repository = repositoryServer(serverAddress).findOneRpy(rpyId);
 
         if (Objects.isNull(repository)){
-            throw new ApplicationException("找不到"+rpyName +"仓库！");
+            throw new ApplicationException("找不到"+rpyId +"仓库！");
         }
-
+        List<XcodeBranch> list = new ArrayList<>();
         try {
-            String rpyId = repository.getRpyId();
             allBranch = branchServer(serverAddress).findAllBranch(rpyId);
-
-            if (allBranch == null || allBranch.isEmpty()){
-                allBranch = new ArrayList<>();
-                Branch branch = new Branch();
-                branch.setBranchName("master");
-                allBranch.add(branch);
-            }
-
         }catch (Throwable throwable){
-            if (throwable instanceof RemoteAccessException){
-                logger.error(throwable.getMessage());
-                throw new ApplicationException("无法连接到:" + serverAddress);
-            }
-            throw new ApplicationException(throwable.getMessage());
+            logger.error(throwable.getMessage());
+            throw new ApplicationException("无法连接到："+serverAddress);
         }
-        return allBranch;
+
+        if (Objects.isNull(allBranch) || allBranch.isEmpty()){
+            allBranch = new ArrayList<>();
+            Branch branch = new Branch();
+            branch.setBranchName("master");
+            branch.setBranchId("master");
+            allBranch.add(branch);
+        }
+
+        for (Branch branch : allBranch) {
+            list.add(bindXcodeBranch(branch));
+        }
+
+        return list;
     }
 
+    @Override
+    public XcodeBranch findOneBranch(String authId,String rpyId,String branchId){
+        if (Objects.isNull(authId) || Objects.isNull(branchId)){
+            return null;
+        }
+        AuthThird authServer = serverServer.findOneAuthServer(authId);
+        String  serverAddress = authServer.getServerAddress();
+        Branch branch;
+        try {
+            branch = branchServer(serverAddress).findBranch(rpyId, branchId);
 
-    public String findRepository(String authId,String rpyName){
+        }catch (Throwable throwable){
+            logger.error(throwable.getMessage());
+            throw new ApplicationException("无法连接到："+ serverAddress );
+        }
+        if (Objects.isNull(branch)){
+            return null;
+        }
 
-        if (Objects.isNull(authId) || Objects.isNull(rpyName)){
+        return bindXcodeBranch(branch);
+    }
+
+    @Override
+    public XcodeRepository findRepository(String authId,String rpyId){
+
+        if (Objects.isNull(authId) || Objects.isNull(rpyId)){
             return null;
         }
 
         AuthThird authServer = serverServer.findOneAuthServer(authId);
         String  serverAddress = authServer.getServerAddress();
 
-        Repository repository = repositoryServer(serverAddress).findNameRpy(rpyName);
-        if (Objects.isNull(repository)){
-            throw new ApplicationException("找不到"+rpyName +"仓库！");
+
+        Repository repository ;
+        try {
+            repository = repositoryServer(serverAddress).findOneRpy(rpyId);
+        }catch (Exception e){
+            logger.error(e.getMessage());
+            throw new ApplicationException("无法连接到："+serverAddress);
         }
 
-        return repository.getFullPath();
+        if (Objects.isNull(repository)){
+            throw new ApplicationException("找不到"+ rpyId +"仓库！");
+        }
+        return bindXcodeRepository(repository);
+
+    }
+
+    private XcodeRepository bindXcodeRepository(Repository repository){
+        XcodeRepository xcodeRepository = new XcodeRepository();
+        xcodeRepository.setId(repository.getRpyId());
+        xcodeRepository.setAddress(repository.getFullPath());
+        xcodeRepository.setName(repository.getName());
+        return xcodeRepository;
+    }
+
+    private XcodeBranch bindXcodeBranch(Branch branch){
+        XcodeBranch xcodeBranch = new XcodeBranch();
+        xcodeBranch.setId(branch.getBranchId());
+        xcodeBranch.setName(branch.getBranchName());
+        return xcodeBranch;
     }
 
 

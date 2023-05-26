@@ -50,7 +50,7 @@ public class TaskBuildExecServiceImpl implements TaskBuildExecService {
         }
         
 
-        TaskBuild taskBuild = (TaskBuild) task.getValues();
+        TaskBuild taskBuild = (TaskBuild) task.getTask();
         String name = task.getTaskName();
 
 

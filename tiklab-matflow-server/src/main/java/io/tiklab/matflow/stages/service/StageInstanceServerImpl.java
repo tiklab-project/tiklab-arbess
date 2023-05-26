@@ -171,6 +171,10 @@ public class StageInstanceServerImpl implements StageInstanceServer{
                     stageState = PipelineFinal.RUN_ERROR;
                     break;
                 }
+                if (stageStates.equals(PipelineFinal.RUN_WAIT)){
+                    stageState = PipelineFinal.RUN_WAIT;
+                    break;
+                }
                 if (stageStates.equals(PipelineFinal.RUN_RUN)){
                     stageState = PipelineFinal.RUN_RUN;
                     break;

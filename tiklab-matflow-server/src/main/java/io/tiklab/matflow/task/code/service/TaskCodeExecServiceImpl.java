@@ -12,6 +12,7 @@ import io.tiklab.matflow.support.condition.service.ConditionService;
 import io.tiklab.matflow.support.util.PipelineUtil;
 import io.tiklab.matflow.support.variable.service.VariableService;
 import io.tiklab.matflow.task.code.model.TaskCode;
+import io.tiklab.matflow.task.code.model.XcodeRepository;
 import io.tiklab.matflow.task.task.model.Tasks;
 import io.tiklab.matflow.task.task.service.TasksInstanceService;
 import io.tiklab.rpc.annotation.Exporter;
@@ -60,7 +61,6 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
     @Autowired
     private TaskCodeThirdService codeThirdService;
 
-
     private final Logger logger = LoggerFactory.getLogger(TaskCodeExecServiceImpl.class);
 
     // git克隆
@@ -78,9 +78,14 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
         
         String name = task.getTaskName();
 
-        String object = JSON.toJSONString(task.getValues());
+        String object = JSON.toJSONString(task.getTask());
         TaskCode code = JSON.parseObject(object, TaskCode.class);
         code.setType(taskType);
+
+        if (taskType.equals("xcode")){
+            XcodeRepository repository = code.getRepository();
+            code.setCodeAddress(repository.getAddress());
+        }
 
         if (!PipelineUtil.isNoNull(code.getCodeAddress())){
             tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"代码源地址未配置。");
@@ -120,7 +125,7 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
             Process process = codeStart(code,pipelineId);
             String  type = code.getType();
             String enCode = null;
-            if (!type.equals("5") || !type.equals("svn")){
+            if (!type.equals("svn")){
                 enCode = "UTF-8";
             }
             boolean result = tasksInstanceService.readCommandExecResult(process, enCode, error(type), taskId);
@@ -247,6 +252,7 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
         if (Objects.isNull(auth)){
             return gitBranch(codeAddress, taskCode, fileAddress);
         }
+
 
         StringBuilder stringBuilder = gitUrl(auth.getUsername(), auth.getPassword(), codeAddress);
         return gitBranch(stringBuilder, taskCode, fileAddress);

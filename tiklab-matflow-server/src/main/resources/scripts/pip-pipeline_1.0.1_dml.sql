@@ -11,3 +11,8 @@ ALTER TABLE pip_task_test ADD COLUMN api_env varchar(255);
 ALTER TABLE pip_task_test ADD COLUMN app_env varchar(255);
 ALTER TABLE pip_task_test ADD COLUMN web_env varchar(255);
 ALTER TABLE pip_task_test ADD COLUMN auth_id varchar(255);
+
+
+ALTER TABLE pip_task_artifact ADD COLUMN xpack_id varchar(255);
+ALTER TABLE pip_task_code ADD COLUMN xcode_id varchar(255);
+ALTER TABLE pip_task_code ADD COLUMN branch_id varchar(255);

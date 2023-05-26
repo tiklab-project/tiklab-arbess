@@ -39,14 +39,13 @@ public class PostprocessServiceImpl implements PostprocessService {
         postprocessEntity.setCreateTime(PipelineUtil.date(1));
         String postId = postprocessDao.createPost(postprocessEntity);
         Tasks tasks = new Tasks();
-        tasks.setValues(postprocess.getValues());
+        tasks.setTask(postprocess.getValues());
         tasks.setTaskSort(1);
         tasks.setTaskType(postprocess.getTaskType());
         tasks.setPostprocessId(postId);
         tasksService.createTasksOrTask(tasks);
         return postId;
     }
-
 
     public List<Postprocess> findAllPipelinePostTask(String pipelineId){
         List<PostprocessEntity> allPostEntity = postprocessDao.findPipelinePost(pipelineId);
@@ -59,6 +58,8 @@ public class PostprocessServiceImpl implements PostprocessService {
             String postprocessId = postprocess.getPostprocessId();
             Tasks tasks = tasksService.findOnePostTaskOrTask(postprocessId);
             postprocess.setTask(tasks);
+            String taskType = tasks.getTaskType();
+            postprocess.setTaskType(taskType);
             list.add(postprocess);
         }
         return list;
@@ -75,6 +76,8 @@ public class PostprocessServiceImpl implements PostprocessService {
         for (Postprocess postprocess : postprocessList) {
             String id = postprocess.getPostprocessId();
             Tasks tasks = tasksService.findOnePostTaskOrTask(id);
+            String taskType = tasks.getTaskType();
+            postprocess.setTaskType(taskType);
             postprocess.setTask(tasks);
             list.add(postprocess);
         }
@@ -110,9 +113,9 @@ public class PostprocessServiceImpl implements PostprocessService {
     @Override
     public void updatePostTask(Postprocess postprocess) {
         String postprocessId = postprocess.getPostprocessId();
-        // String taskId = postprocess.getTaskId();
         Tasks task = tasksService.findOnePostTask(postprocessId);
         Object values = postprocess.getValues();
+        task.setTask(values);
         task.setValues(values);
         task.setTaskType(postprocess.getTaskType());
         tasksService.updateTasksTask(task);
@@ -124,6 +127,7 @@ public class PostprocessServiceImpl implements PostprocessService {
         String id = postprocess.getPostprocessId();
         Tasks taskOrTask = tasksService.findOnePostTaskOrTask(id);
         postprocess.setTask(taskOrTask);
+        postprocess.setTaskType(taskOrTask.getTaskType());
         return postprocess;
     }
 

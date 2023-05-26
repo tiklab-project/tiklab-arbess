@@ -1,6 +1,7 @@
 package io.tiklab.matflow.task.artifact.controller;
 
 import io.tiklab.core.Result;
+import io.tiklab.matflow.task.artifact.model.XpackRepository;
 import io.tiklab.matflow.task.artifact.service.TaskArtifactXpackService;
 import io.tiklab.postin.annotation.Api;
 import io.tiklab.postin.annotation.ApiMethod;
@@ -28,7 +29,7 @@ public class PipelineArtifactXpackController {
     @ApiParam(name = "authId", desc = "回调地址", required = true)
     public Result<List<Repository>> findAllRepository(@NotNull String authId) {
 
-        List<Repository> allRepository = TaskArtifactXpackService.findAllRepository(authId);
+        List<XpackRepository> allRepository = TaskArtifactXpackService.findAllRepository(authId);
 
         return Result.ok(allRepository);
     }
