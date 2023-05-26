@@ -124,13 +124,8 @@ public class AuthHostServiceImpl implements AuthHostService {
                     return true;
                 }
             }
-            case "aliyun"  ->{
-                if (taskType.equals("aliyun")){
-                    return true;
-                }
-            }
-            case "tencent"  ->{
-                if (taskType.equals("tencent")){
+            case "aliyun" ,"tencent" ->{
+                if (taskType.equals(type)){
                     return true;
                 }
             }

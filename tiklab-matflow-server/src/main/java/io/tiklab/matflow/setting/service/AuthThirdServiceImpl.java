@@ -172,6 +172,11 @@ public class AuthThirdServiceImpl implements AuthThirdService {
                     return true;
                 }
             }
+            case "xcode" ,"teston" ,"xpack" ->{
+                if (taskType.equals(type)){
+                    return true;
+                }
+            }
             default -> {
                 return false;
             }
