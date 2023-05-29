@@ -151,7 +151,7 @@ public class TaskTestExecServiceImpl implements TaskTestExecService {
             tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4) + "------------------------------------------------------------------");
             tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4) +
                     "  用例数："+testPlanInstance.getTotal() +
-                    "    成功数："+testPlanInstance.getFailNum() +
+                    "    成功数："+testPlanInstance.getPassNum() +
                     "    失败数："+testPlanInstance.getFailNum() +
                     "    成功率："+testPlanInstance.getPassRate()
             );
@@ -163,7 +163,7 @@ public class TaskTestExecServiceImpl implements TaskTestExecService {
         tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4) + "------------------------------------------------------------------");
         tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4) +
                 "  用例数："+testPlanInstance.getTotal() +
-                "    成功数："+testPlanInstance.getFailNum() +
+                "    成功数："+testPlanInstance.getPassNum() +
                 "    失败数："+testPlanInstance.getFailNum() +
                 "    成功率："+testPlanInstance.getPassRate()
         );
@@ -180,7 +180,8 @@ public class TaskTestExecServiceImpl implements TaskTestExecService {
         }
         AuthThird authServer = authThirdService.findOneAuthServer(authId);
 
-        tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"TestOn执行完成！具体信息请在："+authServer.getServerAddress()+"  查看！");
+        tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"TestOn执行完成！具体信息请在："+
+                authServer.getServerAddress() + "/#/repository/plan/"+testPlan.getId()+"  查看！");
 
         return true;
     }

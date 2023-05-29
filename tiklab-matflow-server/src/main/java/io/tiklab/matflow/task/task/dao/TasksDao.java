@@ -24,7 +24,6 @@ public class TasksDao {
     @Autowired
     JpaTemplate jpaTemplate;
 
-
     private static final Logger logger = LoggerFactory.getLogger(TasksDao.class);
 
     /**

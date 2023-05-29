@@ -118,6 +118,7 @@ public class RelevanceTestOnServiceImpl implements RelevanceTestOnService{
                 String dateTime = PipelineUtil.findDateTime(date, 0);
                 relevanceTestOn.setTime(dateTime);
                 relevanceTestOn.setObject(testPlanInstance);
+                relevanceTestOn.setUrl(authThird.getServerAddress());
                 list.add(relevanceTestOn);
             }else {
                 TestOnPlanInstance testPlanInstance = null;
@@ -126,6 +127,7 @@ public class RelevanceTestOnServiceImpl implements RelevanceTestOnService{
                     if (Objects.isNull(testPlanInstance1)){
                         continue;
                     }
+                    relevanceTestOn.setUrl(authThird.getServerAddress());
                     testPlanInstance = testPlanInstance1;
                 }
                 Date date = PipelineUtil.StringChengeDate(relevanceTestOn.getCreateTime());
