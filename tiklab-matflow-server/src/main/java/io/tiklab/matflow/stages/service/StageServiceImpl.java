@@ -81,7 +81,7 @@ public class StageServiceImpl implements StageService {
             Stage stages = new Stage();
             stages.setParentId(id);
             stages.setStageSort(1);
-            stages.setStageName("并行阶段-"+1);
+            stages.setStageName("并行阶段-"+initStage+"-" + 1);
             stagesId = createStages(stages);
             tasks.setStageId(stagesId);
             return tasksService.createTasksOrTask(tasks);
@@ -90,10 +90,11 @@ public class StageServiceImpl implements StageService {
         //并行任务
         if (PipelineUtil.isNoNull(stagesId) && stageSort == 0){
             List<Stage> otherStage = findOtherStage(stagesId);
+            Stage oneStages = findOneStages(stagesId);
             Stage stages = new Stage();
             stages.setParentId(stagesId);
-            stages.setStageSort(otherStage.size()+1);
-            stages.setStageName("并行阶段-"+(otherStage.size()+1));
+            stages.setStageSort(otherStage.size() + 1);
+            stages.setStageName("并行阶段-"+oneStages.getStageSort()+"-"+(otherStage.size()+1));
             stagesId = createStages(stages);
             tasks.setStageId(stagesId);
             return tasksService.createTasksOrTask(tasks);

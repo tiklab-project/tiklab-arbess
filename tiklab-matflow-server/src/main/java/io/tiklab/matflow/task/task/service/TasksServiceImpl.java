@@ -1000,6 +1000,12 @@ public class TasksServiceImpl implements TasksService {
                 return false;
             }
         }
+        if (taskType.equals("xpack")){
+            if (!PipelineUtil.isNoNull(product.getRepository().getName())){
+                return false;
+            }
+        }
+
         if ( taskType.equals("52")||  taskType.equals("ssh")){
             if (!PipelineUtil.isNoNull(product.getFileAddress())){
                 return false;

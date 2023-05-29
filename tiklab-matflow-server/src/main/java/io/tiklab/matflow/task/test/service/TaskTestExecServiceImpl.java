@@ -114,10 +114,13 @@ public class TaskTestExecServiceImpl implements TaskTestExecService {
         try {
             taskTestOnService.execTestPlan(authId, testData);
         }catch (Exception e){
-            tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"执行测试失败："+e.getMessage());
+            TestPlanExecResult  testPlanExecResult = taskTestOnService.findTestPlanExecResult(authId);
+            String instanceId = testPlanExecResult.getTestPlanInstance().getId();
+            relevanceTestOnService.createRelevance(pipelineId,instanceId);
+            tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"testOn执行失败："+e.getMessage());
             return false;
         }
-
+        AuthThird authServer = authThirdService.findOneAuthServer(authId);
         Integer status = 0;
         // 获取执行结果
         TestPlanExecResult testPlanExecResult;
@@ -133,12 +136,11 @@ public class TaskTestExecServiceImpl implements TaskTestExecService {
         }
 
         tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"获取测试结果...");
-        TestOnPlanInstance testPlanInstance = testPlanExecResult.getTestPlanInstance();
+
         // 判断是否正在运行
         while (Objects.equals(status,1)){
-            // 获取最新结果
             try {
-                testPlanExecResult = taskTestOnService.findTestPlanExecResult(authId);
+                testPlanExecResult = findTestPlanExecResult(taskId,authId);
             }catch (Exception e){
                 if (e instanceof ApplicationException){
                     tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"获取测试结果失败："+e.getMessage());
@@ -147,28 +149,8 @@ public class TaskTestExecServiceImpl implements TaskTestExecService {
                 tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"系统异常，获取测试结果失败："+e.getMessage());
                 return false;
             }
-            // 输出最新结果
-            tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4) + "------------------------------------------------------------------");
-            tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4) +
-                    "  用例数："+testPlanInstance.getTotal() +
-                    "    成功数："+testPlanInstance.getPassNum() +
-                    "    失败数："+testPlanInstance.getFailNum() +
-                    "    成功率："+testPlanInstance.getPassRate()
-            );
-            tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4) + "------------------------------------------------------------------");
-            testPlanInstance = testPlanExecResult.getTestPlanInstance();
             status = testPlanExecResult.getStatus();
         }
-        // 输出最终结果
-        tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4) + "------------------------------------------------------------------");
-        tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4) +
-                "  用例数："+testPlanInstance.getTotal() +
-                "    成功数："+testPlanInstance.getPassNum() +
-                "    失败数："+testPlanInstance.getFailNum() +
-                "    成功率："+testPlanInstance.getPassRate()
-        );
-        tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4) + "------------------------------------------------------------------");
-
         String instanceId = testPlanExecResult.getTestPlanInstance().getId();
 
         // 创建对应的测试关系表
@@ -178,12 +160,34 @@ public class TaskTestExecServiceImpl implements TaskTestExecService {
             tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"获取测试结果失败："+e.getMessage());
             return false;
         }
-        AuthThird authServer = authThirdService.findOneAuthServer(authId);
 
         tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"TestOn执行完成！具体信息请在："+
-                authServer.getServerAddress() + "/#/repository/plan/"+testPlan.getId()+"  查看！");
+                authServer.getServerAddress() + "/#/repository/report/"+instanceId+"  查看！");
 
         return true;
+    }
+
+    private TestPlanExecResult findTestPlanExecResult(String taskId,String authId){
+        // 获取执行结果
+        TestPlanExecResult testPlanExecResult;
+        try {
+            testPlanExecResult = taskTestOnService.findTestPlanExecResult(authId);
+        }catch (Exception e){
+            throw new ApplicationException(e);
+        }
+        TestOnPlanInstance testPlanInstance = testPlanExecResult.getTestPlanInstance();
+        // 输出最新结果
+        tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4) + "------------------------------------------------------------------");
+        tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4) +
+                "  用例数：" + testPlanInstance.getTotal() +
+                "    成功数：" + testPlanInstance.getPassNum() +
+                "    失败数：" + testPlanInstance.getFailNum() +
+                "    成功率：" + testPlanInstance.getPassRate()
+        );
+        tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4) + "------------------------------------------------------------------");
+
+
+        return testPlanExecResult;
     }
 
 

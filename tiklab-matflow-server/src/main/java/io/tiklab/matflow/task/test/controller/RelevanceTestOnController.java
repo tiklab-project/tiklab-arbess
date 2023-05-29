@@ -39,7 +39,8 @@ public class RelevanceTestOnController {
     @RequestMapping(path="/findAllRelevancePage",method = RequestMethod.POST)
     @ApiMethod(name = "findAllRelevancePage",desc = "获取所有仓库")
     @ApiParam(name = "relevanceTestOnQuery",desc = "条件",required = true)
-    public Result<Pagination<RelevanceTestOn>> findAllRelevance(@RequestBody @Valid @NotNull RelevanceTestOnQuery relevanceTestOnQuery){
+    public Result<Pagination<RelevanceTestOn>> findAllRelevance(
+            @RequestBody @Valid @NotNull RelevanceTestOnQuery relevanceTestOnQuery){
 
         Pagination<RelevanceTestOn> allRelevance = relevanceTestOnService.findAllRelevancePage(relevanceTestOnQuery);
 
