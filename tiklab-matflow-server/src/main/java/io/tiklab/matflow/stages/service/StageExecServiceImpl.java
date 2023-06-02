@@ -6,7 +6,7 @@ import io.tiklab.matflow.stages.model.Stage;
 import io.tiklab.matflow.stages.model.StageInstance;
 import io.tiklab.matflow.support.postprocess.service.PostprocessExecService;
 import io.tiklab.matflow.support.util.PipelineFinal;
-import io.tiklab.matflow.support.util.PipelineUtil;
+import io.tiklab.matflow.support.util.PipelineUtilService;
 import io.tiklab.matflow.task.message.model.TaskExecMessage;
 import io.tiklab.matflow.task.task.model.Tasks;
 import io.tiklab.matflow.task.task.service.TasksExecService;
@@ -45,6 +45,9 @@ public class StageExecServiceImpl implements  StageExecService {
     @Autowired
     private PostprocessExecService postExecService;
 
+    @Autowired
+    private PipelineUtilService utilService;
+
     //阶段任务实例id及阶段任务实例
     public static Map<String , StageInstance> stageInstanceIdOrStageInstance = new HashMap<>();
 
@@ -56,7 +59,7 @@ public class StageExecServiceImpl implements  StageExecService {
 
     @Override
     public void createStageExecInstance(String pipelineId,String instanceId) {
-        String fileAddress = PipelineUtil.findFileAddress(pipelineId,2)+instanceId;
+        String fileAddress =utilService.findPipelineDefaultAddress(pipelineId,2)+instanceId;
         List<Stage> allMainStage = stageService.findAllMainStage(pipelineId);
         for (Stage mainStage : allMainStage) {
             //创建主阶段日志

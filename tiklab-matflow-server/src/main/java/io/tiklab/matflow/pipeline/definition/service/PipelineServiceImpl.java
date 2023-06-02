@@ -13,8 +13,10 @@ import io.tiklab.matflow.pipeline.instance.model.PipelineInstance;
 import io.tiklab.matflow.pipeline.instance.service.PipelineInstanceService;
 import io.tiklab.matflow.stages.service.StageService;
 import io.tiklab.matflow.support.authority.service.PipelineAuthorityService;
+import io.tiklab.matflow.support.util.PipelineFileUtil;
 import io.tiklab.matflow.support.util.PipelineFinal;
 import io.tiklab.matflow.support.util.PipelineUtil;
+import io.tiklab.matflow.support.util.PipelineUtilService;
 import io.tiklab.matflow.task.task.service.TasksService;
 import io.tiklab.rpc.annotation.Exporter;
 import io.tiklab.user.user.model.User;
@@ -59,6 +61,9 @@ public class PipelineServiceImpl implements PipelineService {
 
     @Autowired
     private PipelineFollowService followService;
+
+    @Autowired
+    private PipelineUtilService utilService;
 
 
     private static final Logger logger = LoggerFactory.getLogger(PipelineServiceImpl.class);
@@ -369,11 +374,11 @@ public class PipelineServiceImpl implements PipelineService {
         //删除对应的历史
         instanceService.deleteAllInstance(pipelineId);
         //删除对应源码文件
-        String fileAddress = PipelineUtil.findFileAddress(pipelineId,1);
-        PipelineUtil.deleteFile(new File(fileAddress));
+        String fileAddress = utilService.findPipelineDefaultAddress(pipelineId,1);
+        PipelineFileUtil.deleteFile(new File(fileAddress));
         //删除对应日志
-        String logAddress = PipelineUtil.findFileAddress(pipelineId,2);
-        PipelineUtil.deleteFile(new File(logAddress+"/"+pipelineId));
+        String logAddress = utilService.findPipelineDefaultAddress(pipelineId,2);
+        PipelineFileUtil.deleteFile(new File(logAddress+"/"+pipelineId));
     }
 
     /**

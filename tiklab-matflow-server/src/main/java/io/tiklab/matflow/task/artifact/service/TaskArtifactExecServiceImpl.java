@@ -7,8 +7,10 @@ import io.tiklab.matflow.setting.model.AuthThird;
 import io.tiklab.matflow.setting.model.Scm;
 import io.tiklab.matflow.setting.service.ScmService;
 import io.tiklab.matflow.support.condition.service.ConditionService;
+import io.tiklab.matflow.support.util.PipelineFileUtil;
 import io.tiklab.matflow.support.util.PipelineFinal;
 import io.tiklab.matflow.support.util.PipelineUtil;
+import io.tiklab.matflow.support.util.PipelineUtilService;
 import io.tiklab.matflow.support.variable.service.VariableService;
 import io.tiklab.matflow.task.artifact.model.TaskArtifact;
 import io.tiklab.matflow.task.artifact.model.XpackRepository;
@@ -44,6 +46,9 @@ public class TaskArtifactExecServiceImpl implements TaskArtifactExecService {
     @Autowired
     private TaskArtifactXpackService taskArtifactXpackService;
 
+    @Autowired
+    private PipelineUtilService utilService;
+
     private static final Logger logger = LoggerFactory.getLogger(TaskArtifactExecServiceImpl.class);
 
     @Override
@@ -64,7 +69,7 @@ public class TaskArtifactExecServiceImpl implements TaskArtifactExecService {
         String fileAddress = product.getFileAddress();
         String path;
         try {
-             path = PipelineUtil.getFile(pipelineId,fileAddress);
+             path = utilService.findFile(pipelineId,fileAddress);
         }catch (ApplicationException e){
             tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+e);
             return false;
@@ -226,7 +231,7 @@ public class TaskArtifactExecServiceImpl implements TaskArtifactExecService {
         }
 
         if (authHost.getAuthType() == 2){
-            String tempFile = PipelineUtil.createTempFile(authHost.getPrivateKey());
+            String tempFile = PipelineFileUtil.createTempFile(authHost.getPrivateKey());
             if (!PipelineUtil.isNoNull(tempFile)){
                 throw new ApplicationException("获取私钥失败。");
             }
@@ -236,7 +241,7 @@ public class TaskArtifactExecServiceImpl implements TaskArtifactExecService {
                 String message = e.getMessage();
                 throw new ApplicationException("私钥无效："+message);
             }
-            PipelineUtil.deleteFile(new File(tempFile));
+            PipelineFileUtil.deleteFile(new File(tempFile));
         }
 
         Session session;

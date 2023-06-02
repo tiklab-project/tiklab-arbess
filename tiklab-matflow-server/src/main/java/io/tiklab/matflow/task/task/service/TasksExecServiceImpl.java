@@ -1,6 +1,7 @@
 package io.tiklab.matflow.task.task.service;
 
 import io.tiklab.core.exception.ApplicationException;
+import io.tiklab.matflow.support.util.PipelineFileUtil;
 import io.tiklab.matflow.support.util.PipelineUtil;
 import io.tiklab.matflow.task.artifact.service.TaskArtifactExecService;
 import io.tiklab.matflow.task.build.service.TaskBuildExecService;
@@ -87,7 +88,7 @@ public class TasksExecServiceImpl implements TasksExecService {
         //日志文件地址
         String  fileAddress = logPath +"/"+ taskInstanceId + ".log";
         instance.setLogAddress(fileAddress);
-        PipelineUtil.createFile(fileAddress);
+        PipelineFileUtil.createFile(fileAddress);
         tasksInstanceService.updateTaskInstance(instance);
         taskOrTaskInstance.put(taskInstanceId,instance);
         taskIdOrTaskInstanceId.put(task.getTaskId(),taskInstanceId);
@@ -167,7 +168,7 @@ public class TasksExecServiceImpl implements TasksExecService {
         }
         String logAddress = instance.getLogAddress();
         String runLog = instance.getRunLog();
-        PipelineUtil.logWriteFile(runLog,logAddress);
+        PipelineFileUtil.logWriteFile(runLog,logAddress);
 
         Integer integer = tasksInstanceService.findTaskRuntime(taskInstanceId);
         instance.setRunTime(integer);

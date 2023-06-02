@@ -1,7 +1,7 @@
 package io.tiklab.matflow;
 
 import io.tiklab.core.property.PropertyAndYamlSourceFactory;
-import io.tiklab.matflow.support.util.PipelineUtil;
+import io.tiklab.matflow.support.util.PipelineFileUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -23,7 +23,7 @@ public class MatFlowApplication {
 
     public static void main(String[] args) {
         logger.info("初始化项目地址");
-        PipelineUtil.initMatFlowAddress(1);
+        PipelineFileUtil.initMatFlowAddress(1);
         logger.info("项目地址初始完成。");
         SpringApplication.run(MatFlowApplication.class, args);
 

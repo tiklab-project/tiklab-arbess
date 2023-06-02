@@ -3,7 +3,7 @@ package io.tiklab.matflow.support.postprocess.service;
 import io.tiklab.matflow.support.postprocess.model.Postprocess;
 import io.tiklab.matflow.support.postprocess.model.PostprocessInstance;
 import io.tiklab.matflow.support.util.PipelineFinal;
-import io.tiklab.matflow.support.util.PipelineUtil;
+import io.tiklab.matflow.support.util.PipelineUtilService;
 import io.tiklab.matflow.task.message.model.TaskExecMessage;
 import io.tiklab.matflow.task.task.model.Tasks;
 import io.tiklab.matflow.task.task.service.TasksExecService;
@@ -25,6 +25,9 @@ public class PostprocessExecServiceImpl implements PostprocessExecService{
     @Autowired
     private PostprocessInstanceService postInstanceService;
 
+    @Autowired
+    private PipelineUtilService utilService;
+
 
     //后置任务id与后置任务实例id之间的关系
     public static Map<String , String> postIdOrPostInstanceId = new HashMap<>();
@@ -37,7 +40,7 @@ public class PostprocessExecServiceImpl implements PostprocessExecService{
 
     @Override
     public void createPipelinePostInstance(String pipelineId, String instanceId){
-        String fileAddress = PipelineUtil.findFileAddress(pipelineId,2) + instanceId;
+        String fileAddress = utilService.findPipelineDefaultAddress(pipelineId,2) + instanceId;
         List<Postprocess> postprocessList = postprocessService.findAllPipelinePostTask(pipelineId);
         if (postprocessList.isEmpty()){
             return ;
@@ -59,7 +62,7 @@ public class PostprocessExecServiceImpl implements PostprocessExecService{
 
     @Override
     public void createTaskPostInstance(String pipelineId, String instanceId, String taskId){
-        String fileAddress = PipelineUtil.findFileAddress(pipelineId,2) + instanceId;
+        String fileAddress = utilService.findPipelineDefaultAddress(pipelineId,2) + instanceId;
         List<Postprocess> postprocessList = postprocessService.findAllTaskPostTask(taskId);
         if (postprocessList.isEmpty()){
             return ;

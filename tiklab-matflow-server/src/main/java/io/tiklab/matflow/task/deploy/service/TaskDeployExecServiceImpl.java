@@ -1,14 +1,16 @@
 package io.tiklab.matflow.task.deploy.service;
 
 import com.jcraft.jsch.*;
+import io.tiklab.core.exception.ApplicationException;
+import io.tiklab.matflow.setting.model.AuthHost;
+import io.tiklab.matflow.support.condition.service.ConditionService;
+import io.tiklab.matflow.support.util.PipelineFileUtil;
+import io.tiklab.matflow.support.util.PipelineUtil;
+import io.tiklab.matflow.support.util.PipelineUtilService;
 import io.tiklab.matflow.support.variable.service.VariableService;
 import io.tiklab.matflow.task.deploy.model.TaskDeploy;
 import io.tiklab.matflow.task.task.model.Tasks;
 import io.tiklab.matflow.task.task.service.TasksInstanceService;
-import io.tiklab.core.exception.ApplicationException;
-import io.tiklab.matflow.setting.model.AuthHost;
-import io.tiklab.matflow.support.condition.service.ConditionService;
-import io.tiklab.matflow.support.util.PipelineUtil;
 import io.tiklab.rpc.annotation.Exporter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +39,9 @@ public class TaskDeployExecServiceImpl implements TaskDeployExecService {
 
     @Autowired
     private ConditionService conditionService;
+
+    @Autowired
+    private PipelineUtilService utilService;
 
     private static final Logger logger = LoggerFactory.getLogger(TaskDeployExecServiceImpl.class);
 
@@ -98,7 +103,7 @@ public class TaskDeployExecServiceImpl implements TaskDeployExecService {
 
         try {
             tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"获取部署文件......");
-            filePath = PipelineUtil.getFile(pipelineId, taskDeploy.getLocalAddress());
+            filePath = utilService.findFile(pipelineId, taskDeploy.getLocalAddress());
         } catch (ApplicationException e) {
             String message = PipelineUtil.date(4) + e.getMessage();
             tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"部署文件获取失败，\n"+ message);
@@ -195,12 +200,12 @@ public class TaskDeployExecServiceImpl implements TaskDeployExecService {
         JSch jsch = new JSch();
         Session session = jsch.getSession(username, sshIp, sshPort);
         if (authHost.getAuthType() ==2){
-            String tempFile = PipelineUtil.createTempFile(authHost.getPrivateKey());
+            String tempFile = PipelineFileUtil.createTempFile(authHost.getPrivateKey());
             if (!PipelineUtil.isNoNull(tempFile)){
                 throw new ApplicationException("写入私钥失败。");
             }
             jsch.addIdentity(tempFile);
-            PipelineUtil.deleteFile(new File(tempFile));
+            PipelineFileUtil.deleteFile(new File(tempFile));
         }else {
             String password = authHost.getPassword();
             session.setPassword(password);

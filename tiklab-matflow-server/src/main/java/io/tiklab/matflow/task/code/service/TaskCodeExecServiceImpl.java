@@ -9,7 +9,9 @@ import io.tiklab.matflow.setting.service.AuthService;
 import io.tiklab.matflow.setting.service.AuthThirdService;
 import io.tiklab.matflow.setting.service.ScmService;
 import io.tiklab.matflow.support.condition.service.ConditionService;
+import io.tiklab.matflow.support.util.PipelineFileUtil;
 import io.tiklab.matflow.support.util.PipelineUtil;
+import io.tiklab.matflow.support.util.PipelineUtilService;
 import io.tiklab.matflow.support.variable.service.VariableService;
 import io.tiklab.matflow.task.code.model.TaskCode;
 import io.tiklab.matflow.task.code.model.XcodeRepository;
@@ -29,8 +31,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-
-import static io.tiklab.matflow.support.util.PipelineUtil.findSystemType;
 
 /**
  * 源码管理执行方法
@@ -60,6 +60,9 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
 
     @Autowired
     private TaskCodeThirdService codeThirdService;
+
+    @Autowired
+    private PipelineUtilService utilService;
 
     private final Logger logger = LoggerFactory.getLogger(TaskCodeExecServiceImpl.class);
 
@@ -93,14 +96,14 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
         }
 
         //代码保存路径
-        String codeDir = PipelineUtil.findFileAddress(pipelineId,1);
+        String codeDir = utilService.findPipelineDefaultAddress(pipelineId,1);
         File file = new File(codeDir);
 
         //删除旧的代码
         boolean b = false;
         while (!b){
             if (file.exists()){
-                b = PipelineUtil.deleteFile(file);
+                b = PipelineFileUtil.deleteFile(file);
             }else {
                 b = true;
             }
@@ -192,7 +195,7 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
         PipelineUtil.validFile(serverAddress, taskCode.getType());
 
         //源码存放位置
-        String fileAddress = PipelineUtil.findFileAddress(pipelineId,1);
+        String fileAddress = utilService.findPipelineDefaultAddress(pipelineId,1);
         String gitOrder;
         String path = null;
         switch (taskCode.getType()) {
@@ -203,7 +206,7 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
                 if (list.size() > 1){
                     gitOrder = list.get(2);
                     path = list.get(3);
-                   if (findSystemType() != 1){
+                   if (PipelineUtil.findSystemType() != 1){
                        logger.info("执行更改文件权限:" +" chmod 600 "+" "+path);
                        process(serverAddress, " chmod 600 "+" "+path);
                    }
@@ -213,7 +216,7 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
                     if (PipelineUtil.isNoNull(path)){
                         try {
                             Thread.sleep(1000);
-                            PipelineUtil.deleteFile(new File(path));
+                            PipelineFileUtil.deleteFile(new File(path));
                         } catch (InterruptedException e) {
                             return process;
                         }
@@ -295,7 +298,7 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
             return list;
         }
 
-        String tempFile = PipelineUtil.createTempFile(auth.getPrivateKey());
+        String tempFile = PipelineFileUtil.createTempFile(auth.getPrivateKey());
         String userHome = System.getProperty("user.home");
         if (!PipelineUtil.isNoNull(tempFile)){
             throw new ApplicationException("私钥写入失败。");
@@ -307,7 +310,7 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
         String address = tempFile.replace(userHome, "").replace("\\", "/");
         String orderClean;
         String orderAdd;
-        if (findSystemType() == 1){
+        if (PipelineUtil.findSystemType() == 1){
              orderClean = ".\\git.exe git config --global --unset core.sshCommand";
              orderAdd = ".\\git.exe config --global core.sshCommand \"ssh -i ~" + address + "\"";
         }else {
@@ -377,7 +380,7 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
             order =" -b "+branch+" "+ url+" "+codeDir;
         }
         //根据不同系统更新命令
-        if (findSystemType() == 1){
+        if (PipelineUtil.findSystemType() == 1){
             order=".\\git.exe clone"+" " + order;
         }else {
             order="./git clone"+" " + order;
@@ -433,7 +436,7 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
             codeAddress  = codeAddress + " --username "+ " "  +username + " --password " + " " + password + " " +codeDir;
         }
         //不同系统检出
-        if (findSystemType() == 1){
+        if (PipelineUtil.findSystemType() == 1){
             codeAddress=".\\svn.exe checkout"+" " + codeAddress;
         }else {
             codeAddress="./svn checkout"+" " + codeAddress;
@@ -451,14 +454,6 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
     private void typeAddress(String type,int authType,String address) throws ApplicationException{
         String substring = address.substring(0, 3);
         if (type.equals("5") || type.equals("svn")){
-            if (substring.equals("htt") && authType == 1){
-                return;
-            }
-            if (substring.equals("git") && authType == 2){
-                return;
-            }
-            throw new ApplicationException("Git地址类型与凭证认证类型不一致。");
-        }else {
             if (substring.equals("svn") && authType == 1){
                 return;
             }
@@ -467,6 +462,14 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
                 return;
             }
             throw new ApplicationException("SVN地址类型与凭证认证类型不一致。");
+        }else {
+            if (substring.equals("htt") && authType == 1){
+                return;
+            }
+            if (substring.equals("git") && authType == 2){
+                return;
+            }
+            throw new ApplicationException("Git地址类型与凭证认证类型不一致。");
         }
     }
 
@@ -482,7 +485,7 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
             return null;
         }
         String order = "git log --pretty=format:\"commit：%cn email：%ae message：%s date：%ad time：%ar \" --date=format:\"%Y-%m-%d %H:%M:%S\" -n 1";
-        String fileAddress = PipelineUtil.findFileAddress(pipelineId,1);
+        String fileAddress = utilService.findPipelineDefaultAddress(pipelineId,1);
         return PipelineUtil.process(fileAddress, order);
     }
 
@@ -525,7 +528,7 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
         Process process;
         String[] cmd;
 
-        if (findSystemType()==1){
+        if (PipelineUtil.findSystemType()==1){
             if (!PipelineUtil.isNoNull(path)){
                 cmd = new String[] { "cmd.exe", "/c", order };
                 process = runtime.exec(cmd);

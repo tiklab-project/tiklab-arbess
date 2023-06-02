@@ -2,12 +2,12 @@ package io.tiklab.matflow.support.util;
 
 import io.tiklab.core.exception.ApplicationException;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -85,7 +85,6 @@ public class PipelineUtil {
         return targetTime;
     }
 
-
     /**
      * 获取指定指定时间与现在时间是否相差在指定天数内
      * @param targetTime 指定时间
@@ -152,6 +151,24 @@ public class PipelineUtil {
 
     }
 
+    //时间转换成时分秒
+    public static String formatDateTime(long time) {
+        String DateTimes ;
+        long days = time / ( 60 * 60 * 24);
+        long hours = (time % ( 60 * 60 * 24)) / (60 * 60);
+        long minutes = (time % ( 60 * 60)) /60;
+        long seconds = time % 60;
+        if(days>0){
+            DateTimes= days + " 天" + hours + " 时" + minutes + " 分" + seconds + " 秒";
+        }else if(hours>0){
+            DateTimes=hours + " 时" + minutes + " 分" + seconds + " 秒";
+        }else if(minutes>0){
+            DateTimes=minutes + " 分" + seconds + " 秒";
+        }else{
+            DateTimes=seconds + " 秒";
+        }
+        return DateTimes;
+    }
 
     /**
      * 返回今天星期几
@@ -166,29 +183,14 @@ public class PipelineUtil {
         return i;
     }
 
-
-    //效验git地址
-    public static boolean validGit(String address){
-        String valid = "^(http(s)?:\\/\\/([^\\/]+?\\/){2}|git@[^:]+:[^\\/]+?\\/).*?\\.git$";
-        return Pattern.matches(valid,address);
-    }
-
-    //效验svn地址
-    public static boolean validSvn(String address){
-        String valid = "^svn(\\+ssh)?:\\/\\/([^\\/]+?\\/){2}.*$";
-        return Pattern.matches(valid,address);
-    }
-
-    //效验URl地址
-    public static boolean validURL(String address){
+    /**
+     * 效验URl地址
+     * @param url url
+     * @return 效验成功或失败
+     */
+    public static boolean validURL(String url){
         String valid = "^(http|ftp|https):\\/\\/[\\w\\-_]+(\\.[\\w\\-_]+)+([\\w\\-\\.,@?^=%&:/~\\+#]*[\\w\\-\\@?^=%&/~\\+#])?";
-        return Pattern.matches(valid,address);
-    }
-
-    //效验ip
-    public static boolean validIp(String ip){
-        String valid = "^((25[0-5]|2[0-4]\\d|1\\d{2}|[1-9]?\\d)\\.){3}(25[0-5]|2[0-4]\\d|1\\d{2}|[1-9]?\\d)";
-        return Pattern.matches(valid,ip);
+        return Pattern.matches(valid,url);
     }
 
     /**
@@ -262,172 +264,6 @@ public class PipelineUtil {
                 }
             }else {
                 list.add(s);
-            }
-        }
-        return list;
-    }
-
-    //时间转换成时分秒
-    public static String formatDateTime(long time) {
-        String DateTimes ;
-        long days = time / ( 60 * 60 * 24);
-        long hours = (time % ( 60 * 60 * 24)) / (60 * 60);
-        long minutes = (time % ( 60 * 60)) /60;
-        long seconds = time % 60;
-        if(days>0){
-            DateTimes= days + " 天" + hours + " 时" + minutes + " 分" + seconds + " 秒";
-        }else if(hours>0){
-            DateTimes=hours + " 时" + minutes + " 分" + seconds + " 秒";
-        }else if(minutes>0){
-            DateTimes=minutes + " 分" + seconds + " 秒";
-        }else{
-            DateTimes=seconds + " 秒";
-        }
-        return DateTimes;
-    }
-
-    /**
-     * 初始化项目空间
-     * @param type 类型 1.工作空间目录   2.日志目录
-     */
-    public static String initMatFlowAddress(int type){
-
-        //根目录
-        String userHome = System.getProperty("user.home");
-
-        //工作空间目录
-        File file = new File(userHome + PipelineFinal.MATFLOW_WORKSPACE);
-        String path = file.getAbsolutePath();
-        if (!file.exists()){
-            createDirectory(path);
-            try {
-                //更改为隐藏文件夹
-                if (findSystemType() == 1){
-                    process(null," attrib +H " + userHome);
-                }
-            } catch (IOException e) {
-                throw new ApplicationException("更改工作空间为隐藏失败。");
-            }
-        }
-
-        //日志目录
-        File logFile = new File(userHome+ PipelineFinal.MATFLOW_LOGS);
-        String logAddress = logFile.getAbsolutePath();
-        if (!logFile.exists()){
-            createDirectory(logAddress);
-        }
-
-        if (type == 2){
-            return logAddress;
-        }else {
-            return path;
-        }
-
-    }
-
-    /**
-     * 系统默认存储位置
-     * @return 位置
-     */
-    public static String findFileAddress(String id,int type){
-        String path = initMatFlowAddress(type);
-        int systemType = findSystemType();
-        if (systemType == 1){
-            if (!PipelineUtil.isNoNull(id)){
-                return path + "\\";
-            }else {
-                return path + "\\" + id + "\\";
-            }
-        }else {
-            if (!PipelineUtil.isNoNull(id)){
-                return path + "/";
-            }else {
-                return path + "/" + id + "/" ;
-            }
-        }
-    }
-
-    /**
-     * 删除文件
-     * @param file 文件地址
-     * @return 是否删除 true 删除成功,false 删除失败
-     */
-    public static Boolean deleteFile(File file){
-        if (file.isDirectory()) {
-            String[] children = file.list();
-            //递归删除目录中的子目录下
-            if (children != null) {
-                for (String child : children) {
-                    boolean state = deleteFile(new File(file, child));
-                    int tryCount = 0;
-                    while (!state && tryCount ++ < 10) {
-                        System.gc();
-                        state = file.delete();
-                    }
-                }
-            }
-            // 目录此时为空，删除
-        }
-        return file.delete();
-    }
-
-
-    /**
-     * 匹配文件路径
-     * @param pipelineId 流水线id
-     * @param regex 条件
-     * @return 文件全路径
-     */
-    public static String getFile(String pipelineId, String regex) throws ApplicationException{
-        List<String> list = new ArrayList<>();
-        String path= findFileAddress(pipelineId,1) ;
-        List<String> filePath = PipelineUtil.getFilePath(new File(path),new ArrayList<>());
-        for (String s : filePath) {
-            File file = new File(s);
-
-            //拼装正则匹配
-            boolean matches = file.getName().matches("^(.*" + regex + ".*)");
-            //正则匹配
-            boolean matches1 = file.getName().matches(regex);
-
-            File file1 = new File(s + "/" + regex);
-            if (file1.exists()){
-                return file1.getAbsolutePath();
-            }
-
-            if (matches || matches1){
-                list.add(s);
-            }
-        }
-
-        if (list.size() > 1){
-            StringBuilder s  = new StringBuilder("匹配到多个文件，请重新输入部署文件信息。");
-            for (String s1 : list) {
-                s.append("\n").append(s1);
-            }
-            throw new ApplicationException(s.toString());
-        }
-
-        if (list.size()== 1){
-            return list.get(0);
-        }
-        throw new ApplicationException("没有匹配到部署文件。");
-    }
-
-    /**
-     * 获取文件夹下所有的文件
-     * @param path 目录地址
-     * @param list new ArrayList<>()
-     * @return 文件夹下的文件集合
-     */
-    public static List<String> getFilePath(File path,List<String> list){
-        File[] fa = path.listFiles();
-        if (fa != null) {
-            for (File file : fa) {
-                if (file.isDirectory()){
-                    getFilePath(file,list);
-                }
-                list.add(file.getPath());
             }
         }
         return list;
@@ -531,124 +367,8 @@ public class PipelineUtil {
         }
     }
 
-    /**
-     * 创建临时文件写入私钥
-     * @param key 私钥内容
-     * @return 文件地址
-     */
-    public static String createTempFile(String key){
-        FileWriter writer = null;
-        String path = null;
-        try {
-            try {
-                File tempFile = File.createTempFile("key", ".txt");
-                path = tempFile.getPath();
-                writer = new FileWriter(path);
-                writer.write(key);
-                writer.flush();
-                writer.close();
-            } catch (IOException e) {
-                return null;
-            }finally {
-                if (writer != null) {
-                    writer.close();
-                }
-            }
-        }catch (IOException e){
-            return null;
-        }
-        return path;
-    }
 
-    /**
-     * 字符串写入文件
-     * @param str 字符串
-     * @param path 文件地址
-     * @throws ApplicationException 写入失败
-     */
-    public static void logWriteFile(String str, String path) throws ApplicationException {
-        try (FileWriter writer = new FileWriter(path, StandardCharsets.UTF_8,true)) {
-            writer.write(str);
-            writer.flush();
-        } catch (Exception e) {
-            throw new ApplicationException("文件写入失败。");
-        }
-    }
 
-    /**
-     * 创建目录
-     * @param address 文件地址
-     * @throws ApplicationException 文件创建失败
-     */
-    public static void createDirectory(String address) throws ApplicationException {
-        File file = new File(address);
-        if (file.exists()) {
-            return;
-        }
-        int i = 0;
-        boolean b = false;
-        if (!file.exists()) {
-            while (!b && i <= 10) {
-                b = file.mkdirs();
-                i++;
-            }
-        }
-        if (i >= 10) {
-            throw new ApplicationException("项目工作目录创建失败。");
-        }
-    }
-
-    /**
-     * 创建文件
-     * @param address 文件地址
-     * @throws ApplicationException 文件创建失败
-     */
-    public static String createFile(String address) throws ApplicationException {
-        File file = new File(address);
-        String parent = file.getParent();
-        File parentFile = new File(parent);
-        try {
-            if (!parentFile.exists()){
-                createDirectory(parent);
-            }
-            boolean newFile = file.createNewFile();
-        } catch (IOException | ApplicationException e) {
-            throw new ApplicationException("文件创建失败。");
-        }
-        return file.getAbsolutePath();
-
-    }
-
-    /**
-     * 读取文件后100行内容
-     * @param fileAddress 文件地址
-     * @return 内容
-     */
-    public static String readFile(String fileAddress,int length) throws ApplicationException {
-        if (!isNoNull(fileAddress)){
-            return null;
-        }
-
-        File file = new File(fileAddress);
-
-        if (!file.exists()){
-            return null;
-        }
-
-        Path path = Paths.get(fileAddress);
-
-        StringBuilder s = new StringBuilder();
-        List<String> lines ;
-        try {
-            lines = Files.readAllLines(path,StandardCharsets.UTF_8);
-            for (int i = Math.max(0, lines.size() - length); i < lines.size(); i++) {
-                s.append(lines.get(i)).append("\n");
-            }
-        } catch (IOException e) {
-            throw new ApplicationException("读取文件信息失败"+ e.getMessage());
-        }
-        return s.toString();
-    }
 
 }
 

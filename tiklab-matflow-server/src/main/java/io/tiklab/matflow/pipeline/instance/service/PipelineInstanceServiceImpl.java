@@ -13,8 +13,10 @@ import io.tiklab.matflow.pipeline.instance.model.PipelineInstance;
 import io.tiklab.matflow.pipeline.instance.model.PipelineInstanceQuery;
 import io.tiklab.matflow.stages.service.StageInstanceServer;
 import io.tiklab.matflow.support.authority.service.PipelineAuthorityService;
+import io.tiklab.matflow.support.util.PipelineFileUtil;
 import io.tiklab.matflow.support.util.PipelineFinal;
 import io.tiklab.matflow.support.util.PipelineUtil;
+import io.tiklab.matflow.support.util.PipelineUtilService;
 import io.tiklab.matflow.task.task.service.TasksInstanceService;
 import io.tiklab.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +45,9 @@ public class PipelineInstanceServiceImpl implements PipelineInstanceService {
 
     @Autowired
     private StageInstanceServer stageInstanceServer;
+
+    @Autowired
+    private PipelineUtilService utilService;
 
     @Autowired
     private JoinTemplate joinTemplate;
@@ -120,9 +125,9 @@ public class PipelineInstanceServiceImpl implements PipelineInstanceService {
         }
         pipelineInstanceDao.deleteInstance(instanceId);
 
-        String fileAddress = PipelineUtil.findFileAddress(instanceId,2);
+        String fileAddress = utilService.findPipelineDefaultAddress(instanceId,2);
         //删除对应日志
-        PipelineUtil.deleteFile(new File(fileAddress));
+        PipelineFileUtil.deleteFile(new File(fileAddress));
     }
 
     @Override

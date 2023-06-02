@@ -4,6 +4,7 @@ package io.tiklab.matflow.task.task.service;
 import io.tiklab.beans.BeanMapper;
 import io.tiklab.matflow.support.postprocess.model.PostprocessInstance;
 import io.tiklab.matflow.support.postprocess.service.PostprocessInstanceService;
+import io.tiklab.matflow.support.util.PipelineFileUtil;
 import io.tiklab.matflow.support.util.PipelineFinal;
 import io.tiklab.matflow.support.util.PipelineUtil;
 import io.tiklab.matflow.task.task.dao.TaskInstanceDao;
@@ -102,7 +103,7 @@ public class TasksInstanceServiceImpl implements TasksInstanceService {
             }else {
                 TaskInstance taskInstances = findPostPipelineRunMessage(taskInstanceId,false);
                 String logAddress = instance.getLogAddress();
-                String readFile = PipelineUtil.readFile(logAddress, 100);
+                String readFile = PipelineFileUtil.readFile(logAddress, 100);
                 int date = instance.getRunTime();
                 if (!Objects.isNull(taskInstances)){
                     date =  date + taskInstances.getRunTime();
@@ -151,7 +152,7 @@ public class TasksInstanceServiceImpl implements TasksInstanceService {
             if (Objects.isNull(taskInstance)){
                  taskInstance = BeanMapper.map(postInstance.get(0), TaskInstance.class);
             }
-            String readFile = PipelineUtil.readFile(taskInstance.getLogAddress(), 100);
+            String readFile = PipelineFileUtil.readFile(taskInstance.getLogAddress(), 100);
             runTime = runTime + taskInstance.getRunTime();
             runLog.append(readFile).append("\n");
             taskInstances.setRunState(taskInstance.getRunState());
@@ -198,7 +199,7 @@ public class TasksInstanceServiceImpl implements TasksInstanceService {
             }
             String time = PipelineUtil.formatDateTime(taskInstance.getRunTime());
             taskInstance.setRunTimeDate(time);
-            String readFile = PipelineUtil.readFile(taskInstance.getLogAddress(), 100);
+            String readFile = PipelineFileUtil.readFile(taskInstance.getLogAddress(), 100);
             runTime = runTime + taskInstance.getRunTime();
             taskInstance.setRunLog(readFile);
             list.add(taskInstance);
@@ -255,7 +256,7 @@ public class TasksInstanceServiceImpl implements TasksInstanceService {
             if (Objects.isNull(taskInstance)){
                 TaskInstance taskInstances = findPostPipelineRunMessage(taskInstanceId,false);
                 String logAddress = instance.getLogAddress();
-                String readFile = PipelineUtil.readFile(logAddress, 100);
+                String readFile = PipelineFileUtil.readFile(logAddress, 100);
                 int date = instance.getRunTime();
                 if (!Objects.isNull(taskInstances)){
                     readFile = readFile +"\n"+ taskInstances.getRunLog();
@@ -430,7 +431,7 @@ public class TasksInstanceServiceImpl implements TasksInstanceService {
         String runInstance = taskInstance.getRunLog();
         if (runInstance.length() > 9000){
             String logAddress = taskInstance.getLogAddress();
-            PipelineUtil.logWriteFile(runInstance,logAddress);
+            PipelineFileUtil.logWriteFile(runInstance,logAddress);
             taskInstance.setRunLog(null);
         }
         tasksExecService.setTaskOrTaskInstance(taskInstanceId, taskInstance);

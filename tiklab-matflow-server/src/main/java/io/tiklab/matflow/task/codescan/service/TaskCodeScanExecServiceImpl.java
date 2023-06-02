@@ -5,6 +5,7 @@ import io.tiklab.matflow.setting.model.Scm;
 import io.tiklab.matflow.setting.service.ScmService;
 import io.tiklab.matflow.support.condition.service.ConditionService;
 import io.tiklab.matflow.support.util.PipelineUtil;
+import io.tiklab.matflow.support.util.PipelineUtilService;
 import io.tiklab.matflow.support.variable.service.VariableService;
 import io.tiklab.matflow.task.codescan.model.TaskCodeScan;
 import io.tiklab.matflow.task.task.model.Tasks;
@@ -37,6 +38,9 @@ public class TaskCodeScanExecServiceImpl implements TaskCodeScanExecService {
     @Autowired
     private ScmService scmService;
 
+    @Autowired
+    PipelineUtilService utilService;
+
 
     @Override
     public boolean codeScan(String pipelineId, Tasks task , String taskType) {
@@ -56,7 +60,7 @@ public class TaskCodeScanExecServiceImpl implements TaskCodeScanExecService {
 
         taskCodeScan.setType(taskType);
 
-        String fileAddress = PipelineUtil.findFileAddress(pipelineId,1);
+        String fileAddress = utilService.findPipelineDefaultAddress(pipelineId,1);
 
         try {
             Process process = getOrder(taskId, taskCodeScan,fileAddress);
@@ -131,7 +135,9 @@ public class TaskCodeScanExecServiceImpl implements TaskCodeScanExecService {
         if (type.equals("sonar")){
             strings = new String[]{
                     "svn: E170000:",
-                    "invalid option;"
+                    "invalid option;",
+                    "BUILD FAILURE",
+                    "[ERROR]"
             };
             return strings;
         }

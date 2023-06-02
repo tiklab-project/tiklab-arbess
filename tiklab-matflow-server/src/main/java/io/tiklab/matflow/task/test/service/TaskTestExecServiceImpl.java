@@ -8,6 +8,7 @@ import io.tiklab.matflow.setting.service.AuthThirdService;
 import io.tiklab.matflow.setting.service.ScmService;
 import io.tiklab.matflow.support.condition.service.ConditionService;
 import io.tiklab.matflow.support.util.PipelineUtil;
+import io.tiklab.matflow.support.util.PipelineUtilService;
 import io.tiklab.matflow.support.variable.service.VariableService;
 import io.tiklab.matflow.task.task.model.Tasks;
 import io.tiklab.matflow.task.task.service.TasksInstanceService;
@@ -50,6 +51,9 @@ public class TaskTestExecServiceImpl implements TaskTestExecService {
 
     @Autowired
     private RelevanceTestOnService relevanceTestOnService;
+
+    @Autowired
+    private PipelineUtilService utilService;
 
     private static final Logger logger = LoggerFactory.getLogger(TaskTestExecServiceImpl.class);
 
@@ -194,7 +198,7 @@ public class TaskTestExecServiceImpl implements TaskTestExecService {
     private boolean execTestMaven(String taskId, TaskTest taskTest,String pipelineId,Tasks task){
         //初始化日志
         String testOrder = taskTest.getTestOrder();
-        String path = PipelineUtil.findFileAddress(pipelineId,1);
+        String path = utilService.findPipelineDefaultAddress(pipelineId,1);
         try {
             List<String> list = PipelineUtil.execOrder(testOrder);
             for (String s : list) {

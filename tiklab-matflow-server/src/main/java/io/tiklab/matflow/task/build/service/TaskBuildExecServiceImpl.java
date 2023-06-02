@@ -2,6 +2,7 @@ package io.tiklab.matflow.task.build.service;
 
 import io.tiklab.matflow.setting.model.Scm;
 import io.tiklab.matflow.setting.service.ScmService;
+import io.tiklab.matflow.support.util.PipelineUtilService;
 import io.tiklab.matflow.support.variable.service.VariableService;
 import io.tiklab.matflow.task.build.model.TaskBuild;
 import io.tiklab.matflow.task.task.model.Tasks;
@@ -36,6 +37,9 @@ public class TaskBuildExecServiceImpl implements TaskBuildExecService {
     @Autowired
     private ScmService scmService;
 
+    @Autowired
+    private PipelineUtilService utilService;
+
     // 构建
     public boolean build(String pipelineId, Tasks task , String taskType)  {
 
@@ -59,7 +63,7 @@ public class TaskBuildExecServiceImpl implements TaskBuildExecService {
         String buildOrder = taskBuild.getBuildOrder();
 
         //项目地址
-        String path = PipelineUtil.findFileAddress(pipelineId,1);
+        String path = utilService.findPipelineDefaultAddress(pipelineId,1);
         String  type = taskBuild.getType();
         try {
             //执行命令

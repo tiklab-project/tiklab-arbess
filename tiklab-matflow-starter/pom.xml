@@ -123,6 +123,12 @@
             <artifactId>tiklab-mysql-starter</artifactId>
             <version>1.0.0-SNAPSHOT</version>
         </dependency>
+        <dependency>
+            <groupId>io.tiklab</groupId>
+            <artifactId>tiklab-matflow-spring-boot-starter</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
 
 
     </dependencies>
@@ -136,13 +142,13 @@
                 <activeByDefault>true</activeByDefault>
             </activation>
             <dependencies>
-                <dependency>
-                    <groupId>io.tiklab</groupId>
-                    <artifactId>tiklab-mysql-linux</artifactId>
-                    <version>${project.version}</version>
-                    <type>zip</type>
-                    <scope>provided</scope>
-                </dependency>
+<!--                <dependency>-->
+<!--                    <groupId>io.tiklab</groupId>-->
+<!--                    <artifactId>tiklab-mysql-linux</artifactId>-->
+<!--                    <version>${project.version}</version>-->
+<!--                    <type>zip</type>-->
+<!--                    <scope>provided</scope>-->
+<!--                </dependency>-->
                 <dependency>
                     <groupId>io.tiklab</groupId>
                     <artifactId>tiklab-jdk-linux</artifactId>
@@ -197,13 +203,13 @@
         <profile>
             <id>system-windows</id>
             <dependencies>
-                <dependency>
-                    <groupId>io.tiklab</groupId>
-                    <artifactId>tiklab-mysql-windows</artifactId>
-                    <version>${project.version}</version>
-                    <type>zip</type>
-                    <scope>provided</scope>
-                </dependency>
+<!--                <dependency>-->
+<!--                    <groupId>io.tiklab</groupId>-->
+<!--                    <artifactId>tiklab-mysql-windows</artifactId>-->
+<!--                    <version>${project.version}</version>-->
+<!--                    <type>zip</type>-->
+<!--                    <scope>provided</scope>-->
+<!--                </dependency>-->
                 <dependency>
                     <groupId>io.tiklab</groupId>
                     <artifactId>tiklab-jdk-windows</artifactId>
@@ -258,13 +264,13 @@
         <profile>
             <id>system-mac</id>
             <dependencies>
-                <dependency>
-                    <groupId>io.tiklab</groupId>
-                    <artifactId>tiklab-jdk-mac</artifactId>
-                    <version>${project.version}</version>
-                    <type>zip</type>
-                    <scope>provided</scope>
-                </dependency>
+<!--                <dependency>-->
+<!--                    <groupId>io.tiklab</groupId>-->
+<!--                    <artifactId>tiklab-mysql-mac</artifactId>-->
+<!--                    <version>${project.version}</version>-->
+<!--                    <type>zip</type>-->
+<!--                    <scope>provided</scope>-->
+<!--                </dependency>-->
                 <dependency>
                     <groupId>io.tiklab</groupId>
                     <artifactId>tiklab-jdk-mac</artifactId>

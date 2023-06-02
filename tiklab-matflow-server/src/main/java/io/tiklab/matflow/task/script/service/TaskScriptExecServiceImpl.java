@@ -1,6 +1,7 @@
 package io.tiklab.matflow.task.script.service;
 
 import io.tiklab.matflow.support.util.PipelineFinal;
+import io.tiklab.matflow.support.util.PipelineUtilService;
 import io.tiklab.matflow.task.task.model.Tasks;
 import io.tiklab.matflow.task.task.service.TasksInstanceService;
 import io.tiklab.core.exception.ApplicationException;
@@ -31,6 +32,9 @@ public class TaskScriptExecServiceImpl implements TaskScriptExecService {
 
     @Autowired
     private ConditionService conditionService;
+
+    @Autowired
+    PipelineUtilService utilService;
 
     public boolean scripts(String pipelineId, Tasks task , String taskType) {
 
@@ -80,7 +84,7 @@ public class TaskScriptExecServiceImpl implements TaskScriptExecService {
             for (String s : list) {
                 String key = variableServer.replaceVariable(pipelineId, taskId, s);
                 tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+ "执行："+key );
-                String fileAddress = PipelineUtil.findFileAddress(pipelineId,1);
+                String fileAddress = utilService.findPipelineDefaultAddress(pipelineId,1);
                 Process process = PipelineUtil.process(fileAddress, key);
                 String enCode = PipelineFinal.UTF_8;
                 if (PipelineUtil.findSystemType() == 1){
