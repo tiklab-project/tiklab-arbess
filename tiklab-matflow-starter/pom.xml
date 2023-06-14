@@ -237,13 +237,13 @@
                                 </goals>
                                 <configuration>
                                     <artifactItems>
-                                        <artifactItem>
-                                            <groupId>io.tiklab</groupId>
-                                            <artifactId>tiklab-jdk-windows</artifactId>
-                                            <version>${project.version}</version>
-                                            <type>zip</type>
-                                            <outputDirectory>embbed</outputDirectory>
-                                        </artifactItem>
+<!--                                        <artifactItem>-->
+<!--                                            <groupId>io.tiklab</groupId>-->
+<!--                                            <artifactId>tiklab-jdk-windows</artifactId>-->
+<!--                                            <version>${project.version}</version>-->
+<!--                                            <type>zip</type>-->
+<!--                                            <outputDirectory>embbed</outputDirectory>-->
+<!--                                        </artifactItem>-->
                                         <artifactItem>
                                             <groupId>io.tiklab</groupId>
                                             <artifactId>tiklab-mysql-windows</artifactId>
@@ -305,13 +305,13 @@
                                             <type>zip</type>
                                             <outputDirectory>embbed</outputDirectory>
                                         </artifactItem>
-                                        <artifactItem>
-                                            <groupId>io.tiklab</groupId>
-                                            <artifactId>tiklab-mysql-mac</artifactId>
-                                            <version>${project.version}</version>
-                                            <type>zip</type>
-                                            <outputDirectory>embbed</outputDirectory>
-                                        </artifactItem>
+<!--                                        <artifactItem>-->
+<!--                                            <groupId>io.tiklab</groupId>-->
+<!--                                            <artifactId>tiklab-mysql-mac</artifactId>-->
+<!--                                            <version>${project.version}</version>-->
+<!--                                            <type>zip</type>-->
+<!--                                            <outputDirectory>embbed</outputDirectory>-->
+<!--                                        </artifactItem>-->
                                     </artifactItems>
                                 </configuration>
                             </execution>
@@ -349,6 +349,7 @@
     </profiles>
 
     <build>
+
         <plugins>
 
             <!--jar去掉配置文件-->

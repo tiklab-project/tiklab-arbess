@@ -51,7 +51,8 @@ public class TaskCodeThirdServiceImpl implements TaskCodeThirdService {
     public static Map<String, Long> userAuthThirdTime = new HashMap<>();
 
     private static final Logger logger = LoggerFactory.getLogger(TaskCodeThirdServiceImpl.class);
-    
+
+    @Override
     public String findCode(AuthThird authThird){
         String callbackUrl = authThird.getCallbackUrl().trim();
         String encode = URLEncoder.encode(callbackUrl(callbackUrl), StandardCharsets.UTF_8);
@@ -411,7 +412,9 @@ public class TaskCodeThirdServiceImpl implements TaskCodeThirdService {
         AuthThird authCode = serverServer.findOneAuthServer(authId);
         boolean token = PipelineUtil.isNoNull(authCode.getAccessToken());
         boolean refresh = PipelineUtil.isNoNull(authCode.getRefreshToken());
-        if (!token || !refresh) return null;
+        if (!token || !refresh) {
+            return null;
+        }
         logger.info("更新授权信息,授权人：" + authCode.getUsername());
         String refreshToken = findRefreshToken(authCode.getRefreshToken());
         ResponseEntity<JSONObject> forEntity;
@@ -444,6 +447,7 @@ public class TaskCodeThirdServiceImpl implements TaskCodeThirdService {
      * @param callbackUrl 回调地址
      * @return 转码后的回调地址
      */
+    @Override
     public String callbackUrl(String callbackUrl){
         boolean b = PipelineUtil.validURL(callbackUrl);
         if (!b){

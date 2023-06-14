@@ -29,7 +29,7 @@ public class ResourcesServiceImpl implements ResourcesService {
     @Autowired
     private PipelineUtilService utilService;
 
-
+    @Override
     public void instanceResources(int time){
         int month = Calendar.getInstance().get(Calendar.MONTH) + 1;
         if (time == 0){
@@ -58,6 +58,7 @@ public class ResourcesServiceImpl implements ResourcesService {
         }
     }
 
+    @Override
     public void judgeResources(){
         Resources resources = findResourcesList();
         double cacheNumber = resources.getResidueCacheNumber();
@@ -73,28 +74,32 @@ public class ResourcesServiceImpl implements ResourcesService {
         }
     }
 
+    @Override
     public String createResources(Resources resources){
         return resourcesDao.createResources(resources);
     }
 
+    @Override
     public void updateResources(Resources resources){
         resourcesDao.updateResources(resources);
     }
 
-
+    @Override
     public void deleteResources(String resourcesId){
         resourcesDao.deleteResources(resourcesId);
     }
 
+    @Override
     public Resources findOneResources(String resourcesId){
         return resourcesDao.findOneResources(resourcesId);
     }
 
+    @Override
     public List<Resources> findAllResources(){
         return resourcesDao.findAllResources();
     }
 
-
+    @Override
     public Resources findResourcesList(){
         List<Resources> allResources = resourcesDao.findAllResources();
         Resources resources = new Resources();
