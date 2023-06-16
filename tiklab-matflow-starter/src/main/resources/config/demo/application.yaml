@@ -4,22 +4,12 @@ app:
 APP_HOME: ${APP_HOME}
 application: matflow
 
-setting:
-  address: tiklab-matflow-starter/src/main/resources/settings.xml
-
 server:
-  port: 8089
-
-#jdbc:
-#  driverClassName: com.mysql.cj.jdbc.Driver
-#  url: jdbc:mysql://172.10.1.10:3306/tiklab_matflow?characterEncoding=utf8&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-#  username: root
-#  password: darth2020
+  port: 8080
 
 jdbc:
   driverClassName: org.postgresql.Driver
-#  url: jdbc:postgresql://172.10.1.10:5432/tiklab_matflow?currentSchema=tiklab_matflow&stringtype=unspecified
-  url: jdbc:postgresql://172.10.1.10:5432/tiklab_matflow?stringtype=unspecified
+  url: jdbc:postgresql://172.12.1.10:5432/tiklab_matflow?stringtype=unspecified
   username: postgres
   password: darth2020
 
@@ -69,23 +59,11 @@ message:
 
 eas:
   embbed:
-    enable: true
-#    enable: false
-#  address: http://eas.dev.tiklab.net
-#  web:
-#    address: http://eas.local.tiklab.net
+    enable: false
+  address: http://bac.eas.demo.tiklab.net
 
 base:
-  url: http://192.168.10.23:3000
-
-mysql:
-  embbed:
-    enable: false
-  database: tiklab_matflow
-
-#homes
-homes:
-  address: http://192.168.10.12:8080
+  url: http://bac.matflow.demo.tiklab.net
 
 #license
 licences:
@@ -93,7 +71,7 @@ licences:
 
 #file
 file:
-  path: http://file.dev.tiklab.net
+  path: http://file.demo.tiklab.net
 
 
 
