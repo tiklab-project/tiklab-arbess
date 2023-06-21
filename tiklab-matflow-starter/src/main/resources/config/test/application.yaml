@@ -9,7 +9,7 @@ server:
 
 jdbc:
   driverClassName: org.postgresql.Driver
-  url: jdbc:postgresql://172.11.1.10:5432/tiklab_matflow?stringtype=unspecified
+  url: jdbc:postgresql://localhost:5432/tiklab_matflow?stringtype=unspecified
   username: postgres
   password: darth2020
 
@@ -68,7 +68,7 @@ message:
 postgresql:
   embbed:
     enable: true
-  database: tiklab_eas
+  database: tiklab_matflow
 
 #homes
 homes:
