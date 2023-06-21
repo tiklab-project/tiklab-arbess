@@ -65,10 +65,10 @@ message:
   sms:
     enabled: true
 
-mysql:
+postgresql:
   embbed:
     enable: true
-  database: tiklab_matflow
+  database: tiklab_eas
 
 #homes
 homes:

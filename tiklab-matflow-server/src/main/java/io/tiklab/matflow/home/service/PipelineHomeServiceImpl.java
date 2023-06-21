@@ -188,6 +188,7 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
      * 发送短信
      * @param map 短信内容
      */
+    @Override
     public void smsMessage(Map<String,String> map) throws  ApplicationException{
 
         String rootId = map.get("rootId");

@@ -9,6 +9,7 @@ import io.tiklab.join.starter.EnableToolkit;
 import io.tiklab.licence.starter.EnableLicenceServer;
 import io.tiklab.messsage.starter.EnableMessage;
 import io.tiklab.pluginx.starter.EnablePluginServer;
+import io.tiklab.postgresql.EnablePostgresql;
 import io.tiklab.privilege.EnablePrivilegeServer;
 import io.tiklab.rpc.starter.annotation.EnableRpc;
 import io.tiklab.security.stater.EnableSecurity;
@@ -20,7 +21,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @EnableToolkit
-// @EnableMysql
+@EnablePostgresql
 @EnableDal
 //rpc
 @EnableRpc

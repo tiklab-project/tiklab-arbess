@@ -2,6 +2,7 @@ app:
   name: matflow
 
 APP_HOME: ${APP_HOME}
+
 application: matflow
 
 setting:

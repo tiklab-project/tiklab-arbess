@@ -12,16 +12,6 @@
     <name>${project.artifactId}</name>
 
     <dependencies>
-<!--        <dependency>-->
-<!--            <groupId>io.tiklab</groupId>-->
-<!--            <artifactId>tiklab-beans-spring-boot-starter</artifactId>-->
-<!--            <version>${project.version}</version>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>io.tiklab</groupId>-->
-<!--            <artifactId>tiklab-join-spring-boot-starter</artifactId>-->
-<!--            <version>${project.version}</version>-->
-<!--        </dependency>-->
         <dependency>
             <groupId>io.tiklab</groupId>
             <artifactId>tiklab-eam-spring-boot-starter</artifactId>
@@ -116,12 +106,10 @@
             <artifactId>tiklab-security-spring-boot-starter</artifactId>
             <version>${project.version}</version>
         </dependency>
-
-
         <dependency>
             <groupId>io.tiklab</groupId>
-            <artifactId>tiklab-mysql-starter</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
+            <artifactId>tiklab-postgresql-starter</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>io.tiklab</groupId>
@@ -169,6 +157,13 @@
                                 </goals>
                                 <configuration>
                                     <artifactItems>
+                                        <artifactItem>
+                                            <groupId>io.tiklab</groupId>
+                                            <artifactId>tiklab-postgresql-linux</artifactId>
+                                            <version>${project.version}</version>
+                                            <type>zip</type>
+                                            <outputDirectory>embbed</outputDirectory>
+                                        </artifactItem>
                                         <artifactItem>
                                             <groupId>io.tiklab</groupId>
                                             <artifactId>tiklab-jdk-linux</artifactId>
