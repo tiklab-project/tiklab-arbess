@@ -9,7 +9,7 @@ setting:
   address: tiklab-matflow-starter/src/main/resources/settings.xml
 
 server:
-  port: 8089
+  port: 8090
 
 #jdbc:
 #  driverClassName: com.mysql.cj.jdbc.Driver
@@ -72,12 +72,12 @@ eas:
   embbed:
     enable: true
 #    enable: false
-#  address: http://eas.dev.tiklab.net
+#  address: http://eas-ce.mastre.tiklab.net
 #  web:
-#    address: http://eas.local.tiklab.net
+#    address: http://eas-ce.local.tiklab.net
 
 base:
-  url: http://192.168.10.23:3000
+  url: http://192.168.10.5:3000
 
 mysql:
   embbed:
@@ -86,7 +86,7 @@ mysql:
 
 #homes
 homes:
-  address: http://192.168.10.12:8080
+  address: http://192.168.10.7:8080
 
 #license
 licences:
