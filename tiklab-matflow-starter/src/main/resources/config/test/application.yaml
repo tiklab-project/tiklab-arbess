@@ -9,7 +9,7 @@ server:
 
 jdbc:
   driverClassName: org.postgresql.Driver
-  url: jdbc:postgresql://localhost:5432/tiklab_matflow?stringtype=unspecified
+  url: jdbc:postgresql://localhost:5000/tiklab_matflow?stringtype=unspecified
   username: postgres
   password: darth2020
 
