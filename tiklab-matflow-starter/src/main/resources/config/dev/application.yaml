@@ -72,9 +72,9 @@ eas:
   embbed:
     enable: true
 #    enable: false
-#  address: http://eas-ce.mastre.tiklab.net
+#  address: http://192.168.10.6:8080
 #  web:
-#    address: http://eas-ce.local.tiklab.net
+#    address: http://192.168.10.5:3010
 
 base:
   url: http://192.168.10.5:3000
