@@ -69,6 +69,8 @@ postgresql:
   embbed:
     enable: true
   database: tiklab_matflow
+  server:
+    port: 5000
 
 #homes
 homes:
