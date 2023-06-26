@@ -60,7 +60,7 @@ message:
 eas:
   embbed:
     enable: false
-  address: http://bac.eas.demo.tiklab.net
+  address: http://eas-ce.demo.tiklab.net
 
 base:
   url: http://matflow-ce.demo.tiklab.net
