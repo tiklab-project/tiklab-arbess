@@ -50,7 +50,7 @@ shutdown(){
     fi
 }
 
-
+shutdown
 
 
 
