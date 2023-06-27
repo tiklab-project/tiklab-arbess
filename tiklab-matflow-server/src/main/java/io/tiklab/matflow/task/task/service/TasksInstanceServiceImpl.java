@@ -123,7 +123,7 @@ public class TasksInstanceServiceImpl implements TasksInstanceService {
         return list;
     }
 
-
+    @Override
     public TaskInstance findPostPipelineRunMessage(String id,Boolean b){
         List<PostprocessInstance> taskPostInstance;
         if (b){
@@ -156,6 +156,8 @@ public class TasksInstanceServiceImpl implements TasksInstanceService {
             runTime = runTime + taskInstance.getRunTime();
             runLog.append(readFile).append("\n");
             taskInstances.setRunState(taskInstance.getRunState());
+            taskInstances.setPostprocessId(postInstanceId);
+            taskInstances.setLogAddress(postprocessInstance.getPostAddress());
         }
         taskInstances.setRunLog(runLog.toString());
         String runState = taskInstances.getRunState();
@@ -169,6 +171,7 @@ public class TasksInstanceServiceImpl implements TasksInstanceService {
         taskInstances.setRunTimeDate(time);
         taskInstances.setRunTime(runTime);
         taskInstances.setTaskName("后置处理");
+        taskInstances.setId("post");
         return taskInstances;
     }
 
@@ -460,6 +463,7 @@ public class TasksInstanceServiceImpl implements TasksInstanceService {
     //时间线程池
     private final ExecutorService timeThreadPool = Executors.newCachedThreadPool();
 
+    @Override
     public void taskRuntime(String taskInstanceId){
         runTime.put(taskInstanceId,0);
         timeThreadPool.submit(() -> {
@@ -477,6 +481,7 @@ public class TasksInstanceServiceImpl implements TasksInstanceService {
         });
     }
 
+    @Override
     public Integer findTaskRuntime(String taskInstanceId){
         Integer integer = runTime.get(taskInstanceId);
         if (Objects.isNull(integer)){
@@ -485,6 +490,8 @@ public class TasksInstanceServiceImpl implements TasksInstanceService {
         return integer;
     }
 
+
+    @Override
     public void removeTaskRuntime(String taskInstanceId){
         runTime.remove(taskInstanceId);
     }
