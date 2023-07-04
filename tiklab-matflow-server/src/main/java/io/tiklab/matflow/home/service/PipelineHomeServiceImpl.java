@@ -13,7 +13,6 @@ import io.tiklab.message.message.service.SendMessageNoticeService;
 import io.tiklab.message.message.service.SingleSendMessageService;
 import io.tiklab.message.setting.model.MessageType;
 import io.tiklab.message.sms.modal.Sms;
-import io.tiklab.message.sms.service.SmsSignCfgService;
 import io.tiklab.rpc.annotation.Exporter;
 import io.tiklab.security.logging.model.Logging;
 import io.tiklab.security.logging.model.LoggingType;
@@ -43,8 +42,8 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
     @Autowired
     private LoggingByTemplService logService;
 
-    @Autowired
-    private SmsSignCfgService smsSignCfgService;
+    // @Autowired
+    // private SmsSignCfgService smsSignCfgService;
 
     @Autowired
     private SendMessageNoticeService dispatchNoticeService;
@@ -209,7 +208,7 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
         jsonObject.putAll(stringMap);
         sms.setTemplateParam(jsonObject);
         try {
-            smsSignCfgService.generalSms(sms);
+            // smsSignCfgService.generalSms(sms);
         } catch (Exception e) {
             throw new ApplicationException("消息发送失败:"+e.getMessage());
         }

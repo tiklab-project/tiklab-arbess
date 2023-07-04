@@ -64,9 +64,9 @@ dss:
 
 datapath: ${PROJECT_HOME}/caches
 
-message:
-  sms:
-    enabled: true
+#message:
+#  sms:
+#    enabled: true
 
 eas:
   embbed:
@@ -76,13 +76,15 @@ eas:
 #  web:
 #    address: http://192.168.10.5:3010
 
-base:
-  url: http://192.168.10.5:3000
 
-mysql:
+postgresql:
   embbed:
     enable: false
   database: tiklab_matflow
+
+
+base:
+  url: http://192.168.10.5:3000
 
 #homes
 homes:

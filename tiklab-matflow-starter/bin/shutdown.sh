@@ -1,17 +1,14 @@
 #!/bin/sh
 
 DIRS=$(dirname "$PWD")
-JAVA_HOME="/usr/local/jdk-17.0.7"
-
 JDK_VERSION=jdk-16.0.2
-
-#判断是否自定义jdk
-JAVA_HOME="/usr/local/${JDK_VERSION}"
-if [ -e "${DIRS}/embbed/${JDK_VERSION}" ]; then
-      JAVA_HOME="${DIRS}/embbed/${JDK_VERSION}"
+if [ -d "${DIRS}/embbed/${JDK_VERSION}" ]; then
+    echo "Using embedded jdk...."
+    JAVA_HOME="${DIRS}/embbed/${JDK_VERSION}"
+else
+    JAVA_HOME="/usr/local/jdk-17.0.7"
 fi
 
-#APP_MAIN=${application.main.class}
 APP_MAIN="io.tiklab.matflow.MatFlowApplication"
 
 PID=0

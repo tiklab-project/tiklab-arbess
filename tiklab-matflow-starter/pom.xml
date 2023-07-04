@@ -111,14 +111,6 @@
             <artifactId>tiklab-postgresql-starter</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>io.tiklab</groupId>
-            <artifactId>tiklab-matflow-spring-boot-starter</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
-            <scope>compile</scope>
-        </dependency>
-
-
     </dependencies>
 
     <profiles>
@@ -279,13 +271,6 @@
                                             <type>zip</type>
                                             <outputDirectory>embbed</outputDirectory>
                                         </artifactItem>
-<!--                                        <artifactItem>-->
-<!--                                            <groupId>io.tiklab</groupId>-->
-<!--                                            <artifactId>tiklab-mysql-mac</artifactId>-->
-<!--                                            <version>${project.version}</version>-->
-<!--                                            <type>zip</type>-->
-<!--                                            <outputDirectory>embbed</outputDirectory>-->
-<!--                                        </artifactItem>-->
                                     </artifactItems>
                                 </configuration>
                             </execution>
@@ -319,6 +304,14 @@
             </properties>
         </profile>
 
+        <!--demo-->
+        <profile>
+            <id>env-prd</id>
+            <properties>
+                <yaml-type>/config/prd</yaml-type>
+            </properties>
+        </profile>
+
         <!--release-->
         <profile>
             <id>env-release</id>
@@ -345,6 +338,7 @@
                         <exclude>*.xml</exclude>
                         <exclude>**/config/dev/**</exclude>
                         <exclude>**/config/test/**</exclude>
+                        <exclude>**/config/prd/**</exclude>
                     </excludes>
                 </configuration>
             </plugin>

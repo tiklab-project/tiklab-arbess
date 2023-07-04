@@ -13,15 +13,9 @@ spring:
 server:
   port: 8080
 
-#jdbc:
-#  driverClassName: com.mysql.cj.jdbc.Driver
-#  url: jdbc:mysql://172.12.1.16:3306/tiklab_matflow?characterEncoding=utf8&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-#  username: root
-#  password: darth2020
-
 jdbc:
   driverClassName: org.postgresql.Driver
-  url: jdbc:postgresql://172.13.1.13:5432/tiklab_matflow?stringtype=unspecified
+  url: jdbc:postgresql://localhost:5432/tiklab_matflow?stringtype=unspecified
   username: postgres
   password: darth2020
 
@@ -67,24 +61,24 @@ datapath: ${PROJECT_HOME}/caches
 
 eas:
   embbed:
-    enable: false
-  address: http://bac.eas.tiklab.net
+    enable: true
+  address: http://eas.tiklab.net
 
-message:
-  sms:
-    enabled: true
+postgresql:
+  embbed:
+    enable: true
+  database: tiklab_matflow
+
+#message:
+#  sms:
+#    enabled: true
 
 base:
-  url: http://bac.matflow.tiklab.net
-
-mysql:
-  embbed:
-    enable: false
-  database: tiklab_matflow
+  url: http://matflow.tiklab.net
 
 #homes
 homes:
-  address: http://192.168.10.19:8080
+  address: http://tiklab.net
 
 #license
 licences:

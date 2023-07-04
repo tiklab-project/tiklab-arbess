@@ -61,9 +61,9 @@ eas:
 base:
   url: http://matflow-ce.test.tiklab.net
 
-message:
-  sms:
-    enabled: true
+#message:
+#  sms:
+#    enabled: true
 
 postgresql:
   embbed:

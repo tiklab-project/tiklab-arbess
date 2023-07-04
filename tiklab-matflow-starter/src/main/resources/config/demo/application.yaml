@@ -53,10 +53,6 @@ dss:
 
 datapath: ${PROJECT_HOME}/caches
 
-message:
-  sms:
-    enabled: true
-
 eas:
   embbed:
     enable: false
