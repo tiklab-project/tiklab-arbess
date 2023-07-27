@@ -35,10 +35,10 @@ dcs:
   server:
     enabled: true
     mode: server
-    port: 5000
+    port: 5010
     datapath: ${DATA_HOME}/caches
   client:
-    url: 127.0.0.1:5000
+    url: 127.0.0.1:5010
     bucket: ${app.name}
 
 #dcs config
