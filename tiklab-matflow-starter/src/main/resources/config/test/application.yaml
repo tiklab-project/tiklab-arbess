@@ -33,7 +33,7 @@ dfs:
 #dcs config
 dcs:
   server:
-    enabled: false
+    enabled: true
     mode: server
     port: 5000
     datapath: ${DATA_HOME}/caches
