@@ -11,7 +11,7 @@ import java.util.List;
  */
 @ApiModel
 @Join
-@Mapper(targetAlias = "TaskMessageTypeEntity")
+@Mapper
 public class TaskMessageType {
 
     @ApiProperty(name = "id",desc = "id")

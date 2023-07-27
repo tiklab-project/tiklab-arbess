@@ -7,6 +7,11 @@ import io.tiklab.postin.annotation.ApiProperty;
 
 import java.util.List;
 
+/**
+ * @pi.model:io.tiklab.matflow.pipeline.definition.model.PipelineQuery
+ * @desc: 流水线查询模型
+ */
+
 public class PipelineQuery {
 
     @ApiProperty(name ="userId",desc = "用户")

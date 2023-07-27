@@ -18,54 +18,70 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 /**
- * 流水线实例控制器
+ * @pi.protocol: http
+ * @pi.groupName: 流水线实例控制器
  */
 @RestController
 @RequestMapping("/instance")
-@Api(name = "PipelineInstanceController",desc = "流水线实例")
 public class PipelineInstanceController {
 
     @Autowired
     PipelineInstanceService instanceService;
 
-    //删除历史
+    /**
+     * @pi.name:删除流水线执行实例
+     * @pi.path:/instance/deleteInstance
+     * @pi.method:post
+     * @pi.request-type: formdata
+     * @pi.param: name=instanceId;dataType=string;value=instanceId;
+     */
     @RequestMapping(path="/deleteInstance",method = RequestMethod.POST)
-    @ApiMethod(name = "deleteInstance",desc = "删除流水线实例")
-    @ApiParam(name = "instanceId",desc = "流水线实例id",required = true)
     public Result<Void> deleteInstance(@NotNull String instanceId){
         instanceService.deleteInstance(instanceId);
         return Result.ok();
     }
 
+    /**
+     * @pi.name:查询流水线实例
+     * @pi.path:/follow/findPipelineInstance
+     * @pi.method:post
+     * @pi.request-type:json
+     * @pi.param: model=query
+     */
     @RequestMapping(path="/findPipelineInstance",method = RequestMethod.POST)
-    @ApiMethod(name = "findPipelineInstance",desc = "查询流水线实例")
-    @ApiParam(name = "query",desc = "查询条件",required = true)
     public Result<Pagination<PipelineInstance>> findPipelineInstance(
             @RequestBody @NotNull @Valid  PipelineInstanceQuery query){
         Pagination<PipelineInstance> list =
                 instanceService.findPipelineInstance(query);
         return Result.ok(list);
     }
-    
+
+    /**
+     * @pi.name:查询用户流水线实例
+     * @pi.path:/follow/findUserInstance
+     * @pi.method:post
+     * @pi.request-type:json
+     * @pi.param: model=query
+     */
     @RequestMapping(path="/findUserInstance",method = RequestMethod.POST)
-    @ApiMethod(name = "findUserInstance",desc = "查询用户实例")
-    @ApiParam(name = "query",desc = "查询条件",required = true)
     public Result<Pagination<PipelineInstance>>  findUserInstance(
             @RequestBody @Valid @NotNull PipelineInstanceQuery query){
         Pagination<PipelineInstance> userAllInstance = instanceService.findUserInstance(query);
         return Result.ok(userAllInstance);
     }
 
-
+    /**
+     * @pi.name:查询单个流水线实例
+     * @pi.path:/instance/findOneInstance
+     * @pi.method:post
+     * @pi.request-type: formdata
+     * @pi.param: name=instanceId;dataType=string;value=instanceId;
+     */
     @RequestMapping(path="/findOneInstance",method = RequestMethod.POST)
-    @ApiMethod(name = "findOneInstance",desc = "查询用户实例")
-    @ApiParam(name = "instanceId",desc = "查询条件",required = true)
     public Result<Pagination<PipelineInstance>>  findOneInstance( @NotNull String instanceId){
         PipelineInstance lastInstance = instanceService.findOneInstance(instanceId);
         return Result.ok(lastInstance);
     }
-
-    
     
     
 

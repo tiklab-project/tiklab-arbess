@@ -1,5 +1,6 @@
-package io.tiklab.matflow;
+package io.tiklab.matflow.starter.annotation;
 
+import io.tiklab.matflow.starter.config.MatFlowAutoConfiguration;
 import org.springframework.context.annotation.Import;
 
 import java.lang.annotation.*;

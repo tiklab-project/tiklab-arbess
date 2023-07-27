@@ -14,26 +14,38 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.constraints.NotNull;
 
+/**
+ * @pi.protocol: http
+ * @pi.groupName: 流水线执行控制器
+ */
 @RestController
 @RequestMapping("/exec")
-@Api(name = "PipelineExecController",desc = "流水线执行")
 public class PipelineExecController {
 
     @Autowired
     PipelineExecService pipelineExecService;
 
-    //开始构建
+    /**
+     * @pi.name:执行流水线
+     * @pi.path:/exec/start
+     * @pi.method:post
+     * @pi.request-type: formdata
+     * @pi.param: name=pipelineId;dataType=string;value=pipelineId;
+     */
     @RequestMapping(path="/start",method = RequestMethod.POST)
-    @ApiMethod(name = "start",desc = "执行")
-    @ApiParam(name = "pipelineId",desc = "流水线id",required = true)
     public Result<PipelineInstance> start(@NotNull String pipelineId ){
         PipelineInstance start = pipelineExecService.start(pipelineId,1);
         return Result.ok(start);
     }
 
+    /**
+     * @pi.name:停止流水线执行
+     * @pi.path:/exec/stop
+     * @pi.method:post
+     * @pi.request-type: formdata
+     * @pi.param: name=pipelineId;dataType=string;value=pipelineId;
+     */
     @RequestMapping(path="/stop",method = RequestMethod.POST)
-    @ApiMethod(name = "killInstance",desc = "判断是否执行")
-    @ApiParam(name = "pipelineId",desc = "流水线id",required = true)
     public Result<Void> killInstance(@NotNull String pipelineId) {
         pipelineExecService.stop(pipelineId);
         return Result.ok();

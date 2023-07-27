@@ -5,9 +5,6 @@ import io.tiklab.core.page.Pagination;
 import io.tiklab.matflow.task.test.model.RelevanceTestOn;
 import io.tiklab.matflow.task.test.model.RelevanceTestOnQuery;
 import io.tiklab.matflow.task.test.service.RelevanceTestOnService;
-import io.tiklab.postin.annotation.Api;
-import io.tiklab.postin.annotation.ApiMethod;
-import io.tiklab.postin.annotation.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,17 +15,26 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
+/**
+ * @pi.protocol: http
+ * @pi.groupName: 流水线集成teston实例控制器
+ */
+
 @RestController
 @RequestMapping("/testOnRelevance")
-@Api(name = "RelevanceTestOnController",desc = "teston")
 public class RelevanceTestOnController {
 
     @Autowired
     private RelevanceTestOnService relevanceTestOnService;
 
+    /**
+     * @pi.name:查询流水线测试信息执行实例
+     * @pi.path:/testOnRelevance/findAllRelevance
+     * @pi.method:post
+     * @pi.request-type: formdata
+     * @pi.param: name=pipelineId;dataType=string;value=pipelineId;
+     */
     @RequestMapping(path="/findAllRelevance",method = RequestMethod.POST)
-    @ApiMethod(name = "findAllRelevance",desc = "获取所有仓库")
-    @ApiParam(name = "pipelineId",desc = "流水线id",required = true)
     public Result< List<RelevanceTestOn>> findAllRelevance(@NotNull String pipelineId){
 
         List<RelevanceTestOn> allRelevance = relevanceTestOnService.findAllRelevance(pipelineId);
@@ -36,9 +42,14 @@ public class RelevanceTestOnController {
         return Result.ok(allRelevance);
     }
 
+    /**
+     * @pi.name:条件查询流水线测试信息执行实例
+     * @pi.path:/testOnRelevance/findAllRelevancePage
+     * @pi.method:post
+     * @pi.request-type:json
+     * @pi.param: model=relevanceTestOnQuery
+     */
     @RequestMapping(path="/findAllRelevancePage",method = RequestMethod.POST)
-    @ApiMethod(name = "findAllRelevancePage",desc = "获取所有仓库")
-    @ApiParam(name = "relevanceTestOnQuery",desc = "条件",required = true)
     public Result<Pagination<RelevanceTestOn>> findAllRelevance(
             @RequestBody @Valid @NotNull RelevanceTestOnQuery relevanceTestOnQuery){
 
@@ -47,10 +58,14 @@ public class RelevanceTestOnController {
         return Result.ok(allRelevance);
     }
 
-
+    /**
+     * @pi.name:查询测试信息执行实例
+     * @pi.path:/testOnRelevance/deleteRelevance
+     * @pi.method:post
+     * @pi.request-type: formdata
+     * @pi.param: name=relevanceId;dataType=string;value=relevanceId;
+     */
     @RequestMapping(path="/deleteRelevance",method = RequestMethod.POST)
-    @ApiMethod(name = "deleteRelevance",desc = "获取所有仓库")
-    @ApiParam(name = "relevanceId",desc = "流水线id",required = true)
     public Result<Void> deleteRelevance(@NotNull String relevanceId){
 
         relevanceTestOnService.deleteRelevance(relevanceId);

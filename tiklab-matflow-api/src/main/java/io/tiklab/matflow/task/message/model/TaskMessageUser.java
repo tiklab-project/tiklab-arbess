@@ -13,7 +13,7 @@ import io.tiklab.user.user.model.User;
  */
 @ApiModel
 @Join
-@Mapper(targetAlias = "TaskMessageUserEntity")
+@Mapper
 public class TaskMessageUser {
 
     @ApiProperty(name="messageId",desc="配置id")

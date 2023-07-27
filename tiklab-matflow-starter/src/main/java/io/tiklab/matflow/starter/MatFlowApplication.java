@@ -1,6 +1,7 @@
-package io.tiklab.matflow;
+package io.tiklab.matflow.starter;
 
 import io.tiklab.core.property.PropertyAndYamlSourceFactory;
+import io.tiklab.matflow.starter.annotation.MatFlowPipeline;
 import io.tiklab.matflow.support.util.PipelineFileUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

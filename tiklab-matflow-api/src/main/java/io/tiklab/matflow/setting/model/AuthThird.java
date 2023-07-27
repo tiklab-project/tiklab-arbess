@@ -13,9 +13,14 @@ import io.tiklab.user.user.model.User;
 /**
  * 流水线第三方模型
  */
+
+/**
+ * @pi.model:io.tiklab.matflow.setting.model.AuthThird
+ * @desc:
+ */
 @ApiModel
 @Join
-@Mapper(targetAlias = "AuthThirdEntity")
+@Mapper
 public class AuthThird {
 
     @ApiProperty(name = "serverId",desc="id")

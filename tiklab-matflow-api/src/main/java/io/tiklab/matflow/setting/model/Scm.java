@@ -11,7 +11,7 @@ import io.tiklab.postin.annotation.ApiProperty;
  */
 @ApiModel
 @Join
-@Mapper(targetAlias = "ScmEntity")
+@Mapper
 public class Scm {
 
     @ApiProperty(name = "scmId",desc = "id")

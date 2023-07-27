@@ -14,49 +14,100 @@ import io.tiklab.user.user.model.User;
 import java.util.List;
 
 /**
- * 流水线模型
+ * @pi.model:io.tiklab.matflow.pipeline.definition.model.Pipeline
+ * @desc:流水线模型
  */
 
-@ApiModel
 @Join
-@Mapper(targetAlias = "PipelineEntity")
+@Mapper
 public class Pipeline {
 
-    @ApiProperty(name="id",desc="流水线id")
+    /**
+     * @pi.name:id
+     * @pi.dataType:string
+     * @pi.desc:流水线id
+     * @pi.value:11111
+     */
     private String id;
 
-    @ApiProperty(name="name",desc="流水线名称")
+    /**
+     * @pi.name:name
+     * @pi.dataType:string
+     * @pi.desc:流水线名称
+     * @pi.value:name
+     */
     private String name;
 
-    @ApiProperty(name="user",desc="用户")
+    /**
+     * @pi.model:User
+     * @pi.desc:用户
+     */
     @Mappings({
             @Mapping(source = "user.id",target = "userId")
     })
     @JoinQuery(key = "id")
     private User user;
 
-    @ApiProperty(name="createTime",desc="流水线创建时间")
+    /**
+     * @pi.name:createTime
+     * @pi.dataType:string
+     * @pi.desc:流水线创建时间
+     * @pi.value:createTime
+     */
     private String createTime;
 
-    @ApiProperty(name="type",desc="流水线类型 1.多任务 2.多阶段")
+    /**
+     * @pi.name:type
+     * @pi.dataType:Integer
+     * @pi.desc:流水线类型 1.多任务 2.多阶段
+     * @pi.value: 1
+     */
     private int type;
 
-    @ApiProperty(name="state",desc="运行状态 1.运行中 2.停止中")
+    /**
+     * @pi.name:state
+     * @pi.dataType:Integer
+     * @pi.desc:运行状态 1.运行中 2.停止中
+     * @pi.value:1
+     */
     private int state;
 
-    @ApiProperty(name="power",desc="项目作用域 1.全局 2.项目")
+    /**
+     * @pi.name:power
+     * @pi.dataType:Integer
+     * @pi.desc:项目作用域 1.全局 2.项目
+     * @pi.value:1
+     */
     private int power;
 
-    @ApiProperty(name="color",desc="颜色 1~5随机生成")
+    /**
+     * @pi.name:color
+     * @pi.dataType:Integer
+     * @pi.desc:颜色 1~5随机生成
+     * @pi.value:2
+     */
     private int color;
 
-    @ApiProperty(name="template",desc="流水线模板")
+    /**
+     * @pi.name:template
+     * @pi.dataType:string
+     * @pi.desc:流水线模板
+     * @pi.value:template
+     */
     private String template;
 
-    @ApiProperty(name="collect",desc="收藏 0.未收藏 1.收藏")
+    /**
+     * @pi.name:collect
+     * @pi.dataType:Integer
+     * @pi.desc:收藏 0.未收藏 1.收藏
+     * @pi.value:2
+     */
     private int collect;
 
-    @ApiProperty(name="userList",desc="流水线成员")
+    /**
+     * @pi.model:userList
+     * @pi.desc:流水线成员
+     */
     private List<PatchUser> userList;
 
     public Pipeline() {

@@ -16,58 +16,90 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
+/**
+ * @pi.protocol: http
+ * @pi.groupName: 流水线后置配置控制器
+ */
 @RestController
 @RequestMapping("/postprocess")
-@Api(name = "PostprocessController",desc = "流水线后置配置")
 public class PostprocessController {
 
     @Autowired
     PostprocessService postServer;
 
-    //更新信息
+    /**
+     * @pi.name:创建流水线后置配置
+     * @pi.path:/postprocess/createPost
+     * @pi.method:post
+     * @pi.request-type:json
+     * @pi.param: model=postprocess
+     */
     @RequestMapping(path="/createPost",method = RequestMethod.POST)
-    @ApiMethod(name = "createPost",desc = "创建后置配置")
-    @ApiParam(name = "postprocess",desc = "postprocess",required = true)
     public Result<String> createPost(@RequestBody @NotNull @Valid Postprocess postprocess){
         String postId = postServer.createPostTask(postprocess);
         return Result.ok(postId);
     }
 
+    /**
+     * @pi.name:更新流水线后置配置
+     * @pi.path:/postprocess/createPost
+     * @pi.method:post
+     * @pi.request-type:json
+     * @pi.param: model=postprocess
+     */
     @RequestMapping(path="/updatePost",method = RequestMethod.POST)
-    @ApiMethod(name = "updatePost",desc = "更新后置配置")
-    @ApiParam(name = "postprocess",desc = "postprocess",required = true)
     public Result<Void> updatePost(@RequestBody @NotNull @Valid Postprocess postprocess){
         postServer.updatePostTask(postprocess);
         return Result.ok();
     }
 
+    /**
+     * @pi.name:查询流水线后置配置信息
+     * @pi.path:/postprocess/findPipelinePost
+     * @pi.method:post
+     * @pi.request-type: formdata
+     * @pi.param: name=pipelineId;dataType=string;value=pipelineId;
+     */
     @RequestMapping(path="/findPipelinePost",method = RequestMethod.POST)
-    @ApiMethod(name = "findAllConfig",desc = "根据流水线id查询后置配置")
-    @ApiParam(name = "taskId",desc = "流水线id",required = true)
     public Result<List<Postprocess>> findAllPipelinePostTask(@NotNull String pipelineId) {
         List<Postprocess> list = postServer.findAllPipelinePostTask(pipelineId);
         return Result.ok(list);
     }
 
+    /**
+     * @pi.name:查询流水线任务后置配置信息
+     * @pi.path:/postprocess/findTaskPost
+     * @pi.method:post
+     * @pi.request-type: formdata
+     * @pi.param: name=pipelineId;dataType=string;value=pipelineId;
+     */
     @RequestMapping(path="/findTaskPost",method = RequestMethod.POST)
-    @ApiMethod(name = "findAllConfig",desc = "根据流水线id查询后置配置")
-    @ApiParam(name = "taskId",desc = "流水线id",required = true)
     public Result< List<Postprocess>> findAllTaskPostTask(@NotNull String taskId) {
         List<Postprocess> list = postServer.findAllTaskPostTask(taskId);
         return Result.ok(list);
     }
 
+    /**
+     * @pi.name:删除流水线任务后置配置信息
+     * @pi.path:/postprocess/deletePost
+     * @pi.method:post
+     * @pi.request-type: formdata
+     * @pi.param: name=postprocessId;dataType=string;value=postprocessId;
+     */
     @RequestMapping(path="/deletePost",method = RequestMethod.POST)
-    @ApiMethod(name = "deletePost",desc = "根据流水线id查询后置配置")
-    @ApiParam(name = "postprocessId",desc = "后置任务id",required = true)
     public Result<Void> deletePost(@NotNull String postprocessId) {
          postServer.deletePostTask(postprocessId);
         return Result.ok();
     }
 
+    /**
+     * @pi.name:查询后置配置信息
+     * @pi.path:/postprocess/findOnePost
+     * @pi.method:post
+     * @pi.request-type: formdata
+     * @pi.param: name=postprocessId;dataType=string;value=postprocessId;
+     */
     @RequestMapping(path="/findOnePost",method = RequestMethod.POST)
-    @ApiMethod(name = "findOnePostOrTask",desc = "根据流水线id查询后置配置")
-    @ApiParam(name = "postprocessId",desc = "后置任务id",required = true)
     public Result<Postprocess> findOnePostOrTask(@NotNull String postprocessId) {
         Postprocess postOrTask = postServer.findOnePostOrTask(postprocessId);
         return Result.ok(postOrTask);

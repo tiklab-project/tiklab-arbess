@@ -9,22 +9,36 @@ import io.tiklab.join.annotation.JoinQuery;
 import io.tiklab.postin.annotation.ApiModel;
 import io.tiklab.postin.annotation.ApiProperty;
 
+
 /**
- * 流水线收藏模型
+ * @pi.model:io.tiklab.matflow.pipeline.definition.model.PipelineFollow
+ * @desc:流水线收藏模型
  */
 
-@ApiModel
 @Join
-@Mapper(targetAlias = "PipelineFollowEntity")
+@Mapper
 public class PipelineFollow {
 
-    @ApiProperty(name="id",desc="日志id")
+    /**
+     * @pi.name:id
+     * @pi.dataType:string
+     * @pi.desc:日志id
+     * @pi.value:id24324234343
+     */
     private String id;
 
-    @ApiProperty(name="userId",desc="用户Id",eg="@selectOne")
+    /**
+     * @pi.name:userId
+     * @pi.dataType:string
+     * @pi.desc:用户id
+     * @pi.value:userId
+     */
     private String userId;
 
-    @ApiProperty(name="pipeline",desc="流水线",eg="@selectOne")
+    /**
+     * @pi.model:pipeline
+     * @pi.desc:流水线信息
+     */
     @Mappings({
             @Mapping(source = "pipeline.id",target = "pipelineId")
     })

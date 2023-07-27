@@ -12,7 +12,7 @@ import io.tiklab.postin.annotation.ApiProperty;
 
 @ApiModel
 @Join
-@Mapper(targetAlias = "TaskInstanceEntity")
+@Mapper
 public class TaskInstance {
 
     @ApiProperty(name="id",desc="日志id")

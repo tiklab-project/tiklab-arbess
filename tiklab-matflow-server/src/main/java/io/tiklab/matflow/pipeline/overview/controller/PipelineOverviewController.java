@@ -14,19 +14,24 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.validation.constraints.NotNull;
 
 /**
- * 流水线统计服务控制器
+ * @pi.protocol: http
+ * @pi.groupName: 流水线统计服务控制器
  */
 @RestController
 @RequestMapping("/overview")
-@Api(name = "PipelineOverviewController",desc = "流水线概况")
 public class PipelineOverviewController {
 
     @Autowired
     PipelineOverviewService overviewService;
 
+    /**
+     * @pi.name:查询流水线最近执行状态
+     * @pi.path:/overview/pipelineCensus
+     * @pi.method:post
+     * @pi.request-type: formdata
+     * @pi.param: name=pipelineId;dataType=string;value=pipelineId;
+     */
     @RequestMapping(path="/pipelineCensus",method = RequestMethod.POST)
-    @ApiMethod(name = "pipelineCensus",desc = "查询流水线最近状态")
-    @ApiParam(name = "pipelineId",desc = "流水线id",required = true)
     public Result<PipelineOverview> pipelineCensus(@NotNull String pipelineId){
 
         PipelineOverview buildStatus = overviewService.pipelineOverview(pipelineId);

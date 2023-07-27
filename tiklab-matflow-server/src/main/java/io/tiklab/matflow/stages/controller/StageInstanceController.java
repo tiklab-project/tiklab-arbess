@@ -14,15 +14,24 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
-
+/**
+ * @pi.protocol: http
+ * @pi.groupName: 流水线多阶段实例控制器
+ */
 @RestController
 @RequestMapping("/stageInstance")
-@Api(name = "StageInstanceController",desc = "阶段实例")
 public class StageInstanceController {
 
     @Autowired
     StageInstanceServer stageInstanceServer;
 
+    /**
+     * @pi.name:查询流水线多阶段运行信息
+     * @pi.path:/stageInstance/findStageInstance
+     * @pi.method:post
+     * @pi.request-type: formdata
+     * @pi.param: name=instanceId;dataType=string;value=instanceId;
+     */
     @RequestMapping(path="/findStageInstance",method = RequestMethod.POST)
     @ApiMethod(name = "findAllLog",desc = "查询日志")
     @ApiParam(name = "instanceId",desc = "流水线实例id",required = true)

@@ -10,7 +10,7 @@ import io.tiklab.postin.annotation.ApiModel;
 
 @ApiModel
 @Join
-@Mapper(targetAlias = "RelevanceTestOnEntity")
+@Mapper
 public class RelevanceTestOn {
     private String relevanceId;
 

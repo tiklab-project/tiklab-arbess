@@ -1,6 +1,5 @@
 package io.tiklab.matflow.setting.model;
 
-
 import io.tiklab.beans.annotation.Mapper;
 import io.tiklab.beans.annotation.Mapping;
 import io.tiklab.beans.annotation.Mappings;
@@ -10,44 +9,90 @@ import io.tiklab.postin.annotation.ApiModel;
 import io.tiklab.postin.annotation.ApiProperty;
 import io.tiklab.user.user.model.User;
 
+
 /**
- * 流水线基本认证模型
+ *  @pi.model: io.tiklab.matflow.setting.model.Auth
+ *  desc:流水线基本认证模型
  */
 
-@ApiModel
 @Join
-@Mapper(targetAlias = "AuthMatFlowEntity")
+@Mapper
 public class Auth {
 
-    @ApiProperty(name = "authId",desc="id")
+    /**
+     * @pi.name:authId
+     * @pi.dataType:string
+     * @pi.desc:id
+     * @pi.value:authId
+     */
     private String authId;
 
-    @ApiProperty(name = "authType",desc="类型 1.用户名密码 2.私钥")
+    /**
+     * @pi.name: authType
+     * @pi.dataType:int
+     * @pi.desc: 类型 1.用户名密码 2.私钥
+     * @pi.value: 1
+     */
     private int authType;
 
-    @ApiProperty(name = "name",desc="名称")
+    /**
+     * @pi.name:name
+     * @pi.dataType:string
+     * @pi.desc:名称
+     * @pi.value:name
+     */
     private String name;
 
-    @ApiProperty(name = "username",desc="用户名")
+    /**
+     * @pi.name:username
+     * @pi.dataType:string
+     * @pi.desc:用户名
+     * @pi.value:username
+     */
     private String username;
 
-    @ApiProperty(name = "password",desc="密码")
+    /**
+     * @pi.name:password
+     * @pi.dataType:string
+     * @pi.desc:密码
+     * @pi.value:password
+     */
     private String password;
 
-    @ApiProperty(name = "privateKey",desc="私钥")
+    /**
+     * @pi.name:privateKey
+     * @pi.dataType:string
+     * @pi.desc:私钥
+     * @pi.value:privateKey
+     */
     private String privateKey;
 
+    /**
+     * @pi.name:createTime
+     * @pi.dataType:string
+     * @pi.desc:创建时间
+     * @pi.value:createTime
+     */
     @ApiProperty(name = "createTime")
     private String createTime ;
 
+    /**
+     * @pi.model:User
+     * @pi.desc:用户信息
+     */
     @Mappings({
             @Mapping(source = "user.id",target = "userId")
     })
     @JoinQuery(key = "id")
     private User user;
 
-    @ApiProperty(name = "authPublic",desc="是否公开1.公开,2.不公开")
-    private int authPublic;
+    /**
+     * @pi.name:authPublic
+     * @pi.dataType:Integer
+     * @pi.desc:是否公开1.公开,2.不公开
+     * @pi.value:1
+     */
+    private Integer authPublic;
 
 
     public String getAuthId() {

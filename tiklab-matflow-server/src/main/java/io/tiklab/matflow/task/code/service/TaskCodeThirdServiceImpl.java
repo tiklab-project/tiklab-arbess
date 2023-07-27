@@ -165,7 +165,7 @@ public class TaskCodeThirdServiceImpl implements TaskCodeThirdService {
             if (timedOut || connectOut){
                 throw new ApplicationException(50001,"连接超时，请重新授权。");
             }
-            System.out.println(e.getMessage());
+            logger. info(e.getMessage());
             throw new RuntimeException();
         }
         JSONObject body = response.getBody();

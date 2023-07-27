@@ -14,7 +14,7 @@ import io.tiklab.postin.annotation.ApiProperty;
  */
 @ApiModel
 @Join
-@Mapper(targetAlias = "TriggerEntity")
+@Mapper
 public class Trigger {
 
     @ApiProperty(name = "triggerId",desc="id")

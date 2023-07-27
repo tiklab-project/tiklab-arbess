@@ -9,6 +9,7 @@ import io.tiklab.matflow.support.util.PipelineFinal;
 import io.tiklab.privilege.dmRole.service.DmRoleService;
 import io.tiklab.privilege.role.model.PatchUser;
 import io.tiklab.user.dmUser.model.DmUser;
+import io.tiklab.user.dmUser.model.DmUserQuery;
 import io.tiklab.user.dmUser.service.DmUserService;
 import io.tiklab.user.user.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,24 +67,38 @@ public class PipelineAuthorityServiceImpl implements PipelineAuthorityService{
 
     @Override
     public String[] findUserPipelineIdString(String userId){
-        List<DmUser> allDmUser = dmUserService.findAllDmUser();
 
-        List<String> list = new ArrayList<>();
-        if (!Objects.isNull(allDmUser)){
-            for (DmUser dmUser : allDmUser) {
-                User user = dmUser.getUser();
-                if (Objects.isNull(user)|| !Objects.equals(user.getId(),userId)){
-                    continue;
-                }
-                list.add(dmUser.getDomainId());
-            }
+        List<PipelineEntity> allPipeline1 = pipelineDao.findAllPipeline();
+        if (Objects.isNull(allPipeline1) || allPipeline1.size() == 0){
+            return new String[]{};
         }
+        List<String> list = new ArrayList<>();
+
         List<PipelineEntity> allPipeline = pipelineDao.findAllPublicPipeline();
         if (!Objects.isNull(allPipeline)){
             for (PipelineEntity pipelineEntity : allPipeline) {
                 list.add(pipelineEntity.getId());
             }
         }
+        if (allPipeline1.size() == allPipeline.size()){
+            return list.toArray(new String[0]);
+        }
+
+        DmUserQuery dmUserQuery = new DmUserQuery();
+        dmUserQuery.setUserId(userId);
+        List<DmUser> allDmUser = dmUserService.findDmUserList(dmUserQuery);
+        if (Objects.isNull(allDmUser) || allDmUser.size() == 0){
+            return list.toArray(new String[0]);
+        }
+
+        for (DmUser dmUser : allDmUser) {
+            User user = dmUser.getUser();
+            if (Objects.isNull(user)){
+                continue;
+            }
+            list.add(dmUser.getDomainId());
+        }
+
         return list.toArray(new String[0]);
     }
 
@@ -93,21 +108,25 @@ public class PipelineAuthorityServiceImpl implements PipelineAuthorityService{
      * @param pipelineId 流水线id
      * @return 用户信息
      */
+    @Override
     public List<User> findPipelineUser(String pipelineId) {
-        List<DmUser> allDmUser = dmUserService.findAllDmUser();
-        List<User> userList = new ArrayList<>();
+
+        DmUserQuery dmUserQuery = new DmUserQuery();
+        dmUserQuery.setDomainId(pipelineId);
+        List<DmUser> allDmUser =  dmUserService.findDmUserList(dmUserQuery);
         if (allDmUser == null){
             return null;
         }
+
+        List<User> userList = new ArrayList<>();
         for (DmUser dmUser : allDmUser) {
-            if (dmUser.getDomainId().equals(pipelineId)){
-                userList.add(dmUser.getUser());
-            }
+            userList.add(dmUser.getUser());
         }
         return userList;
     }
 
 
+    @Override
     public List<Pipeline> findUserPipeline(String userId) {
         String[] idString = findUserPipelineIdString(userId);
         List<PipelineEntity> pipelineEntities = pipelineDao.findUserPipeline(idString);

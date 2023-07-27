@@ -7,7 +7,7 @@ import io.tiklab.postin.annotation.ApiProperty;
 
 @ApiModel
 @Join
-@Mapper(targetAlias = "ResourcesEntity")
+@Mapper
 public class Resources {
 
     @ApiProperty(name = "id" ,desc="id")

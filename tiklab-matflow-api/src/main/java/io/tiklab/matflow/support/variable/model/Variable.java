@@ -11,7 +11,7 @@ import java.util.List;
  */
 @ApiModel
 @Join
-@Mapper(targetAlias = "VariableEntity")
+@Mapper
 public class Variable {
 
 

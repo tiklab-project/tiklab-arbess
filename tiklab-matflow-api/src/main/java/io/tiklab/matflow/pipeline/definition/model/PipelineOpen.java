@@ -11,33 +11,61 @@ import io.tiklab.postin.annotation.ApiModel;
 import io.tiklab.postin.annotation.ApiProperty;
 
 /**
- * 流水线最近打开模型
+ * @pi.model:io.tiklab.matflow.pipeline.definition.model.PipelineOpen
+ * @desc:流水线最近打开模型
  */
-@ApiModel
+
 @Join
-@Mapper(targetAlias = "PipelineOpenEntity")
+@Mapper
 public class PipelineOpen {
 
-    @ApiProperty(name="openId",desc="日志id")
+    /**
+     * @pi.name:openId
+     * @pi.dataType:string
+     * @pi.desc:id
+     * @pi.value:openId
+     */
     private String openId;
 
-    @ApiProperty(name="userId",desc="用户",eg="@selectOne")
+    /**
+     * @pi.name:userId
+     * @pi.dataType:string
+     * @pi.desc:用户id
+     * @pi.value:userId
+     */
     private String userId;
 
-    @ApiProperty(name="pipeline",desc="流水线id",eg="@selectOne")
+
+    /**
+     * @pi.model:pipeline
+     * @pi.desc:流水线id
+     */
     @Mappings({
             @Mapping(source = "pipeline.id",target = "pipelineId")
     })
     @JoinQuery(key = "id")
     private Pipeline pipeline;
 
-    @ApiProperty(name="number",desc="打开次数")
+    /**
+     * @pi.name:number
+     * @pi.dataType:Integer
+     * @pi.desc:数量
+     * @pi.value:2
+     */
     private int number;
 
-    @ApiProperty(name="createTime",desc="创建时间")
+    /**
+     * @pi.name:createTime
+     * @pi.dataType:string
+     * @pi.desc:创建时间
+     * @pi.value:createTime
+     */
     private String createTime;
 
-    @ApiProperty(name="pipelineOverview",desc="流水线执行统计信息")
+    /**
+     * @pi.model:pipelineOverview
+     * @pi.desc:流水线执行统计信息
+     */
     private PipelineOverview pipelineOverview;
 
 

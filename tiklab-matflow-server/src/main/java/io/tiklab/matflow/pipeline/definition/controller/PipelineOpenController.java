@@ -14,17 +14,25 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
+/**
+ * @pi.protocol: http
+ * @pi.groupName: PipelineOpen
+ */
 @RestController
 @RequestMapping("/open")
-@Api(name = "PipelineController",desc = "流水线")
 public class PipelineOpenController {
 
     @Autowired
     PipelineOpenService openService;
 
+    /**
+     * @pi.name:findAllOpen
+     * @pi.path:/open/findAllOpen
+     * @pi.method:post
+     * @pi.request-type: formdata;
+     * @pi.param: name=number;dataType=int;value=5;
+     */
     @RequestMapping(path="/findAllOpen",method = RequestMethod.POST)
-    @ApiMethod(name = "findAllOpen",desc = "查询流水线最近状态")
-    @ApiParam(name = "number",desc = "数量",required = true)
     public Result<List<PipelineOpen>> findAllOpen(@NotNull int number){
 
         List<PipelineOpen> openList = openService.findUserAllOpen(number);
@@ -32,6 +40,13 @@ public class PipelineOpenController {
         return Result.ok(openList);
     }
 
+    /**
+     * @pi.name:updateOpen
+     * @pi.path:/open/updateOpen
+     * @pi.method:post
+     * @pi.request-type: formdata;
+     * @pi.param: name=pipelineId;dataType=string;value=pipelineId;
+     */
     @RequestMapping(path="/updateOpen",method = RequestMethod.POST)
     @ApiMethod(name = "updatePipelineOpen",desc = "查询流水线最近状态")
     @ApiParam(name = "pipelineId",desc = "流水线id",required = true)

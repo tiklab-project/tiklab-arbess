@@ -80,12 +80,6 @@
 
         <dependency>
             <groupId>io.tiklab</groupId>
-            <artifactId>tiklab-integration-spring-boot-starter</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
-        </dependency>
-
-        <dependency>
-            <groupId>io.tiklab</groupId>
             <artifactId>tiklab-dsm-spring-boot-starter</artifactId>
             <version>1.0.0-SNAPSHOT</version>
         </dependency>
@@ -210,13 +204,6 @@
                                 </goals>
                                 <configuration>
                                     <artifactItems>
-<!--                                        <artifactItem>-->
-<!--                                            <groupId>io.tiklab</groupId>-->
-<!--                                            <artifactId>tiklab-jdk-windows</artifactId>-->
-<!--                                            <version>${project.version}</version>-->
-<!--                                            <type>zip</type>-->
-<!--                                            <outputDirectory>embbed</outputDirectory>-->
-<!--                                        </artifactItem>-->
                                         <artifactItem>
                                             <groupId>io.tiklab</groupId>
                                             <artifactId>tiklab-mysql-windows</artifactId>
@@ -326,7 +313,6 @@
     <build>
 
         <plugins>
-
             <!--jar去掉配置文件-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

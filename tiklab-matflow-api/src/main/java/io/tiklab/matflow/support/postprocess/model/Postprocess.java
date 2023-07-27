@@ -10,7 +10,7 @@ import io.tiklab.postin.annotation.ApiProperty;
  */
 @ApiModel
 @Join
-@Mapper(targetAlias = "PostprocessEntity")
+@Mapper
 public class Postprocess {
 
     @ApiProperty(name = "postprocessId",desc="id")

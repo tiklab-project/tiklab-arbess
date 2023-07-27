@@ -2,7 +2,7 @@ package io.tiklab.matflow.setting.dao;
 
 import io.tiklab.dal.jpa.JpaTemplate;
 import io.tiklab.eam.common.context.LoginContext;
-import io.tiklab.matflow.setting.entity.AuthMatFlowEntity;
+import io.tiklab.matflow.setting.entity.AuthEntity;
 import io.tiklab.matflow.support.util.PipelineUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -20,13 +20,13 @@ public class AuthDao {
 
     /**
      * 基本认证
-     * @param authMatFlowEntity 基本认证
+     * @param authEntity 基本认证
      * @return 基本认证id
      */
-    public  String createAuth(AuthMatFlowEntity authMatFlowEntity){
-        authMatFlowEntity.setCreateTime(PipelineUtil.date(1));
-        authMatFlowEntity.setUserId(LoginContext.getLoginId());
-        return jpaTemplate.save(authMatFlowEntity, String.class);
+    public  String createAuth(AuthEntity authEntity){
+        authEntity.setCreateTime(PipelineUtil.date(1));
+        authEntity.setUserId(LoginContext.getLoginId());
+        return jpaTemplate.save(authEntity, String.class);
     }
 
     /**
@@ -34,15 +34,15 @@ public class AuthDao {
      * @param authId 基本认证id
      */
     public  void deleteAuth(String authId){
-        jpaTemplate.delete(AuthMatFlowEntity.class, authId);
+        jpaTemplate.delete(AuthEntity.class, authId);
     }
 
     /**
      * 更新基本认证
-     * @param authMatFlowEntity 更新信息
+     * @param authEntity 更新信息
      */
-    public  void updateAuth(AuthMatFlowEntity authMatFlowEntity){
-        jpaTemplate.update(authMatFlowEntity);
+    public  void updateAuth(AuthEntity authEntity){
+        jpaTemplate.update(authEntity);
     }
 
     /**
@@ -50,21 +50,21 @@ public class AuthDao {
      * @param authId 基本认证id
      * @return 基本认证信息
      */
-    public AuthMatFlowEntity findOneAuth(String authId){
-        return jpaTemplate.findOne(AuthMatFlowEntity.class,authId);
+    public AuthEntity findOneAuth(String authId){
+        return jpaTemplate.findOne(AuthEntity.class,authId);
     }
 
     /**
      * 查询所有基本认证
      * @return 基本认证集合
      */
-    public List<AuthMatFlowEntity> findAllAuth(){
-        return jpaTemplate.findAll(AuthMatFlowEntity.class);
+    public List<AuthEntity> findAllAuth(){
+        return jpaTemplate.findAll(AuthEntity.class);
     }
 
 
-    public List<AuthMatFlowEntity> findAllAuthList(List<String> idList){
-        return jpaTemplate.findList(AuthMatFlowEntity.class,idList);
+    public List<AuthEntity> findAllAuthList(List<String> idList){
+        return jpaTemplate.findList(AuthEntity.class,idList);
     }
     
 }

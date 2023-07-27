@@ -3,9 +3,6 @@ package io.tiklab.matflow.setting.controller;
 import io.tiklab.matflow.setting.model.AuthHost;
 import io.tiklab.matflow.setting.service.AuthHostService;
 import io.tiklab.core.Result;
-import io.tiklab.postin.annotation.Api;
-import io.tiklab.postin.annotation.ApiMethod;
-import io.tiklab.postin.annotation.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,54 +13,78 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
+
+/**
+ * @pi.protocol: http
+ * @pi.groupName: 流水线主机认证控制器
+ */
 @RestController
 @RequestMapping("/authHost")
-@Api(name = "AuthHostController",desc = "主机认证")
 public class AuthHostController {
 
     @Autowired
     AuthHostService authHost;
 
-    //创建
+    /**
+     * @pi.name:创建流水线主机认证信息
+     * @pi.path:/authHost/createAuthHost
+     * @pi.method:post
+     * @pi.request-type:json
+     * @pi.param: model=authHost
+     */
     @RequestMapping(path="/createAuthHost",method = RequestMethod.POST)
-    @ApiMethod(name = "createPipelineAuthHost",desc = "创建")
-    @ApiParam(name = "authHost",desc = "配置信息",required = true)
     public Result<String> createPipelineAuthHost(@RequestBody @Valid AuthHost authHost) {
         String pipelineAuthHostId = this.authHost.createAuthHost(authHost);
         return Result.ok(pipelineAuthHostId);
     }
 
-    //删除
+    /**
+     * @pi.name:删除主机认证信息
+     * @pi.path:/authHost/deleteAuthHost
+     * @pi.method:post
+     * @pi.request-type: formdata
+     * @pi.param: name=hostId;dataType=string;value=hostId;
+     */
     @RequestMapping(path="/deleteAuthHost",method = RequestMethod.POST)
-    @ApiMethod(name = "deletePipelineAuthHost",desc = "删除")
-    @ApiParam(name = "hostId",desc = "配置id",required = true)
     public Result<Void> deletePipelineAuthHost(@NotNull @Valid String hostId) {
         authHost.deleteAuthHost(hostId);
         return Result.ok();
     }
 
-    //更新
+    /**
+     * @pi.name:更新主机认证信息
+     * @pi.path:/authHost/updateAuthHost
+     * @pi.method:post
+     * @pi.request-type: json
+     * @pi.param: model=authHost
+     */
     @RequestMapping(path="/updateAuthHost",method = RequestMethod.POST)
-    @ApiMethod(name = "updatePipelineAuthHost",desc = "更新")
-    @ApiParam(name = "authHost",desc = "配置信息",required = true)
     public Result<Void> updatePipelineAuthHost(@RequestBody @NotNull @Valid AuthHost authHost) {
         this.authHost.updateAuthHost(authHost);
         return Result.ok();
     }
 
-    //查询
+    /**
+     * @pi.name:查询单个主机认证信息
+     * @pi.path:/authHost/findAuthHost
+     * @pi.method:post
+     * @pi.request-type:formdata
+     * @pi.param: name=hostId;dataType=string;value=hostId;
+     */
     @RequestMapping(path="/findAuthHost",method = RequestMethod.POST)
-    @ApiMethod(name = "findPipelineAuthHost",desc = "查询")
-    @ApiParam(name = "hostId",desc = "配置id",required = true)
     public Result<AuthHost> findPipelineAuthHost(@NotNull @Valid String hostId) {
         AuthHost authHost = this.authHost.findOneAuthHost(hostId);
         return Result.ok(authHost);
     }
 
-    //查询所有
+    /**
+     * @pi.name:查询所有主机认证信息
+     * @pi.path:/auth/findAllAuthHostList
+     * @pi.method:post
+     * @pi.request-type:formdata
+     * @pi.param:name=type;dataType=string;value=aliyun;
+     */
     @RequestMapping(path="/findAllAuthHostList",method = RequestMethod.POST)
-    @ApiMethod(name = "findAllAuthHostList",desc = "查询所有")
-    @ApiParam(name = "type",desc = "类型",required = true)
     public Result<List<AuthHost>> findAllAuthHostList(@NotNull String type) {
         List<AuthHost> allAuthHost = authHost.findAllAuthHostList(type);
         return Result.ok(allAuthHost);

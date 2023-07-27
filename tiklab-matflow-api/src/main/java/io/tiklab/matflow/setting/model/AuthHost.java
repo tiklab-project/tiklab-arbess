@@ -1,6 +1,5 @@
 package io.tiklab.matflow.setting.model;
 
-
 import io.tiklab.beans.annotation.Mapper;
 import io.tiklab.beans.annotation.Mapping;
 import io.tiklab.beans.annotation.Mappings;
@@ -11,50 +10,109 @@ import io.tiklab.postin.annotation.ApiProperty;
 import io.tiklab.user.user.model.User;
 
 /**
- * 流水线主机认证模型
+ * @pi.model: io.tiklab.matflow.setting.model.AuthHost
+ * desc:流水线主机认证模型
  */
-@ApiModel
 @Join
-@Mapper(targetAlias = "AuthHostEntity")
+@Mapper
 public class AuthHost {
 
-    @ApiProperty(name = "hostId",desc="id")
+    /**
+     * @pi.name:hostId
+     * @pi.dataType:string
+     * @pi.desc:id
+     * @pi.value:hostId
+     */
     private String hostId;
 
-    @ApiProperty(name = "type",desc="类型 common 普通  aliyun  阿里云； tencent. 腾讯云" )
+    /**
+     * @pi.name:type
+     * @pi.dataType:string
+     * @pi.desc:类型 common 普通  aliyun  阿里云； tencent. 腾讯云
+     * @pi.value:aliyun
+     */
     private String type;
 
-    @ApiProperty(name = "authType",desc="认证类型 1.用户名密码 2. 通用认证")
-    private int authType;
+    /**
+     * @pi.name:authType
+     * @pi.dataType:Integer
+     * @pi.desc:认证类型 1.用户名密码 2. 通用认证
+     * @pi.value: 1
+     */
+    private Integer authType;
 
-    @ApiProperty(name = "name",desc="名称")
+    /**
+     * @pi.name:name
+     * @pi.dataType:string
+     * @pi.desc:名称
+     * @pi.value:name
+     */
     private String name;
 
-    @ApiProperty(name = "ip",desc="ip地址")
+    /**
+     * @pi.name:ip
+     * @pi.dataType:string
+     * @pi.desc:ip地址
+     * @pi.value:ip
+     */
     private String ip;
 
-    @ApiProperty(name = "port",desc="端口号")
-    private int port;
+    /**
+     * @pi.name:port
+     * @pi.dataType:Integer
+     * @pi.desc:端口号
+     * @pi.value:8080
+     */
+    private Integer port;
 
-    @ApiProperty(name = "create_time")
+    /**
+     * @pi.name:createTime
+     * @pi.dataType:string
+     * @pi.desc:创建时间
+     * @pi.value:createTime
+     */
     private String createTime;
 
-    @ApiProperty(name = "username",desc="用户名")
+    /**
+     * @pi.name:username
+     * @pi.dataType:string
+     * @pi.desc:用户名
+     * @pi.value:username
+     */
     private String username;
 
-    @ApiProperty(name = "password",desc="密码")
+    /**
+     * @pi.name:password
+     * @pi.dataType:string
+     * @pi.desc:密码
+     * @pi.value:password
+     */
     private String password;
 
-    @ApiProperty(name = "privateKey",desc="私钥")
+    /**
+     * @pi.name:privateKey
+     * @pi.dataType:string
+     * @pi.desc:私钥
+     * @pi.value:privateKey
+     */
     private String privateKey;
 
+    /**
+     * @pi.model:user
+     * @pi.desc:创建人
+     */
     @Mappings({
             @Mapping(source = "user.id",target = "userId")
     })
     @JoinQuery(key = "id")
     private User user;
 
-    @ApiProperty(name = "authPublic",desc="是否公开")
+    /**
+     * @pi.name:authPublic
+     * @pi.dataType:Integer
+     * @pi.desc:是否公开 1.公开 3.不公开
+     * @pi.value:1
+     */
     private int authPublic;
 
     public String getHostId() {

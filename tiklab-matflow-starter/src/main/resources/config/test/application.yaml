@@ -14,9 +14,9 @@ jdbc:
   password: darth2020
 
 #plugin config
-PROJECT_HOME: ${user.home}/pipeline/${app.name}
+DATE_HOME: ${user.home}/pipeline/${app.name}
 plugin:
-  path: ${PROJECT_HOME}/plugin
+  path: ${DATE_HOME}/plugin
 
 #dfs config
 dfs:
@@ -24,7 +24,7 @@ dfs:
     enabled: false
     mode: server
     port: 4000
-    datapath: ${PROJECT_HOME}/files
+    datapath: ${DATE_HOME}/files
   client:
     url: 127.0.0.1:4000
     bucket: ${app.name}
@@ -35,7 +35,7 @@ dcs:
     enabled: false
     mode: server
     port: 5000
-    datapath: ${PROJECT_HOME}/caches
+    datapath: ${DATE_HOME}/caches
   client:
     url: 127.0.0.1:5000
     bucket: ${app.name}
@@ -46,12 +46,12 @@ dss:
     enabled: false
     mode: server
     port: 6000
-    datapath: ${PROJECT_HOME}/index
+    datapath: ${DATE_HOME}/index
   client:
     url: 127.0.0.1:6000
     bucket: ${app.name}
 
-datapath: ${PROJECT_HOME}/caches
+datapath: ${DATE_HOME}/caches
 
 eas:
   embbed:
@@ -61,16 +61,15 @@ eas:
 base:
   url: http://matflow-ce.test.tiklab.net
 
-#message:
-#  sms:
-#    enabled: true
-
 postgresql:
   embbed:
     enable: true
   database: tiklab_matflow
-  server:
-    port: 5000
+  db:
+    port: 5432
+    username: postgres
+    password: darth2020
+    address: ${DATE_HOME}
 
 #homes
 homes:

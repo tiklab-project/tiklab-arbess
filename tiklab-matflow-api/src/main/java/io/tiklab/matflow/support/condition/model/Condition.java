@@ -9,7 +9,7 @@ import io.tiklab.postin.annotation.ApiProperty;
  */
 @ApiModel
 @Join
-@Mapper(targetAlias = "ConditionEntity")
+@Mapper
 public class Condition {
 
     @ApiProperty(name="condId",desc="条件id")

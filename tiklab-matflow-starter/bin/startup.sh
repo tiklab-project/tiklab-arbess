@@ -3,14 +3,12 @@
 DIRS=$(dirname "$PWD")
 
 APP_MAIN="io.tiklab.matflow.MatFlowApplication"
-JAVA_HOME="/usr/local/jdk-17.0.7"
-
 JDK_VERSION=jdk-16.0.2
-
-#判断是否自定义jdk
-JAVA_HOME="/usr/local/${JDK_VERSION}"
-if [ -e "${DIRS}/embbed/${JDK_VERSION}" ]; then
-      JAVA_HOME="${DIRS}/embbed/${JDK_VERSION}"
+if [ -d "${DIRS}/embbed/${JDK_VERSION}" ]; then
+    echo "使用内嵌jdk"
+    JAVA_HOME="${DIRS}/embbed/${JDK_VERSION}"
+else
+    JAVA_HOME="/usr/local/jdk-17.0.7"
 fi
 
 find ${DIRS}/ -name '*.sh' | xargs dos2unix;

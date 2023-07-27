@@ -19,7 +19,7 @@ import java.util.List;
 
 @ApiModel
 @Join
-@Mapper(targetAlias = "PipelineInstanceEntity")
+@Mapper
 public class PipelineInstance {
 
     @ApiProperty(name="instanceId",desc="构建实例id")

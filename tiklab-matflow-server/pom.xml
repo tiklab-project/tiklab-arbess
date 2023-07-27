@@ -14,8 +14,8 @@
     <dependencies>
         <!--common-->
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -87,7 +87,6 @@
             <version>2.3.2</version>
         </dependency>
 
-
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context-support</artifactId>
@@ -123,8 +122,14 @@
             <version>1.0.0-SNAPSHOT</version>
         </dependency>
 
+        <dependency>
+            <groupId>io.tiklab</groupId>
+            <artifactId>tiklab-postin-doclet</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+        </dependency>
 
     </dependencies>
+
     <build>
         <plugins>
             <plugin>
@@ -139,6 +144,33 @@
                     </execution>
                 </executions>
             </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.0.0</version>
+                <executions>
+                    <execution>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <mainClass>io.tiklab.postin.doclet.starter.DocletApplication</mainClass>
+                    <arguments>
+                        <!-- modules-->
+                        <argument>D:\tiklab\tiklab-matflow\tiklab-matflow-api;${project.basedir}</argument>
+                        <!-- workspaceId-->
+<!--                        <argument>73c78f9e2b1c</argument>-->
+                        <argument>dac459d5dc86</argument>
+                        <!-- server-->
+                        <argument>http://192.168.10.3:8090</argument>
+                    </arguments>
+                </configuration>
+            </plugin>
+
         </plugins>
     </build>
 

@@ -14,7 +14,7 @@ import java.util.List;
  */
 @ApiModel
 @Join
-@Mapper(targetAlias = "StageEntity")
+@Mapper
 public class Stage {
 
     @ApiProperty(name = "stageId",desc="id")

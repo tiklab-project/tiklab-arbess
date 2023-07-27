@@ -1,31 +1,32 @@
 app:
-  name: matflow
+  name: tiklab-matflow
 
 APP_HOME: ${APP_HOME}
-
 application: matflow
 
-setting:
-  address: tiklab-matflow-starter/src/main/resources/settings.xml
+spring:
+  config:
+    import: optional:classpath:/config/${env:dev}/application.yaml
+  main:
+    allow-bean-definition-overriding: true
 
 server:
-  port: 8090
+  port: 8080
 
 #jdbc:
 #  driverClassName: com.mysql.cj.jdbc.Driver
-#  url: jdbc:mysql://172.10.1.10:3306/tiklab_matflow?characterEncoding=utf8&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+#  url: jdbc:mysql://172.12.1.16:3306/tiklab_matflow?characterEncoding=utf8&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
 #  username: root
 #  password: darth2020
 
 jdbc:
   driverClassName: org.postgresql.Driver
-#  url: jdbc:postgresql://172.10.1.10:5432/tiklab_matflow?currentSchema=tiklab_matflow&stringtype=unspecified
-  url: jdbc:postgresql://172.10.1.10:5432/tiklab_matflow?stringtype=unspecified
+  url: jdbc:postgresql://172.13.1.13:5432/tiklab_matflow?stringtype=unspecified
   username: postgres
   password: darth2020
 
 #plugin config
-PROJECT_HOME: ${user.home}/matflow/${app.name}
+PROJECT_HOME: ${user.home}/pipeline/${app.name}
 plugin:
   path: ${PROJECT_HOME}/plugin
 
@@ -43,12 +44,12 @@ dfs:
 #dcs config
 dcs:
   server:
-    enabled: true
+    enabled: false
     mode: server
-    port: 5010
+    port: 5000
     datapath: ${PROJECT_HOME}/caches
   client:
-    url: 127.0.0.1:5010
+    url: 127.0.0.1:5000
     bucket: ${app.name}
 
 #dcs config
@@ -64,31 +65,21 @@ dss:
 
 datapath: ${PROJECT_HOME}/caches
 
+eas:
+  embbed:
+    enable: false
+  address: http://bac.eas.tiklab.net
+
 #message:
 #  sms:
 #    enabled: true
 
-eas:
-  embbed:
-    enable: true
-#    enable: false
-#  address: http://192.168.10.6:8080
-#  web:
-#    address: http://192.168.10.5:3010
-
-
-postgresql:
-  embbed:
-    enable: false
-  database: tiklab_matflow
-
-
 base:
-  url: http://192.168.10.5:3000
+  url: http://bac.matflow.tiklab.net
 
 #homes
 homes:
-  address: http://192.168.10.7:8080
+  address: http://192.168.10.19:8080
 
 #license
 licences:
@@ -96,8 +87,7 @@ licences:
 
 #file
 file:
-  path: http://file.dev.tiklab.net
-
+  path: http://file.tiklab.net
 
 
 

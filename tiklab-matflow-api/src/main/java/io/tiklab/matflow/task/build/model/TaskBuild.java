@@ -10,7 +10,7 @@ import io.tiklab.postin.annotation.ApiProperty;
  */
 @ApiModel
 @Join
-@Mapper(targetAlias = "TaskBuildEntity")
+@Mapper
 public class TaskBuild {
 
     @ApiProperty(name = "taskId",desc = "id")
