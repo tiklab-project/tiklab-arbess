@@ -14,9 +14,10 @@ jdbc:
   password: darth2020
 
 #plugin config
-DATE_HOME: ${user.home}/pipeline/${app.name}
+DATA_HOME: /opt/tiklab/${app.name}
+
 plugin:
-  path: ${DATE_HOME}/plugin
+  path: ${DATA_HOME}/plugin
 
 #dfs config
 dfs:
@@ -24,7 +25,7 @@ dfs:
     enabled: false
     mode: server
     port: 4000
-    datapath: ${DATE_HOME}/files
+    datapath: ${DATA_HOME}/files
   client:
     url: 127.0.0.1:4000
     bucket: ${app.name}
@@ -35,7 +36,7 @@ dcs:
     enabled: false
     mode: server
     port: 5000
-    datapath: ${DATE_HOME}/caches
+    datapath: ${DATA_HOME}/caches
   client:
     url: 127.0.0.1:5000
     bucket: ${app.name}
@@ -46,12 +47,12 @@ dss:
     enabled: false
     mode: server
     port: 6000
-    datapath: ${DATE_HOME}/index
+    datapath: ${DATA_HOME}/index
   client:
     url: 127.0.0.1:6000
     bucket: ${app.name}
 
-datapath: ${DATE_HOME}/caches
+datapath: ${DATA_HOME}/caches
 
 eas:
   embbed:
@@ -69,7 +70,7 @@ postgresql:
     port: 5000
     username: postgres
     password: darth2020
-    address: /opt
+    address: ${DATA_HOME}/postgresql
 
 #homes
 homes:
