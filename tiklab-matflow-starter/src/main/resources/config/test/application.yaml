@@ -66,10 +66,10 @@ postgresql:
     enable: true
   database: tiklab_matflow
   db:
-    port: 5432
+    port: 5000
     username: postgres
     password: darth2020
-    address: ${DATE_HOME}
+    address: /opt
 
 #homes
 homes:
