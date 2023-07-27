@@ -2,7 +2,7 @@
 #-------------------------------------------------------------------------------------------------------------
 DIRS=$(dirname "$PWD")
 
-APP_MAIN="io.tiklab.matflow.MatFlowApplication"
+APP_MAIN="io.tiklab.matflow.starter.MatFlowApplication"
 JDK_VERSION=jdk-16.0.2
 if [ -d "${DIRS}/embbed/${JDK_VERSION}" ]; then
     echo "使用内嵌jdk"

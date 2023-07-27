@@ -9,7 +9,7 @@ else
     JAVA_HOME="/usr/local/jdk-17.0.7"
 fi
 
-APP_MAIN="io.tiklab.matflow.MatFlowApplication"
+APP_MAIN="io.tiklab.matflow.starter.MatFlowApplication"
 
 PID=0
 
