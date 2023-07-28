@@ -9,7 +9,7 @@ server:
 
 jdbc:
   driverClassName: org.postgresql.Driver
-  url: jdbc:postgresql://localhost:5000/tiklab_matflow?stringtype=unspecified
+  url: jdbc:postgresql://localhost:5000/matflow?stringtype=unspecified
   username: postgres
   password: darth2020
 
@@ -34,12 +34,13 @@ dfs:
 dcs:
   server:
     enabled: true
-    mode: server
-    port: 5010
+    port: 5020
     datapath: ${DATA_HOME}/caches
   client:
-    url: 127.0.0.1:5010
-    bucket: ${app.name}
+    url: 127.0.0.1:5020
+    group: g1
+    database: dcs1
+    expire: 7200
 
 #dcs config
 dss:
@@ -65,7 +66,7 @@ base:
 postgresql:
   embbed:
     enable: true
-  database: tiklab_matflow
+  database: matflow
   db:
     port: 5000
     username: postgres

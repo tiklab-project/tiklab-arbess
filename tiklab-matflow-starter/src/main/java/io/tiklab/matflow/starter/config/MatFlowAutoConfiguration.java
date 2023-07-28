@@ -8,12 +8,15 @@ import io.tiklab.eam.boot.starter.annotation.EnableEamServer;
 import io.tiklab.gateway.boot.starter.annotation.EnableGateway;
 import io.tiklab.licence.boot.starter.annotation.EnableLicenceServer;
 import io.tiklab.matflow.EnableMatFlowServer;
+import io.tiklab.messsage.boot.starter.annotation.EnableMessageClient;
 import io.tiklab.messsage.boot.starter.annotation.EnableMessageServer;
 import io.tiklab.plugin.starter.EnablePluginServer;
 import io.tiklab.postgresql.EnablePostgresql;
 import io.tiklab.privilege.boot.starter.annotation.EnablePrivilegeServer;
 import io.tiklab.rpc.boot.starter.annotation.EnableRpc;
+import io.tiklab.security.boot.stater.annotation.EnableSecurityClient;
 import io.tiklab.security.boot.stater.annotation.EnableSecurityServer;
+import io.tiklab.todotask.boot.stater.annotation.EnableTodoTaskClient;
 import io.tiklab.todotask.boot.stater.annotation.EnableTodoTaskServer;
 import io.tiklab.toolkit.boot.starter.annotation.EnableToolkit;
 import io.tiklab.user.boot.starter.annotation.EnableUserClient;
@@ -43,8 +46,11 @@ import org.springframework.context.annotation.Configuration;
 
 //消息,日志,待办
 @EnableMessageServer
+@EnableMessageClient
 @EnableSecurityServer
+@EnableSecurityClient
 @EnableTodoTaskServer
+@EnableTodoTaskClient
 
 //登录,认证
 @EnableEamServer

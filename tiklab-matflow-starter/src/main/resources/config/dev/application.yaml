@@ -19,15 +19,14 @@ server:
 
 jdbc:
   driverClassName: org.postgresql.Driver
-#  url: jdbc:postgresql://172.10.1.10:5432/tiklab_matflow?currentSchema=tiklab_matflow&stringtype=unspecified
   url: jdbc:postgresql://172.10.1.10:5432/tiklab_matflow?stringtype=unspecified
   username: postgres
   password: darth2020
 
 #plugin config
-PROJECT_HOME: ${user.home}/matflow/${app.name}
+DATA_HOME: ${user.home}/matflow/${app.name}
 plugin:
-  path: ${PROJECT_HOME}/plugin
+  path: ${DATA_HOME}/plugin
 
 #dfs config
 dfs:
@@ -35,7 +34,7 @@ dfs:
     enabled: false
     mode: server
     port: 4000
-    datapath: ${PROJECT_HOME}/files
+    datapath: ${DATA_HOME}/files
   client:
     url: 127.0.0.1:4000
     bucket: ${app.name}
@@ -44,12 +43,13 @@ dfs:
 dcs:
   server:
     enabled: true
-    mode: server
-    port: 5010
-    datapath: ${PROJECT_HOME}/caches
+    port: 5020
+    datapath: ${DATA_HOME}/caches
   client:
-    url: 127.0.0.1:5010
-    bucket: ${app.name}
+    url: 127.0.0.1:5020
+    group: g1
+    database: dcs1
+    expire: 7200
 
 #dcs config
 dss:
@@ -57,12 +57,12 @@ dss:
     enabled: false
     mode: server
     port: 6000
-    datapath: ${PROJECT_HOME}/index
+    datapath: ${DATA_HOME}/index
   client:
     url: 127.0.0.1:6000
     bucket: ${app.name}
 
-datapath: ${PROJECT_HOME}/caches
+datapath: ${DATA_HOME}/caches
 
 #message:
 #  sms:
