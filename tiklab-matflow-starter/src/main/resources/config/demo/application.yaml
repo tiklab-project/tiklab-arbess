@@ -1,5 +1,5 @@
 app:
-  name: matflow
+  name: tiklab-matflow
 
 APP_HOME: ${APP_HOME}
 application: matflow
@@ -9,14 +9,15 @@ server:
 
 jdbc:
   driverClassName: org.postgresql.Driver
-  url: jdbc:postgresql://172.12.1.10:5432/tiklab_matflow?stringtype=unspecified
+  url: jdbc:postgresql://localhost:5000/matflow?stringtype=unspecified
   username: postgres
   password: darth2020
 
 #plugin config
-PROJECT_HOME: ${user.home}/matflow/${app.name}
+DATA_HOME: /opt/tiklab/matflow
+
 plugin:
-  path: ${PROJECT_HOME}/plugin
+  path: ${DATA_HOME}/plugin
 
 #dfs config
 dfs:
@@ -24,7 +25,7 @@ dfs:
     enabled: false
     mode: server
     port: 4000
-    datapath: ${PROJECT_HOME}/files
+    datapath: ${DATA_HOME}/files
   client:
     url: 127.0.0.1:4000
     bucket: ${app.name}
@@ -35,7 +36,7 @@ dcs:
     enabled: false
     mode: server
     port: 5000
-    datapath: ${PROJECT_HOME}/caches
+    datapath: ${DATA_HOME}/caches
   client:
     url: 127.0.0.1:5000
     bucket: ${app.name}
@@ -46,12 +47,22 @@ dss:
     enabled: false
     mode: server
     port: 6000
-    datapath: ${PROJECT_HOME}/index
+    datapath: ${DATA_HOME}/index
   client:
     url: 127.0.0.1:6000
     bucket: ${app.name}
 
-datapath: ${PROJECT_HOME}/caches
+datapath: ${DATA_HOME}/caches
+
+postgresql:
+  embbed:
+    enable: true
+  database: matflow
+  db:
+    port: 5000
+    username: postgres
+    password: darth2020
+    address: ${DATA_HOME}/postgresql
 
 eas:
   embbed:

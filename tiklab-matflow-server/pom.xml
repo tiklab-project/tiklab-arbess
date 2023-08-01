@@ -145,31 +145,31 @@
                 </executions>
             </plugin>
 
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>3.0.0</version>
-                <executions>
-                    <execution>
-                        <phase>test</phase>
-                        <goals>
-                            <goal>java</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <mainClass>io.tiklab.postin.doclet.starter.DocletApplication</mainClass>
-                    <arguments>
-                        <!-- modules-->
-                        <argument>D:\tiklab\tiklab-matflow\tiklab-matflow-api;${project.basedir}</argument>
-                        <!-- workspaceId-->
-<!--                        <argument>73c78f9e2b1c</argument>-->
-                        <argument>dac459d5dc86</argument>
-                        <!-- server-->
-                        <argument>http://192.168.10.3:8090</argument>
-                    </arguments>
-                </configuration>
-            </plugin>
+<!--            <plugin>-->
+<!--                <groupId>org.codehaus.mojo</groupId>-->
+<!--                <artifactId>exec-maven-plugin</artifactId>-->
+<!--                <version>3.0.0</version>-->
+<!--                <executions>-->
+<!--                    <execution>-->
+<!--                        <phase>test</phase>-->
+<!--                        <goals>-->
+<!--                            <goal>java</goal>-->
+<!--                        </goals>-->
+<!--                    </execution>-->
+<!--                </executions>-->
+<!--                <configuration>-->
+<!--                    <mainClass>io.tiklab.postin.doclet.starter.DocletApplication</mainClass>-->
+<!--                    <arguments>-->
+<!--                        &lt;!&ndash; modules&ndash;&gt;-->
+<!--                        <argument>D:\tiklab\tiklab-matflow\tiklab-matflow-api;${project.basedir}</argument>-->
+<!--                        &lt;!&ndash; workspaceId&ndash;&gt;-->
+<!--&lt;!&ndash;                        <argument>73c78f9e2b1c</argument>&ndash;&gt;-->
+<!--                        <argument>dac459d5dc86</argument>-->
+<!--                        &lt;!&ndash; server&ndash;&gt;-->
+<!--                        <argument>http://192.168.10.3:8090</argument>-->
+<!--                    </arguments>-->
+<!--                </configuration>-->
+<!--            </plugin>-->
 
         </plugins>
     </build>

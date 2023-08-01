@@ -20,7 +20,7 @@ jdbc:
   password: darth2020
 
 #plugin config
-DATA_HOME: ${user.home}/matflow/${app.name}
+DATA_HOME: /opt/matflow/matflow
 
 plugin:
   path: ${DATA_HOME}/plugin

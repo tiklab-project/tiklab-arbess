@@ -4,7 +4,7 @@ import io.tiklab.dal.jpa.annotation.*;
 
 @Entity
 @Table(name="pip_task_artifact")
-public class TaskProductEntity {
+public class TaskArtifactEntity {
 
     @Id
     @Column(name = "task_id" ,notNull = true)

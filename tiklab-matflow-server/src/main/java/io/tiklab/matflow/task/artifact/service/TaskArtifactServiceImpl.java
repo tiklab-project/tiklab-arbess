@@ -6,7 +6,7 @@ import io.tiklab.matflow.setting.service.AuthHostService;
 import io.tiklab.matflow.setting.service.AuthThirdService;
 import io.tiklab.matflow.support.util.PipelineUtil;
 import io.tiklab.matflow.task.artifact.dao.TaskProductDao;
-import io.tiklab.matflow.task.artifact.entity.TaskProductEntity;
+import io.tiklab.matflow.task.artifact.entity.TaskArtifactEntity;
 import io.tiklab.matflow.task.artifact.model.TaskArtifact;
 import io.tiklab.matflow.task.artifact.model.XpackRepository;
 import io.tiklab.rpc.annotation.Exporter;
@@ -40,8 +40,8 @@ public class TaskArtifactServiceImpl implements TaskArtifactService {
      */
     @Override
     public String createProduct(TaskArtifact taskArtifact) {
-        TaskProductEntity taskProductEntity = BeanMapper.map(taskArtifact, TaskProductEntity.class);
-        return productDao.createProduct(taskProductEntity);
+        TaskArtifactEntity taskArtifactEntity = BeanMapper.map(taskArtifact, TaskArtifactEntity.class);
+        return productDao.createProduct(taskArtifactEntity);
     }
 
     /**
@@ -106,7 +106,7 @@ public class TaskArtifactServiceImpl implements TaskArtifactService {
      */
     @Override
     public void updateProduct(TaskArtifact taskArtifact) {
-        TaskProductEntity productEntity = BeanMapper.map(taskArtifact, TaskProductEntity.class);
+        TaskArtifactEntity productEntity = BeanMapper.map(taskArtifact, TaskArtifactEntity.class);
         productDao.updateProduct(productEntity);
     }
 
@@ -117,7 +117,7 @@ public class TaskArtifactServiceImpl implements TaskArtifactService {
      */
     @Override
     public TaskArtifact findOneProduct(String ProductId) {
-        TaskProductEntity oneProduct = productDao.findOneProduct(ProductId);
+        TaskArtifactEntity oneProduct = productDao.findOneProduct(ProductId);
         TaskArtifact product = BeanMapper.map(oneProduct, TaskArtifact.class);
         if (PipelineUtil.isNoNull(product.getAuthId())){
             Object auth = findAuth(product.getAuthId());
@@ -132,13 +132,13 @@ public class TaskArtifactServiceImpl implements TaskArtifactService {
      */
     @Override
     public List<TaskArtifact> findAllProduct() {
-        List<TaskProductEntity> allProduct = productDao.findAllProduct();
+        List<TaskArtifactEntity> allProduct = productDao.findAllProduct();
         return BeanMapper.mapList(allProduct, TaskArtifact.class);
     }
 
     @Override
     public List<TaskArtifact> findAllProductList(List<String> idList) {
-        List<TaskProductEntity> allProductList = productDao.findAllProductList(idList);
+        List<TaskArtifactEntity> allProductList = productDao.findAllProductList(idList);
         return BeanMapper.mapList(allProductList, TaskArtifact.class);
     }
 

@@ -23,11 +23,7 @@ public class MatFlowApplication {
     public static final Logger logger = LoggerFactory.getLogger(MatFlowApplication.class);
 
     public static void main(String[] args) {
-        logger.info("初始化项目地址");
-        PipelineFileUtil.initMatFlowAddress(1);
-        logger.info("项目地址初始完成。");
         SpringApplication.run(MatFlowApplication.class, args);
-
     }
 }
 

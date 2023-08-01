@@ -5,9 +5,9 @@ public class PipelineFinal {
 
     public static final String MATFLOW_ROOT_PATH = "/.tiklab";
 
-    public static final String MATFLOW_WORKSPACE = MATFLOW_ROOT_PATH + "/matflow/workspace";
+    public static final String MATFLOW_WORKSPACE = "/workspace";
 
-    public static final String MATFLOW_LOGS = MATFLOW_ROOT_PATH+  "/matflow/logs";
+    public static final String MATFLOW_LOGS = "/logs";
 
     /**
      * 项目名称

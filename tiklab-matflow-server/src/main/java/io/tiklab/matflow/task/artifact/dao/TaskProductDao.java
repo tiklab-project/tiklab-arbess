@@ -1,6 +1,6 @@
 package io.tiklab.matflow.task.artifact.dao;
 
-import io.tiklab.matflow.task.artifact.entity.TaskProductEntity;
+import io.tiklab.matflow.task.artifact.entity.TaskArtifactEntity;
 import io.tiklab.dal.jpa.JpaTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -16,12 +16,12 @@ public class TaskProductDao {
 
     /**
      * 创建动态
-     * @param taskProductEntity 推送制品
+     * @param taskArtifactEntity 推送制品
      * @return 推送制品id
      */
-    public  String createProduct(TaskProductEntity taskProductEntity){
+    public  String createProduct(TaskArtifactEntity taskArtifactEntity){
 
-        return jpaTemplate.save(taskProductEntity, String.class);
+        return jpaTemplate.save(taskArtifactEntity, String.class);
     }
 
     /**
@@ -29,15 +29,15 @@ public class TaskProductDao {
      * @param productId 推送制品id
      */
     public  void deleteProduct(String productId){
-        jpaTemplate.delete(TaskProductEntity.class, productId);
+        jpaTemplate.delete(TaskArtifactEntity.class, productId);
     }
 
     /**
      * 更新推送制品
-     * @param taskProductEntity 更新信息
+     * @param taskArtifactEntity 更新信息
      */
-    public  void updateProduct(TaskProductEntity taskProductEntity){
-        jpaTemplate.update(taskProductEntity);
+    public  void updateProduct(TaskArtifactEntity taskArtifactEntity){
+        jpaTemplate.update(taskArtifactEntity);
     }
 
     /**
@@ -45,21 +45,21 @@ public class TaskProductDao {
      * @param productId 推送制品id
      * @return 推送制品信息
      */
-    public TaskProductEntity findOneProduct(String productId){
-        return jpaTemplate.findOne(TaskProductEntity.class,productId);
+    public TaskArtifactEntity findOneProduct(String productId){
+        return jpaTemplate.findOne(TaskArtifactEntity.class,productId);
     }
 
     /**
      * 查询所有推送制品
      * @return 推送制品集合
      */
-    public List<TaskProductEntity> findAllProduct(){
-        return jpaTemplate.findAll(TaskProductEntity.class);
+    public List<TaskArtifactEntity> findAllProduct(){
+        return jpaTemplate.findAll(TaskArtifactEntity.class);
     }
 
 
-    public List<TaskProductEntity> findAllProductList(List<String> idList){
-        return jpaTemplate.findList(TaskProductEntity.class,idList);
+    public List<TaskArtifactEntity> findAllProductList(List<String> idList){
+        return jpaTemplate.findList(TaskArtifactEntity.class,idList);
     }
     
 }

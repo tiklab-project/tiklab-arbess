@@ -1,19 +1,30 @@
 package io.tiklab.matflow.support.util;
 
 import io.tiklab.core.exception.ApplicationException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class PipelineUtilServiceImpl implements PipelineUtilService {
 
+    @Value("${DATA_HOME:null}")
+    String dataHome;
+
     @Override
     public String instanceAddress(int type) {
-        return  PipelineFileUtil.initMatFlowAddress(type);
-
+        if (Objects.isNull(dataHome) || dataHome.equals("null")){
+            dataHome = "/opt/tiklab/matflow";
+        }
+        if (type == 1){
+            return dataHome + PipelineFinal.MATFLOW_WORKSPACE;
+        }else {
+            return dataHome + PipelineFinal.MATFLOW_LOGS;
+        }
     }
 
     @Override

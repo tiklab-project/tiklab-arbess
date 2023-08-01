@@ -1,5 +1,5 @@
 app:
-  name: matflow
+  name: tiklab-matflow
 
 APP_HOME: ${APP_HOME}
 application: matflow
@@ -14,7 +14,7 @@ jdbc:
   password: darth2020
 
 #plugin config
-DATA_HOME: /opt/tiklab/${app.name}
+DATA_HOME: /opt/tiklab/matflow
 
 plugin:
   path: ${DATA_HOME}/plugin

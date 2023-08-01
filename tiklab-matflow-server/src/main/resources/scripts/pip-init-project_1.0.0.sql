@@ -208,7 +208,8 @@ INSERT INTO pcs_prc_dm_role_user (id, dmRole_id, domain_id, user_id) VALUES ('34
 
 
 
-update pip_auth set private_key = '-----BEGIN OPENSSH PRIVATE KEY-----
+update pip_auth set private_key = '
+-----BEGIN OPENSSH PRIVATE KEY-----
 b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAABlwAAAAdzc2gtcn
 NhAAAAAwEAAQAAAYEAtmW0yfv70CDm572lLvshdRzoMH7gYDW0VndFvnhzbzqgU+8DJsjI
 0LLcy6vq7bJbx/Q04HWyQ2xVJKlz7cIt7/rWVlm2uJhWJ64r3Aj0CrK/eVQV5u1LzpC1hP

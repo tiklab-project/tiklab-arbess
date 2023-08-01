@@ -4,21 +4,9 @@ app:
 APP_HOME: ${APP_HOME}
 application: matflow
 
-spring:
-  config:
-    import: optional:classpath:/config/${env:dev}/application.yaml
-  main:
-    allow-bean-definition-overriding: true
-
 server:
   port: 8080
-
-#jdbc:
-#  driverClassName: com.mysql.cj.jdbc.Driver
-#  url: jdbc:mysql://172.12.1.16:3306/tiklab_matflow?characterEncoding=utf8&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-#  username: root
-#  password: darth2020
-
+  
 jdbc:
   driverClassName: org.postgresql.Driver
   url: jdbc:postgresql://172.13.1.13:5432/tiklab_matflow?stringtype=unspecified
@@ -26,9 +14,10 @@ jdbc:
   password: darth2020
 
 #plugin config
-PROJECT_HOME: ${user.home}/pipeline/${app.name}
+DATA_HOME: /opt/tiklab/matflow
+
 plugin:
-  path: ${PROJECT_HOME}/plugin
+  path: ${DATA_HOME}/plugin
 
 #dfs config
 dfs:
@@ -36,7 +25,7 @@ dfs:
     enabled: false
     mode: server
     port: 4000
-    datapath: ${PROJECT_HOME}/files
+    datapath: ${DATA_HOME}/files
   client:
     url: 127.0.0.1:4000
     bucket: ${app.name}
@@ -47,7 +36,7 @@ dcs:
     enabled: false
     mode: server
     port: 5000
-    datapath: ${PROJECT_HOME}/caches
+    datapath: ${DATA_HOME}/caches
   client:
     url: 127.0.0.1:5000
     bucket: ${app.name}
@@ -58,12 +47,12 @@ dss:
     enabled: false
     mode: server
     port: 6000
-    datapath: ${PROJECT_HOME}/index
+    datapath: ${DATA_HOME}/index
   client:
     url: 127.0.0.1:6000
     bucket: ${app.name}
 
-datapath: ${PROJECT_HOME}/caches
+datapath: ${DATA_HOME}/caches
 
 eas:
   embbed:
