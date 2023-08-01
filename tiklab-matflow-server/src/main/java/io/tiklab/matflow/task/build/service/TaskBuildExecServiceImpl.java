@@ -94,7 +94,14 @@ public class TaskBuildExecServiceImpl implements TaskBuildExecService {
      * @return 执行命令
      */
     private Process getOrder(String orders,String type,String address,String path) throws ApplicationException, IOException {
-        Scm pipelineScm = scmService.findOnePipelineScm(type);
+        Scm pipelineScm = null;
+        if (type.equals("21") || type.equals("maven")){
+            pipelineScm = scmService.findOnePipelineScm(21);
+        }
+        if (type.equals("22") || type.equals("nodejs")){
+            pipelineScm = scmService.findOnePipelineScm(22);
+        }
+
         if (pipelineScm == null) {
             if (type.equals("21") || type.equals("maven")){
                 throw new ApplicationException("不存在maven配置");
@@ -102,6 +109,7 @@ public class TaskBuildExecServiceImpl implements TaskBuildExecService {
             if (type.equals("22") || type.equals("nodejs")){
                 throw new ApplicationException("不存在npm配置");
             }
+            throw new ApplicationException("获取环境配置信息失败！");
         }
 
         String serverAddress = pipelineScm.getScmAddress();
