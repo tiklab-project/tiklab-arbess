@@ -91,8 +91,8 @@ public class TaskDeployExecServiceImpl implements TaskDeployExecService {
                 }
 
                 if (!Objects.isNull(buildProduct)){
-                    startShell = startShell.replaceAll("DEFAULT_ARTIFACT_ADDRESS", buildProduct.getProductName());
-                    startShell = startShell.replaceAll("DEFAULT_ARTIFACT", buildProduct.getProductAddress());
+                    startShell = startShell.replaceAll("DEFAULT_ARTIFACT_ADDRESS",buildProduct.getProductAddress() );
+                    startShell = startShell.replaceAll("DEFAULT_ARTIFACT", buildProduct.getProductName());
                 }
 
                 String key = variableServer.replaceVariable(pipelineId, taskId, startShell);
@@ -152,8 +152,8 @@ public class TaskDeployExecServiceImpl implements TaskDeployExecService {
 
         String deployOrder = taskDeploy.getDeployOrder();
 
-        String order = deployOrder.replaceAll("DEFAULT_ARTIFACT_ADDRESS", buildProduct.getProductName());
-        order = order.replaceAll("DEFAULT_ARTIFACT", buildProduct.getProductAddress());
+        String order = deployOrder.replaceAll("DEFAULT_ARTIFACT_ADDRESS",buildProduct.getProductAddress());
+        order = order.replaceAll("DEFAULT_ARTIFACT",  buildProduct.getProductName());
 
         taskDeploy.setDeployOrder(order);
         try {
@@ -191,6 +191,7 @@ public class TaskDeployExecServiceImpl implements TaskDeployExecService {
             for (String s : list) {
                 String key = variableServer.replaceVariable(pipelineId, taskId, s);
                 String orders = "cd "+" "+ deployAddress + ";" + key;
+                System.out.println("命令："+orders);
                 tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"执行部署命令：" + key);
                 sshOrder(session,orders, taskId);
             }
