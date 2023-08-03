@@ -2,10 +2,7 @@ package io.tiklab.matflow.support.util;
 
 public class PipelineFinal {
 
-
-    public static final String MATFLOW_ROOT_PATH = "/.tiklab";
-
-    public static final String MATFLOW_WORKSPACE = "/workspace";
+    public static final String MATFLOW_WORKSPACE = "/pipeline";
 
     public static final String MATFLOW_LOGS = "/logs";
 

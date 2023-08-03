@@ -954,9 +954,13 @@ public class TasksServiceImpl implements TasksService {
             if (Objects.isNull(taskTest.getTestPlan())|| Objects.isNull(taskTest.getTestPlan().getName())){
                 return false;
             }
-           boolean b  = Objects.isNull(taskTest.getApiEnv()) && Objects.isNull(taskTest.getAppEnv())&&  Objects.isNull(taskTest.getWebEnv());
-           boolean b1  = Objects.isNull(taskTest.getApiEnv().getName()) && Objects.isNull(taskTest.getAppEnv().getName())&&  Objects.isNull(taskTest.getWebEnv().getName());
-            return !b && !b1;
+           boolean b  = Objects.isNull(taskTest.getApiEnv())
+                   && Objects.isNull(taskTest.getAppEnv())
+                   && Objects.isNull(taskTest.getWebEnv());
+           boolean b1  = Objects.isNull(taskTest.getApiEnv().getName())
+                   && Objects.isNull(taskTest.getAppEnv().getName())
+                   && Objects.isNull(taskTest.getWebEnv().getName());
+           return !b && !b1;
         }
         return true;
     }
@@ -971,9 +975,9 @@ public class TasksServiceImpl implements TasksService {
 
         if (taskType.equals("31") || taskType.equals("liunx")){
             if (deploy.getAuthType() == 1){
-                if (!PipelineUtil.isNoNull(deploy.getDeployAddress())){
-                   return false;
-                }
+                // if (!PipelineUtil.isNoNull(deploy.getDeployAddress())){
+                //    return false;
+                // }
                 return PipelineUtil.isNoNull(deploy.getStartAddress());
             }
         }
@@ -993,12 +997,12 @@ public class TasksServiceImpl implements TasksService {
             if (!PipelineUtil.isNoNull(product.getGroupId())){
                 return false;
             }
-            if (!PipelineUtil.isNoNull(product.getFileAddress())){
-                return false;
-            }
-            if (!PipelineUtil.isNoNull(product.getFileType())){
-                return false;
-            }
+            // if (!PipelineUtil.isNoNull(product.getFileAddress())){
+            //     return false;
+            // }
+            // if (!PipelineUtil.isNoNull(product.getFileType())){
+            //     return false;
+            // }
         }
         if (taskType.equals("xpack")){
             if (!PipelineUtil.isNoNull(product.getRepository().getName())){
@@ -1007,9 +1011,9 @@ public class TasksServiceImpl implements TasksService {
         }
 
         if ( taskType.equals("52")||  taskType.equals("ssh")){
-            if (!PipelineUtil.isNoNull(product.getFileAddress())){
-                return false;
-            }
+            // if (!PipelineUtil.isNoNull(product.getFileAddress())){
+            //     return false;
+            // }
             return PipelineUtil.isNoNull(product.getPutAddress());
         }
         return true;

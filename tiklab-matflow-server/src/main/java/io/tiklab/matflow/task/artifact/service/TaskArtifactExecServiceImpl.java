@@ -14,9 +14,13 @@ import io.tiklab.matflow.support.util.PipelineUtilService;
 import io.tiklab.matflow.support.variable.service.VariableService;
 import io.tiklab.matflow.task.artifact.model.TaskArtifact;
 import io.tiklab.matflow.task.artifact.model.XpackRepository;
+import io.tiklab.matflow.task.build.model.TaskBuildProduct;
+import io.tiklab.matflow.task.build.service.TaskBuildProductService;
+import io.tiklab.matflow.task.task.model.TaskInstance;
 import io.tiklab.matflow.task.task.model.Tasks;
 import io.tiklab.matflow.task.task.service.TasksInstanceService;
 import io.tiklab.rpc.annotation.Exporter;
+import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,6 +53,10 @@ public class TaskArtifactExecServiceImpl implements TaskArtifactExecService {
     @Autowired
     private PipelineUtilService utilService;
 
+
+    @Autowired
+    private TaskBuildProductService taskBuildProductService;
+
     private static final Logger logger = LoggerFactory.getLogger(TaskArtifactExecServiceImpl.class);
 
     @Override
@@ -66,19 +74,31 @@ public class TaskArtifactExecServiceImpl implements TaskArtifactExecService {
         TaskArtifact product = (TaskArtifact) task.getTask();
         product.setType(taskType);
 
-        String fileAddress = product.getFileAddress();
         String path;
-        try {
-             path = utilService.findFile(pipelineId,fileAddress);
-        }catch (ApplicationException e){
-            tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+e);
+        // String fileAddress = product.getFileAddress();
+        // try {
+        //      path = utilService.findFile(pipelineId,fileAddress);
+        // }catch (ApplicationException e){
+        //     tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+e);
+        //     return false;
+        // }
+        //
+        // if (path == null){
+        //     tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"匹配不到制品");
+        //     return false;
+        // }
+
+        TaskInstance execInstance = tasksInstanceService.findExecInstance(taskId);
+        TaskBuildProduct buildProduct = taskBuildProductService.findBuildProduct(execInstance.getInstanceId());
+
+        if (buildProduct == null){
+            tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"无法获取到制品!");
             return false;
         }
 
-        if (path == null){
-            tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"匹配不到制品");
-            return false;
-        }
+        path = buildProduct.getProductAddress();
+        String ext = FilenameUtils.getExtension(path);
+        product.setFileType(ext);
 
         tasksInstanceService.writeExecLog(taskId,
                 PipelineUtil.date(4)+"制品匹配成功\n"+
@@ -118,6 +138,7 @@ public class TaskArtifactExecServiceImpl implements TaskArtifactExecService {
                     //替换变量
                     String key = variableService.replaceVariable(pipelineId, taskId, putAddress);
                     tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"制品推送位置："+key);
+
                     sshPut(session,path,key);
                 }
             }

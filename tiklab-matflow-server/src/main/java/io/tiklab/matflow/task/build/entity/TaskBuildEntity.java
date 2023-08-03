@@ -18,6 +18,9 @@ public class TaskBuildEntity {
     @Column(name = "build_order",notNull = true)
     private String buildOrder;
 
+    @Column(name = "product_rule",notNull = true)
+    private String productRule;
+
 
     public String getTaskId() {
         return taskId;
@@ -43,4 +46,11 @@ public class TaskBuildEntity {
         this.buildOrder = buildOrder;
     }
 
+    public String getProductRule() {
+        return productRule;
+    }
+
+    public void setProductRule(String productRule) {
+        this.productRule = productRule;
+    }
 }

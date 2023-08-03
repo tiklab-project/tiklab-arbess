@@ -8,7 +8,10 @@ import io.tiklab.matflow.support.util.PipelineFileUtil;
 import io.tiklab.matflow.support.util.PipelineUtil;
 import io.tiklab.matflow.support.util.PipelineUtilService;
 import io.tiklab.matflow.support.variable.service.VariableService;
+import io.tiklab.matflow.task.build.model.TaskBuildProduct;
+import io.tiklab.matflow.task.build.service.TaskBuildProductService;
 import io.tiklab.matflow.task.deploy.model.TaskDeploy;
+import io.tiklab.matflow.task.task.model.TaskInstance;
 import io.tiklab.matflow.task.task.model.Tasks;
 import io.tiklab.matflow.task.task.service.TasksInstanceService;
 import io.tiklab.rpc.annotation.Exporter;
@@ -42,6 +45,9 @@ public class TaskDeployExecServiceImpl implements TaskDeployExecService {
 
     @Autowired
     private PipelineUtilService utilService;
+
+    @Autowired
+    private TaskBuildProductService taskBuildProductService;
 
     private static final Logger logger = LoggerFactory.getLogger(TaskDeployExecServiceImpl.class);
 
@@ -81,17 +87,28 @@ public class TaskDeployExecServiceImpl implements TaskDeployExecService {
         //执行自定义脚本
         try {
             if (taskDeploy.getAuthType() == 2) {
-                List<String> list = PipelineUtil.execOrder(startShell);
-                for (String s : list) {
-                    String key = variableServer.replaceVariable(pipelineId, taskId, s);
-                    tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+ key );
-                    sshOrder(session,key,taskId);
+                // List<String> list = PipelineUtil.execOrder(startShell);
+
+                String key = variableServer.replaceVariable(pipelineId, taskId, startShell);
+                Process process = Runtime.getRuntime().exec(key);
+                tasksInstanceService.readCommandExecResult(process, "UTF-8", error(41), taskId);
+
+                int exitCode = process.waitFor();
+                if (exitCode != 0) {
+                    tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"任务："+name+"命令执行失败。");
+                    return false;
                 }
+
+                // for (String s : list) {
+                //     String key = variableServer.replaceVariable(pipelineId, taskId, s);
+                //     tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+ key );
+                //     sshOrder(session,key,taskId);
+                // }
                 tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"任务："+name+"执行完成。");
-                session.disconnect();
+                // session.disconnect();
                 return true;
             }
-        } catch (IOException | JSchException e) {
+        } catch (IOException |InterruptedException e) {
             String s = PipelineUtil.date(4) + "命令执行失败" ;
             tasksInstanceService.writeExecLog(taskId, s);
             tasksInstanceService.writeExecLog(taskId, e.getMessage());
@@ -100,30 +117,30 @@ public class TaskDeployExecServiceImpl implements TaskDeployExecService {
 
         //获取部署文件
         String filePath;
+        tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"获取部署文件......");
 
-        try {
-            tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"获取部署文件......");
-            filePath = utilService.findFile(pipelineId, taskDeploy.getLocalAddress());
-        } catch (ApplicationException e) {
-            String message = PipelineUtil.date(4) + e.getMessage();
-            tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"部署文件获取失败，\n"+ message);
+        TaskInstance execInstance = tasksInstanceService.findExecInstance(taskId);
+        TaskBuildProduct buildProduct = taskBuildProductService.findBuildProduct(execInstance.getInstanceId());
+        if (buildProduct == null){
+            tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"无法获取到制品!");
             return false;
         }
+        filePath = buildProduct.getProductAddress();
 
-        tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"部署文件获取成功："+ filePath );
+        tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"制品文件获取成功："+ filePath );
 
         //发送文件位置
         String deployAddress = taskDeploy.getDeployAddress();
         deployAddress = variableServer.replaceVariable(pipelineId, taskId, deployAddress);
         try {
-            tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"部署文件文件上传中..." );
+            tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"制品文件文件上传中..." );
             ftp(session, filePath, deployAddress);
         } catch (JSchException | SftpException e) {
             session.disconnect();
-            tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"部署文件上传失败："+e.getMessage());
+            tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"制品文件上传失败："+e.getMessage());
             return false;
         }
-        tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"部署文件上传成功" );
+        tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"制品文件上传成功" );
         try {
             linux(session, pipelineId, taskDeploy,taskId);
         } catch (JSchException | IOException e) {

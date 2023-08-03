@@ -138,6 +138,10 @@ public interface TasksInstanceService {
      */
     void writeExecLog(String taskId, String log);
 
+
+    TaskInstance findExecInstance(String taskId);
+
+
     /**
      * 获取Command执行结果
      * @param process Command执行实例

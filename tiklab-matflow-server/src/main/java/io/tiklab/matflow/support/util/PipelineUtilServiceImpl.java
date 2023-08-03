@@ -71,7 +71,7 @@ public class PipelineUtilServiceImpl implements PipelineUtilService {
         }
 
         if (list.size() > 1){
-            StringBuilder s  = new StringBuilder("匹配到多个文件，请重新输入部署文件信息。");
+            StringBuilder s  = new StringBuilder("匹配到多个文件，请重新输入文件信息。");
             for (String s1 : list) {
                 s.append("\n").append(s1);
             }
@@ -81,7 +81,7 @@ public class PipelineUtilServiceImpl implements PipelineUtilService {
         if (list.size()== 1){
             return list.get(0);
         }
-        throw new ApplicationException("没有匹配到部署文件。");
+        throw new ApplicationException("没有匹配到文件。");
     }
 
 

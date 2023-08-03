@@ -24,6 +24,9 @@ public class TaskBuild {
     @ApiProperty(name="buildOrder",desc="构建命令")
     private String buildOrder;
 
+    @ApiProperty(name="productRule",desc="制品规则")
+    private String productRule;
+
     //顺序
     private int sort;
 
@@ -70,5 +73,11 @@ public class TaskBuild {
         this.sort = sort;
     }
 
+    public String getProductRule() {
+        return productRule;
+    }
 
+    public void setProductRule(String productRule) {
+        this.productRule = productRule;
+    }
 }

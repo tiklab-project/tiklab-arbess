@@ -440,6 +440,14 @@ public class TasksInstanceServiceImpl implements TasksInstanceService {
         tasksExecService.setTaskOrTaskInstance(taskInstanceId, taskInstance);
     }
 
+    @Override
+    public TaskInstance findExecInstance(String taskId){
+        TasksExecServiceImpl tasksExecService = new TasksExecServiceImpl();
+        String taskInstanceId = tasksExecService.findTaskInstanceId(taskId);
+        return tasksExecService.findTaskInstance(taskInstanceId);
+    }
+
+
     /**
      * 删除任务执行实例
      * @param taskInstanceId 任务实例id

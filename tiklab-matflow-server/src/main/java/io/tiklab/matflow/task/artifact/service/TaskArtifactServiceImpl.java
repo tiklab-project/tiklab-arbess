@@ -1,6 +1,7 @@
 package io.tiklab.matflow.task.artifact.service;
 
 import io.tiklab.beans.BeanMapper;
+import io.tiklab.matflow.setting.model.AuthHost;
 import io.tiklab.matflow.setting.model.AuthThird;
 import io.tiklab.matflow.setting.service.AuthHostService;
 import io.tiklab.matflow.setting.service.AuthThirdService;
@@ -74,6 +75,11 @@ public class TaskArtifactServiceImpl implements TaskArtifactService {
                 }
                 AuthThird authServer = thirdServer.findOneAuthServer(authId);
                 product.setAuth(authServer);
+
+                if (taskType.equals("ssh")){
+                    AuthHost oneAuthHost = hostServer.findOneAuthHost(authId);
+                    product.setAuth(oneAuthHost);
+                }
 
                 XpackRepository repositorys = taskArtifact.getRepository();
                 if (taskType.equals("xpack") && !Objects.isNull(repositorys)){

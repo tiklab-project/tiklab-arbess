@@ -2,20 +2,27 @@ package io.tiklab.matflow.task.build.service;
 
 import io.tiklab.matflow.setting.model.Scm;
 import io.tiklab.matflow.setting.service.ScmService;
+import io.tiklab.matflow.support.util.PipelineFileUtil;
+import io.tiklab.matflow.support.util.PipelineFinal;
 import io.tiklab.matflow.support.util.PipelineUtilService;
 import io.tiklab.matflow.support.variable.service.VariableService;
 import io.tiklab.matflow.task.build.model.TaskBuild;
+import io.tiklab.matflow.task.build.model.TaskBuildProduct;
+import io.tiklab.matflow.task.task.model.TaskInstance;
 import io.tiklab.matflow.task.task.model.Tasks;
 import io.tiklab.matflow.task.task.service.TasksInstanceService;
 import io.tiklab.core.exception.ApplicationException;
 import io.tiklab.matflow.support.condition.service.ConditionService;
 import io.tiklab.matflow.support.util.PipelineUtil;
 import io.tiklab.rpc.annotation.Exporter;
+import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * 构建执行方法
@@ -40,6 +47,9 @@ public class TaskBuildExecServiceImpl implements TaskBuildExecService {
     @Autowired
     private PipelineUtilService utilService;
 
+    @Autowired
+    private  TaskBuildProductService taskBuildProductService;
+
     // 构建
     public boolean build(String pipelineId, Tasks task , String taskType)  {
 
@@ -52,12 +62,9 @@ public class TaskBuildExecServiceImpl implements TaskBuildExecService {
             tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+s);
             return true;
         }
-        
 
         TaskBuild taskBuild = (TaskBuild) task.getTask();
         String name = task.getTaskName();
-
-
         taskBuild.setType(taskType);
         String buildAddress = taskBuild.getBuildAddress();
         String buildOrder = taskBuild.getBuildOrder();
@@ -78,6 +85,49 @@ public class TaskBuildExecServiceImpl implements TaskBuildExecService {
                     return false;
                 }
             }
+
+            String productRule = taskBuild.getProductRule();
+
+            boolean noNull = PipelineUtil.isNoNull(productRule);
+
+            if (!noNull){
+                tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"任务"+name+"执行完成");
+                return true;
+            }
+
+            // 匹配制品
+            String productAddress;
+            try {
+                productAddress = utilService.findFile(pipelineId,taskBuild.getProductRule());
+            }catch (ApplicationException e){
+                tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+e);
+                return false;
+            }
+
+            if (path == null){
+                tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"匹配不到制品！");
+                return false;
+            }
+
+            File file = new File(productAddress);
+
+            // 默认路径
+            TaskInstance execInstance = tasksInstanceService.findExecInstance(taskId);
+
+            String defaultAddress = utilService.findPipelineDefaultAddress(pipelineId, 2);
+
+            String fileAddress = defaultAddress + execInstance.getInstanceId()+"/"+file.getName();
+
+            TaskBuildProduct taskBuildProduct = new TaskBuildProduct(fileAddress,execInstance.getInstanceId());
+
+            String buildProduct = taskBuildProductService.createBuildProduct(taskBuildProduct);
+
+            System.out.println(buildProduct);
+
+            // 移动文件
+            FileUtils.moveFile(file, new File(fileAddress));
+
+            tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"匹配到制品："+productAddress);
         } catch (IOException | ApplicationException e) {
             String s = PipelineUtil.date(4) + e.getMessage();
             tasksInstanceService.writeExecLog(taskId,s);

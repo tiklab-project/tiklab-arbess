@@ -107,6 +107,10 @@
         </dependency>
     </dependencies>
 
+<!--    <properties>-->
+<!--        <timestamp>${maven.build.timestamp}</timestamp>-->
+<!--    </properties>-->
+
     <profiles>
 
         <!--linux-->
@@ -135,6 +139,7 @@
                 <assembly>linux</assembly>
                 <systemType>linux</systemType>
             </properties>
+
             <build>
                 <plugins>
                     <plugin>
@@ -350,7 +355,7 @@
                                 <descriptor>assembly/distribution-${assembly}.xml</descriptor>
                             </descriptors>
                             <finalName>tiklab-matflow</finalName>
-                            <appendAssemblyId>false</appendAssemblyId>
+<!--                            <appendAssemblyId>false</appendAssemblyId>-->
                         </configuration>
                         <phase>package</phase>
                         <goals>
