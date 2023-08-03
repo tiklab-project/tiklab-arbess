@@ -97,6 +97,7 @@ public class TaskDeployServiceImpl implements TaskDeployService {
         if (authType == 0){
             TaskDeploy oneDeploy = findOneDeploy(deployId);
             taskDeploy.setAuthType(oneDeploy.getAuthType());
+            taskDeploy.setStartOrder(taskDeploy.getStartOrder());
             taskDeployDao.updateDeploy(BeanMapper.map(taskDeploy, TaskDeployEntity.class));
             return;
         }
