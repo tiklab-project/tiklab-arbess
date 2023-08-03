@@ -18,6 +18,9 @@ public class TaskBuildProduct {
     @ApiProperty(name = "productAddress",desc = "制品地址")
     private String productAddress;
 
+    @ApiProperty(name = "productName",desc = "制品名称")
+    private String productName;
+
     //分支
     @ApiProperty(name = "instanceId",desc = "实例id")
     private String instanceId;
@@ -52,5 +55,13 @@ public class TaskBuildProduct {
 
     public void setInstanceId(String instanceId) {
         this.instanceId = instanceId;
+    }
+
+    public String getProductName() {
+        return productName;
+    }
+
+    public void setProductName(String productName) {
+        this.productName = productName;
     }
 }

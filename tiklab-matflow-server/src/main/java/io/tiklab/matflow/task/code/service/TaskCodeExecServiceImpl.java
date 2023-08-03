@@ -12,6 +12,7 @@ import io.tiklab.matflow.support.condition.service.ConditionService;
 import io.tiklab.matflow.support.util.PipelineFileUtil;
 import io.tiklab.matflow.support.util.PipelineUtil;
 import io.tiklab.matflow.support.util.PipelineUtilService;
+import io.tiklab.matflow.support.variable.model.Variable;
 import io.tiklab.matflow.support.variable.service.VariableService;
 import io.tiklab.matflow.task.code.model.TaskCode;
 import io.tiklab.matflow.task.code.model.XcodeRepository;
@@ -149,6 +150,17 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
                 }
                 message.destroy();
             }
+
+            // 把系统默认路径添加到流水线变量里面
+            String fileAddress = utilService.findPipelineDefaultAddress(pipelineId,1);
+            File file1 = new File(fileAddress);
+            Variable variable = new Variable();
+            variable.setVarValue(file1.getAbsolutePath());
+            variable.setVarKey("APP_HOME");
+            variable.setTaskId(pipelineId);
+            variable.setType(1);
+            variable.setTaskType(1);
+            variableServer.createVariable(variable);
 
         } catch (IOException e) {
             tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"系统执行命令错误 \n" + e);

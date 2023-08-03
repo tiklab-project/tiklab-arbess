@@ -119,15 +119,16 @@ public class TaskBuildExecServiceImpl implements TaskBuildExecService {
             String fileAddress = defaultAddress + execInstance.getInstanceId()+"/"+file.getName();
 
             TaskBuildProduct taskBuildProduct = new TaskBuildProduct(fileAddress,execInstance.getInstanceId());
+            taskBuildProduct.setProductName(file.getName());
 
-            String buildProduct = taskBuildProductService.createBuildProduct(taskBuildProduct);
-
-            System.out.println(buildProduct);
+            taskBuildProductService.createBuildProduct(taskBuildProduct);
 
             // 移动文件
             FileUtils.moveFile(file, new File(fileAddress));
 
             tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"匹配到制品："+productAddress);
+
+
         } catch (IOException | ApplicationException e) {
             String s = PipelineUtil.date(4) + e.getMessage();
             tasksInstanceService.writeExecLog(taskId,s);

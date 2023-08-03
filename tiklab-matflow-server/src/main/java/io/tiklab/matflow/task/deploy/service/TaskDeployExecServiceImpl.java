@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * 部署执行方法
@@ -72,6 +73,48 @@ public class TaskDeployExecServiceImpl implements TaskDeployExecService {
         //部署命令
         String startShell = taskDeploy.getStartOrder();
 
+
+        //获取部署文件
+        String filePath;
+        tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"获取部署文件......");
+
+        TaskInstance execInstance = tasksInstanceService.findExecInstance(taskId);
+        TaskBuildProduct buildProduct = taskBuildProductService.findBuildProduct(execInstance.getInstanceId());
+
+        //执行自定义脚本
+        try {
+            if (taskDeploy.getAuthType() == 2) {
+
+                if (!PipelineUtil.isNoNull(startShell)){
+                    tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"任务："+name+"执行完成。");
+                    return true;
+                }
+
+                if (!Objects.isNull(buildProduct)){
+                    startShell = startShell.replaceAll("DEFAULT_ARTIFACT_ADDRESS", buildProduct.getProductName());
+                    startShell = startShell.replaceAll("DEFAULT_ARTIFACT", buildProduct.getProductAddress());
+                }
+
+                String key = variableServer.replaceVariable(pipelineId, taskId, startShell);
+                Process process = Runtime.getRuntime().exec(key);
+                tasksInstanceService.readCommandExecResult(process, "UTF-8", error(41), taskId);
+
+                int exitCode = process.waitFor();
+                if (exitCode != 0) {
+                    tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"任务："+name+"命令执行失败。");
+                    return false;
+                }
+
+                tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"任务："+name+"执行完成。");
+                return true;
+            }
+        } catch (IOException |InterruptedException e) {
+            String s = PipelineUtil.date(4) + "命令执行失败" ;
+            tasksInstanceService.writeExecLog(taskId, s);
+            tasksInstanceService.writeExecLog(taskId, e.getMessage());
+            return false;
+        }
+
         //连接服务器
         Session session;
         try {
@@ -84,43 +127,8 @@ public class TaskDeployExecServiceImpl implements TaskDeployExecService {
         tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"建立服务器链接：" );
         tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"服务器链接建立成功。" );
 
-        //执行自定义脚本
-        try {
-            if (taskDeploy.getAuthType() == 2) {
-                // List<String> list = PipelineUtil.execOrder(startShell);
 
-                String key = variableServer.replaceVariable(pipelineId, taskId, startShell);
-                Process process = Runtime.getRuntime().exec(key);
-                tasksInstanceService.readCommandExecResult(process, "UTF-8", error(41), taskId);
 
-                int exitCode = process.waitFor();
-                if (exitCode != 0) {
-                    tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"任务："+name+"命令执行失败。");
-                    return false;
-                }
-
-                // for (String s : list) {
-                //     String key = variableServer.replaceVariable(pipelineId, taskId, s);
-                //     tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+ key );
-                //     sshOrder(session,key,taskId);
-                // }
-                tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"任务："+name+"执行完成。");
-                // session.disconnect();
-                return true;
-            }
-        } catch (IOException |InterruptedException e) {
-            String s = PipelineUtil.date(4) + "命令执行失败" ;
-            tasksInstanceService.writeExecLog(taskId, s);
-            tasksInstanceService.writeExecLog(taskId, e.getMessage());
-            return false;
-        }
-
-        //获取部署文件
-        String filePath;
-        tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"获取部署文件......");
-
-        TaskInstance execInstance = tasksInstanceService.findExecInstance(taskId);
-        TaskBuildProduct buildProduct = taskBuildProductService.findBuildProduct(execInstance.getInstanceId());
         if (buildProduct == null){
             tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"无法获取到制品!");
             return false;
@@ -141,6 +149,13 @@ public class TaskDeployExecServiceImpl implements TaskDeployExecService {
             return false;
         }
         tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"制品文件上传成功" );
+
+        String deployOrder = taskDeploy.getDeployOrder();
+
+        String order = deployOrder.replaceAll("DEFAULT_ARTIFACT_ADDRESS", buildProduct.getProductName());
+        order = order.replaceAll("DEFAULT_ARTIFACT", buildProduct.getProductAddress());
+
+        taskDeploy.setDeployOrder(order);
         try {
             linux(session, pipelineId, taskDeploy,taskId);
         } catch (JSchException | IOException e) {
@@ -163,18 +178,11 @@ public class TaskDeployExecServiceImpl implements TaskDeployExecService {
         String deployAddress = "/"+ taskDeploy.getDeployAddress();
         deployAddress = variableServer.replaceVariable(pipelineId, taskId, deployAddress);
 
-        //启动文件地址
-        String startAddress = "/"+ taskDeploy.getStartAddress();
-        startAddress = variableServer.replaceVariable(pipelineId, taskId, startAddress);
-
         //部署脚本命令
         String deployOrder= taskDeploy.getDeployOrder();
 
-        //启动脚本命令
-        String startOrder = taskDeploy.getStartOrder();
-
         //部署命令和启动命令都为空
-        if (!PipelineUtil.isNoNull(startOrder) && !PipelineUtil.isNoNull(deployOrder)){
+        if (!PipelineUtil.isNoNull(deployOrder)){
            return;
         }
 
@@ -188,15 +196,6 @@ public class TaskDeployExecServiceImpl implements TaskDeployExecService {
             }
         }
 
-        if (PipelineUtil.isNoNull(startOrder)){
-            List<String> list = PipelineUtil.execOrder(startOrder);
-            for (String s : list) {
-                String key = variableServer.replaceVariable(pipelineId, taskId, s);
-                String orders = "cd "+" "+ startAddress+";" + key;
-                tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"执行启动命令：" + key );
-                sshOrder(session,orders, taskId);
-            }
-        }
 
     }
 
@@ -285,7 +284,6 @@ public class TaskDeployExecServiceImpl implements TaskDeployExecService {
         tasksInstanceService.readCommandExecResult(process, "UTF-8", error(41), taskId);
         exec.disconnect();
     }
-
 
     /**
      * 发送文件

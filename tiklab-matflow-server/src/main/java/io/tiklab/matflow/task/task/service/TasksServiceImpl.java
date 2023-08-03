@@ -975,10 +975,7 @@ public class TasksServiceImpl implements TasksService {
 
         if (taskType.equals("31") || taskType.equals("liunx")){
             if (deploy.getAuthType() == 1){
-                // if (!PipelineUtil.isNoNull(deploy.getDeployAddress())){
-                //    return false;
-                // }
-                return PipelineUtil.isNoNull(deploy.getStartAddress());
+                // return PipelineUtil.isNoNull(deploy.getStartAddress());
             }
         }
         return true;

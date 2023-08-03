@@ -19,6 +19,9 @@ public class TaskBuildProductEntity {
     @Column(name = "instance_id",notNull = true)
     private String instanceId;
 
+    @Column(name = "product_name",notNull = true)
+    private String productName;
+
 
     public String getId() {
         return id;
@@ -42,5 +45,13 @@ public class TaskBuildProductEntity {
 
     public void setInstanceId(String instanceId) {
         this.instanceId = instanceId;
+    }
+
+    public String getProductName() {
+        return productName;
+    }
+
+    public void setProductName(String productName) {
+        this.productName = productName;
     }
 }

@@ -1,14 +1,16 @@
 
 #jenkins项目目录
-jenkins_name=tiklab-postin-ee
+jenkins_name=tiklab-matflow
 #应用名称
-app_name=tiklab-postin-ee
+app_name=tiklab-matflow
+
+Environment=test
+system_type=linux
+
 #不同环境ip地址
-dev_ip=
-test_ip=172.11.1.15
-demo_ip=172.12.1.15
-prd_ip=172.13.1.19
-aliyun_ip=
+dev_ip=172.10.1.12
+test_ip=172.11.1.18
+demo_ip=172.12.1.18
 #部署位置
 build_address=/usr/local/apps
 #历史文件夹
@@ -81,14 +83,12 @@ build_prd(){
     app_package
     echo "制品位置："${tar_file}
     echo "制品解压后文件名称："${app_file}
-     ip=${prd_ip}
 }
 
 build_aliyun(){
     app_package
     echo "制品位置："${tar_file}
     echo "制品解压后文件名称："${app_file}
-     ip=${aliyun_ip}
 }
 
 case ${system_type} in
@@ -121,7 +121,8 @@ case ${Environment} in
     build_demo
     ;;
   "prd")
-    build_prd
+    echo "当前环境未配置执行程序！"
+    exit 0
     ;;
   "aliyun")
     echo "当前环境未配置执行程序！"
@@ -150,6 +151,7 @@ scp -r ${tar_file} ${ip}:${history_address}
 tar="tar -xvf ${history_address}/${app_tar_file} -C ${build_address}"
 
 #启动命令
+#start="cd ${build_address}/${app_file}/bin;source /etc/profile;sh shutdown.sh;nohup sh startup.sh > /dev/null 2>&1 &"
 start="cd ${build_address}/${app_file}/bin;source /etc/profile;sh shutdown.sh;sh startup.sh "
 
 #解压文件
@@ -157,7 +159,3 @@ ssh root@${ip} ${tar}
 
 #启动
 ssh root@${ip} ${start}
-
-
-
-
