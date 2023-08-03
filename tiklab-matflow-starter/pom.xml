@@ -355,7 +355,7 @@
                                 <descriptor>assembly/distribution-${assembly}.xml</descriptor>
                             </descriptors>
                             <finalName>tiklab-matflow-${version}-${timestamp}</finalName>
-<!--                            <appendAssemblyId>false</appendAssemblyId>-->
+                            <appendAssemblyId>false</appendAssemblyId>
                         </configuration>
                         <phase>package</phase>
                         <goals>
