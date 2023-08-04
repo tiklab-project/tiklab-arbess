@@ -73,104 +73,31 @@ public class PipelineDao {
         return jpaTemplate.findList(PipelineEntity.class,idList);
     }
 
-    /**
-     * 获取用户拥有的流水线
-     * @param strings 拼装的流水线id
-     * @return 流水线实体集合
-     */
-    public List<PipelineEntity> findUserPipeline(String[] strings){
-        List<Order> orderList = OrderBuilders.instance().desc("createTime").get();
-        QueryCondition queryCondition = QueryBuilders.createQuery(PipelineEntity.class)
-                .in("id", strings)
-                .orders(orderList)
-                .get();
-        return jpaTemplate.findList(queryCondition,PipelineEntity.class);
-    }
-
-    /**
-     * 查询全局流水线
-     * @return 流水线实体集合
-     */
-    public List<PipelineEntity> findAllPublicPipeline(){
-        String sql = " select p.* from pip_pipeline p";
-        sql = sql.concat(" where p.power = 1");
-        return jpaTemplate.getJdbcTemplate().query(sql, new BeanPropertyRowMapper(PipelineEntity.class));
-    }
-
-    /**
-     * 获取用户收藏的流水线
-     * @param userId 用户id
-     * @param idString 拼装的流水线id
-     * @return 流水线实体集合
-     */
-    public List<PipelineEntity> findPipelineFollow(String userId, StringBuilder idString){
-        String sql = "select p.* from pip_pipeline p ";
-        sql = sql.concat(" where p.id  "
-                + " in ("+ idString +")"
-                + " and p.id "
-                + " in (select pip_other_follow.pipeline_id from pip_other_follow"
-                + " where pip_other_follow.user_id  =  '" + userId + "'  )");
-        JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
-        return  jdbcTemplate.query(sql, new BeanPropertyRowMapper(PipelineEntity.class));
-    }
-
-    public Pagination<PipelineEntity> findUserPipelineQuery(String[] idString, PipelineQuery query){
-        QueryBuilders builders = QueryBuilders.createQuery(PipelineEntity.class);
-
-        if (!Objects.isNull(query.getUserId())){
-            builders.eq("userId",query.getUserId());
-        }
-
-        if (!Objects.isNull(query.getPipelineName())){
-            builders.like("name",query.getPipelineName());
-        }
-
-        if (!Objects.isNull(query.getPipelineType())){
-            builders.eq("type",query.getPipelineType());
-        }
-        if (!Objects.isNull(query.getPipelineState())){
-            builders.eq("state",query.getPipelineState());
-        }
-
-        if (!Objects.isNull(query.getPipelinePower())){
-            builders.eq("power",query.getPipelinePower());
-        }
-
-        builders.in("id",idString);
-
-
-        QueryCondition pipelineEntityList =  builders.pagination(query.getPageParam())
+    public List<PipelineEntity> findPipelineList(PipelineQuery query){
+        QueryCondition builders = QueryBuilders.createQuery(PipelineEntity.class)
+                .eq("userId",query.getUserId())
+                .eq("type",query.getPipelineType())
+                .eq("state",query.getPipelineState())
+                .eq("power",query.getPipelinePower())
+                .like("name",query.getPipelineName())
+                .in("id",query.getIdString())
                 .orders(query.getOrderParams())
                 .get();
-        return jpaTemplate.findPage(pipelineEntityList, PipelineEntity.class);
+        return jpaTemplate.findList(builders, PipelineEntity.class);
     }
 
-    /**
-     * 查询用户未收藏的流水线
-     * @param userId 用户id
-     * @param idString 拼装的流水线id
-     * @return 流水线实体集合
-     */
-    public List<PipelineEntity> findPipelineNotFollow(String userId, StringBuilder idString){
-        String sql = "select p.* from pip_pipeline p ";
-        sql = sql.concat(" where p.id  "
-                + " in ("+ idString +")"
-                + " and p.id "
-                + " not in (select pip_other_follow.pipeline_id from pip_other_follow"
-                + " where pip_other_follow.user_id  =  '" + userId + "'  )");
-        JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
-        return  jdbcTemplate.query(sql, new BeanPropertyRowMapper(PipelineEntity.class));
-    }
-
-    /**
-     * 根据名称模糊查询
-     * @param pipelineName 查询条件
-     * @return 流水线集合
-     */
-    public List<PipelineEntity> findPipelineByName(String pipelineName){
+    public Pagination<PipelineEntity> findPipelinePage(PipelineQuery query){
         QueryCondition queryCondition = QueryBuilders.createQuery(PipelineEntity.class)
-                .like("name", pipelineName).get();
-        return jpaTemplate.findList(queryCondition, PipelineEntity.class);
+                .eq("userId",query.getUserId())
+                .eq("type",query.getPipelineType())
+                .eq("state",query.getPipelineState())
+                .eq("power",query.getPipelinePower())
+                .like("name",query.getPipelineName())
+                .in("id",query.getIdString())
+                .pagination(query.getPageParam())
+                .orders(query.getOrderParams())
+                .get();
+        return jpaTemplate.findPage(queryCondition, PipelineEntity.class);
     }
 
 

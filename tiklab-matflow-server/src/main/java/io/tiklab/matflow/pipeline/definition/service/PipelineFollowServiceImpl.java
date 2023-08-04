@@ -7,11 +7,13 @@ import io.tiklab.matflow.pipeline.definition.dao.PipelineFollowDao;
 import io.tiklab.matflow.pipeline.definition.entity.PipelineFollowEntity;
 import io.tiklab.matflow.pipeline.definition.model.Pipeline;
 import io.tiklab.matflow.pipeline.definition.model.PipelineFollow;
+import io.tiklab.matflow.pipeline.definition.model.PipelineFollowQuery;
 import io.tiklab.matflow.support.util.PipelineUtil;
 import io.tiklab.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -48,9 +50,20 @@ public class PipelineFollowServiceImpl implements PipelineFollowService {
         }
     }
 
+    @Override
     public List<PipelineFollow> findUserFollowPipeline(String userId){
         List<PipelineFollowEntity> list =
                 pipelineFollowDao.findUserFollowPipeline(userId);
+        return BeanMapper.mapList(list, PipelineFollow.class);
+    }
+
+    @Override
+    public List<PipelineFollow> findFollowQueryList(PipelineFollowQuery followQuery){
+        List<PipelineFollowEntity> list =
+                pipelineFollowDao.findFollowQueryList(followQuery);
+        if (list == null || list.size() == 0){
+            return Collections.emptyList();
+        }
         return BeanMapper.mapList(list, PipelineFollow.class);
     }
 

@@ -2,7 +2,10 @@ package io.tiklab.matflow.pipeline.definition.dao;
 
 import io.tiklab.dal.jdbc.JdbcTemplate;
 import io.tiklab.dal.jpa.JpaTemplate;
+import io.tiklab.dal.jpa.criterial.condition.QueryCondition;
+import io.tiklab.dal.jpa.criterial.conditionbuilder.QueryBuilders;
 import io.tiklab.matflow.pipeline.definition.entity.PipelineFollowEntity;
+import io.tiklab.matflow.pipeline.definition.model.PipelineFollowQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.stereotype.Repository;
@@ -95,6 +98,14 @@ public class PipelineFollowDao {
     }
 
 
+    public List<PipelineFollowEntity> findFollowQueryList(PipelineFollowQuery followQuery) {
+        QueryCondition queryCondition = QueryBuilders.createQuery(PipelineFollowEntity.class)
+                .eq("userId", followQuery.getUserId())
+                .eq("pipelineId", followQuery.getPipelineId())
+                .orders(followQuery.getOrderParams())
+                .get();
+        return jpaTemplate.findList(queryCondition, PipelineFollowEntity.class);
+    }
 
 
 

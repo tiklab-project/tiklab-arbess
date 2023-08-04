@@ -1,11 +1,14 @@
 package io.tiklab.matflow.support.authority.service;
 
 import io.tiklab.beans.BeanMapper;
+import io.tiklab.core.page.Pagination;
 import io.tiklab.eam.common.context.LoginContext;
 import io.tiklab.matflow.pipeline.definition.dao.PipelineDao;
 import io.tiklab.matflow.pipeline.definition.entity.PipelineEntity;
 import io.tiklab.matflow.pipeline.definition.model.Pipeline;
+import io.tiklab.matflow.pipeline.definition.model.PipelineQuery;
 import io.tiklab.matflow.support.util.PipelineFinal;
+import io.tiklab.matflow.support.util.PipelineUtil;
 import io.tiklab.privilege.dmRole.service.DmRoleService;
 import io.tiklab.privilege.role.model.PatchUser;
 import io.tiklab.user.dmUser.model.DmUser;
@@ -16,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -34,30 +38,15 @@ public class PipelineAuthorityServiceImpl implements PipelineAuthorityService{
     @Override
     public void createDmUser(String pipelineId, List<PatchUser> userList){
         //拉入创建人
-        DmUser dmUser = new DmUser();
-        dmUser.setDomainId(pipelineId);
         User user = new User();
         if (userList == null){
             user.setId(LoginContext.getLoginId());
-            dmUser.setUser(user);
-            dmUser.setType(1);
+
             dmRoleService.initDmRoles(pipelineId, LoginContext.getLoginId(), PipelineFinal.appName);
             return;
         }
-
-        //多个用户
-        for (PatchUser patchUser : userList) {
-            dmUser.setType(0);
-            user.setId(patchUser.getId());
-            dmUser.setUser(user);
-            if (patchUser.getId().equals(LoginContext.getLoginId())){
-                dmUser.setType(1);
-            }
-        }
-
         //关联权限
         dmRoleService.initPatchDmRole(pipelineId,userList, PipelineFinal.appName);
-
     }
 
     @Override
@@ -69,21 +58,27 @@ public class PipelineAuthorityServiceImpl implements PipelineAuthorityService{
     public String[] findUserPipelineIdString(String userId){
 
         List<PipelineEntity> allPipeline1 = pipelineDao.findAllPipeline();
+        // 流水线为空
         if (Objects.isNull(allPipeline1) || allPipeline1.size() == 0){
             return new String[]{};
         }
-        List<String> list = new ArrayList<>();
 
-        List<PipelineEntity> allPipeline = pipelineDao.findAllPublicPipeline();
+        List<String> list = new ArrayList<>();
+        // 查询公共的流水线
+        PipelineQuery pipelineQuery = new PipelineQuery();
+        pipelineQuery.setPipelinePower(1);
+        List<PipelineEntity> allPipeline = pipelineDao.findPipelineList(pipelineQuery);
+
         if (!Objects.isNull(allPipeline)){
             for (PipelineEntity pipelineEntity : allPipeline) {
                 list.add(pipelineEntity.getId());
             }
         }
+        // 流水线全部都为公共的
         if (allPipeline1.size() == allPipeline.size()){
             return list.toArray(new String[0]);
         }
-
+        // 查询用户拥有的流水线
         DmUserQuery dmUserQuery = new DmUserQuery();
         dmUserQuery.setUserId(userId);
         List<DmUser> allDmUser = dmUserService.findDmUserList(dmUserQuery);
@@ -115,7 +110,7 @@ public class PipelineAuthorityServiceImpl implements PipelineAuthorityService{
         dmUserQuery.setDomainId(pipelineId);
         List<DmUser> allDmUser =  dmUserService.findDmUserList(dmUserQuery);
         if (allDmUser == null){
-            return null;
+            return Collections.emptyList();
         }
 
         List<User> userList = new ArrayList<>();
@@ -129,7 +124,9 @@ public class PipelineAuthorityServiceImpl implements PipelineAuthorityService{
     @Override
     public List<Pipeline> findUserPipeline(String userId) {
         String[] idString = findUserPipelineIdString(userId);
-        List<PipelineEntity> pipelineEntities = pipelineDao.findUserPipeline(idString);
+        PipelineQuery query = new PipelineQuery();
+        query.setIdString(idString);
+        List<PipelineEntity> pipelineEntities = pipelineDao.findPipelineList(query);
         return BeanMapper.mapList(pipelineEntities,Pipeline.class);
 
     }

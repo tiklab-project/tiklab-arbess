@@ -3,6 +3,7 @@ package io.tiklab.matflow.pipeline.definition.service;
 import io.tiklab.beans.BeanMapper;
 import io.tiklab.core.exception.ApplicationException;
 import io.tiklab.core.page.Pagination;
+import io.tiklab.core.page.PaginationBuilder;
 import io.tiklab.eam.common.context.LoginContext;
 import io.tiklab.join.JoinTemplate;
 import io.tiklab.matflow.home.service.PipelineHomeService;
@@ -208,7 +209,9 @@ public class PipelineServiceImpl implements PipelineService {
     public List<Pipeline> findUserPipeline(){
         String userId = LoginContext.getLoginId();
         String[] builder = authorityService.findUserPipelineIdString(userId);
-        List<PipelineEntity> userPipeline = pipelineDao.findUserPipeline(builder);
+        PipelineQuery pipelineQuery = new PipelineQuery();
+        pipelineQuery.setIdString(builder);
+        List<PipelineEntity> userPipeline = pipelineDao.findPipelineList(pipelineQuery);
         if (userPipeline != null){
             return BeanMapper.mapList(userPipeline, Pipeline.class);
         }
@@ -218,19 +221,26 @@ public class PipelineServiceImpl implements PipelineService {
     @Override
     public Pagination<PipelineExecMessage> findUserPipelinePage(PipelineQuery query){
         String loginId = LoginContext.getLoginId();
-        List<PipelineFollow> followPipeline = followService.findUserFollowPipeline(loginId);
-        int size = followPipeline.size();
+
+        // 查询用户收藏的流水线
+        PipelineFollowQuery followQuery = new PipelineFollowQuery();
+        followQuery.setUserId(loginId);
+        List<PipelineFollow> followPipeline = followService.findFollowQueryList(followQuery);
+
         Pagination<PipelineEntity> userPipelineQuery;
         List<Pipeline> list = new ArrayList<>();
+        // 查询收藏的流水线
         if (Objects.equals(query.getPipelineFollow(),1)){
+            // 当前用户未收藏流水线
             if (Objects.equals(followPipeline.size(),0)){
                 return null;
             }
-            String[] strings = new String[size];
-            for (int i = 0; i < size; i++) {
+            String[] strings = new String[followPipeline.size()];
+            for (int i = 0; i < followPipeline.size(); i++) {
                 strings[i] = followPipeline.get(i).getPipeline().getId();
             }
-            userPipelineQuery = pipelineDao.findUserPipelineQuery(strings, query);
+            query.setIdString(strings);
+            userPipelineQuery = pipelineDao.findPipelinePage(query);
             List<PipelineEntity> pipelineEntityList = userPipelineQuery.getDataList();
             List<Pipeline> pipelineList = BeanMapper.mapList(pipelineEntityList, Pipeline.class);
             for (Pipeline pipeline : pipelineList) {
@@ -238,48 +248,41 @@ public class PipelineServiceImpl implements PipelineService {
                 list.add(pipeline);
             }
         } else {
+            // 获取用户有权限查看的流水线
             String[] builder = authorityService.findUserPipelineIdString(loginId);
-            userPipelineQuery =  pipelineDao.findUserPipelineQuery(builder, query);
+            query.setIdString(builder);
+            userPipelineQuery =  pipelineDao.findPipelinePage(query);
             List<PipelineEntity> pipelineEntityList = userPipelineQuery.getDataList();
             List<Pipeline> pipelineList = BeanMapper.mapList(pipelineEntityList, Pipeline.class);
-            if (!Objects.equals(size,0)){
+            if (followPipeline.isEmpty()){
+                list.addAll(pipelineList);
+            }else {
                 for (Pipeline pipeline : pipelineList) {
                     String id = pipeline.getId();
-                    for (PipelineFollow pipelineFollow : followPipeline) {
-                        String s = pipelineFollow.getPipeline().getId();
-                        if (!Objects.equals(id,s)){
-                            continue;
-                        }
+                    // 查询用户是否收藏点前流水线
+                    PipelineFollowQuery pipelineFollowQuery = new PipelineFollowQuery();
+                    pipelineFollowQuery.setPipelineId(id);
+                    pipelineFollowQuery.setUserId(loginId);
+                    List<PipelineFollow> followQueryList = followService.findFollowQueryList(pipelineFollowQuery);
+                    if (!followQueryList.isEmpty()){
                         pipeline.setCollect(1);
                     }
                     list.add(pipeline);
                 }
-            }else {
-                list.addAll(pipelineList);
             }
         }
-
         if (Objects.isNull(userPipelineQuery.getDataList())){
             return null;
         }
-
-        List<PipelineExecMessage> allStatus = findAllExecMessage(list);
-        Pagination<PipelineExecMessage> pagination  = new Pagination<>();
-        pagination.setBeginIndex(userPipelineQuery.getBeginIndex());
-        pagination.setEndIndex(userPipelineQuery.getEndIndex());
-        pagination.setCurrentPage(userPipelineQuery.getCurrentPage());
-        pagination.setPageSize(userPipelineQuery.getPageSize());
-        pagination.setTotalPage(userPipelineQuery.getTotalPage());
-        pagination.setTotalRecord(userPipelineQuery.getTotalRecord());
-        pagination.setDataList(allStatus);
-        return pagination;
+        return PaginationBuilder.build(userPipelineQuery,findAllExecMessage(list));
     }
 
 
     @Override
     public List<Pipeline> findUserFollowPipeline(){
-        String userId = LoginContext.getLoginId();
-        List<PipelineFollow> followPipeline = followService.findUserFollowPipeline(userId);
+        PipelineFollowQuery pipelineFollowQuery = new PipelineFollowQuery();
+        pipelineFollowQuery.setUserId(LoginContext.getLoginId());
+        List<PipelineFollow> followPipeline = followService.findFollowQueryList(pipelineFollowQuery);
         int size = followPipeline.size();
         String[] strings = new String[size];
         for (int i = 0; i < size; i++) {
@@ -288,17 +291,24 @@ public class PipelineServiceImpl implements PipelineService {
         if (strings.length == 0){
             return Collections.emptyList();
         }
-        List<PipelineEntity> pipelineEntityList = pipelineDao.findUserPipeline(strings);
+        PipelineQuery pipelineQuery = new PipelineQuery();
+        pipelineQuery.setIdString(strings);
+        List<PipelineEntity> pipelineEntityList = pipelineDao.findPipelineList(pipelineQuery);
        return BeanMapper.mapList(pipelineEntityList,Pipeline.class);
     }
     
     @Override
     public List<PipelineExecMessage> findPipelineByName(String pipelineName) {
-        List<PipelineEntity> pipelineEntityList = pipelineDao.findPipelineByName(pipelineName);
-        List<Pipeline> list = BeanMapper.mapList(pipelineEntityList, Pipeline.class);
+        PipelineQuery pipelineQuery = new PipelineQuery();
+        pipelineQuery.setPipelineName(pipelineName);
+        List<PipelineEntity> pipelineListQuery = pipelineDao.findPipelineList(pipelineQuery);
+
+        List<Pipeline> list = BeanMapper.mapList(pipelineListQuery, Pipeline.class);
         String loginId = LoginContext.getLoginId();
         String[] builder = authorityService.findUserPipelineIdString(loginId);
-        List<PipelineEntity> allPipeline = pipelineDao.findUserPipeline(builder);
+        PipelineQuery query = new PipelineQuery();
+        query.setIdString(builder);
+        List<PipelineEntity> allPipeline = pipelineDao.findPipelineList(query);
         if (list == null || allPipeline == null){
             return Collections.emptyList();
         }

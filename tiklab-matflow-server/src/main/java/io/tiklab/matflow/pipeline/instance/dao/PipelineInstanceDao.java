@@ -167,9 +167,6 @@ public class PipelineInstanceDao {
         return  list.get(0);
     }
 
-
-
-
     /**
      * 获取最近一次构建信息不包括正在运行的
      * @param pipelineId 流水线id

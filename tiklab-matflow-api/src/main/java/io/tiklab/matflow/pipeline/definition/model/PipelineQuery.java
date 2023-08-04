@@ -32,6 +32,9 @@ public class PipelineQuery {
     @ApiProperty(name ="pipelineFollow",desc = "收藏, 1.收藏 0.未收藏")
     private Integer pipelineFollow;
 
+    @ApiProperty(name ="idString",desc = "流水线id数组")
+    private String[] idString;
+
     @ApiProperty(name ="pageParam",desc = "分页参数")
     private Page pageParam= new Page();
 
@@ -101,5 +104,13 @@ public class PipelineQuery {
 
     public void setOrderParams(List<Order> orderParams) {
         this.orderParams = orderParams;
+    }
+
+    public String[] getIdString() {
+        return idString;
+    }
+
+    public void setIdString(String[] idString) {
+        this.idString = idString;
     }
 }

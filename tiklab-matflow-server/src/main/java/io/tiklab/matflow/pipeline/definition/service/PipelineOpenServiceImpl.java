@@ -61,19 +61,6 @@ public class PipelineOpenServiceImpl implements PipelineOpenService {
         pipelineOpen.setCreateTime(PipelineUtil.date(1));
         pipelineOpen.setUserId(userId);
         createOpen(pipelineOpen);
-
-        // PipelineOpen open = findPipelineOpenNumber(userId, pipelineId);
-        // if (open != null){
-        //     open.setNumber(open.getNumber()+1);
-        //     updateOpen(open);
-        // }else {
-        //     PipelineOpen pipelineOpen = new PipelineOpen();
-        //     pipelineOpen.setUserId(userId);
-        //     pipelineOpen.setPipeline(new Pipeline(pipelineId));
-        //     pipelineOpen.setNumber(1);
-        //     pipelineOpen.setCreateTime(PipelineUtil.date(2));
-        //     createOpen(pipelineOpen);
-        // }
     }
 
     @Override
@@ -94,21 +81,6 @@ public class PipelineOpenServiceImpl implements PipelineOpenService {
     public List<PipelineOpen> findAllOpenList(List<String> idList) {
         List<PipelineOpenEntity> openList = pipelineOpenDao.findAllOpenList(idList);
         return BeanMapper.mapList(openList, PipelineOpen.class);
-    }
-
-    //获取流水线打开次数
-    private PipelineOpen findPipelineOpenNumber(String userId , String pipelineId){
-        if ( findAllOpen()==null){
-            return null;
-        }
-        for (PipelineOpen pipelineOpen : findAllOpen()) {
-            String user = pipelineOpen.getUserId();
-            Pipeline pipeline = pipelineOpen.getPipeline();
-            if (pipeline.getId().equals(pipelineId) && user.equals(userId)){
-                return pipelineOpen;
-            }
-        }
-        return null;
     }
 
     //更新最近打开
@@ -134,24 +106,21 @@ public class PipelineOpenServiceImpl implements PipelineOpenService {
      */
     @Override
     public List<PipelineOpen> findUserAllOpen(int number) {
+
+        System.out.println("时间："+PipelineUtil.date(1));
+
         String userId = LoginContext.getLoginId();
         List<Pipeline> userPipeline = authorityService.findUserPipeline(userId);
         if (userPipeline.isEmpty()){
             return Collections.emptyList();
         }
-
+        System.out.println("时间："+PipelineUtil.date(1));
         List<PipelineOpen> openList = new ArrayList<>();
         for (Pipeline pipeline : userPipeline) {
             String pipelineId = pipeline.getId();
-            // // 判断天数是否超过7天
-            // String openTime = pipelineOpenDao.findUserLastOpenPipeline(userId, pipelineId);
-            // if (openTime.length() < 11){
-            //     openTime = openTime +" 00:00:00";
-            // }
+
             PipelineOpen pipelineOpen = new PipelineOpen();
-
             Date date = PipelineUtil.findDate(Calendar.DATE, -7);
-
             String format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date);
             Integer openNumber = pipelineOpenDao.findUserOpenPipelineNumber(userId, pipelineId, format);
             pipelineOpen.setNumber(openNumber);
@@ -162,7 +131,10 @@ public class PipelineOpenServiceImpl implements PipelineOpenService {
 
             openList.add(pipelineOpen);
         }
+
         openList.sort(Comparator.comparing(PipelineOpen::getNumber).reversed());
+
+        System.out.println("时间："+PipelineUtil.date(1));
 
         List<PipelineOpen> list = new ArrayList<>();
         for (int i = 0; i < openList.size(); i++) {
@@ -173,29 +145,6 @@ public class PipelineOpenServiceImpl implements PipelineOpenService {
         }
         return list;
     }
-
-    //查询流水线最近打开
-    private List<PipelineOpen> findUserAllOpen(){
-        String loginId = LoginContext.getLoginId();
-        List<PipelineOpenEntity> allOpen = pipelineOpenDao.findUserAllOpen(loginId);
-        List<PipelineOpen> list = BeanMapper.mapList(allOpen, PipelineOpen.class);
-        joinTemplate.joinQuery(list);
-        List<PipelineOpen> openList = new ArrayList<>();
-        for (PipelineOpen pipelineOpen : list) {
-            Pipeline pipeline = pipelineOpen.getPipeline();
-            String name = pipeline.getName();
-            if (!PipelineUtil.isNoNull(name)){
-                deleteOpen(pipelineOpen.getOpenId());
-                continue;
-            }
-            openList.add(pipelineOpen);
-        }
-        return openList;
-    }
-
-
-
-
 
 
 }

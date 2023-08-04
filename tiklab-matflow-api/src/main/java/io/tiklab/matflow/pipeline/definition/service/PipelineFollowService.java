@@ -1,6 +1,7 @@
 package io.tiklab.matflow.pipeline.definition.service;
 
 import io.tiklab.matflow.pipeline.definition.model.PipelineFollow;
+import io.tiklab.matflow.pipeline.definition.model.PipelineFollowQuery;
 
 import java.util.List;
 
@@ -21,6 +22,13 @@ public interface PipelineFollowService {
      * @return 收藏的流水线
      */
     List<PipelineFollow> findUserFollowPipeline(String userId);
+
+    /**
+     * 条件查询
+     * @param followQuery 条件
+     * @return 查询结果
+     */
+    List<PipelineFollow> findFollowQueryList(PipelineFollowQuery followQuery);
 
     /**
      * 删除收藏
