@@ -96,6 +96,7 @@ public class TaskDeployExecServiceImpl implements TaskDeployExecService {
                 }
 
                 String key = variableServer.replaceVariable(pipelineId, taskId, startShell);
+
                 Process process = Runtime.getRuntime().exec(key);
                 tasksInstanceService.readCommandExecResult(process, "UTF-8", error(41), taskId);
 
@@ -118,6 +119,12 @@ public class TaskDeployExecServiceImpl implements TaskDeployExecService {
         //连接服务器
         Session session;
         try {
+            Object auth = taskDeploy.getAuth();
+            if (Objects.isNull(auth)){
+                tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"连接失败，服务器地址为空\n");
+                return false;
+            }
+
             session = createSession(taskDeploy);
         } catch (JSchException e) {
             String message = PipelineUtil.date(4)+ e.getMessage();
@@ -126,8 +133,6 @@ public class TaskDeployExecServiceImpl implements TaskDeployExecService {
         }
         tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"建立服务器链接：" );
         tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"服务器链接建立成功。" );
-
-
 
         if (buildProduct == null){
             tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"无法获取到制品!");
@@ -196,8 +201,6 @@ public class TaskDeployExecServiceImpl implements TaskDeployExecService {
                 sshOrder(session,orders, taskId);
             }
         }
-
-
     }
 
 

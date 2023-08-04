@@ -152,15 +152,15 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
             }
 
             // 把系统默认路径添加到流水线变量里面
-            String fileAddress = utilService.findPipelineDefaultAddress(pipelineId,1);
-            File file1 = new File(fileAddress);
-            Variable variable = new Variable();
-            variable.setVarValue(file1.getAbsolutePath());
-            variable.setVarKey("APP_HOME");
-            variable.setTaskId(pipelineId);
-            variable.setType(1);
-            variable.setTaskType(1);
-            variableServer.createVariable(variable);
+            // String fileAddress = utilService.findPipelineDefaultAddress(pipelineId,1);
+            // File file1 = new File(fileAddress);
+            // Variable variable = new Variable();
+            // variable.setVarValue(file1.getAbsolutePath());
+            // variable.setVarKey("APP_HOME");
+            // variable.setTaskId(pipelineId);
+            // variable.setType(1);
+            // variable.setTaskType(1);
+            // variableServer.createVariable(variable);
 
         } catch (IOException e) {
             tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"系统执行命令错误 \n" + e);
