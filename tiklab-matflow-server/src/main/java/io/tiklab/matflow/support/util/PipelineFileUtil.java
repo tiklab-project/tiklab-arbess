@@ -1,6 +1,9 @@
 package io.tiklab.matflow.support.util;
 
 import io.tiklab.core.exception.ApplicationException;
+import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -9,10 +12,15 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.MessageFormat;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 public class PipelineFileUtil {
+
+    private static Logger logger = LoggerFactory.getLogger(PipelineFileUtil.class);
 
 
     /**
@@ -240,6 +248,13 @@ public class PipelineFileUtil {
         StringBuilder s = new StringBuilder();
         List<String> lines ;
         try {
+            if (length == 0){
+                lines = Files.readAllLines(path,StandardCharsets.UTF_8);
+                for (String line : lines) {
+                    s.append(line).append("\n");
+                }
+                return s.toString();
+            }
             lines = Files.readAllLines(path,StandardCharsets.UTF_8);
             for (int i = Math.max(0, lines.size() - length); i < lines.size(); i++) {
                 s.append(lines.get(i)).append("\n");
@@ -257,22 +272,44 @@ public class PipelineFileUtil {
      * @return 是否删除 true 删除成功,false 删除失败
      */
     public static Boolean deleteFile(File file){
-        if (file.isDirectory()) {
-            String[] children = file.list();
-            //递归删除目录中的子目录下
-            if (children != null) {
-                for (String child : children) {
-                    boolean state = deleteFile(new File(file, child));
-                    int tryCount = 0;
-                    while (!state && tryCount ++ < 10) {
-                        System.gc();
-                        state = file.delete();
-                    }
-                }
-            }
-            // 目录此时为空，删除
+
+        if (!file.exists()){
+            logger.error("文件不存在！{}",file.getAbsolutePath());
+            return true;
         }
-        return file.delete();
+
+
+        boolean b = FileUtils.deleteQuietly(file);
+        if (!b){
+            logger.error("文件删除失败！{}",file.getAbsolutePath());
+        }else {
+            logger.warn("文件删除成功！{}",file.getAbsolutePath());
+        }
+        return true;
+        //
+        // if (file.isDirectory()) {
+        //     String[] children = file.list();
+        //     //递归删除目录中的子目录下
+        //     if (children != null) {
+        //         for (String child : children) {
+        //             boolean state = deleteFile(new File(file, child));
+        //             int tryCount = 0;
+        //             while (!state && tryCount ++ < 10) {
+        //                 System.gc();
+        //                 state = file.delete();
+        //             }
+        //         }
+        //     }
+        //     // 目录此时为空，删除
+        // }
+        // return file.delete();
+    }
+
+
+    public static void main(String[] args) {
+        String name = "ni hao a ${app}";
+        String s = name.replaceAll("\\$\\{app}", "zhangcheng");
+        System.out.println(s);
     }
 
 

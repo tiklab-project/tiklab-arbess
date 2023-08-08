@@ -66,6 +66,9 @@ public class PipelineServiceImpl implements PipelineService {
     @Autowired
     private PipelineUtilService utilService;
 
+    @Autowired
+    private PipelineOpenService openService;
+
 
     private static final Logger logger = LoggerFactory.getLogger(PipelineServiceImpl.class);
 
@@ -124,8 +127,11 @@ public class PipelineServiceImpl implements PipelineService {
         joinTemplate.joinQuery(pipeline);
         //删除关联信息
         pipelineDao.deletePipeline(pipelineId); //删除流水线
+
         authorityService.deleteDmUser(pipelineId); //删除关联用户
-        deleteHistory(pipelineId); //删除历史，日志信息
+
+        deleteOther(pipelineId); //删除历史,日志,收藏,最近打开
+
         //删除配置信息
         if (pipeline.getType() == 1){
             tasksService.deleteAllTasksOrTask(pipelineId,1);
@@ -133,6 +139,7 @@ public class PipelineServiceImpl implements PipelineService {
         if (pipeline.getType() == 2){
             stageService.deleteAllStagesOrTask(pipelineId);
         }
+
         //动态与消息
         HashMap<String,Object> map = homeService.initMap(pipeline);
         map.put("title","流水线删除消息");
@@ -334,11 +341,25 @@ public class PipelineServiceImpl implements PipelineService {
 
     @Override
     public List<PipelineRecently> findPipelineRecently(int number){
-        List<Pipeline> userPipeline = findUserPipeline();
 
-        if (userPipeline.isEmpty()){
+        List<String> userRunPipeline = instanceService.findUserRunPipeline();
+        if (userRunPipeline.isEmpty()){
             return Collections.emptyList();
         }
+
+        List<Pipeline> userPipeline = new ArrayList<>();
+        for (String s : userRunPipeline) {
+            if (userPipeline.size() > number){
+                break;
+            }
+            PipelineEntity pipelineEntity = pipelineDao.findPipelineById(s);
+            String userId = LoginContext.getLoginId();
+            if (!pipelineEntity.getUserId().equals(userId)){
+                continue;
+            }
+            userPipeline.add(BeanMapper.map(pipelineEntity, Pipeline.class));
+        }
+
         List<PipelineRecently> list = new ArrayList<>();
         for (Pipeline pipeline : userPipeline) {
             String pipelineId = pipeline.getId();
@@ -380,15 +401,24 @@ public class PipelineServiceImpl implements PipelineService {
      * 删除关联信息
      * @param pipelineId 流水线Id
      */
-    public void deleteHistory ( String pipelineId){
+    private void deleteOther(String pipelineId){
+
         //删除对应的历史
         instanceService.deleteAllInstance(pipelineId);
+
         //删除对应源码文件
         String fileAddress = utilService.findPipelineDefaultAddress(pipelineId,1);
         PipelineFileUtil.deleteFile(new File(fileAddress));
+
         //删除对应日志
         String logAddress = utilService.findPipelineDefaultAddress(pipelineId,2);
-        PipelineFileUtil.deleteFile(new File(logAddress+"/"+pipelineId));
+        PipelineFileUtil.deleteFile(new File(logAddress));
+
+        // 删除最近打开
+        openService.deleteAllOpen(pipelineId);
+
+        // 删除收藏
+        followService.deletePipelineFollow(pipelineId);
     }
 
     /**

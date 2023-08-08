@@ -33,22 +33,22 @@ import java.util.Objects;
 public class TaskBuildExecServiceImpl implements TaskBuildExecService {
 
     @Autowired
-    private TasksInstanceService tasksInstanceService;
+    TasksInstanceService tasksInstanceService;
 
     @Autowired
-    private VariableService variableServer;
+    VariableService variableServer;
     
     @Autowired
-    private ConditionService conditionService;
+    ConditionService conditionService;
 
     @Autowired
-    private ScmService scmService;
+    ScmService scmService;
 
     @Autowired
-    private PipelineUtilService utilService;
+    PipelineUtilService utilService;
 
     @Autowired
-    private  TaskBuildProductService taskBuildProductService;
+    TaskBuildProductService taskBuildProductService;
 
     // 构建
     public boolean build(String pipelineId, Tasks task , String taskType)  {

@@ -86,16 +86,4 @@ public class PipelineUtilServiceImpl implements PipelineUtilService {
     }
 
 
-    public static void main(String[] args) {
-        File file = new File("D:\\opt\\tiklab\\matflow\\pipeline\\3847d6abea9c\\tiklab-matflow-starter\\target\\tiklab-matflow-1.0.0-SNAPSHOT-202308030240.tar.gz");
-        System.out.println(file.getName());
-        boolean matches1 = file.getName().matches("r'tiklab*\\\\.tar\\\\.gz$'");
-
-        boolean matches = file.getName().matches("tiklab.*\\.tar\\.gz");
-        System.out.println(matches);
-
-
-    }
-
-
 }

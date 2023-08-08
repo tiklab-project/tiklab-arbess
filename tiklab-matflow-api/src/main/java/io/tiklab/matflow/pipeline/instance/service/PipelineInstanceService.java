@@ -38,7 +38,7 @@ public interface PipelineInstanceService {
      * @param startWAy 运行方式
      * @return 实例
      */
-    PipelineInstance initializeInstance(String pipelineId , int startWAy);
+    PipelineInstance initializeInstance(String pipelineId,String loginId , int startWAy);
 
 
     /**
@@ -96,6 +96,9 @@ public interface PipelineInstanceService {
      * @return 历史实例
      */
     PipelineInstance findLastInstance(String pipelineId);
+
+
+    List<String> findUserRunPipeline();
 
 
     @FindList

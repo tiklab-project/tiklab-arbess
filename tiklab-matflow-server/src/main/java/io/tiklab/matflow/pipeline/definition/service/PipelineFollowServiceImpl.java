@@ -72,6 +72,18 @@ public class PipelineFollowServiceImpl implements PipelineFollowService {
         pipelineFollowDao.deleteFollow(followId);
     }
 
+
+    public void deletePipelineFollow(String pipelineId){
+        PipelineFollowQuery followQuery = new PipelineFollowQuery();
+        followQuery.setPipelineId(pipelineId);
+        List<PipelineFollowEntity> list = pipelineFollowDao.findFollowQueryList(followQuery);
+
+        for (PipelineFollowEntity pipelineFollowEntity : list) {
+            deletePipelineFollow(pipelineFollowEntity.getId());
+        }
+
+    }
+
     @Override
     public PipelineFollow findOneFollow(String followId) {
         return BeanMapper.map(pipelineFollowDao.findOneFollow(followId), PipelineFollow.class);

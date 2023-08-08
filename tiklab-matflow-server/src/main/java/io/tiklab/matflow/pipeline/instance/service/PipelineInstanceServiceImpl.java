@@ -75,8 +75,7 @@ public class PipelineInstanceServiceImpl implements PipelineInstanceService {
     }
 
     @Override
-    public PipelineInstance initializeInstance(String pipelineId , int startWAy) {
-        String loginId = LoginContext.getLoginId();
+    public PipelineInstance initializeInstance(String pipelineId ,String loginId, int startWAy) {
         String date = PipelineUtil.date(1);
 
         PipelineInstance pipelineInstance = new PipelineInstance(date,startWAy,loginId,pipelineId);
@@ -125,7 +124,7 @@ public class PipelineInstanceServiceImpl implements PipelineInstanceService {
         }
         pipelineInstanceDao.deleteInstance(instanceId);
 
-        String fileAddress = utilService.findPipelineDefaultAddress(instanceId,2);
+        String fileAddress = utilService.findPipelineDefaultAddress(pipeline.getId()+"/"+instanceId,2);
         //删除对应日志
         PipelineFileUtil.deleteFile(new File(fileAddress));
     }
@@ -158,6 +157,10 @@ public class PipelineInstanceServiceImpl implements PipelineInstanceService {
         List<PipelineInstance> allInstance = BeanMapper.mapList(list, PipelineInstance.class);
         allInstance.sort(Comparator.comparing(PipelineInstance::getCreateTime,Comparator.reverseOrder()));
         return allInstance;
+    }
+
+    public List<String> findUserRunPipeline(){
+       return pipelineInstanceDao.findUserPipelineInstance();
     }
 
 

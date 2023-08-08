@@ -5,9 +5,11 @@ import io.tiklab.beans.BeanMapper;
 import io.tiklab.eam.common.context.LoginContext;
 import io.tiklab.join.JoinTemplate;
 import io.tiklab.matflow.pipeline.definition.dao.PipelineOpenDao;
+import io.tiklab.matflow.pipeline.definition.entity.PipelineEntity;
 import io.tiklab.matflow.pipeline.definition.entity.PipelineOpenEntity;
 import io.tiklab.matflow.pipeline.definition.model.Pipeline;
 import io.tiklab.matflow.pipeline.definition.model.PipelineOpen;
+import io.tiklab.matflow.pipeline.definition.model.PipelineOpenQuery;
 import io.tiklab.matflow.pipeline.overview.model.PipelineOverview;
 import io.tiklab.matflow.pipeline.overview.service.PipelineOverviewService;
 import io.tiklab.matflow.support.authority.service.PipelineAuthorityService;
@@ -54,13 +56,32 @@ public class PipelineOpenServiceImpl implements PipelineOpenService {
 
     @Override
     public void updatePipelineOpen(String pipelineId) {
-        String userId = LoginContext.getLoginId();
 
+        if (pipelineId.equals("undefined")){
+            return;
+        }
+        String userId = LoginContext.getLoginId();
         PipelineOpen pipelineOpen = new PipelineOpen();
         pipelineOpen.setPipeline(new Pipeline(pipelineId));
         pipelineOpen.setCreateTime(PipelineUtil.date(1));
         pipelineOpen.setUserId(userId);
         createOpen(pipelineOpen);
+
+        new Thread(() -> {
+            List<String> pipelineIds = pipelineOpenDao.findUserPipelineOpen(userId, 100);
+            if (pipelineIds.size() < 10){
+                return;
+            }
+            for (int i = 9; i < pipelineIds.size(); i++) {
+                PipelineOpenQuery pipelineOpenQuery = new PipelineOpenQuery();
+                pipelineOpenQuery.setPipelineId(pipelineIds.get(i));
+                List<PipelineOpenEntity> pipelineOpenList = pipelineOpenDao.findPipelineOpenList(pipelineOpenQuery);
+                for (PipelineOpenEntity pipelineOpenEntity : pipelineOpenList) {
+                    deleteOpen(pipelineOpenEntity.getOpenId());
+                }
+            }
+        }).start();
+
     }
 
     @Override
@@ -107,43 +128,37 @@ public class PipelineOpenServiceImpl implements PipelineOpenService {
     @Override
     public List<PipelineOpen> findUserAllOpen(int number) {
 
-        System.out.println("时间："+PipelineUtil.date(1));
-
         String userId = LoginContext.getLoginId();
+        List<String> pipelineIds = pipelineOpenDao.findUserPipelineOpen(userId, number);
+        if (pipelineIds.isEmpty()){
+            return Collections.emptyList();
+        }
+
         List<Pipeline> userPipeline = authorityService.findUserPipeline(userId);
         if (userPipeline.isEmpty()){
             return Collections.emptyList();
         }
-        System.out.println("时间："+PipelineUtil.date(1));
-        List<PipelineOpen> openList = new ArrayList<>();
-        for (Pipeline pipeline : userPipeline) {
-            String pipelineId = pipeline.getId();
 
+        List<PipelineOpen> openList = new ArrayList<>();
+
+        for (String pipelineId : pipelineIds) {
             PipelineOpen pipelineOpen = new PipelineOpen();
             Date date = PipelineUtil.findDate(Calendar.DATE, -7);
+
             String format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date);
             Integer openNumber = pipelineOpenDao.findUserOpenPipelineNumber(userId, pipelineId, format);
             pipelineOpen.setNumber(openNumber);
 
+            pipelineOpen.setPipeline(new Pipeline(pipelineId));
+
             PipelineOverview pipelineOverview = overviewService.pipelineOverview(pipelineId);
             pipelineOpen.setPipelineExecState(pipelineOverview);
-            pipelineOpen.setPipeline(pipeline);
+
+            joinTemplate.joinQuery(pipelineOpen);
 
             openList.add(pipelineOpen);
         }
-
-        openList.sort(Comparator.comparing(PipelineOpen::getNumber).reversed());
-
-        System.out.println("时间："+PipelineUtil.date(1));
-
-        List<PipelineOpen> list = new ArrayList<>();
-        for (int i = 0; i < openList.size(); i++) {
-            if (i >= number){
-                continue;
-            }
-            list.add(openList.get(i));
-        }
-        return list;
+        return openList;
     }
 
 

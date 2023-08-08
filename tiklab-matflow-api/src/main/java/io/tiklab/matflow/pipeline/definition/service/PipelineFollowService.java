@@ -36,6 +36,9 @@ public interface PipelineFollowService {
      */
     void deleteFollow(String followId);
 
+
+    void deletePipelineFollow(String pipelineId);
+
     /**
      * 查询单个信息
      * @param followId 收藏id

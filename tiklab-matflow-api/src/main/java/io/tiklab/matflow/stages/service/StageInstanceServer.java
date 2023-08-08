@@ -22,6 +22,9 @@ public interface StageInstanceServer {
      */
     void deleteAllMainStageInstance(String instanceId);
 
+
+    List<String> findAllStageInstanceLogs(String instanceId);
+
     /**
      * 删除阶段下的所有实例
      * @param stageId 阶段id

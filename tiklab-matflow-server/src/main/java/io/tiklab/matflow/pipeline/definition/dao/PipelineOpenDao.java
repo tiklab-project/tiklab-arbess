@@ -1,16 +1,25 @@
 package io.tiklab.matflow.pipeline.definition.dao;
 
 
+import io.tiklab.core.page.Pagination;
 import io.tiklab.dal.jdbc.JdbcTemplate;
 import io.tiklab.dal.jpa.JpaTemplate;
+import io.tiklab.dal.jpa.criterial.condition.QueryCondition;
+import io.tiklab.dal.jpa.criterial.conditionbuilder.QueryBuilders;
+import io.tiklab.matflow.pipeline.definition.entity.PipelineEntity;
 import io.tiklab.matflow.pipeline.definition.entity.PipelineOpenEntity;
+import io.tiklab.matflow.pipeline.definition.model.PipelineOpenQuery;
+import io.tiklab.matflow.pipeline.definition.model.PipelineQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 @Repository
 public class PipelineOpenDao {
@@ -79,6 +88,37 @@ public class PipelineOpenDao {
         return  list.get(0);
     }
 
+    public List<String > findUserPipelineOpen(String userId,Integer number){
+        String sql = "SELECT pipeline_id, MAX(create_time)" +
+                " FROM pip_other_open" +
+                " WHERE user_id = '"+userId+"'" +
+                " GROUP BY pipeline_id" +
+                " ORDER BY MAX(create_time) DESC" +
+                " LIMIT "+ number;
+        JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
+        List<Map<String, Object>> queryForList = jdbcTemplate.queryForList(sql);
+        if (queryForList.isEmpty()){
+            return Collections.emptyList();
+        }
+        List<String> list = new ArrayList<>();
+
+        for (Map<String, Object> stringObjectMap : queryForList) {
+            String id = (String)stringObjectMap.get("pipeline_id");
+            list.add(id);
+        }
+        return list;
+    }
+
+
+    public List<PipelineOpenEntity> findExpirePipelineOpen(String time){
+        String sql = "SELECT * FROM pip_other_open" +
+                " WHERE create_time < '" + time + "'";
+        JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
+        return  jdbcTemplate.query(sql, new BeanPropertyRowMapper(PipelineOpenEntity.class));
+    }
+
+
+
     public String findUserLastOpenPipeline(String userId,String pipelineId){
         String sql = "SELECT create_time FROM pip_other_open " +
                 " WHERE \"user_id\" = '" + userId +
@@ -91,6 +131,29 @@ public class PipelineOpenDao {
         }
         return  list.get(0);
     }
+
+
+    public List<PipelineOpenEntity> findPipelineOpenList(PipelineOpenQuery query){
+        QueryCondition builders = QueryBuilders.createQuery(PipelineOpenEntity.class)
+                .eq("userId",query.getUserId())
+                .eq("pipelineId",query.getPipelineId())
+                .orders(query.getOrderParams())
+                .get();
+        return jpaTemplate.findList(builders, PipelineOpenEntity.class);
+    }
+
+
+    public Pagination<PipelineOpenEntity> findPipelineOpenPage(PipelineOpenQuery query){
+        QueryCondition queryCondition = QueryBuilders.createQuery(PipelineOpenEntity.class)
+                .eq("userId",query.getUserId())
+                .eq("pipelineId",query.getPipelineId())
+                .orders(query.getOrderParams())
+                .pagination(query.getPageParam())
+                .orders(query.getOrderParams())
+                .get();
+        return jpaTemplate.findPage(queryCondition, PipelineOpenEntity.class);
+    }
+
 
     /**
      * 查询所有次数

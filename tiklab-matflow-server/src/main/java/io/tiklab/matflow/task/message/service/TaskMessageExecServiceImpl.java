@@ -28,10 +28,10 @@ import java.util.List;
 public class TaskMessageExecServiceImpl implements TaskMessageExecService {
 
     @Autowired
-    private TasksInstanceService tasksInstanceService;
+    TasksInstanceService tasksInstanceService;
 
     @Autowired
-    private PipelineHomeService homeService;
+    PipelineHomeService homeService;
 
 
     public boolean message(TaskExecMessage taskExecMessage) {
@@ -112,7 +112,7 @@ public class TaskMessageExecServiceImpl implements TaskMessageExecService {
      * @param type 类型
      * @throws ApplicationException 消息发送失败
      */
-    private void messageType(String taskId, String type, List<TaskMessageUser> userList,
+    public void messageType(String taskId, String type, List<TaskMessageUser> userList,
                              HashMap<String, Object> map) throws ApplicationException {
         switch (type){
             case PipelineFinal.MES_SEND_SITE ->{
@@ -124,11 +124,6 @@ public class TaskMessageExecServiceImpl implements TaskMessageExecService {
                 }
                 homeService.message(map,list);
                 tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+ "站内信发送成功");
-            }
-            case "sms" ->{
-                tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+ "发送消息，类型：短信");
-                homeService.smsMessage(new HashMap<>());
-                tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+ "短信发送成功。");
             }
             case "wechat" ->{
                 tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+ "发送消息，类型：微信机器人消息");
@@ -152,7 +147,6 @@ public class TaskMessageExecServiceImpl implements TaskMessageExecService {
                 homeService.message(map,new ArrayList<>());
                 tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+ "钉钉机器人消息成功");
             }
-
             default -> {
                 throw new ApplicationException("没有该类型的消息提醒:"+ type);
             }

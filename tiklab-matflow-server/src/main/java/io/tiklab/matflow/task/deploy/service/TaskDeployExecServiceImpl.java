@@ -36,19 +36,16 @@ import java.util.Objects;
 public class TaskDeployExecServiceImpl implements TaskDeployExecService {
 
     @Autowired
-    private TasksInstanceService tasksInstanceService;
+    TasksInstanceService tasksInstanceService;
 
     @Autowired
-    private VariableService variableServer;
+    VariableService variableServer;
 
     @Autowired
-    private ConditionService conditionService;
+    ConditionService conditionService;
 
     @Autowired
-    private PipelineUtilService utilService;
-
-    @Autowired
-    private TaskBuildProductService taskBuildProductService;
+    TaskBuildProductService taskBuildProductService;
 
     private static final Logger logger = LoggerFactory.getLogger(TaskDeployExecServiceImpl.class);
 
@@ -91,7 +88,9 @@ public class TaskDeployExecServiceImpl implements TaskDeployExecService {
                 }
 
                 if (!Objects.isNull(buildProduct)){
+                    startShell = startShell.replaceAll("\\$\\{DEFAULT_ARTIFACT_ADDRESS}",buildProduct.getProductAddress() );
                     startShell = startShell.replaceAll("DEFAULT_ARTIFACT_ADDRESS",buildProduct.getProductAddress() );
+                    startShell = startShell.replaceAll("\\$\\{DEFAULT_ARTIFACT}", buildProduct.getProductName());
                     startShell = startShell.replaceAll("DEFAULT_ARTIFACT", buildProduct.getProductName());
                 }
 
@@ -157,8 +156,10 @@ public class TaskDeployExecServiceImpl implements TaskDeployExecService {
 
         String deployOrder = taskDeploy.getDeployOrder();
 
-        String order = deployOrder.replaceAll("DEFAULT_ARTIFACT_ADDRESS",buildProduct.getProductAddress());
-        order = order.replaceAll("DEFAULT_ARTIFACT",  buildProduct.getProductName());
+        String order = deployOrder.replaceAll("\\$\\{DEFAULT_ARTIFACT_ADDRESS}",buildProduct.getProductAddress() );
+        order = order.replaceAll("DEFAULT_ARTIFACT_ADDRESS",buildProduct.getProductAddress() );
+        order = order.replaceAll("\\$\\{DEFAULT_ARTIFACT}", buildProduct.getProductName());
+        order = order.replaceAll("DEFAULT_ARTIFACT", buildProduct.getProductName());
 
         taskDeploy.setDeployOrder(order);
         try {

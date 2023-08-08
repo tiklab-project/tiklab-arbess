@@ -27,6 +27,9 @@ public interface TasksInstanceService {
      */
     void deleteAllInstanceInstance(String instanceId);
 
+
+    List<String> findAllInstanceLogs(String instanceId);
+
     /**
      * 删除阶段下的运行实例
      * @param stageId 阶段id

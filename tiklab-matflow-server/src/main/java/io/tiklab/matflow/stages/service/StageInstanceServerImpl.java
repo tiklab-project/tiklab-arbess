@@ -4,6 +4,7 @@ import io.tiklab.beans.BeanMapper;
 import io.tiklab.matflow.stages.dao.StageInstanceDao;
 import io.tiklab.matflow.stages.entity.StageInstanceEntity;
 import io.tiklab.matflow.stages.model.StageInstance;
+import io.tiklab.matflow.support.util.PipelineFileUtil;
 import io.tiklab.matflow.support.util.PipelineFinal;
 import io.tiklab.matflow.task.task.model.TaskInstance;
 import io.tiklab.matflow.task.task.service.TasksInstanceService;
@@ -21,10 +22,10 @@ import java.util.concurrent.Executors;
 public class StageInstanceServerImpl implements StageInstanceServer{
 
     @Autowired
-    private StageInstanceDao stageInstanceDao;
+    StageInstanceDao stageInstanceDao;
 
     @Autowired
-    private TasksInstanceService tasksInstanceService;
+    TasksInstanceService tasksInstanceService;
 
     @Override
     public String createStageInstance(StageInstance stageInstance) {
@@ -48,6 +49,29 @@ public class StageInstanceServerImpl implements StageInstanceServer{
             deleteStageInstance(id);
         }
     }
+
+    @Override
+    public List<String> findAllStageInstanceLogs(String instanceId){
+        List<StageInstance> allStageInstance = findAllMainStageInstance(instanceId);
+        List<String> list = new ArrayList<>();
+        for (StageInstance stageInstance : allStageInstance) {
+            List<StageInstance> allOtherStageInstance = findAllOtherStageInstance(stageInstance.getId());
+            for (StageInstance instance : allOtherStageInstance) {
+                List<TaskInstance> allTaskInstance = tasksInstanceService.findAllStageInstance(instance.getId());
+                for (TaskInstance taskInstance : allTaskInstance) {
+                    String runLog = taskInstance.getLogAddress();
+                    String readFile = PipelineFileUtil.readFile(runLog, 0);
+                    if (Objects.isNull(readFile)){
+                        continue;
+                    }
+                    list.add(readFile+ "\n");
+                }
+            }
+        }
+        return list;
+    }
+
+
 
     @Override
     public void deleteAllStageInstance(String stageId) {

@@ -41,6 +41,15 @@ public class TasksInstanceController {
         return Result.ok(allLog);
     }
 
+
+    @RequestMapping(path="/findAllInstanceLogs",method = RequestMethod.POST)
+    public Result<List<String>> findAllInstanceLogs(@NotNull String instanceId){
+
+        List<String> allLog = tasksInstanceService.findAllInstanceLogs(instanceId);
+
+        return Result.ok(allLog);
+    }
+
 }
 
 

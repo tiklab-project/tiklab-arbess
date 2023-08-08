@@ -14,7 +14,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 @Repository
 public class PipelineInstanceDao {
@@ -166,6 +169,30 @@ public class PipelineInstanceDao {
         }
         return  list.get(0);
     }
+
+    /**
+     * 最近运行的流水线进行时间排序，并分组
+     * @return
+     */
+    public List<String> findUserPipelineInstance(){
+        String sql = "SELECT pipeline_id, MAX(create_time)" +
+                " FROM pip_pipeline_instance" +
+                " GROUP BY pipeline_id" +
+                " ORDER BY MAX(create_time) DESC";
+        JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
+        List<Map<String, Object>> queryForList = jdbcTemplate.queryForList(sql);
+        if (queryForList.isEmpty()){
+            return Collections.emptyList();
+        }
+        List<String> list = new ArrayList<>();
+
+        for (Map<String, Object> stringObjectMap : queryForList) {
+            String id = (String)stringObjectMap.get("pipeline_id");
+            list.add(id);
+        }
+        return list;
+    }
+
 
     /**
      * 获取最近一次构建信息不包括正在运行的

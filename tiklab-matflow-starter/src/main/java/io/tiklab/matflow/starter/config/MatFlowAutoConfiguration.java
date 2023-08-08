@@ -53,8 +53,8 @@ import org.springframework.context.annotation.Configuration;
 @EnableTodoTaskClient
 
 //登录,认证
-@EnableEamServer
 @EnableEamClient
+@EnableEamServer
 
 //权限中心
 @EnablePrivilegeServer

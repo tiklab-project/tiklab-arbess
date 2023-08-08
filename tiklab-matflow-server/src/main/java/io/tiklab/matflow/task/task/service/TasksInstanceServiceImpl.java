@@ -30,10 +30,10 @@ import java.util.concurrent.Executors;
 public class TasksInstanceServiceImpl implements TasksInstanceService {
 
     @Autowired
-    private TaskInstanceDao taskInstanceDao;
+    TaskInstanceDao taskInstanceDao;
 
     @Autowired
-    private PostprocessInstanceService postInstanceService;
+    PostprocessInstanceService postInstanceService;
 
     //任务运行时间
     private final Map<String,Integer> runTime = new HashMap<>();
@@ -55,6 +55,27 @@ public class TasksInstanceServiceImpl implements TasksInstanceService {
             deleteTaskInstance(taskInstanceId);
         }
     }
+
+    @Override
+    public List<String> findAllInstanceLogs(String instanceId){
+        List<TaskInstance> allInstanceInstance = findAllInstanceInstance(instanceId);
+        if (allInstanceInstance.isEmpty()){
+            return Collections.emptyList();
+        }
+        List<String> list = new ArrayList<>();
+        for (TaskInstance taskInstance : allInstanceInstance) {
+            String runLog = taskInstance.getLogAddress();
+            String readFile = PipelineFileUtil.readFile(runLog, 0);
+            if (Objects.isNull(readFile)){
+                continue;
+            }
+            list.add(readFile + "\n");
+        }
+        return list;
+    }
+
+
+
 
     @Override
     public void deleteAllStageInstance(String stageId) {

@@ -1,5 +1,6 @@
 package io.tiklab.matflow.pipeline.execute.service;
 
+import io.tiklab.eam.common.context.LoginContext;
 import io.tiklab.join.JoinTemplate;
 import io.tiklab.matflow.home.service.PipelineHomeService;
 import io.tiklab.matflow.pipeline.definition.model.Pipeline;
@@ -35,37 +36,37 @@ import java.util.concurrent.Executors;
 public class PipelineExecServiceImpl implements PipelineExecService  {
 
     @Autowired
-    private PipelineService pipelineService;
+    PipelineService pipelineService;
 
     @Autowired
-    private PipelineHomeService homeService;
+    PipelineHomeService homeService;
 
     @Autowired
-    private PostprocessExecService postExecService;
+    PostprocessExecService postExecService;
 
     @Autowired
-    private PipelineInstanceService instanceService;
+    PipelineInstanceService instanceService;
 
     @Autowired
-    private TasksService tasksService;
+    TasksService tasksService;
 
     @Autowired
-    private TasksExecService tasksExecService;
+    TasksExecService tasksExecService;
 
     @Autowired
-    private StageExecService stageExecService;
+    StageExecService stageExecService;
 
     @Autowired
-    private ResourcesService resourcesService;
+    ResourcesService resourcesService;
 
     @Autowired
-    private PipelineVersionService versionService;
+    PipelineVersionService versionService;
 
     @Autowired
-    private PipelineUtilService utilService;
+    PipelineUtilService utilService;
 
     @Autowired
-    private JoinTemplate joinTemplate;
+    JoinTemplate joinTemplate;
 
     private final Logger logger = LoggerFactory.getLogger(PipelineExecServiceImpl.class);
 
@@ -102,7 +103,8 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
             return null;
         }
         execMap.put(pipelineId,pipelineId);
-        return beginExecPipeline(pipeline, startWAy);
+        String loginId = LoginContext.getLoginId();
+        return beginExecPipeline(pipeline,loginId, startWAy);
     }
 
 
@@ -143,7 +145,8 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
         Pipeline pipeline = pipelineService.findPipelineById(key);
 
         execCacheMap.remove(key);
-        beginExecPipeline(pipeline, value);
+        String loginId = LoginContext.getLoginId();
+        beginExecPipeline(pipeline,loginId, value);
     }
 
     /**
@@ -152,14 +155,14 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
      * @param startWAy 流水线执行方式
      * @return 流水线实例
      */
-    private PipelineInstance beginExecPipeline(Pipeline pipeline,int startWAy){
+    private PipelineInstance beginExecPipeline(Pipeline pipeline,String loginId,int startWAy){
         String pipelineId = pipeline.getId();
         pipeline.setState(2);
         pipelineService.updatePipeline(pipeline);
         logger.info(pipeline.getName() + "开始运行。");
 
         PipelineInstance pipelineInstance =
-                instanceService.initializeInstance(pipelineId, startWAy);
+                instanceService.initializeInstance(pipelineId,loginId, startWAy);
         String instanceId = pipelineInstance.getInstanceId();
         // 运行实例放入内存中
         pipelineIdOrInstanceId.put(pipelineId, instanceId);
@@ -339,7 +342,7 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
         }
 
         // 流水线显示在运行，但未产生实例
-        if (instanceId == null){
+        if (Objects.isNull(instanceId)){
             List<PipelineInstance> allInstance = instanceService.findAllInstance();
             allInstance.sort(Comparator.comparing(PipelineInstance::getCreateTime).reversed());
             PipelineInstance latelyInstance = allInstance.get(0);

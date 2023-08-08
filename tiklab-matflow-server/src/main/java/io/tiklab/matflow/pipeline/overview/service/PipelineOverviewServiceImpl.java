@@ -52,33 +52,6 @@ public class PipelineOverviewServiceImpl implements PipelineOverviewService {
             overview.setTime(s);
         }
         return overview;
-
-        //
-        // for (PipelineInstance history : allHistory) {
-        //
-        //     if (history.getRunStatus().equals(PipelineFinal.RUN_ERROR) ){
-        //         state.setErrorNumber(state.getErrorNumber() + 1);
-        //     }
-        //     if (history.getRunStatus().equals(PipelineFinal.RUN_HALT)){
-        //         state.setRemoveNumber(state.getRemoveNumber() + 1);
-        //     }
-        //     if (history.getRunStatus().equals(PipelineFinal.RUN_SUCCESS)){
-        //         state.setSuccessNumber(state.getSuccessNumber() + 1);
-        //     }
-        //     state.setExecTime(state.getExecTime()+history.getRunTime());
-        //     state.setNumber(state.getNumber()+1);
-        // }
-        //
-        // if (state.getNumber() != 0){
-        //     state.setExecTime(state.getExecTime()/state.getNumber()+1);
-        // }
-        //
-        // if (state.getExecTime() == 0){
-        //     state.setTime("0 秒");
-        //     return state;
-        // }
-        // state.setTime(PipelineUtil.formatDateTime(state.getExecTime()));
-        // return state;
     }
 
 

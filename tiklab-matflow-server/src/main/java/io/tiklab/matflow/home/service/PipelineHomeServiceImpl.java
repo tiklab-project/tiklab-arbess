@@ -30,23 +30,21 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-@Exporter
 public class PipelineHomeServiceImpl implements PipelineHomeService {
 
     @Autowired
-    private UserService userService;
+    UserService userService;
 
     @Autowired
-    private SingleSendMessageService sendMessage;
+    SingleSendMessageService sendMessage;
 
     @Autowired
-    private LoggingByTemplService logService;
+    LoggingByTemplService logService;
 
-    // @Autowired
-    // private SmsSignCfgService smsSignCfgService;
+
 
     @Autowired
-    private SendMessageNoticeService dispatchNoticeService;
+    SendMessageNoticeService dispatchNoticeService;
 
 
     @Value("${base.url:null}")
