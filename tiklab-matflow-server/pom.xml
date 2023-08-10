@@ -6,7 +6,7 @@
     <parent>
         <groupId>io.tiklab</groupId>
         <artifactId>tiklab-matflow</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
+        <version>1.0.0.3</version>
     </parent>
     <artifactId>tiklab-matflow-server</artifactId>
     <name>${project.artifactId}</name>
@@ -33,47 +33,42 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
-            <version>3.12.0</version>
+            <version>${commons-lang3.version}</version>
         </dependency>
         <dependency>
             <groupId>io.tiklab</groupId>
             <artifactId>tiklab-dal-jpa</artifactId>
-            <version>${project.version}</version>
+            <version>${tiklab-dal.version}</version>
         </dependency>
         <dependency>
             <groupId>io.tiklab</groupId>
             <artifactId>tiklab-matflow-api</artifactId>
-            <version>${project.version}</version>
+            <version>${project.parent.version}</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/com.github.mwiede/jsch -->
         <dependency>
             <groupId>com.github.mwiede</groupId>
             <artifactId>jsch</artifactId>
-            <version>0.2.7</version>
+            <version>${jsch.version}</version>
         </dependency>
 
         <dependency>
             <groupId>io.tiklab</groupId>
             <artifactId>tiklab-todotask-api</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
+            <version>${tiklab-todotask.version}</version>
         </dependency>
         <dependency>
             <groupId>io.tiklab</groupId>
             <artifactId>tiklab-toolkit-core</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
+            <version>${tiklab-toolkit.version}</version>
         </dependency>
 
-        <dependency>
-            <groupId>io.tiklab</groupId>
-            <artifactId>tiklab-message-api</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
-        </dependency>
 
         <dependency>
             <groupId>io.tiklab</groupId>
             <artifactId>tiklab-message-spring-boot-starter</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
+            <version>${tiklab-message.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
@@ -84,48 +79,48 @@
         <dependency>
             <groupId>org.quartz-scheduler</groupId>
             <artifactId>quartz</artifactId>
-            <version>2.3.2</version>
+            <version>${quartz.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context-support</artifactId>
-            <version>5.3.12</version>
         </dependency>
+
         <dependency>
             <groupId>org.apache.tomcat</groupId>
             <artifactId>tomcat-annotations-api</artifactId>
-            <version>9.0.54</version>
+            <version>${tomcat-annotations-api.version}</version>
             <scope>compile</scope>
         </dependency>
 
         <dependency>
             <groupId>io.tiklab</groupId>
             <artifactId>tiklab-xcode-api</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
+            <version>${tiklab-xcode.version}</version>
         </dependency>
 
         <dependency>
             <groupId>io.tiklab</groupId>
             <artifactId>tiklab-xpack-api</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
+            <version>${tiklab-xpack.version}</version>
         </dependency>
 
         <dependency>
             <groupId>io.tiklab</groupId>
             <artifactId>tiklab-teston-api</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
+            <version>${tiklab-teston.version}</version>
         </dependency>
         <dependency>
             <groupId>io.tiklab</groupId>
-            <artifactId>tiklab-licence-api</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
+            <artifactId>tiklab-postin-doclet</artifactId>
+            <version>${tiklab-postin.version}</version>
         </dependency>
 
         <dependency>
             <groupId>io.tiklab</groupId>
-            <artifactId>tiklab-postin-doclet</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
+            <artifactId>tiklab-licence-api</artifactId>
+            <version>1.0.0.3</version>
         </dependency>
 
     </dependencies>

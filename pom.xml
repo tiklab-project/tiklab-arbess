@@ -7,13 +7,13 @@
     <parent>
         <groupId>io.tiklab</groupId>
         <artifactId>tiklab-dependencies</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
+        <version>1.0.0.3</version>
     </parent>
 
     <artifactId>tiklab-matflow</artifactId>
     <name>${project.artifactId}</name>
     <packaging>pom</packaging>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.0.3</version>
 
     <modules>
         <module>tiklab-matflow-api</module>
@@ -21,112 +21,46 @@
         <module>tiklab-matflow-starter</module>
     </modules>
 
-    <!-- 许可证信息 -->
-    <licenses>
-        <!-- Apache许可证 -->
-        <license>
-            <name>The Apache Software License, Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-        </license>
-    </licenses>
+    <properties>
+        <tiklab-matflow.version>${version}</tiklab-matflow.version>
+        <!--tiklab-->
 
-    <scm>
-        <url>https://gitee.com/zhangzh1978_admin/tiklab_pipeline</url>
-        <connection>https://gitee.com/zhangzh1978_admin/tiklab_pipeline.git</connection>
-        <developerConnection>https://gitee.com/zhangzh1978_admin/tiklab_pipeline</developerConnection>
-    </scm>
+        <tiklab-dal.version>1.0.0.3</tiklab-dal.version>
+        <tiklab-core.version>1.0.0.3</tiklab-core.version>
+        <tiklab-toolkit.version>1.0.0.3</tiklab-toolkit.version>
+        <tiklab-rpc.version>1.0.0.3</tiklab-rpc.version>
+        <tiklab-dss.version>1.0.0.3</tiklab-dss.version>
+        <tiklab-dcs.version>1.0.0.3</tiklab-dcs.version>
+        <tiklab-dfs.version>1.0.0.3</tiklab-dfs.version>
+        <tiklab-codegen.version>1.0.0.3</tiklab-codegen.version>
+        <tiklab-gateway.version>1.0.0.3</tiklab-gateway.version>
+        <tiklab-plugin.version>1.0.0.3</tiklab-plugin.version>
 
-    <profiles>
-        <profile>
-            <id>deploy-local</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <repositories>
-                <repository>
-                    <id>maven-public</id>
-                    <name>maven public</name>
-                    <url>http://172.12.1.11:8081/repository/maven-public/</url>
-                </repository>
-            </repositories>
-            <properties>
-                <profile.assembly.package.suffix>deploy-local</profile.assembly.package.suffix>
-            </properties>
-        </profile>
+        <tiklab-user.version>1.0.0.3</tiklab-user.version>
+        <tiklab-message.version>1.0.0.3</tiklab-message.version>
+        <tiklab-security.version>1.0.0.3</tiklab-security.version>
+        <tiklab-todotask.version>1.0.0.3</tiklab-todotask.version>
+        <tiklab-licence.version>1.0.0.3</tiklab-licence.version>
+        <tiklab-privilege.version>1.0.0.3</tiklab-privilege.version>
+        <tiklab-eam.version>1.0.0.3</tiklab-eam.version>
 
-        <profile>
-            <id>deploy-public</id>
-            <distributionManagement>
-                <snapshotRepository>
-                    <id>sonatype-snapshots</id>
-                    <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
-                </snapshotRepository>
-                <repository>
-                    <id>sonatype-release</id>
-                    <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-                </repository>
-            </distributionManagement>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.sonatype.plugins</groupId>
-                        <artifactId>nexus-staging-maven-plugin</artifactId>
-                        <version>1.6.7</version>
-                        <extensions>true</extensions>
-                        <configuration>
-                            <serverId>taip</serverId>
-                            <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-                            <autoReleaseAfterClose>true</autoReleaseAfterClose>
-                        </configuration>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-source-plugin</artifactId>
-                        <version>2.2.1</version>
-                        <executions>
-                            <execution>
-                                <id>attach-sources</id>
-                                <goals>
-                                    <goal>jar-no-fork</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-gpg-plugin</artifactId>
-                        <version>1.5</version>
-                        <executions>
-                            <execution>
-                                <id>sign-artifacts</id>
-                                <phase>verify</phase>
-                                <goals>
-                                    <goal>sign</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-javadoc-plugin</artifactId>
-                        <version>2.9.1</version>
-                        <executions>
-                            <execution>
-                                <id>attach-javadocs</id>
-                                <goals>
-                                    <goal>jar</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-            <properties>
-                <profile.assembly.package.suffix>deploy-public</profile.assembly.package.suffix>
-            </properties>
-        </profile>
+        <tiklab-postin.version>1.0.0.3</tiklab-postin.version>
+        <tiklab-xcode.version>1.0.0.3</tiklab-xcode.version>
+        <tiklab-xpack.version>1.0.0.3</tiklab-xpack.version>
+        <tiklab-teston.version>1.0.0.3</tiklab-teston.version>
 
-    </profiles>
+        <tiklab-postgresql.version>1.0.0.3</tiklab-postgresql.version>
+        <tiklab-jdk.version>1.0.0.3</tiklab-jdk.version>
+        <tiklab-upgrade.version>1.0.0.3</tiklab-upgrade.version>
+
+
+        <commons-lang3.version>3.10</commons-lang3.version>
+        <jsch.version>0.2.7</jsch.version>
+        <quartz.version>2.3.2</quartz.version>
+        <tomcat-annotations-api.version>9.0.54</tomcat-annotations-api.version>
+
+
+    </properties>
 
 </project>
 
