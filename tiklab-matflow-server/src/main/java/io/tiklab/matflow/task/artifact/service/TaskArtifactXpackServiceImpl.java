@@ -28,7 +28,7 @@ public class TaskArtifactXpackServiceImpl implements TaskArtifactXpackService {
     private static final Logger logger = LoggerFactory.getLogger(TaskCodeXcodeServiceImpl.class);
 
     @Autowired
-    private AuthThirdService authThirdService;
+    AuthThirdService authThirdService;
 
 
     RpcClient rpcClient(){

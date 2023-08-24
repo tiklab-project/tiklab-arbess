@@ -42,6 +42,12 @@ public class MatFlowDsmAutoConfiguration {
         dsmConfig.newVersion("1.0.2", new String[]{
                 "pip-project_1.0.2"
         });
+        dsmConfig.newVersion("1.0.3", new String[]{
+                "pip-project_1.0.3"
+        });
+        dsmConfig.newVersion("1.0.4", new String[]{
+                "pip-project_1.0.4"
+        });
         return dsmConfig;
     }
 

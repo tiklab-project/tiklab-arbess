@@ -1,6 +1,7 @@
 package io.tiklab.matflow.stages.service;
 
 import io.tiklab.matflow.stages.model.StageInstance;
+import io.tiklab.matflow.stages.model.StageInstanceQuery;
 
 import java.util.List;
 
@@ -72,6 +73,9 @@ public interface StageInstanceServer {
 
 
     void removeStageRunTime(String stageInstanceId);
+
+
+    List<StageInstance> findStageInstanceList(StageInstanceQuery query);
 
 
 }

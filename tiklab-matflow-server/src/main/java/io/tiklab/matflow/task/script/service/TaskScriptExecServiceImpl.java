@@ -1,5 +1,6 @@
 package io.tiklab.matflow.task.script.service;
 
+import io.tiklab.matflow.support.util.PipelineFileUtil;
 import io.tiklab.matflow.support.util.PipelineFinal;
 import io.tiklab.matflow.support.util.PipelineUtilService;
 import io.tiklab.matflow.task.task.model.Tasks;
@@ -13,8 +14,12 @@ import io.tiklab.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * 执行bat,sh脚本
@@ -25,16 +30,13 @@ import java.util.List;
 public class TaskScriptExecServiceImpl implements TaskScriptExecService {
 
     @Autowired
-    private TasksInstanceService tasksInstanceService;
+    TasksInstanceService tasksInstanceService;
 
     @Autowired
-    private VariableService variableServer;
+    VariableService variableServer;
 
     @Autowired
-    private ConditionService conditionService;
-
-    @Autowired
-    PipelineUtilService utilService;
+    ConditionService conditionService;
 
     public boolean scripts(String pipelineId, Tasks task , String taskType) {
 
@@ -58,51 +60,152 @@ public class TaskScriptExecServiceImpl implements TaskScriptExecService {
         if (type.equals("72")|| type.equals("shell")){
             name = "Shell脚本";
         }
-        tasksInstanceService.writeExecLog(taskId,  PipelineUtil.date(4)+"执行任务："+name);
+        tasksInstanceService.writeExecLog(taskId,  PipelineUtil.date(4)+"执行："+name);
 
+        // 效验系统是否可以执行当前脚本
         int systemType = PipelineUtil.findSystemType();
-
         if (systemType == 1 && (type.equals("72")|| type.equals("shell")) ){
             tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+ "Windows系统无法执行Shell脚本。");
             return false;
         }
-
         if (systemType == 2 &&  (type.equals("71")|| type.equals("bat") )){
             tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+ "Linux系统无法执行Bat脚本。");
             return false;
         }
 
-        String order = script.getScriptOrder();
-
-        List<String> list = PipelineUtil.execOrder(order);
-        if (list.size() == 0){
-            tasksInstanceService.writeExecLog(taskId, "\n"+ PipelineUtil.date(4)+"任务："+name+"执行完成。");
-            return true;
-        }
+        // 替换脚本中的系统变量
+        String key = variableServer.replaceVariable(pipelineId, taskId, script.getScriptOrder());
 
         try {
-            for (String s : list) {
-                String key = variableServer.replaceVariable(pipelineId, taskId, s);
-                tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+ "执行："+key );
-                String fileAddress = utilService.findPipelineDefaultAddress(pipelineId,1);
-                Process process = PipelineUtil.process(fileAddress, key);
-                String enCode = PipelineFinal.UTF_8;
-                if (PipelineUtil.findSystemType() == 1){
-                    enCode = PipelineFinal.GBK;
-                }
-                boolean result = tasksInstanceService.readCommandExecResult(process, enCode, list.toArray(new String[0]), taskId);
-                if (!result){
-                    tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"任务："+task.getTaskName()+"执行失败。");
-                    return false;
-                }
+            if (type.equals("71")|| type.equals("bat")){
+                execBat(key,taskId);
+            }else {
+                execShell(key,taskId);
             }
-        }catch (IOException | ApplicationException e){
-            String s = PipelineUtil.date(4) + e.getMessage();
-            tasksInstanceService.writeExecLog(taskId,s);
+        }catch (Exception e){
+            String message = e.getMessage();
+            tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+ message);
+            tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"任务："+name+"执行失败！");
             return false;
         }
+
+        // List<String> list = PipelineUtil.execOrder(order);
+        // if (list.size() == 0){
+        //     tasksInstanceService.writeExecLog(taskId, "\n"+ PipelineUtil.date(4)+"任务："+name+"执行完成。");
+        //     return true;
+        // }
+        //
+        // try {
+        //     for (String s : list) {
+        //         String key = variableServer.replaceVariable(pipelineId, taskId, s);
+        //         tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+ "执行："+key );
+        //         String fileAddress = utilService.findPipelineDefaultAddress(pipelineId,1);
+        //         Process process = PipelineUtil.process(fileAddress, key);
+        //         String enCode = PipelineFinal.UTF_8;
+        //         if (PipelineUtil.findSystemType() == 1){
+        //             enCode = PipelineFinal.GBK;
+        //         }
+        //         boolean result = tasksInstanceService.readCommandExecResult(process, enCode, new HashMap<>(), taskId);
+        //         if (!result){
+        //             tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"任务："+task.getTaskName()+"执行失败。");
+        //             return false;
+        //         }
+        //     }
+        // }catch (IOException | ApplicationException e){
+        //     String s = PipelineUtil.date(4) + e.getMessage();
+        //     tasksInstanceService.writeExecLog(taskId,s);
+        //     return false;
+        // }
+
         tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"任务："+name+"执行完成。");
         return true;
+    }
+
+    /**
+     * 执行shell脚本
+     * @param scriptOrder 脚本命令
+     * @param taskId 任务id
+     */
+    private void execShell(String scriptOrder,String taskId){
+
+        // 创建临时文件
+        String tempFile = PipelineFileUtil.createTempFile(scriptOrder,PipelineFinal.FILE_TYPE_SH);
+
+        if (Objects.isNull(tempFile)){
+            throw new ApplicationException("无法获取到执行环境，创建脚本执行文件错误！");
+        }
+
+        File file = new File(tempFile);
+
+        String absolutePath = file.getParentFile().getAbsolutePath();
+        try {
+            // 执行脚本
+            String validOrder =" sh -n " + file.getName();
+            Process processs = PipelineUtil.process(absolutePath, validOrder);
+            tasksInstanceService.readCommandExecResult(processs, PipelineFinal.UTF_8, error(), taskId);
+            int exitCodes = processs.waitFor();
+            if (exitCodes != 0) {
+                PipelineFileUtil.deleteFile(file);
+                throw new ApplicationException("Shell脚本语法错误！");
+            }
+
+            String order = " sh " + file.getName();
+            Process process = PipelineUtil.process(absolutePath, order);
+            tasksInstanceService.readCommandExecResult(process,  PipelineFinal.UTF_8,error(), taskId);
+
+            // 获取执行状态
+            int exitCode = process.waitFor();
+            if (exitCode != 0) {
+                PipelineFileUtil.deleteFile(file);
+                throw new ApplicationException("Shell脚本执行失败");
+            }
+            PipelineFileUtil.deleteFile(file);
+        }catch (Exception e){
+            PipelineFileUtil.deleteFile(file);
+            throw new ApplicationException(e.getMessage());
+        }
+
+    }
+
+    /**
+     * 执行bat及哦啊本
+     * @param scriptOrder 脚本命令
+     * @param taskId 任务id
+     */
+    private void execBat(String scriptOrder,String taskId){
+
+        // 创建临时文件
+        String tempFile = PipelineFileUtil.createTempFile(scriptOrder,PipelineFinal.FILE_TYPE_BAT);
+        if (Objects.isNull(tempFile)){
+            throw new ApplicationException("无法获取到执行环境，创建脚本执行文件错误！");
+        }
+        File file = new File(tempFile);
+        String absolutePath = file.getParentFile().getAbsolutePath();
+        try {
+            String order = " .\\" + file.getName();
+            Process process = PipelineUtil.process(absolutePath, order);
+            tasksInstanceService.readCommandExecResult(process, PipelineFinal.GBK, error(), taskId);
+
+            // 获取执行状态
+            int exitCode = process.waitFor();
+            if (exitCode != 0) {
+                PipelineFileUtil.deleteFile(file);
+                throw new ApplicationException("Bat脚本执行失败");
+            }
+            PipelineFileUtil.deleteFile(file);
+        }catch (Exception e){
+            PipelineFileUtil.deleteFile(file);
+            throw new ApplicationException(e.getMessage());
+        }
+
+    }
+
+
+    private Map<String,String> error(){
+        Map<String,String> map = new HashMap<>();
+        map.put("syntax error:","脚本语法错误！");
+        map.put("invalid option;","");
+        return map;
     }
 
 }

@@ -7,7 +7,6 @@ import io.tiklab.join.annotation.FindList;
 import io.tiklab.join.annotation.FindOne;
 import io.tiklab.join.annotation.JoinProvider;
 import io.tiklab.matflow.pipeline.definition.model.Pipeline;
-import io.tiklab.matflow.pipeline.definition.model.PipelineExecMessage;
 import io.tiklab.matflow.pipeline.definition.model.PipelineQuery;
 import io.tiklab.matflow.pipeline.definition.model.PipelineRecently;
 import io.tiklab.user.user.model.User;
@@ -70,20 +69,7 @@ public interface PipelineService {
      * @param query 查询条件
      * @return 流水线信息
      */
-    Pagination<PipelineExecMessage> findUserPipelinePage(PipelineQuery query);
-
-    /**
-     * 获取用户收藏的流水线
-     * @return 流水线信息
-     */
-    List<Pipeline>  findUserFollowPipeline();
-
-    /**
-     * 模糊查询流水线
-     * @param pipelineName 流水线名称
-     * @return 流水线
-     */
-    List<PipelineExecMessage> findPipelineByName(String pipelineName);
+    Pagination<Pipeline> findUserPipelinePage(PipelineQuery query);
 
 
     /**

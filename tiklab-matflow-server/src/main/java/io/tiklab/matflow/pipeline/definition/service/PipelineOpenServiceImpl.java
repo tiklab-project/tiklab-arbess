@@ -129,13 +129,14 @@ public class PipelineOpenServiceImpl implements PipelineOpenService {
     public List<PipelineOpen> findUserAllOpen(int number) {
 
         String userId = LoginContext.getLoginId();
-        List<String> pipelineIds = pipelineOpenDao.findUserPipelineOpen(userId, number);
-        if (pipelineIds.isEmpty()){
+
+        String[] userPipeline = authorityService.findUserPipelineIdString(userId);
+        if (userPipeline.length == 0){
             return Collections.emptyList();
         }
 
-        List<Pipeline> userPipeline = authorityService.findUserPipeline(userId);
-        if (userPipeline.isEmpty()){
+        List<String> pipelineIds = pipelineOpenDao.findUserPipelineOpen(userId, number);
+        if (pipelineIds.isEmpty()){
             return Collections.emptyList();
         }
 
@@ -143,18 +144,23 @@ public class PipelineOpenServiceImpl implements PipelineOpenService {
 
         for (String pipelineId : pipelineIds) {
             PipelineOpen pipelineOpen = new PipelineOpen();
+            pipelineOpen.setPipeline(new Pipeline(pipelineId));
+
             Date date = PipelineUtil.findDate(Calendar.DATE, -7);
 
             String format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date);
             Integer openNumber = pipelineOpenDao.findUserOpenPipelineNumber(userId, pipelineId, format);
             pipelineOpen.setNumber(openNumber);
 
-            pipelineOpen.setPipeline(new Pipeline(pipelineId));
-
             PipelineOverview pipelineOverview = overviewService.pipelineOverview(pipelineId);
             pipelineOpen.setPipelineExecState(pipelineOverview);
 
             joinTemplate.joinQuery(pipelineOpen);
+
+            if (Objects.isNull(pipelineOpen.getPipeline().getName())){
+                deleteAllOpen(pipelineId);
+                continue;
+            }
 
             openList.add(pipelineOpen);
         }

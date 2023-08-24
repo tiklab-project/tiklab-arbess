@@ -4,6 +4,7 @@ import io.tiklab.join.annotation.FindAll;
 import io.tiklab.join.annotation.FindList;
 import io.tiklab.join.annotation.JoinProvider;
 import io.tiklab.matflow.task.task.model.TaskInstance;
+import io.tiklab.matflow.task.task.model.TaskInstanceQuery;
 
 import java.util.List;
 import java.util.Map;
@@ -142,6 +143,9 @@ public interface TasksInstanceService {
     void writeExecLog(String taskId, String log);
 
 
+    void writeAllExecLog(String taskId, String execLog);
+
+
     TaskInstance findExecInstance(String taskId);
 
 
@@ -153,7 +157,7 @@ public interface TasksInstanceService {
      * @param taskId 任务id
      * @return 执行结果 true:执行完成 false:执行失败
      */
-    boolean readCommandExecResult(Process process , String enCode, String[] error,String taskId);
+    boolean readCommandExecResult(Process process , String enCode, Map<String,String> error,String taskId);
 
     /**
      * 查询所有任务日志
@@ -178,6 +182,9 @@ public interface TasksInstanceService {
 
 
     void removeTaskRuntime(String taskInstanceId);
+
+
+    List<TaskInstance> findTaskInstanceList(TaskInstanceQuery query);
 
 
     @FindList

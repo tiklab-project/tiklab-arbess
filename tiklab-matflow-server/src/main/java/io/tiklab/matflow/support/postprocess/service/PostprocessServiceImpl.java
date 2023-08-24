@@ -43,6 +43,7 @@ public class PostprocessServiceImpl implements PostprocessService {
         tasks.setTaskSort(1);
         tasks.setTaskType(postprocess.getTaskType());
         tasks.setPostprocessId(postId);
+        tasks.setValues(postprocess.getValues());
         tasksService.createTasksOrTask(tasks);
         return postId;
     }

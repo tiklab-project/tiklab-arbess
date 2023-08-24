@@ -27,24 +27,39 @@ import java.util.Objects;
 public class PipelineAuthorityServiceImpl implements PipelineAuthorityService{
 
     @Autowired
-    private DmUserService dmUserService;
+    DmUserService dmUserService;
 
     @Autowired
-    private DmRoleService dmRoleService;
+    DmRoleService dmRoleService;
 
     @Autowired
-    private PipelineDao pipelineDao;
+    PipelineDao pipelineDao;
 
     @Override
     public void createDmUser(String pipelineId, List<PatchUser> userList){
         //拉入创建人
-        User user = new User();
-        if (userList == null){
-            user.setId(LoginContext.getLoginId());
-
+        if (Objects.isNull(userList)){
             dmRoleService.initDmRoles(pipelineId, LoginContext.getLoginId(), PipelineFinal.appName);
+            // 拉入超级管理员
+            if (!LoginContext.getLoginId().equals("111111")){
+                dmRoleService.initDmRoles(pipelineId, "111111", PipelineFinal.appName);
+            }
             return;
         }
+        boolean admin = false;
+        for (PatchUser patchUser : userList) {
+            if (patchUser.getId().equals("111111")){
+                admin = true;
+            }
+        }
+        // 拉入超级管理员
+        if (!admin){
+            PatchUser patchUser = new PatchUser();
+            patchUser.setId("111111");
+            patchUser.setAdminRole(true);
+            userList.add(patchUser);
+        }
+
         //关联权限
         dmRoleService.initPatchDmRole(pipelineId,userList, PipelineFinal.appName);
     }
@@ -78,10 +93,12 @@ public class PipelineAuthorityServiceImpl implements PipelineAuthorityService{
         if (allPipeline1.size() == allPipeline.size()){
             return list.toArray(new String[0]);
         }
+
         // 查询用户拥有的流水线
         DmUserQuery dmUserQuery = new DmUserQuery();
         dmUserQuery.setUserId(userId);
         List<DmUser> allDmUser = dmUserService.findDmUserList(dmUserQuery);
+
         if (Objects.isNull(allDmUser) || allDmUser.size() == 0){
             return list.toArray(new String[0]);
         }
@@ -128,13 +145,7 @@ public class PipelineAuthorityServiceImpl implements PipelineAuthorityService{
         query.setIdString(idString);
         List<PipelineEntity> pipelineEntities = pipelineDao.findPipelineList(query);
         return BeanMapper.mapList(pipelineEntities,Pipeline.class);
-
     }
-
-
-
-
-
 }
 
 

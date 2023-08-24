@@ -73,7 +73,7 @@ public class CronUtils {
         String time = weekDays[day];
 
         Map<String, String > map = new HashMap<>();
-        map.put("cron",time+"/"+date);
+        map.put("cron",time);
         map.put("time",date);
         map.put("weekTime",weekTime(cron));
         return map;

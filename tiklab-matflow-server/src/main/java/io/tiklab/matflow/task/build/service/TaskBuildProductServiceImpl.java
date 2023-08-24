@@ -4,6 +4,7 @@ import io.tiklab.beans.BeanMapper;
 import io.tiklab.matflow.task.build.dao.TaskBuildProductDao;
 import io.tiklab.matflow.task.build.entity.TaskBuildProductEntity;
 import io.tiklab.matflow.task.build.model.TaskBuildProduct;
+import io.tiklab.matflow.task.build.model.TaskBuildProductQuery;
 import io.tiklab.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -43,16 +44,6 @@ public class TaskBuildProductServiceImpl implements TaskBuildProductService {
     }
 
     @Override
-    public TaskBuildProduct findBuildProduct(String instanceId) {
-        List<TaskBuildProductEntity> allBuildProduct = taskBuildProductDao.findBuildProductList(instanceId);
-        if (allBuildProduct == null || allBuildProduct.size() == 0){
-            return null;
-        }
-        List<TaskBuildProduct> taskBuildProducts = BeanMapper.mapList(allBuildProduct, TaskBuildProduct.class);
-        return taskBuildProducts.get(0);
-    }
-
-    @Override
     public List<TaskBuildProduct> findAllBuildProduct() {
         List<TaskBuildProductEntity> allBuildProduct = taskBuildProductDao.findAllBuildProduct();
         if (allBuildProduct == null || allBuildProduct.size() == 0){
@@ -60,4 +51,35 @@ public class TaskBuildProductServiceImpl implements TaskBuildProductService {
         }
         return BeanMapper.mapList(allBuildProduct, TaskBuildProduct.class);
     }
+
+    @Override
+    public List<TaskBuildProduct> findBuildProductList(TaskBuildProductQuery taskBuildProductQuery) {
+        List<TaskBuildProductEntity> allBuildProduct = taskBuildProductDao.findBuildProductList(taskBuildProductQuery);
+        if (allBuildProduct == null || allBuildProduct.size() == 0){
+            return Collections.emptyList();
+        }
+        return BeanMapper.mapList(allBuildProduct, TaskBuildProduct.class);
+    }
+
+
+    @Override
+    public String replace(String instanceId,String strings){
+        TaskBuildProductQuery taskBuildProductQuery = new TaskBuildProductQuery();
+        taskBuildProductQuery.setInstanceId(instanceId);
+        List<TaskBuildProduct> buildProductList = findBuildProductList(taskBuildProductQuery);
+
+        if (buildProductList.isEmpty()){
+            return strings;
+        }
+
+        for (TaskBuildProduct taskBuildProduct : buildProductList) {
+            String key = taskBuildProduct.getKey();
+            String value = taskBuildProduct.getValue();
+            strings = strings.replaceAll("\\$\\{" + key  + "}",value);
+            strings = strings.replaceAll(key,value);
+        }
+        return strings;
+    }
+
+
 }

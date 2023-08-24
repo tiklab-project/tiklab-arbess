@@ -39,7 +39,8 @@ public class PipelineQuery {
     private Page pageParam= new Page();
 
     @ApiProperty(name ="orderParams",desc = "排序参数")
-    private List<Order> orderParams = OrderBuilders.instance().desc("createTime").get();
+    // private List<Order> orderParams = OrderBuilders.instance().desc("createTime").get();
+    private List<Order> orderParams = OrderBuilders.instance().desc("name").get();
 
 
     public String getUserId() {

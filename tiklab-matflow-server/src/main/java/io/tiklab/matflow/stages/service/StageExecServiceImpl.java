@@ -4,12 +4,15 @@ import io.tiklab.core.exception.ApplicationException;
 import io.tiklab.matflow.pipeline.definition.model.Pipeline;
 import io.tiklab.matflow.stages.model.Stage;
 import io.tiklab.matflow.stages.model.StageInstance;
+import io.tiklab.matflow.stages.model.StageInstanceQuery;
 import io.tiklab.matflow.support.postprocess.service.PostprocessExecService;
 import io.tiklab.matflow.support.util.PipelineFinal;
 import io.tiklab.matflow.support.util.PipelineUtilService;
 import io.tiklab.matflow.task.message.model.TaskExecMessage;
+import io.tiklab.matflow.task.task.model.TaskInstance;
 import io.tiklab.matflow.task.task.model.Tasks;
 import io.tiklab.matflow.task.task.service.TasksExecService;
+import io.tiklab.matflow.task.task.service.TasksExecServiceImpl;
 import io.tiklab.matflow.task.task.service.TasksService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +22,7 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -31,29 +35,28 @@ import java.util.concurrent.Future;
 public class StageExecServiceImpl implements  StageExecService {
 
     @Autowired
-    private StageService stageService;
+    StageService stageService;
 
     @Autowired
-    private StageInstanceServer stageInstanceServer;
+    StageInstanceServer stageInstanceServer;
 
     @Autowired
-    private TasksExecService tasksExecService;
+    TasksExecService tasksExecService;
 
     @Autowired
-    private TasksService tasksService;
+    TasksService tasksService;
 
     @Autowired
-    private PostprocessExecService postExecService;
+    PostprocessExecService postExecService;
 
     @Autowired
-    private PipelineUtilService utilService;
+    PipelineUtilService utilService;
 
     //阶段任务实例id及阶段任务实例
     public static Map<String , StageInstance> stageInstanceIdOrStageInstance = new HashMap<>();
 
     //阶段id及阶段任务实例
     private final Map<String , String> stageIdOrStageInstanceId = new HashMap<>();
-
 
     private final Logger logger = LoggerFactory.getLogger(StageExecServiceImpl.class);
 
@@ -127,7 +130,6 @@ public class StageExecServiceImpl implements  StageExecService {
             stageInstanceServer.stageRunTime(stageInstanceId);
             stageInstance.setStageState(PipelineFinal.RUN_RUN);
             stageInstanceServer.updateStageInstance(stageInstance);
-            stageInstanceIdOrStageInstance.remove(stageInstanceId);
             stageInstanceIdOrStageInstance.put(stageInstanceId,stageInstance);
 
             //获取并行阶段
@@ -166,7 +168,7 @@ public class StageExecServiceImpl implements  StageExecService {
                     state = futureMap.get(stageId).get();
                     updateStageExecState(stageId,state);
                     if (!state){
-                        threadPool.shutdown();
+                        // threadPool.shutdown();
                         break;
                     }
                 }
@@ -182,7 +184,46 @@ public class StageExecServiceImpl implements  StageExecService {
             }
         }
         threadPool.shutdown();
+
+        if (!state){
+            runError(pipelineId);
+        }
+
         return state;
+    }
+
+    public void runError(String pipelineId){
+        List<Stage> allMainStage = stageService.findAllMainStage(pipelineId);
+
+        for (Stage stage : allMainStage) {
+            String mainStageId = stage.getStageId();
+            String mainInstanceStageId = stageIdOrStageInstanceId.get(mainStageId);
+
+            if (!Objects.isNull(mainInstanceStageId)){
+                List<Stage> otherStages = stageService.findOtherStage(mainStageId);
+                for (Stage otherStage : otherStages) {
+                    String otherStageId = otherStage.getStageId();
+                    String otherInstanceStageId = stageIdOrStageInstanceId.get(otherStageId);
+                    if (Objects.isNull(otherInstanceStageId)){
+                        continue;
+                    }
+                    List<Tasks> tasks = tasksService.finAllStageTask(otherStageId);
+                    tasksExecService.runError(tasks);
+
+                    StageInstance stageInstance = stageInstanceIdOrStageInstance.get(otherInstanceStageId);
+                    if (!Objects.isNull(stageInstance)){
+                        stageInstance.setStageState(PipelineFinal.RUN_HALT);
+                        stageInstanceServer.updateStageInstance(stageInstance);
+                    }
+                }
+            }
+            StageInstance mainStageInstance = stageInstanceIdOrStageInstance.get(mainInstanceStageId);
+            if (!Objects.isNull(mainStageInstance)){
+                mainStageInstance.setStageState(PipelineFinal.RUN_HALT);
+                stageInstanceServer.updateStageInstance(mainStageInstance);
+            }
+        }
+
     }
 
     /**
@@ -230,6 +271,37 @@ public class StageExecServiceImpl implements  StageExecService {
         if (executorService != null){
             executorService.shutdown();
         }
+    }
+
+    public void stop(String instanceId){
+        if (Objects.isNull(instanceId)){
+            return;
+        }
+
+        StageInstanceQuery stageInstanceQuery = new StageInstanceQuery();
+        stageInstanceQuery.setStageState(PipelineFinal.RUN_RUN);
+        stageInstanceQuery.setInstanceId(instanceId);
+        List<StageInstance> stageInstanceList = stageInstanceServer.findStageInstanceList(stageInstanceQuery);
+        if (stageInstanceList.isEmpty()){
+            return;
+        }
+        for (StageInstance stageInstance : stageInstanceList) {
+            String id = stageInstance.getId();
+            stageInstance.setStageState(PipelineFinal.RUN_HALT);
+
+            stageInstanceQuery = new StageInstanceQuery();
+            stageInstanceQuery.setParentId(id);
+            stageInstanceQuery.setStageState(PipelineFinal.RUN_RUN);
+            stageInstanceList = stageInstanceServer.findStageInstanceList(stageInstanceQuery);
+            for (StageInstance instance : stageInstanceList) {
+                instance.setStageState(PipelineFinal.RUN_HALT);
+                tasksExecService.stop(null,instance.getId(),null);
+                stageInstanceServer.updateStageInstance(instance);
+            }
+            stageInstanceServer.updateStageInstance(stageInstance);
+        }
+
+
     }
 
     /**

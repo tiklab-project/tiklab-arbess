@@ -32,6 +32,9 @@ public interface StageExecService {
     void stopStage(String pipelineId);
 
 
+    void stop(String instanceId);
+
+
 
 
 

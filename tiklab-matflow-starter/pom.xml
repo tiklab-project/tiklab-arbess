@@ -6,7 +6,7 @@
     <parent>
         <groupId>io.tiklab</groupId>
         <artifactId>tiklab-matflow</artifactId>
-        <version>1.0.0.3</version>
+        <version>1.0.0.6</version>
     </parent>
     <artifactId>tiklab-matflow-starter</artifactId>
     <name>${project.artifactId}</name>
@@ -176,7 +176,7 @@
                 <dependency>
                     <groupId>io.tiklab</groupId>
                     <artifactId>tiklab-jdk-windows</artifactId>
-                    <version>${project.version}</version>
+                    <version>${tiklab-jdk.version}</version>
                     <type>zip</type>
                     <scope>provided</scope>
                 </dependency>

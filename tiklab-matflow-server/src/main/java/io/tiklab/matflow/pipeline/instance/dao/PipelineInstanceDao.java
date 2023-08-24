@@ -14,10 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Repository
 public class PipelineInstanceDao {
@@ -84,23 +81,44 @@ public class PipelineInstanceDao {
      * @return 历史
      */
     public Pagination<PipelineInstanceEntity> findPageInstance(PipelineInstanceQuery pipelineInstanceQuery){
-        QueryBuilders builders = QueryBuilders.createQuery(PipelineInstanceEntity.class);
-            if (PipelineUtil.isNoNull(pipelineInstanceQuery.getPipelineId())){
-                builders.eq("pipelineId", pipelineInstanceQuery.getPipelineId());
-            }
-            if (PipelineUtil.isNoNull(pipelineInstanceQuery.getState())) {
-                builders.eq("runStatus", pipelineInstanceQuery.getState());
-            }
+        QueryBuilders queryBuilders = QueryBuilders.createQuery(PipelineInstanceEntity.class)
+                .eq("pipelineId", pipelineInstanceQuery.getPipelineId())
+                .eq("runStatus", pipelineInstanceQuery.getState())
+                .eq("userId", pipelineInstanceQuery.getUserId())
+                .like("findNumber",pipelineInstanceQuery.getNumber());
+
             if (pipelineInstanceQuery.getType() != 0){
-                builders.eq("runWay", pipelineInstanceQuery.getType() );
+                queryBuilders.eq("runWay", pipelineInstanceQuery.getType() );
             }
-            if (pipelineInstanceQuery.getUserId() != null){
-                builders.eq("userId", pipelineInstanceQuery.getUserId() );
+
+            if (Objects.isNull(pipelineInstanceQuery.getNumber())){
+                queryBuilders.like("findNumber",pipelineInstanceQuery.getNumber());
             }
-        QueryCondition pipelineExecInstanceList =  builders.pagination(pipelineInstanceQuery.getPageParam())
+        QueryCondition pipelineExecInstanceList =  queryBuilders.pagination(pipelineInstanceQuery.getPageParam())
                 .orders(pipelineInstanceQuery.getOrderParams())
                 .get();
         return jpaTemplate.findPage(pipelineExecInstanceList, PipelineInstanceEntity.class);
+    }
+
+
+    public List<PipelineInstanceEntity> findInstanceList(PipelineInstanceQuery pipelineInstanceQuery){
+        QueryBuilders queryBuilders = QueryBuilders.createQuery(PipelineInstanceEntity.class)
+                .eq("pipelineId", pipelineInstanceQuery.getPipelineId())
+                .eq("runStatus", pipelineInstanceQuery.getState())
+                .eq("userId", pipelineInstanceQuery.getUserId())
+                .like("findNumber",pipelineInstanceQuery.getNumber());
+
+        if (pipelineInstanceQuery.getType() != 0){
+            queryBuilders.eq("runWay", pipelineInstanceQuery.getType() );
+        }
+
+        if (Objects.isNull(pipelineInstanceQuery.getNumber())){
+            queryBuilders.like("findNumber",pipelineInstanceQuery.getNumber());
+        }
+        QueryCondition pipelineExecInstanceList =  queryBuilders.pagination(pipelineInstanceQuery.getPageParam())
+                .orders(pipelineInstanceQuery.getOrderParams())
+                .get();
+        return jpaTemplate.findList(pipelineExecInstanceList, PipelineInstanceEntity.class);
     }
 
     /**
@@ -109,20 +127,20 @@ public class PipelineInstanceDao {
      * @return 历史
      */
     public Pagination<PipelineInstanceEntity> findAllPageInstance(PipelineInstanceQuery pipelineInstanceQuery){
-        String pipelineId = pipelineInstanceQuery.getPipelineId();
         String sql = "select pip_pipeline_instance.* from pip_pipeline_instance ";
-        sql = sql.concat(" where ( pipeline_id = ");
+        sql = sql.concat(" where pipeline_id in ( ");
+        String ids = "";
+        String[] idList = pipelineInstanceQuery.getIds();
 
-        if (PipelineUtil.isNoNull(pipelineId)){
-            sql = sql.concat("'" + pipelineId + "'");
-        }else {
-            List<Pipeline> pipelineList = pipelineInstanceQuery.getPipelineList();
-            sql = sql.concat("'" +pipelineList.get(0).getId()+ "'");
-            for (int i = 1; i < pipelineList.size(); i++) {
-                sql = sql.concat(" or pipeline_id = '" + pipelineList.get(i).getId()+ "'");
+        for (int i = 0; i < idList.length; i++) {
+            if (i == idList.length-1){
+                ids = ids.concat("'" + idList[i]+ "'");
+            }else {
+                ids = ids.concat("'" + idList[i]+ "',");
             }
         }
-        sql = sql.concat(")");
+        sql = sql.concat(ids+") ");
+
         if (pipelineInstanceQuery.getType() != 0){
             sql = sql.concat(" and run_way = " + pipelineInstanceQuery.getType());
         }
@@ -130,6 +148,14 @@ public class PipelineInstanceDao {
         if (PipelineUtil.isNoNull(pipelineInstanceQuery.getState())){
             sql = sql.concat(" and run_status = '" + pipelineInstanceQuery.getState()+ "'");
         }
+
+        if (PipelineUtil.isNoNull(pipelineInstanceQuery.getPipelineId())){
+            sql = sql.concat(" and pipeline_id = '" + pipelineInstanceQuery.getPipelineId()+ "'");
+        }
+        if (!Objects.isNull(pipelineInstanceQuery.getNumber() )){
+            sql = sql.concat(" and find_number like '%" + pipelineInstanceQuery.getNumber()+ "%'");
+        }
+
 
         sql = sql.concat(" order by create_time desc " +
                 ", case 'run_status' when 'run' then 1 end");//run排在第一

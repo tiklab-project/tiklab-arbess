@@ -10,6 +10,7 @@ import io.tiklab.matflow.support.util.PipelineUtil;
 import io.tiklab.matflow.task.task.dao.TaskInstanceDao;
 import io.tiklab.matflow.task.task.entity.TaskInstanceEntity;
 import io.tiklab.matflow.task.task.model.TaskInstance;
+import io.tiklab.matflow.task.task.model.TaskInstanceQuery;
 import io.tiklab.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -74,9 +75,6 @@ public class TasksInstanceServiceImpl implements TasksInstanceService {
         return list;
     }
 
-
-
-
     @Override
     public void deleteAllStageInstance(String stageId) {
         List<TaskInstance> allStageInstance = findAllStageInstance(stageId);
@@ -101,6 +99,8 @@ public class TasksInstanceServiceImpl implements TasksInstanceService {
         taskInstanceDao.updateInstance(instance);
     }
 
+    private static Integer readLogLength= 600;
+
     @Override
     public List<TaskInstance> findAllInstanceInstance(String instanceId) {
         List<TaskInstanceEntity> pipelineInstance = taskInstanceDao.findPipelineInstance(instanceId);
@@ -108,23 +108,34 @@ public class TasksInstanceServiceImpl implements TasksInstanceService {
         if (Objects.isNull(allInstance) || allInstance.size() == 0){
             return Collections.emptyList();
         }
+        allInstance.sort(Comparator.comparing(TaskInstance::getTaskSort));
+
+        // 没有正在运行的任务是查询所有日志
+        TaskInstance taskInstance1 = allInstance.get(allInstance.size() - 1);
+        String runState = taskInstance1.getRunState();
+        if (!runState.equals(PipelineFinal.RUN_RUN)){
+            readLogLength = 0;
+        }
+
         List<TaskInstance> list = new ArrayList<>();
         for (TaskInstance instance : allInstance) {
             String taskInstanceId = instance.getId();
             //任务是否在运行中
             TasksExecServiceImpl tasksExecService = new TasksExecServiceImpl();
-            TaskInstance taskInstance = tasksExecService.findTaskInstance(taskInstanceId);
+            TaskInstance taskInstance5 = tasksExecService.findTaskInstance(taskInstanceId);
             String time;
-            if (!Objects.isNull(taskInstance)){
+            if (!Objects.isNull(taskInstance5)){
                 Integer integer = findTaskRuntime(taskInstanceId);
-                taskInstance.setRunTime(integer);
+                if (!Objects.isNull(integer)){
+                    taskInstance5.setRunTime(integer);
+                }
                 time = PipelineUtil.formatDateTime(integer);
-                taskInstance.setRunTimeDate(time);
-                list.add(taskInstance);
+                taskInstance5.setRunTimeDate(time);
+                list.add(taskInstance5);
             }else {
                 TaskInstance taskInstances = findPostPipelineRunMessage(taskInstanceId,false);
                 String logAddress = instance.getLogAddress();
-                String readFile = PipelineFileUtil.readFile(logAddress, 100);
+                String readFile = PipelineFileUtil.readFile(logAddress, readLogLength);
                 int date = instance.getRunTime();
                 if (!Objects.isNull(taskInstances)){
                     date =  date + taskInstances.getRunTime();
@@ -136,7 +147,7 @@ public class TasksInstanceServiceImpl implements TasksInstanceService {
                 list.add(instance);
             }
         }
-        list.sort(Comparator.comparing(TaskInstance::getTaskSort));
+        // list.sort(Comparator.comparing(TaskInstance::getTaskSort));
         TaskInstance taskInstance = findPostPipelineRunMessage(instanceId,true);
         if (!Objects.isNull(taskInstance)){
             list.add(list.size(),taskInstance);
@@ -158,7 +169,7 @@ public class TasksInstanceServiceImpl implements TasksInstanceService {
         }
 
         int runTime = 0;
-        TaskInstance taskInstances = new TaskInstance();
+        TaskInstance taskInstances4 = new TaskInstance();
         StringBuilder runLog = new StringBuilder();
         for (PostprocessInstance postprocessInstance : taskPostInstance) {
             String postInstanceId = postprocessInstance.getId();
@@ -173,15 +184,15 @@ public class TasksInstanceServiceImpl implements TasksInstanceService {
             if (Objects.isNull(taskInstance)){
                  taskInstance = BeanMapper.map(postInstance.get(0), TaskInstance.class);
             }
-            String readFile = PipelineFileUtil.readFile(taskInstance.getLogAddress(), 100);
+            String readFile = PipelineFileUtil.readFile(taskInstance.getLogAddress(), readLogLength);
             runTime = runTime + taskInstance.getRunTime();
             runLog.append(readFile).append("\n");
-            taskInstances.setRunState(taskInstance.getRunState());
-            taskInstances.setPostprocessId(postInstanceId);
-            taskInstances.setLogAddress(postprocessInstance.getPostAddress());
+            taskInstances4.setRunState(taskInstance.getRunState());
+            taskInstances4.setPostprocessId(postInstanceId);
+            taskInstances4.setLogAddress(postprocessInstance.getPostAddress());
         }
-        taskInstances.setRunLog(runLog.toString());
-        String runState = taskInstances.getRunState();
+        taskInstances4.setRunLog(runLog.toString());
+        String runState = taskInstances4.getRunState();
         if (Objects.equals(runTime,0) &&
                 !Objects.isNull(runState) &&
                 !Objects.equals(runState,PipelineFinal.RUN_RUN) &&
@@ -189,11 +200,11 @@ public class TasksInstanceServiceImpl implements TasksInstanceService {
             runTime = 1;
         }
         String time = PipelineUtil.formatDateTime(runTime);
-        taskInstances.setRunTimeDate(time);
-        taskInstances.setRunTime(runTime);
-        taskInstances.setTaskName("后置处理");
-        taskInstances.setId("post");
-        return taskInstances;
+        taskInstances4.setRunTimeDate(time);
+        taskInstances4.setRunTime(runTime);
+        taskInstances4.setTaskName("后置处理");
+        taskInstances4.setId("post");
+        return taskInstances4;
     }
 
 
@@ -223,7 +234,7 @@ public class TasksInstanceServiceImpl implements TasksInstanceService {
             }
             String time = PipelineUtil.formatDateTime(taskInstance.getRunTime());
             taskInstance.setRunTimeDate(time);
-            String readFile = PipelineFileUtil.readFile(taskInstance.getLogAddress(), 100);
+            String readFile = PipelineFileUtil.readFile(taskInstance.getLogAddress(), readLogLength);
             runTime = runTime + taskInstance.getRunTime();
             taskInstance.setRunLog(readFile);
             list.add(taskInstance);
@@ -275,12 +286,12 @@ public class TasksInstanceServiceImpl implements TasksInstanceService {
         for (TaskInstance instance : allInstance) {
             String taskInstanceId = instance.getId();
             TasksExecServiceImpl tasksExecService = new TasksExecServiceImpl();
-            TaskInstance taskInstance = tasksExecService.findTaskInstance(taskInstanceId);
+            TaskInstance taskInstance3 = tasksExecService.findTaskInstance(taskInstanceId);
             String time;
-            if (Objects.isNull(taskInstance)){
+            if (Objects.isNull(taskInstance3)){
                 TaskInstance taskInstances = findPostPipelineRunMessage(taskInstanceId,false);
                 String logAddress = instance.getLogAddress();
-                String readFile = PipelineFileUtil.readFile(logAddress, 100);
+                String readFile = PipelineFileUtil.readFile(logAddress, readLogLength);
                 int date = instance.getRunTime();
                 if (!Objects.isNull(taskInstances)){
                     readFile = readFile +"\n"+ taskInstances.getRunLog();
@@ -294,12 +305,14 @@ public class TasksInstanceServiceImpl implements TasksInstanceService {
                 list.add(instance);
             }else {
                 Integer integer = findTaskRuntime(taskInstanceId);
-                taskInstance.setRunTime(integer);
+                if (!Objects.isNull(integer)){
+                    taskInstance3.setRunTime(integer);
+                }
                 time = PipelineUtil.formatDateTime(integer);
-                taskInstance.setRunTimeDate(time);
-                stageRunLog.append(taskInstance.getRunLog());
+                taskInstance3.setRunTimeDate(time);
+                stageRunLog.append(taskInstance3.getRunLog());
                 stageRunTime = stageRunTime + integer;
-                list.add(taskInstance);
+                list.add(taskInstance3);
             }
         }
 
@@ -357,7 +370,7 @@ public class TasksInstanceServiceImpl implements TasksInstanceService {
     }
 
     @Override
-    public boolean readCommandExecResult(Process process , String enCode, String[] error,String taskId) {
+    public boolean readCommandExecResult(Process process , String enCode, Map<String,String> error,String taskId) {
         boolean state = true;
         //指定编码
         if (!PipelineUtil.isNoNull(enCode)){
@@ -388,10 +401,13 @@ public class TasksInstanceServiceImpl implements TasksInstanceService {
 
             //读取执行信息
             while ((s = bufferedReader.readLine()) != null) {
-                if (validStatus(s,error)){
+                String s1 = validStatus(s, error);
+                if (!Objects.isNull(s1)){
                     state = false ;
+                    writeExecLog(taskId, PipelineUtil.date(4) + s1);
                 }
                 writeExecLog(taskId, PipelineUtil.date(4) + s);
+
             }
 
             //读取err执行信息
@@ -399,7 +415,11 @@ public class TasksInstanceServiceImpl implements TasksInstanceService {
             bufferedReader = new BufferedReader(inputStreamReader);
 
             while ((s = bufferedReader.readLine()) != null) {
-                if (validStatus(s,error)){state = false ;}
+                String s1 = validStatus(s, error);
+                if (!Objects.isNull(s1)){
+                    state = false ;
+                    writeExecLog(taskId, PipelineUtil.date(4) + s1);
+                }
                 writeExecLog(taskId, PipelineUtil.date(4) + s);
             }
 
@@ -407,7 +427,8 @@ public class TasksInstanceServiceImpl implements TasksInstanceService {
             inputStreamReader.close();
             bufferedReader.close();
 
-        }catch (Exception e){
+        } catch (Exception e){
+            writeExecLog(taskId, PipelineUtil.date(4) + e.getMessage());
             state = false;
         }
         process.destroy();
@@ -417,20 +438,20 @@ public class TasksInstanceServiceImpl implements TasksInstanceService {
     /**
      * 效验日志状态
      * @param s 日志
-     * @param error 错误状态
-     * @return true 正确 false：错误
+     * @param errors 错误状态
+     * @return null 正确  other：错误
      */
-    private boolean validStatus(String s,String[] error){
-        if (error == null){
-            return false;
-        }
-        for (String s1 : error) {
-            if (!s.contains(s1)){
+    private String validStatus(String s,Map<String,String> errors){
+
+        for (Map.Entry<String, String> errorString : errors.entrySet()) {
+            String key = errorString.getKey();
+            if (!s.contains(key)){
                 continue;
             }
-            return true;
+            return errorString.getValue();
         }
-        return false;
+
+        return null;
     }
 
     @Override
@@ -440,25 +461,56 @@ public class TasksInstanceServiceImpl implements TasksInstanceService {
         }
         TasksExecServiceImpl tasksExecService = new TasksExecServiceImpl();
         String taskInstanceId = tasksExecService.findTaskInstanceId(taskId);
-        TaskInstance taskInstance = tasksExecService.findTaskInstance(taskInstanceId);
+        TaskInstance taskInstance2 = tasksExecService.findTaskInstance(taskInstanceId);
+        if (Objects.isNull(taskInstance2)){
+            return;
+        }
         Integer integer = findTaskRuntime(taskInstanceId);
-        taskInstance.setRunTime(integer);
-        String execInstance = taskInstance.getRunLog();
+        if (!Objects.isNull(integer)){
+            taskInstance2.setRunTime(integer);
+        }
+        String execInstance = taskInstance2.getRunLog();
 
         if (!PipelineUtil.isNoNull(execInstance)){
-            taskInstance.setRunLog(execLog);
+            taskInstance2.setRunLog(execLog);
         }else {
-            taskInstance.setRunLog(execInstance +"\n"+ execLog);
+            taskInstance2.setRunLog(execInstance +"\n"+ execLog);
         }
 
         //长度过长写入文件中
-        String runInstance = taskInstance.getRunLog();
+        String runInstance = taskInstance2.getRunLog();
         if (runInstance.length() > 9000){
-            String logAddress = taskInstance.getLogAddress();
+            String logAddress = taskInstance2.getLogAddress();
             PipelineFileUtil.logWriteFile(runInstance,logAddress);
-            taskInstance.setRunLog(null);
+            taskInstance2.setRunLog(null);
         }
-        tasksExecService.setTaskOrTaskInstance(taskInstanceId, taskInstance);
+        tasksExecService.setTaskOrTaskInstance(taskInstanceId, taskInstance2);
+    }
+
+
+    public void writeAllExecLog(String taskId, String execLog){
+        if(!PipelineUtil.isNoNull(execLog)){
+            return;
+        }
+        TasksExecServiceImpl tasksExecService = new TasksExecServiceImpl();
+        String taskInstanceId = tasksExecService.findTaskInstanceId(taskId);
+        TaskInstance taskInstance1 = tasksExecService.findTaskInstance(taskInstanceId);
+        Integer integer = findTaskRuntime(taskInstanceId);
+        if (!Objects.isNull(integer)){
+            taskInstance1.setRunTime(integer);
+        }
+        String execInstance = taskInstance1.getRunLog();
+
+        if (!PipelineUtil.isNoNull(execInstance)){
+            taskInstance1.setRunLog(execLog);
+        }else {
+            taskInstance1.setRunLog(execInstance +"\n"+ execLog);
+        }
+
+        //长度过长写入文件中
+        String runInstance = taskInstance1.getRunLog();
+        String logAddress = taskInstance1.getLogAddress();
+        PipelineFileUtil.logWriteFile(runInstance,logAddress);
     }
 
     @Override
@@ -488,6 +540,16 @@ public class TasksInstanceServiceImpl implements TasksInstanceService {
         List<TaskInstanceEntity> pipelineInstanceList = taskInstanceDao.findAllInstanceList(idList);
         return BeanMapper.mapList(pipelineInstanceList, TaskInstance.class);
     }
+
+    @Override
+    public List<TaskInstance> findTaskInstanceList(TaskInstanceQuery query){
+        List<TaskInstanceEntity> pipelineInstanceList = taskInstanceDao.findTaskInstanceList(query);
+        if (pipelineInstanceList == null || pipelineInstanceList.isEmpty()){
+            return Collections.emptyList();
+        }
+        return BeanMapper.mapList(pipelineInstanceList,TaskInstance.class);
+    }
+
 
     //时间线程池
     private final ExecutorService timeThreadPool = Executors.newCachedThreadPool();

@@ -105,6 +105,9 @@ public interface PipelineInstanceService {
     List<PipelineInstance> findInstanceList(List<String> idList);
 
 
+    List<PipelineInstance> findPipelineInstanceList(PipelineInstanceQuery pipelineInstanceQuery);
+
+
     /**
      * 查询用户所有实例分页
      * @param pipelineInstanceQuery 实例

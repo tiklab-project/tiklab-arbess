@@ -3,7 +3,6 @@ package io.tiklab.matflow.pipeline.definition.controller;
 import io.tiklab.core.Result;
 import io.tiklab.core.page.Pagination;
 import io.tiklab.matflow.pipeline.definition.model.Pipeline;
-import io.tiklab.matflow.pipeline.definition.model.PipelineExecMessage;
 import io.tiklab.matflow.pipeline.definition.model.PipelineQuery;
 import io.tiklab.matflow.pipeline.definition.model.PipelineRecently;
 import io.tiklab.matflow.pipeline.definition.service.PipelineService;
@@ -106,23 +105,6 @@ public class PipelineController {
         return Result.ok();
     }
 
-    /**
-     * @pi.name:findLikePipeline
-     * @pi.path:/pipeline/findLikePipeline
-     * @pi.method:post
-     * @pi.request-type:formdata
-     * @pi.param: name=pipelineName;dataType=string;value=pipelineName;
-     */
-    @RequestMapping(path="/findLikePipeline",method = RequestMethod.POST)
-    // @ApiMethod(name = "findLikePipeline",desc = "模糊查询")
-    // @ApiParam(name = "pipelineName",desc = "模糊查询条件",required = true)
-    public Result<List<PipelineExecMessage>> findLikePipeline(@NotNull String pipelineName){
-
-        List<PipelineExecMessage> pipelineQueryList = pipelineService.findPipelineByName(pipelineName);
-
-        return Result.ok(pipelineQueryList);
-    }
-
 
     /**
      * @pi.name:findUserPipelinePage
@@ -132,9 +114,9 @@ public class PipelineController {
      * @pi.param: model=query
      */
     @RequestMapping(path="/findUserPipelinePage",method = RequestMethod.POST)
-    public Result< Pagination<PipelineExecMessage>> findUserPipelinePage(@RequestBody @NotNull @Valid PipelineQuery query){
+    public Result< Pagination<Pipeline>> findUserPipelinePage(@RequestBody @NotNull @Valid PipelineQuery query){
 
-        Pagination<PipelineExecMessage> userPipeline = pipelineService.findUserPipelinePage(query);
+        Pagination<Pipeline> userPipeline = pipelineService.findUserPipelinePage(query);
 
         return Result.ok(userPipeline);
     }
@@ -148,20 +130,6 @@ public class PipelineController {
     @RequestMapping(path="/findUserPipeline",method = RequestMethod.POST)
     public Result< List<Pipeline>> findAllUserPipeline(){
         List<Pipeline> userPipeline = pipelineService.findUserPipeline();
-
-        return Result.ok(userPipeline);
-    }
-
-    /**
-     * @pi.name:findUserFollowPipeline
-     * @pi.path:/pipeline/findUserFollowPipeline
-     * @pi.method:post
-     * @pi.request-type:none
-     */
-    @RequestMapping(path="/findUserFollowPipeline",method = RequestMethod.POST)
-    public Result<List<Pipeline>> findUserFollowPipeline(){
-
-        List<Pipeline> userPipeline = pipelineService.findUserFollowPipeline();
 
         return Result.ok(userPipeline);
     }

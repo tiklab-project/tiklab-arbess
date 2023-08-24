@@ -10,6 +10,7 @@ import io.tiklab.matflow.setting.service.AuthThirdService;
 import io.tiklab.matflow.setting.service.ScmService;
 import io.tiklab.matflow.support.condition.service.ConditionService;
 import io.tiklab.matflow.support.util.PipelineFileUtil;
+import io.tiklab.matflow.support.util.PipelineFinal;
 import io.tiklab.matflow.support.util.PipelineUtil;
 import io.tiklab.matflow.support.util.PipelineUtilService;
 import io.tiklab.matflow.support.variable.model.Variable;
@@ -29,9 +30,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * 源码管理执行方法
@@ -42,28 +41,28 @@ import java.util.Objects;
 public class TaskCodeExecServiceImpl implements TaskCodeExecService {
 
     @Autowired
-    private TasksInstanceService tasksInstanceService;
+    TasksInstanceService tasksInstanceService;
 
     @Autowired
-    private VariableService variableServer;
+    VariableService variableServer;
 
     @Autowired
-    private ScmService scmService;
+    ScmService scmService;
 
     @Autowired
-    private ConditionService conditionService;
+    ConditionService conditionService;
 
     @Autowired
-    private AuthService authServer;
+    AuthService authServer;
 
     @Autowired
-    private AuthThirdService thirdService;
+    AuthThirdService thirdService;
 
     @Autowired
-    private TaskCodeThirdService codeThirdService;
+    TaskCodeThirdService codeThirdService;
 
     @Autowired
-    private PipelineUtilService utilService;
+    PipelineUtilService utilService;
 
     private final Logger logger = LoggerFactory.getLogger(TaskCodeExecServiceImpl.class);
 
@@ -100,14 +99,12 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
         String codeDir = utilService.findPipelineDefaultAddress(pipelineId,1);
         File file = new File(codeDir);
 
+        tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"分配源码空间..." );
+
         //删除旧的代码
-        boolean b = false;
-        while (!b){
-            if (file.exists()){
-                b = PipelineFileUtil.deleteFile(file);
-            }else {
-                b = true;
-            }
+        Boolean aBoolean1 = PipelineFileUtil.deleteFile(file);
+        if (!aBoolean1){
+            tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"空间被占用分配失败！" );
         }
 
         //分支
@@ -122,9 +119,17 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
 
         tasksInstanceService.writeExecLog(taskId,s);
 
-        tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"分配源码空间..." );
+        try {
+            Thread.sleep(300);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+ "空间分配成功。" );
 
         try {
+
+            tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+ "拉取远程代码..." );
+
             //命令执行失败
             Process process = codeStart(code,pipelineId);
             String  type = code.getType();
@@ -139,28 +144,20 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
             }
 
             process.destroy();
-            tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+ "空间分配成功。" );
-            //获取提交信息
-            Process message = cloneMessage(code.getType(),pipelineId);
-            if (message != null){
-                boolean result1 = tasksInstanceService.readCommandExecResult(message, enCode, error(type), taskId);
-                if (!result1){
-                    tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"任务："+task.getTaskName()+"执行失败。");
-                    return false;
-                }
-                message.destroy();
-            }
+            tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+ "获取提交信息..." );
 
-            // 把系统默认路径添加到流水线变量里面
-            // String fileAddress = utilService.findPipelineDefaultAddress(pipelineId,1);
-            // File file1 = new File(fileAddress);
-            // Variable variable = new Variable();
-            // variable.setVarValue(file1.getAbsolutePath());
-            // variable.setVarKey("APP_HOME");
-            // variable.setTaskId(pipelineId);
-            // variable.setType(1);
-            // variable.setTaskType(1);
-            // variableServer.createVariable(variable);
+            if (!type.equals("svn")){
+                //获取提交信息
+                Process message = cloneMessage(code.getType(),pipelineId);
+                if (message != null){
+                    boolean result1 = tasksInstanceService.readCommandExecResult(message, enCode, error(type), taskId);
+                    if (!result1){
+                        tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"任务："+task.getTaskName()+"执行失败。");
+                        return false;
+                    }
+                    message.destroy();
+                }
+            }
 
         } catch (IOException e) {
             tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"系统执行命令错误 \n" + e);
@@ -185,17 +182,17 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
      * @throws ApplicationException 不存在配置
      */
     private Process codeStart(TaskCode taskCode, String pipelineId) throws IOException, URISyntaxException , ApplicationException{
-        boolean b = !taskCode.getType().equals("5") || !taskCode.getType().equals("svn");
+        boolean b = !(taskCode.getType().equals("5") || taskCode.getType().equals("svn"));
         Scm pipelineScm ;
 
         if (b){
             pipelineScm = scmService.findOnePipelineScm(1);
         }else {
-            pipelineScm = scmService.findOnePipelineScm(2);
+            pipelineScm = scmService.findOnePipelineScm(5);
         }
 
         //效验地址是否应用程序地址
-        if (pipelineScm == null ){
+        if (Objects.isNull(pipelineScm)){
             if (b){
                 throw new ApplicationException(50001,"未配置git程序地址");
             }else {
@@ -209,7 +206,7 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
         //源码存放位置
         String fileAddress = utilService.findPipelineDefaultAddress(pipelineId,1);
         String gitOrder;
-        String path = null;
+        String path ;
         switch (taskCode.getType()) {
             //账号密码或ssh登录
             case "1", "4","git","gitlab" -> {
@@ -245,10 +242,9 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
             //svn
             case "5","svn" -> gitOrder = svnOrder(taskCode, fileAddress);
             //错误
-            default ->
-                    throw new ApplicationException("未知的任务类型");
+            default -> throw new ApplicationException("未知的任务类型");
         }
-        logger.info("执行："+ gitOrder);
+        logger.warn("执行："+ gitOrder);
         return PipelineUtil.process(serverAddress, gitOrder);
     }
 
@@ -267,7 +263,6 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
         if (Objects.isNull(auth)){
             return gitBranch(codeAddress, taskCode, fileAddress);
         }
-
 
         StringBuilder stringBuilder = gitUrl(auth.getUsername(), auth.getPassword(), codeAddress);
         return gitBranch(stringBuilder, taskCode, fileAddress);
@@ -310,7 +305,7 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
             return list;
         }
 
-        String tempFile = PipelineFileUtil.createTempFile(auth.getPrivateKey());
+        String tempFile = PipelineFileUtil.createTempFile(auth.getPrivateKey(), PipelineFinal.FILE_TYPE_TXT);
         String userHome = System.getProperty("user.home");
         if (!PipelineUtil.isNoNull(tempFile)){
             throw new ApplicationException("私钥写入失败。");
@@ -383,7 +378,12 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
      * @return 地址
      */
     private String gitBranch(StringBuilder url , TaskCode code, String codeDir){
+        String type = code.getType();
         String branch = code.getCodeBranch();
+        if (type.equals("Xcode")){
+            branch = code.getBranch().getName();
+        }
+
         //判断是否存在分支
         String order;
         if (!PipelineUtil.isNoNull(branch)){
@@ -441,12 +441,20 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
         if (PipelineUtil.isNoNull(svnFile)){
             codeAddress = codeAddress + "/./" +svnFile;
         }
-        //判断检出类型
-        if (auth.getAuthType() == 1){
-            String username = auth.getUsername();
-            String password = auth.getPassword();
-            codeAddress  = codeAddress + " --username "+ " "  +username + " --password " + " " + password + " " +codeDir;
+
+        if (!Objects.isNull(auth)){
+            //判断检出类型
+            if (auth.getAuthType() == 1){
+                String username = auth.getUsername();
+                String password = auth.getPassword();
+                codeAddress  = codeAddress + " --username "+ " "  +username + " --password " + " " + password + " " +codeDir;
+            }else {
+                throw new ApplicationException("SVN暂不支持使用秘钥认证！");
+            }
+        }else {
+            codeAddress  = codeAddress + " " +codeDir;
         }
+
         //不同系统检出
         if (PipelineUtil.findSystemType() == 1){
             codeAddress=".\\svn.exe checkout"+" " + codeAddress;
@@ -506,25 +514,23 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
      * @param type 类型
      * @return 错误
      */
-    private String[] error(String type){
-        String[] strings;
+    private Map<String,String> error(String type){
+        Map<String,String> map = new HashMap<>();
         if (type.equals("5") || type.equals("svn")){
-            strings = new String[]{
-                "svn: E170000",
-                "invalid option",
-                "svn: E204900",
-                "svn: E170013",
-                "svn: E210002",
-                "svn: E205000"
-            };
-            return strings;
+            map.put("svn: E170000","");
+            map.put("invalid option","");
+            map.put("vn: E204900","");
+            map.put("svn: E170013","");
+            map.put("svn: E210002","");
+            map.put("svn: E205000","");
+            return map;
         }
-        strings = new String[]{
-            "fatal: Could not read from remote repository",
-            "remote: HTTP Basic: Access denied",
-            "fatal: Authentication failed "
-        };
-        return strings;
+        map.put("fatal: Could not read from remote repository","无法连接到远程仓库！");
+        map.put("remote: HTTP Basic: Access denied","访问被拒绝！");
+        map.put("fatal: Authentication failed ","认证失败!");
+        map.put("not found in upstream origin","分支不存在！");
+        map.put("404 not found","获取远程仓库失败！");
+        return map;
     }
 
 

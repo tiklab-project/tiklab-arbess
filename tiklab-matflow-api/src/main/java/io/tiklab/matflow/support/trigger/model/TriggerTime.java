@@ -1,6 +1,7 @@
 package io.tiklab.matflow.support.trigger.model;
 
 import io.tiklab.beans.annotation.Mapper;
+import io.tiklab.core.order.Order;
 import io.tiklab.join.annotation.Join;
 import io.tiklab.postin.annotation.ApiModel;
 import io.tiklab.postin.annotation.ApiProperty;
@@ -41,11 +42,22 @@ public class TriggerTime {
     @ApiProperty(name="timeList",desc="天数,周几")
     private List<Integer> timeList;
 
+    private Integer dayTime;
+
     @ApiProperty(name="type",desc="类型")
     private int type;
 
     @ApiProperty(name="name",desc="名称")
     private String name;
+
+
+    public Integer getDayTime() {
+        return dayTime;
+    }
+
+    public void setDayTime(Integer dayTime) {
+        this.dayTime = dayTime;
+    }
 
     public String getName() {
         return name;

@@ -35,22 +35,22 @@ import java.util.concurrent.Executors;
 public class PipelineInstanceServiceImpl implements PipelineInstanceService {
 
     @Autowired
-    private PipelineInstanceDao pipelineInstanceDao;
+    PipelineInstanceDao pipelineInstanceDao;
 
     @Autowired
-    private PipelineAuthorityService authorityService;
+    PipelineAuthorityService authorityService;
 
     @Autowired
-    private TasksInstanceService tasksInstanceService;
+    TasksInstanceService tasksInstanceService;
 
     @Autowired
-    private StageInstanceServer stageInstanceServer;
+    StageInstanceServer stageInstanceServer;
 
     @Autowired
-    private PipelineUtilService utilService;
+    PipelineUtilService utilService;
 
     @Autowired
-    private JoinTemplate joinTemplate;
+    JoinTemplate joinTemplate;
 
     @Override
     public String createInstance(PipelineInstance pipelineInstance) {
@@ -190,7 +190,7 @@ public class PipelineInstanceServiceImpl implements PipelineInstanceService {
             return null;
         }
         PipelineInstance instance = pipelineExecHistories.get(0);
-        joinTemplate.joinQuery(instance);
+        // joinTemplate.joinQuery(instance);
         return instance;
     }
 
@@ -198,6 +198,16 @@ public class PipelineInstanceServiceImpl implements PipelineInstanceService {
     public List<PipelineInstance> findInstanceList(List<String> idList) {
         List<PipelineInstanceEntity> pipelineInstanceEntityList = pipelineInstanceDao.findInstanceList(idList);
         return BeanMapper.mapList(pipelineInstanceEntityList, PipelineInstance.class);
+    }
+
+
+    public List<PipelineInstance> findPipelineInstanceList(PipelineInstanceQuery pipelineInstanceQuery){
+        List<PipelineInstanceEntity> instanceList = pipelineInstanceDao.findInstanceList(pipelineInstanceQuery);
+        if (instanceList == null || instanceList.size() == 0){
+            return Collections.emptyList();
+        }
+        return BeanMapper.mapList(instanceList,PipelineInstance.class);
+
     }
 
     @Override
@@ -233,8 +243,8 @@ public class PipelineInstanceServiceImpl implements PipelineInstanceService {
     @Override
     public Pagination<PipelineInstance> findUserInstance(PipelineInstanceQuery pipelineInstanceQuery){
         String loginId = LoginContext.getLoginId();
-        List<Pipeline> userPipeline = authorityService.findUserPipeline(loginId);
-        pipelineInstanceQuery.setPipelineList(userPipeline);
+        String[] userPipeline = authorityService.findUserPipelineIdString(loginId);
+        pipelineInstanceQuery.setIds(userPipeline);
         Pagination<PipelineInstanceEntity> pagination = pipelineInstanceDao.findAllPageInstance(pipelineInstanceQuery);
         List<PipelineInstance> execInstanceList = BeanMapper.mapList(pagination.getDataList(), PipelineInstance.class);
         List<PipelineInstance> instanceList = new ArrayList<>();

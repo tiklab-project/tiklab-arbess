@@ -5,10 +5,11 @@ import io.tiklab.core.exception.ApplicationException;
 import io.tiklab.matflow.setting.model.AuthHost;
 import io.tiklab.matflow.support.condition.service.ConditionService;
 import io.tiklab.matflow.support.util.PipelineFileUtil;
+import io.tiklab.matflow.support.util.PipelineFinal;
 import io.tiklab.matflow.support.util.PipelineUtil;
-import io.tiklab.matflow.support.util.PipelineUtilService;
 import io.tiklab.matflow.support.variable.service.VariableService;
 import io.tiklab.matflow.task.build.model.TaskBuildProduct;
+import io.tiklab.matflow.task.build.model.TaskBuildProductQuery;
 import io.tiklab.matflow.task.build.service.TaskBuildProductService;
 import io.tiklab.matflow.task.deploy.model.TaskDeploy;
 import io.tiklab.matflow.task.task.model.TaskInstance;
@@ -20,11 +21,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -53,8 +53,8 @@ public class TaskDeployExecServiceImpl implements TaskDeployExecService {
     public boolean deploy(String pipelineId, Tasks task , String taskType) {
 
         String taskId = task.getTaskId();
-        String names = "执行任务："+task.getTaskName();
-        tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+names);
+        tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+ "执行任务："+task.getTaskName());
+        // 判断是否满足执行条件
         Boolean aBoolean = conditionService.variableCondition(pipelineId, taskId);
         if (!aBoolean){
             String s = "任务"+task.getTaskName()+"执行条件不满足，跳过执行\n";
@@ -63,49 +63,15 @@ public class TaskDeployExecServiceImpl implements TaskDeployExecService {
         }
         
         TaskDeploy taskDeploy = (TaskDeploy) task.getValues();
-        String name = task.getTaskName();
-
         taskDeploy.setType(taskType);
-
-        //部署命令
-        String startShell = taskDeploy.getStartOrder();
-
-
         //获取部署文件
-        String filePath;
         tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"获取部署文件......");
-
-        TaskInstance execInstance = tasksInstanceService.findExecInstance(taskId);
-        TaskBuildProduct buildProduct = taskBuildProductService.findBuildProduct(execInstance.getInstanceId());
 
         //执行自定义脚本
         try {
             if (taskDeploy.getAuthType() == 2) {
-
-                if (!PipelineUtil.isNoNull(startShell)){
-                    tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"任务："+name+"执行完成。");
-                    return true;
-                }
-
-                if (!Objects.isNull(buildProduct)){
-                    startShell = startShell.replaceAll("\\$\\{DEFAULT_ARTIFACT_ADDRESS}",buildProduct.getProductAddress() );
-                    startShell = startShell.replaceAll("DEFAULT_ARTIFACT_ADDRESS",buildProduct.getProductAddress() );
-                    startShell = startShell.replaceAll("\\$\\{DEFAULT_ARTIFACT}", buildProduct.getProductName());
-                    startShell = startShell.replaceAll("DEFAULT_ARTIFACT", buildProduct.getProductName());
-                }
-
-                String key = variableServer.replaceVariable(pipelineId, taskId, startShell);
-
-                Process process = Runtime.getRuntime().exec(key);
-                tasksInstanceService.readCommandExecResult(process, "UTF-8", error(41), taskId);
-
-                int exitCode = process.waitFor();
-                if (exitCode != 0) {
-                    tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"任务："+name+"命令执行失败。");
-                    return false;
-                }
-
-                tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"任务："+name+"执行完成。");
+                execShell(pipelineId,taskId,taskDeploy.getStartOrder());
+                tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"任务：" + task.getTaskName() +"执行完成。");
                 return true;
             }
         } catch (IOException |InterruptedException e) {
@@ -113,9 +79,13 @@ public class TaskDeployExecServiceImpl implements TaskDeployExecService {
             tasksInstanceService.writeExecLog(taskId, s);
             tasksInstanceService.writeExecLog(taskId, e.getMessage());
             return false;
+        } catch (ApplicationException e){
+            String s = PipelineUtil.date(4) + e.getMessage() ;
+            tasksInstanceService.writeExecLog(taskId, s);
+            return false;
         }
 
-        //连接服务器
+        //建立服务器连接
         Session session;
         try {
             Object auth = taskDeploy.getAuth();
@@ -123,30 +93,32 @@ public class TaskDeployExecServiceImpl implements TaskDeployExecService {
                 tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"连接失败，服务器地址为空\n");
                 return false;
             }
-
+            tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"建立与远程服务器链接：" );
             session = createSession(taskDeploy);
         } catch (JSchException e) {
             String message = PipelineUtil.date(4)+ e.getMessage();
             tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"连接失败，无法连接到服务器\n"+message);
             return false;
         }
-        tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"建立服务器链接：" );
         tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"服务器链接建立成功。" );
 
-        if (buildProduct == null){
+
+        //  获取制品信息
+        TaskInstance execInstance = tasksInstanceService.findExecInstance(taskId);
+        List<TaskBuildProduct> buildProductList = findTaskBuildProduct(execInstance.getInstanceId());
+        if (buildProductList.isEmpty()){
             tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"无法获取到制品!");
             return false;
         }
-        filePath = buildProduct.getProductAddress();
 
-        tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"制品文件获取成功："+ filePath );
-
-        //发送文件位置
-        String deployAddress = taskDeploy.getDeployAddress();
-        deployAddress = variableServer.replaceVariable(pipelineId, taskId, deployAddress);
+        // 上传制品
         try {
+            TaskBuildProduct buildProduct = buildProductList.get(0);
+            tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"制品文件获取成功："+ buildProduct.getValue() );
+            String deployAddress = variableServer.replaceVariable(pipelineId, taskId, taskDeploy.getDeployAddress());
             tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"制品文件文件上传中..." );
-            ftp(session, filePath, deployAddress);
+            // 开始上传文件
+            ftp(session, buildProduct.getValue(), deployAddress);
         } catch (JSchException | SftpException e) {
             session.disconnect();
             tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"制品文件上传失败："+e.getMessage());
@@ -154,15 +126,12 @@ public class TaskDeployExecServiceImpl implements TaskDeployExecService {
         }
         tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"制品文件上传成功" );
 
-        String deployOrder = taskDeploy.getDeployOrder();
-
-        String order = deployOrder.replaceAll("\\$\\{DEFAULT_ARTIFACT_ADDRESS}",buildProduct.getProductAddress() );
-        order = order.replaceAll("DEFAULT_ARTIFACT_ADDRESS",buildProduct.getProductAddress() );
-        order = order.replaceAll("\\$\\{DEFAULT_ARTIFACT}", buildProduct.getProductName());
-        order = order.replaceAll("DEFAULT_ARTIFACT", buildProduct.getProductName());
-
-        taskDeploy.setDeployOrder(order);
         try {
+            // 替换运行时产生的变量
+            String order = taskBuildProductService.replace(execInstance.getInstanceId(),taskDeploy.getDeployOrder());
+            taskDeploy.setDeployOrder(order);
+
+            // 执行远程命令
             linux(session, pipelineId, taskDeploy,taskId);
         } catch (JSchException | IOException e) {
             session.disconnect();
@@ -170,8 +139,75 @@ public class TaskDeployExecServiceImpl implements TaskDeployExecService {
             return false;
         }
         session.disconnect();
-        tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"任务："+name+"执行完成。");
+        tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"任务："+ task.getTaskName() +"执行完成。");
         return true;
+    }
+
+    /**
+     * 执行shell脚本
+     * @param pipelineId 流水线id
+     * @param taskId 任务id
+     * @param startShell 执行命令
+     * @throws InterruptedException 脚本状态获取失败
+     * @throws IOException 运行脚本失败
+     */
+    private void execShell(String pipelineId,String taskId,String startShell) throws InterruptedException, IOException {
+        // 执行的脚本为空
+        if (!PipelineUtil.isNoNull(startShell)){
+            return;
+        }
+
+        TaskInstance execInstance = tasksInstanceService.findExecInstance(taskId);
+        List<TaskBuildProduct> buildProductList = findTaskBuildProduct(execInstance.getInstanceId());
+
+        // 替换运行时产生的变量
+        if (!buildProductList.isEmpty()){
+            startShell = taskBuildProductService.replace(execInstance.getInstanceId(),startShell);
+        }
+
+        // 替换自定义的变量
+        String key = variableServer.replaceVariable(pipelineId, taskId, startShell);
+        String tempFile = PipelineFileUtil.createTempFile(key,PipelineFinal.FILE_TYPE_SH);
+
+        if (Objects.isNull(tempFile)){
+            throw new ApplicationException("无法获取到执行环境，创建脚本执行文件错误！");
+        }
+
+        File file = new File(tempFile);
+
+        String absolutePath = file.getParentFile().getAbsolutePath();
+        String name = file.getName();
+
+        // 执行脚本
+        String validOrder =" sh -n " + name;
+        Process processs = PipelineUtil.process(absolutePath, validOrder);
+        tasksInstanceService.readCommandExecResult(processs, "UTF-8", error(41), taskId);
+        int exitCodes = processs.waitFor();
+        if (exitCodes != 0) {
+            PipelineFileUtil.deleteFile(file);
+            throw new ApplicationException("Shell脚本语法错误！");
+        }
+
+        String order = " sh " + name;
+        Process process = PipelineUtil.process(absolutePath, order);
+        tasksInstanceService.readCommandExecResult(process, "UTF-8", error(41), taskId);
+
+        // 获取执行状态
+        int exitCode = process.waitFor();
+        if (exitCode != 0) {
+            PipelineFileUtil.deleteFile(file);
+            throw new ApplicationException("Shell脚本执行失败");
+        }
+        PipelineFileUtil.deleteFile(file);
+    }
+
+    private List<TaskBuildProduct> findTaskBuildProduct(String instanceId){
+        // 查询制品信息
+        TaskBuildProductQuery taskBuildProductQuery = new TaskBuildProductQuery();
+        taskBuildProductQuery.setInstanceId(instanceId);
+        taskBuildProductQuery.setType(PipelineFinal.DEFAULT_TYPE);
+        taskBuildProductQuery.setKey(PipelineFinal.DEFAULT_ARTIFACT_ADDRESS);
+        return taskBuildProductService.findBuildProductList(taskBuildProductQuery);
     }
 
     /**
@@ -204,7 +240,6 @@ public class TaskDeployExecServiceImpl implements TaskDeployExecService {
         }
     }
 
-
     /**
      * 创建连接实例
      * @param taskDeploy 连接配置信息
@@ -221,7 +256,7 @@ public class TaskDeployExecServiceImpl implements TaskDeployExecService {
         JSch jsch = new JSch();
         Session session = jsch.getSession(username, sshIp, sshPort);
         if (authHost.getAuthType() ==2){
-            String tempFile = PipelineFileUtil.createTempFile(authHost.getPrivateKey());
+            String tempFile = PipelineFileUtil.createTempFile(authHost.getPrivateKey(),PipelineFinal.FILE_TYPE_TXT);
             if (!PipelineUtil.isNoNull(tempFile)){
                 throw new ApplicationException("写入私钥失败。");
             }
@@ -243,7 +278,7 @@ public class TaskDeployExecServiceImpl implements TaskDeployExecService {
      * @throws JSchException 连接错误
      * @throws IOException 读取执行信息失败
      */
-    private void sshOrder(Session session,String orders,String taskId) throws JSchException, IOException {
+    private void sshOrder(Session session,String orders,String taskId) throws JSchException {
         ChannelExec exec = (ChannelExec) session.openChannel("exec");
         exec.setCommand(orders);
         exec.connect();
@@ -278,7 +313,7 @@ public class TaskDeployExecServiceImpl implements TaskDeployExecService {
 
             @Override
             public int exitValue() {
-                return 0;
+                return exec.getExitStatus();
             }
 
             @Override
@@ -286,7 +321,7 @@ public class TaskDeployExecServiceImpl implements TaskDeployExecService {
 
             }
         };
-        tasksInstanceService.readCommandExecResult(process, "UTF-8", error(41), taskId);
+        tasksInstanceService.readCommandExecResult(process, PipelineFinal.UTF_8, error(41), taskId);
         exec.disconnect();
     }
 
@@ -305,7 +340,31 @@ public class TaskDeployExecServiceImpl implements TaskDeployExecService {
         } catch (SftpException e) {
             sftp.mkdir(uploadAddress);
         }
+
+        // StringBuilder content = new StringBuilder();
+        // try (BufferedReader reader = new BufferedReader(new FileReader(localFile))) {
+        //     String line;
+        //     while ((line = reader.readLine()) != null) {
+        //         content.append(line).append("\n");
+        //     }
+        // } catch (FileNotFoundException e) {
+        //     throw new ApplicationException("找不到部署文件！");
+        // } catch (IOException e) {
+        //     throw new ApplicationException("读取制品文件失败！");
+        // }
+        //
+        // String unixEncodedContent = content.toString();
+        //
+        // File file = new File(localFile);
+        //
+        // try (OutputStream out = sftp.put(uploadAddress+"/"+file.getName(), ChannelSftp.OVERWRITE)) {
+        //     out.write(unixEncodedContent.getBytes());
+        // } catch (IOException e) {
+        //     throw new ApplicationException("制品上传失败！");
+        // }
+
         //ChannelSftp.OVERWRITE 覆盖上传
+
         sftp.put(localFile,uploadAddress,ChannelSftp.OVERWRITE);
         sftp.disconnect();
     }
@@ -354,19 +413,11 @@ public class TaskDeployExecServiceImpl implements TaskDeployExecService {
     }
 
 
-    private String[] error(int type){
-        String[] strings;
-        if (type == 5){
-            strings = new String[]{
-                    "svn: E170000:",
-                    "invalid option;"
-            };
-            return strings;
-        }
-        strings = new String[]{
-
-        };
-        return strings;
+    private Map<String,String> error(int type){
+        Map<String,String> map = new HashMap<>();
+        map.put("syntax error:","脚本语法错误！");
+        map.put("invalid option;","");
+        return map;
     }
 
 }

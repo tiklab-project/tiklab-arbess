@@ -4,6 +4,7 @@ import io.tiklab.dal.jpa.JpaTemplate;
 import io.tiklab.dal.jpa.criterial.condition.QueryCondition;
 import io.tiklab.dal.jpa.criterial.conditionbuilder.QueryBuilders;
 import io.tiklab.matflow.task.task.entity.TaskInstanceEntity;
+import io.tiklab.matflow.task.task.model.TaskInstanceQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -69,6 +70,17 @@ public class TaskInstanceDao {
     public List<TaskInstanceEntity> findPipelineInstance(String instanceId){
         QueryCondition queryCondition = QueryBuilders.createQuery(TaskInstanceEntity.class)
                 .eq("instanceId", instanceId)
+                .get();
+        return jpaTemplate.findList(queryCondition,TaskInstanceEntity.class);
+    }
+
+    public List<TaskInstanceEntity> findTaskInstanceList(TaskInstanceQuery query){
+        QueryCondition queryCondition = QueryBuilders.createQuery(TaskInstanceEntity.class)
+                .eq("instanceId", query.getInstanceId())
+                .eq("taskType", query.getTaskType())
+                .eq("runState", query.getRunState())
+                .eq("stageId", query.getStagesId())
+                .eq("postprocessId", query.getPostprocessId())
                 .get();
         return jpaTemplate.findList(queryCondition,TaskInstanceEntity.class);
     }

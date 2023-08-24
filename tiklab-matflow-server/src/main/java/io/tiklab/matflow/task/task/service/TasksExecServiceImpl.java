@@ -2,6 +2,7 @@ package io.tiklab.matflow.task.task.service;
 
 import io.tiklab.core.exception.ApplicationException;
 import io.tiklab.matflow.support.util.PipelineFileUtil;
+import io.tiklab.matflow.support.util.PipelineFinal;
 import io.tiklab.matflow.support.util.PipelineUtil;
 import io.tiklab.matflow.task.artifact.service.TaskArtifactExecService;
 import io.tiklab.matflow.task.build.service.TaskBuildExecService;
@@ -12,6 +13,7 @@ import io.tiklab.matflow.task.message.model.TaskExecMessage;
 import io.tiklab.matflow.task.message.service.TaskMessageExecService;
 import io.tiklab.matflow.task.script.service.TaskScriptExecService;
 import io.tiklab.matflow.task.task.model.TaskInstance;
+import io.tiklab.matflow.task.task.model.TaskInstanceQuery;
 import io.tiklab.matflow.task.task.model.Tasks;
 import io.tiklab.matflow.task.test.service.TaskTestExecService;
 import org.slf4j.Logger;
@@ -19,9 +21,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 import static io.tiklab.matflow.support.util.PipelineFinal.*;
 
@@ -29,34 +29,34 @@ import static io.tiklab.matflow.support.util.PipelineFinal.*;
 public class TasksExecServiceImpl implements TasksExecService {
 
     @Autowired
-    private TaskCodeExecService code ;
+    TaskCodeExecService code ;
 
     @Autowired
-    private TaskBuildExecService build ;
+    TaskBuildExecService build ;
 
     @Autowired
-    private TaskTestExecService test;
+    TaskTestExecService test;
 
     @Autowired
-    private TaskDeployExecService deploy ;
+    TaskDeployExecService deploy ;
 
     @Autowired
-    private TaskCodeScanExecService codeScan;
+    TaskCodeScanExecService codeScan;
 
     @Autowired
-    private TaskArtifactExecService product;
+    TaskArtifactExecService product;
 
     @Autowired
-    private TaskMessageExecService message;
+    TaskMessageExecService message;
 
     @Autowired
-    private TaskScriptExecService scripts;
+    TaskScriptExecService scripts;
 
     @Autowired
-    private TasksInstanceService tasksInstanceService;
+    TasksInstanceService tasksInstanceService;
 
     @Autowired
-    private TasksService tasksService;
+    TasksService tasksService;
 
     private static final Logger logger = LoggerFactory.getLogger(TasksExecServiceImpl.class);
 
@@ -116,14 +116,14 @@ public class TasksExecServiceImpl implements TasksExecService {
         boolean state = true;
 
         //分发执行不同任务
-        switch (taskType) {
-            case "1","2","3","4","5","git","gitee","github","svn","xcode" -> state = code.clone(pipelineId, tasks, taskType);
-            case "11","maventest","teston" -> state = test.test(pipelineId, tasks, taskType);
-            case "21","maven" -> state = build.build(pipelineId, tasks, taskType);
-            case "31","32","liunx","docker" -> state = deploy.deploy(pipelineId, tasks, taskType);
-            case "41","sonar" -> state = codeScan.codeScan(pipelineId, tasks, taskType);
-            case "51","52","nexus","ssh","xpack" -> state = product.product(pipelineId, tasks, taskType);
-            case "71","bat","shell" -> state = scripts.scripts(pipelineId, tasks, taskType);
+        switch (tasksService.findTaskType(taskType)) {
+            case "code"     -> state = code.clone(pipelineId, tasks, taskType);
+            case "test"     -> state = test.test(pipelineId, tasks, taskType);
+            case "build"    -> state = build.build(pipelineId, tasks, taskType);
+            case "deploy"   -> state = deploy.deploy(pipelineId, tasks, taskType);
+            case "codescan" -> state = codeScan.codeScan(pipelineId, tasks, taskType);
+            case "artifact" -> state = product.product(pipelineId, tasks, taskType);
+            case "script"   -> state = scripts.scripts(pipelineId, tasks, taskType);
         }
 
         //更新阶段状态
@@ -161,6 +161,9 @@ public class TasksExecServiceImpl implements TasksExecService {
     private void taskExecEnd(String taskId,boolean state){
         String taskInstanceId = taskIdOrTaskInstanceId.get(taskId);
         TaskInstance instance = taskOrTaskInstance.get(taskInstanceId);
+        if (Objects.isNull(instance)){
+            return;
+        }
         if (state){
             instance.setRunState(RUN_SUCCESS);
         }else {
@@ -171,7 +174,9 @@ public class TasksExecServiceImpl implements TasksExecService {
         PipelineFileUtil.logWriteFile(runLog,logAddress);
 
         Integer integer = tasksInstanceService.findTaskRuntime(taskInstanceId);
-        instance.setRunTime(integer);
+        if (!Objects.isNull(integer)){
+            instance.setRunTime(integer);
+        }
         //更新数据库数据,移除内存中的实例数据
         tasksInstanceService.updateTaskInstance(instance);
         stopThread(taskInstanceId);
@@ -191,10 +196,15 @@ public class TasksExecServiceImpl implements TasksExecService {
             return;
         }
         Integer integer = tasksInstanceService.findTaskRuntime(taskInstanceId);
-        taskInstance.setRunTime(integer);
+        if (!Objects.isNull(integer)){
+            taskInstance.setRunTime(integer);
+        }
         taskInstance.setRunState(RUN_HALT);
-
         tasksInstanceService.updateTaskInstance(taskInstance);
+
+        Tasks task = tasksService.findOneTasksOrTask(taskId);
+
+        tasksInstanceService.writeAllExecLog(taskId, PipelineUtil.date(4)+"任务"+task.getTaskName()+"运行终止。");
         //移除内存
         tasksInstanceService.removeTaskRuntime(taskInstanceId);
         stopThread(taskInstanceId);
@@ -202,6 +212,28 @@ public class TasksExecServiceImpl implements TasksExecService {
         taskIdOrTaskInstanceId.remove(taskId);
         taskOrTaskInstance.remove(taskInstanceId);
     }
+
+    public void stop(String instanceId,String stageInstanceId,String postProcessId){
+        TaskInstanceQuery taskInstanceQuery = new TaskInstanceQuery();
+        taskInstanceQuery.setRunState(RUN_RUN);
+        taskInstanceQuery.setInstanceId(instanceId);
+        taskInstanceQuery.setStagesId(stageInstanceId);
+        taskInstanceQuery.setPostprocessId(postProcessId);
+        List<TaskInstance> taskInstanceList = tasksInstanceService.findTaskInstanceList(taskInstanceQuery);
+        if (taskInstanceList.isEmpty()){
+            return;
+        }
+        for (TaskInstance taskInstance6 : taskInstanceList) {
+            String id = taskInstance6.getId();
+            taskInstance6.setRunState(RUN_HALT);
+            Integer integer = tasksInstanceService.findTaskRuntime(id);
+            if (!Objects.isNull(integer)){
+                taskInstance6.setRunTime(integer);
+            }
+            tasksInstanceService.updateTaskInstance(taskInstance6);
+        }
+    }
+
 
     public void stopThread(String threadName){
         ThreadGroup currentGroup = Thread.currentThread().getThreadGroup();
@@ -217,6 +249,20 @@ public class TasksExecServiceImpl implements TasksExecService {
                 continue;
             }
             lstThreads[i].stop();
+        }
+    }
+
+    public void runError( List<Tasks> tasks){
+        for (Tasks task : tasks) {
+            String taskInstanceId = taskIdOrTaskInstanceId.get(task.getTaskId());
+            if (Objects.isNull(taskInstanceId)){
+                continue;
+            }
+            TaskInstance taskInstance = taskOrTaskInstance.get(taskInstanceId);
+            if (!Objects.isNull(taskInstance)){
+                taskInstance.setRunState(PipelineFinal.RUN_HALT);
+                tasksInstanceService.updateTaskInstance(taskInstance);
+            }
         }
     }
 

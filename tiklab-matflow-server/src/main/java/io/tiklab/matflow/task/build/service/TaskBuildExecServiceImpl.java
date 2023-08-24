@@ -2,7 +2,6 @@ package io.tiklab.matflow.task.build.service;
 
 import io.tiklab.matflow.setting.model.Scm;
 import io.tiklab.matflow.setting.service.ScmService;
-import io.tiklab.matflow.support.util.PipelineFileUtil;
 import io.tiklab.matflow.support.util.PipelineFinal;
 import io.tiklab.matflow.support.util.PipelineUtilService;
 import io.tiklab.matflow.support.variable.service.VariableService;
@@ -18,11 +17,11 @@ import io.tiklab.rpc.annotation.Exporter;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * 构建执行方法
@@ -89,7 +88,6 @@ public class TaskBuildExecServiceImpl implements TaskBuildExecService {
             String productRule = taskBuild.getProductRule();
 
             boolean noNull = PipelineUtil.isNoNull(productRule);
-
             if (!noNull){
                 tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"任务"+name+"执行完成");
                 return true;
@@ -118,10 +116,19 @@ public class TaskBuildExecServiceImpl implements TaskBuildExecService {
 
             String fileAddress = defaultAddress + execInstance.getInstanceId()+"/"+file.getName();
 
-            TaskBuildProduct taskBuildProduct = new TaskBuildProduct(fileAddress,execInstance.getInstanceId());
-            taskBuildProduct.setProductName(file.getName());
+            // 创建流水线运行时产生的制品信息
+            TaskBuildProduct taskBuildProduct = new TaskBuildProduct(execInstance.getInstanceId());
+            taskBuildProduct.setKey(PipelineFinal.DEFAULT_ARTIFACT_ADDRESS);
+            taskBuildProduct.setValue(fileAddress);
+            taskBuildProduct.setType(PipelineFinal.DEFAULT_TYPE);
+
+            TaskBuildProduct taskBuildProducts = new TaskBuildProduct(execInstance.getInstanceId());
+            taskBuildProducts.setKey(PipelineFinal.DEFAULT_ARTIFACT_NAME);
+            taskBuildProducts.setValue(file.getName());
+            taskBuildProducts.setType(PipelineFinal.DEFAULT_TYPE);
 
             taskBuildProductService.createBuildProduct(taskBuildProduct);
+            taskBuildProductService.createBuildProduct(taskBuildProducts);
 
             // 移动文件
             FileUtils.moveFile(file, new File(fileAddress));
@@ -202,20 +209,17 @@ public class TaskBuildExecServiceImpl implements TaskBuildExecService {
      * @param type 任务类型
      * @return 错误状态
      */
-    private String[] error(String type){
-        String[] strings;
+    private Map<String,String> error(String type){
+        Map<String,String> map = new HashMap<>();
         if (type.equals("21") || type.equals("maven")){
-            strings = new String[]{
-                    "BUILD FAILUREl",
-                    "ERROR"
-            };
-            return strings;
+            map.put("BUILD FAILUREl","构建失败！");
+            map.put("BUILD FAILURE","构建失败！");
+            return map;
         }
-        strings = new String[]{
-                "npm ERR! errno -4058",
-                "npm ERR! code ENOENT"
-        };
-        return strings;
+        map.put("npm ERR! errno -4058","npm ERR! errno -4058");
+        map.put("npm ERR! code ENOENT","npm ERR! code ENOENT");
+        map.put("npm ERR!","");
+        return map;
     }
 
 

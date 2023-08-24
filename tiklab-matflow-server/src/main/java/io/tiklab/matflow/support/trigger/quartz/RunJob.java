@@ -1,5 +1,6 @@
 package io.tiklab.matflow.support.trigger.quartz;
 
+import io.tiklab.eam.common.context.LoginContext;
 import io.tiklab.matflow.pipeline.execute.service.PipelineExecService;
 import io.tiklab.matflow.support.trigger.service.TriggerService;
 import org.quartz.JobDataMap;
@@ -43,11 +44,12 @@ public  class RunJob implements org.quartz.Job {
         String pipelineId = (String)map.get("pipelineId");
         String weekTime = (String)map.get("weekTime");
         String cron = (String)map.get("cron");
-        logger.info("执行定时任务，时间："+ pipelineId +"    时间："+ weekTime+"     cron"+cron);
-        execService.start(pipelineId, 2);
+        logger.warn("执行定时任务，时间："+ pipelineId +"    时间："+ weekTime+"     cron"+cron);
+        String loginId = LoginContext.getLoginId();
+        execService.start(pipelineId,loginId, 2);
         triggerConfigServer.deleteCronConfig(pipelineId,cron);
         job.removeJob(pipelineId,cron);
-        logger.info("执行定时任务执行完成，移除定时任务，流水线id："+pipelineId +"    时间："+ weekTime+"     cron"+cron);
+        logger.warn("定时任务执行完成，移除定时任务，流水线id："+pipelineId +"    时间："+ weekTime+"     cron"+cron);
     }
 
 }

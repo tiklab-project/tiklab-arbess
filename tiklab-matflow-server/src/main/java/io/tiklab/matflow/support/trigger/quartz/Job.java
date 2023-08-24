@@ -28,7 +28,7 @@ public class Job {
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public void addJob(String pipelineId, Class jobClass, String cron) throws SchedulerException {
         Map<String, String> map = CronUtils.cronWeek(cron);
-        logger.info("添加定时任务，流水线id:"+pipelineId+"    时间："+ map.get("weekTime") +"  cron:" +cron );
+        logger.warn("添加定时任务，流水线id:"+pipelineId+"    时间："+ map.get("weekTime") +"  cron:" +cron );
 
         //任务名
         String jobName =pipelineId + "_"+cron;
@@ -110,7 +110,7 @@ public class Job {
 
             String oldTime = trigger.getCronExpression();
             if (!oldTime.equalsIgnoreCase(cron)) {
-                System.out.println("任务："+jobName+"被修改");
+                logger.warn("任务："+jobName+"被修改");
                 /** 方式一 ：调用 rescheduleJob 开始 */
                /* // 触发器
                 TriggerBuilder<Trigger> triggerBuilder = TriggerBuilder.newTrigger();
@@ -145,7 +145,7 @@ public class Job {
             TriggerKey triggerKey = TriggerKey.triggerKey(jobName);
             JobKey jobKey = JobKey.jobKey(jobName);
             scheduler.getJobDetail(jobKey);
-            logger.info("移除触发器，流水线id："+pipelineId+"     时间：" + CronUtils.weekTime(cron) +"   cron:"+ cron  );
+            logger.warn("移除触发器，流水线id："+pipelineId+"     时间：" + CronUtils.weekTime(cron) +"   cron:"+ cron  );
             scheduler.deleteJob(jobKey);
             scheduler.pauseTrigger(triggerKey);// 停止触发器
             scheduler.unscheduleJob(triggerKey);// 移除触发器

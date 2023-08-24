@@ -6,6 +6,9 @@ import io.tiklab.dal.jpa.JpaTemplate;
 import io.tiklab.dal.jpa.criterial.condition.QueryCondition;
 import io.tiklab.dal.jpa.criterial.conditionbuilder.QueryBuilders;
 import io.tiklab.matflow.stages.entity.StageInstanceEntity;
+import io.tiklab.matflow.stages.model.StageInstanceQuery;
+import io.tiklab.matflow.task.task.entity.TaskInstanceEntity;
+import io.tiklab.matflow.task.task.model.TaskInstanceQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -88,6 +91,16 @@ public class StageInstanceDao {
         QueryCondition queryCondition = QueryBuilders.createQuery(StageInstanceEntity.class)
                 .eq("parentId", parentId)
                 .orders(orderList)
+                .get();
+        return jpaTemplate.findList(queryCondition,StageInstanceEntity.class);
+    }
+
+
+    public List<StageInstanceEntity> findStageInstanceList(StageInstanceQuery query){
+        QueryCondition queryCondition = QueryBuilders.createQuery(StageInstanceEntity.class)
+                .eq("instanceId", query.getInstanceId())
+                .eq("stageState", query.getStageState())
+                .eq("parentId", query.getParentId())
                 .get();
         return jpaTemplate.findList(queryCondition,StageInstanceEntity.class);
     }

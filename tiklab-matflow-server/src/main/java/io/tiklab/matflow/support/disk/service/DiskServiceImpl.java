@@ -11,7 +11,7 @@ import java.io.File;
 public class DiskServiceImpl implements DiskService {
 
     @Autowired
-    private PipelineUtilService utilService;
+    PipelineUtilService utilService;
 
     @Override
     public Boolean deleteDisk(String pipelineId) {

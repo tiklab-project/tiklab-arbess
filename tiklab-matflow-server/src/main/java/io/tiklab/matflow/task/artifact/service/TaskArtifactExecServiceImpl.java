@@ -7,14 +7,12 @@ import io.tiklab.matflow.setting.model.AuthThird;
 import io.tiklab.matflow.setting.model.Scm;
 import io.tiklab.matflow.setting.service.ScmService;
 import io.tiklab.matflow.support.condition.service.ConditionService;
-import io.tiklab.matflow.support.util.PipelineFileUtil;
-import io.tiklab.matflow.support.util.PipelineFinal;
-import io.tiklab.matflow.support.util.PipelineUtil;
-import io.tiklab.matflow.support.util.PipelineUtilService;
+import io.tiklab.matflow.support.util.*;
 import io.tiklab.matflow.support.variable.service.VariableService;
 import io.tiklab.matflow.task.artifact.model.TaskArtifact;
 import io.tiklab.matflow.task.artifact.model.XpackRepository;
 import io.tiklab.matflow.task.build.model.TaskBuildProduct;
+import io.tiklab.matflow.task.build.model.TaskBuildProductQuery;
 import io.tiklab.matflow.task.build.service.TaskBuildProductService;
 import io.tiklab.matflow.task.task.model.TaskInstance;
 import io.tiklab.matflow.task.task.model.Tasks;
@@ -29,6 +27,9 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 @Service
@@ -36,26 +37,26 @@ import java.util.Objects;
 public class TaskArtifactExecServiceImpl implements TaskArtifactExecService {
 
     @Autowired
-    private TasksInstanceService tasksInstanceService;
+    TasksInstanceService tasksInstanceService;
 
     @Autowired
-    private VariableService variableService;
+    VariableService variableService;
 
     @Autowired
-    private ConditionService conditionService;
+    ConditionService conditionService;
 
     @Autowired
-    private ScmService scmService;
+    ScmService scmService;
 
     @Autowired
-    private TaskArtifactXpackService taskArtifactXpackService;
+    TaskArtifactXpackService taskArtifactXpackService;
 
     @Autowired
-    private PipelineUtilService utilService;
+    PipelineUtilService utilService;
 
 
     @Autowired
-    private TaskBuildProductService taskBuildProductService;
+    TaskBuildProductService taskBuildProductService;
 
     private static final Logger logger = LoggerFactory.getLogger(TaskArtifactExecServiceImpl.class);
 
@@ -74,29 +75,23 @@ public class TaskArtifactExecServiceImpl implements TaskArtifactExecService {
         TaskArtifact product = (TaskArtifact) task.getTask();
         product.setType(taskType);
 
-        String path;
-        // String fileAddress = product.getFileAddress();
-        // try {
-        //      path = utilService.findFile(pipelineId,fileAddress);
-        // }catch (ApplicationException e){
-        //     tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+e);
-        //     return false;
-        // }
-        //
-        // if (path == null){
-        //     tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"匹配不到制品");
-        //     return false;
-        // }
-
+        // 查询制品信息
         TaskInstance execInstance = tasksInstanceService.findExecInstance(taskId);
-        TaskBuildProduct buildProduct = taskBuildProductService.findBuildProduct(execInstance.getInstanceId());
+        TaskBuildProductQuery taskBuildProductQuery = new TaskBuildProductQuery();
+        taskBuildProductQuery.setInstanceId(execInstance.getInstanceId());
+        taskBuildProductQuery.setKey(PipelineFinal.DEFAULT_ARTIFACT_ADDRESS);
+        taskBuildProductQuery.setType(PipelineFinal.DEFAULT_TYPE);
+        List<TaskBuildProduct> buildProductList = taskBuildProductService.findBuildProductList(taskBuildProductQuery);
 
-        if (buildProduct == null){
+        if (buildProductList.isEmpty()){
             tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"无法获取到制品!");
             return false;
         }
 
-        path = buildProduct.getProductAddress();
+        TaskBuildProduct taskBuildProduct = buildProductList.get(0);
+
+        String path = taskBuildProduct.getValue();
+        // 获取文件后缀名
         String ext = FilenameUtils.getExtension(path);
         product.setFileType(ext);
 
@@ -121,8 +116,7 @@ public class TaskArtifactExecServiceImpl implements TaskArtifactExecService {
                     //执行命令
                     Process process = getProductOrder(product,path);
 
-                    String[] error = error(product.getType());
-                    boolean result = tasksInstanceService.readCommandExecResult(process, "UTF-8", error, taskId);
+                    boolean result = tasksInstanceService.readCommandExecResult(process, "UTF-8", error(product.getType()), taskId);
                     if (!result){
                         tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"任务："+task.getTaskName()+"执行失败。");
                         return false;
@@ -189,11 +183,10 @@ public class TaskArtifactExecServiceImpl implements TaskArtifactExecService {
         if (authThird.getAuthType() == 1){
             String id = PipelineFinal.appName;
 
-            String s  ;
-
             if (!PipelineUtil.isNoNull(settingAddress)){
                 settingAddress = "conf/settings.xml";
             }
+            String s  ;
 
             File file = new File(System.getProperty("user.dir"));
             if (file.getAbsolutePath().endsWith("bin")){
@@ -252,7 +245,7 @@ public class TaskArtifactExecServiceImpl implements TaskArtifactExecService {
         }
 
         if (authHost.getAuthType() == 2){
-            String tempFile = PipelineFileUtil.createTempFile(authHost.getPrivateKey());
+            String tempFile = PipelineFileUtil.createTempFile(authHost.getPrivateKey(),PipelineFinal.FILE_TYPE_TXT);
             if (!PipelineUtil.isNoNull(tempFile)){
                 throw new ApplicationException("获取私钥失败。");
             }
@@ -324,21 +317,27 @@ public class TaskArtifactExecServiceImpl implements TaskArtifactExecService {
         return order;
     }
 
-    private String[] error(String type){
-
+    private Map<String,String> error(String type){
+        Map<String,String> map =new HashMap<>();
         String[] strings = new String[]{};
         switch (type){
             case "xpack","nexus","51" ->{
-             return new String[]{
-                    "Error executing Maven",
-                    "The specified user settings file does not exist",
-                    "405 HTTP method PUT is not supported by this URL",
-                    "[INFO] BUILD FAILURE",
-                    "BUILD FAILURE"
-                };
+                map.put("Error executing Maven","执行maven命令失败！");
+                map.put("The specified user settings file does not exist","无法找到Setting文件！");
+                map.put("405 HTTP method PUT is not supported by this URL","方法不被允许！");
+                map.put("[INFO] BUILD FAILURE","构建失败！");
+                map.put("BUILD FAILURE","构建失败！");
+                return map;
+             // return new String[]{
+             //        "Error executing Maven",
+             //        "The specified user settings file does not exist",
+             //        "405 HTTP method PUT is not supported by this URL",
+             //        "[INFO] BUILD FAILURE",
+             //        "BUILD FAILURE"
+             //    };
             }
             default -> {
-                return strings;
+                return map;
             }
         }
 

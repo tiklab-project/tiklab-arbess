@@ -33,8 +33,8 @@ public class PipelineExecController {
      * @pi.param: name=pipelineId;dataType=string;value=pipelineId;
      */
     @RequestMapping(path="/start",method = RequestMethod.POST)
-    public Result<PipelineInstance> start(@NotNull String pipelineId ){
-        PipelineInstance start = pipelineExecService.start(pipelineId,1);
+    public Result<PipelineInstance> start(@NotNull String pipelineId ,@NotNull  String userId){
+        PipelineInstance start = pipelineExecService.start(pipelineId,userId,1);
         return Result.ok(start);
     }
 

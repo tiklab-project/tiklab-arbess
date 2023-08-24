@@ -6,6 +6,7 @@ import io.tiklab.matflow.home.service.PipelineHomeService;
 import io.tiklab.matflow.pipeline.definition.model.Pipeline;
 import io.tiklab.matflow.pipeline.definition.service.PipelineService;
 import io.tiklab.matflow.pipeline.instance.model.PipelineInstance;
+import io.tiklab.matflow.pipeline.instance.model.PipelineInstanceQuery;
 import io.tiklab.matflow.pipeline.instance.service.PipelineInstanceService;
 import io.tiklab.matflow.setting.service.ResourcesService;
 import io.tiklab.matflow.stages.service.StageExecService;
@@ -90,7 +91,7 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
      * @return 是否正在运行
      */
     @Override
-    public PipelineInstance start(String pipelineId, int startWAy) {
+    public PipelineInstance start(String pipelineId,String userId, int startWAy) {
 
         resourcesService.judgeResources();
 
@@ -103,8 +104,7 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
             return null;
         }
         execMap.put(pipelineId,pipelineId);
-        String loginId = LoginContext.getLoginId();
-        return beginExecPipeline(pipeline,loginId, startWAy);
+        return beginExecPipeline(pipeline,userId, startWAy);
     }
 
 
@@ -121,7 +121,7 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
         Pipeline pipeline = pipelineService.findPipelineById(pipelineId);
         int size = execMap.size();
 
-        // 放入等待执行的缓存中
+        // 资源限制放入缓存中等待执行
         if ((version == 1 && size >= 1) || (version == 2 && size >= 1) ){
             pipeline.setState(3);
             pipelineService.updatePipeline(pipeline);
@@ -144,9 +144,9 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
         logger.info("执行待执行流水线："+ key);
         Pipeline pipeline = pipelineService.findPipelineById(key);
 
-        execCacheMap.remove(key);
         String loginId = LoginContext.getLoginId();
         beginExecPipeline(pipeline,loginId, value);
+        execCacheMap.remove(key);
     }
 
     /**
@@ -219,7 +219,7 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
         joinTemplate.joinQuery(pipelineInstance);
 
         try {
-            Thread.sleep(100);
+            Thread.sleep(400);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
@@ -249,7 +249,7 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
             try {
                 b = tasksExecService.execTask(pipelineId, task.getTaskType(), task.getTaskId());
             }catch (Exception e){
-                logger.info("错误："+e.getMessage());
+                logger.error("错误："+e.getMessage());
             }
             TaskExecMessage taskExecMessage = new TaskExecMessage(pipeline,task.getTaskName(),task.getTaskId(),b);
             boolean b1 = postExecService.execTaskPostTask(taskExecMessage);
@@ -267,9 +267,12 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
      */
     private void pipelineExecEnd(String pipelineId , boolean state){
         String instanceId = pipelineIdOrInstanceId.get(pipelineId);
-        Integer integer = instanceService.findPipelineRunTime(instanceId);
         PipelineInstance pipelineInstance = instanceIdOrInstance.get(instanceId);
-        pipelineInstance.setRunTime(integer);
+
+        Integer integer = instanceService.findPipelineRunTime(instanceId);
+        if (!Objects.isNull(integer)){
+            pipelineInstance.setRunTime(integer);
+        }
 
         // 添加资源配置
         resourcesService.instanceResources(integer);
@@ -327,6 +330,16 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
 
         String instanceId = pipelineIdOrInstanceId.get(pipelineId);
 
+        if (Objects.isNull(instanceId)){
+            PipelineInstanceQuery pipelineInstanceQuery = new PipelineInstanceQuery();
+            pipelineInstanceQuery.setPipelineId(pipelineId);
+            pipelineInstanceQuery.setState(PipelineFinal.RUN_RUN);
+            List<PipelineInstance> pipelineInstanceList = instanceService.findPipelineInstanceList(pipelineInstanceQuery);
+            if (!pipelineInstanceList.isEmpty()){
+                instanceId = pipelineInstanceList.get(0).getInstanceId();
+            }
+        }
+
         //多任务
         if (type == 1){
             List<Tasks> tasks = tasksService.finAllPipelineTask(pipelineId);
@@ -334,11 +347,15 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
                 String taskId = task.getTaskId();
                 tasksExecService.stopTask(taskId);
             }
+            if (!Objects.isNull(instanceId)){
+                tasksExecService.stop(instanceId,null,null);
+            }
         }
 
         //多阶段
         if (type == 2){
             stageExecService.stopStage(pipelineId);
+            stageExecService.stop(instanceId);
         }
 
         // 流水线显示在运行，但未产生实例
@@ -381,6 +398,8 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
         pipelineService.updatePipeline(pipeline);
         instanceIdOrInstance.remove(instanceId);
         pipelineIdOrInstanceId.remove(pipelineId);
+
+        tasksExecService.stopThread(pipelineId);
 
         // 移除缓存中正在运行的流水线
         execMap.remove(pipelineId);

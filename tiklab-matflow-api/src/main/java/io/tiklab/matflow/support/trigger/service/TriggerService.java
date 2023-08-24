@@ -58,6 +58,12 @@ public interface TriggerService {
     void deleteTrigger(String triggerId) ;
 
 
+    List<Trigger> findAllTrigger();
+
+
+    Trigger findOneTriggerById(String triggerId);
+
+
     List<Trigger> findAllTriggerConfigList(List<String> idList) ;
 
 }

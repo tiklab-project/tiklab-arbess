@@ -6,7 +6,7 @@
     <parent>
         <groupId>io.tiklab</groupId>
         <artifactId>tiklab-matflow</artifactId>
-        <version>1.0.0.3</version>
+        <version>1.0.0.6</version>
     </parent>
     <artifactId>tiklab-matflow-server</artifactId>
     <name>${project.artifactId}</name>

@@ -19,15 +19,13 @@ import io.tiklab.security.logging.model.LoggingType;
 import io.tiklab.security.logging.service.LoggingByTemplService;
 import io.tiklab.user.user.model.User;
 import io.tiklab.user.user.service.UserService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class PipelineHomeServiceImpl implements PipelineHomeService {
@@ -40,8 +38,6 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
 
     @Autowired
     LoggingByTemplService logService;
-
-
 
     @Autowired
     SendMessageNoticeService dispatchNoticeService;
@@ -61,6 +57,9 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
     public HashMap<String,Object> initMap(Pipeline pipeline){
         HashMap<String,Object> map = new HashMap<>();
         String userId = LoginContext.getLoginId();
+        if (Objects.isNull(userId)){
+            userId = pipeline.getUser().getId();
+        }
         User user = userService.findOne(userId);
         map.put("pipelineId", pipeline.getId());
         map.put("pipelineName", pipeline.getName());
@@ -70,7 +69,7 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
         if (user.getNickname() != null){
             map.put("userName", user.getNickname());
         }
-        map.put("color", ""+pipeline.getColor());
+        map.put("color", pipeline.getColor());
         map.put("date", PipelineUtil.date(1));
         return map;
     }

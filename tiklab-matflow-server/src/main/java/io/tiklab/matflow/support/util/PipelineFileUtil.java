@@ -5,6 +5,7 @@ import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.validation.constraints.Null;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -18,49 +19,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import static io.tiklab.matflow.support.util.PipelineFinal.FILE_TEMP_PREFIX;
+
 public class PipelineFileUtil {
 
     private static Logger logger = LoggerFactory.getLogger(PipelineFileUtil.class);
-
-
-    /**
-     * 初始化项目空间
-     * @param type 类型 1.工作空间目录   2.日志目录
-     */
-    public static String initMatFlowAddress(int type){
-
-        //根目录
-        String userHome = System.getProperty("user.home");
-
-        //工作空间目录
-        File file = new File(userHome + PipelineFinal.MATFLOW_WORKSPACE);
-        String path = file.getAbsolutePath();
-        if (!file.exists()){
-            createDirectory(path);
-            try {
-                //更改为隐藏文件夹
-                if (PipelineUtil.findSystemType() == 1){
-                    PipelineUtil.process(null," attrib +H " + userHome);
-                }
-            } catch (IOException e) {
-                throw new ApplicationException("更改工作空间为隐藏失败。");
-            }
-        }
-
-        //日志目录
-        File logFile = new File(userHome+ PipelineFinal.MATFLOW_LOGS);
-        String logAddress = logFile.getAbsolutePath();
-        if (!logFile.exists()){
-            createDirectory(logAddress);
-        }
-
-        if (type == 2){
-            return logAddress;
-        }else {
-            return path;
-        }
-
-    }
 
 
     /**
@@ -139,14 +102,15 @@ public class PipelineFileUtil {
     /**
      * 创建临时文件写入信息
      * @param key 私钥内容
+     * @param suffix 后缀
      * @return 文件地址
      */
-    public static String createTempFile(String key){
+    public static String createTempFile(String key,String suffix){
         FileWriter writer = null;
         String path ;
         try {
             try {
-                File tempFile = File.createTempFile("key", ".txt");
+                File tempFile = File.createTempFile(FILE_TEMP_PREFIX, suffix);
                 path = tempFile.getPath();
                 writer = new FileWriter(path);
                 writer.write(key);
@@ -233,34 +197,32 @@ public class PipelineFileUtil {
      * @return 内容
      */
     public static String readFile(String fileAddress,int length) throws ApplicationException {
-        if (!PipelineUtil.isNoNull(fileAddress)){
+
+        if (!PipelineUtil.isNoNull(fileAddress) || !new File(fileAddress).exists()){
             return null;
         }
 
-        File file = new File(fileAddress);
-
-        if (!file.exists()){
-            return null;
-        }
-
-        Path path = Paths.get(fileAddress);
-
+        // File file = new File(fileAddress);
+        // if (!file.exists()){
+        //     return null;
+        // }
         StringBuilder s = new StringBuilder();
-        List<String> lines ;
         try {
+            Path path = Paths.get(fileAddress);
+            List<String> lines ;
             if (length == 0){
                 lines = Files.readAllLines(path,StandardCharsets.UTF_8);
                 for (String line : lines) {
                     s.append(line).append("\n");
                 }
-                return s.toString();
-            }
-            lines = Files.readAllLines(path,StandardCharsets.UTF_8);
-            for (int i = Math.max(0, lines.size() - length); i < lines.size(); i++) {
-                s.append(lines.get(i)).append("\n");
+            }else {
+                lines = Files.readAllLines(path,StandardCharsets.UTF_8);
+                for (int i = Math.max(0, lines.size() - length); i < lines.size(); i++) {
+                    s.append(lines.get(i)).append("\n");
+                }
             }
         } catch (IOException e) {
-            throw new ApplicationException("读取文件信息失败"+ e.getMessage());
+            throw new ApplicationException("读取文件信息失败" + e.getMessage());
         }
         return s.toString();
     }
@@ -274,42 +236,18 @@ public class PipelineFileUtil {
     public static Boolean deleteFile(File file){
 
         if (!file.exists()){
-            logger.error("文件不存在！{}",file.getAbsolutePath());
+            logger.warn("文件不存在！{}",file.getAbsolutePath());
             return true;
         }
-
 
         boolean b = FileUtils.deleteQuietly(file);
         if (!b){
             logger.error("文件删除失败！{}",file.getAbsolutePath());
+            return false;
         }else {
             logger.warn("文件删除成功！{}",file.getAbsolutePath());
         }
         return true;
-        //
-        // if (file.isDirectory()) {
-        //     String[] children = file.list();
-        //     //递归删除目录中的子目录下
-        //     if (children != null) {
-        //         for (String child : children) {
-        //             boolean state = deleteFile(new File(file, child));
-        //             int tryCount = 0;
-        //             while (!state && tryCount ++ < 10) {
-        //                 System.gc();
-        //                 state = file.delete();
-        //             }
-        //         }
-        //     }
-        //     // 目录此时为空，删除
-        // }
-        // return file.delete();
-    }
-
-
-    public static void main(String[] args) {
-        String name = "ni hao a ${app}";
-        String s = name.replaceAll("\\$\\{app}", "zhangcheng");
-        System.out.println(s);
     }
 
 

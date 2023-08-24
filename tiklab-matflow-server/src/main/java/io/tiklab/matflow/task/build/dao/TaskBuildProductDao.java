@@ -8,6 +8,7 @@ import io.tiklab.dal.jpa.annotation.Table;
 import io.tiklab.dal.jpa.criterial.condition.QueryCondition;
 import io.tiklab.dal.jpa.criterial.conditionbuilder.QueryBuilders;
 import io.tiklab.matflow.task.build.entity.TaskBuildProductEntity;
+import io.tiklab.matflow.task.build.model.TaskBuildProductQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -61,9 +62,11 @@ public class TaskBuildProductDao {
         return jpaTemplate.findAll(TaskBuildProductEntity.class);
     }
 
-    public List<TaskBuildProductEntity> findBuildProductList(String instanceId){
+    public List<TaskBuildProductEntity> findBuildProductList(TaskBuildProductQuery taskBuildProductQuery){
         QueryCondition queryCondition = QueryBuilders.createQuery(TaskBuildProductEntity.class)
-                .eq("instanceId", instanceId)
+                .eq("instanceId", taskBuildProductQuery.getInstanceId())
+                .eq("type", taskBuildProductQuery.getType())
+                .eq("key", taskBuildProductQuery.getKey())
                 .get();
         return jpaTemplate.findList(queryCondition, TaskBuildProductEntity.class);
     }
@@ -71,7 +74,6 @@ public class TaskBuildProductDao {
     public List<TaskBuildProductEntity> findAllBuildProductList(List<String> idList){
         return jpaTemplate.findList(TaskBuildProductEntity.class,idList);
     }
-
 
 
 

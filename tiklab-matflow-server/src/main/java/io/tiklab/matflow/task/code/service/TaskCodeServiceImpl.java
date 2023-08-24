@@ -24,19 +24,19 @@ import java.util.Objects;
 public class TaskCodeServiceImpl implements TaskCodeService {
 
     @Autowired
-    private TaskCodeDao taskCodeDao;
+    TaskCodeDao taskCodeDao;
 
     @Autowired
-    private AuthService authServer;
+    AuthService authServer;
 
     @Autowired
-    private AuthThirdService authServerServer;
+    AuthThirdService authServerServer;
 
     @Autowired
-    private TaskCodeThirdService taskCodeThirdService;
+    TaskCodeThirdService taskCodeThirdService;
 
     @Autowired
-    private TaskCodeXcodeService taskCodeXcodeService;
+    TaskCodeXcodeService taskCodeXcodeService;
 
     private static final Logger logger = LoggerFactory.getLogger(TaskCodeServiceImpl.class);
 

@@ -1,6 +1,9 @@
 package io.tiklab.matflow.setting.service;
 
 import io.tiklab.core.exception.ApplicationException;
+import io.tiklab.matflow.pipeline.definition.dao.PipelineDao;
+import io.tiklab.matflow.pipeline.definition.entity.PipelineEntity;
+import io.tiklab.matflow.pipeline.definition.model.PipelineQuery;
 import io.tiklab.matflow.pipeline.execute.service.PipelineExecServiceImpl;
 import io.tiklab.matflow.setting.dao.ResourcesDao;
 import io.tiklab.matflow.setting.model.Resources;
@@ -21,13 +24,16 @@ public class ResourcesServiceImpl implements ResourcesService {
 
 
     @Autowired
-    private ResourcesDao resourcesDao;
+    ResourcesDao resourcesDao;
 
     @Autowired
-    private PipelineVersionService versionService;
+    PipelineVersionService versionService;
 
     @Autowired
-    private PipelineUtilService utilService;
+    PipelineUtilService utilService;
+
+    @Autowired
+    PipelineDao pipelineDao;
 
     @Override
     public void instanceResources(int time){
@@ -115,8 +121,11 @@ public class ResourcesServiceImpl implements ResourcesService {
             resources.setCacheNumber(-1);
         }
 
-        Map<String, String> execMap = PipelineExecServiceImpl.execMap;
-        int size = execMap.size();
+        PipelineQuery pipelineQuery = new PipelineQuery();
+        pipelineQuery.setPipelineState(1);
+        List<PipelineEntity> pipelineList = pipelineDao.findPipelineList(pipelineQuery);
+
+        int size = pipelineList.size();
 
         // 并发数
         resources.setUseCcyNumber(size);

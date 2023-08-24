@@ -13,43 +13,36 @@ import org.quartz.SchedulerException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 @Service
 @Exporter
 public class TriggerTimeServiceImpl implements TriggerTimeService {
 
-
     @Autowired
-    private TriggerTimeDao triggerTimeDao;
+    TriggerTimeDao triggerTimeDao;
 
     @Autowired
     Job manager;
 
     @Override
-    public String createTriggerTime(TriggerTime pipelineTriggerTime, String pipelineId){
-        List<Integer> timeList = pipelineTriggerTime.getTimeList();
+    public String createTriggerTime(TriggerTime triggerTime, String pipelineId){
+        List<Integer> timeList = triggerTime.getTimeList();
         if (timeList == null || timeList.size() == 0){
             throw new ApplicationException(50001,"无法获取到执行时间");
         }
-        String time = pipelineTriggerTime.getTime();
-        for (Integer integer : timeList) {
-            pipelineTriggerTime.setDate(integer);
-            String cron = CronUtils.weekCron(time, integer);
-            pipelineTriggerTime.setCron(cron);
-            try {
-                manager.addJob(pipelineId, RunJob.class,cron);
-            } catch (SchedulerException e) {
-                throw new ApplicationException(50001,"当前时间已经添加过，无需重复添加。");
-            }
-            TriggerTimeEntity triggerTimeEntity = BeanMapper.map(pipelineTriggerTime, TriggerTimeEntity.class);
-            return triggerTimeDao.createTime(triggerTimeEntity);
+        String time = triggerTime.getTime();
+        triggerTime.setDate(triggerTime.getDayTime());
+        String cron = CronUtils.weekCron(time, triggerTime.getDayTime());
+        triggerTime.setCron(cron);
+        try {
+            manager.addJob(pipelineId, RunJob.class,cron);
+        } catch (SchedulerException e) {
+            throw new ApplicationException(50001,"当前时间已经添加过，无需重复添加。");
         }
-        return null;
+        TriggerTimeEntity triggerTimeEntity = BeanMapper.map(triggerTime, TriggerTimeEntity.class);
+        return triggerTimeDao.createTime(triggerTimeEntity);
     }
 
     @Override
@@ -62,14 +55,25 @@ public class TriggerTimeServiceImpl implements TriggerTimeService {
         //获取时间
         List<Integer> allDataConfig = findAllDataConfig(configId);
 
+        StringBuilder execTime = new StringBuilder();
+
+        for (Integer integer : allDataConfig) {
+            TriggerTime triggerTime = findOneConfig(configId, integer);
+            triggerTime.setTimeList(allDataConfig);
+            Map<String, String> map = CronUtils.cronWeek(triggerTime.getCron());
+            execTime.append(map.get("cron")).append(" | ");
+        }
+
         Integer integer = allDataConfig.get(0);
         TriggerTime triggerTime = findOneConfig(configId, integer);
         triggerTime.setTimeList(allDataConfig);
         //获取具体时间
         Map<String, String> map = CronUtils.cronWeek(triggerTime.getCron());
-        triggerTime.setExecTime(map.get("cron"));
+
+        triggerTime.setExecTime(execTime + map.get("time"));
         triggerTime.setTime(map.get("time"));
         triggerTime.setWeekTime(map.get("weekTime"));
+
         return triggerTime;
     }
 
@@ -121,26 +125,20 @@ public class TriggerTimeServiceImpl implements TriggerTimeService {
 
     @Override
     public List<Integer> findAllDataConfig(String configId){
-        List<TriggerTime> allTriggerTime = findAllTime();
+        List<TriggerTime> allTriggerTime = findAllTriggerTime(configId);
         if (allTriggerTime == null){
             return null;
         }
         List<Integer> list = new ArrayList<>();
-        List<Integer> afterList = new ArrayList<>();
         for (TriggerTime triggerTime : allTriggerTime) {
-            int date = triggerTime.getDate();
-            if (triggerTime.getTriggerId().equals(configId) && date != 0){
-                int week = PipelineUtil.week();
-                if (date > week){
-                    list.add(date);
-                }else {
-                    afterList.add(date);
-                }
-            }
-            Collections.sort(list);
-            Collections.sort(afterList);
+            String s = CronUtils.weekTime(triggerTime.getCron());
+            triggerTime.setTime(s);
         }
-        list.addAll(afterList);
+        allTriggerTime.sort(Comparator.comparing(TriggerTime::getTime));
+
+        for (TriggerTime triggerTime : allTriggerTime) {
+            list.add(triggerTime.getDate());
+        }
         return list;
     }
 

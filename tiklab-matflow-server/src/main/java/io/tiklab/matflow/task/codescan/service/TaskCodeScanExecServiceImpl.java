@@ -16,6 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 代码扫描
@@ -27,16 +29,16 @@ public class TaskCodeScanExecServiceImpl implements TaskCodeScanExecService {
 
 
     @Autowired
-    private TasksInstanceService tasksInstanceService;
+    TasksInstanceService tasksInstanceService;
 
     @Autowired
-    private ConditionService conditionService;
+    ConditionService conditionService;
     
     @Autowired
-    private VariableService variableService;
+    VariableService variableService;
     
     @Autowired
-    private ScmService scmService;
+    ScmService scmService;
 
     @Autowired
     PipelineUtilService utilService;
@@ -130,21 +132,25 @@ public class TaskCodeScanExecServiceImpl implements TaskCodeScanExecService {
         return order;
     }
 
-    private String[] error(String type){
+    private Map<String,String> error(String type){
+        Map<String,String> map = new HashMap<>();
         String[] strings;
         if (type.equals("sonar")){
-            strings = new String[]{
-                    "svn: E170000:",
-                    "invalid option;",
-                    "BUILD FAILURE",
-                    "[ERROR]"
-            };
-            return strings;
+            map.put("svn: E170000:","");
+            map.put("invalid option;","");
+            map.put("BUILD FAILURE","构建失败！");
+            // strings = new String[]{
+            //         "svn: E170000:",
+            //         "invalid option;",
+            //         "BUILD FAILURE",
+            //         "[ERROR]"
+            // };
+            return map;
         }
-        strings = new String[]{
-
-        };
-        return strings;
+        // strings = new String[]{
+        //
+        // };
+        return map;
     }
 
 

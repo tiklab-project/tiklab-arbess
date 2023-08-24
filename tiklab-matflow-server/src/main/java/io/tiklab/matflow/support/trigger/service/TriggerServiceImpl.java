@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @Exporter
@@ -41,20 +42,26 @@ public class TriggerServiceImpl implements TriggerService {
     public String createTrigger(Trigger trigger) {
         trigger.setCreateTime(PipelineUtil.date(1));
         String triggerId = createTriggerConfig(trigger);
-        trigger.setTriggerId(triggerId);
-
-        Pipeline pipeline = trigger.getPipeline();
-        String pipelineId = pipeline.getId();
-        int taskType = trigger.getTaskType();
+        List<String> list = new ArrayList<>();
         try {
-            String object = JSON.toJSONString(trigger.getValues());
+            int taskType = trigger.getTaskType();
+            Pipeline pipeline = trigger.getPipeline();
+            String pipelineId = pipeline.getId();
             if (taskType == 81){
+                String object = JSON.toJSONString(trigger.getValues());
                 TriggerTime triggerTime = JSON.parseObject(object, TriggerTime.class);
-                triggerTime.setTriggerId(triggerId);
-                timeServer.createTriggerTime(triggerTime,pipelineId);
+                List<Integer> timeList = triggerTime.getTimeList();
+                for (Integer integer : timeList) {
+                    list.add(triggerId);
+                    triggerTime.setDayTime(integer);
+                    triggerTime.setTriggerId(triggerId);
+                    timeServer.createTriggerTime(triggerTime,pipelineId);
+                }
             }
         }catch (ApplicationException e){
-            deleteTrigger(triggerId);
+            for (String s : list) {
+                deleteTrigger(s);
+            }
         }
         return triggerId;
     }
@@ -142,7 +149,13 @@ public class TriggerServiceImpl implements TriggerService {
             TriggerTime triggerTime = JSON.parseObject(object, TriggerTime.class);
             triggerTime.setTriggerId(triggerId);
             timeServer.deleteAllTime(triggerId,pipelineId);
-            timeServer.createTriggerTime(triggerTime,pipelineId);
+
+            List<Integer> timeList = triggerTime.getTimeList();
+            for (Integer integer : timeList) {
+                triggerTime.setDayTime(integer);
+                timeServer.createTriggerTime(triggerTime,pipelineId);
+            }
+
         }
     }
 
@@ -158,6 +171,9 @@ public class TriggerServiceImpl implements TriggerService {
 
         if (allTriggerConfig == null || allTriggerConfig.size() == 0){
             return null;
+        }
+        if (Objects.isNull(pipelineId)){
+            return allTriggerConfig;
         }
 
         for (Trigger trigger : allTriggerConfig) {
@@ -190,7 +206,6 @@ public class TriggerServiceImpl implements TriggerService {
         String pipelineId = trigger.getPipeline().getId();
         timeServer.deleteAllTime(triggerId,pipelineId);
         triggerDao.deleteTriggerConfig(triggerId);
-
     }
 
 

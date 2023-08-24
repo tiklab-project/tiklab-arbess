@@ -13,7 +13,7 @@
     <artifactId>tiklab-matflow</artifactId>
     <name>${project.artifactId}</name>
     <packaging>pom</packaging>
-    <version>1.0.0.3</version>
+    <version>1.0.0.6</version>
 
     <modules>
         <module>tiklab-matflow-api</module>
@@ -45,14 +45,13 @@
         <tiklab-eam.version>1.0.0.3</tiklab-eam.version>
 
         <tiklab-postin.version>1.0.0.3</tiklab-postin.version>
-        <tiklab-xcode.version>1.0.0.3</tiklab-xcode.version>
+        <tiklab-xcode.version>1.0.0.4</tiklab-xcode.version>
         <tiklab-xpack.version>1.0.0.3</tiklab-xpack.version>
         <tiklab-teston.version>1.0.0.3</tiklab-teston.version>
 
         <tiklab-postgresql.version>1.0.0.3</tiklab-postgresql.version>
         <tiklab-jdk.version>1.0.0.3</tiklab-jdk.version>
         <tiklab-upgrade.version>1.0.0.3</tiklab-upgrade.version>
-
 
         <commons-lang3.version>3.10</commons-lang3.version>
         <jsch.version>0.2.7</jsch.version>

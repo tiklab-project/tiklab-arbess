@@ -4,6 +4,8 @@ import io.tiklab.core.exception.ApplicationException;
 import io.tiklab.matflow.task.message.model.TaskExecMessage;
 import io.tiklab.matflow.task.task.model.Tasks;
 
+import java.util.List;
+
 /**
  * 任务执行服务接口
  */
@@ -32,6 +34,9 @@ public interface TasksExecService {
      */
     void stopTask(String taskId);
 
+
+    void stop(String instanceId,String stageInstanceId,String postProcessId);
+
     /**
      * 创建任务或阶段运行实例
      * @param task 任务运行信息
@@ -45,6 +50,9 @@ public interface TasksExecService {
      * @param threadName 线程名称
      */
     void stopThread(String threadName);
+
+
+    void runError( List<Tasks> tasks);
 
 
 }

@@ -14,7 +14,7 @@ public interface PipelineExecService {
      * @param startWAy   执行方式（1.手动执行 2.定时器触发）
      * @return 开始构建（true:开始运行 false:正在运行）
      */
-    PipelineInstance start(String pipelineId, int startWAy);
+    PipelineInstance start(String pipelineId,String userId, int startWAy);
 
     /**
      * 停止流水线运行

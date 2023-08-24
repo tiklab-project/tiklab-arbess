@@ -48,7 +48,7 @@ public class PipelineUtilServiceImpl implements PipelineUtilService {
 
 
     @Override
-    public  String findFile(String pipelineId, String regex) throws ApplicationException {
+    public  String findFile(String pipelineId, String regex) {
         List<String> list = new ArrayList<>();
         String path= findPipelineDefaultAddress(pipelineId,1) ;
         List<String> filePath = PipelineFileUtil.getFilePath(new File(path),new ArrayList<>());

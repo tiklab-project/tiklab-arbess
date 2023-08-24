@@ -8,7 +8,10 @@ import io.tiklab.dal.jpa.JpaTemplate;
 import io.tiklab.dal.jpa.criterial.condition.QueryCondition;
 import io.tiklab.dal.jpa.criterial.conditionbuilder.QueryBuilders;
 import io.tiklab.matflow.pipeline.definition.entity.PipelineEntity;
+import io.tiklab.matflow.pipeline.definition.model.Pipeline;
 import io.tiklab.matflow.pipeline.definition.model.PipelineQuery;
+import io.tiklab.matflow.pipeline.instance.entity.PipelineInstanceEntity;
+import io.tiklab.matflow.support.util.PipelineUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.stereotype.Repository;
@@ -71,6 +74,37 @@ public class PipelineDao {
 
     public List<PipelineEntity> findAllPipelineList(List<String> idList){
         return jpaTemplate.findList(PipelineEntity.class,idList);
+    }
+
+    public Pagination<PipelineEntity> findPipelineListQuery(PipelineQuery query){
+        String sql = "select pip_pipeline.* from pip_pipeline ";
+        sql = sql.concat(" where id in ( ");
+        String ids = "";
+        String[] idList = query.getIdString();
+
+        for (int i = 0; i < idList.length; i++) {
+            if (i == idList.length-1){
+                ids = ids.concat("'" + idList[i]+ "'");
+            }else {
+                ids = ids.concat("'" + idList[i]+ "',");
+            }
+        }
+
+        sql = sql.concat(ids+") and ");
+
+        Integer follow = query.getPipelineFollow();
+        String followSql=  "select pip_other_follow.pipeline_id from pip_other_follow where user_id = '"+query.getUserId()+"'";
+        if (follow == 1){
+            sql = sql.concat(" id in  (" +followSql +")");
+        }else {
+            sql = sql.concat(" id not in (" +followSql +")");
+        }
+        if (!Objects.isNull(query.getPipelineName())){
+            sql = sql.concat(" and name like '%" + query.getPipelineName() +"%'");
+        }
+
+        return jpaTemplate.getJdbcTemplate().findPage(sql, null, query.getPageParam(),
+                new BeanPropertyRowMapper<>(PipelineEntity.class));
     }
 
     public List<PipelineEntity> findPipelineList(PipelineQuery query){

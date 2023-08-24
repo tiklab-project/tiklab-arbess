@@ -32,6 +32,11 @@ public class PipelineInstanceQuery {
     @ApiProperty(name ="pipelineList",desc = "用户流水线")
     private List<Pipeline> pipelineList;
 
+    @ApiProperty(name ="ids",desc = "用户流水线")
+    private String[] ids;
+
+    private String number;
+
     @ApiProperty(name ="pageParam",desc = "分页参数")
     private Page pageParam= new Page();
 
@@ -92,5 +97,21 @@ public class PipelineInstanceQuery {
 
     public void setOrderParams(List<Order> orderParams) {
         this.orderParams = orderParams;
+    }
+
+    public String getNumber() {
+        return number;
+    }
+
+    public void setNumber(String number) {
+        this.number = number;
+    }
+
+    public String[] getIds() {
+        return ids;
+    }
+
+    public void setIds(String[] ids) {
+        this.ids = ids;
     }
 }

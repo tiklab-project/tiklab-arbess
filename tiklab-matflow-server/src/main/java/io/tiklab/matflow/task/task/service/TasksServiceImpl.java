@@ -47,37 +47,37 @@ public class TasksServiceImpl implements TasksService {
     TasksDao tasksDao;
 
     @Autowired
-    private TaskCodeService codeService;
+    TaskCodeService codeService;
 
     @Autowired
-    private TaskBuildService buildService;
+    TaskBuildService buildService;
 
     @Autowired
-    private TaskTestService testService;
+    TaskTestService testService;
 
     @Autowired
-    private TaskDeployService deployService;
+    TaskDeployService deployService;
 
     @Autowired
-    private TaskCodeScanService codeScanService;
+    TaskCodeScanService codeScanService;
 
     @Autowired
-    private TaskArtifactService productServer;
+    TaskArtifactService productServer;
 
     @Autowired
-    private TaskMessageTypeService messageTypeServer;
+    TaskMessageTypeService messageTypeServer;
 
     @Autowired
-    private TaskScriptService scriptServer;
+    TaskScriptService scriptServer;
 
     @Autowired
-    private AuthService authServer;
+    AuthService authServer;
 
     @Autowired
-    private AuthThirdService authServerServer;
+    AuthThirdService authServerServer;
 
     @Autowired
-    private AuthHostService authHostService;
+    AuthHostService authHostService;
 
     private final ExecutorService executorService = Executors.newCachedThreadPool();
 
@@ -143,11 +143,9 @@ public class TasksServiceImpl implements TasksService {
         int taskSort = tasks.getTaskSort();
         String taskType = tasks.getTaskType();
 
-        boolean b = taskType.equals("1") || taskType.equals("2") || taskType.equals("3") || taskType.equals("4") || taskType.equals("5");
-        boolean b1 = taskType.equals("git") || taskType.equals("gitee") || taskType.equals("github") || taskType.equals("svn") || taskType.equals("xcode");
-
         //判断多任务是否存在代码源
-        if (tasks.getPipelineId() != null && (b || b1) ){
+        boolean b = findTaskType(taskType).equals("code");
+        if (tasks.getPipelineId() != null && (b) ){
             findCode(tasks.getPipelineId());
         }
 
@@ -187,10 +185,7 @@ public class TasksServiceImpl implements TasksService {
         }
         for (Tasks task : tasks) {
             String taskType = task.getTaskType();
-            boolean b = taskType.equals("1") || taskType.equals("2") || taskType.equals("3") || taskType.equals("4") || taskType.equals("5");
-            boolean b1 = taskType.equals("git") || taskType.equals("gitee") || taskType.equals("github") || taskType.equals("svn") || taskType.equals("xcode");
-
-            if (b || b1){
+            if (findTaskType(taskType).equals("code")){
                 throw new ApplicationException(50001,"代码源已存在");
             }
         }
@@ -361,8 +356,8 @@ public class TasksServiceImpl implements TasksService {
             }
             String taskType = task.getTaskType();
             String taskId = task.getTaskId();
-            switch (taskType) {
-                case "1","2","3","4","5","git","gitee","github","gitlab","xcode" -> {
+            switch (findTaskType(taskType)) {
+                case "code" -> {
                     TaskCode taskCode = codeService.findOneCode(taskId);
                     String authId = taskCode.getAuthId();
                     if (!Objects.isNull(authId)){
@@ -379,7 +374,7 @@ public class TasksServiceImpl implements TasksService {
                     }
                     object =  taskCode;
                 }
-                case "11","maventest","teston" -> {
+                case "test" -> {
                     TaskTest taskTest = testService.findOneTest(taskId);
                     String authId = taskTest.getAuthId();
                     if (taskType.equals("teston")){
@@ -388,10 +383,10 @@ public class TasksServiceImpl implements TasksService {
                     }
                     object = taskTest;
                 }
-                case "21","22","maven","nodejs" -> {
+                case "build" -> {
                     object = buildService.findOneBuild(taskId);
                 }
-                case "31","32","liunx","docker" -> {
+                case "deploy" -> {
                     TaskDeploy taskDeploy = deployService.findOneDeployConfig(taskId);
                     String authId = taskDeploy.getAuthId();
                     if (!Objects.isNull(authId)){
@@ -400,7 +395,7 @@ public class TasksServiceImpl implements TasksService {
                     }
                     object = taskDeploy;
                 }
-                case "41","sonar" -> {
+                case "codescan" -> {
                     TaskCodeScan codeScanConfig = codeScanService.findOneCodeScanConfig(taskId);
                     String authId = codeScanConfig.getAuthId();
                     if (!Objects.isNull(authId)){
@@ -409,7 +404,7 @@ public class TasksServiceImpl implements TasksService {
                     }
                     object = codeScanConfig;
                 }
-                case "51","52","nexus","ssh","xpack" -> {
+                case "artifact" -> {
                     TaskArtifact taskArtifact = productServer.findOneProduct(taskId);
                     String authId = taskArtifact.getAuthId();
                     if (!Objects.isNull(authId)){
@@ -425,10 +420,10 @@ public class TasksServiceImpl implements TasksService {
 
                     object = taskArtifact;
                 }
-                case "61","message" -> {
+                case "message" -> {
                     object = messageTypeServer.findMessage(taskId);
                 }
-                case "71","72","bat","shell" -> {
+                case "script" -> {
                     object = scriptServer.findScript(taskId);
                 }
                 default -> {
@@ -617,40 +612,42 @@ public class TasksServiceImpl implements TasksService {
      * @param taskType 任务类型
      */
     private void createDifferentTask(String taskId,String taskType,Object values){
-        switch (taskType) {
-           case "1","2","3","4","5","git","gitee","github","gitlab","xcode" -> {
+        switch (findTaskType(taskType)) {
+           case "code"     -> {
                 TaskCode task = new TaskCode();
                 task.setTaskId(taskId);
-                task.setTaskId(taskId);
+                if (taskType.equals("git")||taskType.equals("gitlab")){
+                    task.setCodeBranch("master");
+                }
                 codeService.createCode(task);
             }
-             case "11","maventest","teston" -> {
+           case "test"     -> {
                 TaskTest task = new TaskTest();
                 task.setTaskId(taskId);
                 testService.createTest(task);
             }
-            case "21","22","maven","nodejs" -> {
+           case "build"    -> {
                 TaskBuild task = new TaskBuild();
                 task.setTaskId(taskId);
                 buildService.createBuild(task);
             }
-            case "31","32","liunx","docker" -> {
+           case "deploy"   -> {
                 TaskDeploy task = new TaskDeploy();
                 task.setTaskId(taskId);
                 task.setAuthType(1);
                 deployService.createDeploy(task);
             }
-             case "41","sonar" -> {
+           case "codescan" -> {
                 TaskCodeScan task = new TaskCodeScan();
                 task.setTaskId(taskId);
                 codeScanService.createCodeScan(task);
             }
-             case "51","nexus","ssh","xpack" -> {
+           case "artifact" -> {
                 TaskArtifact task = new TaskArtifact();
                 task.setTaskId(taskId);
                 productServer.createProduct(task);
             }
-             case "61","message" ->{
+           case "message"  -> {
                 String object = JSON.toJSONString(values);
                 TaskMessageType task = JSON.parseObject(object, TaskMessageType.class);
                 if (task == null){
@@ -659,7 +656,7 @@ public class TasksServiceImpl implements TasksService {
                 task.setTaskId(taskId);
                 messageTypeServer.createMessage(task);
             }
-             case "71","72","bat","shell" ->{
+           case "script"   -> {
                 String object = JSON.toJSONString(values);
                 TaskScript task = JSON.parseObject(object, TaskScript.class);
                 if (task == null){
@@ -668,9 +665,7 @@ public class TasksServiceImpl implements TasksService {
                 task.setTaskId(taskId);
                 scriptServer.createScript(task);
             }
-            default -> {
-                throw new ApplicationException("无法更新未知的配置类型:"+taskType);
-            }
+           default -> throw new ApplicationException("无法更新未知的配置类型:"+taskType);
         }
     }
 
@@ -680,18 +675,17 @@ public class TasksServiceImpl implements TasksService {
      * @param taskType 任务类型
      */
     private void deleteDifferentTask(String taskId,String taskType){
-        switch (taskType) {
-           case "1","2","3","4","5","git","gitee","github","gitlab","xcode" -> codeService.deleteCodeConfig(taskId);
-            case "11","maventest","teston" -> testService.deleteTestConfig(taskId);
-            case "21","22","maven","nodejs" -> buildService.deleteBuildConfig(taskId);
-            case "31","32","liunx","docker" -> deployService.deleteDeployConfig(taskId);
-            case "41","sonar" -> codeScanService.deleteCodeScanConfig(taskId);
-            case "51","nexus","ssh","xpack" -> productServer.deleteProductConfig(taskId);
-            case "61","message" -> messageTypeServer.deleteAllMessage(taskId);
-            case "71","72","bat","shell" -> scriptServer.deleteScript(taskId);
-            default -> throw new ApplicationException("无法更新未知的配置类型:"+taskType);
+        switch (findTaskType(taskType)) {
+           case "code"      -> codeService.deleteCodeConfig(taskId);
+           case "test"     -> testService.deleteTestConfig(taskId);
+           case "build"    -> buildService.deleteBuildConfig(taskId);
+           case "deploy"   -> deployService.deleteDeployConfig(taskId);
+           case "codescan" -> codeScanService.deleteCodeScanConfig(taskId);
+           case "artifact" -> productServer.deleteProductConfig(taskId);
+           case "message"  -> messageTypeServer.deleteAllMessage(taskId);
+           case "script"   -> scriptServer.deleteScript(taskId);
+           default -> throw new ApplicationException("无法更新未知的配置类型:"+taskType);
         }
-
     }
 
     /**
@@ -702,8 +696,8 @@ public class TasksServiceImpl implements TasksService {
      */
     private void updateDifferentTask(String taskId,String taskType,Object o){
         String object = JSON.toJSONString(o);
-        switch (taskType) {
-           case "1","2","3","4","5","git","gitee","github","gitlab","xcode" -> {
+        switch (findTaskType(taskType)) {
+           case "code"     -> {
                 TaskCode taskCode = JSON.parseObject(object, TaskCode.class);
                 TaskCode oneCodeConfig = codeService.findOneCode(taskId);
                 String id;
@@ -716,7 +710,7 @@ public class TasksServiceImpl implements TasksService {
                 taskCode.setType(taskType);
                 codeService.updateCode(taskCode);
             }
-             case "11","maventest","teston" -> {
+           case "test"     -> {
                 TaskTest taskTest = JSON.parseObject(object, TaskTest.class);
                 TaskTest oneTestConfig = testService.findOneTestConfig(taskId);
                 String id;
@@ -728,7 +722,7 @@ public class TasksServiceImpl implements TasksService {
                 taskTest.setTaskId(id);
                 testService.updateTest(taskTest);
             }
-            case "21","22","maven","nodejs" -> {
+           case "build"    -> {
                 TaskBuild taskBuild = JSON.parseObject(object, TaskBuild.class);
                 TaskBuild oneBuildConfig = buildService.findOneBuildConfig(taskId);
                 String id;
@@ -740,7 +734,7 @@ public class TasksServiceImpl implements TasksService {
                 taskBuild.setTaskId(id);
                 buildService.updateBuild(taskBuild);
             }
-            case "31","32","liunx","docker" -> {
+           case "deploy"   -> {
                 TaskDeploy taskDeploy = JSON.parseObject(object, TaskDeploy.class);
                 TaskDeploy oneDeployConfig = deployService.findOneDeployConfig(taskId);
                 String id;
@@ -752,7 +746,7 @@ public class TasksServiceImpl implements TasksService {
                 taskDeploy.setTaskId(id);
                 deployService.updateDeploy(taskDeploy);
             }
-             case "41","sonar" -> {
+           case "codescan" -> {
                 TaskCodeScan taskCodeScan = JSON.parseObject(object, TaskCodeScan.class);
                 TaskCodeScan oneCodeScanConfig = codeScanService.findOneCodeScanConfig(taskId);
                 String id;
@@ -764,7 +758,7 @@ public class TasksServiceImpl implements TasksService {
                 taskCodeScan.setTaskId(id);
                 codeScanService.updateCodeScan(taskCodeScan);
             }
-             case "51","nexus","ssh","xpack" -> {
+           case "artifact" -> {
                 TaskArtifact taskArtifact = JSON.parseObject(object, TaskArtifact.class);
                 TaskArtifact oneProductConfig = productServer.findOneProductConfig(taskId,"");
                 String id;
@@ -776,81 +770,18 @@ public class TasksServiceImpl implements TasksService {
                 taskArtifact.setTaskId(id);
                 productServer.updateProduct(taskArtifact);
             }
-             case "61","message" -> {
+           case "message"  -> {
                 messageTypeServer.deleteAllMessage(taskId);
                 TaskMessageType task = JSON.parseObject(object, TaskMessageType.class);
                 task.setTaskId(taskId);
                 messageTypeServer.createMessage(task);
             }
-             case "71","72","bat","shell" -> {
+           case "script"   -> {
                 TaskScript task = JSON.parseObject(object, TaskScript.class);
                 task.setTaskId(taskId);
                 scriptServer.updateScript(task);
             }
-            default -> {
-                throw new ApplicationException("无法更新未知的配置类型。");
-            }
-        }
-    }
-
-    /**
-     * 分发获取默认任务名称
-     * @param taskType 任务类型
-     * @return 任务默认名称
-     */
-    private String initDifferentTaskName(String taskType){
-        switch (taskType) {
-            case "1","git" -> {
-                return "通用Git";
-            }
-            case "2","gitee" -> {
-                return "Gitee";
-            }
-            case "3","github" -> {
-                return "GitHub";
-            }
-            case "4","gitlab" -> {
-                return "GitLab";
-            }
-            case "5","svn" -> {
-                return "Svn";
-            }
-            case "11","maventest" -> {
-                return "Maven单元测试";
-            }
-            case "21","maven" -> {
-                return "Maven构建";
-            }
-            case "22","nodejs" -> {
-                return "Node.js";
-            }
-            case "31","liunx" -> {
-                return "虚拟机";
-            }
-            case "32","docker" -> {
-                return "Docker";
-            }
-            case "41","sonar" -> {
-                return "sonarQuebe";
-            }
-            case "51","nexus" -> {
-                return "Nexus";
-            }
-            case "52","ssh" -> {
-                return "SSH";
-            }
-            case "61","message" -> {
-                return "消息通知";
-            }
-            case "71","bat" -> {
-                return "执行Bat脚本";
-            }
-            case "72","shell" -> {
-                return "执行Shell脚本";
-            }
-            default -> {
-                return taskType;
-            }
+            default ->  throw new ApplicationException("无法更新未知的配置类型。");
         }
     }
 
@@ -861,34 +792,32 @@ public class TasksServiceImpl implements TasksService {
      * @return 任务详情
      */
     private Object findOneDifferentTask(String taskId,String taskType){
-        switch (taskType) {
-           case "1","2","3","4","5","git","gitee","github","gitlab","xcode" -> {
+        switch (findTaskType(taskType)) {
+           case "code"     -> {
                 return codeService.findOneCodeConfig(taskId,taskType);
             }
-             case "11","maventest","teston" -> {
+           case "test"     -> {
                 return testService.findOneTestConfig(taskId);
             }
-            case "21","22","maven","nodejs" -> {
+           case "build"    -> {
                 return buildService.findOneBuildConfig(taskId);
             }
-            case "31","32","liunx","docker" -> {
+           case "deploy"   -> {
                 return deployService.findOneDeployConfig(taskId);
             }
-             case "41","sonar" -> {
+           case "codescan" -> {
                 return codeScanService.findOneCodeScanConfig(taskId);
             }
-             case "51","nexus","ssh","xpack" -> {
+           case "artifact" -> {
                 return productServer.findOneProductConfig(taskId,taskType);
             }
-             case "61","message" -> {
+           case "message"  -> {
                 return messageTypeServer.findMessage(taskId);
             }
-             case "71","72","bat","shell" -> {
+           case "script"   -> {
                 return scriptServer.findScript(taskId);
             }
-            default -> {
-                throw new ApplicationException("无法更新未知的配置类型。");
-            }
+           default -> throw new ApplicationException("无法更新未知的配置类型。");
         }
     }
     
@@ -898,16 +827,44 @@ public class TasksServiceImpl implements TasksService {
      * @param object 任务信息
      */
     private Boolean validDifferentTaskMastField(String taskType,Object object){
-        switch (taskType) {
-           case "1","2","3","4","5","git","gitee","github","gitlab","xcode" ->  { return codeValid(taskType, object); }
-           case "11","maventest","teston" ->  { return testValid(taskType, object); }
-           case "21","22","maven","nodejs" -> { return buildValid(taskType, object); }
-           case "31","32","liunx","docker" -> { return deployValid(taskType, object); }
-           case "41","sonar" -> { return codeScanValid(taskType, object); }
-           case "51","nexus","ssh","xpack" -> { return productValid(taskType, object); }
-            default -> {
-                return true;
+        switch (findTaskType(taskType)) {
+           case "code"     ->  { return codeValid(taskType, object); }
+           case "test"     ->  { return testValid(taskType, object); }
+           case "build"    -> { return buildValid(taskType, object); }
+           case "deploy"   -> { return deployValid(taskType, object); }
+           case "codescan" -> { return codeScanValid(taskType, object); }
+           case "artifact" -> { return productValid(taskType, object); }
+           default -> {return true;}
+        }
+    }
+
+    public String findTaskType(String taskType){
+        switch (taskType){
+            case "1","2","3","4","5","git","gitee","github","gitlab","xcode","svn" ->{
+                return "code";
             }
+            case "21","22","maven","nodejs" ->{
+                return "build";
+            }
+            case "11","maventest","teston"  ->{
+                return "test";
+            }
+            case "31","32","liunx","docker" ->{
+                return "deploy";
+            }
+            case "51","nexus","ssh","xpack" ->{
+                return "artifact";
+            }
+            case  "41","sonar" ->{
+                return "codescan";
+            }
+            case  "61","message" ->{
+                return "message";
+            }
+            case "71","72","bat","shell" ->{
+                return "script";
+            }
+            default ->  throw new ApplicationException("无法更新未知的配置类型:"+taskType);
         }
     }
 
@@ -994,12 +951,6 @@ public class TasksServiceImpl implements TasksService {
             if (!PipelineUtil.isNoNull(product.getGroupId())){
                 return false;
             }
-            // if (!PipelineUtil.isNoNull(product.getFileAddress())){
-            //     return false;
-            // }
-            // if (!PipelineUtil.isNoNull(product.getFileType())){
-            //     return false;
-            // }
         }
         if (taskType.equals("xpack")){
             if (!PipelineUtil.isNoNull(product.getRepository().getName())){
@@ -1008,9 +959,6 @@ public class TasksServiceImpl implements TasksService {
         }
 
         if ( taskType.equals("52")||  taskType.equals("ssh")){
-            // if (!PipelineUtil.isNoNull(product.getFileAddress())){
-            //     return false;
-            // }
             return PipelineUtil.isNoNull(product.getPutAddress());
         }
         return true;
@@ -1018,7 +966,66 @@ public class TasksServiceImpl implements TasksService {
 
 
 
-
+    /**
+     * 分发获取默认任务名称
+     * @param taskType 任务类型
+     * @return 任务默认名称
+     */
+    private String initDifferentTaskName(String taskType){
+        switch (taskType) {
+            case "1","git" -> {
+                return "通用Git";
+            }
+            case "2","gitee" -> {
+                return "Gitee";
+            }
+            case "3","github" -> {
+                return "GitHub";
+            }
+            case "4","gitlab" -> {
+                return "GitLab";
+            }
+            case "5","svn" -> {
+                return "Svn";
+            }
+            case "11","maventest" -> {
+                return "Maven单元测试";
+            }
+            case "21","maven" -> {
+                return "Maven构建";
+            }
+            case "22","nodejs" -> {
+                return "Node.js";
+            }
+            case "31","liunx" -> {
+                return "虚拟机";
+            }
+            case "32","docker" -> {
+                return "Docker";
+            }
+            case "41","sonar" -> {
+                return "sonarQuebe";
+            }
+            case "51","nexus" -> {
+                return "Nexus";
+            }
+            case "52","ssh" -> {
+                return "SSH";
+            }
+            case "61","message" -> {
+                return "消息通知";
+            }
+            case "71","bat" -> {
+                return "执行Bat脚本";
+            }
+            case "72","shell" -> {
+                return "执行Shell脚本";
+            }
+            default -> {
+                return taskType;
+            }
+        }
+    }
 
 
 

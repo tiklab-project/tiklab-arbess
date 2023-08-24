@@ -21,7 +21,7 @@ import java.util.List;
 public class ResourcesController {
 
     @Autowired
-    private ResourcesService resourcesService;
+    ResourcesService resourcesService;
 
     /**
      * @pi.name:查询所有资源配置信息

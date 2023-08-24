@@ -67,7 +67,7 @@ public class Pipeline {
     /**
      * @pi.name:state
      * @pi.dataType:Integer
-     * @pi.desc:运行状态 1.运行中 2.停止中
+     * @pi.desc:运行状态 1.运行中 2.停止中,3.等待执行
      * @pi.value:1
      */
     private int state;
@@ -109,6 +109,53 @@ public class Pipeline {
      * @pi.desc:流水线成员
      */
     private List<PatchUser> userList;
+
+
+    // 以下为统计信息
+
+
+    /**
+     * @pi.model:execUser
+     * @pi.desc:用户(执行人)
+     */
+    private User execUser;
+
+    /**
+     * @pi.name:number
+     * @pi.dataType:Integer
+     * @pi.desc:执行次数
+     * @pi.value:2
+     */
+    private Integer number;
+
+    /**
+     * @pi.name:instanceId
+     * @pi.dataType:string
+     * @pi.desc:实例id
+     * @pi.value:instanceId
+     */
+    private String instanceId;
+
+
+    /**
+     * @pi.name:buildStatus
+     * @pi.dataType:string
+     * @pi.desc:最近构建状态
+     * @pi.value:buildStatus
+     */
+    private String buildStatus;
+
+
+    /**
+     * @pi.name:lastBuildTime
+     * @pi.dataType:string
+     * @pi.desc:最近构建时间
+     * @pi.value:lastBuildTime
+     */
+    private String lastBuildTime;
+
+
+
 
     public Pipeline() {
     }
@@ -203,5 +250,46 @@ public class Pipeline {
 
     public void setUserList(List<PatchUser> userList) {
         this.userList = userList;
+    }
+
+
+    public User getExecUser() {
+        return execUser;
+    }
+
+    public void setExecUser(User execUser) {
+        this.execUser = execUser;
+    }
+
+    public Integer getNumber() {
+        return number;
+    }
+
+    public void setNumber(Integer number) {
+        this.number = number;
+    }
+
+    public String getInstanceId() {
+        return instanceId;
+    }
+
+    public void setInstanceId(String instanceId) {
+        this.instanceId = instanceId;
+    }
+
+    public String getBuildStatus() {
+        return buildStatus;
+    }
+
+    public void setBuildStatus(String buildStatus) {
+        this.buildStatus = buildStatus;
+    }
+
+    public String getLastBuildTime() {
+        return lastBuildTime;
+    }
+
+    public void setLastBuildTime(String lastBuildTime) {
+        this.lastBuildTime = lastBuildTime;
     }
 }

@@ -20,7 +20,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -32,28 +34,28 @@ import java.util.Objects;
 public class TaskTestExecServiceImpl implements TaskTestExecService {
 
     @Autowired
-    private TasksInstanceService tasksInstanceService;
+    TasksInstanceService tasksInstanceService;
 
     @Autowired
-    private VariableService variableServer;
+    VariableService variableServer;
 
     @Autowired
-    private ScmService scmService;
+    ScmService scmService;
 
     @Autowired
-    private ConditionService conditionService;
+    ConditionService conditionService;
 
     @Autowired
-    private TaskTestOnService taskTestOnService;
+    TaskTestOnService taskTestOnService;
 
     @Autowired
-    private AuthThirdService authThirdService;
+    AuthThirdService authThirdService;
 
     @Autowired
-    private RelevanceTestOnService relevanceTestOnService;
+    RelevanceTestOnService relevanceTestOnService;
 
     @Autowired
-    private PipelineUtilService utilService;
+    PipelineUtilService utilService;
 
     private static final Logger logger = LoggerFactory.getLogger(TaskTestExecServiceImpl.class);
 
@@ -263,12 +265,15 @@ public class TaskTestExecServiceImpl implements TaskTestExecService {
         return order;
     }
 
-    private String[] error(String type){
+    private Map<String,String> error(String type){
         String[] strings;
-        strings = new String[]{
-            "BUILD FAILURE","ERROR","Compilation failure"
-        };
-        return strings;
+        Map<String,String> map = new HashMap<>();
+        map.put("BUILD FAILURE","构建失败！");
+        map.put("Compilation failure","编译失败！");
+        // strings = new String[]{
+        //     "BUILD FAILURE","ERROR","Compilation failure"
+        // };
+        return map;
     }
 
 }

@@ -120,6 +120,9 @@ public interface TasksService {
      */
     Tasks findOneTasksOrTask(String tasksId);
 
+
+    String findTaskType(String taskType);
+
 }
 
 

@@ -1,6 +1,7 @@
 package io.tiklab.matflow.task.build.service;
 
 import io.tiklab.matflow.task.build.model.TaskBuildProduct;
+import io.tiklab.matflow.task.build.model.TaskBuildProductQuery;
 
 import java.util.List;
 
@@ -14,10 +15,13 @@ public interface TaskBuildProductService {
 
     TaskBuildProduct findOneBuildProduct(String id);
 
-    TaskBuildProduct findBuildProduct(String instanceId);
-
 
     List<TaskBuildProduct> findAllBuildProduct();
+
+    List<TaskBuildProduct> findBuildProductList(TaskBuildProductQuery taskBuildProductQuery);
+
+
+    String replace(String instanceId,String strings);
 
 
 

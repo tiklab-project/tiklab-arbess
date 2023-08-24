@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static io.tiklab.matflow.support.util.PipelineFinal.*;
 
@@ -43,12 +44,12 @@ public class TaskMessageTypeServiceImpl implements TaskMessageTypeService {
         List<String> typeList = message.getTypeList() ;
         List<TaskMessageUser> userList = message.getUserList();
 
-        if (typeList == null){
+        if (Objects.isNull(typeList)){
             typeList = new ArrayList<>();
             typeList.add(MES_SEND_SITE);
         }
 
-        if (userList == null){
+        if (Objects.isNull(userList)){
             userList = new ArrayList<>();
             TaskMessageUser taskMessageUser = new TaskMessageUser();
             taskMessageUser.setReceiveType(1);

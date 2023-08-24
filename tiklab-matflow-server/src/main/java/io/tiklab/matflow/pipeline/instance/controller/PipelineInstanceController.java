@@ -51,8 +51,7 @@ public class PipelineInstanceController {
     @RequestMapping(path="/findPipelineInstance",method = RequestMethod.POST)
     public Result<Pagination<PipelineInstance>> findPipelineInstance(
             @RequestBody @NotNull @Valid  PipelineInstanceQuery query){
-        Pagination<PipelineInstance> list =
-                instanceService.findPipelineInstance(query);
+        Pagination<PipelineInstance> list = instanceService.findPipelineInstance(query);
         return Result.ok(list);
     }
 
@@ -64,7 +63,7 @@ public class PipelineInstanceController {
      * @pi.param: model=query
      */
     @RequestMapping(path="/findUserInstance",method = RequestMethod.POST)
-    public Result<Pagination<PipelineInstance>>  findUserInstance(
+    public Result<Pagination<PipelineInstance>>  findUserInstance (
             @RequestBody @Valid @NotNull PipelineInstanceQuery query){
         Pagination<PipelineInstance> userAllInstance = instanceService.findUserInstance(query);
         return Result.ok(userAllInstance);
