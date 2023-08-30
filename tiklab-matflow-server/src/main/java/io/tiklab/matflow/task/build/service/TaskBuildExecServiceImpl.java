@@ -1,7 +1,12 @@
 package io.tiklab.matflow.task.build.service;
 
+import io.tiklab.matflow.pipeline.execute.service.PipelineExecServiceImpl;
+import io.tiklab.matflow.pipeline.instance.model.PipelineInstance;
+import io.tiklab.matflow.pipeline.instance.model.PipelineInstanceQuery;
+import io.tiklab.matflow.pipeline.instance.service.PipelineInstanceService;
 import io.tiklab.matflow.setting.model.Scm;
 import io.tiklab.matflow.setting.service.ScmService;
+import io.tiklab.matflow.stages.service.StageInstanceServer;
 import io.tiklab.matflow.support.util.PipelineFinal;
 import io.tiklab.matflow.support.util.PipelineUtilService;
 import io.tiklab.matflow.support.variable.service.VariableService;
@@ -22,6 +27,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * 构建执行方法
@@ -48,6 +54,12 @@ public class TaskBuildExecServiceImpl implements TaskBuildExecService {
 
     @Autowired
     TaskBuildProductService taskBuildProductService;
+
+    @Autowired
+    StageInstanceServer stageInstanceServer;
+
+    @Autowired
+    PipelineInstanceService pipelineInstanceService;
 
     // 构建
     public boolean build(String pipelineId, Tasks task , String taskType)  {
@@ -103,28 +115,30 @@ public class TaskBuildExecServiceImpl implements TaskBuildExecService {
             }
 
             if (path == null){
-                tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"匹配不到制品！");
+                tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"没有匹配到构建产物！");
                 return false;
             }
 
             File file = new File(productAddress);
 
-            // 默认路径
-            TaskInstance execInstance = tasksInstanceService.findExecInstance(taskId);
-
             String defaultAddress = utilService.findPipelineDefaultAddress(pipelineId, 2);
 
-            String fileAddress = defaultAddress + execInstance.getInstanceId()+"/"+file.getName();
+            // 默认路径
+            String instanceId = findPipelineInstanceId(pipelineId);
+            String fileAddress = defaultAddress + instanceId +"/"+file.getName();
+
 
             // 创建流水线运行时产生的制品信息
-            TaskBuildProduct taskBuildProduct = new TaskBuildProduct(execInstance.getInstanceId());
+            TaskBuildProduct taskBuildProduct = new TaskBuildProduct(instanceId);
             taskBuildProduct.setKey(PipelineFinal.DEFAULT_ARTIFACT_ADDRESS);
             taskBuildProduct.setValue(fileAddress);
+            taskBuildProduct.setInstanceId(instanceId);
             taskBuildProduct.setType(PipelineFinal.DEFAULT_TYPE);
 
-            TaskBuildProduct taskBuildProducts = new TaskBuildProduct(execInstance.getInstanceId());
+            TaskBuildProduct taskBuildProducts = new TaskBuildProduct(instanceId);
             taskBuildProducts.setKey(PipelineFinal.DEFAULT_ARTIFACT_NAME);
             taskBuildProducts.setValue(file.getName());
+            taskBuildProduct.setInstanceId(instanceId);
             taskBuildProducts.setType(PipelineFinal.DEFAULT_TYPE);
 
             taskBuildProductService.createBuildProduct(taskBuildProduct);
@@ -133,7 +147,9 @@ public class TaskBuildExecServiceImpl implements TaskBuildExecService {
             // 移动文件
             FileUtils.moveFile(file, new File(fileAddress));
 
-            tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"匹配到制品："+productAddress);
+            System.out.println("移动文件："+fileAddress);
+
+            tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"获取的到构建产物："+fileAddress);
 
 
         } catch (IOException | ApplicationException e) {
@@ -143,6 +159,19 @@ public class TaskBuildExecServiceImpl implements TaskBuildExecService {
         }
         tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"任务"+name+"执行完成");
         return true;
+    }
+
+    public String findPipelineInstanceId(String pipelineId){
+
+        PipelineInstanceQuery pipelineInstanceQuery = new PipelineInstanceQuery();
+        pipelineInstanceQuery.setState(PipelineFinal.RUN_RUN);
+        pipelineInstanceQuery.setPipelineId(pipelineId);
+        List<PipelineInstance> pipelineInstanceList = pipelineInstanceService.findPipelineInstanceList(pipelineInstanceQuery);
+        if (pipelineInstanceList.isEmpty()){
+            return null;
+        }
+        PipelineInstance pipelineInstance = pipelineInstanceList.get(0);
+        return pipelineInstance.getInstanceId();
     }
 
     /**

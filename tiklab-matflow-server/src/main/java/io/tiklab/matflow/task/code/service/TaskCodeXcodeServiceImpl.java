@@ -3,6 +3,7 @@ package io.tiklab.matflow.task.code.service;
 import io.tiklab.core.exception.ApplicationException;
 import io.tiklab.matflow.setting.model.AuthThird;
 import io.tiklab.matflow.setting.service.AuthThirdService;
+import io.tiklab.matflow.support.util.PipelineUtil;
 import io.tiklab.matflow.task.code.model.XcodeBranch;
 import io.tiklab.matflow.task.code.model.XcodeRepository;
 import io.tiklab.rpc.client.RpcClient;
@@ -53,14 +54,22 @@ public class TaskCodeXcodeServiceImpl implements TaskCodeXcodeService {
         if (Objects.isNull(authServer)){
             return null;
         }
+
         String serverAddress =  authServer.getServerAddress();
         try {
-            allRpy = repositoryServer(serverAddress).findAllRpy();
+
+            String username = authServer.getUsername();
+            String password = authServer.getPassword();
+
+            allRpy = repositoryServer(serverAddress).findRepositoryByUser(username,password,"1");
         }catch (Throwable throwable){
             String message = throwable.getMessage();
             logger.error(message);
             if (message.contains("未订阅")){
                 throw new ApplicationException("当前企业未订阅Xcode");
+            }
+            if (message.contains("用户校验失败")){
+                throw new ApplicationException("用户校验失败！");
             }
             if (throwable instanceof ApplicationException){
                 throw new ApplicationException(message);

@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -103,6 +104,7 @@ public class ConditionServiceImpl implements ConditionService {
             }
             list.add(condition);
         }
+        list.sort(Comparator.comparing(Condition::getCreateTime).reversed());
         return list;
     }
 

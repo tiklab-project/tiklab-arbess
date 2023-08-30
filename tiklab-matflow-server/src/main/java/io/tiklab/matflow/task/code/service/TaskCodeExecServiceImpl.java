@@ -105,6 +105,8 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
         Boolean aBoolean1 = PipelineFileUtil.deleteFile(file);
         if (!aBoolean1){
             tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"空间被占用分配失败！" );
+            tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+file.getAbsolutePath()+"文件夹被占用，请删除该文件夹！" );
+            return false;
         }
 
         //分支

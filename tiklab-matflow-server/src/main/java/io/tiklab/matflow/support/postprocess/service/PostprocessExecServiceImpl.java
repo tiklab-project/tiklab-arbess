@@ -4,10 +4,12 @@ import io.tiklab.matflow.support.postprocess.model.Postprocess;
 import io.tiklab.matflow.support.postprocess.model.PostprocessInstance;
 import io.tiklab.matflow.support.util.PipelineFinal;
 import io.tiklab.matflow.support.util.PipelineUtilService;
-import io.tiklab.matflow.task.message.model.TaskExecMessage;
+import io.tiklab.matflow.task.task.model.TaskExecMessage;
 import io.tiklab.matflow.task.task.model.Tasks;
 import io.tiklab.matflow.task.task.service.TasksExecService;
 import io.tiklab.matflow.task.task.service.TasksExecServiceImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,16 +19,18 @@ import java.util.*;
 public class PostprocessExecServiceImpl implements PostprocessExecService{
 
     @Autowired
-    private PostprocessService postprocessService;
+    PostprocessService postprocessService;
 
     @Autowired
-    private TasksExecService tasksExecService;
+    TasksExecService tasksExecService;
 
     @Autowired
-    private PostprocessInstanceService postInstanceService;
+    PostprocessInstanceService postInstanceService;
 
     @Autowired
-    private PipelineUtilService utilService;
+    PipelineUtilService utilService;
+
+    private static final Logger logger = LoggerFactory.getLogger(PostprocessExecServiceImpl.class);
 
 
     //后置任务id与后置任务实例id之间的关系
@@ -90,6 +94,13 @@ public class PostprocessExecServiceImpl implements PostprocessExecService{
         String pipelineId = taskExecMessage.getPipeline().getId();
         List<Postprocess> postprocessList = postprocessService.findAllPipelinePostTask(pipelineId);
         boolean state = true;
+
+        if (postprocessList.isEmpty()){
+            return true;
+        }
+
+        logger.info("执行流水线{}后置任务......",taskExecMessage.getPipeline().getName());
+
         for (Postprocess postprocess : postprocessList) {
             if (state){
                 updatePostInstanceCache(postprocess.getPostprocessId());
@@ -116,10 +127,19 @@ public class PostprocessExecServiceImpl implements PostprocessExecService{
         return state;
     }
 
+
+
     @Override
     public boolean execTaskPostTask(TaskExecMessage taskExecMessage){
         String pipelineId = taskExecMessage.getPipeline().getId();
         List<Postprocess> postprocessList = postprocessService.findAllTaskPostTask(taskExecMessage.getTaskId());
+
+        if (postprocessList.isEmpty()){
+            return true;
+        }
+
+        logger.warn("执行任务{}的后置任务......",taskExecMessage.getTaskName());
+
         boolean state = true;
         for (Postprocess postprocess : postprocessList) {
             boolean b;

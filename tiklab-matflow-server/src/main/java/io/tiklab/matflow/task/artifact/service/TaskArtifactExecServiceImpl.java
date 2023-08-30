@@ -2,6 +2,10 @@ package io.tiklab.matflow.task.artifact.service;
 
 import com.jcraft.jsch.*;
 import io.tiklab.core.exception.ApplicationException;
+import io.tiklab.matflow.pipeline.execute.service.PipelineExecServiceImpl;
+import io.tiklab.matflow.pipeline.instance.model.PipelineInstance;
+import io.tiklab.matflow.pipeline.instance.model.PipelineInstanceQuery;
+import io.tiklab.matflow.pipeline.instance.service.PipelineInstanceService;
 import io.tiklab.matflow.setting.model.AuthHost;
 import io.tiklab.matflow.setting.model.AuthThird;
 import io.tiklab.matflow.setting.model.Scm;
@@ -58,6 +62,9 @@ public class TaskArtifactExecServiceImpl implements TaskArtifactExecService {
     @Autowired
     TaskBuildProductService taskBuildProductService;
 
+    @Autowired
+    PipelineInstanceService pipelineInstanceService;
+
     private static final Logger logger = LoggerFactory.getLogger(TaskArtifactExecServiceImpl.class);
 
     @Override
@@ -76,9 +83,10 @@ public class TaskArtifactExecServiceImpl implements TaskArtifactExecService {
         product.setType(taskType);
 
         // 查询制品信息
-        TaskInstance execInstance = tasksInstanceService.findExecInstance(taskId);
+        String instanceId = findPipelineInstanceId(pipelineId);
+
         TaskBuildProductQuery taskBuildProductQuery = new TaskBuildProductQuery();
-        taskBuildProductQuery.setInstanceId(execInstance.getInstanceId());
+        taskBuildProductQuery.setInstanceId(instanceId);
         taskBuildProductQuery.setKey(PipelineFinal.DEFAULT_ARTIFACT_ADDRESS);
         taskBuildProductQuery.setType(PipelineFinal.DEFAULT_TYPE);
         List<TaskBuildProduct> buildProductList = taskBuildProductService.findBuildProductList(taskBuildProductQuery);
@@ -127,12 +135,15 @@ public class TaskArtifactExecServiceImpl implements TaskArtifactExecService {
                     Session session = createSession(product);
                     tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"制品服务器连接成功。");
                     String putAddress = product.getPutAddress();
-                    tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"开始推送制品。");
+
+                    if (!putAddress.startsWith("/")){
+                        putAddress = "/"+putAddress;
+                    }
 
                     //替换变量
                     String key = variableService.replaceVariable(pipelineId, taskId, putAddress);
-                    tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"制品推送位置："+key);
-
+                    tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"制品推送位置：" + key );
+                    tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"开始推送制品.....");
                     sshPut(session,path,key);
                 }
             }
@@ -341,6 +352,20 @@ public class TaskArtifactExecServiceImpl implements TaskArtifactExecService {
             }
         }
 
+    }
+
+
+    public String findPipelineInstanceId(String pipelineId){
+
+        PipelineInstanceQuery pipelineInstanceQuery = new PipelineInstanceQuery();
+        pipelineInstanceQuery.setState(PipelineFinal.RUN_RUN);
+        pipelineInstanceQuery.setPipelineId(pipelineId);
+        List<PipelineInstance> pipelineInstanceList = pipelineInstanceService.findPipelineInstanceList(pipelineInstanceQuery);
+        if (pipelineInstanceList.isEmpty()){
+            return null;
+        }
+        PipelineInstance pipelineInstance = pipelineInstanceList.get(0);
+        return pipelineInstance.getInstanceId();
     }
 
 }

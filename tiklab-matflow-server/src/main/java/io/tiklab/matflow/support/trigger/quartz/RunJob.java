@@ -1,6 +1,7 @@
 package io.tiklab.matflow.support.trigger.quartz;
 
 import io.tiklab.eam.common.context.LoginContext;
+import io.tiklab.matflow.pipeline.execute.model.PipelineRunMsg;
 import io.tiklab.matflow.pipeline.execute.service.PipelineExecService;
 import io.tiklab.matflow.support.trigger.service.TriggerService;
 import org.quartz.JobDataMap;
@@ -46,7 +47,8 @@ public  class RunJob implements org.quartz.Job {
         String cron = (String)map.get("cron");
         logger.warn("执行定时任务，时间："+ pipelineId +"    时间："+ weekTime+"     cron"+cron);
         String loginId = LoginContext.getLoginId();
-        execService.start(pipelineId,loginId, 2);
+        PipelineRunMsg pipelineRunMsg = new PipelineRunMsg(pipelineId,loginId,2);
+        execService.start(pipelineRunMsg);
         triggerConfigServer.deleteCronConfig(pipelineId,cron);
         job.removeJob(pipelineId,cron);
         logger.warn("定时任务执行完成，移除定时任务，流水线id："+pipelineId +"    时间："+ weekTime+"     cron"+cron);

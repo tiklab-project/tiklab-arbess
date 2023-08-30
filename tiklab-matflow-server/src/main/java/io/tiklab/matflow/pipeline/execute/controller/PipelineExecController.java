@@ -2,16 +2,19 @@ package io.tiklab.matflow.pipeline.execute.controller;
 
 
 import io.tiklab.core.Result;
+import io.tiklab.matflow.pipeline.execute.model.PipelineRunMsg;
 import io.tiklab.matflow.pipeline.execute.service.PipelineExecService;
 import io.tiklab.matflow.pipeline.instance.model.PipelineInstance;
 import io.tiklab.postin.annotation.Api;
 import io.tiklab.postin.annotation.ApiMethod;
 import io.tiklab.postin.annotation.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 /**
@@ -33,8 +36,9 @@ public class PipelineExecController {
      * @pi.param: name=pipelineId;dataType=string;value=pipelineId;
      */
     @RequestMapping(path="/start",method = RequestMethod.POST)
-    public Result<PipelineInstance> start(@NotNull String pipelineId ,@NotNull  String userId){
-        PipelineInstance start = pipelineExecService.start(pipelineId,userId,1);
+    public Result<PipelineInstance> start(@RequestBody @Valid @NotNull PipelineRunMsg runMsg){
+        runMsg.setRunWay(1);
+        PipelineInstance start = pipelineExecService.start(runMsg);
         return Result.ok(start);
     }
 

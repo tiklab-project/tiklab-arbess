@@ -1,6 +1,7 @@
 package io.tiklab.matflow.support.postprocess.service;
 
 import io.tiklab.beans.BeanMapper;
+import io.tiklab.core.exception.ApplicationException;
 import io.tiklab.matflow.support.postprocess.dao.PostprocessDao;
 import io.tiklab.matflow.support.postprocess.entity.PostprocessEntity;
 import io.tiklab.matflow.support.postprocess.model.Postprocess;
@@ -18,13 +19,17 @@ import java.util.*;
 public class PostprocessServiceImpl implements PostprocessService {
 
     @Autowired
-    private PostprocessDao postprocessDao;
+    PostprocessDao postprocessDao;
 
     @Autowired
-    private TasksService tasksService;
+    TasksService tasksService;
 
     @Override
     public String createPostTask(Postprocess postprocess) {
+        if (Objects.isNull(postprocess.getTaskType())){
+            throw new ApplicationException("taskType不能为空！");
+        }
+
         String pipelineId = postprocess.getPipelineId();
         if (Objects.isNull(pipelineId)){
             List<PostprocessEntity> taskPost = postprocessDao.findTaskPost(postprocess.getTaskId());
@@ -35,11 +40,16 @@ public class PostprocessServiceImpl implements PostprocessService {
             int size = taskPost.size();
             postprocess.setTaskSort(size);
         }
+        // 设置默认名称
+        if (Objects.isNull(postprocess.getName())){
+            String name = tasksService.initDifferentTaskName(postprocess.getTaskType());
+            postprocess.setName(name);
+        }
+
         PostprocessEntity postprocessEntity = BeanMapper.map(postprocess, PostprocessEntity.class);
         postprocessEntity.setCreateTime(PipelineUtil.date(1));
         String postId = postprocessDao.createPost(postprocessEntity);
         Tasks tasks = new Tasks();
-        tasks.setTask(postprocess.getValues());
         tasks.setTaskSort(1);
         tasks.setTaskType(postprocess.getTaskType());
         tasks.setPostprocessId(postId);
@@ -82,6 +92,7 @@ public class PostprocessServiceImpl implements PostprocessService {
             postprocess.setTask(tasks);
             list.add(postprocess);
         }
+        postprocessList.sort(Comparator.comparing(Postprocess::getCreateTime).reversed());
         return list;
     }
 
@@ -114,12 +125,20 @@ public class PostprocessServiceImpl implements PostprocessService {
     @Override
     public void updatePostTask(Postprocess postprocess) {
         String postprocessId = postprocess.getPostprocessId();
+        Postprocess onePost = findOnePost(postprocessId);
+        onePost.setName(postprocess.getName());
+        postprocessDao.updatePost(BeanMapper.map(onePost,PostprocessEntity.class));
+
         Tasks task = tasksService.findOnePostTask(postprocessId);
         Object values = postprocess.getValues();
         task.setTask(values);
         task.setValues(values);
         task.setTaskType(postprocess.getTaskType());
         tasksService.updateTasksTask(task);
+    }
+
+    public void updatePost(Postprocess postprocess){
+        postprocessDao.updatePost(BeanMapper.map(postprocess,PostprocessEntity.class));
     }
 
     @Override

@@ -1,6 +1,6 @@
 package io.tiklab.matflow.task.message.service;
 
-import io.tiklab.matflow.task.message.model.TaskExecMessage;
+import io.tiklab.matflow.task.task.model.TaskExecMessage;
 
 /**
  * 流水线执行消息任务服务接口

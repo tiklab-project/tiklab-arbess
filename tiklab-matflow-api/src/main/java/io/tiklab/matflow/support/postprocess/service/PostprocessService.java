@@ -50,6 +50,9 @@ public interface PostprocessService {
      */
     void updatePostTask(Postprocess postprocess);
 
+
+    void updatePost(Postprocess postprocess);
+
     /**
      * 查询单个后置任务及详情
      * @param postprocessId 后置任务id

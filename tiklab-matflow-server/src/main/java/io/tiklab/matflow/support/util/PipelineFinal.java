@@ -2,15 +2,22 @@ package io.tiklab.matflow.support.util;
 
 public class PipelineFinal {
 
-    public static final String MATFLOW_WORKSPACE = "/source";
-
-    public static final String MATFLOW_LOGS = "/artifact";
-
     /**
      * 项目名称
      */
     public static final String appName = "matflow";
 
+    /**
+     * 流水线文件系统
+     */
+    public static final String MATFLOW_WORKSPACE = "/source";
+
+    public static final String MATFLOW_LOGS = "/artifact";
+
+
+    /**
+     * 流水线运行状态
+     */
     //流水线运行状态
     public static final String RUN_SUCCESS = "success";
 
@@ -22,12 +29,19 @@ public class PipelineFinal {
 
     public static final String RUN_RUN = "run";
 
+
+    /**
+     * 系统编码
+     */
     //字节编码
     public static final String UTF_8 = "UTF-8";
 
     public static final String GBK = "GBK";
 
 
+    /**
+     * 消息
+     */
     //消息发送类型
     public static final String MES_PIPELINE_RUN = "PIPELINE_RUN";
     public static final String MES_PIPELINE_TASK_RUN = "INE_TASK_RUN";
@@ -46,7 +60,9 @@ public class PipelineFinal {
     public static final String MES_RUN = "MES_RUN";
 
 
-
+    /**
+     * 日志信息
+     */
     //日志类型
     public static final String LOG_PIPELINE = "LOG_PIPELINE"; //流水线
 
@@ -59,7 +75,9 @@ public class PipelineFinal {
     public static final String LOG_TEM_RUN = "LOG_TEM_RUN";
 
 
-
+    /**
+     * 构建产物信息
+     */
     // 默认制品地址
     public static final String DEFAULT_ARTIFACT_ADDRESS = "DEFAULT_ARTIFACT_ADDRESS";
 
@@ -72,11 +90,73 @@ public class PipelineFinal {
     public static final String DEFAULT_TYPE = "string";
 
 
+    /**
+     * 文件信息
+     */
     public static final String FILE_TEMP_PREFIX = "temp";
     public static final String FILE_TYPE_TXT = ".txt";
     public static final String FILE_TYPE_SH = ".sh";
 
     public static final String FILE_TYPE_BAT = ".bat";
+
+
+    /**
+     * 系统任务类型
+     */
+
+    // 源码应用类型
+    public static final String TASK_TYPE_CODE = "code";
+    public static final String TASK_CODE_GIT = "git";
+    public static final String TASK_CODE_GITLAB = "gitlab";
+    public static final String TASK_CODE_GITHUB = "giehub";
+    public static final String TASK_CODE_GITEE = "gitee";
+    public static final String TASK_CODE_SVN = "svn";
+    public static final String TASK_CODE_XCODE = "xcode";
+    public static final String TASK_CODE_DEFAULT_BRANCH = "master";
+
+
+    // 构建应用类型
+    public static final String TASK_TYPE_BUILD = "build";
+    public static final String TASK_BUILD_MAVEN = "maven";
+    public static final String TASK_BUILD_NODEJS = "nodejs";
+
+
+    // 测试应用类型
+    public static final String TASK_TYPE_TEST = "test";
+    public static final String TASK_TEST_MAVENTEST = "maventest";
+    public static final String TASK_TEST_TESTON = "teston";
+
+
+    // 部署应用类型
+    public static final String TASK_TYPE_DEPLOY = "deploy";
+    public static final String TASK_DEPLOY_LINUX = "liunx";
+    public static final String TASK_DEPLOY_DOCKER = "docker";
+
+
+    // 推送制品应用类型
+    public static final String TASK_TYPE_ARTIFACT = "artifact";
+    public static final String TASK_ARTIFACT_XPACK = "xpack";
+    public static final String TASK_ARTIFACT_SSH = "ssh";
+    public static final String TASK_ARTIFACT_NEXUS = "nexus";
+
+    // 代码扫描应用类型
+    public static final String TASK_TYPE_CODESCAN = "codescan";
+    public static final String TASK_CODESCAN_SONAR = "sonsr";
+
+    // 消息应用类型
+    public static final String TASK_TYPE_MESSAGE = "message";
+    public static final String TASK_MESSAGE_MSG = "message";
+
+    // 脚本应用类型
+    public static final String TASK_TYPE_SCRIPT = "script";
+    public static final String TASK_SCRIPT_SHELL = "shell";
+    public static final String TASK_SCRIPT_BAT = "bat";
+
+
+    //触发器
+    public static final String TRIGGER_SCHEDULED = "scheduled";
+
+
 
 
 

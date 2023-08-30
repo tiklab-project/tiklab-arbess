@@ -6,6 +6,7 @@ import io.tiklab.core.page.PaginationBuilder;
 import io.tiklab.eam.common.context.LoginContext;
 import io.tiklab.join.JoinTemplate;
 import io.tiklab.matflow.pipeline.definition.model.Pipeline;
+import io.tiklab.matflow.pipeline.execute.model.PipelineRunMsg;
 import io.tiklab.matflow.pipeline.execute.service.PipelineExecServiceImpl;
 import io.tiklab.matflow.pipeline.instance.dao.PipelineInstanceDao;
 import io.tiklab.matflow.pipeline.instance.entity.PipelineInstanceEntity;
@@ -17,6 +18,9 @@ import io.tiklab.matflow.support.util.PipelineFileUtil;
 import io.tiklab.matflow.support.util.PipelineFinal;
 import io.tiklab.matflow.support.util.PipelineUtil;
 import io.tiklab.matflow.support.util.PipelineUtilService;
+import io.tiklab.matflow.task.build.model.TaskBuildProduct;
+import io.tiklab.matflow.task.build.model.TaskBuildProductQuery;
+import io.tiklab.matflow.task.build.service.TaskBuildProductService;
 import io.tiklab.matflow.task.task.service.TasksInstanceService;
 import io.tiklab.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,6 +56,9 @@ public class PipelineInstanceServiceImpl implements PipelineInstanceService {
     @Autowired
     JoinTemplate joinTemplate;
 
+    @Autowired
+    TaskBuildProductService taskBuildProductService;
+
     @Override
     public String createInstance(PipelineInstance pipelineInstance) {
         return pipelineInstanceDao.createInstance(BeanMapper.map(pipelineInstance, PipelineInstanceEntity.class));
@@ -75,10 +82,11 @@ public class PipelineInstanceServiceImpl implements PipelineInstanceService {
     }
 
     @Override
-    public PipelineInstance initializeInstance(String pipelineId ,String loginId, int startWAy) {
+    public PipelineInstance initializeInstance(PipelineRunMsg runMsg) {
         String date = PipelineUtil.date(1);
-
-        PipelineInstance pipelineInstance = new PipelineInstance(date,startWAy,loginId,pipelineId);
+        String pipelineId = runMsg.getPipelineId();
+        String userId = runMsg.getUserId();
+        PipelineInstance pipelineInstance = new PipelineInstance(date,runMsg.getRunWay(),userId,pipelineId);
         pipelineInstance.setRunStatus(PipelineFinal.RUN_RUN);
         String instanceId = createInstance(pipelineInstance);
         pipelineInstance.setInstanceId(instanceId);
@@ -112,7 +120,7 @@ public class PipelineInstanceServiceImpl implements PipelineInstanceService {
     @Override
     public void deleteInstance(String instanceId) {
         PipelineInstance instance = findOneInstance(instanceId);
-        if (instance == null){
+        if (Objects.isNull(instance)){
             return;
         }
         Pipeline pipeline = instance.getPipeline();
@@ -127,6 +135,14 @@ public class PipelineInstanceServiceImpl implements PipelineInstanceService {
         String fileAddress = utilService.findPipelineDefaultAddress(pipeline.getId()+"/"+instanceId,2);
         //删除对应日志
         PipelineFileUtil.deleteFile(new File(fileAddress));
+
+        // 删除对应制品信息
+        TaskBuildProductQuery taskBuildProductQuery = new TaskBuildProductQuery();
+        taskBuildProductQuery.setInstanceId(instance.getInstanceId());
+        List<TaskBuildProduct> buildProductList = taskBuildProductService.findBuildProductList(taskBuildProductQuery);
+        for (TaskBuildProduct taskBuildProduct : buildProductList) {
+            taskBuildProductService.deleteBuildProduct(taskBuildProduct.getId());
+        }
     }
 
     @Override
@@ -159,8 +175,13 @@ public class PipelineInstanceServiceImpl implements PipelineInstanceService {
         return allInstance;
     }
 
-    public List<String> findUserRunPipeline(){
-       return pipelineInstanceDao.findUserPipelineInstance();
+    public List<PipelineInstance> findUserPipelineInstance(String userId,Integer limit){
+        List<PipelineInstanceEntity> instanceEntityList = pipelineInstanceDao.findUserPipelineInstance(userId, limit);
+        if (instanceEntityList.isEmpty()){
+            return Collections.emptyList();
+        }
+
+        return BeanMapper.mapList(instanceEntityList,PipelineInstance.class);
     }
 
 
@@ -189,9 +210,7 @@ public class PipelineInstanceServiceImpl implements PipelineInstanceService {
         if (pipelineExecHistories.size() == 0){
             return null;
         }
-        PipelineInstance instance = pipelineExecHistories.get(0);
-        // joinTemplate.joinQuery(instance);
-        return instance;
+        return pipelineExecHistories.get(0);
     }
 
     @Override
@@ -282,7 +301,7 @@ public class PipelineInstanceServiceImpl implements PipelineInstanceService {
                 int integer = pipelineRunTime.get(instanceId);
                 try {
                     Thread.sleep(1000);
-                    integer = integer +1;
+                    integer = integer + 1;
                     pipelineRunTime.put(instanceId,integer);
                 }catch (RuntimeException e){
                     throw new RuntimeException();
@@ -299,8 +318,9 @@ public class PipelineInstanceServiceImpl implements PipelineInstanceService {
         return integer;
     }
 
-    public void removePipelineRunTime(String instanceId){
+    public void removeInstanceRunTime(String instanceId){
         pipelineRunTime.remove(instanceId);
+        tasksInstanceService.stopThread(instanceId);
     }
 
 

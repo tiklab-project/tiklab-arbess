@@ -134,6 +134,7 @@ public class VariableServiceImpl implements VariableService {
             }
             list.add(variable);
         }
+        list.sort(Comparator.comparing(Variable::getCreateTime).reversed());
         return list;
     }
 

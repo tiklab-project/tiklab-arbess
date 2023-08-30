@@ -2,6 +2,10 @@ package io.tiklab.matflow.task.deploy.service;
 
 import com.jcraft.jsch.*;
 import io.tiklab.core.exception.ApplicationException;
+import io.tiklab.matflow.pipeline.execute.service.PipelineExecServiceImpl;
+import io.tiklab.matflow.pipeline.instance.model.PipelineInstance;
+import io.tiklab.matflow.pipeline.instance.model.PipelineInstanceQuery;
+import io.tiklab.matflow.pipeline.instance.service.PipelineInstanceService;
 import io.tiklab.matflow.setting.model.AuthHost;
 import io.tiklab.matflow.support.condition.service.ConditionService;
 import io.tiklab.matflow.support.util.PipelineFileUtil;
@@ -46,6 +50,9 @@ public class TaskDeployExecServiceImpl implements TaskDeployExecService {
 
     @Autowired
     TaskBuildProductService taskBuildProductService;
+
+    @Autowired
+    PipelineInstanceService pipelineInstanceService;
 
     private static final Logger logger = LoggerFactory.getLogger(TaskDeployExecServiceImpl.class);
 
@@ -104,8 +111,8 @@ public class TaskDeployExecServiceImpl implements TaskDeployExecService {
 
 
         //  获取制品信息
-        TaskInstance execInstance = tasksInstanceService.findExecInstance(taskId);
-        List<TaskBuildProduct> buildProductList = findTaskBuildProduct(execInstance.getInstanceId());
+        String instanceId = findPipelineInstanceId(pipelineId);
+        List<TaskBuildProduct> buildProductList = findTaskBuildProduct(instanceId);
         if (buildProductList.isEmpty()){
             tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"无法获取到制品!");
             return false;
@@ -128,7 +135,7 @@ public class TaskDeployExecServiceImpl implements TaskDeployExecService {
 
         try {
             // 替换运行时产生的变量
-            String order = taskBuildProductService.replace(execInstance.getInstanceId(),taskDeploy.getDeployOrder());
+            String order = taskBuildProductService.replace(instanceId,taskDeploy.getDeployOrder());
             taskDeploy.setDeployOrder(order);
 
             // 执行远程命令
@@ -141,6 +148,20 @@ public class TaskDeployExecServiceImpl implements TaskDeployExecService {
         session.disconnect();
         tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"任务："+ task.getTaskName() +"执行完成。");
         return true;
+    }
+
+
+    public String findPipelineInstanceId(String pipelineId){
+
+        PipelineInstanceQuery pipelineInstanceQuery = new PipelineInstanceQuery();
+        pipelineInstanceQuery.setState(PipelineFinal.RUN_RUN);
+        pipelineInstanceQuery.setPipelineId(pipelineId);
+        List<PipelineInstance> pipelineInstanceList = pipelineInstanceService.findPipelineInstanceList(pipelineInstanceQuery);
+        if (pipelineInstanceList.isEmpty()){
+            return null;
+        }
+        PipelineInstance pipelineInstance = pipelineInstanceList.get(0);
+        return pipelineInstance.getInstanceId();
     }
 
     /**
@@ -157,12 +178,12 @@ public class TaskDeployExecServiceImpl implements TaskDeployExecService {
             return;
         }
 
-        TaskInstance execInstance = tasksInstanceService.findExecInstance(taskId);
-        List<TaskBuildProduct> buildProductList = findTaskBuildProduct(execInstance.getInstanceId());
+        String instanceId = findPipelineInstanceId(pipelineId);
+        List<TaskBuildProduct> buildProductList = findTaskBuildProduct(instanceId);
 
         // 替换运行时产生的变量
         if (!buildProductList.isEmpty()){
-            startShell = taskBuildProductService.replace(execInstance.getInstanceId(),startShell);
+            startShell = taskBuildProductService.replace(instanceId,startShell);
         }
 
         // 替换自定义的变量

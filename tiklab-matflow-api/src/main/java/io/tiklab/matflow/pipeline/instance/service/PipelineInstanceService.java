@@ -6,6 +6,7 @@ import io.tiklab.join.annotation.FindAll;
 import io.tiklab.join.annotation.FindList;
 import io.tiklab.join.annotation.FindOne;
 import io.tiklab.join.annotation.JoinProvider;
+import io.tiklab.matflow.pipeline.execute.model.PipelineRunMsg;
 import io.tiklab.matflow.pipeline.instance.model.PipelineInstance;
 import io.tiklab.matflow.pipeline.instance.model.PipelineInstanceQuery;
 
@@ -38,7 +39,7 @@ public interface PipelineInstanceService {
      * @param startWAy 运行方式
      * @return 实例
      */
-    PipelineInstance initializeInstance(String pipelineId,String loginId , int startWAy);
+    PipelineInstance initializeInstance(PipelineRunMsg runMsg);
 
 
     /**
@@ -98,7 +99,7 @@ public interface PipelineInstanceService {
     PipelineInstance findLastInstance(String pipelineId);
 
 
-    List<String> findUserRunPipeline();
+    List<PipelineInstance> findUserPipelineInstance(String userId,Integer limit);
 
 
     @FindList
@@ -130,7 +131,7 @@ public interface PipelineInstanceService {
     Integer findPipelineRunTime(String instanceId);
 
 
-    void removePipelineRunTime(String instanceId);
+    void removeInstanceRunTime(String instanceId);
 
 
 

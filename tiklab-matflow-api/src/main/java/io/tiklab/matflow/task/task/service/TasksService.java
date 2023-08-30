@@ -123,6 +123,15 @@ public interface TasksService {
 
     String findTaskType(String taskType);
 
+
+    String initDifferentTaskName(String taskType);
+
+
+    List<Tasks> findAllTasks();
+
+
+    void updateTasks(Tasks tasks);
+
 }
 
 

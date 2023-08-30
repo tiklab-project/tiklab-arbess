@@ -335,32 +335,23 @@ public class PipelineServiceImpl implements PipelineService {
 
     @Override
     public List<PipelineRecently> findPipelineRecently(int number){
+        String userId = LoginContext.getLoginId();
+        // List<String> userRunPipeline = instanceService.findUserPipelineInstance(userId,number);
 
-        List<String> userRunPipeline = instanceService.findUserRunPipeline();
-        if (userRunPipeline.isEmpty()){
+        List<PipelineInstance> instanceList = instanceService.findUserPipelineInstance(userId,number);
+        if (instanceList.isEmpty()){
             return Collections.emptyList();
         }
 
-        List<Pipeline> userPipeline = new ArrayList<>();
-        for (String s : userRunPipeline) {
-            if (userPipeline.size() > number){
-                break;
-            }
-            PipelineEntity pipelineEntity = pipelineDao.findPipelineById(s);
-            String userId = LoginContext.getLoginId();
-            if (!pipelineEntity.getUserId().equals(userId)){
-                continue;
-            }
-            userPipeline.add(BeanMapper.map(pipelineEntity, Pipeline.class));
-        }
-
         List<PipelineRecently> list = new ArrayList<>();
-        for (Pipeline pipeline : userPipeline) {
+        for (PipelineInstance lastInstance : instanceList) {
+            joinTemplate.joinQuery(lastInstance);
+            Pipeline pipeline = lastInstance.getPipeline();
             String pipelineId = pipeline.getId();
-            PipelineInstance lastInstance = instanceService.findLastInstance(pipelineId);
-            if (Objects.isNull(lastInstance)){
-                continue;
-            }
+            // PipelineInstance lastInstance = instanceService.findLastInstance(pipelineId);
+            // if (Objects.isNull(lastInstance)){
+            //     continue;
+            // }
             PipelineRecently recently = new PipelineRecently();
             recently.setPipelineId(pipelineId);
             recently.setPipelineName(pipeline.getName());
@@ -378,17 +369,55 @@ public class PipelineServiceImpl implements PipelineService {
             recently.setLastRunType(lastInstance.getRunWay());
             list.add(recently);
         }
-        list.sort(Comparator.comparing(PipelineRecently::getCreateTime).reversed());
-        List<PipelineRecently> recentlyList = new ArrayList<>();
-
-        for (int i = 0; i < list.size(); i++) {
-            PipelineRecently recently = list.get(i);
-            if (i >= number){
-                continue;
-            }
-            recentlyList.add(recently);
-        }
-        return recentlyList;
+        // List<Pipeline> userPipeline = new ArrayList<>();
+        // for (String s : userRunPipeline) {
+        //     if (userPipeline.size() > number){
+        //         break;
+        //     }
+        //     PipelineEntity pipelineEntity = pipelineDao.findPipelineById(s);
+        //
+        //     if (!pipelineEntity.getUserId().equals(userId)){
+        //         continue;
+        //     }
+        //     userPipeline.add(BeanMapper.map(pipelineEntity, Pipeline.class));
+        // }
+        //
+        // List<PipelineRecently> list = new ArrayList<>();
+        // for (Pipeline pipeline : userPipeline) {
+        //     String pipelineId = pipeline.getId();
+        //     PipelineInstance lastInstance = instanceService.findLastInstance(pipelineId);
+        //     if (Objects.isNull(lastInstance)){
+        //         continue;
+        //     }
+        //     PipelineRecently recently = new PipelineRecently();
+        //     recently.setPipelineId(pipelineId);
+        //     recently.setPipelineName(pipeline.getName());
+        //     recently.setLastRunState(lastInstance.getRunStatus());
+        //     recently.setNumber(lastInstance.getFindNumber());
+        //     String createTime = lastInstance.getCreateTime();
+        //     recently.setCreateTime(createTime);
+        //     Date date = PipelineUtil.StringChengeDate(createTime);
+        //     String dateTime = PipelineUtil.findDateTime(date, 30);
+        //     recently.setExecTime(dateTime);
+        //     String formatted = PipelineUtil.formatDateTime(lastInstance.getRunTime());
+        //     recently.setLastRunTime(formatted);
+        //     recently.setColor(pipeline.getColor());
+        //     recently.setInstanceId(lastInstance.getInstanceId());
+        //     recently.setLastRunType(lastInstance.getRunWay());
+        //     list.add(recently);
+        // }
+        // list.sort(Comparator.comparing(PipelineRecently::getCreateTime).reversed());
+        // List<PipelineRecently> recentlyList = new ArrayList<>();
+        //
+        // for (int i = 0; i < list.size(); i++) {
+        //     PipelineRecently recently = list.get(i);
+        //     if (i >= number){
+        //         continue;
+        //     }
+        //     recentlyList.add(recently);
+        // }
+        // return recentlyList;
+        return list;
     }
 
     /**

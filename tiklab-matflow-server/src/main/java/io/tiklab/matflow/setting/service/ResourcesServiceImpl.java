@@ -67,14 +67,18 @@ public class ResourcesServiceImpl implements ResourcesService {
     @Override
     public void judgeResources(){
         Resources resources = findResourcesList();
+
+        int residueCcyNumber = resources.getResidueCcyNumber();
+        if (residueCcyNumber == 0 ){
+            throw new ApplicationException("并行任务已达上限，无法执行！");
+        }
+
         double cacheNumber = resources.getResidueCacheNumber();
-
-        int sceNumber = resources.getResidueSceNumber();
-
         if (cacheNumber == 0 ){
             throw new ApplicationException("可使用的缓存已用完，无法执行！");
         }
 
+        int sceNumber = resources.getResidueSceNumber();
         if (sceNumber == 0 ){
             throw new ApplicationException("可使用的构建时长已用完，无法执行！");
         }
@@ -107,55 +111,130 @@ public class ResourcesServiceImpl implements ResourcesService {
 
     @Override
     public Resources findResourcesList(){
-        List<Resources> allResources = resourcesDao.findAllResources();
-        Resources resources = new Resources();
+        // List<Resources> allResources = resourcesDao.findAllResources();
+        // Resources resources = new Resources();
         int version = versionService.version();
-        // 1.免费 2.付费 可用资源总数
-        if (version == 1){
-            resources.setCcyNumber(3);
-            resources.setSceNumber(1800);
-            resources.setCacheNumber(-1);
-        }else {
-            resources.setCcyNumber(5);
-            resources.setSceNumber(-1);
-            resources.setCacheNumber(-1);
-        }
 
         PipelineQuery pipelineQuery = new PipelineQuery();
-        pipelineQuery.setPipelineState(1);
+        pipelineQuery.setPipelineState(2);
         List<PipelineEntity> pipelineList = pipelineDao.findPipelineList(pipelineQuery);
+        int number = pipelineList.size();
 
-        int size = pipelineList.size();
-
-        // 并发数
-        resources.setUseCcyNumber(size);
+        // 1.免费 2.付费 可用资源总数
         if (version == 1){
-            resources.setResidueCcyNumber(3- size);
+            Resources resources = notVipResources(number);
+            resources.setVersion(version);
+            return resources;
+            // resources.setCcyNumber(2);
+            // resources.setSceNumber(1800);
+            // resources.setCacheNumber(-1);
         }else {
-            resources.setResidueCcyNumber(5 - size);
+            Resources resources = vipResources(number);
+            resources.setVersion(version);
+            return resources;
+            // resources.setCcyNumber(5);
+            // resources.setSceNumber(-1);
+            // resources.setCacheNumber(-1);
         }
 
-        // 磁盘数（社区版不限制磁盘大小）
-        resources.setResidueCacheNumber(-1);
+        // PipelineQuery pipelineQuery = new PipelineQuery();
+        // pipelineQuery.setPipelineState(1);
+        // List<PipelineEntity> pipelineList = pipelineDao.findPipelineList(pipelineQuery);
+        //
+        // int size = pipelineList.size();
+        //
+        // // 并发数
+        // resources.setUseCcyNumber(size);
+        // if (version == 1){
+        //     resources.setResidueCcyNumber(3- size);
+        // }else {
+        //     resources.setResidueCcyNumber(5 - size);
+        // }
+        //
+        // // 磁盘数（社区版不限制磁盘大小）
+        // resources.setResidueCacheNumber(-1);
+        // resources.setUseCacheNumber(0);
+        //
+        // // 构建时长
+        // if (allResources.isEmpty()){
+        //     resources.setUseSceNumber(0);
+        //     if (version == 1){
+        //         resources.setResidueSceNumber(1800);
+        //     }
+        // }else {
+        //     int useSceNumber = allResources.get(0).getUseSceNumber();
+        //     int i = useSceNumber / 60;
+        //     if (useSceNumber != 0 && i == 0){
+        //         i = 1;
+        //         resources.setUseSceNumber(1);
+        //     }
+        //     if (version == 1){
+        //         resources.setResidueSceNumber(1800 - i);
+        //     }
+        // }
+        // if (version == 2){
+        //     resources.setResidueSceNumber(-1);
+        // }
+        // resources.setVersion(version);
+        // return resources;
+    }
+
+    private static final int vipExecNumber = 4;
+
+    private static final int vipCacheNTime = -1;
+
+    private static final int vipExecTime = -1;
+
+    private static final int notVipExecNumber = 2;
+    private static final int notVipExecTime = -1;
+    private static final int notVipCacheNTime = -1;
+
+
+    public Resources vipResources(int execNumber){
+        Resources resources = new Resources();
+
+        // 总资源数
+        resources.setCcyNumber(vipExecNumber);
+        resources.setSceNumber(vipExecTime);
+        resources.setCacheNumber(vipCacheNTime);
+
+        // 并发数
+        resources.setUseCcyNumber(execNumber);
+
+        int i = vipExecNumber - execNumber;
+        resources.setResidueCcyNumber(Math.max(i, 0));
+        // resources.setResidueCcyNumber(vipExecNumber - execNumber);
+
+        // 磁盘数（社区版,企业版不限制磁盘大小）
+        resources.setResidueCacheNumber(vipCacheNTime);
         resources.setUseCacheNumber(0);
 
         // 构建时长
-        if (allResources.isEmpty()){
-            resources.setUseSceNumber(0);
-            if (version == 1){
-                resources.setResidueSceNumber(1800);
-            }
-        }else {
-            int useSceNumber = allResources.get(0).getUseSceNumber();
-            resources.setUseSceNumber(useSceNumber);
-            if (version == 1){
-                resources.setResidueSceNumber(1800-useSceNumber);
-            }
-        }
-        if (version == 2){
-            resources.setResidueSceNumber(-1);
-        }
-        resources.setVersion(version);
+        resources.setResidueSceNumber(vipExecTime);
+
+        return resources;
+    }
+
+    public Resources notVipResources(int execNumber){
+        Resources resources = new Resources();
+        // 可用资源总数
+        resources.setCcyNumber(notVipExecNumber);
+        resources.setSceNumber(notVipExecTime);
+        resources.setCacheNumber(notVipCacheNTime);
+
+        // 并发数
+        resources.setUseCcyNumber(execNumber);
+        int i = notVipExecNumber - execNumber;
+        resources.setResidueCcyNumber(Math.max(i, 0));
+        // resources.setResidueCcyNumber(notVipExecNumber- execNumber);
+
+        // 磁盘数（社区版不限制磁盘大小）
+        resources.setResidueCacheNumber(notVipCacheNTime);
+        resources.setUseCacheNumber(0);
+
+        // 构建时长
+        resources.setUseSceNumber(0);
+        resources.setResidueSceNumber(notVipExecTime);
         return resources;
     }
 

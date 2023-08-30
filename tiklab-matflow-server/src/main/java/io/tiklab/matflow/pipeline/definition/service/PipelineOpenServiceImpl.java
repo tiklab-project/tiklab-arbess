@@ -67,20 +67,33 @@ public class PipelineOpenServiceImpl implements PipelineOpenService {
         pipelineOpen.setUserId(userId);
         createOpen(pipelineOpen);
 
-        new Thread(() -> {
-            List<String> pipelineIds = pipelineOpenDao.findUserPipelineOpen(userId, 100);
-            if (pipelineIds.size() < 10){
-                return;
+        // new Thread(() -> {
+        //     List<String> pipelineIds = pipelineOpenDao.findUserPipelineOpen(userId, 100);
+        //     if (pipelineIds.size() < 10){
+        //         return;
+        //     }
+        //     for (int i = 9; i < pipelineIds.size(); i++) {
+        //         PipelineOpenQuery pipelineOpenQuery = new PipelineOpenQuery();
+        //         pipelineOpenQuery.setPipelineId(pipelineIds.get(i));
+        //         List<PipelineOpenEntity> pipelineOpenList = pipelineOpenDao.findPipelineOpenList(pipelineOpenQuery);
+        //         for (PipelineOpenEntity pipelineOpenEntity : pipelineOpenList) {
+        //             deleteOpen(pipelineOpenEntity.getOpenId());
+        //         }
+        //     }
+        // }).start();
+
+        List<String> pipelineIds = pipelineOpenDao.findUserPipelineOpen(userId, 100);
+        if (pipelineIds.size() < 10){
+            return;
+        }
+        for (int i = 9; i < pipelineIds.size(); i++) {
+            PipelineOpenQuery pipelineOpenQuery = new PipelineOpenQuery();
+            pipelineOpenQuery.setPipelineId(pipelineIds.get(i));
+            List<PipelineOpenEntity> pipelineOpenList = pipelineOpenDao.findPipelineOpenList(pipelineOpenQuery);
+            for (PipelineOpenEntity pipelineOpenEntity : pipelineOpenList) {
+                deleteOpen(pipelineOpenEntity.getOpenId());
             }
-            for (int i = 9; i < pipelineIds.size(); i++) {
-                PipelineOpenQuery pipelineOpenQuery = new PipelineOpenQuery();
-                pipelineOpenQuery.setPipelineId(pipelineIds.get(i));
-                List<PipelineOpenEntity> pipelineOpenList = pipelineOpenDao.findPipelineOpenList(pipelineOpenQuery);
-                for (PipelineOpenEntity pipelineOpenEntity : pipelineOpenList) {
-                    deleteOpen(pipelineOpenEntity.getOpenId());
-                }
-            }
-        }).start();
+        }
 
     }
 

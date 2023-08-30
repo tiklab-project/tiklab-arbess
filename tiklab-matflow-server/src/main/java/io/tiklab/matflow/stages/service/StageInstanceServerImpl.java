@@ -77,8 +77,6 @@ public class StageInstanceServerImpl implements StageInstanceServer{
         return list;
     }
 
-
-
     @Override
     public void deleteAllStageInstance(String stageId) {
         List<StageInstance> allStageInstance = findAllOtherStageInstance(stageId);

@@ -1,4 +1,4 @@
-package io.tiklab.matflow.task.message.model;
+package io.tiklab.matflow.task.task.model;
 
 import io.tiklab.matflow.pipeline.definition.model.Pipeline;
 import io.tiklab.matflow.task.task.model.Tasks;

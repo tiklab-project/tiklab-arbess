@@ -79,7 +79,7 @@ public class TaskInstanceDao {
                 .eq("instanceId", query.getInstanceId())
                 .eq("taskType", query.getTaskType())
                 .eq("runState", query.getRunState())
-                .eq("stageId", query.getStagesId())
+                .eq("stagesId", query.getStagesId())
                 .eq("postprocessId", query.getPostprocessId())
                 .get();
         return jpaTemplate.findList(queryCondition,TaskInstanceEntity.class);

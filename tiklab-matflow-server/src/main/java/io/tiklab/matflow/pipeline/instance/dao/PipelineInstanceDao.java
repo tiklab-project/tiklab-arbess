@@ -200,23 +200,46 @@ public class PipelineInstanceDao {
      * 最近运行的流水线进行时间排序，并分组
      * @return
      */
-    public List<String> findUserPipelineInstance(){
-        String sql = "SELECT pipeline_id, MAX(create_time)" +
-                " FROM pip_pipeline_instance" +
-                " GROUP BY pipeline_id" +
-                " ORDER BY MAX(create_time) DESC";
+    public List<PipelineInstanceEntity> findUserPipelineInstance(String userId,Integer limit){
+
+        // 子查询： 根据流水线id分组，userId筛选获取用户运行的流水线，
+        // 然后将子查询的结果作为临时表与主查询中的 pip_pipeline_instance 表进行联接
+        String sql = "select p1.*" +
+                " from pip_pipeline_instance p1" +
+                " join (" +
+                "    select pipeline_id, MAX(create_time) AS max_create_time" +
+                "    from pip_pipeline_instance" +
+                "    where user_id = '" + userId + "'" +
+                "    group by pipeline_id" +
+                " ) p2 on p1.pipeline_id = p2.pipeline_id and p1.create_time = p2.max_create_time" +
+                " order by p1.create_time DESC" +
+                " limit " + limit ;
         JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
-        List<Map<String, Object>> queryForList = jdbcTemplate.queryForList(sql);
-        if (queryForList.isEmpty()){
+        List<PipelineInstanceEntity> instanceEntityList = jdbcTemplate.query(sql, new BeanPropertyRowMapper(PipelineInstanceEntity.class));
+        if ( instanceEntityList.size() == 0){
             return Collections.emptyList();
         }
-        List<String> list = new ArrayList<>();
 
-        for (Map<String, Object> stringObjectMap : queryForList) {
-            String id = (String)stringObjectMap.get("pipeline_id");
-            list.add(id);
-        }
-        return list;
+        return instanceEntityList;
+
+        // String sql = "SELECT pipeline_id, MAX(create_time)" +
+        //         " FROM pip_pipeline_instance" +
+        //         " where user_id = '" + userId + "'" +
+        //         " GROUP BY pipeline_id" +
+        //         " ORDER BY MAX(create_time) DESC" +
+        //         " limit " + limit ;
+        // JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
+        // List<Map<String, Object>> queryForList = jdbcTemplate.queryForList(sql);
+        // if (queryForList.isEmpty()){
+        //     return Collections.emptyList();
+        // }
+        // List<String> list = new ArrayList<>();
+        //
+        // for (Map<String, Object> stringObjectMap : queryForList) {
+        //     String id = (String)stringObjectMap.get("pipeline_id");
+        //     list.add(id);
+        // }
+        // return list;
     }
 
 

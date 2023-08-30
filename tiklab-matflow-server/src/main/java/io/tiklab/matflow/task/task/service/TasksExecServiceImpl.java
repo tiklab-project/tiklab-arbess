@@ -9,7 +9,7 @@ import io.tiklab.matflow.task.build.service.TaskBuildExecService;
 import io.tiklab.matflow.task.code.service.TaskCodeExecService;
 import io.tiklab.matflow.task.codescan.service.TaskCodeScanExecService;
 import io.tiklab.matflow.task.deploy.service.TaskDeployExecService;
-import io.tiklab.matflow.task.message.model.TaskExecMessage;
+import io.tiklab.matflow.task.task.model.TaskExecMessage;
 import io.tiklab.matflow.task.message.service.TaskMessageExecService;
 import io.tiklab.matflow.task.script.service.TaskScriptExecService;
 import io.tiklab.matflow.task.task.model.TaskInstance;
@@ -90,27 +90,23 @@ public class TasksExecServiceImpl implements TasksExecService {
         instance.setLogAddress(fileAddress);
         PipelineFileUtil.createFile(fileAddress);
         tasksInstanceService.updateTaskInstance(instance);
-        taskOrTaskInstance.put(taskInstanceId,instance);
+        putTaskOrTaskInstance(taskInstanceId,instance);
         taskIdOrTaskInstanceId.put(task.getTaskId(),taskInstanceId);
     }
 
     @Override
     public boolean execTask(String pipelineId, String taskType,String taskId){
-        Tasks tasks ;
-        try {
-            tasks = tasksService.findOneTasksOrTask(taskId);
-        } catch (Exception e){
-            throw new ApplicationException("查询失败："+e.getMessage());
-        }
+        Tasks tasks = tasksService.findOneTasksOrTask(taskId);
 
-        logger.info("执行任务："+tasks.getTaskName());
-        String taskInstanceId = taskIdOrTaskInstanceId.get(taskId);
+        logger.warn("执行任务：" + tasks.getTaskName());
+        String taskInstanceId = findTaskInstanceId(taskId);
         //计算时间
         tasksInstanceService.taskRuntime(taskInstanceId);
+
         //更改日志为运行运行中
-        TaskInstance instance = taskOrTaskInstance.get(taskInstanceId);
+        TaskInstance instance = findTaskInstance(taskInstanceId);
         instance.setRunState(RUN_RUN);
-        taskOrTaskInstance.put(taskInstanceId,instance);
+        putTaskOrTaskInstance(taskInstanceId,instance);
         tasksInstanceService.updateTaskInstance(instance);
 
         boolean state = true;
@@ -136,17 +132,19 @@ public class TasksExecServiceImpl implements TasksExecService {
     public boolean execSendMessageTask(TaskExecMessage taskExecMessage){
 
         String taskId = taskExecMessage.getTasks().getTaskId();
-        String taskInstanceId = taskIdOrTaskInstanceId.get(taskId);
+        String taskInstanceId = findTaskInstanceId(taskId);
         //计算时间
         tasksInstanceService.taskRuntime(taskInstanceId);
 
-        Tasks tasks = tasksService.findOneTasksOrTask(taskId);
-        logger.info("执行任务：" + tasks.getTaskName());
+        String taskName = taskExecMessage.getTaskName();
+        logger.info("执行任务：{}" , taskName);
         //更改日志为运行运行中
-        TaskInstance instance = taskOrTaskInstance.get(taskInstanceId);
+        TaskInstance instance = findTaskInstance(taskInstanceId);
         instance.setRunState(RUN_RUN);
-        taskOrTaskInstance.put(taskInstanceId,instance);
+        putTaskOrTaskInstance(taskInstanceId,instance);
+
         tasksInstanceService.updateTaskInstance(instance);
+
         boolean state = message.message(taskExecMessage);
         //更新任务状态
         taskExecEnd(taskId,state);
@@ -159,8 +157,8 @@ public class TasksExecServiceImpl implements TasksExecService {
      * @param state 任务状态
      */
     private void taskExecEnd(String taskId,boolean state){
-        String taskInstanceId = taskIdOrTaskInstanceId.get(taskId);
-        TaskInstance instance = taskOrTaskInstance.get(taskInstanceId);
+        String taskInstanceId = findTaskInstanceId(taskId);
+        TaskInstance instance = findTaskInstance(taskInstanceId);
         if (Objects.isNull(instance)){
             return;
         }
@@ -179,18 +177,20 @@ public class TasksExecServiceImpl implements TasksExecService {
         }
         //更新数据库数据,移除内存中的实例数据
         tasksInstanceService.updateTaskInstance(instance);
-        stopThread(taskInstanceId);
-        stopThread(taskId);
+
         tasksInstanceService.removeTaskRuntime(taskInstanceId);
         taskIdOrTaskInstanceId.remove(taskId);
         taskOrTaskInstance.remove(taskInstanceId);
+
+        stopThread(taskId);
     }
 
     public void stopTask(String taskId){
-        String taskInstanceId = taskIdOrTaskInstanceId.get(taskId);
-        TaskInstance taskInstance = taskOrTaskInstance.get(taskInstanceId);
+        String taskInstanceId = findTaskInstanceId(taskId);
+        TaskInstance taskInstance = findTaskInstance(taskInstanceId);
+
         //更新任务实例状态
-        if (taskInstance == null){
+        if (Objects.isNull(taskInstance)){
             stopThread(taskInstanceId);
             stopThread(taskId);
             return;
@@ -202,15 +202,17 @@ public class TasksExecServiceImpl implements TasksExecService {
         taskInstance.setRunState(RUN_HALT);
         tasksInstanceService.updateTaskInstance(taskInstance);
 
-        Tasks task = tasksService.findOneTasksOrTask(taskId);
+        Tasks task = tasksService.findOneTasks(taskId);
 
         tasksInstanceService.writeAllExecLog(taskId, PipelineUtil.date(4)+"任务"+task.getTaskName()+"运行终止。");
         //移除内存
+
         tasksInstanceService.removeTaskRuntime(taskInstanceId);
-        stopThread(taskInstanceId);
         stopThread(taskId);
         taskIdOrTaskInstanceId.remove(taskId);
         taskOrTaskInstance.remove(taskInstanceId);
+
+
     }
 
     public void stop(String instanceId,String stageInstanceId,String postProcessId){
@@ -252,13 +254,13 @@ public class TasksExecServiceImpl implements TasksExecService {
         }
     }
 
-    public void runError( List<Tasks> tasks){
+    public void runError(List<Tasks> tasks){
         for (Tasks task : tasks) {
-            String taskInstanceId = taskIdOrTaskInstanceId.get(task.getTaskId());
+            String taskInstanceId = findTaskInstanceId(task.getTaskId());
             if (Objects.isNull(taskInstanceId)){
                 continue;
             }
-            TaskInstance taskInstance = taskOrTaskInstance.get(taskInstanceId);
+            TaskInstance taskInstance = findTaskInstance(taskInstanceId);
             if (!Objects.isNull(taskInstance)){
                 taskInstance.setRunState(PipelineFinal.RUN_HALT);
                 tasksInstanceService.updateTaskInstance(taskInstance);
@@ -274,7 +276,7 @@ public class TasksExecServiceImpl implements TasksExecService {
         return taskIdOrTaskInstanceId.get(taskId);
     }
 
-    public void setTaskOrTaskInstance(String taskInstanceId ,TaskInstance taskInstance ){
+    public void putTaskOrTaskInstance(String taskInstanceId ,TaskInstance taskInstance ){
         taskOrTaskInstance.put(taskInstanceId,taskInstance);
     }
 

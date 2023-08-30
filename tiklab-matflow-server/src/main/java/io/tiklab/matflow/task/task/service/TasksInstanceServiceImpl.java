@@ -484,7 +484,7 @@ public class TasksInstanceServiceImpl implements TasksInstanceService {
             PipelineFileUtil.logWriteFile(runInstance,logAddress);
             taskInstance2.setRunLog(null);
         }
-        tasksExecService.setTaskOrTaskInstance(taskInstanceId, taskInstance2);
+        tasksExecService.putTaskOrTaskInstance(taskInstanceId, taskInstance2);
     }
 
 
@@ -512,14 +512,6 @@ public class TasksInstanceServiceImpl implements TasksInstanceService {
         String logAddress = taskInstance1.getLogAddress();
         PipelineFileUtil.logWriteFile(runInstance,logAddress);
     }
-
-    @Override
-    public TaskInstance findExecInstance(String taskId){
-        TasksExecServiceImpl tasksExecService = new TasksExecServiceImpl();
-        String taskInstanceId = tasksExecService.findTaskInstanceId(taskId);
-        return tasksExecService.findTaskInstance(taskInstanceId);
-    }
-
 
     /**
      * 删除任务执行实例
@@ -585,6 +577,26 @@ public class TasksInstanceServiceImpl implements TasksInstanceService {
     @Override
     public void removeTaskRuntime(String taskInstanceId){
         runTime.remove(taskInstanceId);
+        stopThread(taskInstanceId);
+    }
+
+
+
+    public void stopThread(String threadName){
+        ThreadGroup currentGroup = Thread.currentThread().getThreadGroup();
+        int noThreads = currentGroup.activeCount();
+        Thread[] lstThreads = new Thread[noThreads];
+        if (Objects.equals(lstThreads.length,0)){
+            return;
+        }
+        currentGroup.enumerate(lstThreads);
+        for (int i = 0; i < noThreads; i++) {
+            String nm = lstThreads[i].getName();
+            if (!PipelineUtil.isNoNull(nm) ||!nm.equals(threadName)) {
+                continue;
+            }
+            lstThreads[i].stop();
+        }
     }
 
 

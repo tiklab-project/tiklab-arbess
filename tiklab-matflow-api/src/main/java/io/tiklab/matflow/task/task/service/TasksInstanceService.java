@@ -146,9 +146,6 @@ public interface TasksInstanceService {
     void writeAllExecLog(String taskId, String execLog);
 
 
-    TaskInstance findExecInstance(String taskId);
-
-
     /**
      * 获取Command执行结果
      * @param process Command执行实例
@@ -185,6 +182,9 @@ public interface TasksInstanceService {
 
 
     List<TaskInstance> findTaskInstanceList(TaskInstanceQuery query);
+
+
+    void stopThread(String threadName);
 
 
     @FindList

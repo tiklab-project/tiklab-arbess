@@ -14,18 +14,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.context.event.ContextRefreshedEvent;
 
 import java.util.List;
 
 @Configuration
 public class InitJob implements ApplicationListener<ContextRefreshedEvent> {
-
-
-    @Override
-    public void onApplicationEvent(ContextRefreshedEvent event) {
-        run();
-    }
 
     private static final Logger logger = LoggerFactory.getLogger(InitJob.class);
 
@@ -34,6 +29,11 @@ public class InitJob implements ApplicationListener<ContextRefreshedEvent> {
 
     @Autowired
     TriggerService triggerConfigServer;
+
+    @Override
+    public void onApplicationEvent(ContextRefreshedEvent event) {
+        // run();
+    }
 
     public void run(){
         logger.info("Load scheduled tasks......");
@@ -56,7 +56,6 @@ public class InitJob implements ApplicationListener<ContextRefreshedEvent> {
 
     /**
      * 初始注入scheduler
-     *
      * @throws SchedulerException
      */
     @Bean
