@@ -72,6 +72,9 @@ public interface PipelineService {
     Pagination<Pipeline> findUserPipelinePage(PipelineQuery query);
 
 
+    List<Pipeline> findUserPipelineList(PipelineQuery query);
+
+
     /**
      * 查询拥有此流水线的用户
      * @param pipelineId 流水线id
@@ -85,6 +88,16 @@ public interface PipelineService {
      * @return 流水线信息
      */
     List<PipelineRecently> findPipelineRecently(int number);
+
+
+    String findPipelineCloneName(String pipelineId);
+
+
+    /**
+     * 流水线克隆
+     * @param pipelineId 流水线id
+     */
+    void pipelineClone(String pipelineId,String pipelineName);
 
 
 

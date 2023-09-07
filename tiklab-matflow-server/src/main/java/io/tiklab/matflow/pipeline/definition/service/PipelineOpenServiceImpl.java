@@ -171,7 +171,7 @@ public class PipelineOpenServiceImpl implements PipelineOpenService {
             joinTemplate.joinQuery(pipelineOpen);
 
             if (Objects.isNull(pipelineOpen.getPipeline().getName())){
-                deleteAllOpen(pipelineId);
+                // deleteAllOpen(pipelineId);
                 continue;
             }
 

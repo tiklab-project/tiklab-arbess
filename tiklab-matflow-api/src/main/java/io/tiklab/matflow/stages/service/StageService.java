@@ -30,6 +30,13 @@ public interface StageService {
      */
     void createStageTemplate(String pipelineId,String[] template);
 
+
+    /**
+     * 克隆阶段任务
+     * @param pipelineId 流水线id
+     */
+    void cloneStage(String pipelineId,String clonePipelineId);
+
     /**
      * 查询所有阶段任务
      * @param pipelineId 流水线id

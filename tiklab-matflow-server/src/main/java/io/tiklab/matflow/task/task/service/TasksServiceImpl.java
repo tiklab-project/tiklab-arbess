@@ -6,7 +6,12 @@ import io.tiklab.core.exception.ApplicationException;
 import io.tiklab.matflow.setting.service.AuthHostService;
 import io.tiklab.matflow.setting.service.AuthService;
 import io.tiklab.matflow.setting.service.AuthThirdService;
+import io.tiklab.matflow.support.condition.service.ConditionService;
+import io.tiklab.matflow.support.postprocess.dao.PostprocessDao;
+import io.tiklab.matflow.support.postprocess.entity.PostprocessEntity;
+import io.tiklab.matflow.support.postprocess.model.PostprocessQuery;
 import io.tiklab.matflow.support.util.PipelineUtil;
+import io.tiklab.matflow.support.variable.service.VariableService;
 import io.tiklab.matflow.task.artifact.model.TaskArtifact;
 import io.tiklab.matflow.task.artifact.service.TaskArtifactService;
 import io.tiklab.matflow.task.build.model.TaskBuild;
@@ -25,6 +30,7 @@ import io.tiklab.matflow.task.script.service.TaskScriptService;
 import io.tiklab.matflow.task.task.dao.TasksDao;
 import io.tiklab.matflow.task.task.entity.TasksEntity;
 import io.tiklab.matflow.task.task.model.Tasks;
+import io.tiklab.matflow.task.task.model.TasksQuery;
 import io.tiklab.matflow.task.test.model.TaskTest;
 import io.tiklab.matflow.task.test.service.TaskTestService;
 import io.tiklab.rpc.annotation.Exporter;
@@ -79,6 +85,15 @@ public class TasksServiceImpl implements TasksService {
     @Autowired
     AuthHostService authHostService;
 
+    @Autowired
+    VariableService variableService;
+
+    @Autowired
+    ConditionService conditionService;
+
+    @Autowired
+    PostprocessDao postprocessDao;
+
     private final ExecutorService executorService = Executors.newCachedThreadPool();
 
     private static final Logger logger = LoggerFactory.getLogger(TasksServiceImpl.class);
@@ -110,7 +125,6 @@ public class TasksServiceImpl implements TasksService {
         if ( list.size() == 0){
             return 1;
         }
-
 
         boolean b = findTaskType(taskType).equals(TASK_TYPE_CODE);
 
@@ -196,7 +210,6 @@ public class TasksServiceImpl implements TasksService {
         Object values = tasks.getValues();
         Tasks task = findOneTasks(taskId);
         String taskType = task.getTaskType();
-        // String initTaskType = initTaskType(taskType);
         //更新任务字段值
         updateDifferentTask(taskId,taskType,values);
     }
@@ -266,19 +279,25 @@ public class TasksServiceImpl implements TasksService {
     
     @Override
     public List<Tasks> finAllPipelineTask(String pipelineId) {
-        List<TasksEntity> tasksEntityList = tasksDao.findPipelineTask(pipelineId);
+        TasksQuery tasksQuery = new TasksQuery();
+        tasksQuery.setPipelineId(pipelineId);
+        List<TasksEntity> tasksEntityList = tasksDao.findTaskList(tasksQuery);
         return BeanMapper.mapList(tasksEntityList, Tasks.class);
     }
     
     @Override
     public List<Tasks> finAllStageTask(String stageId) {
-        List<TasksEntity> tasksEntityList = tasksDao.findStageTask(stageId);
+        TasksQuery tasksQuery = new TasksQuery();
+        tasksQuery.setStageId(stageId);
+        List<TasksEntity> tasksEntityList = tasksDao.findTaskList(tasksQuery);
         return BeanMapper.mapList(tasksEntityList, Tasks.class);
     }
 
     @Override
     public Tasks findOnePostTask(String postId) {
-        List<TasksEntity> tasksEntityList = tasksDao.findPostTask(postId);
+        TasksQuery tasksQuery = new TasksQuery();
+        tasksQuery.setPostprocessId(postId);
+        List<TasksEntity> tasksEntityList = tasksDao.findTaskList(tasksQuery);
         List<Tasks> tasksList = BeanMapper.mapList(tasksEntityList, Tasks.class);
         if (tasksList.size()>0){
             return tasksList.get(0);
@@ -291,7 +310,6 @@ public class TasksServiceImpl implements TasksService {
         Tasks postTask = findOnePostTask(postId);
         String  taskType = postTask.getTaskType();
         String taskId = postTask.getTaskId();
-        // String initTaskType = initTaskType(taskType);
         Object task = findOneDifferentTask(taskId, taskType);
         postTask.setValues(task);
         postTask.setTaskType(taskType);
@@ -314,7 +332,6 @@ public class TasksServiceImpl implements TasksService {
         for (Tasks task : tasks) {
             String taskId = task.getTaskId();
             String taskType = task.getTaskType();
-            // String initTaskType = initTaskType(taskType);
             Future<Object> future = executorService.submit(() -> {
                 Object object;
                 try {
@@ -434,6 +451,7 @@ public class TasksServiceImpl implements TasksService {
             task.setTask(object);
             list.add(task);
         }
+        list.sort(Comparator.comparing(Tasks::getTaskSort));
         return list;
     }
 
@@ -535,11 +553,151 @@ public class TasksServiceImpl implements TasksService {
      * 查询所有任务
      * @return 任务模型列表
      */
+    @Override
     public List<Tasks> findAllTasks(){
         List<TasksEntity> allConfigure = tasksDao.findAllConfigure();
         return BeanMapper.mapList(allConfigure, Tasks.class);
     }
 
+    public void clonePostTasks(String id ,String cloneId){
+
+        Tasks task = findOnePostTask(id);
+
+        // 克隆任务
+        TasksEntity tasksEntity = BeanMapper.map(task, TasksEntity.class);
+        tasksEntity.setPostprocessId(cloneId);
+        String taskCloneId = tasksDao.createConfigure(tasksEntity);
+
+        // 克隆任务详情
+        cloneDifferentTask(task.getTaskId(),taskCloneId,task.getTaskType());
+    }
+
+
+    @Override
+    public void cloneTasks(String id,String cloneId,String type){
+        switch (type){
+            case "pipelineId" ->{
+                List<Tasks> tasks = finAllPipelineTask(id);
+                for (Tasks task : tasks) {
+
+                    String taskId = task.getTaskId();
+
+                    // 克隆任务
+                    TasksEntity tasksEntity = BeanMapper.map(task, TasksEntity.class);
+                    tasksEntity.setPipelineId(cloneId);
+                    String taskCloneId = tasksDao.createConfigure(tasksEntity);
+
+                    // 克隆任务详情
+                    cloneDifferentTask(taskId,taskCloneId,task.getTaskType());
+
+                    // 克隆任务变量
+                    variableService.cloneVariable(taskId,taskCloneId);
+
+                    // 克隆任务条件
+                    conditionService.cloneCond(taskId,taskCloneId);
+
+                    // 克隆任务后置处理
+                    PostprocessQuery postprocessQuery = new PostprocessQuery();
+                    postprocessQuery.setTaskId(taskId);
+                    List<PostprocessEntity> postTaskList = postprocessDao.findPostTaskList(postprocessQuery);
+                    for (PostprocessEntity postprocessEntity : postTaskList) {
+                        String postProcessId = postprocessEntity.getPostprocessId();
+                        postprocessEntity.setTaskId(taskCloneId);
+                        String clonePostProcessId = postprocessDao.createPost(postprocessEntity);
+                        clonePostTasks(postProcessId,clonePostProcessId);
+                    }
+                }
+            }
+            case "stageId" ->{
+                List<Tasks> tasks = finAllStageTask(id);
+                for (Tasks task : tasks) {
+
+                    String taskId = task.getTaskId();
+
+                    // 克隆任务
+                    TasksEntity tasksEntity = BeanMapper.map(task, TasksEntity.class);
+                    tasksEntity.setStageId(cloneId);
+                    String taskCloneId = tasksDao.createConfigure(tasksEntity);
+
+                    // 克隆任务详情
+                    cloneDifferentTask(task.getTaskId(),taskCloneId,task.getTaskType());
+
+                    // 克隆任务变量
+                    variableService.cloneVariable(task.getTaskId(),taskCloneId);
+
+                    // 克隆任务条件
+                    conditionService.cloneCond(task.getTaskId(),taskCloneId);
+
+                    // 克隆任务后置处理
+                    PostprocessQuery postprocessQuery = new PostprocessQuery();
+                    postprocessQuery.setTaskId(taskId);
+                    List<PostprocessEntity> postTaskList = postprocessDao.findPostTaskList(postprocessQuery);
+                    for (PostprocessEntity postprocessEntity : postTaskList) {
+                        String postProcessId = postprocessEntity.getPostprocessId();
+                        postprocessEntity.setTaskId(taskCloneId);
+                        String clonePostProcessId = postprocessDao.createPost(postprocessEntity);
+                        clonePostTasks(postProcessId,clonePostProcessId);
+                    }
+
+                }
+            }
+            default -> {
+                throw new ApplicationException("无法克隆未知的任务信息！type:"+type);
+            }
+        }
+
+    }
+
+    /**
+     * 分发克隆不同类型的任务
+     * @param taskId 任务id
+     * @param taskType 任务类型
+     */
+    private void cloneDifferentTask(String taskId,String cloneTaskId,String taskType){
+        switch (findTaskType(taskType)) {
+            case TASK_TYPE_CODE     -> {
+                TaskCode task = codeService.findOneCode(taskId);
+                task.setTaskId(cloneTaskId);
+                codeService.createCode(task);
+            }
+            case TASK_TYPE_TEST     -> {
+                TaskTest task = testService.findOneTest(taskId);
+                task.setTaskId(cloneTaskId);
+                testService.createTest(task);
+            }
+            case TASK_TYPE_BUILD    -> {
+                TaskBuild task = buildService.findOneBuild(taskId);
+                task.setTaskId(cloneTaskId);
+                buildService.createBuild(task);
+            }
+            case TASK_TYPE_DEPLOY   -> {
+                TaskDeploy task = deployService.findOneDeploy(taskId);
+                task.setTaskId(cloneTaskId);
+                deployService.createDeploy(task);
+            }
+            case TASK_TYPE_CODESCAN -> {
+                TaskCodeScan task = codeScanService.findOneCodeScan(taskId);
+                task.setTaskId(cloneTaskId);
+                codeScanService.createCodeScan(task);
+            }
+            case TASK_TYPE_ARTIFACT -> {
+                TaskArtifact task = productServer.findOneProduct(taskId);
+                task.setTaskId(cloneTaskId);
+                productServer.createProduct(task);
+            }
+            case TASK_TYPE_MESSAGE -> {
+                TaskMessageType task = messageTypeServer.findMessage(taskId);
+                task.setTaskId(cloneTaskId);
+                messageTypeServer.createMessage(task);
+            }
+            case TASK_TYPE_SCRIPT   -> {
+                TaskScript task = scriptServer.findScript(taskId);
+                task.setTaskId(cloneTaskId);
+                scriptServer.createScript(task);
+            }
+            default -> throw new ApplicationException("无法更新未知的配置类型:"+taskType);
+        }
+    }
 
     /**
      * 分发创建不同类型的任务
@@ -897,8 +1055,6 @@ public class TasksServiceImpl implements TasksService {
         return true;
     }
 
-
-
     /**
      * 分发获取默认任务名称
      * @param taskType 任务类型
@@ -931,7 +1087,7 @@ public class TasksServiceImpl implements TasksService {
                 return "Node.js";
             }
             case TASK_DEPLOY_LINUX -> {
-                return "虚拟机";
+                return "主机部署";
             }
             case TASK_DEPLOY_DOCKER -> {
                 return "Docker";
@@ -959,12 +1115,6 @@ public class TasksServiceImpl implements TasksService {
             }
         }
     }
-
-
-
-
-
-
 
 
 }

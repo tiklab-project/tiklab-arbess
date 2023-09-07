@@ -1,10 +1,14 @@
 package io.tiklab.matflow.support.variable.service;
 
+import io.tiklab.beans.BeanMapper;
 import io.tiklab.matflow.support.variable.dao.VariableDao;
 import io.tiklab.matflow.support.util.PipelineUtil;
+import io.tiklab.matflow.support.variable.entity.VariableEntity;
 import io.tiklab.matflow.support.variable.model.Variable;
+import io.tiklab.matflow.support.variable.model.VariableQuery;
 import org.apache.commons.lang.text.StrSubstitutor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -138,6 +142,25 @@ public class VariableServiceImpl implements VariableService {
         return list;
     }
 
+    @Override
+    public List<Variable> findVariableList(VariableQuery query){
+        List<VariableEntity> variableList = variableDao.findVariableList(query);
+        if (variableList == null || variableList.size() == 0){
+            return Collections.emptyList();
+        }
+        return BeanMapper.mapList(variableList, Variable.class);
+    }
+
+    @Override
+    public void cloneVariable(String id,String cloneId){
+        VariableQuery variableQuery = new VariableQuery();
+        variableQuery.setTaskId(id);
+        List<Variable> variableList = findVariableList(variableQuery);
+        for (Variable variable : variableList) {
+            variable.setTaskId(cloneId);
+            createVariable(variable);
+        }
+    }
 
 }
 

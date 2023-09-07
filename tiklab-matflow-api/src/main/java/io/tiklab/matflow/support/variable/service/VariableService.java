@@ -1,6 +1,7 @@
 package io.tiklab.matflow.support.variable.service;
 
 import io.tiklab.matflow.support.variable.model.Variable;
+import io.tiklab.matflow.support.variable.model.VariableQuery;
 
 import java.util.List;
 /**
@@ -51,5 +52,11 @@ public interface VariableService {
      * @return 变量
      */
     List<Variable> findAllVariable(String taskId);
+
+
+    List<Variable> findVariableList(VariableQuery query);
+
+    // 克隆变量
+    void cloneVariable(String id,String cloneId);
 
 }

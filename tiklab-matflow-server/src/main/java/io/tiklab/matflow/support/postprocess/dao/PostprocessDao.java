@@ -6,6 +6,8 @@ import io.tiklab.dal.jpa.JpaTemplate;
 import io.tiklab.dal.jpa.criterial.condition.QueryCondition;
 import io.tiklab.dal.jpa.criterial.conditionbuilder.QueryBuilders;
 import io.tiklab.matflow.support.postprocess.entity.PostprocessEntity;
+import io.tiklab.matflow.support.postprocess.model.PostprocessQuery;
+import io.tiklab.matflow.task.task.entity.TasksEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -81,6 +83,14 @@ public class PostprocessDao {
         return jpaTemplate.findList(queryCondition,PostprocessEntity.class);
     }
 
+
+    public List<PostprocessEntity> findPostTaskList(PostprocessQuery query){
+        QueryCondition queryCondition = QueryBuilders.createQuery(PostprocessEntity.class)
+                .eq("taskId", query.getTaskId())
+                .eq("pipelineId", query.getPipelineId())
+                .get();
+        return jpaTemplate.findList(queryCondition,PostprocessEntity.class);
+    }
 
 
     /**

@@ -3,6 +3,7 @@ package io.tiklab.matflow.task.code.service;
 import io.tiklab.core.exception.ApplicationException;
 import io.tiklab.matflow.setting.model.AuthThird;
 import io.tiklab.matflow.setting.service.AuthThirdService;
+import io.tiklab.matflow.support.util.PipelineFinal;
 import io.tiklab.matflow.support.util.PipelineUtil;
 import io.tiklab.matflow.task.code.model.XcodeBranch;
 import io.tiklab.matflow.task.code.model.XcodeRepository;
@@ -18,10 +19,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.awt.print.PageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+
+import static io.tiklab.matflow.support.util.PipelineFinal.TASK_CODE_DEFAULT_BRANCH;
 
 @Service
 public class TaskCodeXcodeServiceImpl implements TaskCodeXcodeService {
@@ -115,16 +119,16 @@ public class TaskCodeXcodeServiceImpl implements TaskCodeXcodeService {
             if (throwable instanceof ApplicationException){
                 throw new ApplicationException(message);
             }
-
             throw new ApplicationException("无法连接到："+serverAddress);
         }
 
         if (Objects.isNull(allBranch) || allBranch.isEmpty()){
-            allBranch = new ArrayList<>();
-            Branch branch = new Branch();
-            branch.setBranchName("master");
-            branch.setBranchId("master");
-            allBranch.add(branch);
+            throw new ApplicationException("获取Xcode分支失败，该仓库没有分支或该仓库为空仓库");
+            // allBranch = new ArrayList<>();
+            // Branch branch = new Branch();
+            // branch.setBranchName(TASK_CODE_DEFAULT_BRANCH);
+            // branch.setBranchId(TASK_CODE_DEFAULT_BRANCH);
+            // allBranch.add(branch);
         }
 
         for (Branch branch : allBranch) {
@@ -144,7 +148,6 @@ public class TaskCodeXcodeServiceImpl implements TaskCodeXcodeService {
         Branch branch;
         try {
             branch = branchServer(serverAddress).findBranch(rpyId, branchId);
-
         }catch (Throwable throwable){
             logger.error(throwable.getMessage());
             throw new ApplicationException("无法连接到："+ serverAddress );

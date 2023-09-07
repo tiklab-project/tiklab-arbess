@@ -35,6 +35,8 @@ public class PipelineQuery {
     @ApiProperty(name ="idString",desc = "流水线id数组")
     private String[] idString;
 
+    private boolean eqName;
+
     @ApiProperty(name ="pageParam",desc = "分页参数")
     private Page pageParam= new Page();
 
@@ -113,5 +115,13 @@ public class PipelineQuery {
 
     public void setIdString(String[] idString) {
         this.idString = idString;
+    }
+
+    public boolean isEqName() {
+        return eqName;
+    }
+
+    public void setEqName(boolean eqName) {
+        this.eqName = eqName;
     }
 }

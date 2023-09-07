@@ -7,11 +7,13 @@ import io.tiklab.dal.jpa.JpaTemplate;
 import io.tiklab.dal.jpa.criterial.condition.QueryCondition;
 import io.tiklab.dal.jpa.criterial.conditionbuilder.QueryBuilders;
 import io.tiklab.matflow.task.task.entity.TasksEntity;
+import io.tiklab.matflow.task.task.model.TasksQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -28,11 +30,11 @@ public class TasksDao {
 
     /**
      * 添加流水线配置信息
-     * @param pipelineConfigureEntity 配置信息实体
+     * @param tasksEntity 配置信息实体
      * @return 配置信息id
      */
-    public String createConfigure(TasksEntity pipelineConfigureEntity){
-        return jpaTemplate.save(pipelineConfigureEntity,String.class);
+    public String createConfigure(TasksEntity tasksEntity){
+        return jpaTemplate.save(tasksEntity,String.class);
     }
 
     /**
@@ -68,32 +70,16 @@ public class TasksDao {
         return jpaTemplate.findAll(TasksEntity.class);
     }
 
-    /**
-     * 查询流水线任务
-     * @param pipelineId 流水线id
-     * @return 任务
-     */
-    public List<TasksEntity> findPipelineTask(String pipelineId){
-        List<Order> orderList = OrderBuilders.instance().asc("taskSort").get();
+    public List<TasksEntity> findTaskList(TasksQuery query){
         QueryCondition queryCondition = QueryBuilders.createQuery(TasksEntity.class)
-                .eq("pipelineId", pipelineId)
-                .orders(orderList)
+                .eq("pipelineId", query.getPipelineId())
+                .eq("stageId", query.getStageId())
+                .eq("postprocessId", query.getPostprocessId())
+                .orders(query.getOrderParams())
                 .get();
-        return jpaTemplate.findList(queryCondition,TasksEntity.class);
-    }
-
-    /**
-     * 查询阶段任务
-     * @param stageId 阶段id
-     * @return 任务
-     */
-    public List<TasksEntity> findStageTask(String stageId){
-        List<Order> orderList = OrderBuilders.instance().asc("taskSort").get();
-        QueryCondition queryCondition = QueryBuilders.createQuery(TasksEntity.class)
-                .eq("stageId", stageId)
-                .orders(orderList)
-                .get();
-        return jpaTemplate.findList(queryCondition,TasksEntity.class);
+        List<TasksEntity> list = jpaTemplate.findList(queryCondition, TasksEntity.class);
+        list.sort(Comparator.comparing(TasksEntity::getTaskSort));
+        return list;
     }
 
     /**

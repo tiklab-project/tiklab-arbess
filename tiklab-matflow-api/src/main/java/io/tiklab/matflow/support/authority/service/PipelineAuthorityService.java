@@ -44,4 +44,7 @@ public interface PipelineAuthorityService {
      */
     void createDmUser(String pipelineId, List<PatchUser> userList);
 
+
+    void cloneDomainRole(String sourceDomainId,String cloneDomainId);
+
 }

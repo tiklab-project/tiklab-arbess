@@ -1,25 +1,20 @@
 package io.tiklab.matflow.support.variable.model;
 
 import io.tiklab.beans.annotation.Mapper;
+import io.tiklab.core.order.Order;
+import io.tiklab.core.order.OrderBuilders;
+import io.tiklab.core.page.Page;
 import io.tiklab.join.annotation.Join;
 import io.tiklab.postin.annotation.ApiModel;
 import io.tiklab.postin.annotation.ApiProperty;
 
 import java.util.List;
+
 /**
  * 流水线条件模型
  */
-@ApiModel
-@Join
-@Mapper
-public class Variable {
 
-
-    @ApiProperty(name="varId",desc="id")
-    private String varId;
-
-    @ApiProperty(name="createTime",desc="创建时间")
-    private String createTime;
+public class VariableQuery {
 
     @ApiProperty(name="taskType",desc="类型 1.字符串 2.单选")
     private int taskType;
@@ -30,9 +25,6 @@ public class Variable {
     @ApiProperty(name="taskId",desc="任务id")
     private String taskId;
 
-    @ApiProperty(name="pipelineId",desc="流水线id")
-    private String pipelineId;
-
     @ApiProperty(name = "varKey",desc="名称")
     private String varKey;
 
@@ -42,32 +34,15 @@ public class Variable {
     @ApiProperty(name = "varValues",desc="值")
     private String varValues;
 
-    private List<String> valueList;
+    @ApiProperty(name="pipelineId",desc="流水线id")
+    private String pipelineId;
 
+    @ApiProperty(name ="pageParam",desc = "分页参数")
+    private Page pageParam= new Page();
 
-    public List<String> getValueList() {
-        return valueList;
-    }
+    @ApiProperty(name ="orderParams",desc = "排序参数")
+    private List<Order> orderParams = OrderBuilders.instance().desc("varKey").get();
 
-    public void setValueList(List<String> valueList) {
-        this.valueList = valueList;
-    }
-
-    public String getVarId() {
-        return varId;
-    }
-
-    public void setVarId(String varId) {
-        this.varId = varId;
-    }
-
-    public String getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(String createTime) {
-        this.createTime = createTime;
-    }
 
     public int getTaskType() {
         return taskType;
@@ -123,5 +98,21 @@ public class Variable {
 
     public void setPipelineId(String pipelineId) {
         this.pipelineId = pipelineId;
+    }
+
+    public Page getPageParam() {
+        return pageParam;
+    }
+
+    public void setPageParam(Page pageParam) {
+        this.pageParam = pageParam;
+    }
+
+    public List<Order> getOrderParams() {
+        return orderParams;
+    }
+
+    public void setOrderParams(List<Order> orderParams) {
+        this.orderParams = orderParams;
     }
 }

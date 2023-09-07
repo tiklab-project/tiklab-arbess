@@ -127,7 +127,6 @@ public class TaskBuildExecServiceImpl implements TaskBuildExecService {
             String instanceId = findPipelineInstanceId(pipelineId);
             String fileAddress = defaultAddress + instanceId +"/"+file.getName();
 
-
             // 创建流水线运行时产生的制品信息
             TaskBuildProduct taskBuildProduct = new TaskBuildProduct(instanceId);
             taskBuildProduct.setKey(PipelineFinal.DEFAULT_ARTIFACT_ADDRESS);

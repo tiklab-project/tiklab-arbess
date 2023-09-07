@@ -2,6 +2,9 @@ package io.tiklab.matflow.task.code.service;
 
 import com.alibaba.fastjson.JSON;
 import io.tiklab.core.exception.ApplicationException;
+import io.tiklab.matflow.pipeline.instance.model.PipelineInstance;
+import io.tiklab.matflow.pipeline.instance.model.PipelineInstanceQuery;
+import io.tiklab.matflow.pipeline.instance.service.PipelineInstanceService;
 import io.tiklab.matflow.setting.model.Auth;
 import io.tiklab.matflow.setting.model.AuthThird;
 import io.tiklab.matflow.setting.model.Scm;
@@ -15,6 +18,8 @@ import io.tiklab.matflow.support.util.PipelineUtil;
 import io.tiklab.matflow.support.util.PipelineUtilService;
 import io.tiklab.matflow.support.variable.model.Variable;
 import io.tiklab.matflow.support.variable.service.VariableService;
+import io.tiklab.matflow.task.build.model.TaskBuildProduct;
+import io.tiklab.matflow.task.build.service.TaskBuildProductService;
 import io.tiklab.matflow.task.code.model.TaskCode;
 import io.tiklab.matflow.task.code.model.XcodeRepository;
 import io.tiklab.matflow.task.task.model.Tasks;
@@ -31,6 +36,8 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.*;
+
+import static io.tiklab.matflow.support.util.PipelineFinal.TASK_CODE_SVN;
 
 /**
  * 源码管理执行方法
@@ -85,7 +92,7 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
         TaskCode code = JSON.parseObject(object, TaskCode.class);
         code.setType(taskType);
 
-        if (taskType.equals("xcode")){
+        if (taskType.equals(PipelineFinal.TASK_CODE_XCODE)){
             XcodeRepository repository = code.getRepository();
             code.setCodeAddress(repository.getAddress());
         }
@@ -109,24 +116,20 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
             return false;
         }
 
-        //分支
-        String codeBranch = code.getCodeBranch();
-        if(!PipelineUtil.isNoNull(codeBranch)){
-            codeBranch = "master";
-        }
 
-        //更新日志
-        String s = PipelineUtil.date(4) + "Uri : " + code.getCodeAddress() + "\n"
-                + PipelineUtil.date(4) + "Branch : " + codeBranch ;
-
-        tasksInstanceService.writeExecLog(taskId,s);
 
         try {
             Thread.sleep(300);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
+
         tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+ "空间分配成功。" );
+
+        //更新日志
+        String s = PipelineUtil.date(4) + "Url : " + code.getCodeAddress() ;
+
+        tasksInstanceService.writeExecLog(taskId,s);
 
         try {
 
@@ -136,8 +139,8 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
             Process process = codeStart(code,pipelineId);
             String  type = code.getType();
             String enCode = null;
-            if (!type.equals("svn")){
-                enCode = "UTF-8";
+            if (!type.equals(TASK_CODE_SVN)){
+                enCode = PipelineFinal.UTF_8;
             }
             boolean result = tasksInstanceService.readCommandExecResult(process, enCode, error(type), taskId);
             if (!result){
@@ -148,8 +151,8 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
             process.destroy();
             tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+ "获取提交信息..." );
 
-            if (!type.equals("svn")){
-                //获取提交信息
+            //获取提交信息
+            if (!type.equals(TASK_CODE_SVN)){
                 Process message = cloneMessage(code.getType(),pipelineId);
                 if (message != null){
                     boolean result1 = tasksInstanceService.readCommandExecResult(message, enCode, error(type), taskId);
@@ -171,6 +174,7 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
             tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+ e);
             return false;
         }
+
         tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"任务"+name+"执行成功。");
         return true;
     }
@@ -184,7 +188,7 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
      * @throws ApplicationException 不存在配置
      */
     private Process codeStart(TaskCode taskCode, String pipelineId) throws IOException, URISyntaxException , ApplicationException{
-        boolean b = !(taskCode.getType().equals("5") || taskCode.getType().equals("svn"));
+        boolean b = !(taskCode.getType().equals(TASK_CODE_SVN));
         Scm pipelineScm ;
 
         if (b){
@@ -211,7 +215,7 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
         String path ;
         switch (taskCode.getType()) {
             //账号密码或ssh登录
-            case "1", "4","git","gitlab" -> {
+            case "git","gitlab" -> {
                 List<String> list = gitUpOrder(taskCode, fileAddress);
                 gitOrder = list.get(0);
                 if (list.size() > 1){
@@ -239,14 +243,14 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
                 gitOrder = gitXcodeOrder(taskCode, fileAddress);
             }
             //第三方授权
-            case  "2", "3","gitee","github" -> gitOrder = gitThirdOrder(taskCode, fileAddress);
+            case "gitee","github" -> gitOrder = gitThirdOrder(taskCode, fileAddress);
 
             //svn
-            case "5","svn" -> gitOrder = svnOrder(taskCode, fileAddress);
+            case TASK_CODE_SVN -> gitOrder = svnOrder(taskCode, fileAddress);
             //错误
             default -> throw new ApplicationException("未知的任务类型");
         }
-        logger.warn("执行："+ gitOrder);
+        logger.warn("执行代码克隆命令："+ gitOrder);
         return PipelineUtil.process(serverAddress, gitOrder);
     }
 
@@ -382,9 +386,18 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
     private String gitBranch(StringBuilder url , TaskCode code, String codeDir){
         String type = code.getType();
         String branch = code.getCodeBranch();
-        if (type.equals("Xcode")){
+        if (type.equals("xcode")){
             branch = code.getBranch().getName();
         }
+
+        //分支
+        if(!PipelineUtil.isNoNull(branch)){
+            branch = PipelineFinal.TASK_CODE_DEFAULT_BRANCH;
+        }
+
+        //更新日志
+        String s = PipelineUtil.date(4) + "Branch : " + branch ;
+        tasksInstanceService.writeExecLog(code.getTaskId(),s);
 
         //判断是否存在分支
         String order;

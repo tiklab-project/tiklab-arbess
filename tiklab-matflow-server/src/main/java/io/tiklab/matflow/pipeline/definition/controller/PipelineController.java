@@ -7,8 +7,6 @@ import io.tiklab.matflow.pipeline.definition.model.PipelineQuery;
 import io.tiklab.matflow.pipeline.definition.model.PipelineRecently;
 import io.tiklab.matflow.pipeline.definition.service.PipelineService;
 import io.tiklab.user.user.model.User;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,8 +23,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/pipeline")
 public class PipelineController {
-
-    private static final Logger logger = LoggerFactory.getLogger(PipelineController.class);
 
     @Autowired
     PipelineService pipelineService;
@@ -164,6 +160,37 @@ public class PipelineController {
         return Result.ok(userPipeline);
     }
 
+
+    /**
+     * @pi.name:pipelineClone
+     * @pi.path:/pipeline/pipelineClone
+     * @pi.method:post
+     * @pi.request-type: formdata;
+     * @pi.param: name=pipelineId;dataType=string;value=pipelineId;
+     */
+    @RequestMapping(path="/pipelineClone",method = RequestMethod.POST)
+    public Result<Void> pipelineClone(@NotNull String pipelineId,@NotNull String pipelineName){
+
+        pipelineService.pipelineClone(pipelineId,pipelineName);
+
+        return Result.ok();
+    }
+
+
+    /**
+     * @pi.name:findPipelineCloneName
+     * @pi.path:/pipeline/findPipelineCloneName
+     * @pi.method:post
+     * @pi.request-type: formdata;
+     * @pi.param: name=pipelineId;dataType=string;value=pipelineId;
+     */
+    @RequestMapping(path="/findPipelineCloneName",method = RequestMethod.POST)
+    public Result<String> pindPipelineCloneName(@NotNull String pipelineId){
+
+        String name = pipelineService.findPipelineCloneName(pipelineId);
+
+        return Result.ok(name);
+    }
 
 }
 

@@ -13,7 +13,7 @@
     <artifactId>tiklab-matflow</artifactId>
     <name>${project.artifactId}</name>
     <packaging>pom</packaging>
-    <version>1.0.0.11</version>
+    <version>1.0.0-SNAPSHOT</version>
 
     <modules>
         <module>tiklab-matflow-api</module>
@@ -36,20 +36,20 @@
         <tiklab-gateway.version>1.0.0.3</tiklab-gateway.version>
         <tiklab-plugin.version>1.0.0.3</tiklab-plugin.version>
 
-        <tiklab-user.version>1.0.0.3</tiklab-user.version>
-        <tiklab-message.version>1.0.0.3</tiklab-message.version>
-        <tiklab-security.version>1.0.0.3</tiklab-security.version>
-        <tiklab-todotask.version>1.0.0.3</tiklab-todotask.version>
-        <tiklab-licence.version>1.0.0.3</tiklab-licence.version>
-        <tiklab-privilege.version>1.0.0.3</tiklab-privilege.version>
-        <tiklab-eam.version>1.0.0.3</tiklab-eam.version>
+        <tiklab-user.version>1.0.0-SNAPSHOT</tiklab-user.version>
+        <tiklab-message.version>1.0.0-SNAPSHOT</tiklab-message.version>
+        <tiklab-security.version>1.0.0-SNAPSHOT</tiklab-security.version>
+        <tiklab-todotask.version>1.0.0-SNAPSHOT</tiklab-todotask.version>
+        <tiklab-licence.version>1.0.0-SNAPSHOT</tiklab-licence.version>
+        <tiklab-privilege.version>1.0.0-SNAPSHOT</tiklab-privilege.version>
+        <tiklab-eam.version>1.0.0-SNAPSHOT</tiklab-eam.version>
 
         <tiklab-postin.version>1.0.0.3</tiklab-postin.version>
-        <tiklab-xcode.version>1.0.0.5</tiklab-xcode.version>
-        <tiklab-xpack.version>1.0.0.3</tiklab-xpack.version>
-        <tiklab-teston.version>1.0.0.3</tiklab-teston.version>
+        <tiklab-xcode.version>1.0.0-SNAPSHOT</tiklab-xcode.version>
+        <tiklab-xpack.version>1.0.0-SNAPSHOT</tiklab-xpack.version>
+        <tiklab-teston.version>1.0.0.6</tiklab-teston.version>
 
-        <tiklab-postgresql.version>1.0.0.3</tiklab-postgresql.version>
+        <tiklab-postgresql.version>1.0.0-SNAPSHOT</tiklab-postgresql.version>
         <tiklab-jdk.version>1.0.0.4</tiklab-jdk.version>
         <tiklab-upgrade.version>1.0.0.3</tiklab-upgrade.version>
 

@@ -187,7 +187,7 @@ public class PipelineFileUtil {
             writer.write(str);
             writer.flush();
         } catch (Exception e) {
-            throw new ApplicationException("文件写入失败。");
+            throw new ApplicationException("文件写入失败," + e.getMessage());
         }
     }
 
@@ -202,10 +202,6 @@ public class PipelineFileUtil {
             return null;
         }
 
-        // File file = new File(fileAddress);
-        // if (!file.exists()){
-        //     return null;
-        // }
         StringBuilder s = new StringBuilder();
         try {
             Path path = Paths.get(fileAddress);

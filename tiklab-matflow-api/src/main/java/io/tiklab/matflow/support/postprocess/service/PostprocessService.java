@@ -29,6 +29,9 @@ public interface PostprocessService {
      */
     List<Postprocess> findAllPipelinePostTask(String pipelineId);
 
+
+    void clonePostTask(String pipelineId,String clonePipelineId);
+
     /**
      * 查询任务后置处理
      * @param taskId 任务id

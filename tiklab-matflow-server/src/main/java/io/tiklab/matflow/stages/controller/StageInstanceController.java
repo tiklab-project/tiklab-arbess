@@ -33,8 +33,6 @@ public class StageInstanceController {
      * @pi.param: name=instanceId;dataType=string;value=instanceId;
      */
     @RequestMapping(path="/findStageInstance",method = RequestMethod.POST)
-    @ApiMethod(name = "findAllLog",desc = "查询日志")
-    @ApiParam(name = "instanceId",desc = "流水线实例id",required = true)
     public Result<List<StageInstance>> findStageInstance(@NotNull String instanceId){
 
         List<StageInstance> allLog = stageInstanceServer.findStageExecInstance(instanceId);

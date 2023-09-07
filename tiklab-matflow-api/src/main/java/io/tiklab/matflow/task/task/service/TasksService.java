@@ -130,6 +130,17 @@ public interface TasksService {
     List<Tasks> findAllTasks();
 
 
+    void clonePostTasks(String id ,String cloneId);
+
+
+    /**
+     * 克隆任务
+     * @param id id
+     * @param type 类型（pipelineId -- 流水线id，stageId -- 阶段id）
+     */
+    void cloneTasks(String id,String cloneId,String type);
+
+
     void updateTasks(Tasks tasks);
 
 }

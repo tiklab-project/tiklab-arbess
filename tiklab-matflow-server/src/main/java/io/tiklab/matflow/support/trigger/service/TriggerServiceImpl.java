@@ -94,6 +94,29 @@ public class TriggerServiceImpl implements TriggerService {
         return new ArrayList<>(triggerTimeList);
     }
 
+
+    public void cloneTrigger(String pipelineId,String clonePipelineId){
+        List<Trigger> allTrigger = findAllPipelineTrigger(pipelineId);
+        if (allTrigger == null){
+            return;
+        }
+        for (Trigger trigger : allTrigger) {
+            String triggerId = trigger.getTriggerId();
+            trigger.setPipeline(new Pipeline(clonePipelineId));
+            TriggerEntity triggerEntity = BeanMapper.map(trigger, TriggerEntity.class);
+            String triggerEntityId = triggerDao.createTriggerConfig(triggerEntity);
+
+            TriggerTime triggerTime = timeServer.findTriggerTime(triggerId);
+            List<Integer> timeList = triggerTime.getTimeList();
+            for (Integer integer : timeList) {
+                triggerTime.setDayTime(integer);
+                triggerTime.setTriggerId(triggerEntityId);
+                timeServer.createTriggerTime(triggerTime,clonePipelineId);
+            }
+        }
+
+    }
+
     /**
      * 删除流水线所有定时任务
      * @param pipelineId 流水线id

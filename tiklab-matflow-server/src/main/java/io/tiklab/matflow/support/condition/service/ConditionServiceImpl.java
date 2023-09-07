@@ -18,7 +18,7 @@ public class ConditionServiceImpl implements ConditionService {
     ConditionDao conditionDao;
 
     @Autowired
-    private VariableService variableService;
+    VariableService variableService;
 
     /**
      * 创建条件
@@ -38,7 +38,7 @@ public class ConditionServiceImpl implements ConditionService {
      */
     public Boolean variableCondition(String pipelineId,String taskId){
         List<Condition> allTaskCond = findAllTaskCond(taskId);
-        if (allTaskCond == null || allTaskCond.size() == 0 ){
+        if (allTaskCond == null || allTaskCond.isEmpty()){
             return true;
         }
         for (Condition condition : allTaskCond) {
@@ -93,7 +93,7 @@ public class ConditionServiceImpl implements ConditionService {
      */
     public List<Condition> findAllTaskCond(String taskId){
         List<Condition> allCond = conditionDao.findAllCond();
-        if (allCond.size() == 0){
+        if (allCond.isEmpty()){
             return null;
         }
         List<Condition> list = new ArrayList<>();
@@ -108,6 +108,15 @@ public class ConditionServiceImpl implements ConditionService {
         return list;
     }
 
+
+    @Override
+    public void cloneCond(String id ,String cloneId){
+        List<Condition> allTaskCond = findAllTaskCond(id);
+        for (Condition condition : allTaskCond) {
+            condition.setTaskId(cloneId);
+            createCond(condition);
+        }
+    }
 }
 
 

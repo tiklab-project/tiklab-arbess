@@ -37,6 +37,14 @@
             <outputDirectory>/</outputDirectory>
         </fileSet>
         <fileSet>
+            <directory>${basedir}/backups</directory>
+            <fileMode>755</fileMode>
+            <excludes>
+                <exclude>*.bat</exclude>
+            </excludes>
+            <outputDirectory>/backups</outputDirectory>
+        </fileSet>
+        <fileSet>
             <directory>${basedir}/bin</directory>
             <fileMode>755</fileMode>
             <excludes>

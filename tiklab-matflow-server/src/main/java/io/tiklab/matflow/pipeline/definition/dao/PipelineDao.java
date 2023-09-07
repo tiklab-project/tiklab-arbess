@@ -76,6 +76,7 @@ public class PipelineDao {
         return jpaTemplate.findList(PipelineEntity.class,idList);
     }
 
+    // 关联查询，查询出收藏的
     public Pagination<PipelineEntity> findPipelineListQuery(PipelineQuery query){
         String sql = "select pip_pipeline.* from pip_pipeline ";
         sql = sql.concat(" where id in ( ");
@@ -108,16 +109,20 @@ public class PipelineDao {
     }
 
     public List<PipelineEntity> findPipelineList(PipelineQuery query){
-        QueryCondition builders = QueryBuilders.createQuery(PipelineEntity.class)
-                .eq("userId",query.getUserId())
-                .eq("type",query.getPipelineType())
-                .eq("state",query.getPipelineState())
-                .eq("power",query.getPipelinePower())
-                .like("name",query.getPipelineName())
-                .in("id",query.getIdString())
+        QueryBuilders queryBuilders = QueryBuilders.createQuery(PipelineEntity.class)
+                .eq("userId", query.getUserId())
+                .eq("type", query.getPipelineType())
+                .eq("state", query.getPipelineState())
+                .eq("power", query.getPipelinePower());
+                if (query.isEqName()){
+                    queryBuilders.eq("name",query.getPipelineName());
+                }else {
+                    queryBuilders.like("name",query.getPipelineName());
+                }
+        QueryCondition queryCondition = queryBuilders.in("id", query.getIdString())
                 .orders(query.getOrderParams())
                 .get();
-        return jpaTemplate.findList(builders, PipelineEntity.class);
+        return jpaTemplate.findList(queryCondition, PipelineEntity.class);
     }
 
     public Pagination<PipelineEntity> findPipelinePage(PipelineQuery query){

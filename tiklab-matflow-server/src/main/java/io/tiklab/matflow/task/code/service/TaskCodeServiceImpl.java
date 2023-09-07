@@ -4,6 +4,7 @@ import io.tiklab.beans.BeanMapper;
 import io.tiklab.matflow.setting.model.AuthThird;
 import io.tiklab.matflow.setting.service.AuthService;
 import io.tiklab.matflow.setting.service.AuthThirdService;
+import io.tiklab.matflow.support.util.PipelineFinal;
 import io.tiklab.matflow.support.util.PipelineUtil;
 import io.tiklab.matflow.task.code.dao.TaskCodeDao;
 import io.tiklab.matflow.task.code.entity.TaskCodeEntity;
@@ -18,6 +19,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
+
+import static io.tiklab.matflow.support.util.PipelineFinal.TASK_CODE_DEFAULT_BRANCH;
 
 @Service
 @Exporter
@@ -79,23 +82,23 @@ public class TaskCodeServiceImpl implements TaskCodeService {
         String xcodeId = oneCodeEntity.getXcodeId();
         XcodeRepository repository = taskCodeXcodeService.findRepository(authId, xcodeId);
         taskCode.setRepository(repository);
-
+        // 查询不到仓库
         if (Objects.isNull(repository)){
             return taskCode;
         }
 
+        // 查询不到分支
         String codeBranch = oneCodeEntity.getBranchId();
         if (Objects.isNull(codeBranch)){
             return taskCode;
         }
         XcodeBranch branch = taskCodeXcodeService.findOneBranch(authId, repository.getId(), codeBranch);
-        taskCode.setBranch(branch);
-        if (codeBranch.equals("master") && Objects.isNull(branch)){
-            XcodeBranch branch1 = new XcodeBranch();
-            branch1.setName("master");
-            branch1.setId("master");
-            taskCode.setBranch(branch1);
+        if (Objects.isNull(branch)){
+            branch = new XcodeBranch();
+            branch.setName(TASK_CODE_DEFAULT_BRANCH);
+            branch.setId(TASK_CODE_DEFAULT_BRANCH);
         }
+        taskCode.setBranch(branch);
         return taskCode;
     }
 

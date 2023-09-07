@@ -25,7 +25,7 @@ import java.util.List;
 public class StageServiceImpl implements StageService {
 
     @Autowired
-    private StageDao stageDao;
+    StageDao stageDao;
 
     @Autowired
     TasksService tasksService;
@@ -42,7 +42,11 @@ public class StageServiceImpl implements StageService {
         Tasks tasks = new Tasks();
         tasks.setTaskType(taskType);
         tasks.setTaskSort(1);
-        boolean b = taskType.equals("git") || taskType.equals("gitlab") || taskType.equals("gitee") || taskType.equals("github") || taskType.equals("xcode");
+        boolean b = taskType.equals("git")
+                || taskType.equals("gitlab")
+                || taskType.equals("gitee")
+                || taskType.equals("github")
+                || taskType.equals("xcode");
 
         //是否为源码
         if (b){
@@ -123,6 +127,24 @@ public class StageServiceImpl implements StageService {
         }
     }
 
+    @Override
+    public void cloneStage(String pipelineId,String clonePipelineId){
+        List<Stage> allMainStage = findAllMainStage(pipelineId);
+        for (Stage stage : allMainStage) {
+            String stageId = stage.getStageId();
+            StageEntity cloneStageEntity = BeanMapper.map(stage, StageEntity.class);
+            cloneStageEntity.setPipelineId(clonePipelineId);
+            String cloneMainStagesId = stageDao.createStages(cloneStageEntity);
+            List<Stage> otherStageList = findOtherStage(stageId);
+            for (Stage otherStage : otherStageList) {
+                String otherStageId = otherStage.getStageId();
+                otherStage.setParentId(cloneMainStagesId);
+                StageEntity otherStageEntity = BeanMapper.map(otherStage, StageEntity.class);
+                String cloneOtherStagesId = stageDao.createStages(otherStageEntity);
+                tasksService.cloneTasks(otherStageId,cloneOtherStagesId,"stageId");
+            }
+        }
+    }
 
     /**
      * 判断任务是否存在代码源
@@ -173,18 +195,6 @@ public class StageServiceImpl implements StageService {
     public List<Stage> findAllMainStage(String pipelineId){
         List<StageEntity> pipelineStage = stageDao.findPipelineStage(pipelineId);
         return BeanMapper.mapList(pipelineStage,Stage.class);
-        // List<Stage> allStage = findAllPipelineStages(pipelineId);
-        // if ( allStage.size() == 0){
-        //     return Collections.emptyList();
-        // }
-        // List<Stage> list = new ArrayList<>();
-        // for (Stage stage : allStage) {
-        //     if (stage.getPipelineId().equals(pipelineId)){
-        //         list.add(stage);
-        //     }
-        // }
-        // list.sort(Comparator.comparing(Stage::getStageSort));
-        // return list;
     }
 
     @Override
@@ -201,27 +211,6 @@ public class StageServiceImpl implements StageService {
             list.add(stage);
         }
         return list;
-
-        // List<Stage> allStages = findAllStages();
-        // if (allStages == null || allStages.size() == 0){
-        //     return Collections.emptyList();
-        // }
-        // List<Stage> list = new ArrayList<>();
-        // for (Stage allStage : allStages) {
-        //     String id = allStage.getParentId();
-        //     if (id == null || !id.equals(stagesId)){
-        //         continue;
-        //     }
-        //     //获取阶段配置及任务
-        //     String stagesId1 = allStage.getStageId();
-        //
-        //     List<Tasks> allStagesConfig =
-        //             tasksService.finAllStageTaskOrTask(stagesId1);
-        //     allStage.setTaskValues(allStagesConfig);
-        //     list.add(allStage);
-        // }
-        // list.sort(Comparator.comparing(Stage::getStageSort));
-        // return list;
     }
 
     /**

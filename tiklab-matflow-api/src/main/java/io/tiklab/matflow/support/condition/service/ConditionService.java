@@ -50,6 +50,10 @@ public interface ConditionService {
      */
     List<Condition> findAllTaskCond(String taskId);
 
+
+    // 克隆条件
+    void cloneCond(String id ,String cloneId);
+
 }
 
 

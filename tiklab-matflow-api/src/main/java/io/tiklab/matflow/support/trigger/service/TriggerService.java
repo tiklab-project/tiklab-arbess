@@ -23,6 +23,9 @@ public interface TriggerService {
      */
     List<Object> findAllTrigger(String pipelineId);
 
+
+    void cloneTrigger(String pipelineId,String clonePipelineId);
+
     /**
      * 删除流水线所有定时任务
      * @param pipelineId 流水线id

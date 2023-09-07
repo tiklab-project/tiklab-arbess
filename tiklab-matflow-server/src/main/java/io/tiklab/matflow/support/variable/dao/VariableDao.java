@@ -2,8 +2,13 @@ package io.tiklab.matflow.support.variable.dao;
 
 import io.tiklab.beans.BeanMapper;
 import io.tiklab.dal.jpa.JpaTemplate;
+import io.tiklab.dal.jpa.criterial.condition.QueryCondition;
+import io.tiklab.dal.jpa.criterial.conditionbuilder.QueryBuilders;
+import io.tiklab.matflow.pipeline.definition.entity.PipelineEntity;
+import io.tiklab.matflow.pipeline.definition.model.PipelineQuery;
 import io.tiklab.matflow.support.variable.entity.VariableEntity;
 import io.tiklab.matflow.support.variable.model.Variable;
+import io.tiklab.matflow.support.variable.model.VariableQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -60,6 +65,25 @@ public class VariableDao {
     public List<Variable> findAllVariable(){
         List<VariableEntity> variableEntity = jpaTemplate.findAll(VariableEntity.class);
         return BeanMapper.mapList(variableEntity, Variable.class);
+    }
+
+
+    public List<VariableEntity> findVariableList(VariableQuery query){
+        QueryBuilders queryBuilders = QueryBuilders.createQuery(VariableEntity.class)
+                .eq("taskId",query.getTaskId())
+                .eq("varKey",query.getVarKey())
+                .eq("varValue",query.getVarValue());
+        if (query.getTaskType() != 0){
+            queryBuilders.eq("taskType", query.getTaskType());
+        }
+
+        if ( query.getType() != 0){
+            queryBuilders.eq("type",  query.getType());
+        }
+        QueryCondition queryCondition = queryBuilders
+                .orders(query.getOrderParams())
+                .get();
+        return jpaTemplate.findList(queryCondition, VariableEntity.class);
     }
 
 

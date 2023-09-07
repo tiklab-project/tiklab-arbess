@@ -37,13 +37,13 @@ dfs:
 #dcs config
 dcs:
   server:
-#    enabled: true
-    enabled: false
+    enabled: true
+#    enabled: false
     port: 5020
     datapath: ${DATA_HOME}/caches
   client:
-#    url: 127.0.0.1:5020
-    url: 127.0.0.1:5035
+    url: 127.0.0.1:5020
+#    url: 127.0.0.1:5035
     group: g1
     database: dcs1
     expire: 7200
@@ -67,11 +67,11 @@ datapath: ${DATA_HOME}/caches
 
 eas:
   embbed:
-#    enable: true
-    enable: false
-  address: http://192.168.10.19:8080
-  web:
-    address: http://192.168.10.11:3010
+    enable: true
+#    enable: false
+#  address: http://192.168.10.19:8080
+#  web:
+#    address: http://192.168.10.11:3010
 
 
 postgresql:

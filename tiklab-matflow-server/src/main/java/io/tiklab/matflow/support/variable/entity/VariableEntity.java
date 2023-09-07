@@ -35,6 +35,9 @@ public class VariableEntity {
     @Column(name = "task_id",notNull = true)
     private String taskId;
 
+    @Column(name = "pipeline_id",notNull = true)
+    private String pipelineId;
+
     @Column(name = "var_values",notNull = true)
     private String varValues;
 
@@ -101,6 +104,15 @@ public class VariableEntity {
 
     public void setTaskId(String taskId) {
         this.taskId = taskId;
+    }
+
+
+    public String getPipelineId() {
+        return pipelineId;
+    }
+
+    public void setPipelineId(String pipelineId) {
+        this.pipelineId = pipelineId;
     }
 }
 

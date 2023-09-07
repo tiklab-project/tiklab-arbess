@@ -14,10 +14,14 @@ import io.tiklab.matflow.pipeline.instance.model.PipelineInstance;
 import io.tiklab.matflow.pipeline.instance.service.PipelineInstanceService;
 import io.tiklab.matflow.stages.service.StageService;
 import io.tiklab.matflow.support.authority.service.PipelineAuthorityService;
+import io.tiklab.matflow.support.condition.service.ConditionService;
+import io.tiklab.matflow.support.postprocess.service.PostprocessService;
+import io.tiklab.matflow.support.trigger.service.TriggerService;
 import io.tiklab.matflow.support.util.PipelineFileUtil;
 import io.tiklab.matflow.support.util.PipelineFinal;
 import io.tiklab.matflow.support.util.PipelineUtil;
 import io.tiklab.matflow.support.util.PipelineUtilService;
+import io.tiklab.matflow.support.variable.service.VariableService;
 import io.tiklab.matflow.task.task.service.TasksService;
 import io.tiklab.rpc.annotation.Exporter;
 import io.tiklab.user.user.model.User;
@@ -68,6 +72,18 @@ public class PipelineServiceImpl implements PipelineService {
 
     @Autowired
     PipelineOpenService openService;
+
+    @Autowired
+    PostprocessService postprocessService;
+
+    @Autowired
+    TriggerService triggerService;
+
+    @Autowired
+    VariableService variableService;
+
+    @Autowired
+    ConditionService conditionService;
 
 
     private static final Logger logger = LoggerFactory.getLogger(PipelineServiceImpl.class);
@@ -234,6 +250,7 @@ public class PipelineServiceImpl implements PipelineService {
 
         String[] builders = authorityService.findUserPipelineIdString(loginId);
         query.setIdString(builders);
+        // 用户收藏的流水线
         Integer follow = query.getPipelineFollow();
         if (!Objects.isNull(follow) && follow == 1){
             query.setUserId(loginId);
@@ -276,56 +293,15 @@ public class PipelineServiceImpl implements PipelineService {
         }
         joinTemplate.joinQuery(list);
         return PaginationBuilder.build(pipelinePage,list);
+    }
 
-
-        // Pagination<PipelineEntity> userPipelineQuery;
-        // List<Pipeline> list = new ArrayList<>();
-        // // 查询收藏的流水线
-        // if (Objects.equals(query.getPipelineFollow(),1)){
-        //     // 当前用户未收藏流水线
-        //     if (Objects.equals(followPipeline.size(),0)){
-        //         return null;
-        //     }
-        //     String[] strings = new String[followPipeline.size()];
-        //     for (int i = 0; i < followPipeline.size(); i++) {
-        //         strings[i] = followPipeline.get(i).getPipeline().getId();
-        //     }
-        //     query.setIdString(strings);
-        //     userPipelineQuery = pipelineDao.findPipelinePage(query);
-        //     List<PipelineEntity> pipelineEntityList = userPipelineQuery.getDataList();
-        //     List<Pipeline> pipelineList = BeanMapper.mapList(pipelineEntityList, Pipeline.class);
-        //     for (Pipeline pipeline : pipelineList) {
-        //         pipeline.setCollect(1);
-        //         list.add(pipeline);
-        //     }
-        // } else {
-        //     // 获取用户有权限查看的流水线
-        //     String[] builder = authorityService.findUserPipelineIdString(loginId);
-        //     query.setIdString(builder);
-        //     userPipelineQuery =  pipelineDao.findPipelinePage(query);
-        //     List<PipelineEntity> pipelineEntityList = userPipelineQuery.getDataList();
-        //     List<Pipeline> pipelineList = BeanMapper.mapList(pipelineEntityList, Pipeline.class);
-        //     if (followPipeline.isEmpty()){
-        //         list.addAll(pipelineList);
-        //     }else {
-        //         for (Pipeline pipeline : pipelineList) {
-        //             String id = pipeline.getId();
-        //             // 查询用户是否收藏点前流水线
-        //             PipelineFollowQuery pipelineFollowQuery = new PipelineFollowQuery();
-        //             pipelineFollowQuery.setPipelineId(id);
-        //             pipelineFollowQuery.setUserId(loginId);
-        //             List<PipelineFollow> followQueryList = followService.findFollowQueryList(pipelineFollowQuery);
-        //             if (!followQueryList.isEmpty()){
-        //                 pipeline.setCollect(1);
-        //             }
-        //             list.add(pipeline);
-        //         }
-        //     }
-        // }
-        // if (Objects.isNull(userPipelineQuery.getDataList())){
-        //     return null;
-        // }
-        // return PaginationBuilder.build(userPipelineQuery,findAllExecMessage(list,0));
+    @Override
+    public List<Pipeline> findUserPipelineList(PipelineQuery query){
+        List<PipelineEntity> pipelineEntityList = pipelineDao.findPipelineList(query);
+        if (pipelineEntityList == null){
+            return Collections.emptyList();
+        }
+        return BeanMapper.mapList(pipelineEntityList,Pipeline.class);
     }
 
     @Override
@@ -336,7 +312,6 @@ public class PipelineServiceImpl implements PipelineService {
     @Override
     public List<PipelineRecently> findPipelineRecently(int number){
         String userId = LoginContext.getLoginId();
-        // List<String> userRunPipeline = instanceService.findUserPipelineInstance(userId,number);
 
         List<PipelineInstance> instanceList = instanceService.findUserPipelineInstance(userId,number);
         if (instanceList.isEmpty()){
@@ -348,10 +323,6 @@ public class PipelineServiceImpl implements PipelineService {
             joinTemplate.joinQuery(lastInstance);
             Pipeline pipeline = lastInstance.getPipeline();
             String pipelineId = pipeline.getId();
-            // PipelineInstance lastInstance = instanceService.findLastInstance(pipelineId);
-            // if (Objects.isNull(lastInstance)){
-            //     continue;
-            // }
             PipelineRecently recently = new PipelineRecently();
             recently.setPipelineId(pipelineId);
             recently.setPipelineName(pipeline.getName());
@@ -369,55 +340,86 @@ public class PipelineServiceImpl implements PipelineService {
             recently.setLastRunType(lastInstance.getRunWay());
             list.add(recently);
         }
-        // List<Pipeline> userPipeline = new ArrayList<>();
-        // for (String s : userRunPipeline) {
-        //     if (userPipeline.size() > number){
-        //         break;
-        //     }
-        //     PipelineEntity pipelineEntity = pipelineDao.findPipelineById(s);
-        //
-        //     if (!pipelineEntity.getUserId().equals(userId)){
-        //         continue;
-        //     }
-        //     userPipeline.add(BeanMapper.map(pipelineEntity, Pipeline.class));
-        // }
-        //
-        // List<PipelineRecently> list = new ArrayList<>();
-        // for (Pipeline pipeline : userPipeline) {
-        //     String pipelineId = pipeline.getId();
-        //     PipelineInstance lastInstance = instanceService.findLastInstance(pipelineId);
-        //     if (Objects.isNull(lastInstance)){
-        //         continue;
-        //     }
-        //     PipelineRecently recently = new PipelineRecently();
-        //     recently.setPipelineId(pipelineId);
-        //     recently.setPipelineName(pipeline.getName());
-        //     recently.setLastRunState(lastInstance.getRunStatus());
-        //     recently.setNumber(lastInstance.getFindNumber());
-        //     String createTime = lastInstance.getCreateTime();
-        //     recently.setCreateTime(createTime);
-        //     Date date = PipelineUtil.StringChengeDate(createTime);
-        //     String dateTime = PipelineUtil.findDateTime(date, 30);
-        //     recently.setExecTime(dateTime);
-        //     String formatted = PipelineUtil.formatDateTime(lastInstance.getRunTime());
-        //     recently.setLastRunTime(formatted);
-        //     recently.setColor(pipeline.getColor());
-        //     recently.setInstanceId(lastInstance.getInstanceId());
-        //     recently.setLastRunType(lastInstance.getRunWay());
-        //     list.add(recently);
-        // }
-        // list.sort(Comparator.comparing(PipelineRecently::getCreateTime).reversed());
-        // List<PipelineRecently> recentlyList = new ArrayList<>();
-        //
-        // for (int i = 0; i < list.size(); i++) {
-        //     PipelineRecently recently = list.get(i);
-        //     if (i >= number){
-        //         continue;
-        //     }
-        //     recentlyList.add(recently);
-        // }
-        // return recentlyList;
         return list;
+    }
+
+
+    public String findPipelineCloneName(String pipelineId){
+        Pipeline pipeline = findPipelineById(pipelineId);
+
+        if (Objects.isNull(pipeline)){
+            logger.error("没有查询到当前流水线信息,pipelineId:{}",pipelineId);
+            throw new ApplicationException("没有查询到当前流水线信息！");
+        }
+         String name = pipeline.getName() + "_copy";
+
+         // 匹配流水线名称
+         int i = 1;
+         PipelineQuery pipelineQuery = new PipelineQuery();
+         pipelineQuery.setPipelineName(name);
+         pipelineQuery.setEqName(true);
+         List<Pipeline> userPipelineList = findUserPipelineList(pipelineQuery);
+         while (!userPipelineList.isEmpty() && i < 31){
+            name = pipeline.getName() + "_copy_"+ i ;
+            pipelineQuery.setPipelineName(name);
+            userPipelineList = findUserPipelineList(pipelineQuery);
+            i ++ ;
+        }
+         return name;
+    }
+
+    @Override
+    public void pipelineClone(String pipelineId,String pipelineName) {
+        Pipeline pipeline = findPipelineById(pipelineId);
+
+        if (Objects.isNull(pipeline)){
+            logger.error("没有查询到当前流水线信息,pipelineId:{}",pipelineId);
+            throw new ApplicationException("没有查询到当前流水线信息！");
+        }
+
+       //  String name = pipeline.getName() + "_copy";
+       //
+       //  // 匹配流水线名称
+       //  int i = 1;
+       //  PipelineQuery pipelineQuery = new PipelineQuery();
+       //  pipelineQuery.setPipelineName(name);
+       //  pipelineQuery.setEqName(true);
+       //  List<Pipeline> userPipelineList = findUserPipelineList(pipelineQuery);
+       //  while (!userPipelineList.isEmpty() && i < 31){
+       //     name = pipeline.getName() + "_copy_"+ i ;
+       //     pipelineQuery.setPipelineName(name);
+       //     userPipelineList = findUserPipelineList(pipelineQuery);
+       //     i ++ ;
+       // }
+
+        pipeline.setName(pipelineName);
+
+        // 克隆流水线
+        PipelineEntity pipelineEntity = BeanMapper.map(pipeline, PipelineEntity.class);
+        String clonePipelineId = pipelineDao.createPipeline(pipelineEntity);
+
+        // 克隆流水线成员以及权限信息
+        authorityService.cloneDomainRole(pipelineId,clonePipelineId);
+
+        // 克隆任务
+        int type = pipeline.getType();
+        if (type == 1){
+            // 多任务
+            tasksService.cloneTasks(pipelineId,clonePipelineId,"pipelineId");
+        }else {
+            // 多阶段
+            stageService.cloneStage(pipelineId, clonePipelineId);
+        }
+
+        // 克隆后置任务
+        postprocessService.clonePostTask(pipelineId,clonePipelineId);
+
+        // 克隆触发器
+        triggerService.cloneTrigger(pipelineId,clonePipelineId);
+
+        // 克隆流水线变量
+        variableService.cloneVariable(pipelineId,clonePipelineId);
+
     }
 
     /**
@@ -457,7 +459,6 @@ public class PipelineServiceImpl implements PipelineService {
                 pipeline.setNumber(latelyHistory.getFindNumber());
                 pipeline.setInstanceId(latelyHistory.getInstanceId());
             }
-            // pipeline.setExecUser(latelyHistory.getUser());
         }
         pipeline.setCollect(integer);
         return pipeline;

@@ -146,6 +146,13 @@ public class PipelineAuthorityServiceImpl implements PipelineAuthorityService{
         List<PipelineEntity> pipelineEntities = pipelineDao.findPipelineList(query);
         return BeanMapper.mapList(pipelineEntities,Pipeline.class);
     }
+
+
+    public void cloneDomainRole(String sourceDomainId,String cloneDomainId){
+        dmRoleService.cloneDomainRole(sourceDomainId,cloneDomainId);
+    }
+
+
 }
 
 

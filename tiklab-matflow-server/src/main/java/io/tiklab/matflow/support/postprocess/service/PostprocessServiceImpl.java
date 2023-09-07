@@ -58,6 +58,7 @@ public class PostprocessServiceImpl implements PostprocessService {
         return postId;
     }
 
+    @Override
     public List<Postprocess> findAllPipelinePostTask(String pipelineId){
         List<PostprocessEntity> allPostEntity = postprocessDao.findPipelinePost(pipelineId);
         List<Postprocess> postprocessList = BeanMapper.mapList(allPostEntity, Postprocess.class);
@@ -74,6 +75,18 @@ public class PostprocessServiceImpl implements PostprocessService {
             list.add(postprocess);
         }
         return list;
+    }
+
+    @Override
+    public void clonePostTask(String pipelineId,String clonePipelineId){
+        List<PostprocessEntity> allPostEntity = postprocessDao.findPipelinePost(pipelineId);
+        List<Postprocess> postprocessList = BeanMapper.mapList(allPostEntity, Postprocess.class);
+        for (Postprocess postprocess : postprocessList) {
+            postprocess.setPipelineId(clonePipelineId);
+            PostprocessEntity postprocessEntity = BeanMapper.map(postprocess, PostprocessEntity.class);
+            String clonePostId = postprocessDao.createPost(postprocessEntity);
+            tasksService.clonePostTasks(postprocess.getPostprocessId(),clonePostId);
+        }
     }
 
     @Override
