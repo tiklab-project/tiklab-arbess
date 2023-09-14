@@ -95,7 +95,7 @@ public class MatFlowGatewayAutoConfiguration {
                         "/licence/import",
                         "/wechatCallback/instruct",
                         "/gui",
-                        "/pipeline/pipelineClone"
+                        "/disk/findDiskList"
                 })
                 .ignorePreUrls(new String[]{
                         "/service",

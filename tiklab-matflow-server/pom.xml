@@ -123,6 +123,12 @@
             <version>${tiklab-licence.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-compress</artifactId>
+            <version>${commons-compress}</version>
+        </dependency>
+
     </dependencies>
 
     <build>

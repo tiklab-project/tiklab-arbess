@@ -1,6 +1,7 @@
 package io.tiklab.matflow.support.util;
 
 import io.tiklab.core.exception.ApplicationException;
+import io.tiklab.core.exception.SystemException;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,6 +10,8 @@ import javax.validation.constraints.Null;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -244,6 +247,78 @@ public class PipelineFileUtil {
             logger.warn("文件删除成功！{}",file.getAbsolutePath());
         }
         return true;
+    }
+
+    /**
+     * 获取磁盘大小
+     * @param dir
+     * @return
+     */
+    public static float findDiskSize(String dir){
+        File folder = new File(dir);
+        if (!folder.exists()) {
+            throw new SystemException("文件夹不存在！");
+        }
+        while (folder.getParentFile() != null) {
+            folder = folder.getParentFile();
+        }
+        String rootPath = folder.getPath();
+        File root = new File(rootPath);
+        long diskSpace =  root.getTotalSpace();
+        float l = (float)diskSpace / (1024 * 1024 * 1024);
+        // 使用 BigDecimal 控制小数位数
+        BigDecimal decimalL = new BigDecimal(Float.toString(l));
+        decimalL = decimalL.setScale(2, RoundingMode.HALF_UP);
+
+        return decimalL.floatValue();
+    }
+
+    /**
+     * 获取文件夹大小
+     * @param dir 文件夹
+     * @param type 返回指定类型 mb 或 gb
+     * @return
+     */
+    public static float findDirSize(String dir,String type){
+        File folder = new File(dir);
+
+        if (!folder.exists()) {
+            return 0;
+        }
+        long diskSpace = calculateDiskSpace(folder);
+        if (type.equals(PipelineFinal.SIZE_TYPE_MB)){
+            // 转换成mb
+            float mbSize =(float) diskSpace / (1024 * 1024);
+            BigDecimal mbDecimalL = new BigDecimal(Float.toString(mbSize));
+            mbDecimalL = mbDecimalL.setScale(0, RoundingMode.HALF_UP);
+            mbSize = mbDecimalL.floatValue();
+
+            return mbSize;
+        }else {
+            // 转换成gb
+            float gbSize = (float)diskSpace / (1024 * 1024 *  1024);
+            BigDecimal decimalL = new BigDecimal(Float.toString(gbSize));
+            decimalL = decimalL.setScale(2, RoundingMode.HALF_UP);
+            gbSize = decimalL.floatValue();
+            return gbSize;
+        }
+
+    }
+
+
+    public static long calculateDiskSpace(File file) {
+        long space = 0;
+        if (file.isFile()) {
+            space = file.length();
+        } else if (file.isDirectory()) {
+            File[] files = file.listFiles();
+            if (files != null) {
+                for (File subFile : files) {
+                    space += calculateDiskSpace(subFile);
+                }
+            }
+        }
+        return space;
     }
 
 

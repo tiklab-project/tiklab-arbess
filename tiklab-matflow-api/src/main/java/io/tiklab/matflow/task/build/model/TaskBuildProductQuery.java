@@ -22,31 +22,35 @@ public class TaskBuildProductQuery {
         return type;
     }
 
-    public void setType(String type) {
+    public TaskBuildProductQuery setType(String type) {
         this.type = type;
+        return this;
     }
 
     public String getKey() {
         return key;
     }
 
-    public void setKey(String key) {
+    public TaskBuildProductQuery setKey(String key) {
         this.key = key;
+        return this;
     }
 
     public String getValue() {
         return value;
     }
 
-    public void setValue(String value) {
+    public TaskBuildProductQuery setValue(String value) {
         this.value = value;
+        return this;
     }
 
     public String getInstanceId() {
         return instanceId;
     }
 
-    public void setInstanceId(String instanceId) {
+    public TaskBuildProductQuery setInstanceId(String instanceId) {
         this.instanceId = instanceId;
+        return this;
     }
 }

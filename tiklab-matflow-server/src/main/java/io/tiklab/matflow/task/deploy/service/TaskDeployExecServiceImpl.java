@@ -362,28 +362,6 @@ public class TaskDeployExecServiceImpl implements TaskDeployExecService {
             sftp.mkdir(uploadAddress);
         }
 
-        // StringBuilder content = new StringBuilder();
-        // try (BufferedReader reader = new BufferedReader(new FileReader(localFile))) {
-        //     String line;
-        //     while ((line = reader.readLine()) != null) {
-        //         content.append(line).append("\n");
-        //     }
-        // } catch (FileNotFoundException e) {
-        //     throw new ApplicationException("找不到部署文件！");
-        // } catch (IOException e) {
-        //     throw new ApplicationException("读取制品文件失败！");
-        // }
-        //
-        // String unixEncodedContent = content.toString();
-        //
-        // File file = new File(localFile);
-        //
-        // try (OutputStream out = sftp.put(uploadAddress+"/"+file.getName(), ChannelSftp.OVERWRITE)) {
-        //     out.write(unixEncodedContent.getBytes());
-        // } catch (IOException e) {
-        //     throw new ApplicationException("制品上传失败！");
-        // }
-
         //ChannelSftp.OVERWRITE 覆盖上传
 
         sftp.put(localFile,uploadAddress,ChannelSftp.OVERWRITE);

@@ -1,4 +1,4 @@
-package io.tiklab.matflow.support.version;
+package io.tiklab.matflow.support.version.service;
 
 public interface PipelineVersionService {
 

@@ -74,10 +74,16 @@ eas:
 #    address: http://192.168.10.11:3010
 
 
+backups:
+  dir: /data/matflow
+  #    time: 0 */1 * * * ?
+  time: 0 0 2 * * ?
+
 postgresql:
   embbed:
     enable: false
   database: tiklab_matflow
+  type: local
 
 
 base:

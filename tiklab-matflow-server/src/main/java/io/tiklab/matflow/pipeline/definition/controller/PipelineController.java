@@ -153,7 +153,7 @@ public class PipelineController {
      * @pi.param: name=number;dataType=int;value=5;
      */
     @RequestMapping(path="/findPipelineRecently",method = RequestMethod.POST)
-    public Result<List<PipelineRecently>> findPipelineRecently(int number){
+    public Result<List<PipelineRecently>> findPipelineRecently(Integer number){
 
         List<PipelineRecently> userPipeline = pipelineService.findPipelineRecently(number);
 

@@ -157,10 +157,15 @@ public class PipelineFinal {
     public static final String TRIGGER_SCHEDULED = "scheduled";
 
 
+    public static final String SIZE_TYPE_MB = "MB";
+
+    public static final int DEFAULT_SIZE = 2;
 
 
+    public static final String SIZE_TYPE_GB = "GB";
 
 
+    public static final  Integer DEFAULT_CLEAN_CACHE_DAY = 7;
 
 
 

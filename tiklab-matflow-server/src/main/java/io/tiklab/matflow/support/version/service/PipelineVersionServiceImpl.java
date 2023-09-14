@@ -1,4 +1,4 @@
-package io.tiklab.matflow.support.version;
+package io.tiklab.matflow.support.version.service;
 
 import io.tiklab.licence.licence.model.Version;
 import io.tiklab.licence.licence.service.VersionService;
@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 public class PipelineVersionServiceImpl implements PipelineVersionService {
 
     @Autowired
-    private VersionService versionServer;
+    VersionService versionServer;
 
 
     @Override

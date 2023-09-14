@@ -4,11 +4,10 @@ import io.tiklab.core.exception.ApplicationException;
 import io.tiklab.matflow.pipeline.definition.dao.PipelineDao;
 import io.tiklab.matflow.pipeline.definition.entity.PipelineEntity;
 import io.tiklab.matflow.pipeline.definition.model.PipelineQuery;
-import io.tiklab.matflow.pipeline.execute.service.PipelineExecServiceImpl;
 import io.tiklab.matflow.setting.dao.ResourcesDao;
 import io.tiklab.matflow.setting.model.Resources;
 import io.tiklab.matflow.support.util.PipelineUtilService;
-import io.tiklab.matflow.support.version.PipelineVersionService;
+import io.tiklab.matflow.support.version.service.PipelineVersionService;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,7 +15,6 @@ import org.springframework.stereotype.Service;
 import java.io.File;
 import java.util.Calendar;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 @Service

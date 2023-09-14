@@ -16,6 +16,7 @@ password=""
 #数据库信息
 db=""
 schema=""
+version=""
 
 
 #解析参数
@@ -58,12 +59,19 @@ for arg in "$@"; do
       schema=$2
       shift 2
       ;;
+    -v)
+      version=$2
+      shift 2
+      ;;
   esac
 done
 
 #数据库可执行文件地址
-db_dir=${dir}/embbed/pgsql-10.23/bin
-#db_dir=/usr/bin
+if [ "${version}" = "15" ]; then
+   db_dir=/usr/bin
+  else
+   db_dir=${dir}/embbed/pgsql-10.23/bin
+fi
 
 #效验参数
 valid_overall_parameters(){
@@ -73,6 +81,10 @@ valid_overall_parameters(){
   fi
   if [ -z "${type}" ]; then
       echo "Execution type cannot be empty"
+      exit 1
+  fi
+  if [ -z "${version}" ]; then
+      echo "Execution version cannot be empty"
       exit 1
   fi
 }
@@ -117,9 +129,15 @@ restore(){
   export PGPASSWORD=${password} &&  ${db_dir}/psql -U ${username} -d ${db} -n ${schema} -h ${ip} -p ${port} -f ${backups_dir}
 }
 
+create(){
+   export PGPASSWORD=${password} &&  ${db_dir}/psql -U ${username} -d ${db} -h ${ip} -p ${port} -c "CREATE SCHEMA IF NOT EXISTS ${schema};"
+}
+
 clean(){
   export PGPASSWORD=${password} &&  ${db_dir}/psql -U ${username} -d ${db} -h ${ip} -p ${port} -c "DROP SCHEMA IF EXISTS ${schema} CASCADE;"
-  export PGPASSWORD=${password} &&  ${db_dir}/psql -U ${username} -d ${db} -h ${ip} -p ${port} -c "CREATE SCHEMA IF NOT EXISTS ${schema};"
+  if [ "${version}" = "10" ]; then
+      create
+  fi
 }
 
 echo "Validate backup data......"

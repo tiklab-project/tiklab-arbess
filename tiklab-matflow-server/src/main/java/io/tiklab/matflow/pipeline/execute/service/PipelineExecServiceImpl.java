@@ -11,16 +11,16 @@ import io.tiklab.matflow.pipeline.instance.model.PipelineInstanceQuery;
 import io.tiklab.matflow.pipeline.instance.service.PipelineInstanceService;
 import io.tiklab.matflow.setting.service.ResourcesService;
 import io.tiklab.matflow.stages.service.StageExecService;
+import io.tiklab.matflow.support.disk.service.DiskService;
 import io.tiklab.matflow.support.postprocess.service.PostprocessExecService;
 import io.tiklab.matflow.support.util.PipelineFinal;
 import io.tiklab.matflow.support.util.PipelineUtilService;
-import io.tiklab.matflow.support.version.PipelineVersionService;
+import io.tiklab.matflow.support.version.service.PipelineVersionService;
 import io.tiklab.matflow.task.task.model.TaskExecMessage;
 import io.tiklab.matflow.task.task.model.Tasks;
 import io.tiklab.matflow.task.task.service.TasksExecService;
 import io.tiklab.matflow.task.task.service.TasksService;
 import io.tiklab.rpc.annotation.Exporter;
-import io.tiklab.rpc.common.context.RpcTenantHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,6 +69,9 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
     PipelineUtilService utilService;
 
     @Autowired
+    DiskService diskService;
+
+    @Autowired
     JoinTemplate joinTemplate;
 
     public final Logger logger = LoggerFactory.getLogger(PipelineExecServiceImpl.class);
@@ -93,6 +96,8 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
     @Override
     public PipelineInstance start(PipelineRunMsg runMsg) {
 
+        diskService.ValidationStorageSpace();
+
         resourcesService.judgeResources();
 
         // 判断同一任务是否在运行
@@ -101,7 +106,7 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
         // 放入等待执行的缓存中
         if (pipeline.getState() == 3 ){
             logger.warn("并行任务已满，等待执行！");
-            throw new ApplicationException("并行任务已满，等待执行！");
+            throw new ApplicationException(2000,"并行任务已满，等待执行！");
         }
 
         return beginExecPipeline(runMsg);

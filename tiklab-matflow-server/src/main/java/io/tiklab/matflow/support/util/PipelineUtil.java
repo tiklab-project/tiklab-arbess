@@ -144,7 +144,7 @@ public class PipelineUtil {
             }
         }
 
-        if (time.equals("")){
+        if (time.isEmpty()){
             return null;
         }
         return time + "前";
@@ -279,9 +279,6 @@ public class PipelineUtil {
             return false;
         }
         if (s.equals(" ")){
-            return false;
-        }
-        if (s.equals("")){
             return false;
         }
         if (s.equals("\n")){
