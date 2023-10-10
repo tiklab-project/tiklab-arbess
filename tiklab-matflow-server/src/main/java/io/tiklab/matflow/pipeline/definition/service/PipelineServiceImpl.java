@@ -377,21 +377,6 @@ public class PipelineServiceImpl implements PipelineService {
             throw new ApplicationException("没有查询到当前流水线信息！");
         }
 
-       //  String name = pipeline.getName() + "_copy";
-       //
-       //  // 匹配流水线名称
-       //  int i = 1;
-       //  PipelineQuery pipelineQuery = new PipelineQuery();
-       //  pipelineQuery.setPipelineName(name);
-       //  pipelineQuery.setEqName(true);
-       //  List<Pipeline> userPipelineList = findUserPipelineList(pipelineQuery);
-       //  while (!userPipelineList.isEmpty() && i < 31){
-       //     name = pipeline.getName() + "_copy_"+ i ;
-       //     pipelineQuery.setPipelineName(name);
-       //     userPipelineList = findUserPipelineList(pipelineQuery);
-       //     i ++ ;
-       // }
-
         pipeline.setName(pipelineName);
 
         // 克隆流水线
@@ -419,6 +404,11 @@ public class PipelineServiceImpl implements PipelineService {
 
         // 克隆流水线变量
         variableService.cloneVariable(pipelineId,clonePipelineId);
+
+    }
+
+    @Override
+    public void importPipelineYaml(String pipelineId) {
 
     }
 

@@ -101,6 +101,8 @@ public interface PipelineService {
 
 
 
+    void importPipelineYaml(String pipelineId);
+
 }
 
 
