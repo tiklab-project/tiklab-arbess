@@ -15,7 +15,7 @@ public class TaskScriptEntity {
     private String name;
 
     @Column(name = "type")
-    private int type;
+    private String type;
 
     @Column(name = "script_order")
     private String scriptOrder;
@@ -36,12 +36,13 @@ public class TaskScriptEntity {
         this.name = name;
     }
 
-    public int getType() {
+    public String getType() {
         return type;
     }
 
-    public void setType(int type) {
+    public TaskScriptEntity setType(String type) {
         this.type = type;
+        return this;
     }
 
     public String getScriptOrder() {

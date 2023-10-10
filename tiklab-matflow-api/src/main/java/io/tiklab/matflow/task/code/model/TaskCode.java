@@ -63,91 +63,102 @@ public class TaskCode {
     private String type;
 
 
-    public XcodeRepository getRepository() {
-        return repository;
-    }
-
-    public void setRepository(XcodeRepository repository) {
-        this.repository = repository;
-    }
-
-    public XcodeBranch getBranch() {
-        return branch;
-    }
-
-    public void setBranch(XcodeBranch branch) {
-        this.branch = branch;
-    }
-
     public String getTaskId() {
         return taskId;
     }
 
-    public void setTaskId(String taskId) {
+    public TaskCode setTaskId(String taskId) {
         this.taskId = taskId;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
+        return this;
     }
 
     public String getCodeName() {
         return codeName;
     }
 
-    public void setCodeName(String codeName) {
+    public TaskCode setCodeName(String codeName) {
         this.codeName = codeName;
+        return this;
     }
 
     public String getCodeAddress() {
         return codeAddress;
     }
 
-    public void setCodeAddress(String codeAddress) {
+    public TaskCode setCodeAddress(String codeAddress) {
         this.codeAddress = codeAddress;
+        return this;
     }
 
     public String getCodeBranch() {
         return codeBranch;
     }
 
-    public void setCodeBranch(String codeBranch) {
+    public TaskCode setCodeBranch(String codeBranch) {
         this.codeBranch = codeBranch;
+        return this;
     }
 
     public String getAuthId() {
         return authId;
     }
 
-    public void setAuthId(String authId) {
+    public TaskCode setAuthId(String authId) {
         this.authId = authId;
-    }
-
-    public int getSort() {
-        return sort;
-    }
-
-    public void setSort(int sort) {
-        this.sort = sort;
-    }
-
-    public Object getAuth() {
-        return auth;
-    }
-
-    public void setAuth(Object auth) {
-        this.auth = auth;
+        return this;
     }
 
     public String getSvnFile() {
         return svnFile;
     }
 
-    public void setSvnFile(String svnFile) {
+    public TaskCode setSvnFile(String svnFile) {
         this.svnFile = svnFile;
+        return this;
+    }
+
+    public XcodeRepository getRepository() {
+        return repository;
+    }
+
+    public TaskCode setRepository(XcodeRepository repository) {
+        this.repository = repository;
+        return this;
+    }
+
+    public XcodeBranch getBranch() {
+        return branch;
+    }
+
+    public TaskCode setBranch(XcodeBranch branch) {
+        this.branch = branch;
+        return this;
+    }
+
+    public Object getAuth() {
+        return auth;
+    }
+
+    public TaskCode setAuth(Object auth) {
+        this.auth = auth;
+        return this;
+    }
+
+    public int getSort() {
+        return sort;
+    }
+
+    public TaskCode setSort(int sort) {
+        this.sort = sort;
+        return this;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public TaskCode setType(String type) {
+        this.type = type;
+        return this;
     }
 }

@@ -21,6 +21,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import static io.tiklab.matflow.support.util.PipelineFinal.TASK_SCRIPT_BAT;
+import static io.tiklab.matflow.support.util.PipelineFinal.TASK_SCRIPT_SHELL;
+
 /**
  * 执行bat,sh脚本
  */
@@ -51,24 +54,24 @@ public class TaskScriptExecServiceImpl implements TaskScriptExecService {
         }
 
         TaskScript script = (TaskScript) task.getValues();
-        script.setType(taskType);
+        // script.setType(taskType);
         String name = task.getTaskName();
         String type = script.getType();
-        if (type.equals("71")|| type.equals("bat")){
+        if (type.equals(TASK_SCRIPT_BAT)){
             name = "Bat脚本";
         }
-        if (type.equals("72")|| type.equals("shell")){
+        if (type.equals(TASK_SCRIPT_SHELL)){
             name = "Shell脚本";
         }
         tasksInstanceService.writeExecLog(taskId,  PipelineUtil.date(4)+"执行："+name);
 
         // 效验系统是否可以执行当前脚本
         int systemType = PipelineUtil.findSystemType();
-        if (systemType == 1 && (type.equals("72")|| type.equals("shell")) ){
+        if (systemType == 1 && (type.equals(TASK_SCRIPT_SHELL)) ){
             tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+ "Windows系统无法执行Shell脚本。");
             return false;
         }
-        if (systemType == 2 &&  (type.equals("71")|| type.equals("bat") )){
+        if (systemType == 2 &&  ( type.equals(TASK_SCRIPT_BAT) )){
             tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+ "Linux系统无法执行Bat脚本。");
             return false;
         }
@@ -77,7 +80,7 @@ public class TaskScriptExecServiceImpl implements TaskScriptExecService {
         String key = variableServer.replaceVariable(pipelineId, taskId, script.getScriptOrder());
 
         try {
-            if (type.equals("71")|| type.equals("bat")){
+            if (type.equals(TASK_SCRIPT_BAT)){
                 execBat(key,taskId);
             }else {
                 execShell(key,taskId);
@@ -88,34 +91,6 @@ public class TaskScriptExecServiceImpl implements TaskScriptExecService {
             tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"任务："+name+"执行失败！");
             return false;
         }
-
-        // List<String> list = PipelineUtil.execOrder(order);
-        // if (list.size() == 0){
-        //     tasksInstanceService.writeExecLog(taskId, "\n"+ PipelineUtil.date(4)+"任务："+name+"执行完成。");
-        //     return true;
-        // }
-        //
-        // try {
-        //     for (String s : list) {
-        //         String key = variableServer.replaceVariable(pipelineId, taskId, s);
-        //         tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+ "执行："+key );
-        //         String fileAddress = utilService.findPipelineDefaultAddress(pipelineId,1);
-        //         Process process = PipelineUtil.process(fileAddress, key);
-        //         String enCode = PipelineFinal.UTF_8;
-        //         if (PipelineUtil.findSystemType() == 1){
-        //             enCode = PipelineFinal.GBK;
-        //         }
-        //         boolean result = tasksInstanceService.readCommandExecResult(process, enCode, new HashMap<>(), taskId);
-        //         if (!result){
-        //             tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"任务："+task.getTaskName()+"执行失败。");
-        //             return false;
-        //         }
-        //     }
-        // }catch (IOException | ApplicationException e){
-        //     String s = PipelineUtil.date(4) + e.getMessage();
-        //     tasksInstanceService.writeExecLog(taskId,s);
-        //     return false;
-        // }
 
         tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"任务："+name+"执行完成。");
         return true;

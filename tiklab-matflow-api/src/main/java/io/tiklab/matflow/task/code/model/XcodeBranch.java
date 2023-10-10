@@ -12,15 +12,17 @@ public class XcodeBranch {
         return id;
     }
 
-    public void setId(String id) {
+    public XcodeBranch setId(String id) {
         this.id = id;
+        return this;
     }
 
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
+    public XcodeBranch setName(String name) {
         this.name = name;
+        return this;
     }
 }

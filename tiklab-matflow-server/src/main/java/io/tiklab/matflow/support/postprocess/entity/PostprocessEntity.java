@@ -9,11 +9,11 @@ public class PostprocessEntity {
     //id
     @Id
     @GeneratorValue(length = 12)
-    @Column(name = "postprocess_id")
-    private String postprocessId;
+    @Column(name = "post_id")
+    private String postId;
 
-    @Column(name = "name")
-    private String name;
+    @Column(name = "post_name")
+    private String postName;
 
     @Column(name = "task_sort")
     private int taskSort;
@@ -38,20 +38,22 @@ public class PostprocessEntity {
         this.pipelineId = pipelineId;
     }
 
-    public String getPostprocessId() {
-        return postprocessId;
+    public String getPostId() {
+        return postId;
     }
 
-    public void setPostprocessId(String postprocessId) {
-        this.postprocessId = postprocessId;
+    public PostprocessEntity setPostId(String postId) {
+        this.postId = postId;
+        return this;
     }
 
-    public String getName() {
-        return name;
+    public String getPostName() {
+        return postName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public PostprocessEntity setPostName(String postName) {
+        this.postName = postName;
+        return this;
     }
 
     public int getTaskSort() {

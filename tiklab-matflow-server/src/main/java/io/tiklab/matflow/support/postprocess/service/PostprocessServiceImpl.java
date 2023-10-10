@@ -40,10 +40,11 @@ public class PostprocessServiceImpl implements PostprocessService {
             int size = taskPost.size();
             postprocess.setTaskSort(size);
         }
+
         // 设置默认名称
-        if (Objects.isNull(postprocess.getName())){
+        if (Objects.isNull(postprocess.getPostName())){
             String name = tasksService.initDifferentTaskName(postprocess.getTaskType());
-            postprocess.setName(name);
+            postprocess.setPostName(name);
         }
 
         PostprocessEntity postprocessEntity = BeanMapper.map(postprocess, PostprocessEntity.class);
@@ -67,7 +68,7 @@ public class PostprocessServiceImpl implements PostprocessService {
         }
         List<Postprocess> list = new ArrayList<>();
         for (Postprocess postprocess : postprocessList) {
-            String postprocessId = postprocess.getPostprocessId();
+            String postprocessId = postprocess.getPostId();
             Tasks tasks = tasksService.findOnePostTaskOrTask(postprocessId);
             postprocess.setTask(tasks);
             String taskType = tasks.getTaskType();
@@ -85,7 +86,7 @@ public class PostprocessServiceImpl implements PostprocessService {
             postprocess.setPipelineId(clonePipelineId);
             PostprocessEntity postprocessEntity = BeanMapper.map(postprocess, PostprocessEntity.class);
             String clonePostId = postprocessDao.createPost(postprocessEntity);
-            tasksService.clonePostTasks(postprocess.getPostprocessId(),clonePostId);
+            tasksService.clonePostTasks(postprocess.getPostId(),clonePostId);
         }
     }
 
@@ -98,7 +99,7 @@ public class PostprocessServiceImpl implements PostprocessService {
         }
         List<Postprocess> list = new ArrayList<>();
         for (Postprocess postprocess : postprocessList) {
-            String id = postprocess.getPostprocessId();
+            String id = postprocess.getPostId();
             Tasks tasks = tasksService.findOnePostTaskOrTask(id);
             String taskType = tasks.getTaskType();
             postprocess.setTaskType(taskType);
@@ -137,9 +138,9 @@ public class PostprocessServiceImpl implements PostprocessService {
 
     @Override
     public void updatePostTask(Postprocess postprocess) {
-        String postprocessId = postprocess.getPostprocessId();
+        String postprocessId = postprocess.getPostId();
         Postprocess onePost = findOnePost(postprocessId);
-        onePost.setName(postprocess.getName());
+        onePost.setPostName(postprocess.getPostName());
         postprocessDao.updatePost(BeanMapper.map(onePost,PostprocessEntity.class));
 
         Tasks task = tasksService.findOnePostTask(postprocessId);
@@ -157,7 +158,7 @@ public class PostprocessServiceImpl implements PostprocessService {
     @Override
     public Postprocess findOnePostOrTask(String postprocessId) {
         Postprocess postprocess = findOnePost(postprocessId);
-        String id = postprocess.getPostprocessId();
+        String id = postprocess.getPostId();
         Tasks taskOrTask = tasksService.findOnePostTaskOrTask(id);
         postprocess.setTask(taskOrTask);
         postprocess.setTaskType(taskOrTask.getTaskType());

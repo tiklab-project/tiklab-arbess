@@ -13,11 +13,11 @@ import io.tiklab.postin.annotation.ApiProperty;
 @Mapper
 public class Postprocess {
 
-    @ApiProperty(name = "postprocessId",desc="id")
-    private String postprocessId;
+    @ApiProperty(name = "postId",desc="id")
+    private String postId;
 
-    @ApiProperty(name = "name",desc="名称")
-    private String name;
+    @ApiProperty(name = "postName",desc="名称")
+    private String postName;
 
     @ApiProperty(name = "taskType",desc="类型 61:消息通知 71:bat脚本 72:sh脚本")
     private String taskType;
@@ -57,12 +57,13 @@ public class Postprocess {
         this.pipelineId = pipelineId;
     }
 
-    public String getPostprocessId() {
-        return postprocessId;
+    public String getPostId() {
+        return postId;
     }
 
-    public void setPostprocessId(String postprocessId) {
-        this.postprocessId = postprocessId;
+    public Postprocess setPostId(String postId) {
+        this.postId = postId;
+        return this;
     }
 
     public Tasks getTask() {
@@ -73,12 +74,13 @@ public class Postprocess {
         this.task = task;
     }
 
-    public String getName() {
-        return name;
+    public String getPostName() {
+        return postName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public Postprocess setPostName(String postName) {
+        this.postName = postName;
+        return this;
     }
 
     public String getTaskType() {

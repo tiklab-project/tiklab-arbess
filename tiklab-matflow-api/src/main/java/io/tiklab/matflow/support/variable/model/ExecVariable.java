@@ -13,8 +13,8 @@ import java.util.List;
 @ApiModel
 public class ExecVariable {
 
-    @ApiProperty(name="taskType",desc="类型 1.字符串 2.单选")
-    private int taskType;
+    @ApiProperty(name="varType",desc="类型 str.字符串 single.单选")
+    private String varType;
 
     @ApiProperty(name = "varKey",desc="名称")
     private String varKey;
@@ -26,35 +26,39 @@ public class ExecVariable {
     private String pipelineId;
 
 
-    public int getTaskType() {
-        return taskType;
+    public String getVarType() {
+        return varType;
     }
 
-    public void setTaskType(int taskType) {
-        this.taskType = taskType;
+    public ExecVariable setVarType(String varType) {
+        this.varType = varType;
+        return this;
     }
 
     public String getVarKey() {
         return varKey;
     }
 
-    public void setVarKey(String varKey) {
+    public ExecVariable setVarKey(String varKey) {
         this.varKey = varKey;
+        return this;
     }
 
     public Object getVarValue() {
         return varValue;
     }
 
-    public void setVarValue(Object varValue) {
+    public ExecVariable setVarValue(Object varValue) {
         this.varValue = varValue;
+        return this;
     }
 
     public String getPipelineId() {
         return pipelineId;
     }
 
-    public void setPipelineId(String pipelineId) {
+    public ExecVariable setPipelineId(String pipelineId) {
         this.pipelineId = pipelineId;
+        return this;
     }
 }

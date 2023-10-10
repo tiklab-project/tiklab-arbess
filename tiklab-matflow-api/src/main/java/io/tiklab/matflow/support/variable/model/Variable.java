@@ -21,8 +21,8 @@ public class Variable {
     @ApiProperty(name="createTime",desc="创建时间")
     private String createTime;
 
-    @ApiProperty(name="taskType",desc="类型 1.字符串 2.单选")
-    private int taskType;
+    @ApiProperty(name="varType",desc="类型 str.字符串 single .单选")
+    private String varType;
 
     @ApiProperty(name="type",desc="类型 1.全局 2.项目")
     private int type;
@@ -69,12 +69,13 @@ public class Variable {
         this.createTime = createTime;
     }
 
-    public int getTaskType() {
-        return taskType;
+    public String getVarType() {
+        return varType;
     }
 
-    public void setTaskType(int taskType) {
-        this.taskType = taskType;
+    public Variable setVarType(String varType) {
+        this.varType = varType;
+        return this;
     }
 
     public int getType() {

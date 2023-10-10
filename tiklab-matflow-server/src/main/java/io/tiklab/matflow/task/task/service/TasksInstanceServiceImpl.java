@@ -105,7 +105,7 @@ public class TasksInstanceServiceImpl implements TasksInstanceService {
     public List<TaskInstance> findAllInstanceInstance(String instanceId) {
         List<TaskInstanceEntity> pipelineInstance = taskInstanceDao.findPipelineInstance(instanceId);
         List<TaskInstance> allInstance = BeanMapper.mapList(pipelineInstance, TaskInstance.class);
-        if (Objects.isNull(allInstance) || allInstance.size() == 0){
+        if (Objects.isNull(allInstance) || allInstance.isEmpty()){
             return Collections.emptyList();
         }
         allInstance.sort(Comparator.comparing(TaskInstance::getTaskSort));
@@ -147,7 +147,6 @@ public class TasksInstanceServiceImpl implements TasksInstanceService {
                 list.add(instance);
             }
         }
-        // list.sort(Comparator.comparing(TaskInstance::getTaskSort));
         TaskInstance taskInstance = findPostPipelineRunMessage(instanceId,true);
         if (!Objects.isNull(taskInstance)){
             list.add(list.size(),taskInstance);
@@ -202,6 +201,7 @@ public class TasksInstanceServiceImpl implements TasksInstanceService {
         String time = PipelineUtil.formatDateTime(runTime);
         taskInstances4.setRunTimeDate(time);
         taskInstances4.setRunTime(runTime);
+        taskInstances4.setTaskType("post");
         taskInstances4.setTaskName("后置处理");
         taskInstances4.setId("post");
         return taskInstances4;

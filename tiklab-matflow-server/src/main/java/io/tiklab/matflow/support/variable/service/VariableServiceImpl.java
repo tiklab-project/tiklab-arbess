@@ -24,7 +24,7 @@ public class VariableServiceImpl implements VariableService {
         Map<String , String > map = new HashMap<>();
         //替换全局变量
         List<Variable> allVariable = findAllVariable(pipelineId);
-        if (allVariable.size() != 0){
+        if (!allVariable.isEmpty()){
             for (Variable variable : allVariable) {
                 String varKey = variable.getVarKey();
                 String varValue = variable.getVarValue();
@@ -33,7 +33,7 @@ public class VariableServiceImpl implements VariableService {
         }
         //替换局部变量
         List<Variable> variableList = findAllVariable(taskId);
-        if (variableList.size() != 0){
+        if (!variableList.isEmpty()){
             for (Variable variable : variableList) {
                 String varValue = variable.getVarValue();
                 String varKey = variable.getVarKey();
@@ -47,9 +47,9 @@ public class VariableServiceImpl implements VariableService {
 
     @Override
     public String createVariable(Variable variable) {
-        int taskType = variable.getTaskType();
+        String taskType = variable.getVarType();
         variable.setCreateTime(PipelineUtil.date(1));
-        if (taskType == 2){
+        if (taskType.equals("single")){
             String values = updateValues(variable.getValueList());
             variable.setVarValues(values);
         }
@@ -83,8 +83,8 @@ public class VariableServiceImpl implements VariableService {
      */
     @Override
     public void updateVariable(Variable variable) {
-        int taskType = variable.getTaskType();
-        if (taskType == 2){
+        String taskType = variable.getVarType();
+        if (taskType.equals("single")){
             String values = updateValues(variable.getValueList());
             variable.setVarValues(values);
         }
@@ -107,7 +107,7 @@ public class VariableServiceImpl implements VariableService {
      */
     public List<Variable> findAllVariable() {
         List<Variable> allVariable = variableDao.findAllVariable();
-        if (allVariable == null || allVariable.size() == 0){
+        if (allVariable == null || allVariable.isEmpty()){
             return Collections.emptyList();
         }
         return allVariable;
@@ -121,7 +121,7 @@ public class VariableServiceImpl implements VariableService {
     @Override
     public List<Variable> findAllVariable(String taskId) {
         List<Variable> allVariable = findAllVariable();
-        if (allVariable.size() == 0){
+        if (allVariable.isEmpty()){
             return Collections.emptyList();
         }
         List<Variable> list = new ArrayList<>();
@@ -130,7 +130,7 @@ public class VariableServiceImpl implements VariableService {
             if (id == null ||!id.equals(taskId)){
                 continue;
             }
-            if (variable.getTaskType()==2){
+            if (variable.getVarType().equals("single")){
                 String values = variable.getVarValues();
                 String[] split = values.split(",");
                 List<String> stringList = new ArrayList<>(List.of(split));
@@ -145,7 +145,7 @@ public class VariableServiceImpl implements VariableService {
     @Override
     public List<Variable> findVariableList(VariableQuery query){
         List<VariableEntity> variableList = variableDao.findVariableList(query);
-        if (variableList == null || variableList.size() == 0){
+        if (variableList == null || variableList.isEmpty()){
             return Collections.emptyList();
         }
         return BeanMapper.mapList(variableList, Variable.class);

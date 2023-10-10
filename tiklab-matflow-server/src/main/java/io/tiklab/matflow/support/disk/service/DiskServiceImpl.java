@@ -49,22 +49,22 @@ public class DiskServiceImpl implements DiskService {
 
     @Override
     public void ValidationStorageSpace(){
-        throw new SystemException(9000,"系统空间不足，请先清理过后在运行!");
+        // throw new SystemException(9000,"系统空间不足，请先清理过后在运行!");
 
-       // String defaultAddress = utilService.instanceAddress(1);
-       //
-       // File file = new File(defaultAddress);
-       //
-       // File parentFile = file.getParentFile();
-       // String dir = parentFile.getAbsolutePath();
-       //
-       // float diskSize = PipelineFileUtil.findDiskSize(dir);
-       //
-       // float dirSize = PipelineFileUtil.findDirSize(dir, SIZE_TYPE_GB);
-       //
-       // if ((diskSize - dirSize) < PipelineFinal.DEFAULT_SIZE){
-       //      throw new SystemException(9000,"系统空间不足，请先清理过后在运行!");
-       // }
+       String defaultAddress = utilService.instanceAddress(1);
+
+       File file = new File(defaultAddress);
+
+       File parentFile = file.getParentFile();
+       String dir = parentFile.getAbsolutePath();
+
+       float diskSize = PipelineFileUtil.findDiskSize(dir);
+
+       float dirSize = PipelineFileUtil.findDirSize(dir, SIZE_TYPE_GB);
+
+       if ((diskSize - dirSize) < PipelineFinal.DEFAULT_SIZE){
+            throw new SystemException(9000,"系统空间不足，请先清理过后在运行!");
+       }
    }
 
     @Override

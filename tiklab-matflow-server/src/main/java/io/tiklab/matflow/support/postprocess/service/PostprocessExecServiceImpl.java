@@ -50,7 +50,7 @@ public class PostprocessExecServiceImpl implements PostprocessExecService{
             return ;
         }
         for (Postprocess postprocess : postprocessList) {
-            String postprocessId = postprocess.getPostprocessId();
+            String postprocessId = postprocess.getPostId();
             PostprocessInstance postInstance = new PostprocessInstance();
             postInstance.setInstanceId(instanceId);
             postInstance.setPostState(PipelineFinal.RUN_HALT);
@@ -83,7 +83,7 @@ public class PostprocessExecServiceImpl implements PostprocessExecService{
             fileAddress = fileAddress + "/" + taskInstanceId + "/" +  postInstanceId;
             tasksExecService.createTaskExecInstance(postprocess.getTask(),postInstanceId,3,fileAddress);
             //缓存
-            postIdOrPostInstanceId.put(postprocess.getPostprocessId(),postInstanceId);
+            postIdOrPostInstanceId.put(postprocess.getPostId(),postInstanceId);
             postInstanceIdOrPostInstance.put(postInstanceId,postInstance);
             updatePipelineOrPostInstanceCache(pipelineId,postInstanceId);
         }
@@ -103,11 +103,11 @@ public class PostprocessExecServiceImpl implements PostprocessExecService{
 
         for (Postprocess postprocess : postprocessList) {
             if (state){
-                updatePostInstanceCache(postprocess.getPostprocessId());
+                updatePostInstanceCache(postprocess.getPostId());
                 String taskType = postprocess.getTaskType();
                 Tasks task = postprocess.getTask();
                 boolean b;
-                String postprocessId = postprocess.getPostprocessId();
+                String postprocessId = postprocess.getPostId();
                 if (taskType.equals("61")|| taskType.equals("message")){
                     taskExecMessage.setTasks(task);
                     taskExecMessage.setExecPipeline(true);
@@ -143,7 +143,7 @@ public class PostprocessExecServiceImpl implements PostprocessExecService{
         boolean state = true;
         for (Postprocess postprocess : postprocessList) {
             boolean b;
-            String postprocessId = postprocess.getPostprocessId();
+            String postprocessId = postprocess.getPostId();
             if (state){
                 updatePostInstanceCache(postprocessId);
                 String taskType = postprocess.getTaskType();

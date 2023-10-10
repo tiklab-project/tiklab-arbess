@@ -6,15 +6,30 @@ import io.tiklab.matflow.pipeline.definition.model.Pipeline;
 import io.tiklab.matflow.pipeline.definition.model.PipelineQuery;
 import io.tiklab.matflow.pipeline.definition.model.PipelineRecently;
 import io.tiklab.matflow.pipeline.definition.service.PipelineService;
+import io.tiklab.matflow.pipeline.definition.service.PipelineYamlService;
+import io.tiklab.matflow.support.util.PipelineFileUtil;
+import io.tiklab.postin.annotation.ApiMethod;
 import io.tiklab.user.user.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @pi.protocol: http
@@ -26,6 +41,9 @@ public class PipelineController {
 
     @Autowired
     PipelineService pipelineService;
+
+    @Autowired
+    PipelineYamlService yamlService;
 
     /**
      * @pi.name:createPipeline
@@ -190,6 +208,49 @@ public class PipelineController {
         String name = pipelineService.findPipelineCloneName(pipelineId);
 
         return Result.ok(name);
+    }
+
+
+    /**
+     * @pi.name:findPipelineCloneName
+     * @pi.path:/pipeline/importPipelineYaml
+     * @pi.method:post
+     * @pi.request-type: formdata;
+     * @pi.param: name=pipelineId;dataType=string;value=pipelineId;
+     */
+    @RequestMapping(path="/importPipelineYaml",method = RequestMethod.POST)
+    public ResponseEntity<Object> importPipelineYaml(HttpServletRequest request, HttpServletResponse response) {
+        try {
+            Map<String, String[]> parameterMap = request.getParameterMap();
+
+            String pipelineId = Arrays.toString(parameterMap.get("pipelineId")).replace("[","").replace("]","");
+
+            String yamlString = yamlService.importPipelineYaml(pipelineId);
+
+            Pipeline pipeline = pipelineService.findPipelineById(pipelineId);
+
+            String tempFile = PipelineFileUtil.createTempFile(yamlString, ".yaml");
+            File file = new File(tempFile);
+            BufferedInputStream in = new BufferedInputStream(new FileInputStream(file));
+
+            ServletOutputStream outputStream = response.getOutputStream();
+            response.setHeader("Content-Disposition", "attachment; filename="+pipeline.getName());
+            response.setContentLength((int) file.length());
+
+            int buf_size = 1024;
+            byte[] buffer = new byte[buf_size];
+            int len = 0;
+            while (-1 != (len = in.read(buffer, 0, buf_size))) {
+                outputStream.write(buffer,0,len);
+            }
+            in.close();
+            outputStream.close();
+
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Result.error(1000,"下载失败"));
+        }
     }
 
 }

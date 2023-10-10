@@ -17,23 +17,26 @@ public class XcodeRepository {
         return id;
     }
 
-    public void setId(String id) {
+    public XcodeRepository setId(String id) {
         this.id = id;
+        return this;
     }
 
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
+    public XcodeRepository setName(String name) {
         this.name = name;
+        return this;
     }
 
     public String getAddress() {
         return address;
     }
 
-    public void setAddress(String address) {
+    public XcodeRepository setAddress(String address) {
         this.address = address;
+        return this;
     }
 }

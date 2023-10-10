@@ -25,8 +25,8 @@ public class VariableEntity {
     private String varValue;
 
     //类型
-    @Column(name = "task_type",notNull = true)
-    private int taskType;
+    @Column(name = "var_type",notNull = true)
+    private String varType;
 
     @Column(name = "type",notNull = true)
     private int type;
@@ -90,14 +90,6 @@ public class VariableEntity {
         this.varValues = varValues;
     }
 
-    public int getTaskType() {
-        return taskType;
-    }
-
-    public void setTaskType(int taskType) {
-        this.taskType = taskType;
-    }
-
     public String getTaskId() {
         return taskId;
     }
@@ -113,6 +105,15 @@ public class VariableEntity {
 
     public void setPipelineId(String pipelineId) {
         this.pipelineId = pipelineId;
+    }
+
+    public String getVarType() {
+        return varType;
+    }
+
+    public VariableEntity setVarType(String varType) {
+        this.varType = varType;
+        return this;
     }
 }
 

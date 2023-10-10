@@ -35,7 +35,7 @@ public class ExecVariableServiceImpl implements ExecVariableService {
         // 添加到缓存中
         for (Variable variable : variableList) {
             ExecVariable execVariable = new ExecVariable();
-            execVariable.setTaskType(variable.getTaskType());
+            execVariable.setVarType(variable.getVarType());
             execVariable.setVarKey(variable.getVarKey());
             execVariable.setVarValue(variable.getVarValue());
             execVariable.setPipelineId(pipelineId);
@@ -47,7 +47,7 @@ public class ExecVariableServiceImpl implements ExecVariableService {
     public void addExecVariable(ExecVariable variable){
         String pipelineId = variable.getPipelineId();
         List<ExecVariable> list = variableMap.get(pipelineId);
-        if (Objects.isNull(list) || list.size() == 0){
+        if (Objects.isNull(list) || list.isEmpty()){
             list = new ArrayList<>();
         }
         list.add(variable);

@@ -1,6 +1,7 @@
 package io.tiklab.matflow.task.task.service;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import io.tiklab.beans.BeanMapper;
 import io.tiklab.core.exception.ApplicationException;
 import io.tiklab.matflow.setting.service.AuthHostService;
@@ -122,7 +123,7 @@ public class TasksServiceImpl implements TasksService {
             }
         }
 
-        if ( list.size() == 0){
+        if (list.isEmpty()){
             return 1;
         }
 
@@ -216,12 +217,9 @@ public class TasksServiceImpl implements TasksService {
 
     @Override
     public void updateTaskName(Tasks tasks) {
-        Object values = tasks.getValues();
-        String object = JSON.toJSONString(values);
-        Tasks tasks1 = JSON.parseObject(object, Tasks.class);
         String taskId = tasks.getTaskId();
         Tasks task = findOneTasks(taskId);
-        task.setTaskName(tasks1.getTaskName());
+        task.setTaskName(tasks.getTaskName());
         updateTasks(task);
     }
 
@@ -265,7 +263,7 @@ public class TasksServiceImpl implements TasksService {
             list = finAllStageTask(id);
         }
 
-        if (list.size() == 0){
+        if (list.isEmpty()){
             return;
         }
         //循环删除任务
@@ -299,7 +297,7 @@ public class TasksServiceImpl implements TasksService {
         tasksQuery.setPostprocessId(postId);
         List<TasksEntity> tasksEntityList = tasksDao.findTaskList(tasksQuery);
         List<Tasks> tasksList = BeanMapper.mapList(tasksEntityList, Tasks.class);
-        if (tasksList.size()>0){
+        if (!tasksList.isEmpty()){
             return tasksList.get(0);
         }
         return null;
@@ -601,7 +599,7 @@ public class TasksServiceImpl implements TasksService {
                     postprocessQuery.setTaskId(taskId);
                     List<PostprocessEntity> postTaskList = postprocessDao.findPostTaskList(postprocessQuery);
                     for (PostprocessEntity postprocessEntity : postTaskList) {
-                        String postProcessId = postprocessEntity.getPostprocessId();
+                        String postProcessId = postprocessEntity.getPostId();
                         postprocessEntity.setTaskId(taskCloneId);
                         String clonePostProcessId = postprocessDao.createPost(postprocessEntity);
                         clonePostTasks(postProcessId,clonePostProcessId);
@@ -633,7 +631,7 @@ public class TasksServiceImpl implements TasksService {
                     postprocessQuery.setTaskId(taskId);
                     List<PostprocessEntity> postTaskList = postprocessDao.findPostTaskList(postprocessQuery);
                     for (PostprocessEntity postprocessEntity : postTaskList) {
-                        String postProcessId = postprocessEntity.getPostprocessId();
+                        String postProcessId = postprocessEntity.getPostId();
                         postprocessEntity.setTaskId(taskCloneId);
                         String clonePostProcessId = postprocessDao.createPost(postprocessEntity);
                         clonePostTasks(postProcessId,clonePostProcessId);
@@ -788,10 +786,10 @@ public class TasksServiceImpl implements TasksService {
      * @param o 更新内容
      */
     private void updateDifferentTask(String taskId,String taskType,Object o){
-        String object = JSON.toJSONString(o);
+        String object = JSONObject.toJSONString(o);
         switch (findTaskType(taskType)) {
             case TASK_TYPE_CODE     -> {
-                TaskCode taskCode = JSON.parseObject(object, TaskCode.class);
+                TaskCode taskCode = JSONObject.parseObject(object, TaskCode.class);
                 TaskCode oneCodeConfig = codeService.findOneCode(taskId);
                 String id;
                 if (oneCodeConfig == null){
@@ -955,7 +953,7 @@ public class TasksServiceImpl implements TasksService {
             case  TASK_MESSAGE_MSG ->{
                 return TASK_TYPE_MESSAGE;
             }
-            case TASK_SCRIPT_BAT ,TASK_SCRIPT_SHELL ->{
+            case TASK_TYPE_SCRIPT,TASK_SCRIPT_BAT ,TASK_SCRIPT_SHELL ->{
                 return TASK_TYPE_SCRIPT;
             }
             default ->  throw new ApplicationException("无法更新未知的配置类型:"+taskType);
@@ -1093,7 +1091,7 @@ public class TasksServiceImpl implements TasksService {
                 return "Docker";
             }
             case TASK_CODESCAN_SONAR -> {
-                return "sonarQuebe";
+                return "sonarQube";
             }
             case TASK_ARTIFACT_NEXUS -> {
                 return "Nexus";

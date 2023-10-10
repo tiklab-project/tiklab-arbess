@@ -96,7 +96,7 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
     @Override
     public PipelineInstance start(PipelineRunMsg runMsg) {
 
-        diskService.ValidationStorageSpace();
+        // diskService.ValidationStorageSpace();
 
         resourcesService.judgeResources();
 
@@ -142,7 +142,7 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
      * 执行等待执行的流水线
      */
     public void execCachePipeline(){
-        if (runMsgList.size() == 0){
+        if (runMsgList.isEmpty()){
             return;
         }
         PipelineRunMsg pipelineRunMsg = runMsgList.get(0);
@@ -212,6 +212,7 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
                 if (type == 1) {
                     b = execTask(pipeline,instanceId);
                 }
+
                 if (type == 2) {
                     // 创建多阶段运行实例
                     stageExecService.createStageExecInstance(pipelineId, instanceId);
@@ -228,7 +229,6 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
                 // 执行完成
                 pipelineExecEnd(pipelineId, b);
 
-
                 tasksExecService.stopThread(pipelineId);
 
             }catch (Exception e){
@@ -243,7 +243,7 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
         });
 
         try {
-            Thread.sleep(400);
+            Thread.sleep(200);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }

@@ -5,6 +5,7 @@ import io.tiklab.matflow.stages.entity.StageEntity;
 import io.tiklab.matflow.stages.model.Stage;
 import io.tiklab.beans.BeanMapper;
 import io.tiklab.core.exception.ApplicationException;
+import io.tiklab.matflow.support.util.PipelineFinal;
 import io.tiklab.matflow.support.util.PipelineUtil;
 import io.tiklab.matflow.task.task.model.Tasks;
 import io.tiklab.matflow.task.task.service.TasksService;
@@ -42,14 +43,11 @@ public class StageServiceImpl implements StageService {
         Tasks tasks = new Tasks();
         tasks.setTaskType(taskType);
         tasks.setTaskSort(1);
-        boolean b = taskType.equals("git")
-                || taskType.equals("gitlab")
-                || taskType.equals("gitee")
-                || taskType.equals("github")
-                || taskType.equals("xcode");
+
+        String type = tasksService.findTaskType(taskType);
 
         //是否为源码
-        if (b){
+        if (type.equals(PipelineFinal.TASK_TYPE_CODE)){
             //判断是否存在代码源
             findTypeTasks(pipelineId);
 
@@ -153,7 +151,7 @@ public class StageServiceImpl implements StageService {
      */
     private void findTypeTasks(String pipelineId) throws ApplicationException {
         List<Stage> allStage = findAllMainStage(pipelineId);
-        if ( allStage.size() == 0){
+        if (allStage.isEmpty()){
             return;
         }
         for (Stage stage : allStage) {
@@ -167,8 +165,8 @@ public class StageServiceImpl implements StageService {
     public List<Stage> findAllStagesOrTask(String pipelineId){
         //获取流水线主节点
         List<Stage> stageMainStage = findAllMainStage(pipelineId);
-        if (stageMainStage.size() == 0){
-            return null;
+        if (stageMainStage.isEmpty()){
+            return Collections.emptyList();
         }
         List<Stage> list = new ArrayList<>();
         for (Stage stage : stageMainStage) {
@@ -221,7 +219,7 @@ public class StageServiceImpl implements StageService {
      */
     private Integer initStage(String pipelineId,int taskSort){
         List<Stage> allMainStage = findAllMainStage(pipelineId);
-        if (allMainStage.size() == 0){
+        if (allMainStage.isEmpty()){
             return 1;
         }
         for (Stage stages : allMainStage) {
@@ -242,7 +240,7 @@ public class StageServiceImpl implements StageService {
      */
     private List<Stage> findAllPipelineStages(String pipelineId){
         List<Stage> allStages = findAllStages();
-        if (allStages == null || allStages.size() == 0){
+        if (allStages == null || allStages.isEmpty()){
             return Collections.emptyList();
         }
         List<Stage> list = new ArrayList<>();
@@ -270,19 +268,19 @@ public class StageServiceImpl implements StageService {
 
         List<Tasks> tasks = tasksService.finAllStageTask(taskStagesId);
         //该阶段不存在其他任务
-        if (tasks == null || tasks.size() == 0){
+        if (tasks == null || tasks.isEmpty()){
             deleteStages(taskStagesId);
             //主阶段id
             String mainStageId = stages.getParentId();
             List<Stage> otherStage = findOtherStage(mainStageId);
             //判断是否存在从节点，不存在删除主节点
-            if (otherStage == null || otherStage.size() == 0){
+            if (otherStage == null || otherStage.isEmpty()){
                 Stage mainStage = findOneStages(mainStageId);
                 deleteStages(mainStageId);
                 String pipelineId = mainStage.getPipelineId();
                 //更新其他主节点顺序
                 List<Stage> allMainStage = findAllMainStage(pipelineId);
-                if (allMainStage == null || allMainStage.size() == 0){
+                if (allMainStage == null || allMainStage.isEmpty()){
                     return;
                 }
                 for (Stage stage : allMainStage) {
@@ -321,7 +319,7 @@ public class StageServiceImpl implements StageService {
     @Override
     public void deleteAllStagesOrTask(String pipelineId){
        List<Stage> allStage = findAllPipelineStages(pipelineId);
-       if (allStage.size() == 0){
+       if (allStage.isEmpty()){
            return;
        }
        for (Stage stage : allStage) {

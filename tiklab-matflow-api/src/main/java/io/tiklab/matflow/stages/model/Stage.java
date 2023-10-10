@@ -56,115 +56,132 @@ public class Stage {
     @ApiProperty(name = "taskSort",desc="任务顺序")
     private int taskSort;
 
-    public int getTaskSort() {
-        return taskSort;
+    @ApiProperty(name = "parallelName",desc="并行阶段名称")
+    private String parallelName;
+
+    public String getStageId() {
+        return stageId;
     }
 
-    public void setTaskSort(int taskSort) {
-        this.taskSort = taskSort;
-    }
-
-    public String getTaskId() {
-        return taskId;
-    }
-
-    public void setTaskId(String taskId) {
-        this.taskId = taskId;
-    }
-
-    public Object getValues() {
-        return values;
-    }
-
-    public void setValues(Object values) {
-        this.values = values;
-    }
-
-    public Stage() {
-    }
-
-    public List<Stage> getStageList() {
-        return stageList;
-    }
-
-    public void setStageList(List<Stage> stageList) {
-        this.stageList = stageList;
-    }
-
-    public String getTaskType() {
-        return taskType;
-    }
-
-    public void setTaskType(String taskType) {
-        this.taskType = taskType;
-    }
-
-    public String getParentId() {
-        return parentId;
-    }
-
-    public void setParentId(String parentId) {
-        this.parentId = parentId;
+    public Stage setStageId(String stageId) {
+        this.stageId = stageId;
+        return this;
     }
 
     public String getStageName() {
         return stageName;
     }
 
-    public void setStageName(String stageName) {
+    public Stage setStageName(String stageName) {
         this.stageName = stageName;
-    }
-
-    public int getStageSort() {
-        return stageSort;
-    }
-
-    public void setStageSort(int stageSort) {
-        this.stageSort = stageSort;
-    }
-
-    public boolean isCode() {
-        return code;
-    }
-
-    public void setCode(boolean code) {
-        this.code = code;
-    }
-
-    public Stage(String createTime) {
-        this.createTime = createTime;
+        return this;
     }
 
     public String getCreateTime() {
         return createTime;
     }
 
-    public void setCreateTime(String createTime) {
+    public Stage setCreateTime(String createTime) {
         this.createTime = createTime;
+        return this;
     }
 
     public String getPipelineId() {
         return pipelineId;
     }
 
-    public void setPipelineId(String pipelineId) {
+    public Stage setPipelineId(String pipelineId) {
         this.pipelineId = pipelineId;
+        return this;
+    }
+
+    public int getStageSort() {
+        return stageSort;
+    }
+
+    public Stage setStageSort(int stageSort) {
+        this.stageSort = stageSort;
+        return this;
+    }
+
+    public String getParentId() {
+        return parentId;
+    }
+
+    public Stage setParentId(String parentId) {
+        this.parentId = parentId;
+        return this;
+    }
+
+    public boolean isCode() {
+        return code;
+    }
+
+    public Stage setCode(boolean code) {
+        this.code = code;
+        return this;
     }
 
     public List<Tasks> getTaskValues() {
         return taskValues;
     }
 
-    public void setTaskValues(List<Tasks> taskValues) {
+    public Stage setTaskValues(List<Tasks> taskValues) {
         this.taskValues = taskValues;
+        return this;
     }
 
-    public String getStageId() {
-        return stageId;
+    public List<Stage> getStageList() {
+        return stageList;
     }
 
-    public void setStageId(String stageId) {
-        this.stageId = stageId;
+    public Stage setStageList(List<Stage> stageList) {
+        this.stageList = stageList;
+        return this;
     }
 
+    public String getTaskType() {
+        return taskType;
+    }
+
+    public Stage setTaskType(String taskType) {
+        this.taskType = taskType;
+        return this;
+    }
+
+    public String getTaskId() {
+        return taskId;
+    }
+
+    public Stage setTaskId(String taskId) {
+        this.taskId = taskId;
+        return this;
+    }
+
+    public Object getValues() {
+        return values;
+    }
+
+    public Stage setValues(Object values) {
+        this.values = values;
+        return this;
+    }
+
+    public int getTaskSort() {
+        return taskSort;
+    }
+
+    public Stage setTaskSort(int taskSort) {
+        this.taskSort = taskSort;
+        return this;
+    }
+
+    public String getParallelName() {
+        return parallelName;
+    }
+
+    public Stage setParallelName(String parallelName) {
+        this.parallelName = parallelName;
+        return this;
+    }
 }

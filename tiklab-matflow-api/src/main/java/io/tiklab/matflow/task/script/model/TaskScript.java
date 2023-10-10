@@ -15,7 +15,7 @@ public class TaskScript {
     @ApiProperty(name = "taskId",desc = "id")
     private String taskId;
 
-    @ApiProperty(name = "type",desc = "类型 71:bat脚本 72:shell脚本")
+    @ApiProperty(name = "type",desc = "类型 bat:bat脚本 shell:shell脚本")
     private String type;
 
     @ApiProperty(name = "scriptOrder",desc = "命令")

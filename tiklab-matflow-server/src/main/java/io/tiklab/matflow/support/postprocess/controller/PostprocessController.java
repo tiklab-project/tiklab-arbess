@@ -87,8 +87,8 @@ public class PostprocessController {
      * @pi.param: name=postprocessId;dataType=string;value=postprocessId;
      */
     @RequestMapping(path="/deletePost",method = RequestMethod.POST)
-    public Result<Void> deletePost(@NotNull String postprocessId) {
-         postServer.deletePostTask(postprocessId);
+    public Result<Void> deletePost(@NotNull String postId) {
+         postServer.deletePostTask(postId);
         return Result.ok();
     }
 
@@ -100,8 +100,8 @@ public class PostprocessController {
      * @pi.param: name=postprocessId;dataType=string;value=postprocessId;
      */
     @RequestMapping(path="/findOnePost",method = RequestMethod.POST)
-    public Result<Postprocess> findOnePostOrTask(@NotNull String postprocessId) {
-        Postprocess postOrTask = postServer.findOnePostOrTask(postprocessId);
+    public Result<Postprocess> findOnePostOrTask(@NotNull String postId) {
+        Postprocess postOrTask = postServer.findOnePostOrTask(postId);
         return Result.ok(postOrTask);
     }
 
