@@ -1074,6 +1074,9 @@ public class TasksServiceImpl implements TasksService {
             case TASK_CODE_GITHUB -> {
                 return "GitHub";
             }
+            case TASK_CODE_XCODE -> {
+                return "Xcode";
+            }
             case TASK_CODE_GITLAB -> {
                 return "GitLab";
             }
@@ -1082,6 +1085,9 @@ public class TasksServiceImpl implements TasksService {
             }
             case TASK_TEST_MAVENTEST -> {
                 return "Maven单元测试";
+            }
+            case TASK_TEST_TESTON -> {
+                return "TestOn";
             }
             case TASK_BUILD_MAVEN -> {
                 return "Maven构建";
@@ -1096,7 +1102,7 @@ public class TasksServiceImpl implements TasksService {
                 return "主机部署";
             }
             case TASK_DEPLOY_DOCKER -> {
-                return "Docker";
+                return "Docker部署";
             }
             case TASK_CODESCAN_SONAR -> {
                 return "sonarQube";
@@ -1106,6 +1112,9 @@ public class TasksServiceImpl implements TasksService {
             }
             case TASK_ARTIFACT_SSH -> {
                 return "SSH";
+            }
+            case TASK_ARTIFACT_XPACK -> {
+                return "Xpack制品库";
             }
             case TASK_MESSAGE_MSG -> {
                 return "消息通知";

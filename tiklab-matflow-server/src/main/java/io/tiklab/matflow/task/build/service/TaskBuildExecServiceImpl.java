@@ -79,6 +79,7 @@ public class TaskBuildExecServiceImpl implements TaskBuildExecService {
         TaskBuild taskBuild = (TaskBuild) task.getTask();
         String name = task.getTaskName();
         taskBuild.setTaskId(taskId);
+        taskBuild.setType(taskType);
         boolean state;
         if (taskType.equals(TASK_BUILD_DOCKER)){
             state = docker(taskBuild, pipelineId);
@@ -279,29 +280,61 @@ public class TaskBuildExecServiceImpl implements TaskBuildExecService {
         String path = utilService.findPipelineDefaultAddress(pipelineId,1) ;
 
         if (!Objects.isNull(dockerFile)){
-            path = path + "/" + dockerFile;
+            path = path + dockerFile;
         }
 
-        File file = new File(path + "Dockerfile");
+        File file = new File(path + "/Dockerfile");
         if (!file.exists()){
             tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+file.getAbsolutePath()+"下找不到Dockerfile文件！");
             return false;
         }
-        boolean result = true;
+        boolean result;
         try {
             tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"开始构建镜像");
 
-            String order = "docker image build -t " + name + " .";
+            String order = "docker image build -t " + name + " " + path;
             Process process = PipelineUtil.process(path, order);
             result = tasksInstanceService.readCommandExecResult(process, null, error(type), taskId);
             if (!result){
                 tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"镜像构建失败");
             }
+            tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"镜像构建成功！");
         }catch (Exception e){
             tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"镜像构建失败"+e.getMessage());
             return false;
         }
 
+        try {
+            tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"保存镜像.....");
+
+            String instanceId = findPipelineInstanceId(pipelineId);
+
+            String logPath = utilService.findPipelineDefaultAddress(pipelineId,2)+instanceId ;
+
+            String imageFile = logPath + "/" + dockerName + ".tar.gz";
+
+            String order = "docker save -o  \"" + imageFile + "\" " + name ;
+
+            System.out.println(order);
+            Process process = PipelineUtil.process(path, order);
+            result = tasksInstanceService.readCommandExecResult(process, null, error(type), taskId);
+            if (!result){
+                tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"保存镜像失败");
+            }
+            tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"保存镜像完成！地址：" + imageFile);
+
+            // 创建流水线运行时产生的制品信息
+            TaskBuildProduct taskBuildProduct = new TaskBuildProduct(instanceId);
+            taskBuildProduct.setKey(PipelineFinal.DEFAULT_ARTIFACT_DOCKER);
+            taskBuildProduct.setValue(imageFile);
+            taskBuildProduct.setInstanceId(instanceId);
+            taskBuildProduct.setType(PipelineFinal.DEFAULT_TYPE);
+            taskBuildProductService.createBuildProduct(taskBuildProduct);
+
+        }catch (Exception e){
+            tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"保存镜像失败"+e.getMessage());
+            return false;
+        }
         return result;
     }
 

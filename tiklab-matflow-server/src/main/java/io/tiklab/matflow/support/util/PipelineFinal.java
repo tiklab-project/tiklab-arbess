@@ -84,6 +84,14 @@ public class PipelineFinal {
     // 默认制品
     public static final String DEFAULT_ARTIFACT_NAME = "DEFAULT_ARTIFACT_NAME";
 
+    // Docker制品
+    public static final String DEFAULT_ARTIFACT_DOCKER = "DEFAULT_ARTIFACT_DOCKER";
+
+    // Docker名称
+    public static final String DEFAULT_ARTIFACT_DOCKER_NAME = "DEFAULT_ARTIFACT_DOCKER_NAME";
+
+
+
     // 默认源码位置
     public static final String DEFAULT_CODE_ADDRESS = "DEFAULT_CODE_ADDRESS";
 
