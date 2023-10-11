@@ -21,6 +21,42 @@ public class TaskBuildEntity {
     @Column(name = "product_rule",notNull = true)
     private String productRule;
 
+    @Column(name = "docker_name",notNull = true)
+    private String dockerName;
+
+    @Column(name = "docker_version",notNull = true)
+    private String dockerVersion;
+
+    @Column(name = "docker_file",notNull = true)
+    private String dockerFile;
+
+
+    public String getDockerName() {
+        return dockerName;
+    }
+
+    public TaskBuildEntity setDockerName(String dockerName) {
+        this.dockerName = dockerName;
+        return this;
+    }
+
+    public String getDockerVersion() {
+        return dockerVersion;
+    }
+
+    public TaskBuildEntity setDockerVersion(String dockerVersion) {
+        this.dockerVersion = dockerVersion;
+        return this;
+    }
+
+    public String getDockerFile() {
+        return dockerFile;
+    }
+
+    public TaskBuildEntity setDockerFile(String dockerFile) {
+        this.dockerFile = dockerFile;
+        return this;
+    }
 
     public String getTaskId() {
         return taskId;

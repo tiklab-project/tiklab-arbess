@@ -29,6 +29,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import static io.tiklab.matflow.support.util.PipelineFinal.*;
+
 /**
  * 构建执行方法
  */
@@ -76,7 +78,106 @@ public class TaskBuildExecServiceImpl implements TaskBuildExecService {
 
         TaskBuild taskBuild = (TaskBuild) task.getTask();
         String name = task.getTaskName();
-        taskBuild.setType(taskType);
+        taskBuild.setTaskId(taskId);
+        boolean state;
+        if (taskType.equals(TASK_BUILD_DOCKER)){
+            state = docker(taskBuild, pipelineId);
+        }else {
+            state = mavenOrNodeJs(taskBuild, pipelineId);
+        }
+
+        if (!state){
+            tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"任务：" + task.getTaskName()+"执行失败。");
+            return state;
+        }
+
+        // String buildAddress = taskBuild.getBuildAddress();
+        // String buildOrder = taskBuild.getBuildOrder();
+        //
+        // //项目地址
+        // String path = utilService.findPipelineDefaultAddress(pipelineId,1);
+        // String  type = taskBuild.getType();
+        // try {
+        //     //执行命令
+        //     List<String> list = PipelineUtil.execOrder(buildOrder);
+        //     for (String s : list) {
+        //         String key = variableServer.replaceVariable(pipelineId, taskId, s);
+        //         tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"执行命令："+ key);
+        //         Process process = getOrder(key,type,buildAddress, path);
+        //         boolean result = tasksInstanceService.readCommandExecResult(process, null, error(type), taskId);
+        //         if (!result){
+        //             tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"任务："+task.getTaskName()+"执行失败。");
+        //             return false;
+        //         }
+        //     }
+        //
+        //     String productRule = taskBuild.getProductRule();
+        //
+        //     boolean noNull = PipelineUtil.isNoNull(productRule);
+        //     if (!noNull){
+        //         tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"任务"+name+"执行完成");
+        //         return true;
+        //     }
+        //
+        //     // 匹配制品
+        //     String productAddress;
+        //     try {
+        //         productAddress = utilService.findFile(pipelineId,taskBuild.getProductRule());
+        //     }catch (ApplicationException e){
+        //         tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+e);
+        //         return false;
+        //     }
+        //
+        //     if (path == null){
+        //         tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"没有匹配到构建产物！");
+        //         return false;
+        //     }
+        //
+        //     File file = new File(productAddress);
+        //
+        //     String defaultAddress = utilService.findPipelineDefaultAddress(pipelineId, 2);
+        //
+        //     // 默认路径
+        //     String instanceId = findPipelineInstanceId(pipelineId);
+        //     String fileAddress = defaultAddress + instanceId +"/"+file.getName();
+        //
+        //     // 创建流水线运行时产生的制品信息
+        //     TaskBuildProduct taskBuildProduct = new TaskBuildProduct(instanceId);
+        //     taskBuildProduct.setKey(PipelineFinal.DEFAULT_ARTIFACT_ADDRESS);
+        //     taskBuildProduct.setValue(fileAddress);
+        //     taskBuildProduct.setInstanceId(instanceId);
+        //     taskBuildProduct.setType(PipelineFinal.DEFAULT_TYPE);
+        //
+        //     TaskBuildProduct taskBuildProducts = new TaskBuildProduct(instanceId);
+        //     taskBuildProducts.setKey(PipelineFinal.DEFAULT_ARTIFACT_NAME);
+        //     taskBuildProducts.setValue(file.getName());
+        //     taskBuildProduct.setInstanceId(instanceId);
+        //     taskBuildProducts.setType(PipelineFinal.DEFAULT_TYPE);
+        //
+        //     taskBuildProductService.createBuildProduct(taskBuildProduct);
+        //     taskBuildProductService.createBuildProduct(taskBuildProducts);
+        //
+        //     // 移动文件
+        //     FileUtils.moveFile(file, new File(fileAddress));
+        //
+        //     System.out.println("移动文件："+fileAddress);
+        //
+        //     tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"获取的到构建产物："+fileAddress);
+        //
+        //
+        // } catch (IOException | ApplicationException e) {
+        //     String s = PipelineUtil.date(4) + e.getMessage();
+        //     tasksInstanceService.writeExecLog(taskId,s);
+        //     return false;
+        // }
+        tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"任务"+name+"执行完成");
+        return true;
+    }
+
+    public Boolean mavenOrNodeJs(TaskBuild taskBuild,String pipelineId){
+
+        String taskId = taskBuild.getTaskId();
+
         String buildAddress = taskBuild.getBuildAddress();
         String buildOrder = taskBuild.getBuildOrder();
 
@@ -89,10 +190,15 @@ public class TaskBuildExecServiceImpl implements TaskBuildExecService {
             for (String s : list) {
                 String key = variableServer.replaceVariable(pipelineId, taskId, s);
                 tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"执行命令："+ key);
-                Process process = getOrder(key,type,buildAddress, path);
+                Process process ;
+                if (type.equals(TASK_BUILD_MAVEN)){
+                    process = mavenOrder(key,buildAddress, path);
+                }else {
+                    process = nodeJsOrder(key,buildAddress, path);
+                }
+
                 boolean result = tasksInstanceService.readCommandExecResult(process, null, error(type), taskId);
                 if (!result){
-                    tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"任务："+task.getTaskName()+"执行失败。");
                     return false;
                 }
             }
@@ -101,7 +207,6 @@ public class TaskBuildExecServiceImpl implements TaskBuildExecService {
 
             boolean noNull = PipelineUtil.isNoNull(productRule);
             if (!noNull){
-                tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"任务"+name+"执行完成");
                 return true;
             }
 
@@ -114,7 +219,7 @@ public class TaskBuildExecServiceImpl implements TaskBuildExecService {
                 return false;
             }
 
-            if (path == null){
+            if (Objects.isNull(path)){
                 tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"没有匹配到构建产物！");
                 return false;
             }
@@ -156,9 +261,51 @@ public class TaskBuildExecServiceImpl implements TaskBuildExecService {
             tasksInstanceService.writeExecLog(taskId,s);
             return false;
         }
-        tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"任务"+name+"执行完成");
         return true;
     }
+
+
+    public Boolean docker(TaskBuild taskBuild,String pipelineId){
+
+        String dockerName = taskBuild.getDockerName();
+        String dockerVersion = taskBuild.getDockerVersion();
+        String dockerFile = taskBuild.getDockerFile();
+
+        String taskId = taskBuild.getTaskId();
+        String type = taskBuild.getType();
+
+        String name  = dockerName + ":"+ dockerVersion;
+
+        String path = utilService.findPipelineDefaultAddress(pipelineId,1) ;
+
+        if (!Objects.isNull(dockerFile)){
+            path = path + "/" + dockerFile;
+        }
+
+        File file = new File(path + "Dockerfile");
+        if (!file.exists()){
+            tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+file.getAbsolutePath()+"下找不到Dockerfile文件！");
+            return false;
+        }
+        boolean result = true;
+        try {
+            tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"开始构建镜像");
+
+            String order = "docker image build -t " + name + " .";
+            Process process = PipelineUtil.process(path, order);
+            result = tasksInstanceService.readCommandExecResult(process, null, error(type), taskId);
+            if (!result){
+                tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"镜像构建失败");
+            }
+        }catch (Exception e){
+            tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"镜像构建失败"+e.getMessage());
+            return false;
+        }
+
+        return result;
+    }
+
+
 
     public String findPipelineInstanceId(String pipelineId){
 
@@ -175,27 +322,14 @@ public class TaskBuildExecServiceImpl implements TaskBuildExecService {
 
     /**
      * 执行build
-     * @param type 任务类型
      * @param path 项目地址
      * @return 执行命令
      */
-    private Process getOrder(String orders,String type,String address,String path) throws ApplicationException, IOException {
-        Scm pipelineScm = null;
-        if (type.equals("21") || type.equals("maven")){
-            pipelineScm = scmService.findOnePipelineScm(21);
-        }
-        if (type.equals("22") || type.equals("nodejs")){
-            pipelineScm = scmService.findOnePipelineScm(22);
-        }
+    private Process mavenOrder(String orders,String address,String path) throws  IOException {
+        Scm pipelineScm = scmService.findOnePipelineScm(21);
 
-        if (pipelineScm == null) {
-            if (type.equals("21") || type.equals("maven")){
-                throw new ApplicationException("不存在maven配置");
-            }
-            if (type.equals("22") || type.equals("nodejs")){
-                throw new ApplicationException("不存在npm配置");
-            }
-            throw new ApplicationException("获取环境配置信息失败！");
+        if (Objects.isNull(pipelineScm)) {
+            throw new ApplicationException("不存在maven配置");
         }
 
         String serverAddress = pipelineScm.getScmAddress();
@@ -204,16 +338,27 @@ public class TaskBuildExecServiceImpl implements TaskBuildExecService {
             path = path +"/"+ address;
         }
 
-        switch (type){
-            case "21","maven" -> {
-                String order =  mavenOrder(orders,path);
-                return PipelineUtil.process(serverAddress, order);
-            }
-            case "22","nodejs" -> {
-                return PipelineUtil.process(path, orders);
-            }
-            default -> throw new  ApplicationException("未知的任务类型");
+        String order =  mavenOrder(orders,path);
+        return PipelineUtil.process(serverAddress, order);
+    }
+
+    /**
+     * 执行build
+     * @param path 项目地址
+     * @return 执行命令
+     */
+    private Process nodeJsOrder(String orders,String address,String path) throws IOException {
+        Scm pipelineScm  = scmService.findOnePipelineScm(22);
+
+        if (pipelineScm == null) {
+            throw new ApplicationException("不存在npm配置");
         }
+
+        if(PipelineUtil.isNoNull(address)){
+            path = path +"/"+ address;
+        }
+
+        return PipelineUtil.process(path, orders);
     }
 
     /**
@@ -239,7 +384,7 @@ public class TaskBuildExecServiceImpl implements TaskBuildExecService {
      */
     private Map<String,String> error(String type){
         Map<String,String> map = new HashMap<>();
-        if (type.equals("21") || type.equals("maven")){
+        if (type.equals(TASK_BUILD_MAVEN)){
             map.put("BUILD FAILUREl","构建失败！");
             map.put("BUILD FAILURE","构建失败！");
             return map;

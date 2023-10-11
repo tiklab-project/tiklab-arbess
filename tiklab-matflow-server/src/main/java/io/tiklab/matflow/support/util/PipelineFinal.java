@@ -120,6 +120,8 @@ public class PipelineFinal {
     public static final String TASK_BUILD_MAVEN = "maven";
     public static final String TASK_BUILD_NODEJS = "nodejs";
 
+    public static final String TASK_BUILD_DOCKER = "build_docker";
+
 
     // 测试应用类型
     public static final String TASK_TYPE_TEST = "test";

@@ -27,11 +27,50 @@ public class TaskBuild {
     @ApiProperty(name="productRule",desc="制品规则")
     private String productRule;
 
+
+    @ApiProperty(name = "dockerName",desc="镜像名称")
+    private String dockerName;
+
+    @ApiProperty(name = "dockerVersion",desc="镜像版本")
+    private String dockerVersion;
+
+    @ApiProperty(name = "dockerFile",desc="DockerFile文件地址")
+    private String dockerFile;
+
+
     //顺序
     private int sort;
 
     //构建类型
     private String type;
+
+
+    public String getDockerName() {
+        return dockerName;
+    }
+
+    public TaskBuild setDockerName(String dockerName) {
+        this.dockerName = dockerName;
+        return this;
+    }
+
+    public String getDockerVersion() {
+        return dockerVersion;
+    }
+
+    public TaskBuild setDockerVersion(String dockerVersion) {
+        this.dockerVersion = dockerVersion;
+        return this;
+    }
+
+    public String getDockerFile() {
+        return dockerFile;
+    }
+
+    public TaskBuild setDockerFile(String dockerFile) {
+        this.dockerFile = dockerFile;
+        return this;
+    }
 
     public String getTaskId() {
         return taskId;

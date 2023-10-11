@@ -73,6 +73,13 @@ postgresql:
     address: ${DATA_HOME}
     port: 5432
 
+
+backups:
+  embbed:
+    enable: false
+  dir: /data/matflow
+  time: 0 0 2 * * ?
+
 #message:
 #  sms:
 #    enabled: true

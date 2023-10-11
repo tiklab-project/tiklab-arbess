@@ -1,9 +1,8 @@
-FROM tiklab:1.0.0
-ADD /target/tiklab-matflow-1.0.0-distribution.tar.gz /usr/local
-WORKDIR /usr/local/tiklab-matflow-1.0.0
-EXPOSE 8080
-EXPOSE 3306
-RUN sh /opt/mysql-8.0.28/start.sh
+FROM centos:8
+ADD src /usr/local
+WORKDIR /usr/local/tiklab-matflow-1.0.0-SNAPSHOT-202310110129
+# EXPOSE 8080
+# CMD sh /usr/local/tiklab-matflow-1.0.0-SNAPSHOT-202310110207/bin/startup.sh
 
 
 

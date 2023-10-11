@@ -372,9 +372,11 @@ public class TaskDeployExecServiceImpl implements TaskDeployExecService {
      * docker部署
      * @param pipelineId 配置信息
      */
-    private void docker(Session session,String pipelineId, TaskDeploy taskDeploy) throws JSchException, IOException {
+    private void docker(Session session,String pipelineId, TaskDeploy taskDeploy) throws JSchException {
 
         // String pipelineName = pipeline.getName();
+
+        String taskId = taskDeploy.getTaskId();
         //部署位置
         String deployAddress = "/"+  taskDeploy.getDeployAddress();
         //部署文件命令
@@ -383,31 +385,31 @@ public class TaskDeployExecServiceImpl implements TaskDeployExecService {
         String startAddress = taskDeploy.getStartAddress();
 
 
-        // String order = "docker stop $(docker ps -a | grep '"+pipelineName+"' | awk '{print $1 }');"
-        //         +"docker rm $(docker ps -a | grep '"+pipelineName+"' | awk '{print $1 }');"
-        //         +"docker image rm"+" "+pipelineName+";";
+        String order = "docker stop $(docker ps -a | grep '" + pipelineId + "' | awk '{print $1 }');"
+                +"docker rm $(docker ps -a | grep '" + pipelineId + "' | awk '{print $1 }');"
+                +"docker image rm"+" " + pipelineId + ";";
 
-        // if ((deployOrder == null || deployOrder.equals("")) && (startAddress == null || startAddress.equals("/")) ){
-        //
-        //      order = order +"cd"+" "+deployAddress+";"+"docker image build -t"+" "+pipelineName+"  .;"
-        //             +"docker run -itd -p"+" "+ taskDeploy.getMappingPort()+":"+ taskDeploy.getStartPort()+" "+pipelineName;
-        //     sshOrder(session,order, taskId);
-        //     return;
-        // }
-        // if (deployOrder != null && !deployOrder.equals("") ) {
-        //     deployOrder = "cd "+" "+ deployAddress +";"+deployOrder;
-        //     sshOrder(session,deployOrder, taskId);
-        //     if (startAddress == null || startAddress.equals("/")) {
-        //
-        //         order = order + "cd" + " " + deployAddress + ";" + "docker image build -t" + " " + pipelineName + "  .;"
-        //                 + "docker run -itd -p" + " " + taskDeploy.getMappingPort() + ":" + taskDeploy.getStartPort() + " " + pipelineName;
-        //         sshOrder(session, order, taskId);
-        //         return;
-        //     }
-        // }
-        //
-        // order = order +"cd"+" "+deployAddress+"/"+startAddress+";"+"docker image build -t"+" "+pipelineName+"  .;"
-        //         +"docker run -itd -p"+" "+ taskDeploy.getMappingPort()+":"+ taskDeploy.getStartPort()+" "+pipelineName;
+        if ((deployOrder == null || deployOrder.equals("")) && (startAddress == null || startAddress.equals("/")) ){
+
+            //  order = order +"cd"+" "+deployAddress+";"+"docker image build -t"+" " + pipelineId + "  .;"
+            //         +"docker run -itd -p"+" "+ taskDeploy.getMappingPort()+":"+ taskDeploy.getStartPort()+" "+ pipelineId;
+            // sshOrder(session,order, taskId);
+            return;
+        }
+        if (deployOrder != null && !deployOrder.equals("") ) {
+            deployOrder = "cd "+" "+ deployAddress +";"+deployOrder;
+            sshOrder(session,deployOrder, taskId);
+            if (startAddress == null || startAddress.equals("/")) {
+
+                // order = order + "cd" + " " + deployAddress + ";" + "docker image build -t" + " " + pipelineId + "  .;"
+                //         + "docker run -itd -p" + " " + taskDeploy.getMappingPort() + ":" + taskDeploy.getStartPort() + " " + pipelineId;
+                // sshOrder(session, order, taskId);
+                return;
+            }
+        }
+
+        // order = order +"cd"+" "+deployAddress+"/"+startAddress+";"+"docker image build -t"+" "+pipelineId+"  .;"
+        //         +"docker run -itd -p"+" "+ taskDeploy.getMappingPort()+":"+ taskDeploy.getStartPort()+" "+pipelineId;
         // sshOrder(session, order, taskId);
     }
 

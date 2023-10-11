@@ -246,6 +246,8 @@ public class PipelineController {
             in.close();
             outputStream.close();
 
+            file.delete();
+
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             e.printStackTrace();

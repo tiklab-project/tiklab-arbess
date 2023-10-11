@@ -3,6 +3,8 @@
 DIRS=$(dirname "$PWD")
 
 APP_MAIN="io.tiklab.matflow.starter.MatFlowApplication"
+
+echo Dir=${DIRS}
 JDK_VERSION=jdk-16.0.2
 if [ -d "${DIRS}/embbed/${JDK_VERSION}" ]; then
     echo "使用内嵌jdk"
@@ -21,6 +23,9 @@ DIR=$(cd "$(dirname "$0")"; pwd)
 APP_HOME=${DIR}/..
 APP_CONFIG=${APP_HOME}/conf/application-${env}.properties
 APP_LOG=${APP_HOME}/logs
+
+JAVA_HOME="${APP_HOME}/embbed/${JDK_VERSION}"
+
 
 export APP_HOME
 #export app.home=$APP_HOME

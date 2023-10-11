@@ -935,7 +935,7 @@ public class TasksServiceImpl implements TasksService {
                     TASK_CODE_GITLAB,TASK_CODE_XCODE,TASK_CODE_SVN ->{
                 return TASK_TYPE_CODE;
             }
-            case TASK_BUILD_MAVEN,TASK_BUILD_NODEJS ->{
+            case TASK_BUILD_MAVEN,TASK_BUILD_NODEJS,TASK_BUILD_DOCKER ->{
                 return TASK_TYPE_BUILD;
             }
             case TASK_TEST_MAVENTEST,TASK_TEST_TESTON  ->{
@@ -1012,7 +1012,12 @@ public class TasksServiceImpl implements TasksService {
     }
 
     private Boolean buildValid(String taskType,Object object){
-        // TaskBuild build = (TaskBuild) object;
+        TaskBuild build = (TaskBuild) object;
+        if (taskType.equals(TASK_BUILD_DOCKER)){
+            if (Objects.isNull(build.getDockerName())){
+                return false;
+            }
+        }
         return true;
     }
 
@@ -1080,6 +1085,9 @@ public class TasksServiceImpl implements TasksService {
             }
             case TASK_BUILD_MAVEN -> {
                 return "Maven构建";
+            }
+            case TASK_BUILD_DOCKER -> {
+                return "Docker构建";
             }
             case TASK_BUILD_NODEJS -> {
                 return "Node.js";
