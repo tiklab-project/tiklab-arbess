@@ -20,7 +20,7 @@ jdbc:
   password: darth2020
 
 #plugin config
-DATA_HOME: /opt/matflow/matflow
+DATA_HOME: /opt/tiklab/matflow
 
 plugin:
   path: ${DATA_HOME}/plugin
@@ -70,7 +70,7 @@ postgresql:
     enable: true
   database: tiklab_matflow
   db:
-    address: ${DATA_HOME}
+    address: ${DATA_HOME}/postgresql
     port: 5432
 
 

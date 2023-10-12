@@ -31,14 +31,15 @@ dfs:
     bucket: ${app.name}
 
 #dcs config
-#dcs
 dcs:
   server:
     enabled: true
-    port: 5001
-    datapath: ${DATA_HOME}/data
+    #    enabled: false
+    port: 5020
+    datapath: ${DATA_HOME}/caches
   client:
-    url: 127.0.0.1:5001
+    url: 127.0.0.1:5020
+    #    url: 127.0.0.1:5035
     group: g1
     database: dcs1
     expire: 7200
@@ -54,24 +55,27 @@ dss:
     url: 127.0.0.1:6000
     bucket: ${app.name}
 
-eas:
-  embbed:
-    enable: true
-  address: http://e.eas.tiklab.net
-
 postgresql:
   embbed:
     enable: true
   database: tiklab_matflow
   db:
-    address: ${DATA_HOME}/postgresql
     port: 5432
+    username: postgres
+    password: darth2020
+    address: ${DATA_HOME}/postgresql
+
+datapath: ${DATA_HOME}/caches
+
+eas:
+  embbed:
+    enable: true
+  address: http://e.eas.tiklab.net
 
 
 backups:
-  embbed:
-    enable: false
-  dir: /data/matflow
+  dir: /data/matflow-ee
+  #    time: 0 */1 * * * ?
   time: 0 0 2 * * ?
 
 #message:
@@ -79,11 +83,11 @@ backups:
 #    enabled: true
 
 base:
-  url: http://matflow.tiklab.net
+  url: http://e.matflow.tiklab.net
 
 #homes
 homes:
-  address: http://tiklab.net
+  address: http://192.168.10.19:8080
 
 #license
 licences:
