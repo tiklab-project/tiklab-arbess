@@ -47,7 +47,7 @@
         <tiklab-postin.version>1.0.2-SNAPSHOT</tiklab-postin.version>
         <tiklab-xcode.version>1.0.0-SNAPSHOT</tiklab-xcode.version>
         <tiklab-xpack.version>1.0.0-SNAPSHOT</tiklab-xpack.version>
-        <tiklab-teston.version>1.0.0.6</tiklab-teston.version>
+        <tiklab-teston.version>1.0.2-SNAPSHOT</tiklab-teston.version>
 
         <tiklab-postgresql.version>1.0.0-SNAPSHOT</tiklab-postgresql.version>
         <tiklab-jdk.version>1.0.0.4</tiklab-jdk.version>
