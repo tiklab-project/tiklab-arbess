@@ -37,6 +37,9 @@ public class TaskBuild {
     @ApiProperty(name = "dockerFile",desc="DockerFile文件地址")
     private String dockerFile;
 
+    @ApiProperty(name = "dockerOrder",desc="Docker部署命令")
+    private String dockerOrder;
+
 
     //顺序
     private int sort;
@@ -44,6 +47,14 @@ public class TaskBuild {
     //构建类型
     private String type;
 
+    public String getDockerOrder() {
+        return dockerOrder;
+    }
+
+    public TaskBuild setDockerOrder(String dockerOrder) {
+        this.dockerOrder = dockerOrder;
+        return this;
+    }
 
     public String getDockerName() {
         return dockerName;

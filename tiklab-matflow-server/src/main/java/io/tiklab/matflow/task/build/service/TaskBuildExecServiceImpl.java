@@ -12,6 +12,7 @@ import io.tiklab.matflow.support.util.PipelineUtilService;
 import io.tiklab.matflow.support.variable.service.VariableService;
 import io.tiklab.matflow.task.build.model.TaskBuild;
 import io.tiklab.matflow.task.build.model.TaskBuildProduct;
+import io.tiklab.matflow.task.build.model.TaskBuildProductQuery;
 import io.tiklab.matflow.task.task.model.TaskInstance;
 import io.tiklab.matflow.task.task.model.Tasks;
 import io.tiklab.matflow.task.task.service.TasksInstanceService;
@@ -292,7 +293,15 @@ public class TaskBuildExecServiceImpl implements TaskBuildExecService {
         try {
             tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"开始构建镜像");
 
-            String order = "docker image build -t " + name + " " + path;
+            String dockerOrder = taskBuild.getDockerOrder();
+
+            // 替换命令中的变量
+            String instanceId = findPipelineInstanceId(pipelineId);
+            dockerOrder = taskBuildProductService.replace(instanceId,dockerOrder);
+
+            // 替换命令中的系统变量
+            String order = variableServer.replaceVariable(pipelineId, taskId, dockerOrder);
+
             Process process = PipelineUtil.process(path, order);
             result = tasksInstanceService.readCommandExecResult(process, null, error(type), taskId);
             if (!result){
@@ -422,9 +431,14 @@ public class TaskBuildExecServiceImpl implements TaskBuildExecService {
             map.put("BUILD FAILURE","构建失败！");
             return map;
         }
-        map.put("npm ERR! errno -4058","npm ERR! errno -4058");
-        map.put("npm ERR! code ENOENT","npm ERR! code ENOENT");
-        map.put("npm ERR!","");
+        if (type.equals(TASK_BUILD_NODEJS)){
+            map.put("npm ERR! errno -4058","npm ERR! errno -4058");
+            map.put("npm ERR! code ENOENT","npm ERR! code ENOENT");
+            map.put("npm ERR!","");
+            return map;
+        }
+        map.put("Error","构建失败");
+        map.put("docker: Error","Docker构建失败");
         return map;
     }
 

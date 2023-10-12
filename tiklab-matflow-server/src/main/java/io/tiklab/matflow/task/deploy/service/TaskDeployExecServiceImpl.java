@@ -449,6 +449,8 @@ public class TaskDeployExecServiceImpl implements TaskDeployExecService {
         Map<String,String> map = new HashMap<>();
         map.put("syntax error:","脚本语法错误！");
         map.put("invalid option;","");
+        map.put("Error","构建失败");
+        map.put("docker: Error","Docker构建失败");
         return map;
     }
 

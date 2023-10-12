@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @Exporter
@@ -48,6 +49,9 @@ public class TaskBuildServiceImpl implements TaskBuildService {
         }
         for (TaskBuild taskBuild : allBuild) {
             if (taskBuild.getTaskId().equals(configId)){
+                if (Objects.isNull(taskBuild.getDockerVersion())){
+                    taskBuild.setDockerVersion("latest");
+                }
                 return taskBuild;
             }
         }

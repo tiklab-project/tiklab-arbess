@@ -55,7 +55,7 @@ public class TaskBuildProductServiceImpl implements TaskBuildProductService {
     @Override
     public List<TaskBuildProduct> findBuildProductList(TaskBuildProductQuery taskBuildProductQuery) {
         List<TaskBuildProductEntity> allBuildProduct = taskBuildProductDao.findBuildProductList(taskBuildProductQuery);
-        if (allBuildProduct == null || allBuildProduct.size() == 0){
+        if (allBuildProduct == null || allBuildProduct.isEmpty()){
             return Collections.emptyList();
         }
         return BeanMapper.mapList(allBuildProduct, TaskBuildProduct.class);

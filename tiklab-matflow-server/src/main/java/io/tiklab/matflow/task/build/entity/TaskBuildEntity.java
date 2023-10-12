@@ -30,6 +30,17 @@ public class TaskBuildEntity {
     @Column(name = "docker_file",notNull = true)
     private String dockerFile;
 
+    @Column(name = "docker_order",notNull = true)
+    private String dockerOrder;
+
+    public String getDockerOrder() {
+        return dockerOrder;
+    }
+
+    public TaskBuildEntity setDockerOrder(String dockerOrder) {
+        this.dockerOrder = dockerOrder;
+        return this;
+    }
 
     public String getDockerName() {
         return dockerName;
