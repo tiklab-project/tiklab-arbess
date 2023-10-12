@@ -50,7 +50,7 @@
         <tiklab-teston.version>1.0.2-SNAPSHOT</tiklab-teston.version>
 
         <tiklab-postgresql.version>1.0.0-SNAPSHOT</tiklab-postgresql.version>
-        <tiklab-jdk.version>1.0.0.4</tiklab-jdk.version>
+        <tiklab-jdk.version>1.0.0.5</tiklab-jdk.version>
         <tiklab-upgrade.version>1.0.0.3</tiklab-upgrade.version>
 
         <commons-lang3.version>3.10</commons-lang3.version>
