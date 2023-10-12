@@ -1,4 +1,4 @@
-FROM centos:8
+FROM dokken/centos-stream-8
 ENV DIR_HOME /usr/local
 ENV VERSION tiklab-matflow-1.0.0-SNAPSHOT
 ENV DEPLOY_FILE /target/${VERSION}.tar.gz
