@@ -7,9 +7,7 @@ import io.tiklab.matflow.support.util.PipelineUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class ConditionServiceImpl implements ConditionService {
@@ -94,7 +92,7 @@ public class ConditionServiceImpl implements ConditionService {
     public List<Condition> findAllTaskCond(String taskId){
         List<Condition> allCond = conditionDao.findAllCond();
         if (allCond.isEmpty()){
-            return null;
+            return Collections.emptyList();
         }
         List<Condition> list = new ArrayList<>();
         for (Condition condition : allCond) {
@@ -112,6 +110,9 @@ public class ConditionServiceImpl implements ConditionService {
     @Override
     public void cloneCond(String id ,String cloneId){
         List<Condition> allTaskCond = findAllTaskCond(id);
+        if (Objects.isNull(allTaskCond)){
+            return;
+        }
         for (Condition condition : allTaskCond) {
             condition.setTaskId(cloneId);
             createCond(condition);
