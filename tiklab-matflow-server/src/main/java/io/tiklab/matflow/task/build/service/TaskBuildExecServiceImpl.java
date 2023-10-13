@@ -251,9 +251,7 @@ public class TaskBuildExecServiceImpl implements TaskBuildExecService {
             taskBuildProductService.createBuildProduct(taskBuildProducts);
 
             // 移动文件
-            FileUtils.moveFile(file, new File(fileAddress));
-
-            // System.out.println("移动文件："+fileAddress);
+            FileUtils.copyFile(file, new File(fileAddress));
 
             tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"获取的到构建产物："+fileAddress);
 

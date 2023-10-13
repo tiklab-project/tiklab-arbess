@@ -74,8 +74,7 @@ eas:
 
 
 backups:
-  dir: /data/matflow-ee
-  #    time: 0 */1 * * * ?
+  dir: /data/matflow
   time: 0 0 2 * * ?
 
 #message:

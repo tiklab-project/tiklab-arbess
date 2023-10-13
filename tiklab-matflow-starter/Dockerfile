@@ -5,10 +5,10 @@ ARG APP_DIR
 
 #添加部署文件
 ENV DIR_HOME=/usr/local/apps
-ADD ${APP_DIR} ${DIR_HOME}
-#工作空间
-ENV APP_HOME=${DIR_HOME}/${APP}
 
+ADD target/${APP_NAME} ${DIR_HOME}
+
+#工作空间
 WORKDIR ${DIR_HOME}
 #暴露端口
 EXPOSE 8080
