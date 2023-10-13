@@ -17,3 +17,7 @@ ALTER TABLE pip_task_build ADD COLUMN docker_name VARCHAR(255);
 ALTER TABLE pip_task_build ADD COLUMN docker_version VARCHAR(255);
 ALTER TABLE pip_task_build ADD COLUMN docker_file VARCHAR(255);
 ALTER TABLE pip_task_build ADD COLUMN docker_order VARCHAR(600);
+
+
+-- 测试
+alter table pip_task_test alter column test_order type text;

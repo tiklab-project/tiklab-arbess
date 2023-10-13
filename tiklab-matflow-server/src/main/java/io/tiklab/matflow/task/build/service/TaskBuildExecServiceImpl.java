@@ -253,7 +253,7 @@ public class TaskBuildExecServiceImpl implements TaskBuildExecService {
             // 移动文件
             FileUtils.moveFile(file, new File(fileAddress));
 
-            System.out.println("移动文件："+fileAddress);
+            // System.out.println("移动文件："+fileAddress);
 
             tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"获取的到构建产物："+fileAddress);
 
@@ -306,6 +306,7 @@ public class TaskBuildExecServiceImpl implements TaskBuildExecService {
             result = tasksInstanceService.readCommandExecResult(process, null, error(type), taskId);
             if (!result){
                 tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"镜像构建失败");
+                return false;
             }
             tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"镜像构建成功！");
         }catch (Exception e){
@@ -438,6 +439,7 @@ public class TaskBuildExecServiceImpl implements TaskBuildExecService {
             return map;
         }
         map.put("Error","构建失败");
+        map.put("ERROR","构建失败");
         map.put("docker: Error","Docker构建失败");
         return map;
     }

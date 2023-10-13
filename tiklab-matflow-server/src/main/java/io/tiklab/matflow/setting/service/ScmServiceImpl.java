@@ -7,6 +7,8 @@ import io.tiklab.matflow.setting.entity.ScmEntity;
 import io.tiklab.matflow.setting.model.Scm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -50,6 +52,7 @@ public class ScmServiceImpl implements ScmService {
     @Override
     public List<Scm> findAllPipelineScm() {
         List<ScmEntity> scmEntityList = scmDao.selectAllPipelineScm();
+        scmEntityList.sort(Comparator.comparing(ScmEntity::getCreateTime));
         return BeanMapper.mapList(scmEntityList, Scm.class);
     }
 
