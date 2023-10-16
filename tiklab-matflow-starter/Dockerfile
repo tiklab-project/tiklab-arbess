@@ -1,18 +1,16 @@
 FROM dokken/centos-stream-8
-#获取传入的变量
-ARG APP_NAME
 
 #添加部署文件
 ENV DIR_HOME=/usr/local/apps
 
-ADD target/${APP_NAME} ${DIR_HOME}
+ADD target ${DIR_HOME}
 
 #工作空间
-WORKDIR ${DIR_HOME}
+WORKDIR ${DIR_HOME}/target
 #暴露端口
 EXPOSE 8080
 #启动
-CMD APP_HOME=$(find ${DIR_HOME} -type d -name "*tiklab-*") ; sh ${APP_HOME}/bin/startup.sh ; tail -100f ${APP_HOME}/logs/app.log
+CMD APP_HOME=$(find ${DIR_HOME}/target -type d -name "*tiklab-*"); sh target/bin/startup.sh ; tail -100f target/logs/app.log
 
 
 
