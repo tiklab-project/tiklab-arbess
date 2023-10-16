@@ -10,7 +10,7 @@ WORKDIR ${DIR_HOME}/target
 #暴露端口
 EXPOSE 8080
 #启动
-CMD APP_HOME=$(find ${DIR_HOME}/target -type d -name "*tiklab-*"); sh target/bin/startup.sh ; tail -100f target/logs/app.log
+CMD APP_HOME=$(find ${DIR_HOME}/target -type d -name "*tiklab-*"); sh ${APP_HOME}/bin/startup.sh ; tail -100f ${APP_HOME}/logs/app.log
 
 
 
