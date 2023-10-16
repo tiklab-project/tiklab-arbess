@@ -36,10 +36,10 @@ public interface TaskArtifactService {
 
     /**
      * 根据配置id查询任务
-     * @param configId 配置id
+     * @param taskId 配置id
      * @return 任务
      */
-    TaskArtifact findOneProductConfig(String configId,String taskType);
+    TaskArtifact findOneArtifact(String taskId,String taskType);
 
 
     /**

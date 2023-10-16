@@ -11,6 +11,7 @@ import io.tiklab.matflow.support.condition.service.ConditionService;
 import io.tiklab.matflow.support.postprocess.dao.PostprocessDao;
 import io.tiklab.matflow.support.postprocess.entity.PostprocessEntity;
 import io.tiklab.matflow.support.postprocess.model.PostprocessQuery;
+import io.tiklab.matflow.support.util.PipelineFinal;
 import io.tiklab.matflow.support.util.PipelineUtil;
 import io.tiklab.matflow.support.variable.service.VariableService;
 import io.tiklab.matflow.task.artifact.model.TaskArtifact;
@@ -736,6 +737,7 @@ public class TasksServiceImpl implements TasksService {
             case TASK_TYPE_ARTIFACT -> {
                 TaskArtifact task = new TaskArtifact();
                 task.setTaskId(taskId);
+                task.setArtifactType(PipelineFinal.TASK_ARTIFACT_XPACK);
                 productServer.createProduct(task);
             }
             case TASK_TYPE_MESSAGE -> {
@@ -851,15 +853,24 @@ public class TasksServiceImpl implements TasksService {
             }
             case TASK_TYPE_ARTIFACT -> {
                 TaskArtifact taskArtifact = JSON.parseObject(object, TaskArtifact.class);
-                TaskArtifact oneProductConfig = productServer.findOneProductConfig(taskId,"");
+                TaskArtifact oneArtifact = productServer.findOneArtifact(taskId,"");
                 String id;
-                if (oneProductConfig == null){
+                if (Objects.isNull(oneArtifact)){
                     id = productServer.createProduct(new TaskArtifact());
                 }else {
-                    id = oneProductConfig.getTaskId();
+                    id = oneArtifact.getTaskId();
                 }
-                taskArtifact.setTaskId(id);
-                productServer.updateProduct(taskArtifact);
+                String artifactType = taskArtifact.getArtifactType();
+                if(!Objects.isNull(taskArtifact.getArtifactType())){
+                    productServer.deleteProduct(oneArtifact.getTaskId());
+                    TaskArtifact artifact = new TaskArtifact();
+                    artifact.setArtifactType(artifactType);
+                    artifact.setTaskId(oneArtifact.getTaskId());
+                    productServer.createProduct(artifact);
+                }else {
+                    taskArtifact.setTaskId(id);
+                    productServer.updateProduct(taskArtifact);
+                }
             }
             case TASK_TYPE_MESSAGE  -> {
                 messageTypeServer.deleteAllMessage(taskId);
@@ -900,7 +911,7 @@ public class TasksServiceImpl implements TasksService {
                 return codeScanService.findOneCodeScanConfig(taskId);
             }
             case TASK_TYPE_ARTIFACT -> {
-                return productServer.findOneProductConfig(taskId,taskType);
+                return productServer.findOneArtifact(taskId,taskType);
             }
             case TASK_TYPE_MESSAGE  -> {
                 return messageTypeServer.findMessage(taskId);
@@ -944,7 +955,7 @@ public class TasksServiceImpl implements TasksService {
             case TASK_DEPLOY_LINUX ,TASK_DEPLOY_DOCKER ->{
                 return TASK_TYPE_DEPLOY;
             }
-            case TASK_ARTIFACT_NEXUS ,TASK_ARTIFACT_SSH ,TASK_ARTIFACT_XPACK ->{
+            case TASK_ARTIFACT_MAVEN,TASK_ARTIFACT_DOCKER,TASK_ARTIFACT_NODEJS ->{
                 return TASK_TYPE_ARTIFACT;
             }
             case  TASK_CODESCAN_SONAR ->{
@@ -1096,7 +1107,7 @@ public class TasksServiceImpl implements TasksService {
                 return "Docker构建";
             }
             case TASK_BUILD_NODEJS -> {
-                return "Node.js";
+                return "Node.Js构建";
             }
             case TASK_DEPLOY_LINUX -> {
                 return "主机部署";
@@ -1107,14 +1118,14 @@ public class TasksServiceImpl implements TasksService {
             case TASK_CODESCAN_SONAR -> {
                 return "sonarQube";
             }
-            case TASK_ARTIFACT_NEXUS -> {
-                return "Nexus";
+            case TASK_ARTIFACT_MAVEN -> {
+                return "Maven推送";
             }
-            case TASK_ARTIFACT_SSH -> {
-                return "SSH";
+            case TASK_ARTIFACT_NODEJS -> {
+                return "Node.Js推送";
             }
-            case TASK_ARTIFACT_XPACK -> {
-                return "Xpack制品库";
+            case TASK_ARTIFACT_DOCKER -> {
+                return "Docker推送";
             }
             case TASK_MESSAGE_MSG -> {
                 return "消息通知";

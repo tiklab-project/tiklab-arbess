@@ -25,6 +25,9 @@ public class TaskArtifact {
     @ApiProperty(name = "artifactId",desc = "artifactId")
     private String artifactId;
 
+    @ApiProperty(name = "artifactType",desc = "推送类型")
+    private String artifactType;
+
     @ApiProperty(name = "version",desc = "version")
     private String version;
 
@@ -37,10 +40,15 @@ public class TaskArtifact {
     @ApiProperty(name = "putAddress",desc = "发送地址")
     private String putAddress;
 
+    @ApiProperty(name = "dockerImage",desc = "docker镜像")
+    private String dockerImage;
+
     //授权id
     @ApiProperty(name="authId",desc="授权id")
     private String authId;
 
+    @ApiProperty(name="authId",desc="rule")
+    private String rule;
 
     @Mappings({
             @Mapping(source = "repository.id",target = "xpackId")
@@ -55,6 +63,32 @@ public class TaskArtifact {
 
     private int sort;
 
+    public String getDockerImage() {
+        return dockerImage;
+    }
+
+    public TaskArtifact setDockerImage(String dockerImage) {
+        this.dockerImage = dockerImage;
+        return this;
+    }
+
+    public String getRule() {
+        return rule;
+    }
+
+    public TaskArtifact setRule(String rule) {
+        this.rule = rule;
+        return this;
+    }
+
+    public String getArtifactType() {
+        return artifactType;
+    }
+
+    public TaskArtifact setArtifactType(String artifactType) {
+        this.artifactType = artifactType;
+        return this;
+    }
 
     public XpackRepository getRepository() {
         return repository;

@@ -21,3 +21,12 @@ ALTER TABLE pip_task_build ADD COLUMN docker_order VARCHAR(600);
 
 -- 测试
 alter table pip_task_test alter column test_order type text;
+
+
+-- 推送制品
+ALTER TABLE pip_task_artifact ADD COLUMN artifact_type VARCHAR(32);
+ALTER TABLE pip_task_artifact ADD COLUMN rule VARCHAR(64);
+ALTER TABLE pip_task_artifact ADD COLUMN docker_image VARCHAR(64);
+
+-- 部署
+ALTER TABLE pip_task_deploy ADD COLUMN rule VARCHAR(64);

@@ -5,6 +5,7 @@ import io.tiklab.matflow.setting.model.AuthHost;
 import io.tiklab.matflow.setting.model.AuthThird;
 import io.tiklab.matflow.setting.service.AuthHostService;
 import io.tiklab.matflow.setting.service.AuthThirdService;
+import io.tiklab.matflow.support.util.PipelineFinal;
 import io.tiklab.matflow.support.util.PipelineUtil;
 import io.tiklab.matflow.task.artifact.dao.TaskProductDao;
 import io.tiklab.matflow.task.artifact.entity.TaskArtifactEntity;
@@ -16,6 +17,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
+
+import static io.tiklab.matflow.support.util.PipelineFinal.TASK_ARTIFACT_SSH;
+import static io.tiklab.matflow.support.util.PipelineFinal.TASK_ARTIFACT_XPACK;
 
 @Service
 @Exporter
@@ -51,42 +55,42 @@ public class TaskArtifactServiceImpl implements TaskArtifactService {
      */
     @Override
     public void deleteProductConfig(String configId){
-        TaskArtifact oneProductConfig = findOneProductConfig(configId,"");
+        TaskArtifact oneProductConfig = findOneArtifact(configId,"");
         deleteProduct(oneProductConfig.getTaskId());
     }
 
     /**
      * 根据配置id查询任务
-     * @param configId 配置id
      * @return 任务
      */
     @Override
-    public TaskArtifact findOneProductConfig(String configId,String taskType){
+    public TaskArtifact findOneArtifact(String taskId,String taskType){
         List<TaskArtifact> allProduct = findAllProduct();
         if (allProduct == null){
             return null;
         }
         for (TaskArtifact taskArtifact : allProduct) {
-            if (taskArtifact.getTaskId().equals(configId)){
+            if (taskArtifact.getTaskId().equals(taskId)){
                 TaskArtifact product = findOneProduct(taskArtifact.getTaskId());
                 String authId = product.getAuthId();
                 if (Objects.isNull(authId)){
                     return product;
                 }
+                String artifactType = product.getArtifactType();
                 AuthThird authServer = thirdServer.findOneAuthServer(authId);
                 product.setAuth(authServer);
 
-                if (taskType.equals("ssh")){
+                if (artifactType.equals(TASK_ARTIFACT_SSH)){
                     AuthHost oneAuthHost = hostServer.findOneAuthHost(authId);
                     product.setAuth(oneAuthHost);
                 }
 
-                XpackRepository repositorys = taskArtifact.getRepository();
-                if (taskType.equals("xpack") && !Objects.isNull(repositorys)){
-                    XpackRepository repository = taskArtifactXpackService.findRepository(authId, taskArtifact.getRepository().getId());
-                    if (!Objects.isNull(repository)){
-                        product.setPutAddress(repository.getName());
-                        product.setRepository(repository);
+                XpackRepository repository = taskArtifact.getRepository();
+                if (artifactType.equals(TASK_ARTIFACT_XPACK) && !Objects.isNull(repository)){
+                    XpackRepository xpackRepository = taskArtifactXpackService.findRepository(authId, taskArtifact.getRepository().getId());
+                    if (!Objects.isNull(xpackRepository)){
+                        product.setPutAddress(xpackRepository.getName());
+                        product.setRepository(xpackRepository);
                     }
                 }
                 return product;

@@ -1,5 +1,6 @@
 package io.tiklab.matflow.task.build.service;
 
+import com.alibaba.fastjson.JSONObject;
 import io.tiklab.matflow.pipeline.execute.service.PipelineExecServiceImpl;
 import io.tiklab.matflow.pipeline.instance.model.PipelineInstance;
 import io.tiklab.matflow.pipeline.instance.model.PipelineInstanceQuery;
@@ -25,10 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 import static io.tiklab.matflow.support.util.PipelineFinal.*;
 
@@ -90,88 +88,9 @@ public class TaskBuildExecServiceImpl implements TaskBuildExecService {
 
         if (!state){
             tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"任务：" + task.getTaskName()+"执行失败。");
-            return state;
+            return false;
         }
 
-        // String buildAddress = taskBuild.getBuildAddress();
-        // String buildOrder = taskBuild.getBuildOrder();
-        //
-        // //项目地址
-        // String path = utilService.findPipelineDefaultAddress(pipelineId,1);
-        // String  type = taskBuild.getType();
-        // try {
-        //     //执行命令
-        //     List<String> list = PipelineUtil.execOrder(buildOrder);
-        //     for (String s : list) {
-        //         String key = variableServer.replaceVariable(pipelineId, taskId, s);
-        //         tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"执行命令："+ key);
-        //         Process process = getOrder(key,type,buildAddress, path);
-        //         boolean result = tasksInstanceService.readCommandExecResult(process, null, error(type), taskId);
-        //         if (!result){
-        //             tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"任务："+task.getTaskName()+"执行失败。");
-        //             return false;
-        //         }
-        //     }
-        //
-        //     String productRule = taskBuild.getProductRule();
-        //
-        //     boolean noNull = PipelineUtil.isNoNull(productRule);
-        //     if (!noNull){
-        //         tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"任务"+name+"执行完成");
-        //         return true;
-        //     }
-        //
-        //     // 匹配制品
-        //     String productAddress;
-        //     try {
-        //         productAddress = utilService.findFile(pipelineId,taskBuild.getProductRule());
-        //     }catch (ApplicationException e){
-        //         tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+e);
-        //         return false;
-        //     }
-        //
-        //     if (path == null){
-        //         tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"没有匹配到构建产物！");
-        //         return false;
-        //     }
-        //
-        //     File file = new File(productAddress);
-        //
-        //     String defaultAddress = utilService.findPipelineDefaultAddress(pipelineId, 2);
-        //
-        //     // 默认路径
-        //     String instanceId = findPipelineInstanceId(pipelineId);
-        //     String fileAddress = defaultAddress + instanceId +"/"+file.getName();
-        //
-        //     // 创建流水线运行时产生的制品信息
-        //     TaskBuildProduct taskBuildProduct = new TaskBuildProduct(instanceId);
-        //     taskBuildProduct.setKey(PipelineFinal.DEFAULT_ARTIFACT_ADDRESS);
-        //     taskBuildProduct.setValue(fileAddress);
-        //     taskBuildProduct.setInstanceId(instanceId);
-        //     taskBuildProduct.setType(PipelineFinal.DEFAULT_TYPE);
-        //
-        //     TaskBuildProduct taskBuildProducts = new TaskBuildProduct(instanceId);
-        //     taskBuildProducts.setKey(PipelineFinal.DEFAULT_ARTIFACT_NAME);
-        //     taskBuildProducts.setValue(file.getName());
-        //     taskBuildProduct.setInstanceId(instanceId);
-        //     taskBuildProducts.setType(PipelineFinal.DEFAULT_TYPE);
-        //
-        //     taskBuildProductService.createBuildProduct(taskBuildProduct);
-        //     taskBuildProductService.createBuildProduct(taskBuildProducts);
-        //
-        //     // 移动文件
-        //     FileUtils.moveFile(file, new File(fileAddress));
-        //
-        //     System.out.println("移动文件："+fileAddress);
-        //
-        //     tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"获取的到构建产物："+fileAddress);
-        //
-        //
-        // } catch (IOException | ApplicationException e) {
-        //     String s = PipelineUtil.date(4) + e.getMessage();
-        //     tasksInstanceService.writeExecLog(taskId,s);
-        //     return false;
-        // }
         tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"任务"+name+"执行完成");
         return true;
     }
@@ -198,7 +117,6 @@ public class TaskBuildExecServiceImpl implements TaskBuildExecService {
                 }else {
                     process = nodeJsOrder(key,buildAddress, path);
                 }
-
                 boolean result = tasksInstanceService.readCommandExecResult(process, null, error(type), taskId);
                 if (!result){
                     return false;
@@ -212,50 +130,6 @@ public class TaskBuildExecServiceImpl implements TaskBuildExecService {
                 return true;
             }
 
-            // 匹配制品
-            String productAddress;
-            try {
-                productAddress = utilService.findFile(pipelineId,taskBuild.getProductRule());
-            }catch (ApplicationException e){
-                tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+e);
-                return false;
-            }
-
-            if (Objects.isNull(path)){
-                tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"没有匹配到构建产物！");
-                return false;
-            }
-
-            File file = new File(productAddress);
-
-            String defaultAddress = utilService.findPipelineDefaultAddress(pipelineId, 2);
-
-            // 默认路径
-            String instanceId = findPipelineInstanceId(pipelineId);
-            String fileAddress = defaultAddress + instanceId +"/"+file.getName();
-
-            // 创建流水线运行时产生的制品信息
-            TaskBuildProduct taskBuildProduct = new TaskBuildProduct(instanceId);
-            taskBuildProduct.setKey(PipelineFinal.DEFAULT_ARTIFACT_ADDRESS);
-            taskBuildProduct.setValue(fileAddress);
-            taskBuildProduct.setInstanceId(instanceId);
-            taskBuildProduct.setType(PipelineFinal.DEFAULT_TYPE);
-
-            TaskBuildProduct taskBuildProducts = new TaskBuildProduct(instanceId);
-            taskBuildProducts.setKey(PipelineFinal.DEFAULT_ARTIFACT_NAME);
-            taskBuildProducts.setValue(file.getName());
-            taskBuildProduct.setInstanceId(instanceId);
-            taskBuildProducts.setType(PipelineFinal.DEFAULT_TYPE);
-
-            taskBuildProductService.createBuildProduct(taskBuildProduct);
-            taskBuildProductService.createBuildProduct(taskBuildProducts);
-
-            // 移动文件
-            FileUtils.copyFile(file, new File(fileAddress));
-
-            tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"获取的到构建产物："+fileAddress);
-
-
         } catch (IOException | ApplicationException e) {
             String s = PipelineUtil.date(4) + e.getMessage();
             tasksInstanceService.writeExecLog(taskId,s);
@@ -267,14 +141,10 @@ public class TaskBuildExecServiceImpl implements TaskBuildExecService {
 
     public Boolean docker(TaskBuild taskBuild,String pipelineId){
 
-        String dockerName = taskBuild.getDockerName();
-        String dockerVersion = taskBuild.getDockerVersion();
         String dockerFile = taskBuild.getDockerFile();
 
         String taskId = taskBuild.getTaskId();
         String type = taskBuild.getType();
-
-        String name  = dockerName + ":"+ dockerVersion;
 
         String path = utilService.findPipelineDefaultAddress(pipelineId,1) ;
 
@@ -312,40 +182,30 @@ public class TaskBuildExecServiceImpl implements TaskBuildExecService {
             return false;
         }
 
-        try {
-            tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"保存镜像.....");
-
-            String instanceId = findPipelineInstanceId(pipelineId);
-
-            String logPath = utilService.findPipelineDefaultAddress(pipelineId,2)+instanceId ;
-
-            String imageFile = logPath + "/" + dockerName + ".tar.gz";
-
-            String order = "docker save -o  \"" + imageFile + "\" " + name ;
-
-            System.out.println(order);
-            Process process = PipelineUtil.process(path, order);
-            result = tasksInstanceService.readCommandExecResult(process, null, error(type), taskId);
-            if (!result){
-                tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"保存镜像失败");
-            }
-            tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"保存镜像完成！地址：" + imageFile);
-
-            // 创建流水线运行时产生的制品信息
-            TaskBuildProduct taskBuildProduct = new TaskBuildProduct(instanceId);
-            taskBuildProduct.setKey(PipelineFinal.DEFAULT_ARTIFACT_DOCKER);
-            taskBuildProduct.setValue(imageFile);
-            taskBuildProduct.setInstanceId(instanceId);
-            taskBuildProduct.setType(PipelineFinal.DEFAULT_TYPE);
-            taskBuildProductService.createBuildProduct(taskBuildProduct);
-
-        }catch (Exception e){
-            tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"保存镜像失败"+e.getMessage());
-            return false;
-        }
+        // try {
+        //     tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"保存镜像.....");
+        //
+        //     String instanceId = findPipelineInstanceId(pipelineId);
+        //
+        //     String logPath = utilService.findPipelineDefaultAddress(pipelineId,2)+instanceId ;
+        //
+        //     String imageFile = logPath + "/" + dockerName + ".tar.gz";
+        //
+        //     String order = "docker save -o  \"" + imageFile + "\" " + name ;
+        //
+        //     Process process = PipelineUtil.process(path, order);
+        //     result = tasksInstanceService.readCommandExecResult(process, null, error(type), taskId);
+        //     if (!result){
+        //         tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"保存镜像失败");
+        //     }
+        //     tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"保存镜像完成！地址：" + imageFile);
+        //
+        // }catch (Exception e){
+        //     tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"保存镜像失败"+e.getMessage());
+        //     return false;
+        // }
         return result;
     }
-
 
 
     public String findPipelineInstanceId(String pipelineId){

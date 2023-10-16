@@ -145,7 +145,16 @@ public class PipelineFinal {
 
     // 推送制品应用类型
     public static final String TASK_TYPE_ARTIFACT = "artifact";
+
+    public static final String TASK_ARTIFACT_MAVEN = "artifact_maven";
+
+    public static final String TASK_ARTIFACT_NODEJS = "artifact_nodejs";
+
+    public static final String TASK_ARTIFACT_DOCKER = "artifact_docker";
+
+
     public static final String TASK_ARTIFACT_XPACK = "xpack";
+
     public static final String TASK_ARTIFACT_SSH = "ssh";
     public static final String TASK_ARTIFACT_NEXUS = "nexus";
 

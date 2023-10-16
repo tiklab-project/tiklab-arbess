@@ -220,12 +220,12 @@ public class PipelineUtil {
         String[] cmd;
         if (findSystemType()==1){
             if (!PipelineUtil.isNoNull(path)){
-                cmd = new String[] { "cmd.exe", "/c", " "+ order };
-                process = runtime.exec(cmd);
-                // process = runtime.exec(" cmd.exe /c " + " " + order);
+                ProcessBuilder processBuilder = new ProcessBuilder("cmd.exe", "/c", order);
+                process = processBuilder.start();
+                // cmd = new String[] { "cmd.exe", "/c", " " + order };
+                // process = runtime.exec(cmd);
             }else {
                 cmd = new String[] { "cmd.exe", "/c", " " + order };
-                // process = runtime.exec(" cmd.exe /c " + " " + order,null,new File(path));
                 process = runtime.exec(cmd,null,new File(path));
             }
         }else {

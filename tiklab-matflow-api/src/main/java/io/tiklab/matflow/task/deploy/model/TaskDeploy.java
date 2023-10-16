@@ -36,12 +36,24 @@ public class TaskDeploy {
     @ApiProperty(name="startOrder",desc="启动命令")
     private String startOrder;
 
+    @ApiProperty(name="rule",desc="规则")
+    private String rule;
+
     //授权信息
     private Object auth;
 
     private int sort;
 
     private String type;
+
+    public String getRule() {
+        return rule;
+    }
+
+    public TaskDeploy setRule(String rule) {
+        this.rule = rule;
+        return this;
+    }
 
     public String getTaskId() {
         return taskId;

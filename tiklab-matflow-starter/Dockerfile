@@ -1,7 +1,6 @@
 FROM dokken/centos-stream-8
 #获取传入的变量
 ARG APP_NAME
-ARG APP_DIR
 
 #添加部署文件
 ENV DIR_HOME=/usr/local/apps

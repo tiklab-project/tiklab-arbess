@@ -1,6 +1,8 @@
 package io.tiklab.matflow.task.build.service;
 
+import com.alibaba.fastjson.JSONObject;
 import io.tiklab.beans.BeanMapper;
+import io.tiklab.eam.common.model.EamTicket;
 import io.tiklab.matflow.task.build.dao.TaskBuildProductDao;
 import io.tiklab.matflow.task.build.entity.TaskBuildProductEntity;
 import io.tiklab.matflow.task.build.model.TaskBuildProduct;
@@ -10,7 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Exporter
@@ -46,7 +50,7 @@ public class TaskBuildProductServiceImpl implements TaskBuildProductService {
     @Override
     public List<TaskBuildProduct> findAllBuildProduct() {
         List<TaskBuildProductEntity> allBuildProduct = taskBuildProductDao.findAllBuildProduct();
-        if (allBuildProduct == null || allBuildProduct.size() == 0){
+        if (allBuildProduct == null || allBuildProduct.isEmpty()){
             return Collections.emptyList();
         }
         return BeanMapper.mapList(allBuildProduct, TaskBuildProduct.class);
@@ -73,10 +77,14 @@ public class TaskBuildProductServiceImpl implements TaskBuildProductService {
         }
 
         for (TaskBuildProduct taskBuildProduct : buildProductList) {
-            String key = taskBuildProduct.getKey();
-            String value = taskBuildProduct.getValue();
-            strings = strings.replaceAll("\\$\\{" + key  + "}",value);
-            strings = strings.replaceAll(key,value);
+
+            LinkedHashMap<String,Object> linkedHashMap = JSONObject.parseObject(taskBuildProduct.getValue(), LinkedHashMap.class);
+            for (Map.Entry<String, Object> entry : linkedHashMap.entrySet()) {
+                String value = (String)entry.getValue();
+                String key = entry.getKey();
+                strings = strings.replaceAll("\\$\\{" + key  + "}",value);
+                strings = strings.replaceAll(key,value);
+            }
         }
         return strings;
     }

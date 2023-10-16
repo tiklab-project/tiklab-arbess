@@ -38,6 +38,18 @@ public class TaskDeployEntity {
     @Column(name = "start_order")
     private String startOrder;
 
+    @Column(name = "rule")
+    private String rule;
+
+    public String getRule() {
+        return rule;
+    }
+
+    public TaskDeployEntity setRule(String rule) {
+        this.rule = rule;
+        return this;
+    }
+
     public String getTaskId() {
         return taskId;
     }
