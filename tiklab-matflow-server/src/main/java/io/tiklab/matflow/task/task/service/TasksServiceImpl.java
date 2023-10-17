@@ -27,6 +27,8 @@ import io.tiklab.matflow.task.deploy.model.TaskDeploy;
 import io.tiklab.matflow.task.deploy.service.TaskDeployService;
 import io.tiklab.matflow.task.message.model.TaskMessageType;
 import io.tiklab.matflow.task.message.service.TaskMessageTypeService;
+import io.tiklab.matflow.task.pullArtifact.model.TaskPullArtifact;
+import io.tiklab.matflow.task.pullArtifact.service.TaskPullArtifactService;
 import io.tiklab.matflow.task.script.model.TaskScript;
 import io.tiklab.matflow.task.script.service.TaskScriptService;
 import io.tiklab.matflow.task.task.dao.TasksDao;
@@ -95,6 +97,9 @@ public class TasksServiceImpl implements TasksService {
 
     @Autowired
     PostprocessDao postprocessDao;
+
+    @Autowired
+    TaskPullArtifactService pullArtifactService;
 
     private final ExecutorService executorService = Executors.newCachedThreadPool();
 
@@ -436,6 +441,23 @@ public class TasksServiceImpl implements TasksService {
 
                     object = taskArtifact;
                 }
+                case TASK_TYPE_PULL -> {
+                    TaskPullArtifact taskArtifact = pullArtifactService.findOnePullArtifact(taskId);
+                    String authId = taskArtifact.getAuthId();
+                    if (!Objects.isNull(authId)){
+                        if (taskType.equals(TASK_ARTIFACT_XPACK)
+                                || taskType.equals(TASK_ARTIFACT_NEXUS) ){
+                            Object auth = authServerServer.findOneAuthServer(authId);
+                            taskArtifact.setAuth(auth);
+                        }
+                        if (taskType.equals(TASK_ARTIFACT_SSH)){
+                            Object auth = authHostService.findOneAuthHost(authId);
+                            taskArtifact.setAuth(auth);
+                        }
+                    }
+
+                    object = taskArtifact;
+                }
                 case TASK_TYPE_MESSAGE -> {
                     object = messageTypeServer.findMessage(taskId);
                 }
@@ -684,6 +706,11 @@ public class TasksServiceImpl implements TasksService {
                 task.setTaskId(cloneTaskId);
                 productServer.createProduct(task);
             }
+            case TASK_TYPE_PULL -> {
+                TaskPullArtifact task = pullArtifactService.findOnePullArtifact(taskId);
+                task.setTaskId(cloneTaskId);
+                pullArtifactService.createPullArtifact(task);
+            }
             case TASK_TYPE_MESSAGE -> {
                 TaskMessageType task = messageTypeServer.findMessage(taskId);
                 task.setTaskId(cloneTaskId);
@@ -737,8 +764,15 @@ public class TasksServiceImpl implements TasksService {
             case TASK_TYPE_ARTIFACT -> {
                 TaskArtifact task = new TaskArtifact();
                 task.setTaskId(taskId);
-                task.setArtifactType(PipelineFinal.TASK_ARTIFACT_XPACK);
+                task.setArtifactType(TASK_ARTIFACT_NEXUS);
                 productServer.createProduct(task);
+            }
+            case TASK_TYPE_PULL -> {
+                TaskPullArtifact task = new TaskPullArtifact();
+                task.setTaskId(taskId);
+                task.setPullType(TASK_ARTIFACT_NEXUS);
+                task.setTransitive(true);
+                pullArtifactService.createPullArtifact(task);
             }
             case TASK_TYPE_MESSAGE -> {
                 String object = JSON.toJSONString(values);
@@ -775,6 +809,7 @@ public class TasksServiceImpl implements TasksService {
             case TASK_TYPE_DEPLOY   -> deployService.deleteDeployConfig(taskId);
             case TASK_TYPE_CODESCAN -> codeScanService.deleteCodeScanConfig(taskId);
             case TASK_TYPE_ARTIFACT -> productServer.deleteProductConfig(taskId);
+            case TASK_TYPE_PULL     -> pullArtifactService.deletePullArtifactTask(taskId);
             case TASK_TYPE_MESSAGE  -> messageTypeServer.deleteAllMessage(taskId);
             case TASK_TYPE_SCRIPT   -> scriptServer.deleteScript(taskId);
            default -> throw new ApplicationException("无法更新未知的配置类型:"+taskType);
@@ -872,6 +907,27 @@ public class TasksServiceImpl implements TasksService {
                     productServer.updateProduct(taskArtifact);
                 }
             }
+            case TASK_TYPE_PULL -> {
+                TaskPullArtifact taskArtifact = JSON.parseObject(object, TaskPullArtifact.class);
+                TaskPullArtifact pullArtifact = pullArtifactService.findPullArtifact(taskId,"");
+                String id;
+                if (Objects.isNull(pullArtifact)){
+                    id = pullArtifactService.createPullArtifact(new TaskPullArtifact());
+                }else {
+                    id = pullArtifact.getTaskId();
+                }
+                String pullType = taskArtifact.getPullType();
+                if(!Objects.isNull(pullType)){
+                    pullArtifactService.deletePullArtifactTask(pullArtifact.getTaskId());
+                    TaskPullArtifact artifact = new TaskPullArtifact();
+                    artifact.setPullType(pullType);
+                    artifact.setTaskId(pullArtifact.getTaskId());
+                    pullArtifactService.createPullArtifact(artifact);
+                }else {
+                    taskArtifact.setTaskId(id);
+                    pullArtifactService.updatePullArtifact(taskArtifact);
+                }
+            }
             case TASK_TYPE_MESSAGE  -> {
                 messageTypeServer.deleteAllMessage(taskId);
                 TaskMessageType task = JSON.parseObject(object, TaskMessageType.class);
@@ -913,6 +969,9 @@ public class TasksServiceImpl implements TasksService {
             case TASK_TYPE_ARTIFACT -> {
                 return productServer.findOneArtifact(taskId,taskType);
             }
+            case TASK_TYPE_PULL -> {
+                return pullArtifactService.findPullArtifact(taskId,taskType);
+            }
             case TASK_TYPE_MESSAGE  -> {
                 return messageTypeServer.findMessage(taskId);
             }
@@ -936,6 +995,7 @@ public class TasksServiceImpl implements TasksService {
            case TASK_TYPE_DEPLOY   -> { return deployValid(taskType, object); }
            case TASK_TYPE_CODESCAN -> { return codeScanValid(taskType, object); }
            case TASK_TYPE_ARTIFACT -> { return productValid(taskType, object); }
+           case TASK_TYPE_PULL -> { return pullValid(taskType, object); }
            default -> {return true;}
         }
     }
@@ -966,6 +1026,9 @@ public class TasksServiceImpl implements TasksService {
             }
             case TASK_TYPE_SCRIPT,TASK_SCRIPT_BAT ,TASK_SCRIPT_SHELL ->{
                 return TASK_TYPE_SCRIPT;
+            }
+            case TASK_PULL_MAVEN,TASK_PULL_DOCKER,TASK_PULL_NODEJS ->{
+                return TASK_TYPE_PULL;
             }
             default ->  throw new ApplicationException("无法更新未知的配置类型:"+taskType);
         }
@@ -1025,9 +1088,7 @@ public class TasksServiceImpl implements TasksService {
     private Boolean buildValid(String taskType,Object object){
         TaskBuild build = (TaskBuild) object;
         if (taskType.equals(TASK_BUILD_DOCKER)){
-            if (Objects.isNull(build.getDockerName())){
-                return false;
-            }
+            return !Objects.isNull(build.getDockerFile());
         }
         return true;
     }
@@ -1044,28 +1105,84 @@ public class TasksServiceImpl implements TasksService {
     }
 
     private Boolean productValid(String taskType,Object object){
-        TaskArtifact product = (TaskArtifact) object;
+        TaskArtifact artifact = (TaskArtifact) object;
+        String artifactType = artifact.getArtifactType();
 
-        if (taskType.equals(TASK_ARTIFACT_NEXUS) || taskType.equals(TASK_ARTIFACT_XPACK)){
-            if (!PipelineUtil.isNoNull(product.getArtifactId())){
-                return false;
-            }
-            if (!PipelineUtil.isNoNull(product.getVersion())){
-                return false;
-            }
-            if (!PipelineUtil.isNoNull(product.getGroupId())){
-                return false;
-            }
-        }
-        if (taskType.equals(TASK_ARTIFACT_XPACK)){
-            if (!PipelineUtil.isNoNull(product.getRepository().getName())){
-                return false;
+        if (taskType.equals(TASK_ARTIFACT_DOCKER)){
+            if (artifactType.equals(TASK_ARTIFACT_NEXUS)){
+                if (!PipelineUtil.isNoNull(artifact.getDockerImage())){
+                    return false;
+                }
             }
         }
 
-        if (taskType.equals(TASK_ARTIFACT_SSH)){
-            return PipelineUtil.isNoNull(product.getPutAddress());
+        if (taskType.equals(TASK_ARTIFACT_NODEJS)){
+            return true;
         }
+        if (taskType.equals(TASK_ARTIFACT_MAVEN)){
+            if (artifactType.equals(TASK_ARTIFACT_NEXUS) || artifactType.equals(TASK_ARTIFACT_XPACK)){
+                if (!PipelineUtil.isNoNull(artifact.getArtifactId())){
+                    return false;
+                }
+                if (!PipelineUtil.isNoNull(artifact.getVersion())){
+                    return false;
+                }
+                if (!PipelineUtil.isNoNull(artifact.getGroupId())){
+                    return false;
+                }
+            }
+            if (artifactType.equals(TASK_ARTIFACT_XPACK)){
+                if (!PipelineUtil.isNoNull(artifact.getRepository().getName())){
+                    return false;
+                }
+            }
+
+            if (artifactType.equals(TASK_ARTIFACT_SSH)){
+                return PipelineUtil.isNoNull(artifact.getPutAddress());
+            }
+        }
+        return true;
+    }
+
+    private Boolean pullValid(String taskType,Object object){
+        TaskPullArtifact pullArtifact = (TaskPullArtifact) object;
+        String pullType = pullArtifact.getPullType();
+
+        if (taskType.equals(TASK_PULL_DOCKER)){
+            if (pullType.equals(TASK_ARTIFACT_NEXUS) || pullType.equals(TASK_ARTIFACT_XPACK)){
+                return PipelineUtil.isNoNull(pullArtifact.getDockerImage());
+            }
+            return true;
+        }
+
+        if (taskType.equals(TASK_PULL_NODEJS)){
+            return true;
+        }
+
+        if (taskType.equals(TASK_PULL_MAVEN)){
+            if (pullType.equals(TASK_ARTIFACT_NEXUS) || pullType.equals(TASK_ARTIFACT_XPACK)){
+                if (!PipelineUtil.isNoNull(pullArtifact.getArtifactId())){
+                    return false;
+                }
+                if (!PipelineUtil.isNoNull(pullArtifact.getVersion())){
+                    return false;
+                }
+                if (!PipelineUtil.isNoNull(pullArtifact.getGroupId())){
+                    return false;
+                }
+            }
+
+            if (pullType.equals(TASK_ARTIFACT_SSH)){
+                if (!PipelineUtil.isNoNull(pullArtifact.getLocalAddress())){
+                    return false;
+                }
+                return PipelineUtil.isNoNull(pullArtifact.getRemoteAddress());
+            }
+            return true;
+        }
+
+
+
         return true;
     }
 
@@ -1126,6 +1243,15 @@ public class TasksServiceImpl implements TasksService {
             }
             case TASK_ARTIFACT_DOCKER -> {
                 return "Docker推送";
+            }
+            case TASK_PULL_MAVEN ->{
+                return "Maven拉取";
+            }
+            case TASK_PULL_NODEJS ->{
+                return "Node.Js拉取";
+            }
+            case TASK_PULL_DOCKER ->{
+                return "Docker拉取";
             }
             case TASK_MESSAGE_MSG -> {
                 return "消息通知";

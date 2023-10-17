@@ -153,6 +153,15 @@ public class PipelineFinal {
     public static final String TASK_ARTIFACT_DOCKER = "artifact_docker";
 
 
+    public static final String TASK_TYPE_PULL = "pull";
+
+    public static final String TASK_PULL_MAVEN = "pull_maven";
+
+    public static final String TASK_PULL_NODEJS = "pull_nodejs";
+
+    public static final String TASK_PULL_DOCKER = "pull_docker";
+
+
     public static final String TASK_ARTIFACT_XPACK = "xpack";
 
     public static final String TASK_ARTIFACT_SSH = "ssh";

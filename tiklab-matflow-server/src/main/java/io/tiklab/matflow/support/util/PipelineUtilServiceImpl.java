@@ -48,10 +48,21 @@ public class PipelineUtilServiceImpl implements PipelineUtilService {
 
 
     @Override
-    public  String findFile(String pipelineId, String regex) {
+    public  String findFile(String pipelineId,String fileDir, String regex) {
         List<String> list = new ArrayList<>();
-        String path= findPipelineDefaultAddress(pipelineId,1) ;
-        List<String> filePath = PipelineFileUtil.getFilePath(new File(path),new ArrayList<>());
+
+        File file3 = new File(fileDir);
+        if (file3.exists() && file3.isFile()){
+            return fileDir;
+        }
+
+        File file2 = new File(fileDir + "/" + regex);
+        if (file2.exists() && file2.isFile()){
+            return file2.getAbsolutePath();
+        }
+
+
+        List<String> filePath = PipelineFileUtil.getFilePath(new File(fileDir),new ArrayList<>());
         for (String s : filePath) {
             File file = new File(s);
 

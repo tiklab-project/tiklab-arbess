@@ -30,3 +30,19 @@ ALTER TABLE pip_task_artifact ADD COLUMN docker_image VARCHAR(64);
 
 -- 部署
 ALTER TABLE pip_task_deploy ADD COLUMN rule VARCHAR(64);
+ALTER TABLE pip_task_deploy ADD COLUMN docker_image VARCHAR(64);
+
+
+
+create table pip_task_pull_artifact  (
+    task_id varchar(64) PRIMARY KEY,
+    pull_type varchar(32) ,
+    docker_image varchar(32) ,
+    remote_address varchar(64) ,
+    local_address varchar(255) ,
+    auth_id varchar(255),
+    group_id varchar(255),
+    version varchar(255),
+    artifact_id varchar(255),
+    transitive varchar(255)
+);

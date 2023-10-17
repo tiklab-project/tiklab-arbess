@@ -38,8 +38,20 @@ public class TaskDeployEntity {
     @Column(name = "start_order")
     private String startOrder;
 
+    @Column(name = "docker_image")
+    private String dockerImage;;
+
     @Column(name = "rule")
     private String rule;
+
+    public String getDockerImage() {
+        return dockerImage;
+    }
+
+    public TaskDeployEntity setDockerImage(String dockerImage) {
+        this.dockerImage = dockerImage;
+        return this;
+    }
 
     public String getRule() {
         return rule;

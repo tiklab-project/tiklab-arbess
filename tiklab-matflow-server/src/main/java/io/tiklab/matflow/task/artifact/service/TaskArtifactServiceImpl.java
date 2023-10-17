@@ -5,9 +5,8 @@ import io.tiklab.matflow.setting.model.AuthHost;
 import io.tiklab.matflow.setting.model.AuthThird;
 import io.tiklab.matflow.setting.service.AuthHostService;
 import io.tiklab.matflow.setting.service.AuthThirdService;
-import io.tiklab.matflow.support.util.PipelineFinal;
 import io.tiklab.matflow.support.util.PipelineUtil;
-import io.tiklab.matflow.task.artifact.dao.TaskProductDao;
+import io.tiklab.matflow.task.artifact.dao.TaskArtifactDao;
 import io.tiklab.matflow.task.artifact.entity.TaskArtifactEntity;
 import io.tiklab.matflow.task.artifact.model.TaskArtifact;
 import io.tiklab.matflow.task.artifact.model.XpackRepository;
@@ -27,7 +26,7 @@ public class TaskArtifactServiceImpl implements TaskArtifactService {
 
 
     @Autowired
-    private TaskProductDao productDao;
+    private TaskArtifactDao productDao;
 
     @Autowired
     private AuthThirdService thirdServer;

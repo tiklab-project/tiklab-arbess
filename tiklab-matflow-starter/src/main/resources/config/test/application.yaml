@@ -9,7 +9,7 @@ server:
 
 jdbc:
   driverClassName: org.postgresql.Driver
-  url: jdbc:postgresql://localhost:5000/matflow?stringtype=unspecified
+  url: jdbc:postgresql://localhost:5432/tiklab_matflow?stringtype=unspecified
   username: postgres
   password: darth2020
 
@@ -34,10 +34,12 @@ dfs:
 dcs:
   server:
     enabled: true
+    #    enabled: false
     port: 5020
     datapath: ${DATA_HOME}/caches
   client:
     url: 127.0.0.1:5020
+    #    url: 127.0.0.1:5035
     group: g1
     database: dcs1
     expire: 7200
@@ -53,25 +55,34 @@ dss:
     url: 127.0.0.1:6000
     bucket: ${app.name}
 
+postgresql:
+  embbed:
+    enable: true
+  database: tiklab_matflow
+  db:
+    port: 5432
+    username: postgres
+    password: darth2020
+    address: ${DATA_HOME}/postgresql
+
 datapath: ${DATA_HOME}/caches
 
 eas:
   embbed:
     enable: true
-  address: http://eas-ce.test.tiklab.net
+  address: http://e.eas.tiklab.net
+
+
+backups:
+  dir: /data/matflow
+  time: 0 0 2 * * ?
+
+#message:
+#  sms:
+#    enabled: true
 
 base:
-  url: http://matflow-ce.test.tiklab.net
-
-postgresql:
-  embbed:
-    enable: true
-  database: matflow
-  db:
-    port: 5000
-    username: postgres
-    password: darth2020
-    address: ${DATA_HOME}/postgresql
+  url: http://e.matflow.tiklab.net
 
 #homes
 homes:
@@ -83,9 +94,7 @@ licences:
 
 #file
 file:
-  path: http://file.dev.tiklab.net
-
-
+  path: http://file.tiklab.net
 
 
 

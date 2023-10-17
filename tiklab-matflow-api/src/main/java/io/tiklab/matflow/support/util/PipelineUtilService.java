@@ -27,7 +27,7 @@ public interface PipelineUtilService {
      * @return 文件地址
      * @throws ApplicationException 匹配到多个文件/没有匹配到文件
      */
-    String findFile(String pipelineId, String regex) throws ApplicationException;
+    String findFile(String pipelineId,String fileDir, String regex) throws ApplicationException;
 
 
 

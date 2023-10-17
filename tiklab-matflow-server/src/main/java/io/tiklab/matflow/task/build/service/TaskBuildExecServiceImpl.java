@@ -171,7 +171,7 @@ public class TaskBuildExecServiceImpl implements TaskBuildExecService {
             String order = variableServer.replaceVariable(pipelineId, taskId, dockerOrder);
 
             Process process = PipelineUtil.process(path, order);
-            result = tasksInstanceService.readCommandExecResult(process, null, error(type), taskId);
+            result = tasksInstanceService.readCommandExecResult(process, GBK, error(type), taskId);
             if (!result){
                 tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"镜像构建失败");
                 return false;
@@ -204,7 +204,7 @@ public class TaskBuildExecServiceImpl implements TaskBuildExecService {
         //     tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"保存镜像失败"+e.getMessage());
         //     return false;
         // }
-        return result;
+        return true;
     }
 
 

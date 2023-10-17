@@ -9,6 +9,7 @@ import io.tiklab.matflow.task.build.service.TaskBuildExecService;
 import io.tiklab.matflow.task.code.service.TaskCodeExecService;
 import io.tiklab.matflow.task.codescan.service.TaskCodeScanExecService;
 import io.tiklab.matflow.task.deploy.service.TaskDeployExecService;
+import io.tiklab.matflow.task.pullArtifact.service.TaskPullArtifactExecService;
 import io.tiklab.matflow.task.task.model.TaskExecMessage;
 import io.tiklab.matflow.task.message.service.TaskMessageExecService;
 import io.tiklab.matflow.task.script.service.TaskScriptExecService;
@@ -57,6 +58,9 @@ public class TasksExecServiceImpl implements TasksExecService {
 
     @Autowired
     TasksService tasksService;
+
+    @Autowired
+    TaskPullArtifactExecService pullArtifact;
 
     private static final Logger logger = LoggerFactory.getLogger(TasksExecServiceImpl.class);
 
@@ -113,13 +117,14 @@ public class TasksExecServiceImpl implements TasksExecService {
 
         //分发执行不同任务
         switch (tasksService.findTaskType(taskType)) {
-            case "code"     -> state = code.clone(pipelineId, tasks, taskType);
-            case "test"     -> state = test.test(pipelineId, tasks, taskType);
-            case "build"    -> state = build.build(pipelineId, tasks, taskType);
-            case "deploy"   -> state = deploy.deploy(pipelineId, tasks, taskType);
-            case "codescan" -> state = codeScan.codeScan(pipelineId, tasks, taskType);
-            case "artifact" -> state = product.product(pipelineId, tasks, taskType);
-            case "script"   -> state = scripts.scripts(pipelineId, tasks, taskType);
+            case TASK_TYPE_CODE     -> state = code.clone(pipelineId, tasks, taskType);
+            case TASK_TYPE_TEST     -> state = test.test(pipelineId, tasks, taskType);
+            case TASK_TYPE_BUILD    -> state = build.build(pipelineId, tasks, taskType);
+            case TASK_TYPE_DEPLOY   -> state = deploy.deploy(pipelineId, tasks, taskType);
+            case TASK_TYPE_CODESCAN -> state = codeScan.codeScan(pipelineId, tasks, taskType);
+            case TASK_TYPE_ARTIFACT -> state = product.product(pipelineId, tasks, taskType);
+            case TASK_TYPE_SCRIPT   -> state = scripts.scripts(pipelineId, tasks, taskType);
+            case TASK_TYPE_PULL   -> state = pullArtifact.pullArtifact(pipelineId, tasks, taskType);
         }
 
         //更新阶段状态

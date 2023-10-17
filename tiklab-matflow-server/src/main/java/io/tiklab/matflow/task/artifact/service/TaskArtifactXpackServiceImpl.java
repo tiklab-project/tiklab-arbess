@@ -55,6 +55,13 @@ public class TaskArtifactXpackServiceImpl implements TaskArtifactXpackService {
         List<XpackRepository> list = new ArrayList<>();
         try {
             repositoryList = repositoryServer(serverAddress).findRepositoryList(repositoryQuery);
+
+
+
+
+
+
+
             if (repositoryList == null || repositoryList.isEmpty()){
                 return Collections.emptyList();
             }

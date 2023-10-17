@@ -12,6 +12,7 @@ import io.tiklab.matflow.support.condition.service.ConditionService;
 import io.tiklab.matflow.support.util.PipelineFileUtil;
 import io.tiklab.matflow.support.util.PipelineFinal;
 import io.tiklab.matflow.support.util.PipelineUtil;
+import io.tiklab.matflow.support.util.PipelineUtilService;
 import io.tiklab.matflow.support.variable.service.VariableService;
 import io.tiklab.matflow.task.build.model.TaskBuildProduct;
 import io.tiklab.matflow.task.build.model.TaskBuildProductQuery;
@@ -21,6 +22,7 @@ import io.tiklab.matflow.task.task.model.TaskInstance;
 import io.tiklab.matflow.task.task.model.Tasks;
 import io.tiklab.matflow.task.task.service.TasksInstanceService;
 import io.tiklab.rpc.annotation.Exporter;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -55,6 +57,9 @@ public class TaskDeployExecServiceImpl implements TaskDeployExecService {
 
     @Autowired
     PipelineInstanceService pipelineInstanceService;
+
+    @Autowired
+    PipelineUtilService utilService;
 
     private static final Logger logger = LoggerFactory.getLogger(TaskDeployExecServiceImpl.class);
 
@@ -131,6 +136,7 @@ public class TaskDeployExecServiceImpl implements TaskDeployExecService {
         return true;
     }
 
+
     /**
      * linux部署
      */
@@ -141,24 +147,22 @@ public class TaskDeployExecServiceImpl implements TaskDeployExecService {
         //获取部署文件
         tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"获取部署文件......");
 
-        // //  获取制品信息
+        //  获取制品信息
         String instanceId = findPipelineInstanceId(pipelineId);
 
-        TaskBuildProduct artifact = findArtifact(pipelineId, DEFAULT_ARTIFACT_ADDRESS);
-        LinkedHashMap<String,Object> linkedHashMap = JSONObject.parseObject(artifact.getValue(), LinkedHashMap.class);
-        String path = (String)linkedHashMap.get(DEFAULT_ARTIFACT_ADDRESS);
+        String filePath = findRuleArtifact(pipelineId, taskDeploy.getLocalAddress(),taskDeploy.getRule());
 
         // 上传制品
         try {
-
-            tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"制品文件获取成功："+ path );
+            tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"制品文件获取成功："+ filePath );
             String deployAddress = variableServer.replaceVariable(pipelineId, taskId, taskDeploy.getDeployAddress());
             tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"制品文件文件上传中..." );
             // 开始上传文件
-            ftp(session, path, deployAddress);
+            ftp(session, filePath, deployAddress);
         } catch (JSchException | SftpException e) {
             throw new ApplicationException("制品文件上传失败："+e.getMessage());
         }
+
         tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"制品文件上传成功" );
 
         try {
@@ -183,7 +187,6 @@ public class TaskDeployExecServiceImpl implements TaskDeployExecService {
                 for (String s : list) {
                     String key = variableServer.replaceVariable(pipelineId, taskId, s);
                     String orders = "cd "+" "+ deployAddress + ";" + key;
-                    System.out.println("命令："+orders);
                     tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"执行部署命令：" + key);
                     sshOrder(session,orders, taskId);
                 }
@@ -194,31 +197,55 @@ public class TaskDeployExecServiceImpl implements TaskDeployExecService {
         }
     }
 
-    /**
-     * 查询制品信息
-     * @param pipelineId 流水线id
-     * @return 制品信息
-     */
-    private TaskBuildProduct findArtifact(String pipelineId,String type){
-        // 查询制品信息
-        String instanceId = findPipelineInstanceId(pipelineId);
 
-        TaskBuildProductQuery taskBuildProductQuery = new TaskBuildProductQuery();
-        taskBuildProductQuery.setInstanceId(instanceId);
-        taskBuildProductQuery.setKey(type);
-        taskBuildProductQuery.setType(PipelineFinal.DEFAULT_TYPE);
-        List<TaskBuildProduct> buildProductList = taskBuildProductService.findBuildProductList(taskBuildProductQuery);
+    private String findRuleArtifact(String pipelineId,String fileDir,String rule) {
 
-        if (buildProductList.isEmpty()){
-            throw new ApplicationException("无法获取到制品!");
+        String path = utilService.findPipelineDefaultAddress(pipelineId,1);
+
+        if (fileDir.equals("${DEPLOY_DEFAULT_ADDRESS}")){
+            fileDir = path;
         }
 
-        TaskBuildProduct taskBuildProduct = buildProductList.get(0);
-        String path = taskBuildProduct.getValue();
-        // 获取文件后缀名
-        String ext = FilenameUtils.getExtension(path);
+        // 匹配制品
+        String productAddress;
+        try {
+            productAddress = utilService.findFile(pipelineId,fileDir,rule);
+        }catch (ApplicationException e){
+            throw new ApplicationException(e.getMessage());
+        }
 
-        return taskBuildProduct;
+        if (Objects.isNull(path)){
+            throw new ApplicationException("没有匹配到部署文件!");
+        }
+
+        File file = new File(productAddress);
+
+        String defaultAddress = utilService.findPipelineDefaultAddress(pipelineId, 2);
+
+        // 默认路径
+        String instanceId = findPipelineInstanceId(pipelineId);
+        String fileAddress = defaultAddress + instanceId +"/"+file.getName();
+
+        LinkedHashMap<String,Object> linkedMap = new LinkedHashMap<>();
+        linkedMap.put(DEFAULT_ARTIFACT_ADDRESS,fileAddress);
+        linkedMap.put(DEFAULT_ARTIFACT_NAME,file.getName());
+
+        // 创建流水线运行时产生的制品信息
+        TaskBuildProduct taskBuildProduct = new TaskBuildProduct(instanceId);
+        taskBuildProduct.setKey(PipelineFinal.DEFAULT_ARTIFACT_ADDRESS);
+        taskBuildProduct.setValue(JSONObject.toJSONString(linkedMap));
+        taskBuildProduct.setInstanceId(instanceId);
+        taskBuildProduct.setType(PipelineFinal.DEFAULT_TYPE);
+
+        taskBuildProductService.createBuildProduct(taskBuildProduct);
+
+        // 移动文件
+        try {
+            FileUtils.copyFile(file, new File(fileAddress));
+        } catch (IOException e) {
+            throw new ApplicationException("保存部署文件失败!");
+        }
+        return productAddress;
     }
 
     /**
@@ -228,26 +255,65 @@ public class TaskDeployExecServiceImpl implements TaskDeployExecService {
 
         String taskId = taskDeploy.getTaskId();
 
-        //部署位置
-        String deployAddress = "/"+  taskDeploy.getDeployAddress();
+        String dockerImage = taskDeploy.getDockerImage();
 
-        TaskBuildProduct artifact = findArtifact(pipelineId, DEFAULT_ARTIFACT_DOCKER);
-        LinkedHashMap<String,Object> linkedHashMap = JSONObject.parseObject(artifact.getValue(), LinkedHashMap.class);
-        String imagePath = (String)linkedHashMap.get(DEFAULT_ARTIFACT_DOCKER);
+        // 镜像文件保存位置
+        String instanceId = findPipelineInstanceId(pipelineId);
+        String imageFile = utilService.findPipelineDefaultAddress(pipelineId,2)+instanceId ;
+        String tarFile = "docker_build.tar.gz";
 
         try {
-            ftp(session,imagePath,deployAddress);
+            tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"保存镜像.....");
+
+
+            String logPath = utilService.findPipelineDefaultAddress(pipelineId,2)+instanceId ;
+
+            File file = new File(logPath);
+            if (!file.exists()){
+                file.mkdirs();
+            }
+
+            String order = "docker save -o  \"" + imageFile+"/" + tarFile + "\" \"" + dockerImage +"\"" ;
+
+            Process process = PipelineUtil.process(null, order);
+            boolean result = tasksInstanceService.readCommandExecResult(process, null, error(taskDeploy.getType()), taskId);
+            if (!result){
+                throw new ApplicationException("保存镜像失败!");
+            }
+            tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"保存镜像完成！地址：" + imageFile+"/" + tarFile);
+        }catch (Exception e){
+            throw new ApplicationException("保存镜像失败"+e.getMessage());
+        }
+
+
+
+        LinkedHashMap<String,Object> linkedMap = new LinkedHashMap<>();
+        linkedMap.put(DEFAULT_ARTIFACT_ADDRESS,imageFile);
+        linkedMap.put(DEFAULT_ARTIFACT_NAME,dockerImage);
+
+        // 创建流水线运行时产生的制品信息
+        TaskBuildProduct taskBuildProduct = new TaskBuildProduct(instanceId);
+        taskBuildProduct.setKey(DEFAULT_ARTIFACT_DOCKER);
+        taskBuildProduct.setValue(JSONObject.toJSONString(linkedMap));
+        taskBuildProduct.setInstanceId(instanceId);
+        taskBuildProduct.setType(PipelineFinal.DEFAULT_TYPE);
+        taskBuildProductService.createBuildProduct(taskBuildProduct);
+
+
+        //部署位置
+        tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"开始推送镜像......");
+        String deployAddress = "/"+  taskDeploy.getDeployAddress();
+
+        try {
+            ftp(session,imageFile +"/" + tarFile,deployAddress);
             tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"镜像文件推送成功!");
         } catch (JSchException | SftpException e) {
             throw new ApplicationException("推送镜像文件失败！"+e.getMessage());
         }
 
-        File file = new File(imagePath);
-
-        String name = file.getName();
         try {
             tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"开始加载镜像文件......");
-            String order= "docker load -i " + deployAddress + "/" + name;
+            String order= "docker load -i " + deployAddress + "/" + tarFile;
             sshOrder(session,order,taskId);
             tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"镜像文件加载成功！");
         } catch (JSchException | ApplicationException e) {
@@ -255,19 +321,18 @@ public class TaskDeployExecServiceImpl implements TaskDeployExecService {
         }
 
         try {
-            tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"启动容器......");
+            tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"执行启动命令......");
             //启动命令
             String deployOrder = taskDeploy.getDeployOrder();
 
             if (!StringUtils.isEmpty(deployOrder)){
                 sshOrder(session,deployOrder,taskId);
             }
-            tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"容器启动完成！");
+            tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"启动命令执行完成！");
         } catch (JSchException | ApplicationException e) {
-            throw new ApplicationException("容器启动失败！"+e.getMessage());
+            throw new ApplicationException("启动命令执行失败！"+e.getMessage());
         }
     }
-
 
     public String findPipelineInstanceId(String pipelineId){
 
@@ -317,7 +382,7 @@ public class TaskDeployExecServiceImpl implements TaskDeployExecService {
         // 执行脚本
         String validOrder =" sh -n " + name;
         Process processs = PipelineUtil.process(absolutePath, validOrder);
-        tasksInstanceService.readCommandExecResult(processs, "UTF-8", error(41), taskId);
+        tasksInstanceService.readCommandExecResult(processs, "UTF-8", error(""), taskId);
         int exitCodes = processs.waitFor();
         if (exitCodes != 0) {
             PipelineFileUtil.deleteFile(file);
@@ -326,7 +391,7 @@ public class TaskDeployExecServiceImpl implements TaskDeployExecService {
 
         String order = " sh " + name;
         Process process = PipelineUtil.process(absolutePath, order);
-        tasksInstanceService.readCommandExecResult(process, "UTF-8", error(41), taskId);
+        tasksInstanceService.readCommandExecResult(process, "UTF-8", error(""), taskId);
 
         // 获取执行状态
         int exitCode = process.waitFor();
@@ -427,7 +492,7 @@ public class TaskDeployExecServiceImpl implements TaskDeployExecService {
 
             }
         };
-        boolean result = tasksInstanceService.readCommandExecResult(process, PipelineFinal.UTF_8, error(41), taskId);
+        boolean result = tasksInstanceService.readCommandExecResult(process, PipelineFinal.UTF_8, error(""), taskId);
         if (!result){
             exec.disconnect();
             throw new ApplicationException("");
@@ -458,7 +523,7 @@ public class TaskDeployExecServiceImpl implements TaskDeployExecService {
     }
 
 
-    private Map<String,String> error(int type){
+    private Map<String,String> error(String type){
         Map<String,String> map = new HashMap<>();
         map.put("syntax error:","脚本语法错误！");
         map.put("invalid option;","");

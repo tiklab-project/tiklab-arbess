@@ -39,12 +39,24 @@ public class TaskDeploy {
     @ApiProperty(name="rule",desc="规则")
     private String rule;
 
+    @ApiProperty(name="dockerImage",desc="规则")
+    private String dockerImage;
+
     //授权信息
     private Object auth;
 
     private int sort;
 
     private String type;
+
+    public String getDockerImage() {
+        return dockerImage;
+    }
+
+    public TaskDeploy setDockerImage(String dockerImage) {
+        this.dockerImage = dockerImage;
+        return this;
+    }
 
     public String getRule() {
         return rule;
