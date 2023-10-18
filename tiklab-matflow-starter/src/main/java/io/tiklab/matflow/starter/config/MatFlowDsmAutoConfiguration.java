@@ -35,7 +35,8 @@ public class MatFlowDsmAutoConfiguration {
                 //MatfloeDsm
                 "pip-pipeline_1.0.0",
                 "pip-init-project_1.0.0",
-                "pip-var_1.0.0"
+                "pip-var_1.0.0",
+                "pip-test_1.0.0"
         });
         dsmConfig.newVersion("1.0.1", new String[]{
                 "pip-project_1.0.1",

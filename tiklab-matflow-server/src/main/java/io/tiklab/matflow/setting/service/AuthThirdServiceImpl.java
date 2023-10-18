@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -206,6 +207,17 @@ public class AuthThirdServiceImpl implements AuthThirdService {
             }
         }
         List<AuthThird> authThirds = BeanMapper.mapList(allAuthServerEntity, AuthThird.class);
+        joinTemplate.joinQuery(authThirds);
+        return authThirds;
+    }
+
+
+    public List<AuthThird> findAllAuthServerList() {
+        List<AuthThirdEntity> allAuthServer = authServerDao.findAllAuthServer();
+        if (allAuthServer == null){
+            return Collections.emptyList();
+        }
+        List<AuthThird> authThirds = BeanMapper.mapList(allAuthServer, AuthThird.class);
         joinTemplate.joinQuery(authThirds);
         return authThirds;
     }

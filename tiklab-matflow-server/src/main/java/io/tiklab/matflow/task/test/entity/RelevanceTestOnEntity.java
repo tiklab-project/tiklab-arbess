@@ -17,9 +17,20 @@ public class RelevanceTestOnEntity {
     @Column(name = "pipeline_id" ,notNull = true)
     private String pipelineId;
 
+    @Column(name = "auth_id" ,notNull = true)
+    private String authId;
+
     @Column(name = "create_time" ,notNull = true)
     private String createTime;
 
+    public String getAuthId() {
+        return authId;
+    }
+
+    public RelevanceTestOnEntity setAuthId(String authId) {
+        this.authId = authId;
+        return this;
+    }
 
     public String getRelevanceId() {
         return relevanceId;

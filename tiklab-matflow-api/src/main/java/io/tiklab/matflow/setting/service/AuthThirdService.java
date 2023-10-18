@@ -49,6 +49,8 @@ public interface AuthThirdService {
      */
     List<AuthThird> findAllAuthServerList(String type);
 
+    List<AuthThird> findAllAuthServerList();
+
     /**
      * 查询所有流水线第三方授权
      * @return 流水线第三方授权列表

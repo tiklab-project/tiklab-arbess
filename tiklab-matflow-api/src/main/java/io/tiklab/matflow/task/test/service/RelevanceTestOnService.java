@@ -14,7 +14,7 @@ import java.util.List;
 public interface RelevanceTestOnService {
 
 
-    void createRelevance(String pipelineId,String instanceId);
+    void createRelevance(String pipelineId,String instanceId,String authId);
 
 
     /**

@@ -1168,8 +1168,14 @@ public class TasksServiceImpl implements TasksService {
         String pullType = pullArtifact.getPullType();
 
         if (taskType.equals(TASK_PULL_DOCKER)){
-            if (pullType.equals(TASK_ARTIFACT_NEXUS) || pullType.equals(TASK_ARTIFACT_XPACK)){
+            if (pullType.equals(TASK_ARTIFACT_NEXUS) ){
                 return PipelineUtil.isNoNull(pullArtifact.getDockerImage());
+            }
+            if ( pullType.equals(TASK_ARTIFACT_XPACK)){
+                if (!PipelineUtil.isNoNull(pullArtifact.getDockerImage())){
+                    return false;
+                }
+                return !Objects.isNull(pullArtifact.getRepository());
             }
             return true;
         }
@@ -1179,7 +1185,7 @@ public class TasksServiceImpl implements TasksService {
         }
 
         if (taskType.equals(TASK_PULL_MAVEN)){
-            if (pullType.equals(TASK_ARTIFACT_NEXUS) || pullType.equals(TASK_ARTIFACT_XPACK)){
+            if (pullType.equals(TASK_ARTIFACT_NEXUS) ){
                 if (!PipelineUtil.isNoNull(pullArtifact.getArtifactId())){
                     return false;
                 }
@@ -1187,6 +1193,20 @@ public class TasksServiceImpl implements TasksService {
                     return false;
                 }
                 if (!PipelineUtil.isNoNull(pullArtifact.getGroupId())){
+                    return false;
+                }
+            }
+            if (pullType.equals(TASK_ARTIFACT_XPACK)){
+                if (!PipelineUtil.isNoNull(pullArtifact.getArtifactId())){
+                    return false;
+                }
+                if (!PipelineUtil.isNoNull(pullArtifact.getVersion())){
+                    return false;
+                }
+                if (!PipelineUtil.isNoNull(pullArtifact.getGroupId())){
+                    return false;
+                }
+                if (Objects.isNull(pullArtifact.getRepository())){
                     return false;
                 }
             }

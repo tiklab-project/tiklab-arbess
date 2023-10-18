@@ -22,6 +22,8 @@ public class RelevanceTestOn {
 
     private String time;
 
+    private String authId;
+
     private String createTime;
 
     private String testonId;
@@ -33,6 +35,15 @@ public class RelevanceTestOn {
     private Object object;
 
     private String url;
+
+    public String getAuthId() {
+        return authId;
+    }
+
+    public RelevanceTestOn setAuthId(String authId) {
+        this.authId = authId;
+        return this;
+    }
 
     public String getUrl() {
         return url;

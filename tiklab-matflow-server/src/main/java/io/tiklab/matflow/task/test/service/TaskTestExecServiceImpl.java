@@ -122,7 +122,7 @@ public class TaskTestExecServiceImpl implements TaskTestExecService {
         }catch (Exception e){
             TestPlanExecResult  testPlanExecResult = taskTestOnService.findTestPlanExecResult(authId);
             String instanceId = testPlanExecResult.getTestPlanInstance().getId();
-            relevanceTestOnService.createRelevance(pipelineId,instanceId);
+            relevanceTestOnService.createRelevance(pipelineId,instanceId,authId);
             tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"testOn执行失败："+e.getMessage());
             return false;
         }
@@ -161,7 +161,7 @@ public class TaskTestExecServiceImpl implements TaskTestExecService {
 
         // 创建对应的测试关系表
         try {
-            relevanceTestOnService.createRelevance(pipelineId,instanceId);
+            relevanceTestOnService.createRelevance(pipelineId,instanceId,authId);
         }catch (Exception e){
             tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"获取测试结果失败："+e.getMessage());
             return false;
