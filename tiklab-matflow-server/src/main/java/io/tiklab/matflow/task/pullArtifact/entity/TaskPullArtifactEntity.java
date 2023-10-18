@@ -37,8 +37,21 @@ public class TaskPullArtifactEntity {
     @Column(name = "artifact_id")
     private String artifactId;
 
+    @Column(name = "xpack_id")
+    private String xpackId;
+
     @Column(name = "transitive")
     private String transitive;
+
+
+    public String getXpackId() {
+        return xpackId;
+    }
+
+    public TaskPullArtifactEntity setXpackId(String xpackId) {
+        this.xpackId = xpackId;
+        return this;
+    }
 
     public String getVersion() {
         return version;

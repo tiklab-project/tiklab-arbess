@@ -123,6 +123,7 @@ public class TaskPullArtifactExecServiceImpl implements TaskPullArtifactExecServ
                 process = mavenNexus(pullArtifact);
             }
             case TASK_ARTIFACT_SSH -> {
+                tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"拉取制品......");
                 ssh(pullArtifact);
             }
         }
@@ -206,18 +207,24 @@ public class TaskPullArtifactExecServiceImpl implements TaskPullArtifactExecServ
 
 
         execOrder = execOrder +
-                " -DgroupId="+pullArtifact.getGroupId() +
-                " -DartifactId="+pullArtifact.getArtifactId() +
-                " -Dversion="+pullArtifact.getVersion()+
-                " -Dtransitive=true="+pullArtifact.getTransitive();
+                " -DgroupId=\""+pullArtifact.getGroupId() +"\"" +
+                " -DartifactId=\""+pullArtifact.getArtifactId() +"\"" +
+                " -Dversion=\""+pullArtifact.getVersion() +"\"" +
+                " -Dtransitive=\""+pullArtifact.getTransitive() +"\"";
 
         AuthThird authThird = (AuthThird) pullArtifact.getAuth();
-        if (authThird == null){
+        if (Objects.isNull(authThird)){
             order = mavenOrder(execOrder);
             return PipelineUtil.process(mavenAddress, order);
         }
 
-        execOrder = execOrder + " -DremoteRepositories=" + authThird.getServerAddress() ;
+        if (Objects.isNull(pullArtifact.getRepository())){
+            throw new ApplicationException("无法获取到远程仓库！");
+        }
+        String address = pullArtifact.getRepository().getAddress();
+
+        execOrder = execOrder + " -DremoteRepositories=\"" + address+"\""
+                +" -Durl=\"" + address+"\"";
 
         if (authThird.getAuthType() == 1){
             String id = PipelineFinal.appName;
@@ -236,7 +243,7 @@ public class TaskPullArtifactExecServiceImpl implements TaskPullArtifactExecServ
             }else {
                 s = file.getAbsolutePath() + "/" + settingAddress;
             }
-            logger.info("settings.xml文件地址为："+ s);
+            logger.warn("settings.xml文件地址为："+ s);
             File file1 = new File(s);
 
             if (!file1.exists()){
@@ -248,13 +255,13 @@ public class TaskPullArtifactExecServiceImpl implements TaskPullArtifactExecServ
                     " -Dpassword="+authThird.getPassword()+
                     " -Did="+id+
                     " -DrepositoryId="+id+
-                    " -s"+" "+s;
+                    " -s"+" \""+s+"\"";
         }else {
             execOrder = execOrder +
                     " -DrepositoryId="+authThird.getPrivateKey();
         }
 
-        logger.info("命令为："+execOrder);
+        logger.warn("命令为："+execOrder);
 
         order = mavenOrder(execOrder);
         return PipelineUtil.process(mavenAddress, order);
@@ -274,10 +281,10 @@ public class TaskPullArtifactExecServiceImpl implements TaskPullArtifactExecServ
 
 
         execOrder = execOrder +
-                " -DgroupId="+pullArtifact.getGroupId() +
-                " -DartifactId="+pullArtifact.getArtifactId() +
-                " -Dversion="+pullArtifact.getVersion()+
-                " -Dtransitive=true="+pullArtifact.getTransitive();
+                " -DgroupId=\""+pullArtifact.getGroupId() +"\"" +
+                " -DartifactId=\""+pullArtifact.getArtifactId() +"\"" +
+                " -Dversion=\""+pullArtifact.getVersion() +"\""+
+                " -Dtransitive=\""+pullArtifact.getTransitive() +"\"";
 
         AuthThird authThird = (AuthThird) pullArtifact.getAuth();
         if (authThird == null){
@@ -286,7 +293,8 @@ public class TaskPullArtifactExecServiceImpl implements TaskPullArtifactExecServ
             return PipelineUtil.process(mavenAddress, order);
         }
 
-        execOrder = execOrder + " -DremoteRepositories=" + authThird.getServerAddress() ;
+        execOrder = execOrder + " -DremoteRepositories=\"" + authThird.getServerAddress()+"\""
+                              +" -Durl=\"" + authThird.getServerAddress()+"\"";
 
         if (authThird.getAuthType() == 1){
             String id = PipelineFinal.appName;
@@ -317,7 +325,7 @@ public class TaskPullArtifactExecServiceImpl implements TaskPullArtifactExecServ
                     " -Dpassword="+authThird.getPassword()+
                     " -Did="+id+
                     " -DrepositoryId="+id+
-                    " -s"+" "+s;
+                    " -s"+" \""+s+"\"";
         }else {
             execOrder = execOrder +
                     " -DrepositoryId="+authThird.getPrivateKey();
@@ -403,6 +411,10 @@ public class TaskPullArtifactExecServiceImpl implements TaskPullArtifactExecServ
     private Process dockerXpack(TaskPullArtifact pullArtifact)throws ApplicationException, IOException{
         String dockerImage = pullArtifact.getDockerImage();
 
+        if (Objects.isNull(pullArtifact.getRepository())){
+            throw new ApplicationException("无法获取到远程仓库！");
+        }
+
         AuthThird auth = (AuthThird)pullArtifact.getAuth();
 
         if (Objects.isNull(auth)){
@@ -451,7 +463,7 @@ public class TaskPullArtifactExecServiceImpl implements TaskPullArtifactExecServ
         String username = auth.getUsername();
         String password = auth.getPassword();
 
-        String replace = auth.getServerAddress().replace("https://", "").replace("http://", "");
+        String replace = pullArtifact.getRepository().getAddress().replace("https://", "").replace("http://", "");
 
         String loginOrder;
         if (isHttp){
@@ -477,7 +489,6 @@ public class TaskPullArtifactExecServiceImpl implements TaskPullArtifactExecServ
             throw new ApplicationException("无法连接到服务器:" + e.getMessage());
         }
     }
-
 
     /**
      * 下载文件
@@ -568,16 +579,13 @@ public class TaskPullArtifactExecServiceImpl implements TaskPullArtifactExecServ
     private Map<String,String> error(String type){
         Map<String,String> map =new HashMap<>();
         switch (type){
-            case TASK_ARTIFACT_XPACK  ,TASK_ARTIFACT_NEXUS ->{
+            default -> {
                 map.put("Error executing Maven","执行maven命令失败！");
                 map.put("The specified user settings file does not exist","无法找到Setting文件！");
                 map.put("405 HTTP method PUT is not supported by this URL","方法不被允许！");
-                map.put("[INFO] BUILD FAILURE","构建失败！");
-                map.put("BUILD FAILURE","构建失败！");
-                map.put("[ERROR]","拉取失败！");
-                return map;
-            }
-            default -> {
+                map.put("[INFO] BUILD FAILURE","拉取失败！");
+                map.put("BUILD FAILURE","拉取失败！");
+                map.put("[ERROR]","");
                 map.put("Error","拉取失败！");
                 return map;
             }

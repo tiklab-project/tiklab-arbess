@@ -146,17 +146,21 @@ public class TaskBuildExecServiceImpl implements TaskBuildExecService {
         String taskId = taskBuild.getTaskId();
         String type = taskBuild.getType();
 
-        String path = utilService.findPipelineDefaultAddress(pipelineId,1) ;
-
-        if (!Objects.isNull(dockerFile)){
-            path = path + dockerFile;
+        if (dockerFile.contains(PROJECT_DEFAULT_ADDRESS)){
+            String path = utilService.findPipelineDefaultAddress(pipelineId,1) ;
+            dockerFile = dockerFile.replace(PROJECT_DEFAULT_ADDRESS,path);
         }
 
-        File file = new File(path + "/Dockerfile");
+        File file = new File(dockerFile);
         if (!file.exists()){
-            tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+file.getAbsolutePath()+"下找不到Dockerfile文件！");
+            tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+file.getAbsolutePath()+"不存在！");
             return false;
         }
+        if (!file.isDirectory()){
+            tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+file.getAbsolutePath()+"是个文件夹！");
+            return false;
+        }
+
         boolean result;
         try {
             tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"开始构建镜像");
@@ -170,7 +174,7 @@ public class TaskBuildExecServiceImpl implements TaskBuildExecService {
             // 替换命令中的系统变量
             String order = variableServer.replaceVariable(pipelineId, taskId, dockerOrder);
 
-            Process process = PipelineUtil.process(path, order);
+            Process process = PipelineUtil.process(file.getParent(), order);
             result = tasksInstanceService.readCommandExecResult(process, GBK, error(type), taskId);
             if (!result){
                 tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"镜像构建失败");
@@ -181,29 +185,6 @@ public class TaskBuildExecServiceImpl implements TaskBuildExecService {
             tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"镜像构建失败"+e.getMessage());
             return false;
         }
-
-        // try {
-        //     tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"保存镜像.....");
-        //
-        //     String instanceId = findPipelineInstanceId(pipelineId);
-        //
-        //     String logPath = utilService.findPipelineDefaultAddress(pipelineId,2)+instanceId ;
-        //
-        //     String imageFile = logPath + "/" + dockerName + ".tar.gz";
-        //
-        //     String order = "docker save -o  \"" + imageFile + "\" " + name ;
-        //
-        //     Process process = PipelineUtil.process(path, order);
-        //     result = tasksInstanceService.readCommandExecResult(process, null, error(type), taskId);
-        //     if (!result){
-        //         tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"保存镜像失败");
-        //     }
-        //     tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"保存镜像完成！地址：" + imageFile);
-        //
-        // }catch (Exception e){
-        //     tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"保存镜像失败"+e.getMessage());
-        //     return false;
-        // }
         return true;
     }
 

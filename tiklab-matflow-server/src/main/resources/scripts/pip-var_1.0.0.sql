@@ -44,5 +44,6 @@ create table pip_task_pull_artifact  (
     group_id varchar(255),
     version varchar(255),
     artifact_id varchar(255),
+    xpack_id varchar(255),
     transitive varchar(255)
 );

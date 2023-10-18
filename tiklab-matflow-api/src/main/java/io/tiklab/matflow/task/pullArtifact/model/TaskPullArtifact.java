@@ -1,7 +1,11 @@
 package io.tiklab.matflow.task.pullArtifact.model;
 
 import io.tiklab.beans.annotation.Mapper;
+import io.tiklab.beans.annotation.Mapping;
+import io.tiklab.beans.annotation.Mappings;
 import io.tiklab.join.annotation.Join;
+import io.tiklab.join.annotation.JoinQuery;
+import io.tiklab.matflow.task.artifact.model.XpackRepository;
 import io.tiklab.postin.annotation.ApiModel;
 import io.tiklab.postin.annotation.ApiProperty;
 
@@ -40,6 +44,12 @@ public class TaskPullArtifact {
     @ApiProperty(name = "transitive",desc = "是否拉取关联依赖")
     private Boolean transitive;
 
+    @Mappings({
+            @Mapping(source = "repository.id",target = "xpackId")
+    })
+    @JoinQuery(key = "xpackId")
+    private XpackRepository repository;
+
     //授权信息
     private Object auth;
 
@@ -47,6 +57,14 @@ public class TaskPullArtifact {
 
     private String type;
 
+    public XpackRepository getRepository() {
+        return repository;
+    }
+
+    public TaskPullArtifact setRepository(XpackRepository repository) {
+        this.repository = repository;
+        return this;
+    }
 
     public String getVersion() {
         return version;

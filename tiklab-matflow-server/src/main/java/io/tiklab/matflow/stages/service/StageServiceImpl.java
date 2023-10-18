@@ -332,13 +332,14 @@ public class StageServiceImpl implements StageService {
     @Override
     public List<String> validStagesMustField(String pipelineId){
         List<Stage> allStage = findAllMainStage(pipelineId);
-        if (allStage.size() == 0){
+        if (allStage.isEmpty()){
             return null;
         }
         List<String> list = new ArrayList<>();
         for (Stage stage : allStage) {
             String stagesId = stage.getStageId();
-            for (Stage pipelineStage : findOtherStage(stagesId)) {
+            List<Stage> otherStage = findOtherStage(stagesId);
+            for (Stage pipelineStage : otherStage) {
                 String id = pipelineStage.getStageId();
                 //获取任务详情
                 List<String> stringList = tasksService.validTasksMustField(id, 2);

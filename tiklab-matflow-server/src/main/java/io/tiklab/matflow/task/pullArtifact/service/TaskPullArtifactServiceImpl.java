@@ -6,6 +6,8 @@ import io.tiklab.matflow.setting.model.AuthThird;
 import io.tiklab.matflow.setting.service.AuthHostService;
 import io.tiklab.matflow.setting.service.AuthThirdService;
 import io.tiklab.matflow.support.util.PipelineUtil;
+import io.tiklab.matflow.task.artifact.model.XpackRepository;
+import io.tiklab.matflow.task.artifact.service.TaskArtifactXpackService;
 import io.tiklab.matflow.task.pullArtifact.dao.TaskPullArtifactDao;
 import io.tiklab.matflow.task.pullArtifact.entity.TaskPullArtifactEntity;
 import io.tiklab.matflow.task.pullArtifact.model.TaskPullArtifact;
@@ -30,6 +32,9 @@ public class TaskPullArtifactServiceImpl implements TaskPullArtifactService {
 
     @Autowired
     private AuthHostService hostServer;
+
+    @Autowired
+    private TaskArtifactXpackService taskArtifactXpackService;
 
     /**
      * 创建流水线推送制品
@@ -80,6 +85,12 @@ public class TaskPullArtifactServiceImpl implements TaskPullArtifactService {
                 if (pullType.equals(TASK_ARTIFACT_NEXUS)){
                     AuthThird authServer = thirdServer.findOneAuthServer(authId);
                     pullArtifact.setAuth(authServer);
+                }
+                if (pullType.equals(TASK_ARTIFACT_XPACK) && !Objects.isNull(pullArtifact.getRepository())){
+                    XpackRepository xpackRepository = taskArtifactXpackService.findRepository(authId, pullArtifact.getRepository().getId());
+                    if (!Objects.isNull(xpackRepository)){
+                        pullArtifact.setRepository(xpackRepository);
+                    }
                 }
 
                 return pullArtifact;

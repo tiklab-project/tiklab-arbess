@@ -167,6 +167,12 @@ under the License.
       <url>http://my.repository.com/repo/path</url>
     </mirror>
      -->
+      <!--  配置私服  -->
+      <mirror>
+          <id>ossrh</id>
+          <mirrorOf>repositoryId</mirrorOf>
+          <url>${url}</url>
+      </mirror>
 
   </mirrors>
 

@@ -39,7 +39,8 @@ public class MatFlowDsmAutoConfiguration {
         });
         dsmConfig.newVersion("1.0.1", new String[]{
                 "pip-project_1.0.1",
-                "privilege_1.0.1"
+                "privilege_1.0.1",
+                "pip-init-project_1.0.1"
         });
         dsmConfig.newVersion("1.0.2", new String[]{
                 "pip-project_1.0.2"

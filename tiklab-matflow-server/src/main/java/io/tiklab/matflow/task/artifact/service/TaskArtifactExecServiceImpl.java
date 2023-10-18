@@ -132,7 +132,7 @@ public class TaskArtifactExecServiceImpl implements TaskArtifactExecService {
         }
 
         if (!Objects.isNull(process)){
-            boolean result = tasksInstanceService.readCommandExecResult(process, PipelineFinal.UTF_8, error(product.getType()), taskId);
+            boolean result = tasksInstanceService.readCommandExecResult(process, PipelineFinal.UTF_8, error(artifactType), taskId);
             if (!result){
                 throw new ApplicationException("推送失败！");
             }
@@ -159,7 +159,7 @@ public class TaskArtifactExecServiceImpl implements TaskArtifactExecService {
             }
         }
         if (!Objects.isNull(process)){
-            boolean result = tasksInstanceService.readCommandExecResult(process, PipelineFinal.UTF_8, error(artifact.getType()), taskId);
+            boolean result = tasksInstanceService.readCommandExecResult(process, PipelineFinal.UTF_8, error(artifactType), taskId);
             if (!result){
                 throw new ApplicationException("推送失败！");
             }
@@ -229,8 +229,8 @@ public class TaskArtifactExecServiceImpl implements TaskArtifactExecService {
                 " -DartifactId="+product.getArtifactId() +
                 " -Dversion="+product.getVersion()+
                 " -Dpackaging="+product.getFileType() +
-                " -Dfile= \""+path +"\""+
-                " -Durl="+authThird.getServerAddress() ;
+                " -Dfile=\""+path +"\""+
+                " -Durl=\""+authThird.getServerAddress() +"\"";
         if (authThird.getAuthType() == 1){
             String id = PipelineFinal.appName;
 
@@ -248,7 +248,7 @@ public class TaskArtifactExecServiceImpl implements TaskArtifactExecService {
             }else {
                 s = file.getAbsolutePath() + "/" + settingAddress;
             }
-            logger.info("settings.xml文件地址为："+ s);
+            logger.warn("settings.xml文件地址为："+ s);
             File file1 = new File(s);
 
             if (!file1.exists()){
@@ -260,13 +260,13 @@ public class TaskArtifactExecServiceImpl implements TaskArtifactExecService {
                     " -Dpassword="+authThird.getPassword()+
                     " -Did="+id+
                     " -DrepositoryId="+id+
-                    " -s"+" "+s;
+                    " -s"+" \""+s +"\"";
         }else {
             execOrder = execOrder +
                     " -DrepositoryId="+authThird.getPrivateKey();
         }
 
-        logger.info("命令为："+execOrder);
+        logger.warn("命令为："+execOrder);
 
         order = mavenOrder(execOrder, path);
         return PipelineUtil.process(mavenAddress, order);
@@ -406,9 +406,74 @@ public class TaskArtifactExecServiceImpl implements TaskArtifactExecService {
     }
 
     //docker推送到xpack
-    private Process dockerXpack(TaskArtifact product)throws ApplicationException, IOException{
+    private Process dockerXpack(TaskArtifact artifact)throws ApplicationException, IOException{
 
-        return null;
+        String domain;
+        boolean isHttp = true;
+        int port;
+
+        XpackRepository repository = artifact.getRepository();
+        if (Objects.isNull(repository)){
+            throw new ApplicationException("查询不到仓库");
+        }
+
+        String dockerImage = artifact.getDockerImage();
+
+        AuthThird auth = (AuthThird)artifact.getAuth();
+        try {
+
+            // 创建URL对象
+            URL url = new URL(auth.getServerAddress());
+
+            // 判断是否为HTTPS
+            if ("https".equalsIgnoreCase(url.getProtocol())) {
+                isHttp = false;
+            }
+
+            // 提取域名
+            domain = url.getHost();
+
+            // 提取端口
+            port = url.getPort();
+            if (port == -1) {
+                // 如果端口未明确指定，您可以使用默认端口
+                port = url.getDefaultPort();
+            }
+
+        } catch (Exception e) {
+            throw new ApplicationException("远程地址获取失败！"+e.getMessage());
+        }
+
+        int authType = auth.getAuthType();
+
+        if (authType == 2){
+            throw new ApplicationException("暂不支持秘钥认证！");
+        }
+        String username = auth.getUsername();
+        String password = auth.getPassword();
+
+        String replace = repository.getAddress().replace("https://", "").replace("http://", "");
+
+        String loginOrder;
+        if (isHttp){
+            loginOrder = "docker login -u " + username + " -p " + password +" http://"+domain+":"+port  ;
+        }else {
+            loginOrder = "docker login -u " + username + " -p " + password +" https://"+domain+":"+port  ;
+        }
+        String tarOrder = "docker tag  " + dockerImage + " " + replace+"/"+ dockerImage ;
+        String pushOrder = "docker push  " + replace+"/"+ dockerImage ;
+
+
+        String order = loginOrder + " && " + tarOrder + " && " + pushOrder;
+
+        logger.warn("执行命令：{}",order);
+
+        // docker login -u admin -p darth2020 http://172.13.1.11:9003 ;docker tag matflow:1.0.3 "172.13.1.11:9003/b/matflow:1.0.3"; docker push 172.13.1.11:9003/b/matflow:1.0.3
+
+        PipelineUtil.process(null, loginOrder);
+        PipelineUtil.process(null, tarOrder);
+
+        return PipelineUtil.process(null, pushOrder);
     }
 
     // ssh 推送
@@ -429,10 +494,9 @@ public class TaskArtifactExecServiceImpl implements TaskArtifactExecService {
 
     private String findRuleArtifact(String pipelineId,String fileDir,String rule) {
 
-        String path = utilService.findPipelineDefaultAddress(pipelineId,1);
-
-        if (fileDir.equals("${PROJECT_DEFAULT_ADDRESS}")){
-            fileDir = path;
+        if (fileDir.contains(PROJECT_DEFAULT_ADDRESS)){
+            String path = utilService.findPipelineDefaultAddress(pipelineId,1);
+            fileDir = fileDir.replace(PROJECT_DEFAULT_ADDRESS,path);
         }
 
         // 匹配制品
@@ -443,8 +507,8 @@ public class TaskArtifactExecServiceImpl implements TaskArtifactExecService {
             throw new ApplicationException(e.getMessage());
         }
 
-        if (Objects.isNull(path)){
-            throw new ApplicationException("没有匹配到构建产物!");
+        if (Objects.isNull(productAddress)){
+            throw new ApplicationException("没有匹配到制品!");
         }
 
         return productAddress;
@@ -555,6 +619,7 @@ public class TaskArtifactExecServiceImpl implements TaskArtifactExecService {
                 map.put("[INFO] BUILD FAILURE","构建失败！");
                 map.put("BUILD FAILURE","构建失败！");
                 map.put("[ERROR]","推送失败！");
+                map.put("failed ","执行失败！");
                 return map;
             }
             default -> {

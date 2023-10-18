@@ -448,7 +448,20 @@ public class PipelineYamlServiceImpl implements PipelineYamlService {
                     taskDetailsMap.put("deploy_order",taskDeploy.getDeployOrder());
                 }
             }
-
+            case TASK_DEPLOY_DOCKER->{
+                if (!Objects.isNull(taskDeploy.getAuthId())){
+                    taskDetailsMap.put("authId",taskDeploy.getAuthId());
+                }
+                if (!Objects.isNull(taskDeploy.getDockerImage())){
+                    taskDetailsMap.put("image",taskDeploy.getDockerImage());
+                }
+                if (!Objects.isNull(taskDeploy.getDeployAddress())){
+                    taskDetailsMap.put("deploy_address",taskDeploy.getDeployAddress());
+                }
+                if (!Objects.isNull(taskDeploy.getDeployOrder())){
+                    taskDetailsMap.put("deploy_order",taskDeploy.getDeployOrder());
+                }
+            }
         }
         return taskDetailsMap;
     }
@@ -459,47 +472,167 @@ public class PipelineYamlServiceImpl implements PipelineYamlService {
 
         TaskArtifact taskArtifact = JSONObject.parseObject(string, TaskArtifact.class);
 
+        String artifactType = taskArtifact.getArtifactType();
+        taskDetailsMap.put("artifact_type",artifactType);
         switch (taskType){
-            case TASK_ARTIFACT_NEXUS ->{
-                if (!Objects.isNull(taskArtifact.getArtifactId())){
-                    taskDetailsMap.put("artifactId",taskArtifact.getArtifactId());
-                }
-                if (!Objects.isNull(taskArtifact.getAuthId())){
-                    taskDetailsMap.put("authId",taskArtifact.getAuthId());
-                }
-                if (!Objects.isNull(taskArtifact.getGroupId())){
-                    taskDetailsMap.put("groupId",taskArtifact.getGroupId());
-                }
-                if (!Objects.isNull(taskArtifact.getVersion())){
-                    taskDetailsMap.put("version",taskArtifact.getVersion());
+            case TASK_ARTIFACT_MAVEN ->{
+                switch (artifactType){
+                    case TASK_ARTIFACT_NEXUS ->{
+                        if (!Objects.isNull(taskArtifact.getArtifactId())){
+                            taskDetailsMap.put("artifact_id",taskArtifact.getArtifactId());
+                        }
+                        if (!Objects.isNull(taskArtifact.getAuthId())){
+                            taskDetailsMap.put("auth_id",taskArtifact.getAuthId());
+                        }
+                        if (!Objects.isNull(taskArtifact.getGroupId())){
+                            taskDetailsMap.put("group_id",taskArtifact.getGroupId());
+                        }
+                        if (!Objects.isNull(taskArtifact.getVersion())){
+                            taskDetailsMap.put("version",taskArtifact.getVersion());
+                        }
+                        if (!Objects.isNull(taskArtifact.getFileAddress())){
+                            taskDetailsMap.put("file_address",taskArtifact.getFileAddress());
+                        }
+                        if (!Objects.isNull(taskArtifact.getRule())){
+                            taskDetailsMap.put("rule",taskArtifact.getRule());
+                        }
+                    }
+                    case TASK_ARTIFACT_SSH ->{
+                        if (!Objects.isNull(taskArtifact.getAuthId())){
+                            taskDetailsMap.put("auth_id",taskArtifact.getAuthId());
+                        }
+                        if (!Objects.isNull(taskArtifact.getPutAddress())){
+                            taskDetailsMap.put("remote_address",taskArtifact.getPutAddress());
+                        }
+                        if (!Objects.isNull(taskArtifact.getFileAddress())){
+                            taskDetailsMap.put("fileAddress",taskArtifact.getFileAddress());
+                        }
+                        if (!Objects.isNull(taskArtifact.getFileAddress())){
+                            taskDetailsMap.put("put_address",taskArtifact.getPutAddress());
+                        }
+                        if (!Objects.isNull(taskArtifact.getRule())){
+                            taskDetailsMap.put("rule",taskArtifact.getRule());
+                        }
+                    }
+                    case TASK_ARTIFACT_XPACK ->{
+                        if (!Objects.isNull(taskArtifact.getArtifactId())){
+                            taskDetailsMap.put("artifactId",taskArtifact.getArtifactId());
+                        }
+                        if (!Objects.isNull(taskArtifact.getAuthId())){
+                            taskDetailsMap.put("authId",taskArtifact.getAuthId());
+                        }
+                        if (!Objects.isNull(taskArtifact.getGroupId())){
+                            taskDetailsMap.put("groupId",taskArtifact.getGroupId());
+                        }
+                        if (!Objects.isNull(taskArtifact.getVersion())){
+                            taskDetailsMap.put("version",taskArtifact.getVersion());
+                        }
+                        if (!Objects.isNull(taskArtifact.getRepository())){
+                            taskDetailsMap.put("repository_id",taskArtifact.getRepository().getId());
+                        }
+                    }
                 }
             }
-            case TASK_ARTIFACT_SSH ->{
-                if (!Objects.isNull(taskArtifact.getAuthId())){
-                    taskDetailsMap.put("authId",taskArtifact.getAuthId());
-                }
-                if (!Objects.isNull(taskArtifact.getPutAddress())){
-                    taskDetailsMap.put("remote_address",taskArtifact.getPutAddress());
-                }
-            }
-            case TASK_ARTIFACT_XPACK ->{
-                if (!Objects.isNull(taskArtifact.getArtifactId())){
-                    taskDetailsMap.put("artifactId",taskArtifact.getArtifactId());
-                }
-                if (!Objects.isNull(taskArtifact.getAuthId())){
-                    taskDetailsMap.put("authId",taskArtifact.getAuthId());
-                }
-                if (!Objects.isNull(taskArtifact.getGroupId())){
-                    taskDetailsMap.put("groupId",taskArtifact.getGroupId());
-                }
-                if (!Objects.isNull(taskArtifact.getVersion())){
-                    taskDetailsMap.put("version",taskArtifact.getVersion());
-                }
-                if (!Objects.isNull(taskArtifact.getRepository())){
-                    taskDetailsMap.put("repository_id",taskArtifact.getRepository().getId());
-                }
-            }
+            case TASK_ARTIFACT_NODEJS ->{
 
+            }
+            case TASK_ARTIFACT_DOCKER ->{
+                switch (artifactType){
+                    case TASK_ARTIFACT_NEXUS ->{
+                        if (!Objects.isNull(taskArtifact.getDockerImage())){
+                            taskDetailsMap.put("image",taskArtifact.getDockerImage());
+                        }
+                        if (!Objects.isNull(taskArtifact.getAuthId())){
+                            taskDetailsMap.put("authId",taskArtifact.getAuthId());
+                        }
+                    }
+                }
+            }
+        }
+        return taskDetailsMap;
+    }
+
+    private LinkedHashMap<String, Object> taskPullArtifactDetails(String taskType,Object object,LinkedHashMap<String, Object> taskDetailsMap){
+        String string = JSONObject.toJSONString(object);
+
+        TaskArtifact taskArtifact = JSONObject.parseObject(string, TaskArtifact.class);
+
+        String artifactType = taskArtifact.getArtifactType();
+        taskDetailsMap.put("artifact_type",artifactType);
+        switch (taskType){
+            case TASK_PULL_MAVEN ->{
+                switch (artifactType){
+                    case TASK_ARTIFACT_NEXUS ->{
+                        if (!Objects.isNull(taskArtifact.getArtifactId())){
+                            taskDetailsMap.put("artifact_id",taskArtifact.getArtifactId());
+                        }
+                        if (!Objects.isNull(taskArtifact.getAuthId())){
+                            taskDetailsMap.put("auth_id",taskArtifact.getAuthId());
+                        }
+                        if (!Objects.isNull(taskArtifact.getGroupId())){
+                            taskDetailsMap.put("group_id",taskArtifact.getGroupId());
+                        }
+                        if (!Objects.isNull(taskArtifact.getVersion())){
+                            taskDetailsMap.put("version",taskArtifact.getVersion());
+                        }
+                        if (!Objects.isNull(taskArtifact.getFileAddress())){
+                            taskDetailsMap.put("file_address",taskArtifact.getFileAddress());
+                        }
+                        if (!Objects.isNull(taskArtifact.getRule())){
+                            taskDetailsMap.put("rule",taskArtifact.getRule());
+                        }
+                    }
+                    case TASK_ARTIFACT_SSH ->{
+                        if (!Objects.isNull(taskArtifact.getAuthId())){
+                            taskDetailsMap.put("auth_id",taskArtifact.getAuthId());
+                        }
+                        if (!Objects.isNull(taskArtifact.getPutAddress())){
+                            taskDetailsMap.put("remote_address",taskArtifact.getPutAddress());
+                        }
+                        if (!Objects.isNull(taskArtifact.getFileAddress())){
+                            taskDetailsMap.put("fileAddress",taskArtifact.getFileAddress());
+                        }
+                        if (!Objects.isNull(taskArtifact.getFileAddress())){
+                            taskDetailsMap.put("put_address",taskArtifact.getPutAddress());
+                        }
+                        if (!Objects.isNull(taskArtifact.getRule())){
+                            taskDetailsMap.put("rule",taskArtifact.getRule());
+                        }
+                    }
+                    case TASK_ARTIFACT_XPACK ->{
+                        if (!Objects.isNull(taskArtifact.getArtifactId())){
+                            taskDetailsMap.put("artifactId",taskArtifact.getArtifactId());
+                        }
+                        if (!Objects.isNull(taskArtifact.getAuthId())){
+                            taskDetailsMap.put("authId",taskArtifact.getAuthId());
+                        }
+                        if (!Objects.isNull(taskArtifact.getGroupId())){
+                            taskDetailsMap.put("groupId",taskArtifact.getGroupId());
+                        }
+                        if (!Objects.isNull(taskArtifact.getVersion())){
+                            taskDetailsMap.put("version",taskArtifact.getVersion());
+                        }
+                        if (!Objects.isNull(taskArtifact.getRepository())){
+                            taskDetailsMap.put("repository_id",taskArtifact.getRepository().getId());
+                        }
+                    }
+                }
+            }
+            case TASK_PULL_NODEJS ->{
+
+            }
+            case TASK_PULL_DOCKER ->{
+                switch (artifactType){
+                    case TASK_ARTIFACT_NEXUS ->{
+                        if (!Objects.isNull(taskArtifact.getDockerImage())){
+                            taskDetailsMap.put("image",taskArtifact.getDockerImage());
+                        }
+                        if (!Objects.isNull(taskArtifact.getAuthId())){
+                            taskDetailsMap.put("authId",taskArtifact.getAuthId());
+                        }
+                    }
+                }
+            }
         }
         return taskDetailsMap;
     }

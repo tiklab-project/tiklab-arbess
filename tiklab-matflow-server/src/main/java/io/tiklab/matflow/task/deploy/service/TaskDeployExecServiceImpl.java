@@ -202,8 +202,8 @@ public class TaskDeployExecServiceImpl implements TaskDeployExecService {
 
         String path = utilService.findPipelineDefaultAddress(pipelineId,1);
 
-        if (fileDir.equals("${DEPLOY_DEFAULT_ADDRESS}")){
-            fileDir = path;
+        if (fileDir.contains(PROJECT_DEFAULT_ADDRESS)){
+            fileDir = fileDir.replace(PROJECT_DEFAULT_ADDRESS,path);
         }
 
         // 匹配制品
@@ -212,10 +212,6 @@ public class TaskDeployExecServiceImpl implements TaskDeployExecService {
             productAddress = utilService.findFile(pipelineId,fileDir,rule);
         }catch (ApplicationException e){
             throw new ApplicationException(e.getMessage());
-        }
-
-        if (Objects.isNull(path)){
-            throw new ApplicationException("没有匹配到部署文件!");
         }
 
         File file = new File(productAddress);

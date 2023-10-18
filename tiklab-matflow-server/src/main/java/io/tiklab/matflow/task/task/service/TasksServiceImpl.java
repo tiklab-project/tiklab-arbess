@@ -482,7 +482,8 @@ public class TasksServiceImpl implements TasksService {
         if (tasks.isEmpty()){
             return Collections.emptyList();
         }
-        return bindAllTaskOrTask(findAllTaskOrTask(tasks));
+        List<Tasks> allTaskOrTask = findAllTaskOrTask(tasks);
+        return bindAllTaskOrTask(allTaskOrTask);
     }
 
     @Override
@@ -921,6 +922,7 @@ public class TasksServiceImpl implements TasksService {
                     pullArtifactService.deletePullArtifactTask(pullArtifact.getTaskId());
                     TaskPullArtifact artifact = new TaskPullArtifact();
                     artifact.setPullType(pullType);
+                    artifact.setTransitive(true);
                     artifact.setTaskId(pullArtifact.getTaskId());
                     pullArtifactService.createPullArtifact(artifact);
                 }else {
@@ -1098,8 +1100,17 @@ public class TasksServiceImpl implements TasksService {
 
         if ( taskType.equals(TASK_DEPLOY_LINUX)){
             if (deploy.getAuthType() == 1){
+                if (!PipelineUtil.isNoNull(deploy.getLocalAddress())){
+                    return false;
+                }
                 return PipelineUtil.isNoNull(deploy.getDeployAddress());
             }
+        }
+        if ( taskType.equals(TASK_DEPLOY_DOCKER)){
+            if (!PipelineUtil.isNoNull(deploy.getDockerImage())){
+                return false;
+            }
+            return PipelineUtil.isNoNull(deploy.getDeployAddress());
         }
         return true;
     }
@@ -1111,6 +1122,14 @@ public class TasksServiceImpl implements TasksService {
         if (taskType.equals(TASK_ARTIFACT_DOCKER)){
             if (artifactType.equals(TASK_ARTIFACT_NEXUS)){
                 if (!PipelineUtil.isNoNull(artifact.getDockerImage())){
+                    return false;
+                }
+            }
+            if (artifactType.equals(TASK_ARTIFACT_XPACK)){
+                if (!PipelineUtil.isNoNull(artifact.getDockerImage())){
+                    return false;
+                }
+                if (Objects.isNull(artifact.getRepository()) || !PipelineUtil.isNoNull(artifact.getRepository().getId())){
                     return false;
                 }
             }

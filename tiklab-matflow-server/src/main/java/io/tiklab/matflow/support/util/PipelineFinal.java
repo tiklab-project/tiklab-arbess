@@ -79,6 +79,8 @@ public class PipelineFinal {
      * 构建产物信息
      */
     // 默认制品地址
+    public static final String PROJECT_DEFAULT_ADDRESS = "${PROJECT_DEFAULT_ADDRESS}";
+
     public static final String DEFAULT_ARTIFACT_ADDRESS = "DEFAULT_ARTIFACT_ADDRESS";
 
     // 默认制品
