@@ -55,7 +55,7 @@ dss:
 postgresql:
   embbed:
     enable: true
-  database: matflow_ee
+  database: matflow_ce
   db:
     port: 5432
     username: postgres
