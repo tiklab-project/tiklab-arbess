@@ -3,30 +3,30 @@ package io.tiklab.matflow.setting.model;
 
 import io.tiklab.beans.annotation.Mapper;
 import io.tiklab.join.annotation.Join;
-import io.tiklab.postin.annotation.ApiModel;
-import io.tiklab.postin.annotation.ApiProperty;
+
+
 
 /**
  * 流水线环境配置模型
  */
-@ApiModel
+//@ApiModel
 @Join
 @Mapper
 public class Scm {
 
-    @ApiProperty(name = "scmId",desc = "id")
+    //@ApiProperty(name = "scmId",desc = "id")
     private String scmId;
 
-    @ApiProperty(name = "scmType",desc = "类型")
+    //@ApiProperty(name = "scmType",desc = "类型")
     private int scmType;
 
-    @ApiProperty(name = "scmName",desc = "名称")
+    //@ApiProperty(name = "scmName",desc = "名称")
     private String scmName;
 
-    @ApiProperty(name = "createTime",desc = "创建时间")
+    //@ApiProperty(name = "createTime",desc = "创建时间")
     private String createTime;
 
-    @ApiProperty(name = "scmAddress",desc = "地址")
+    //@ApiProperty(name = "scmAddress",desc = "地址")
     private String scmAddress;
 
     public String getScmId() {

@@ -6,37 +6,37 @@ import io.tiklab.beans.annotation.Mapping;
 import io.tiklab.beans.annotation.Mappings;
 import io.tiklab.join.annotation.Join;
 import io.tiklab.join.annotation.JoinQuery;
-import io.tiklab.postin.annotation.ApiModel;
-import io.tiklab.postin.annotation.ApiProperty;
+
+
 
 /**
  * 任务源码模型
  */
-@ApiModel
+//@ApiModel
 @Join
 @Mapper
 public class TaskCode {
 
-    @ApiProperty(name = "taskId",desc = "id")
+    //@ApiProperty(name = "taskId",desc = "id")
     private String taskId;
 
     //地址名
-    @ApiProperty(name="codeName",desc="地址名")
+    //@ApiProperty(name="codeName",desc="地址名")
     private String codeName;
 
     //代码源地址
-    @ApiProperty(name="codeAddress",desc="代码地址")
+    //@ApiProperty(name="codeAddress",desc="代码地址")
     private String codeAddress;
 
     //分支
-    @ApiProperty(name="codeBranch",desc="分支")
+    //@ApiProperty(name="codeBranch",desc="分支")
     private String codeBranch;
 
     //授权id
-    @ApiProperty(name="authId",desc="授权id")
+    //@ApiProperty(name="authId",desc="授权id")
     private String authId;
 
-    @ApiProperty(name="svnFile",desc="svn检出文件夹")
+    //@ApiProperty(name="svnFile",desc="svn检出文件夹")
     private String svnFile;
 
 

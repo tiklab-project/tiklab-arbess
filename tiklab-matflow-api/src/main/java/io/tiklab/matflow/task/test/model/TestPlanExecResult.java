@@ -1,15 +1,15 @@
 package io.tiklab.matflow.task.test.model;
 
-import io.tiklab.postin.annotation.ApiProperty;
+
 
 public class TestPlanExecResult {
 
 
 
-    @ApiProperty(name = "status", desc = "状态类型：0：未开始，1：正在执行,2：结束")
+    //@ApiProperty(name = "status", desc = "状态类型：0：未开始，1：正在执行,2：结束")
     private Integer status;
 
-    @ApiProperty(name = "testPlanInstance", desc = "测试实例")
+    //@ApiProperty(name = "testPlanInstance", desc = "测试实例")
 
     private TestOnPlanInstance testPlanInstance;
 

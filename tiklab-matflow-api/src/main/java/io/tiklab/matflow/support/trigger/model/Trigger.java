@@ -6,31 +6,31 @@ import io.tiklab.beans.annotation.Mapping;
 import io.tiklab.beans.annotation.Mappings;
 import io.tiklab.join.annotation.Join;
 import io.tiklab.join.annotation.JoinQuery;
-import io.tiklab.postin.annotation.ApiModel;
-import io.tiklab.postin.annotation.ApiProperty;
+
+
 
 /**
  * 流水线触发器模型
  */
-@ApiModel
+//@ApiModel
 @Join
 @Mapper
 public class Trigger {
 
-    @ApiProperty(name = "triggerId",desc="id")
+    //@ApiProperty(name = "triggerId",desc="id")
     private String triggerId;
 
-    @ApiProperty(name = "name",desc="名称")
+    //@ApiProperty(name = "name",desc="名称")
     private String name;
 
-    @ApiProperty(name = "taskType",desc="类型 81:定时任务")
+    //@ApiProperty(name = "taskType",desc="类型 81:定时任务")
     private int taskType;
 
-    @ApiProperty(name = "createTime",desc="创建时间")
+    //@ApiProperty(name = "createTime",desc="创建时间")
     private String createTime;
 
     //流水线
-    @ApiProperty(name="pipeline",desc="流水线id",eg="@selectOne")
+    //@ApiProperty(name="pipeline",desc="流水线id",eg="@selectOne")
     @Mappings({
             @Mapping(source = "pipeline.id",target = "pipelineId")
     })
@@ -38,10 +38,10 @@ public class Trigger {
     private Pipeline pipeline;
 
 
-    @ApiProperty(name="taskSort",desc="顺序")
+    //@ApiProperty(name="taskSort",desc="顺序")
     private int taskSort;
 
-    @ApiProperty(name="values",desc="更改的数据")
+    //@ApiProperty(name="values",desc="更改的数据")
     private Object values;
 
 

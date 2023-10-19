@@ -3,23 +3,23 @@ package io.tiklab.matflow.pipeline.definition.model;
 import io.tiklab.core.order.Order;
 import io.tiklab.core.order.OrderBuilders;
 import io.tiklab.core.page.Page;
-import io.tiklab.postin.annotation.ApiProperty;
+
 
 import java.util.List;
 
 public class PipelineFollowQuery {
 
-    @ApiProperty(name ="userId",desc = "用户")
+    //@ApiProperty(name ="userId",desc = "用户")
     private String userId;
 
-    @ApiProperty(name ="pipelineState",desc = "流水线状态")
+    //@ApiProperty(name ="pipelineState",desc = "流水线状态")
     private String pipelineId;
 
 
-    @ApiProperty(name ="pageParam",desc = "分页参数")
+    //@ApiProperty(name ="pageParam",desc = "分页参数")
     private Page pageParam= new Page();
 
-    @ApiProperty(name ="orderParams",desc = "排序参数")
+    //@ApiProperty(name ="orderParams",desc = "排序参数")
     private List<Order> orderParams = OrderBuilders.instance().desc("userId").get();
 
     public String getUserId() {

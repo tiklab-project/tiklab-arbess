@@ -7,8 +7,8 @@ import io.tiklab.beans.annotation.Mappings;
 import io.tiklab.join.annotation.Join;
 import io.tiklab.join.annotation.JoinQuery;
 import io.tiklab.matflow.pipeline.overview.model.PipelineOverview;
-import io.tiklab.postin.annotation.ApiModel;
-import io.tiklab.postin.annotation.ApiProperty;
+
+
 
 /**
  * @pi.model:io.tiklab.matflow.pipeline.definition.model.PipelineOpen

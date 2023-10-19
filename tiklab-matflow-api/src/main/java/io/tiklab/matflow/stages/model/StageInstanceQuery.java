@@ -7,8 +7,8 @@ import io.tiklab.core.order.OrderBuilders;
 import io.tiklab.core.page.Page;
 import io.tiklab.join.annotation.Join;
 import io.tiklab.matflow.task.task.model.TaskInstance;
-import io.tiklab.postin.annotation.ApiModel;
-import io.tiklab.postin.annotation.ApiProperty;
+
+
 
 import java.util.List;
 
@@ -16,31 +16,31 @@ import java.util.List;
  * 阶段运行实例模型
  */
 
-@ApiModel
+//@ApiModel
 @Join
 @Mapper(targetAlias = "StageInstanceEntity")
 public class StageInstanceQuery {
 
-    @ApiProperty(name = "stageName" ,desc = "阶段名称")
+    //@ApiProperty(name = "stageName" ,desc = "阶段名称")
     private String stageName;
 
-    @ApiProperty(name = "instanceId" ,desc = "实例id")
+    //@ApiProperty(name = "instanceId" ,desc = "实例id")
     private String instanceId;
 
-    @ApiProperty(name = "stageSort" ,desc = "阶段顺序")
+    //@ApiProperty(name = "stageSort" ,desc = "阶段顺序")
     private int stageSort ;
 
-    @ApiProperty(name = "stageState" ,desc = "运行状态")
+    //@ApiProperty(name = "stageState" ,desc = "运行状态")
     private String stageState;
 
-    @ApiProperty(name = "parentId" ,desc = "阶段id")
+    //@ApiProperty(name = "parentId" ,desc = "阶段id")
     private String parentId;
 
 
-    @ApiProperty(name ="pageParam",desc = "分页参数")
+    //@ApiProperty(name ="pageParam",desc = "分页参数")
     private Page pageParam= new Page();
 
-    @ApiProperty(name ="orderParams",desc = "排序参数")
+    //@ApiProperty(name ="orderParams",desc = "排序参数")
     private List<Order> orderParams = OrderBuilders.instance().desc("stageSort").get();
 
     public String getStageName() {

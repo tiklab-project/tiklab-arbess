@@ -6,25 +6,25 @@ import io.tiklab.beans.annotation.Mapping;
 import io.tiklab.beans.annotation.Mappings;
 import io.tiklab.join.annotation.Join;
 import io.tiklab.join.annotation.JoinQuery;
-import io.tiklab.postin.annotation.ApiModel;
-import io.tiklab.postin.annotation.ApiProperty;
+
+
 
 /**
  * 任务测试模型
  */
-@ApiModel
+//@ApiModel
 @Join
 @Mapper
 public class TaskTest {
 
-    @ApiProperty(name = "taskId",desc = "id")
+    //@ApiProperty(name = "taskId",desc = "id")
     private String taskId;
 
     //测试内容
-    @ApiProperty(name="testOrder",desc="测试内容",required = true)
+    //@ApiProperty(name="testOrder",desc="测试内容",required = true)
     private String testOrder;
 
-    @ApiProperty(name="address",desc="测试地址",required = true)
+    //@ApiProperty(name="address",desc="测试地址",required = true)
     private String address;
 
     @Mappings({
@@ -57,7 +57,7 @@ public class TaskTest {
     @JoinQuery(key = "webEnv")
     private TestOnWebEnv webEnv;
 
-    @ApiProperty(name = "authId",desc="认证id")
+    //@ApiProperty(name = "authId",desc="认证id")
     private String authId;
 
     private Object auth;

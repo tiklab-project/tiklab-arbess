@@ -6,9 +6,9 @@ import io.tiklab.beans.annotation.Mappings;
 import io.tiklab.join.annotation.Join;
 import io.tiklab.join.annotation.JoinQuery;
 import io.tiklab.matflow.pipeline.definition.model.Pipeline;
-import io.tiklab.postin.annotation.ApiModel;
 
-@ApiModel
+
+//@ApiModel
 @Join
 @Mapper
 public class RelevanceTestOn {

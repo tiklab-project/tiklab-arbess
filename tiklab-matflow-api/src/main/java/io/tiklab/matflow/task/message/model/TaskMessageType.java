@@ -2,31 +2,31 @@ package io.tiklab.matflow.task.message.model;
 
 import io.tiklab.beans.annotation.Mapper;
 import io.tiklab.join.annotation.Join;
-import io.tiklab.postin.annotation.ApiModel;
-import io.tiklab.postin.annotation.ApiProperty;
+
+
 
 import java.util.List;
 /**
  * 任务消息类型模型
  */
-@ApiModel
+//@ApiModel
 @Join
 @Mapper
 public class TaskMessageType {
 
-    @ApiProperty(name = "id",desc = "id")
+    //@ApiProperty(name = "id",desc = "id")
     private String id;
 
-    @ApiProperty(name = "taskId",desc = "任务id")
+    //@ApiProperty(name = "taskId",desc = "任务id")
     private String taskId;
 
-    @ApiProperty(name="taskType",desc="消息类型")
+    //@ApiProperty(name="taskType",desc="消息类型")
     private String taskType;
 
-    @ApiProperty(name="typeList",desc="site:站内信  sms:短信发送  wechat:微信  mail:邮箱发送")
+    //@ApiProperty(name="typeList",desc="site:站内信  sms:短信发送  wechat:微信  mail:邮箱发送")
     private List<String> typeList;
 
-    @ApiProperty(name="userList",desc="接收人信息")
+    //@ApiProperty(name="userList",desc="接收人信息")
     private List<TaskMessageUser> userList;
 
     public String getId() {

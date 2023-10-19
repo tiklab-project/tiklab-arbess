@@ -3,41 +3,41 @@ package io.tiklab.matflow.task.build.model;
 
 import io.tiklab.beans.annotation.Mapper;
 import io.tiklab.join.annotation.Join;
-import io.tiklab.postin.annotation.ApiModel;
-import io.tiklab.postin.annotation.ApiProperty;
+
+
 /**
  * 任务构建模型
  */
-@ApiModel
+//@ApiModel
 @Join
 @Mapper
 public class TaskBuild {
 
-    @ApiProperty(name = "taskId",desc = "id")
+    //@ApiProperty(name = "taskId",desc = "id")
     private String taskId;
 
     //构建文件地址
-    @ApiProperty(name="buildAddress",desc="构建文件地址")
+    //@ApiProperty(name="buildAddress",desc="构建文件地址")
     private String buildAddress;
 
     //构建命令
-    @ApiProperty(name="buildOrder",desc="构建命令")
+    //@ApiProperty(name="buildOrder",desc="构建命令")
     private String buildOrder;
 
-    @ApiProperty(name="productRule",desc="制品规则")
+    //@ApiProperty(name="productRule",desc="制品规则")
     private String productRule;
 
 
-    @ApiProperty(name = "dockerName",desc="镜像名称")
+    //@ApiProperty(name = "dockerName",desc="镜像名称")
     private String dockerName;
 
-    @ApiProperty(name = "dockerVersion",desc="镜像版本")
+    //@ApiProperty(name = "dockerVersion",desc="镜像版本")
     private String dockerVersion;
 
-    @ApiProperty(name = "dockerFile",desc="DockerFile文件地址")
+    //@ApiProperty(name = "dockerFile",desc="DockerFile文件地址")
     private String dockerFile;
 
-    @ApiProperty(name = "dockerOrder",desc="Docker部署命令")
+    //@ApiProperty(name = "dockerOrder",desc="Docker部署命令")
     private String dockerOrder;
 
 

@@ -1,21 +1,21 @@
 package io.tiklab.matflow.task.build.model;
 
-import io.tiklab.postin.annotation.ApiProperty;
+
 
 public class TaskBuildProductQuery {
 
     //地址
-    @ApiProperty(name = "type",desc = "类型")
+    //@ApiProperty(name = "type",desc = "类型")
     private String type;
 
-    @ApiProperty(name = "key",desc = "key")
+    //@ApiProperty(name = "key",desc = "key")
     private String key;
 
-    @ApiProperty(name = "value",desc = "值")
+    //@ApiProperty(name = "value",desc = "值")
     private String value;
 
     //分支
-    @ApiProperty(name = "instanceId",desc = "实例id")
+    //@ApiProperty(name = "instanceId",desc = "实例id")
     private String instanceId;
 
     public String getType() {

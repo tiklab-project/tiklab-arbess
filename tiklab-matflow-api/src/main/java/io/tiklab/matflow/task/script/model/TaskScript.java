@@ -2,23 +2,23 @@ package io.tiklab.matflow.task.script.model;
 
 import io.tiklab.beans.annotation.Mapper;
 import io.tiklab.join.annotation.Join;
-import io.tiklab.postin.annotation.ApiModel;
-import io.tiklab.postin.annotation.ApiProperty;
+
+
 /**
  * 任务脚本模型
  */
-@ApiModel
+//@ApiModel
 @Join
 @Mapper
 public class TaskScript {
 
-    @ApiProperty(name = "taskId",desc = "id")
+    //@ApiProperty(name = "taskId",desc = "id")
     private String taskId;
 
-    @ApiProperty(name = "type",desc = "类型 bat:bat脚本 shell:shell脚本")
+    //@ApiProperty(name = "type",desc = "类型 bat:bat脚本 shell:shell脚本")
     private String type;
 
-    @ApiProperty(name = "scriptOrder",desc = "命令")
+    //@ApiProperty(name = "scriptOrder",desc = "命令")
     private String scriptOrder;
 
     private int sort;

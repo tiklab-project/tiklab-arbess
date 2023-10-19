@@ -2,29 +2,29 @@ package io.tiklab.matflow.task.task.model;
 
 import io.tiklab.matflow.pipeline.definition.model.Pipeline;
 import io.tiklab.matflow.task.task.model.Tasks;
-import io.tiklab.postin.annotation.ApiProperty;
+
 
 /**
  * 执行发送消息通知需要的信息
  */
 public class TaskExecMessage {
 
-    @ApiProperty(name = "pipeline",desc = "流水线信息")
+    //@ApiProperty(name = "pipeline",desc = "流水线信息")
     private Pipeline pipeline;
 
-    @ApiProperty(name = "tasks",desc = "任务信息")
+    //@ApiProperty(name = "tasks",desc = "任务信息")
     private Tasks tasks;
 
-    @ApiProperty(name = "taskName",desc = "需要执行任务的名称")
+    //@ApiProperty(name = "taskName",desc = "需要执行任务的名称")
     private String taskName;
 
-    @ApiProperty(name = "taskId",desc = "需要执行任务的Id")
+    //@ApiProperty(name = "taskId",desc = "需要执行任务的Id")
     private String taskId;
 
-    @ApiProperty(name = "execState",desc = "执行任务的状态")
+    //@ApiProperty(name = "execState",desc = "执行任务的状态")
     private boolean execState;
 
-    @ApiProperty(name = "execPipeline",desc = "是任务还是流水线")
+    //@ApiProperty(name = "execPipeline",desc = "是任务还是流水线")
     private boolean execPipeline;
 
 

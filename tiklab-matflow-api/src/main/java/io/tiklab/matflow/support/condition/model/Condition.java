@@ -2,35 +2,35 @@ package io.tiklab.matflow.support.condition.model;
 
 import io.tiklab.beans.annotation.Mapper;
 import io.tiklab.join.annotation.Join;
-import io.tiklab.postin.annotation.ApiModel;
-import io.tiklab.postin.annotation.ApiProperty;
+
+
 /**
  * 流水线变量模型
  */
-@ApiModel
+//@ApiModel
 @Join
 @Mapper
 public class Condition {
 
-    @ApiProperty(name="condId",desc="条件id")
+    //@ApiProperty(name="condId",desc="条件id")
     private String condId;
 
-    @ApiProperty(name="condName",desc="条件名称")
+    //@ApiProperty(name="condName",desc="条件名称")
     private String condName;
 
-    @ApiProperty(name="taskId",desc="任务id")
+    //@ApiProperty(name="taskId",desc="任务id")
     private String taskId;
 
-    @ApiProperty(name="createTime",desc="创建时间")
+    //@ApiProperty(name="createTime",desc="创建时间")
     private String createTime;
 
-    @ApiProperty(name="condType",desc="条件类型 1.等于 2.不等于")
+    //@ApiProperty(name="condType",desc="条件类型 1.等于 2.不等于")
     private int condType;
 
-    @ApiProperty(name="condKey",desc="条件key")
+    //@ApiProperty(name="condKey",desc="条件key")
     private String condKey;
 
-    @ApiProperty(name="condValue",desc="条件value")
+    //@ApiProperty(name="condValue",desc="条件value")
     private String condValue;
 
 

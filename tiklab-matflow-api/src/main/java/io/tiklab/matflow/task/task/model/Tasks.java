@@ -2,47 +2,46 @@ package io.tiklab.matflow.task.task.model;
 
 import io.tiklab.beans.annotation.Mapper;
 import io.tiklab.join.annotation.Join;
-import io.tiklab.postin.annotation.ApiModel;
-import io.tiklab.postin.annotation.ApiProperty;
+
+
 
 /**
  * 流水线配置顺序模型
  */
 
-@ApiModel
+//@ApiModel
 @Join
 @Mapper(targetAlias = "TasksEntity")
 public class Tasks {
 
-    @ApiProperty(name="taskId",desc="配置id")
+    //@ApiProperty(name="taskId",desc="配置id")
     private String taskId;
 
-    @ApiProperty(name="createTime",desc="创建时间")
+    //@ApiProperty(name="createTime",desc="创建时间")
     private String createTime;
 
-    @ApiProperty(name="taskType",
-            desc= "类型1-10:源码,10-20:测试,20-30:构建,30-40:部署,40-50:代码扫描,50-60:推送制品")
+    //@ApiProperty(name="taskType",desc= "类型1-10:源码,10-20:测试,20-30:构建,30-40:部署,40-50:代码扫描,50-60:推送制品")
     private String taskType;
 
-    @ApiProperty(name="taskSort",desc="顺序")
+    //@ApiProperty(name="taskSort",desc="顺序")
     private int taskSort;
 
-    @ApiProperty(name="taskName",desc="顺序")
+    //@ApiProperty(name="taskName",desc="顺序")
     private String taskName;
 
-    @ApiProperty(name="values",desc="任务")
+    //@ApiProperty(name="values",desc="任务")
     private Object values;
 
-    @ApiProperty(name="pipeline",desc="流水线id",eg="@selectOne")
+    //@ApiProperty(name="pipeline",desc="流水线id",eg="@selectOne")
     private String pipelineId;
 
-    @ApiProperty(name="postprocessId",desc="后置处理id",eg="@selectOne")
+    //@ApiProperty(name="postprocessId",desc="后置处理id",eg="@selectOne")
     private String postprocessId;;
 
-    @ApiProperty(name="stageId",desc="阶段",eg="@selectOne")
+    //@ApiProperty(name="stageId",desc="阶段",eg="@selectOne")
     private String stageId;
 
-    @ApiProperty(name="task",desc="任务",eg="@selectOne")
+    //@ApiProperty(name="task",desc="任务",eg="@selectOne")
     private Object task;
 
     public Object getTask() {

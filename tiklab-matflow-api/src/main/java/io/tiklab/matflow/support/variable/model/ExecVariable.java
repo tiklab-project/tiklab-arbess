@@ -2,27 +2,27 @@ package io.tiklab.matflow.support.variable.model;
 
 import io.tiklab.beans.annotation.Mapper;
 import io.tiklab.join.annotation.Join;
-import io.tiklab.postin.annotation.ApiModel;
-import io.tiklab.postin.annotation.ApiProperty;
+
+
 
 import java.util.List;
 
 /**
  * 流水线条件模型
  */
-@ApiModel
+//@ApiModel
 public class ExecVariable {
 
-    @ApiProperty(name="varType",desc="类型 str.字符串 single.单选")
+    //@ApiProperty(name="varType",desc="类型 str.字符串 single.单选")
     private String varType;
 
-    @ApiProperty(name = "varKey",desc="名称")
+    //@ApiProperty(name = "varKey",desc="名称")
     private String varKey;
 
-    @ApiProperty(name = "varValue",desc="默认值")
+    //@ApiProperty(name = "varValue",desc="默认值")
     private Object varValue;
 
-    @ApiProperty(name = "pipelineId",desc="默认值")
+    //@ApiProperty(name = "pipelineId",desc="默认值")
     private String pipelineId;
 
 

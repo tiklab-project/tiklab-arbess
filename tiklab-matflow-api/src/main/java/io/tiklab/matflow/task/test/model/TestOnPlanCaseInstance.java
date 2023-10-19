@@ -1,28 +1,28 @@
 package io.tiklab.matflow.task.test.model;
 
-import io.tiklab.postin.annotation.ApiProperty;
+
 
 public class TestOnPlanCaseInstance {
 
-    @ApiProperty(name = "id", desc = "id")
+    //@ApiProperty(name = "id", desc = "id")
     private String id;
 
-    @ApiProperty(name = "testPlanInstanceId", desc = "所属测试计划实例")
+    //@ApiProperty(name = "testPlanInstanceId", desc = "所属测试计划实例")
     private String testPlanInstanceId;
 
-    @ApiProperty(name = "caseInstanceId", desc = "用例实例id")
+    //@ApiProperty(name = "caseInstanceId", desc = "用例实例id")
     private String caseInstanceId;
 
-    @ApiProperty(name = "name", desc = "名称")
+    //@ApiProperty(name = "name", desc = "名称")
     private String name;
 
-    @ApiProperty(name = "testType", desc = "测试类型")
+    //@ApiProperty(name = "testType", desc = "测试类型")
     private String testType;
 
-    @ApiProperty(name = "caseType", desc = "用例类型")
+    //@ApiProperty(name = "caseType", desc = "用例类型")
     private String caseType;
 
-    @ApiProperty(name = "result", desc = "结果")
+    //@ApiProperty(name = "result", desc = "结果")
     private Integer result;
 
 

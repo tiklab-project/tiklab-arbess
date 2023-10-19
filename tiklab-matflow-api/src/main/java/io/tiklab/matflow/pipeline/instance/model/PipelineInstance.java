@@ -7,8 +7,8 @@ import io.tiklab.beans.annotation.Mappings;
 import io.tiklab.join.annotation.Join;
 import io.tiklab.join.annotation.JoinQuery;
 import io.tiklab.matflow.pipeline.definition.model.Pipeline;
-import io.tiklab.postin.annotation.ApiModel;
-import io.tiklab.postin.annotation.ApiProperty;
+
+
 import io.tiklab.user.user.model.User;
 
 import java.util.List;
@@ -17,31 +17,31 @@ import java.util.List;
  * 流水线实例模型
  */
 
-@ApiModel
+//@ApiModel
 @Join
 @Mapper
 public class PipelineInstance {
 
-    @ApiProperty(name="instanceId",desc="构建实例id")
+    //@ApiProperty(name="instanceId",desc="构建实例id")
     private String instanceId;
 
-    @ApiProperty(name="createTime",desc="创建时间")
+    //@ApiProperty(name="createTime",desc="创建时间")
     private String createTime;
 
-    @ApiProperty(name="runWay",desc="运行方式(1.手动运行 2.触发器运行)")
+    //@ApiProperty(name="runWay",desc="运行方式(1.手动运行 2.触发器运行)")
     private int runWay;
 
-    @ApiProperty(name="user",desc="用户",required = true)
+    //@ApiProperty(name="user",desc="用户",required = true)
     @Mappings({
             @Mapping(source = "user.id",target = "userId")
     })
     @JoinQuery(key = "id")
     private User user;
 
-    @ApiProperty(name="runStatus",desc="运行状态 1.失败 10.成功 20:停止")
+    //@ApiProperty(name="runStatus",desc="运行状态 1.失败 10.成功 20:停止")
     private String runStatus;
 
-    @ApiProperty(name="runTime",desc="运行时间")
+    //@ApiProperty(name="runTime",desc="运行时间")
     private int runTime;
 
     @Mappings({
@@ -50,12 +50,12 @@ public class PipelineInstance {
     @JoinQuery(key = "id")
     private Pipeline pipeline;
 
-    @ApiProperty(name="findNumber",desc="构建次数")
+    //@ApiProperty(name="findNumber",desc="构建次数")
     private int findNumber;
 
 
 
-    @ApiProperty(name="runTimeDate",desc ="运行时间")
+    //@ApiProperty(name="runTimeDate",desc ="运行时间")
     private String runTimeDate;
 
 

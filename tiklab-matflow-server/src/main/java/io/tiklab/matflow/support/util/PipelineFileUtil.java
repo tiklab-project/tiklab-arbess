@@ -3,6 +3,7 @@ package io.tiklab.matflow.support.util;
 import io.tiklab.core.exception.ApplicationException;
 import io.tiklab.core.exception.SystemException;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -186,6 +187,9 @@ public class PipelineFileUtil {
      * @throws ApplicationException 写入失败
      */
     public static void logWriteFile(String str, String path) throws ApplicationException {
+        if (StringUtils.isEmpty(str)){
+            return;
+        }
         try (FileWriter writer = new FileWriter(path, StandardCharsets.UTF_8,true)) {
             writer.write(str);
             writer.flush();

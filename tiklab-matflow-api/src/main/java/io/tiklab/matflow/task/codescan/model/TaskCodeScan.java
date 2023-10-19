@@ -2,24 +2,24 @@ package io.tiklab.matflow.task.codescan.model;
 
 import io.tiklab.beans.annotation.Mapper;
 import io.tiklab.join.annotation.Join;
-import io.tiklab.postin.annotation.ApiModel;
-import io.tiklab.postin.annotation.ApiProperty;
+
+
 /**
  * 任务代码扫描模型
  */
-@ApiModel
+//@ApiModel
 @Join
 @Mapper
 public class TaskCodeScan {
 
-    @ApiProperty(name = "taskId",desc = "id")
+    //@ApiProperty(name = "taskId",desc = "id")
     private String taskId;
 
-    @ApiProperty(name="projectName",desc="项目名称")
+    //@ApiProperty(name="projectName",desc="项目名称")
     private String projectName;
 
     //授权id
-    @ApiProperty(name="authName",desc="授权id")
+    //@ApiProperty(name="authName",desc="授权id")
     private String authId;
 
     //授权信息

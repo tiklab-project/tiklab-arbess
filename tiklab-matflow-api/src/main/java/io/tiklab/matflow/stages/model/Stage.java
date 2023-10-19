@@ -4,59 +4,59 @@ package io.tiklab.matflow.stages.model;
 import io.tiklab.beans.annotation.Mapper;
 import io.tiklab.join.annotation.Join;
 import io.tiklab.matflow.task.task.model.Tasks;
-import io.tiklab.postin.annotation.ApiModel;
-import io.tiklab.postin.annotation.ApiProperty;
+
+
 
 import java.util.List;
 
 /**
  * 流水线阶段模型
  */
-@ApiModel
+//@ApiModel
 @Join
 @Mapper
 public class Stage {
 
-    @ApiProperty(name = "stageId",desc="id")
+    //@ApiProperty(name = "stageId",desc="id")
     private String stageId;
 
-    @ApiProperty(name = "stageName",desc="名称")
+    //@ApiProperty(name = "stageName",desc="名称")
     private String stageName;
 
-    @ApiProperty(name = "createTime",desc="创建时间")
+    //@ApiProperty(name = "createTime",desc="创建时间")
     private String createTime;
 
-    @ApiProperty(name="pipelineId",desc="流水线id")
+    //@ApiProperty(name="pipelineId",desc="流水线id")
     private String pipelineId;
 
-    @ApiProperty(name="stageSort",desc="阶段顺序")
+    //@ApiProperty(name="stageSort",desc="阶段顺序")
     private int stageSort;
 
-    @ApiProperty(name = "parentId",desc="主阶段")
+    //@ApiProperty(name = "parentId",desc="主阶段")
     private String parentId;
 
-    @ApiProperty(name = "code",desc="是否是源码")
+    //@ApiProperty(name = "code",desc="是否是源码")
     private boolean code;
 
-    @ApiProperty(name = "taskValues",desc="阶段任务")
+    //@ApiProperty(name = "taskValues",desc="阶段任务")
     private List<Tasks> taskValues;
 
-    @ApiProperty(name = "stageList",desc="阶段")
+    //@ApiProperty(name = "stageList",desc="阶段")
     private List<Stage> stageList;
 
-    @ApiProperty(name = "taskType",desc="任务类型")
+    //@ApiProperty(name = "taskType",desc="任务类型")
     private String taskType;
 
-    @ApiProperty(name = "taskId",desc="任务id")
+    //@ApiProperty(name = "taskId",desc="任务id")
     private String taskId;
 
-    @ApiProperty(name = "values",desc="更新内容")
+    //@ApiProperty(name = "values",desc="更新内容")
     private Object values;
 
-    @ApiProperty(name = "taskSort",desc="任务顺序")
+    //@ApiProperty(name = "taskSort",desc="任务顺序")
     private int taskSort;
 
-    @ApiProperty(name = "parallelName",desc="并行阶段名称")
+    //@ApiProperty(name = "parallelName",desc="并行阶段名称")
     private String parallelName;
 
     public String getStageId() {

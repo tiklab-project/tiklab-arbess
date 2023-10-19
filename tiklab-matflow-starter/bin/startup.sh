@@ -56,7 +56,7 @@ echo "APP_HOME="$APP_HOME
 echo "APP_MAIN="$APP_MAIN
 
 
-APPLY=matflow
+APPLY=matflow-ce
 
 enableApply(){
 

@@ -5,49 +5,49 @@ import io.tiklab.beans.annotation.Mapping;
 import io.tiklab.beans.annotation.Mappings;
 import io.tiklab.join.annotation.Join;
 import io.tiklab.join.annotation.JoinQuery;
-import io.tiklab.postin.annotation.ApiModel;
-import io.tiklab.postin.annotation.ApiProperty;
+
+
 
 /**
  * 任务推送制品模型
  */
-@ApiModel
+//@ApiModel
 @Join
 @Mapper
 public class TaskArtifact {
 
-    @ApiProperty(name = "taskId",desc = "id")
+    //@ApiProperty(name = "taskId",desc = "id")
     private String taskId;
 
-    @ApiProperty(name = "groupId",desc = "groupId")
+    //@ApiProperty(name = "groupId",desc = "groupId")
     private String groupId;
 
-    @ApiProperty(name = "artifactId",desc = "artifactId")
+    //@ApiProperty(name = "artifactId",desc = "artifactId")
     private String artifactId;
 
-    @ApiProperty(name = "artifactType",desc = "推送类型")
+    //@ApiProperty(name = "artifactType",desc = "推送类型")
     private String artifactType;
 
-    @ApiProperty(name = "version",desc = "version")
+    //@ApiProperty(name = "version",desc = "version")
     private String version;
 
-    @ApiProperty(name = "fileType",desc = "文件类型")
+    //@ApiProperty(name = "fileType",desc = "文件类型")
     private String fileType;
 
-    @ApiProperty(name = "fileAddress",desc = "文件地址")
+    //@ApiProperty(name = "fileAddress",desc = "文件地址")
     private String fileAddress;
 
-    @ApiProperty(name = "putAddress",desc = "发送地址")
+    //@ApiProperty(name = "putAddress",desc = "发送地址")
     private String putAddress;
 
-    @ApiProperty(name = "dockerImage",desc = "docker镜像")
+    //@ApiProperty(name = "dockerImage",desc = "docker镜像")
     private String dockerImage;
 
     //授权id
-    @ApiProperty(name="authId",desc="授权id")
+    //@ApiProperty(name="authId",desc="授权id")
     private String authId;
 
-    @ApiProperty(name="authId",desc="rule")
+    //@ApiProperty(name="authId",desc="rule")
     private String rule;
 
     @Mappings({

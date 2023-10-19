@@ -6,42 +6,42 @@ import io.tiklab.beans.annotation.Mappings;
 import io.tiklab.join.annotation.Join;
 import io.tiklab.join.annotation.JoinQuery;
 import io.tiklab.matflow.task.artifact.model.XpackRepository;
-import io.tiklab.postin.annotation.ApiModel;
-import io.tiklab.postin.annotation.ApiProperty;
 
-@ApiModel
+
+
+//@ApiModel
 @Join
 @Mapper
 public class TaskPullArtifact {
 
-    @ApiProperty(name = "id",desc = "id")
+    //@ApiProperty(name = "id",desc = "id")
     private String taskId;
 
-    @ApiProperty(name = "id",desc = "id")
+    //@ApiProperty(name = "id",desc = "id")
     private String pullType;
 
-    @ApiProperty(name = "id",desc = "id")
+    //@ApiProperty(name = "id",desc = "id")
     private String dockerImage;
 
-    @ApiProperty(name = "id",desc = "id")
+    //@ApiProperty(name = "id",desc = "id")
     private String remoteAddress;
 
-    @ApiProperty(name = "id",desc = "id")
+    //@ApiProperty(name = "id",desc = "id")
     private String localAddress;
 
-    @ApiProperty(name = "id",desc = "id")
+    //@ApiProperty(name = "id",desc = "id")
     private String authId;
 
-    @ApiProperty(name = "version",desc = "version")
+    //@ApiProperty(name = "version",desc = "version")
     private String version;
 
-    @ApiProperty(name = "groupId",desc = "groupId")
+    //@ApiProperty(name = "groupId",desc = "groupId")
     private String groupId;
 
-    @ApiProperty(name = "artifactId",desc = "artifactId")
+    //@ApiProperty(name = "artifactId",desc = "artifactId")
     private String artifactId;
 
-    @ApiProperty(name = "transitive",desc = "是否拉取关联依赖")
+    //@ApiProperty(name = "transitive",desc = "是否拉取关联依赖")
     private Boolean transitive;
 
     @Mappings({

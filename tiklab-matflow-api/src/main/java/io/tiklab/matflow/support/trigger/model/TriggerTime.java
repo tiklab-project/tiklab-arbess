@@ -3,51 +3,51 @@ package io.tiklab.matflow.support.trigger.model;
 import io.tiklab.beans.annotation.Mapper;
 import io.tiklab.core.order.Order;
 import io.tiklab.join.annotation.Join;
-import io.tiklab.postin.annotation.ApiModel;
-import io.tiklab.postin.annotation.ApiProperty;
+
+
 
 import java.util.List;
 /**
  * 流水线触发器时间模型
  */
-@ApiModel
+//@ApiModel
 @Join
 @Mapper(targetAlias = "TriggerTimeEntity")
 public class TriggerTime {
 
-    @ApiProperty(name="timeId",desc="id")
+    //@ApiProperty(name="timeId",desc="id")
     private String timeId;
 
-    @ApiProperty(name="taskType",desc="类型 cycle:周期 one:单次")
+    //@ApiProperty(name="taskType",desc="类型 cycle:周期 one:单次")
     private int taskType;
 
-    @ApiProperty(name="date",desc="时间")
+    //@ApiProperty(name="date",desc="时间")
     private int date;
 
-    @ApiProperty(name="time",desc="具体时间")
+    //@ApiProperty(name="time",desc="具体时间")
     private String time;
 
-    @ApiProperty(name="triggerId",desc="配置id")
+    //@ApiProperty(name="triggerId",desc="配置id")
     private String triggerId;
 
-    @ApiProperty(name="cron",desc="配置id")
+    //@ApiProperty(name="cron",desc="配置id")
     private String cron;
 
-    @ApiProperty(name="execTime",desc="具体执行时间")
+    //@ApiProperty(name="execTime",desc="具体执行时间")
     private String weekTime;
 
-    @ApiProperty(name="execTime",desc="执行时间")
+    //@ApiProperty(name="execTime",desc="执行时间")
     private String execTime;
 
-    @ApiProperty(name="timeList",desc="天数,周几")
+    //@ApiProperty(name="timeList",desc="天数,周几")
     private List<Integer> timeList;
 
     private Integer dayTime;
 
-    @ApiProperty(name="type",desc="类型")
+    //@ApiProperty(name="type",desc="类型")
     private int type;
 
-    @ApiProperty(name="name",desc="名称")
+    //@ApiProperty(name="name",desc="名称")
     private String name;
 
 

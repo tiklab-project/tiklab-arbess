@@ -2,44 +2,44 @@ package io.tiklab.matflow.task.deploy.model;
 
 import io.tiklab.beans.annotation.Mapper;
 import io.tiklab.join.annotation.Join;
-import io.tiklab.postin.annotation.ApiModel;
-import io.tiklab.postin.annotation.ApiProperty;
+
+
 /**
  * 任务部署模型
  */
-@ApiModel
+//@ApiModel
 @Join
 @Mapper
 public class TaskDeploy {
 
-    @ApiProperty(name = "taskId",desc = "id")
+    //@ApiProperty(name = "taskId",desc = "id")
     private String taskId;
 
-    @ApiProperty(name = "authType",desc = "认证类型" )
+    //@ApiProperty(name = "authType",desc = "认证类型" )
     private int authType;
 
-    @ApiProperty(name = "localAddress" , desc = "文件地址")
+    //@ApiProperty(name = "localAddress" , desc = "文件地址")
     private String localAddress;
 
-    @ApiProperty(name="deployAddress",desc="部署地址")
+    //@ApiProperty(name="deployAddress",desc="部署地址")
     private String deployAddress;
 
-    @ApiProperty(name = "authId" , desc = "认证id")
+    //@ApiProperty(name = "authId" , desc = "认证id")
     private String authId;
 
-    @ApiProperty(name = "deployOrder",desc = "部署命令" )
+    //@ApiProperty(name = "deployOrder",desc = "部署命令" )
     private String deployOrder;
 
-    @ApiProperty(name = "startAddress",desc = "启动文件地址" )
+    //@ApiProperty(name = "startAddress",desc = "启动文件地址" )
     private String startAddress;
 
-    @ApiProperty(name="startOrder",desc="启动命令")
+    //@ApiProperty(name="startOrder",desc="启动命令")
     private String startOrder;
 
-    @ApiProperty(name="rule",desc="规则")
+    //@ApiProperty(name="rule",desc="规则")
     private String rule;
 
-    @ApiProperty(name="dockerImage",desc="规则")
+    //@ApiProperty(name="dockerImage",desc="规则")
     private String dockerImage;
 
     //授权信息

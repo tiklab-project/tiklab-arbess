@@ -5,8 +5,8 @@ import io.tiklab.beans.annotation.Mapping;
 import io.tiklab.beans.annotation.Mappings;
 import io.tiklab.join.annotation.Join;
 import io.tiklab.join.annotation.JoinQuery;
-import io.tiklab.postin.annotation.ApiModel;
-import io.tiklab.postin.annotation.ApiProperty;
+
+
 import io.tiklab.user.user.model.User;
 
 
@@ -73,7 +73,7 @@ public class Auth {
      * @pi.desc:创建时间
      * @pi.value:createTime
      */
-    @ApiProperty(name = "createTime")
+    //@ApiProperty(name = "createTime")
     private String createTime ;
 
     /**

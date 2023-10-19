@@ -4,8 +4,8 @@ package io.tiklab.matflow.stages.model;
 import io.tiklab.beans.annotation.Mapper;
 import io.tiklab.join.annotation.Join;
 import io.tiklab.matflow.task.task.model.TaskInstance;
-import io.tiklab.postin.annotation.ApiModel;
-import io.tiklab.postin.annotation.ApiProperty;
+
+
 
 import java.util.List;
 
@@ -13,42 +13,42 @@ import java.util.List;
  * 阶段运行实例模型
  */
 
-@ApiModel
+//@ApiModel
 @Join
 @Mapper(targetAlias = "StageInstanceEntity")
 public class StageInstance {
 
-    @ApiProperty(name = "id" ,desc = "id")
+    //@ApiProperty(name = "id" ,desc = "id")
     private String id;
 
-    @ApiProperty(name = "stageName" ,desc = "阶段名称")
+    //@ApiProperty(name = "stageName" ,desc = "阶段名称")
     private String stageName;
 
-    @ApiProperty(name = "instanceId" ,desc = "实例id")
+    //@ApiProperty(name = "instanceId" ,desc = "实例id")
     private String instanceId;
 
-    @ApiProperty(name = "stageSort" ,desc = "阶段顺序")
+    //@ApiProperty(name = "stageSort" ,desc = "阶段顺序")
     private int stageSort ;
 
-    @ApiProperty(name = "stageAddress" ,desc = "运行日志地址")
+    //@ApiProperty(name = "stageAddress" ,desc = "运行日志地址")
     private String stageAddress;
 
-    @ApiProperty(name = "stageTime" ,desc = "运行时间")
+    //@ApiProperty(name = "stageTime" ,desc = "运行时间")
     private int stageTime;
 
-    @ApiProperty(name = "stageState" ,desc = "运行状态")
+    //@ApiProperty(name = "stageState" ,desc = "运行状态")
     private String stageState;
 
-    @ApiProperty(name = "parentId" ,desc = "阶段id")
+    //@ApiProperty(name = "parentId" ,desc = "阶段id")
     private String parentId;
 
-    @ApiProperty(name = "stageRunLog" ,desc = "阶段运行日志")
+    //@ApiProperty(name = "stageRunLog" ,desc = "阶段运行日志")
     private String runLog;
 
-    @ApiProperty(name = "stageInstanceList" ,desc = "阶段实例")
+    //@ApiProperty(name = "stageInstanceList" ,desc = "阶段实例")
     private List<StageInstance> stageInstanceList ;
 
-    @ApiProperty(name = "taskInstanceList" ,desc = "任务实例")
+    //@ApiProperty(name = "taskInstanceList" ,desc = "任务实例")
     private List<TaskInstance> taskInstanceList;
 
 

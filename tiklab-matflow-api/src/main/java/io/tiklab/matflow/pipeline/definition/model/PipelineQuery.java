@@ -3,7 +3,7 @@ package io.tiklab.matflow.pipeline.definition.model;
 import io.tiklab.core.order.Order;
 import io.tiklab.core.order.OrderBuilders;
 import io.tiklab.core.page.Page;
-import io.tiklab.postin.annotation.ApiProperty;
+
 
 import java.util.List;
 
@@ -14,33 +14,33 @@ import java.util.List;
 
 public class PipelineQuery {
 
-    @ApiProperty(name ="userId",desc = "用户")
+    //@ApiProperty(name ="userId",desc = "用户")
     private String userId;
 
-    @ApiProperty(name ="pipelineName",desc = "流水线名称")
+    //@ApiProperty(name ="pipelineName",desc = "流水线名称")
     private String pipelineName;
 
-    @ApiProperty(name ="pipelineState",desc = "流水线状态")
+    //@ApiProperty(name ="pipelineState",desc = "流水线状态")
     private Integer pipelineState;
 
-    @ApiProperty(name ="pipelineType",desc = "流水线类型")
+    //@ApiProperty(name ="pipelineType",desc = "流水线类型")
     private Integer pipelineType;
 
-    @ApiProperty(name ="pipelinePower",desc = "流水线权限")
+    //@ApiProperty(name ="pipelinePower",desc = "流水线权限")
     private Integer pipelinePower;
 
-    @ApiProperty(name ="pipelineFollow",desc = "收藏, 1.收藏 0.未收藏")
+    //@ApiProperty(name ="pipelineFollow",desc = "收藏, 1.收藏 0.未收藏")
     private Integer pipelineFollow;
 
-    @ApiProperty(name ="idString",desc = "流水线id数组")
+    //@ApiProperty(name ="idString",desc = "流水线id数组")
     private String[] idString;
 
     private boolean eqName;
 
-    @ApiProperty(name ="pageParam",desc = "分页参数")
+    //@ApiProperty(name ="pageParam",desc = "分页参数")
     private Page pageParam= new Page();
 
-    @ApiProperty(name ="orderParams",desc = "排序参数")
+    //@ApiProperty(name ="orderParams",desc = "排序参数")
     // private List<Order> orderParams = OrderBuilders.instance().desc("createTime").get();
     private List<Order> orderParams = OrderBuilders.instance().desc("name").get();
 

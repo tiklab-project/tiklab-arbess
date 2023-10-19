@@ -6,29 +6,29 @@ import io.tiklab.core.order.OrderBuilders;
 import io.tiklab.core.page.Page;
 import io.tiklab.join.annotation.Join;
 import io.tiklab.matflow.task.task.model.Tasks;
-import io.tiklab.postin.annotation.ApiModel;
-import io.tiklab.postin.annotation.ApiProperty;
+
+
 
 import java.util.List;
 
 /**
  * 流水线后置处理模型
  */
-@ApiModel
+//@ApiModel
 public class PostprocessQuery {
 
 
-    @ApiProperty(name="taskId",desc="任务id")
+    //@ApiProperty(name="taskId",desc="任务id")
     private String taskId;
 
-    @ApiProperty(name="pipelineId",desc="流水线id")
+    //@ApiProperty(name="pipelineId",desc="流水线id")
     private String pipelineId;
 
 
-    @ApiProperty(name ="pageParam",desc = "分页参数")
+    //@ApiProperty(name ="pageParam",desc = "分页参数")
     private Page pageParam= new Page();
 
-    @ApiProperty(name ="orderParams",desc = "排序参数")
+    //@ApiProperty(name ="orderParams",desc = "排序参数")
     private List<Order> orderParams = OrderBuilders.instance().desc("taskId").get();
 
 

@@ -2,44 +2,44 @@ package io.tiklab.matflow.support.variable.model;
 
 import io.tiklab.beans.annotation.Mapper;
 import io.tiklab.join.annotation.Join;
-import io.tiklab.postin.annotation.ApiModel;
-import io.tiklab.postin.annotation.ApiProperty;
+
+
 
 import java.util.List;
 /**
  * 流水线条件模型
  */
-@ApiModel
+//@ApiModel
 @Join
 @Mapper
 public class Variable {
 
 
-    @ApiProperty(name="varId",desc="id")
+    //@ApiProperty(name="varId",desc="id")
     private String varId;
 
-    @ApiProperty(name="createTime",desc="创建时间")
+    //@ApiProperty(name="createTime",desc="创建时间")
     private String createTime;
 
-    @ApiProperty(name="varType",desc="类型 str.字符串 single .单选")
+    //@ApiProperty(name="varType",desc="类型 str.字符串 single .单选")
     private String varType;
 
-    @ApiProperty(name="type",desc="类型 1.全局 2.项目")
+    //@ApiProperty(name="type",desc="类型 1.全局 2.项目")
     private int type;
 
-    @ApiProperty(name="taskId",desc="任务id")
+    //@ApiProperty(name="taskId",desc="任务id")
     private String taskId;
 
-    @ApiProperty(name="pipelineId",desc="流水线id")
+    //@ApiProperty(name="pipelineId",desc="流水线id")
     private String pipelineId;
 
-    @ApiProperty(name = "varKey",desc="名称")
+    //@ApiProperty(name = "varKey",desc="名称")
     private String varKey;
 
-    @ApiProperty(name = "varValue",desc="默认值")
+    //@ApiProperty(name = "varValue",desc="默认值")
     private String varValue;
 
-    @ApiProperty(name = "varValues",desc="值")
+    //@ApiProperty(name = "varValues",desc="值")
     private String varValues;
 
     private List<String> valueList;

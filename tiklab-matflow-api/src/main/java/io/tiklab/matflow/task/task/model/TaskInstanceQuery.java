@@ -6,8 +6,8 @@ import io.tiklab.core.order.Order;
 import io.tiklab.core.order.OrderBuilders;
 import io.tiklab.core.page.Page;
 import io.tiklab.join.annotation.Join;
-import io.tiklab.postin.annotation.ApiModel;
-import io.tiklab.postin.annotation.ApiProperty;
+
+
 
 import java.util.List;
 
@@ -15,31 +15,31 @@ import java.util.List;
  * 任务实例模型
  */
 
-@ApiModel
+//@ApiModel
 @Join
 @Mapper
 public class TaskInstanceQuery {
 
-    @ApiProperty(name = "instanceId",desc = "历史Id")
+    //@ApiProperty(name = "instanceId",desc = "历史Id")
     private String instanceId;
 
-    @ApiProperty(name = "taskType",desc = "运行类型")
+    //@ApiProperty(name = "taskType",desc = "运行类型")
     private String taskType ;
 
-    @ApiProperty(name = "runState",desc = "运行状态 error.失败 success.成功 halt.停止 wait.等待")
+    //@ApiProperty(name = "runState",desc = "运行状态 error.失败 success.成功 halt.停止 wait.等待")
     private String runState;
 
-    @ApiProperty(name="stageId",desc="阶段id")
+    //@ApiProperty(name="stageId",desc="阶段id")
     private String stagesId;
 
-    @ApiProperty(name="postprocessId",desc="后置任务id")
+    //@ApiProperty(name="postprocessId",desc="后置任务id")
     private String postprocessId;
 
 
-    @ApiProperty(name ="pageParam",desc = "分页参数")
+    //@ApiProperty(name ="pageParam",desc = "分页参数")
     private Page pageParam= new Page();
 
-    @ApiProperty(name ="orderParams",desc = "排序参数")
+    //@ApiProperty(name ="orderParams",desc = "排序参数")
     private List<Order> orderParams = OrderBuilders.instance().desc("taskType").get();
 
 

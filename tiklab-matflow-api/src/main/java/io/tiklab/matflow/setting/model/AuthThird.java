@@ -6,8 +6,8 @@ import io.tiklab.beans.annotation.Mapping;
 import io.tiklab.beans.annotation.Mappings;
 import io.tiklab.join.annotation.Join;
 import io.tiklab.join.annotation.JoinQuery;
-import io.tiklab.postin.annotation.ApiModel;
-import io.tiklab.postin.annotation.ApiProperty;
+
+
 import io.tiklab.user.user.model.User;
 
 /**
@@ -18,53 +18,53 @@ import io.tiklab.user.user.model.User;
  * @pi.model:io.tiklab.matflow.setting.model.AuthThird
  * @desc:
  */
-@ApiModel
+//@ApiModel
 @Join
 @Mapper
 public class AuthThird {
 
-    @ApiProperty(name = "serverId",desc="id")
+    //@ApiProperty(name = "serverId",desc="id")
     private String serverId;
 
-    @ApiProperty(name = "type",desc="类型 1. gitee 2. github 3.sonar 4.nexus" )
+    //@ApiProperty(name = "type",desc="类型 1. gitee 2. github 3.sonar 4.nexus" )
     private String type;
 
-    @ApiProperty(name = "authType",desc="认证类型 1.用户名密码 2. 通用认证")
+    //@ApiProperty(name = "authType",desc="认证类型 1.用户名密码 2. 通用认证")
     private int authType;
 
-    @ApiProperty(name = "name",desc="服务名称")
+    //@ApiProperty(name = "name",desc="服务名称")
     private String name;
 
-    @ApiProperty(name = "createTime")
+    //@ApiProperty(name = "createTime")
     private String createTime ;
 
-    @ApiProperty(name = "username",desc="用户名")
+    //@ApiProperty(name = "username",desc="用户名")
     private String username;
 
-    @ApiProperty(name = "password",desc="密码")
+    //@ApiProperty(name = "password",desc="密码")
     private String password;
 
-    @ApiProperty(name = "privateKey",desc="token")
+    //@ApiProperty(name = "privateKey",desc="token")
     private String privateKey;
 
-    @ApiProperty(name = "serverAddress",desc="服务地址")
+    //@ApiProperty(name = "serverAddress",desc="服务地址")
     private String serverAddress;
 
-    @ApiProperty(name = "accessToken",desc="授权信息")
+    //@ApiProperty(name = "accessToken",desc="授权信息")
     private String accessToken;
 
-    @ApiProperty(name = "refreshToken",desc="刷新授权")
+    //@ApiProperty(name = "refreshToken",desc="刷新授权")
     private String refreshToken;
 
     private String code;
 
-    @ApiProperty(name = "clientId",desc="授权id")
+    //@ApiProperty(name = "clientId",desc="授权id")
     private String clientId;
 
-    @ApiProperty(name = "clientSecret",desc="授权密码")
+    //@ApiProperty(name = "clientSecret",desc="授权密码")
     private String clientSecret;
 
-    @ApiProperty(name = "callbackUrl",desc="回调地址")
+    //@ApiProperty(name = "callbackUrl",desc="回调地址")
     private String callbackUrl;
 
     @Mappings({
@@ -73,10 +73,10 @@ public class AuthThird {
     @JoinQuery(key = "id")
     private User user;
 
-    @ApiProperty(name = "authPublic",desc="是否公开")
+    //@ApiProperty(name = "authPublic",desc="是否公开")
     private int authPublic;
 
-    @ApiProperty(name = "message",desc="授权信息")
+    //@ApiProperty(name = "message",desc="授权信息")
     private String message;
 
 

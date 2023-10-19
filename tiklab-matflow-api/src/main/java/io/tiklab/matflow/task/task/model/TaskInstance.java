@@ -3,52 +3,52 @@ package io.tiklab.matflow.task.task.model;
 
 import io.tiklab.beans.annotation.Mapper;
 import io.tiklab.join.annotation.Join;
-import io.tiklab.postin.annotation.ApiModel;
-import io.tiklab.postin.annotation.ApiProperty;
+
+
 
 /**
  * 任务实例模型
  */
 
-@ApiModel
+//@ApiModel
 @Join
 @Mapper
 public class TaskInstance {
 
-    @ApiProperty(name="id",desc="日志id")
+    //@ApiProperty(name="id",desc="日志id")
     private String id;
 
-    @ApiProperty(name = "instanceId",desc = "历史Id")
+    //@ApiProperty(name = "instanceId",desc = "历史Id")
     private String instanceId;
 
-    @ApiProperty(name = "taskType",desc = "运行类型")
+    //@ApiProperty(name = "taskType",desc = "运行类型")
     private String taskType ;
 
-    @ApiProperty(name = "taskSort",desc = "执行顺序")
+    //@ApiProperty(name = "taskSort",desc = "执行顺序")
     private int taskSort ;
 
-    @ApiProperty(name = "taskName",desc = "任务名称")
+    //@ApiProperty(name = "taskName",desc = "任务名称")
     private String taskName;
 
-    @ApiProperty(name = "logAddress",desc = "运行日志地址")
+    //@ApiProperty(name = "logAddress",desc = "运行日志地址")
     private String logAddress;
 
-    @ApiProperty(name = "runTime",desc = "运行时间")
+    //@ApiProperty(name = "runTime",desc = "运行时间")
     private int runTime;
 
-    @ApiProperty(name = "runTimeDate",desc = "运行时间")
+    //@ApiProperty(name = "runTimeDate",desc = "运行时间")
     private String runTimeDate;
 
-    @ApiProperty(name = "runState",desc = "运行状态 error.失败 success.成功 halt.停止 wait.等待")
+    //@ApiProperty(name = "runState",desc = "运行状态 error.失败 success.成功 halt.停止 wait.等待")
     private String runState;
 
-    @ApiProperty(name="stageId",desc="阶段id")
+    //@ApiProperty(name="stageId",desc="阶段id")
     private String stagesId;
 
-    @ApiProperty(name="postprocessId",desc="后置任务id")
+    //@ApiProperty(name="postprocessId",desc="后置任务id")
     private String postprocessId;
 
-    @ApiProperty(name="runLog",desc="运行日志")
+    //@ApiProperty(name="runLog",desc="运行日志")
     private String runLog;
 
 

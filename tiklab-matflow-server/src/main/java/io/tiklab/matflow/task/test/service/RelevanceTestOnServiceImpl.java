@@ -106,36 +106,20 @@ public class RelevanceTestOnServiceImpl implements RelevanceTestOnService{
                 deleteRelevance(relevanceTestOn.getAuthId());
                 continue;
             }
-            if (relevanceTestOnList.size() == 1 ){
-                AuthThird authThird = authThirdService.findOneAuthServer(authId);
-                TestOnPlanInstance testPlanInstance = taskTestOnService.findAllTestPlanInstance(authThird.getServerId(), testonId);
-                relevanceTestOn.setStatus(1);
-                if (Objects.isNull(testPlanInstance)){
-                    relevanceTestOn.setStatus(2);
-                }
-                Date date = PipelineUtil.StringChengeDate(relevanceTestOn.getCreateTime());
-                String dateTime = PipelineUtil.findDateTime(date, 0);
-                relevanceTestOn.setTime(dateTime);
-                relevanceTestOn.setObject(testPlanInstance);
-                relevanceTestOn.setUrl(authThird.getServerAddress());
-                list.add(relevanceTestOn);
-            }else {
-
-                AuthThird authThird = authThirdService.findOneAuthServer(authId);
-                TestOnPlanInstance testPlanInstance = taskTestOnService.findAllTestPlanInstance(authThird.getServerId(), testonId);
-                relevanceTestOn.setStatus(1);
-                if (Objects.isNull(testPlanInstance)){
-                    relevanceTestOn.setStatus(2);
-                }
-                relevanceTestOn.setUrl(authThird.getServerAddress());
-
-                Date date = PipelineUtil.StringChengeDate(relevanceTestOn.getCreateTime());
-                String dateTime = PipelineUtil.findDateTime(date, 0);
-                relevanceTestOn.setTime(dateTime);
-
-                relevanceTestOn.setObject(testPlanInstance);
-                list.add(relevanceTestOn);
+            AuthThird authThird = authThirdService.findOneAuthServer(authId);
+            TestOnPlanInstance testPlanInstance = taskTestOnService.findAllTestPlanInstance(authThird.getServerId(), testonId);
+            relevanceTestOn.setStatus(1);
+            if (Objects.isNull(testPlanInstance)){
+                relevanceTestOn.setStatus(2);
             }
+            relevanceTestOn.setUrl(authThird.getServerAddress());
+
+            Date date = PipelineUtil.StringChengeDate(relevanceTestOn.getCreateTime());
+            String dateTime = PipelineUtil.findDateTime(date, 0);
+            relevanceTestOn.setTime(dateTime);
+
+            relevanceTestOn.setObject(testPlanInstance);
+            list.add(relevanceTestOn);
         }
         list.sort(Comparator.comparing(RelevanceTestOn::getCreateTime).reversed());
         return list;

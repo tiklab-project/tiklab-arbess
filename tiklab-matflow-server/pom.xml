@@ -6,7 +6,7 @@
     <parent>
         <groupId>io.tiklab</groupId>
         <artifactId>tiklab-matflow</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
+        <version>1.0.0</version>
     </parent>
     <artifactId>tiklab-matflow-server</artifactId>
     <name>${project.artifactId}</name>
@@ -63,8 +63,6 @@
             <artifactId>tiklab-toolkit-core</artifactId>
             <version>${tiklab-toolkit.version}</version>
         </dependency>
-
-
         <dependency>
             <groupId>io.tiklab</groupId>
             <artifactId>tiklab-message-spring-boot-starter</artifactId>
@@ -113,12 +111,6 @@
         </dependency>
         <dependency>
             <groupId>io.tiklab</groupId>
-            <artifactId>tiklab-postin-doclet</artifactId>
-            <version>${tiklab-postin.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>io.tiklab</groupId>
             <artifactId>tiklab-licence-api</artifactId>
             <version>${tiklab-licence.version}</version>
         </dependency>
@@ -145,33 +137,6 @@
                     </execution>
                 </executions>
             </plugin>
-
-<!--            <plugin>-->
-<!--                <groupId>org.codehaus.mojo</groupId>-->
-<!--                <artifactId>exec-maven-plugin</artifactId>-->
-<!--                <version>3.0.0</version>-->
-<!--                <executions>-->
-<!--                    <execution>-->
-<!--                        <phase>test</phase>-->
-<!--                        <goals>-->
-<!--                            <goal>java</goal>-->
-<!--                        </goals>-->
-<!--                    </execution>-->
-<!--                </executions>-->
-<!--                <configuration>-->
-<!--                    <mainClass>io.tiklab.postin.doclet.starter.DocletApplication</mainClass>-->
-<!--                    <arguments>-->
-<!--                        &lt;!&ndash; modules&ndash;&gt;-->
-<!--                        <argument>D:\tiklab\tiklab-matflow\tiklab-matflow-api;${project.basedir}</argument>-->
-<!--                        &lt;!&ndash; workspaceId&ndash;&gt;-->
-<!--&lt;!&ndash;                        <argument>73c78f9e2b1c</argument>&ndash;&gt;-->
-<!--                        <argument>dac459d5dc86</argument>-->
-<!--                        &lt;!&ndash; server&ndash;&gt;-->
-<!--                        <argument>http://192.168.10.3:8090</argument>-->
-<!--                    </arguments>-->
-<!--                </configuration>-->
-<!--            </plugin>-->
-
         </plugins>
     </build>
 

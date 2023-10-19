@@ -2,30 +2,30 @@ package io.tiklab.matflow.task.build.model;
 
 import io.tiklab.beans.annotation.Mapper;
 import io.tiklab.join.annotation.Join;
-import io.tiklab.postin.annotation.ApiModel;
-import io.tiklab.postin.annotation.ApiProperty;
 
-@ApiModel
+
+
+//@ApiModel
 @Join
 @Mapper
 public class TaskBuildProduct {
 
 
-    @ApiProperty(name = "taskId",desc = "id")
+    //@ApiProperty(name = "taskId",desc = "id")
     private String id;
 
     //地址
-    @ApiProperty(name = "type",desc = "类型")
+    //@ApiProperty(name = "type",desc = "类型")
     private String type;
 
-    @ApiProperty(name = "key",desc = "key")
+    //@ApiProperty(name = "key",desc = "key")
     private String key;
 
-    @ApiProperty(name = "value",desc = "值")
+    //@ApiProperty(name = "value",desc = "值")
     private String value;
 
     //分支
-    @ApiProperty(name = "instanceId",desc = "实例id")
+    //@ApiProperty(name = "instanceId",desc = "实例id")
     private String instanceId;
 
     public TaskBuildProduct() {

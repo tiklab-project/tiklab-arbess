@@ -1,32 +1,32 @@
 package io.tiklab.matflow.pipeline.overview.model;
 
 
-import io.tiklab.postin.annotation.ApiModel;
-import io.tiklab.postin.annotation.ApiProperty;
+
+
 
 /**
  * 流水线概况统计模型
  */
 
-@ApiModel
+//@ApiModel
 public class PipelineOverview {
 
-    @ApiProperty(name="allNumber",desc="运行次数")
+    //@ApiProperty(name="allNumber",desc="运行次数")
     private int allNumber;
 
-    @ApiProperty(name="execTime",desc="平均执行时长")
+    //@ApiProperty(name="execTime",desc="平均执行时长")
     private int execTime;
 
-    @ApiProperty(name="successNumber",desc="成功次数")
+    //@ApiProperty(name="successNumber",desc="成功次数")
     private int successNumber;
 
-    @ApiProperty(name="errorNumber",desc="失败次数")
+    //@ApiProperty(name="errorNumber",desc="失败次数")
     private int errorNumber;
 
-    @ApiProperty(name="haltNumber",desc="停止次数")
+    //@ApiProperty(name="haltNumber",desc="停止次数")
     private int haltNumber;
 
-    @ApiProperty(name="time",desc="平均执行时长(转换成时分秒)")
+    //@ApiProperty(name="time",desc="平均执行时长(转换成时分秒)")
     private String time;
 
 

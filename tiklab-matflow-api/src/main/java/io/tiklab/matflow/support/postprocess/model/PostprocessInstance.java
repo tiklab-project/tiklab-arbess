@@ -2,36 +2,36 @@ package io.tiklab.matflow.support.postprocess.model;
 
 import io.tiklab.beans.annotation.Mapper;
 import io.tiklab.join.annotation.Join;
-import io.tiklab.postin.annotation.ApiModel;
-import io.tiklab.postin.annotation.ApiProperty;
+
+
 /**
  * 流水线后置处理实例
  */
-@ApiModel
+//@ApiModel
 @Join
 @Mapper(targetAlias = "PostprocessInstanceEntity")
 public class PostprocessInstance {
 
-    @ApiProperty(name = "id",desc="id")
+    //@ApiProperty(name = "id",desc="id")
     private String id;
 
 
-    @ApiProperty(name = "instanceId",desc="实例id")
+    //@ApiProperty(name = "instanceId",desc="实例id")
     private String instanceId;
 
 
-    @ApiProperty(name = "taskInstanceId",desc="任务实例id")
+    //@ApiProperty(name = "taskInstanceId",desc="任务实例id")
     private String taskInstanceId;
 
 
-    @ApiProperty(name = "postAddress",desc="日志地址")
+    //@ApiProperty(name = "postAddress",desc="日志地址")
     private String postAddress;
 
-    @ApiProperty(name = "postTime",desc="运行时间")
+    //@ApiProperty(name = "postTime",desc="运行时间")
     private Integer postTime;
 
 
-    @ApiProperty(name = "postState",desc="运行状态")
+    //@ApiProperty(name = "postState",desc="运行状态")
     private String postState;
 
     public String getTaskInstanceId() {

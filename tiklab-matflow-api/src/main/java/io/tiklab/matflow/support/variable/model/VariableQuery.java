@@ -5,8 +5,8 @@ import io.tiklab.core.order.Order;
 import io.tiklab.core.order.OrderBuilders;
 import io.tiklab.core.page.Page;
 import io.tiklab.join.annotation.Join;
-import io.tiklab.postin.annotation.ApiModel;
-import io.tiklab.postin.annotation.ApiProperty;
+
+
 
 import java.util.List;
 
@@ -16,31 +16,31 @@ import java.util.List;
 
 public class VariableQuery {
 
-    @ApiProperty(name="taskType",desc="类型 1.字符串 2.单选")
+    //@ApiProperty(name="taskType",desc="类型 1.字符串 2.单选")
     private int taskType;
 
-    @ApiProperty(name="type",desc="类型 1.全局 2.项目")
+    //@ApiProperty(name="type",desc="类型 1.全局 2.项目")
     private int type;
 
-    @ApiProperty(name="taskId",desc="任务id")
+    //@ApiProperty(name="taskId",desc="任务id")
     private String taskId;
 
-    @ApiProperty(name = "varKey",desc="名称")
+    //@ApiProperty(name = "varKey",desc="名称")
     private String varKey;
 
-    @ApiProperty(name = "varValue",desc="默认值")
+    //@ApiProperty(name = "varValue",desc="默认值")
     private String varValue;
 
-    @ApiProperty(name = "varValues",desc="值")
+    //@ApiProperty(name = "varValues",desc="值")
     private String varValues;
 
-    @ApiProperty(name="pipelineId",desc="流水线id")
+    //@ApiProperty(name="pipelineId",desc="流水线id")
     private String pipelineId;
 
-    @ApiProperty(name ="pageParam",desc = "分页参数")
+    //@ApiProperty(name ="pageParam",desc = "分页参数")
     private Page pageParam= new Page();
 
-    @ApiProperty(name ="orderParams",desc = "排序参数")
+    //@ApiProperty(name ="orderParams",desc = "排序参数")
     private List<Order> orderParams = OrderBuilders.instance().desc("varKey").get();
 
 

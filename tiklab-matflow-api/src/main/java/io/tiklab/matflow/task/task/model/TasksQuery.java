@@ -5,8 +5,8 @@ import io.tiklab.core.order.Order;
 import io.tiklab.core.order.OrderBuilders;
 import io.tiklab.core.page.Page;
 import io.tiklab.join.annotation.Join;
-import io.tiklab.postin.annotation.ApiModel;
-import io.tiklab.postin.annotation.ApiProperty;
+
+
 
 import java.util.List;
 
@@ -14,32 +14,31 @@ import java.util.List;
  * 流水线配置顺序模型
  */
 
-@ApiModel
+//@ApiModel
 public class TasksQuery {
 
-    @ApiProperty(name="taskId",desc="配置id")
+    //@ApiProperty(name="taskId",desc="配置id")
     private String taskId;
 
-    @ApiProperty(name="taskType",
-            desc= "类型1-10:源码,10-20:测试,20-30:构建,30-40:部署,40-50:代码扫描,50-60:推送制品")
+    //@ApiProperty(name="taskType",desc= "类型1-10:源码,10-20:测试,20-30:构建,30-40:部署,40-50:代码扫描,50-60:推送制品")
     private String taskType;
 
-    @ApiProperty(name="pipeline",desc="流水线id",eg="@selectOne")
+    //@ApiProperty(name="pipeline",desc="流水线id",eg="@selectOne")
     private String pipelineId;
 
-    @ApiProperty(name="postprocessId",desc="后置处理id",eg="@selectOne")
+    //@ApiProperty(name="postprocessId",desc="后置处理id",eg="@selectOne")
     private String postprocessId;;
 
-    @ApiProperty(name="stageId",desc="阶段",eg="@selectOne")
+    //@ApiProperty(name="stageId",desc="阶段",eg="@selectOne")
     private String stageId;
 
-    @ApiProperty(name="taskSort",desc="阶段",eg="@selectOne")
+    //@ApiProperty(name="taskSort",desc="阶段",eg="@selectOne")
     private String taskSort;
 
-    @ApiProperty(name ="pageParam",desc = "分页参数")
+    //@ApiProperty(name ="pageParam",desc = "分页参数")
     private Page pageParam= new Page();
 
-    @ApiProperty(name ="orderParams",desc = "排序参数")
+    //@ApiProperty(name ="orderParams",desc = "排序参数")
     private List<Order> orderParams = OrderBuilders.instance().desc("taskSort").get();
 
 

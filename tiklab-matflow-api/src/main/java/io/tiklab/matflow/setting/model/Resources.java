@@ -2,48 +2,48 @@ package io.tiklab.matflow.setting.model;
 
 import io.tiklab.beans.annotation.Mapper;
 import io.tiklab.join.annotation.Join;
-import io.tiklab.postin.annotation.ApiModel;
-import io.tiklab.postin.annotation.ApiProperty;
 
-@ApiModel
+
+
+//@ApiModel
 @Join
 @Mapper
 public class Resources {
 
-    @ApiProperty(name = "id" ,desc="id")
+    //@ApiProperty(name = "id" ,desc="id")
     private String id;
 
-    @ApiProperty(name = "version" ,desc="版本 1.免费 2.付费")
+    //@ApiProperty(name = "version" ,desc="版本 1.免费 2.付费")
     private int version;
 
-    @ApiProperty(name = "month" ,desc="月份")
+    //@ApiProperty(name = "month" ,desc="月份")
     private int month;
 
-    @ApiProperty(name = "useCcyNumber" ,desc="使用并发数")
+    //@ApiProperty(name = "useCcyNumber" ,desc="使用并发数")
     private int useCcyNumber;
 
-    @ApiProperty(name = "residueCcyNumber" ,desc="剩余并发数")
+    //@ApiProperty(name = "residueCcyNumber" ,desc="剩余并发数")
     private int residueCcyNumber;
 
-    @ApiProperty(name = "residueCcyNumber" ,desc="总并发数")
+    //@ApiProperty(name = "residueCcyNumber" ,desc="总并发数")
     private int ccyNumber;
 
-    @ApiProperty(name = "useSceNumber" ,desc="总构建时长")
+    //@ApiProperty(name = "useSceNumber" ,desc="总构建时长")
     private int sceNumber;
 
-    @ApiProperty(name = "useSceNumber" ,desc="使用构建时长")
+    //@ApiProperty(name = "useSceNumber" ,desc="使用构建时长")
     private int useSceNumber;
 
-    @ApiProperty(name = "residueSceNumber" ,desc="剩余构建时长")
+    //@ApiProperty(name = "residueSceNumber" ,desc="剩余构建时长")
     private int residueSceNumber;
 
-    @ApiProperty(name = "cacheNumber" ,desc="总缓存大小")
+    //@ApiProperty(name = "cacheNumber" ,desc="总缓存大小")
     private int cacheNumber;
 
-    @ApiProperty(name = "useCacheNumber" ,desc="使用缓存大小")
+    //@ApiProperty(name = "useCacheNumber" ,desc="使用缓存大小")
     private double useCacheNumber;
 
-    @ApiProperty(name = "residueCacheNumber" ,desc="剩余缓存大小")
+    //@ApiProperty(name = "residueCacheNumber" ,desc="剩余缓存大小")
     private double residueCacheNumber;
 
 
