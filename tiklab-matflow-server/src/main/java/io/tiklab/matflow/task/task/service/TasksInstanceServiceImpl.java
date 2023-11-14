@@ -276,7 +276,7 @@ public class TasksInstanceServiceImpl implements TasksInstanceService {
     public List<TaskInstance> findAllStageInstance(String stageId) {
         List<TaskInstanceEntity> pipelineInstance = taskInstanceDao.findStageInstance(stageId);
         List<TaskInstance> allInstance = BeanMapper.mapList(pipelineInstance, TaskInstance.class);
-        if (Objects.isNull(allInstance) || allInstance.size() == 0){
+        if (Objects.isNull(allInstance) || allInstance.isEmpty()){
             return Collections.emptyList();
         }
         StringBuilder stageRunLog = new StringBuilder();

@@ -8,6 +8,12 @@ application: matflow
 setting:
   address: tiklab-matflow-starter/src/main/resources/settings.xml
 
+spotbugs:
+  address: /embbed/spotbugs-4.8.1/bin
+
+jdk:
+  address: /Users/zcamy/apply/jdk-17.0.9.jdk/Contents/Home
+
 server:
   port: 8090
 
@@ -18,7 +24,7 @@ jdbc:
   password: darth2020
 
 #plugin config
-DATA_HOME: D:\opt\tiklab\matflow
+DATA_HOME: /Users/zcamy/tiklab/apply_data/matflow
 
 plugin:
   path: ${DATA_HOME}/plugin

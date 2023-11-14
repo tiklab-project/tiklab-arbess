@@ -102,6 +102,10 @@ public interface PipelineInstanceService {
     List<PipelineInstance> findUserPipelineInstance(String userId,Integer limit);
 
 
+
+    String findRunInstanceId(String pipelineId);
+
+
     @FindList
     List<PipelineInstance> findInstanceList(List<String> idList);
 

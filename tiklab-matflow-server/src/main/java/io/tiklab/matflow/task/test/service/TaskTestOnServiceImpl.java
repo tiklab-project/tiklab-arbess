@@ -313,8 +313,6 @@ public class TaskTestOnServiceImpl implements TaskTestOnService {
             if (Objects.isNull(testPlanInstance)){
                 return null;
             }
-
-
             String testPlanId = testPlanInstance.getTestPlanId();
             TestOnPlanInstance testOnPlanInstance = bindTestOnPlanInstance(testPlanInstance);
             TestPlan testPlan = testPlanService(serverAddress).findOne(testPlanId);

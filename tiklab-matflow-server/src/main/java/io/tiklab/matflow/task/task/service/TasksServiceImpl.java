@@ -1020,7 +1020,7 @@ public class TasksServiceImpl implements TasksService {
             case TASK_ARTIFACT_MAVEN,TASK_ARTIFACT_DOCKER,TASK_ARTIFACT_NODEJS ->{
                 return TASK_TYPE_ARTIFACT;
             }
-            case  TASK_CODESCAN_SONAR ->{
+            case  TASK_CODESCAN_SONAR ,TASK_CODESCAN_SPOTBUGS->{
                 return TASK_TYPE_CODESCAN;
             }
             case  TASK_MESSAGE_MSG ->{
@@ -1273,6 +1273,9 @@ public class TasksServiceImpl implements TasksService {
             }
             case TASK_CODESCAN_SONAR -> {
                 return "sonarQube";
+            }
+            case TASK_CODESCAN_SPOTBUGS ->{
+                return "spotBugsJava代码扫描";
             }
             case TASK_ARTIFACT_MAVEN -> {
                 return "Maven推送";

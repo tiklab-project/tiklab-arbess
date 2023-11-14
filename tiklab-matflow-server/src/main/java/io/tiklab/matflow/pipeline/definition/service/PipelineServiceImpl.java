@@ -318,8 +318,24 @@ public class PipelineServiceImpl implements PipelineService {
             return Collections.emptyList();
         }
 
+        // 筛选出用户拥有的流水线的历史
+        String[] userPipeline = authorityService.findUserPipelineIdString(userId);
+        if (userPipeline.length == 0){
+            return Collections.emptyList();
+        }
+        List<PipelineInstance> pipelineInstanceList = new ArrayList<>();
+        List<String> pipelineIdList = Arrays.stream(userPipeline).toList();
+        for (PipelineInstance instance : instanceList) {
+            String id = instance.getPipeline().getId();
+            boolean containsElement = pipelineIdList.contains(id);
+            if (!containsElement){
+                continue;
+            }
+            pipelineInstanceList.add(instance);
+        }
+
         List<PipelineRecently> list = new ArrayList<>();
-        for (PipelineInstance lastInstance : instanceList) {
+        for (PipelineInstance lastInstance : pipelineInstanceList) {
             joinTemplate.joinQuery(lastInstance);
             Pipeline pipeline = lastInstance.getPipeline();
             String pipelineId = pipeline.getId();

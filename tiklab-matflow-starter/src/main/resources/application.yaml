@@ -7,6 +7,12 @@ application: matflow-ce
 server:
   port: 8080
 
+spring:
+  config:
+    import: optional:classpath:/config/${env:dev}/application.yaml
+  main:
+    allow-bean-definition-overriding: true
+
 jdbc:
   driverClassName: org.postgresql.Driver
   url: jdbc:postgresql://localhost:5432/matflow_ce?stringtype=unspecified

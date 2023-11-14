@@ -30,5 +30,12 @@ public interface PipelineUtilService {
     String findFile(String pipelineId,String fileDir, String regex) throws ApplicationException;
 
 
+    /**
+     * 获取Java安装位置
+     * @return Java安装位置
+     */
+    String findJavaPath();
+
+
 
 }

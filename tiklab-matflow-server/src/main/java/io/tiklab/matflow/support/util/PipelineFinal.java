@@ -172,6 +172,7 @@ public class PipelineFinal {
     // 代码扫描应用类型
     public static final String TASK_TYPE_CODESCAN = "codescan";
     public static final String TASK_CODESCAN_SONAR = "sonar";
+    public static final String TASK_CODESCAN_SPOTBUGS = "spotbugs";
 
     // 消息应用类型
     public static final String TASK_TYPE_MESSAGE = "message";

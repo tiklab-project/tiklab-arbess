@@ -22,12 +22,38 @@ public class TaskCodeScan {
     //@ApiProperty(name="authName",desc="授权id")
     private String authId;
 
+
+    // 是否开启断言
+    private Boolean openAssert;
+
+    // 是否启用调试模式
+    private Boolean openDebug;
+
     //授权信息
     private Object auth;
 
     private int sort;
 
     private String type;
+
+
+    public Boolean getOpenAssert() {
+        return openAssert;
+    }
+
+    public TaskCodeScan setOpenAssert(Boolean openAssert) {
+        this.openAssert = openAssert;
+        return this;
+    }
+
+    public Boolean getOpenDebug() {
+        return openDebug;
+    }
+
+    public TaskCodeScan setOpenDebug(Boolean openDebug) {
+        this.openDebug = openDebug;
+        return this;
+    }
 
     public String getTaskId() {
         return taskId;

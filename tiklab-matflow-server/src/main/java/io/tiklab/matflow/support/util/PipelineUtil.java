@@ -340,28 +340,45 @@ public class PipelineUtil {
             }
             String name = listFile.getName();
             switch (type) {
-                case "1","2","3","4","git","gitee","github","gitlab","xcode" -> {
-                    if (name.equals("git") || name.equals("git.exe")) {
+                case "git","gitee","github","gitlab","xcode" -> {
+                    if ("git".equals(name) || "git.exe".equals(name)) {
                         return ;
                     }
                 }
-                case "5","svn" -> {
-                    if (name.equals("svn") || name.equals("svn.exe")) {
+                case "svn" -> {
+                    if ("svn".equals(name) || "svn.exe".equals(name)) {
                         return ;
                     }
                 }
-                case "21","maven" -> {
-                    if (name.equals("mvn")) {
+                case "maven" -> {
+                    if ("mvn".equals(name)) {
                         return ;
                     }
                 }
-                case "22","nodejs" -> {
-                    if (name.equals("npm")) {
+                case "nodejs" -> {
+                    if ("npm".equals(name)) {
                         return ;
                     }
                 }
             }
         }
+    }
+
+
+    /**
+     * 生成随机字符串（1~33位）
+     * @param length 字符串长度
+     * @return 随机字符串
+     */
+    public static String randomString(Integer length) {
+        String chars = "abcdefghijklmnopqrstuvwxyz123456789";
+        StringBuilder sb = new StringBuilder();
+        Random random = new Random();
+        for (int i = 0; i < length; i++) {
+            int index = random.nextInt(chars.length());
+            sb.append(chars.charAt(index));
+        }
+        return sb.toString();
     }
 
 

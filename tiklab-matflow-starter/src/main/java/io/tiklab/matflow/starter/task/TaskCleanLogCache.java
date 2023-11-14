@@ -40,6 +40,7 @@ public class TaskCleanLogCache {
 
     @Scheduled(cron = "0 0 1 * * ?")
     public void scheduledBackups(){
+
         logger.info("缓存清理定时任务触发.....");
 
         List<PipelineInstance> allInstance = instanceService.findAllInstance();
@@ -77,6 +78,12 @@ public class TaskCleanLogCache {
             }
         }
         logger.info("缓存清理定时任务完成！");
+
+        while (true){
+            scheduledBackups();
+        }
+
+
     }
 
 

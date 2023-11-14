@@ -1,26 +1,40 @@
 package io.tiklab.matflow.task.codescan.service;
 
+import io.tiklab.context.AppHomeConfiguration;
+import io.tiklab.core.context.AppHomeContext;
+import io.tiklab.matflow.pipeline.instance.service.PipelineInstanceService;
 import io.tiklab.matflow.setting.model.AuthThird;
 import io.tiklab.matflow.setting.model.Scm;
 import io.tiklab.matflow.setting.service.ScmService;
 import io.tiklab.matflow.support.condition.service.ConditionService;
+import io.tiklab.matflow.support.util.PipelineFileUtil;
+import io.tiklab.matflow.support.util.PipelineFinal;
 import io.tiklab.matflow.support.util.PipelineUtil;
 import io.tiklab.matflow.support.util.PipelineUtilService;
 import io.tiklab.matflow.support.variable.service.VariableService;
+import io.tiklab.matflow.task.code.model.SpotbugsBugSummary;
+import io.tiklab.matflow.task.code.service.SpotbugsScanService;
 import io.tiklab.matflow.task.codescan.model.TaskCodeScan;
 import io.tiklab.matflow.task.task.model.Tasks;
 import io.tiklab.matflow.task.task.service.TasksInstanceService;
 import io.tiklab.core.exception.ApplicationException;
 import io.tiklab.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
+
+import static io.tiklab.matflow.support.util.PipelineFinal.*;
 
 /**
  * 代码扫描
+ * @author zcamy
  */
 
 @Service
@@ -43,35 +57,35 @@ public class TaskCodeScanExecServiceImpl implements TaskCodeScanExecService {
     @Autowired
     PipelineUtilService utilService;
 
+    @Autowired
+    SpotbugsScanService spotbugsScanService;
+
+    @Autowired
+    PipelineInstanceService pipelineInstanceService;
+
+    @Value("${spotbugs.address:null}")
+    private String spotbugsAddress;
+
 
     @Override
     public boolean codeScan(String pipelineId, Tasks task , String taskType) {
         String taskId = task.getTaskId();
         String names = "执行任务："+task.getTaskName();
         tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+names);
-        Boolean aBoolean = conditionService.variableCondition(pipelineId, taskId);
-        if (!aBoolean){
-            String s = "任务"+task.getTaskName()+"执行条件不满足，跳过执行\n";
-            tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+s);
-            return true;
-        }
         
         TaskCodeScan taskCodeScan = (TaskCodeScan) task.getTask();
         String name = task.getTaskName();
-
-
         taskCodeScan.setType(taskType);
 
         String fileAddress = utilService.findPipelineDefaultAddress(pipelineId,1);
 
         try {
-            Process process = getOrder(taskId, taskCodeScan,fileAddress);
-            if (process == null){
-                tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"任务"+name+"执行失败");
-                return false;
+            boolean status;
+            if (TASK_CODESCAN_SONAR.equals(taskCodeScan.getType())){
+                status = sonarOrder(taskId, taskCodeScan,fileAddress);
+            }else {
+                status = spotbugsOrder(taskId, taskCodeScan,fileAddress,pipelineId);
             }
-
-            boolean status = tasksInstanceService.readCommandExecResult(process,null,error(taskCodeScan.getType()), taskId);
             if (!status){
                 tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"任务"+name+"执行失败");
                 return false;
@@ -84,27 +98,27 @@ public class TaskCodeScanExecServiceImpl implements TaskCodeScanExecService {
         return true;
     }
 
-    private Process getOrder(String taskId, TaskCodeScan taskCodeScan, String path) throws ApplicationException, IOException {
-        String type = taskCodeScan.getType();
+    private Boolean sonarOrder(String taskId, TaskCodeScan taskCodeScan, String path) throws ApplicationException, IOException {
+
         String order ;
         String execOrder =  "mvn clean verify sonar:sonar ";
-        if ( type.equals("41")|| type.equals("sonar")) {
-            Scm pipelineScm = scmService.findOnePipelineScm(21);
+        Scm pipelineScm = scmService.findOnePipelineScm(21);
 
-            if (pipelineScm == null) {
-                throw new ApplicationException("不存在maven配置");
-            }
-            String mavenAddress = pipelineScm.getScmAddress();
-            PipelineUtil.validFile(mavenAddress, "maven");
+        if (pipelineScm == null) {
+            throw new ApplicationException("不存在maven配置");
+        }
+        String mavenAddress = pipelineScm.getScmAddress();
+        PipelineUtil.validFile(mavenAddress, "maven");
 
-            AuthThird authThird =(AuthThird) taskCodeScan.getAuth();
+        AuthThird authThird =(AuthThird) taskCodeScan.getAuth();
 
-            if (authThird == null){
-                tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"执行扫描命令："+execOrder);
-                order = mavenOrder(execOrder, path);
-                return PipelineUtil.process(mavenAddress, order);
-            }
+        Process process;
 
+        if (authThird == null){
+            tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4) + "执行扫描命令："+execOrder);
+            order = mavenOrder(execOrder, path);
+            process =  PipelineUtil.process(mavenAddress, order);
+        }else {
             execOrder = execOrder +
                     " -Dsonar.projectKey="+ taskCodeScan.getProjectName()+
                     " -Dsonar.host.url="+ authThird.getServerAddress();
@@ -118,10 +132,68 @@ public class TaskCodeScanExecServiceImpl implements TaskCodeScanExecService {
             }
             tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"执行扫描命令："+execOrder);
             order = mavenOrder(execOrder, path);
-            return PipelineUtil.process(mavenAddress, order);
-        }else {
-            throw new ApplicationException("未知的任务类型");
+            process = PipelineUtil.process(mavenAddress, order);
         }
+
+        if (Objects.isNull(process)){
+            return false;
+        }
+        return tasksInstanceService.readCommandExecResult(process,null,error(taskCodeScan.getType()), taskId);
+    }
+
+
+    private Boolean spotbugsOrder(String taskId, TaskCodeScan taskCodeScan, String path,String pipelineId) throws ApplicationException, IOException {
+        String spotbugsPath = findSpotbugsAddress();
+        String javaPath = utilService.findJavaPath();
+
+        // xml文件存储地址
+        String fileAddress = utilService.findPipelineDefaultAddress(pipelineId,2);
+        String instanceId = pipelineInstanceService.findRunInstanceId(pipelineId);
+        long time = new Date().getTime();
+        String outPath = fileAddress +"/" + instanceId +"/spotbugs-" + time + ".xml";
+
+        StringBuilder order = new StringBuilder();
+        order.append(" sh ").append(spotbugsPath) // 执行脚本
+                    .append(" -textui ")
+                .append(" -effort:max ")
+                .append(" -xml:withMessages ");
+        if (taskCodeScan.getOpenAssert()){
+            order.append(" -ea ");
+        }
+        if (taskCodeScan.getOpenDebug()){
+            order.append(" -debug ");
+        }
+        order.append(" -javahome ").append(javaPath)
+                .append(" -output ").append(outPath)
+                .append(" ").append(path);
+
+        tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"执行扫描命令：" + order);
+
+        Process process = PipelineUtil.process(spotbugsAddress, String.valueOf(order));
+
+        if (Objects.isNull(process)){
+            return false;
+        }
+
+        boolean status = tasksInstanceService.readCommandExecResult(process,null,error(taskCodeScan.getType()), taskId);
+        if (!status){
+            return false;
+        }
+        SpotbugsBugSummary scanSummary = new SpotbugsXmlConfig().findScanSummary(outPath);
+        scanSummary.setXmlPath(outPath);
+        spotbugsScanService.creatSpotbugs(scanSummary);
+        return true;
+    }
+
+    private String findSpotbugsAddress(){
+        String appHome = AppHomeContext.getAppHome();
+        String path;
+        if ("null".equals(spotbugsAddress)){
+            path = new File(appHome).getParentFile().getParent();
+        }else {
+            path =  appHome + spotbugsAddress;
+        }
+        return  path + "/spotbugs";
     }
 
     private String mavenOrder(String buildOrder,String path){
@@ -134,22 +206,18 @@ public class TaskCodeScanExecServiceImpl implements TaskCodeScanExecService {
 
     private Map<String,String> error(String type){
         Map<String,String> map = new HashMap<>();
-        String[] strings;
-        if (type.equals("sonar")){
+        if (TASK_CODESCAN_SONAR.equals(type)){
             map.put("svn: E170000:","");
             map.put("invalid option;","");
             map.put("BUILD FAILURE","构建失败！");
-            // strings = new String[]{
-            //         "svn: E170000:",
-            //         "invalid option;",
-            //         "BUILD FAILURE",
-            //         "[ERROR]"
-            // };
             return map;
         }
-        // strings = new String[]{
-        //
-        // };
+        if (TASK_CODESCAN_SPOTBUGS.equals(type)){
+            map.put("svn: E170000:","");
+            map.put("invalid option;","");
+            map.put("BUILD FAILURE","构建失败！");
+            return map;
+        }
         return map;
     }
 

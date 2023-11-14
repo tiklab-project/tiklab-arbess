@@ -88,7 +88,7 @@ public class PipelineOpenDao {
         return  list.get(0);
     }
 
-    public List<String > findUserPipelineOpen(String userId,Integer number){
+    public List<String> findUserPipelineOpen(String userId,Integer number){
         String sql = "SELECT pipeline_id, MAX(create_time)" +
                 " FROM pip_other_open" +
                 " WHERE user_id = '"+userId+"'" +

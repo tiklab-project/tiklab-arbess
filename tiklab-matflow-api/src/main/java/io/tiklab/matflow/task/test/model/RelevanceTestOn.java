@@ -28,9 +28,7 @@ public class RelevanceTestOn {
 
     private String testonId;
 
-
     private Integer status;
-
 
     private Object object;
 

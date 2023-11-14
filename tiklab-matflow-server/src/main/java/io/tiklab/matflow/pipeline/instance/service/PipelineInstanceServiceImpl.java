@@ -207,7 +207,7 @@ public class PipelineInstanceServiceImpl implements PipelineInstanceService {
     public PipelineInstance findLatelyInstance(String pipelineId){
         List<PipelineInstanceEntity> latelySuccess = pipelineInstanceDao.findLatelyInstance(pipelineId);
         List<PipelineInstance> pipelineExecHistories = BeanMapper.mapList(latelySuccess, PipelineInstance.class);
-        if (pipelineExecHistories.size() == 0){
+        if (pipelineExecHistories.isEmpty()){
             return null;
         }
         return pipelineExecHistories.get(0);
@@ -219,10 +219,23 @@ public class PipelineInstanceServiceImpl implements PipelineInstanceService {
         return BeanMapper.mapList(pipelineInstanceEntityList, PipelineInstance.class);
     }
 
+    @Override
+    public String findRunInstanceId(String pipelineId){
+        PipelineInstanceQuery pipelineInstanceQuery = new PipelineInstanceQuery();
+        pipelineInstanceQuery.setState(PipelineFinal.RUN_RUN);
+        pipelineInstanceQuery.setPipelineId(pipelineId);
+        List<PipelineInstance> pipelineInstanceList = this.findPipelineInstanceList(pipelineInstanceQuery);
+        if (pipelineInstanceList.isEmpty()){
+            return null;
+        }
+        PipelineInstance pipelineInstance = pipelineInstanceList.get(0);
+        return pipelineInstance.getInstanceId();
+    }
+
 
     public List<PipelineInstance> findPipelineInstanceList(PipelineInstanceQuery pipelineInstanceQuery){
         List<PipelineInstanceEntity> instanceList = pipelineInstanceDao.findInstanceList(pipelineInstanceQuery);
-        if (instanceList == null || instanceList.size() == 0){
+        if (instanceList == null || instanceList.isEmpty()){
             return Collections.emptyList();
         }
         return BeanMapper.mapList(instanceList,PipelineInstance.class);

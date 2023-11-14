@@ -49,6 +49,7 @@
 
         <tiklab-postgresql.version>1.0.0</tiklab-postgresql.version>
         <tiklab-jdk.version>1.0.0</tiklab-jdk.version>
+        <tiklab-spotbugs.version>1.0.0</tiklab-spotbugs.version>
         <tiklab-upgrade.version>1.0.0</tiklab-upgrade.version>
 
         <!--other-->

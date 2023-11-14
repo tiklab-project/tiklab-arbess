@@ -168,7 +168,7 @@ public class TaskBuildExecServiceImpl implements TaskBuildExecService {
             String dockerOrder = taskBuild.getDockerOrder();
 
             // 替换命令中的变量
-            String instanceId = findPipelineInstanceId(pipelineId);
+            String instanceId = pipelineInstanceService.findRunInstanceId(pipelineId);
             dockerOrder = taskBuildProductService.replace(instanceId,dockerOrder);
 
             // 替换命令中的系统变量
@@ -186,20 +186,6 @@ public class TaskBuildExecServiceImpl implements TaskBuildExecService {
             return false;
         }
         return true;
-    }
-
-
-    public String findPipelineInstanceId(String pipelineId){
-
-        PipelineInstanceQuery pipelineInstanceQuery = new PipelineInstanceQuery();
-        pipelineInstanceQuery.setState(PipelineFinal.RUN_RUN);
-        pipelineInstanceQuery.setPipelineId(pipelineId);
-        List<PipelineInstance> pipelineInstanceList = pipelineInstanceService.findPipelineInstanceList(pipelineInstanceQuery);
-        if (pipelineInstanceList.isEmpty()){
-            return null;
-        }
-        PipelineInstance pipelineInstance = pipelineInstanceList.get(0);
-        return pipelineInstance.getInstanceId();
     }
 
     /**

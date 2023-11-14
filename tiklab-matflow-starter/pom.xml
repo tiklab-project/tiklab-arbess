@@ -101,6 +101,7 @@
             <version>${tiklab-eam.version}</version>
             <scope>compile</scope>
         </dependency>
+
     </dependencies>
 
     <profiles>
@@ -123,6 +124,13 @@
                     <groupId>io.tiklab</groupId>
                     <artifactId>tiklab-postgresql-linux</artifactId>
                     <version>${tiklab-postgresql.version}</version>
+                    <type>zip</type>
+                    <scope>provided</scope>
+                </dependency>
+                <dependency>
+                    <groupId>io.tiklab</groupId>
+                    <artifactId>tiklab-spotbugs</artifactId>
+                    <version>${tiklab-spotbugs.version}</version>
                     <type>zip</type>
                     <scope>provided</scope>
                 </dependency>
@@ -160,6 +168,13 @@
                                             <type>zip</type>
                                             <outputDirectory>embbed</outputDirectory>
                                         </artifactItem>
+                                        <artifactItem>
+                                            <groupId>io.tiklab</groupId>
+                                            <artifactId>tiklab-spotbugs</artifactId>
+                                            <version>${tiklab-spotbugs.version}</version>
+                                            <type>zip</type>
+                                            <outputDirectory>embbed</outputDirectory>
+                                        </artifactItem>
                                     </artifactItems>
                                 </configuration>
                             </execution>
@@ -173,13 +188,13 @@
         <profile>
             <id>system-windows</id>
             <dependencies>
-                <dependency>
-                    <groupId>io.tiklab</groupId>
-                    <artifactId>tiklab-jdk-windows</artifactId>
-                    <version>${tiklab-jdk.version}</version>
-                    <type>zip</type>
-                    <scope>provided</scope>
-                </dependency>
+<!--                <dependency>-->
+<!--                    <groupId>io.tiklab</groupId>-->
+<!--                    <artifactId>tiklab-jdk-windows</artifactId>-->
+<!--                    <version>${tiklab-jdk.version}</version>-->
+<!--                    <type>zip</type>-->
+<!--                    <scope>provided</scope>-->
+<!--                </dependency>-->
             </dependencies>
             <properties>
                 <assembly>windows</assembly>
@@ -387,8 +402,6 @@
                     </execution>
                 </executions>
             </plugin>
-
-
         </plugins>
     </build>
 

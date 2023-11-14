@@ -141,17 +141,26 @@ public class PipelineOpenServiceImpl implements PipelineOpenService {
     @Override
     public List<PipelineOpen> findUserAllOpen(int number) {
 
+        // 获取用户流水线
         String userId = LoginContext.getLoginId();
-
         String[] userPipeline = authorityService.findUserPipelineIdString(userId);
         if (userPipeline.length == 0){
             return Collections.emptyList();
         }
 
+        List<String> list = Arrays.stream(userPipeline).toList();
+
         List<String> pipelineIds = pipelineOpenDao.findUserPipelineOpen(userId, number);
         if (pipelineIds.isEmpty()){
             return Collections.emptyList();
         }
+
+
+        // 使用HashSet来存储list1中的元素
+        HashSet<String> set = new HashSet<>(list);
+
+        // 仅保留list2中也包含在HashSet中的元素
+        pipelineIds.retainAll(set);
 
         List<PipelineOpen> openList = new ArrayList<>();
 
@@ -171,7 +180,6 @@ public class PipelineOpenServiceImpl implements PipelineOpenService {
             joinTemplate.joinQuery(pipelineOpen);
 
             if (Objects.isNull(pipelineOpen.getPipeline().getName())){
-                // deleteAllOpen(pipelineId);
                 continue;
             }
 

@@ -1,5 +1,6 @@
 package io.tiklab.matflow.support.util;
 
+import io.tiklab.core.context.AppHomeContext;
 import io.tiklab.core.exception.ApplicationException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -9,15 +10,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * @author zcamy
+ */
 @Service
 public class PipelineUtilServiceImpl implements PipelineUtilService {
 
     @Value("${DATA_HOME:null}")
     String dataHome;
 
+    @Value("${jdk.address:null}")
+    String jdkPath;
+
     @Override
     public String instanceAddress(int type) {
-        if (Objects.isNull(dataHome) || dataHome.equals("null")){
+        if (Objects.isNull(dataHome) || "null".equals(dataHome)){
             dataHome = "/opt/tiklab/matflow";
         }
         if (type == 1){
@@ -94,6 +101,21 @@ public class PipelineUtilServiceImpl implements PipelineUtilService {
             return list.get(0);
         }
         throw new ApplicationException("没有匹配到文件。");
+    }
+
+
+    @Override
+    public String findJavaPath(){
+
+        if ("null".equals(jdkPath)){
+            return jdkPath;
+        }
+
+        String appHome = AppHomeContext.getAppHome();
+        String applyRootDir = new File(appHome).getParentFile().getParent();
+
+        return applyRootDir+"/embbed/jdk-16.0.2";
+
     }
 
 

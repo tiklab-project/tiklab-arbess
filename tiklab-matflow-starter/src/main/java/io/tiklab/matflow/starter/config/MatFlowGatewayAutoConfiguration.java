@@ -108,7 +108,8 @@ public class MatFlowGatewayAutoConfiguration {
                         "/socket",
                         "/start",
                         "/eas",
-                        "/sql"
+                        "/sql",
+                        "/spotbugsScan"
                 })
                 .get();
     }
