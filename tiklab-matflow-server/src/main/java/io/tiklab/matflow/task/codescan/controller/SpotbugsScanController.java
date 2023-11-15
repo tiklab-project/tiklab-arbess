@@ -1,15 +1,17 @@
 package io.tiklab.matflow.task.codescan.controller;
 
 import io.tiklab.core.Result;
-import io.tiklab.matflow.task.code.model.SpotbugsBugFileStats;
-import io.tiklab.matflow.task.code.model.SpotbugsBugInstance;
-import io.tiklab.matflow.task.code.model.SpotbugsBugPackageStats;
-import io.tiklab.matflow.task.code.model.SpotbugsBugSummary;
+import io.tiklab.core.page.Pagination;
+import io.tiklab.matflow.task.code.model.*;
 import io.tiklab.matflow.task.code.service.SpotbugsScanService;
+import io.tiklab.matflow.task.codescan.service.SpotbugsXmlConfig;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
@@ -24,24 +26,32 @@ public class SpotbugsScanController {
     SpotbugsScanService spotbugsScanService;
 
 
-    @RequestMapping(path = "/findScanBugs", method = RequestMethod.POST)
-    public Result<List<SpotbugsBugInstance>> findScanBugs(@NotNull String xmlPath) {
+    @RequestMapping(path = "/findScanBugsList", method = RequestMethod.POST)
+    public Result<List<SpotbugsBugSummary>> findSpotbugsList(@RequestBody @Valid @NotNull SpotbugsBugQuery spotbugsBugQuery) {
+        List<SpotbugsBugSummary> spotbugsList = spotbugsScanService.findSpotbugsList(spotbugsBugQuery);
 
-
-        return Result.ok();
+        return Result.ok(spotbugsList);
     }
 
-    @RequestMapping(path = "/findBugFileStats", method = RequestMethod.POST)
-    public Result<List<SpotbugsBugFileStats>> findAllRepository(@NotNull String xmlPath) {
+    @RequestMapping(path = "/findSpotbugsPage", method = RequestMethod.POST)
+    public Result<Pagination<SpotbugsBugSummary>> findSpotbugsPage(@RequestBody @Valid @NotNull SpotbugsBugQuery spotbugsBugQuery) {
 
+        Pagination<SpotbugsBugSummary> spotbugsList = spotbugsScanService.findSpotbugsPage(spotbugsBugQuery);
 
-        return Result.ok();
+        return Result.ok(spotbugsList);
     }
 
-    @RequestMapping(path = "/findBugPackageStats", method = RequestMethod.POST)
-    public Result<List<SpotbugsBugPackageStats>> findBugPackageStats(@NotNull String xmlPath) {
+    @RequestMapping(path = "/findBugs", method = RequestMethod.POST)
+    public Result<List<SpotbugsBugInstance>> findAllRepository(@NotNull String xmlPath) {
+        List<SpotbugsBugInstance> scanBugs = new SpotbugsXmlConfig().findScanBugs(xmlPath);
 
+        return Result.ok(scanBugs);
+    }
 
+    @RequestMapping(path = "/deleteSpotbugs", method = RequestMethod.POST)
+    public Result<List<SpotbugsBugPackageStats>> deleteSpotbugs(@NotNull String bugId) {
+
+        spotbugsScanService.deleteSpotbugs(bugId);
         return Result.ok();
     }
 

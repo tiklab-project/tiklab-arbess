@@ -8,6 +8,11 @@ public class PipelineFinal {
     public static final String appName = "matflow";
 
     /**
+     * DEFAULT
+      */
+    public static final String DEFAULT = "default";
+
+    /**
      * 流水线文件系统
      */
     public static final String MATFLOW_WORKSPACE = "/source";
@@ -95,7 +100,7 @@ public class PipelineFinal {
 
 
     // 默认源码位置
-    public static final String DEFAULT_CODE_ADDRESS = "DEFAULT_CODE_ADDRESS";
+    public static final String DEFAULT_CODE_ADDRESS = "${DEFAULT_CODE_ADDRESS}";
 
     public static final String DEFAULT_TYPE = "string";
 

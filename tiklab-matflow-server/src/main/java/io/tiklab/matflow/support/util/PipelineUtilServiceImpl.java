@@ -107,7 +107,7 @@ public class PipelineUtilServiceImpl implements PipelineUtilService {
     @Override
     public String findJavaPath(){
 
-        if ("null".equals(jdkPath)){
+        if (!"null".equals(jdkPath)){
             return jdkPath;
         }
 

@@ -6,6 +6,10 @@ import io.tiklab.dal.dsm.support.DsmConfigBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * 数据库脚本配置
+ * @author zcamy
+ */
 @Configuration
 public class MatFlowDsmAutoConfiguration {
 
@@ -37,7 +41,7 @@ public class MatFlowDsmAutoConfiguration {
                 "pip-init-project_1.0.0",
                 "pip-var_1.0.0",
                 "pip-test_1.0.0",
-                "pip-scan_spotbugs_1.0.0"
+                "pip-scan-spotbugs_1.0.0"
         });
         dsmConfig.newVersion("1.0.1", new String[]{
                 "pip-project_1.0.1",

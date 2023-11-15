@@ -1,5 +1,6 @@
 package io.tiklab.matflow.task.codescan.service;
 
+import io.tiklab.core.page.Pagination;
 import io.tiklab.matflow.task.code.model.SpotbugsBugQuery;
 import io.tiklab.matflow.task.code.model.SpotbugsBugSummary;
 import io.tiklab.matflow.task.code.service.SpotbugsScanService;
@@ -7,7 +8,9 @@ import io.tiklab.matflow.task.codescan.dao.SpotbugsScanDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author Spotbugs代码扫描实现
@@ -31,6 +34,16 @@ public class SpotbugsScanServiceImpl implements SpotbugsScanService {
 
     @Override
     public void deleteSpotbugs(String bugId) {
+        SpotbugsBugSummary spotbugs = findOneSpotbugs(bugId);
+        if (Objects.isNull(spotbugs)){
+            return;
+        }
+        String xmlPath = spotbugs.getXmlPath();
+
+        File file = new File(xmlPath);
+        if (file.exists()){
+            file.delete();
+        }
         spotbugsScanDao.deleteSpotbugs(bugId);
     }
 
@@ -47,6 +60,11 @@ public class SpotbugsScanServiceImpl implements SpotbugsScanService {
     @Override
     public List<SpotbugsBugSummary> findSpotbugsList(SpotbugsBugQuery bugQuery) {
         return spotbugsScanDao.findSpotbugsList(bugQuery);
+    }
+
+    @Override
+    public Pagination<SpotbugsBugSummary> findSpotbugsPage(SpotbugsBugQuery bugQuery) {
+        return spotbugsScanDao.findSpotbugsPage(bugQuery);
     }
 }
 

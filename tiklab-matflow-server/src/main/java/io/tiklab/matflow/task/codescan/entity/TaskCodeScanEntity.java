@@ -29,6 +29,44 @@ public class TaskCodeScanEntity {
     @Column(name = "open_debug")
     private String openDebug;
 
+    @Column(name = "scan_path")
+    private String scanPath;
+
+    // 扫描等级 min--最小，default--默认，max--最大
+    @Column(name = "scan_grade" ,notNull = true)
+    private String scanGrade;
+
+    // 扫描错误级别 default--默认 max--最大
+    @Column(name = "err_grade" ,notNull = true)
+    private String errGrade;
+
+
+    public String getScanGrade() {
+        return scanGrade;
+    }
+
+    public TaskCodeScanEntity setScanGrade(String scanGrade) {
+        this.scanGrade = scanGrade;
+        return this;
+    }
+
+    public String getErrGrade() {
+        return errGrade;
+    }
+
+    public TaskCodeScanEntity setErrGrade(String errGrade) {
+        this.errGrade = errGrade;
+        return this;
+    }
+
+    public String getScanPath() {
+        return scanPath;
+    }
+
+    public TaskCodeScanEntity setScanPath(String scanPath) {
+        this.scanPath = scanPath;
+        return this;
+    }
 
     public String getOpenAssert() {
         return openAssert;

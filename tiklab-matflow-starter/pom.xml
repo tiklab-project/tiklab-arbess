@@ -134,6 +134,13 @@
                     <type>zip</type>
                     <scope>provided</scope>
                 </dependency>
+                <dependency>
+                    <groupId>io.tiklab</groupId>
+                    <artifactId>tiklab-spotbugs</artifactId>
+                    <version>${tiklab-spotbugs.version}</version>
+                    <type>zip</type>
+                    <scope>provided</scope>
+                </dependency>
             </dependencies>
             <properties>
                 <assembly>linux</assembly>

@@ -1,5 +1,6 @@
 package io.tiklab.matflow.task.code.service;
 
+import io.tiklab.core.page.Pagination;
 import io.tiklab.matflow.task.code.model.*;
 
 import java.util.List;
@@ -25,6 +26,9 @@ public interface SpotbugsScanService {
 
 
     List<SpotbugsBugSummary> findSpotbugsList(SpotbugsBugQuery bugQuery);
+
+
+    Pagination<SpotbugsBugSummary> findSpotbugsPage(SpotbugsBugQuery bugQuery);
 
 
 

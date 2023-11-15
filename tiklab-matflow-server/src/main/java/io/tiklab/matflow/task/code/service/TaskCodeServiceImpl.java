@@ -85,6 +85,8 @@ public class TaskCodeServiceImpl implements TaskCodeService {
         // 查询不到仓库
         if (Objects.isNull(repository)){
             return taskCode;
+        }else {
+            taskCode.setCodeName(repository.getName());
         }
 
         // 查询不到分支

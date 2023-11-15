@@ -29,6 +29,15 @@ public class TaskCodeScan {
     // 是否启用调试模式
     private Boolean openDebug;
 
+    // 扫描路径
+    private String scanPath;
+
+    // 扫描等级 min--最小，default--默认，max--最大
+    private String scanGrade;
+
+    // 扫描错误级别 default--默认 max--最大
+    private String errGrade;
+
     //授权信息
     private Object auth;
 
@@ -36,6 +45,32 @@ public class TaskCodeScan {
 
     private String type;
 
+    public String getScanGrade() {
+        return scanGrade;
+    }
+
+    public TaskCodeScan setScanGrade(String scanGrade) {
+        this.scanGrade = scanGrade;
+        return this;
+    }
+
+    public String getErrGrade() {
+        return errGrade;
+    }
+
+    public TaskCodeScan setErrGrade(String errGrade) {
+        this.errGrade = errGrade;
+        return this;
+    }
+
+    public String getScanPath() {
+        return scanPath;
+    }
+
+    public TaskCodeScan setScanPath(String scanPath) {
+        this.scanPath = scanPath;
+        return this;
+    }
 
     public Boolean getOpenAssert() {
         return openAssert;

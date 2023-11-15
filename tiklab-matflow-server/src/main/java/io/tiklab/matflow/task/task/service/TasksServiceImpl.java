@@ -760,6 +760,13 @@ public class TasksServiceImpl implements TasksService {
             case TASK_TYPE_CODESCAN -> {
                 TaskCodeScan task = new TaskCodeScan();
                 task.setTaskId(taskId);
+                if (taskType.equals(TASK_CODESCAN_SPOTBUGS)){
+                    task.setOpenAssert(false);
+                    task.setOpenDebug(false);
+                    task.setScanPath(DEFAULT_CODE_ADDRESS);
+                    task.setErrGrade(DEFAULT);
+                    task.setScanGrade(DEFAULT);
+                }
                 codeScanService.createCodeScan(task);
             }
             case TASK_TYPE_ARTIFACT -> {
@@ -1275,7 +1282,7 @@ public class TasksServiceImpl implements TasksService {
                 return "sonarQube";
             }
             case TASK_CODESCAN_SPOTBUGS ->{
-                return "spotBugsJava代码扫描";
+                return "spotBugs-Java代码扫描";
             }
             case TASK_ARTIFACT_MAVEN -> {
                 return "Maven推送";

@@ -216,8 +216,6 @@ public class TasksExecServiceImpl implements TasksExecService {
         stopThread(taskId);
         taskIdOrTaskInstanceId.remove(taskId);
         taskOrTaskInstance.remove(taskInstanceId);
-
-
     }
 
     public void stop(String instanceId,String stageInstanceId,String postProcessId){

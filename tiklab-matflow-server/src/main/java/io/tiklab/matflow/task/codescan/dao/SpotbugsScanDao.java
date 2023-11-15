@@ -1,6 +1,8 @@
 package io.tiklab.matflow.task.codescan.dao;
 
 import io.tiklab.beans.BeanMapper;
+import io.tiklab.core.page.Pagination;
+import io.tiklab.core.page.PaginationBuilder;
 import io.tiklab.dal.jpa.JpaTemplate;
 import io.tiklab.dal.jpa.criterial.condition.QueryCondition;
 import io.tiklab.dal.jpa.criterial.conditionbuilder.QueryBuilders;
@@ -13,6 +15,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Spotbugs代码扫描数据操作
@@ -37,7 +40,7 @@ public class SpotbugsScanDao {
 
     
     public void deleteSpotbugs(String bugId) {
-        jpaTemplate.delete(String.class,bugId);
+        jpaTemplate.delete(SpotbugsScanEntity.class,bugId);
     }
 
     
@@ -60,7 +63,7 @@ public class SpotbugsScanDao {
     public List<SpotbugsBugSummary> findSpotbugsList(SpotbugsBugQuery bugQuery) {
         QueryBuilders queryBuilders = QueryBuilders.createQuery(SpotbugsScanEntity.class)
                 .eq("pipelineId", bugQuery.getPipelineId());
-        QueryCondition queryCondition = queryBuilders
+        QueryCondition queryCondition = queryBuilders.orders(bugQuery.getOrderParams())
                 .get();
         List<SpotbugsScanEntity> scanEntityList = jpaTemplate.findList(queryCondition, SpotbugsScanEntity.class);
 
@@ -69,7 +72,21 @@ public class SpotbugsScanDao {
         }
         return BeanMapper.mapList(scanEntityList,SpotbugsBugSummary.class);
     }
-    
-    
+
+    public Pagination<SpotbugsBugSummary> findSpotbugsPage(SpotbugsBugQuery bugQuery) {
+        QueryBuilders queryBuilders = QueryBuilders.createQuery(SpotbugsScanEntity.class)
+                .eq("pipelineId", bugQuery.getPipelineId());
+        QueryCondition queryCondition = queryBuilders.pagination(bugQuery.getPageParam())
+                .orders(bugQuery.getOrderParams())
+                .get();
+        Pagination<SpotbugsScanEntity> scanEntityPagination = jpaTemplate.findPage(queryCondition, SpotbugsScanEntity.class);
+        List<SpotbugsScanEntity> dataList = scanEntityPagination.getDataList();
+        if (Objects.isNull(dataList) || dataList.isEmpty()){
+            return PaginationBuilder.build(scanEntityPagination,Collections.emptyList());
+        }
+
+        List<SpotbugsBugSummary> summaryList = BeanMapper.mapList(dataList, SpotbugsBugSummary.class);
+        return PaginationBuilder.build(scanEntityPagination,summaryList);
+    }
     
 }

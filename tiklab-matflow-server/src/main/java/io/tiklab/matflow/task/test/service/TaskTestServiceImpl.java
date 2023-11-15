@@ -15,19 +15,21 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * @author zcamy
+ */
 @Service
 @Exporter
 public class TaskTestServiceImpl implements TaskTestService {
 
     @Autowired
-    private TaskTestDao taskTestDao;
-
-
-    @Autowired
-    private AuthThirdService thirdServer;
+    TaskTestDao taskTestDao;
 
     @Autowired
-    private AuthHostService hostServer;
+    AuthThirdService thirdServer;
+
+    @Autowired
+    AuthHostService hostServer;
 
     @Autowired
     TaskTestOnService taskTestOnService;

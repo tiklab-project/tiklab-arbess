@@ -295,8 +295,7 @@ public class SpotbugsXmlConfig {
                     list.add(spotbugsBugInstance);
                 }
             }
-
-            return list;
+            return list.stream().sorted(Comparator.comparing(SpotbugsBugInstance::getBugPriority)).toList();
 
         } catch (Exception e) {
             throw new SystemException("解析Xml文件失败，path:"+xmlPath+" ，message："+e.getMessage());

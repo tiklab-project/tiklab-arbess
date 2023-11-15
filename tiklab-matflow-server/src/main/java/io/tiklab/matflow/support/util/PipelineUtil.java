@@ -199,13 +199,15 @@ public class PipelineUtil {
      */
     public static int findSystemType(){
         String property = System.getProperty("os.name");
-        String[] s1 = property.split(" ");
-        if (s1[0].equals("Windows")){
+        if (property.contains("Windows")){
             return 1;
+        } else if (property.contains("mac")){
+            return 3;
         }else {
             return 2;
         }
     }
+
 
     /**
      * 执行cmd命令
@@ -218,7 +220,7 @@ public class PipelineUtil {
         Runtime runtime=Runtime.getRuntime();
         Process process;
         String[] cmd;
-        if (findSystemType()==1){
+        if (findSystemType() == 1){
             if (!PipelineUtil.isNoNull(path)){
                 ProcessBuilder processBuilder = new ProcessBuilder("cmd.exe", "/c", order);
                 process = processBuilder.start();
@@ -228,12 +230,20 @@ public class PipelineUtil {
                 cmd = new String[] { "cmd.exe", "/c", " " + order };
                 process = runtime.exec(cmd,null,new File(path));
             }
-        }else {
+        } else if (findSystemType() == 2){
             if (!PipelineUtil.isNoNull(path)){
                 cmd = new String[] { "/bin/sh", "-c", " source /etc/profile;"+ order };
                 process = runtime.exec(cmd);
             }else {
                 cmd = new String[] { "/bin/sh", "-c", "cd " + path + ";" + " source /etc/profile;"+ order };
+                process = runtime.exec(cmd,null,new File(path));
+            }
+        }else {
+            if (!PipelineUtil.isNoNull(path)){
+                cmd = new String[] { "/bin/zsh", "-c", order };
+                process = runtime.exec(cmd);
+            }else {
+                cmd = new String[] { "/bin/zsh", "-c", "cd " + path + ";" + " source /etc/profile;"+ order };
                 process = runtime.exec(cmd,null,new File(path));
             }
         }

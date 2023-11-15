@@ -1,9 +1,6 @@
 package io.tiklab.matflow.task.codescan.entity;
 
-import io.tiklab.dal.jpa.annotation.Column;
-import io.tiklab.dal.jpa.annotation.Entity;
-import io.tiklab.dal.jpa.annotation.Id;
-import io.tiklab.dal.jpa.annotation.Table;
+import io.tiklab.dal.jpa.annotation.*;
 
 /**
  * @author Spotbugs代码扫描
@@ -13,6 +10,7 @@ import io.tiklab.dal.jpa.annotation.Table;
 public class SpotbugsScanEntity {
 
     @Id
+    @GeneratorValue(length = 12)
     @Column(name = "id" ,notNull = true)
     private String id;
 
