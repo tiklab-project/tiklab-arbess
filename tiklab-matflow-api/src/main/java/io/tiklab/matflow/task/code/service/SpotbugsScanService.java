@@ -1,7 +1,8 @@
 package io.tiklab.matflow.task.code.service;
 
 import io.tiklab.core.page.Pagination;
-import io.tiklab.matflow.task.code.model.*;
+import io.tiklab.matflow.task.codescan.model.SpotbugsBugQuery;
+import io.tiklab.matflow.task.codescan.model.SpotbugsBugSummary;
 
 import java.util.List;
 

@@ -1,8 +1,8 @@
 package io.tiklab.matflow.task.codescan.service;
 
 import io.tiklab.core.page.Pagination;
-import io.tiklab.matflow.task.code.model.SpotbugsBugQuery;
-import io.tiklab.matflow.task.code.model.SpotbugsBugSummary;
+import io.tiklab.matflow.task.codescan.model.SpotbugsBugQuery;
+import io.tiklab.matflow.task.codescan.model.SpotbugsBugSummary;
 import io.tiklab.matflow.task.code.service.SpotbugsScanService;
 import io.tiklab.matflow.task.codescan.dao.SpotbugsScanDao;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +20,6 @@ public class SpotbugsScanServiceImpl implements SpotbugsScanService {
 
     @Autowired
     SpotbugsScanDao spotbugsScanDao;
-
 
     @Override
     public String creatSpotbugs(SpotbugsBugSummary bugSummary) {

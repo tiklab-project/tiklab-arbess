@@ -2,8 +2,11 @@ package io.tiklab.matflow.task.codescan.controller;
 
 import io.tiklab.core.Result;
 import io.tiklab.core.page.Pagination;
-import io.tiklab.matflow.task.code.model.*;
 import io.tiklab.matflow.task.code.service.SpotbugsScanService;
+import io.tiklab.matflow.task.codescan.model.SpotbugsBugInstance;
+import io.tiklab.matflow.task.codescan.model.SpotbugsBugPackageStats;
+import io.tiklab.matflow.task.codescan.model.SpotbugsBugQuery;
+import io.tiklab.matflow.task.codescan.model.SpotbugsBugSummary;
 import io.tiklab.matflow.task.codescan.service.SpotbugsXmlConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;

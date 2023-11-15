@@ -9,7 +9,7 @@ import io.tiklab.matflow.support.condition.service.ConditionService;
 import io.tiklab.matflow.support.util.PipelineUtil;
 import io.tiklab.matflow.support.util.PipelineUtilService;
 import io.tiklab.matflow.support.variable.service.VariableService;
-import io.tiklab.matflow.task.code.model.SpotbugsBugSummary;
+import io.tiklab.matflow.task.codescan.model.SpotbugsBugSummary;
 import io.tiklab.matflow.task.code.service.SpotbugsScanService;
 import io.tiklab.matflow.task.codescan.model.TaskCodeScan;
 import io.tiklab.matflow.task.task.model.Tasks;

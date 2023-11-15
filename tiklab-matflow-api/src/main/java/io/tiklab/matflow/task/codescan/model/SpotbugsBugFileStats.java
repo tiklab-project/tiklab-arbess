@@ -1,4 +1,4 @@
-package io.tiklab.matflow.task.code.model;
+package io.tiklab.matflow.task.codescan.model;
 
 import java.util.List;
 

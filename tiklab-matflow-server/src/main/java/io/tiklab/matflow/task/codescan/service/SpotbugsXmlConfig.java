@@ -1,7 +1,7 @@
 package io.tiklab.matflow.task.codescan.service;
 
 import io.tiklab.core.exception.SystemException;
-import io.tiklab.matflow.task.code.model.*;
+import io.tiklab.matflow.task.codescan.model.*;
 import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
