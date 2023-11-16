@@ -2,6 +2,9 @@ package io.tiklab.matflow.task.deploy.service;
 
 
 import io.tiklab.beans.BeanMapper;
+import io.tiklab.matflow.setting.model.AuthHost;
+import io.tiklab.matflow.setting.model.AuthHostGroup;
+import io.tiklab.matflow.setting.service.AuthHostGroupService;
 import io.tiklab.matflow.setting.service.AuthHostService;
 import io.tiklab.matflow.task.deploy.dao.TaskDeployDao;
 import io.tiklab.matflow.task.deploy.entity.TaskDeployEntity;
@@ -11,7 +14,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
+/**
+ * @author zcamy
+ */
 @Service
 @Exporter
 public class TaskDeployServiceImpl implements TaskDeployService {
@@ -21,6 +28,9 @@ public class TaskDeployServiceImpl implements TaskDeployService {
 
     @Autowired
     AuthHostService hostServer;
+
+    @Autowired
+    AuthHostGroupService groupService;
 
     //创建
     @Override
@@ -70,8 +80,17 @@ public class TaskDeployServiceImpl implements TaskDeployService {
     public TaskDeploy findOneDeploy(String deployId) {
         TaskDeployEntity oneDeploy = taskDeployDao.findOneDeploy(deployId);
         TaskDeploy taskDeploy = BeanMapper.map(oneDeploy, TaskDeploy.class);
-        if (taskDeploy.getAuthId() != null){
-            taskDeploy.setAuth(hostServer.findOneAuthHost(taskDeploy.getAuthId()));
+        String authId = taskDeploy.getAuthId();
+        if (authId != null){
+            AuthHost authHost = hostServer.findOneAuthHost(authId);
+            if (!Objects.isNull(authHost)){
+                taskDeploy.setHostType("host");
+                taskDeploy.setAuth(authHost);
+                return taskDeploy;
+            }
+            AuthHostGroup hostGroup = groupService.findOneHostGroup(authId);
+            taskDeploy.setHostType("hostGroup");
+            taskDeploy.setAuth(hostGroup);
         }
         return taskDeploy;
     }

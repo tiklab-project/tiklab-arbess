@@ -6,6 +6,7 @@ import io.tiklab.join.annotation.Join;
 
 /**
  * 任务部署模型
+ * @author zcamy
  */
 //@ApiModel
 @Join
@@ -15,7 +16,7 @@ public class TaskDeploy {
     //@ApiProperty(name = "taskId",desc = "id")
     private String taskId;
 
-    //@ApiProperty(name = "authType",desc = "认证类型" )
+    //@ApiProperty(name = "authType",desc = "部署方式，自定义部署，结构化部署" )
     private int authType;
 
     //@ApiProperty(name = "localAddress" , desc = "文件地址")
@@ -42,12 +43,24 @@ public class TaskDeploy {
     //@ApiProperty(name="dockerImage",desc="规则")
     private String dockerImage;
 
+    // 主机类型 host--主机  hostGroup--主机组
+    private String hostType;
+
     //授权信息
     private Object auth;
 
     private int sort;
 
     private String type;
+
+    public String getHostType() {
+        return hostType;
+    }
+
+    public TaskDeploy setHostType(String hostType) {
+        this.hostType = hostType;
+        return this;
+    }
 
     public String getDockerImage() {
         return dockerImage;

@@ -8,6 +8,9 @@ import io.tiklab.matflow.pipeline.instance.model.PipelineInstance;
 import io.tiklab.matflow.pipeline.instance.model.PipelineInstanceQuery;
 import io.tiklab.matflow.pipeline.instance.service.PipelineInstanceService;
 import io.tiklab.matflow.setting.model.AuthHost;
+import io.tiklab.matflow.setting.model.AuthHostGroup;
+import io.tiklab.matflow.setting.model.AuthHostGroupDetails;
+import io.tiklab.matflow.setting.service.AuthHostGroupService;
 import io.tiklab.matflow.support.condition.service.ConditionService;
 import io.tiklab.matflow.support.util.PipelineFileUtil;
 import io.tiklab.matflow.support.util.PipelineFinal;
@@ -61,6 +64,9 @@ public class TaskDeployExecServiceImpl implements TaskDeployExecService {
     @Autowired
     PipelineUtilService utilService;
 
+    @Autowired
+    AuthHostGroupService groupService;
+
     private static final Logger logger = LoggerFactory.getLogger(TaskDeployExecServiceImpl.class);
 
 
@@ -97,26 +103,67 @@ public class TaskDeployExecServiceImpl implements TaskDeployExecService {
                 tasksInstanceService.writeExecLog(taskId, s);
                 return false;
             }
-
         }
 
-        //建立服务器连接
-        Session session;
-        try {
-            Object auth = taskDeploy.getAuth();
-            if (Objects.isNull(auth)){
-                tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"连接失败，服务器地址为空\n");
-                return false;
-            }
-            tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"建立与远程服务器链接：" );
-            session = createSession(taskDeploy);
-        } catch (JSchException e) {
-            String message = PipelineUtil.date(4)+ e.getMessage();
-            tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"连接失败，无法连接到服务器\n"+message);
+
+        Object auth = taskDeploy.getAuth();
+        if (Objects.isNull(auth)){
+            tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"任务："+ task.getTaskName()
+                    +"执行失败，无法获取的服务器连接信息");
             return false;
         }
-        tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"服务器链接建立成功。" );
 
+        String hostType = taskDeploy.getHostType();
+        Session session;
+        if ("hostGroup".equals(hostType)){
+            AuthHostGroup hostGroup = (AuthHostGroup)auth;
+            List<AuthHostGroupDetails> detailsList = hostGroup.getDetailsList();
+            if (detailsList.isEmpty()){
+                tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"当前主机组中没有主机实例！");
+                return true;
+            }
+            boolean state = true;
+            for (AuthHostGroupDetails groupDetails : detailsList) {
+                AuthHost authHost = groupDetails.getAuthHost();
+                String ip = authHost.getIp();
+                //建立服务器连接
+                try {
+                    session = createSession(authHost,taskId);
+                    execDeploy(taskDeploy,pipelineId,session);
+                } catch (JSchException e) {
+
+                    String message = PipelineUtil.date(4)+ e.getMessage();
+                    tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"主机："+ip+"部署失败！"+message);
+                    state = false;
+                }
+                tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"主机："+ip+"部署成功。\n");
+            }
+
+            if (!state){
+                return false;
+            }
+
+        }else {
+            //建立服务器连接
+            try {
+                AuthHost authHost = (AuthHost) auth;
+                session = createSession(authHost,taskId);
+                execDeploy(taskDeploy,pipelineId,session);
+            } catch (JSchException e) {
+                String message = PipelineUtil.date(4)+ e.getMessage();
+                tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"连接失败，无法连接到服务器\n"+message);
+                return false;
+            }
+        }
+
+        tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"任务："+ task.getTaskName() +"执行完成。");
+        return true;
+    }
+
+
+    private void execDeploy(TaskDeploy taskDeploy,String pipelineId,Session session){
+        String taskId = taskDeploy.getTaskId();
+        String taskType = taskDeploy.getType();
 
         try {
             if (taskType.equals(PipelineFinal.TASK_DEPLOY_DOCKER)){
@@ -128,12 +175,8 @@ public class TaskDeployExecServiceImpl implements TaskDeployExecService {
             String message = PipelineUtil.date(4)+ e.getMessage();
             tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+message );
             session.disconnect();
-            return false;
         }
-
         session.disconnect();
-        tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"任务："+ task.getTaskName() +"执行完成。");
-        return true;
     }
 
 
@@ -409,19 +452,27 @@ public class TaskDeployExecServiceImpl implements TaskDeployExecService {
 
     /**
      * 创建连接实例
-     * @param taskDeploy 连接配置信息
+     * @param authHost 连接配置信息
      * @return 实例
      * @throws JSchException 连接失败
      */
-    private Session createSession(TaskDeploy taskDeploy) throws JSchException,ApplicationException {
+    private Session createSession(AuthHost authHost ,String taskId) throws JSchException,ApplicationException {
 
-        AuthHost authHost = (AuthHost) taskDeploy.getAuth();
+        tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"建立与远程服务器链接：" );
+
         String username = authHost.getUsername();
 
         String sshIp = authHost.getIp();
         int sshPort = authHost.getPort();
+
+        tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)
+                +"连接服务器："+sshIp + " Port: "+sshPort );
+
         JSch jsch = new JSch();
         Session session = jsch.getSession(username, sshIp, sshPort);
+        tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)
+                +"连接用户名：" + username );
+
         if (authHost.getAuthType() ==2){
             String tempFile = PipelineFileUtil.createTempFile(authHost.getPrivateKey(),PipelineFinal.FILE_TYPE_TXT);
             if (!PipelineUtil.isNoNull(tempFile)){
@@ -429,12 +480,20 @@ public class TaskDeployExecServiceImpl implements TaskDeployExecService {
             }
             jsch.addIdentity(tempFile);
             PipelineFileUtil.deleteFile(new File(tempFile));
+            tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)
+                    +"秘钥：******" );
         }else {
             String password = authHost.getPassword();
             session.setPassword(password);
+            tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)
+                    +"密码：******" );
         }
         session.setConfig("StrictHostKeyChecking", "no");
-        session.connect();
+
+        tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"建立连接中......" );
+        session.connect(10000);
+
+        tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"服务器链接建立成功。" );
         return session;
     }
 
@@ -517,7 +576,6 @@ public class TaskDeployExecServiceImpl implements TaskDeployExecService {
         sftp.put(localFile,uploadAddress,ChannelSftp.OVERWRITE);
         sftp.disconnect();
     }
-
 
     private Map<String,String> error(String type){
         Map<String,String> map = new HashMap<>();

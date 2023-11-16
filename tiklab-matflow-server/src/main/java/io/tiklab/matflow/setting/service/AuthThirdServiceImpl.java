@@ -6,6 +6,7 @@ import io.tiklab.join.JoinTemplate;
 import io.tiklab.matflow.setting.dao.AuthThirdDao;
 import io.tiklab.matflow.setting.entity.AuthThirdEntity;
 import io.tiklab.matflow.setting.model.AuthThird;
+import io.tiklab.matflow.support.util.PipelineFinal;
 import io.tiklab.matflow.task.code.service.TaskCodeThirdServiceImpl;
 import io.tiklab.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+
+import static io.tiklab.matflow.support.util.PipelineFinal.*;
 
 @Service
 @Exporter
@@ -35,7 +38,7 @@ public class AuthThirdServiceImpl implements AuthThirdService {
      */
     public String createAuthServer(AuthThird authThird) {
         String thirdType = authThird.getType();
-        boolean b = thirdType.equals("2") || thirdType.equals("3")|| thirdType.equals("gitee")|| thirdType.equals("github");
+        boolean b = thirdType.equals(TASK_CODE_GITEE)|| thirdType.equals(TASK_CODE_GITHUB);
         if (b){
             TaskCodeThirdServiceImpl thirdService = new TaskCodeThirdServiceImpl();
             AuthThird authServer = thirdService.findUserAuthThird(LoginContext.getLoginId());
@@ -106,7 +109,7 @@ public class AuthThirdServiceImpl implements AuthThirdService {
 
         List<AuthThird> list = new ArrayList<>();
 
-        if (Objects.isNull(type) || type.equals("all")){
+        if (Objects.isNull(type) || "all".equals(type)){
 
             for (AuthThird authThird : allAuthServer) {
                 String oneType = findOneType(authThird.getType());
@@ -122,10 +125,10 @@ public class AuthThirdServiceImpl implements AuthThirdService {
                 list.add(authServer);
                 continue;
             }
-            boolean type2 = findType(type, type1);
-            if (!type2 ){
-                continue;
-            }
+            // boolean type2 = findType(type, type1);
+            // if (!type2 ){
+            //     continue;
+            // }
             authServer.setType(type);
             list.add(authServer);
         }
@@ -135,57 +138,21 @@ public class AuthThirdServiceImpl implements AuthThirdService {
     private String findOneType(String type){
         switch (type){
             case "2"  ->{
-                return "gitee";
+                return TASK_CODE_GITEE;
             }
             case "3"  ->{
-                return "github";
+                return TASK_CODE_GITHUB;
             }
             case "41"  ->{
-                return "sonar";
+                return TASK_CODESCAN_SONAR;
             }
             case "51"  ->{
-                return "nexus";
+                return TASK_ARTIFACT_NEXUS;
             }
             default -> {
                 return type;
             }
         }
-    }
-
-
-    private boolean findType(String type,String taskType){
-        switch (type){
-            case "gitee"  ->{
-                if (taskType.equals("2")|| taskType.equals("gitee")){
-                    return true;
-                }
-            }
-            case "github"  ->{
-                if (taskType.equals("3")|| taskType.equals("github")){
-                    return true;
-                }
-            }
-            case "sonar"  ->{
-                if (taskType.equals("41")|| taskType.equals("sonar")){
-                    return true;
-                }
-            }
-            case "nexus"  ->{
-                if (taskType.equals("51")|| taskType.equals("nexus")){
-                    return true;
-                }
-            }
-            case "xcode" ,"teston" ,"xpack" ->{
-                if (taskType.equals(type)){
-                    return true;
-                }
-            }
-            default -> {
-                return false;
-            }
-
-        }
-        return false;
     }
 
     /**

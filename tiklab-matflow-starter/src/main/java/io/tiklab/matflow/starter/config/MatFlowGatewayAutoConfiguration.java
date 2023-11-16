@@ -109,7 +109,7 @@ public class MatFlowGatewayAutoConfiguration {
                         "/start",
                         "/eas",
                         "/sql",
-                        "/spotbugsScan"
+                        "/authHostGroup"
                 })
                 .get();
     }

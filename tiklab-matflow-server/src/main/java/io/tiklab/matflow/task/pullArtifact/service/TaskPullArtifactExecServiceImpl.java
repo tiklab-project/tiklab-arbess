@@ -558,7 +558,7 @@ public class TaskPullArtifactExecServiceImpl implements TaskPullArtifactExecServ
         }
         session.setConfig("StrictHostKeyChecking", "no");
         try {
-            session.connect();
+            session.connect(10000);
         } catch (JSchException e) {
             String message = e.getMessage();
             throw new ApplicationException("连接服务器失败："+message);

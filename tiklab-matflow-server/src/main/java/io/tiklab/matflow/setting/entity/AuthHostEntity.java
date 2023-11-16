@@ -8,7 +8,7 @@ public class AuthHostEntity {
 
     @Id
     @GeneratorValue(length = 12)
-    @Column(name = "id")
+    @Column(name = "host_id")
     private String hostId;
 
     @Column(name = "name")

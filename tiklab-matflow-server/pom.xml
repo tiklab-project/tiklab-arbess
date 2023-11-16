@@ -128,17 +128,9 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.13.1</version>
+            <version>4.13.2</version>
             <scope>test</scope>
         </dependency>
-
-        <!-- https://mvnrepository.com/artifact/org.codehaus.mojo/findbugs-maven-plugin -->
-        <dependency>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>findbugs-maven-plugin</artifactId>
-            <version>3.0.5</version>
-        </dependency>
-
 
 
     </dependencies>
@@ -159,77 +151,16 @@
             </plugin>
 
             <plugin>
-                <groupId>org.jacoco</groupId>
-                <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.7</version> <!-- 请根据你的需要选择合适的版本 -->
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>prepare-agent</goal>
-                        </goals>
-                        <configuration>
-                            <!-- 需要修改maven-surefire-plugin插件的<argLine>配置，默认是argLine -->
-                            <propertyName>argLine</propertyName>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>report</id>
-                        <phase>prepare-package</phase>
-                        <goals>
-                            <goal>report</goal>
-                        </goals>
-                    </execution>
-                </executions>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <skip>false</skip>
+                    <includes>
+                        <include>**/*TestPipelineHomeServiceImplTest.java</include>
+                    </includes>
+                </configuration>
             </plugin>
 
-<!--            <plugin>-->
-<!--                <groupId>org.apache.maven.plugins</groupId>-->
-<!--                <artifactId>maven-surefire-plugin</artifactId>-->
-<!--                <configuration>-->
-<!--                    <skip>false</skip>-->
-<!--&lt;!&ndash;                    <includes>&ndash;&gt;-->
-<!--&lt;!&ndash;                        <include>**/*TestPipelineHomeServiceImpl.java</include>&ndash;&gt;-->
-<!--&lt;!&ndash;                    </includes>&ndash;&gt;-->
-<!--                </configuration>-->
-<!--            </plugin>-->
-
-<!--            <plugin>-->
-<!--                <groupId>com.github.spotbugs</groupId>-->
-<!--                <artifactId>spotbugs-maven-plugin</artifactId>-->
-<!--                <version>4.8.1.0</version> &lt;!&ndash; 使用最新版本 &ndash;&gt;-->
-<!--                <configuration>-->
-<!--                    <effort>Max</effort> &lt;!&ndash; 设置分析努力级别，可以是 Min, Default, Max 中的一个 &ndash;&gt;-->
-<!--                    <threshold>Low</threshold> &lt;!&ndash; 设置问题阈值级别，可以是 Low, Medium, High 中的一个 &ndash;&gt;-->
-<!--                    &lt;!&ndash;                    <excludeFilterFile>path/to/excludeFilter.xml</excludeFilterFile> &lt;!&ndash; 指定排除规则的配置文件路径 &ndash;&gt;&ndash;&gt;-->
-<!--                </configuration>-->
-<!--                <executions>-->
-<!--                    <execution>-->
-<!--                        <phase>verify</phase> &lt;!&ndash; 在verify阶段执行SpotBugs分析 &ndash;&gt;-->
-<!--                        <goals>-->
-<!--                            <goal>check</goal>-->
-<!--                        </goals>-->
-<!--                    </execution>-->
-<!--                </executions>-->
-<!--            </plugin>-->
-
-<!--            <plugin>-->
-<!--                <groupId>org.codehaus.mojo</groupId>-->
-<!--                <artifactId>findbugs-maven-plugin</artifactId>-->
-<!--                <version>3.0.5</version>-->
-<!--                <configuration>-->
-<!--                    <effort>Max</effort>-->
-<!--                    <failOnError>true</failOnError>-->
-<!--                    &lt;!&ndash; 其他配置选项 &ndash;&gt;-->
-<!--                </configuration>-->
-<!--                <executions>-->
-<!--                    <execution>-->
-<!--                        <phase>verify</phase>-->
-<!--                        <goals>-->
-<!--                            <goal>check</goal>-->
-<!--                        </goals>-->
-<!--                    </execution>-->
-<!--                </executions>-->
-<!--            </plugin>-->
 
 
         </plugins>

@@ -4,7 +4,8 @@ import org.junit.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-public class TestPipelineHomeServiceImplTest {
+public class TestOneTest {
+
 
     @Test
     public void homeOne() {
@@ -16,40 +17,4 @@ public class TestPipelineHomeServiceImplTest {
         System.out.println("这是第一个测试用例！");
     }
 
-
-
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

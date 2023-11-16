@@ -1,11 +1,15 @@
 package io.tiklab.matflow.setting.service;
 
 import io.tiklab.beans.BeanMapper;
+import io.tiklab.core.page.Pagination;
+import io.tiklab.core.page.PaginationBuilder;
 import io.tiklab.eam.common.context.LoginContext;
 import io.tiklab.join.JoinTemplate;
 import io.tiklab.matflow.setting.dao.AuthHostDao;
 import io.tiklab.matflow.setting.entity.AuthHostEntity;
 import io.tiklab.matflow.setting.model.AuthHost;
+import io.tiklab.matflow.setting.model.AuthHostQuery;
+import io.tiklab.matflow.support.util.PipelineUtil;
 import io.tiklab.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -32,6 +36,8 @@ public class AuthHostServiceImpl implements AuthHostService {
     @Override
     public String createAuthHost(AuthHost authHost) {
         AuthHostEntity authHostEntity = BeanMapper.map(authHost, AuthHostEntity.class);
+        authHostEntity.setCreateTime(PipelineUtil.date(1));
+        authHostEntity.setUserId(LoginContext.getLoginId());
         return authHostDao.createAuthHost(authHostEntity);
     }
 
@@ -165,6 +171,18 @@ public class AuthHostServiceImpl implements AuthHostService {
     public List<AuthHost> findAllAuthHostList(List<String> idList) {
         List<AuthHostEntity> allAuthHostList = authHostDao.findAllAuthHostList(idList);
         return BeanMapper.mapList(allAuthHostList, AuthHost.class);
+    }
+
+    @Override
+    public Pagination<AuthHost> findAuthHostPage(AuthHostQuery hostQuery){
+
+        Pagination<AuthHostEntity> allAuthHostPage = authHostDao.findAuthHostPage(hostQuery);
+
+        List<AuthHostEntity> dataList = allAuthHostPage.getDataList();
+
+        List<AuthHost> authHosts = BeanMapper.mapList(dataList, AuthHost.class);
+
+        return PaginationBuilder.build(allAuthHostPage,authHosts);
     }
     
 }

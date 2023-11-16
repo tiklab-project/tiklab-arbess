@@ -1,6 +1,8 @@
 package io.tiklab.matflow.task.codescan.service;
 
+import io.tiklab.core.exception.ApplicationException;
 import io.tiklab.core.exception.SystemException;
+import io.tiklab.matflow.support.util.PipelineFileUtil;
 import io.tiklab.matflow.task.codescan.model.*;
 import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Document;
@@ -80,7 +82,6 @@ public class SpotbugsXmlConfig {
      * @param xmlPath 文件地址
      * @return Bug集合
      */
-
     public List<SpotbugsBugFileStats> findBugFileStats(String xmlPath){
         try {
             File xmlFile = new File(xmlPath);
@@ -139,7 +140,6 @@ public class SpotbugsXmlConfig {
      * @param xmlPath xml文件地址
      * @return bug集合
      */
-
     public List<SpotbugsBugPackageStats> findBugPackageStats(String xmlPath){
         try {
             File xmlFile = new File(xmlPath);
@@ -213,7 +213,6 @@ public class SpotbugsXmlConfig {
             throw new SystemException("解析Xml文件失败，path:"+xmlPath+" ，message："+e.getMessage());
         }
     }
-
 
     public List<SpotbugsBugInstance> findScanBugs(String xmlPath){
         try {
@@ -481,6 +480,39 @@ public class SpotbugsXmlConfig {
         }
         return hashMap;
     }
+
+    private Map<String,String> findJavaFilePath(String filePath){
+
+        File file = new File(filePath);
+
+        if (!file.exists() || file.isFile()){
+            throw new ApplicationException("文件夹不存在！" + filePath);
+        }
+
+        Map<String , String> map  = new HashMap<>();
+
+        List<String> javaPathList = PipelineFileUtil.getFilePath(file, new ArrayList<>());
+
+        for (String javaPath : javaPathList) {
+            if (!javaPath.endsWith(".java")){
+                continue;
+            }
+            System.out.println(javaPath.replace(filePath,""));
+            String name = new File(javaPath).getName();
+
+            if (StringUtils.isEmpty(map.get(name))){
+                String parent = new File(javaPath).getParent();
+                map.put( parent+"/"+name ,javaPath);
+            }else {
+                map.put(name,javaPath);
+            }
+        }
+        return map;
+    }
+
+
+
+
 
 
 

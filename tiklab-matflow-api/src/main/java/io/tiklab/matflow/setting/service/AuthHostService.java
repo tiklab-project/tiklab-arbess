@@ -1,11 +1,13 @@
 package io.tiklab.matflow.setting.service;
 
 
+import io.tiklab.core.page.Pagination;
 import io.tiklab.join.annotation.FindAll;
 import io.tiklab.join.annotation.FindList;
 import io.tiklab.join.annotation.FindOne;
 import io.tiklab.join.annotation.JoinProvider;
 import io.tiklab.matflow.setting.model.AuthHost;
+import io.tiklab.matflow.setting.model.AuthHostQuery;
 
 import java.util.List;
 
@@ -59,5 +61,8 @@ public interface AuthHostService {
 
     @FindList
     List<AuthHost> findAllAuthHostList(List<String> idList);
+
+
+    Pagination<AuthHost> findAuthHostPage(AuthHostQuery hostQuery);
     
 }

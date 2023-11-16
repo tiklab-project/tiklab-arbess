@@ -1,6 +1,8 @@
 package io.tiklab.matflow.setting.controller;
 
+import io.tiklab.core.page.Pagination;
 import io.tiklab.matflow.setting.model.AuthHost;
+import io.tiklab.matflow.setting.model.AuthHostQuery;
 import io.tiklab.matflow.setting.service.AuthHostService;
 import io.tiklab.core.Result;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -89,6 +91,14 @@ public class AuthHostController {
         List<AuthHost> allAuthHost = authHost.findAllAuthHostList(type);
         return Result.ok(allAuthHost);
     }
+
+
+    @RequestMapping(path="/findAuthHostPage",method = RequestMethod.POST)
+    public Result<Pagination<AuthHost>> findAuthHostPage( @RequestBody @Valid @NotNull AuthHostQuery hostQuery) {
+        Pagination<AuthHost> allAuthHost = authHost.findAuthHostPage(hostQuery);
+        return Result.ok(allAuthHost);
+    }
+
 
 
 }
