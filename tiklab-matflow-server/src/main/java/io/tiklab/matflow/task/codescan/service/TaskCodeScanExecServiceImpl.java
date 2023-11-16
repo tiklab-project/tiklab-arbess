@@ -148,7 +148,7 @@ public class TaskCodeScanExecServiceImpl implements TaskCodeScanExecService {
         String scanPath = taskCodeScan.getScanPath();
         if (scanPath.contains(DEFAULT_CODE_ADDRESS)){
             String defaultAddress = utilService.findPipelineDefaultAddress(pipelineId, 1);
-            scanPath = scanPath.replaceAll(DEFAULT_CODE_ADDRESS,defaultAddress);
+            scanPath = scanPath.replace(DEFAULT_CODE_ADDRESS,defaultAddress);
         }
 
         File file = new File(scanPath);
@@ -224,7 +224,7 @@ public class TaskCodeScanExecServiceImpl implements TaskCodeScanExecService {
                 .append(" -output ").append(outPath);
 
         // 源码位置
-        order.append(scanPath);
+        order.append(" ").append(scanPath);
 
         logger.warn("执行代码扫描：{}",order);
 

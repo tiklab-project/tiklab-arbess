@@ -1,6 +1,7 @@
 package io.tiklab.matflow.setting.controller;
 
 import io.tiklab.matflow.setting.model.AuthThird;
+import io.tiklab.matflow.setting.model.AuthThirdQuery;
 import io.tiklab.matflow.setting.service.AuthThirdService;
 import io.tiklab.core.Result;
 import io.tiklab.postin.annotation.Api;
@@ -97,9 +98,9 @@ public class AuthThirdController {
      * @pi.request-type: formdata
      * @pi.param: name=type;dataType=string;value=gitee;
      */
-    @RequestMapping(path="/findAllAuthServerList",method = RequestMethod.POST)
-    public Result<List<AuthThird>> findAllAuthServerList(@NotNull String type) {
-        List<AuthThird> allAuthThird = authServerService.findAllAuthServerList(type);
+    @RequestMapping(path="/findAuthServerList",method = RequestMethod.POST)
+    public Result<List<AuthThird>> findAllAuthServerList(@RequestBody @Valid @NotNull AuthThirdQuery thirdQuery) {
+        List<AuthThird> allAuthThird = authServerService.findAuthServerList(thirdQuery);
         return Result.ok(allAuthThird);
     }
 

@@ -6,6 +6,7 @@ import io.tiklab.join.JoinTemplate;
 import io.tiklab.matflow.setting.dao.AuthThirdDao;
 import io.tiklab.matflow.setting.entity.AuthThirdEntity;
 import io.tiklab.matflow.setting.model.AuthThird;
+import io.tiklab.matflow.setting.model.AuthThirdQuery;
 import io.tiklab.matflow.support.util.PipelineFinal;
 import io.tiklab.matflow.task.code.service.TaskCodeThirdServiceImpl;
 import io.tiklab.rpc.annotation.Exporter;
@@ -110,10 +111,9 @@ public class AuthThirdServiceImpl implements AuthThirdService {
         List<AuthThird> list = new ArrayList<>();
 
         if (Objects.isNull(type) || "all".equals(type)){
-
             for (AuthThird authThird : allAuthServer) {
-                String oneType = findOneType(authThird.getType());
-                authThird.setType(oneType);
+                // String oneType = findOneType(authThird.getType());
+                authThird.setType(authThird.getType());
                 list.add(authThird);
             }
             return list;
@@ -135,25 +135,38 @@ public class AuthThirdServiceImpl implements AuthThirdService {
         return list;
     }
 
-    private String findOneType(String type){
-        switch (type){
-            case "2"  ->{
-                return TASK_CODE_GITEE;
-            }
-            case "3"  ->{
-                return TASK_CODE_GITHUB;
-            }
-            case "41"  ->{
-                return TASK_CODESCAN_SONAR;
-            }
-            case "51"  ->{
-                return TASK_ARTIFACT_NEXUS;
-            }
-            default -> {
-                return type;
-            }
+
+    @Override
+    public List<AuthThird> findAuthServerList(AuthThirdQuery thirdQuery){
+        String type = thirdQuery.getType();
+        if (type.equals("all")){
+            thirdQuery.setType(null);
         }
+        List<AuthThirdEntity> authThirdEntityList = authServerDao.findAuthServerList(thirdQuery);
+        List<AuthThird> authThirds = BeanMapper.mapList(authThirdEntityList, AuthThird.class);
+        joinTemplate.joinQuery(authThirds);
+        return authThirds;
     }
+
+    // private String findOneType(String type){
+    //     switch (type){
+    //         case "2"  ->{
+    //             return TASK_CODE_GITEE;
+    //         }
+    //         case "3"  ->{
+    //             return TASK_CODE_GITHUB;
+    //         }
+    //         case "41"  ->{
+    //             return TASK_CODESCAN_SONAR;
+    //         }
+    //         case "51"  ->{
+    //             return TASK_ARTIFACT_NEXUS;
+    //         }
+    //         default -> {
+    //             return type;
+    //         }
+    //     }
+    // }
 
     /**
      * 查询所有流水线授权

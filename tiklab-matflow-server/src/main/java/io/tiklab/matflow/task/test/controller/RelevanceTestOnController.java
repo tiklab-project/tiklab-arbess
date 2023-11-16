@@ -25,7 +25,7 @@ import java.util.List;
 public class RelevanceTestOnController {
 
     @Autowired
-    private RelevanceTestOnService relevanceTestOnService;
+    RelevanceTestOnService relevanceTestOnService;
 
     /**
      * @pi.name:查询流水线测试信息执行实例

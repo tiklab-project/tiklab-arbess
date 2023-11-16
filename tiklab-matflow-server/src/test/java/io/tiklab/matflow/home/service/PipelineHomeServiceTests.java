@@ -4,8 +4,7 @@ import org.junit.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-public class TestOneTest {
-
+public class PipelineHomeServiceTests {
 
     @Test
     public void testOne() {
@@ -18,4 +17,40 @@ public class TestOneTest {
         // throw new ApplicationException("这是第二个测试用例。");
     }
 
+
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

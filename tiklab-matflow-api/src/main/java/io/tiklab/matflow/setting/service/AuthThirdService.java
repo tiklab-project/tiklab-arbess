@@ -6,6 +6,7 @@ import io.tiklab.join.annotation.FindList;
 import io.tiklab.join.annotation.FindOne;
 import io.tiklab.join.annotation.JoinProvider;
 import io.tiklab.matflow.setting.model.AuthThird;
+import io.tiklab.matflow.setting.model.AuthThirdQuery;
 
 import java.util.List;
 
@@ -48,6 +49,9 @@ public interface AuthThirdService {
      * @return 认证信息
      */
     List<AuthThird> findAllAuthServerList(String type);
+
+
+    List<AuthThird> findAuthServerList(AuthThirdQuery thirdQuery);
 
     List<AuthThird> findAllAuthServerList();
 

@@ -23,11 +23,6 @@
             <artifactId>tiklab-user-api</artifactId>
             <version>${tiklab-user.version}</version>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>io.tiklab</groupId>-->
-<!--            <artifactId>tiklab-postin-annotation</artifactId>-->
-<!--            <version>${tiklab-postin.version}</version>-->
-<!--        </dependency>-->
         <dependency>
             <groupId>io.tiklab</groupId>
             <artifactId>tiklab-rpc-annotation</artifactId>

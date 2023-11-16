@@ -7,7 +7,9 @@ import com.alibaba.fastjson.JSONObject;
 import io.tiklab.core.exception.ApplicationException;
 import io.tiklab.eam.common.context.LoginContext;
 import io.tiklab.matflow.setting.model.AuthThird;
+import io.tiklab.matflow.setting.model.AuthThirdQuery;
 import io.tiklab.matflow.setting.service.AuthThirdService;
+import io.tiklab.matflow.support.util.PipelineFinal;
 import io.tiklab.matflow.support.util.PipelineUtil;
 import io.tiklab.rpc.annotation.Exporter;
 import org.slf4j.Logger;
@@ -30,6 +32,8 @@ import java.io.InputStreamReader;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+
+import static io.tiklab.matflow.support.util.PipelineFinal.TASK_CODE_GITEE;
 
 /**
  * gitee , github第三方实现
@@ -405,7 +409,8 @@ public class TaskCodeThirdServiceImpl implements TaskCodeThirdService {
     }
 
     public String updateAuthorization(String authId) {
-        List<AuthThird> allAuthCode = serverServer.findAllAuthServerList("gitee");
+        AuthThirdQuery authThirdQuery = new AuthThirdQuery().setType(TASK_CODE_GITEE);
+        List<AuthThird> allAuthCode = serverServer.findAuthServerList(authThirdQuery);
         if (allAuthCode == null) {
             return null;
         }

@@ -59,6 +59,7 @@
         <quartz.version>2.3.2</quartz.version>
         <tomcat-annotations-api.version>9.0.54</tomcat-annotations-api.version>
         <commons-compress>1.21</commons-compress>
+        <junit.junit.version>4.13.1</junit.junit.version>
 
 
     </properties>

@@ -128,7 +128,7 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.13.2</version>
+            <version>${junit.junit.version}</version>
             <scope>test</scope>
         </dependency>
 
@@ -144,24 +144,24 @@
                     <execution>
                         <id>attach-sources</id>
                         <goals>
-                            <goal>jar</goal>
+                            <goal>jar-no-fork</goal>
                         </goals>
                     </execution>
                 </executions>
             </plugin>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.0.0-M5</version>
                 <configuration>
                     <skip>false</skip>
                     <includes>
-                        <include>**/*TestPipelineHomeServiceImplTest.java</include>
+                        <include>**/*PipelineHomeServiceImplTests.java</include>
+                        <include>**/*TestOneTest.java</include>
+                        <include>**/*PipelineServiceTest.java</include>
                     </includes>
                 </configuration>
             </plugin>
-
-
 
         </plugins>
     </build>

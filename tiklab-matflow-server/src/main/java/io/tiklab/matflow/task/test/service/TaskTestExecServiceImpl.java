@@ -7,6 +7,7 @@ import io.tiklab.matflow.setting.model.Scm;
 import io.tiklab.matflow.setting.service.AuthThirdService;
 import io.tiklab.matflow.setting.service.ScmService;
 import io.tiklab.matflow.support.condition.service.ConditionService;
+import io.tiklab.matflow.support.util.PipelineFinal;
 import io.tiklab.matflow.support.util.PipelineUtil;
 import io.tiklab.matflow.support.util.PipelineUtilService;
 import io.tiklab.matflow.support.variable.service.VariableService;
@@ -19,11 +20,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.*;
+
+import static io.tiklab.matflow.support.util.PipelineFinal.TASK_TEST_MAVENTEST;
+import static io.tiklab.matflow.support.util.PipelineFinal.TASK_TEST_TESTON;
 
 /**
  * 测试执行方法
@@ -77,10 +81,11 @@ public class TaskTestExecServiceImpl implements TaskTestExecService {
         taskTest.setType(taskType);
 
         switch (taskType){
-            case "11","maventest" -> {
+            case TASK_TEST_MAVENTEST -> {
                 return execTestMaven(taskId,taskTest,pipelineId,task);
             }
-            case "teston" ->{
+
+            case TASK_TEST_TESTON ->{
                 return execTestOn(pipelineId,taskId,taskTest);
             }
             default -> {
@@ -224,6 +229,53 @@ public class TaskTestExecServiceImpl implements TaskTestExecService {
         return true;
     }
 
+    List<String> readCommandExecResult(Process process) {
+
+        //转换流
+        InputStream inputStream = process.getInputStream();
+        InputStream errInputStream = process.getErrorStream();
+
+        InputStreamReader inputStreamReader ;
+        BufferedReader bufferedReader ;
+        if ( Objects.isNull(inputStream)){
+            inputStreamReader = PipelineUtil.encode(errInputStream, PipelineFinal.UTF_8);
+        }else {
+            inputStreamReader = PipelineUtil.encode(inputStream, PipelineFinal.UTF_8);
+        }
+
+        List<String> list = new ArrayList<>();
+
+        String s;
+        bufferedReader = new BufferedReader(inputStreamReader);
+        try {
+
+            //读取执行信息
+            while ((s = bufferedReader.readLine()) != null) {
+                if (s.startsWith("[INFO] Tests run: ")){
+
+                }
+                list.add(s);
+            }
+
+            //读取err执行信息
+            inputStreamReader = PipelineUtil.encode(errInputStream, PipelineFinal.UTF_8);
+            bufferedReader = new BufferedReader(inputStreamReader);
+
+            while ((s = bufferedReader.readLine()) != null) {
+                list.add(s);
+            }
+
+            // 关闭
+            inputStreamReader.close();
+            bufferedReader.close();
+
+        } catch (Exception e){
+           return list;
+        }
+        process.destroy();
+        return list;
+    }
+
     /**
      * 执行build
      * @param taskTest 执行信息
@@ -233,14 +285,14 @@ public class TaskTestExecServiceImpl implements TaskTestExecService {
     private Process getOrder(TaskTest taskTest, String testOrder, String path ) throws ApplicationException, IOException {
         String type = taskTest.getType();
         String order ;
-        if (type.equals("11") || type.equals("maventest")) {
+        if ( type.equals(TASK_TEST_MAVENTEST)) {
             Scm pipelineScm = scmService.findOnePipelineScm(21);
 
-            if (pipelineScm == null) {
+            if (Objects.isNull(pipelineScm)) {
                 throw new ApplicationException(PipelineUtil.date(4)+"不存在maven配置");
             }
             String mavenAddress = pipelineScm.getScmAddress();
-            PipelineUtil.validFile(mavenAddress,"maventest");
+            PipelineUtil.validFile(mavenAddress,TASK_TEST_MAVENTEST);
             order = testOrder(testOrder, path);
             return PipelineUtil.process(mavenAddress, order);
         }else {
@@ -266,13 +318,9 @@ public class TaskTestExecServiceImpl implements TaskTestExecService {
     }
 
     private Map<String,String> error(String type){
-        String[] strings;
         Map<String,String> map = new HashMap<>();
         map.put("BUILD FAILURE","构建失败！");
         map.put("Compilation failure","编译失败！");
-        // strings = new String[]{
-        //     "BUILD FAILURE","ERROR","Compilation failure"
-        // };
         return map;
     }
 
