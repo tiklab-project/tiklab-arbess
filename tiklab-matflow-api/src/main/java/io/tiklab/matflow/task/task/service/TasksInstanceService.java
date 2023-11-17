@@ -156,6 +156,9 @@ public interface TasksInstanceService {
      */
     boolean readCommandExecResult(Process process , String enCode, Map<String,String> error,String taskId);
 
+
+    String validStatus(String s,Map<String,String> errors);
+
     /**
      * 查询所有任务日志
      * @return 任务日志列表

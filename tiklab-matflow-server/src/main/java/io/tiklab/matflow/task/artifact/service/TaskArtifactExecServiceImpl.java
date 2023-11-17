@@ -1,12 +1,8 @@
 package io.tiklab.matflow.task.artifact.service;
 
-import com.alibaba.fastjson.JSONObject;
+
 import com.jcraft.jsch.*;
 import io.tiklab.core.exception.ApplicationException;
-import io.tiklab.matflow.pipeline.execute.service.PipelineExecServiceImpl;
-import io.tiklab.matflow.pipeline.instance.model.PipelineInstance;
-import io.tiklab.matflow.pipeline.instance.model.PipelineInstanceQuery;
-import io.tiklab.matflow.pipeline.instance.service.PipelineInstanceService;
 import io.tiklab.matflow.setting.model.AuthHost;
 import io.tiklab.matflow.setting.model.AuthThird;
 import io.tiklab.matflow.setting.model.Scm;

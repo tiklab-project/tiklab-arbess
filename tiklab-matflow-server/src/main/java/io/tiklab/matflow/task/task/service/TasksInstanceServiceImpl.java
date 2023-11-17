@@ -441,7 +441,7 @@ public class TasksInstanceServiceImpl implements TasksInstanceService {
      * @param errors 错误状态
      * @return null 正确  other：错误
      */
-    private String validStatus(String s,Map<String,String> errors){
+    public String validStatus(String s,Map<String,String> errors){
 
         for (Map.Entry<String, String> errorString : errors.entrySet()) {
             String key = errorString.getKey();

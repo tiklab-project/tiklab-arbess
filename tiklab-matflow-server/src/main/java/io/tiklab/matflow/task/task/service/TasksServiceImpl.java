@@ -744,6 +744,7 @@ public class TasksServiceImpl implements TasksService {
             case TASK_TYPE_TEST     -> {
                 TaskTest task = new TaskTest();
                 task.setTaskId(taskId);
+                task.setAddress(DEFAULT_CODE_ADDRESS);
                 testService.createTest(task);
             }
             case TASK_TYPE_BUILD    -> {

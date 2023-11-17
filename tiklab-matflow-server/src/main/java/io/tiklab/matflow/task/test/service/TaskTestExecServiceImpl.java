@@ -2,6 +2,7 @@ package io.tiklab.matflow.task.test.service;
 
 import com.alibaba.fastjson.JSONObject;
 import io.tiklab.core.exception.ApplicationException;
+import io.tiklab.matflow.pipeline.definition.dao.PipelineDao;
 import io.tiklab.matflow.setting.model.AuthThird;
 import io.tiklab.matflow.setting.model.Scm;
 import io.tiklab.matflow.setting.service.AuthThirdService;
@@ -15,19 +16,16 @@ import io.tiklab.matflow.task.task.model.Tasks;
 import io.tiklab.matflow.task.task.service.TasksInstanceService;
 import io.tiklab.matflow.task.test.model.*;
 import io.tiklab.rpc.annotation.Exporter;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.*;
 
-import static io.tiklab.matflow.support.util.PipelineFinal.TASK_TEST_MAVENTEST;
-import static io.tiklab.matflow.support.util.PipelineFinal.TASK_TEST_TESTON;
+import static io.tiklab.matflow.support.util.PipelineFinal.*;
 
 /**
  * 测试执行方法
@@ -60,6 +58,9 @@ public class TaskTestExecServiceImpl implements TaskTestExecService {
 
     @Autowired
     PipelineUtilService utilService;
+
+    @Autowired
+    MavenTestService mavenTestService;
 
     private static final Logger logger = LoggerFactory.getLogger(TaskTestExecServiceImpl.class);
 
@@ -203,16 +204,42 @@ public class TaskTestExecServiceImpl implements TaskTestExecService {
 
 
     private boolean execTestMaven(String taskId, TaskTest taskTest,String pipelineId,Tasks task){
+
+        // 效验maven环境
+        Scm pipelineScm = scmService.findOnePipelineScm(21);
+        if (Objects.isNull(pipelineScm)) {
+            throw new ApplicationException(PipelineUtil.date(4)+"不存在maven配置");
+        }
+        String mavenAddress = pipelineScm.getScmAddress();
+        PipelineUtil.validFile(mavenAddress,TASK_TEST_MAVENTEST);
+
+
         //初始化日志
+        String address = taskTest.getAddress();
+        if (address.contains(DEFAULT_CODE_ADDRESS)){
+            String path = utilService.findPipelineDefaultAddress(pipelineId,1);
+            address = address.replace(DEFAULT_CODE_ADDRESS,path);
+        }
+
+        File file = new File(address);
+        if (!file.exists() || file.isFile()){
+            throw new ApplicationException(PipelineUtil.date(4)+"找不到源代码！");
+        }
+
+
         String testOrder = taskTest.getTestOrder();
-        String path = utilService.findPipelineDefaultAddress(pipelineId,1);
+
         try {
             List<String> list = PipelineUtil.execOrder(testOrder);
             for (String s : list) {
                 String key = variableServer.replaceVariable(pipelineId, taskId, s);
                 tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"执行："+ key );
-                Process process = getOrder(taskTest,key,path);
-                boolean result = tasksInstanceService.readCommandExecResult(process, null, error(taskTest.getType()), taskId);
+                Process process = PipelineUtil.process(mavenAddress, testOrder(key, address));
+
+                boolean result = readMavenTestResult(process,pipelineId,taskId,error(taskTest.getType()));
+
+                // boolean result = tasksInstanceService.readCommandExecResult(process, null, error(taskTest.getType()), taskId);
+
                 if (!result){
                     tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"任务：" + task.getTaskName()+"执行失败。");
                     return false;
@@ -229,7 +256,7 @@ public class TaskTestExecServiceImpl implements TaskTestExecService {
         return true;
     }
 
-    List<String> readCommandExecResult(Process process) {
+    boolean readMavenTestResult(Process process,String pipelineId,String taskId, Map<String,String> error) throws IOException {
 
         //转换流
         InputStream inputStream = process.getInputStream();
@@ -238,66 +265,147 @@ public class TaskTestExecServiceImpl implements TaskTestExecService {
         InputStreamReader inputStreamReader ;
         BufferedReader bufferedReader ;
         if ( Objects.isNull(inputStream)){
-            inputStreamReader = PipelineUtil.encode(errInputStream, PipelineFinal.UTF_8);
+            inputStreamReader = PipelineUtil.encode(errInputStream, UTF_8);
         }else {
-            inputStreamReader = PipelineUtil.encode(inputStream, PipelineFinal.UTF_8);
+            inputStreamReader = PipelineUtil.encode(inputStream, UTF_8);
         }
-
-        List<String> list = new ArrayList<>();
 
         String s;
+        StringBuilder testLog = new StringBuilder();
         bufferedReader = new BufferedReader(inputStreamReader);
-        try {
 
-            //读取执行信息
-            while ((s = bufferedReader.readLine()) != null) {
-                if (s.startsWith("[INFO] Tests run: ")){
+        String mavenTestId = mavenTestService.creatMavenTest(new MavenTest());
+        boolean skip = true;
+        boolean state = true;
+        boolean runResult = false;
+        String runState = RUN_SUCCESS;
+        String errMavenTestId = null;
+        //读取执行信息
+        while ((s = bufferedReader.readLine()) != null) {
 
-                }
-                list.add(s);
+            String s1 = tasksInstanceService.validStatus(s, error);
+            if (!Objects.isNull(s1)){
+                state = false ;
+                tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4) + s1);
+            }
+            tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4) + s);
+
+            // 测试开始
+            if (s.startsWith("[INFO]  T E S T S")){
+                skip = false;
+            }
+            if (skip){
+                continue;
             }
 
-            //读取err执行信息
-            inputStreamReader = PipelineUtil.encode(errInputStream, PipelineFinal.UTF_8);
-            bufferedReader = new BufferedReader(inputStreamReader);
-
-            while ((s = bufferedReader.readLine()) != null) {
-                list.add(s);
+            if (s.contains("-------------------------------------") || s.startsWith("[INFO]  T E S T S")){
+                continue;
             }
 
-            // 关闭
-            inputStreamReader.close();
-            bufferedReader.close();
+            testLog.append(PipelineUtil.date(4)).append(s).append("\n");
 
-        } catch (Exception e){
-           return list;
+            // 当前测试类执行结果
+            if (s.startsWith("[INFO] Tests ")  && !runResult){
+                MavenTest mavenTest = reloadMavenTestResult(s);
+                mavenTest.setMessage(testLog.toString());
+                mavenTest.setTestId(mavenTestId);
+                mavenTestService.creatMavenTest(mavenTest);
+                testLog = new StringBuilder();
+            }
+
+            // 当前测试类执行结果
+            if (s.startsWith("[ERROR] Tests ") && !runResult){
+                MavenTest mavenTest = reloadMavenTestResult(s);
+                mavenTest.setMessage(testLog.toString());
+                mavenTest.setTestId(mavenTestId);
+                errMavenTestId = mavenTestService.creatMavenTest(mavenTest);
+                runState = RUN_ERROR;
+            }
+
+            if (runState.equals(RUN_ERROR) && StringUtils.isEmpty(s) && !runResult){
+                MavenTest oneMavenTest = mavenTestService.findOneMavenTest(errMavenTestId);
+                oneMavenTest.setMessage(testLog.toString());
+                mavenTestService.updateMavenTest(oneMavenTest);
+                testLog = new StringBuilder();
+            }
+
+            // 测试结束
+            if (s.startsWith("[INFO] Results:") ){
+                runResult  = true;
+            }
+
+            if ((s.startsWith("[INFO] Tests ") || s.startsWith("[ERROR] Tests ")) && runResult){
+                MavenTest mavenTest = reloadMavenTestResult(s);
+                mavenTest.setId(mavenTestId);
+                mavenTest.setPipelineId(pipelineId);
+                mavenTest.setTestState(runState);
+                mavenTestService.updateMavenTest(mavenTest);
+                skip = true;
+                runResult  = false;
+            }
         }
+
+
+        //读取err执行信息
+        inputStreamReader = PipelineUtil.encode(errInputStream, UTF_8);
+        bufferedReader = new BufferedReader(inputStreamReader);
+
+        while ((s = bufferedReader.readLine()) != null) {
+            String s1 = tasksInstanceService.validStatus(s, error);
+            if (!Objects.isNull(s1)){
+                state = false ;
+                tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4) + s1);
+            }
+            tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4) + s);
+        }
+
+        // 关闭
+        inputStreamReader.close();
+        bufferedReader.close();
+
         process.destroy();
-        return list;
+        return state;
     }
 
-    /**
-     * 执行build
-     * @param taskTest 执行信息
-     * @param path 项目地址
-     * @return 执行命令
-     */
-    private Process getOrder(TaskTest taskTest, String testOrder, String path ) throws ApplicationException, IOException {
-        String type = taskTest.getType();
-        String order ;
-        if ( type.equals(TASK_TEST_MAVENTEST)) {
-            Scm pipelineScm = scmService.findOnePipelineScm(21);
+    private MavenTest reloadMavenTestResult(String s){
+        MavenTest mavenTest = new MavenTest();
 
-            if (Objects.isNull(pipelineScm)) {
-                throw new ApplicationException(PipelineUtil.date(4)+"不存在maven配置");
+        String[] split = s.split(", ");
+
+        for (int i = 0; i < split.length; i++) {
+            if (i > 3){
+                continue;
             }
-            String mavenAddress = pipelineScm.getScmAddress();
-            PipelineUtil.validFile(mavenAddress,TASK_TEST_MAVENTEST);
-            order = testOrder(testOrder, path);
-            return PipelineUtil.process(mavenAddress, order);
-        }else {
-            throw  new ApplicationException(PipelineUtil.date(4)+"未知的任务类型");
+            String[] split1 = split[i].split(": ");
+            if (split1[0].contains("run")){
+                mavenTest.setAllNumber(split1[1]);
+            }
+            if (split1[0].contains("Failures")){
+                mavenTest.setFailNumber(split1[1]);
+            }
+            if (split1[0].contains("Errors")){
+                mavenTest.setErrorNumber(split1[1]);
+            }
+            if (split1[0].contains("Skipped")){
+                mavenTest.setSkipNumber(split1[1]);
+            }
         }
+
+        if (s.contains("<<< FAILURE!")){
+            mavenTest.setTestState(RUN_ERROR);
+        }else {
+            mavenTest.setTestState(RUN_SUCCESS);
+        }
+
+        if (!s.contains(" - in ")){
+            return mavenTest;
+        }
+
+        String[] packagePath = s.split(" - in ");
+        mavenTest.setPackagePath(packagePath[1]);
+        String[] split2 = packagePath[1].split("\\.");
+        mavenTest.setName(split2[split2.length-1]);
+        return mavenTest;
     }
 
     /**

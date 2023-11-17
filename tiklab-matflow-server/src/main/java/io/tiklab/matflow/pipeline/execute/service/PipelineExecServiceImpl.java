@@ -171,7 +171,7 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
         String pipelineId = pipeline.getId();
         pipeline.setState(2);
         pipelineService.updatePipeline(pipeline);
-        logger.info("流水线{}开始运行",pipeline.getName());
+        logger.warn("流水线{}开始运行",pipeline.getName());
         PipelineInstance pipelineInstance = pipelineInstanceService.initializeInstance(runMsg);
         String instanceId = pipelineInstance.getInstanceId();
 
@@ -333,7 +333,7 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
         // 发送流水线运行消息
         sendPipelineRunMessage(pipeline,state);
 
-        logger.info("流水线：" +pipeline.getName() + "运行完成...");
+        logger.warn("流水线：" +pipeline.getName() + "运行完成...");
     }
 
     public void stop(String pipelineId){
