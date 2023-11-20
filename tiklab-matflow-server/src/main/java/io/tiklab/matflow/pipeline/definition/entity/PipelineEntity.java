@@ -43,6 +43,29 @@ public class PipelineEntity {
     @Column(name="color")
     private int color;
 
+    @Column(name="env_id")
+    private String envId;
+
+    @Column(name="group_id")
+    private String groupId;
+
+    public String getEnvId() {
+        return envId;
+    }
+
+    public PipelineEntity setEnvId(String envId) {
+        this.envId = envId;
+        return this;
+    }
+
+    public String getGroupId() {
+        return groupId;
+    }
+
+    public PipelineEntity setGroupId(String groupId) {
+        this.groupId = groupId;
+        return this;
+    }
 
     public String getId() {
         return id;

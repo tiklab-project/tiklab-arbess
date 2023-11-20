@@ -44,6 +44,7 @@ public class MatFlowDsmAutoConfiguration {
                 "pip-scan-spotbugs_1.0.0",
                 "pip-host-group_1.0.0",
                 "pip-maven-test_1.0.0",
+                "pip-setting-envorgroup_1.0.0"
         });
         dsmConfig.newVersion("1.0.1", new String[]{
                 "pip-project_1.0.1",

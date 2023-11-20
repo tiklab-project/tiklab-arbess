@@ -2,6 +2,7 @@ package io.tiklab.matflow.setting.controller;
 
 import io.tiklab.core.Result;
 import io.tiklab.matflow.setting.model.AuthHostGroup;
+import io.tiklab.matflow.setting.model.AuthHostGroupQuery;
 import io.tiklab.matflow.setting.service.AuthHostGroupService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -85,8 +86,8 @@ public class AuthHostGroupController {
      * @pi.param:name=userId;dataType=string;value=aliyun;
      */
     @RequestMapping(path="/findHostGroupList",method = RequestMethod.POST)
-    public Result<List<AuthHostGroup>> findHostGroupList(@NotNull String userId) {
-        List<AuthHostGroup> authHostGroupList = authHostGroupService.findHostGroupList(userId);
+    public Result<List<AuthHostGroup>> findHostGroupList(@RequestBody @NotNull @Valid  AuthHostGroupQuery groupQuery) {
+        List<AuthHostGroup> authHostGroupList = authHostGroupService.findHostGroupList(groupQuery);
         return Result.ok(authHostGroupList);
     }
 

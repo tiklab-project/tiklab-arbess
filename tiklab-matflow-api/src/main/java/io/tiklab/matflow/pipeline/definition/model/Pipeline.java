@@ -8,6 +8,8 @@ import io.tiklab.join.annotation.Join;
 import io.tiklab.join.annotation.JoinQuery;
 
 
+import io.tiklab.matflow.setting.model.Env;
+import io.tiklab.matflow.setting.model.Group;
 import io.tiklab.privilege.role.model.PatchUser;
 import io.tiklab.user.user.model.User;
 
@@ -47,6 +49,27 @@ public class Pipeline {
     })
     @JoinQuery(key = "id")
     private User user;
+
+
+    /**
+     * @pi.model:Env
+     * @pi.desc:环境
+     */
+    @Mappings({
+            @Mapping(source = "env.id",target = "envId")
+    })
+    @JoinQuery(key = "id")
+    private Env env;
+
+    /**
+     * @pi.model:Env
+     * @pi.desc:环境
+     */
+    @Mappings({
+            @Mapping(source = "group.id",target = "groupId")
+    })
+    @JoinQuery(key = "id")
+    private Group group;
 
     /**
      * @pi.name:createTime
@@ -162,6 +185,24 @@ public class Pipeline {
 
     public Pipeline(String id) {
         this.id = id;
+    }
+
+    public Env getEnv() {
+        return env;
+    }
+
+    public Pipeline setEnv(Env env) {
+        this.env = env;
+        return this;
+    }
+
+    public Group getGroup() {
+        return group;
+    }
+
+    public Pipeline setGroup(Group group) {
+        this.group = group;
+        return this;
     }
 
     public String getId() {

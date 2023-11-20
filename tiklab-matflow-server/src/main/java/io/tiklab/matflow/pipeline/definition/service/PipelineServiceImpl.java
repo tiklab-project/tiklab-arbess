@@ -203,6 +203,9 @@ public class PipelineServiceImpl implements PipelineService {
             flow.setState(pipeline.getState());
         }
 
+        flow.setEnv(pipeline.getEnv());
+        flow.setGroup(pipeline.getGroup());
+
         PipelineEntity pipelineEntity = BeanMapper.map(flow, PipelineEntity.class);
         pipelineDao.updatePipeline(pipelineEntity);
 

@@ -37,6 +37,13 @@ public class PipelineQuery {
 
     private boolean eqName;
 
+    // 环境
+    private String envId;
+
+    // 分组
+    private String groupId;
+
+
     //@ApiProperty(name ="pageParam",desc = "分页参数")
     private Page pageParam= new Page();
 
@@ -44,6 +51,24 @@ public class PipelineQuery {
     // private List<Order> orderParams = OrderBuilders.instance().desc("createTime").get();
     private List<Order> orderParams = OrderBuilders.instance().desc("name").get();
 
+
+    public String getEnvId() {
+        return envId;
+    }
+
+    public PipelineQuery setEnvId(String envId) {
+        this.envId = envId;
+        return this;
+    }
+
+    public String getGroupId() {
+        return groupId;
+    }
+
+    public PipelineQuery setGroupId(String groupId) {
+        this.groupId = groupId;
+        return this;
+    }
 
     public String getUserId() {
         return userId;

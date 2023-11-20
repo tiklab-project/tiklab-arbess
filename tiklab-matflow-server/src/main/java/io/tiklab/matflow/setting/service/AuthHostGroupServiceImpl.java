@@ -4,7 +4,9 @@ import io.tiklab.join.JoinTemplate;
 import io.tiklab.matflow.setting.dao.AuthHostGroupDao;
 import io.tiklab.matflow.setting.model.AuthHostGroup;
 import io.tiklab.matflow.setting.model.AuthHostGroupDetails;
+import io.tiklab.matflow.setting.model.AuthHostGroupQuery;
 import io.tiklab.matflow.support.util.PipelineUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -91,8 +93,9 @@ public class AuthHostGroupServiceImpl implements AuthHostGroupService {
     }
 
     @Override
-    public List<AuthHostGroup> findHostGroupList(String userId) {
-        List<AuthHostGroup>  hostGroupList = authHostGroupDao.findHostGroupList(userId);
+    public List<AuthHostGroup> findHostGroupList(AuthHostGroupQuery groupQuery) {
+        List<AuthHostGroup>   hostGroupList = authHostGroupDao.findHostGroupList(groupQuery);
+
         for (AuthHostGroup authHostGroup : hostGroupList) {
             String groupId = authHostGroup.getGroupId();
             List<AuthHostGroupDetails> hostGroupDetailsList = groupDetailsService.findHostGroupDetailsList(groupId);

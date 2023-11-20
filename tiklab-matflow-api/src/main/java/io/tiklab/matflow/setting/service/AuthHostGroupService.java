@@ -1,6 +1,7 @@
 package io.tiklab.matflow.setting.service;
 
 import io.tiklab.matflow.setting.model.AuthHostGroup;
+import io.tiklab.matflow.setting.model.AuthHostGroupQuery;
 
 import java.util.List;
 
@@ -26,7 +27,7 @@ public interface AuthHostGroupService {
      List<AuthHostGroup> findAllHostGroup() ;
 
     
-     List<AuthHostGroup> findHostGroupList(String userId) ;
+     List<AuthHostGroup> findHostGroupList(AuthHostGroupQuery groupQuery) ;
     
     
 }

@@ -246,11 +246,11 @@ public class TaskCodeScanExecServiceImpl implements TaskCodeScanExecService {
         return true;
     }
 
-    private String findSpotbugsAddress(){
+    public String findSpotbugsAddress(){
         String appHome = AppHomeContext.getAppHome();
         String path;
         if ("null".equals(spotbugsAddress)){
-            path = new File(appHome).getParentFile().getParent();
+            path = new File(appHome).getParentFile().getParent()+"/embbed/spotbugs-4.8.1/bin";
         }else {
             path =  appHome + spotbugsAddress;
         }

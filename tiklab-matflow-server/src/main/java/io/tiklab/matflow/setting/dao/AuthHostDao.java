@@ -80,9 +80,7 @@ public class AuthHostDao {
         String type = hostQuery.getType();
 
         sql.append( " select * from pip_auth_host ")
-                .append( "where ((auth_public = ").append(2)
-                .append( " and user_id = '").append(hostQuery.getUserId()).append("')") //查询用户私有的主机
-                .append(" or ( auth_public = ").append(1).append("))"); //查询公共的主机
+                .append( "where 1 = 1");
         if (!type.equals("all")){
             sql.append(" and type = '").append(hostQuery.getType()).append("'"); // 根据类型查询
         }

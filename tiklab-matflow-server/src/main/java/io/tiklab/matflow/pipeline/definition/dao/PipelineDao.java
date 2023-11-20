@@ -113,6 +113,8 @@ public class PipelineDao {
                 .eq("userId", query.getUserId())
                 .eq("type", query.getPipelineType())
                 .eq("state", query.getPipelineState())
+                .eq("envId",query.getEnvId())
+                .eq("groupId",query.getGroupId())
                 .eq("power", query.getPipelinePower());
                 if (query.isEqName()){
                     queryBuilders.eq("name",query.getPipelineName());
@@ -131,6 +133,8 @@ public class PipelineDao {
                 .eq("type",query.getPipelineType())
                 .eq("state",query.getPipelineState())
                 .eq("power",query.getPipelinePower())
+                .eq("envId",query.getEnvId())
+                .eq("groupId",query.getGroupId())
                 .like("name",query.getPipelineName())
                 .in("id",query.getIdString())
                 .pagination(query.getPageParam())

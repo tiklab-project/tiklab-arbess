@@ -10,6 +10,6 @@ create table IF NOT EXISTS pip_test_maven_test  (
     package_path varchar(256),
     name varchar(256),
     test_id varchar(256),
-    message varchar(256),
+    message varchar(5000),
     create_time varchar(256)
 );

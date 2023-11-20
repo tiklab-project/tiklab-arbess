@@ -1,22 +1,23 @@
 package io.tiklab.matflow.setting.model;
 
-
+import io.tiklab.beans.annotation.Mapper;
 import io.tiklab.core.order.Order;
 import io.tiklab.core.order.OrderBuilders;
 import io.tiklab.core.page.Page;
+import io.tiklab.join.annotation.Join;
 
 import java.util.List;
 
-public class AuthHostQuery {
 
+public class EnvQuery {
+
+    // 环境名称
+    private String envName;
+
+
+    // 用户ID
     private String userId;
 
-
-    private String type;
-
-    private String name;
-
-    private String ip;
 
     //@ApiProperty(name ="pageParam",desc = "分页参数")
     private Page pageParam= new Page();
@@ -25,22 +26,12 @@ public class AuthHostQuery {
     private List<Order> orderParams = OrderBuilders.instance().desc("createTime").get();
 
 
-
-    public String getName() {
-        return name;
+    public String getEnvName() {
+        return envName;
     }
 
-    public AuthHostQuery setName(String name) {
-        this.name = name;
-        return this;
-    }
-
-    public String getIp() {
-        return ip;
-    }
-
-    public AuthHostQuery setIp(String ip) {
-        this.ip = ip;
+    public EnvQuery setEnvName(String envName) {
+        this.envName = envName;
         return this;
     }
 
@@ -48,17 +39,8 @@ public class AuthHostQuery {
         return userId;
     }
 
-    public AuthHostQuery setUserId(String userId) {
+    public EnvQuery setUserId(String userId) {
         this.userId = userId;
-        return this;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public AuthHostQuery setType(String type) {
-        this.type = type;
         return this;
     }
 
@@ -66,7 +48,7 @@ public class AuthHostQuery {
         return pageParam;
     }
 
-    public AuthHostQuery setPageParam(Page pageParam) {
+    public EnvQuery setPageParam(Page pageParam) {
         this.pageParam = pageParam;
         return this;
     }
@@ -75,7 +57,7 @@ public class AuthHostQuery {
         return orderParams;
     }
 
-    public AuthHostQuery setOrderParams(List<Order> orderParams) {
+    public EnvQuery setOrderParams(List<Order> orderParams) {
         this.orderParams = orderParams;
         return this;
     }

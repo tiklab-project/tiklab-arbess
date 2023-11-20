@@ -9,6 +9,7 @@ import io.tiklab.dal.jpa.criterial.condition.QueryCondition;
 import io.tiklab.dal.jpa.criterial.conditionbuilder.QueryBuilders;
 import io.tiklab.matflow.setting.entity.AuthHostGroupEntity;
 import io.tiklab.matflow.setting.model.AuthHostGroup;
+import io.tiklab.matflow.setting.model.AuthHostGroupQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import java.util.Collections;
@@ -56,10 +57,11 @@ public class AuthHostGroupDao {
     }
 
 
-    public List<AuthHostGroup> findHostGroupList(String userId) {
+    public List<AuthHostGroup> findHostGroupList(AuthHostGroupQuery groupQuery) {
         QueryBuilders queryBuilders = QueryBuilders.createQuery(AuthHostGroupEntity.class)
-                .eq("userId", userId);
-        QueryCondition queryCondition = queryBuilders.orders(OrderBuilders.instance().desc("createTime").get())
+                .eq("userId", groupQuery.getUserId());
+        QueryCondition queryCondition = queryBuilders
+                .orders(OrderBuilders.instance().desc("createTime").get())
                 .get();
         List<AuthHostGroupEntity> scanEntityList = jpaTemplate.findList(queryCondition, AuthHostGroupEntity.class);
 
