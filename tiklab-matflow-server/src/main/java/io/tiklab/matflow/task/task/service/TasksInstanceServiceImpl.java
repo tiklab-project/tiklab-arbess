@@ -2,6 +2,7 @@ package io.tiklab.matflow.task.task.service;
 
 
 import io.tiklab.beans.BeanMapper;
+import io.tiklab.matflow.pipeline.execute.service.PipelineExecServiceImpl;
 import io.tiklab.matflow.support.postprocess.model.PostprocessInstance;
 import io.tiklab.matflow.support.postprocess.service.PostprocessInstanceService;
 import io.tiklab.matflow.support.util.PipelineFileUtil;
@@ -11,11 +12,14 @@ import io.tiklab.matflow.task.task.dao.TaskInstanceDao;
 import io.tiklab.matflow.task.task.entity.TaskInstanceEntity;
 import io.tiklab.matflow.task.task.model.TaskInstance;
 import io.tiklab.matflow.task.task.model.TaskInstanceQuery;
+import io.tiklab.matflow.task.test.service.TaskTestExecServiceImpl;
 import io.tiklab.rpc.annotation.Exporter;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.*;
@@ -110,7 +114,7 @@ public class TasksInstanceServiceImpl implements TasksInstanceService {
         }
         allInstance.sort(Comparator.comparing(TaskInstance::getTaskSort));
 
-        // 没有正在运行的任务是查询所有日志
+        // 没有正在运行的任务时查询所有日志
         TaskInstance taskInstance1 = allInstance.get(allInstance.size() - 1);
         String runState = taskInstance1.getRunState();
         if (!runState.equals(PipelineFinal.RUN_RUN)){
@@ -481,6 +485,7 @@ public class TasksInstanceServiceImpl implements TasksInstanceService {
         String runInstance = taskInstance2.getRunLog();
         if (runInstance.length() > 9000){
             String logAddress = taskInstance2.getLogAddress();
+            System.out.println(logAddress);
             PipelineFileUtil.logWriteFile(runInstance,logAddress);
             taskInstance2.setRunLog(null);
         }

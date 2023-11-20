@@ -238,8 +238,6 @@ public class TaskTestExecServiceImpl implements TaskTestExecService {
 
                 boolean result = readMavenTestResult(process,pipelineId,taskId,error(taskTest.getType()));
 
-                // boolean result = tasksInstanceService.readCommandExecResult(process, null, error(taskTest.getType()), taskId);
-
                 if (!result){
                     tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"任务：" + task.getTaskName()+"执行失败。");
                     return false;
@@ -253,6 +251,7 @@ public class TaskTestExecServiceImpl implements TaskTestExecService {
             tasksInstanceService.writeExecLog(taskId,e.getMessage());
             return false;
         }
+        tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"任务：" + task.getTaskName()+"执行成功。\n");
         return true;
     }
 

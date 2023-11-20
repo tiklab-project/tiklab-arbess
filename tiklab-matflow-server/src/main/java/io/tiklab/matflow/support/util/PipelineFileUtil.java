@@ -199,7 +199,7 @@ public class PipelineFileUtil {
     }
 
     /**
-     * 读取文件后100行内容
+     * 读取文件后100行内容 0读取全部
      * @param fileAddress 文件地址
      * @return 内容
      */
@@ -289,7 +289,13 @@ public class PipelineFileUtil {
         if (!folder.exists()) {
             return 0;
         }
-        long diskSpace = calculateDiskSpace(folder);
+        long diskSpace;
+        if (folder.isFile()){
+            diskSpace = folder.length();
+        }else {
+            diskSpace = calculateDiskSpace(folder);
+        }
+
         if (type.equals(PipelineFinal.SIZE_TYPE_MB)){
             // 转换成mb
             float mbSize =(float) diskSpace / (1024 * 1024);
@@ -300,7 +306,7 @@ public class PipelineFileUtil {
             return mbSize;
         }else {
             // 转换成gb
-            float gbSize = (float)diskSpace / (1024 * 1024 *  1024);
+            float gbSize = (float)diskSpace / (1024 * 1024 * 1024);
             BigDecimal decimalL = new BigDecimal(Float.toString(gbSize));
             decimalL = decimalL.setScale(2, RoundingMode.HALF_UP);
             gbSize = decimalL.floatValue();

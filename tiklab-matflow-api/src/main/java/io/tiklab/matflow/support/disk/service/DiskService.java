@@ -2,19 +2,21 @@ package io.tiklab.matflow.support.disk.service;
 
 import io.tiklab.matflow.support.disk.model.Disk;
 
+import java.util.List;
+
 public interface DiskService {
 
 
     Boolean deleteDisk(String pipelineId);
 
 
-    void ValidationStorageSpace();
+    void validationStorageSpace();
 
 
-    Disk findDiskList();
+    List<Disk> findDiskList();
 
 
-    void cleanDisk(Disk disk);
+    void cleanDisk(String fileList);
 
 
 }

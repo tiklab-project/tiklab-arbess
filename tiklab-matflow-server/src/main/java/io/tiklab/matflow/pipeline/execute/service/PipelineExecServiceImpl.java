@@ -13,19 +13,24 @@ import io.tiklab.matflow.setting.service.ResourcesService;
 import io.tiklab.matflow.stages.service.StageExecService;
 import io.tiklab.matflow.support.disk.service.DiskService;
 import io.tiklab.matflow.support.postprocess.service.PostprocessExecService;
+import io.tiklab.matflow.support.util.PipelineFileUtil;
 import io.tiklab.matflow.support.util.PipelineFinal;
+import io.tiklab.matflow.support.util.PipelineUtil;
 import io.tiklab.matflow.support.util.PipelineUtilService;
 import io.tiklab.matflow.support.version.service.PipelineVersionService;
 import io.tiklab.matflow.task.task.model.TaskExecMessage;
+import io.tiklab.matflow.task.task.model.TaskInstance;
 import io.tiklab.matflow.task.task.model.Tasks;
 import io.tiklab.matflow.task.task.service.TasksExecService;
 import io.tiklab.matflow.task.task.service.TasksService;
 import io.tiklab.rpc.annotation.Exporter;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
@@ -96,7 +101,7 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
     @Override
     public PipelineInstance start(PipelineRunMsg runMsg) {
 
-        // diskService.ValidationStorageSpace();
+        diskService.validationStorageSpace();
 
         resourcesService.judgeResources();
 
@@ -204,6 +209,7 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
         executorService.submit((Callable<Object>) () -> {
             try {
                 Thread.currentThread().setName(pipelineId);
+
                 boolean b = true;
                 int type = pipeline.getType();
 
@@ -437,7 +443,6 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
       return instanceIdOrInstance.get(instanceId);
     }
 
-
     /**
      * 获取流水线对应的实例id
      * @param pipelineId 流水线
@@ -455,7 +460,6 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
         pipelineIdOrInstanceId.put(pipelineId, instanceId);
     }
 
-
     /**
      * 清除内存中的流水线缓存
      * @param pipelineId 流水线id
@@ -470,7 +474,6 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
         // 停止时间计时器
         // tasksExecService.stopThread(pipelineId);
     }
-
 
     // 发送消息
     public void sendPipelineRunMessage(Pipeline pipeline,Boolean state){

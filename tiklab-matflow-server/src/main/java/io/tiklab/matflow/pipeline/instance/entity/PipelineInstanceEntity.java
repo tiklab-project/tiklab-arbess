@@ -45,6 +45,7 @@ public class PipelineInstanceEntity {
     @Column(name = "find_number", notNull = true)
     private int findNumber;
 
+
     public String getInstanceId() {
         return instanceId;
     }

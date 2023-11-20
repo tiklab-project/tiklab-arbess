@@ -16,10 +16,12 @@ import io.tiklab.matflow.task.build.model.TaskBuildProductQuery;
 import io.tiklab.matflow.task.build.service.TaskBuildProductService;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static io.tiklab.matflow.support.util.PipelineFinal.SIZE_TYPE_GB;
 import static io.tiklab.matflow.support.util.PipelineFinal.SIZE_TYPE_MB;
@@ -40,6 +42,9 @@ public class DiskServiceImpl implements DiskService {
     @Autowired
     TaskBuildProductService buildProductService;
 
+    @Value("${matflow.cache.size:20}")
+    private Integer size;
+
     @Override
     public Boolean deleteDisk(String pipelineId) {
         String defaultAddress = utilService.instanceAddress(1);
@@ -48,107 +53,76 @@ public class DiskServiceImpl implements DiskService {
     }
 
     @Override
-    public void ValidationStorageSpace(){
+    public void validationStorageSpace(){
+
         // throw new SystemException(9000,"系统空间不足，请先清理过后在运行!");
 
-       String defaultAddress = utilService.instanceAddress(1);
+       String codeAddress = utilService.instanceAddress(1);
+       String logAddress = utilService.instanceAddress(2);
 
-       File file = new File(defaultAddress);
+       float diskSize = PipelineFileUtil.findDiskSize(logAddress);
 
-       File parentFile = file.getParentFile();
-       String dir = parentFile.getAbsolutePath();
 
-       float diskSize = PipelineFileUtil.findDiskSize(dir);
+       float dirSize = PipelineFileUtil.findDirSize(codeAddress, SIZE_TYPE_GB);
+       float logDirSize = PipelineFileUtil.findDirSize(logAddress, SIZE_TYPE_GB);
 
-       float dirSize = PipelineFileUtil.findDirSize(dir, SIZE_TYPE_GB);
-
-       if ((diskSize - dirSize) < PipelineFinal.DEFAULT_SIZE){
+       if ((diskSize - dirSize - logDirSize) < PipelineFinal.DEFAULT_SIZE){
             throw new SystemException(9000,"系统空间不足，请先清理过后在运行!");
        }
    }
 
     @Override
-    public Disk findDiskList(){
+    public List<Disk> findDiskList(){
 
-        Disk disk = new Disk();
-
-        String defaultAddress = utilService.instanceAddress(1);
+        String defaultAddress = utilService.instanceAddress(2);
         File file = new File(defaultAddress);
 
-        File parentFile = file.getParentFile();
-        String dir = parentFile.getAbsolutePath();
-
-        float diskSize = PipelineFileUtil.findDiskSize(dir);
-
+        List<File> largeFiles = new ArrayList<>();
+        getLargeFiles(file, largeFiles);
         List<Disk> list = new ArrayList<>();
-        List<Pipeline> userPipeline = pipelineService.findUserPipeline();
-        for (Pipeline pipeline : userPipeline) {
+        for (File largeFile : largeFiles) {
+            String type = SIZE_TYPE_MB ;
+            if (largeFile.length() > 1024 * 1024 * 1024){
+                type = SIZE_TYPE_GB;
+            }
+            String absolutePath = largeFile.getAbsolutePath();
             Disk disks = new Disk();
-            String name = pipeline.getName();
-            String pipelineId = pipeline.getId();
-            List<PipelineInstance> instanceList = instanceService.findPipelineAllInstance(pipelineId);
-
-            float size = 0;
-            for (PipelineInstance instance : instanceList) {
-                String runStatus = instance.getRunStatus();
-                if (runStatus.equals(PipelineFinal.RUN_RUN)){
-                    continue;
-                }
-                TaskBuildProductQuery taskBuildProductQuery = new TaskBuildProductQuery();
-                taskBuildProductQuery.setInstanceId(instance.getInstanceId());
-                taskBuildProductQuery.setKey(PipelineFinal.DEFAULT_ARTIFACT_ADDRESS);
-                List<TaskBuildProduct> buildProductList = buildProductService.findBuildProductList(taskBuildProductQuery);
-                if (buildProductList.isEmpty()){
-                    continue;
-                }
-                TaskBuildProduct taskBuildProduct = buildProductList.get(0);
-
-                String value = taskBuildProduct.getValue();
-                size = size +  PipelineFileUtil.findDirSize(value, SIZE_TYPE_GB);
-            }
-            if (size == 0){
-                continue;
-            }
-            String userSize = "0";
-            if (size < 1){
-                userSize = size * 1024 + SIZE_TYPE_MB;
-            }else {
-                userSize = size + SIZE_TYPE_GB;
-            }
-            disks.setName(name).setUserSize(userSize).setPipelineId(pipelineId);
+            float dirSize = PipelineFileUtil.findDirSize(absolutePath, type);
+            String replace = absolutePath.replace(defaultAddress, "..");
+            disks.setName(largeFile.getName())
+                    .setUserSize(dirSize+"."+type)
+                    .setPath(absolutePath)
+                    .setFilePath(replace);
             list.add(disks);
         }
-       disk.setDiskSize(diskSize + SIZE_TYPE_GB);
-       return disk.setDiskList(list);
+       return list;
    }
 
-    @Override
-    public void cleanDisk(Disk disk) {
-        List<String> pipelineList = disk.getPipelineList();
-        for (String pipelineId : pipelineList) {
-            List<PipelineInstance> instanceList = instanceService.findPipelineAllInstance(pipelineId);
-            for (PipelineInstance instance : instanceList) {
-                String runStatus = instance.getRunStatus();
-                if (runStatus.equals(PipelineFinal.RUN_RUN)){
-                    continue;
-                }
-                TaskBuildProductQuery taskBuildProductQuery = new TaskBuildProductQuery();
-                taskBuildProductQuery.setInstanceId(instance.getInstanceId());
-                List<TaskBuildProduct> buildProductList = buildProductService.findBuildProductList(taskBuildProductQuery);
-                if (buildProductList.isEmpty()){
-                    continue;
-                }
-
-                for (TaskBuildProduct taskBuildProduct : buildProductList) {
-                    String key = taskBuildProduct.getKey();
-                    if (key.equals(PipelineFinal.DEFAULT_ARTIFACT_ADDRESS)){
-                        String value = taskBuildProduct.getValue();
-                        FileUtils.deleteQuietly(new File(value));
-                    }
-                    String id = taskBuildProduct.getId();
-                    buildProductService.deleteBuildProduct(id);
+    public void getLargeFiles(File dir, List<File> largeFiles) {
+        File[] files = dir.listFiles();
+        if (files != null) {
+            for (File file : files) {
+                long length = file.length();
+                if (file.isFile() && length >= size * 1024 * 1024) {
+                    largeFiles.add(file);
+                } else if (file.isDirectory()) {
+                    getLargeFiles(file, largeFiles); // 递归调用
                 }
             }
+        }
+    }
+
+    @Override
+    public void cleanDisk(String fileList) {
+
+        String[] split = fileList.split(",");
+
+        for (String string : split) {
+            File file = new File(string);
+            if (!file.exists() || !file.isFile()){
+                continue;
+            }
+            file.delete();
         }
     }
 

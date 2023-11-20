@@ -34,14 +34,14 @@ public class DiskController {
      * @pi.param: model=postprocess
      */
     @RequestMapping(path="/findDiskList",method = RequestMethod.POST)
-    public Result<String> createPost(){
-        Disk disk = diskService.findDiskList();
+    public Result<List<Disk>> createPost(){
+        List<Disk> disk = diskService.findDiskList();
         return Result.ok(disk);
     }
 
     @RequestMapping(path="/cleanDisk",method = RequestMethod.POST)
-    public Result<Void> cleanDisk(@RequestBody @Valid @NotNull Disk disk){
-        diskService.cleanDisk(disk);
+    public Result<Void> cleanDisk( String fileList){
+        diskService.cleanDisk(fileList);
         return Result.ok();
     }
 

@@ -8,33 +8,29 @@ public class Disk {
 
     private String dirSize;
 
-
     private String diskSize;
 
     private String userSize;
 
-    private String pipelineId;
+    private String path;
 
-    private List<String> pipelineList;
+    private String filePath;
 
-
-    private List<Disk> diskList;
-
-    public String getPipelineId() {
-        return pipelineId;
+    public String getFilePath() {
+        return filePath;
     }
 
-    public Disk setPipelineId(String pipelineId) {
-        this.pipelineId = pipelineId;
+    public Disk setFilePath(String filePath) {
+        this.filePath = filePath;
         return this;
     }
 
-    public List<Disk> getDiskList() {
-        return diskList;
+    public String getPath() {
+        return path;
     }
 
-    public Disk setDiskList(List<Disk> diskList) {
-        this.diskList = diskList;
+    public Disk setPath(String path) {
+        this.path = path;
         return this;
     }
 
@@ -71,15 +67,6 @@ public class Disk {
 
     public Disk setUserSize(String userSize) {
         this.userSize = userSize;
-        return this;
-    }
-
-    public List<String> getPipelineList() {
-        return pipelineList;
-    }
-
-    public Disk setPipelineList(List<String> pipelineList) {
-        this.pipelineList = pipelineList;
         return this;
     }
 }

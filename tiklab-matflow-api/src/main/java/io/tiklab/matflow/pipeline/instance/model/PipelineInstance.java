@@ -53,13 +53,23 @@ public class PipelineInstance {
     //@ApiProperty(name="findNumber",desc="构建次数")
     private int findNumber;
 
-
-
     //@ApiProperty(name="runTimeDate",desc ="运行时间")
     private String runTimeDate;
 
+    //@ApiProperty(name="runTimeDate",desc ="日志文件")
+    private String logPath;
+
 
     public PipelineInstance() {
+    }
+
+    public String getLogPath() {
+        return logPath;
+    }
+
+    public PipelineInstance setLogPath(String logPath) {
+        this.logPath = logPath;
+        return this;
     }
 
     /**
