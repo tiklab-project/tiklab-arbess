@@ -15,6 +15,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 
+import static io.tiklab.matflow.support.util.PipelineFinal.DEFAULT;
+
 
 @Service
 @Exporter
@@ -29,7 +31,7 @@ public class TriggerTimeServiceImpl implements TriggerTimeService {
     @Override
     public String createTriggerTime(TriggerTime triggerTime, String pipelineId){
         List<Integer> timeList = triggerTime.getTimeList();
-        if (timeList == null || timeList.size() == 0){
+        if (timeList == null || timeList.isEmpty()){
             throw new ApplicationException(50001,"无法获取到执行时间");
         }
         String time = triggerTime.getTime();
@@ -37,8 +39,9 @@ public class TriggerTimeServiceImpl implements TriggerTimeService {
         String cron = CronUtils.weekCron(time, triggerTime.getDayTime());
         triggerTime.setCron(cron);
         try {
-            manager.addJob(pipelineId, RunJob.class,cron);
+            manager.addJob(DEFAULT,pipelineId, RunJob.class,cron);
         } catch (SchedulerException e) {
+            e.printStackTrace();
             throw new ApplicationException(50001,"当前时间已经添加过，无需重复添加。");
         }
         TriggerTimeEntity triggerTimeEntity = BeanMapper.map(triggerTime, TriggerTimeEntity.class);
@@ -48,7 +51,7 @@ public class TriggerTimeServiceImpl implements TriggerTimeService {
     @Override
     public TriggerTime findTriggerTime(String configId){
         List<TriggerTime> allTriggerTime = findAllTriggerTime(configId);
-        if (allTriggerTime == null || allTriggerTime.size() == 0){
+        if (allTriggerTime == null || allTriggerTime.isEmpty()){
             return null;
         }
 
@@ -56,7 +59,6 @@ public class TriggerTimeServiceImpl implements TriggerTimeService {
         List<Integer> allDataConfig = findAllDataConfig(configId);
 
         StringBuilder execTime = new StringBuilder();
-
         for (Integer integer : allDataConfig) {
             TriggerTime triggerTime = findOneConfig(configId, integer);
             triggerTime.setTimeList(allDataConfig);
@@ -150,17 +152,17 @@ public class TriggerTimeServiceImpl implements TriggerTimeService {
         }
         for (TriggerTime triggerTime : triggerTimeConfig) {
             String cron = triggerTime.getCron();
-            manager.removeJob(pipelineId, cron);
+            manager.removeJob(DEFAULT,pipelineId, cron);
             deleteTime(triggerTime.getTimeId());
         }
     }
 
     @Override
-    public void deleteCronTime(String pipelineId,String timeId){
+    public Boolean deleteCronTime(String pipelineId,String timeId){
         TriggerTime oneTriggerTime = findOneTime(timeId);
         if (oneTriggerTime.getTaskType() == 1){
-            deleteTime(timeId);
-            return;
+            // deleteTime(timeId);
+            return true;
         }
         String cron = oneTriggerTime.getCron();
         String[] s = cron.split(" ");
@@ -169,11 +171,12 @@ public class TriggerTimeServiceImpl implements TriggerTimeService {
         String weekCron = CronUtils.weekCron(time, date);
         oneTriggerTime.setCron(weekCron);
         try {
-            manager.addJob(pipelineId, RunJob.class,weekCron);
+            manager.addJob(DEFAULT,pipelineId, RunJob.class,weekCron);
         } catch (SchedulerException e) {
             throw new ApplicationException(50001,"当前时间已经添加过，无需重复添加。");
         }
         updateTime(oneTriggerTime);
+        return false;
     }
 
     @Override

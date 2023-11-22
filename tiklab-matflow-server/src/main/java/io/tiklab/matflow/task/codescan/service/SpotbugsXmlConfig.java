@@ -497,7 +497,6 @@ public class SpotbugsXmlConfig {
             if (!javaPath.endsWith(".java")){
                 continue;
             }
-            System.out.println(javaPath.replace(filePath,""));
             String name = new File(javaPath).getName();
 
             if (StringUtils.isEmpty(map.get(name))){

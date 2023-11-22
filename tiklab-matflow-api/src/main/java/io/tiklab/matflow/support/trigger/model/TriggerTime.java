@@ -50,6 +50,16 @@ public class TriggerTime {
     //@ApiProperty(name="name",desc="名称")
     private String name;
 
+    private String state;
+
+    public String getState() {
+        return state;
+    }
+
+    public TriggerTime setState(String state) {
+        this.state = state;
+        return this;
+    }
 
     public Integer getDayTime() {
         return dayTime;

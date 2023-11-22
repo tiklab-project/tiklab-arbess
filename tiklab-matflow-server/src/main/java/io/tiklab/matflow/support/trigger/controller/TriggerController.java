@@ -2,6 +2,7 @@ package io.tiklab.matflow.support.trigger.controller;
 
 import io.tiklab.core.Result;
 import io.tiklab.matflow.support.trigger.model.Trigger;
+import io.tiklab.matflow.support.trigger.model.TriggerQuery;
 import io.tiklab.matflow.support.trigger.service.TriggerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -71,8 +72,8 @@ public class TriggerController {
      * @pi.param: name=pipelineId;dataType=string;value=pipelineId;
      */
     @RequestMapping(path="/findAllTrigger",method = RequestMethod.POST)
-    public Result<List<Object>> findAllTrigger(@NotNull String pipelineId) {
-        List<Object> list = triggerServer.findAllTrigger(pipelineId);
+    public Result<List<Object>> findAllTrigger(@RequestBody @Valid@NotNull TriggerQuery triggerQuery) {
+        List<Object> list = triggerServer.findAllTrigger(triggerQuery);
         return Result.ok(list);
     }
 

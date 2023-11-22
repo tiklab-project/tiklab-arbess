@@ -7,6 +7,7 @@ import io.tiklab.beans.BeanMapper;
 import io.tiklab.core.exception.ApplicationException;
 import io.tiklab.join.JoinTemplate;
 import io.tiklab.matflow.pipeline.definition.model.Pipeline;
+import io.tiklab.matflow.support.trigger.model.TriggerQuery;
 import io.tiklab.matflow.support.trigger.model.TriggerTime;
 import io.tiklab.matflow.support.trigger.model.Trigger;
 import io.tiklab.matflow.support.util.PipelineUtil;
@@ -14,10 +15,7 @@ import io.tiklab.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Service
 @Exporter
@@ -42,43 +40,30 @@ public class TriggerServiceImpl implements TriggerService {
     public String createTrigger(Trigger trigger) {
         trigger.setCreateTime(PipelineUtil.date(1));
         String triggerId = createTriggerConfig(trigger);
-        List<String> list = new ArrayList<>();
-        try {
-            int taskType = trigger.getTaskType();
-            Pipeline pipeline = trigger.getPipeline();
-            String pipelineId = pipeline.getId();
-            if (taskType == 81){
-                String object = JSON.toJSONString(trigger.getValues());
-                TriggerTime triggerTime = JSON.parseObject(object, TriggerTime.class);
-                List<Integer> timeList = triggerTime.getTimeList();
-                for (Integer integer : timeList) {
-                    list.add(triggerId);
-                    triggerTime.setDayTime(integer);
-                    triggerTime.setTriggerId(triggerId);
-                    timeServer.createTriggerTime(triggerTime,pipelineId);
-                }
-            }
-        }catch (ApplicationException e){
-            for (String s : list) {
-                deleteTrigger(s);
+        int taskType = trigger.getTaskType();
+        Pipeline pipeline = trigger.getPipeline();
+        String pipelineId = pipeline.getId();
+        if (taskType == 81){
+            String object = JSON.toJSONString(trigger.getValues());
+            TriggerTime triggerTime = JSON.parseObject(object, TriggerTime.class);
+            List<Integer> timeList = triggerTime.getTimeList();
+            for (Integer integer : timeList) {
+                triggerTime.setDayTime(integer);
+                triggerTime.setTriggerId(triggerId);
+                timeServer.createTriggerTime(triggerTime,pipelineId);
             }
         }
         return triggerId;
     }
 
-    /**
-     * 查询所有配置
-     * @param pipelineId 流水线id
-     * @return 配置列表
-     */
     @Override
-    public List<Object> findAllTrigger(String pipelineId){
-        List<Trigger> allTriggerConfig = findAllPipelineTrigger(pipelineId);
-        if (allTriggerConfig == null){
+    public List<Object> findAllTrigger(TriggerQuery triggerQuery){
+        List<Trigger> triggerList = findTriggerList(triggerQuery);
+        if (triggerList.isEmpty()){
             return null;
         }
         List<TriggerTime> triggerTimeList = new ArrayList<>();
-        for (Trigger trigger : allTriggerConfig) {
+        for (Trigger trigger : triggerList) {
             String triggerId = trigger.getTriggerId();
             TriggerTime triggerTime = timeServer.findTriggerTime(triggerId);
             if (triggerTime == null){
@@ -87,6 +72,7 @@ public class TriggerServiceImpl implements TriggerService {
             }
             int taskType = trigger.getTaskType();
             triggerTime.setType(taskType);
+            triggerTime.setState(trigger.getState());
             triggerTimeList.add(triggerTime);
         }
         triggerTimeList.sort(Comparator.comparing(TriggerTime::getWeekTime));
@@ -94,10 +80,12 @@ public class TriggerServiceImpl implements TriggerService {
         return new ArrayList<>(triggerTimeList);
     }
 
-
+    @Override
     public void cloneTrigger(String pipelineId,String clonePipelineId){
-        List<Trigger> allTrigger = findAllPipelineTrigger(pipelineId);
-        if (allTrigger == null){
+        TriggerQuery triggerQuery = new TriggerQuery();
+        triggerQuery.setPipelineId(pipelineId);
+        List<Trigger> allTrigger = findTriggerList(triggerQuery);
+        if (allTrigger.isEmpty()){
             return;
         }
         for (Trigger trigger : allTrigger) {
@@ -121,9 +109,12 @@ public class TriggerServiceImpl implements TriggerService {
      * 删除流水线所有定时任务
      * @param pipelineId 流水线id
      */
+    @Override
     public void deleteAllTrigger(String pipelineId){
-        List<Trigger> allTriggerConfig = findAllPipelineTrigger(pipelineId);
-        if (allTriggerConfig == null || allTriggerConfig.size() == 0){
+        TriggerQuery triggerQuery = new TriggerQuery();
+        triggerQuery.setPipelineId(pipelineId);
+        List<Trigger> allTriggerConfig = findTriggerList(triggerQuery);
+        if ( allTriggerConfig.isEmpty()){
             return;
         }
         for (Trigger trigger : allTriggerConfig) {
@@ -140,18 +131,25 @@ public class TriggerServiceImpl implements TriggerService {
      */
     @Override
     public void deleteCronConfig(String pipelineId,String cron){
-        List<Trigger> allTriggerConfig = findAllPipelineTrigger(pipelineId);
-        if (allTriggerConfig == null){
+        TriggerQuery triggerQuery = new TriggerQuery();
+        triggerQuery.setPipelineId(pipelineId);
+        List<Trigger> allTriggerConfig = findTriggerList(triggerQuery);
+        if (allTriggerConfig.isEmpty()){
             return;
         }
         for (Trigger trigger : allTriggerConfig) {
             String triggerId = trigger.getTriggerId();
 
             TriggerTime triggerTime = timeServer.fondCronConfig(triggerId, cron);
-            if (triggerTime == null){
-                return;
+            if (Objects.isNull(triggerTime)){
+                continue;
             }
-            timeServer.deleteCronTime(pipelineId, triggerTime.getTimeId());
+            Boolean state = timeServer.deleteCronTime(pipelineId, triggerTime.getTimeId());
+            if (state){
+                Trigger triggerById = findOneTriggerById(triggerId);
+                triggerById.setState("2");
+                triggerDao.updateTriggerConfig(BeanMapper.map(triggerById, TriggerEntity.class));
+            }
         }
     }
 
@@ -184,29 +182,18 @@ public class TriggerServiceImpl implements TriggerService {
 
     /**
      * 根据流水线id查询触发器配置
-     * @param pipelineId 流水线id
+     * @param triggerQuery 条件
      * @return 配置
      */
     @Override
-    public List<Trigger> findAllPipelineTrigger(String pipelineId) {
-        List<Trigger> allTriggerConfig = findAllTrigger();
-        List<Trigger> list = new ArrayList<>();
+    public List<Trigger> findTriggerList(TriggerQuery triggerQuery) {
+        List<TriggerEntity> triggerEntityList = triggerDao.findTriggerList(triggerQuery);
 
-        if (allTriggerConfig == null || allTriggerConfig.size() == 0){
-            return null;
-        }
-        if (Objects.isNull(pipelineId)){
-            return allTriggerConfig;
+        if ( triggerEntityList.isEmpty()){
+            return Collections.emptyList();
         }
 
-        for (Trigger trigger : allTriggerConfig) {
-            Pipeline pipeline = trigger.getPipeline();
-            if (!pipeline.getId().equals(pipelineId)){
-                continue;
-            }
-            list.add(trigger);
-        }
-        return list;
+        return BeanMapper.mapList(triggerEntityList, Trigger.class);
     }
 
     //创建

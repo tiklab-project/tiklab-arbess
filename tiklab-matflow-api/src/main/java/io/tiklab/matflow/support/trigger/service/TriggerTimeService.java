@@ -63,7 +63,7 @@ public interface TriggerTimeService {
      * 周期任务更新执行时间
      * @param timeId 任务id
      */
-    void deleteCronTime(String pipelineId,String timeId);
+    Boolean deleteCronTime(String pipelineId,String timeId);
 
     /**
      * 删除

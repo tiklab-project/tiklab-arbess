@@ -27,6 +27,19 @@ public class TriggerEntity {
     @Column(name = "pipeline_id")
     private String pipelineId;
 
+    @Column(name = "state")
+    private String state;
+
+
+    public String getState() {
+        return state;
+    }
+
+    public TriggerEntity setState(String state) {
+        this.state = state;
+        return this;
+    }
+
     public String getTriggerId() {
         return triggerId;
     }

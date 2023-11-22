@@ -62,7 +62,6 @@ public class DiskServiceImpl implements DiskService {
 
        float diskSize = PipelineFileUtil.findDiskSize(logAddress);
 
-
        float dirSize = PipelineFileUtil.findDirSize(codeAddress, SIZE_TYPE_GB);
        float logDirSize = PipelineFileUtil.findDirSize(logAddress, SIZE_TYPE_GB);
 

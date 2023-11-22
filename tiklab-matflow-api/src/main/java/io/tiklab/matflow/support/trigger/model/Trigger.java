@@ -44,6 +44,17 @@ public class Trigger {
     //@ApiProperty(name="values",desc="更改的数据")
     private Object values;
 
+    // 状态 1--未执行 2--已执行
+    private String state;
+
+    public String getState() {
+        return state;
+    }
+
+    public Trigger setState(String state) {
+        this.state = state;
+        return this;
+    }
 
     public String getTriggerId() {
         return triggerId;

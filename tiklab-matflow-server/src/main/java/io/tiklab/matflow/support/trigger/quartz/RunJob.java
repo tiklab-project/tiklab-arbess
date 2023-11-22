@@ -12,15 +12,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-
 @Component
 public  class RunJob implements org.quartz.Job {
 
-    private static PipelineExecService execService;
+    public static PipelineExecService execService;
 
-    private static Job job;
+    public static Job job;
 
-    private static TriggerService triggerConfigServer;
+    public static TriggerService triggerConfigServer;
 
     private static final Logger logger = LoggerFactory.getLogger(RunJob.class);
 
@@ -43,15 +42,16 @@ public  class RunJob implements org.quartz.Job {
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
         JobDataMap map = jobExecutionContext.getMergedJobDataMap();
         String pipelineId = (String)map.get("pipelineId");
+        String group = (String)map.get("group");
         String weekTime = (String)map.get("weekTime");
         String cron = (String)map.get("cron");
-        logger.warn("执行定时任务，时间："+ pipelineId +"    时间："+ weekTime+"     cron"+cron);
+        logger.warn("定时任务触发，组：{}，流水线：{} 时间：{}，",group,pipelineId,weekTime);
         String loginId = LoginContext.getLoginId();
         PipelineRunMsg pipelineRunMsg = new PipelineRunMsg(pipelineId,loginId,2);
         execService.start(pipelineRunMsg);
         triggerConfigServer.deleteCronConfig(pipelineId,cron);
-        job.removeJob(pipelineId,cron);
-        logger.warn("定时任务执行完成，移除定时任务，流水线id："+pipelineId +"    时间："+ weekTime+"     cron"+cron);
+        logger.warn("组：{}，流水线：{},定时任务触发完成",group,pipelineId);
+        job.removeJob(group,pipelineId,cron);
     }
 
 }

@@ -1,6 +1,7 @@
 package io.tiklab.matflow.support.trigger.service;
 
 import io.tiklab.matflow.support.trigger.model.Trigger;
+import io.tiklab.matflow.support.trigger.model.TriggerQuery;
 
 import java.util.List;
 /**
@@ -18,10 +19,10 @@ public interface TriggerService {
 
     /**
      * 查询所有配置
-     * @param pipelineId 流水线id
+     * @param triggerQuery 流水线id
      * @return 配置列表
      */
-    List<Object> findAllTrigger(String pipelineId);
+    List<Object> findAllTrigger(TriggerQuery triggerQuery);
 
 
     void cloneTrigger(String pipelineId,String clonePipelineId);
@@ -48,10 +49,10 @@ public interface TriggerService {
 
     /**
      * 根据流水线id查询触发器配置
-     * @param pipelineId 流水线id
+     * @param triggerQuery 流水线id
      * @return 配置
      */
-     List<Trigger> findAllPipelineTrigger(String pipelineId) ;
+     List<Trigger> findTriggerList(TriggerQuery triggerQuery) ;
 
 
     /**

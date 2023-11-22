@@ -167,7 +167,6 @@ public class TaskCodeScanExecServiceImpl implements TaskCodeScanExecService {
         }
 
         String outPath = file1.getAbsolutePath() +"/spotbugs-" + time + ".xml";
-        System.out.println(outPath);
         tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"开始编译源代码......");
 
         Scm pipelineScm = scmService.findOnePipelineScm(21);

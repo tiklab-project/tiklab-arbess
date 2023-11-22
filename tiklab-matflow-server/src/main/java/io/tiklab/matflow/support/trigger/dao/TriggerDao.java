@@ -1,10 +1,14 @@
 package io.tiklab.matflow.support.trigger.dao;
 
+import io.tiklab.dal.jpa.criterial.condition.QueryCondition;
+import io.tiklab.dal.jpa.criterial.conditionbuilder.QueryBuilders;
 import io.tiklab.matflow.support.trigger.entity.TriggerEntity;
 import io.tiklab.dal.jpa.JpaTemplate;
+import io.tiklab.matflow.support.trigger.model.TriggerQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collections;
 import java.util.List;
 
 @Repository
@@ -45,6 +49,23 @@ public class TriggerDao {
      */
     public TriggerEntity findOneTriggerConfig(String TriggerConfigId){
         return jpaTemplate.findOne(TriggerEntity.class,TriggerConfigId);
+    }
+
+    /**
+     *  查询定时任务
+     * @param triggerQuery 查询条件
+     * @return 定时任务
+     */
+    public List<TriggerEntity> findTriggerList(TriggerQuery triggerQuery){
+        QueryCondition queryCondition = QueryBuilders.createQuery(TriggerEntity.class)
+                .eq("pipelineId", triggerQuery.getPipelineId())
+                .eq("state", triggerQuery.getState())
+                .get();
+        List<TriggerEntity> triggerEntities = jpaTemplate.findList(queryCondition, TriggerEntity.class);
+        if (triggerEntities == null || triggerEntities.isEmpty()){
+            return Collections.emptyList();
+        }
+        return  triggerEntities;
     }
 
     /**
