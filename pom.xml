@@ -35,13 +35,13 @@
         <tiklab-gateway.version>1.0.1-SNAPSHOT</tiklab-gateway.version>
         <tiklab-plugin.version>1.0.0</tiklab-plugin.version>
 
-        <tiklab-user.version>1.0.0</tiklab-user.version>
+        <tiklab-user.version>1.0.1-SNAPSHOT</tiklab-user.version>
         <tiklab-message.version>1.0.0</tiklab-message.version>
         <tiklab-security.version>1.0.0</tiklab-security.version>
         <tiklab-todotask.version>1.0.0</tiklab-todotask.version>
         <tiklab-licence.version>1.0.0</tiklab-licence.version>
         <tiklab-privilege.version>1.0.0</tiklab-privilege.version>
-        <tiklab-eam.version>1.0.0</tiklab-eam.version>
+        <tiklab-eam.version>1.0.1-SNAPSHOT</tiklab-eam.version>
 
         <tiklab-xcode.version>1.0.0</tiklab-xcode.version>
         <tiklab-xpack.version>1.0.0</tiklab-xpack.version>
