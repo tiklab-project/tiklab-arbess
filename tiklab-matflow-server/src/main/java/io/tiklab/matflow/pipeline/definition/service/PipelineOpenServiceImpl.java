@@ -103,6 +103,28 @@ public class PipelineOpenServiceImpl implements PipelineOpenService {
         pipelineOpenDao.createOpen(BeanMapper.map(pipelineOpen, PipelineOpenEntity.class));
     }
 
+    public List<String> findUserOpen(int number){
+        // 获取用户流水线
+        String userId = LoginContext.getLoginId();
+        String[] userPipeline = authorityService.findUserPipelineIdString(userId);
+        if (userPipeline.length == 0){
+            return Collections.emptyList();
+        }
+
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < userPipeline.length; i++) {
+            builder.append("'").append(userPipeline[i]).append("'");
+            if (i != userPipeline.length-1){
+                builder.append(",");
+            }
+        }
+
+        List<String> pipelineIds = pipelineOpenDao.findUserOpen(userId, number,builder.toString());
+        if (pipelineIds.isEmpty()){
+            return Collections.emptyList();
+        }
+        return pipelineIds;
+    }
 
     /**
      * 查询流水线最近打开
@@ -114,26 +136,33 @@ public class PipelineOpenServiceImpl implements PipelineOpenService {
 
         // 获取用户流水线
         String userId = LoginContext.getLoginId();
-        String[] userPipeline = authorityService.findUserPipelineIdString(userId);
-        if (userPipeline.length == 0){
-            return Collections.emptyList();
-        }
+        // String[] userPipeline = authorityService.findUserPipelineIdString(userId);
+        // if (userPipeline.length == 0){
+        //     return Collections.emptyList();
+        // }
+        //
+        // StringBuilder builder = new StringBuilder();
+        // for (int i = 0; i < userPipeline.length; i++) {
+        //     builder.append("'").append(userPipeline[i]).append("'");
+        //     if (i != userPipeline.length-1){
+        //         builder.append(",");
+        //     }
+        // }
 
-        System.out.println(userPipeline);
+        // List<String> list = Arrays.stream(userPipeline).toList();
 
-        List<String> list = Arrays.stream(userPipeline).toList();
-
-        List<String> pipelineIds = pipelineOpenDao.findUserPipelineOpen(userId, number);
+        // List<String> pipelineIds = pipelineOpenDao.findUserOpen(userId, number,builder.toString());
+        List<String> pipelineIds = findUserOpen(number);
         if (pipelineIds.isEmpty()){
             return Collections.emptyList();
         }
 
 
-        // 使用HashSet来存储list1中的元素
-        HashSet<String> set = new HashSet<>(list);
-
-        // 仅保留list2中也包含在HashSet中的元素
-        pipelineIds.retainAll(set);
+        // // 使用HashSet来存储list1中的元素
+        // HashSet<String> set = new HashSet<>(list);
+        //
+        // // 仅保留list2中也包含在HashSet中的元素
+        // pipelineIds.retainAll(set);
 
         List<PipelineOpen> openList = new ArrayList<>();
 

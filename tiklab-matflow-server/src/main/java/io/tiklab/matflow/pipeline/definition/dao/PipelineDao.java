@@ -16,8 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * 流水线数据访问
@@ -143,6 +142,16 @@ public class PipelineDao {
         return jpaTemplate.findPage(queryCondition, PipelineEntity.class);
     }
 
+
+    public List<PipelineEntity> findRecentlyPipeline(String pipelineIds,Integer number){
+        StringBuilder sqlBuffer = new StringBuilder();
+        sqlBuffer.append(" SELECT * ");
+        sqlBuffer.append(" FROM pip_pipeline");
+        sqlBuffer.append(" WHERE id not in  ('").append(pipelineIds).append("')");
+        sqlBuffer.append(" LIMIT ").append(number);
+        JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
+        return jdbcTemplate.query(sqlBuffer.toString(),new BeanPropertyRowMapper<>(PipelineEntity.class));
+    }
 
 
 

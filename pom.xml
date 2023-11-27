@@ -33,6 +33,7 @@
         <tiklab-dfs.version>1.0.0</tiklab-dfs.version>
         <tiklab-codegen.version>1.0.0</tiklab-codegen.version>
         <tiklab-gateway.version>1.0.1-SNAPSHOT</tiklab-gateway.version>
+        <tiklab-openapi.version>1.0.0-SNAPSHOT</tiklab-openapi.version>
         <tiklab-plugin.version>1.0.0</tiklab-plugin.version>
 
         <tiklab-user.version>1.0.1-SNAPSHOT</tiklab-user.version>

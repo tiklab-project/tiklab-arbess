@@ -24,7 +24,7 @@ jdbc:
   password: darth2020
 
 #plugin config
-DATA_HOME:  ${user.home}/matflow/
+DATA_HOME: /Users/zcamy/tiklab/apply_data/matflow
 
 plugin:
   path: ${DATA_HOME}/plugin

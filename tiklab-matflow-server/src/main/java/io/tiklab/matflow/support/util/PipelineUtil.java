@@ -137,10 +137,17 @@ public class PipelineUtil {
             if (day == 1 && hours == 0){
                 return (hours + 24) + " 小时 " + minutes + " 分前 " ;
             }
-            if (hours != 0){
-                time = day +" 天 "+hours + " 小时";
+
+            if (day > 365){
+                int year = day / 365;
+                int i = day - year * 365;
+                time = year + " 年 " + i + " 天 ";
             }else {
-                time = day +" 天";
+                time = day + " 天 ";
+            }
+
+            if (hours != 0){
+                time = time + hours + " 小时";
             }
         }
 

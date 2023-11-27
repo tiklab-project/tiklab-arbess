@@ -203,11 +203,25 @@ public class PipelineController {
      * @pi.param: name=pipelineId;dataType=string;value=pipelineId;
      */
     @RequestMapping(path="/findPipelineCloneName",method = RequestMethod.POST)
-    public Result<String> pindPipelineCloneName(@NotNull String pipelineId){
+    public Result<String> findPipelineCloneName(@NotNull String pipelineId){
 
         String name = pipelineService.findPipelineCloneName(pipelineId);
 
         return Result.ok(name);
+    }
+
+    /**
+     * 获取流水线最近打开的流水线
+     * @param number 数量
+     * @param pipelineId 流水线id
+     * @return 流水线
+     */
+    @RequestMapping(path="/findRecentlyPipeline",method = RequestMethod.POST)
+    public Result<String> findRecentlyPipeline(@NotNull Integer number,@NotNull String pipelineId){
+
+        List<Pipeline> pipelineList = pipelineService.findRecentlyPipeline(number,pipelineId);
+
+        return Result.ok(pipelineList);
     }
 
 

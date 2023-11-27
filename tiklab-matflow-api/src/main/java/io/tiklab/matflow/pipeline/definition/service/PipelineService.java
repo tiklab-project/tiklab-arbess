@@ -108,8 +108,12 @@ public interface PipelineService {
     void pipelineClone(String pipelineId,String pipelineName);
 
 
-
-    void importPipelineYaml(String pipelineId);
+    /**
+     * 获取最近打开的流水线
+     * @param number 数量
+     * @return 流水线
+     */
+    List<Pipeline> findRecentlyPipeline(Integer number,String pipelineId);
 
 }
 

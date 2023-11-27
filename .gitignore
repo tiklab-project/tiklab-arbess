@@ -18,3 +18,4 @@ matflow-log
 tiklab-matflow-starter/plugin
 tiklab-matflow-starter/target
 tiklab-matflow-starter/licences
+tiklab-matflow-starter/src/main/resources/config/dev/application.yaml

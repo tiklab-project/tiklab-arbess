@@ -16,10 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Repository
 public class PipelineOpenDao {
@@ -109,6 +106,31 @@ public class PipelineOpenDao {
                 " LIMIT "+ number;
         JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
         List<Map<String, Object>> queryForList = jdbcTemplate.queryForList(sql);
+        if (queryForList.isEmpty()){
+            return Collections.emptyList();
+        }
+        List<String> list = new ArrayList<>();
+
+        for (Map<String, Object> stringObjectMap : queryForList) {
+            String id = (String)stringObjectMap.get("pipeline_id");
+            list.add(id);
+        }
+        return list;
+    }
+
+    public List<String> findUserOpen(String userId,Integer number,String pipelineIds){
+
+        StringBuilder sqlBuffer = new StringBuilder();
+        sqlBuffer.append(" SELECT pipeline_id, MAX(create_time)");
+        sqlBuffer.append("FROM pip_other_open");
+        sqlBuffer.append(" WHERE user_id = '").append(userId).append("'");
+        sqlBuffer.append(" and pipeline_id in (").append(pipelineIds).append(")");
+        sqlBuffer.append(" GROUP BY pipeline_id");
+        sqlBuffer.append(" ORDER BY MAX(create_time) DESC");
+        sqlBuffer.append(" LIMIT ").append(number);
+
+        JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
+        List<Map<String, Object>> queryForList = jdbcTemplate.queryForList(sqlBuffer.toString());
         if (queryForList.isEmpty()){
             return Collections.emptyList();
         }

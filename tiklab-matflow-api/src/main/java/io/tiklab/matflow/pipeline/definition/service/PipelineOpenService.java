@@ -16,11 +16,18 @@ import java.util.List;
 public interface PipelineOpenService {
 
     /**
-     * 查询用户最近打开流水线
+     * 查询用户最近打开流水线(详细信息)
      * @param number 查询数量
      * @return 最近打开的流水线
      */
     List<PipelineOpen> findUserAllOpen(int number);
+
+    /**
+     * 查询用户最近打开流水线
+     * @param number 查询数量
+     * @return 最近打开的流水线
+     */
+    List<String> findUserOpen(int number);
 
     /**
      * 删除流水线收藏

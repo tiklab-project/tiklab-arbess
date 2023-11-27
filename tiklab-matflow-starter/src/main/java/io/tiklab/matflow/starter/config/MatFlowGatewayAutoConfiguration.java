@@ -3,7 +3,7 @@ package io.tiklab.matflow.starter.config;
 import io.tiklab.eam.author.Authenticator;
 import io.tiklab.eam.client.author.config.AuthorConfig;
 import io.tiklab.eam.client.author.config.AuthorConfigBuilder;
-import io.tiklab.eam.client.author.filter.AuthorPreHandler;
+import io.tiklab.eam.client.author.handler.AuthorHandler;
 import io.tiklab.gateway.router.Router;
 import io.tiklab.gateway.router.RouterBuilder;
 import io.tiklab.gateway.router.config.RouterConfig;
@@ -42,8 +42,8 @@ public class MatFlowGatewayAutoConfiguration {
 
     //认证filter
     @Bean
-    AuthorPreHandler authorFilter(Authenticator authenticator, AuthorConfig ignoreConfig){
-        return new AuthorPreHandler()
+    AuthorHandler authorFilter(Authenticator authenticator, AuthorConfig ignoreConfig){
+        return new AuthorHandler()
                 .setAuthenticator(authenticator)
                 .setAuthorConfig(ignoreConfig);
     }
@@ -95,7 +95,8 @@ public class MatFlowGatewayAutoConfiguration {
                         "/licence/import",
                         "/wechatCallback/instruct",
                         "/gui",
-                        "/disk/findDiskList"
+                        "/disk/findDiskList",
+                        "/appAuthorization/validUserInProduct"
                 })
                 .ignorePreUrls(new String[]{
                         "/service",

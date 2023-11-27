@@ -1,14 +1,12 @@
 package io.tiklab.matflow.support.authority.service;
 
 import io.tiklab.beans.BeanMapper;
-import io.tiklab.core.page.Pagination;
 import io.tiklab.eam.common.context.LoginContext;
 import io.tiklab.matflow.pipeline.definition.dao.PipelineDao;
 import io.tiklab.matflow.pipeline.definition.entity.PipelineEntity;
 import io.tiklab.matflow.pipeline.definition.model.Pipeline;
 import io.tiklab.matflow.pipeline.definition.model.PipelineQuery;
 import io.tiklab.matflow.support.util.PipelineFinal;
-import io.tiklab.matflow.support.util.PipelineUtil;
 import io.tiklab.privilege.dmRole.service.DmRoleService;
 import io.tiklab.privilege.role.model.PatchUser;
 import io.tiklab.user.dmUser.model.DmUser;
@@ -17,7 +15,6 @@ import io.tiklab.user.dmUser.service.DmUserService;
 import io.tiklab.user.user.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -74,7 +71,7 @@ public class PipelineAuthorityServiceImpl implements PipelineAuthorityService{
 
         List<PipelineEntity> allPipeline1 = pipelineDao.findAllPipeline();
         // 流水线为空
-        if (Objects.isNull(allPipeline1) || allPipeline1.size() == 0){
+        if (Objects.isNull(allPipeline1) || allPipeline1.isEmpty()){
             return new String[]{};
         }
 
@@ -99,7 +96,7 @@ public class PipelineAuthorityServiceImpl implements PipelineAuthorityService{
         dmUserQuery.setUserId(userId);
         List<DmUser> allDmUser = dmUserService.findDmUserList(dmUserQuery);
 
-        if (Objects.isNull(allDmUser) || allDmUser.size() == 0){
+        if (Objects.isNull(allDmUser) || allDmUser.isEmpty()){
             return list.toArray(new String[0]);
         }
 

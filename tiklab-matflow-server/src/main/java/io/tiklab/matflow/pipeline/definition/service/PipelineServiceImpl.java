@@ -29,11 +29,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.io.File;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.*;
+
+import static io.tiklab.matflow.support.util.PipelineFinal.*;
 
 /**
  * 流水线服务
@@ -112,16 +113,16 @@ public class PipelineServiceImpl implements PipelineService {
         String template = pipeline.getTemplate();
         String[] ints;
         switch (template) {
-            case "2131" -> ints = new String[]{"git", "maven", "liunx"};
-            case "112131" -> ints = new String[]{"git", "maventest",  "maven", "liunx"};
-            case "2231" -> ints = new String[]{"git",  "nodejs", "liunx"};
-            default -> ints = new String[]{"git"};
+            case "2131" -> ints = new String[]{TASK_CODE_GIT, TASK_BUILD_MAVEN, TASK_DEPLOY_LINUX};
+            case "112131" -> ints = new String[]{TASK_CODE_GIT, TASK_TEST_MAVENTEST,  TASK_BUILD_MAVEN, TASK_DEPLOY_LINUX};
+            case "2231" -> ints = new String[]{TASK_CODE_GIT,  TASK_TEST_MAVENTEST, TASK_DEPLOY_LINUX};
+            default -> ints = new String[]{TASK_CODE_GIT};
         }
-        if (pipeline.getType() == 1){
-            tasksService.createTaskTemplate(pipelineId,ints);
+        if (pipeline.getType() == 1) {
+            tasksService.createTaskTemplate(pipelineId , ints);
         }
-        if (pipeline.getType() == 2){
-            stageService.createStageTemplate(pipelineId,ints);
+        if (pipeline.getType() == 2) {
+            stageService.createStageTemplate(pipelineId , ints);
         }
 
         //流水线关联角色，用户信息
@@ -222,7 +223,6 @@ public class PipelineServiceImpl implements PipelineService {
 
     @Override
     public Pipeline findOnePipeline(String pipelineId){
-        String loginId = LoginContext.getLoginId();
         List<Pipeline> pipelineList = findUserPipeline();
         if (pipelineList.isEmpty()){
             return null;
@@ -235,9 +235,6 @@ public class PipelineServiceImpl implements PipelineService {
         }
         return null;
     }
-
-
-
 
     //查询所有
     @Override
@@ -369,7 +366,7 @@ public class PipelineServiceImpl implements PipelineService {
             String createTime = lastInstance.getCreateTime();
             recently.setCreateTime(createTime);
             Date date = PipelineUtil.StringChengeDate(createTime);
-            String dateTime = PipelineUtil.findDateTime(date, 30);
+            String dateTime = PipelineUtil.findDateTime(date, 3000);
             recently.setExecTime(dateTime);
             String formatted = PipelineUtil.formatDateTime(lastInstance.getRunTime());
             recently.setLastRunTime(formatted);
@@ -380,7 +377,6 @@ public class PipelineServiceImpl implements PipelineService {
         }
         return list;
     }
-
 
     public String findPipelineCloneName(String pipelineId){
         Pipeline pipeline = findPipelineById(pipelineId);
@@ -445,9 +441,40 @@ public class PipelineServiceImpl implements PipelineService {
 
     }
 
-    @Override
-    public void importPipelineYaml(String pipelineId) {
 
+    @Override
+    public List<Pipeline> findRecentlyPipeline(Integer number,String pipelineId){
+
+        List<String> userOpen = openService.findUserOpen(number + 1);
+        if (userOpen.isEmpty()){
+            List<PipelineEntity> pipelineEntityList = pipelineDao.findRecentlyPipeline(pipelineId,number+1);
+            List<Pipeline> pipelineList = BeanMapper.mapList(pipelineEntityList, Pipeline.class);
+            return pipelineList.subList(0,number);
+        }
+
+        // 过滤出当前流水线
+        List<String> list = userOpen.stream().filter(s -> !s.equals(pipelineId)).toList();
+
+        // 查询流水线
+        List<Pipeline> pipelineList = new ArrayList<>();
+        for (String id : list) {
+            Pipeline pipeline = findPipelineById(id);
+            pipelineList.add(pipeline);
+        }
+
+        // 判断是否足够当前数量
+        if (pipelineList.size() < number){
+            int size = number -pipelineList.size();
+            List<PipelineEntity> allPipeline = pipelineDao.findRecentlyPipeline(pipelineId,number+1);
+            List<Pipeline> pipelineList1 = BeanMapper.mapList(allPipeline, Pipeline.class).subList(0, size);
+            pipelineList.addAll(pipelineList.size(),pipelineList1);
+        }
+
+        // 当前流水线放在最前
+        Pipeline pipeline = findPipelineById(pipelineId);
+        pipelineList.add(0,pipeline);
+
+        return pipelineList;
     }
 
     /**
