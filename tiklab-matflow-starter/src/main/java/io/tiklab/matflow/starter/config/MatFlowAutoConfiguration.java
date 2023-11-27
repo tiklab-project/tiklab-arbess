@@ -10,6 +10,7 @@ import io.tiklab.licence.boot.starter.annotation.EnableLicenceServer;
 import io.tiklab.matflow.EnableMatFlowServer;
 import io.tiklab.messsage.boot.starter.annotation.EnableMessageClient;
 import io.tiklab.messsage.boot.starter.annotation.EnableMessageServer;
+import io.tiklab.openapi.boot.starter.annotation.EnableOpenApi;
 import io.tiklab.plugin.starter.EnablePluginServer;
 import io.tiklab.postgresql.EnablePostgresql;
 import io.tiklab.privilege.boot.starter.annotation.EnablePrivilegeServer;
@@ -36,6 +37,7 @@ import org.springframework.context.annotation.Configuration;
 @EnableDal
 @EnableRpc
 @EnableGateway
+@EnableOpenApi
 @EnableDcsClient
 @EnableDcsServer
 @EnablePluginServer
