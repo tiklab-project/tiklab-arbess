@@ -40,6 +40,7 @@ public class MatFlowDsmAutoConfiguration {
                 "pip-pipeline_1.0.0",
                 "pip-init-project_1.0.0",
                 "pip-var_1.0.0",
+                "backups_1.0.0",
                 "pip-test_1.0.0",
                 "pip-scan-spotbugs_1.0.0",
                 "pip-host-group_1.0.0",

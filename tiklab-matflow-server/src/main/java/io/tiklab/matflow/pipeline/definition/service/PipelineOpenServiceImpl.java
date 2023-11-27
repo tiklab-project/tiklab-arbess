@@ -66,35 +66,6 @@ public class PipelineOpenServiceImpl implements PipelineOpenService {
         pipelineOpen.setCreateTime(PipelineUtil.date(1));
         pipelineOpen.setUserId(userId);
         createOpen(pipelineOpen);
-
-        // new Thread(() -> {
-        //     List<String> pipelineIds = pipelineOpenDao.findUserPipelineOpen(userId, 100);
-        //     if (pipelineIds.size() < 10){
-        //         return;
-        //     }
-        //     for (int i = 9; i < pipelineIds.size(); i++) {
-        //         PipelineOpenQuery pipelineOpenQuery = new PipelineOpenQuery();
-        //         pipelineOpenQuery.setPipelineId(pipelineIds.get(i));
-        //         List<PipelineOpenEntity> pipelineOpenList = pipelineOpenDao.findPipelineOpenList(pipelineOpenQuery);
-        //         for (PipelineOpenEntity pipelineOpenEntity : pipelineOpenList) {
-        //             deleteOpen(pipelineOpenEntity.getOpenId());
-        //         }
-        //     }
-        // }).start();
-
-        List<String> pipelineIds = pipelineOpenDao.findUserPipelineOpen(userId, 100);
-        if (pipelineIds.size() < 10){
-            return;
-        }
-        for (int i = 9; i < pipelineIds.size(); i++) {
-            PipelineOpenQuery pipelineOpenQuery = new PipelineOpenQuery();
-            pipelineOpenQuery.setPipelineId(pipelineIds.get(i));
-            List<PipelineOpenEntity> pipelineOpenList = pipelineOpenDao.findPipelineOpenList(pipelineOpenQuery);
-            for (PipelineOpenEntity pipelineOpenEntity : pipelineOpenList) {
-                deleteOpen(pipelineOpenEntity.getOpenId());
-            }
-        }
-
     }
 
     @Override
@@ -148,6 +119,8 @@ public class PipelineOpenServiceImpl implements PipelineOpenService {
             return Collections.emptyList();
         }
 
+        System.out.println(userPipeline);
+
         List<String> list = Arrays.stream(userPipeline).toList();
 
         List<String> pipelineIds = pipelineOpenDao.findUserPipelineOpen(userId, number);
@@ -168,10 +141,7 @@ public class PipelineOpenServiceImpl implements PipelineOpenService {
             PipelineOpen pipelineOpen = new PipelineOpen();
             pipelineOpen.setPipeline(new Pipeline(pipelineId));
 
-            Date date = PipelineUtil.findDate(Calendar.DATE, -7);
-
-            String format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date);
-            Integer openNumber = pipelineOpenDao.findUserOpenPipelineNumber(userId, pipelineId, format);
+            Integer openNumber = pipelineOpenDao.findUserOpenNumber(userId, pipelineId);
             pipelineOpen.setNumber(openNumber);
 
             PipelineOverview pipelineOverview = overviewService.pipelineOverview(pipelineId);

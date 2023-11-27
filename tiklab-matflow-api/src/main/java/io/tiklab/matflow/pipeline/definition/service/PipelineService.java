@@ -48,6 +48,14 @@ public interface PipelineService {
     @FindOne
     Pipeline findPipelineById(@NotNull String pipelineId);
 
+
+    /**
+     * 该接口返回用户流水线
+     * @param pipelineId 流水线Id
+     * @return 流水线
+     */
+    Pipeline findOnePipeline(String pipelineId);
+
     /**
      * 查询所有流水线
      * @return 流水线列表

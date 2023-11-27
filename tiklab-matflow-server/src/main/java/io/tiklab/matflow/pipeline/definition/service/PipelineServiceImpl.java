@@ -220,6 +220,25 @@ public class PipelineServiceImpl implements PipelineService {
         return pipeline;
     }
 
+    @Override
+    public Pipeline findOnePipeline(String pipelineId){
+        String loginId = LoginContext.getLoginId();
+        List<Pipeline> pipelineList = findUserPipeline();
+        if (pipelineList.isEmpty()){
+            return null;
+        }
+        for (Pipeline pipeline : pipelineList) {
+            if (!pipeline.getId().equals(pipelineId)){
+                continue;
+            }
+            return pipeline;
+        }
+        return null;
+    }
+
+
+
+
     //查询所有
     @Override
     public List<Pipeline> findAllPipeline() {

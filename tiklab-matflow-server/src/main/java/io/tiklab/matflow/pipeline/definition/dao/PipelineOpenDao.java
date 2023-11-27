@@ -76,10 +76,22 @@ public class PipelineOpenDao {
         return  jdbcTemplate.query(sql, new BeanPropertyRowMapper(PipelineOpenEntity.class));
     }
 
-    public Integer findUserOpenPipelineNumber(String userId,String pipelineId,String time){
+    public Integer findUserOpenNumberByTime(String userId,String pipelineId,String time){
         String sql = "SELECT count(*) FROM pip_other_open WHERE \"user_id\" = '" + userId +
-                "' and  pipeline_id = '" +pipelineId +
-                "' and create_time >= '"+ time +"'";
+                "' and  pipeline_id = '" +pipelineId ;
+                // "' and create_time >= '"+ time +"'";
+        JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
+        List<Integer> list = jdbcTemplate.queryForList(sql, Integer.class);
+        if (list.isEmpty()){
+            return 0;
+        }
+        return  list.get(0);
+    }
+
+
+    public Integer findUserOpenNumber(String userId,String pipelineId){
+        String sql = "SELECT count(*) FROM pip_other_open WHERE \"user_id\" = '" + userId +
+                "' and  pipeline_id = '" +pipelineId +"'";
         JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
         List<Integer> list = jdbcTemplate.queryForList(sql, Integer.class);
         if (list.isEmpty()){

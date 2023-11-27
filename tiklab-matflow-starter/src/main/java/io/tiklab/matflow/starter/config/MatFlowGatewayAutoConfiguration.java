@@ -3,7 +3,7 @@ package io.tiklab.matflow.starter.config;
 import io.tiklab.eam.author.Authenticator;
 import io.tiklab.eam.client.author.config.AuthorConfig;
 import io.tiklab.eam.client.author.config.AuthorConfigBuilder;
-import io.tiklab.eam.client.author.filter.AuthorFilter;
+import io.tiklab.eam.client.author.filter.AuthorPreHandler;
 import io.tiklab.gateway.router.Router;
 import io.tiklab.gateway.router.RouterBuilder;
 import io.tiklab.gateway.router.config.RouterConfig;
@@ -42,8 +42,8 @@ public class MatFlowGatewayAutoConfiguration {
 
     //认证filter
     @Bean
-    AuthorFilter authorFilter(Authenticator authenticator, AuthorConfig ignoreConfig){
-        return new AuthorFilter()
+    AuthorPreHandler authorFilter(Authenticator authenticator, AuthorConfig ignoreConfig){
+        return new AuthorPreHandler()
                 .setAuthenticator(authenticator)
                 .setAuthorConfig(ignoreConfig);
     }

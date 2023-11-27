@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import io.tiklab.core.exception.ApplicationException;
 import io.tiklab.eam.common.context.LoginContext;
 import io.tiklab.matflow.pipeline.definition.model.Pipeline;
+import io.tiklab.matflow.support.util.PipelineFileUtil;
 import io.tiklab.matflow.support.util.PipelineFinal;
 import io.tiklab.matflow.support.util.PipelineUtil;
 import io.tiklab.message.message.model.Message;
@@ -19,13 +20,20 @@ import io.tiklab.security.logging.model.LoggingType;
 import io.tiklab.security.logging.service.LoggingByTemplService;
 import io.tiklab.user.user.model.User;
 import io.tiklab.user.user.service.UserService;
+import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
+import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
+import org.apache.commons.compress.compressors.gzip.GzipCompressorOutputStream;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.io.*;
+import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.sql.Timestamp;
 import java.util.*;
+import java.util.zip.GZIPOutputStream;
 
 @Service
 public class PipelineHomeServiceImpl implements PipelineHomeService {
@@ -249,6 +257,123 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
         User user = userService.findOne(loginId);
         list.add(user);
         return list;
+    }
+
+
+    public static void main(String[] args) throws IOException {
+        String path = "/Users/zcamy/tmp/clone";
+        File file = new File(path);
+        boolean exists = file.exists();
+        if (!exists){
+            file.getParentFile().mkdirs();
+            file.createNewFile();
+        }
+
+        List<File> objects = new ArrayList<>();
+        objects.add(file);
+
+        compress(path,"/Users/zcamy/tmp/aa.tar.gz");
+        // compressList(objects,"/Users/zcamy/tmp/aa.tar.gz",true);
+
+
+    }
+
+    /**
+     * 压缩目录
+     * @param srcFolder  需要压缩的目录
+     * @param zipPath 压缩后的位置
+     * @throws IOException 压缩失败
+     */
+    public static void compress(String srcFolder, String zipPath) throws IOException {
+
+        FileOutputStream fos = new FileOutputStream(zipPath);
+        GzipCompressorOutputStream gzOut = new GzipCompressorOutputStream(fos);
+        TarArchiveOutputStream tarOut = new TarArchiveOutputStream(gzOut);
+        tarOut.setLongFileMode(TarArchiveOutputStream.LONGFILE_GNU);
+        Path sourcePath = Paths.get(srcFolder);
+
+        Files.walk(sourcePath)
+                .forEach(file -> {
+                    if (Files.isRegularFile(file)) {
+                        String entryName = sourcePath.relativize(file).toString();
+                        TarArchiveEntry tarEntry = new TarArchiveEntry(file.toFile(), entryName);
+                        try {
+
+                            tarOut.putArchiveEntry(tarEntry);
+                            FileInputStream fis = new FileInputStream(file.toFile());
+                            byte[] buffer = new byte[1024];
+                            int bytesRead;
+                            while ((bytesRead = fis.read(buffer)) != -1) {
+                                tarOut.write(buffer, 0, bytesRead);
+                            }
+                            fis.close();
+                            tarOut.closeArchiveEntry();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+
+        tarOut.finish();
+        tarOut.close();
+        gzOut.close();
+        fos.close();
+    }
+
+
+    /**
+     * 压缩多个目录
+     * @param fileList 目录名称
+     * @param outputTarGzFile 输出地址
+     * @param b  是否包含目录顶级路径 /user/aa压缩是否包含aa路径
+     * @throws IOException 压缩失败
+     */
+    public static void compressList(List<File> fileList, String outputTarGzFile, Boolean b) throws IOException {
+        try (FileOutputStream fileOutputStream = new FileOutputStream(outputTarGzFile);
+             BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(fileOutputStream);
+             GZIPOutputStream gzipOutputStream = new GZIPOutputStream(bufferedOutputStream);
+             TarArchiveOutputStream tarArchiveOutputStream = new TarArchiveOutputStream(gzipOutputStream)) {
+
+            for (File inputDirectory : fileList) {
+                Path dirPath = Paths.get(inputDirectory.toURI());
+
+                Files.walkFileTree(dirPath, new SimpleFileVisitor<>() {
+                    @Override
+                    public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                        // 添加文件到tar归档，包括相对路径
+                        Path relativePath;
+                        if (b){
+                            Path parent = dirPath.getParent();
+                            relativePath = parent.relativize(file);
+                        }else {
+                            relativePath = dirPath.relativize(file);
+                        }
+                        TarArchiveEntry entry = new TarArchiveEntry(file.toFile(), relativePath.toString());
+                        tarArchiveOutputStream.putArchiveEntry(entry);
+                        Files.copy(file, tarArchiveOutputStream);
+                        tarArchiveOutputStream.closeArchiveEntry();
+                        return FileVisitResult.CONTINUE;
+                    }
+
+                    @Override
+                    public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+                        // 添加目录到tar归档，包括相对路径
+                        Path relativePath;
+                        if (b){
+                            Path parent = dirPath.getParent();
+                            relativePath = parent.relativize(dir);
+                        }else {
+                            relativePath = dirPath.relativize(dir);
+                        }
+                        String dirName = relativePath.toString();
+                        TarArchiveEntry entry = new TarArchiveEntry(dir.toFile(), dirName + "/");
+                        tarArchiveOutputStream.putArchiveEntry(entry);
+                        tarArchiveOutputStream.closeArchiveEntry();
+                        return FileVisitResult.CONTINUE;
+                    }
+                });
+            }
+        }
     }
 
 

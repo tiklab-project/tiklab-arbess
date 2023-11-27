@@ -1,6 +1,7 @@
 package io.tiklab.matflow.support.trigger.quartz;
 
 import io.tiklab.matflow.support.trigger.service.CronUtils;
+import io.tiklab.matflow.support.util.PipelineUtil;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
@@ -8,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -29,8 +31,14 @@ public class Job {
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public void addJob(String group, String pipelineId, Class jobClass, String cron) throws SchedulerException {
         Map<String, String> map = CronUtils.cronWeek(cron);
+        String weekTime = map.get("weekTime");
+        Date date = PipelineUtil.StringChengeDate(weekTime);
+        if (date.getTime() <= new Date().getTime()){
+            logger.warn("定时任务时间已过，跳过添加：{}，执行流水线id：{}，执行时间：{}，cron：{}",group,pipelineId, weekTime,cron);
+            return;
+        }
 
-        logger.warn("添加定时任务，定时任务组：{}，执行流水线id：{}，执行时间：{}，cron：{}",group,pipelineId, map.get("weekTime"),cron);
+        logger.warn("添加定时任务，定时任务组：{}，执行流水线id：{}，执行时间：{}，cron：{}",group,pipelineId, weekTime,cron);
 
         // 任务名，任务组，任务执行类
         Scheduler scheduler = schedulerFactory.getScheduler();

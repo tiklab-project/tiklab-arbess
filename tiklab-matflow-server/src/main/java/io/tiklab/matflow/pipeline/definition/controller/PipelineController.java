@@ -99,7 +99,7 @@ public class PipelineController {
     @RequestMapping(path="/findOnePipeline",method = RequestMethod.POST)
     public Result<Pipeline> findOnePipeline(@NotNull String pipelineId){
 
-        Pipeline pipeline = pipelineService.findPipelineById(pipelineId);
+        Pipeline pipeline = pipelineService.findOnePipeline(pipelineId);
 
         return Result.ok(pipeline);
     }
