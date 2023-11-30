@@ -66,18 +66,9 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public List<Auth> findAllAuth() {
-        List<AuthEntity> allAuth = authDao.findAllAuth();
-        if (allAuth == null){
+        List<AuthEntity> allAuthEntity = authDao.findAllAuth();
+        if (allAuthEntity == null){
             return null;
-        }
-        //获取公共的和用户私有的
-        List<AuthEntity> allAuthEntity = new ArrayList<>();
-        String loginId = LoginContext.getLoginId();
-        for (AuthEntity authEntity : allAuth) {
-            if (authEntity.getUserId().equals(loginId)
-                    || authEntity.getAuthPublic() == 1){
-                allAuthEntity.add(authEntity);
-            }
         }
         List<Auth> auths = BeanMapper.mapList(allAuthEntity, Auth.class);
         joinTemplate.joinQuery(auths);

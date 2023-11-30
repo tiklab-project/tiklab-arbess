@@ -95,54 +95,20 @@ public class AuthHostServiceImpl implements AuthHostService {
         if (allAuthHost == null){
             return null;
         }
-        List<AuthHost> list = new ArrayList<>();
+
         if (Objects.isNull(type) || type.equals("all")){
-            for (AuthHost authHost : allAuthHost) {
-                String oneType = findOneType(authHost.getType());
-                authHost.setType(oneType);
-                list.add(authHost);
-            }
-            return list;
+            return allAuthHost;
         }
 
+        List<AuthHost> list = new ArrayList<>();
         for (AuthHost authHost : allAuthHost) {
-            String type1 = authHost.getType();
-            if (type.equals(type1)){
-                list.add(authHost);
+            if (type.equals(authHost.getType())){
                 continue;
             }
-            boolean b = findType(type, type1);
-            if (b){
-                authHost.setType(type);
-                list.add(authHost);
-            }
+            list.add(authHost);
         }
         return list;
     }
-
-    private String findOneType(String type){
-        if (type.equals("31")) {
-            return "common";
-        }
-        return type;
-    }
-
-    private boolean findType(String type,String taskType){
-        switch (type){
-            case "common"  ->{
-                if (taskType.equals("31")|| taskType.equals("common")){
-                    return true;
-                }
-            }
-            case "aliyun" ,"tencent" ->{
-                if (taskType.equals(type)){
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
 
     /**
      * 查询所有流水线授权
@@ -150,17 +116,9 @@ public class AuthHostServiceImpl implements AuthHostService {
      */
     @Override
     public List<AuthHost> findAllAuthHost() {
-        List<AuthHostEntity> allAuthHost = authHostDao.findAllAuthHost();
-        if (allAuthHost == null){
+        List<AuthHostEntity> allAuthHostEntity = authHostDao.findAllAuthHost();
+        if (allAuthHostEntity == null){
             return null;
-        }
-        //获取公共的和用户私有的
-        List<AuthHostEntity> allAuthHostEntity = new ArrayList<>();
-        String loginId = LoginContext.getLoginId();
-        for (AuthHostEntity authHostEntity : allAuthHost) {
-            if (authHostEntity.getUserId().equals(loginId) || authHostEntity.getAuthPublic() ==1){
-                allAuthHostEntity.add(authHostEntity);
-            }
         }
         List<AuthHost> authHosts = BeanMapper.mapList(allAuthHostEntity, AuthHost.class);
         joinTemplate.joinQuery(authHosts);
