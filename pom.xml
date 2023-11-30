@@ -48,7 +48,7 @@
         <tiklab-xpack.version>1.0.0</tiklab-xpack.version>
         <tiklab-teston.version>1.0.0</tiklab-teston.version>
 
-        <tiklab-postgresql.version>1.0.0</tiklab-postgresql.version>
+        <tiklab-postgresql.version>1.0.1-SNAPSHOT</tiklab-postgresql.version>
         <tiklab-jdk.version>1.0.0</tiklab-jdk.version>
         <tiklab-spotbugs.version>1.0.0</tiklab-spotbugs.version>
         <tiklab-opensca.version>1.0.0</tiklab-opensca.version>

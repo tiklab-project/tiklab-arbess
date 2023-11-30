@@ -104,7 +104,6 @@
             <groupId>io.tiklab</groupId>
             <artifactId>tiklab-eam-spring-boot-starter</artifactId>
             <version>${tiklab-eam.version}</version>
-            <scope>compile</scope>
         </dependency>
 
     </dependencies>
