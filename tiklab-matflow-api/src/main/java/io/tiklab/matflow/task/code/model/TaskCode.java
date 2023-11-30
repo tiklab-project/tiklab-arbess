@@ -41,14 +41,14 @@ public class TaskCode {
 
 
     @Mappings({
-            @Mapping(source = "repository.id",target = "xcodeId")
+            @Mapping(source = "repository.rpyId",target = "xcodeId")
     })
     @JoinQuery(key = "xcodeId")
     private XcodeRepository repository;
 
 
     @Mappings({
-            @Mapping(source = "branch.id",target = "branchId")
+            @Mapping(source = "branch.branchId",target = "branchId")
     })
     @JoinQuery(key = "branchId")
     private XcodeBranch branch;

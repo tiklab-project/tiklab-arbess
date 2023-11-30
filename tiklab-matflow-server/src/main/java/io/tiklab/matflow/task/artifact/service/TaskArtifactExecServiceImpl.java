@@ -218,7 +218,7 @@ public class TaskArtifactExecServiceImpl implements TaskArtifactExecService {
         if (Objects.isNull(repository)){
             throw new ApplicationException("获取制品库信息失败！");
         }
-        authThird.setServerAddress(repository.getAddress());
+        authThird.setServerAddress(repository.getRepositoryUrl());
 
         execOrder = execOrder +
                 " -DgroupId="+product.getGroupId() +
@@ -448,7 +448,7 @@ public class TaskArtifactExecServiceImpl implements TaskArtifactExecService {
         String username = auth.getUsername();
         String password = auth.getPassword();
 
-        String replace = repository.getAddress().replace("https://", "").replace("http://", "");
+        String replace = repository.getRepositoryUrl().replace("https://", "").replace("http://", "");
 
         String loginOrder;
         if (isHttp){

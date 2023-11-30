@@ -3,9 +3,6 @@ package io.tiklab.matflow.support.postprocess.controller;
 import io.tiklab.core.Result;
 import io.tiklab.matflow.support.postprocess.model.Postprocess;
 import io.tiklab.matflow.support.postprocess.service.PostprocessService;
-import io.tiklab.postin.annotation.Api;
-import io.tiklab.postin.annotation.ApiMethod;
-import io.tiklab.postin.annotation.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,7 +27,7 @@ public class PostprocessController {
     /**
      * @pi.name:创建流水线后置配置
      * @pi.path:/postprocess/createPost
-     * @pi.method:post
+     * @pi.methodType:post
      * @pi.request-type:json
      * @pi.param: model=postprocess
      */
@@ -43,7 +40,7 @@ public class PostprocessController {
     /**
      * @pi.name:更新流水线后置配置
      * @pi.path:/postprocess/createPost
-     * @pi.method:post
+     * @pi.methodType:post
      * @pi.request-type:json
      * @pi.param: model=postprocess
      */
@@ -56,7 +53,7 @@ public class PostprocessController {
     /**
      * @pi.name:查询流水线后置配置信息
      * @pi.path:/postprocess/findPipelinePost
-     * @pi.method:post
+     * @pi.methodType:post
      * @pi.request-type: formdata
      * @pi.param: name=pipelineId;dataType=string;value=pipelineId;
      */
@@ -69,7 +66,7 @@ public class PostprocessController {
     /**
      * @pi.name:查询流水线任务后置配置信息
      * @pi.path:/postprocess/findTaskPost
-     * @pi.method:post
+     * @pi.methodType:post
      * @pi.request-type: formdata
      * @pi.param: name=pipelineId;dataType=string;value=pipelineId;
      */
@@ -82,7 +79,7 @@ public class PostprocessController {
     /**
      * @pi.name:删除流水线任务后置配置信息
      * @pi.path:/postprocess/deletePost
-     * @pi.method:post
+     * @pi.methodType:post
      * @pi.request-type: formdata
      * @pi.param: name=postprocessId;dataType=string;value=postprocessId;
      */
@@ -95,7 +92,7 @@ public class PostprocessController {
     /**
      * @pi.name:查询后置配置信息
      * @pi.path:/postprocess/findOnePost
-     * @pi.method:post
+     * @pi.methodType:post
      * @pi.request-type: formdata
      * @pi.param: name=postprocessId;dataType=string;value=postprocessId;
      */

@@ -9,7 +9,7 @@ import io.tiklab.eam.common.context.LoginContext;
 import io.tiklab.matflow.setting.model.AuthThird;
 import io.tiklab.matflow.setting.model.AuthThirdQuery;
 import io.tiklab.matflow.setting.service.AuthThirdService;
-import io.tiklab.matflow.support.util.PipelineFinal;
+import io.tiklab.matflow.support.util.PipelineRequestUtil;
 import io.tiklab.matflow.support.util.PipelineUtil;
 import io.tiklab.rpc.annotation.Exporter;
 import org.slf4j.Logger;
@@ -160,7 +160,7 @@ public class TaskCodeThirdServiceImpl implements TaskCodeThirdService {
         paramMap.add("callback_url", authThird.getCallbackUrl().trim());
         paramMap.add("code",authThird.getCode());
         HttpEntity<MultiValueMap<String, Object>> entity = new HttpEntity<>(paramMap, headers);
-        ResponseEntity<JSONObject> response = null;
+        ResponseEntity<JSONObject> response;
         try {
              response = restTemplate.exchange(accessTokenUrl, HttpMethod.POST, entity, JSONObject.class);
         }catch (ResourceAccessException e){

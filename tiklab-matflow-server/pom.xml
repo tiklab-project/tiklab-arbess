@@ -107,30 +107,11 @@
             <version>${tomcat-annotations-api.version}</version>
             <scope>compile</scope>
         </dependency>
-
-        <dependency>
-            <groupId>io.tiklab</groupId>
-            <artifactId>tiklab-xcode-api</artifactId>
-            <version>${tiklab-xcode.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>io.tiklab</groupId>
-            <artifactId>tiklab-xpack-api</artifactId>
-            <version>${tiklab-xpack.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>io.tiklab</groupId>
-            <artifactId>tiklab-teston-api</artifactId>
-            <version>${tiklab-teston.version}</version>
-        </dependency>
         <dependency>
             <groupId>io.tiklab</groupId>
             <artifactId>tiklab-licence-api</artifactId>
             <version>${tiklab-licence.version}</version>
         </dependency>
-
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-compress</artifactId>
@@ -148,7 +129,11 @@
             <scope>test</scope>
         </dependency>
 
-
+        <dependency>
+            <groupId>io.tiklab</groupId>
+            <artifactId>tiklab-postin-doclet</artifactId>
+            <version>1.0.1-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -165,20 +150,6 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.0.0-M5</version>
-                <configuration>
-                    <skip>false</skip>
-                    <includes>
-                        <include>**/*PipelineHomeServiceImplTests.java</include>
-                        <include>**/*TestOneTest.java</include>
-                        <include>**/*PipelineServiceTest.java</include>
-                    </includes>
-                </configuration>
-            </plugin>
-
         </plugins>
     </build>
 

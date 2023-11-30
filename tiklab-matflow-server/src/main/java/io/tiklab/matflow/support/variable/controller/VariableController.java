@@ -3,9 +3,6 @@ package io.tiklab.matflow.support.variable.controller;
 import io.tiklab.core.Result;
 import io.tiklab.matflow.support.variable.model.Variable;
 import io.tiklab.matflow.support.variable.service.VariableService;
-import io.tiklab.postin.annotation.Api;
-import io.tiklab.postin.annotation.ApiMethod;
-import io.tiklab.postin.annotation.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,7 +27,7 @@ public class VariableController {
     /**
      * @pi.name:创建变量
      * @pi.path:/pipelineVariable/createVariable
-     * @pi.method:post
+     * @pi.methodType:post
      * @pi.request-type:json
      * @pi.param: model=variable
      */
@@ -43,7 +40,7 @@ public class VariableController {
     /**
      * @pi.name:删除变量
      * @pi.path:/pipelineVariable/deleteVariable
-     * @pi.method:post
+     * @pi.methodType:post
      * @pi.request-type: formdata
      * @pi.param: name=varId;dataType=string;value=varId;
      */
@@ -56,7 +53,7 @@ public class VariableController {
     /**
      * @pi.name:更新变量
      * @pi.path:/pipelineVariable/createVariable
-     * @pi.method:post
+     * @pi.methodType:post
      * @pi.request-type:json
      * @pi.param: model=variable
      */
@@ -69,13 +66,13 @@ public class VariableController {
     /**
      * @pi.name:查询任务变量
      * @pi.path:/pipelineVariable/findAllVariable
-     * @pi.method:post
+     * @pi.methodType:post
      * @pi.request-type: formdata
      * @pi.param: name=taskId;dataType=string;value=taskId;
      */
     @RequestMapping(path="/findAllVariable",method = RequestMethod.POST)
-    @ApiMethod(name = "findAllVariable",desc = "查询变量")
-    @ApiParam(name = "taskId",desc = "taskId",required = true)
+    // @ApiMethod(name = "findAllVariable",desc = "查询变量")
+    // @ApiParam(name = "taskId",desc = "taskId",required = true)
     public Result< List<Variable>> findAllVariable(@NotNull String taskId){
         List<Variable> allVariable = variableServer.findAllVariable(taskId);
         return Result.ok(allVariable);

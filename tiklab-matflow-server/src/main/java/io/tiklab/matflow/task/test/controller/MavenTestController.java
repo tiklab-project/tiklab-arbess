@@ -34,7 +34,7 @@ public class MavenTestController {
     /**
      * @pi.name:条件查询流水线测试信息执行实例
      * @pi.path:/testOnRelevance/findAllRelevancePage
-     * @pi.method:post
+     * @pi.methodType:post
      * @pi.request-type:json
      * @pi.param: model=relevanceTestOnQuery
      */

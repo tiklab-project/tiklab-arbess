@@ -3,29 +3,18 @@ package io.tiklab.matflow.task.code.service;
 import io.tiklab.core.exception.ApplicationException;
 import io.tiklab.matflow.setting.model.AuthThird;
 import io.tiklab.matflow.setting.service.AuthThirdService;
-import io.tiklab.matflow.support.util.PipelineFinal;
-import io.tiklab.matflow.support.util.PipelineUtil;
+import io.tiklab.matflow.support.util.PipelineRequestUtil;
 import io.tiklab.matflow.task.code.model.XcodeBranch;
 import io.tiklab.matflow.task.code.model.XcodeRepository;
-import io.tiklab.rpc.client.RpcClient;
-import io.tiklab.rpc.client.config.RpcClientConfig;
-import io.tiklab.rpc.client.router.lookup.FixedLookup;
-import io.tiklab.xcode.branch.model.Branch;
-import io.tiklab.xcode.branch.service.BranchServer;
-import io.tiklab.xcode.repository.model.Repository;
-import io.tiklab.xcode.repository.service.RepositoryServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-
-import java.awt.print.PageFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-
-import static io.tiklab.matflow.support.util.PipelineFinal.TASK_CODE_DEFAULT_BRANCH;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import java.util.*;
 
 @Service
 public class TaskCodeXcodeServiceImpl implements TaskCodeXcodeService {
@@ -33,26 +22,15 @@ public class TaskCodeXcodeServiceImpl implements TaskCodeXcodeService {
     private static final Logger logger = LoggerFactory.getLogger(TaskCodeXcodeServiceImpl.class);
 
     @Autowired
-    private AuthThirdService serverServer;
+    AuthThirdService serverServer;
 
+    @Autowired
+    PipelineRequestUtil requestUtil;
 
-    RpcClient rpcClient(){
-        RpcClientConfig rpcClientConfig = RpcClientConfig.instance();
-        return new RpcClient(rpcClientConfig);
-    }
-
-    RepositoryServer repositoryServer(String xcodeAddress){
-        return rpcClient().getBean(RepositoryServer.class, new FixedLookup(xcodeAddress));
-    }
-
-    BranchServer branchServer(String xcodeAddress){
-        return rpcClient().getBean(BranchServer.class, new FixedLookup(xcodeAddress));
-    }
 
     @Override
     public List<XcodeRepository> findAllRepository(String authId){
 
-        List<Repository> allRpy  ;
         AuthThird authServer = serverServer.findOneAuthServer(authId);
 
         if (Objects.isNull(authServer)){
@@ -65,7 +43,13 @@ public class TaskCodeXcodeServiceImpl implements TaskCodeXcodeService {
             String username = authServer.getUsername();
             String password = authServer.getPassword();
 
-            allRpy = repositoryServer(serverAddress).findRepositoryByUser(username,password,"1");
+            HttpHeaders headers = requestUtil.initHeaders(MediaType.APPLICATION_JSON, new HashMap<>());
+            MultiValueMap<String, Object> valueMap = new LinkedMultiValueMap<>();
+            valueMap.add("account",username);
+            valueMap.add("password",password);
+            valueMap.add("dirId","1");
+            String requestUrl = serverAddress+"/api/rpy/findRepositoryByUser";
+            return requestUtil.requestPostList(headers, requestUrl, valueMap, XcodeRepository.class);
         }catch (Throwable throwable){
             String message = throwable.getMessage();
             logger.error(message);
@@ -81,35 +65,19 @@ public class TaskCodeXcodeServiceImpl implements TaskCodeXcodeService {
 
             throw new ApplicationException("无法连接到："+serverAddress);
         }
-
-        if (allRpy == null){
-            return Collections.emptyList();
-        }
-
-        List<XcodeRepository> list = new ArrayList<>();
-
-        for (Repository repository : allRpy) {
-            list.add(bindXcodeRepository(repository));
-        }
-
-        return list;
     }
 
     @Override
     public List<XcodeBranch> findAllBranch(String authId, String rpyId){
-        List<Branch> allBranch;
 
         AuthThird authServer = serverServer.findOneAuthServer(authId);
         String  serverAddress = authServer.getServerAddress();
-
-        Repository repository = repositoryServer(serverAddress).findOneRpy(rpyId);
-
-        if (Objects.isNull(repository)){
-            throw new ApplicationException("找不到"+rpyId +"仓库！");
-        }
-        List<XcodeBranch> list = new ArrayList<>();
         try {
-            allBranch = branchServer(serverAddress).findAllBranch(rpyId);
+            HttpHeaders headers = requestUtil.initHeaders(MediaType.APPLICATION_JSON, new HashMap<>());
+            MultiValueMap<String, Object> valueMap = new LinkedMultiValueMap<>();
+            valueMap.add("rpyId",rpyId);
+            String requestUrl = serverAddress+"/api/branch/findAllBranch";
+            return requestUtil.requestPostList(headers, requestUrl, valueMap, XcodeBranch.class);
         }catch (Throwable throwable){
             String message = throwable.getMessage();
             logger.error(message);
@@ -121,21 +89,6 @@ public class TaskCodeXcodeServiceImpl implements TaskCodeXcodeService {
             }
             throw new ApplicationException("无法连接到："+serverAddress);
         }
-
-        if (Objects.isNull(allBranch) || allBranch.isEmpty()){
-            throw new ApplicationException("获取Xcode分支失败，该仓库没有分支或该仓库为空仓库");
-            // allBranch = new ArrayList<>();
-            // Branch branch = new Branch();
-            // branch.setBranchName(TASK_CODE_DEFAULT_BRANCH);
-            // branch.setBranchId(TASK_CODE_DEFAULT_BRANCH);
-            // allBranch.add(branch);
-        }
-
-        for (Branch branch : allBranch) {
-            list.add(bindXcodeBranch(branch));
-        }
-
-        return list;
     }
 
     @Override
@@ -143,20 +96,16 @@ public class TaskCodeXcodeServiceImpl implements TaskCodeXcodeService {
         if (Objects.isNull(authId) || Objects.isNull(branchId)){
             return null;
         }
+
         AuthThird authServer = serverServer.findOneAuthServer(authId);
         String  serverAddress = authServer.getServerAddress();
-        Branch branch;
-        try {
-            branch = branchServer(serverAddress).findBranch(rpyId, branchId);
-        }catch (Throwable throwable){
-            logger.error(throwable.getMessage());
-            throw new ApplicationException("无法连接到："+ serverAddress );
-        }
-        if (Objects.isNull(branch)){
-            return null;
-        }
 
-        return bindXcodeBranch(branch);
+        HttpHeaders headers = requestUtil.initHeaders(MediaType.APPLICATION_JSON, new HashMap<>());
+        MultiValueMap<String, Object> valueMap = new LinkedMultiValueMap<>();
+        valueMap.add("rpyId",rpyId);
+        valueMap.add("commitId",branchId);
+        String requestUrl = serverAddress+"/api/branch/findBranch";
+        return requestUtil.requestPost(headers, requestUrl, valueMap, XcodeBranch.class);
     }
 
     @Override
@@ -165,14 +114,18 @@ public class TaskCodeXcodeServiceImpl implements TaskCodeXcodeService {
         if (Objects.isNull(authId) || Objects.isNull(rpyId)){
             return null;
         }
-
         AuthThird authServer = serverServer.findOneAuthServer(authId);
         String  serverAddress = authServer.getServerAddress();
-
-
-        Repository repository ;
         try {
-            repository = repositoryServer(serverAddress).findOneRpy(rpyId);
+            HttpHeaders headers = requestUtil.initHeaders(MediaType.APPLICATION_JSON, new HashMap<>());
+            MultiValueMap<String, Object> valueMap = new LinkedMultiValueMap<>();
+            valueMap.add("id",rpyId);
+            String requestUrl = serverAddress+"/api/rpy/findRepository";
+            XcodeRepository repository = requestUtil.requestPost(headers, requestUrl, valueMap, XcodeRepository.class);
+            if (Objects.isNull(repository)){
+                throw new ApplicationException("找不到"+ rpyId +"仓库！");
+            }
+            return repository;
         }catch (Throwable throwable){
             String message = throwable.getMessage();
             logger.error(message);
@@ -184,32 +137,7 @@ public class TaskCodeXcodeServiceImpl implements TaskCodeXcodeService {
             }
             throw new ApplicationException("无法连接到："+serverAddress);
         }
-
-        if (Objects.isNull(repository)){
-            throw new ApplicationException("找不到"+ rpyId +"仓库！");
-        }
-        return bindXcodeRepository(repository);
-
     }
-
-    private XcodeRepository bindXcodeRepository(Repository repository){
-        XcodeRepository xcodeRepository = new XcodeRepository();
-        xcodeRepository.setId(repository.getRpyId());
-        xcodeRepository.setAddress(repository.getFullPath());
-        xcodeRepository.setName(repository.getName());
-        return xcodeRepository;
-    }
-
-    private XcodeBranch bindXcodeBranch(Branch branch){
-        XcodeBranch xcodeBranch = new XcodeBranch();
-        xcodeBranch.setId(branch.getBranchId());
-        xcodeBranch.setName(branch.getBranchName());
-        return xcodeBranch;
-    }
-
-
-
-
 
 }
 

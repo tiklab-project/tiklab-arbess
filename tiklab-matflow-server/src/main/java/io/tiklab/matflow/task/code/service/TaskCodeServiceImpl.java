@@ -94,11 +94,11 @@ public class TaskCodeServiceImpl implements TaskCodeService {
         if (Objects.isNull(codeBranch)){
             return taskCode;
         }
-        XcodeBranch branch = taskCodeXcodeService.findOneBranch(authId, repository.getId(), codeBranch);
+        XcodeBranch branch = taskCodeXcodeService.findOneBranch(authId, repository.getRpyId(), codeBranch);
         if (Objects.isNull(branch)){
             branch = new XcodeBranch();
-            branch.setName(TASK_CODE_DEFAULT_BRANCH);
-            branch.setId(TASK_CODE_DEFAULT_BRANCH);
+            branch.setBranchName(TASK_CODE_DEFAULT_BRANCH);
+            branch.setBranchId(TASK_CODE_DEFAULT_BRANCH);
         }
         taskCode.setBranch(branch);
         return taskCode;
@@ -127,7 +127,7 @@ public class TaskCodeServiceImpl implements TaskCodeService {
             case "xcode" -> {
                 XcodeRepository repository = oneCode.getRepository();
                 if (!Objects.isNull(repository)){
-                    taskCode.setCodeAddress(repository.getAddress());
+                    taskCode.setCodeAddress(repository.getFullPath());
                 }
             }
             default -> taskCode.setCodeAddress(taskCode.getCodeName());

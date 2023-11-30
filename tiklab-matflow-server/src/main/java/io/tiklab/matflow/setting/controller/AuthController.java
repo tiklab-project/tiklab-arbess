@@ -28,7 +28,7 @@ public class AuthController {
     /**
      * @pi.name:createAuth
      * @pi.path:/auth/createAuth
-     * @pi.method:post
+     * @pi.methodType:post
      * @pi.request-type:json
      * @pi.param: model=auth
      */
@@ -41,7 +41,7 @@ public class AuthController {
     /**
      * @pi.name:deleteAuth
      * @pi.path:/auth/deleteAuth
-     * @pi.method:post
+     * @pi.methodType:post
      * @pi.request-type: formdata
      * @pi.param: name=authId;dataType=string;value=authId;
      */
@@ -54,7 +54,7 @@ public class AuthController {
     /**
      * @pi.name:updateAuth
      * @pi.path:/auth/createAuth
-     * @pi.method:post
+     * @pi.methodType:post
      * @pi.request-type:json
      * @pi.param: model=auth
      */
@@ -67,7 +67,7 @@ public class AuthController {
     /**
      * @pi.name:findOneAuth
      * @pi.path:/auth/findOneAuth
-     * @pi.method:post
+     * @pi.methodType:post
      * @pi.request-type: formdata
      * @pi.param: name=authId;dataType=string;value=authId;
      */
@@ -80,7 +80,7 @@ public class AuthController {
     /**
      * @pi.name:查询所有认证信息
      * @pi.path:/auth/findAllAuth
-     * @pi.method:post
+     * @pi.methodType:post
      * @pi.request-type:none
      */
     @RequestMapping(path="/findAllAuth",method = RequestMethod.POST)

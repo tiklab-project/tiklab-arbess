@@ -221,7 +221,7 @@ public class TaskPullArtifactExecServiceImpl implements TaskPullArtifactExecServ
         if (Objects.isNull(pullArtifact.getRepository())){
             throw new ApplicationException("无法获取到远程仓库！");
         }
-        String address = pullArtifact.getRepository().getAddress();
+        String address = pullArtifact.getRepository().getRepositoryUrl();
 
         execOrder = execOrder + " -DremoteRepositories=\"" + address+"\""
                 +" -Durl=\"" + address+"\"";
@@ -463,7 +463,7 @@ public class TaskPullArtifactExecServiceImpl implements TaskPullArtifactExecServ
         String username = auth.getUsername();
         String password = auth.getPassword();
 
-        String replace = pullArtifact.getRepository().getAddress().replace("https://", "").replace("http://", "");
+        String replace = pullArtifact.getRepository().getRepositoryUrl().replace("https://", "").replace("http://", "");
 
         String loginOrder;
         if (isHttp){

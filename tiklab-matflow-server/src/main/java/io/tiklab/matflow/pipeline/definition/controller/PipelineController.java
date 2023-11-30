@@ -8,7 +8,6 @@ import io.tiklab.matflow.pipeline.definition.model.PipelineRecently;
 import io.tiklab.matflow.pipeline.definition.service.PipelineService;
 import io.tiklab.matflow.pipeline.definition.service.PipelineYamlService;
 import io.tiklab.matflow.support.util.PipelineFileUtil;
-import io.tiklab.postin.annotation.ApiMethod;
 import io.tiklab.user.user.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -33,7 +31,7 @@ import java.util.Map;
 
 /**
  * @pi.protocol: http
- * @pi.groupName: pipeline
+ * @pi.groupName: Pipeline
  */
 @RestController
 @RequestMapping("/pipeline")
@@ -48,7 +46,7 @@ public class PipelineController {
     /**
      * @pi.name:createPipeline
      * @pi.path:/pipeline/createPipeline
-     * @pi.method:post
+     * @pi.methodType:post
      * @pi.request-type:json
      * @pi.param: model=pipeline
      */
@@ -63,7 +61,7 @@ public class PipelineController {
     /**
      * @pi.name:findAllPipeline
      * @pi.path:/pipeline/findAllPipeline
-     * @pi.method:post
+     * @pi.methodType:post
      * @pi.request-type:none
      */
     @RequestMapping(path="/findAllPipeline",method = RequestMethod.POST)
@@ -77,7 +75,7 @@ public class PipelineController {
     /**
      * @pi.name:deletePipeline
      * @pi.path:/pipeline/deletePipeline
-     * @pi.method:post
+     * @pi.methodType:post
      * @pi.request-type:formdata
      * @pi.param: name=pipelineId;dataType=string;value=pipelineId;
      */
@@ -92,7 +90,7 @@ public class PipelineController {
     /**
      * @pi.name:findOnePipeline
      * @pi.path:/pipeline/findOnePipeline
-     * @pi.method:post
+     * @pi.methodType:post
      * @pi.request-type:formdata
      * @pi.param: name=pipelineId;dataType=string;value=pipelineId;
      */
@@ -107,9 +105,9 @@ public class PipelineController {
     /**
      * @pi.name:updatePipeline
      * @pi.path:/pipeline/updatePipeline
-     * @pi.method:post
+     * @pi.methodType:post
      * @pi.request-type:json
-     * @pi.param: model=pipeline
+     * @pi.param:model=pipeline
      */
     @RequestMapping(path="/updatePipeline",method = RequestMethod.POST)
     public Result<Void> updatePipeline(@RequestBody @NotNull @Valid Pipeline pipeline){
@@ -123,7 +121,7 @@ public class PipelineController {
     /**
      * @pi.name:findUserPipelinePage
      * @pi.path:/pipeline/findUserPipelinePage
-     * @pi.method:post
+     * @pi.methodType:post
      * @pi.request-type:json
      * @pi.param: model=query
      */
@@ -138,7 +136,7 @@ public class PipelineController {
     /**
      * @pi.name:findUserPipeline
      * @pi.path:/pipeline/findUserPipeline
-     * @pi.method:post
+     * @pi.methodType:post
      * @pi.request-type:none
      */
     @RequestMapping(path="/findUserPipeline",method = RequestMethod.POST)
@@ -151,7 +149,7 @@ public class PipelineController {
     /**
      * @pi.name:findPipelineUser
      * @pi.path:/pipeline/findPipelineUser
-     * @pi.method:post
+     * @pi.methodType:post
      * @pi.request-type: formdata
      * @pi.param: name=pipelineId;dataType=string;value=pipelineId;
      */
@@ -166,7 +164,7 @@ public class PipelineController {
     /**
      * @pi.name:findPipelineRecently
      * @pi.path:/pipeline/findPipelineRecently
-     * @pi.method:post
+     * @pi.methodType:post
      * @pi.request-type: formdata;
      * @pi.param: name=number;dataType=int;value=5;
      */
@@ -182,7 +180,7 @@ public class PipelineController {
     /**
      * @pi.name:pipelineClone
      * @pi.path:/pipeline/pipelineClone
-     * @pi.method:post
+     * @pi.methodType:post
      * @pi.request-type: formdata;
      * @pi.param: name=pipelineId;dataType=string;value=pipelineId;
      */
@@ -198,7 +196,7 @@ public class PipelineController {
     /**
      * @pi.name:findPipelineCloneName
      * @pi.path:/pipeline/findPipelineCloneName
-     * @pi.method:post
+     * @pi.methodType:post
      * @pi.request-type: formdata;
      * @pi.param: name=pipelineId;dataType=string;value=pipelineId;
      */
@@ -210,11 +208,13 @@ public class PipelineController {
         return Result.ok(name);
     }
 
+
     /**
-     * 获取流水线最近打开的流水线
-     * @param number 数量
-     * @param pipelineId 流水线id
-     * @return 流水线
+     * @pi.name:findRecentlyPipeline
+     * @pi.path:/pipeline/findRecentlyPipeline
+     * @pi.methodType:post
+     * @pi.request-type: formdata;
+     * @pi.param: name=pipelineId;dataType=string;value=pipelineId;
      */
     @RequestMapping(path="/findRecentlyPipeline",method = RequestMethod.POST)
     public Result<String> findRecentlyPipeline(@NotNull Integer number,@NotNull String pipelineId){
@@ -226,9 +226,9 @@ public class PipelineController {
 
 
     /**
-     * @pi.name:findPipelineCloneName
+     * @pi.name:importPipelineYaml
      * @pi.path:/pipeline/importPipelineYaml
-     * @pi.method:post
+     * @pi.methodType:post
      * @pi.request-type: formdata;
      * @pi.param: name=pipelineId;dataType=string;value=pipelineId;
      */

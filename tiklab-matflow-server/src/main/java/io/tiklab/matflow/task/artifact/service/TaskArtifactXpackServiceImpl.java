@@ -3,23 +3,20 @@ package io.tiklab.matflow.task.artifact.service;
 import io.tiklab.core.exception.ApplicationException;
 import io.tiklab.matflow.setting.model.AuthThird;
 import io.tiklab.matflow.setting.service.AuthThirdService;
+import io.tiklab.matflow.support.util.PipelineRequestUtil;
 import io.tiklab.matflow.task.artifact.model.XpackRepository;
+import io.tiklab.matflow.task.artifact.model.XpackRepositoryQuery;
 import io.tiklab.matflow.task.code.service.TaskCodeXcodeServiceImpl;
-import io.tiklab.rpc.client.RpcClient;
-import io.tiklab.rpc.client.config.RpcClientConfig;
-import io.tiklab.rpc.client.router.lookup.FixedLookup;
-import io.tiklab.xpack.repository.model.Repository;
-import io.tiklab.xpack.repository.model.RepositoryQuery;
-import io.tiklab.xpack.repository.service.RepositoryService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Service
 public class TaskArtifactXpackServiceImpl implements TaskArtifactXpackService {
@@ -30,15 +27,8 @@ public class TaskArtifactXpackServiceImpl implements TaskArtifactXpackService {
     @Autowired
     AuthThirdService authThirdService;
 
-
-    RpcClient rpcClient(){
-        RpcClientConfig rpcClientConfig = RpcClientConfig.instance();
-        return new RpcClient(rpcClientConfig);
-    }
-
-    RepositoryService repositoryServer(String xpackAddress){
-        return rpcClient().getBean(RepositoryService.class, new FixedLookup(xpackAddress));
-    }
+    @Autowired
+    PipelineRequestUtil requestUtil;
 
 
     public List<XpackRepository> findAllRepository(String authId){
@@ -49,27 +39,13 @@ public class TaskArtifactXpackServiceImpl implements TaskArtifactXpackService {
         }
 
         String serverAddress = authServer.getServerAddress();
-        RepositoryQuery repositoryQuery = new RepositoryQuery();
+        XpackRepositoryQuery repositoryQuery = new XpackRepositoryQuery();
         repositoryQuery.setRepositoryType("local");
-        List<Repository> repositoryList ;
-        List<XpackRepository> list = new ArrayList<>();
         try {
-            repositoryList = repositoryServer(serverAddress).findRepositoryList(repositoryQuery);
+            HttpHeaders headers = requestUtil.initHeaders(MediaType.APPLICATION_JSON, new HashMap<>());
+            String requestUrl = serverAddress+"/api/xpackRepository/findRepositoryList";
+            return requestUtil.requestPostList(headers, requestUrl, repositoryQuery, XpackRepository.class);
 
-
-
-
-
-
-
-            if (repositoryList == null || repositoryList.isEmpty()){
-                return Collections.emptyList();
-            }
-
-            for (Repository repository : repositoryList) {
-                list.add(bindXpackRepository(repository));
-            }
-            return list;
         } catch (Throwable throwable){
             String message = throwable.getMessage();
             logger.error(message);
@@ -89,9 +65,13 @@ public class TaskArtifactXpackServiceImpl implements TaskArtifactXpackService {
             return null;
         }
         String serverAddress = authServer.getServerAddress();
-        Repository repository ;
+
         try {
-             repository = repositoryServer(serverAddress).findRepository(rpyId);
+            HttpHeaders headers = requestUtil.initHeaders(MediaType.APPLICATION_JSON, new HashMap<>());
+            String requestUrl = serverAddress+"/api/xpackRepository/findRepository";
+            MultiValueMap<String, String> multiValueMap = new LinkedMultiValueMap<>();
+            multiValueMap.add("id",rpyId);
+            return requestUtil.requestPost(headers, requestUrl, multiValueMap, XpackRepository.class);
 
         } catch (Throwable throwable){
             String message = throwable.getMessage();
@@ -104,23 +84,6 @@ public class TaskArtifactXpackServiceImpl implements TaskArtifactXpackService {
             }
             throw new ApplicationException("无法连接到："+serverAddress);
         }
-
-        if (repository == null){
-            throw new ApplicationException("获取仓库信息为空！");
-        }
-
-        return bindXpackRepository(repository);
-    }
-
-
-    private XpackRepository bindXpackRepository(Repository repository){
-        XpackRepository xpackRepository = new XpackRepository();
-
-        xpackRepository.setId(repository.getId());
-        xpackRepository.setName(repository.getName());
-        xpackRepository.setAddress(repository.getRepositoryUrl());
-        return xpackRepository;
-
     }
 
 

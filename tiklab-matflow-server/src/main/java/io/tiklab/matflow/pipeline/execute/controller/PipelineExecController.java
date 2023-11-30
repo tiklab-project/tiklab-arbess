@@ -5,9 +5,6 @@ import io.tiklab.core.Result;
 import io.tiklab.matflow.pipeline.execute.model.PipelineRunMsg;
 import io.tiklab.matflow.pipeline.execute.service.PipelineExecService;
 import io.tiklab.matflow.pipeline.instance.model.PipelineInstance;
-import io.tiklab.postin.annotation.Api;
-import io.tiklab.postin.annotation.ApiMethod;
-import io.tiklab.postin.annotation.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,7 +28,7 @@ public class PipelineExecController {
     /**
      * @pi.name:执行流水线
      * @pi.path:/exec/start
-     * @pi.method:post
+     * @pi.methodType:post
      * @pi.request-type: formdata
      * @pi.param: name=pipelineId;dataType=string;value=pipelineId;
      */
@@ -45,7 +42,7 @@ public class PipelineExecController {
     /**
      * @pi.name:停止流水线执行
      * @pi.path:/exec/stop
-     * @pi.method:post
+     * @pi.methodType:post
      * @pi.request-type: formdata
      * @pi.param: name=pipelineId;dataType=string;value=pipelineId;
      */

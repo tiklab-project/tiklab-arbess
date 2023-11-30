@@ -26,7 +26,7 @@ public class PipelineCodeXcodeController {
     /**
      * @pi.name:获取xcode所有仓库
      * @pi.path:/xcodeAuthorize/findAllStorehouse
-     * @pi.method:post
+     * @pi.methodType:post
      * @pi.request-type: formdata
      * @pi.param: name=authId;dataType=string;value=authId;
      */
@@ -42,7 +42,7 @@ public class PipelineCodeXcodeController {
     /**
      * @pi.name:获取仓库分支信息
      * @pi.path:/xcodeAuthorize/findAllBranch
-     * @pi.method:post
+     * @pi.methodType:post
      * @pi.request-type: formdata
      * @pi.param: name=authId;dataType=string;value=authId;
      * @pi.param: name=rpyId;dataType=string;value=rpyId;

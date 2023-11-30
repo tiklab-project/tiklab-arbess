@@ -28,7 +28,7 @@ public class PipelineCodeThirdController {
     /**
      * @pi.name:获取第三方临时授权码
      * @pi.path:/codeAuthorize/findCode
-     * @pi.method:post
+     * @pi.methodType:post
      * @pi.request-type:json
      * @pi.param: model=authThird
      */
@@ -43,7 +43,7 @@ public class PipelineCodeThirdController {
     /**
      * @pi.name:获取第三方永久授权码
      * @pi.path:/codeAuthorize/findAccessToken
-     * @pi.method:post
+     * @pi.methodType:post
      * @pi.request-type:json
      * @pi.param: model=authThird
      */
@@ -56,7 +56,7 @@ public class PipelineCodeThirdController {
     /**
      * @pi.name:查询第三方仓库信息
      * @pi.path:/codeAuthorize/findAllStorehouse
-     * @pi.method:post
+     * @pi.methodType:post
      * @pi.request-type: formdata
      * @pi.param: name=authId;dataType=string;value=authId;
      */
@@ -69,7 +69,7 @@ public class PipelineCodeThirdController {
     /**
      * @pi.name:查询第三方仓库分支信息
      * @pi.path:/codeAuthorize/findBranch
-     * @pi.method:post
+     * @pi.methodType:post
      * @pi.request-type: formdata
      * @pi.param: name=authId;dataType=string;value=authId;
      * @pi.param: name=houseName;dataType=string;value=houseName;
@@ -83,7 +83,7 @@ public class PipelineCodeThirdController {
     /**
      * @pi.name:获取第三方授权回调地址
      * @pi.path:/codeAuthorize/callbackUrl
-     * @pi.method:post
+     * @pi.methodType:post
      * @pi.request-type: formdata
      * @pi.param: name=authId;dataType=string;value=authId;
      */

@@ -23,7 +23,7 @@ public class SystemMassageController {
     /**
      * @pi.name:获取系统信息
      * @pi.path:/systemMassage/getSystemMassage
-     * @pi.method:post
+     * @pi.methodType:post
      * @pi.request-type:none
      */
     @RequestMapping(path="/getSystemMassage",method = RequestMethod.POST)

@@ -27,7 +27,7 @@ public class TriggerController {
     /**
      * @pi.name:创建流水线触发器
      * @pi.path:/trigger/createTrigger
-     * @pi.method:post
+     * @pi.methodType:post
      * @pi.request-type:json
      * @pi.param: model=trigger
      */
@@ -40,7 +40,7 @@ public class TriggerController {
     /**
      * @pi.name:创建流水线触发器信息
      * @pi.path:/trigger/updateTrigger
-     * @pi.method:post
+     * @pi.methodType:post
      * @pi.request-type:json
      * @pi.param: model=trigger
      */
@@ -53,7 +53,7 @@ public class TriggerController {
     /**
      * @pi.name:删除流水线触发器信息
      * @pi.path:/trigger/finAllStage
-     * @pi.method:post
+     * @pi.methodType:post
      * @pi.request-type: formdata
      * @pi.param: name=triggerId;dataType=string;value=triggerId;
      */
@@ -67,7 +67,7 @@ public class TriggerController {
     /**
      * @pi.name:查询流水线触发器信息
      * @pi.path:/trigger/findAllTrigger
-     * @pi.method:post
+     * @pi.methodType:post
      * @pi.request-type: formdata
      * @pi.param: name=pipelineId;dataType=string;value=pipelineId;
      */

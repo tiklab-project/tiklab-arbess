@@ -3,9 +3,6 @@ package io.tiklab.matflow.task.task.controller;
 import io.tiklab.core.Result;
 import io.tiklab.matflow.task.task.model.TaskInstance;
 import io.tiklab.matflow.task.task.service.TasksInstanceService;
-import io.tiklab.postin.annotation.Api;
-import io.tiklab.postin.annotation.ApiMethod;
-import io.tiklab.postin.annotation.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -20,7 +17,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/taskInstance")
-@Api(name = "TaskInstanceController",desc = "任务实例")
+// @Api(name = "TaskInstanceController",desc = "任务实例")
 public class TasksInstanceController {
 
     @Autowired
@@ -29,7 +26,7 @@ public class TasksInstanceController {
     /**
      * @pi.name:查询流水线多任务实例
      * @pi.path:/taskInstance/findTaskInstance
-     * @pi.method:post
+     * @pi.methodType:post
      * @pi.request-type: formdata
      * @pi.param: name=instanceId;dataType=string;value=instanceId;
      */

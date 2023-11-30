@@ -3,9 +3,6 @@ package io.tiklab.matflow.support.condition.controller;
 import io.tiklab.matflow.support.condition.model.Condition;
 import io.tiklab.matflow.support.condition.service.ConditionService;
 import io.tiklab.core.Result;
-import io.tiklab.postin.annotation.Api;
-import io.tiklab.postin.annotation.ApiMethod;
-import io.tiklab.postin.annotation.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,7 +26,7 @@ public class ConditionController {
     /**
      * @pi.name:创建条件
      * @pi.path:/pipelineCond/createCond
-     * @pi.method:post
+     * @pi.methodType:post
      * @pi.request-type:json
      * @pi.param: model=condition
      */
@@ -42,7 +39,7 @@ public class ConditionController {
     /**
      * @pi.name:更新条件
      * @pi.path:/pipelineCond/updateCond
-     * @pi.method:post
+     * @pi.methodType:post
      * @pi.request-type:json
      * @pi.param: model=condition
      */
@@ -55,13 +52,13 @@ public class ConditionController {
     /**
      * @pi.name:删除条件
      * @pi.path:/pipelineCond/deleteCond
-     * @pi.method:post
+     * @pi.methodType:post
      * @pi.request-type: formdata
      * @pi.param: name=condId;dataType=string;value=condId;
      */
     @RequestMapping(path="/deleteCond",method = RequestMethod.POST)
-    @ApiMethod(name = "deleteCond",desc = "查询流水线配置")
-    @ApiParam(name = "condId",desc = "条件id",required = true)
+    // @ApiMethod(name = "deleteCond",desc = "查询流水线配置")
+    // @ApiParam(name = "condId",desc = "条件id",required = true)
     public Result<Void> deleteCond(@NotNull String condId){
         conditionServer.deleteCond(condId);
         return Result.ok();
@@ -70,13 +67,13 @@ public class ConditionController {
     /**
      * @pi.name:查询任务条件
      * @pi.path:/pipelineCond/findAllTaskCond
-     * @pi.method:post
+     * @pi.methodType:post
      * @pi.request-type: formdata
      * @pi.param: name=taskId;dataType=string;value=taskId;
      */
     @RequestMapping(path="/findAllTaskCond",method = RequestMethod.POST)
-    @ApiMethod(name = "findAllTaskCond",desc = "查询流水线配置")
-    @ApiParam(name = "taskId",desc = "任务id",required = true)
+    // @ApiMethod(name = "findAllTaskCond",desc = "查询流水线配置")
+    // @ApiParam(name = "taskId",desc = "任务id",required = true)
     public Result<List<Condition>> findAllTaskCond(@NotNull String  taskId){
         List<Condition> condId = conditionServer.findAllTaskCond(taskId);
         return Result.ok(condId);

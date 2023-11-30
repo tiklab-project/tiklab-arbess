@@ -447,27 +447,40 @@ public class PipelineServiceImpl implements PipelineService {
 
         List<String> userOpen = openService.findUserOpen(number + 1);
         if (userOpen.isEmpty()){
-            List<PipelineEntity> pipelineEntityList = pipelineDao.findRecentlyPipeline(pipelineId,number+1);
+            List<PipelineEntity> pipelineEntityList =
+                    pipelineDao.findRecentlyPipeline("'"+pipelineId+"'",number+1);
             List<Pipeline> pipelineList = BeanMapper.mapList(pipelineEntityList, Pipeline.class);
-            return pipelineList.subList(0,number);
+            List<Pipeline> pipelines = pipelineList.subList(0, number);
+            Pipeline pipeline = findPipelineById(pipelineId);
+            pipelines.add(0,pipeline);
+            return pipelines;
         }
 
         // 过滤出当前流水线
         List<String> list = userOpen.stream().filter(s -> !s.equals(pipelineId)).toList();
 
+        StringBuilder ids =  new StringBuilder();
         // 查询流水线
         List<Pipeline> pipelineList = new ArrayList<>();
         for (String id : list) {
             Pipeline pipeline = findPipelineById(id);
             pipelineList.add(pipeline);
+            ids.append("'").append(id).append("',");
         }
 
+        ids.append("'").append(pipelineId).append("'");
         // 判断是否足够当前数量
         if (pipelineList.size() < number){
             int size = number -pipelineList.size();
-            List<PipelineEntity> allPipeline = pipelineDao.findRecentlyPipeline(pipelineId,number+1);
-            List<Pipeline> pipelineList1 = BeanMapper.mapList(allPipeline, Pipeline.class).subList(0, size);
-            pipelineList.addAll(pipelineList.size(),pipelineList1);
+            List<PipelineEntity> allPipeline = pipelineDao.findRecentlyPipeline(String.valueOf(ids),number+1);
+            if (allPipeline != null){
+                List<Pipeline> pipelineList1 = BeanMapper.mapList(allPipeline, Pipeline.class);
+                if (pipelineList1.size() <= size){
+                    pipelineList.addAll(pipelineList.size(),pipelineList1);
+                }else {
+                    pipelineList.addAll(pipelineList.size(),pipelineList1.subList(0, size));
+                }
+            }
         }
 
         // 当前流水线放在最前

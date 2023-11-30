@@ -3,9 +3,6 @@ package io.tiklab.matflow.pipeline.definition.controller;
 import io.tiklab.matflow.pipeline.definition.model.PipelineOpen;
 import io.tiklab.matflow.pipeline.definition.service.PipelineOpenService;
 import io.tiklab.core.Result;
-import io.tiklab.postin.annotation.Api;
-import io.tiklab.postin.annotation.ApiMethod;
-import io.tiklab.postin.annotation.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -28,7 +25,7 @@ public class PipelineOpenController {
     /**
      * @pi.name:findAllOpen
      * @pi.path:/open/findAllOpen
-     * @pi.method:post
+     * @pi.methodType:post
      * @pi.request-type: formdata;
      * @pi.param: name=number;dataType=int;value=5;
      */
@@ -43,13 +40,13 @@ public class PipelineOpenController {
     /**
      * @pi.name:updateOpen
      * @pi.path:/open/updateOpen
-     * @pi.method:post
+     * @pi.methodType:post
      * @pi.request-type: formdata;
      * @pi.param: name=pipelineId;dataType=string;value=pipelineId;
      */
     @RequestMapping(path="/updateOpen",method = RequestMethod.POST)
-    @ApiMethod(name = "updatePipelineOpen",desc = "查询流水线最近状态")
-    @ApiParam(name = "pipelineId",desc = "流水线id",required = true)
+    // @ApiMethod(name = "updatePipelineOpen",desc = "查询流水线最近状态")
+    // @ApiParam(name = "pipelineId",desc = "流水线id",required = true)
     public Result<Void> updatePipelineOpen(@NotNull String pipelineId){
 
        openService.updatePipelineOpen(pipelineId);

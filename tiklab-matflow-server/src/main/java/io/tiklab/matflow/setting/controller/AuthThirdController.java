@@ -4,9 +4,6 @@ import io.tiklab.matflow.setting.model.AuthThird;
 import io.tiklab.matflow.setting.model.AuthThirdQuery;
 import io.tiklab.matflow.setting.service.AuthThirdService;
 import io.tiklab.core.Result;
-import io.tiklab.postin.annotation.Api;
-import io.tiklab.postin.annotation.ApiMethod;
-import io.tiklab.postin.annotation.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,7 +27,7 @@ public class AuthThirdController {
     /**
      * @pi.name:创建流水线第三方认证信息
      * @pi.path:/authServer/createAuthServer
-     * @pi.method:post
+     * @pi.methodType:post
      * @pi.request-type:json
      * @pi.param: model=authThird
      */
@@ -43,7 +40,7 @@ public class AuthThirdController {
     /**
      * @pi.name:删除第三方认证信息
      * @pi.path:/authServer/deleteAuthServer
-     * @pi.method:post
+     * @pi.methodType:post
      * @pi.request-type: formdata
      * @pi.param: name=serverId;dataType=string;value=serverId;
      */
@@ -56,7 +53,7 @@ public class AuthThirdController {
     /**
      * @pi.name:更新流水线第三方认证信息
      * @pi.path:/authServer/updateAuthServer
-     * @pi.method:post
+     * @pi.methodType:post
      * @pi.request-type:json
      * @pi.param: model=authThird
      */
@@ -69,7 +66,7 @@ public class AuthThirdController {
     /**
      * @pi.name:查询单个第三方认证信息
      * @pi.path:/authServer/findOneAuthServer
-     * @pi.method:post
+     * @pi.methodType:post
      * @pi.request-type: formdata
      * @pi.param: name=serverId;dataType=string;value=serverId;
      */
@@ -82,7 +79,7 @@ public class AuthThirdController {
     /**
      * @pi.name:查询所有第三方认证信息
      * @pi.path:/authServer/findAllAuthServer
-     * @pi.method:post
+     * @pi.methodType:post
      * @pi.request-type:none
      */
     @RequestMapping(path="/findAllAuthServer",method = RequestMethod.POST)
@@ -94,7 +91,7 @@ public class AuthThirdController {
     /**
      * @pi.name:根据类型单个第三方认证信息
      * @pi.path:/authServer/findAllAuthServerList
-     * @pi.method:post
+     * @pi.methodType:post
      * @pi.request-type: formdata
      * @pi.param: name=type;dataType=string;value=gitee;
      */

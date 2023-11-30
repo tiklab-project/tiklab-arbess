@@ -147,7 +147,7 @@ public class PipelineDao {
         StringBuilder sqlBuffer = new StringBuilder();
         sqlBuffer.append(" SELECT * ");
         sqlBuffer.append(" FROM pip_pipeline");
-        sqlBuffer.append(" WHERE id not in  ('").append(pipelineIds).append("')");
+        sqlBuffer.append(" WHERE id not in  (").append(pipelineIds).append(")");
         sqlBuffer.append(" LIMIT ").append(number);
         JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
         return jdbcTemplate.query(sqlBuffer.toString(),new BeanPropertyRowMapper<>(PipelineEntity.class));

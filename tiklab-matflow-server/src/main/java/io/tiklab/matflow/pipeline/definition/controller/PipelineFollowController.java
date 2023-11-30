@@ -14,20 +14,20 @@ import javax.validation.constraints.NotNull;
 
 /**
  * @pi.protocol: http
- * @pi.groupName: pipelineFollow
+ * @pi.groupName: PipelineFollow
  */
 @RestController
 @RequestMapping("/follow")
 public class PipelineFollowController {
 
     @Autowired
-    private PipelineFollowService followService;
+    PipelineFollowService followService;
 
 
     /**
      * @pi.name:updateFollow
      * @pi.path:/follow/updateFollow
-     * @pi.method:post
+     * @pi.methodType:post
      * @pi.request-type:json
      * @pi.param: model=pipelineFollow
      */

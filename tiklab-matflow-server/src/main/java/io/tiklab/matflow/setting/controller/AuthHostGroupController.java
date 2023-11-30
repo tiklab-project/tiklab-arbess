@@ -29,7 +29,7 @@ public class AuthHostGroupController {
     /**
      * @pi.name:创建流水线主机组认证信息
      * @pi.path:/authHostGroup/createAuthHostGroup
-     * @pi.method:post
+     * @pi.methodType:post
      * @pi.request-type:json
      * @pi.param:model=hostGroup
      */
@@ -42,7 +42,7 @@ public class AuthHostGroupController {
     /**
      * @pi.name:删除主机组认证信息
      * @pi.path:/authHostGroup/deleteAuthHostGroup
-     * @pi.method:post
+     * @pi.methodType:post
      * @pi.request-type: formdata
      * @pi.param:name=groupId;dataType=string;value=groupId;
      */
@@ -55,7 +55,7 @@ public class AuthHostGroupController {
     /**
      * @pi.name:更新主机组认证信息
      * @pi.path:/authHostGroup/updateAuthHostGroup
-     * @pi.method:post
+     * @pi.methodType:post
      * @pi.request-type:json
      * @pi.param:model=hostGroup
      */
@@ -68,7 +68,7 @@ public class AuthHostGroupController {
     /**
      * @pi.name:查询单个主机组认证信息
      * @pi.path:/authHostGroup/findAuthHostGroup
-     * @pi.method:post
+     * @pi.methodType:post
      * @pi.request-type:formdata
      * @pi.param:name=groupId;dataType=string;value=groupId;
      */
@@ -81,7 +81,7 @@ public class AuthHostGroupController {
     /**
      * @pi.name:查询所有主机组认证信息
      * @pi.path:/auth/findAllAuthHostGroupList
-     * @pi.method:post
+     * @pi.methodType:post
      * @pi.request-type:formdata
      * @pi.param:name=userId;dataType=string;value=aliyun;
      */

@@ -8,7 +8,16 @@ public class XpackRepository {
     private String name;
 
 
-    private String address;
+    private String repositoryUrl;
+
+    public String getRepositoryUrl() {
+        return repositoryUrl;
+    }
+
+    public void setRepositoryUrl(String repositoryUrl) {
+        this.repositoryUrl = repositoryUrl;
+    }
+
 
     public String getId() {
         return id;
@@ -26,11 +35,5 @@ public class XpackRepository {
         this.name = name;
     }
 
-    public String getAddress() {
-        return address;
-    }
 
-    public void setAddress(String address) {
-        this.address = address;
-    }
 }

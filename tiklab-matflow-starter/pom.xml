@@ -414,6 +414,30 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.0.0</version>
+                <executions>
+                    <execution>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <mainClass>io.tiklab.postin.doclet.starter.DocletApplication</mainClass>
+                    <arguments>
+                        <!-- modules-->
+                        <argument>/Users/zcamy/tiklab/tiklab-matflow/tiklab-matflow-api;/Users/zcamy/tiklab/tiklab-matflow/tiklab-matflow-server</argument>
+                        <!-- workspaceId-->
+                        <argument>8ee7d045a30c</argument>
+                        <!-- server-->
+                        <argument>http://192.168.10.21:8090</argument>
+                    </arguments>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 

@@ -28,7 +28,7 @@ public class TasksController {
     /**
      * @pi.name:创建流水线任务
      * @pi.path:/tasks/createTask
-     * @pi.method:post
+     * @pi.methodType:post
      * @pi.request-type:json
      * @pi.param: model=tasks
      */
@@ -41,7 +41,7 @@ public class TasksController {
     /**
      * @pi.name:查询流水线所有任务
      * @pi.path:/tasks/finAllTask
-     * @pi.method:post
+     * @pi.methodType:post
      * @pi.request-type: formdata
      * @pi.param: name=pipelineId;dataType=string;value=pipelineId;
      */
@@ -54,7 +54,7 @@ public class TasksController {
     /**
      * @pi.name:更新流水线任务
      * @pi.path:/tasks/updateTask
-     * @pi.method:post
+     * @pi.methodType:post
      * @pi.request-type:json
      * @pi.param: model=tasks
      */
@@ -67,7 +67,7 @@ public class TasksController {
     /**
      * @pi.name:更新任务名称
      * @pi.path:/tasks/updateTaskName
-     * @pi.method:post
+     * @pi.methodType:post
      * @pi.request-type:json
      * @pi.param: model=tasks
      */
@@ -81,7 +81,7 @@ public class TasksController {
     /**
      * @pi.name:删除任务
      * @pi.path:/tasks/deleteTask
-     * @pi.method:post
+     * @pi.methodType:post
      * @pi.request-type: formdata
      * @pi.param: name=taskId;dataType=string;value=taskId;
      */
@@ -94,7 +94,7 @@ public class TasksController {
     /**
      * @pi.name:查询任务详情任务
      * @pi.path:/tasks/findOneTasksOrTask
-     * @pi.method:post
+     * @pi.methodType:post
      * @pi.request-type: formdata
      * @pi.param: name=taskId;dataType=string;value=taskId;
      */
@@ -107,7 +107,7 @@ public class TasksController {
     /**
      * @pi.name:效验流水线多任务完整性
      * @pi.path:/tasks/validTaskMustField
-     * @pi.method:post
+     * @pi.methodType:post
      * @pi.request-type: formdata
      * @pi.param: name=pipelineId;dataType=string;value=pipelineId;
      */

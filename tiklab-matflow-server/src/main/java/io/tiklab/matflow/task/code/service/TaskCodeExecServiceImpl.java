@@ -94,7 +94,7 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
 
         if (taskType.equals(PipelineFinal.TASK_CODE_XCODE)){
             XcodeRepository repository = code.getRepository();
-            code.setCodeAddress(repository.getAddress());
+            code.setCodeAddress(repository.getFullPath());
         }
 
         if (!PipelineUtil.isNoNull(code.getCodeAddress())){
@@ -387,7 +387,7 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
         String type = code.getType();
         String branch = code.getCodeBranch();
         if (type.equals("xcode")){
-            branch = code.getBranch().getName();
+            branch = code.getBranch().getBranchName();
         }
 
         //分支

@@ -2,17 +2,11 @@ package io.tiklab.matflow.support.disk.controller;
 
 import io.tiklab.core.Result;
 import io.tiklab.matflow.support.disk.model.Disk;
-import io.tiklab.matflow.support.disk.service.DiskServiceImpl;
-import io.tiklab.matflow.support.postprocess.model.Postprocess;
-import io.tiklab.matflow.support.postprocess.service.PostprocessService;
+import io.tiklab.matflow.support.disk.service.DiskService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
@@ -24,12 +18,12 @@ import java.util.List;
 public class DiskController {
 
     @Autowired
-    DiskServiceImpl diskService;
+    DiskService diskService;
 
     /**
      * @pi.name:创建流水线后置配置
      * @pi.path:/postprocess/createPost
-     * @pi.method:post
+     * @pi.methodType:post
      * @pi.request-type:json
      * @pi.param: model=postprocess
      */

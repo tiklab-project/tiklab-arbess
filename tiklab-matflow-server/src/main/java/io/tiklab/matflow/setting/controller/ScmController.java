@@ -27,7 +27,7 @@ public class ScmController {
     /**
      * @pi.name:创建流水线环境配置信息
      * @pi.path:/scm/createPipelineScm
-     * @pi.method:post
+     * @pi.methodType:post
      * @pi.request-type:json
      * @pi.param: model=scm
      */
@@ -40,7 +40,7 @@ public class ScmController {
     /**
      * @pi.name:删除流水线环境配置信息
      * @pi.path:/scm/deletePipelineScm
-     * @pi.method:post
+     * @pi.methodType:post
      * @pi.request-type: formdata
      * @pi.param: name=scmId;dataType=string;value=scmId;
      */
@@ -53,7 +53,7 @@ public class ScmController {
     /**
      * @pi.name:更新流水线环境配置信息
      * @pi.path:/scm/updatePipelineScm
-     * @pi.method:post
+     * @pi.methodType:post
      * @pi.request-type:json
      * @pi.param: model=scm
      */
@@ -66,7 +66,7 @@ public class ScmController {
     /**
      * @pi.name:查询单个流水线环境配置信息
      * @pi.path:/scm/findPipelineScm
-     * @pi.method:post
+     * @pi.methodType:post
      * @pi.request-type: formdata
      * @pi.param: name=scmId;dataType=string;value=scmId;
      */
@@ -79,7 +79,7 @@ public class ScmController {
     /**
      * @pi.name:查询所有流水线环境配置信息
      * @pi.path:/auth/findAllPipelineScm
-     * @pi.method:post
+     * @pi.methodType:post
      * @pi.request-type:none
      */
     @RequestMapping(path="/findAllPipelineScm",method = RequestMethod.POST)

@@ -3,8 +3,6 @@ package io.tiklab.matflow.setting.controller;
 import io.tiklab.core.Result;
 import io.tiklab.matflow.setting.model.Resources;
 import io.tiklab.matflow.setting.service.ResourcesService;
-import io.tiklab.postin.annotation.Api;
-import io.tiklab.postin.annotation.ApiMethod;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -26,7 +24,7 @@ public class ResourcesController {
     /**
      * @pi.name:查询所有资源配置信息
      * @pi.path:/resources/findAllResources
-     * @pi.method:post
+     * @pi.methodType:post
      * @pi.request-type:none
      */
     @RequestMapping(path="/findAllResources",method = RequestMethod.POST)
@@ -38,7 +36,7 @@ public class ResourcesController {
     /**
      * @pi.name:查询可用资源配置信息
      * @pi.path:/resources/findResourcesList
-     * @pi.method:post
+     * @pi.methodType:post
      * @pi.request-type:none
      */
     @RequestMapping(path="/findResourcesList",method = RequestMethod.POST)

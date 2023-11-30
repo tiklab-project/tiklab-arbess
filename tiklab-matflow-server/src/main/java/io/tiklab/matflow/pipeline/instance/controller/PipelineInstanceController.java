@@ -5,9 +5,6 @@ import io.tiklab.core.page.Pagination;
 import io.tiklab.matflow.pipeline.instance.model.PipelineInstance;
 import io.tiklab.matflow.pipeline.instance.model.PipelineInstanceQuery;
 import io.tiklab.matflow.pipeline.instance.service.PipelineInstanceService;
-import io.tiklab.postin.annotation.Api;
-import io.tiklab.postin.annotation.ApiMethod;
-import io.tiklab.postin.annotation.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,7 +28,7 @@ public class PipelineInstanceController {
     /**
      * @pi.name:删除流水线执行实例
      * @pi.path:/instance/deleteInstance
-     * @pi.method:post
+     * @pi.methodType:post
      * @pi.request-type: formdata
      * @pi.param: name=instanceId;dataType=string;value=instanceId;
      */
@@ -44,7 +41,7 @@ public class PipelineInstanceController {
     /**
      * @pi.name:查询流水线实例
      * @pi.path:/follow/findPipelineInstance
-     * @pi.method:post
+     * @pi.methodType:post
      * @pi.request-type:json
      * @pi.param: model=query
      */
@@ -58,7 +55,7 @@ public class PipelineInstanceController {
     /**
      * @pi.name:查询用户流水线实例
      * @pi.path:/follow/findUserInstance
-     * @pi.method:post
+     * @pi.methodType:post
      * @pi.request-type:json
      * @pi.param: model=query
      */
@@ -72,7 +69,7 @@ public class PipelineInstanceController {
     /**
      * @pi.name:查询单个流水线实例
      * @pi.path:/instance/findOneInstance
-     * @pi.method:post
+     * @pi.methodType:post
      * @pi.request-type: formdata
      * @pi.param: name=instanceId;dataType=string;value=instanceId;
      */

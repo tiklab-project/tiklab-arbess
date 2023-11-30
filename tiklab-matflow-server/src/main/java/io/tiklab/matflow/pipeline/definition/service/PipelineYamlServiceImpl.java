@@ -289,25 +289,25 @@ public class PipelineYamlServiceImpl implements PipelineYamlService {
                     taskDetailsMap.put("authId",taskCode.getAuthId());
                 }
                 if (!Objects.isNull(taskCode.getRepository())){
-                    String rpyId = taskCode.getRepository().getId();
+                    String rpyId = taskCode.getRepository().getRpyId();
                     taskDetailsMap.put("repository_id",rpyId);
                     XcodeRepository repository = taskCodeXcodeService
                             .findRepository((String) taskDetailsMap.get("authId"), rpyId);
                     if (!Objects.isNull(repository)) {
                         taskCode.setRepository(repository);
-                        taskDetailsMap.put("repository_url",repository.getAddress());
+                        taskDetailsMap.put("repository_url",repository.getFullPath());
                         taskDetailsMap.put("repository_name",repository.getName());
                     }
                 }
 
                 if (!Objects.isNull(taskCode.getBranch())){
-                    String branchId = taskCode.getBranch().getId();
+                    String branchId = taskCode.getBranch().getBranchId();
                     String authId1 = (String) taskDetailsMap.get("authId");
                     String rpyId1 = (String) taskDetailsMap.get("repository_id");
                     XcodeBranch xcodeBranch = taskCodeXcodeService.findOneBranch(authId1, rpyId1,branchId);
                     if (!Objects.isNull(xcodeBranch)){
                         taskCode.setBranch(xcodeBranch);
-                        taskDetailsMap.put("branch_name",xcodeBranch.getName());
+                        taskDetailsMap.put("branch_name",xcodeBranch.getBranchName());
                     }
                 }else {
                     taskDetailsMap.put("branch", TASK_CODE_DEFAULT_BRANCH);

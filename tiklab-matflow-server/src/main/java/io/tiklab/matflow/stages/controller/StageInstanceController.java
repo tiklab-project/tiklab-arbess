@@ -3,9 +3,6 @@ package io.tiklab.matflow.stages.controller;
 import io.tiklab.matflow.stages.model.StageInstance;
 import io.tiklab.matflow.stages.service.StageInstanceServer;
 import io.tiklab.core.Result;
-import io.tiklab.postin.annotation.Api;
-import io.tiklab.postin.annotation.ApiMethod;
-import io.tiklab.postin.annotation.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -28,7 +25,7 @@ public class StageInstanceController {
     /**
      * @pi.name:查询流水线多阶段运行信息
      * @pi.path:/stageInstance/findStageInstance
-     * @pi.method:post
+     * @pi.methodType:post
      * @pi.request-type: formdata
      * @pi.param: name=instanceId;dataType=string;value=instanceId;
      */
@@ -41,8 +38,8 @@ public class StageInstanceController {
     }
 
     @RequestMapping(path="/findAllStageInstanceLogs",method = RequestMethod.POST)
-    @ApiMethod(name = "findAllLog",desc = "查询日志")
-    @ApiParam(name = "instanceId",desc = "流水线实例id",required = true)
+    // @ApiMethod(name = "findAllLog",desc = "查询日志")
+    // @ApiParam(name = "instanceId",desc = "流水线实例id",required = true)
     public Result<List<String>> findAllStageInstanceLogs(@NotNull String instanceId){
 
         List<String> allLog = stageInstanceServer.findAllStageInstanceLogs(instanceId);
