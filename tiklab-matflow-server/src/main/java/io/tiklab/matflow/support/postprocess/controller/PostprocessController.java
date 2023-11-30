@@ -68,7 +68,7 @@ public class PostprocessController {
      * @pi.path:/postprocess/findTaskPost
      * @pi.methodType:post
      * @pi.request-type: formdata
-     * @pi.param: name=pipelineId;dataType=string;value=pipelineId;
+     * @pi.param: name=taskId;dataType=string;value=taskId;
      */
     @RequestMapping(path="/findTaskPost",method = RequestMethod.POST)
     public Result< List<Postprocess>> findAllTaskPostTask(@NotNull String taskId) {
@@ -81,7 +81,7 @@ public class PostprocessController {
      * @pi.path:/postprocess/deletePost
      * @pi.methodType:post
      * @pi.request-type: formdata
-     * @pi.param: name=postprocessId;dataType=string;value=postprocessId;
+     * @pi.param: name=postId;dataType=string;value=postId;
      */
     @RequestMapping(path="/deletePost",method = RequestMethod.POST)
     public Result<Void> deletePost(@NotNull String postId) {
@@ -94,7 +94,7 @@ public class PostprocessController {
      * @pi.path:/postprocess/findOnePost
      * @pi.methodType:post
      * @pi.request-type: formdata
-     * @pi.param: name=postprocessId;dataType=string;value=postprocessId;
+     * @pi.param: name=postId;dataType=string;value=postId;
      */
     @RequestMapping(path="/findOnePost",method = RequestMethod.POST)
     public Result<Postprocess> findOnePostOrTask(@NotNull String postId) {

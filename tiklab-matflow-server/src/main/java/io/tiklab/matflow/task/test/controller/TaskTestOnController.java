@@ -14,7 +14,7 @@ import java.util.List;
 
 /**
  * @pi.protocol: http
- * @pi.groupName: 流水线集成teston控制器
+ * @pi.groupName: 流水线集成Teston控制器
  */
 
 @RestController
@@ -22,18 +22,16 @@ import java.util.List;
 public class TaskTestOnController {
 
     @Autowired
-    private TaskTestOnService taskTestOnService;
+    TaskTestOnService taskTestOnService;
 
     /**
-     * @pi.name:查询所有测试信息
+     * @pi.name:查询所有测试仓库
      * @pi.path:/testOnAuthorize/findAllRepository
      * @pi.methodType:post
      * @pi.request-type: formdata
      * @pi.param: name=authId;dataType=string;value=authId;
      */
     @RequestMapping(path="/findAllRepository",method = RequestMethod.POST)
-    // @ApiMethod(name = "findAllRepository",desc = "获取所有仓库")
-    // @ApiParam(name = "authId",desc = "回调地址",required = true)
     public Result<List<TestOnRepository>> findAllRepository(@NotNull String authId){
 
         List<TestOnRepository> allRepository = taskTestOnService.findAllRepository(authId);

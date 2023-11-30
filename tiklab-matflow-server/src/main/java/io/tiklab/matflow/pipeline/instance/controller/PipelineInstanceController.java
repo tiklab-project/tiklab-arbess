@@ -30,7 +30,7 @@ public class PipelineInstanceController {
      * @pi.path:/instance/deleteInstance
      * @pi.methodType:post
      * @pi.request-type: formdata
-     * @pi.param: name=instanceId;dataType=string;value=instanceId;
+     * @pi.param: name=instanceId;dataType=string;value=实例id;
      */
     @RequestMapping(path="/deleteInstance",method = RequestMethod.POST)
     public Result<Void> deleteInstance(@NotNull String instanceId){
@@ -71,7 +71,7 @@ public class PipelineInstanceController {
      * @pi.path:/instance/findOneInstance
      * @pi.methodType:post
      * @pi.request-type: formdata
-     * @pi.param: name=instanceId;dataType=string;value=instanceId;
+     * @pi.param: name=instanceId;dataType=string;value=实例id;
      */
     @RequestMapping(path="/findOneInstance",method = RequestMethod.POST)
     public Result<Pagination<PipelineInstance>>  findOneInstance( @NotNull String instanceId){

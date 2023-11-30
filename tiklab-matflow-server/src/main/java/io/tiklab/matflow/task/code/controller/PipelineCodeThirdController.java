@@ -16,7 +16,7 @@ import java.util.List;
 
 /**
  * @pi.protocol: http
- * @pi.groupName: 流水线集成gitee,github控制器
+ * @pi.groupName: 流水线集成Gitee,Github控制器
  */
 @RestController
 @RequestMapping("/codeAuthorize")
@@ -72,7 +72,7 @@ public class PipelineCodeThirdController {
      * @pi.methodType:post
      * @pi.request-type: formdata
      * @pi.param: name=authId;dataType=string;value=authId;
-     * @pi.param: name=houseName;dataType=string;value=houseName;
+     * @pi.param: name=houseName;dataType=string;value=仓库名称;
      */
     @RequestMapping(path="/findBranch",method = RequestMethod.POST)
     public Result<List<String>> findBranch(@NotNull String authId,String houseName){
@@ -85,7 +85,7 @@ public class PipelineCodeThirdController {
      * @pi.path:/codeAuthorize/callbackUrl
      * @pi.methodType:post
      * @pi.request-type: formdata
-     * @pi.param: name=authId;dataType=string;value=authId;
+     * @pi.param: name=callbackUrl;dataType=string;value=callbackUrl;
      */
     @RequestMapping(path="/callbackUrl",method = RequestMethod.POST)
     public Result<String> getState(@NotNull  String callbackUrl){

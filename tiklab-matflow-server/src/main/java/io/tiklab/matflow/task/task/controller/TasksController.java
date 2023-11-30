@@ -92,7 +92,7 @@ public class TasksController {
     }
 
     /**
-     * @pi.name:查询任务详情任务
+     * @pi.name:查询任务及任务详情
      * @pi.path:/tasks/findOneTasksOrTask
      * @pi.methodType:post
      * @pi.request-type: formdata

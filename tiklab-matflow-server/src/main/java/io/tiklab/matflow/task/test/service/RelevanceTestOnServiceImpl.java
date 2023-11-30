@@ -135,7 +135,7 @@ public class RelevanceTestOnServiceImpl implements RelevanceTestOnService{
     public List<RelevanceTestOn> findAllRelevance() {
         List<RelevanceTestOnEntity> allRelevanceTestOn = relevanceTestOnDao.findAllRelevanceTestOn();
 
-        if (allRelevanceTestOn == null || allRelevanceTestOn.size() == 0){
+        if (allRelevanceTestOn == null || allRelevanceTestOn.isEmpty()){
             return Collections.emptyList();
         }
         return  BeanMapper.mapList(allRelevanceTestOn,RelevanceTestOn.class);

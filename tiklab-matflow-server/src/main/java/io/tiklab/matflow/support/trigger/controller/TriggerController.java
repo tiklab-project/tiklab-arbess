@@ -38,7 +38,7 @@ public class TriggerController {
     }
 
     /**
-     * @pi.name:创建流水线触发器信息
+     * @pi.name:更新流水线触发器信息
      * @pi.path:/trigger/updateTrigger
      * @pi.methodType:post
      * @pi.request-type:json
@@ -65,11 +65,11 @@ public class TriggerController {
 
 
     /**
-     * @pi.name:查询流水线触发器信息
+     * @pi.name:条件查询流水线触发器信息
      * @pi.path:/trigger/findAllTrigger
      * @pi.methodType:post
-     * @pi.request-type: formdata
-     * @pi.param: name=pipelineId;dataType=string;value=pipelineId;
+     * @pi.request-type:json
+     * @pi.param: model=triggerQuery
      */
     @RequestMapping(path="/findAllTrigger",method = RequestMethod.POST)
     public Result<List<Object>> findAllTrigger(@RequestBody @Valid@NotNull TriggerQuery triggerQuery) {

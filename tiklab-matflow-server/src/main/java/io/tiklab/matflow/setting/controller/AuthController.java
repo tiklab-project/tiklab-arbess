@@ -26,53 +26,53 @@ public class AuthController {
     AuthService authService;
 
     /**
-     * @pi.name:createAuth
+     * @pi.name:创建流水线基本认证
      * @pi.path:/auth/createAuth
      * @pi.methodType:post
      * @pi.request-type:json
      * @pi.param: model=auth
      */
     @RequestMapping(path="/createAuth",method = RequestMethod.POST)
-    public Result<String> createPipelineAuth(@RequestBody @Valid Auth auth) {
+    public Result<String> createAuth(@RequestBody @Valid Auth auth) {
         String pipelineAuthId = authService.createAuth(auth);
         return Result.ok(pipelineAuthId);
     }
 
     /**
-     * @pi.name:deleteAuth
+     * @pi.name:删除流水线基本认证
      * @pi.path:/auth/deleteAuth
      * @pi.methodType:post
      * @pi.request-type: formdata
-     * @pi.param: name=authId;dataType=string;value=authId;
+     * @pi.param: name=authId;dataType=string;value=认证id;
      */
     @RequestMapping(path="/deleteAuth",method = RequestMethod.POST)
-    public Result<Void> deletePipelineAuth(@NotNull @Valid String authId) {
+    public Result<Void> deleteAuth(@NotNull @Valid String authId) {
         authService.deleteAuth(authId);
         return Result.ok();
     }
 
     /**
-     * @pi.name:updateAuth
+     * @pi.name:跟新流水线基本认证
      * @pi.path:/auth/createAuth
      * @pi.methodType:post
      * @pi.request-type:json
      * @pi.param: model=auth
      */
     @RequestMapping(path="/updateAuth",method = RequestMethod.POST)
-    public Result<Void> updatePipelineAuth(@RequestBody @NotNull @Valid Auth auth) {
+    public Result<Void> updateAuth(@RequestBody @NotNull @Valid Auth auth) {
         authService.updateAuth(auth);
         return Result.ok();
     }
 
     /**
-     * @pi.name:findOneAuth
+     * @pi.name:查询流水线基本认证
      * @pi.path:/auth/findOneAuth
      * @pi.methodType:post
      * @pi.request-type: formdata
      * @pi.param: name=authId;dataType=string;value=authId;
      */
     @RequestMapping(path="/findOneAuth",method = RequestMethod.POST)
-    public Result<Auth> findPipelineAuth(@NotNull @Valid String authId) {
+    public Result<Auth> findOneAuth(@NotNull @Valid String authId) {
         Auth auth = authService.findOneAuth(authId);
         return Result.ok(auth);
     }
@@ -84,7 +84,7 @@ public class AuthController {
      * @pi.request-type:none
      */
     @RequestMapping(path="/findAllAuth",method = RequestMethod.POST)
-    public Result<List<Auth>> findAllPipelineAuth() {
+    public Result<List<Auth>> findAllAuth() {
         List<Auth> allAuth = authService.findAllAuth();
         return Result.ok(allAuth);
     }

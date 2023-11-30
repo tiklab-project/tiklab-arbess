@@ -28,7 +28,7 @@ public class AuthHostController {
     AuthHostService authHost;
 
     /**
-     * @pi.name:创建流水线主机认证信息
+     * @pi.name:创建主机认证信息
      * @pi.path:/authHost/createAuthHost
      * @pi.methodType:post
      * @pi.request-type:json
@@ -80,7 +80,7 @@ public class AuthHostController {
     }
 
     /**
-     * @pi.name:查询所有主机认证信息
+     * @pi.name:查询主机认证信息
      * @pi.path:/auth/findAllAuthHostList
      * @pi.methodType:post
      * @pi.request-type:formdata
@@ -92,7 +92,13 @@ public class AuthHostController {
         return Result.ok(allAuthHost);
     }
 
-
+    /**
+     * @pi.name:分页查询主机认证信息
+     * @pi.path:/auth/findAuthHostPage
+     * @pi.methodType:post
+     * @pi.request-type:json
+     * @pi.param:model=hostQuery;
+     */
     @RequestMapping(path="/findAuthHostPage",method = RequestMethod.POST)
     public Result<Pagination<AuthHost>> findAuthHostPage( @RequestBody @Valid @NotNull AuthHostQuery hostQuery) {
         Pagination<AuthHost> allAuthHost = authHost.findAuthHostPage(hostQuery);

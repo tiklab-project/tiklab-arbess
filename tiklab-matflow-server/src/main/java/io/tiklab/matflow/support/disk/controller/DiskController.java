@@ -11,7 +11,7 @@ import java.util.List;
 
 /**
  * @pi.protocol: http
- * @pi.groupName: 流水线后置配置控制器
+ * @pi.groupName: 流水线存储空间控制器
  */
 @RestController
 @RequestMapping("/disk")
@@ -21,11 +21,10 @@ public class DiskController {
     DiskService diskService;
 
     /**
-     * @pi.name:创建流水线后置配置
-     * @pi.path:/postprocess/createPost
+     * @pi.name:查询流水线存储空间
+     * @pi.path:/disk/findDiskList
      * @pi.methodType:post
-     * @pi.request-type:json
-     * @pi.param: model=postprocess
+     * @pi.request-type:none
      */
     @RequestMapping(path="/findDiskList",method = RequestMethod.POST)
     public Result<List<Disk>> createPost(){
@@ -33,8 +32,15 @@ public class DiskController {
         return Result.ok(disk);
     }
 
+    /**
+     * @pi.name:清理储存空间
+     * @pi.path:/disk/cleanDisk
+     * @pi.methodType:post
+     * @pi.request-type: formdata
+     * @pi.param: name=taskId;dataType=string;value=fileList;
+     */
     @RequestMapping(path="/cleanDisk",method = RequestMethod.POST)
-    public Result<Void> cleanDisk( String fileList){
+    public Result<Void> cleanDisk(String fileList){
         diskService.cleanDisk(fileList);
         return Result.ok();
     }

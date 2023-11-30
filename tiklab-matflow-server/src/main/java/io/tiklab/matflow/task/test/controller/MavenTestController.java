@@ -20,7 +20,7 @@ import java.util.List;
 
 /**
  * @pi.protocol: http
- * @pi.groupName: 流水线集成teston实例控制器
+ * @pi.groupName: 流水线单元测试实例控制器
  */
 
 @RestController
@@ -33,10 +33,10 @@ public class MavenTestController {
 
     /**
      * @pi.name:条件查询流水线测试信息执行实例
-     * @pi.path:/testOnRelevance/findAllRelevancePage
+     * @pi.path:/maven/test/findMavenTestList
      * @pi.methodType:post
      * @pi.request-type:json
-     * @pi.param: model=relevanceTestOnQuery
+     * @pi.param: model=testQuery
      */
     @RequestMapping(path="/findMavenTestList",method = RequestMethod.POST)
     public Result<List<MavenTest>> findMavenTestList(@RequestBody @Valid @NotNull MavenTestQuery testQuery){
@@ -46,7 +46,13 @@ public class MavenTestController {
         return Result.ok(mavenTestList);
     }
 
-
+    /**
+     * @pi.name:分页查询流水线测试信息执行实例
+     * @pi.path:/maven/test/findMavenTestList
+     * @pi.methodType:post
+     * @pi.request-type:json
+     * @pi.param: model=testQuery
+     */
     @RequestMapping(path="/findMavenTestPage",method = RequestMethod.POST)
     public Result<Pagination<MavenTest>> findMavenTestPage(@RequestBody @Valid @NotNull MavenTestQuery testQuery){
 
@@ -56,6 +62,13 @@ public class MavenTestController {
     }
 
 
+    /**
+     * @pi.name:删除测试信息执行实例
+     * @pi.path:/maven/test/deleteRelevance
+     * @pi.methodType:post
+     * @pi.request-type: formdata
+     * @pi.param: name=testId;dataType=string;value=testId;
+     */
     @RequestMapping(path="/deleteMavenTest",method = RequestMethod.POST)
     public Result<Void> deleteMavenTest(@NotNull String testId){
 

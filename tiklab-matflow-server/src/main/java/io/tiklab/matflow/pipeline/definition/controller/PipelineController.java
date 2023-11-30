@@ -31,7 +31,7 @@ import java.util.Map;
 
 /**
  * @pi.protocol: http
- * @pi.groupName: Pipeline
+ * @pi.groupName: 流水线控制器
  */
 @RestController
 @RequestMapping("/pipeline")
@@ -44,7 +44,7 @@ public class PipelineController {
     PipelineYamlService yamlService;
 
     /**
-     * @pi.name:createPipeline
+     * @pi.name:创建流水线
      * @pi.path:/pipeline/createPipeline
      * @pi.methodType:post
      * @pi.request-type:json
@@ -59,7 +59,7 @@ public class PipelineController {
     }
 
     /**
-     * @pi.name:findAllPipeline
+     * @pi.name:查询所有流水线
      * @pi.path:/pipeline/findAllPipeline
      * @pi.methodType:post
      * @pi.request-type:none
@@ -73,11 +73,11 @@ public class PipelineController {
     }
 
     /**
-     * @pi.name:deletePipeline
+     * @pi.name:删除流水线
      * @pi.path:/pipeline/deletePipeline
      * @pi.methodType:post
      * @pi.request-type:formdata
-     * @pi.param: name=pipelineId;dataType=string;value=pipelineId;
+     * @pi.param: name=pipelineId;dataType=string;value=流水线id;
      */
     @RequestMapping(path="/deletePipeline",method = RequestMethod.POST)
     public Result<Void> deletePipeline(@NotNull String pipelineId){
@@ -88,11 +88,11 @@ public class PipelineController {
     }
 
     /**
-     * @pi.name:findOnePipeline
+     * @pi.name:查询流水线
      * @pi.path:/pipeline/findOnePipeline
      * @pi.methodType:post
      * @pi.request-type:formdata
-     * @pi.param: name=pipelineId;dataType=string;value=pipelineId;
+     * @pi.param: name=pipelineId;dataType=string;value=流水线id;
      */
     @RequestMapping(path="/findOnePipeline",method = RequestMethod.POST)
     public Result<Pipeline> findOnePipeline(@NotNull String pipelineId){
@@ -103,7 +103,7 @@ public class PipelineController {
     }
 
     /**
-     * @pi.name:updatePipeline
+     * @pi.name:更新流水线
      * @pi.path:/pipeline/updatePipeline
      * @pi.methodType:post
      * @pi.request-type:json
@@ -119,7 +119,7 @@ public class PipelineController {
 
 
     /**
-     * @pi.name:findUserPipelinePage
+     * @pi.name:条件分页查询流水线
      * @pi.path:/pipeline/findUserPipelinePage
      * @pi.methodType:post
      * @pi.request-type:json
@@ -134,7 +134,7 @@ public class PipelineController {
     }
 
     /**
-     * @pi.name:findUserPipeline
+     * @pi.name:查询用户流水线
      * @pi.path:/pipeline/findUserPipeline
      * @pi.methodType:post
      * @pi.request-type:none
@@ -147,11 +147,11 @@ public class PipelineController {
     }
 
     /**
-     * @pi.name:findPipelineUser
+     * @pi.name:查询流水线用户
      * @pi.path:/pipeline/findPipelineUser
      * @pi.methodType:post
      * @pi.request-type: formdata
-     * @pi.param: name=pipelineId;dataType=string;value=pipelineId;
+     * @pi.param: name=pipelineId;dataType=string;value=流水线id;
      */
     @RequestMapping(path="/findPipelineUser",method = RequestMethod.POST)
     public Result<List<User>> findPipelineUser(@NotNull String pipelineId){
@@ -162,11 +162,11 @@ public class PipelineController {
     }
 
     /**
-     * @pi.name:findPipelineRecently
+     * @pi.name:查询最近构建的流水线
      * @pi.path:/pipeline/findPipelineRecently
      * @pi.methodType:post
-     * @pi.request-type: formdata;
-     * @pi.param: name=number;dataType=int;value=5;
+     * @pi.request-type: formdata
+     * @pi.param: name=number;dataType=int;value=查询数量;
      */
     @RequestMapping(path="/findPipelineRecently",method = RequestMethod.POST)
     public Result<List<PipelineRecently>> findPipelineRecently(Integer number){
@@ -178,11 +178,12 @@ public class PipelineController {
 
 
     /**
-     * @pi.name:pipelineClone
+     * @pi.name:克隆流水线
      * @pi.path:/pipeline/pipelineClone
      * @pi.methodType:post
-     * @pi.request-type: formdata;
-     * @pi.param: name=pipelineId;dataType=string;value=pipelineId;
+     * @pi.request-type: formdata
+     * @pi.param:name=pipelineId;dataType=string;value=流水线Id;
+     * @pi.param:name=pipelineName;dataType=string;value=流水线名称;
      */
     @RequestMapping(path="/pipelineClone",method = RequestMethod.POST)
     public Result<Void> pipelineClone(@NotNull String pipelineId,@NotNull String pipelineName){
@@ -194,11 +195,11 @@ public class PipelineController {
 
 
     /**
-     * @pi.name:findPipelineCloneName
+     * @pi.name:获取克隆流水线默认名称
      * @pi.path:/pipeline/findPipelineCloneName
      * @pi.methodType:post
-     * @pi.request-type: formdata;
-     * @pi.param: name=pipelineId;dataType=string;value=pipelineId;
+     * @pi.request-type:formdata
+     * @pi.param:name=pipelineId;dataType=string;value=pipelineId;
      */
     @RequestMapping(path="/findPipelineCloneName",method = RequestMethod.POST)
     public Result<String> findPipelineCloneName(@NotNull String pipelineId){
@@ -210,11 +211,12 @@ public class PipelineController {
 
 
     /**
-     * @pi.name:findRecentlyPipeline
+     * @pi.name:获取最近打开的流水线
      * @pi.path:/pipeline/findRecentlyPipeline
      * @pi.methodType:post
-     * @pi.request-type: formdata;
-     * @pi.param: name=pipelineId;dataType=string;value=pipelineId;
+     * @pi.request-type: formdata
+     * @pi.param: name=number;dataType=Integer;value=查询数量;
+     * @pi.param: name=pipelineId;dataType=String;value=流水线id;
      */
     @RequestMapping(path="/findRecentlyPipeline",method = RequestMethod.POST)
     public Result<String> findRecentlyPipeline(@NotNull Integer number,@NotNull String pipelineId){
@@ -226,11 +228,12 @@ public class PipelineController {
 
 
     /**
-     * @pi.name:importPipelineYaml
+     * @pi.name:流水线导出为Yaml格式
      * @pi.path:/pipeline/importPipelineYaml
      * @pi.methodType:post
-     * @pi.request-type: formdata;
-     * @pi.param: name=pipelineId;dataType=string;value=pipelineId;
+     * @pi.request-type: formdata
+     * @pi.param: name=request;dataType=HttpServletResponse;value=请求;
+     * @pi.param: name=response;dataType=HttpServletRequest;value=请求体;
      */
     @RequestMapping(path="/importPipelineYaml",method = RequestMethod.POST)
     public ResponseEntity<Object> importPipelineYaml(HttpServletRequest request, HttpServletResponse response) {

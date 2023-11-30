@@ -51,7 +51,7 @@ public class StageController {
     }
 
     /**
-     * @pi.name:更新流水线阶段任务信息
+     * @pi.name:更新流水线阶段任务
      * @pi.path:/stage/createStage
      * @pi.methodType:post
      * @pi.request-type:json
@@ -90,11 +90,11 @@ public class StageController {
     }
 
     /**
-     * @pi.name:效验流水线各个阶段完整性
+     * @pi.name:效验流水线各个配置阶段完整性
      * @pi.path:/stage/validStagesMustField
      * @pi.methodType:post
      * @pi.request-type: formdata
-     * @pi.param: name=pipelineId;dataType=string;value=pipelineId;
+     * @pi.param: name=pipelineId;dataType=string;value=流水线Id;
      */
     @RequestMapping(path="/validStagesMustField",method = RequestMethod.POST)
     public Result<List<String>> validStagesMustField(@NotNull String pipelineId){

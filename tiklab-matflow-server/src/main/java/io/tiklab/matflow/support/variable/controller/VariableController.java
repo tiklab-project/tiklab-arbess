@@ -25,7 +25,7 @@ public class VariableController {
     VariableService variableServer;
 
     /**
-     * @pi.name:创建变量
+     * @pi.name:创建流水线变量
      * @pi.path:/pipelineVariable/createVariable
      * @pi.methodType:post
      * @pi.request-type:json
@@ -38,7 +38,7 @@ public class VariableController {
     }
 
     /**
-     * @pi.name:删除变量
+     * @pi.name:删除流水线变量
      * @pi.path:/pipelineVariable/deleteVariable
      * @pi.methodType:post
      * @pi.request-type: formdata
@@ -51,7 +51,7 @@ public class VariableController {
     }
 
     /**
-     * @pi.name:更新变量
+     * @pi.name:更新流水线变量
      * @pi.path:/pipelineVariable/createVariable
      * @pi.methodType:post
      * @pi.request-type:json
@@ -64,16 +64,14 @@ public class VariableController {
     }
 
     /**
-     * @pi.name:查询任务变量
+     * @pi.name:查询流水线任务变量
      * @pi.path:/pipelineVariable/findAllVariable
      * @pi.methodType:post
      * @pi.request-type: formdata
-     * @pi.param: name=taskId;dataType=string;value=taskId;
+     * @pi.param: name=taskId;dataType=string;value=任务id;
      */
     @RequestMapping(path="/findAllVariable",method = RequestMethod.POST)
-    // @ApiMethod(name = "findAllVariable",desc = "查询变量")
-    // @ApiParam(name = "taskId",desc = "taskId",required = true)
-    public Result< List<Variable>> findAllVariable(@NotNull String taskId){
+    public Result<List<Variable>> findAllVariable(@NotNull String taskId){
         List<Variable> allVariable = variableServer.findAllVariable(taskId);
         return Result.ok(allVariable);
     }

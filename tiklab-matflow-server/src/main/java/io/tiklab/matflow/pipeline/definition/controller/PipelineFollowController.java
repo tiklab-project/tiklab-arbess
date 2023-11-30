@@ -14,7 +14,7 @@ import javax.validation.constraints.NotNull;
 
 /**
  * @pi.protocol: http
- * @pi.groupName: PipelineFollow
+ * @pi.groupName: 流水线收藏控制器
  */
 @RestController
 @RequestMapping("/follow")
@@ -25,7 +25,7 @@ public class PipelineFollowController {
 
 
     /**
-     * @pi.name:updateFollow
+     * @pi.name:更新流水线收藏
      * @pi.path:/follow/updateFollow
      * @pi.methodType:post
      * @pi.request-type:json

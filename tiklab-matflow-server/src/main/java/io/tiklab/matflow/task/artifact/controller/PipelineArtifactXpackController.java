@@ -13,7 +13,7 @@ import java.util.List;
 
 /**
  * @pi.protocol: http
- * @pi.groupName: 流水线集成xpack控制器
+ * @pi.groupName: 流水线集成Xpack控制器
  */
 @RestController
 @RequestMapping("/xpackAuthorize")
@@ -23,11 +23,11 @@ public class PipelineArtifactXpackController {
     TaskArtifactXpackService TaskArtifactXpackService;
 
     /**
-     * @pi.name:获取所有制品库信息
+     * @pi.name:查询Xpack所有制品库信息
      * @pi.path:/xpackAuthorize/findAllRepository
      * @pi.methodType:post
      * @pi.request-type: formdata
-     * @pi.param: name=authId;dataType=string;value=authId;
+     * @pi.param:name=authId;dataType=string;value=authId;
      */
     @RequestMapping(path = "/findAllRepository", method = RequestMethod.POST)
     public Result<List<XpackRepository>> findAllRepository(@NotNull String authId) {

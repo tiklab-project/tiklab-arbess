@@ -13,7 +13,7 @@ import java.util.List;
 
 /**
  * @pi.protocol: http
- * @pi.groupName: PipelineOpen
+ * @pi.groupName: 流水线最近打开控制器
  */
 @RestController
 @RequestMapping("/open")
@@ -23,11 +23,11 @@ public class PipelineOpenController {
     PipelineOpenService openService;
 
     /**
-     * @pi.name:findAllOpen
+     * @pi.name:查询最近打开
      * @pi.path:/open/findAllOpen
      * @pi.methodType:post
-     * @pi.request-type: formdata;
-     * @pi.param: name=number;dataType=int;value=5;
+     * @pi.request-type: formdata
+     * @pi.param: name=number;dataType=int;value=查询数据量;
      */
     @RequestMapping(path="/findAllOpen",method = RequestMethod.POST)
     public Result<List<PipelineOpen>> findAllOpen(@NotNull int number){
@@ -38,15 +38,13 @@ public class PipelineOpenController {
     }
 
     /**
-     * @pi.name:updateOpen
+     * @pi.name:更新最近打开
      * @pi.path:/open/updateOpen
      * @pi.methodType:post
-     * @pi.request-type: formdata;
-     * @pi.param: name=pipelineId;dataType=string;value=pipelineId;
+     * @pi.request-type: formdata
+     * @pi.param: name=pipelineId;dataType=string;value=流水线id;
      */
     @RequestMapping(path="/updateOpen",method = RequestMethod.POST)
-    // @ApiMethod(name = "updatePipelineOpen",desc = "查询流水线最近状态")
-    // @ApiParam(name = "pipelineId",desc = "流水线id",required = true)
     public Result<Void> updatePipelineOpen(@NotNull String pipelineId){
 
        openService.updatePipelineOpen(pipelineId);

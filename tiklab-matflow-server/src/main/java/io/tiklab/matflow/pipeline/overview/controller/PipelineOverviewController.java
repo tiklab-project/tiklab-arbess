@@ -26,7 +26,7 @@ public class PipelineOverviewController {
      * @pi.path:/overview/pipelineCensus
      * @pi.methodType:post
      * @pi.request-type: formdata
-     * @pi.param: name=pipelineId;dataType=string;value=pipelineId;
+     * @pi.param: name=pipelineId;dataType=string;value=流水线id;
      */
     @RequestMapping(path="/pipelineCensus",method = RequestMethod.POST)
     public Result<PipelineOverview> pipelineCensus(@NotNull String pipelineId){

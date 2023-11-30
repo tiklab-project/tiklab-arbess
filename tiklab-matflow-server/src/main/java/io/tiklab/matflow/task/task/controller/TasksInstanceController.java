@@ -17,7 +17,6 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/taskInstance")
-// @Api(name = "TaskInstanceController",desc = "任务实例")
 public class TasksInstanceController {
 
     @Autowired
@@ -28,17 +27,23 @@ public class TasksInstanceController {
      * @pi.path:/taskInstance/findTaskInstance
      * @pi.methodType:post
      * @pi.request-type: formdata
-     * @pi.param: name=instanceId;dataType=string;value=instanceId;
+     * @pi.param: name=instanceId;dataType=string;value=实例id;
      */
     @RequestMapping(path="/findTaskInstance",method = RequestMethod.POST)
-    public Result< List<TaskInstance>> findTaskInstance(@NotNull String instanceId){
+    public Result<List<TaskInstance>> findTaskInstance(@NotNull String instanceId){
 
         List<TaskInstance> allLog = tasksInstanceService.findAllInstanceInstance(instanceId);
 
         return Result.ok(allLog);
     }
 
-
+    /**
+     * @pi.name:查询流水线任务实例日志
+     * @pi.path:/taskInstance/findAllInstanceLogs
+     * @pi.methodType:post
+     * @pi.request-type: formdata
+     * @pi.param: name=instanceId;dataType=string;value=实例id;
+     */
     @RequestMapping(path="/findAllInstanceLogs",method = RequestMethod.POST)
     public Result<List<String>> findAllInstanceLogs(@NotNull String instanceId){
 

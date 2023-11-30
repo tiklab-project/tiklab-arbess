@@ -57,8 +57,6 @@ public class ConditionController {
      * @pi.param: name=condId;dataType=string;value=condId;
      */
     @RequestMapping(path="/deleteCond",method = RequestMethod.POST)
-    // @ApiMethod(name = "deleteCond",desc = "查询流水线配置")
-    // @ApiParam(name = "condId",desc = "条件id",required = true)
     public Result<Void> deleteCond(@NotNull String condId){
         conditionServer.deleteCond(condId);
         return Result.ok();
@@ -72,8 +70,6 @@ public class ConditionController {
      * @pi.param: name=taskId;dataType=string;value=taskId;
      */
     @RequestMapping(path="/findAllTaskCond",method = RequestMethod.POST)
-    // @ApiMethod(name = "findAllTaskCond",desc = "查询流水线配置")
-    // @ApiParam(name = "taskId",desc = "任务id",required = true)
     public Result<List<Condition>> findAllTaskCond(@NotNull String  taskId){
         List<Condition> condId = conditionServer.findAllTaskCond(taskId);
         return Result.ok(condId);

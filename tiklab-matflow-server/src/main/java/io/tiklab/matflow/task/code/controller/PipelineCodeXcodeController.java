@@ -14,18 +14,18 @@ import java.util.List;
 
 /**
  * @pi.protocol: http
- * @pi.groupName: 流水线集成xcode控制器
+ * @pi.groupName: 流水线集成Xcode控制器
  */
 @RestController
 @RequestMapping("/xcodeAuthorize")
 public class PipelineCodeXcodeController {
 
     @Autowired
-    private TaskCodeXcodeService taskCodeXcodeService;
+    TaskCodeXcodeService taskCodeXcodeService;
 
     /**
      * @pi.name:获取xcode所有仓库
-     * @pi.path:/xcodeAuthorize/findAllStorehouse
+     * @pi.path:/xcodeAuthorize/findAllRepository
      * @pi.methodType:post
      * @pi.request-type: formdata
      * @pi.param: name=authId;dataType=string;value=authId;

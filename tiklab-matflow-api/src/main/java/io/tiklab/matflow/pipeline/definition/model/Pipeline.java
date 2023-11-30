@@ -19,7 +19,6 @@ import java.util.List;
  * @pi.model:io.tiklab.matflow.pipeline.definition.model.Pipeline
  * @desc:流水线模型
  */
-
 @Join
 @Mapper
 public class Pipeline {
@@ -53,7 +52,7 @@ public class Pipeline {
 
     /**
      * @pi.model:Env
-     * @pi.desc:环境
+     * @pi.desc:流水线环境
      */
     @Mappings({
             @Mapping(source = "env.id",target = "envId")
@@ -63,7 +62,7 @@ public class Pipeline {
 
     /**
      * @pi.model:Env
-     * @pi.desc:环境
+     * @pi.desc:流水线组
      */
     @Mappings({
             @Mapping(source = "group.id",target = "groupId")

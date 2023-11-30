@@ -29,8 +29,8 @@ public class PipelineExecController {
      * @pi.name:执行流水线
      * @pi.path:/exec/start
      * @pi.methodType:post
-     * @pi.request-type: formdata
-     * @pi.param: name=pipelineId;dataType=string;value=pipelineId;
+     * @pi.request-type: json
+     * @pi.param: model=runMsg;
      */
     @RequestMapping(path="/start",method = RequestMethod.POST)
     public Result<PipelineInstance> start(@RequestBody @Valid @NotNull PipelineRunMsg runMsg){
@@ -44,10 +44,10 @@ public class PipelineExecController {
      * @pi.path:/exec/stop
      * @pi.methodType:post
      * @pi.request-type: formdata
-     * @pi.param: name=pipelineId;dataType=string;value=pipelineId;
+     * @pi.param: name=pipelineId;dataType=string;value=流水线id;
      */
     @RequestMapping(path="/stop",method = RequestMethod.POST)
-    public Result<Void> killInstance(@NotNull String pipelineId) {
+    public Result<Void> stop(@NotNull String pipelineId) {
         pipelineExecService.stop(pipelineId);
         return Result.ok();
     }

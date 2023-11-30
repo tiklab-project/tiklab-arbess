@@ -25,7 +25,7 @@ public class ScmController {
     ScmService scmService;
 
     /**
-     * @pi.name:创建流水线环境配置信息
+     * @pi.name:创建环境配置信息
      * @pi.path:/scm/createPipelineScm
      * @pi.methodType:post
      * @pi.request-type:json
@@ -38,7 +38,7 @@ public class ScmController {
     }
 
     /**
-     * @pi.name:删除流水线环境配置信息
+     * @pi.name:删除环境配置信息
      * @pi.path:/scm/deletePipelineScm
      * @pi.methodType:post
      * @pi.request-type: formdata
@@ -51,7 +51,7 @@ public class ScmController {
     }
 
     /**
-     * @pi.name:更新流水线环境配置信息
+     * @pi.name:更新环境配置信息
      * @pi.path:/scm/updatePipelineScm
      * @pi.methodType:post
      * @pi.request-type:json
@@ -64,7 +64,7 @@ public class ScmController {
     }
 
     /**
-     * @pi.name:查询单个流水线环境配置信息
+     * @pi.name:查询流水线环境配置信息
      * @pi.path:/scm/findPipelineScm
      * @pi.methodType:post
      * @pi.request-type: formdata
@@ -77,7 +77,7 @@ public class ScmController {
     }
 
     /**
-     * @pi.name:查询所有流水线环境配置信息
+     * @pi.name:查询所有环境配置信息
      * @pi.path:/auth/findAllPipelineScm
      * @pi.methodType:post
      * @pi.request-type:none

@@ -17,7 +17,7 @@ import java.util.List;
 
 /**
  * @pi.protocol: http
- * @pi.groupName: 流水线集成teston实例控制器
+ * @pi.groupName: 流水线集成Teston实例控制器
  */
 
 @RestController
@@ -32,7 +32,7 @@ public class RelevanceTestOnController {
      * @pi.path:/testOnRelevance/findAllRelevance
      * @pi.methodType:post
      * @pi.request-type: formdata
-     * @pi.param: name=pipelineId;dataType=string;value=pipelineId;
+     * @pi.param: name=pipelineId;dataType=string;value=流水线Id
      */
     @RequestMapping(path="/findAllRelevance",method = RequestMethod.POST)
     public Result< List<RelevanceTestOn>> findAllRelevance(@NotNull String pipelineId){
@@ -43,7 +43,7 @@ public class RelevanceTestOnController {
     }
 
     /**
-     * @pi.name:条件查询流水线测试信息执行实例
+     * @pi.name:分页查询流水线测试信息执行实例
      * @pi.path:/testOnRelevance/findAllRelevancePage
      * @pi.methodType:post
      * @pi.request-type:json
@@ -59,7 +59,7 @@ public class RelevanceTestOnController {
     }
 
     /**
-     * @pi.name:查询测试信息执行实例
+     * @pi.name:删除测试信息执行实例
      * @pi.path:/testOnRelevance/deleteRelevance
      * @pi.methodType:post
      * @pi.request-type: formdata

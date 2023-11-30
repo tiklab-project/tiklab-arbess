@@ -25,7 +25,7 @@ public class AuthThirdController {
     AuthThirdService authServerService;
 
     /**
-     * @pi.name:创建流水线第三方认证信息
+     * @pi.name:创建第三方认证信息
      * @pi.path:/authServer/createAuthServer
      * @pi.methodType:post
      * @pi.request-type:json
@@ -51,7 +51,7 @@ public class AuthThirdController {
     }
 
     /**
-     * @pi.name:更新流水线第三方认证信息
+     * @pi.name:更新第三方认证信息
      * @pi.path:/authServer/updateAuthServer
      * @pi.methodType:post
      * @pi.request-type:json
@@ -64,7 +64,7 @@ public class AuthThirdController {
     }
 
     /**
-     * @pi.name:查询单个第三方认证信息
+     * @pi.name:查询第三方认证信息
      * @pi.path:/authServer/findOneAuthServer
      * @pi.methodType:post
      * @pi.request-type: formdata
@@ -89,11 +89,11 @@ public class AuthThirdController {
     }
 
     /**
-     * @pi.name:根据类型单个第三方认证信息
-     * @pi.path:/authServer/findAllAuthServerList
+     * @pi.name:条件查询第三方认证信息
+     * @pi.path:/authServer/findAuthServerList
      * @pi.methodType:post
-     * @pi.request-type: formdata
-     * @pi.param: name=type;dataType=string;value=gitee;
+     * @pi.request-type: json
+     * @pi.param: model=thirdQuery;
      */
     @RequestMapping(path="/findAuthServerList",method = RequestMethod.POST)
     public Result<List<AuthThird>> findAllAuthServerList(@RequestBody @Valid @NotNull AuthThirdQuery thirdQuery) {

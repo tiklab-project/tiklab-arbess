@@ -27,7 +27,7 @@ public class AuthHostGroupController {
     AuthHostGroupService authHostGroupService;
 
     /**
-     * @pi.name:创建流水线主机组认证信息
+     * @pi.name:创建主机组认证信息
      * @pi.path:/authHostGroup/createAuthHostGroup
      * @pi.methodType:post
      * @pi.request-type:json
@@ -66,7 +66,7 @@ public class AuthHostGroupController {
     }
 
     /**
-     * @pi.name:查询单个主机组认证信息
+     * @pi.name:查询主机组认证信息
      * @pi.path:/authHostGroup/findAuthHostGroup
      * @pi.methodType:post
      * @pi.request-type:formdata
@@ -79,7 +79,7 @@ public class AuthHostGroupController {
     }
 
     /**
-     * @pi.name:查询所有主机组认证信息
+     * @pi.name:条件查询主机组认证信息
      * @pi.path:/auth/findAllAuthHostGroupList
      * @pi.methodType:post
      * @pi.request-type:formdata
