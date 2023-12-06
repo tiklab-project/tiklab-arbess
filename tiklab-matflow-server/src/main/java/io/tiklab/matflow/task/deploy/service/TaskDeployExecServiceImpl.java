@@ -214,7 +214,7 @@ public class TaskDeployExecServiceImpl implements TaskDeployExecService {
             taskDeploy.setDeployOrder(order);
 
             //部署地址
-            String deployAddress = "/"+ taskDeploy.getDeployAddress();
+            String deployAddress = "/" + taskDeploy.getDeployAddress();
             deployAddress = variableServer.replaceVariable(pipelineId, taskId, deployAddress);
 
             //部署脚本命令

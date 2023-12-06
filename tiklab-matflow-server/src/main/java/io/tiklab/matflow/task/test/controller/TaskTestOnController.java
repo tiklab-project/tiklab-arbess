@@ -59,7 +59,7 @@ public class TaskTestOnController {
 
     /**
      * @pi.name:查询测试信息测试计划
-     * @pi.path:/testOnAuthorize/findAllEnv
+     * @pi.path:/testOnAuthorize/findAllTestPlan
      * @pi.methodType:post
      * @pi.request-type: formdata
      * @pi.param: name=authId;dataType=string;value=authId;

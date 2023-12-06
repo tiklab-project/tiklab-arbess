@@ -429,11 +429,14 @@
                     <mainClass>io.tiklab.postin.doclet.starter.DocletApplication</mainClass>
                     <arguments>
                         <!-- modules-->
-                        <argument>D:\a-backup\tiklab-matflow\tiklab-matflow-api;D:\a-backup\tiklab-matflow\tiklab-matflow-server</argument>
+                        <argument>/Users/zcamy/tiklab/tiklab-matflow/tiklab-matflow-api;/Users/zcamy/tiklab/tiklab-matflow/tiklab-matflow-server</argument>
                         <!-- workspaceId-->
-                        <argument>8ee7d045a30c</argument>
+<!--                        <argument>8ee7d045a30c</argument>-->
+<!--                        &lt;!&ndash; server&ndash;&gt;-->
+<!--                        <argument>http://192.168.10.21:8090</argument>-->
+                        <argument>2c2dce1d2aeb</argument>-->
                         <!-- server-->
-                        <argument>http://192.168.10.21:8090</argument>
+                        <argument>http://e.postin.tiklab.net</argument>
                     </arguments>
                 </configuration>
             </plugin>

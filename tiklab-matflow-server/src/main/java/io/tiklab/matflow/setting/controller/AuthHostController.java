@@ -81,7 +81,7 @@ public class AuthHostController {
 
     /**
      * @pi.name:查询主机认证信息
-     * @pi.path:/auth/findAllAuthHostList
+     * @pi.path:/authHost/findAllAuthHostList
      * @pi.methodType:post
      * @pi.request-type:formdata
      * @pi.param:name=type;dataType=string;value=aliyun;
@@ -94,7 +94,7 @@ public class AuthHostController {
 
     /**
      * @pi.name:分页查询主机认证信息
-     * @pi.path:/auth/findAuthHostPage
+     * @pi.path:/authHost/findAuthHostPage
      * @pi.methodType:post
      * @pi.request-type:json
      * @pi.param:model=hostQuery;

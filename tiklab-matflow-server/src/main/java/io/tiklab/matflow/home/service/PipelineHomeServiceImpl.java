@@ -115,7 +115,6 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
             map.put("img","/images/pip_pipeline.svg");
         }
 
-
         log.setModule(s[s.length-1]);
 
         log.setLoggingTemplateId(templateId);

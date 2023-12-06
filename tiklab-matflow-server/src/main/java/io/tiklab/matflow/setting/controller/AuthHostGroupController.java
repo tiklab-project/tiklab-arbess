@@ -80,10 +80,10 @@ public class AuthHostGroupController {
 
     /**
      * @pi.name:条件查询主机组认证信息
-     * @pi.path:/auth/findAllAuthHostGroupList
+     * @pi.path:/authHostGroup/findAllAuthHostGroupList
      * @pi.methodType:post
-     * @pi.request-type:formdata
-     * @pi.param:name=userId;dataType=string;value=aliyun;
+     * @pi.request-type:json
+     * @pi.param:model=groupQuery
      */
     @RequestMapping(path="/findHostGroupList",method = RequestMethod.POST)
     public Result<List<AuthHostGroup>> findHostGroupList(@RequestBody @NotNull @Valid  AuthHostGroupQuery groupQuery) {
