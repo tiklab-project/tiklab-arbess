@@ -100,18 +100,15 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
         log.setActionType(opLogType);
         String[] s = templateId.split("_");
         map.put("img","pip_config.svg");
-        map.put("title","流水线");
+        map.put("createTime",PipelineUtil.date(1));
 
         if (logType.contains("RUN")){
-            map.put("title","运行");
             map.put("img","/images/pip_run.svg");
         }
         if (logType.contains("CONFIG")){
-            map.put("title","配置");
             map.put("img","/images/pip_config.svg");
         }
         if (logType.contains("PIPELINE")){
-            map.put("title","流水线");
             map.put("img","/images/pip_pipeline.svg");
         }
 
@@ -123,6 +120,8 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
         //用户信息
         String userId = LoginContext.getLoginId();
         User user = userService.findOne(userId);
+
+        map.put("title",user.getName().substring(0,1));
         log.setUser(user);
         log.setBaseUrl(baseUrl);
         log.setBgroup(appName);

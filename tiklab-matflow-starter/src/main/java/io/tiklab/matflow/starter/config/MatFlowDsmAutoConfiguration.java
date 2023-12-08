@@ -47,6 +47,7 @@ public class MatFlowDsmAutoConfiguration {
                 "pip-maven-test_1.0.0",
                 "pip-setting-envorgroup_1.0.0",
                 "pip-trigger_1.0.0",
+                "pip-massage_1.0.0"
         });
         dsmConfig.newVersion("1.0.1", new String[]{
                 "pip-project_1.0.1",

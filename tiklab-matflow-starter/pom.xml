@@ -6,7 +6,7 @@
     <parent>
         <groupId>io.tiklab</groupId>
         <artifactId>tiklab-matflow</artifactId>
-        <version>1.0.0</version>
+        <version>1.0.1-SNAPSHOT</version>
     </parent>
     <artifactId>tiklab-matflow-starter</artifactId>
     <name>${project.artifactId}</name>
@@ -413,33 +413,33 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>3.0.0</version>
-                <executions>
-                    <execution>
-                        <phase>test</phase>
-                        <goals>
-                            <goal>java</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <mainClass>io.tiklab.postin.doclet.starter.DocletApplication</mainClass>
-                    <arguments>
-                        <!-- modules-->
-                        <argument>/Users/zcamy/tiklab/tiklab-matflow/tiklab-matflow-api;/Users/zcamy/tiklab/tiklab-matflow/tiklab-matflow-server</argument>
-                        <!-- workspaceId-->
-<!--                        <argument>8ee7d045a30c</argument>-->
+<!--            <plugin>-->
+<!--                <groupId>org.codehaus.mojo</groupId>-->
+<!--                <artifactId>exec-maven-plugin</artifactId>-->
+<!--                <version>3.0.0</version>-->
+<!--                <executions>-->
+<!--                    <execution>-->
+<!--                        <phase>test</phase>-->
+<!--                        <goals>-->
+<!--                            <goal>java</goal>-->
+<!--                        </goals>-->
+<!--                    </execution>-->
+<!--                </executions>-->
+<!--                <configuration>-->
+<!--                    <mainClass>io.tiklab.postin.doclet.starter.DocletApplication</mainClass>-->
+<!--                    <arguments>-->
+<!--                        &lt;!&ndash; modules&ndash;&gt;-->
+<!--                        <argument>/Users/zcamy/tiklab/tiklab-matflow/tiklab-matflow-api;/Users/zcamy/tiklab/tiklab-matflow/tiklab-matflow-server</argument>-->
+<!--                        &lt;!&ndash; workspaceId&ndash;&gt;-->
+<!--&lt;!&ndash;                        <argument>8ee7d045a30c</argument>&ndash;&gt;-->
+<!--&lt;!&ndash;                        &lt;!&ndash; server&ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;                        <argument>http://192.168.10.21:8090</argument>&ndash;&gt;-->
+<!--                        <argument>2c2dce1d2aeb</argument>&ndash;&gt;-->
 <!--                        &lt;!&ndash; server&ndash;&gt;-->
-<!--                        <argument>http://192.168.10.21:8090</argument>-->
-                        <argument>2c2dce1d2aeb</argument>-->
-                        <!-- server-->
-                        <argument>http://e.postin.tiklab.net</argument>
-                    </arguments>
-                </configuration>
-            </plugin>
+<!--                        <argument>http://e.postin.tiklab.net</argument>-->
+<!--                    </arguments>-->
+<!--                </configuration>-->
+<!--            </plugin>-->
         </plugins>
     </build>
 
