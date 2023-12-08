@@ -5,54 +5,50 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>io.tiklab</groupId>
-        <artifactId>tiklab-dependencies</artifactId>
+        <groupId>io.thoughtware</groupId>
+        <artifactId>thoughtware-dependencies</artifactId>
         <version>1.0.0</version>
     </parent>
 
-    <artifactId>tiklab-matflow</artifactId>
+    <artifactId>thoughtware-matflow</artifactId>
     <name>${project.artifactId}</name>
     <packaging>pom</packaging>
     <version>1.0.1-SNAPSHOT</version>
 
     <modules>
-        <module>tiklab-matflow-api</module>
-        <module>tiklab-matflow-server</module>
-        <module>tiklab-matflow-starter</module>
+        <module>thoughtware-matflow-api</module>
+        <module>thoughtware-matflow-server</module>
+        <module>thoughtware-matflow-starter</module>
     </modules>
 
     <properties>
         
-        <!--tiklab-->
-        <tiklab-dal.version>1.0.0</tiklab-dal.version>
-        <tiklab-core.version>1.0.0</tiklab-core.version>
-        <tiklab-toolkit.version>1.0.0</tiklab-toolkit.version>
-        <tiklab-rpc.version>1.0.0</tiklab-rpc.version>
-        <tiklab-dss.version>1.0.0</tiklab-dss.version>
-        <tiklab-dcs.version>1.0.0</tiklab-dcs.version>
-        <tiklab-dfs.version>1.0.0</tiklab-dfs.version>
-        <tiklab-codegen.version>1.0.0</tiklab-codegen.version>
-        <tiklab-gateway.version>1.0.1-SNAPSHOT</tiklab-gateway.version>
-        <tiklab-openapi.version>1.0.0-SNAPSHOT</tiklab-openapi.version>
-        <tiklab-plugin.version>1.0.0</tiklab-plugin.version>
+        <!--thoughtware-->
+        <thoughtware-dal.version>1.0.0</thoughtware-dal.version>
+        <thoughtware-core.version>1.0.0</thoughtware-core.version>
+        <thoughtware-toolkit.version>1.0.0</thoughtware-toolkit.version>
+        <thoughtware-rpc.version>1.0.0</thoughtware-rpc.version>
+        <thoughtware-dss.version>1.0.0</thoughtware-dss.version>
+        <thoughtware-dcs.version>1.0.0</thoughtware-dcs.version>
+        <thoughtware-dfs.version>1.0.0</thoughtware-dfs.version>
+        <thoughtware-codegen.version>1.0.0</thoughtware-codegen.version>
+        <thoughtware-gateway.version>1.0.1-SNAPSHOT</thoughtware-gateway.version>
+        <thoughtware-openapi.version>1.0.0-SNAPSHOT</thoughtware-openapi.version>
+        <thoughtware-plugin.version>1.0.1-SNAPSHOT</thoughtware-plugin.version>
 
-        <tiklab-user.version>1.0.1-SNAPSHOT</tiklab-user.version>
-        <tiklab-message.version>1.0.0</tiklab-message.version>
-        <tiklab-security.version>1.0.0</tiklab-security.version>
-        <tiklab-todotask.version>1.0.0</tiklab-todotask.version>
-        <tiklab-licence.version>1.0.0</tiklab-licence.version>
-        <tiklab-privilege.version>1.0.0</tiklab-privilege.version>
-        <tiklab-eam.version>1.0.1-SNAPSHOT</tiklab-eam.version>
+        <thoughtware-user.version>1.0.1-SNAPSHOT</thoughtware-user.version>
+        <thoughtware-message.version>1.0.1-SNAPSHOT</thoughtware-message.version>
+        <thoughtware-security.version>1.0.1-SNAPSHOT</thoughtware-security.version>
+        <thoughtware-todotask.version>1.0.1-SNAPSHOT</thoughtware-todotask.version>
+        <thoughtware-licence.version>1.0.1-SNAPSHOT</thoughtware-licence.version>
+        <thoughtware-privilege.version>1.0.1-SNAPSHOT</thoughtware-privilege.version>
+        <thoughtware-eam.version>1.0.1-SNAPSHOT</thoughtware-eam.version>
 
-        <tiklab-xcode.version>1.0.0</tiklab-xcode.version>
-        <tiklab-xpack.version>1.0.0</tiklab-xpack.version>
-        <tiklab-teston.version>1.0.0</tiklab-teston.version>
-
-        <tiklab-postgresql.version>1.0.1-SNAPSHOT</tiklab-postgresql.version>
-        <tiklab-jdk.version>1.0.0</tiklab-jdk.version>
-        <tiklab-spotbugs.version>1.0.0</tiklab-spotbugs.version>
-        <tiklab-opensca.version>1.0.0</tiklab-opensca.version>
-        <tiklab-upgrade.version>1.0.0</tiklab-upgrade.version>
+        <thoughtware-postgresql.version>1.0.1-SNAPSHOT</thoughtware-postgresql.version>
+        <thoughtware-jdk.version>1.0.0</thoughtware-jdk.version>
+        <thoughtware-spotbugs.version>1.0.0</thoughtware-spotbugs.version>
+        <thoughtware-opensca.version>1.0.0</thoughtware-opensca.version>
+        <thoughtware-upgrade.version>1.0.0</thoughtware-upgrade.version>
 
         <!--other-->
         <commons-lang3.version>3.10</commons-lang3.version>
