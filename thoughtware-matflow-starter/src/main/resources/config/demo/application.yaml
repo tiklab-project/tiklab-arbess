@@ -1,5 +1,5 @@
 app:
-  name: tiklab-matflow-ce
+  name: thoughtware-matflow-ce
 
 APP_HOME: ${APP_HOME}
 application: matflow-ce
@@ -14,7 +14,7 @@ jdbc:
   password: darth2020
 
 #plugin config
-DATA_HOME: /opt/tiklab/matflow-ce
+DATA_HOME: /opt/thoughtware/matflow-ce
 
 plugin:
   path: ${DATA_HOME}/plugin
@@ -67,7 +67,7 @@ datapath: ${DATA_HOME}/caches
 eas:
   embbed:
     enable: false
-  address: http://eas-ce.demo.tiklab.net
+  address: http://eas-ce.demo.thoughtware.cn
 
 
 backups:
@@ -80,7 +80,7 @@ backups:
 #    enabled: true
 
 base:
-  url: http://matflow-ce.demo.tiklab.net
+  url: http://matflow-ce.demo.thoughtware.cn
 
 #homes
 homes:
@@ -92,7 +92,7 @@ licences:
 
 #file
 file:
-  path: http://file.tiklab.net
+  path: http://file.thoughtware.cn
 
 
 
