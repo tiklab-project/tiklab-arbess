@@ -84,7 +84,7 @@ base:
 
 #homes
 homes:
-  address: http://192.168.10.19:8080
+  address: http://thoughtware.cn
 
 #license
 licences:
