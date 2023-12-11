@@ -1,5 +1,5 @@
 app:
-  name: tiklab-matflow
+  name: thoughtware-matflow
 
 APP_HOME: ${APP_HOME}
 application: matflow
@@ -9,12 +9,12 @@ server:
 
 jdbc:
   driverClassName: org.postgresql.Driver
-  url: jdbc:postgresql://localhost:5432/tiklab_matflow?stringtype=unspecified
+  url: jdbc:postgresql://localhost:5432/thoughtware_matflow?stringtype=unspecified
   username: postgres
   password: darth2020
 
 #plugin config
-DATA_HOME: /opt/tiklab/matflow
+DATA_HOME: /opt/thoughtware/matflow
 
 plugin:
   path: ${DATA_HOME}/plugin
@@ -58,7 +58,7 @@ dss:
 postgresql:
   embbed:
     enable: true
-  database: tiklab_matflow
+  database: thoughtware_matflow
   db:
     port: 5432
     username: postgres
@@ -67,26 +67,22 @@ postgresql:
 
 datapath: ${DATA_HOME}/caches
 
-eas:
+darth:
   embbed:
     enable: true
-  address: http://e.eas.tiklab.net
+  address: http://darth-ce.test.thoughtware.cn
 
 
 backups:
   dir: /data/matflow
   time: 0 0 2 * * ?
 
-#message:
-#  sms:
-#    enabled: true
-
 base:
-  url: http://e.matflow.tiklab.net
+  url: http://matflow-ce.test.thoughtware.cn
 
 #homes
 homes:
-  address: http://192.168.10.19:8080
+  address: http://thoughtware.cn
 
 #license
 licences:
@@ -94,7 +90,7 @@ licences:
 
 #file
 file:
-  path: http://file.tiklab.net
+  path: http://file.thoughtware.cn
 
 
 
