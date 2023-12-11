@@ -73,10 +73,10 @@ postgresql:
 
 datapath: ${DATA_HOME}/caches
 
-eas:
+darth:
   embbed:
     enable: true
-  address: http://eas-ce.demo.tiklab.net
+  address: http://e.darth.thoughtware.cn
 
 
 backups:

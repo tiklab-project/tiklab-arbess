@@ -1249,7 +1249,7 @@ public class TasksServiceImpl implements TasksService {
                 return "GitHub";
             }
             case PipelineFinal.TASK_CODE_XCODE -> {
-                return "Xcode";
+                return "Gittork代码库";
             }
             case PipelineFinal.TASK_CODE_GITLAB -> {
                 return "GitLab";
@@ -1278,8 +1278,11 @@ public class TasksServiceImpl implements TasksService {
             case PipelineFinal.TASK_DEPLOY_DOCKER -> {
                 return "Docker部署";
             }
+            case PipelineFinal.TASK_ARTIFACT_XPACK -> {
+                return "Hadess制品库";
+            }
             case PipelineFinal.TASK_CODESCAN_SONAR -> {
-                return "sonarQube";
+                return "SonarQube";
             }
             case PipelineFinal.TASK_CODESCAN_SPOTBUGS ->{
                 return "spotBugs-Java代码扫描";

@@ -123,10 +123,10 @@ public class PipelineFinal {
     public static final String TASK_TYPE_CODE = "code";
     public static final String TASK_CODE_GIT = "git";
     public static final String TASK_CODE_GITLAB = "gitlab";
-    public static final String TASK_CODE_GITHUB = "giehub";
+    public static final String TASK_CODE_GITHUB = "github";
     public static final String TASK_CODE_GITEE = "gitee";
     public static final String TASK_CODE_SVN = "svn";
-    public static final String TASK_CODE_XCODE = "xcode";
+    public static final String TASK_CODE_XCODE = "gittork";
     public static final String TASK_CODE_DEFAULT_BRANCH = "master";
 
 
@@ -169,7 +169,7 @@ public class PipelineFinal {
     public static final String TASK_PULL_DOCKER = "pull_docker";
 
 
-    public static final String TASK_ARTIFACT_XPACK = "xpack";
+    public static final String TASK_ARTIFACT_XPACK = "hadess";
 
     public static final String TASK_ARTIFACT_SSH = "ssh";
     public static final String TASK_ARTIFACT_NEXUS = "nexus";

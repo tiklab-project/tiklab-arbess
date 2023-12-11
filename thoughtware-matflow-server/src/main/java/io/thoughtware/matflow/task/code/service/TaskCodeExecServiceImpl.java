@@ -231,7 +231,7 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
                     return process;
                 }
             }
-            case "xcode" ->{
+            case "gittork" ->{
                 gitOrder = gitXcodeOrder(taskCode, fileAddress);
             }
             //第三方授权
