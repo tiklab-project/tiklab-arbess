@@ -13,10 +13,9 @@ import io.thoughtware.message.message.service.SendMessageNoticeService;
 import io.thoughtware.message.message.service.SingleSendMessageService;
 import io.thoughtware.message.setting.model.MessageType;
 import io.thoughtware.message.sms.modal.Sms;
-import io.thoughtware.rpc.annotation.Exporter;
 import io.thoughtware.security.logging.model.Logging;
 import io.thoughtware.security.logging.model.LoggingType;
-import io.thoughtware.security.logging.service.LoggingByTemplService;
+import io.thoughtware.security.logging.service.LoggingByTempService;
 import io.thoughtware.user.user.model.User;
 import io.thoughtware.user.user.service.UserService;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
@@ -43,7 +42,7 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
     SingleSendMessageService sendMessage;
 
     @Autowired
-    LoggingByTemplService logService;
+    LoggingByTempService logService;
 
     @Autowired
     SendMessageNoticeService dispatchNoticeService;
@@ -71,7 +70,6 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
         map.put("pipelineName", pipeline.getName());
         map.put("name", pipeline.getName().substring(0,1).toUpperCase());
         map.put("userName", user.getName());
-        map.put("rootId",user.getId());
         if (user.getNickname() != null){
             map.put("userName", user.getNickname());
         }
@@ -84,11 +82,10 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
     /**
      * 创建日志
      * @param logType 日志类型
-     * @param templateId 模板code
      * @param map 日志信息
      */
     @Override
-    public void log(String logType, String templateId,HashMap<String, Object> map){
+    public void log(String logType, Map<String, Object> map){
 
         Logging log = new Logging();
 
@@ -96,34 +93,21 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
         LoggingType opLogType = new LoggingType();
         opLogType.setId(logType);
         log.setActionType(opLogType);
-        String[] s = templateId.split("_");
-        map.put("img","pip_config.svg");
-        map.put("createTime",PipelineUtil.date(1));
-
-        if (logType.contains("RUN")){
-            map.put("img","/images/pip_run.svg");
-        }
-        if (logType.contains("CONFIG")){
-            map.put("img","/images/pip_config.svg");
-        }
-        if (logType.contains("PIPELINE")){
-            map.put("img","/images/pip_pipeline.svg");
-        }
-
-        log.setModule(s[s.length-1]);
-
-        log.setLoggingTemplateId(templateId);
-        log.setCreateTime(new Timestamp(System.currentTimeMillis()));
+        log.setModule("pipeline");
 
         //用户信息
         String userId = LoginContext.getLoginId();
         User user = userService.findOne(userId);
 
-        map.put("title",user.getName().substring(0,1));
+        String link = (String) map.get("link");
+        String pipelineName = (String) map.get("pipelineName");
+
         log.setUser(user);
+        log.setLink(link);
+        log.setAction(pipelineName);
         log.setBaseUrl(baseUrl);
         log.setBgroup(appName);
-        log.setContent(JSONObject.toJSONString(map));
+        log.setData(JSONObject.toJSONString(map));
 
         logService.createLog(log);
 
@@ -135,7 +119,7 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
      * @param map 信息
      */
     @Override
-    public void settingMessage(String templateId,HashMap<String, Object> map){
+    public void settingMessage(String templateId,Map<String, Object> map){
         SendMessageNotice dispatchNotice = new SendMessageNotice();
         dispatchNotice.setId(templateId);
         String jsonString = JSONObject.toJSONString(map);
@@ -144,6 +128,10 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
         dispatchNotice.setSiteData(jsonString);
         dispatchNotice.setQywechatData(jsonString);
         dispatchNotice.setBaseUrl(baseUrl);
+        String link = (String) map.get("link");
+        String pipelineName = (String) map.get("pipelineName");
+        dispatchNotice.setLink(link);
+        dispatchNotice.setAction(pipelineName);
         dispatchNoticeService.createMessageItem(dispatchNotice);
     }
 
@@ -154,7 +142,7 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
      * @param map 信息
      */
     @Override
-    public void message(HashMap<String, Object> map,List<String> receiver){
+    public void message(Map<String, Object> map,List<String> receiver){
 
         Message message = new Message();
 

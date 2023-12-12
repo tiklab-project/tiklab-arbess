@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 消息
@@ -54,7 +55,7 @@ public class TaskMessageExecServiceImpl implements TaskMessageExecService {
             return true;
         }
 
-        HashMap<String, Object> map = homeService.initMap(pipeline);
+        Map<String, Object> map = homeService.initMap(pipeline);
 
         //添加接收人
         List<TaskMessageUser> list = new ArrayList<>();
@@ -113,7 +114,7 @@ public class TaskMessageExecServiceImpl implements TaskMessageExecService {
      * @throws ApplicationException 消息发送失败
      */
     public void messageType(String taskId, String type, List<TaskMessageUser> userList,
-                             HashMap<String, Object> map) throws ApplicationException {
+                             Map<String, Object> map) throws ApplicationException {
         switch (type){
             case PipelineFinal.MES_SEND_SITE ->{
                 tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+ "发送消息，类型：站内信");

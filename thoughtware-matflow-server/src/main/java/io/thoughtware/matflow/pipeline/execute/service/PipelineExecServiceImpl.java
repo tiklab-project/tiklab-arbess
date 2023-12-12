@@ -196,11 +196,6 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
         PipelineInstance pipelineInstance = updatePipelineRunState(runMsg);
         String instanceId = pipelineInstance.getInstanceId();
 
-        HashMap<String,Object> map = homeService.initMap(pipeline);
-        map.put("title","流水线执行消息");
-        map.put("message","开始执行");
-        homeService.log(PipelineFinal.LOG_RUN, PipelineFinal.LOG_TEM_RUN, map);
-
         executorService.submit((Callable<Object>) () -> {
             try {
                 Thread.currentThread().setName(pipelineId);
@@ -332,7 +327,7 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
         cleanPipeline(pipelineId,instanceId);
 
         // 发送流水线运行消息
-        sendPipelineRunMessage(pipeline,state);
+        sendPipelineRunMessage(pipeline,instanceId,state);
 
         logger.warn("流水线：" +pipeline.getName() + "运行完成...");
     }
@@ -471,15 +466,17 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
     }
 
     // 发送消息
-    public void sendPipelineRunMessage(Pipeline pipeline,Boolean state){
-        HashMap<String,Object> map = homeService.initMap(pipeline);
+    public void sendPipelineRunMessage(Pipeline pipeline,String instanceId,Boolean state){
+        Map<String,Object> map = homeService.initMap(pipeline);
+        map.put("instanceId",instanceId);
+        map.put("link",PipelineFinal.LOG_LINK_RUN);
         if (state){
-            map.put("message","执行成功");
+            map.put("message","运行成功");
         }else {
-            map.put("message","执行失败");
+            map.put("message","运行失败");
         }
-        map.put("title","流水线执行消息");
-        homeService.log(PipelineFinal.LOG_PIPELINE, PipelineFinal.LOG_TEM_RUN, map);
+        homeService.log(PipelineFinal.LOG_TYPE_RUN,  map);
+        homeService.settingMessage(PipelineFinal.LOG_TYPE_RUN,  map);
     }
 
 

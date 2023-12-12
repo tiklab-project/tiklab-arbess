@@ -65,19 +65,23 @@ public class PipelineFinal {
     public static final String MES_RUN = "MES_RUN";
 
 
-    /**
-     * 日志信息
-     */
-    //日志类型
-    public static final String LOG_PIPELINE = "LOG_PIPELINE"; //流水线
+    // 日志类型
+    public static final String LOG_TYPE_CREATE = "PIP_CREATE";
 
-    public static final String LOG_RUN = "LOG_RUN"; //运行
+    public static final String LOG_TYPE_DELETE = "PIP_DELETE";
 
-    //日志模板
-    public static final String LOG_TEM_CREATE = "G_TEM_CREATE";
-    public static final String LOG_TEM_DELETE = "G_TEM_DELETE";
-    public static final String LOG_TEM_UPDATE = "G_TEM_UPDATE";
-    public static final String LOG_TEM_RUN = "LOG_TEM_RUN";
+    public static final String LOG_TYPE_UPDATE = "PIP_UPDATE";
+
+    public static final String LOG_TYPE_RUN = "PIP_RUN";
+
+
+    public static final String LOG_LINK_CREATE = "/pipeline/${pipelineId}/config";
+
+    public static final String LOG_LINK_DELETE = "/pipeline/${pipelineId}/delete";
+
+    public static final String LOG_LINK_UPDATE = "/pipeline/${pipelineId}/set/info";
+
+    public static final String LOG_LINK_RUN = "/pipeline/${pipelineId}/history/${instanceId}";
 
 
     /**

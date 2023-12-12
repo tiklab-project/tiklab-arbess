@@ -112,9 +112,12 @@ public class PipelineServiceImpl implements PipelineService {
         String template = pipeline.getTemplate();
         String[] ints;
         switch (template) {
-            case "2131" -> ints = new String[]{PipelineFinal.TASK_CODE_GIT, PipelineFinal.TASK_BUILD_MAVEN, PipelineFinal.TASK_DEPLOY_LINUX};
-            case "112131" -> ints = new String[]{PipelineFinal.TASK_CODE_GIT, PipelineFinal.TASK_TEST_MAVENTEST,  PipelineFinal.TASK_BUILD_MAVEN, PipelineFinal.TASK_DEPLOY_LINUX};
-            case "2231" -> ints = new String[]{PipelineFinal.TASK_CODE_GIT,  PipelineFinal.TASK_TEST_MAVENTEST, PipelineFinal.TASK_DEPLOY_LINUX};
+            case "2131" -> ints =
+                    new String[]{PipelineFinal.TASK_CODE_GIT, PipelineFinal.TASK_BUILD_MAVEN, PipelineFinal.TASK_DEPLOY_LINUX};
+            case "112131" -> ints =
+                    new String[]{PipelineFinal.TASK_CODE_GIT, PipelineFinal.TASK_TEST_MAVENTEST,  PipelineFinal.TASK_BUILD_MAVEN, PipelineFinal.TASK_DEPLOY_LINUX};
+            case "2231" -> ints =
+                    new String[]{PipelineFinal.TASK_CODE_GIT,  PipelineFinal.TASK_TEST_MAVENTEST, PipelineFinal.TASK_DEPLOY_LINUX};
             default -> ints = new String[]{PipelineFinal.TASK_CODE_GIT};
         }
         if (pipeline.getType() == 1) {
@@ -128,11 +131,11 @@ public class PipelineServiceImpl implements PipelineService {
         authorityService.createDmUser(pipelineId,pipeline.getUserList());
 
         //动态与消息
-        HashMap<String,Object> map = homeService.initMap(pipeline);
-        map.put("title","流水线创建消息");
-        map.put("message","创建了");
-        homeService.log(PipelineFinal.LOG_PIPELINE, PipelineFinal.LOG_TEM_CREATE, map);
-        homeService.settingMessage(PipelineFinal.MES_CREATE, map);
+        Map<String,Object> map =homeService.initMap(pipeline);
+        map.put("link",PipelineFinal.LOG_LINK_CREATE);
+        map.put("pipelineName",pipeline.getName());
+        homeService.log(PipelineFinal.LOG_TYPE_CREATE, map);
+        homeService.settingMessage(PipelineFinal.LOG_TYPE_CREATE, map);
 
         return pipelineId;
     }
@@ -160,11 +163,10 @@ public class PipelineServiceImpl implements PipelineService {
         }).start();
 
         //动态与消息
-        HashMap<String,Object> map = homeService.initMap(pipeline);
-        map.put("title","流水线删除消息");
-        map.put("message","删除了");
-        homeService.log(PipelineFinal.LOG_PIPELINE, PipelineFinal.LOG_TEM_DELETE, map);
-        homeService.settingMessage(PipelineFinal.MES_DELETE, map);
+        Map<String,Object> map = homeService.initMap(pipeline);
+        map.put("link",PipelineFinal.LOG_LINK_DELETE);
+        homeService.log(PipelineFinal.LOG_TYPE_DELETE,  map);
+        homeService.settingMessage(PipelineFinal.LOG_TYPE_DELETE, map);
 
     }
 
@@ -175,30 +177,19 @@ public class PipelineServiceImpl implements PipelineService {
         joinTemplate.joinQuery(flow);
         //判断名称是否改变
         if (!pipeline.getName().equals(flow.getName())){
-            HashMap<String,Object> map = homeService.initMap(flow);
-            map.put("message", flow.getName()+"名称为:"+pipeline.getName());
+            Map<String,Object> map = homeService.initMap(pipeline);
+            map.put("link",PipelineFinal.LOG_LINK_UPDATE);
+            map.put("message", flow.getName() +"更改为："+pipeline.getName());
             flow.setName(pipeline.getName());
-            homeService.log(PipelineFinal.LOG_PIPELINE, PipelineFinal.LOG_TEM_UPDATE, map);
-            homeService.settingMessage(PipelineFinal.MES_UPDATE, map);
+            homeService.log(PipelineFinal.LOG_TYPE_UPDATE,  map);
+            homeService.settingMessage(PipelineFinal.LOG_TYPE_UPDATE, map);
         }
 
         //判断权限是否改变
         int pipelinePower = pipeline.getPower();
         if (pipelinePower != flow.getPower() && pipelinePower != 0){
             flow.setPower(pipelinePower);
-            HashMap<String,Object> map = homeService.initMap(flow);
-            if (pipelinePower == 1){
-                map.put("message",pipeline.getName()+"权限为全局");
-                homeService.log(PipelineFinal.LOG_PIPELINE, PipelineFinal.LOG_TEM_UPDATE, map);
-                homeService.settingMessage(PipelineFinal.MES_UPDATE, map);
-            }
-            if (pipelinePower == 2){
-                map.put("message",pipeline.getName()+"权限为私有");
-                homeService.log(PipelineFinal.LOG_PIPELINE, PipelineFinal.LOG_TEM_UPDATE, map);
-                homeService.settingMessage(PipelineFinal.MES_UPDATE, map);
-            }
         }
-
         if (pipeline.getState() !=0 ){
             flow.setState(pipeline.getState());
         }
