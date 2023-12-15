@@ -149,8 +149,8 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
         //消息类型
         MessageType messageType = new MessageType();
         messageType.setId(mesType);
-
         message.setMessageType(messageType);
+
         //发送方式
         message.setMessageSendTypeId(sendWay);
         message.setData(map);
@@ -166,7 +166,8 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
         }
         message.setMessageReceiverList(list);
         message.setSendId(LoginContext.getLoginId());
-
+        String pipelineName = (String) map.get("pipelineName");
+        message.setAction(pipelineName);
         sendMessage.sendMessage(message);
     }
 

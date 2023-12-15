@@ -124,6 +124,7 @@ public class TaskMessageExecServiceImpl implements TaskMessageExecService {
             case MES_SEND_SITE ->{
                 tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+ "发送消息，类型：站内信");
                 map.put("sendWay", MES_SEND_SITE);
+                map.put("link",PipelineFinal.RUN_LINK);
                 sendSite(taskId,userList,map);
             }
             case MES_SEND_WECHAT ->{
@@ -179,10 +180,9 @@ public class TaskMessageExecServiceImpl implements TaskMessageExecService {
             User user = message.getUser();
             list.add(user.getId());
         }
+        map.put("mesType",MES_RUN);
         homeService.message(map,list);
         tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+ "站内信发送成功!");
-
-
     }
 
     public void  sendSSM (String taskId,List<TaskMessageUser> userList,Map<String, Object> map){

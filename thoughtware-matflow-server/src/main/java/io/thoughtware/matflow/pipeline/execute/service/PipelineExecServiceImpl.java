@@ -153,7 +153,6 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
         Pipeline pipeline = pipelineService.findPipelineById(pipelineId);
         runMsg.setPipeline(pipeline);
 
-
         int size = pipelineIdOrInstanceId.size();
 
         // 资源限制放入缓存中等待执行
