@@ -1,5 +1,6 @@
 package io.thoughtware.matflow.task.message.service;
 
+import io.thoughtware.join.JoinTemplate;
 import io.thoughtware.matflow.support.util.PipelineFinal;
 import io.thoughtware.matflow.support.util.PipelineUtil;
 import io.thoughtware.matflow.task.message.model.TaskMessageType;
@@ -11,6 +12,8 @@ import io.thoughtware.matflow.task.task.model.TaskExecMessage;
 import io.thoughtware.matflow.task.task.model.Tasks;
 import io.thoughtware.matflow.task.task.service.TasksInstanceService;
 import io.thoughtware.rpc.annotation.Exporter;
+import io.thoughtware.user.user.model.User;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +21,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static io.thoughtware.matflow.support.util.PipelineFinal.*;
 
 /**
  * 消息
@@ -33,6 +38,9 @@ public class TaskMessageExecServiceImpl implements TaskMessageExecService {
 
     @Autowired
     PipelineHomeService homeService;
+
+    @Autowired
+    JoinTemplate joinTemplate;
 
 
     public boolean message(TaskExecMessage taskExecMessage) {
@@ -50,7 +58,8 @@ public class TaskMessageExecServiceImpl implements TaskMessageExecService {
 
         //不存在接收人
         List<TaskMessageUser> userList = messageType.getUserList();
-        if (userList == null || userList.size() == 0){
+        if (userList == null || userList.isEmpty()){
+            tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"接收人为空！");
             tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"任务：消息通知执行完成。");
             return true;
         }
@@ -75,6 +84,7 @@ public class TaskMessageExecServiceImpl implements TaskMessageExecService {
             }
         }
 
+        joinTemplate.joinQuery(list);
         //执行成功或失败
         if (runState){
             map.put("message","执行成功");
@@ -83,12 +93,7 @@ public class TaskMessageExecServiceImpl implements TaskMessageExecService {
         }
 
         //任务消息还是流水线消息
-        if (isPipeline){
-            map.put("mesType", PipelineFinal.MES_PIPELINE_RUN);
-        }else {
-            map.put("mesType", PipelineFinal.MES_PIPELINE_TASK_RUN);
-            map.put("taskName", taskExecMessage.getTaskName());
-        }
+        map.put("mesType", PipelineFinal.MES_PIPELINE_RUN);
 
         //消息发送类型
         List<String> typeList = messageType.getTypeList();
@@ -116,44 +121,78 @@ public class TaskMessageExecServiceImpl implements TaskMessageExecService {
     public void messageType(String taskId, String type, List<TaskMessageUser> userList,
                              Map<String, Object> map) throws ApplicationException {
         switch (type){
-            case PipelineFinal.MES_SEND_SITE ->{
+            case MES_SEND_SITE ->{
                 tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+ "发送消息，类型：站内信");
-                map.put("sendWay", PipelineFinal.MES_SEND_SITE);
-                List<String> list = new ArrayList<>();
-                for (TaskMessageUser message : userList) {
-                    list.add(message.getUser().getId());
-                }
-                homeService.message(map,list);
-                tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+ "站内信发送成功");
+                map.put("sendWay", MES_SEND_SITE);
+                sendSite(taskId,userList,map);
             }
-            case "wechat" ->{
+            case MES_SEND_WECHAT ->{
                 tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+ "发送消息，类型：微信机器人消息");
-                map.put("sendWay", PipelineFinal.MES_SEND_WECHAT);
+                map.put("sendWay", MES_SEND_WECHAT);
                 homeService.message(map,new ArrayList<>());
                 tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+ "微信机器人消息发送成功");
             }
-            case "mail" ->{
-                tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+ "发送消息，类型：邮箱消息");
-                map.put("sendWay", PipelineFinal.MES_SEND_EMAIL);
-                List<String> list = new ArrayList<>();
-                for (TaskMessageUser message : userList) {
-                    list.add(message.getUser().getEmail());
-                }
-                homeService.message(map,list);
-                tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+ "邮箱消息发送成功");
+            case MES_SEND_SMS ->{
+                tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+ "发送消息，类型：短信消息");
+                map.put("sendWay", MES_SEND_SMS);
+                sendSSM(taskId,userList,map);
+                homeService.smsMessage(map);
+                tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+ "短信发送成功");
             }
-            case PipelineFinal.MES_SEND_DINGDING ->{
-                tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+ "发送消息，类型：钉钉机器人消息");
-                map.put("sendWay", PipelineFinal.MES_SEND_DINGDING);
+            case MES_SEND_EMAIL ->{
+                tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+ "发送消息，类型：邮箱消息");
+                map.put("sendWay", MES_SEND_EMAIL);
+                sendMail(taskId,userList,map);
                 homeService.message(map,new ArrayList<>());
-                tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+ "钉钉机器人消息成功");
+            }
+            case MES_SEND_DINGDING ->{
+                tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+ "发送消息，类型：钉钉机器人消息");
+                map.put("sendWay", MES_SEND_DINGDING);
+                sendDingDing(taskId,userList,map);
             }
             default -> {
                 throw new ApplicationException("没有该类型的消息提醒:"+ type);
             }
         }
+    }
 
 
+    public void  sendMail (String taskId,List<TaskMessageUser> userList,Map<String, Object> map){
+        List<String> list = new ArrayList<>();
+        for (TaskMessageUser message : userList) {
+            User user = message.getUser();
+            if (StringUtils.isEmpty(user.getEmail())){
+                tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+ "用户："+user.getNickname()+"邮箱为空！");
+                continue;
+            }
+            list.add(user.getEmail());
+        }
+        homeService.message(map,list);
+        tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+ "邮箱消息发送成功!");
+
+
+    }
+
+    public void  sendSite (String taskId,List<TaskMessageUser> userList,Map<String, Object> map){
+        List<String> list = new ArrayList<>();
+        for (TaskMessageUser message : userList) {
+            User user = message.getUser();
+            list.add(user.getId());
+        }
+        homeService.message(map,list);
+        tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+ "站内信发送成功!");
+
+
+    }
+
+    public void  sendSSM (String taskId,List<TaskMessageUser> userList,Map<String, Object> map){
+
+    }
+
+
+    public void  sendDingDing (String taskId,List<TaskMessageUser> userList,Map<String, Object> map){
+        homeService.message(map,new ArrayList<>());
+        tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+ "钉钉机器人消息成功");
     }
 
 }

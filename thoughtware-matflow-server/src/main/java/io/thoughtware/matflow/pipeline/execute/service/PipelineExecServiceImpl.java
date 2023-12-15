@@ -3,7 +3,9 @@ package io.thoughtware.matflow.pipeline.execute.service;
 import io.thoughtware.matflow.home.service.PipelineHomeService;
 import io.thoughtware.matflow.pipeline.execute.model.PipelineRunMsg;
 import io.thoughtware.matflow.setting.service.ResourcesService;
+import io.thoughtware.matflow.stages.model.Stage;
 import io.thoughtware.matflow.stages.service.StageExecService;
+import io.thoughtware.matflow.stages.service.StageService;
 import io.thoughtware.matflow.support.disk.service.DiskService;
 import io.thoughtware.matflow.support.postprocess.service.PostprocessExecService;
 import io.thoughtware.matflow.support.util.PipelineFileUtil;
@@ -74,6 +76,9 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
     DiskService diskService;
 
     @Autowired
+    StageService stageService;
+
+    @Autowired
     JoinTemplate joinTemplate;
 
     public final Logger logger = LoggerFactory.getLogger(PipelineExecServiceImpl.class);
@@ -104,14 +109,36 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
 
         // 判断同一任务是否在运行
         Pipeline pipeline = validExecPipeline(runMsg);
+
+        judgeConfig(pipeline);
         runMsg.setPipeline(pipeline);
         // 放入等待执行的缓存中
         if (pipeline.getState() == 3 ){
             logger.warn("并行任务已满，等待执行！");
             throw new ApplicationException(2000,"并行任务已满，等待执行！");
         }
-
         return beginExecPipeline(runMsg);
+    }
+
+    /**
+     * 流水线不存在任务
+     * @param pipeline 流水线
+     */
+    public void judgeConfig(Pipeline pipeline){
+        int type = pipeline.getType();
+        String pipelineId = pipeline.getId();
+        if (type == 1){
+            List<Tasks> tasks = tasksService.finAllPipelineTask(pipelineId);
+            if (tasks.isEmpty()){
+                throw new ApplicationException(2000,"当前流水线不存在任务！");
+            }
+        }else {
+            List<Stage> allMainStage = stageService.findAllMainStage(pipelineId);
+            if (allMainStage.isEmpty()){
+                throw new ApplicationException(2000,"当前流水线不存在任务！");
+            }
+        }
+
     }
 
     /**

@@ -39,7 +39,7 @@ public interface PipelineHomeService {
      * 发送短信
      * @param map 短信内容
      */
-    void smsMessage(Map<String,String> map);
+    void smsMessage(Map<String,Object> map);
 
     /**
      * 初始化消息，日志信息

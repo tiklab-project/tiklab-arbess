@@ -26,16 +26,16 @@ import java.util.Objects;
 public class TaskMessageTypeServiceImpl implements TaskMessageTypeService {
 
     @Autowired
-    private TaskMessageTypeDao taskMessageTypeDao;
+    TaskMessageTypeDao taskMessageTypeDao;
     
     @Autowired
-    private TaskMessageUserService messageUserServer;
+    TaskMessageUserService messageUserServer;
 
     @Autowired
-    private WebHookService webHookService;
+    WebHookService webHookService;
 
     @Autowired
-    private MailCfgService mailCfgService;
+    MailCfgService mailCfgService;
 
     //创建
     @Override
@@ -63,9 +63,8 @@ public class TaskMessageTypeServiceImpl implements TaskMessageTypeService {
             TaskMessageTypeEntity messageTypeEntity = BeanMapper.map(message, TaskMessageTypeEntity.class);
             messageTypeEntity.setTaskType(s);
             taskMessageTypeDao.createMessage(messageTypeEntity);
-            messageUserServer.createAllMessage(userList,taskId);
         }
-
+        messageUserServer.createAllMessage(userList,taskId);
     }
 
     @Override
@@ -113,7 +112,6 @@ public class TaskMessageTypeServiceImpl implements TaskMessageTypeService {
         }
         TaskMessageType taskMessageType = new TaskMessageType();
 
-
         //添加消息发送类型
         List<String> list = new ArrayList<>();
         for (TaskMessageType messageType : allMessage) {
@@ -125,7 +123,7 @@ public class TaskMessageTypeServiceImpl implements TaskMessageTypeService {
             list.add(taskType);
         }
 
-        List<TaskMessageUser>  userList = messageUserServer.findAllUserMessage(taskId);
+        List<TaskMessageUser> userList = messageUserServer.findAllUserMessage(taskId);
         taskMessageType.setTypeList(list);
         taskMessageType.setTaskId(taskId);
         taskMessageType.setUserList(userList);

@@ -60,7 +60,7 @@ public class TriggerServiceImpl implements TriggerService {
     public List<Object> findAllTrigger(TriggerQuery triggerQuery){
         List<Trigger> triggerList = findTriggerList(triggerQuery);
         if (triggerList.isEmpty()){
-            return null;
+            return Collections.emptyList();
         }
         List<TriggerTime> triggerTimeList = new ArrayList<>();
         for (Trigger trigger : triggerList) {

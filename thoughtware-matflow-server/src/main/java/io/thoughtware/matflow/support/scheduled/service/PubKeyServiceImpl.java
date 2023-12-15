@@ -29,10 +29,10 @@ public class PubKeyServiceImpl implements PubKeyService {
 
 
 
-    private String pub_key = """
+    public String pub_key = """
                                  ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDnqLwl4hKCUDh2l1AuO/CA2NADlHtEinPWf5muyAFpq2Ryoi3HR9VUYAMkdqz+6ARpYXvwYnTZfmPQ/p+Yspjf0xRj6frO+EEBJKmr2tUPFsiSd3dsMSOihyKoAbwSwLgvJ5ar3xVOKLZNS5vkK4Wp6ohGrZo5g9MPsppTsink5a8Z07cBcNIev8m4Z0XurnC6xI5MaYC5cZkV2RgJ532bSlqLwdraHQ8wjWkm9YEncENxu5dsKj9jftcEtgKE7tJn+X/JXxBQbApS53Qs4wx3pEljwy9cSiphtKSqmW2JypKaia7sCCKOUodx7Twy61JpsfQcPyT35v/ZwiYO69mLKpNid4MSuIV/TxWwauqGPQ52EBGno7Qpl1fB6oaaQsSM2tIwmdFqGVL61wtjKEfIyulkKbTrk8neO4Idcl4mYXi6pUhsTDJit9Uw0wdOqA29M1Frcwd2xJr5hkUR/nzcJIckgQeBAnhNZ60BWN+0lgS4VHr8QI2vrr4nQSluNO0= zcamy@zhangcheng.local
                                  """;
-    private String pvi_key = """ 
+    public String pvi_key = """ 
                                  -----BEGIN OPENSSH PRIVATE KEY-----
                                  b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAABlwAAAAdzc2gtcn
                                  NhAAAAAwEAAQAAAYEA56i8JeISglA4dpdQLjvwgNjQA5R7RIpz1n+ZrsgBaatkcqItx0fV
