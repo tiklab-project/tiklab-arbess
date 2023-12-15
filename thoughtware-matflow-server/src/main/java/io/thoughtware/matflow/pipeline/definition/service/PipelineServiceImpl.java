@@ -132,10 +132,10 @@ public class PipelineServiceImpl implements PipelineService {
 
         //动态与消息
         Map<String,Object> map =homeService.initMap(pipeline);
-        map.put("link",PipelineFinal.LOG_LINK_CREATE);
+        map.put("link",PipelineFinal.CREATE_LINK);
         map.put("pipelineName",pipeline.getName());
         homeService.log(PipelineFinal.LOG_TYPE_CREATE, map);
-        homeService.settingMessage(PipelineFinal.LOG_TYPE_CREATE, map);
+        homeService.settingMessage(PipelineFinal.MES_CREATE, map);
 
         return pipelineId;
     }
@@ -164,9 +164,9 @@ public class PipelineServiceImpl implements PipelineService {
 
         //动态与消息
         Map<String,Object> map = homeService.initMap(pipeline);
-        map.put("link",PipelineFinal.LOG_LINK_DELETE);
+        map.put("link",PipelineFinal.DELETE_LINK);
         homeService.log(PipelineFinal.LOG_TYPE_DELETE,  map);
-        homeService.settingMessage(PipelineFinal.LOG_TYPE_DELETE, map);
+        homeService.settingMessage(PipelineFinal.MES_DELETE, map);
 
     }
 
@@ -178,11 +178,11 @@ public class PipelineServiceImpl implements PipelineService {
         //判断名称是否改变
         if (!pipeline.getName().equals(flow.getName())){
             Map<String,Object> map = homeService.initMap(pipeline);
-            map.put("link",PipelineFinal.LOG_LINK_UPDATE);
+            map.put("link",PipelineFinal.UPDATE_LINK);
             map.put("message", flow.getName() +"更改为："+pipeline.getName());
             flow.setName(pipeline.getName());
             homeService.log(PipelineFinal.LOG_TYPE_UPDATE,  map);
-            homeService.settingMessage(PipelineFinal.LOG_TYPE_UPDATE, map);
+            homeService.settingMessage(PipelineFinal.MES_UPDATE, map);
         }
 
         //判断权限是否改变

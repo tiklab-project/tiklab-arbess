@@ -6,6 +6,7 @@ import io.thoughtware.matflow.setting.service.ResourcesService;
 import io.thoughtware.matflow.stages.service.StageExecService;
 import io.thoughtware.matflow.support.disk.service.DiskService;
 import io.thoughtware.matflow.support.postprocess.service.PostprocessExecService;
+import io.thoughtware.matflow.support.util.PipelineFileUtil;
 import io.thoughtware.matflow.support.util.PipelineFinal;
 import io.thoughtware.matflow.support.util.PipelineUtilService;
 import io.thoughtware.matflow.support.version.service.PipelineVersionService;
@@ -26,6 +27,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
@@ -329,6 +331,11 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
         // 发送流水线运行消息
         sendPipelineRunMessage(pipeline,instanceId,state);
 
+
+        String defaultAddress = utilService.findPipelineDefaultAddress(pipelineId, 1);
+        logger.warn("删除流水线源数据......");
+        PipelineFileUtil.deleteFile(new File(defaultAddress));
+
         logger.warn("流水线：" +pipeline.getName() + "运行完成...");
     }
 
@@ -421,7 +428,13 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
         // 执行等待的流水线
         execCachePipeline();
 
+
+        String defaultAddress = utilService.findPipelineDefaultAddress(pipelineId, 1);
+        logger.warn("删除流水线源数据......");
+        PipelineFileUtil.deleteFile(new File(defaultAddress));
+
         tasksExecService.stopThread(pipelineId);
+
     }
 
     /**
@@ -469,14 +482,14 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
     public void sendPipelineRunMessage(Pipeline pipeline,String instanceId,Boolean state){
         Map<String,Object> map = homeService.initMap(pipeline);
         map.put("instanceId",instanceId);
-        map.put("link",PipelineFinal.LOG_LINK_RUN);
+        map.put("link",PipelineFinal.RUN_LINK);
         if (state){
             map.put("message","运行成功");
         }else {
             map.put("message","运行失败");
         }
         homeService.log(PipelineFinal.LOG_TYPE_RUN,  map);
-        homeService.settingMessage(PipelineFinal.LOG_TYPE_RUN,  map);
+        homeService.settingMessage(PipelineFinal.MES_RUN,  map);
     }
 
 

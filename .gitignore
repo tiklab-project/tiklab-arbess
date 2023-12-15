@@ -12,10 +12,10 @@ logs/
 plugin/
 APP_NAME_IS_UNDEFINED/
 DATA_HOME_IS_UNDEFINED/
-tiklab-matflow-distribution/embbed
-tiklab-matflow-starter/embbed
+thoughtware-matflow-distribution/embbed
+thoughtware-matflow-starter/embbed
 matflow-log
-tiklab-matflow-starter/plugin
-tiklab-matflow-starter/target
-tiklab-matflow-starter/licences
-tiklab-matflow-starter/src/main/resources/config/dev
+thoughtware-matflow-starter/plugin
+thoughtware-matflow-starter/target
+thoughtware-matflow-starter/licences
+thoughtware-matflow-starter/src/main/resources/config/dev

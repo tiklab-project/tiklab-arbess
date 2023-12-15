@@ -49,7 +49,6 @@ public class PipelineFinal {
      */
     //消息发送类型
     public static final String MES_PIPELINE_RUN = "PIPELINE_RUN";
-    public static final String MES_PIPELINE_TASK_RUN = "INE_TASK_RUN";
 
     //消息发送方式
     public static final String MES_SEND_SITE = "site";
@@ -59,29 +58,29 @@ public class PipelineFinal {
     public static final String MES_SEND_SMS = "sms";
 
     //消息通知方案
-    public static final String MES_UPDATE = "MES_UPDATE";
-    public static final String MES_DELETE = "MES_DELETE";
-    public static final String MES_CREATE = "MES_CREATE";
-    public static final String MES_RUN = "MES_RUN";
+    public static final String MES_UPDATE = "MF_MES_TYPE_UPDATE";
+    public static final String MES_DELETE = "MF_MES_TYPE_DELETE";
+    public static final String MES_CREATE = "MF_MES_TYPE_CREATE";
+    public static final String MES_RUN = "MF_MES_TYPE_RUN";
 
 
     // 日志类型
-    public static final String LOG_TYPE_CREATE = "PIP_CREATE";
+    public static final String LOG_TYPE_CREATE = "MF_LOG_TYPE_CREATE";
 
-    public static final String LOG_TYPE_DELETE = "PIP_DELETE";
+    public static final String LOG_TYPE_DELETE = "MF_LOG_TYPE_DELETE";
 
-    public static final String LOG_TYPE_UPDATE = "PIP_UPDATE";
+    public static final String LOG_TYPE_UPDATE = "MF_LOG_TYPE_UPDATE";
 
-    public static final String LOG_TYPE_RUN = "PIP_RUN";
+    public static final String LOG_TYPE_RUN = "MF_LOG_TYPE_RUN";
 
 
-    public static final String LOG_LINK_CREATE = "/pipeline/${pipelineId}/config";
+    public static final String CREATE_LINK = "/pipeline/${pipelineId}/config";
 
-    public static final String LOG_LINK_DELETE = "/pipeline/${pipelineId}/delete";
+    public static final String DELETE_LINK = "/pipeline/${pipelineId}/delete";
 
-    public static final String LOG_LINK_UPDATE = "/pipeline/${pipelineId}/set/info";
+    public static final String UPDATE_LINK = "/pipeline/${pipelineId}/set/info";
 
-    public static final String LOG_LINK_RUN = "/pipeline/${pipelineId}/history/${instanceId}";
+    public static final String RUN_LINK = "/pipeline/${pipelineId}/history/${instanceId}";
 
 
     /**
