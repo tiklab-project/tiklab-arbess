@@ -1,6 +1,10 @@
 package io.thoughtware.matflow.setting.service;
 
+import io.thoughtware.matflow.setting.model.ResourcesDetails;
+import io.thoughtware.matflow.support.util.PipelineUtil;
 import io.thoughtware.matflow.support.util.PipelineUtilService;
+import io.thoughtware.matflow.support.util.Time;
+import io.thoughtware.matflow.support.util.TimeConfig;
 import io.thoughtware.matflow.support.version.service.PipelineVersionService;
 import io.thoughtware.core.exception.ApplicationException;
 import io.thoughtware.matflow.pipeline.definition.dao.PipelineDao;
@@ -13,9 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
-import java.util.Calendar;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Service
 public class ResourcesServiceImpl implements ResourcesService {
@@ -35,26 +37,26 @@ public class ResourcesServiceImpl implements ResourcesService {
 
     @Override
     public void instanceResources(int time){
-        int month = Calendar.getInstance().get(Calendar.MONTH) + 1;
+
         if (time == 0){
             time = 1;
         }
 
-        List<Resources> allResources = findAllResources();
-        if (!allResources.isEmpty()){
-            Resources resources = allResources.get(0);
+        Time dataTime = TimeConfig.findDataTime(PipelineUtil.date(2));
+        String beginTime = dataTime.getMonthBeginTime();
+        String endTime = dataTime.getMonthEndTime();
+        Resources resources = resourcesDao.findResources(beginTime,endTime);
+        if (Objects.nonNull(resources)){
             int structureNumber = resources.getUseSceNumber();
             resources.setUseSceNumber(structureNumber+time);
-            int month1 = resources.getMonth();
-            resources.setMonth(month);
-            if (month1 != month){
-                resources.setUseSceNumber(time);
-            }
+            resources.setMonth(dataTime.getMonth());
             updateResources(resources);
         }else {
-            Resources resources = new Resources();
+            resources = new Resources();
             resources.setUseSceNumber(time);
-            resources.setMonth(month);
+            resources.setMonth(dataTime.getMonth());
+            resources.setBeginTime(beginTime);
+            resources.setEndTime(endTime);
             String resourcesId = createResources(resources);
             if (Objects.isNull(resourcesId)){
                 throw new ApplicationException("创建资源信息失败！");
@@ -104,13 +106,15 @@ public class ResourcesServiceImpl implements ResourcesService {
 
     @Override
     public List<Resources> findAllResources(){
+        List<Resources> allResources = resourcesDao.findAllResources();
+        if (allResources == null || allResources.isEmpty()){
+            return Collections.emptyList();
+        }
         return resourcesDao.findAllResources();
     }
 
     @Override
     public Resources findResourcesList(){
-        // List<Resources> allResources = resourcesDao.findAllResources();
-        // Resources resources = new Resources();
         int version = versionService.version();
 
         PipelineQuery pipelineQuery = new PipelineQuery();
@@ -123,58 +127,11 @@ public class ResourcesServiceImpl implements ResourcesService {
             Resources resources = notVipResources(number);
             resources.setVersion(version);
             return resources;
-            // resources.setCcyNumber(2);
-            // resources.setSceNumber(1800);
-            // resources.setCacheNumber(-1);
         }else {
             Resources resources = vipResources(number);
             resources.setVersion(version);
             return resources;
-            // resources.setCcyNumber(5);
-            // resources.setSceNumber(-1);
-            // resources.setCacheNumber(-1);
         }
-
-        // PipelineQuery pipelineQuery = new PipelineQuery();
-        // pipelineQuery.setPipelineState(1);
-        // List<PipelineEntity> pipelineList = pipelineDao.findPipelineList(pipelineQuery);
-        //
-        // int size = pipelineList.size();
-        //
-        // // 并发数
-        // resources.setUseCcyNumber(size);
-        // if (version == 1){
-        //     resources.setResidueCcyNumber(3- size);
-        // }else {
-        //     resources.setResidueCcyNumber(5 - size);
-        // }
-        //
-        // // 磁盘数（社区版不限制磁盘大小）
-        // resources.setResidueCacheNumber(-1);
-        // resources.setUseCacheNumber(0);
-        //
-        // // 构建时长
-        // if (allResources.isEmpty()){
-        //     resources.setUseSceNumber(0);
-        //     if (version == 1){
-        //         resources.setResidueSceNumber(1800);
-        //     }
-        // }else {
-        //     int useSceNumber = allResources.get(0).getUseSceNumber();
-        //     int i = useSceNumber / 60;
-        //     if (useSceNumber != 0 && i == 0){
-        //         i = 1;
-        //         resources.setUseSceNumber(1);
-        //     }
-        //     if (version == 1){
-        //         resources.setResidueSceNumber(1800 - i);
-        //     }
-        // }
-        // if (version == 2){
-        //     resources.setResidueSceNumber(-1);
-        // }
-        // resources.setVersion(version);
-        // return resources;
     }
 
     private static final int vipExecNumber = 4;
@@ -199,16 +156,25 @@ public class ResourcesServiceImpl implements ResourcesService {
         // 并发数
         resources.setUseCcyNumber(execNumber);
 
+        // 剩余并发数
         int i = vipExecNumber - execNumber;
         resources.setResidueCcyNumber(Math.max(i, 0));
-        // resources.setResidueCcyNumber(vipExecNumber - execNumber);
 
-        // 磁盘数（社区版,企业版不限制磁盘大小）
-        resources.setResidueCacheNumber(vipCacheNTime);
-        resources.setUseCacheNumber(0);
+        // 磁盘大小
+        double size = Double.parseDouble(String.format("%.2f",vipExecNumber - getSize()));
+        resources.setResidueCacheNumber(size);
+        resources.setUseCacheNumber(getSize());
 
         // 构建时长
-        resources.setResidueSceNumber(vipExecTime);
+        List<Resources> allResources = findAllResources();
+        if (allResources.isEmpty()){
+            resources.setResidueSceNumber(vipExecTime);
+        }else {
+            Resources resources1 = allResources.get(0);
+            int sceNumber = resources1.getUseSceNumber();
+            resources.setResidueSceNumber(sceNumber/60);
+        }
+
 
         return resources;
     }
@@ -224,16 +190,62 @@ public class ResourcesServiceImpl implements ResourcesService {
         resources.setUseCcyNumber(execNumber);
         int i = notVipExecNumber - execNumber;
         resources.setResidueCcyNumber(Math.max(i, 0));
-        // resources.setResidueCcyNumber(notVipExecNumber- execNumber);
 
         // 磁盘数（社区版不限制磁盘大小）
-        resources.setResidueCacheNumber(notVipCacheNTime);
-        resources.setUseCacheNumber(0);
+        double size = Double.parseDouble(String.format("%.2f",notVipCacheNTime - getSize()));
+        resources.setResidueCacheNumber(size);
+        resources.setUseCacheNumber(getSize());
 
+        resources.setResidueSceNumber(vipExecTime);
         // 构建时长
-        resources.setUseSceNumber(0);
-        resources.setResidueSceNumber(notVipExecTime);
+        List<Resources> allResources = findAllResources();
+        if (allResources.isEmpty()){
+            resources.setUseSceNumber(0);
+        }else {
+            Resources resources1 = allResources.get(0);
+            int sceNumber = resources1.getUseSceNumber();
+            resources.setUseSceNumber(sceNumber/60);
+        }
         return resources;
+    }
+
+
+    public ResourcesDetails findResourcesDetails(String type){
+        ResourcesDetails resourcesDetails = new ResourcesDetails();
+
+        switch(type) {
+            case "disk" ->{
+                String codeAddress = utilService.instanceAddress(1);
+                String logAddress = utilService.instanceAddress(2);
+                resourcesDetails.setArtifactCache(findDirSize(logAddress)+"");
+                resourcesDetails.setSourceCache(findDirSize(codeAddress)+"");
+            }
+            case "run" ->{
+                PipelineQuery pipelineQuery = new PipelineQuery();
+                pipelineQuery.setPipelineState(2);
+                List<String> list = new ArrayList<>();
+                List<PipelineEntity> pipelineList = pipelineDao.findPipelineList(pipelineQuery);
+                if (pipelineList.isEmpty()){
+                    resourcesDetails.setList(list);
+                    break;
+                }
+                for (PipelineEntity pipelineEntity : pipelineList) {
+                    list.add(pipelineEntity.getName());
+                }
+                resourcesDetails.setList(list);
+            }
+        }
+        return resourcesDetails;
+    }
+
+
+    public double findDirSize(String dir){
+        File file = new File(dir);
+        if (!file.exists()){
+            return 0;
+        }
+        long bytes = FileUtils.sizeOfDirectory(file);
+        return  Math.round((float) (((bytes / 1024) / 1024) * 100) /1024)/100.0 ;
     }
 
 

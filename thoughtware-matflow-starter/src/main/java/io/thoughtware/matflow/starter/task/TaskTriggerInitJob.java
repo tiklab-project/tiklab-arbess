@@ -34,31 +34,35 @@ public class TaskTriggerInitJob implements ApplicationListener<ContextRefreshedE
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
-        // run();
+        run();
     }
 
     public void run(){
-        logger.info("Load scheduled tasks......");
+
         TriggerQuery triggerQuery = new TriggerQuery();
         triggerQuery.setState("1");
         List<Object> triggerList = triggerServer.findAllTrigger(triggerQuery);
-        
-        if (!Objects.isNull(triggerList) && !triggerList.isEmpty()){
-            for (Object o : triggerList) {
-                TriggerTime triggerTime = (TriggerTime) o;
-                String configId = triggerTime.getTriggerId();
-                String time = triggerTime.getWeekTime();
-                Date date = PipelineUtil.StringChengeDate(time);
-                if (date.getTime() < new Date().getTime()){
-                    continue;
-                }
-                Trigger trigger = triggerServer.findOneTriggerById(configId);
-                String pipelineId = trigger.getPipeline().getId();
-                try {
-                    job.addJob(PipelineFinal.DEFAULT,pipelineId, RunJob.class,triggerTime.getCron());
-                } catch (SchedulerException e) {
-                    throw new ApplicationException(e);
-                }
+
+        if (Objects.isNull(triggerList) || triggerList.isEmpty()){
+            return;
+        }
+
+
+        logger.info("Load scheduled tasks......");
+        for (Object o : triggerList) {
+            TriggerTime triggerTime = (TriggerTime) o;
+            String configId = triggerTime.getTriggerId();
+            String time = triggerTime.getWeekTime();
+            Date date = PipelineUtil.StringChengeDate(time);
+            if (date.getTime() < new Date().getTime()){
+                continue;
+            }
+            Trigger trigger = triggerServer.findOneTriggerById(configId);
+            String pipelineId = trigger.getPipeline().getId();
+            try {
+                job.addJob(PipelineFinal.DEFAULT,pipelineId, RunJob.class,triggerTime.getCron());
+            } catch (SchedulerException e) {
+                throw new ApplicationException(e);
             }
         }
         logger.info("Timed task loading completed!");

@@ -1,24 +1,28 @@
-package io.thoughtware.matflow.support.scheduled.service;
+package io.thoughtware.matflow.starter.task;
 
 import io.thoughtware.matflow.setting.model.Auth;
 import io.thoughtware.matflow.setting.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.util.Objects;
 
-@Service
-public class PubKeyServiceImpl implements PubKeyService {
+@Configuration
+public class TaskPubKey  {
 
     @Autowired
     AuthService authService;
 
 
-    @Override
+    @Bean
     public void updatePviKey(){
 
         Auth auth = authService.findOneAuth("f812ab93d8ff");
+        if (Objects.isNull(auth)){
+            return;
+        }
         if (pvi_key.equals(auth.getPrivateKey())){
             return;
         }

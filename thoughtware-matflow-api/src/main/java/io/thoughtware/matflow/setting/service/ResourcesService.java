@@ -1,6 +1,7 @@
 package io.thoughtware.matflow.setting.service;
 
 import io.thoughtware.matflow.setting.model.Resources;
+import io.thoughtware.matflow.setting.model.ResourcesDetails;
 
 import java.util.List;
 
@@ -34,6 +35,9 @@ public interface ResourcesService {
       * @return 使用情况
       */
      Resources findResourcesList();
+
+
+     ResourcesDetails findResourcesDetails(String type);
 
 
 

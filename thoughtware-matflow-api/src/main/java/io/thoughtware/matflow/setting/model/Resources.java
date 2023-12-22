@@ -17,7 +17,7 @@ public class Resources {
     private int version;
 
     //@ApiProperty(name = "month" ,desc="月份")
-    private int month;
+    private String month;
 
     //@ApiProperty(name = "useCcyNumber" ,desc="使用并发数")
     private int useCcyNumber;
@@ -46,6 +46,25 @@ public class Resources {
     //@ApiProperty(name = "residueCacheNumber" ,desc="剩余缓存大小")
     private double residueCacheNumber;
 
+    private String beginTime;
+
+    private String endTime;
+
+    public String getBeginTime() {
+        return beginTime;
+    }
+
+    public void setBeginTime(String beginTime) {
+        this.beginTime = beginTime;
+    }
+
+    public String getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(String endTime) {
+        this.endTime = endTime;
+    }
 
     public String getId() {
         return id;
@@ -63,11 +82,11 @@ public class Resources {
         this.version = version;
     }
 
-    public int getMonth() {
+    public String getMonth() {
         return month;
     }
 
-    public void setMonth(int month) {
+    public void setMonth(String month) {
         this.month = month;
     }
 

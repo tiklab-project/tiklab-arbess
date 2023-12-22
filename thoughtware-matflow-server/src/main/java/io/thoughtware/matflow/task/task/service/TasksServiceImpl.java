@@ -38,6 +38,7 @@ import io.thoughtware.matflow.support.postprocess.dao.PostprocessDao;
 import io.thoughtware.matflow.support.postprocess.entity.PostprocessEntity;
 import io.thoughtware.matflow.task.task.entity.TasksEntity;
 import io.thoughtware.rpc.annotation.Exporter;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -1091,6 +1092,11 @@ public class TasksServiceImpl implements TasksService {
                    && Objects.isNull(taskTest.getWebEnv());
            return !b ;
         }
+        if(StringUtils.isEmpty(taskTest.getAddress())){
+            return false;
+        }
+
+
         return true;
     }
 

@@ -21,8 +21,30 @@ public class ResourcesEntity {
     private int useCacheNumber;
 
     @Column(name = "month" )
-    private int month;
+    private String month;
 
+    @Column(name = "begin_time" )
+    private String beginTime;
+
+    @Column(name = "end_time" )
+    private String endTime;
+
+
+    public String getBeginTime() {
+        return beginTime;
+    }
+
+    public void setBeginTime(String beginTime) {
+        this.beginTime = beginTime;
+    }
+
+    public String getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(String endTime) {
+        this.endTime = endTime;
+    }
 
     public String getId() {
         return id;
@@ -31,7 +53,6 @@ public class ResourcesEntity {
     public void setId(String id) {
         this.id = id;
     }
-
 
     public int getUseSceNumber() {
         return useSceNumber;
@@ -57,11 +78,11 @@ public class ResourcesEntity {
         this.useCacheNumber = useCacheNumber;
     }
 
-    public int getMonth() {
+    public String getMonth() {
         return month;
     }
 
-    public void setMonth(int month) {
+    public void setMonth(String month) {
         this.month = month;
     }
 }

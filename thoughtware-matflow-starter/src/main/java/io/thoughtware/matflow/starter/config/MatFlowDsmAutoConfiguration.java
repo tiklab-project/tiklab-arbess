@@ -47,7 +47,7 @@ public class MatFlowDsmAutoConfiguration {
                 "pip-maven-test_1.0.0",
                 "pip-setting-envorgroup_1.0.0",
                 "pip-trigger_1.0.0",
-                "pip-massage_1.0.0"
+                "pip-setting-cache_1.0.0"
         });
         dsmConfig.newVersion("1.0.1", new String[]{
                 "pip-project_1.0.1",
@@ -65,16 +65,21 @@ public class MatFlowDsmAutoConfiguration {
         });
         dsmConfig.newVersion("1.0.3", new String[]{
                 "pip-project_1.0.3",
-                "message_1.0.3"
+                "message_1.0.3",
+                "oplog_1.0.3"
         });
         dsmConfig.newVersion("1.0.4", new String[]{
-                "pip-project_1.0.4"
+                "pip-project_1.0.4",
+                "message_1.0.4"
         });
         dsmConfig.newVersion("1.0.5", new String[]{
                 "pip-project_1.0.5"
         });
         dsmConfig.newVersion("1.0.7", new String[]{
                 "pip-project_1.0.7"
+        });
+        dsmConfig.newVersion("1.0.8", new String[]{
+                "pip-project_1.0.8"
         });
         return dsmConfig;
     }

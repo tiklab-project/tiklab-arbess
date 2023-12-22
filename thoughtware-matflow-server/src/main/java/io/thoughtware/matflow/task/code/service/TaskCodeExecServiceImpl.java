@@ -31,6 +31,8 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.*;
 
+import static io.thoughtware.matflow.support.util.PipelineFinal.*;
+
 /**
  * 源码管理执行方法
  */
@@ -108,8 +110,6 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
             return false;
         }
 
-
-
         try {
             Thread.sleep(300);
         } catch (InterruptedException e) {
@@ -131,7 +131,7 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
             Process process = codeStart(code,pipelineId);
             String  type = code.getType();
             String enCode = null;
-            if (!type.equals(PipelineFinal.TASK_CODE_SVN)){
+            if (!type.equals(TASK_CODE_SVN)){
                 enCode = PipelineFinal.UTF_8;
             }
             boolean result = tasksInstanceService.readCommandExecResult(process, enCode, error(type), taskId);
@@ -144,7 +144,7 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
             tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+ "获取提交信息..." );
 
             //获取提交信息
-            if (!type.equals(PipelineFinal.TASK_CODE_SVN)){
+            if (!type.equals(TASK_CODE_SVN)){
                 Process message = cloneMessage(code.getType(),pipelineId);
                 if (message != null){
                     boolean result1 = tasksInstanceService.readCommandExecResult(message, enCode, error(type), taskId);
@@ -180,7 +180,7 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
      * @throws ApplicationException 不存在配置
      */
     private Process codeStart(TaskCode taskCode, String pipelineId) throws IOException, URISyntaxException , ApplicationException{
-        boolean b = !(taskCode.getType().equals(PipelineFinal.TASK_CODE_SVN));
+        boolean b = !(taskCode.getType().equals(TASK_CODE_SVN));
         Scm pipelineScm ;
 
         if (b){
@@ -207,7 +207,7 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
         String path ;
         switch (taskCode.getType()) {
             //账号密码或ssh登录
-            case "git","gitlab" -> {
+            case TASK_CODE_GIT  ,TASK_CODE_GITLAB -> {
                 List<String> list = gitUpOrder(taskCode, fileAddress);
                 gitOrder = list.get(0);
                 if (list.size() > 1){
@@ -231,14 +231,14 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
                     return process;
                 }
             }
-            case "gittork" ->{
+            case TASK_CODE_XCODE ->{
                 gitOrder = gitXcodeOrder(taskCode, fileAddress);
             }
             //第三方授权
-            case "gitee","github" -> gitOrder = gitThirdOrder(taskCode, fileAddress);
+            case TASK_CODE_GITEE ,TASK_CODE_GITHUB -> gitOrder = gitThirdOrder(taskCode, fileAddress);
 
             //svn
-            case PipelineFinal.TASK_CODE_SVN -> gitOrder = svnOrder(taskCode, fileAddress);
+            case TASK_CODE_SVN -> gitOrder = svnOrder(taskCode, fileAddress);
             //错误
             default -> throw new ApplicationException("未知的任务类型");
         }
@@ -378,7 +378,7 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
     private String gitBranch(StringBuilder url , TaskCode code, String codeDir){
         String type = code.getType();
         String branch = code.getCodeBranch();
-        if (type.equals("xcode")){
+        if (type.equals(TASK_CODE_XCODE) && !Objects.isNull(code.getBranch())){
             branch = code.getBranch().getBranchName();
         }
 
@@ -480,7 +480,7 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
       */
     private void typeAddress(String type,int authType,String address) throws ApplicationException{
         String substring = address.substring(0, 3);
-        if (type.equals("5") || type.equals("svn")){
+        if (type.equals(TASK_CODE_SVN)){
             if (substring.equals("svn") && authType == 1){
                 return;
             }
@@ -508,7 +508,7 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
      * @throws IOException 执行失败
      */
     private Process cloneMessage(String taskType,String pipelineId) throws IOException {
-        if (taskType.equals("5") || taskType.equals("svn")){
+        if (taskType.equals(TASK_CODE_SVN)){
             return null;
         }
         String order = "git log --pretty=format:\"commit：%cn email：%ae message：%s date：%ad time：%ar \" --date=format:\"%Y-%m-%d %H:%M:%S\" -n 1";
@@ -523,7 +523,7 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
      */
     private Map<String,String> error(String type){
         Map<String,String> map = new HashMap<>();
-        if (type.equals("5") || type.equals("svn")){
+        if (type.equals(TASK_CODE_SVN)){
             map.put("svn: E170000","");
             map.put("invalid option","");
             map.put("vn: E204900","");
@@ -537,6 +537,8 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
         map.put("fatal: Authentication failed ","认证失败!");
         map.put("not found in upstream origin","分支不存在！");
         map.put("404 not found","获取远程仓库失败！");
+        map.put("Could not resolve host","无法连接到远程仓库！");
+        map.put("fatal: ","拉取失败！");
         return map;
     }
 

@@ -105,11 +105,8 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
 
         diskService.validationStorageSpace();
 
-        resourcesService.judgeResources();
-
         // 判断同一任务是否在运行
         Pipeline pipeline = validExecPipeline(runMsg);
-
         judgeConfig(pipeline);
         runMsg.setPipeline(pipeline);
         // 放入等待执行的缓存中
@@ -117,6 +114,10 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
             logger.warn("并行任务已满，等待执行！");
             throw new ApplicationException(2000,"并行任务已满，等待执行！");
         }
+
+        // 资源限制
+        resourcesService.judgeResources();
+
         return beginExecPipeline(runMsg);
     }
 

@@ -42,9 +42,8 @@ INSERT INTO pcs_mec_message_notice_connect_user (id, message_notice_id, user_id)
 
 
 
-
-
-
-
-
+DELETE FROM pcs_mec_message_notice WHERE id = 'PIP_CREATE';
+DELETE FROM pcs_mec_message_notice WHERE id = 'PIP_DELETE';
+DELETE FROM pcs_mec_message_notice WHERE id = 'PIP_RUN';
+DELETE FROM pcs_mec_message_notice WHERE id = 'PIP_UPDATE';
 

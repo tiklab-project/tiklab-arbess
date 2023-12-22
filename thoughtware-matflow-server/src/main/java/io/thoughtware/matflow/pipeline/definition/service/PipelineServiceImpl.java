@@ -164,7 +164,6 @@ public class PipelineServiceImpl implements PipelineService {
 
         //动态与消息
         Map<String,Object> map = homeService.initMap(pipeline);
-        map.put("link",PipelineFinal.DELETE_LINK);
         homeService.log(PipelineFinal.LOG_TYPE_DELETE,  map);
         homeService.settingMessage(PipelineFinal.MES_DELETE, map);
 

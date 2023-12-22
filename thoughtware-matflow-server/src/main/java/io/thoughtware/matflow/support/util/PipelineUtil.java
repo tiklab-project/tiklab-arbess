@@ -89,7 +89,7 @@ public class PipelineUtil {
      * 获取指定指定时间与现在时间是否相差在指定天数内
      * @param targetTime 指定时间
      * @param dayNumber 天数
-     * @return 相差
+     * @return 不为空则代表在相差时间内
      */
     public static String findDateTime(Date targetTime,Integer dayNumber){
 

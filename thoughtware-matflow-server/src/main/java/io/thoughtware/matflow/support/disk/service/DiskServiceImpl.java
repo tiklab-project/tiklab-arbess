@@ -45,8 +45,6 @@ public class DiskServiceImpl implements DiskService {
     @Override
     public void validationStorageSpace(){
 
-        // throw new SystemException(9000,"系统空间不足，请先清理过后在运行!");
-
        String codeAddress = utilService.instanceAddress(1);
        String logAddress = utilService.instanceAddress(2);
 

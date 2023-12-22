@@ -49,7 +49,7 @@ public class TaskTestServiceImpl implements TaskTestService {
      */
     @Override
     public void deleteTestConfig(String configId){
-        TaskTest oneTestConfig = findOneTestConfig(configId);
+        TaskTest oneTestConfig = findOneTest(configId);
         deleteTest(oneTestConfig.getTaskId());
     }
 

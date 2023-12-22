@@ -30,6 +30,8 @@ import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.sql.Timestamp;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.zip.GZIPOutputStream;
 
 @Service
@@ -37,9 +39,6 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
 
     @Autowired
     UserService userService;
-
-    @Autowired
-    SingleSendMessageService sendMessage;
 
     @Autowired
     LoggingByTempService logService;
@@ -52,6 +51,8 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
     String baseUrl;
 
     String appName = PipelineFinal.appName;
+
+    public final ExecutorService executorService = Executors.newCachedThreadPool();
 
     /**
      * 初始化消息，日志信息
@@ -82,30 +83,36 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
      */
     @Override
     public void log(String logType, Map<String, Object> map){
+        executorService.submit(() -> {
+            try {
+                Logging log = new Logging();
 
-        Logging log = new Logging();
+                //消息类型
+                LoggingType opLogType = new LoggingType();
+                opLogType.setId(logType);
+                log.setActionType(opLogType);
+                log.setModule("pipeline");
 
-        //消息类型
-        LoggingType opLogType = new LoggingType();
-        opLogType.setId(logType);
-        log.setActionType(opLogType);
-        log.setModule("pipeline");
+                //用户信息
+                String userId = LoginContext.getLoginId();
+                User user = userService.findOne(userId);
 
-        //用户信息
-        String userId = LoginContext.getLoginId();
-        User user = userService.findOne(userId);
+                String link = (String) map.get("link");
+                String pipelineName = (String) map.get("pipelineName");
 
-        String link = (String) map.get("link");
-        String pipelineName = (String) map.get("pipelineName");
+                log.setUser(user);
+                log.setLink(link);
+                log.setAction(pipelineName);
+                log.setBaseUrl(baseUrl);
+                log.setBgroup(appName);
+                log.setData(JSONObject.toJSONString(map));
 
-        log.setUser(user);
-        log.setLink(link);
-        log.setAction(pipelineName);
-        log.setBaseUrl(baseUrl);
-        log.setBgroup(appName);
-        log.setData(JSONObject.toJSONString(map));
+                logService.createLog(log);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        });
 
-        logService.createLog(log);
 
     }
 
@@ -116,20 +123,27 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
      */
     @Override
     public void settingMessage(String templateId,Map<String, Object> map){
-        SendMessageNotice dispatchNotice = new SendMessageNotice();
-        dispatchNotice.setId(templateId);
-        String jsonString = JSONObject.toJSONString(map);
-        dispatchNotice.setEmailData(jsonString);
-        dispatchNotice.setDingdingData(jsonString);
-        dispatchNotice.setSiteData(jsonString);
-        dispatchNotice.setQywechatData(jsonString);
-        dispatchNotice.setBaseUrl(baseUrl);
-        String link = (String) map.get("link");
-        String pipelineName = (String) map.get("pipelineName");
-        dispatchNotice.setLink(link);
-        dispatchNotice.setAction(pipelineName);
-        dispatchNotice.setSendId(LoginContext.getLoginId());
-        dispatchNoticeService.createMessageItem(dispatchNotice);
+
+        executorService.submit(() -> {
+            try {
+                SendMessageNotice dispatchNotice = new SendMessageNotice();
+                dispatchNotice.setId(templateId);
+                String jsonString = JSONObject.toJSONString(map);
+                dispatchNotice.setEmailData(jsonString);
+                dispatchNotice.setDingdingData(jsonString);
+                dispatchNotice.setSiteData(jsonString);
+                dispatchNotice.setQywechatData(jsonString);
+                dispatchNotice.setBaseUrl(baseUrl);
+                String link = (String) map.get("link");
+                String pipelineName = (String) map.get("pipelineName");
+                dispatchNotice.setLink(link);
+                dispatchNotice.setAction(pipelineName);
+                dispatchNotice.setSendId(LoginContext.getLoginId());
+                dispatchNoticeService.sendMessageNotice(dispatchNotice);
+            }catch (Exception e){
+                e.printStackTrace();
+            };
+        });
     }
 
 
@@ -168,7 +182,7 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
         message.setSendId(LoginContext.getLoginId());
         String pipelineName = (String) map.get("pipelineName");
         message.setAction(pipelineName);
-        sendMessage.sendMessage(message);
+        dispatchNoticeService.sendMessage(message);
     }
 
     /**
