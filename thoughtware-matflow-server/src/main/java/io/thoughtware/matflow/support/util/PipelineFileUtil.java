@@ -258,7 +258,6 @@ public class PipelineFileUtil {
         File folder = new File(dir);
         if (!folder.exists()) {
             folder.mkdirs();
-            // throw new SystemException("文件夹不存在！");
         }
         while (folder.getParentFile() != null) {
             folder = folder.getParentFile();

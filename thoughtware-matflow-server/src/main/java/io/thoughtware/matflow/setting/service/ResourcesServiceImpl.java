@@ -1,10 +1,7 @@
 package io.thoughtware.matflow.setting.service;
 
 import io.thoughtware.matflow.setting.model.ResourcesDetails;
-import io.thoughtware.matflow.support.util.PipelineUtil;
-import io.thoughtware.matflow.support.util.PipelineUtilService;
-import io.thoughtware.matflow.support.util.Time;
-import io.thoughtware.matflow.support.util.TimeConfig;
+import io.thoughtware.matflow.support.util.*;
 import io.thoughtware.matflow.support.version.service.PipelineVersionService;
 import io.thoughtware.core.exception.ApplicationException;
 import io.thoughtware.matflow.pipeline.definition.dao.PipelineDao;
@@ -184,7 +181,11 @@ public class ResourcesServiceImpl implements ResourcesService {
         // 可用资源总数
         resources.setCcyNumber(notVipExecNumber);
         resources.setSceNumber(notVipExecTime);
-        resources.setCacheNumber(notVipCacheNTime);
+
+        String codeAddress = utilService.instanceAddress(1);
+        float dirSize = PipelineFileUtil.findDiskSize(codeAddress);
+        double diskSize = Double.parseDouble(String.format("%.2f",dirSize));
+        resources.setCacheNumber(diskSize);
 
         // 并发数
         resources.setUseCcyNumber(execNumber);

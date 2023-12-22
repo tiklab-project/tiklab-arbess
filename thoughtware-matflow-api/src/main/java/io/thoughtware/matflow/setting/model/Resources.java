@@ -38,7 +38,7 @@ public class Resources {
     private int residueSceNumber;
 
     //@ApiProperty(name = "cacheNumber" ,desc="总缓存大小")
-    private int cacheNumber;
+    private double cacheNumber;
 
     //@ApiProperty(name = "useCacheNumber" ,desc="使用缓存大小")
     private double useCacheNumber;
@@ -138,11 +138,11 @@ public class Resources {
         this.residueSceNumber = residueSceNumber;
     }
 
-    public int getCacheNumber() {
+    public double getCacheNumber() {
         return cacheNumber;
     }
 
-    public void setCacheNumber(int cacheNumber) {
+    public void setCacheNumber(double cacheNumber) {
         this.cacheNumber = cacheNumber;
     }
 
