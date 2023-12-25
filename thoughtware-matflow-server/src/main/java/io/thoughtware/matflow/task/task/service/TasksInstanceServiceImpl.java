@@ -3,9 +3,9 @@ package io.thoughtware.matflow.task.task.service;
 
 import io.thoughtware.matflow.support.postprocess.model.PostprocessInstance;
 import io.thoughtware.matflow.support.postprocess.service.PostprocessInstanceService;
-import io.thoughtware.matflow.support.util.PipelineFileUtil;
-import io.thoughtware.matflow.support.util.PipelineFinal;
-import io.thoughtware.matflow.support.util.PipelineUtil;
+import io.thoughtware.matflow.support.util.util.PipelineFileUtil;
+import io.thoughtware.matflow.support.util.util.PipelineFinal;
+import io.thoughtware.matflow.support.util.util.PipelineUtil;
 import io.thoughtware.matflow.task.task.dao.TaskInstanceDao;
 import io.thoughtware.matflow.task.task.model.TaskInstance;
 import io.thoughtware.matflow.task.task.model.TaskInstanceQuery;

@@ -1,6 +1,6 @@
 package io.thoughtware.matflow.support.variable.service;
 
-import io.thoughtware.matflow.support.util.PipelineUtil;
+import io.thoughtware.matflow.support.util.util.PipelineUtil;
 import io.thoughtware.matflow.support.variable.model.Variable;
 import io.thoughtware.matflow.support.variable.model.VariableQuery;
 import io.thoughtware.beans.BeanMapper;

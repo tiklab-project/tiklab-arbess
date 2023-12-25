@@ -2,7 +2,7 @@ package io.thoughtware.matflow.task.test.service;
 
 import io.thoughtware.matflow.setting.model.AuthThird;
 import io.thoughtware.matflow.setting.service.AuthThirdService;
-import io.thoughtware.matflow.support.util.PipelineUtil;
+import io.thoughtware.matflow.support.util.util.PipelineUtil;
 import io.thoughtware.matflow.task.test.model.RelevanceTestOnQuery;
 import io.thoughtware.matflow.task.test.model.TestOnPlanInstance;
 import io.thoughtware.beans.BeanMapper;

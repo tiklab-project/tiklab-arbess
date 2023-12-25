@@ -2,7 +2,7 @@ package io.thoughtware.matflow.setting.dao;
 
 import io.thoughtware.matflow.setting.entity.AuthThirdEntity;
 import io.thoughtware.matflow.setting.model.AuthThirdQuery;
-import io.thoughtware.matflow.support.util.PipelineUtil;
+import io.thoughtware.matflow.support.util.util.PipelineUtil;
 import io.thoughtware.core.page.Pagination;
 import io.thoughtware.dal.jpa.JpaTemplate;
 import io.thoughtware.dal.jpa.criterial.condition.QueryCondition;

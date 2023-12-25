@@ -96,7 +96,8 @@ public class MatFlowGatewayAutoConfiguration {
                         "/wechatCallback/instruct",
                         "/gui",
                         "/disk/findDiskList",
-                        "/appAuthorization/validUserInProduct"
+                        "/appAuthorization/validUserInProduct",
+                        "/clean/data/cleanMessageData",
                 })
                 .ignorePreUrls(new String[]{
                         "/service",
@@ -110,7 +111,7 @@ public class MatFlowGatewayAutoConfiguration {
                         "/start",
                         "/eas",
                         "/sql",
-                        "/maven/test"
+                        "/maven/test",
                 })
                 .get();
     }

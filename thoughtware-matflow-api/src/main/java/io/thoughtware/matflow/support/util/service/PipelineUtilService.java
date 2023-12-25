@@ -1,4 +1,4 @@
-package io.thoughtware.matflow.support.util;
+package io.thoughtware.matflow.support.util.service;
 
 import io.thoughtware.core.exception.ApplicationException;
 

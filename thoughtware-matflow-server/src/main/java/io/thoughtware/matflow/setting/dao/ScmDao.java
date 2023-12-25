@@ -1,7 +1,7 @@
 package io.thoughtware.matflow.setting.dao;
 
 import io.thoughtware.matflow.setting.entity.ScmEntity;
-import io.thoughtware.matflow.support.util.PipelineUtil;
+import io.thoughtware.matflow.support.util.util.PipelineUtil;
 import io.thoughtware.matflow.pipeline.definition.dao.PipelineDao;
 import io.thoughtware.dal.jpa.JpaTemplate;
 import org.slf4j.Logger;

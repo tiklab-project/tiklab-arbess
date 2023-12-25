@@ -1,8 +1,8 @@
 package io.thoughtware.matflow.pipeline.overview.service;
 
 import io.thoughtware.matflow.pipeline.overview.dao.PipelineOverviewDao;
-import io.thoughtware.matflow.support.util.PipelineFinal;
-import io.thoughtware.matflow.support.util.PipelineUtil;
+import io.thoughtware.matflow.support.util.util.PipelineFinal;
+import io.thoughtware.matflow.support.util.util.PipelineUtil;
 import io.thoughtware.matflow.pipeline.overview.model.PipelineOverview;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

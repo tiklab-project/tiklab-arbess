@@ -1,4 +1,4 @@
-package io.thoughtware.matflow.support.util;
+package io.thoughtware.matflow.support.util.util;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;

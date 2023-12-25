@@ -1,8 +1,8 @@
 package io.thoughtware.matflow.task.message.service;
 
 import io.thoughtware.join.JoinTemplate;
-import io.thoughtware.matflow.support.util.PipelineFinal;
-import io.thoughtware.matflow.support.util.PipelineUtil;
+import io.thoughtware.matflow.support.util.util.PipelineFinal;
+import io.thoughtware.matflow.support.util.util.PipelineUtil;
 import io.thoughtware.matflow.task.message.model.TaskMessageType;
 import io.thoughtware.matflow.task.message.model.TaskMessageUser;
 import io.thoughtware.core.exception.ApplicationException;
@@ -18,11 +18,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static io.thoughtware.matflow.support.util.PipelineFinal.*;
+import static io.thoughtware.matflow.support.util.util.PipelineFinal.*;
 
 /**
  * 消息

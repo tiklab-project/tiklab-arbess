@@ -2,7 +2,7 @@ package io.thoughtware.matflow.support.condition.service;
 
 import io.thoughtware.matflow.support.condition.dao.ConditionDao;
 import io.thoughtware.matflow.support.condition.model.Condition;
-import io.thoughtware.matflow.support.util.PipelineUtil;
+import io.thoughtware.matflow.support.util.util.PipelineUtil;
 import io.thoughtware.matflow.support.variable.service.VariableService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

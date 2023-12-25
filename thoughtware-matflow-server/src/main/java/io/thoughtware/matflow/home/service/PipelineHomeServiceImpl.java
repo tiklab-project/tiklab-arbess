@@ -1,38 +1,26 @@
 package io.thoughtware.matflow.home.service;
 
 import com.alibaba.fastjson.JSONObject;
-import io.thoughtware.matflow.support.util.PipelineFinal;
-import io.thoughtware.matflow.support.util.PipelineUtil;
-import io.thoughtware.core.exception.ApplicationException;
+import io.thoughtware.matflow.support.util.util.PipelineFinal;
 import io.thoughtware.eam.common.context.LoginContext;
 import io.thoughtware.matflow.pipeline.definition.model.Pipeline;
 import io.thoughtware.message.message.model.Message;
 import io.thoughtware.message.message.model.MessageReceiver;
 import io.thoughtware.message.message.model.SendMessageNotice;
 import io.thoughtware.message.message.service.SendMessageNoticeService;
-import io.thoughtware.message.message.service.SingleSendMessageService;
 import io.thoughtware.message.setting.model.MessageType;
-import io.thoughtware.message.sms.modal.Sms;
 import io.thoughtware.security.logging.model.Logging;
 import io.thoughtware.security.logging.model.LoggingType;
 import io.thoughtware.security.logging.service.LoggingByTempService;
 import io.thoughtware.user.user.model.User;
 import io.thoughtware.user.user.service.UserService;
-import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
-import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
-import org.apache.commons.compress.compressors.gzip.GzipCompressorOutputStream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.io.*;
-import java.nio.file.*;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.sql.Timestamp;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.zip.GZIPOutputStream;
 
 @Service
 public class PipelineHomeServiceImpl implements PipelineHomeService {
@@ -139,11 +127,20 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
                 dispatchNotice.setLink(link);
                 dispatchNotice.setAction(pipelineName);
                 dispatchNotice.setSendId(LoginContext.getLoginId());
-                dispatchNoticeService.sendMessageNotice(dispatchNotice);
+
+                if (!Objects.isNull(map.get("dmMessage")) && (Boolean)map.get("dmMessage")){
+                    String pipelineId = (String) map.get("pipelineId");
+                    dispatchNotice.setDomainId(pipelineId);
+                    dispatchNoticeService.sendDmMessageNotice(dispatchNotice);
+                }else {
+                    dispatchNoticeService.sendMessageNotice(dispatchNotice);
+                }
             }catch (Exception e){
                 e.printStackTrace();
             };
         });
+
+
     }
 
 

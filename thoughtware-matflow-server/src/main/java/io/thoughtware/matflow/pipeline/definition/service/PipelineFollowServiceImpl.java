@@ -1,6 +1,6 @@
 package io.thoughtware.matflow.pipeline.definition.service;
 
-import io.thoughtware.matflow.support.util.PipelineUtil;
+import io.thoughtware.matflow.support.util.util.PipelineUtil;
 import io.thoughtware.beans.BeanMapper;
 import io.thoughtware.core.exception.ApplicationException;
 import io.thoughtware.eam.common.context.LoginContext;

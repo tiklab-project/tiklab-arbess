@@ -1,8 +1,8 @@
 package io.thoughtware.matflow.stages.service;
 
 import io.thoughtware.matflow.stages.entity.StageEntity;
-import io.thoughtware.matflow.support.util.PipelineFinal;
-import io.thoughtware.matflow.support.util.PipelineUtil;
+import io.thoughtware.matflow.support.util.util.PipelineFinal;
+import io.thoughtware.matflow.support.util.util.PipelineUtil;
 import io.thoughtware.matflow.stages.dao.StageDao;
 import io.thoughtware.matflow.stages.model.Stage;
 import io.thoughtware.beans.BeanMapper;

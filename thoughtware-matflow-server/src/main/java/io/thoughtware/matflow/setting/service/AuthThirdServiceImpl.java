@@ -1,6 +1,6 @@
 package io.thoughtware.matflow.setting.service;
 
-import io.thoughtware.matflow.support.util.PipelineFinal;
+import io.thoughtware.matflow.support.util.util.PipelineFinal;
 import io.thoughtware.beans.BeanMapper;
 import io.thoughtware.eam.common.context.LoginContext;
 import io.thoughtware.join.JoinTemplate;

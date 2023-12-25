@@ -1,9 +1,8 @@
 package io.thoughtware.matflow.setting.service;
 
-import io.thoughtware.matflow.support.util.PipelineUtil;
+import io.thoughtware.matflow.support.util.util.PipelineUtil;
 import io.thoughtware.core.page.Pagination;
 import io.thoughtware.core.page.PaginationBuilder;
-import io.thoughtware.dal.jpa.criterial.conditionbuilder.QueryBuilders;
 import io.thoughtware.join.JoinTemplate;
 import io.thoughtware.matflow.setting.dao.GroupDao;
 import io.thoughtware.matflow.setting.model.Group;

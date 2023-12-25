@@ -7,10 +7,10 @@ import io.thoughtware.matflow.support.authority.service.PipelineAuthorityService
 import io.thoughtware.matflow.support.condition.service.ConditionService;
 import io.thoughtware.matflow.support.postprocess.service.PostprocessService;
 import io.thoughtware.matflow.support.trigger.service.TriggerService;
-import io.thoughtware.matflow.support.util.PipelineFileUtil;
-import io.thoughtware.matflow.support.util.PipelineFinal;
-import io.thoughtware.matflow.support.util.PipelineUtil;
-import io.thoughtware.matflow.support.util.PipelineUtilService;
+import io.thoughtware.matflow.support.util.util.PipelineFileUtil;
+import io.thoughtware.matflow.support.util.util.PipelineFinal;
+import io.thoughtware.matflow.support.util.util.PipelineUtil;
+import io.thoughtware.matflow.support.util.service.PipelineUtilService;
 import io.thoughtware.matflow.support.variable.service.VariableService;
 import io.thoughtware.matflow.task.task.service.TasksService;
 import io.thoughtware.beans.BeanMapper;
@@ -21,9 +21,9 @@ import io.thoughtware.eam.common.context.LoginContext;
 import io.thoughtware.join.JoinTemplate;
 import io.thoughtware.matflow.pipeline.definition.dao.PipelineDao;
 import io.thoughtware.matflow.pipeline.definition.entity.PipelineEntity;
-import io.thoughtware.matflow.pipeline.definition.model.*;
 import io.thoughtware.matflow.pipeline.instance.model.PipelineInstance;
 import io.thoughtware.matflow.pipeline.instance.service.PipelineInstanceService;
+import io.thoughtware.message.message.service.MessageDmNoticeService;
 import io.thoughtware.rpc.annotation.Exporter;
 import io.thoughtware.user.user.model.User;
 import org.slf4j.Logger;
@@ -85,6 +85,8 @@ public class PipelineServiceImpl implements PipelineService {
     @Autowired
     ConditionService conditionService;
 
+    @Autowired
+    MessageDmNoticeService messageDmNoticeService;
 
     private static final Logger logger = LoggerFactory.getLogger(PipelineServiceImpl.class);
 
@@ -129,6 +131,9 @@ public class PipelineServiceImpl implements PipelineService {
 
         //流水线关联角色，用户信息
         authorityService.createDmUser(pipelineId,pipeline.getUserList());
+
+        // 克隆消息模版
+        messageDmNoticeService.initMessageDmNotice(pipelineId);
 
         //动态与消息
         Map<String,Object> map =homeService.initMap(pipeline);
@@ -180,6 +185,7 @@ public class PipelineServiceImpl implements PipelineService {
             map.put("link",PipelineFinal.UPDATE_LINK);
             map.put("message", flow.getName() +"更改为："+pipeline.getName());
             flow.setName(pipeline.getName());
+            map.put("dmMessage",true);
             homeService.log(PipelineFinal.LOG_TYPE_UPDATE,  map);
             homeService.settingMessage(PipelineFinal.MES_UPDATE, map);
         }
@@ -478,6 +484,7 @@ public class PipelineServiceImpl implements PipelineService {
 
         return pipelineList;
     }
+
 
     /**
      * 删除关联信息

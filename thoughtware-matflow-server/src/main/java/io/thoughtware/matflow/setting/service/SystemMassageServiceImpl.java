@@ -1,7 +1,7 @@
 package io.thoughtware.matflow.setting.service;
 
 
-import io.thoughtware.matflow.support.util.PipelineUtilService;
+import io.thoughtware.matflow.support.util.service.PipelineUtilService;
 import io.thoughtware.matflow.setting.model.SystemMassage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

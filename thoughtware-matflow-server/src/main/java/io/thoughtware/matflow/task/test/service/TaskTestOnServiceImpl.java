@@ -2,10 +2,9 @@ package io.thoughtware.matflow.task.test.service;
 
 import io.thoughtware.matflow.setting.model.AuthThird;
 import io.thoughtware.matflow.setting.service.AuthThirdService;
-import io.thoughtware.matflow.support.util.PipelineRequestUtil;
+import io.thoughtware.matflow.support.util.util.PipelineRequestUtil;
 import io.thoughtware.matflow.task.test.model.*;
 import io.thoughtware.core.exception.ApplicationException;
-import io.thoughtware.matflow.task.test.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

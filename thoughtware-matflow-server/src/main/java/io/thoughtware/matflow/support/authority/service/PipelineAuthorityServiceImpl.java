@@ -4,7 +4,7 @@ import io.thoughtware.matflow.pipeline.definition.dao.PipelineDao;
 import io.thoughtware.matflow.pipeline.definition.entity.PipelineEntity;
 import io.thoughtware.matflow.pipeline.definition.model.Pipeline;
 import io.thoughtware.matflow.pipeline.definition.model.PipelineQuery;
-import io.thoughtware.matflow.support.util.PipelineFinal;
+import io.thoughtware.matflow.support.util.util.PipelineFinal;
 import io.thoughtware.beans.BeanMapper;
 import io.thoughtware.eam.common.context.LoginContext;
 import io.thoughtware.privilege.dmRole.service.DmRoleService;
@@ -45,10 +45,12 @@ public class PipelineAuthorityServiceImpl implements PipelineAuthorityService{
         }
         boolean admin = false;
         for (PatchUser patchUser : userList) {
-            if (patchUser.getId().equals("111111")){
+            if (patchUser.getId().equals("111111")) {
                 admin = true;
+                break;
             }
         }
+
         // 拉入超级管理员
         if (!admin){
             PatchUser patchUser = new PatchUser();

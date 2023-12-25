@@ -1,7 +1,7 @@
 package io.thoughtware.matflow.support.trigger.quartz;
 
 import io.thoughtware.matflow.support.trigger.service.CronUtils;
-import io.thoughtware.matflow.support.util.PipelineUtil;
+import io.thoughtware.matflow.support.util.util.PipelineUtil;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;

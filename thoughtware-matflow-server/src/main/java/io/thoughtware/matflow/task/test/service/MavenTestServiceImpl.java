@@ -1,6 +1,6 @@
 package io.thoughtware.matflow.task.test.service;
 
-import io.thoughtware.matflow.support.util.PipelineUtil;
+import io.thoughtware.matflow.support.util.util.PipelineUtil;
 import io.thoughtware.matflow.task.test.dao.MavenTestDao;
 import io.thoughtware.matflow.task.test.model.MavenTest;
 import io.thoughtware.matflow.task.test.model.MavenTestQuery;

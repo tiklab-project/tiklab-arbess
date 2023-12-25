@@ -2,7 +2,7 @@ package io.thoughtware.matflow.task.codescan.service;
 
 import io.thoughtware.matflow.setting.model.AuthThird;
 import io.thoughtware.matflow.setting.service.AuthThirdService;
-import io.thoughtware.matflow.support.util.PipelineUtil;
+import io.thoughtware.matflow.support.util.util.PipelineUtil;
 import io.thoughtware.beans.BeanMapper;
 import io.thoughtware.join.JoinTemplate;
 import io.thoughtware.matflow.task.codescan.dao.TaskCodeScanDao;

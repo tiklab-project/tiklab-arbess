@@ -8,9 +8,9 @@ import io.thoughtware.matflow.stages.service.StageExecService;
 import io.thoughtware.matflow.stages.service.StageService;
 import io.thoughtware.matflow.support.disk.service.DiskService;
 import io.thoughtware.matflow.support.postprocess.service.PostprocessExecService;
-import io.thoughtware.matflow.support.util.PipelineFileUtil;
-import io.thoughtware.matflow.support.util.PipelineFinal;
-import io.thoughtware.matflow.support.util.PipelineUtilService;
+import io.thoughtware.matflow.support.util.util.PipelineFileUtil;
+import io.thoughtware.matflow.support.util.util.PipelineFinal;
+import io.thoughtware.matflow.support.util.service.PipelineUtilService;
 import io.thoughtware.matflow.support.version.service.PipelineVersionService;
 import io.thoughtware.matflow.task.task.model.TaskExecMessage;
 import io.thoughtware.matflow.task.task.model.Tasks;
@@ -516,6 +516,7 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
             map.put("message","运行失败");
         }
         homeService.log(PipelineFinal.LOG_TYPE_RUN,  map);
+        map.put("dmMessage",true);
         homeService.settingMessage(PipelineFinal.MES_RUN,  map);
     }
 

@@ -2,8 +2,8 @@ package io.thoughtware.matflow.support.postprocess.service;
 
 import io.thoughtware.matflow.support.postprocess.model.Postprocess;
 import io.thoughtware.matflow.support.postprocess.model.PostprocessInstance;
-import io.thoughtware.matflow.support.util.PipelineFinal;
-import io.thoughtware.matflow.support.util.PipelineUtilService;
+import io.thoughtware.matflow.support.util.util.PipelineFinal;
+import io.thoughtware.matflow.support.util.service.PipelineUtilService;
 import io.thoughtware.matflow.task.task.model.TaskExecMessage;
 import io.thoughtware.matflow.task.task.model.Tasks;
 import io.thoughtware.matflow.task.task.service.TasksExecService;

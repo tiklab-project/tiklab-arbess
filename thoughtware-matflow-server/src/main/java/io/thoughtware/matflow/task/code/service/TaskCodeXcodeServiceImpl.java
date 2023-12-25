@@ -2,7 +2,7 @@ package io.thoughtware.matflow.task.code.service;
 
 import io.thoughtware.matflow.setting.model.AuthThird;
 import io.thoughtware.matflow.setting.service.AuthThirdService;
-import io.thoughtware.matflow.support.util.PipelineRequestUtil;
+import io.thoughtware.matflow.support.util.util.PipelineRequestUtil;
 import io.thoughtware.matflow.task.code.model.XcodeBranch;
 import io.thoughtware.matflow.task.code.model.XcodeRepository;
 import io.thoughtware.core.exception.ApplicationException;

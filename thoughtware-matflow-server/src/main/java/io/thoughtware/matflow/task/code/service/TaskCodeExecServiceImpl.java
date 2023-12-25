@@ -8,10 +8,10 @@ import io.thoughtware.matflow.setting.service.AuthService;
 import io.thoughtware.matflow.setting.service.AuthThirdService;
 import io.thoughtware.matflow.setting.service.ScmService;
 import io.thoughtware.matflow.support.condition.service.ConditionService;
-import io.thoughtware.matflow.support.util.PipelineFileUtil;
-import io.thoughtware.matflow.support.util.PipelineFinal;
-import io.thoughtware.matflow.support.util.PipelineUtil;
-import io.thoughtware.matflow.support.util.PipelineUtilService;
+import io.thoughtware.matflow.support.util.util.PipelineFileUtil;
+import io.thoughtware.matflow.support.util.util.PipelineFinal;
+import io.thoughtware.matflow.support.util.util.PipelineUtil;
+import io.thoughtware.matflow.support.util.service.PipelineUtilService;
 import io.thoughtware.matflow.support.variable.service.VariableService;
 import io.thoughtware.matflow.task.code.model.TaskCode;
 import io.thoughtware.matflow.task.code.model.XcodeRepository;
@@ -31,7 +31,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.*;
 
-import static io.thoughtware.matflow.support.util.PipelineFinal.*;
+import static io.thoughtware.matflow.support.util.util.PipelineFinal.*;
 
 /**
  * 源码管理执行方法

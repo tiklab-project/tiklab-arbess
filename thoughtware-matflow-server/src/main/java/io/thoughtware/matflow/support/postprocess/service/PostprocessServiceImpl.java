@@ -1,7 +1,7 @@
 package io.thoughtware.matflow.support.postprocess.service;
 
 import io.thoughtware.matflow.support.postprocess.model.Postprocess;
-import io.thoughtware.matflow.support.util.PipelineUtil;
+import io.thoughtware.matflow.support.util.util.PipelineUtil;
 import io.thoughtware.matflow.task.task.model.Tasks;
 import io.thoughtware.matflow.task.task.service.TasksService;
 import io.thoughtware.beans.BeanMapper;

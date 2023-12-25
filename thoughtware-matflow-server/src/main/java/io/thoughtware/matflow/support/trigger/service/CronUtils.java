@@ -1,7 +1,7 @@
 package io.thoughtware.matflow.support.trigger.service;
 
 import io.thoughtware.core.exception.ApplicationException;
-import io.thoughtware.matflow.support.util.PipelineUtil;
+import io.thoughtware.matflow.support.util.util.PipelineUtil;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

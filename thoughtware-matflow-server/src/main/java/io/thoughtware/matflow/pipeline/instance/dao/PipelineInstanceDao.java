@@ -1,7 +1,7 @@
 package io.thoughtware.matflow.pipeline.instance.dao;
 
 
-import io.thoughtware.matflow.support.util.PipelineUtil;
+import io.thoughtware.matflow.support.util.util.PipelineUtil;
 import io.thoughtware.core.page.Pagination;
 import io.thoughtware.dal.jdbc.JdbcTemplate;
 import io.thoughtware.dal.jpa.JpaTemplate;

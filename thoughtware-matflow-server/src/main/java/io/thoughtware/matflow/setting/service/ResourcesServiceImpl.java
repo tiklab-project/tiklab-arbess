@@ -1,7 +1,11 @@
 package io.thoughtware.matflow.setting.service;
 
 import io.thoughtware.matflow.setting.model.ResourcesDetails;
-import io.thoughtware.matflow.support.util.*;
+import io.thoughtware.matflow.support.util.service.PipelineUtilService;
+import io.thoughtware.matflow.support.util.util.PipelineFileUtil;
+import io.thoughtware.matflow.support.util.util.PipelineUtil;
+import io.thoughtware.matflow.support.util.util.Time;
+import io.thoughtware.matflow.support.util.util.TimeConfig;
 import io.thoughtware.matflow.support.version.service.PipelineVersionService;
 import io.thoughtware.core.exception.ApplicationException;
 import io.thoughtware.matflow.pipeline.definition.dao.PipelineDao;
@@ -148,7 +152,10 @@ public class ResourcesServiceImpl implements ResourcesService {
         // 总资源数
         resources.setCcyNumber(vipExecNumber);
         resources.setSceNumber(vipExecTime);
-        resources.setCacheNumber(vipCacheNTime);
+        String codeAddress = utilService.instanceAddress(1);
+        float dirSize = PipelineFileUtil.findDiskSize(codeAddress);
+        double diskSize = Double.parseDouble(String.format("%.2f",dirSize));
+        resources.setCacheNumber(diskSize);
 
         // 并发数
         resources.setUseCcyNumber(execNumber);
@@ -160,7 +167,8 @@ public class ResourcesServiceImpl implements ResourcesService {
         // 磁盘大小
         double size = Double.parseDouble(String.format("%.2f",vipExecNumber - getSize()));
         resources.setResidueCacheNumber(size);
-        resources.setUseCacheNumber(getSize());
+        double parsed = Double.parseDouble(String.format("%.2f", getSize()));
+        resources.setUseCacheNumber(parsed);
 
         // 构建时长
         List<Resources> allResources = findAllResources();
@@ -195,7 +203,8 @@ public class ResourcesServiceImpl implements ResourcesService {
         // 磁盘数（社区版不限制磁盘大小）
         double size = Double.parseDouble(String.format("%.2f",notVipCacheNTime - getSize()));
         resources.setResidueCacheNumber(size);
-        resources.setUseCacheNumber(getSize());
+        double parsed = Double.parseDouble(String.format("%.2f", getSize()));
+        resources.setUseCacheNumber(parsed);
 
         resources.setResidueSceNumber(vipExecTime);
         // 构建时长

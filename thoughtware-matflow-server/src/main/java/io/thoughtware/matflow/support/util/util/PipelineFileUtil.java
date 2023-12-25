@@ -1,7 +1,6 @@
-package io.thoughtware.matflow.support.util;
+package io.thoughtware.matflow.support.util.util;
 
 import io.thoughtware.core.exception.ApplicationException;
-import io.thoughtware.core.exception.SystemException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -19,7 +18,7 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Objects;
 
-import static io.thoughtware.matflow.support.util.PipelineFinal.FILE_TEMP_PREFIX;
+import static io.thoughtware.matflow.support.util.util.PipelineFinal.FILE_TEMP_PREFIX;
 
 public class PipelineFileUtil {
 

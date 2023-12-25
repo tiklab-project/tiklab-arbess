@@ -2,7 +2,7 @@ package io.thoughtware.matflow.task.artifact.service;
 
 import io.thoughtware.matflow.setting.model.AuthThird;
 import io.thoughtware.matflow.setting.service.AuthThirdService;
-import io.thoughtware.matflow.support.util.PipelineRequestUtil;
+import io.thoughtware.matflow.support.util.util.PipelineRequestUtil;
 import io.thoughtware.matflow.task.artifact.model.XpackRepository;
 import io.thoughtware.core.exception.ApplicationException;
 import io.thoughtware.matflow.task.artifact.model.XpackRepositoryQuery;
