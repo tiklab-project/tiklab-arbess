@@ -34,7 +34,7 @@ public class TaskTriggerInitJob implements ApplicationListener<ContextRefreshedE
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
-        run();
+        // run();
     }
 
     public void run(){
