@@ -16,7 +16,7 @@ public class TaskPubKey  {
     AuthService authService;
 
 
-    @Bean
+    // @Bean
     public void updatePviKey(){
 
         Auth auth = authService.findOneAuth("f812ab93d8ff");
