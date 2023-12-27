@@ -6,7 +6,7 @@ import io.thoughtware.matflow.setting.model.AuthHostGroup;
 import io.thoughtware.matflow.setting.service.AuthHostGroupService;
 import io.thoughtware.matflow.setting.service.AuthHostService;
 import io.thoughtware.matflow.task.deploy.model.TaskDeploy;
-import io.thoughtware.beans.BeanMapper;
+import io.thoughtware.toolkit.beans.BeanMapper;
 import io.thoughtware.matflow.task.deploy.dao.TaskDeployDao;
 import io.thoughtware.matflow.task.deploy.entity.TaskDeployEntity;
 import io.thoughtware.rpc.annotation.Exporter;

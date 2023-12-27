@@ -8,7 +8,7 @@ import io.thoughtware.matflow.support.util.util.PipelineFinal;
 import io.thoughtware.matflow.support.util.util.PipelineUtil;
 import io.thoughtware.matflow.task.artifact.model.TaskArtifact;
 import io.thoughtware.matflow.task.artifact.model.XpackRepository;
-import io.thoughtware.beans.BeanMapper;
+import io.thoughtware.toolkit.beans.BeanMapper;
 import io.thoughtware.matflow.task.artifact.dao.TaskArtifactDao;
 import io.thoughtware.matflow.task.artifact.entity.TaskArtifactEntity;
 import io.thoughtware.rpc.annotation.Exporter;

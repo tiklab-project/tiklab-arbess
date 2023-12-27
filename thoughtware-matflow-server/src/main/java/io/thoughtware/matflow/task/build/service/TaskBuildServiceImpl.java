@@ -4,7 +4,7 @@ package io.thoughtware.matflow.task.build.service;
 import io.thoughtware.matflow.task.build.dao.TaskBuildDao;
 import io.thoughtware.matflow.task.build.entity.TaskBuildEntity;
 import io.thoughtware.matflow.task.build.model.TaskBuild;
-import io.thoughtware.beans.BeanMapper;
+import io.thoughtware.toolkit.beans.BeanMapper;
 import io.thoughtware.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

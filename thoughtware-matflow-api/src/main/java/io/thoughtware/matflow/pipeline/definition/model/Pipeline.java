@@ -3,11 +3,11 @@ package io.thoughtware.matflow.pipeline.definition.model;
 
 import io.thoughtware.matflow.setting.model.Env;
 import io.thoughtware.matflow.setting.model.Group;
-import io.thoughtware.beans.annotation.Mapper;
-import io.thoughtware.beans.annotation.Mapping;
-import io.thoughtware.beans.annotation.Mappings;
-import io.thoughtware.join.annotation.Join;
-import io.thoughtware.join.annotation.JoinQuery;
+import io.thoughtware.toolkit.beans.annotation.Mapper;
+import io.thoughtware.toolkit.beans.annotation.Mapping;
+import io.thoughtware.toolkit.beans.annotation.Mappings;
+import io.thoughtware.toolkit.join.annotation.Join;
+import io.thoughtware.toolkit.join.annotation.JoinQuery;
 
 
 import io.thoughtware.privilege.role.model.PatchUser;

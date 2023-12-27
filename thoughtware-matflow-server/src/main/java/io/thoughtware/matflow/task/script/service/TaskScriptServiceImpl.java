@@ -3,7 +3,7 @@ package io.thoughtware.matflow.task.script.service;
 import io.thoughtware.matflow.task.script.model.TaskScript;
 import io.thoughtware.matflow.task.script.dao.TaskScriptDao;
 import io.thoughtware.matflow.task.script.entity.TaskScriptEntity;
-import io.thoughtware.beans.BeanMapper;
+import io.thoughtware.toolkit.beans.BeanMapper;
 import io.thoughtware.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

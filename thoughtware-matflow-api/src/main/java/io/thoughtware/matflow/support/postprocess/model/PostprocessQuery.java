@@ -1,10 +1,10 @@
 package io.thoughtware.matflow.support.postprocess.model;
 
-import io.thoughtware.beans.annotation.Mapper;
+import io.thoughtware.toolkit.beans.annotation.Mapper;
 import io.thoughtware.core.order.Order;
 import io.thoughtware.core.order.OrderBuilders;
 import io.thoughtware.core.page.Page;
-import io.thoughtware.join.annotation.Join;
+import io.thoughtware.toolkit.join.annotation.Join;
 
 
 import java.util.List;

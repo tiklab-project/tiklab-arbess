@@ -1,7 +1,7 @@
 package io.thoughtware.matflow.support.condition.dao;
 
 import io.thoughtware.matflow.support.condition.model.Condition;
-import io.thoughtware.beans.BeanMapper;
+import io.thoughtware.toolkit.beans.BeanMapper;
 import io.thoughtware.dal.jpa.JpaTemplate;
 import io.thoughtware.matflow.support.condition.entity.ConditionEntity;
 import org.springframework.beans.factory.annotation.Autowired;

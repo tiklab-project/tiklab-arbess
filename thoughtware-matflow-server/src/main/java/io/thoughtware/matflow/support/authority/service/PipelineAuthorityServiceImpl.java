@@ -5,7 +5,7 @@ import io.thoughtware.matflow.pipeline.definition.entity.PipelineEntity;
 import io.thoughtware.matflow.pipeline.definition.model.Pipeline;
 import io.thoughtware.matflow.pipeline.definition.model.PipelineQuery;
 import io.thoughtware.matflow.support.util.util.PipelineFinal;
-import io.thoughtware.beans.BeanMapper;
+import io.thoughtware.toolkit.beans.BeanMapper;
 import io.thoughtware.eam.common.context.LoginContext;
 import io.thoughtware.privilege.dmRole.service.DmRoleService;
 import io.thoughtware.privilege.role.model.PatchUser;

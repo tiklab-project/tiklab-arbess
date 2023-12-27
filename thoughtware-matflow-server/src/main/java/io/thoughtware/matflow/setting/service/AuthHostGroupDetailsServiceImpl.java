@@ -1,6 +1,6 @@
 package io.thoughtware.matflow.setting.service;
 
-import io.thoughtware.join.JoinTemplate;
+import io.thoughtware.toolkit.join.JoinTemplate;
 import io.thoughtware.matflow.setting.dao.AuthHostGroupDetailsDao;
 import io.thoughtware.matflow.setting.model.AuthHostGroupDetails;
 import org.springframework.beans.factory.annotation.Autowired;

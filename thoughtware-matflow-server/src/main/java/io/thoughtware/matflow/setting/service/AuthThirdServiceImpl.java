@@ -1,9 +1,9 @@
 package io.thoughtware.matflow.setting.service;
 
 import io.thoughtware.matflow.support.util.util.PipelineFinal;
-import io.thoughtware.beans.BeanMapper;
+import io.thoughtware.toolkit.beans.BeanMapper;
 import io.thoughtware.eam.common.context.LoginContext;
-import io.thoughtware.join.JoinTemplate;
+import io.thoughtware.toolkit.join.JoinTemplate;
 import io.thoughtware.matflow.setting.dao.AuthThirdDao;
 import io.thoughtware.matflow.setting.entity.AuthThirdEntity;
 import io.thoughtware.matflow.setting.model.AuthThird;

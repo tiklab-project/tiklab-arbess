@@ -7,7 +7,7 @@ import io.thoughtware.matflow.setting.service.AuthThirdService;
 import io.thoughtware.matflow.support.util.util.PipelineFinal;
 import io.thoughtware.matflow.support.util.util.PipelineUtil;
 import io.thoughtware.matflow.task.pullArtifact.model.TaskPullArtifact;
-import io.thoughtware.beans.BeanMapper;
+import io.thoughtware.toolkit.beans.BeanMapper;
 import io.thoughtware.matflow.task.artifact.model.XpackRepository;
 import io.thoughtware.matflow.task.artifact.service.TaskArtifactXpackService;
 import io.thoughtware.matflow.task.pullArtifact.dao.TaskPullArtifactDao;

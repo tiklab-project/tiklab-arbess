@@ -3,6 +3,7 @@ package io.thoughtware.matflow.starter.config;
 import io.thoughtware.dal.boot.starter.annotation.EnableDal;
 import io.thoughtware.dcs.boot.starter.annotation.EnableDcsClient;
 import io.thoughtware.dcs.boot.starter.annotation.EnableDcsServer;
+import io.thoughtware.dsm.boot.starter.annotation.EnableDsm;
 import io.thoughtware.eam.boot.starter.annotation.EnableEamClient;
 import io.thoughtware.eam.boot.starter.annotation.EnableEamServer;
 import io.thoughtware.gateway.boot.starter.annotation.EnableGateway;
@@ -41,7 +42,7 @@ import org.springframework.context.annotation.Configuration;
 @EnableDcsClient
 @EnableDcsServer
 @EnablePluginServer
-
+@EnableDsm
 //用户中心
 @EnableUserServer
 @EnableUserClient

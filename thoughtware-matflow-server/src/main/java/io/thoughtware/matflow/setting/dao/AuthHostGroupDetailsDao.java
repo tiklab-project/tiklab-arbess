@@ -2,7 +2,7 @@ package io.thoughtware.matflow.setting.dao;
 
 import io.thoughtware.matflow.setting.entity.AuthHostGroupDetailsEntity;
 import io.thoughtware.matflow.setting.model.AuthHostGroupDetails;
-import io.thoughtware.beans.BeanMapper;
+import io.thoughtware.toolkit.beans.BeanMapper;
 import io.thoughtware.core.order.OrderBuilders;
 import io.thoughtware.dal.jpa.JpaTemplate;
 import io.thoughtware.dal.jpa.criterial.condition.QueryCondition;

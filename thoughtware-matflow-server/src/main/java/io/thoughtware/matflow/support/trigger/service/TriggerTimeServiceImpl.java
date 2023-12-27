@@ -5,7 +5,7 @@ import io.thoughtware.matflow.support.trigger.entity.TriggerTimeEntity;
 import io.thoughtware.matflow.support.trigger.model.TriggerTime;
 import io.thoughtware.matflow.support.trigger.quartz.Job;
 import io.thoughtware.matflow.support.trigger.quartz.RunJob;
-import io.thoughtware.beans.BeanMapper;
+import io.thoughtware.toolkit.beans.BeanMapper;
 import io.thoughtware.core.exception.ApplicationException;
 import io.thoughtware.rpc.annotation.Exporter;
 import org.quartz.SchedulerException;

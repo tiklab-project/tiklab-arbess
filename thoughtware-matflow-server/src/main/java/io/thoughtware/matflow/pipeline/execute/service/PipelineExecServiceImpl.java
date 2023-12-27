@@ -17,7 +17,7 @@ import io.thoughtware.matflow.task.task.model.Tasks;
 import io.thoughtware.matflow.task.task.service.TasksExecService;
 import io.thoughtware.matflow.task.task.service.TasksService;
 import io.thoughtware.core.exception.ApplicationException;
-import io.thoughtware.join.JoinTemplate;
+import io.thoughtware.toolkit.join.JoinTemplate;
 import io.thoughtware.matflow.pipeline.definition.model.Pipeline;
 import io.thoughtware.matflow.pipeline.definition.service.PipelineService;
 import io.thoughtware.matflow.pipeline.instance.model.PipelineInstance;

@@ -2,7 +2,7 @@ package io.thoughtware.matflow.task.codescan.dao;
 
 import io.thoughtware.matflow.task.codescan.model.SpotbugsBugQuery;
 import io.thoughtware.matflow.task.codescan.model.SpotbugsBugSummary;
-import io.thoughtware.beans.BeanMapper;
+import io.thoughtware.toolkit.beans.BeanMapper;
 import io.thoughtware.core.page.Pagination;
 import io.thoughtware.core.page.PaginationBuilder;
 import io.thoughtware.dal.jpa.JpaTemplate;

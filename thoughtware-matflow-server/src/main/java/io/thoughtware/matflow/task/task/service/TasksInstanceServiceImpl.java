@@ -9,7 +9,7 @@ import io.thoughtware.matflow.support.util.util.PipelineUtil;
 import io.thoughtware.matflow.task.task.dao.TaskInstanceDao;
 import io.thoughtware.matflow.task.task.model.TaskInstance;
 import io.thoughtware.matflow.task.task.model.TaskInstanceQuery;
-import io.thoughtware.beans.BeanMapper;
+import io.thoughtware.toolkit.beans.BeanMapper;
 import io.thoughtware.matflow.task.task.entity.TaskInstanceEntity;
 import io.thoughtware.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;

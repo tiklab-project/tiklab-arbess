@@ -11,7 +11,7 @@ import io.thoughtware.matflow.support.postprocess.service.PostprocessInstanceSer
 import io.thoughtware.matflow.support.util.util.PipelineFileUtil;
 import io.thoughtware.matflow.support.util.util.PipelineFinal;
 import io.thoughtware.matflow.support.util.util.PipelineUtil;
-import io.thoughtware.join.JoinTemplate;
+import io.thoughtware.toolkit.join.JoinTemplate;
 import io.thoughtware.matflow.pipeline.instance.model.PipelineInstance;
 import io.thoughtware.matflow.pipeline.instance.service.PipelineInstanceService;
 import io.thoughtware.matflow.task.build.model.TaskBuildProduct;

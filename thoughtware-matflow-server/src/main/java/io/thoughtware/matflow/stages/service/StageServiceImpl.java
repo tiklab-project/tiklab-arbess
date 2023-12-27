@@ -5,7 +5,7 @@ import io.thoughtware.matflow.support.util.util.PipelineFinal;
 import io.thoughtware.matflow.support.util.util.PipelineUtil;
 import io.thoughtware.matflow.stages.dao.StageDao;
 import io.thoughtware.matflow.stages.model.Stage;
-import io.thoughtware.beans.BeanMapper;
+import io.thoughtware.toolkit.beans.BeanMapper;
 import io.thoughtware.core.exception.ApplicationException;
 import io.thoughtware.matflow.task.task.model.Tasks;
 import io.thoughtware.matflow.task.task.service.TasksService;

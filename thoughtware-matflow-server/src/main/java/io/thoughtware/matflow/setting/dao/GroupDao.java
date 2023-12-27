@@ -3,7 +3,7 @@ package io.thoughtware.matflow.setting.dao;
 import io.thoughtware.matflow.setting.entity.GroupEntity;
 import io.thoughtware.matflow.setting.model.Group;
 import io.thoughtware.matflow.setting.model.GroupQuery;
-import io.thoughtware.beans.BeanMapper;
+import io.thoughtware.toolkit.beans.BeanMapper;
 import io.thoughtware.core.order.OrderBuilders;
 import io.thoughtware.core.page.Pagination;
 import io.thoughtware.core.page.PaginationBuilder;

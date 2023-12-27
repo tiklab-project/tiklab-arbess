@@ -4,7 +4,7 @@ import io.thoughtware.matflow.stages.entity.StageInstanceEntity;
 import io.thoughtware.matflow.stages.model.StageInstance;
 import io.thoughtware.matflow.stages.model.StageInstanceQuery;
 import io.thoughtware.matflow.support.util.util.PipelineFileUtil;
-import io.thoughtware.beans.BeanMapper;
+import io.thoughtware.toolkit.beans.BeanMapper;
 import io.thoughtware.matflow.stages.dao.StageInstanceDao;
 import io.thoughtware.matflow.task.task.model.TaskInstance;
 import io.thoughtware.matflow.task.task.service.TasksInstanceService;

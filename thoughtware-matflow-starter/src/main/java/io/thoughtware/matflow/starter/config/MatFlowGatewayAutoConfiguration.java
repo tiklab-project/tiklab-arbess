@@ -8,18 +8,16 @@ import io.thoughtware.gateway.router.Router;
 import io.thoughtware.gateway.router.RouterBuilder;
 import io.thoughtware.gateway.router.config.RouterConfig;
 import io.thoughtware.gateway.router.config.RouterConfigBuilder;
-import org.springframework.beans.factory.annotation.Value;
+import io.thoughtware.user.util.util.CodeUtilService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class MatFlowGatewayAutoConfiguration {
 
-    @Value("${darth.address:null}")
-    String authAddress;
-
-    @Value("${darth.embbed.enable:false}")
-    Boolean enableEam;
+    @Autowired
+    CodeUtilService codeUtilService;
 
     //路由
     @Bean
@@ -32,11 +30,11 @@ public class MatFlowGatewayAutoConfiguration {
     RouterConfig routerConfig(){
         String[] s =  new String[]{};
 
-         if (enableEam){
+         if (codeUtilService.findEmbedEnable()){
              s = new String[]{};
          }
         return RouterConfigBuilder.instance()
-                .preRoute(s, authAddress)
+                .preRoute(s, codeUtilService.findEmbedAddress())
                 .get();
     }
 

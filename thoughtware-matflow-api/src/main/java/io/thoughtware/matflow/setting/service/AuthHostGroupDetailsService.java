@@ -1,8 +1,8 @@
 package io.thoughtware.matflow.setting.service;
 
-import io.thoughtware.join.annotation.FindAll;
-import io.thoughtware.join.annotation.FindOne;
-import io.thoughtware.join.annotation.JoinProvider;
+import io.thoughtware.toolkit.join.annotation.FindAll;
+import io.thoughtware.toolkit.join.annotation.FindOne;
+import io.thoughtware.toolkit.join.annotation.JoinProvider;
 import io.thoughtware.matflow.setting.model.AuthHostGroupDetails;
 
 import java.util.List;

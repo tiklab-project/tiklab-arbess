@@ -1,7 +1,7 @@
 package io.thoughtware.matflow.setting.service;
 
 import io.thoughtware.matflow.support.util.util.PipelineUtil;
-import io.thoughtware.join.JoinTemplate;
+import io.thoughtware.toolkit.join.JoinTemplate;
 import io.thoughtware.matflow.setting.dao.AuthHostGroupDao;
 import io.thoughtware.matflow.setting.model.AuthHostGroup;
 import io.thoughtware.matflow.setting.model.AuthHostGroupDetails;

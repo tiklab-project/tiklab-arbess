@@ -1,8 +1,8 @@
 package io.thoughtware.matflow.setting.model;
 
 
-import io.thoughtware.beans.annotation.Mapper;
-import io.thoughtware.join.annotation.Join;
+import io.thoughtware.toolkit.beans.annotation.Mapper;
+import io.thoughtware.toolkit.join.annotation.Join;
 
 
 

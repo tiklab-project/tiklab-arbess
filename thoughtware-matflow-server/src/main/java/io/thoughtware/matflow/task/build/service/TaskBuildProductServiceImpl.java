@@ -5,7 +5,7 @@ import io.thoughtware.matflow.task.build.dao.TaskBuildProductDao;
 import io.thoughtware.matflow.task.build.entity.TaskBuildProductEntity;
 import io.thoughtware.matflow.task.build.model.TaskBuildProduct;
 import io.thoughtware.matflow.task.build.model.TaskBuildProductQuery;
-import io.thoughtware.beans.BeanMapper;
+import io.thoughtware.toolkit.beans.BeanMapper;
 import io.thoughtware.eam.common.model.EamTicket;
 import io.thoughtware.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;

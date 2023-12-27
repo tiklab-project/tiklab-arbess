@@ -29,6 +29,7 @@
         <thoughtware-toolkit.version>1.0.0</thoughtware-toolkit.version>
         <thoughtware-rpc.version>1.0.0</thoughtware-rpc.version>
         <thoughtware-dss.version>1.0.0</thoughtware-dss.version>
+        <thoughtware-dsm.version>1.0.0</thoughtware-dsm.version>
         <thoughtware-dcs.version>1.0.0</thoughtware-dcs.version>
         <thoughtware-dfs.version>1.0.0</thoughtware-dfs.version>
         <thoughtware-codegen.version>1.0.0</thoughtware-codegen.version>

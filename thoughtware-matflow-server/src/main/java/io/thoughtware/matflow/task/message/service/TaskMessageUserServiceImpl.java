@@ -1,8 +1,8 @@
 package io.thoughtware.matflow.task.message.service;
 
 import io.thoughtware.matflow.task.message.model.TaskMessageUser;
-import io.thoughtware.beans.BeanMapper;
-import io.thoughtware.join.JoinTemplate;
+import io.thoughtware.toolkit.beans.BeanMapper;
+import io.thoughtware.toolkit.join.JoinTemplate;
 import io.thoughtware.matflow.task.message.dao.TaskMessageUserDao;
 import io.thoughtware.matflow.task.message.entity.TaskMessageUserEntity;
 import io.thoughtware.rpc.annotation.Exporter;

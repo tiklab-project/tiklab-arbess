@@ -1,8 +1,7 @@
 package io.thoughtware.matflow.starter.config;
 
-
-import io.thoughtware.dal.dsm.config.model.DsmConfig;
-import io.thoughtware.dal.dsm.support.DsmConfigBuilder;
+import io.thoughtware.dsm.config.model.DsmConfig;
+import io.thoughtware.dsm.support.DsmConfigBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -70,11 +69,15 @@ public class MatFlowDsmAutoConfiguration {
         });
         dsmConfig.newVersion("1.0.4", new String[]{
                 "pip-project_1.0.4",
-                "message_1.0.4"
+                "message_1.0.4",
+                "oplog_1.0.4"
         });
         dsmConfig.newVersion("1.0.5", new String[]{
                 "pip-project_1.0.5",
                 "message_1.0.5"
+        });
+        dsmConfig.newVersion("1.0.6", new String[]{
+                "message_1.0.6",
         });
         dsmConfig.newVersion("1.0.7", new String[]{
                 "pip-project_1.0.7"
@@ -84,6 +87,9 @@ public class MatFlowDsmAutoConfiguration {
         });
         dsmConfig.newVersion("1.0.9", new String[]{
                 "pip-project_1.0.9"
+        });
+        dsmConfig.newVersion("1.0.10", new String[]{
+                "pip-project_1.0.10"
         });
         return dsmConfig;
     }

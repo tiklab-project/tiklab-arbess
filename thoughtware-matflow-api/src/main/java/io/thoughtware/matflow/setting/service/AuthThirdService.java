@@ -2,10 +2,10 @@ package io.thoughtware.matflow.setting.service;
 
 
 import io.thoughtware.matflow.setting.model.AuthThirdQuery;
-import io.thoughtware.join.annotation.FindAll;
-import io.thoughtware.join.annotation.FindList;
-import io.thoughtware.join.annotation.FindOne;
-import io.thoughtware.join.annotation.JoinProvider;
+import io.thoughtware.toolkit.join.annotation.FindAll;
+import io.thoughtware.toolkit.join.annotation.FindList;
+import io.thoughtware.toolkit.join.annotation.FindOne;
+import io.thoughtware.toolkit.join.annotation.JoinProvider;
 import io.thoughtware.matflow.setting.model.AuthThird;
 
 import java.util.List;

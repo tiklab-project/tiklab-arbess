@@ -2,7 +2,7 @@ package io.thoughtware.matflow.support.variable.dao;
 
 import io.thoughtware.matflow.support.variable.model.Variable;
 import io.thoughtware.matflow.support.variable.model.VariableQuery;
-import io.thoughtware.beans.BeanMapper;
+import io.thoughtware.toolkit.beans.BeanMapper;
 import io.thoughtware.dal.jpa.JpaTemplate;
 import io.thoughtware.dal.jpa.criterial.condition.QueryCondition;
 import io.thoughtware.dal.jpa.criterial.conditionbuilder.QueryBuilders;

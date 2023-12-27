@@ -3,7 +3,7 @@ package io.thoughtware.matflow.setting.dao;
 import io.thoughtware.dal.jpa.criterial.condition.QueryCondition;
 import io.thoughtware.dal.jpa.criterial.conditionbuilder.QueryBuilders;
 import io.thoughtware.matflow.setting.entity.ResourcesEntity;
-import io.thoughtware.beans.BeanMapper;
+import io.thoughtware.toolkit.beans.BeanMapper;
 import io.thoughtware.dal.jpa.JpaTemplate;
 import io.thoughtware.matflow.setting.model.Resources;
 import org.springframework.beans.factory.annotation.Autowired;

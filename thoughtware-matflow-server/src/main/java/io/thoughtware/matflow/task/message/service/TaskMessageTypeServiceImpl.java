@@ -3,7 +3,7 @@ package io.thoughtware.matflow.task.message.service;
 import io.thoughtware.matflow.support.util.util.PipelineFinal;
 import io.thoughtware.matflow.task.message.model.TaskMessageType;
 import io.thoughtware.matflow.task.message.model.TaskMessageUser;
-import io.thoughtware.beans.BeanMapper;
+import io.thoughtware.toolkit.beans.BeanMapper;
 import io.thoughtware.eam.common.context.LoginContext;
 import io.thoughtware.matflow.task.message.dao.TaskMessageTypeDao;
 import io.thoughtware.matflow.task.message.entity.TaskMessageTypeEntity;

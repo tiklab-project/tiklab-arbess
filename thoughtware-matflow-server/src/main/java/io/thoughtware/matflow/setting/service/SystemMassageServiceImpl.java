@@ -10,12 +10,14 @@ import org.springframework.stereotype.Service;
 @Service
 public class SystemMassageServiceImpl implements SystemMassageService {
 
+    @Value("${matflow.cloud:true}")
+    boolean idCe;
 
     @Autowired
-    private PipelineUtilService utilService;
+    PipelineUtilService utilService;
 
 
-    @Autowired
+    @Override
     public SystemMassage getSystemMassage(){
         SystemMassage systemMassage = new SystemMassage();
         String s = utilService.instanceAddress(1);
@@ -23,8 +25,7 @@ public class SystemMassageServiceImpl implements SystemMassageService {
         return systemMassage;
     }
 
-    @Value("${matflow.cloud:true}")
-    boolean idCe;
+
 
 
 

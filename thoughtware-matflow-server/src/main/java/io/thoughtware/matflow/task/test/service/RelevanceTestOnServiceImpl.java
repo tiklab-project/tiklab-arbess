@@ -5,7 +5,7 @@ import io.thoughtware.matflow.setting.service.AuthThirdService;
 import io.thoughtware.matflow.support.util.util.PipelineUtil;
 import io.thoughtware.matflow.task.test.model.RelevanceTestOnQuery;
 import io.thoughtware.matflow.task.test.model.TestOnPlanInstance;
-import io.thoughtware.beans.BeanMapper;
+import io.thoughtware.toolkit.beans.BeanMapper;
 import io.thoughtware.core.exception.ApplicationException;
 import io.thoughtware.core.page.Pagination;
 import io.thoughtware.core.page.PaginationBuilder;

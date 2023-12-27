@@ -7,7 +7,7 @@ import io.thoughtware.matflow.setting.service.AuthThirdService;
 import io.thoughtware.matflow.task.test.dao.TaskTestDao;
 import io.thoughtware.matflow.task.test.entity.TaskTestEntity;
 import io.thoughtware.matflow.task.test.model.*;
-import io.thoughtware.beans.BeanMapper;
+import io.thoughtware.toolkit.beans.BeanMapper;
 import io.thoughtware.matflow.task.test.model.*;
 import io.thoughtware.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;

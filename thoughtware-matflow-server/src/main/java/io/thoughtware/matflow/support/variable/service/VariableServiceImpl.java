@@ -3,7 +3,7 @@ package io.thoughtware.matflow.support.variable.service;
 import io.thoughtware.matflow.support.util.util.PipelineUtil;
 import io.thoughtware.matflow.support.variable.model.Variable;
 import io.thoughtware.matflow.support.variable.model.VariableQuery;
-import io.thoughtware.beans.BeanMapper;
+import io.thoughtware.toolkit.beans.BeanMapper;
 import io.thoughtware.matflow.support.variable.dao.VariableDao;
 import io.thoughtware.matflow.support.variable.entity.VariableEntity;
 import org.apache.commons.lang.text.StrSubstitutor;

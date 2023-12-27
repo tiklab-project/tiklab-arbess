@@ -32,7 +32,7 @@ import io.thoughtware.matflow.task.task.model.Tasks;
 import io.thoughtware.matflow.task.task.model.TasksQuery;
 import io.thoughtware.matflow.task.test.model.TaskTest;
 import io.thoughtware.matflow.task.test.service.TaskTestService;
-import io.thoughtware.beans.BeanMapper;
+import io.thoughtware.toolkit.beans.BeanMapper;
 import io.thoughtware.core.exception.ApplicationException;
 import io.thoughtware.matflow.support.postprocess.dao.PostprocessDao;
 import io.thoughtware.matflow.support.postprocess.entity.PostprocessEntity;

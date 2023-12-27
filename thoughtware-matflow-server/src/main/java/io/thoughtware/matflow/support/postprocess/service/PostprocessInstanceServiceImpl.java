@@ -2,7 +2,7 @@ package io.thoughtware.matflow.support.postprocess.service;
 
 import io.thoughtware.matflow.support.postprocess.entity.PostprocessInstanceEntity;
 import io.thoughtware.matflow.support.postprocess.model.PostprocessInstance;
-import io.thoughtware.beans.BeanMapper;
+import io.thoughtware.toolkit.beans.BeanMapper;
 import io.thoughtware.matflow.support.postprocess.dao.PostprocessInstanceDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

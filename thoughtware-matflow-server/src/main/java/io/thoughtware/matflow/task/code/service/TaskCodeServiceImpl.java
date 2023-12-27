@@ -8,7 +8,7 @@ import io.thoughtware.matflow.support.util.util.PipelineUtil;
 import io.thoughtware.matflow.task.code.model.TaskCode;
 import io.thoughtware.matflow.task.code.model.XcodeBranch;
 import io.thoughtware.matflow.task.code.model.XcodeRepository;
-import io.thoughtware.beans.BeanMapper;
+import io.thoughtware.toolkit.beans.BeanMapper;
 import io.thoughtware.matflow.task.code.dao.TaskCodeDao;
 import io.thoughtware.matflow.task.code.entity.TaskCodeEntity;
 import io.thoughtware.rpc.annotation.Exporter;

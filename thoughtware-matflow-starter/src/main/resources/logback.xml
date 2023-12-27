@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-    <contextListener class="io.thoughtware.logging.LoggingContextListener" />
+    <contextListener class="io.thoughtware.toolkit.logging.LoggingContextListener" />
 
     <property name="LOG_PATH" value="${APP_HOME}/logs" />
 

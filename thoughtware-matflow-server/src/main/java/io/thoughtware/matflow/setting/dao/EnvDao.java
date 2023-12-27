@@ -3,7 +3,7 @@ package io.thoughtware.matflow.setting.dao;
 import io.thoughtware.matflow.setting.entity.EnvEntity;
 import io.thoughtware.matflow.setting.model.Env;
 import io.thoughtware.matflow.setting.model.EnvQuery;
-import io.thoughtware.beans.BeanMapper;
+import io.thoughtware.toolkit.beans.BeanMapper;
 import io.thoughtware.core.order.OrderBuilders;
 import io.thoughtware.core.page.Pagination;
 import io.thoughtware.core.page.PaginationBuilder;

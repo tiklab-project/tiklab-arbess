@@ -4,7 +4,7 @@ import io.thoughtware.matflow.support.postprocess.model.Postprocess;
 import io.thoughtware.matflow.support.util.util.PipelineUtil;
 import io.thoughtware.matflow.task.task.model.Tasks;
 import io.thoughtware.matflow.task.task.service.TasksService;
-import io.thoughtware.beans.BeanMapper;
+import io.thoughtware.toolkit.beans.BeanMapper;
 import io.thoughtware.core.exception.ApplicationException;
 import io.thoughtware.matflow.support.postprocess.dao.PostprocessDao;
 import io.thoughtware.matflow.support.postprocess.entity.PostprocessEntity;

@@ -106,6 +106,12 @@
             <version>${thoughtware-eam.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>io.thoughtware</groupId>
+            <artifactId>thoughtware-dsm-spring-boot-starter</artifactId>
+            <version>${thoughtware-dsm.version}</version>
+        </dependency>
+
 <!--        <dependency>-->
 <!--            <groupId>io.thoughtware</groupId>-->
 <!--            <artifactId>thoughtware-postin-doclet</artifactId>-->

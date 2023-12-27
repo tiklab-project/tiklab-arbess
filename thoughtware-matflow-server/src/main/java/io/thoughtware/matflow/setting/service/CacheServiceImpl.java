@@ -1,7 +1,7 @@
 package io.thoughtware.matflow.setting.service;
 
 
-import io.thoughtware.beans.BeanMapper;
+import io.thoughtware.toolkit.beans.BeanMapper;
 import io.thoughtware.matflow.setting.dao.CacheDao;
 import io.thoughtware.matflow.setting.entity.CacheEntity;
 import io.thoughtware.matflow.setting.model.Cache;

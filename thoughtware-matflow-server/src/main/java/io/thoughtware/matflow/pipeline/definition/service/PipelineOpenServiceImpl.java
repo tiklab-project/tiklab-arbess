@@ -3,9 +3,9 @@ package io.thoughtware.matflow.pipeline.definition.service;
 
 import io.thoughtware.matflow.support.authority.service.PipelineAuthorityService;
 import io.thoughtware.matflow.support.util.util.PipelineUtil;
-import io.thoughtware.beans.BeanMapper;
+import io.thoughtware.toolkit.beans.BeanMapper;
 import io.thoughtware.eam.common.context.LoginContext;
-import io.thoughtware.join.JoinTemplate;
+import io.thoughtware.toolkit.join.JoinTemplate;
 import io.thoughtware.matflow.pipeline.definition.dao.PipelineOpenDao;
 import io.thoughtware.matflow.pipeline.definition.entity.PipelineOpenEntity;
 import io.thoughtware.matflow.pipeline.definition.model.Pipeline;
