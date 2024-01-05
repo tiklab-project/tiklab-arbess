@@ -129,7 +129,7 @@ public class PipelineFinal {
     public static final String TASK_CODE_GITHUB = "github";
     public static final String TASK_CODE_GITEE = "gitee";
     public static final String TASK_CODE_SVN = "svn";
-    public static final String TASK_CODE_XCODE = "gittork";
+    public static final String TASK_CODE_XCODE = "gittok";
     public static final String TASK_CODE_DEFAULT_BRANCH = "master";
 
 

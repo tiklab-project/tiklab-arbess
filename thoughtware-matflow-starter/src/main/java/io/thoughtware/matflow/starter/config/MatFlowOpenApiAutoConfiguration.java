@@ -4,19 +4,17 @@ import io.thoughtware.openapi.router.Router;
 import io.thoughtware.openapi.router.RouterBuilder;
 import io.thoughtware.openapi.router.config.RouterConfig;
 import io.thoughtware.openapi.router.config.RouterConfigBuilder;
+import io.thoughtware.user.util.util.CodeUtilService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class MatFlowOpenApiAutoConfiguration {
 
-    @Value("${darth.address:null}")
-    String authAddress;
-
-    @Value("${darth.embbed.enable:false}")
-    Boolean enableEam;
+    @Autowired
+    CodeUtilService codeUtilService;
 
     //路由
     @Bean("routerForOpenApi")
@@ -29,11 +27,11 @@ public class MatFlowOpenApiAutoConfiguration {
     RouterConfig routerConfig(){
         String[] s =  new String[]{};
 
-         if (enableEam){
+         if (codeUtilService.findEmbedEnable()){
              s = new String[]{};
          }
         return RouterConfigBuilder.instance()
-                .preRoute(s, authAddress)
+                .preRoute(s, codeUtilService.findEmbedAddress())
                 .get();
     }
 }

@@ -36,13 +36,7 @@ public interface TriggerTimeService {
     List<TriggerTime> findAllTriggerTime(String triggerId);
 
 
-    /**
-     * 根据类型查询定时任务
-     * @param configId 配置id
-     * @param cron 表达式
-     * @return 配置
-     */
-    TriggerTime fondCronConfig(String configId, String cron);
+    List<TriggerTime> fondCronTimeList(String cron);
 
 
     /**
@@ -70,6 +64,9 @@ public interface TriggerTimeService {
      * @param timeId timeId
      */
     void deleteTime(String timeId) ;
+
+
+    void updateTime(TriggerTime triggerTime);
 
     /**
      * 查询单个信息

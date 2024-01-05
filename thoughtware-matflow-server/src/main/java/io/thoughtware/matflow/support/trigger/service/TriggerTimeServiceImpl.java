@@ -37,14 +37,19 @@ public class TriggerTimeServiceImpl implements TriggerTimeService {
         triggerTime.setDate(triggerTime.getDayTime());
         String cron = CronUtils.weekCron(time, triggerTime.getDayTime());
         triggerTime.setCron(cron);
+
+        String triggerId = triggerTime.getTriggerId();
+
+        TriggerTimeEntity triggerTimeEntity = BeanMapper.map(triggerTime, TriggerTimeEntity.class);
+        String timeId = triggerTimeDao.createTime(triggerTimeEntity);
+
         try {
-            manager.addJob(DEFAULT,pipelineId, RunJob.class,cron);
+            manager.addJob(DEFAULT,pipelineId, RunJob.class,cron,triggerId);
         } catch (SchedulerException e) {
             e.printStackTrace();
             throw new ApplicationException(50001,"当前时间已经添加过，无需重复添加。");
         }
-        TriggerTimeEntity triggerTimeEntity = BeanMapper.map(triggerTime, TriggerTimeEntity.class);
-        return triggerTimeDao.createTime(triggerTimeEntity);
+        return timeId;
     }
 
     @Override
@@ -108,20 +113,22 @@ public class TriggerTimeServiceImpl implements TriggerTimeService {
         return null;
     }
 
-    @Override
-    public TriggerTime fondCronConfig(String configId, String cron){
-        List<TriggerTime> allTriggerTime = findAllTriggerTime(configId);
+
+    public List<TriggerTime> fondCronTimeList(String cron){
+        List<TriggerTime> allTriggerTime = findAllTime();
         if (allTriggerTime == null){
             return null;
         }
+
+        List<TriggerTime> triggerTimeList = new ArrayList<>();
+
         for (TriggerTime triggerTime : allTriggerTime) {
-            String configId1 = triggerTime.getTriggerId();
-            String cron1 = triggerTime.getCron();
-            if (configId1.equals(configId) && cron1.equals(cron)){
-                return triggerTime;
+            if (!triggerTime.getCron().equals(cron)){
+               continue;
             }
+            triggerTimeList.add(triggerTime);
         }
-        return null;
+        return triggerTimeList;
     }
 
     @Override
@@ -151,7 +158,8 @@ public class TriggerTimeServiceImpl implements TriggerTimeService {
         }
         for (TriggerTime triggerTime : triggerTimeConfig) {
             String cron = triggerTime.getCron();
-            manager.removeJob(DEFAULT,pipelineId, cron);
+            String triggerName = pipelineId + "_" + cron + "_" + triggerId;
+            manager.removeJob(DEFAULT,triggerName);
             deleteTime(triggerTime.getTimeId());
         }
     }
@@ -160,17 +168,17 @@ public class TriggerTimeServiceImpl implements TriggerTimeService {
     public Boolean deleteCronTime(String pipelineId,String timeId){
         TriggerTime oneTriggerTime = findOneTime(timeId);
         if (oneTriggerTime.getTaskType() == 1){
-            // deleteTime(timeId);
             return true;
         }
         String cron = oneTriggerTime.getCron();
+        String triggerId = oneTriggerTime.getTriggerId();
         String[] s = cron.split(" ");
         String time = s[2] + ":" + s[1];
         int date = oneTriggerTime.getDate();
         String weekCron = CronUtils.weekCron(time, date);
         oneTriggerTime.setCron(weekCron);
         try {
-            manager.addJob(DEFAULT,pipelineId, RunJob.class,weekCron);
+            manager.addJob(DEFAULT,pipelineId, RunJob.class,weekCron,triggerId);
         } catch (SchedulerException e) {
             throw new ApplicationException(50001,"当前时间已经添加过，无需重复添加。");
         }

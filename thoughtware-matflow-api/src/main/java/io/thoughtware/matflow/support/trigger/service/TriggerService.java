@@ -35,11 +35,10 @@ public interface TriggerService {
 
 
     /**
-     * 删除单个定时任务
-     * @param pipelineId 流水线id
-     * @param cron 表达式
+     * 更新单个定时任务
+     * @param pipelineId 定时任务id
      */
-    void deleteCronConfig(String pipelineId,String cron);
+    void updateTrigger(String triggerId);
 
     /**
      * 更新配置信息

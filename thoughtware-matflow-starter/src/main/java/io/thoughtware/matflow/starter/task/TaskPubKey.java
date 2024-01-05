@@ -1,22 +1,33 @@
 package io.thoughtware.matflow.starter.task;
 
+import io.thoughtware.matflow.setting.dao.AuthDao;
+import io.thoughtware.matflow.setting.entity.AuthEntity;
 import io.thoughtware.matflow.setting.model.Auth;
 import io.thoughtware.matflow.setting.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.DependsOn;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.util.Objects;
 
-@Configuration
-public class TaskPubKey  {
+@Component
+public class TaskPubKey implements ApplicationRunner {
 
     @Autowired
     AuthService authService;
 
+    @Override
+    public void run(ApplicationArguments args) throws Exception {
+        updatePviKey();
+    }
 
-    // @Bean
+
     public void updatePviKey(){
 
         Auth auth = authService.findOneAuth("f812ab93d8ff");
@@ -76,17 +87,6 @@ public class TaskPubKey  {
                                  E9pQ7QPKWY6DNBBwAAABZ6Y2FteUB6aGFuZ2NoZW5nLmxvY2FsAQID
                                  -----END OPENSSH PRIVATE KEY-----
                                  """;
-
-
-
-
-
-
-
-
-
-
-
 
 
 

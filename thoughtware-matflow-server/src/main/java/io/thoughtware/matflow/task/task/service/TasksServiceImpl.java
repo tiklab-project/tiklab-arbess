@@ -1255,7 +1255,7 @@ public class TasksServiceImpl implements TasksService {
                 return "GitHub";
             }
             case PipelineFinal.TASK_CODE_XCODE -> {
-                return "Gittork代码库";
+                return "Gittok代码库";
             }
             case PipelineFinal.TASK_CODE_GITLAB -> {
                 return "GitLab";

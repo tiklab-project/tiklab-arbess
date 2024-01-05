@@ -20,35 +20,35 @@ public class TriggerDao {
     /**
      * 创建
      * @param triggerEntity 后置配置
-     * @return TriggerConfigId
+     * @return TriggerId
      */
-    public String createTriggerConfig(TriggerEntity triggerEntity){
+    public String createTrigger(TriggerEntity triggerEntity){
         return jpaTemplate.save(triggerEntity,String.class);
     }
 
     /**
-     * 删除TriggerConfig
-     * @param TriggerConfigId TriggerConfigId
+     * 删除Trigger
+     * @param TriggerId TriggerId
      */
-    public void deleteTriggerConfig(String TriggerConfigId){
-        jpaTemplate.delete(TriggerEntity.class,TriggerConfigId);
+    public void deleteTrigger(String TriggerId){
+        jpaTemplate.delete(TriggerEntity.class,TriggerId);
     }
 
     /**
-     * 更新TriggerConfig
+     * 更新Trigger
      * @param triggerEntity 更新信息
      */
-    public void updateTriggerConfig(TriggerEntity triggerEntity){
+    public void updateTrigger(TriggerEntity triggerEntity){
         jpaTemplate.update(triggerEntity);
     }
 
     /**
      * 查询单个后置配置
-     * @param TriggerConfigId TriggerConfigId
+     * @param TriggerId TriggerId
      * @return 后置配置
      */
-    public TriggerEntity findOneTriggerConfig(String TriggerConfigId){
-        return jpaTemplate.findOne(TriggerEntity.class,TriggerConfigId);
+    public TriggerEntity findOneTrigger(String TriggerId){
+        return jpaTemplate.findOne(TriggerEntity.class,TriggerId);
     }
 
     /**
@@ -72,12 +72,12 @@ public class TriggerDao {
      * 查询所有后置配置
      * @return 后置配置集合
      */
-    public List<TriggerEntity> findAllTriggerConfig(){
+    public List<TriggerEntity> findAllTrigger(){
         return jpaTemplate.findAll(TriggerEntity.class);
     }
 
 
-    public List<TriggerEntity> findAllTriggerConfigList(List<String> idList){
+    public List<TriggerEntity> findAllTriggerList(List<String> idList){
         return jpaTemplate.findList(TriggerEntity.class,idList);
     }
 

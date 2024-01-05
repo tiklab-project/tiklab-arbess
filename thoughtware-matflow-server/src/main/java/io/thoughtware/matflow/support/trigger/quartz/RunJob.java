@@ -7,6 +7,7 @@ import io.thoughtware.matflow.support.trigger.service.TriggerService;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.quartz.TriggerKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +20,7 @@ public  class RunJob implements org.quartz.Job {
 
     public static Job job;
 
-    public static TriggerService triggerConfigServer;
+    public static TriggerService triggerService;
 
     private static final Logger logger = LoggerFactory.getLogger(RunJob.class);
 
@@ -34,8 +35,8 @@ public  class RunJob implements org.quartz.Job {
     }
 
     @Autowired
-    public void setTriggerConfigServer(TriggerService triggerConfigServer) {
-        RunJob.triggerConfigServer = triggerConfigServer;
+    public void setTriggerConfigServer(TriggerService triggerService) {
+        RunJob.triggerService = triggerService;
     }
 
     @Override
@@ -45,13 +46,16 @@ public  class RunJob implements org.quartz.Job {
         String group = (String)map.get("group");
         String weekTime = (String)map.get("weekTime");
         String cron = (String)map.get("cron");
+
+        String triggerName = jobExecutionContext.getTrigger().getKey().getName();
+
         logger.warn("定时任务触发，组：{}，流水线：{} 时间：{}，",group,pipelineId,weekTime);
         String loginId = LoginContext.getLoginId();
         PipelineRunMsg pipelineRunMsg = new PipelineRunMsg(pipelineId,loginId,2);
         execService.start(pipelineRunMsg);
-        triggerConfigServer.deleteCronConfig(pipelineId,cron);
+        triggerService.updateTrigger(triggerName.split("_")[2]);
         logger.warn("组：{}，流水线：{},定时任务触发完成",group,pipelineId);
-        job.removeJob(group,pipelineId,cron);
+        job.removeJob(group,triggerName);
     }
 
 }

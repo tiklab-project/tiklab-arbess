@@ -67,7 +67,7 @@ postgresql:
 
 datapath: ${DATA_HOME}/caches
 
-darth:
+eas:
   embbed:
     enable: true
   address: http://e.darth.thoughtware.cn
