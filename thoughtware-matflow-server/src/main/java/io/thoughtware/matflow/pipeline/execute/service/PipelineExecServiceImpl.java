@@ -131,12 +131,12 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
         if (type == 1){
             List<Tasks> tasks = tasksService.finAllPipelineTask(pipelineId);
             if (tasks.isEmpty()){
-                throw new ApplicationException(2000,"当前流水线不存在任务！");
+                throw new ApplicationException(2000,"当前流水线不存在可构建任务！");
             }
         }else {
             List<Stage> allMainStage = stageService.findAllMainStage(pipelineId);
             if (allMainStage.isEmpty()){
-                throw new ApplicationException(2000,"当前流水线不存在任务！");
+                throw new ApplicationException(2000,"当前流水线不存在可构建任务！");
             }
         }
 
@@ -159,9 +159,9 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
         // 资源限制放入缓存中等待执行
         if ((version == 1 && size >= 2) || (version == 2 && size >= 4) ){
             pipeline.setState(3);
-            pipelineService.updatePipeline(pipeline);
-            // 放入缓存池
-            runMsgList.add(runMsg);
+            // pipelineService.updatePipeline(pipeline);
+            // // 放入缓存池
+            // runMsgList.add(runMsg);
             return pipeline;
         }
         return pipeline;
@@ -372,13 +372,13 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
         int type = pipeline.getType();
 
         // 流水线在缓存区
-        if (cleanCachePipeline(pipelineId)){
-            pipeline.setState(1);
-            pipelineService.updatePipeline(pipeline);
-            // 执行等待的流水线
-            execCachePipeline();
-            return;
-        }
+        // if (cleanCachePipeline(pipelineId)){
+        //     pipeline.setState(1);
+        //     pipelineService.updatePipeline(pipeline);
+        //     // 执行等待的流水线
+        //     execCachePipeline();
+        //     return;
+        // }
 
         String instanceId = findPipelineInstanceId(pipelineId);
 
@@ -425,7 +425,7 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
             pipelineService.updatePipeline(pipeline);
 
             // 执行等待的流水线
-            execCachePipeline();
+            // execCachePipeline();
 
             return;
         }
@@ -453,7 +453,7 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
         cleanPipeline(pipelineId,instanceId);
 
         // 执行等待的流水线
-        execCachePipeline();
+        // execCachePipeline();
 
 
         String defaultAddress = utilService.findPipelineDefaultAddress(pipelineId, 1);

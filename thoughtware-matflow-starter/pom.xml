@@ -74,8 +74,8 @@
         </dependency>
         <dependency>
             <groupId>io.thoughtware</groupId>
-            <artifactId>thoughtware-upgrade-starter</artifactId>
-            <version>${thoughtware-upgrade.version}</version>
+            <artifactId>thoughtware-install-starter</artifactId>
+            <version>${thoughtware-install.version}</version>
         </dependency>
 
         <dependency>
@@ -83,13 +83,6 @@
             <artifactId>thoughtware-toolkit-spring-boot-starter</artifactId>
             <version>${thoughtware-toolkit.version}</version>
         </dependency>
-
-        <dependency>
-            <groupId>io.thoughtware</groupId>
-            <artifactId>thoughtware-todotask-spring-boot-starter</artifactId>
-            <version>${thoughtware-todotask.version}</version>
-        </dependency>
-
         <dependency>
             <groupId>io.thoughtware</groupId>
             <artifactId>thoughtware-security-spring-boot-starter</artifactId>
@@ -105,19 +98,11 @@
             <artifactId>thoughtware-eam-spring-boot-starter</artifactId>
             <version>${thoughtware-eam.version}</version>
         </dependency>
-
         <dependency>
             <groupId>io.thoughtware</groupId>
             <artifactId>thoughtware-dsm-spring-boot-starter</artifactId>
             <version>${thoughtware-dsm.version}</version>
         </dependency>
-
-<!--        <dependency>-->
-<!--            <groupId>io.thoughtware</groupId>-->
-<!--            <artifactId>thoughtware-postin-doclet</artifactId>-->
-<!--            <version>1.0.1-SNAPSHOT</version>-->
-<!--        </dependency>-->
-
     </dependencies>
 
     <profiles>

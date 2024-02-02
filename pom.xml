@@ -49,7 +49,7 @@
         <thoughtware-jdk.version>1.0.0</thoughtware-jdk.version>
         <thoughtware-spotbugs.version>1.0.0</thoughtware-spotbugs.version>
         <thoughtware-opensca.version>1.0.0</thoughtware-opensca.version>
-        <thoughtware-upgrade.version>1.0.0</thoughtware-upgrade.version>
+        <thoughtware-install.version>1.0.0</thoughtware-install.version>
 
         <!--other-->
         <commons-lang3.version>3.10</commons-lang3.version>
