@@ -62,7 +62,6 @@ public class TaskCodeXcodeServiceImpl implements TaskCodeXcodeService {
             if (throwable instanceof ApplicationException){
                 throw new ApplicationException(message);
             }
-
             throw new ApplicationException("无法连接到："+serverAddress);
         }
     }

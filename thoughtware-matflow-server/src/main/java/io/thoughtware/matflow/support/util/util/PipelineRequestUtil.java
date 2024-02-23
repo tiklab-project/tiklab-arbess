@@ -154,7 +154,7 @@ public class PipelineRequestUtil {
      * @return 转换后对象
      * @param <T> 对象类型
      */
-    private <T> T findBody(JSONObject jsonObject,Class<T> tClass){
+    public <T> T findBody(JSONObject jsonObject,Class<T> tClass){
         if (Objects.isNull(jsonObject)){
             throw new ApplicationException(50001,"获取接口返回数据为空！");
         }
@@ -177,7 +177,7 @@ public class PipelineRequestUtil {
      * @return 转换后对象
      * @param <T> 对象类型
      */
-    private <T> List<T> findBodyList(JSONObject jsonObject,Class<T> tClass){
+    public <T> List<T> findBodyList(JSONObject jsonObject,Class<T> tClass){
 
         if (Objects.isNull( jsonObject)){
             throw new SystemException("获取返回值为空！");
@@ -198,7 +198,7 @@ public class PipelineRequestUtil {
         return data.toJavaList(tClass);
     }
 
-    private <T> Pagination<T> findBodyPage(JSONObject jsonObject,Class<T> tClass){
+    public <T> Pagination<T> findBodyPage(JSONObject jsonObject,Class<T> tClass){
 
         if (Objects.isNull( jsonObject)){
             throw new SystemException("获取返回值为空！");

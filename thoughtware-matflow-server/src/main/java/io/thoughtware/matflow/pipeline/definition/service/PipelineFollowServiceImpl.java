@@ -37,7 +37,7 @@ public class PipelineFollowServiceImpl implements PipelineFollowService {
         List<PipelineFollowEntity> list =
                 pipelineFollowDao.findOneUserFollowPipeline(userId, pipelineId);
         //用户为收藏该流水线
-        if (list.size() == 0){
+        if (list.isEmpty()){
             PipelineFollowEntity followEntity = BeanMapper.map(pipelineFollow, PipelineFollowEntity.class);
             followEntity.setUserId(userId);
             String follow = pipelineFollowDao.createFollow(followEntity);
@@ -61,7 +61,7 @@ public class PipelineFollowServiceImpl implements PipelineFollowService {
     public List<PipelineFollow> findFollowQueryList(PipelineFollowQuery followQuery){
         List<PipelineFollowEntity> list =
                 pipelineFollowDao.findFollowQueryList(followQuery);
-        if (list == null || list.size() == 0){
+        if (list == null || list.isEmpty()){
             return Collections.emptyList();
         }
         return BeanMapper.mapList(list, PipelineFollow.class);
@@ -79,7 +79,7 @@ public class PipelineFollowServiceImpl implements PipelineFollowService {
         List<PipelineFollowEntity> list = pipelineFollowDao.findFollowQueryList(followQuery);
 
         for (PipelineFollowEntity pipelineFollowEntity : list) {
-            deletePipelineFollow(pipelineFollowEntity.getId());
+            deleteFollow(pipelineFollowEntity.getId());
         }
 
     }
