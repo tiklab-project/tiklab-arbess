@@ -103,21 +103,24 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
     @Override
     public PipelineInstance start(PipelineRunMsg runMsg) {
 
-        diskService.validationStorageSpace();
-
         // 判断同一任务是否在运行
         Pipeline pipeline = validExecPipeline(runMsg);
-        judgeConfig(pipeline);
-        runMsg.setPipeline(pipeline);
-        // 放入等待执行的缓存中
         if (pipeline.getState() == 3 ){
             logger.warn("并行任务已满，等待执行！");
             throw new ApplicationException(2000,"并行任务已满，等待执行！");
         }
 
+        // 判断是否有可执行任务
+        judgeConfig(pipeline);
+
+        // 判断磁盘空间是否足够
+        diskService.validationStorageSpace();
+
         // 资源限制
         resourcesService.judgeResources();
 
+        // 进入执行
+        runMsg.setPipeline(pipeline);
         return beginExecPipeline(runMsg);
     }
 
@@ -149,20 +152,18 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
      */
     public Pipeline validExecPipeline(PipelineRunMsg runMsg){
         String pipelineId = runMsg.getPipelineId();
-        int version = versionService.version();
+        Boolean isVip = versionService.isVip();
 
         Pipeline pipeline = pipelineService.findPipelineById(pipelineId);
-        runMsg.setPipeline(pipeline);
 
         int size = pipelineIdOrInstanceId.size();
 
         // 资源限制放入缓存中等待执行
-        if ((version == 1 && size >= 2) || (version == 2 && size >= 4) ){
+        if ((!isVip && size >= 2) || (isVip && size >= 4) ){
             pipeline.setState(3);
             // pipelineService.updatePipeline(pipeline);
             // // 放入缓存池
             // runMsgList.add(runMsg);
-            return pipeline;
         }
         return pipeline;
     }

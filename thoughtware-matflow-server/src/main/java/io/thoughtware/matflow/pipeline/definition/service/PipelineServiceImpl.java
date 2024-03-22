@@ -310,7 +310,7 @@ public class PipelineServiceImpl implements PipelineService {
     }
 
     @Override
-    public List<Pipeline> findUserPipelineList(PipelineQuery query){
+    public List<Pipeline> findPipelineList(PipelineQuery query){
         List<PipelineEntity> pipelineEntityList = pipelineDao.findPipelineList(query);
         if (pipelineEntityList == null){
             return Collections.emptyList();
@@ -387,11 +387,11 @@ public class PipelineServiceImpl implements PipelineService {
          PipelineQuery pipelineQuery = new PipelineQuery();
          pipelineQuery.setPipelineName(name);
          pipelineQuery.setEqName(true);
-         List<Pipeline> userPipelineList = findUserPipelineList(pipelineQuery);
-         while (!userPipelineList.isEmpty() && i < 31){
+         List<Pipeline> userPipelineList = findPipelineList(pipelineQuery);
+         while (!userPipelineList.isEmpty() && i < 10){
             name = pipeline.getName() + "_copy_"+ i ;
             pipelineQuery.setPipelineName(name);
-            userPipelineList = findUserPipelineList(pipelineQuery);
+            userPipelineList = findPipelineList(pipelineQuery);
             i ++ ;
         }
          return name;

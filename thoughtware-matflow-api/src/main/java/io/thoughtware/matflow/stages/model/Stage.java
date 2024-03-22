@@ -36,7 +36,7 @@ public class Stage {
     private String parentId;
 
     //@ApiProperty(name = "code",desc="是否是源码")
-    private boolean code;
+    private boolean code = false;
 
     //@ApiProperty(name = "taskValues",desc="阶段任务")
     private List<Tasks> taskValues;

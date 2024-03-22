@@ -110,6 +110,7 @@ public class MatFlowGatewayAutoConfiguration {
                         "/eas",
                         "/sql",
                         "/maven/test",
+                        "/update/pipeline"
                 })
                 .get();
     }

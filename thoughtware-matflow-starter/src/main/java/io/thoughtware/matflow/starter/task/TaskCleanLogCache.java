@@ -59,11 +59,10 @@ public class TaskCleanLogCache {
     JoinTemplate joinTemplate;
 
 
-    @Scheduled(cron = "0 0 1 * * ?")
-    // @Scheduled(cron = "0 0/1 * * * *")
+    @Scheduled(cron = "0 0/60 * * * *")
     public void scheduledBackups(){
 
-        logger.info("缓存清理定时任务触发.....");
+        logger.info("The cache cleanup timing task is triggered.....");
 
         List<PipelineInstance> allInstance = instanceService.findAllInstance();
 
@@ -104,7 +103,7 @@ public class TaskCleanLogCache {
 
             deletePostLog(instanceId);
         }
-        logger.info("缓存清理定时任务完成！");
+        logger.info("The cache cleanup is scheduled to complete！");
     }
 
     /**

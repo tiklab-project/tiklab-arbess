@@ -13,15 +13,12 @@ public class PipelineVersionServiceImpl implements PipelineVersionService {
 
 
     @Override
-    public Integer version() {
+    public Boolean isVip() {
         Version version = versionServer.getVersion();
 
         Boolean expired = version.getExpired();
-        Integer release = version.getRelease();
-        if (release == 2 && !expired){
-            return 2;
-        }
-        return 1;
+        // Integer release = version.getRelease();
+        return !expired;
     }
 
 

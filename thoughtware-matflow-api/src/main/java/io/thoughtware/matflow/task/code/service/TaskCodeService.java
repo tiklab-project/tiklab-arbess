@@ -28,7 +28,7 @@ public interface TaskCodeService {
      * 根据配置id删除任务
      * @param configId 配置id
      */
-    void deleteCodeConfig(String configId);
+    void deleteTaskCode(String configId);
 
     /**
      * 根据配置id查询任务

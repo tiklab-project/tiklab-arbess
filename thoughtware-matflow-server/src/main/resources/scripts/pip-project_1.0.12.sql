@@ -1,10 +1,14 @@
 
 --  pip_task
 UPDATE pip_task
-SET bgroup = 'gittok'
-WHERE bgroup = 'gittork';
+SET task_type = 'gittok'
+WHERE task_type = 'gittork';
 
---  pip_task
 UPDATE pip_task
-SET bgroup = 'gittok'
-WHERE bgroup = 'gittork';
+SET task_type = 'gittok'
+WHERE task_type = 'xcode';
+
+
+UPDATE pip_task
+SET task_type = 'hadess'
+WHERE task_type = 'xpack';

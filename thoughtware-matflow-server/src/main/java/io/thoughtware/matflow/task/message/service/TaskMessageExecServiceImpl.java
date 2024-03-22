@@ -1,5 +1,6 @@
 package io.thoughtware.matflow.task.message.service;
 
+import io.thoughtware.matflow.support.version.service.PipelineVersionService;
 import io.thoughtware.toolkit.join.JoinTemplate;
 import io.thoughtware.matflow.support.util.util.PipelineFinal;
 import io.thoughtware.matflow.support.util.util.PipelineUtil;
@@ -40,6 +41,9 @@ public class TaskMessageExecServiceImpl implements TaskMessageExecService {
 
     @Autowired
     JoinTemplate joinTemplate;
+
+    @Autowired
+    PipelineVersionService versionService;
 
 
     public boolean message(TaskExecMessage taskExecMessage) {
@@ -129,21 +133,19 @@ public class TaskMessageExecServiceImpl implements TaskMessageExecService {
             case MES_SEND_WECHAT ->{
                 tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+ "发送消息，类型：微信机器人消息");
                 map.put("sendWay", MES_SEND_WECHAT);
-                homeService.message(map,new ArrayList<>());
-                tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+ "微信机器人消息发送成功");
+                sendQywx(taskId,userList,map);
             }
             case MES_SEND_SMS ->{
                 tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+ "发送消息，类型：短信消息");
                 map.put("sendWay", MES_SEND_SMS);
                 sendSSM(taskId,userList,map);
-                homeService.smsMessage(map);
-                tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+ "短信发送成功");
+                // homeService.smsMessage(map);
             }
             case MES_SEND_EMAIL ->{
                 tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+ "发送消息，类型：邮箱消息");
                 map.put("sendWay", MES_SEND_EMAIL);
                 sendMail(taskId,userList,map);
-                homeService.message(map,new ArrayList<>());
+                // homeService.message(map,new ArrayList<>());
             }
             case MES_SEND_DINGDING ->{
                 tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+ "发送消息，类型：钉钉机器人消息");
@@ -158,6 +160,12 @@ public class TaskMessageExecServiceImpl implements TaskMessageExecService {
 
 
     public void  sendMail (String taskId,List<TaskMessageUser> userList,Map<String, Object> map){
+
+        if (versionService.isVip()){
+            tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+ "当前不是企业版本，或者企业版已过期，无法发送邮箱消息!");
+            return;
+        }
+
         List<String> list = new ArrayList<>();
         for (TaskMessageUser message : userList) {
             User user = message.getUser();
@@ -169,8 +177,6 @@ public class TaskMessageExecServiceImpl implements TaskMessageExecService {
         }
         homeService.message(map,list);
         tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+ "邮箱消息发送成功!");
-
-
     }
 
     public void  sendSite (String taskId,List<TaskMessageUser> userList,Map<String, Object> map){
@@ -188,11 +194,34 @@ public class TaskMessageExecServiceImpl implements TaskMessageExecService {
 
     }
 
+    public void  sendQywx (String taskId,List<TaskMessageUser> userList,Map<String, Object> map){
+
+        if (versionService.isVip()){
+            tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+ "当前不是企业版本，或者企业版已过期，无法发送企业微信消息!");
+            return;
+        }
+
+        homeService.message(map,new ArrayList<>());
+        tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+ "微信机器人消息发送成功!");
+    }
+
 
     public void  sendDingDing (String taskId,List<TaskMessageUser> userList,Map<String, Object> map){
+
+        if (versionService.isVip()){
+            tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+ "当前不是企业版本，或者企业版已过期，无法发送钉钉消息!");
+            return;
+        }
+
         homeService.message(map,new ArrayList<>());
-        tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+ "钉钉机器人消息成功");
+        tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+ "钉钉机器人消息成功!");
     }
+
+
+
+
+
+
 
 }
 

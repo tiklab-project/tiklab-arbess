@@ -5,13 +5,12 @@ import io.thoughtware.matflow.setting.service.AuthService;
 import io.thoughtware.matflow.setting.service.AuthThirdService;
 import io.thoughtware.matflow.support.util.util.PipelineFinal;
 import io.thoughtware.matflow.support.util.util.PipelineUtil;
-import io.thoughtware.matflow.task.code.model.TaskCode;
-import io.thoughtware.matflow.task.code.model.XcodeBranch;
-import io.thoughtware.matflow.task.code.model.XcodeRepository;
+import io.thoughtware.matflow.task.code.model.*;
 import io.thoughtware.toolkit.beans.BeanMapper;
 import io.thoughtware.matflow.task.code.dao.TaskCodeDao;
 import io.thoughtware.matflow.task.code.entity.TaskCodeEntity;
 import io.thoughtware.rpc.annotation.Exporter;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +18,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
+
+import static io.thoughtware.matflow.support.util.util.PipelineFinal.*;
 
 @Service
 @Exporter
@@ -34,10 +35,16 @@ public class TaskCodeServiceImpl implements TaskCodeService {
     AuthThirdService authServerServer;
 
     @Autowired
-    TaskCodeThirdService taskCodeThirdService;
+    TaskCodeGiteeService giteeService;
 
     @Autowired
-    TaskCodeXcodeService taskCodeXcodeService;
+    TaskCodeGitHubService gitHubService;
+
+    @Autowired
+    TaskCodeGitLabService gitLabService;
+
+    @Autowired
+    TaskCodeGittokService xcodeService;
 
     private static final Logger logger = LoggerFactory.getLogger(TaskCodeServiceImpl.class);
 
@@ -52,19 +59,19 @@ public class TaskCodeServiceImpl implements TaskCodeService {
      * @param taskId 配置id
      */
     @Override
-    public void deleteCodeConfig(String taskId){
-        deleteCode(taskId);
+    public void deleteTaskCode(String taskId){
+        taskCodeDao.deleteCode(taskId);
     }
 
 
     /**
      * 根据配置id查询任务
-     * @param configId 配置id
+     * @param taskId 配置id
      * @return 任务
      */
     @Override
-    public TaskCode findOneCodeConfig(String configId,String taskType){
-        TaskCodeEntity oneCodeEntity = taskCodeDao.findOneCode(configId);
+    public TaskCode findOneCodeConfig(String taskId,String taskType){
+        TaskCodeEntity oneCodeEntity = taskCodeDao.findOneCode(taskId);
         TaskCode taskCode = BeanMapper.map(oneCodeEntity, TaskCode.class);
         String authId = taskCode.getAuthId();
 
@@ -77,28 +84,28 @@ public class TaskCodeServiceImpl implements TaskCodeService {
             return taskCode;
         }
 
-        String xcodeId = oneCodeEntity.getXcodeId();
-        XcodeRepository repository = taskCodeXcodeService.findRepository(authId, xcodeId);
-        taskCode.setRepository(repository);
-        // 查询不到仓库
-        if (Objects.isNull(repository)){
-            return taskCode;
-        }else {
-            taskCode.setCodeName(repository.getName());
-        }
-
-        // 查询不到分支
-        String codeBranch = oneCodeEntity.getBranchId();
-        if (Objects.isNull(codeBranch)){
-            return taskCode;
-        }
-        XcodeBranch branch = taskCodeXcodeService.findOneBranch(authId, repository.getRpyId(), codeBranch);
-        if (Objects.isNull(branch)){
-            branch = new XcodeBranch();
-            branch.setBranchName(PipelineFinal.TASK_CODE_DEFAULT_BRANCH);
-            branch.setBranchId(PipelineFinal.TASK_CODE_DEFAULT_BRANCH);
-        }
-        taskCode.setBranch(branch);
+        // String xcodeId = oneCodeEntity.getXcodeId();
+        // XcodeRepository repository = taskCodeGittokService.findRepository(authId, xcodeId);
+        // taskCode.setRepository(repository);
+        // // 查询不到仓库
+        // if (Objects.isNull(repository)){
+        //     return taskCode;
+        // }else {
+        //     taskCode.setCodeName(repository.getName());
+        // }
+        //
+        // // 查询不到分支
+        // String codeBranch = oneCodeEntity.getBranchId();
+        // if (Objects.isNull(codeBranch)){
+        //     return taskCode;
+        // }
+        // XcodeBranch branch = taskCodeGittokService.findOneBranch(authId, repository.getRpyId(), codeBranch);
+        // if (Objects.isNull(branch)){
+        //     branch = new XcodeBranch();
+        //     branch.setBranchName(PipelineFinal.TASK_CODE_DEFAULT_BRANCH);
+        //     branch.setBranchId(PipelineFinal.TASK_CODE_DEFAULT_BRANCH);
+        // }
+        // taskCode.setBranch(branch);
         return taskCode;
     }
 
@@ -114,22 +121,38 @@ public class TaskCodeServiceImpl implements TaskCodeService {
         TaskCodeEntity oneCodeEntity = taskCodeDao.findOneCode(taskCode.getTaskId());
         TaskCode oneCode = BeanMapper.map(oneCodeEntity, TaskCode.class);
         String authId = oneCode.getAuthId();
-        switch (taskCode.getType()) {
-            case "2", "3","gitee","github" -> {
-                if (!PipelineUtil.isNoNull(taskCode.getCodeName())){
-                    break;
+        String houseId = taskCode.getHouseId();
+
+        if (!StringUtils.isEmpty(houseId)){
+            ThirdHouse storeHouse = null;
+            ThirdQuery thirdQuery = new ThirdQuery();
+            thirdQuery.setHouseId(houseId);
+            thirdQuery.setAuthId(authId);
+            switch (taskCode.getType()) {
+                case TASK_CODE_GITEE  -> {
+                    storeHouse = giteeService.findStoreHouse(thirdQuery);
                 }
-                String houseUrl = taskCodeThirdService.getHouseUrl(authId, taskCode.getCodeName(), taskCode.getType());
-                taskCode.setCodeAddress(houseUrl);
-            }
-            case "xcode" -> {
-                XcodeRepository repository = oneCode.getRepository();
-                if (!Objects.isNull(repository)){
-                    taskCode.setCodeAddress(repository.getFullPath());
+                case TASK_CODE_GITHUB -> {
+                    storeHouse = gitHubService.findStoreHouse(thirdQuery);
+                }
+                case TASK_CODE_GITLAB -> {
+                    storeHouse = gitLabService.findStoreHouse(thirdQuery);
+                }
+                case TASK_CODE_XCODE -> {
+                    storeHouse = xcodeService.findStoreHouse(thirdQuery);
+                }
+                default -> {
                 }
             }
-            default -> taskCode.setCodeAddress(taskCode.getCodeName());
+            if (!Objects.isNull(storeHouse)){
+                taskCode.setCodeAddress(storeHouse.getHouseWebUrl());
+                taskCode.setCodeName(storeHouse.getNameWithSpace());
+                taskCode.setCodeBranch(storeHouse.getDefaultBranch());
+            }
+        }else {
+            taskCode.setCodeAddress(taskCode.getCodeName());
         }
+
         taskCodeDao.updateCode(BeanMapper.map(taskCode, TaskCodeEntity.class));
     }
 
@@ -143,7 +166,8 @@ public class TaskCodeServiceImpl implements TaskCodeService {
     //查询所有
     @Override
     public List<TaskCode> findAllCode() {
-        List<TaskCode> taskCodes = BeanMapper.mapList(taskCodeDao.findAllCode(), TaskCode.class);
+        List<TaskCodeEntity> allCode = taskCodeDao.findAllCode();
+        List<TaskCode> taskCodes = BeanMapper.mapList(allCode, TaskCode.class);
         if (taskCodes == null){
             return null;
         }

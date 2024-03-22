@@ -116,7 +116,7 @@ public class ResourcesServiceImpl implements ResourcesService {
 
     @Override
     public Resources findResourcesList(){
-        int version = versionService.version();
+        boolean version = versionService.isVip();
 
         PipelineQuery pipelineQuery = new PipelineQuery();
         pipelineQuery.setPipelineState(2);
@@ -124,13 +124,13 @@ public class ResourcesServiceImpl implements ResourcesService {
         int number = pipelineList.size();
 
         // 1.免费 2.付费 可用资源总数
-        if (version == 1){
+        if (!version){
             Resources resources = notVipResources(number);
-            resources.setVersion(version);
+            resources.setVersion(1);
             return resources;
         }else {
             Resources resources = vipResources(number);
-            resources.setVersion(version);
+            resources.setVersion(2);
             return resources;
         }
     }

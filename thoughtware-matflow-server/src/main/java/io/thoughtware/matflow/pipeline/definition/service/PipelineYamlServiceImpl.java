@@ -12,10 +12,11 @@ import io.thoughtware.matflow.task.artifact.model.TaskArtifact;
 import io.thoughtware.matflow.task.artifact.service.TaskArtifactXpackService;
 import io.thoughtware.matflow.task.build.model.TaskBuild;
 import io.thoughtware.matflow.task.code.model.TaskCode;
+import io.thoughtware.matflow.task.code.model.ThirdHouse;
 import io.thoughtware.matflow.task.code.model.XcodeBranch;
 import io.thoughtware.matflow.task.code.model.XcodeRepository;
 import io.thoughtware.matflow.task.code.service.TaskCodeThirdService;
-import io.thoughtware.matflow.task.code.service.TaskCodeXcodeService;
+import io.thoughtware.matflow.task.code.service.TaskCodeGittokService;
 import io.thoughtware.matflow.task.codescan.model.TaskCodeScan;
 import io.thoughtware.matflow.task.deploy.model.TaskDeploy;
 import io.thoughtware.matflow.task.task.model.Tasks;
@@ -52,7 +53,7 @@ public class PipelineYamlServiceImpl implements PipelineYamlService {
     TaskCodeThirdService taskCodeThirdService;
 
     @Autowired
-    TaskCodeXcodeService taskCodeXcodeService;
+    TaskCodeGittokService taskCodeGittokService;
 
     @Autowired
     TaskArtifactXpackService taskArtifactXpackService;
@@ -234,91 +235,111 @@ public class PipelineYamlServiceImpl implements PipelineYamlService {
         String string = JSONObject.toJSONString(object);
 
         TaskCode taskCode = JSONObject.parseObject(string, TaskCode.class);
-
-        switch (taskType){
-            case PipelineFinal.TASK_CODE_GIT, PipelineFinal.TASK_CODE_GITLAB ->{
-                if (!Objects.isNull(taskCode.getAuthId())){
-                    taskDetailsMap.put("authId",taskCode.getAuthId());
-                }
-                if (!Objects.isNull(taskCode.getCodeName())){
-                    taskDetailsMap.put("url",taskCode.getCodeName());
-                }
-
-                if (!Objects.isNull(taskCode.getCodeBranch())){
-                    taskDetailsMap.put("branch",taskCode.getCodeBranch());
-                }else {
-                    taskDetailsMap.put("branch", PipelineFinal.TASK_CODE_DEFAULT_BRANCH);
-                }
+        if (!Objects.isNull(taskCode.getAuthId())){
+            taskDetailsMap.put("authId",taskCode.getAuthId());
+        }
+        if (!taskType.equals(PipelineFinal.TASK_CODE_SVN)){
+            if (!Objects.isNull(taskCode.getCodeName())){
+                taskDetailsMap.put("url",taskCode.getCodeName());
             }
-            case PipelineFinal.TASK_CODE_GITEE, PipelineFinal.TASK_CODE_GITHUB ->{
-                if (!Objects.isNull(taskCode.getAuthId())){
-                    taskDetailsMap.put("authId",taskCode.getAuthId());
-                }
-                if (!Objects.isNull(taskCode.getCodeName())){
-                    taskDetailsMap.put("repository_name",taskCode.getCodeName());
-                }
-                if (!Objects.isNull(taskCode.getCodeAddress())){
-                    taskDetailsMap.put("repository_url",taskCode.getCodeAddress());
-                }
-
-                if (!Objects.isNull(taskDetailsMap.get("authId"))){
-                    String authId = (String) taskDetailsMap.get("authId");
-                    String repositoryName = (String) taskDetailsMap.get("repository_name");
-                    String houseUrl = codeThirdService.getHouseUrl(authId, repositoryName, taskType);
-                    taskCode.setCodeAddress(houseUrl);
-                    taskDetailsMap.put("repository_url",houseUrl);
-                }
-
-                if (!Objects.isNull(taskCode.getCodeBranch())){
-                    taskDetailsMap.put("branch",taskCode.getCodeBranch());
-                }else {
-                    taskDetailsMap.put("branch", PipelineFinal.TASK_CODE_DEFAULT_BRANCH);
-                }
+            if (!Objects.isNull(taskCode.getCodeBranch())){
+                taskDetailsMap.put("branch",taskCode.getCodeBranch());
+            }else {
+                taskDetailsMap.put("branch", PipelineFinal.TASK_CODE_DEFAULT_BRANCH);
             }
-            case PipelineFinal.TASK_CODE_XCODE ->{
-                String authId = taskCode.getAuthId();
-                if (!Objects.isNull(authId)){
-                    taskDetailsMap.put("authId",taskCode.getAuthId());
-                }
-                if (!Objects.isNull(taskCode.getRepository())){
-                    String rpyId = taskCode.getRepository().getRpyId();
-                    taskDetailsMap.put("repository_id",rpyId);
-                    XcodeRepository repository = taskCodeXcodeService
-                            .findRepository((String) taskDetailsMap.get("authId"), rpyId);
-                    if (!Objects.isNull(repository)) {
-                        taskCode.setRepository(repository);
-                        taskDetailsMap.put("repository_url",repository.getFullPath());
-                        taskDetailsMap.put("repository_name",repository.getName());
-                    }
-                }
-
-                if (!Objects.isNull(taskCode.getBranch())){
-                    String branchId = taskCode.getBranch().getBranchId();
-                    String authId1 = (String) taskDetailsMap.get("authId");
-                    String rpyId1 = (String) taskDetailsMap.get("repository_id");
-                    XcodeBranch xcodeBranch = taskCodeXcodeService.findOneBranch(authId1, rpyId1,branchId);
-                    if (!Objects.isNull(xcodeBranch)){
-                        taskCode.setBranch(xcodeBranch);
-                        taskDetailsMap.put("branch_name",xcodeBranch.getBranchName());
-                    }
-                }else {
-                    taskDetailsMap.put("branch", PipelineFinal.TASK_CODE_DEFAULT_BRANCH);
-                }
+        }else {
+            if (!Objects.isNull(taskCode.getCodeName())){
+                taskDetailsMap.put("detection_url",taskCode.getCodeName());
             }
-            case PipelineFinal.TASK_CODE_SVN ->{
-                if (!Objects.isNull(taskCode.getAuthId())){
-                    taskDetailsMap.put("authId",taskCode.getAuthId());
-                }
-                if (!Objects.isNull(taskCode.getCodeName())){
-                    taskDetailsMap.put("detection_url",taskCode.getCodeName());
-                }
 
-                if (!Objects.isNull(taskCode.getSvnFile())){
-                    taskDetailsMap.put("detection_file",taskCode.getSvnFile());
-                }
-
+            if (!Objects.isNull(taskCode.getSvnFile())){
+                taskDetailsMap.put("detection_file",taskCode.getSvnFile());
             }
         }
+
+        // switch (taskType){
+        //     case PipelineFinal.TASK_CODE_GIT, PipelineFinal.TASK_CODE_GITLAB ->{
+        //         if (!Objects.isNull(taskCode.getAuthId())){
+        //             taskDetailsMap.put("authId",taskCode.getAuthId());
+        //         }
+        //         if (!Objects.isNull(taskCode.getCodeName())){
+        //             taskDetailsMap.put("url",taskCode.getCodeName());
+        //         }
+        //
+        //         if (!Objects.isNull(taskCode.getCodeBranch())){
+        //             taskDetailsMap.put("branch",taskCode.getCodeBranch());
+        //         }else {
+        //             taskDetailsMap.put("branch", PipelineFinal.TASK_CODE_DEFAULT_BRANCH);
+        //         }
+        //     }
+        //     case PipelineFinal.TASK_CODE_GITEE, PipelineFinal.TASK_CODE_GITHUB ->{
+        //         if (!Objects.isNull(taskCode.getAuthId())){
+        //             taskDetailsMap.put("authId",taskCode.getAuthId());
+        //         }
+        //         if (!Objects.isNull(taskCode.getCodeName())){
+        //             taskDetailsMap.put("repository_name",taskCode.getCodeName());
+        //         }
+        //         if (!Objects.isNull(taskCode.getCodeAddress())){
+        //             taskDetailsMap.put("repository_url",taskCode.getCodeAddress());
+        //         }
+        //
+        //         if (!Objects.isNull(taskDetailsMap.get("authId"))){
+        //             String authId = (String) taskDetailsMap.get("authId");
+        //             String repositoryName = (String) taskDetailsMap.get("repository_name");
+        //             String houseUrl = codeThirdService.getHouseUrl(authId, repositoryName, taskType);
+        //             taskCode.setCodeAddress(houseUrl);
+        //             taskDetailsMap.put("repository_url",houseUrl);
+        //         }
+        //
+        //         if (!Objects.isNull(taskCode.getCodeBranch())){
+        //             taskDetailsMap.put("branch",taskCode.getCodeBranch());
+        //         }else {
+        //             taskDetailsMap.put("branch", PipelineFinal.TASK_CODE_DEFAULT_BRANCH);
+        //         }
+        //     }
+        //     case PipelineFinal.TASK_CODE_XCODE ->{
+        //         String authId = taskCode.getAuthId();
+        //         if (!Objects.isNull(authId)){
+        //             taskDetailsMap.put("authId",taskCode.getAuthId());
+        //         }
+        //         if (!Objects.isNull(taskCode.getRepository())){
+        //             String rpyId = taskCode.getRepository().getRpyId();
+        //             taskDetailsMap.put("repository_id",rpyId);
+        //             ThirdHouse thirdHouse = taskCodeGittokService.
+        //                     findStoreHouse((String) taskDetailsMap.get("authId"), rpyId);
+        //             if (!Objects.isNull(thirdHouse)) {
+        //                 // taskCode.setRepository(thirdHouse);
+        //                 taskDetailsMap.put("repository_url",thirdHouse.getHouseWebUrl());
+        //                 taskDetailsMap.put("repository_name",thirdHouse.getName());
+        //             }
+        //         }
+        //         taskDetailsMap.put("branch", PipelineFinal.TASK_CODE_DEFAULT_BRANCH);
+        //         if (!Objects.isNull(taskCode.getBranch())){
+        //             String branchId = taskCode.getBranch().getBranchId();
+        //             String authId1 = (String) taskDetailsMap.get("authId");
+        //             String rpyId1 = (String) taskDetailsMap.get("repository_id");
+        //             XcodeBranch xcodeBranch = taskCodeGittokService.findOneBranch(authId1, rpyId1,branchId);
+        //             if (!Objects.isNull(xcodeBranch)){
+        //                 taskCode.setBranch(xcodeBranch);
+        //                 taskDetailsMap.put("branch_name",xcodeBranch.getBranchName());
+        //             }
+        //         }else {
+        //             taskDetailsMap.put("branch", PipelineFinal.TASK_CODE_DEFAULT_BRANCH);
+        //         }
+        //     }
+        //     case PipelineFinal.TASK_CODE_SVN ->{
+        //         if (!Objects.isNull(taskCode.getAuthId())){
+        //             taskDetailsMap.put("authId",taskCode.getAuthId());
+        //         }
+        //         if (!Objects.isNull(taskCode.getCodeName())){
+        //             taskDetailsMap.put("detection_url",taskCode.getCodeName());
+        //         }
+        //
+        //         if (!Objects.isNull(taskCode.getSvnFile())){
+        //             taskDetailsMap.put("detection_file",taskCode.getSvnFile());
+        //         }
+        //     }
+        // }
         return taskDetailsMap;
     }
 

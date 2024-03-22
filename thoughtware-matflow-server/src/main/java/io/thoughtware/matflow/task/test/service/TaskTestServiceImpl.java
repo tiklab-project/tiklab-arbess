@@ -55,56 +55,53 @@ public class TaskTestServiceImpl implements TaskTestService {
 
     /**
      * 根据配置id查询任务
-     * @param configId 配置id
+     * @param taskId 配置id
      * @return 任务
      */
     @Override
-    public TaskTest findOneTestConfig (String configId){
-        List<TaskTest> allTest = findAllTest();
-        if (allTest == null){
+    public TaskTest findOneTestConfig (String taskId){
+
+        TaskTest taskTest = findOneTest(taskId);
+
+        if (Objects.isNull(taskTest)){
             return null;
         }
-        for (TaskTest taskTest : allTest) {
-            if (taskTest.getTaskId().equals(configId)){
-                String authId = taskTest.getAuthId();
-                if (Objects.isNull(authId)){
-                    return taskTest;
-                }
-                AuthThird authServer = thirdServer.findOneAuthServer(authId);
-                taskTest.setAuth(authServer);
-
-                if (!Objects.isNull(taskTest.getApiEnv())){
-                    String id = taskTest.getApiEnv().getId();
-                    TestOnApiEnv apiEnv = taskTestOnService.findOneTestOnApiEnv(authId,id);
-                    taskTest.setApiEnv(apiEnv);
-                }
-
-                if (!Objects.isNull(taskTest.getAppEnv())){
-                    String id = taskTest.getAppEnv().getId();
-                    TestOnAppEnv apiEnv = taskTestOnService.findOneTestOnAppEnv(authId,id);
-                    taskTest.setAppEnv(apiEnv);
-                }
-
-                if (!Objects.isNull(taskTest.getWebEnv())){
-                    String id = taskTest.getWebEnv().getId();
-                    TestOnWebEnv webEnv = taskTestOnService.findOneTestOnWebEnv(authId,id);
-                    taskTest.setWebEnv(webEnv);
-                }
-
-                if (!Objects.isNull(taskTest.getTestSpace())){
-                    String id = taskTest.getTestSpace().getId();
-                    TestOnRepository repository = taskTestOnService.findOneRepository(authId,id);
-                    taskTest.setTestSpace(repository);
-                }
-                if (!Objects.isNull(taskTest.getTestPlan())){
-                    String id = taskTest.getTestPlan().getId();
-                    TestOnTestPlan testPlan = taskTestOnService.findOneTestPlan(authId,id);
-                    taskTest.setTestPlan(testPlan);
-                }
-                return taskTest;
-            }
+        String authId = taskTest.getAuthId();
+        if (Objects.isNull(authId)){
+            return taskTest;
         }
-        return null;
+        // AuthThird authServer = thirdServer.findOneAuthServer(authId);
+        // taskTest.setAuth(authServer);
+
+        if (!Objects.isNull(taskTest.getApiEnv())){
+            String id = taskTest.getApiEnv().getId();
+            TestOnApiEnv apiEnv = taskTestOnService.findOneTestOnApiEnv(authId,id);
+            taskTest.setApiEnv(apiEnv);
+        }
+
+        if (!Objects.isNull(taskTest.getAppEnv())){
+            String id = taskTest.getAppEnv().getId();
+            TestOnAppEnv apiEnv = taskTestOnService.findOneTestOnAppEnv(authId,id);
+            taskTest.setAppEnv(apiEnv);
+        }
+
+        if (!Objects.isNull(taskTest.getWebEnv())){
+            String id = taskTest.getWebEnv().getId();
+            TestOnWebEnv webEnv = taskTestOnService.findOneTestOnWebEnv(authId,id);
+            taskTest.setWebEnv(webEnv);
+        }
+
+        if (!Objects.isNull(taskTest.getTestSpace())){
+            String id = taskTest.getTestSpace().getId();
+            TestOnRepository repository = taskTestOnService.findOneRepository(authId,id);
+            taskTest.setTestSpace(repository);
+        }
+        if (!Objects.isNull(taskTest.getTestPlan())){
+            String id = taskTest.getTestPlan().getId();
+            TestOnTestPlan testPlan = taskTestOnService.findOneTestPlan(authId,id);
+            taskTest.setTestPlan(testPlan);
+        }
+        return taskTest;
     }
     
 

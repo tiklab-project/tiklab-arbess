@@ -79,7 +79,7 @@ public interface PipelineService {
     Pagination<Pipeline> findUserPipelinePage(PipelineQuery query);
 
 
-    List<Pipeline> findUserPipelineList(PipelineQuery query);
+    List<Pipeline> findPipelineList(PipelineQuery query);
 
 
     /**

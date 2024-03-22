@@ -218,7 +218,7 @@ public class TaskCodeThirdServiceImpl implements TaskCodeThirdService {
         return storehouseList;
     }
 
-    private  List<String> gitHubAllStorehouse(String accessToken, String allStorehouseAddress) throws HttpClientErrorException {
+    private List<String> gitHubAllStorehouse(String accessToken, String allStorehouseAddress) throws HttpClientErrorException {
         List<String> list = new ArrayList<>();
         HttpHeaders headers = new HttpHeaders();
         headers.set("Accept", "application/vnd.github.v3+json");

@@ -151,13 +151,15 @@ public class PipelineInstanceDao {
         if (PipelineUtil.isNoNull(pipelineInstanceQuery.getPipelineId())){
             sql = sql.concat(" and pipeline_id = '" + pipelineInstanceQuery.getPipelineId()+ "'");
         }
-        if (!Objects.isNull(pipelineInstanceQuery.getNumber() )){
-            sql = sql.concat(" and find_number like '%" + pipelineInstanceQuery.getNumber()+ "%'");
+        if (!Objects.isNull(pipelineInstanceQuery.getNumber())){
+            String number = pipelineInstanceQuery.getNumber();
+            sql = sql.concat(" and ( find_number like '%" + number+ "%' " +
+                    "or pipeline_id in (select id from pip_pipeline where name like '%"+number+"%'))");
         }
 
-
+        //正在运行的流水线排在第一
         sql = sql.concat(" order by create_time desc " +
-                ", case 'run_status' when 'run' then 1 end");//run排在第一
+                ", case 'run_status' when 'run' then 1 end");
 
         return jpaTemplate.getJdbcTemplate().findPage(sql, null,
                 pipelineInstanceQuery.getPageParam(),

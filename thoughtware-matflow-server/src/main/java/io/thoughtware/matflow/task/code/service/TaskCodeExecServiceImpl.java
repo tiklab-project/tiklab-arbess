@@ -14,11 +14,14 @@ import io.thoughtware.matflow.support.util.util.PipelineUtil;
 import io.thoughtware.matflow.support.util.service.PipelineUtilService;
 import io.thoughtware.matflow.support.variable.service.VariableService;
 import io.thoughtware.matflow.task.code.model.TaskCode;
+import io.thoughtware.matflow.task.code.model.ThirdQuery;
+import io.thoughtware.matflow.task.code.model.ThirdUser;
 import io.thoughtware.matflow.task.code.model.XcodeRepository;
 import io.thoughtware.matflow.task.task.model.Tasks;
 import io.thoughtware.matflow.task.task.service.TasksInstanceService;
 import io.thoughtware.core.exception.ApplicationException;
 import io.thoughtware.rpc.annotation.Exporter;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,11 +62,23 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
     @Autowired
     AuthThirdService thirdService;
 
-    @Autowired
-    TaskCodeThirdService codeThirdService;
+    // @Autowired
+    // TaskCodeThirdService codeThirdService;
 
     @Autowired
     PipelineUtilService utilService;
+
+    @Autowired
+    TaskCodeGiteeService giteeService;
+
+    @Autowired
+    TaskCodeGitHubService gitHubService;
+
+    @Autowired
+    TaskCodeGitLabService gitLabService;
+
+    @Autowired
+    TaskCodeGittokService xcodeService;
 
     private final Logger logger = LoggerFactory.getLogger(TaskCodeExecServiceImpl.class);
 
@@ -86,10 +101,10 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
         TaskCode code = JSON.parseObject(object, TaskCode.class);
         code.setType(taskType);
 
-        if (taskType.equals(PipelineFinal.TASK_CODE_XCODE)){
-            XcodeRepository repository = code.getRepository();
-            code.setCodeAddress(repository.getFullPath());
-        }
+        // if (taskType.equals(PipelineFinal.TASK_CODE_XCODE)){
+        //     XcodeRepository repository = code.getRepository();
+        //     code.setCodeAddress(repository.getFullPath());
+        // }
 
         if (!PipelineUtil.isNoNull(code.getCodeAddress())){
             tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"代码源地址未配置。");
@@ -207,7 +222,7 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
         String path ;
         switch (taskCode.getType()) {
             //账号密码或ssh登录
-            case TASK_CODE_GIT  ,TASK_CODE_GITLAB -> {
+            case TASK_CODE_GIT -> {
                 List<String> list = gitUpOrder(taskCode, fileAddress);
                 gitOrder = list.get(0);
                 if (list.size() > 1){
@@ -231,11 +246,12 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
                     return process;
                 }
             }
-            case TASK_CODE_XCODE ->{
-                gitOrder = gitXcodeOrder(taskCode, fileAddress);
-            }
+            // case TASK_CODE_XCODE ->{
+            //     gitOrder = gitXcodeOrder(taskCode, fileAddress);
+            // }
             //第三方授权
-            case TASK_CODE_GITEE ,TASK_CODE_GITHUB -> gitOrder = gitThirdOrder(taskCode, fileAddress);
+            case TASK_CODE_GITEE ,TASK_CODE_GITHUB ,TASK_CODE_GITLAB ,TASK_CODE_XCODE->
+                    gitOrder = gitThirdOrder(taskCode, fileAddress);
 
             //svn
             case TASK_CODE_SVN -> gitOrder = svnOrder(taskCode, fileAddress);
@@ -255,15 +271,16 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
      * @throws MalformedURLException 不是https或者http
      */
     private String gitXcodeOrder(TaskCode taskCode, String fileAddress) throws MalformedURLException, URISyntaxException {
-        String authId = taskCode.getAuthId();
-        StringBuilder codeAddress = new StringBuilder(taskCode.getCodeAddress());
-        AuthThird auth = thirdService.findOneAuthServer(authId);
-        if (Objects.isNull(auth)){
-            return gitBranch(codeAddress, taskCode, fileAddress);
-        }
-
-        StringBuilder stringBuilder = gitUrl(auth.getUsername(), auth.getPassword(), codeAddress);
-        return gitBranch(stringBuilder, taskCode, fileAddress);
+        // String authId = taskCode.getAuthId();
+        // StringBuilder codeAddress = new StringBuilder(taskCode.getCodeAddress());
+        // AuthThird auth = thirdService.findOneAuthServer(authId);
+        // if (Objects.isNull(auth)){
+        //     return gitBranch(codeAddress, taskCode, fileAddress);
+        // }
+        //
+        // StringBuilder stringBuilder = gitUrl(auth.getUsername(), auth.getPassword(), codeAddress);
+        // return gitBranch(stringBuilder, taskCode, fileAddress);
+        return null;
     }
 
 
@@ -378,9 +395,9 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
     private String gitBranch(StringBuilder url , TaskCode code, String codeDir){
         String type = code.getType();
         String branch = code.getCodeBranch();
-        if (type.equals(TASK_CODE_XCODE) && !Objects.isNull(code.getBranch())){
-            branch = code.getBranch().getBranchName();
-        }
+        // if (type.equals(TASK_CODE_XCODE) && !Objects.isNull(code.getBranch())){
+        //     branch = code.getBranch().getBranchName();
+        // }
 
         //分支
         if(!PipelineUtil.isNoNull(branch)){
@@ -394,9 +411,9 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
         //判断是否存在分支
         String order;
         if (!PipelineUtil.isNoNull(branch)){
-            order = url+" "+codeDir;
+            order = url + " " + codeDir;
         }else {
-            order =" -b "+branch+" "+ url+" "+codeDir;
+            order = " -b " + branch + " " + url + " " + codeDir;
         }
         //根据不同系统更新命令
         if (PipelineUtil.findSystemType() == 1){
@@ -421,11 +438,38 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
         String authId = taskCode.getAuthId();
         AuthThird auth = thirdService.findOneAuthServer(authId);
         StringBuilder codeAddress = new StringBuilder(taskCode.getCodeAddress());
-        String thirdToken = codeThirdService.findUserAuthThirdToken(authId, auth.getAccessToken());
-        if (Objects.isNull(thirdToken)){
-            throw new ApplicationException("获取第三方Token失败。");
+        ThirdUser authUser;
+        String userName = null;
+        String passWard = null;
+        ThirdQuery thirdQuery = new ThirdQuery().setAuthId(authId);
+        if (auth.getType().equals(TASK_CODE_GITEE)){
+            authUser = giteeService.findAuthUser(thirdQuery);
+            userName = authUser.getPath();
+            passWard = auth.getAccessToken();
         }
-        StringBuilder stringBuilder = gitUrl(auth.getUsername(), thirdToken, codeAddress);
+        if (auth.getType().equals(TASK_CODE_GITHUB)){
+            authUser = gitHubService.findAuthUser(thirdQuery);
+            userName = authUser.getPath();
+            passWard = auth.getAccessToken();
+        }
+        if (auth.getType().equals(TASK_CODE_GITLAB)){
+            authUser = gitLabService.findAuthUser(thirdQuery);
+            userName = authUser.getPath();
+            passWard = auth.getAccessToken();
+        }
+        if (auth.getType().equals(TASK_CODE_XCODE)){
+            userName = auth.getUsername();
+            passWard = auth.getPassword();
+        }
+        if (StringUtils.isEmpty(userName)){
+            throw new ApplicationException("无法获取授权用户信息");
+        }
+
+        // String thirdToken = codeThirdService.findUserAuthThirdToken(authId, auth.getAccessToken());
+        // if (Objects.isNull(thirdToken)){
+        //     throw new ApplicationException("获取第三方Token失败。");
+        // }
+        StringBuilder stringBuilder = gitUrl(userName, passWard, codeAddress);
         return gitBranch(stringBuilder, taskCode,fileAddress);
     }
 

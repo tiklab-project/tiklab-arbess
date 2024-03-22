@@ -92,7 +92,7 @@ public class AuthHostServiceImpl implements AuthHostService {
      */
     public List<AuthHost> findAllAuthHostList(String type) {
         List<AuthHost> allAuthHost = findAllAuthHost();
-        if (allAuthHost == null){
+        if (Objects.isNull(allAuthHost)){
             return null;
         }
 
@@ -102,7 +102,7 @@ public class AuthHostServiceImpl implements AuthHostService {
 
         List<AuthHost> list = new ArrayList<>();
         for (AuthHost authHost : allAuthHost) {
-            if (type.equals(authHost.getType())){
+            if (!type.equals(authHost.getType())){
                 continue;
             }
             list.add(authHost);

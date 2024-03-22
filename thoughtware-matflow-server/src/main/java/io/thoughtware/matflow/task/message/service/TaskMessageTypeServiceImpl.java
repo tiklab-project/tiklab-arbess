@@ -1,6 +1,7 @@
 package io.thoughtware.matflow.task.message.service;
 
 import io.thoughtware.matflow.support.util.util.PipelineFinal;
+import io.thoughtware.matflow.support.version.service.PipelineVersionService;
 import io.thoughtware.matflow.task.message.model.TaskMessageType;
 import io.thoughtware.matflow.task.message.model.TaskMessageUser;
 import io.thoughtware.toolkit.beans.BeanMapper;
@@ -36,6 +37,10 @@ public class TaskMessageTypeServiceImpl implements TaskMessageTypeService {
 
     @Autowired
     MailCfgService mailCfgService;
+
+    @Autowired
+    PipelineVersionService versionService;
+
 
     //创建
     @Override
@@ -85,19 +90,24 @@ public class TaskMessageTypeServiceImpl implements TaskMessageTypeService {
     @Override
     public List<String> messageSendType(){
         List<String> list = new ArrayList<>();
+
+        if (!versionService.isVip()){
+            list.add(PipelineFinal.MES_SEND_EMAIL);
+            list.add(PipelineFinal.MES_SEND_WECHAT);
+            list.add(PipelineFinal.MES_SEND_DINGDING);
+            list.add(PipelineFinal.MES_SEND_SMS);
+            return list;
+        }
+
         MailCfg oneMail = mailCfgService.findOneMail();
-        if (oneMail == null){
+        if (Objects.isNull(oneMail)){
             list.add(PipelineFinal.MES_SEND_EMAIL);
         }
         WebHookQuery webHookQuery = new WebHookQuery();
         webHookQuery.setType(1);
-        WebHook hookByType = webHookService.findWebHookByType(webHookQuery);
-        if (hookByType == null){
-            list.add(PipelineFinal.MES_SEND_DINGDING);
-        }
         webHookQuery.setType(2);
-        hookByType = webHookService.findWebHookByType(webHookQuery);
-        if (hookByType == null){
+        WebHook hookByType = webHookService.findWebHookByType(webHookQuery);
+        if (Objects.isNull(hookByType)){
             list.add(PipelineFinal.MES_SEND_WECHAT);
         }
         list.add(PipelineFinal.MES_SEND_SMS);

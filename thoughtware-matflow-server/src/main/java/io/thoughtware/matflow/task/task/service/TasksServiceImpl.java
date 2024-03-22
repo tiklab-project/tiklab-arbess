@@ -326,7 +326,7 @@ public class TasksServiceImpl implements TasksService {
         if (tasks.isEmpty()){
             return Collections.emptyList();
         }
-        return bindAllTaskOrTask(findAllTaskOrTask(tasks));
+        return bindTaskAuth(findAllTaskOrTask(tasks));
     }
 
     private List<Tasks> findAllTaskOrTask(List<Tasks> tasks){
@@ -341,8 +341,8 @@ public class TasksServiceImpl implements TasksService {
                 try {
                     object = findOneDifferentTask(taskId, taskType);
                 }catch (Exception e){
-                    logger.error("获取配置信息失败:{}  initTaskType:{}",e.getMessage(),taskType);
-                    return  null;
+                    logger.error("获取配置信息失败:{}  initTaskType：{}",e.getMessage(),taskType);
+                    return null;
                 }
                 return object;
             });
@@ -366,7 +366,7 @@ public class TasksServiceImpl implements TasksService {
         return list;
     }
 
-    private List<Tasks> bindAllTaskOrTask(List<Tasks> tasks){
+    private List<Tasks> bindTaskAuth(List<Tasks> tasks){
         List<Tasks> list = new ArrayList<>();
         for (Tasks task : tasks) {
             Object object = task.getTask();
@@ -483,7 +483,7 @@ public class TasksServiceImpl implements TasksService {
             return Collections.emptyList();
         }
         List<Tasks> allTaskOrTask = findAllTaskOrTask(tasks);
-        return bindAllTaskOrTask(allTaskOrTask);
+        return bindTaskAuth(allTaskOrTask);
     }
 
     @Override
@@ -812,7 +812,7 @@ public class TasksServiceImpl implements TasksService {
      */
     private void deleteDifferentTask(String taskId,String taskType){
         switch (findTaskType(taskType)) {
-            case PipelineFinal.TASK_TYPE_CODE      -> codeService.deleteCodeConfig(taskId);
+            case PipelineFinal.TASK_TYPE_CODE      -> codeService.deleteTaskCode(taskId);
             case PipelineFinal.TASK_TYPE_TEST     -> testService.deleteTestConfig(taskId);
             case PipelineFinal.TASK_TYPE_BUILD    -> buildService.deleteBuildConfig(taskId);
             case PipelineFinal.TASK_TYPE_DEPLOY   -> deployService.deleteDeployConfig(taskId);
@@ -838,7 +838,7 @@ public class TasksServiceImpl implements TasksService {
                 TaskCode taskCode = JSONObject.parseObject(object, TaskCode.class);
                 TaskCode oneCodeConfig = codeService.findOneCode(taskId);
                 String id;
-                if (oneCodeConfig == null){
+                if (Objects.isNull(oneCodeConfig)){
                     id = codeService.createCode(new TaskCode());
                 }else {
                     id = oneCodeConfig.getTaskId();
@@ -962,7 +962,7 @@ public class TasksServiceImpl implements TasksService {
     private Object findOneDifferentTask(String taskId,String taskType){
         switch (findTaskType(taskType)) {
             case PipelineFinal.TASK_TYPE_CODE     -> {
-                return codeService.findOneCodeConfig(taskId,taskType);
+                return codeService.findOneCode(taskId);
             }
             case PipelineFinal.TASK_TYPE_TEST     -> {
                 return testService.findOneTestConfig(taskId);
@@ -1046,24 +1046,29 @@ public class TasksServiceImpl implements TasksService {
 
     private Boolean codeValid(String taskType,Object object){
         TaskCode code = (TaskCode) object;
-        switch (taskType){
-            case PipelineFinal.TASK_CODE_GIT , PipelineFinal.TASK_CODE_GITHUB, PipelineFinal.TASK_CODE_GITEE , PipelineFinal.TASK_CODE_SVN -> {
-                String codeAddress = code.getCodeAddress();
-                if (Objects.isNull(codeAddress)){
-                    return false;
-                }
-            }
-            case PipelineFinal.TASK_CODE_XCODE -> {
-                XcodeRepository repository = code.getRepository();
-                if (Objects.isNull(repository)){
-                    return false;
-                }
-                if (Objects.isNull(repository.getName())){
-                    return false;
-                }
 
-            }
+        String codeAddress = code.getCodeAddress();
+        if (Objects.isNull(codeAddress)){
+            return false;
         }
+
+        // switch (taskType){
+        //     case PipelineFinal.TASK_CODE_GIT , PipelineFinal.TASK_CODE_GITHUB, PipelineFinal.TASK_CODE_GITEE , PipelineFinal.TASK_CODE_SVN -> {
+        //         String codeAddress = code.getCodeAddress();
+        //         if (Objects.isNull(codeAddress)){
+        //             return false;
+        //         }
+        //     }
+        //     case PipelineFinal.TASK_CODE_XCODE -> {
+        //         XcodeRepository repository = code.getRepository();
+        //         if (Objects.isNull(repository)){
+        //             return false;
+        //         }
+        //         if (Objects.isNull(repository.getName())){
+        //             return false;
+        //         }
+        //     }
+        // }
         return true;
     }
 

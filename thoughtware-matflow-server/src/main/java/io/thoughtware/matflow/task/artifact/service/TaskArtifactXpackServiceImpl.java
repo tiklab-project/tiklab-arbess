@@ -6,7 +6,7 @@ import io.thoughtware.matflow.support.util.util.PipelineRequestUtil;
 import io.thoughtware.matflow.task.artifact.model.XpackRepository;
 import io.thoughtware.core.exception.ApplicationException;
 import io.thoughtware.matflow.task.artifact.model.XpackRepositoryQuery;
-import io.thoughtware.matflow.task.code.service.TaskCodeXcodeServiceImpl;
+import io.thoughtware.matflow.task.code.service.TaskCodeGittokServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +22,7 @@ import java.util.*;
 public class TaskArtifactXpackServiceImpl implements TaskArtifactXpackService {
 
 
-    private static final Logger logger = LoggerFactory.getLogger(TaskCodeXcodeServiceImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(TaskCodeGittokServiceImpl.class);
 
     @Autowired
     AuthThirdService authThirdService;

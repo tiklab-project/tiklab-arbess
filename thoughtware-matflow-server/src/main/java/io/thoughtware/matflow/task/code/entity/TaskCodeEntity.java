@@ -36,6 +36,18 @@ public class TaskCodeEntity {
     @Column(name = "branch_id",notNull = true)
     private String branchId;
 
+    @Column(name = "house_id",notNull = true)
+    private String houseId;
+
+    public String getHouseId() {
+        return houseId;
+    }
+
+    public TaskCodeEntity setHouseId(String houseId) {
+        this.houseId = houseId;
+        return this;
+    }
+
     public String getXcodeId() {
         return xcodeId;
     }

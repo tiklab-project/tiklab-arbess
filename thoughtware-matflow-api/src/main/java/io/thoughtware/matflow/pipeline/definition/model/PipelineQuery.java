@@ -20,10 +20,15 @@ public class PipelineQuery {
     //@ApiProperty(name ="pipelineName",desc = "流水线名称")
     private String pipelineName;
 
-    //@ApiProperty(name ="pipelineState",desc = "流水线状态")
+
+    /**
+     *  流水线状态 1.运行中 2.未运行,3.等待执行
+     */
     private Integer pipelineState;
 
-    //@ApiProperty(name ="pipelineType",desc = "流水线类型")
+    /**
+     *  流水线类型 1.多任务 2.多阶段
+     */
     private Integer pipelineType;
 
     //@ApiProperty(name ="pipelinePower",desc = "流水线权限")

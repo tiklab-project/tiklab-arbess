@@ -39,19 +39,22 @@ public class TaskCode {
     //@ApiProperty(name="svnFile",desc="svn检出文件夹")
     private String svnFile;
 
-
-    @Mappings({
-            @Mapping(source = "repository.rpyId",target = "xcodeId")
-    })
-    @JoinQuery(key = "xcodeId")
-    private XcodeRepository repository;
+    // 第三方仓库ID
+    private String houseId;
 
 
-    @Mappings({
-            @Mapping(source = "branch.branchId",target = "branchId")
-    })
-    @JoinQuery(key = "branchId")
-    private XcodeBranch branch;
+    // @Mappings({
+    //         @Mapping(source = "repository.rpyId",target = "xcodeId")
+    // })
+    // @JoinQuery(key = "xcodeId")
+    // private XcodeRepository repository;
+    //
+    //
+    // @Mappings({
+    //         @Mapping(source = "branch.branchId",target = "branchId")
+    // })
+    // @JoinQuery(key = "branchId")
+    // private XcodeBranch branch;
 
     //授权信息
     private Object auth;
@@ -62,6 +65,14 @@ public class TaskCode {
     //代码类型
     private String type;
 
+    public String getHouseId() {
+        return houseId;
+    }
+
+    public TaskCode setHouseId(String houseId) {
+        this.houseId = houseId;
+        return this;
+    }
 
     public String getTaskId() {
         return taskId;
@@ -117,23 +128,23 @@ public class TaskCode {
         return this;
     }
 
-    public XcodeRepository getRepository() {
-        return repository;
-    }
-
-    public TaskCode setRepository(XcodeRepository repository) {
-        this.repository = repository;
-        return this;
-    }
-
-    public XcodeBranch getBranch() {
-        return branch;
-    }
-
-    public TaskCode setBranch(XcodeBranch branch) {
-        this.branch = branch;
-        return this;
-    }
+    // public XcodeRepository getRepository() {
+    //     return repository;
+    // }
+    //
+    // public TaskCode setRepository(XcodeRepository repository) {
+    //     this.repository = repository;
+    //     return this;
+    // }
+    //
+    // public XcodeBranch getBranch() {
+    //     return branch;
+    // }
+    //
+    // public TaskCode setBranch(XcodeBranch branch) {
+    //     this.branch = branch;
+    //     return this;
+    // }
 
     public Object getAuth() {
         return auth;

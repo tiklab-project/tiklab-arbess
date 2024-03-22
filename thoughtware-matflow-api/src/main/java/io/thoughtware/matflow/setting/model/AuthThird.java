@@ -26,7 +26,7 @@ public class AuthThird {
     //@ApiProperty(name = "serverId",desc="id")
     private String serverId;
 
-    //@ApiProperty(name = "type",desc="类型 1. gitee 2. github 3.sonar 4.nexus" )
+    //@ApiProperty(name = "type",desc="类型  gitee,github,gitlab,sonar,nexus" )
     private String type;
 
     //@ApiProperty(name = "authType",desc="认证类型 1.用户名密码 2. 通用认证")

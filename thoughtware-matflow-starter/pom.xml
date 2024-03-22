@@ -341,8 +341,8 @@
                             <descriptors>
                                 <descriptor>assembly/distribution-${assembly}.xml</descriptor>
                             </descriptors>
-<!--                            <finalName>thoughtware-matflow-${version}-${timestamp}</finalName>-->
-                            <finalName>thoughtware-matflow-1.0.0</finalName>
+                            <finalName>thoughtware-matflow-${version}-${timestamp}</finalName>
+<!--                            <finalName>thoughtware-matflow-1.0.0</finalName>-->
                             <appendAssemblyId>false</appendAssemblyId>
                         </configuration>
                         <phase>package</phase>
