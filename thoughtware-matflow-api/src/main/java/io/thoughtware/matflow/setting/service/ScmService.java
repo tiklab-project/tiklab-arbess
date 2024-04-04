@@ -49,4 +49,7 @@ public interface ScmService {
 
     List<Scm> selectPipelineScmList(List<String> idList);
 
+
+    Integer findScmNumber();
+
 }

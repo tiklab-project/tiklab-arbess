@@ -68,4 +68,10 @@ public class EnvServiceImpl implements EnvService {
     public List<Env> findAllEnvList(List<String> idList) {
         return envDao.findAllEnvList(idList);
     }
+
+
+    @Override
+    public Integer findEnvNumber() {
+        return envDao.findEnvNumber();
+    }
 }

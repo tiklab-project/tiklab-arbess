@@ -13,7 +13,9 @@ import io.thoughtware.dal.jpa.criterial.conditionbuilder.QueryBuilders;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Repository
 public class EnvDao {
@@ -90,7 +92,14 @@ public class EnvDao {
         List<EnvEntity> envEntities = jpaTemplate.findList(EnvEntity.class, idList);
         return BeanMapper.mapList(envEntities,Env.class);
     }
-    
+
+
+    public Integer findEnvNumber() {
+        String sql = "SELECT COUNT(*) AS number FROM pip_setting_env ;";
+        Map<String, Object> map = jpaTemplate.getNamedParameterJdbcTemplate().queryForMap(sql, new HashMap<>());
+        return ((Long) map.get("number")).intValue();
+    }
+
 }
 
 

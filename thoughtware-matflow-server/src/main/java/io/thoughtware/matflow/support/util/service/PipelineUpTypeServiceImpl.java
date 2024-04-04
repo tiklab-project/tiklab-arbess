@@ -5,15 +5,23 @@ import io.thoughtware.matflow.pipeline.definition.entity.PipelineEntity;
 import io.thoughtware.matflow.pipeline.definition.model.Pipeline;
 import io.thoughtware.matflow.pipeline.definition.model.PipelineQuery;
 import io.thoughtware.matflow.pipeline.definition.service.PipelineService;
+import io.thoughtware.matflow.pipeline.instance.service.PipelineInstanceService;
 import io.thoughtware.matflow.stages.model.Stage;
 import io.thoughtware.matflow.stages.service.StageService;
+import io.thoughtware.matflow.support.util.util.PipelineFileUtil;
 import io.thoughtware.matflow.support.util.util.PipelineFinal;
 import io.thoughtware.matflow.task.task.model.Tasks;
 import io.thoughtware.matflow.task.task.service.TasksService;
 import io.thoughtware.toolkit.beans.BeanMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.io.File;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 
 @Service
@@ -31,6 +39,17 @@ public class PipelineUpTypeServiceImpl implements PipelineUpTypeService {
     @Autowired
     TasksService tasksService;
 
+    @Autowired
+    PipelineInstanceService instanceService;
+
+    @Autowired
+    PipelineUtilService utilService;
+
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
+
+    public final ExecutorService executorService = Executors.newCachedThreadPool();
+
 
     @Override
     public void updatePipelineTypeList(){
@@ -39,7 +58,8 @@ public class PipelineUpTypeServiceImpl implements PipelineUpTypeService {
         List<Pipeline> pipelineList = pipelineService.findPipelineList(pipelineQuery);
         for (Pipeline pipeline : pipelineList) {
             String pipelineId = pipeline.getId();
-            updatePipelineType(pipelineId);
+            logger.warn(" 更新流水线：{}，{}：的类型",pipelineId,pipeline.getName());
+            executorService.submit(() -> updatePipelineType(pipelineId));
         }
     }
 
@@ -80,6 +100,17 @@ public class PipelineUpTypeServiceImpl implements PipelineUpTypeService {
         pipeline.setType(2);
         PipelineEntity pipelineEntity = BeanMapper.map(pipeline, PipelineEntity.class);
         pipelineDao.updatePipeline(pipelineEntity);
+
+        //删除对应的历史
+        instanceService.deleteAllInstance(pipelineId);
+
+        //删除对应源码文件
+        String fileAddress = utilService.findPipelineDefaultAddress(pipelineId,1);
+        PipelineFileUtil.deleteFile(new File(fileAddress));
+
+        //删除对应日志
+        String logAddress = utilService.findPipelineDefaultAddress(pipelineId,2);
+        PipelineFileUtil.deleteFile(new File(logAddress));
     }
 
 

@@ -28,6 +28,9 @@ public interface AuthHostGroupService {
 
     
      List<AuthHostGroup> findHostGroupList(AuthHostGroupQuery groupQuery) ;
+
+
+     Integer findHostGroupNumber();
     
     
 }

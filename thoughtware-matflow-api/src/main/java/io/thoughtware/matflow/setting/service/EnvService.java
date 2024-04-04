@@ -37,5 +37,8 @@ public interface EnvService {
     List<Env> findAllEnvList(List<String> idList);
 
 
+    Integer findEnvNumber();
+
+
 
 }

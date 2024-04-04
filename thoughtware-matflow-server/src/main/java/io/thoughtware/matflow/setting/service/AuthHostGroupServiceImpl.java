@@ -103,4 +103,10 @@ public class AuthHostGroupServiceImpl implements AuthHostGroupService {
         return hostGroupList;
     }
 
+
+    @Override
+    public Integer findHostGroupNumber() {
+        return authHostGroupDao.findHostGroupNumber();
+    }
+
 }

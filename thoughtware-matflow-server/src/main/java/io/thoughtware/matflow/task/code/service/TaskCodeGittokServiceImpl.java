@@ -8,6 +8,8 @@ import io.thoughtware.matflow.setting.service.AuthThirdService;
 import io.thoughtware.matflow.support.util.util.PipelineRequestUtil;
 import io.thoughtware.matflow.task.code.model.*;
 import io.thoughtware.core.exception.ApplicationException;
+import io.thoughtware.user.user.model.User;
+import io.thoughtware.user.user.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +32,9 @@ public class TaskCodeGittokServiceImpl implements TaskCodeGittokService {
 
     @Autowired
     PipelineRequestUtil requestUtil;
+
+    @Autowired
+    UserService userService;
 
 
     @Override
@@ -76,9 +81,6 @@ public class TaskCodeGittokServiceImpl implements TaskCodeGittokService {
             }
             if (message.contains("未订阅")){
                 throw new ApplicationException("当前企业未订阅gittok");
-            }
-            if (message.contains("用户校验失败")){
-                throw new ApplicationException("用户校验失败！");
             }
             if (throwable instanceof ApplicationException){
                 throw new ApplicationException(message);
@@ -199,6 +201,9 @@ public class TaskCodeGittokServiceImpl implements TaskCodeGittokService {
         Integer code = jsonObject.getInteger("code");
         if (code != 0){
             String msg = jsonObject.getString("msg");
+            if (code == 5000){
+                throw new ApplicationException("用户效验失败！");
+            }
             throw new ApplicationException("获取仓库列表失败！,Message："+msg);
         }
         return jsonObject.getObject("data",tClass);

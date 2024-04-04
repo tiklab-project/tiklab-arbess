@@ -10,7 +10,9 @@ import io.thoughtware.matflow.setting.model.GroupQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class GroupServiceImpl implements GroupService {
@@ -69,6 +71,12 @@ public class GroupServiceImpl implements GroupService {
         List<Group> groupList = groupDao.findAllGroupList(idList);
         joinTemplate.joinQuery(groupList);
         return groupList;
+    }
+
+
+    @Override
+    public Integer findGroupNumber() {
+        return groupDao.findGroupNumber();
     }
 
 

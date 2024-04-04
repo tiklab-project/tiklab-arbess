@@ -65,6 +65,9 @@ public interface AuthThirdService {
 
     @FindList
     List<AuthThird> findAllAuthServerList(List<String> idList);
+
+
+    Integer findAuthServerNumber();
     
     
 }

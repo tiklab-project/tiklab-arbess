@@ -13,6 +13,7 @@ import io.thoughtware.user.dmUser.model.DmUser;
 import io.thoughtware.user.dmUser.model.DmUserQuery;
 import io.thoughtware.user.dmUser.service.DmUserService;
 import io.thoughtware.user.user.model.User;
+import io.thoughtware.user.util.util.CodeFinal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
@@ -20,8 +21,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+import static io.thoughtware.user.util.util.CodeFinal.ROOT_ID_CODE;
+
 @Service
-public class PipelineAuthorityServiceImpl implements PipelineAuthorityService{
+public class PipelineAuthorityServiceImpl implements PipelineAuthorityService {
 
     @Autowired
     DmUserService dmUserService;
@@ -33,19 +36,19 @@ public class PipelineAuthorityServiceImpl implements PipelineAuthorityService{
     PipelineDao pipelineDao;
 
     @Override
-    public void createDmUser(String pipelineId, List<PatchUser> userList){
+    public void createDmUser(String pipelineId,String createUserId, List<PatchUser> userList){
         //拉入创建人
         if (Objects.isNull(userList)){
-            dmRoleService.initDmRoles(pipelineId, LoginContext.getLoginId(), PipelineFinal.appName);
+            dmRoleService.initDmRoles(pipelineId, createUserId, PipelineFinal.appName);
             // 拉入超级管理员
-            if (!LoginContext.getLoginId().equals("111111")){
-                dmRoleService.initDmRoles(pipelineId, "111111", PipelineFinal.appName);
+            if (!createUserId.equals(ROOT_ID_CODE)){
+                dmRoleService.initDmRoles(pipelineId, ROOT_ID_CODE, PipelineFinal.appName);
             }
             return;
         }
         boolean admin = false;
         for (PatchUser patchUser : userList) {
-            if (patchUser.getId().equals("111111")) {
+            if (patchUser.getId().equals(ROOT_ID_CODE)) {
                 admin = true;
                 break;
             }
@@ -54,7 +57,7 @@ public class PipelineAuthorityServiceImpl implements PipelineAuthorityService{
         // 拉入超级管理员
         if (!admin){
             PatchUser patchUser = new PatchUser();
-            patchUser.setId("111111");
+            patchUser.setId(ROOT_ID_CODE);
             patchUser.setAdminRole(true);
             userList.add(patchUser);
         }
@@ -96,7 +99,7 @@ public class PipelineAuthorityServiceImpl implements PipelineAuthorityService{
         // 查询用户拥有的流水线
         DmUserQuery dmUserQuery = new DmUserQuery();
         dmUserQuery.setUserId(userId);
-        List<DmUser> allDmUser = dmUserService.findDmUserList(dmUserQuery);
+        List<DmUser> allDmUser = dmUserService.findDmUserListNoQuery(dmUserQuery);
 
         if (Objects.isNull(allDmUser) || allDmUser.isEmpty()){
             return list.toArray(new String[0]);

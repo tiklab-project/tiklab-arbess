@@ -42,7 +42,7 @@ public interface PipelineAuthorityService {
      * 创建流水线关联用户
      * @param pipelineId 流水线id
      */
-    void createDmUser(String pipelineId, List<PatchUser> userList);
+    void createDmUser(String pipelineId,String createUserId, List<PatchUser> userList);
 
 
     void cloneDomainRole(String sourceDomainId,String cloneDomainId);

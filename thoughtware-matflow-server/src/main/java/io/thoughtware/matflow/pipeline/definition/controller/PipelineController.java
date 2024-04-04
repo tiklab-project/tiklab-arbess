@@ -139,8 +139,8 @@ public class PipelineController {
      * @pi.request-type:none
      */
     @RequestMapping(path="/findUserPipeline",method = RequestMethod.POST)
-    public Result< List<Pipeline>> findAllUserPipeline(){
-        List<Pipeline> userPipeline = pipelineService.findUserPipeline();
+    public Result< List<Pipeline>> findAllUserPipeline(@RequestBody @NotNull @Valid PipelineQuery query){
+        List<Pipeline> userPipeline = pipelineService.findUserPipeline(query);
 
         return Result.ok(userPipeline);
     }
@@ -168,9 +168,9 @@ public class PipelineController {
      * @pi.param: name=number;dataType=int;value=查询数量;
      */
     @RequestMapping(path="/findPipelineRecently",method = RequestMethod.POST)
-    public Result<List<PipelineRecently>> findPipelineRecently(Integer number){
+    public Result<List<PipelineRecently>> findPipelineRecently(@NotNull String userId,@NotNull Integer number){
 
-        List<PipelineRecently> userPipeline = pipelineService.findPipelineRecently(number);
+        List<PipelineRecently> userPipeline = pipelineService.findPipelineRecently(userId,number);
 
         return Result.ok(userPipeline);
     }

@@ -106,7 +106,7 @@ public class PipelineDao {
 
     public List<PipelineEntity> findPipelineList(PipelineQuery query){
         QueryBuilders queryBuilders = QueryBuilders.createQuery(PipelineEntity.class)
-                .eq("userId", query.getUserId())
+                .eq("userId", query.getCreateUserId())
                 .eq("type", query.getPipelineType())
                 .eq("state", query.getPipelineState())
                 .eq("envId",query.getEnvId())
@@ -125,7 +125,7 @@ public class PipelineDao {
 
     public Pagination<PipelineEntity> findPipelinePage(PipelineQuery query){
         QueryCondition queryCondition = QueryBuilders.createQuery(PipelineEntity.class)
-                .eq("userId",query.getUserId())
+                .eq("userId",query.getCreateUserId())
                 .eq("type",query.getPipelineType())
                 .eq("state",query.getPipelineState())
                 .eq("power",query.getPipelinePower())

@@ -69,7 +69,7 @@ public interface PipelineService {
      * 获取用户流水线
      * @return 流水线信息
      */
-    List<Pipeline> findUserPipeline();
+    List<Pipeline> findUserPipeline(PipelineQuery query);
 
     /**
      * 分页查询流水线信息
@@ -94,9 +94,14 @@ public interface PipelineService {
      * 查询当前用户最近构建的流水线
      * @return 流水线信息
      */
-    List<PipelineRecently> findPipelineRecently(int number);
+    List<PipelineRecently> findPipelineRecently(String userId,int number);
 
 
+    /**
+     * 获取clone的流水线名称
+     * @param pipelineId 流水线ID
+     * @return 流水线民初
+     */
     String findPipelineCloneName(String pipelineId);
 
 

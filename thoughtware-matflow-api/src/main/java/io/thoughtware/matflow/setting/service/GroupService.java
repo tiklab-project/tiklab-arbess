@@ -33,6 +33,9 @@ public interface GroupService {
 
     @FindList
     List<Group> findAllGroupList(List<String> idList);
+
+
+    Integer findGroupNumber();
     
     
 }

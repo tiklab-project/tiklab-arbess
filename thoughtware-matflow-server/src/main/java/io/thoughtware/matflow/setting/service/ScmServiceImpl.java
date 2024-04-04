@@ -86,5 +86,9 @@ public class ScmServiceImpl implements ScmService {
         return BeanMapper.mapList(scmEntityList, Scm.class);
     }
 
+    @Override
+    public Integer findScmNumber() {
+        return scmDao.findScmNumber();
+    }
     
 }

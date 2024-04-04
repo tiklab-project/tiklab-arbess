@@ -7,7 +7,9 @@ import io.thoughtware.eam.common.context.LoginContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 流水线基本认证数据访问
@@ -66,5 +68,13 @@ public class AuthDao {
     public List<AuthEntity> findAllAuthList(List<String> idList){
         return jpaTemplate.findList(AuthEntity.class,idList);
     }
+
+
+    public Integer findAuthNumber() {
+        String sql = "SELECT COUNT(*) AS number FROM pip_auth;";
+        Map<String, Object> map = jpaTemplate.getNamedParameterJdbcTemplate().queryForMap(sql, new HashMap<>());
+        return ((Long) map.get("number")).intValue();
+    }
+
     
 }

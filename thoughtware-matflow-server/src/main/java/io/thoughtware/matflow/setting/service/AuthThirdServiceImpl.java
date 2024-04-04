@@ -8,15 +8,10 @@ import io.thoughtware.matflow.setting.dao.AuthThirdDao;
 import io.thoughtware.matflow.setting.entity.AuthThirdEntity;
 import io.thoughtware.matflow.setting.model.AuthThird;
 import io.thoughtware.matflow.setting.model.AuthThirdQuery;
-import io.thoughtware.matflow.task.code.service.TaskCodeThirdServiceImpl;
 import io.thoughtware.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Service
 @Exporter
@@ -36,18 +31,6 @@ public class AuthThirdServiceImpl implements AuthThirdService {
      * @return 流水线授权id
      */
     public String createAuthServer(AuthThird authThird) {
-        String thirdType = authThird.getType();
-        boolean b = thirdType.equals(PipelineFinal.TASK_CODE_GITEE)|| thirdType.equals(PipelineFinal.TASK_CODE_GITHUB);
-        if (b){
-            TaskCodeThirdServiceImpl thirdService = new TaskCodeThirdServiceImpl();
-            AuthThird authServer = thirdService.findUserAuthThird(LoginContext.getLoginId());
-            if (!Objects.isNull(authServer)){
-                authThird.setUsername(authServer.getUsername());
-                authThird.setRefreshToken(authServer.getRefreshToken());
-                authThird.setAccessToken(authServer.getAccessToken());
-                thirdService.removeUserAuthThird(LoginContext.getLoginId());
-            }
-        }
         AuthThirdEntity authThirdEntity = BeanMapper.map(authThird, AuthThirdEntity.class);
         return authServerDao.createAuthServer(authThirdEntity);
     }
@@ -110,7 +93,6 @@ public class AuthThirdServiceImpl implements AuthThirdService {
 
         if (Objects.isNull(type) || "all".equals(type)){
             for (AuthThird authThird : allAuthServer) {
-                // String oneType = findOneType(authThird.getType());
                 authThird.setType(authThird.getType());
                 list.add(authThird);
             }
@@ -123,10 +105,6 @@ public class AuthThirdServiceImpl implements AuthThirdService {
                 list.add(authServer);
                 continue;
             }
-            // boolean type2 = findType(type, type1);
-            // if (!type2 ){
-            //     continue;
-            // }
             authServer.setType(type);
             list.add(authServer);
         }
@@ -145,26 +123,6 @@ public class AuthThirdServiceImpl implements AuthThirdService {
         joinTemplate.joinQuery(authThirds);
         return authThirds;
     }
-
-    // private String findOneType(String type){
-    //     switch (type){
-    //         case "2"  ->{
-    //             return TASK_CODE_GITEE;
-    //         }
-    //         case "3"  ->{
-    //             return TASK_CODE_GITHUB;
-    //         }
-    //         case "41"  ->{
-    //             return TASK_CODESCAN_SONAR;
-    //         }
-    //         case "51"  ->{
-    //             return TASK_ARTIFACT_NEXUS;
-    //         }
-    //         default -> {
-    //             return type;
-    //         }
-    //     }
-    // }
 
     /**
      * 查询所有流水线授权
@@ -192,7 +150,7 @@ public class AuthThirdServiceImpl implements AuthThirdService {
 
     public List<AuthThird> findAllAuthServerList() {
         List<AuthThirdEntity> allAuthServer = authServerDao.findAllAuthServer();
-        if (allAuthServer == null){
+        if (Objects.isNull(allAuthServer)){
             return Collections.emptyList();
         }
         List<AuthThird> authThirds = BeanMapper.mapList(allAuthServer, AuthThird.class);
@@ -204,6 +162,11 @@ public class AuthThirdServiceImpl implements AuthThirdService {
     public List<AuthThird> findAllAuthServerList(List<String> idList) {
         List<AuthThirdEntity> allAuthServerList = authServerDao.findAllAuthServerList(idList);
         return  BeanMapper.mapList(allAuthServerList, AuthThird.class);
+    }
+
+    @Override
+    public Integer findAuthServerNumber() {
+        return authServerDao.findAuthServerNumber();
     }
 
 

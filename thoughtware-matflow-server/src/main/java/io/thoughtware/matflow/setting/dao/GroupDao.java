@@ -14,7 +14,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Repository
 public class GroupDao {
@@ -91,6 +93,15 @@ public class GroupDao {
         List<GroupEntity> envEntities = jpaTemplate.findList(GroupEntity.class, idList);
         return BeanMapper.mapList(envEntities,Group.class);
     }
-    
-    
+
+    public Integer findGroupNumber() {
+        String sql = "SELECT COUNT(*) AS number FROM pip_setting_group ;";
+        Map<String, Object> map = jpaTemplate.getNamedParameterJdbcTemplate().queryForMap(sql, new HashMap<>());
+        return ((Long) map.get("number")).intValue();
+    }
+
+
+
+
+
 }

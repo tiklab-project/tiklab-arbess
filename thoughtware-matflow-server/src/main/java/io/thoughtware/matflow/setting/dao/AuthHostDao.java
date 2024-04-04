@@ -11,7 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.stereotype.Repository;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Repository
 public class AuthHostDao {
@@ -90,5 +92,14 @@ public class AuthHostDao {
         return jpaTemplate.getJdbcTemplate().findPage(sql.toString(), null,
                 hostQuery.getPageParam(), new BeanPropertyRowMapper<>(AuthHostEntity.class));
     }
+
+
+
+    public Integer findHostNumber() {
+        String sql = "SELECT COUNT(*) AS number FROM pip_auth_host ;";
+        Map<String, Object> map = jpaTemplate.getNamedParameterJdbcTemplate().queryForMap(sql, new HashMap<>());
+        return ((Long) map.get("number")).intValue();
+    }
+
 
 }

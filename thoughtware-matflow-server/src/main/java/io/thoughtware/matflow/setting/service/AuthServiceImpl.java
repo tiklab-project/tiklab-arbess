@@ -79,7 +79,12 @@ public class AuthServiceImpl implements AuthService {
         List<AuthEntity> allAuthList = authDao.findAllAuthList(idList);
         return  BeanMapper.mapList(allAuthList, Auth.class);
     }
-   
 
-    
+
+    @Override
+    public Integer findAuthNumber() {
+        return authDao.findAuthNumber();
+    }
+
+
 }

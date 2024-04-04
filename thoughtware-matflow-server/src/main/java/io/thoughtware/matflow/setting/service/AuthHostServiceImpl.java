@@ -142,5 +142,11 @@ public class AuthHostServiceImpl implements AuthHostService {
 
         return PaginationBuilder.build(allAuthHostPage,authHosts);
     }
+
+
+    @Override
+    public Integer findHostNumber() {
+        return authHostDao.findHostNumber();
+    }
     
 }

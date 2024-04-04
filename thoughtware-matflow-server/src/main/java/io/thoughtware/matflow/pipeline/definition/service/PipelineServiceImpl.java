@@ -26,6 +26,7 @@ import io.thoughtware.matflow.pipeline.instance.service.PipelineInstanceService;
 import io.thoughtware.message.message.service.MessageDmNoticeService;
 import io.thoughtware.rpc.annotation.Exporter;
 import io.thoughtware.user.user.model.User;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -101,8 +102,11 @@ public class PipelineServiceImpl implements PipelineService {
         }
         pipeline.setColor((random.nextInt(5) + 1));
         pipeline.setCreateTime(PipelineUtil.date(1));
-        String loginId = LoginContext.getLoginId();
-        pipeline.setUser(new User(loginId));
+        if (Objects.isNull(pipeline.getUser()) || StringUtils.isEmpty(pipeline.getUser().getId())){
+            String loginId = LoginContext.getLoginId();
+            pipeline.setUser(new User(loginId));
+        }
+
         //创建流水线
         PipelineEntity pipelineEntity = BeanMapper.map(pipeline, PipelineEntity.class);
         pipelineEntity.setState(1);
@@ -130,7 +134,7 @@ public class PipelineServiceImpl implements PipelineService {
         }
 
         //流水线关联角色，用户信息
-        authorityService.createDmUser(pipelineId,pipeline.getUserList());
+        authorityService.createDmUser(pipelineId,pipeline.getUser().getId(),pipeline.getUserList());
 
         // 克隆消息模版
         messageDmNoticeService.initMessageDmNotice(pipelineId);
@@ -218,17 +222,7 @@ public class PipelineServiceImpl implements PipelineService {
 
     @Override
     public Pipeline findOnePipeline(String pipelineId){
-        List<Pipeline> pipelineList = findUserPipeline();
-        if (pipelineList.isEmpty()){
-            return null;
-        }
-        for (Pipeline pipeline : pipelineList) {
-            if (!pipeline.getId().equals(pipelineId)){
-                continue;
-            }
-            return pipeline;
-        }
-        return null;
+       return findPipelineById(pipelineId);
     }
 
     //查询所有
@@ -246,28 +240,25 @@ public class PipelineServiceImpl implements PipelineService {
     }
 
     @Override
-    public List<Pipeline> findUserPipeline(){
-        String userId = LoginContext.getLoginId();
-        String[] builder = authorityService.findUserPipelineIdString(userId);
-        PipelineQuery pipelineQuery = new PipelineQuery();
-        pipelineQuery.setIdString(builder);
-        List<PipelineEntity> userPipeline = pipelineDao.findPipelineList(pipelineQuery);
-        if (userPipeline != null){
-            return BeanMapper.mapList(userPipeline, Pipeline.class);
+    public List<Pipeline> findUserPipeline(PipelineQuery query){
+        String[] builder = authorityService.findUserPipelineIdString(query.getUserId());
+        query.setIdString(builder);
+        List<Pipeline> userPipeline = findPipelineList(query);
+        if (Objects.isNull(userPipeline)){
+            return Collections.emptyList();
         }
-        return Collections.emptyList();
+        return userPipeline;
     }
 
     @Override
     public Pagination<Pipeline> findUserPipelinePage(PipelineQuery query){
-        String loginId = LoginContext.getLoginId();
+        String userId = query.getUserId();
 
-        String[] builders = authorityService.findUserPipelineIdString(loginId);
+        String[] builders = authorityService.findUserPipelineIdString(userId);
         query.setIdString(builders);
         // 用户收藏的流水线
         Integer follow = query.getPipelineFollow();
         if (!Objects.isNull(follow) && follow == 1){
-            query.setUserId(loginId);
             Pagination<PipelineEntity> pipelineListQuery = pipelineDao.findPipelineListQuery(query);
             List<PipelineEntity> dataList = pipelineListQuery.getDataList();
             List<Pipeline> pipelineList = BeanMapper.mapList(dataList, Pipeline.class);
@@ -280,9 +271,9 @@ public class PipelineServiceImpl implements PipelineService {
             return PaginationBuilder.build(pipelineListQuery,list);
         }
 
-        // 查询用户收藏的流水线
+        // 查询用户流水线
         PipelineFollowQuery followQuery = new PipelineFollowQuery();
-        followQuery.setUserId(loginId);
+        followQuery.setUserId(userId);
         List<PipelineFollow> followPipeline = followService.findFollowQueryList(followQuery);
         Map<String,String> map = new HashMap<>();
         for (PipelineFollow pipelineFollow : followPipeline) {
@@ -324,8 +315,7 @@ public class PipelineServiceImpl implements PipelineService {
     }
 
     @Override
-    public List<PipelineRecently> findPipelineRecently(int number){
-        String userId = LoginContext.getLoginId();
+    public List<PipelineRecently> findPipelineRecently(String userId,int number){
 
         List<PipelineInstance> instanceList = instanceService.findUserPipelineInstance(userId,number);
         if (instanceList.isEmpty()){

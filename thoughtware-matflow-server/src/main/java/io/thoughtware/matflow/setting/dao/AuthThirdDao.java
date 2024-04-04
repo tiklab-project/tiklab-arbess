@@ -11,9 +11,7 @@ import io.thoughtware.eam.common.context.LoginContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Repository
 public class AuthThirdDao {
@@ -92,6 +90,13 @@ public class AuthThirdDao {
 
     public List<AuthThirdEntity> findAllAuthServerList(List<String> idList){
         return jpaTemplate.findList(AuthThirdEntity.class,idList);
+    }
+
+
+    public Integer findAuthServerNumber() {
+        String sql = "SELECT COUNT(*) AS number FROM pip_auth_server;";
+        Map<String, Object> map = jpaTemplate.getNamedParameterJdbcTemplate().queryForMap(sql, new HashMap<>());
+        return ((Long) map.get("number")).intValue();
     }
     
 }

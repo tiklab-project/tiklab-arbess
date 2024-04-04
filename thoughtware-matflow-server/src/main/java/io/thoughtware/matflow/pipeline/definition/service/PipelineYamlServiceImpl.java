@@ -12,10 +12,6 @@ import io.thoughtware.matflow.task.artifact.model.TaskArtifact;
 import io.thoughtware.matflow.task.artifact.service.TaskArtifactXpackService;
 import io.thoughtware.matflow.task.build.model.TaskBuild;
 import io.thoughtware.matflow.task.code.model.TaskCode;
-import io.thoughtware.matflow.task.code.model.ThirdHouse;
-import io.thoughtware.matflow.task.code.model.XcodeBranch;
-import io.thoughtware.matflow.task.code.model.XcodeRepository;
-import io.thoughtware.matflow.task.code.service.TaskCodeThirdService;
 import io.thoughtware.matflow.task.code.service.TaskCodeGittokService;
 import io.thoughtware.matflow.task.codescan.model.TaskCodeScan;
 import io.thoughtware.matflow.task.deploy.model.TaskDeploy;
@@ -50,9 +46,6 @@ public class PipelineYamlServiceImpl implements PipelineYamlService {
     TaskTestOnService taskTestOnService;
 
     @Autowired
-    TaskCodeThirdService taskCodeThirdService;
-
-    @Autowired
     TaskCodeGittokService taskCodeGittokService;
 
     @Autowired
@@ -63,9 +56,6 @@ public class PipelineYamlServiceImpl implements PipelineYamlService {
 
     @Autowired
     PipelineYamlService pipelineYamlService;
-
-    @Autowired
-    TaskCodeThirdService codeThirdService;
 
     @Autowired
     TasksService tasksService;

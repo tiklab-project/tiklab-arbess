@@ -17,6 +17,9 @@ public class PipelineQuery {
     //@ApiProperty(name ="userId",desc = "用户")
     private String userId;
 
+    // 创建人
+    private String createUserId;
+
     //@ApiProperty(name ="pipelineName",desc = "流水线名称")
     private String pipelineName;
 
@@ -56,6 +59,15 @@ public class PipelineQuery {
     // private List<Order> orderParams = OrderBuilders.instance().desc("createTime").get();
     private List<Order> orderParams = OrderBuilders.instance().desc("name").get();
 
+
+    public String getCreateUserId() {
+        return createUserId;
+    }
+
+    public PipelineQuery setCreateUserId(String createUserId) {
+        this.createUserId = createUserId;
+        return this;
+    }
 
     public String getEnvId() {
         return envId;

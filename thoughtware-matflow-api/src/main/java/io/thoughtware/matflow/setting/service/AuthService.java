@@ -53,5 +53,8 @@ public interface AuthService {
 
     @FindList
     List<Auth> findAllAuthList(List<String> idList);
+
+
+    Integer findAuthNumber();
     
 }

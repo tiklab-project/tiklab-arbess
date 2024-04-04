@@ -64,5 +64,8 @@ public interface AuthHostService {
 
 
     Pagination<AuthHost> findAuthHostPage(AuthHostQuery hostQuery);
+
+
+    Integer findHostNumber();
     
 }

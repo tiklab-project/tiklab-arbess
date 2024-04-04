@@ -128,6 +128,11 @@
             <version>${junit.junit.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>io.thoughtware</groupId>
+            <artifactId>thoughtware-plugin-manager</artifactId>
+            <version>${thoughtware-plugin.version}</version>
+        </dependency>
     </dependencies>
 
     <build>
