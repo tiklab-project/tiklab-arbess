@@ -1,0 +1,1 @@
+.mf-tabs{display:flex;justify-content:flex-start}.mf-tab{padding:10px 0;cursor:pointer;margin-right:20px}.mf-active-tab,.mf-tab:hover{color:var(--thoughtware-blue)}.mf-active-tab{border-bottom:2px solid var(--thoughtware-blue)}

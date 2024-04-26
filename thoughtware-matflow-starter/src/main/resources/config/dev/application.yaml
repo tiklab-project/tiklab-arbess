@@ -93,11 +93,11 @@ postgresql:
 
 
 base:
-  url: http://192.168.10.5:3000
+  url: http://192.168.10.13:3000
 
 #homes
 homes:
-  address: http://192.168.10.7:8080
+  address: https://homes.thoughtware.cn
 
 #license
 licences:

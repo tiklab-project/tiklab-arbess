@@ -5,6 +5,11 @@ import io.thoughtware.matflow.pipeline.definition.entity.PipelineEntity;
 import io.thoughtware.matflow.pipeline.definition.model.Pipeline;
 import io.thoughtware.matflow.pipeline.definition.model.PipelineQuery;
 import io.thoughtware.matflow.support.util.util.PipelineFinal;
+import io.thoughtware.message.message.model.MessageNoticePatch;
+import io.thoughtware.message.message.service.MessageDmNoticeService;
+import io.thoughtware.privilege.role.model.RoleUser;
+import io.thoughtware.privilege.role.service.RoleService;
+import io.thoughtware.privilege.role.service.RoleUserService;
 import io.thoughtware.toolkit.beans.BeanMapper;
 import io.thoughtware.eam.common.context.LoginContext;
 import io.thoughtware.privilege.dmRole.service.DmRoleService;
@@ -33,37 +38,39 @@ public class PipelineAuthorityServiceImpl implements PipelineAuthorityService {
     DmRoleService dmRoleService;
 
     @Autowired
+    RoleUserService roleUserService;
+
+    @Autowired
     PipelineDao pipelineDao;
+
+    @Autowired
+    MessageDmNoticeService messageDmNoticeService;
 
     @Override
     public void createDmUser(String pipelineId,String createUserId, List<PatchUser> userList){
-        //拉入创建人
-        if (Objects.isNull(userList)){
-            dmRoleService.initDmRoles(pipelineId, createUserId, PipelineFinal.appName);
-            // 拉入超级管理员
-            if (!createUserId.equals(ROOT_ID_CODE)){
-                dmRoleService.initDmRoles(pipelineId, ROOT_ID_CODE, PipelineFinal.appName);
-            }
-            return;
-        }
-        boolean admin = false;
-        for (PatchUser patchUser : userList) {
-            if (patchUser.getId().equals(ROOT_ID_CODE)) {
-                admin = true;
-                break;
-            }
-        }
 
-        // 拉入超级管理员
-        if (!admin){
-            PatchUser patchUser = new PatchUser();
-            patchUser.setId(ROOT_ID_CODE);
-            patchUser.setAdminRole(true);
-            userList.add(patchUser);
-        }
+        // 获取系统超级管理员
+        RoleUser roleAdmin = roleUserService.findUserRoleAdmin();
+        String id = roleAdmin.getUser().getId();
 
-        //关联权限
-        dmRoleService.initPatchDmRole(pipelineId,userList, PipelineFinal.appName);
+        if (Objects.isNull(userList) || userList.isEmpty()){
+            dmRoleService.initDmRoles(pipelineId, createUserId,2);
+            if (createUserId.equals(id)){
+                return;
+            }
+            dmRoleService.initDmRoles(pipelineId, id,1);
+        }else {
+            // 判断系统管理员是否在其中
+            List<PatchUser> list = userList.stream()
+                    .filter(patchUser -> patchUser.getUserId().equals(id))
+                    .toList();
+            if (list.isEmpty()){
+                PatchUser patchUser = new PatchUser(id);
+                userList.add(patchUser);
+            }
+            //关联权限
+            dmRoleService.initPatchDmRole(pipelineId,userList);
+        }
     }
 
     @Override
@@ -149,7 +156,7 @@ public class PipelineAuthorityServiceImpl implements PipelineAuthorityService {
         return BeanMapper.mapList(pipelineEntities,Pipeline.class);
     }
 
-
+    @Override
     public void cloneDomainRole(String sourceDomainId,String cloneDomainId){
         dmRoleService.cloneDomainRole(sourceDomainId,cloneDomainId);
     }

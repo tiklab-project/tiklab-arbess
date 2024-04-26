@@ -15,8 +15,6 @@ public class PipelineDataController {
     @Autowired
     PipelineDataService dataService;
 
-
-
     @RequestMapping(path="/cleanMessageData",method = RequestMethod.POST)
     public Result<String> createTrigger() {
         dataService.cleanMessageData();

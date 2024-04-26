@@ -4,6 +4,7 @@ import io.thoughtware.matflow.pipeline.definition.model.Pipeline;
 import io.thoughtware.matflow.pipeline.definition.service.PipelineService;
 import io.thoughtware.message.message.model.MessageDmNotice;
 import io.thoughtware.message.message.model.MessageDmNoticeQuery;
+import io.thoughtware.message.message.model.MessageNoticePatch;
 import io.thoughtware.message.message.service.MessageDmNoticeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,7 +24,7 @@ public class PipelineDataServiceImpl implements PipelineDataService {
     @Override
     public void cleanMessageData(){
 
-        List<Pipeline> allPipeline = pipelineService.findAllPipeline();
+        List<Pipeline> allPipeline = pipelineService.findAllPipelineNoQuery();
 
         for (Pipeline pipeline : allPipeline) {
             String domainId = pipeline.getId();
@@ -38,7 +39,10 @@ public class PipelineDataServiceImpl implements PipelineDataService {
             }
 
             // 克隆消息模版
-            messageDmNoticeService.initMessageDmNotice(domainId);
+            MessageNoticePatch messageNoticePatch = new MessageNoticePatch();
+            messageNoticePatch.setDomainId(domainId);
+            messageNoticePatch.setUserList(List.of(pipeline.getUser().getId()));
+            messageDmNoticeService.initMessageDmNotice(messageNoticePatch);
         }
     }
 

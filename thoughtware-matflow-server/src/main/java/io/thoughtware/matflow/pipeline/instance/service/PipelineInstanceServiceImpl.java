@@ -66,13 +66,13 @@ public class PipelineInstanceServiceImpl implements PipelineInstanceService {
 
     @Override
     public void deleteAllInstance(String pipelineId) {
-        List<PipelineInstance> allInstance = findAllInstance();
-        if (allInstance == null){
+        List<PipelineInstance> allInstance = findPipelineAllInstance(pipelineId);
+        if (Objects.isNull(allInstance)){
             return;
         }
         for (PipelineInstance instance : allInstance) {
             Pipeline pipeline = instance.getPipeline();
-            if (pipeline == null){
+            if (Objects.isNull(pipeline)){
                 deleteInstance(instance.getInstanceId());
             }
             if (instance.getPipeline().getId().equals(pipelineId)){
@@ -119,7 +119,7 @@ public class PipelineInstanceServiceImpl implements PipelineInstanceService {
 
     @Override
     public void deleteInstance(String instanceId) {
-        PipelineInstance instance = findOneInstance(instanceId);
+        PipelineInstance instance = findOneInstanceNoQuery(instanceId);
         if (Objects.isNull(instance)){
             return;
         }
@@ -158,6 +158,12 @@ public class PipelineInstanceServiceImpl implements PipelineInstanceService {
         return instance;
     }
 
+    public PipelineInstance findOneInstanceNoQuery(String instanceId) {
+        PipelineInstanceEntity pipelineInstanceEntity = pipelineInstanceDao.findOneInstance(instanceId);
+        return BeanMapper.map(pipelineInstanceEntity, PipelineInstance.class);
+        // joinTemplate.joinQuery(instance);
+    }
+
     @Override
     public List<PipelineInstance> findAllInstance() {
         List<PipelineInstanceEntity> pipelineInstanceEntityList = pipelineInstanceDao.findAllInstance();
@@ -167,8 +173,8 @@ public class PipelineInstanceServiceImpl implements PipelineInstanceService {
     @Override
     public List<PipelineInstance> findPipelineAllInstance(String pipelineId) {
         List<PipelineInstanceEntity> list = pipelineInstanceDao.findAllInstance(pipelineId);
-        if (list == null){
-            return null;
+        if (Objects.isNull(list)){
+            return Collections.emptyList();
         }
         List<PipelineInstance> allInstance = BeanMapper.mapList(list, PipelineInstance.class);
         allInstance.sort(Comparator.comparing(PipelineInstance::getCreateTime,Comparator.reverseOrder()));
@@ -180,7 +186,6 @@ public class PipelineInstanceServiceImpl implements PipelineInstanceService {
         if (instanceEntityList.isEmpty()){
             return Collections.emptyList();
         }
-
         return BeanMapper.mapList(instanceEntityList,PipelineInstance.class);
     }
 

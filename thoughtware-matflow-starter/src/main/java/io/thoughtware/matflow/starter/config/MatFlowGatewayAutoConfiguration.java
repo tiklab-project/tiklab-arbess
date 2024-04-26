@@ -96,6 +96,8 @@ public class MatFlowGatewayAutoConfiguration {
                         "/disk/findDiskList",
                         "/appAuthorization/validUserInProduct",
                         "/clean/data/cleanMessageData",
+                        "/message/messageItem/syncUpdateMessage",
+                        "/message/messageItem/syncDeleteMessage",
                 })
                 .ignorePreUrls(new String[]{
                         "/service",

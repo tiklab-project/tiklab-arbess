@@ -217,7 +217,7 @@ public class PipelineInstanceDao {
                 " limit " + limit ;
         JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
         List<PipelineInstanceEntity> instanceEntityList = jdbcTemplate.query(sql, new BeanPropertyRowMapper(PipelineInstanceEntity.class));
-        if ( instanceEntityList.size() == 0){
+        if (instanceEntityList.isEmpty()){
             return Collections.emptyList();
         }
 

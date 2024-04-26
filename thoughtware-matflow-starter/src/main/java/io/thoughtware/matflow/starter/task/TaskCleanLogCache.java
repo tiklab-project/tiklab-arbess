@@ -59,7 +59,7 @@ public class TaskCleanLogCache {
     JoinTemplate joinTemplate;
 
 
-    @Scheduled(cron = "0 0/60 * * * *")
+    @Scheduled(cron = "0 0/100 * * * *")
     public void scheduledBackups(){
 
         logger.info("The cache cleanup timing task is triggered.....");
@@ -77,7 +77,7 @@ public class TaskCleanLogCache {
         int logCache = cache.getLogCache();
 
         for (PipelineInstance instance : allInstance) {
-            joinTemplate.joinQuery(instance);
+            // joinTemplate.joinQuery(instance);
             String createTime = instance.getCreateTime();
             Date date = PipelineUtil.StringChengeDate(createTime);
 

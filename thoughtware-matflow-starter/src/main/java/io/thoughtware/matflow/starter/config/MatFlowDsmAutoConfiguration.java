@@ -62,12 +62,15 @@ public class MatFlowDsmAutoConfiguration {
                 "pip-project_1.0.2",
                 "message_1.0.2",
                 "oplog_1.0.2",
-                "apply-auth_1.0.2"
+                "apply-auth_1.0.2",
+                "privilege_1.0.2",
         });
         dsmConfig.newVersion("1.0.3", new String[]{
                 "pip-project_1.0.3",
                 "message_1.0.3",
-                "oplog_1.0.3"
+                "oplog_1.0.3",
+                "apply-auth_1.0.3",
+                "privilege_1.0.3"
         });
         dsmConfig.newVersion("1.0.4", new String[]{
                 "pip-project_1.0.4",
@@ -82,10 +85,12 @@ public class MatFlowDsmAutoConfiguration {
                 "message_1.0.6",
         });
         dsmConfig.newVersion("1.0.7", new String[]{
-                "pip-project_1.0.7"
+                "pip-project_1.0.7",
+                "message_1.0.7"
         });
         dsmConfig.newVersion("1.0.8", new String[]{
-                "pip-project_1.0.8"
+                "pip-project_1.0.8",
+                "message_1.0.8"
         });
         dsmConfig.newVersion("1.0.9", new String[]{
                 "pip-project_1.0.9"
@@ -101,6 +106,9 @@ public class MatFlowDsmAutoConfiguration {
         });
         dsmConfig.newVersion("1.0.13", new String[]{
                 "pip-project_1.0.13"
+        });
+        dsmConfig.newVersion("1.0.14", new String[]{
+                "pip-project_1.0.14"
         });
         return dsmConfig;
     }

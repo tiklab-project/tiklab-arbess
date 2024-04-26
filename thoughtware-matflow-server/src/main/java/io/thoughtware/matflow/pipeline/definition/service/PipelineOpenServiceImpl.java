@@ -1,6 +1,8 @@
 package io.thoughtware.matflow.pipeline.definition.service;
 
 
+import io.thoughtware.matflow.pipeline.definition.dao.PipelineDao;
+import io.thoughtware.matflow.pipeline.definition.entity.PipelineEntity;
 import io.thoughtware.matflow.support.authority.service.PipelineAuthorityService;
 import io.thoughtware.matflow.support.util.util.PipelineUtil;
 import io.thoughtware.toolkit.beans.BeanMapper;
@@ -34,15 +36,18 @@ public class PipelineOpenServiceImpl implements PipelineOpenService {
     @Autowired
     JoinTemplate joinTemplate;
 
+    @Autowired
+    PipelineDao pipelineDao;
+
 
     @Override
     public void deleteAllOpen(String pipelineId){
-        List<PipelineOpen> allOpen = findAllOpen();
+        List<PipelineOpen> allOpen = findAllOpenNoQuery();
         if (allOpen == null){
            return;
         }
         for (PipelineOpen pipelineOpen : allOpen) {
-            joinTemplate.joinQuery(pipelineOpen);
+            // joinTemplate.joinQuery(pipelineOpen);
             Pipeline pipeline = pipelineOpen.getPipeline();
             if (!pipeline.getId().equals(pipelineId)){
                continue;
@@ -76,6 +81,12 @@ public class PipelineOpenServiceImpl implements PipelineOpenService {
     public List<PipelineOpen> findAllOpen() {
         List<PipelineOpen> list = BeanMapper.mapList(pipelineOpenDao.findAllOpen(), PipelineOpen.class);
         joinTemplate.joinQuery(list);
+        return list;
+    }
+
+    public List<PipelineOpen> findAllOpenNoQuery() {
+        List<PipelineOpen> list = BeanMapper.mapList(pipelineOpenDao.findAllOpen(), PipelineOpen.class);
+        // joinTemplate.joinQuery(list);
         return list;
     }
 
@@ -133,39 +144,20 @@ public class PipelineOpenServiceImpl implements PipelineOpenService {
 
         // 获取用户流水线
         String userId = LoginContext.getLoginId();
-        // String[] userPipeline = authorityService.findUserPipelineIdString(userId);
-        // if (userPipeline.length == 0){
-        //     return Collections.emptyList();
-        // }
-        //
-        // StringBuilder builder = new StringBuilder();
-        // for (int i = 0; i < userPipeline.length; i++) {
-        //     builder.append("'").append(userPipeline[i]).append("'");
-        //     if (i != userPipeline.length-1){
-        //         builder.append(",");
-        //     }
-        // }
 
-        // List<String> list = Arrays.stream(userPipeline).toList();
-
-        // List<String> pipelineIds = pipelineOpenDao.findUserOpen(userId, number,builder.toString());
         List<String> pipelineIds = findUserOpen(number);
         if (pipelineIds.isEmpty()){
             return Collections.emptyList();
         }
 
-
-        // // 使用HashSet来存储list1中的元素
-        // HashSet<String> set = new HashSet<>(list);
-        //
-        // // 仅保留list2中也包含在HashSet中的元素
-        // pipelineIds.retainAll(set);
-
         List<PipelineOpen> openList = new ArrayList<>();
 
         for (String pipelineId : pipelineIds) {
             PipelineOpen pipelineOpen = new PipelineOpen();
-            pipelineOpen.setPipeline(new Pipeline(pipelineId));
+
+            PipelineEntity pipelineEntity = pipelineDao.findPipelineById(pipelineId);
+            Pipeline pipeline = BeanMapper.map(pipelineEntity, Pipeline.class);
+            pipelineOpen.setPipeline(pipeline);
 
             Integer openNumber = pipelineOpenDao.findUserOpenNumber(userId, pipelineId);
             pipelineOpen.setNumber(openNumber);
@@ -173,9 +165,8 @@ public class PipelineOpenServiceImpl implements PipelineOpenService {
             PipelineOverview pipelineOverview = overviewService.pipelineOverview(pipelineId);
             pipelineOpen.setPipelineExecState(pipelineOverview);
 
-            joinTemplate.joinQuery(pipelineOpen);
-
-            if (Objects.isNull(pipelineOpen.getPipeline().getName())){
+            if (Objects.isNull(pipeline) || Objects.isNull(pipeline.getName())){
+                deleteOpen(pipelineOpen.getOpenId());
                 continue;
             }
 

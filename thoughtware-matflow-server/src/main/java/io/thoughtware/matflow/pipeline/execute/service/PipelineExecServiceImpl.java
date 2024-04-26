@@ -11,6 +11,7 @@ import io.thoughtware.matflow.support.postprocess.service.PostprocessExecService
 import io.thoughtware.matflow.support.util.util.PipelineFileUtil;
 import io.thoughtware.matflow.support.util.util.PipelineFinal;
 import io.thoughtware.matflow.support.util.service.PipelineUtilService;
+import io.thoughtware.matflow.support.util.util.PipelineUtil;
 import io.thoughtware.matflow.support.version.service.PipelineVersionService;
 import io.thoughtware.matflow.task.task.model.TaskExecMessage;
 import io.thoughtware.matflow.task.task.model.Tasks;
@@ -511,11 +512,20 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
         Map<String,Object> map = homeService.initMap(pipeline);
         map.put("instanceId",instanceId);
         map.put("link",PipelineFinal.RUN_LINK);
+        PipelineInstance instance = pipelineInstanceService.findOneInstance(instanceId);
+
         if (state){
             map.put("message","运行成功");
+            map.put("execStatus","运行成功");
+            map.put("colour","info");
         }else {
+            map.put("colour","warning");
             map.put("message","运行失败");
+            map.put("execStatus","运行失败");
         }
+
+        String time = PipelineUtil.formatDateTime(instance.getRunTime());
+        map.put("execTime",time);
         homeService.log(PipelineFinal.LOG_TYPE_RUN,  map);
         map.put("dmMessage",true);
         homeService.settingMessage(PipelineFinal.MES_RUN,  map);

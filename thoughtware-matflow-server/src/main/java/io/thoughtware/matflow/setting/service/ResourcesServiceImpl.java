@@ -124,15 +124,15 @@ public class ResourcesServiceImpl implements ResourcesService {
         int number = pipelineList.size();
 
         // 1.免费 2.付费 可用资源总数
+        Resources resources;
         if (!version){
-            Resources resources = notVipResources(number);
+            resources = notVipResources(number);
             resources.setVersion(1);
-            return resources;
         }else {
-            Resources resources = vipResources(number);
+            resources = vipResources(number);
             resources.setVersion(2);
-            return resources;
         }
+        return resources;
     }
 
     private static final int vipExecNumber = 4;
@@ -169,18 +169,12 @@ public class ResourcesServiceImpl implements ResourcesService {
         resources.setResidueCacheNumber(size);
         double parsed = Double.parseDouble(String.format("%.2f", getSize()));
         resources.setUseCacheNumber(parsed);
-
+        resources.setResidueSceNumber(vipExecTime);
         // 构建时长
         List<Resources> allResources = findAllResources();
-        if (allResources.isEmpty()){
-            resources.setResidueSceNumber(vipExecTime);
-        }else {
-            Resources resources1 = allResources.get(0);
-            int sceNumber = resources1.getUseSceNumber();
-            resources.setResidueSceNumber(sceNumber/60);
+        if (!allResources.isEmpty()){
+            resources.setUseSceNumber(allResources.get(0).getUseSceNumber());
         }
-
-
         return resources;
     }
 
@@ -219,7 +213,7 @@ public class ResourcesServiceImpl implements ResourcesService {
         return resources;
     }
 
-
+    @Override
     public ResourcesDetails findResourcesDetails(String type){
         ResourcesDetails resourcesDetails = new ResourcesDetails();
 
@@ -257,7 +251,6 @@ public class ResourcesServiceImpl implements ResourcesService {
         long bytes = FileUtils.sizeOfDirectory(file);
         return  Math.round((float) (((bytes / 1024) / 1024) * 100) /1024)/100.0 ;
     }
-
 
     /**
      * 获取文件大小

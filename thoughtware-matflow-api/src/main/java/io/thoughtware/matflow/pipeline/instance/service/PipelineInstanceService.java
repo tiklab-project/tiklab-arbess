@@ -35,8 +35,7 @@ public interface PipelineInstanceService {
 
     /**
      * 初始化实例信息
-     * @param pipelineId 流水线id
-     * @param startWAy 运行方式
+     * @param runMsg 流水线
      * @return 实例
      */
     PipelineInstance initializeInstance(PipelineRunMsg runMsg);
@@ -100,7 +99,6 @@ public interface PipelineInstanceService {
 
 
     List<PipelineInstance> findUserPipelineInstance(String userId,Integer limit);
-
 
 
     String findRunInstanceId(String pipelineId);

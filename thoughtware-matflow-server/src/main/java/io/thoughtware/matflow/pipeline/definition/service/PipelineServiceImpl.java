@@ -13,6 +13,7 @@ import io.thoughtware.matflow.support.util.util.PipelineUtil;
 import io.thoughtware.matflow.support.util.service.PipelineUtilService;
 import io.thoughtware.matflow.support.variable.service.VariableService;
 import io.thoughtware.matflow.task.task.service.TasksService;
+import io.thoughtware.message.message.model.MessageNoticePatch;
 import io.thoughtware.toolkit.beans.BeanMapper;
 import io.thoughtware.core.exception.ApplicationException;
 import io.thoughtware.core.page.Pagination;
@@ -26,6 +27,8 @@ import io.thoughtware.matflow.pipeline.instance.service.PipelineInstanceService;
 import io.thoughtware.message.message.service.MessageDmNoticeService;
 import io.thoughtware.rpc.annotation.Exporter;
 import io.thoughtware.user.user.model.User;
+import io.thoughtware.user.user.model.UserQuery;
+import io.thoughtware.user.user.service.UserService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +37,7 @@ import org.springframework.stereotype.Service;
 import java.io.File;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -46,6 +50,9 @@ public class PipelineServiceImpl implements PipelineService {
 
     @Autowired
     JoinTemplate joinTemplate;
+
+    @Autowired
+    UserService userService;
 
     @Autowired
     PipelineDao pipelineDao;
@@ -88,6 +95,7 @@ public class PipelineServiceImpl implements PipelineService {
 
     @Autowired
     MessageDmNoticeService messageDmNoticeService;
+
 
     private static final Logger logger = LoggerFactory.getLogger(PipelineServiceImpl.class);
 
@@ -133,11 +141,15 @@ public class PipelineServiceImpl implements PipelineService {
             stageService.createStageTemplate(pipelineId , ints);
         }
 
+        String userId = pipeline.getUser().getId();
         //流水线关联角色，用户信息
-        authorityService.createDmUser(pipelineId,pipeline.getUser().getId(),pipeline.getUserList());
+        authorityService.createDmUser(pipelineId,userId,pipeline.getUserList());
 
-        // 克隆消息模版
-        messageDmNoticeService.initMessageDmNotice(pipelineId);
+        // 消息通知方案
+        MessageNoticePatch messageNoticePatch = new MessageNoticePatch();
+        messageNoticePatch.setDomainId(pipelineId);
+        messageNoticePatch.setUserList(List.of(userId));
+        messageDmNoticeService.initMessageDmNotice(messageNoticePatch);
 
         //动态与消息
         Map<String,Object> map =homeService.initMap(pipeline);
@@ -152,7 +164,7 @@ public class PipelineServiceImpl implements PipelineService {
     @Override
     public void deletePipeline(String pipelineId) {
         Pipeline pipeline = findPipelineById(pipelineId);
-        joinTemplate.joinQuery(pipeline);
+        // joinTemplate.joinQuery(pipeline);
         //删除关联信息
         pipelineDao.deletePipeline(pipelineId); //删除流水线
 
@@ -188,6 +200,7 @@ public class PipelineServiceImpl implements PipelineService {
             Map<String,Object> map = homeService.initMap(pipeline);
             map.put("link",PipelineFinal.UPDATE_LINK);
             map.put("message", flow.getName() +"更改为："+pipeline.getName());
+            map.put("lastName", flow.getName());
             flow.setName(pipeline.getName());
             map.put("dmMessage",true);
             homeService.log(PipelineFinal.LOG_TYPE_UPDATE,  map);
@@ -221,6 +234,12 @@ public class PipelineServiceImpl implements PipelineService {
     }
 
     @Override
+    public Pipeline findPipelineByIdNoQuery(String pipelineId) {
+        PipelineEntity pipelineEntity = pipelineDao.findPipelineById(pipelineId);
+        return BeanMapper.map(pipelineEntity, Pipeline.class);
+    }
+
+    @Override
     public Pipeline findOnePipeline(String pipelineId){
        return findPipelineById(pipelineId);
     }
@@ -228,6 +247,14 @@ public class PipelineServiceImpl implements PipelineService {
     //查询所有
     @Override
     public List<Pipeline> findAllPipeline() {
+        List<Pipeline> list = BeanMapper.mapList(pipelineDao.findAllPipeline(), Pipeline.class);
+        joinTemplate.joinQuery(list);
+        return list;
+    }
+
+
+    @Override
+    public List<Pipeline> findAllPipelineNoQuery() {
         List<Pipeline> list = BeanMapper.mapList(pipelineDao.findAllPipeline(), Pipeline.class);
         joinTemplate.joinQuery(list);
         return list;
@@ -254,6 +281,8 @@ public class PipelineServiceImpl implements PipelineService {
     public Pagination<Pipeline> findUserPipelinePage(PipelineQuery query){
         String userId = query.getUserId();
 
+        List<User> userListNoQuery = userService.findUserListQuery(new UserQuery());
+
         String[] builders = authorityService.findUserPipelineIdString(userId);
         query.setIdString(builders);
         // 用户收藏的流水线
@@ -264,10 +293,17 @@ public class PipelineServiceImpl implements PipelineService {
             List<Pipeline> pipelineList = BeanMapper.mapList(dataList, Pipeline.class);
             List<Pipeline> list = new ArrayList<>();
             for (Pipeline pipeline : pipelineList) {
-                Pipeline pipelineMessage = findPipelineExecMessage(pipeline, 1);
+
+                List<User> userList = userListNoQuery.stream()
+                        .filter(user -> user.getId().equals(pipeline.getUser().getId()))
+                        .toList();
+                if (!userList.isEmpty()){
+                    pipeline.setUser(userList.get(0));
+                }
+                pipeline.setCollect(1);
+                Pipeline pipelineMessage = findPipelineExecMessage(pipeline);
                 list.add(pipelineMessage);
             }
-            joinTemplate.joinQuery(list);
             return PaginationBuilder.build(pipelineListQuery,list);
         }
 
@@ -290,13 +326,19 @@ public class PipelineServiceImpl implements PipelineService {
         for (Pipeline pipeline : pipelineList) {
             // 判断是否收藏
             String s = map.get(pipeline.getId());
-            int i = 0;
+            pipeline.setCollect(0);
             if (!Objects.isNull(s)){
-                i = 1;
+                pipeline.setCollect(1);
             }
-            list.add(findPipelineExecMessage(pipeline, i));
+            List<User> userList = userListNoQuery.stream()
+                    .filter(user -> user.getId().equals(pipeline.getUser().getId()))
+                    .toList();
+            if (!userList.isEmpty()){
+                pipeline.setUser(userList.get(0));
+            }
+            list.add(findPipelineExecMessage(pipeline));
         }
-        joinTemplate.joinQuery(list);
+        // joinTemplate.joinQuery(list);
         return PaginationBuilder.build(pipelinePage,list);
     }
 
@@ -317,16 +359,17 @@ public class PipelineServiceImpl implements PipelineService {
     @Override
     public List<PipelineRecently> findPipelineRecently(String userId,int number){
 
-        List<PipelineInstance> instanceList = instanceService.findUserPipelineInstance(userId,number);
-        if (instanceList.isEmpty()){
-            return Collections.emptyList();
-        }
-
         // 筛选出用户拥有的流水线的历史
         String[] userPipeline = authorityService.findUserPipelineIdString(userId);
         if (userPipeline.length == 0){
             return Collections.emptyList();
         }
+
+        List<PipelineInstance> instanceList = instanceService.findUserPipelineInstance(userId,number);
+        if (instanceList.isEmpty()){
+            return Collections.emptyList();
+        }
+
         List<PipelineInstance> pipelineInstanceList = new ArrayList<>();
         List<String> pipelineIdList = Arrays.stream(userPipeline).toList();
         for (PipelineInstance instance : instanceList) {
@@ -337,12 +380,11 @@ public class PipelineServiceImpl implements PipelineService {
             }
             pipelineInstanceList.add(instance);
         }
-
         List<PipelineRecently> list = new ArrayList<>();
         for (PipelineInstance lastInstance : pipelineInstanceList) {
-            joinTemplate.joinQuery(lastInstance);
-            Pipeline pipeline = lastInstance.getPipeline();
-            String pipelineId = pipeline.getId();
+            String pipelineId = lastInstance.getPipeline().getId();
+            Pipeline pipeline = findPipelineByIdNoQuery(pipelineId);
+
             PipelineRecently recently = new PipelineRecently();
             recently.setPipelineId(pipelineId);
             recently.setPipelineName(pipeline.getName());
@@ -353,8 +395,8 @@ public class PipelineServiceImpl implements PipelineService {
             Date date = PipelineUtil.StringChengeDate(createTime);
             String dateTime = PipelineUtil.findDateTime(date, 3000);
             recently.setExecTime(dateTime);
-            String formatted = PipelineUtil.formatDateTime(lastInstance.getRunTime());
-            recently.setLastRunTime(formatted);
+            // String formatted = PipelineUtil.formatDateTime(lastInstance.getRunTime());
+            // recently.setLastRunTime(formatted);
             recently.setColor(pipeline.getColor());
             recently.setInstanceId(lastInstance.getInstanceId());
             recently.setLastRunType(lastInstance.getRunWay());
@@ -452,8 +494,8 @@ public class PipelineServiceImpl implements PipelineService {
             pipelineList.add(pipeline);
             ids.append("'").append(id).append("',");
         }
-
         ids.append("'").append(pipelineId).append("'");
+
         // 判断是否足够当前数量
         if (pipelineList.size() < number){
             int size = number -pipelineList.size();
@@ -501,20 +543,24 @@ public class PipelineServiceImpl implements PipelineService {
     }
 
 
-    public Pipeline findPipelineExecMessage(Pipeline pipeline ,Integer integer){
+    public Pipeline findPipelineExecMessage(Pipeline pipeline){
         PipelineInstance latelyHistory = instanceService.findLatelyInstance(pipeline.getId());
         if (!Objects.isNull(latelyHistory)){
+
+            pipeline.setBuildStatus(latelyHistory.getRunStatus());
+            pipeline.setNumber(latelyHistory.getFindNumber());
+            pipeline.setInstanceId(latelyHistory.getInstanceId());
+
             String createTime = latelyHistory.getCreateTime();
             Date date = PipelineUtil.StringChengeDate(createTime);
             String dateTime = PipelineUtil.findDateTime(date, 1000);
             if (!Objects.isNull(dateTime)){
                 pipeline.setLastBuildTime(dateTime);
-                pipeline.setBuildStatus(latelyHistory.getRunStatus());
-                pipeline.setNumber(latelyHistory.getFindNumber());
-                pipeline.setInstanceId(latelyHistory.getInstanceId());
+                // pipeline.setBuildStatus(latelyHistory.getRunStatus());
+                // pipeline.setNumber(latelyHistory.getFindNumber());
+                // pipeline.setInstanceId(latelyHistory.getInstanceId());
             }
         }
-        pipeline.setCollect(integer);
         return pipeline;
     }
 

@@ -9,9 +9,9 @@ import io.thoughtware.message.message.model.MessageReceiver;
 import io.thoughtware.message.message.model.SendMessageNotice;
 import io.thoughtware.message.message.service.SendMessageNoticeService;
 import io.thoughtware.message.setting.model.MessageType;
-import io.thoughtware.security.logging.model.Logging;
-import io.thoughtware.security.logging.model.LoggingType;
-import io.thoughtware.security.logging.service.LoggingByTempService;
+import io.thoughtware.security.logging.logging.model.Logging;
+import io.thoughtware.security.logging.logging.model.LoggingType;
+import io.thoughtware.security.logging.logging.service.LoggingByTempService;
 import io.thoughtware.user.user.model.User;
 import io.thoughtware.user.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -111,9 +111,11 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
      */
     @Override
     public void settingMessage(String templateId,Map<String, Object> map){
-
         executorService.submit(() -> {
             try {
+                String link = (String) map.get("link");
+                map.put("qywxurl", link);
+                System.out.println(baseUrl + link);
                 SendMessageNotice dispatchNotice = new SendMessageNotice();
                 dispatchNotice.setId(templateId);
                 String jsonString = JSONObject.toJSONString(map);
@@ -122,12 +124,10 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
                 dispatchNotice.setSiteData(jsonString);
                 dispatchNotice.setQywechatData(jsonString);
                 dispatchNotice.setBaseUrl(baseUrl);
-                String link = (String) map.get("link");
                 String pipelineName = (String) map.get("pipelineName");
                 dispatchNotice.setLink(link);
                 dispatchNotice.setAction(pipelineName);
                 dispatchNotice.setSendId(LoginContext.getLoginId());
-
                 if (!Objects.isNull(map.get("dmMessage")) && (Boolean)map.get("dmMessage")){
                     String pipelineId = (String) map.get("pipelineId");
                     dispatchNotice.setDomainId(pipelineId);

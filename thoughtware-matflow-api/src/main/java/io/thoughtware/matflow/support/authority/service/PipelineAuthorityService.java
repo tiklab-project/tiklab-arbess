@@ -44,7 +44,11 @@ public interface PipelineAuthorityService {
      */
     void createDmUser(String pipelineId,String createUserId, List<PatchUser> userList);
 
-
+    /**
+     * 克隆项目角色
+     * @param sourceDomainId 原来的流水线ID
+     * @param cloneDomainId 克隆的流水线ID
+     */
     void cloneDomainRole(String sourceDomainId,String cloneDomainId);
 
 }

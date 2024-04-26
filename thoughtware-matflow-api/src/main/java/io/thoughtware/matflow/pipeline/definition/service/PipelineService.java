@@ -48,6 +48,9 @@ public interface PipelineService {
     @FindOne
     Pipeline findPipelineById(@NotNull String pipelineId);
 
+
+    Pipeline findPipelineByIdNoQuery(String pipelineId);
+
     /**
      * 该接口返回用户流水线
      * @param pipelineId 流水线Id
@@ -61,6 +64,9 @@ public interface PipelineService {
      */
     @FindAll
     List<Pipeline> findAllPipeline();
+
+
+    List<Pipeline> findAllPipelineNoQuery();
 
     @FindList
     List<Pipeline> findAllPipelineList(List<String> idList);

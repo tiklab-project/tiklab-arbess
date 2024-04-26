@@ -1010,6 +1010,7 @@ public class TasksServiceImpl implements TasksService {
         }
     }
 
+    @Override
     public String findTaskType(String taskType){
         switch (taskType){
             case PipelineFinal.TASK_CODE_GIT , PipelineFinal.TASK_CODE_GITEE , PipelineFinal.TASK_CODE_GITHUB ,
@@ -1047,36 +1048,20 @@ public class TasksServiceImpl implements TasksService {
     private Boolean codeValid(String taskType,Object object){
         TaskCode code = (TaskCode) object;
 
-        String codeAddress = code.getCodeAddress();
-        if (Objects.isNull(codeAddress)){
-            return false;
+        if (taskType.equals(PipelineFinal.TASK_CODE_SVN)) {
+            String svnFile = code.getSvnFile();
+            return !StringUtils.isEmpty(svnFile);
+        } else {
+            String codeAddress = code.getCodeAddress();
+            return !StringUtils.isEmpty(codeAddress);
         }
-
-        // switch (taskType){
-        //     case PipelineFinal.TASK_CODE_GIT , PipelineFinal.TASK_CODE_GITHUB, PipelineFinal.TASK_CODE_GITEE , PipelineFinal.TASK_CODE_SVN -> {
-        //         String codeAddress = code.getCodeAddress();
-        //         if (Objects.isNull(codeAddress)){
-        //             return false;
-        //         }
-        //     }
-        //     case PipelineFinal.TASK_CODE_XCODE -> {
-        //         XcodeRepository repository = code.getRepository();
-        //         if (Objects.isNull(repository)){
-        //             return false;
-        //         }
-        //         if (Objects.isNull(repository.getName())){
-        //             return false;
-        //         }
-        //     }
-        // }
-        return true;
     }
 
     private Boolean codeScanValid(String taskType,Object object){
         TaskCodeScan code = (TaskCodeScan)object;
         if (taskType.equals(PipelineFinal.TASK_CODESCAN_SONAR)) {
             String projectName = code.getProjectName();
-            return !Objects.isNull(projectName);
+            return !StringUtils.isEmpty(projectName);
         } else {
             return true;
         }
@@ -1097,18 +1082,13 @@ public class TasksServiceImpl implements TasksService {
                    && Objects.isNull(taskTest.getWebEnv());
            return !b ;
         }
-        if(StringUtils.isEmpty(taskTest.getAddress())){
-            return false;
-        }
-
-
-        return true;
+        return !StringUtils.isEmpty(taskTest.getAddress());
     }
 
     private Boolean buildValid(String taskType,Object object){
         TaskBuild build = (TaskBuild) object;
         if (taskType.equals(PipelineFinal.TASK_BUILD_DOCKER)){
-            return !Objects.isNull(build.getDockerFile());
+            return !StringUtils.isEmpty(build.getDockerFile());
         }
         return true;
     }
@@ -1237,9 +1217,6 @@ public class TasksServiceImpl implements TasksService {
             }
             return true;
         }
-
-
-
         return true;
     }
 
