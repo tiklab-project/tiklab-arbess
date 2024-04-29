@@ -106,7 +106,6 @@
     </dependencies>
 
     <profiles>
-
         <!--linux-->
         <profile>
             <id>system-linux</id>
@@ -125,13 +124,6 @@
                     <groupId>io.thoughtware</groupId>
                     <artifactId>thoughtware-postgresql-linux</artifactId>
                     <version>${thoughtware-postgresql.version}</version>
-                    <type>zip</type>
-                    <scope>provided</scope>
-                </dependency>
-                <dependency>
-                    <groupId>io.thoughtware</groupId>
-                    <artifactId>thoughtware-spotbugs</artifactId>
-                    <version>${thoughtware-spotbugs.version}</version>
                     <type>zip</type>
                     <scope>provided</scope>
                 </dependency>
@@ -196,13 +188,27 @@
         <profile>
             <id>system-windows</id>
             <dependencies>
-<!--                <dependency>-->
-<!--                    <groupId>io.thoughtware</groupId>-->
-<!--                    <artifactId>thoughtware-jdk-windows</artifactId>-->
-<!--                    <version>${thoughtware-jdk.version}</version>-->
-<!--                    <type>zip</type>-->
-<!--                    <scope>provided</scope>-->
-<!--                </dependency>-->
+                <dependency>
+                    <groupId>io.thoughtware</groupId>
+                    <artifactId>thoughtware-jdk-windows</artifactId>
+                    <version>${thoughtware-jdk.version}</version>
+                    <type>zip</type>
+                    <scope>provided</scope>
+                </dependency>
+                <dependency>
+                    <groupId>io.thoughtware</groupId>
+                    <artifactId>thoughtware-postgresql-windows</artifactId>
+                    <version>${thoughtware-postgresql.version}</version>
+                    <type>zip</type>
+                    <scope>provided</scope>
+                </dependency>
+                <dependency>
+                    <groupId>io.thoughtware</groupId>
+                    <artifactId>thoughtware-spotbugs</artifactId>
+                    <version>${thoughtware-spotbugs.version}</version>
+                    <type>zip</type>
+                    <scope>provided</scope>
+                </dependency>
             </dependencies>
             <properties>
                 <assembly>windows</assembly>
@@ -222,6 +228,29 @@
                                     <goal>unpack</goal>
                                 </goals>
                                 <configuration>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>io.thoughtware</groupId>
+                                            <artifactId>thoughtware-postgresql-windows</artifactId>
+                                            <version>${thoughtware-postgresql.version}</version>
+                                            <type>zip</type>
+                                            <outputDirectory>embbed</outputDirectory>
+                                        </artifactItem>
+                                        <artifactItem>
+                                            <groupId>io.thoughtware</groupId>
+                                            <artifactId>thoughtware-jdk-windows</artifactId>
+                                            <version>${thoughtware-jdk.version}</version>
+                                            <type>zip</type>
+                                            <outputDirectory>embbed</outputDirectory>
+                                        </artifactItem>
+                                        <artifactItem>
+                                            <groupId>io.thoughtware</groupId>
+                                            <artifactId>thoughtware-spotbugs</artifactId>
+                                            <version>${thoughtware-spotbugs.version}</version>
+                                            <type>zip</type>
+                                            <outputDirectory>embbed</outputDirectory>
+                                        </artifactItem>
+                                    </artifactItems>
                                 </configuration>
                             </execution>
                         </executions>
@@ -237,6 +266,29 @@
                 <assembly>mac</assembly>
                 <systemType>mac</systemType>
             </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>io.thoughtware</groupId>
+                    <artifactId>thoughtware-jdk-mac</artifactId>
+                    <version>${thoughtware-jdk.version}</version>
+                    <type>zip</type>
+                    <scope>provided</scope>
+                </dependency>
+                <dependency>
+                    <groupId>io.thoughtware</groupId>
+                    <artifactId>thoughtware-postgresql-mac</artifactId>
+                    <version>${thoughtware-postgresql.version}</version>
+                    <type>zip</type>
+                    <scope>provided</scope>
+                </dependency>
+                <dependency>
+                    <groupId>io.thoughtware</groupId>
+                    <artifactId>thoughtware-spotbugs</artifactId>
+                    <version>${thoughtware-spotbugs.version}</version>
+                    <type>zip</type>
+                    <scope>provided</scope>
+                </dependency>
+            </dependencies>
             <build>
                 <plugins>
                     <plugin>
@@ -251,6 +303,29 @@
                                     <goal>unpack</goal>
                                 </goals>
                                 <configuration>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>io.thoughtware</groupId>
+                                            <artifactId>thoughtware-postgresql-mac</artifactId>
+                                            <version>${thoughtware-postgresql.version}</version>
+                                            <type>zip</type>
+                                            <outputDirectory>embbed</outputDirectory>
+                                        </artifactItem>
+                                        <artifactItem>
+                                            <groupId>io.thoughtware</groupId>
+                                            <artifactId>thoughtware-jdk-mac</artifactId>
+                                            <version>${thoughtware-jdk.version}</version>
+                                            <type>zip</type>
+                                            <outputDirectory>embbed</outputDirectory>
+                                        </artifactItem>
+                                        <artifactItem>
+                                            <groupId>io.thoughtware</groupId>
+                                            <artifactId>thoughtware-spotbugs</artifactId>
+                                            <version>${thoughtware-spotbugs.version}</version>
+                                            <type>zip</type>
+                                            <outputDirectory>embbed</outputDirectory>
+                                        </artifactItem>
+                                    </artifactItems>
                                 </configuration>
                             </execution>
                         </executions>
@@ -267,11 +342,19 @@
             </properties>
         </profile>
 
-        <!--test文件夹-->
+        <!--test-->
         <profile>
             <id>env-test</id>
             <properties>
                 <yaml-type>/config/test</yaml-type>
+            </properties>
+        </profile>
+
+        <!--release-->
+        <profile>
+            <id>env-release</id>
+            <properties>
+                <yaml-type>/</yaml-type>
             </properties>
         </profile>
 
@@ -288,14 +371,6 @@
             <id>env-prd</id>
             <properties>
                 <yaml-type>/config/prd</yaml-type>
-            </properties>
-        </profile>
-
-        <!--release-->
-        <profile>
-            <id>env-release</id>
-            <properties>
-                <yaml-type>/</yaml-type>
             </properties>
         </profile>
 
@@ -341,8 +416,8 @@
                             <descriptors>
                                 <descriptor>assembly/distribution-${assembly}.xml</descriptor>
                             </descriptors>
-                            <finalName>thoughtware-matflow-${version}-${timestamp}</finalName>
-<!--                            <finalName>thoughtware-matflow-1.0.0</finalName>-->
+<!--                            <finalName>thoughtware-matflow-${version}-${timestamp}</finalName>-->
+                            <finalName>thoughtware-matflow-1.0.0-${systemType}</finalName>
                             <appendAssemblyId>false</appendAssemblyId>
                         </configuration>
                         <phase>package</phase>

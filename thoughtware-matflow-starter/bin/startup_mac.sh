@@ -4,8 +4,8 @@ DIRS=$(dirname "$PWD")
 
 APP_MAIN="io.thoughtware.matflow.starter.MatFlowApplication"
 
-echo Dir=${DIRS}
 JDK_VERSION=jdk-16.0.2
+PGSQL_VERSION=pgsql-10.23
 if [ -d "${DIRS}/embbed/${JDK_VERSION}" ]; then
     echo "使用内嵌jdk"
     JAVA_HOME="${DIRS}/embbed/${JDK_VERSION}"
@@ -13,7 +13,10 @@ else
     JAVA_HOME="/usr/local/jdk-17.0.7"
 fi
 
-find ${DIRS}/ -name '*.sh' | xargs dos2unix;
+
+echo "解压文件....."
+tar -xvf "${DIRS}/embbed/${PGSQL_VERSION}/${PGSQL_VERSION}.tar.gz" -C "${DIRS}/embbed"
+echo "解压完成!"
 
 #-------------------------------------------------------------------------------------------------------------
 #       系统运行参数
@@ -23,9 +26,6 @@ DIR=$(cd "$(dirname "$0")"; pwd)
 APP_HOME=${DIR}/..
 APP_CONFIG=${APP_HOME}/conf/application-${env}.properties
 APP_LOG=${APP_HOME}/logs
-
-JAVA_HOME="${APP_HOME}/embbed/${JDK_VERSION}"
-
 
 export APP_HOME
 #export app.home=$APP_HOME
@@ -55,64 +55,6 @@ echo "CLASSPATH="$CLASSPATH
 echo "APP_HOME="$APP_HOME
 echo "APP_MAIN="$APP_MAIN
 
-
-APPLY=matflow-ce
-
-enableApply(){
-
-      APPLYDIR="$PWD"
-
-      serverName=enable-${APPLY}.service
-
-      applyserver=/etc/systemd/system/${serverName}
-
-      if [ ! -e "${applyserver}" ]; then
-cat << EOF >  ${applyserver}
-[Unit]
-Description=Start Tiklab Apply
-After=network.target remote-fs.target nss-lookup.target
-
-[Service]
-EOF
-
-echo Environment=\"DIR=${APPLYDIR}\" >> ${applyserver}
-
-cat << EOF >> ${applyserver}
-ExecStart=/bin/bash -c 'cd "\$DIR"; sh startup.sh'
-Type=forking
-
-[Install]
-WantedBy=multi-user.target
-EOF
-
-  touch ${applyserver}
-  chmod 644 ${applyserver}
-  systemctl enable ${serverName}
-
-  else
-cat << EOF >  ${applyserver}
-[Unit]
-Description=Start Tiklab Apply
-After=network.target remote-fs.target nss-lookup.target
-
-[Service]
-EOF
-
-echo Environment=\"DIR=${APPLYDIR}\" >> ${applyserver}
-cat << EOF >> ${applyserver}
-ExecStart=/bin/bash -c 'cd "\$DIR"; sh startup.sh'
-Type=forking
-
-[Install]
-WantedBy=multi-user.target
-EOF
-fi
-
-}
-
-enableApply
-
-
 #-------------------------------------------------------------------------------------------------------------
 #   程序开始
 #-------------------------------------------------------------------------------------------------------------
@@ -140,7 +82,8 @@ startup(){
             mkdir "$APP_LOG"
         fi
 
-        nohup $JAVA_HOME/bin/java $JAVA_OPTS $CLASSPATH $APP_MAIN  > info.log 2>&1 &
+#        nohup $JAVA_HOME/bin/java $JAVA_OPTS $CLASSPATH $APP_MAIN  > info.log 2>&1 &
+        nohup $JAVA_HOME/bin/java $JAVA_OPTS $CLASSPATH $APP_MAIN > /dev/null 2>&1 &
 
         for i in $(seq 5)
         do

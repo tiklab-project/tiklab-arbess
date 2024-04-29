@@ -45,8 +45,8 @@
         <thoughtware-privilege.version>1.0.1-SNAPSHOT</thoughtware-privilege.version>
         <thoughtware-eam.version>1.0.1-SNAPSHOT</thoughtware-eam.version>
 
-        <thoughtware-postgresql.version>1.0.1-SNAPSHOT</thoughtware-postgresql.version>
-        <thoughtware-jdk.version>1.0.0</thoughtware-jdk.version>
+        <thoughtware-postgresql.version>1.0.2-SNAPSHOT</thoughtware-postgresql.version>
+        <thoughtware-jdk.version>1.0.1-SNAPSHOT</thoughtware-jdk.version>
         <thoughtware-spotbugs.version>1.0.0</thoughtware-spotbugs.version>
         <thoughtware-opensca.version>1.0.0</thoughtware-opensca.version>
         <thoughtware-install.version>1.0.0</thoughtware-install.version>

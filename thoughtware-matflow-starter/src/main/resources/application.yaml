@@ -15,12 +15,12 @@ spring:
 
 jdbc:
   driverClassName: org.postgresql.Driver
-  url: jdbc:postgresql://localhost:5432/matflow_ce?stringtype=unspecified
+  url: jdbc:postgresql://localhost:6000/matflow_ce?stringtype=unspecified
   username: postgres
   password: darth2020
 
 #plugin config
-DATA_HOME: /opt/tiklab/matflow-ce
+DATA_HOME: C:\Program Files\matflow
 
 plugin:
   path: ${DATA_HOME}/plugin
@@ -40,12 +40,10 @@ dfs:
 dcs:
   server:
     enabled: true
-    #    enabled: false
     port: 5020
     datapath: ${DATA_HOME}/caches
   client:
     url: 127.0.0.1:5020
-    #    url: 127.0.0.1:5035
     group: g1
     database: dcs1
     expire: 7200
@@ -66,7 +64,7 @@ postgresql:
     enable: true
   database: matflow_ce
   db:
-    port: 5432
+    port: 6000
     username: postgres
     password: darth2020
     address: ${DATA_HOME}/postgresql
@@ -76,24 +74,18 @@ datapath: ${DATA_HOME}/caches
 eas:
   embbed:
     enable: true
-  address: http://e.darth.thoughtware.cn
 
 
 backups:
   dir: /data/matflow-ce
-  #    time: 0 */1 * * * ?
   time: 0 0 2 * * ?
 
-#message:
-#  sms:
-#    enabled: true
-
 base:
-  url: http://matflow-ce.demo.tiklab.net
+  url: http://localhost:8080
 
 #homes
 homes:
-  address: http://192.168.10.19:8080
+  address: https://192.168.10.19:8080
 
 #license
 licences:
@@ -102,8 +94,6 @@ licences:
 #file
 file:
   path: http://file.tiklab.net
-
-
 
 
 

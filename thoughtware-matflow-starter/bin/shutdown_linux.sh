@@ -1,18 +1,19 @@
 #!/bin/sh
 
 DIRS=$(dirname "$PWD")
+JAVA_HOME="/usr/local/jdk-17.0.7"
+
 JDK_VERSION=jdk-16.0.2
-if [ -d "${DIRS}/embbed/${JDK_VERSION}" ]; then
-    echo "Using embedded jdk...."
-    JAVA_HOME="${DIRS}/embbed/${JDK_VERSION}"
-else
-    JAVA_HOME="/usr/local/jdk-17.0.7"
+
+#判断是否自定义jdk
+JAVA_HOME="/usr/local/${JDK_VERSION}"
+if [ -e "${DIRS}/embbed/${JDK_VERSION}" ]; then
+      JAVA_HOME="${DIRS}/embbed/${JDK_VERSION}"
 fi
 
 APP_MAIN="io.thoughtware.matflow.starter.MatFlowApplication"
 
 PID=0
-
 getPID(){
     javaps=`$JAVA_HOME/bin/jps -l | grep $APP_MAIN`
     if [ -n "$javaps" ]; then
@@ -48,6 +49,9 @@ shutdown(){
 }
 
 shutdown
+
+
+
 
 
 
