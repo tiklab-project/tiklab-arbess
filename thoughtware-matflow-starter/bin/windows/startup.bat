@@ -249,6 +249,9 @@ REM 删除临时文件
 del temp.txt
 set "IP_ADDRESS=!IP_ADDRESS: =!"
 
+for /f "tokens=5" %%a in ('netstat -aon ^| findstr LISTENING ^| findstr "%PGSQL_PORT%"') do (
+    set PGSQL_PID=%%a
+)
 if "%state%" == "" (
     echo ================================================================================================================
     echo %APP_MAIN% START FAIL
@@ -256,16 +259,11 @@ if "%state%" == "" (
 ) else (
     echo DCS START PORT:%DCS_PORT%
     if "%PGSQL_ENABLE%" == "true" (
-        for /f "tokens=5" %%a in ('netstat -aon ^| findstr LISTENING ^| findstr "%PGSQL_PORT%"') do (
-            set PGSQL_PID=%%a
-        )
         if not "%PGSQL_PID%" == "" (
-            echo Port %PGSQL_PORT% is occupied by process with PID: %PGSQL_PID%
-            echo PGSQL START SUCCESS PORT:%PGSQL_PORT%(PID=%PGSQL_PID%)
+            echo PGSQL START SUCCESS PORT:%PGSQL_PORT%(PID=%PGSQL_PID%^)
         )
     )
-    echo Apply SERVER START PORT:%SERVER_PORT%
-    echo %APP_MAIN% START SUCCESS PORT:%SERVER_PORT%(PID=%state%)
+    echo %APP_MAIN% START SUCCESS PORT:%SERVER_PORT%(PID=%state%^)
     echo ====================================点击以下连接即可访问======================================================
     echo http://%IP_ADDRESS%:%SERVER_PORT%
     echo ================================================================================================================

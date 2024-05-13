@@ -109,7 +109,7 @@ set PID=%%a
 )
 
 if %PID% == 0 (
-     echo %APP_MAIN%  IS NOT RUNNING......
+     echo %APP_MAIN% IS NOT RUNNING......
 ) else (
     taskkill /PID %PID% /F > NUL 2>&1
         if errorlevel 1 (
