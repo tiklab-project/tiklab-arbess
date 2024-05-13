@@ -91,23 +91,23 @@ pg_enable(){
 
 kill_pgsql(){
   pg_enable
+  pg_port
   if [ "${db_enable}" = "true" ]; then
-       pg_port
-        if [ ${db_port} -ne 0 ]; then
+        if [ "${db_port}" = "0" ]; then
             echo "find pgsql port error "
             exit 1
         fi
 
-        result=$(netstat -tuln | grep ":${db_port}")
+        pids=$(netstat -antp | grep "${db_port}" | awk '{print $7}' | cut -d'/' -f1)
+        echo ${pids}
         # shellcheck disable=SC2039
-        if [[ -n "$result" ]]; then
-            echo "pgsql port ${db_port} be occupied！"
-
-            pids=$(echo "$result" | awk '{print $7}' | awk -F'/' '{print $1}')
-            echo "Killing process $pids"
+         if [ "${pids}" != "0" ]; then
+            echo "pgsql port ${db_port} be occupied pid ${pids}！"
+            echo "Killing process ${pids}"
             # 杀死占用端口的进程
-            kill -9 $pids
+            kill -9 "${pids}"
         fi
+
   fi
 }
 
