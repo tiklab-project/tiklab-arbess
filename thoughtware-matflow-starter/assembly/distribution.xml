@@ -32,32 +32,14 @@
         <fileSet>
             <directory>${basedir}</directory>
             <includes>
-                <include>Dockerfile</include>
-            </includes>
-            <outputDirectory>/</outputDirectory>
-        </fileSet>
-        <fileSet>
-            <directory>${basedir}</directory>
-            <includes>
                 <include>version</include>
             </includes>
             <outputDirectory>/</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>${basedir}/bin</directory>
+            <directory>${basedir}/bin/${systemType}</directory>
             <fileMode>755</fileMode>
-            <includes>
-                <include>*_linux.sh</include>
-            </includes>
             <outputDirectory>/bin</outputDirectory>
-        </fileSet>
-        <fileSet>
-            <directory>${basedir}/backups</directory>
-            <fileMode>755</fileMode>
-            <excludes>
-                <exclude>*.bat</exclude>
-            </excludes>
-            <outputDirectory>/backups</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>${basedir}/plugin</directory>
