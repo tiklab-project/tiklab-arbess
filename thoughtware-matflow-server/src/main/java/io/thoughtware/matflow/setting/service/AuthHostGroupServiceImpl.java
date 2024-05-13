@@ -78,8 +78,11 @@ public class AuthHostGroupServiceImpl implements AuthHostGroupService {
 
     @Override
     public AuthHostGroup findOneHostGroup(String groupId) {
-        List<AuthHostGroupDetails> hostGroupDetailsList = groupDetailsService.findHostGroupDetailsList(groupId);
         AuthHostGroup oneHostGroup = authHostGroupDao.findOneHostGroup(groupId);
+        if (Objects.isNull(oneHostGroup)){
+            return null;
+        }
+        List<AuthHostGroupDetails> hostGroupDetailsList = groupDetailsService.findHostGroupDetailsList(groupId);
         oneHostGroup.setDetailsList(hostGroupDetailsList);
         joinTemplate.joinQuery(oneHostGroup);
         return oneHostGroup;
