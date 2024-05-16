@@ -142,7 +142,9 @@ public class ResourcesServiceImpl implements ResourcesService {
     private static final int vipExecTime = -1;
 
     private static final int notVipExecNumber = 2;
-    private static final int notVipExecTime = -1;
+
+    private static final int notVipExecTime = 1500;
+
     private static final int notVipCacheNTime = -1;
 
 
