@@ -56,6 +56,22 @@ public class TaskTestOnController {
         return Result.ok(allEnv);
     }
 
+    /**
+     * @pi.name:获取测试计划需要的环境
+     * @pi.path:/testOnAuthorize/findAllEnv
+     * @pi.methodType:post
+     * @pi.request-type: formdata
+     * @pi.param: name=authId;dataType=string;value=authId;
+     * @pi.param: name=testPlanId;dataType=string;value=testPlanId
+     */
+    @RequestMapping(path="/findTestPlanEnv",method = RequestMethod.POST)
+    public Result<List<String>> findTestPlanEnv(@NotNull String authId,@NotNull String testPlanId){
+
+        List<String> planEnv = taskTestOnService.findTestPlanEnv(authId, testPlanId);
+
+        return Result.ok(planEnv);
+    }
+
 
     /**
      * @pi.name:查询测试信息测试计划

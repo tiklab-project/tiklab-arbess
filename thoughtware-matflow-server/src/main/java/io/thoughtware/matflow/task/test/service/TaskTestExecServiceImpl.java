@@ -106,35 +106,37 @@ public class TaskTestExecServiceImpl implements TaskTestExecService {
         TestOnPlanTestData testData = new TestOnPlanTestData();
         // 环境
         if (!Objects.isNull(taskTest.getWebEnv())){
-            testData.setWebEnv(taskTest.getWebEnv().getUrl());
+            testData.setWebEnv(taskTest.getWebEnv().getId());
         }
         if (!Objects.isNull(taskTest.getAppEnv())){
             testData.setAppEnv(taskTest.getAppEnv().getUrl());
         }
         if (!Objects.isNull(taskTest.getApiEnv())){
-            testData.setApiEnv(taskTest.getApiEnv().getUrl());
+            testData.setApiEnv(taskTest.getApiEnv().getId());
         }
         testData.setTestPlanId(testPlan.getId());
         testData.setRepositoryId(repository.getId());
 
-        logger.info("TestOn执行信息：" + JSONObject.toJSONString(testData));
+        // logger.info("TestOn执行信息：" + JSONObject.toJSONString(testData));
         tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"执行测试执行中...");
+
         // 执行testOn
         try {
-            taskTestOnService.execTestPlan(authId, testData);
+            String testOnInstanceId = taskTestOnService.execTestPlan(authId, testData);
         }catch (Exception e){
-            TestPlanExecResult testPlanExecResult = taskTestOnService.findTestPlanExecResult(authId);
+            TestPlanExecResult testPlanExecResult = taskTestOnService.findPlanExecResult(authId,testPlan.getId());
             String instanceId = testPlanExecResult.getTestPlanInstance().getId();
             relevanceTestOnService.createRelevance(pipelineId,instanceId,authId);
             tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"testOn执行失败："+e.getMessage());
             return false;
         }
-        AuthThird authServer = authThirdService.findOneAuthServer(authId);
+
+         AuthThird authServer = authThirdService.findOneAuthServer(authId);
         Integer status = 0;
         // 获取执行结果
         TestPlanExecResult testPlanExecResult;
         try {
-             testPlanExecResult = taskTestOnService.findTestPlanExecResult(authId);
+             testPlanExecResult = taskTestOnService.findPlanExecResult(authId,testPlan.getId());
         }catch (Exception e){
             if (e instanceof ApplicationException){
                 tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"获取测试结果失败："+e.getMessage());
@@ -144,12 +146,12 @@ public class TaskTestExecServiceImpl implements TaskTestExecService {
             return false;
         }
 
-        tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"获取测试结果...");
+        tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"获取测试结果......");
 
         // 判断是否正在运行
         while (Objects.equals(status,1)){
             try {
-                testPlanExecResult = findTestPlanExecResult(taskId,authId);
+                testPlanExecResult = findTestPlanExecResult(taskId,authId,testPlan.getId());
             }catch (Exception e){
                 if (e instanceof ApplicationException){
                     tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"获取测试结果失败："+e.getMessage());
@@ -176,11 +178,11 @@ public class TaskTestExecServiceImpl implements TaskTestExecService {
         return true;
     }
 
-    private TestPlanExecResult findTestPlanExecResult(String taskId,String authId){
+    private TestPlanExecResult findTestPlanExecResult(String taskId,String authId,String testPlanId){
         // 获取执行结果
         TestPlanExecResult testPlanExecResult;
         try {
-            testPlanExecResult = taskTestOnService.findTestPlanExecResult(authId);
+            testPlanExecResult = taskTestOnService.findPlanExecResult(authId,testPlanId);
         }catch (Exception e){
             throw new ApplicationException(e);
         }

@@ -24,7 +24,7 @@ jdbc:
   password: darth2020
 
 #plugin config
-DATA_HOME: ${user.home}/matflow/
+DATA_HOME: ${user.home}/thoughtware/run_cache/matflow/
 
 plugin:
   path: ${DATA_HOME}/plugin
@@ -44,12 +44,10 @@ dfs:
 dcs:
   server:
     enabled: true
-#    enabled: false
     port: 5020
     datapath: ${DATA_HOME}/caches
   client:
     url: 127.0.0.1:5020
-#    url: 127.0.0.1:5035
     group: g1
     database: dcs1
     expire: 7200
@@ -81,9 +79,11 @@ eas:
 
 
 backups:
-  dir: /data/matflow
-  #    time: 0 */1 * * * ?
+#  pgsql:
+#    dir:
+  dir: ${user.home}/thoughtware/run_cache/data/matflow
   time: 0 0 2 * * ?
+  type: local
 
 postgresql:
   embbed:

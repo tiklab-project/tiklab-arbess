@@ -12,6 +12,8 @@ import io.thoughtware.matflow.pipeline.definition.model.Pipeline;
 @Join
 @Mapper
 public class RelevanceTestOn {
+
+
     private String relevanceId;
 
     @Mappings({

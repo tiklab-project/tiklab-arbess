@@ -23,12 +23,8 @@ import java.util.*;
 @Service
 public class ResourcesServiceImpl implements ResourcesService {
 
-
     @Autowired
     ResourcesDao resourcesDao;
-
-    @Autowired
-    PipelineVersionService versionService;
 
     @Autowired
     PipelineUtilService utilService;
@@ -42,8 +38,8 @@ public class ResourcesServiceImpl implements ResourcesService {
         if (time == 0){
             time = 1;
         }
-
-        Time dataTime = TimeConfig.findDataTime(PipelineUtil.date(2));
+        String date = PipelineUtil.date(2);
+        Time dataTime = TimeConfig.findDataTime(date);
         String beginTime = dataTime.getMonthBeginTime();
         String endTime = dataTime.getMonthEndTime();
         Resources resources = resourcesDao.findResources(beginTime,endTime);
@@ -116,30 +112,15 @@ public class ResourcesServiceImpl implements ResourcesService {
 
     @Override
     public Resources findResourcesList(){
-        boolean version = versionService.isVip();
-
         PipelineQuery pipelineQuery = new PipelineQuery();
         pipelineQuery.setPipelineState(2);
         List<PipelineEntity> pipelineList = pipelineDao.findPipelineList(pipelineQuery);
         int number = pipelineList.size();
 
-        // 1.免费 2.付费 可用资源总数
-        Resources resources;
-        if (!version){
-            resources = notVipResources(number);
-            resources.setVersion(1);
-        }else {
-            resources = vipResources(number);
-            resources.setVersion(2);
-        }
+        Resources resources = notVipResources(number);
+        resources.setVersion(1);
         return resources;
     }
-
-    private static final int vipExecNumber = 4;
-
-    private static final int vipCacheNTime = -1;
-
-    private static final int vipExecTime = -1;
 
     private static final int notVipExecNumber = 2;
 
@@ -149,35 +130,7 @@ public class ResourcesServiceImpl implements ResourcesService {
 
 
     public Resources vipResources(int execNumber){
-        Resources resources = new Resources();
-
-        // 总资源数
-        resources.setCcyNumber(vipExecNumber);
-        resources.setSceNumber(vipExecTime);
-        String codeAddress = utilService.instanceAddress(1);
-        float dirSize = PipelineFileUtil.findDiskSize(codeAddress);
-        double diskSize = Double.parseDouble(String.format("%.2f",dirSize));
-        resources.setCacheNumber(diskSize);
-
-        // 并发数
-        resources.setUseCcyNumber(execNumber);
-
-        // 剩余并发数
-        int i = vipExecNumber - execNumber;
-        resources.setResidueCcyNumber(Math.max(i, 0));
-
-        // 磁盘大小
-        double size = Double.parseDouble(String.format("%.2f",vipExecNumber - getSize()));
-        resources.setResidueCacheNumber(size);
-        double parsed = Double.parseDouble(String.format("%.2f", getSize()));
-        resources.setUseCacheNumber(parsed);
-        resources.setResidueSceNumber(vipExecTime);
-        // 构建时长
-        List<Resources> allResources = findAllResources();
-        if (!allResources.isEmpty()){
-            resources.setUseSceNumber(allResources.get(0).getUseSceNumber());
-        }
-        return resources;
+        return null;
     }
 
     public Resources notVipResources(int execNumber){
@@ -202,7 +155,7 @@ public class ResourcesServiceImpl implements ResourcesService {
         double parsed = Double.parseDouble(String.format("%.2f", getSize()));
         resources.setUseCacheNumber(parsed);
 
-        resources.setResidueSceNumber(vipExecTime);
+        resources.setResidueSceNumber(-1);
         // 构建时长
         List<Resources> allResources = findAllResources();
         if (allResources.isEmpty()){
@@ -244,7 +197,6 @@ public class ResourcesServiceImpl implements ResourcesService {
         return resourcesDetails;
     }
 
-
     public double findDirSize(String dir){
         File file = new File(dir);
         if (!file.exists()){
@@ -267,11 +219,17 @@ public class ResourcesServiceImpl implements ResourcesService {
             return 0;
         }
 
+
+
         long codeBytes = FileUtils.sizeOfDirectory(codeFile);
 
         double  codeSize =  Math.round((float) (((codeBytes / 1024) / 1024) * 100) /1024)/100.0 ;
 
         File logFile = new File(logAddress);
+        if (!logFile.exists()){
+            return codeSize;
+        }
+
         long logBytes = FileUtils.sizeOfDirectory(logFile);
         double logSize =  Math.round((float) (((logBytes / 1024) / 1024) * 100) /1024)/100.0 ;
         return codeSize + logSize;

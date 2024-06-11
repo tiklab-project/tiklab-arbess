@@ -47,9 +47,6 @@ public class CountServiceImpl implements CountService {
     MessageSendTypeService sendTypeService;
 
     @Autowired
-    PluginManagerService pluginManagerService;
-
-    @Autowired
     VersionService versionService;
 
     @Autowired
@@ -103,12 +100,6 @@ public class CountServiceImpl implements CountService {
 
         Integer sendTypeNumber = sendTypeService.findSendTypeNumber();
         map.put("sendTypeNumber",sendTypeNumber);
-
-        Integer installPluginNumber = pluginManagerService.findInstallPluginNumber();
-        map.put("installPluginNumber",installPluginNumber);
-
-        Integer shopPluginNumber = pluginManagerService.findShopPluginNumber();
-        map.put("shopPluginNumber",shopPluginNumber);
 
         Version version = versionService.getVersion();
         map.put("version",version.getExpired());

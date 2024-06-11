@@ -88,6 +88,12 @@ public class TaskCodeGiteeServiceImpl implements TaskCodeGiteeService {
                 houseList.add(thirdHouse);
             }
         }catch (Exception e) {
+            if (e instanceof HttpClientErrorException){
+                int rawStatusCode = ((HttpClientErrorException) e).getRawStatusCode();
+                if (rawStatusCode == 401){
+                    throw new ApplicationException("授权信息认证失败！");
+                }
+            }
             throw new SystemException(e);
         }
         return houseList;

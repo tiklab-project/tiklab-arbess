@@ -163,10 +163,17 @@ public class PipelineRequestUtil {
             String msg = jsonObject.getString("msg");
             throw new SystemException("错误！,Message："+msg);
         }
+
+        if (tClass.isAssignableFrom(String.class)){
+            String data = jsonObject.getString("data");
+            return (T)data;
+        }
+
         JSONObject data = jsonObject.getJSONObject("data");
         if (Objects.isNull(data)){
             return null;
         }
+
         return JSONObject.parseObject(data.toJSONString(), tClass);
     }
 

@@ -51,10 +51,36 @@ public interface TaskTestOnService {
      */
     List<Object> findAllEnv(String authId,String rpyId,String env);
 
+    /**
+     * 获取测试集合执行需要的环境
+     * @param authId teston环境地址
+     * @param testPlanId 测试计划ID
+     * @return 需要的环境
+     */
+    List<String> findTestPlanEnv(String authId,String testPlanId);
+
+    /**
+     * 获取api环境地址
+     * @param authId teston环境地址
+     * @param id id
+     * @return api环境
+     */
     TestOnApiEnv findOneTestOnApiEnv(String authId, String id);
 
+    /**
+     * 获取app环境地址
+     * @param authId teston环境地址
+     * @param id id
+     * @return app环境
+     */
     TestOnAppEnv findOneTestOnAppEnv(String authId, String id);
 
+    /**
+     * 获取web环境地址
+     * @param authId teston环境地址
+     * @param id id
+     * @return web环境
+     */
     TestOnWebEnv findOneTestOnWebEnv(String authId, String id);
 
 
@@ -63,7 +89,7 @@ public interface TaskTestOnService {
      * @param authId 认证id
      * @param testPlanTestData 执行信息
      */
-    void execTestPlan(String authId, TestOnPlanTestData testPlanTestData);
+    String execTestPlan(String authId, TestOnPlanTestData testPlanTestData);
 
 
     /**
@@ -79,7 +105,7 @@ public interface TaskTestOnService {
      * @param authId 认证id
      * @return 测试结果
      */
-    TestPlanExecResult findTestPlanExecResult(String authId);
+    TestPlanExecResult findPlanExecResult(String authId,String testPlanId);
 
     /**
      * 查询测试计划的详情

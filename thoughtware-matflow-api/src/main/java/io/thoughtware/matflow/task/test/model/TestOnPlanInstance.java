@@ -9,34 +9,54 @@ public class TestOnPlanInstance {
 
     //@ApiProperty(name = "id", desc = "id")
     private String id;
+
     //@ApiProperty(name = "testPlanId", desc = "所属计划")
     private String testPlanId;
+
+    private TestOnTestPlan testPlan;
+
     //@ApiProperty(name = "repositoryId", desc = "所属仓库")
     private String repositoryId;
+
     //@ApiProperty(name = "executeNumber", desc = "执行次数")
     private Integer executeNumber;
+
     //@ApiProperty(name = "result", desc = "结果")
     private Integer result;
 
     //@ApiProperty(name = "total", desc = "测试总次数")
     private Integer total;
+
     //@ApiProperty(name = "passNum", desc = "通过数")
     private Integer passNum;
+
     //@ApiProperty(name = "failNum", desc = "错误数")
     private Integer failNum;
+
     //@ApiProperty(name = "passRate", desc = "通过率")
     private String passRate;
+
     //@ApiProperty(name = "errorRate", desc = "错误率")
     private String errorRate;
+
     //@ApiProperty(name = "createTime", desc = "创建时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Timestamp createTime;
+
     //@ApiProperty(name = "createUser", desc = "执行人")
     private String createUser;
 
     private String testPlanName;
 
     private String url;
+
+    public TestOnTestPlan getTestPlan() {
+        return testPlan;
+    }
+
+    public void setTestPlan(TestOnTestPlan testPlan) {
+        this.testPlan = testPlan;
+    }
 
     public String getUrl() {
         return url;

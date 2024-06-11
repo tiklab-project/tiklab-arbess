@@ -103,7 +103,7 @@ public class TaskCodeScanExecServiceImpl implements TaskCodeScanExecService {
         String execOrder =  "mvn clean verify sonar:sonar ";
         Scm pipelineScm = scmService.findOnePipelineScm(21);
 
-        if (pipelineScm == null) {
+        if (Objects.isNull(pipelineScm)) {
             throw new ApplicationException("不存在maven配置");
         }
         String mavenAddress = pipelineScm.getScmAddress();
@@ -113,7 +113,7 @@ public class TaskCodeScanExecServiceImpl implements TaskCodeScanExecService {
 
         Process process;
 
-        if (authThird == null){
+        if (Objects.isNull(authThird)){
             tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4) + "执行扫描命令："+execOrder);
             order = mavenOrder(execOrder, path);
             process =  PipelineUtil.process(mavenAddress, order);

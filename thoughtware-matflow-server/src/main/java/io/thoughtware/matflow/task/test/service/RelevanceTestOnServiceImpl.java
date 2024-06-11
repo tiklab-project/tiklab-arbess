@@ -81,7 +81,8 @@ public class RelevanceTestOnServiceImpl implements RelevanceTestOnService{
         return findAllRelevance(relevanceTestOns);
     }
 
-    public  Pagination<RelevanceTestOn> findAllRelevancePage(RelevanceTestOnQuery relevanceTestOnQuery){
+    @Override
+    public Pagination<RelevanceTestOn> findAllRelevancePage(RelevanceTestOnQuery relevanceTestOnQuery){
         Pagination<RelevanceTestOnEntity> allRelevancePage = relevanceTestOnDao.findAllRelevancePage(relevanceTestOnQuery);
         List<RelevanceTestOnEntity> dataList = allRelevancePage.getDataList();
 
@@ -100,14 +101,15 @@ public class RelevanceTestOnServiceImpl implements RelevanceTestOnService{
         List<RelevanceTestOn> list = new ArrayList<>();
 
         for (RelevanceTestOn relevanceTestOn : relevanceTestOnList) {
-            String testonId = relevanceTestOn.getTestonId();
+            String instanceId = relevanceTestOn.getTestonId();
             String authId = relevanceTestOn.getAuthId();
+
             if (Objects.isNull(authId)){
                 deleteRelevance(relevanceTestOn.getAuthId());
                 continue;
             }
             AuthThird authThird = authThirdService.findOneAuthServer(authId);
-            TestOnPlanInstance testPlanInstance = taskTestOnService.findAllTestPlanInstance(authThird.getServerId(), testonId);
+            TestOnPlanInstance testPlanInstance = taskTestOnService.findAllTestPlanInstance(authThird.getServerId(), instanceId);
             relevanceTestOn.setStatus(1);
             if (Objects.isNull(testPlanInstance)){
                 relevanceTestOn.setStatus(2);

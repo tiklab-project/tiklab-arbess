@@ -6,14 +6,15 @@ public class TestOnWebEnv {
 
     private String name;
 
-    private String url;
+    private String preUrl;
 
-    public String getUrl() {
-        return url;
+
+    public String getPreUrl() {
+        return preUrl;
     }
 
-    public void setUrl(String url) {
-        this.url = url;
+    public void setPreUrl(String preUrl) {
+        this.preUrl = preUrl;
     }
 
     public String getId() {

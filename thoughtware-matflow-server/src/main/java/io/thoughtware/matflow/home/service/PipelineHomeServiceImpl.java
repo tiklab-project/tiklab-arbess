@@ -115,7 +115,6 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
             try {
                 String link = (String) map.get("link");
                 map.put("qywxurl", link);
-                System.out.println(baseUrl + link);
                 SendMessageNotice dispatchNotice = new SendMessageNotice();
                 dispatchNotice.setId(templateId);
                 String jsonString = JSONObject.toJSONString(map);

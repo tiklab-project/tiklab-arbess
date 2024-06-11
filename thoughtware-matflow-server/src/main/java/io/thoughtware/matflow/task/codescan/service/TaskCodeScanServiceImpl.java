@@ -57,19 +57,8 @@ public class TaskCodeScanServiceImpl implements TaskCodeScanService {
      */
     @Override
     public TaskCodeScan findOneCodeScanConfig(String configId){
-        List<TaskCodeScan> allCodeScan = findAllCodeScan();
-        if (allCodeScan == null){
-            return null;
-        }
-        for (TaskCodeScan taskCodeScan : allCodeScan) {
-            if (taskCodeScan.getTaskId().equals(configId)){
-                return findOneCodeScan(taskCodeScan.getTaskId());
-            }
-        }
-        return null;
+        return findOneCodeScan(configId);
     }
-
-
 
     /**
      * 删除流水线代码扫描

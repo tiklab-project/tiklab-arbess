@@ -5,6 +5,7 @@ import io.thoughtware.matflow.setting.service.AuthThirdService;
 import io.thoughtware.matflow.support.util.util.PipelineRequestUtil;
 import io.thoughtware.matflow.task.test.model.*;
 import io.thoughtware.core.exception.ApplicationException;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -194,7 +195,32 @@ public class TaskTestOnServiceImpl implements TaskTestOnService {
     }
 
     @Override
-    public void execTestPlan(String authId, TestOnPlanTestData testPlanTestData){
+    public List<String> findTestPlanEnv(String authId,String testPlanId){
+        String serverAddress = findServerAddress(authId);
+        if (Objects.isNull(serverAddress)){
+            throw new ApplicationException("TestOn远程地址不能为空！");
+        }
+        String requestUrl = serverAddress + "/api/testPlanCase/getCaseTypeNum";
+        try {
+
+            HttpHeaders headers = requestUtil.initHeaders(MediaType.MULTIPART_FORM_DATA, null);
+            MultiValueMap<String, Object> paramMap = new LinkedMultiValueMap<>();
+            paramMap.add("testPlanId",testPlanId);
+            Map<String,Integer> map = requestUtil.requestPost(headers, requestUrl, paramMap, Map.class);
+
+            return null;
+        } catch (Throwable throwable){
+            String message = throwable.getMessage();
+            logger.error(message);
+            if (throwable instanceof ApplicationException){
+                throw new ApplicationException(message);
+            }
+            throw new ApplicationException("无法连接到："+serverAddress);
+        }
+    }
+
+    @Override
+    public String execTestPlan(String authId, TestOnPlanTestData testPlanTestData){
 
         String serverAddress = findServerAddress(authId);
         if (Objects.isNull(serverAddress)){
@@ -206,7 +232,7 @@ public class TaskTestOnServiceImpl implements TaskTestOnService {
 
             HttpHeaders headers = requestUtil.initHeaders(MediaType.APPLICATION_JSON, null);
 
-            requestUtil.requestPostList(headers, requestUrl, testPlanTestData, null);
+            return requestUtil.requestPost(headers, requestUrl, testPlanTestData, String.class);
 
         }catch (Throwable throwable){
             String message = throwable.getMessage();
@@ -219,7 +245,7 @@ public class TaskTestOnServiceImpl implements TaskTestOnService {
     }
 
     @Override
-    public TestPlanExecResult findTestPlanExecResult(String authId){
+    public TestPlanExecResult findPlanExecResult(String authId,String testPlanId){
         String serverAddress = findServerAddress(authId);
         if (Objects.isNull(serverAddress)){
             throw new ApplicationException("TestOn远程地址不能为空！");
@@ -227,11 +253,10 @@ public class TaskTestOnServiceImpl implements TaskTestOnService {
         String requestUrl = serverAddress + "/api/testPlanTestDispatch/exeResult";
 
         try {
-
             HttpHeaders headers = requestUtil.initHeaders(MediaType.APPLICATION_JSON, null);
             MultiValueMap<String, Object> paramMap = new LinkedMultiValueMap<>();
+            paramMap.add("testPlanId",testPlanId);
             return requestUtil.requestPost(headers, requestUrl, paramMap, TestPlanExecResult.class);
-
         } catch (Throwable throwable){
             String message = throwable.getMessage();
             logger.error(message);
@@ -247,29 +272,32 @@ public class TaskTestOnServiceImpl implements TaskTestOnService {
 
         String serverAddress = findServerAddress(authId);
 
-        if (serverAddress == null){
+        if (StringUtils.isEmpty(serverAddress)){
             return null;
         }
-        String requestUrl = serverAddress + "/api/testPlanTestDispatch/exeResult";
+        // String requestUrl = serverAddress + "/api/testPlanTestDispatch/exeResult";
+        String requestUrl = serverAddress + "/api/testPlanInstance/findTestPlanInstance";
 
         try {
-
             HttpHeaders headers = requestUtil.initHeaders(MediaType.APPLICATION_JSON, null);
             MultiValueMap<String, Object> paramMap = new LinkedMultiValueMap<>();
-            TestPlanExecResult testPlanExecResult =
-                    requestUtil.requestPost(headers, requestUrl, paramMap, TestPlanExecResult.class);
+            paramMap.add("id",instanceId);
+            TestOnPlanInstance testPlanInstance = requestUtil.requestPost(headers, requestUrl, paramMap, TestOnPlanInstance.class);
 
-            if (Objects.isNull(testPlanExecResult)){
-                return null;
-            }
-            TestOnPlanInstance testPlanInstance = testPlanExecResult.getTestPlanInstance();
-            String testPlanId = testPlanInstance.getTestPlanId();
-            TestOnTestPlan testPlan = findOneTestPlan(authId, testPlanId);
-            if (!Objects.isNull(testPlan)){
-                testPlanInstance.setTestPlanName(testPlan.getName());
-            }else {
+            if (Objects.isNull(testPlanInstance)){
+                testPlanInstance = new TestOnPlanInstance();
                 testPlanInstance.setTestPlanName("测试计划已被删除！");
+            }else {
+                testPlanInstance.setTestPlanName(testPlanInstance.getTestPlan().getName());
+                // TestOnTestPlan testPlan = findOneTestPlan(authId, instanceId);
+                // if (!Objects.isNull(testPlan)){
+                //     testPlanInstance.setTestPlanName(testPlan.getName());
+                // }else {
+                //     testPlanInstance.setTestPlanName("测试计划已被删除！");
+                // }
             }
+            // TestOnPlanInstance testPlanInstance = testPlanExecResult.getTestPlanInstance();
+            // String testPlanId = testPlanInstance.getTestPlanId();
             testPlanInstance.setUrl(serverAddress);
 
             return testPlanInstance;
@@ -277,6 +305,7 @@ public class TaskTestOnServiceImpl implements TaskTestOnService {
             return null;
         }
     }
+
 
     @Override
     public List<TestOnPlanCaseInstance> findTestPlanExecResult(String authId,String instanceId){
