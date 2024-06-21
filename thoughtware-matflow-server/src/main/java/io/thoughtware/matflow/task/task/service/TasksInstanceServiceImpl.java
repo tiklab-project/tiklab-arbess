@@ -12,6 +12,7 @@ import io.thoughtware.matflow.task.task.model.TaskInstanceQuery;
 import io.thoughtware.toolkit.beans.BeanMapper;
 import io.thoughtware.matflow.task.task.entity.TaskInstanceEntity;
 import io.thoughtware.rpc.annotation.Exporter;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -36,8 +37,7 @@ public class TasksInstanceServiceImpl implements TasksInstanceService {
     @Autowired
     PostprocessInstanceService postInstanceService;
 
-    //任务运行时间
-    private final Map<String,Integer> runTime = new HashMap<>();
+    public static Map<String, TaskInstance> taskInstanceMap = new HashMap<>();
 
     @Override
     public String createTaskInstance(TaskInstance taskInstance) {
@@ -103,6 +103,7 @@ public class TasksInstanceServiceImpl implements TasksInstanceService {
 
     @Override
     public List<TaskInstance> findAllInstanceInstance(String instanceId) {
+
         List<TaskInstanceEntity> pipelineInstance = taskInstanceDao.findPipelineInstance(instanceId);
         List<TaskInstance> allInstance = BeanMapper.mapList(pipelineInstance, TaskInstance.class);
         if (Objects.isNull(allInstance) || allInstance.isEmpty()){
@@ -112,42 +113,36 @@ public class TasksInstanceServiceImpl implements TasksInstanceService {
 
         // 没有正在运行的任务时查询所有日志
         TaskInstance taskInstance1 = allInstance.get(allInstance.size() - 1);
-        String runState = taskInstance1.getRunState();
-        if (!runState.equals(PipelineFinal.RUN_RUN)){
+        if (!taskInstance1.getRunState().equals(PipelineFinal.RUN_RUN)){
             readLogLength = 0;
         }
 
         List<TaskInstance> list = new ArrayList<>();
         for (TaskInstance instance : allInstance) {
             String taskInstanceId = instance.getId();
-            //任务是否在运行中
-            TasksExecServiceImpl tasksExecService = new TasksExecServiceImpl();
-            TaskInstance taskInstance5 = tasksExecService.findTaskInstance(taskInstanceId);
-            String time;
-            if (!Objects.isNull(taskInstance5)){
-                Integer integer = findTaskRuntime(taskInstanceId);
-                if (!Objects.isNull(integer)){
-                    taskInstance5.setRunTime(integer);
+
+            TaskInstance taskInstance = taskInstanceMap.get(taskInstanceId);
+            if (!Objects.isNull(taskInstance)) {
+                int time = taskInstance.getRunTime();
+                if (time == 0){
+                    time = 1;
                 }
-                time = PipelineUtil.formatDateTime(integer);
-                taskInstance5.setRunTimeDate(time);
-                list.add(taskInstance5);
-            }else {
-                TaskInstance taskInstances = findPostPipelineRunMessage(taskInstanceId,false);
-                String logAddress = instance.getLogAddress();
-                String readFile = PipelineFileUtil.readFile(logAddress, readLogLength);
-                int date = instance.getRunTime();
-                if (!Objects.isNull(taskInstances)){
-                    date =  date + taskInstances.getRunTime();
-                    readFile = readFile +"\n"+ taskInstances.getRunLog();
+                instance.setRunTime(time);
+                if (!StringUtils.isEmpty(instance.getRunLog())){
+                    instance.setRunLog(instance.getRunLog() + taskInstance.getRunLog());
+                }else {
+                    instance.setRunLog(taskInstance.getRunLog());
                 }
-                time = PipelineUtil.formatDateTime(date);
-                instance.setRunTimeDate(time);
-                instance.setRunLog(readFile);
-                list.add(instance);
+                instance.setRunState(PipelineFinal.RUN_RUN);
             }
+            String logAddress = instance.getLogAddress();
+            String readFile = PipelineFileUtil.readFile(logAddress, readLogLength);
+            String time = PipelineUtil.formatDateTime(instance.getRunTime());
+            instance.setRunTimeDate(time);
+            instance.setRunLog(readFile);
+            list.add(instance);
         }
-        TaskInstance taskInstance = findPostPipelineRunMessage(instanceId,true);
+        TaskInstance taskInstance = findPostPipelineRunMessage(instanceId);
         if (!Objects.isNull(taskInstance)){
             list.add(list.size(),taskInstance);
         }
@@ -155,34 +150,26 @@ public class TasksInstanceServiceImpl implements TasksInstanceService {
     }
 
     @Override
-    public TaskInstance findPostPipelineRunMessage(String id,Boolean b){
-        List<PostprocessInstance> taskPostInstance;
-        if (b){
-            taskPostInstance = postInstanceService.findPipelinePostInstance(id);
-        }else {
-            taskPostInstance = postInstanceService.findTaskPostInstance(id);
-        }
+    public TaskInstance findPostPipelineRunMessage(String instanceId){
+        List<PostprocessInstance> postInstanceList = postInstanceService.findPipelinePostInstance(instanceId);;
 
-        if (Objects.isNull(taskPostInstance) || Objects.equals(taskPostInstance.size(),0)){
+        if (Objects.isNull(postInstanceList) || postInstanceList.isEmpty()){
             return null;
         }
 
         int runTime = 0;
         TaskInstance taskInstances4 = new TaskInstance();
         StringBuilder runLog = new StringBuilder();
-        for (PostprocessInstance postprocessInstance : taskPostInstance) {
+        for (PostprocessInstance postprocessInstance : postInstanceList) {
             String postInstanceId = postprocessInstance.getId();
             List<TaskInstanceEntity> postInstance = taskInstanceDao.findPostInstance(postInstanceId);
             if (Objects.isNull(postInstance) || Objects.equals(postInstance.size(),0)){
                 return null;
             }
-            String taskInstanceId = postInstance.get(0).getId();
             //任务是否在运行中
-            TasksExecServiceImpl tasksExecService = new TasksExecServiceImpl();
-            TaskInstance taskInstance = tasksExecService.findTaskInstance(taskInstanceId);
-            if (Objects.isNull(taskInstance)){
-                 taskInstance = BeanMapper.map(postInstance.get(0), TaskInstance.class);
-            }
+            String taskInstanceId = postInstance.get(0).getId();
+            TaskInstance taskInstance = taskInstanceMap.get(taskInstanceId);
+
             String readFile = PipelineFileUtil.readFile(taskInstance.getLogAddress(), readLogLength);
             runTime = runTime + taskInstance.getRunTime();
             runLog.append(readFile).append("\n");
@@ -207,70 +194,34 @@ public class TasksInstanceServiceImpl implements TasksInstanceService {
         return taskInstances4;
     }
 
-
-    public static Map<String,String> stageIdOrStagePostRunLog = new HashMap<>();
-
-    public static Map<String,Integer> stageIdOrStagePostRunTime = new HashMap<>();
-
-    public static Map<String,String> stageIdOrStagePostRunState = new HashMap<>();
-
-
     @Override
     public List<TaskInstance> findStagePostRunMessage(String id){
         List<PostprocessInstance> taskPostInstance = postInstanceService.findPipelinePostInstance(id);
-        int runTime = 0;
-        String state = PipelineFinal.RUN_HALT;
-        StringBuilder runLog = new StringBuilder();
         List<TaskInstance>  list = new ArrayList<>();
         for (PostprocessInstance postprocessInstance : taskPostInstance) {
             String postInstanceId = postprocessInstance.getId();
-            List<TaskInstanceEntity> postInstance = taskInstanceDao.findPostInstance(postInstanceId);
-            String taskInstanceId = postInstance.get(0).getId();
+            List<TaskInstanceEntity> postInstanceEntityList = taskInstanceDao.findPostInstance(postInstanceId);
             //任务是否在运行中
-            TasksExecServiceImpl tasksExecService = new TasksExecServiceImpl();
-            TaskInstance taskInstance = tasksExecService.findTaskInstance(taskInstanceId);
+            TaskInstance instance = BeanMapper.map(postInstanceEntityList.get(0), TaskInstance.class);
+            String taskInstanceId = instance.getId();
+            TaskInstance taskInstance = taskInstanceMap.get(taskInstanceId);
             if (Objects.isNull(taskInstance)){
-                 taskInstance = BeanMapper.map(postInstance.get(0), TaskInstance.class);
+                String readFile = PipelineFileUtil.readFile(instance.getLogAddress(), 0);
+                instance.setRunLog(readFile);
+            }else {
+                instance.setRunTime(taskInstance.getRunTime());
+                if (!StringUtils.isEmpty(instance.getRunLog())){
+                    instance.setRunLog(instance.getRunLog() + taskInstance.getRunLog());
+                }else {
+                    instance.setRunLog(taskInstance.getRunLog());
+                }
             }
-            String time = PipelineUtil.formatDateTime(taskInstance.getRunTime());
-            taskInstance.setRunTimeDate(time);
-            String readFile = PipelineFileUtil.readFile(taskInstance.getLogAddress(), readLogLength);
-            runTime = runTime + taskInstance.getRunTime();
-            taskInstance.setRunLog(readFile);
-            list.add(taskInstance);
-            runLog.append(readFile).append("\n");
-            state = taskInstance.getRunState();
+            String time = PipelineUtil.formatDateTime(instance.getRunTime());
+            instance.setRunTimeDate(time);
+            list.add(instance);
         }
-        stageIdOrStagePostRunLog.put(id,runLog.toString());
-        stageIdOrStagePostRunTime.put(id,runTime);
-        stageIdOrStagePostRunState.put(id,state);
         return list;
     }
-
-    @Override
-    public Map<String ,Object> findPostRunMessage(String id){
-        Map<String,Object> map = new HashMap<>();
-        String log = stageIdOrStagePostRunLog.get(id);
-        Integer time = stageIdOrStagePostRunTime.get(id);
-        String state = stageIdOrStagePostRunState.get(id);
-        map.put("log",log);
-        map.put("time",time);
-        map.put("state",state);
-        return map;
-    }
-
-    @Override
-    public void removePostRunMessage(String id){
-        stageIdOrStagePostRunLog.remove(id);
-        stageIdOrStagePostRunTime.remove(id);
-        stageIdOrStagePostRunState.remove(id);
-    }
-
-    public static Map<String,String> stageIdOrStageRunLog = new HashMap<>();
-
-    public static Map<String,Integer> stageIdOrStageRunTime = new HashMap<>();
-
-    public static Map<String,String> stageIdOrStageRunState = new HashMap<>();
 
     @Override
     public List<TaskInstance> findAllStageInstance(String stageId) {
@@ -279,95 +230,37 @@ public class TasksInstanceServiceImpl implements TasksInstanceService {
         if (Objects.isNull(allInstance) || allInstance.isEmpty()){
             return Collections.emptyList();
         }
-        StringBuilder stageRunLog = new StringBuilder();
-        int stageRunTime = 0;
-        String runState = PipelineFinal.RUN_SUCCESS;
-        List<TaskInstance> list = new ArrayList<>();
+
+        int allTaskRunTime = 0;
         for (TaskInstance instance : allInstance) {
             String taskInstanceId = instance.getId();
-            TasksExecServiceImpl tasksExecService = new TasksExecServiceImpl();
-            TaskInstance taskInstance3 = tasksExecService.findTaskInstance(taskInstanceId);
-            String time;
-            if (Objects.isNull(taskInstance3)){
-                TaskInstance taskInstances = findPostPipelineRunMessage(taskInstanceId,false);
+
+            TaskInstance taskInstance = taskInstanceMap.get(taskInstanceId);
+            if (Objects.isNull(taskInstance)){
                 String logAddress = instance.getLogAddress();
-                String readFile = PipelineFileUtil.readFile(logAddress, readLogLength);
-                int date = instance.getRunTime();
-                if (!Objects.isNull(taskInstances)){
-                    readFile = readFile +"\n"+ taskInstances.getRunLog();
-                    date =  date + taskInstances.getRunTime();
-                }
+                String readFile = PipelineFileUtil.readFile(logAddress, 2000);
                 instance.setRunLog(readFile);
-                time = PipelineUtil.formatDateTime(date);
-                instance.setRunTimeDate(time);
-                stageRunLog.append(readFile);
-                stageRunTime = stageRunTime + instance.getRunTime();
-                list.add(instance);
             }else {
-                Integer integer = findTaskRuntime(taskInstanceId);
-                if (!Objects.isNull(integer)){
-                    taskInstance3.setRunTime(integer);
+                int time = taskInstance.getRunTime();
+                if (time == 0){
+                    time = 1;
                 }
-                time = PipelineUtil.formatDateTime(integer);
-                taskInstance3.setRunTimeDate(time);
-                stageRunLog.append(taskInstance3.getRunLog());
-                stageRunTime = stageRunTime + integer;
-                list.add(taskInstance3);
+                if (StringUtils.isEmpty(taskInstance.getRunLog()) ){
+                    String logAddress = instance.getLogAddress();
+                    String readFile = PipelineFileUtil.readFile(logAddress, readLogLength);
+                    instance.setRunLog(readFile);
+                }else {
+                    instance.setRunLog(taskInstance.getRunLog());
+                }
+                instance.setRunTime(time);
             }
+            String time = PipelineUtil.formatDateTime(instance.getRunTime());
+            instance.setRunTimeDate(time);
+            allTaskRunTime = allTaskRunTime + instance.getRunTime();
         }
-
-        for (TaskInstance instance : list) {
-            String state = instance.getRunState();
-            if (state.equals(PipelineFinal.RUN_ERROR)){
-                runState = PipelineFinal.RUN_ERROR;
-                break;
-            }
-            if (state.equals(PipelineFinal.RUN_WAIT)){
-                runState = PipelineFinal.RUN_WAIT;
-                break;
-            }
-            if (state.equals(PipelineFinal.RUN_RUN)){
-                runState = PipelineFinal.RUN_RUN;
-                break;
-            }
-
-        }
-        stageIdOrStageRunTime.put(stageId,stageRunTime);
-        stageIdOrStageRunLog.put(stageId, String.valueOf(stageRunLog));
-        stageIdOrStageRunState.put(stageId,runState);
-        return list;
+        return allInstance;
     }
 
-
-    @Override
-    public String findStageRunState(String stageId){
-        return stageIdOrStageRunState.get(stageId);
-    }
-
-    @Override
-    public void removeStageRunState(String stageId){
-        stageIdOrStageRunState.remove(stageId);
-    }
-
-    @Override
-    public String findStageRunLog(String stageId){
-        return stageIdOrStageRunLog.get(stageId);
-    }
-
-    @Override
-    public void removeStageRunLog(String stageId){
-         stageIdOrStageRunLog.remove(stageId);
-    }
-
-    @Override
-    public Integer findStageRunTime(String stageId){
-        return stageIdOrStageRunTime.get(stageId);
-    }
-
-    @Override
-    public void removeStageRunTime(String stageId){
-        stageIdOrStageRunTime.remove(stageId);
-    }
 
     @Override
     public boolean readCommandExecResult(Process process , String enCode, Map<String,String> error,String taskId) {
@@ -465,10 +358,7 @@ public class TasksInstanceServiceImpl implements TasksInstanceService {
         if (Objects.isNull(taskInstance2)){
             return;
         }
-        Integer integer = findTaskRuntime(taskInstanceId);
-        if (!Objects.isNull(integer)){
-            taskInstance2.setRunTime(integer);
-        }
+
         String execInstance = taskInstance2.getRunLog();
 
         if (!PipelineUtil.isNoNull(execInstance)){
@@ -487,7 +377,7 @@ public class TasksInstanceServiceImpl implements TasksInstanceService {
         tasksExecService.putTaskOrTaskInstance(taskInstanceId, taskInstance2);
     }
 
-
+    @Override
     public void writeAllExecLog(String taskId, String execLog){
         if(!PipelineUtil.isNoNull(execLog)){
             return;
@@ -495,10 +385,6 @@ public class TasksInstanceServiceImpl implements TasksInstanceService {
         TasksExecServiceImpl tasksExecService = new TasksExecServiceImpl();
         String taskInstanceId = tasksExecService.findTaskInstanceId(taskId);
         TaskInstance taskInstance1 = tasksExecService.findTaskInstance(taskInstanceId);
-        Integer integer = findTaskRuntime(taskInstanceId);
-        if (!Objects.isNull(integer)){
-            taskInstance1.setRunTime(integer);
-        }
         String execInstance = taskInstance1.getRunLog();
 
         if (!PipelineUtil.isNoNull(execInstance)){
@@ -541,64 +427,4 @@ public class TasksInstanceServiceImpl implements TasksInstanceService {
         }
         return BeanMapper.mapList(pipelineInstanceList,TaskInstance.class);
     }
-
-
-    //时间线程池
-    private final ExecutorService timeThreadPool = Executors.newCachedThreadPool();
-
-    @Override
-    public void taskRuntime(String taskInstanceId){
-        runTime.put(taskInstanceId,0);
-        timeThreadPool.submit(() -> {
-            while (true){
-                Thread.currentThread().setName(taskInstanceId);
-                int integer = findTaskRuntime(taskInstanceId);
-                try {
-                    Thread.sleep(1000);
-                }catch (RuntimeException e){
-                    throw new RuntimeException();
-                }
-                integer = integer +1;
-                runTime.put(taskInstanceId,integer);
-            }
-        });
-    }
-
-    @Override
-    public Integer findTaskRuntime(String taskInstanceId){
-        Integer integer = runTime.get(taskInstanceId);
-        if (Objects.isNull(integer)){
-            return 0;
-        }
-        return integer;
-    }
-
-
-    @Override
-    public void removeTaskRuntime(String taskInstanceId){
-        runTime.remove(taskInstanceId);
-        stopThread(taskInstanceId);
-    }
-
-
-
-    public void stopThread(String threadName){
-        ThreadGroup currentGroup = Thread.currentThread().getThreadGroup();
-        int noThreads = currentGroup.activeCount();
-        Thread[] lstThreads = new Thread[noThreads];
-        if (Objects.equals(lstThreads.length,0)){
-            return;
-        }
-        currentGroup.enumerate(lstThreads);
-        for (int i = 0; i < noThreads; i++) {
-            String nm = lstThreads[i].getName();
-            if (!PipelineUtil.isNoNull(nm) ||!nm.equals(threadName)) {
-                continue;
-            }
-            lstThreads[i].stop();
-        }
-    }
-
-
-
 }

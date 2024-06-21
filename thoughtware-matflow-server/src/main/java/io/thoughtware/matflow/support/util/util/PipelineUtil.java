@@ -191,16 +191,6 @@ public class PipelineUtil {
     }
 
     /**
-     * 效验URl地址
-     * @param url url
-     * @return 效验成功或失败
-     */
-    public static boolean validURL(String url){
-        String valid = "^(http|ftp|https):\\/\\/[\\w\\-_]+(\\.[\\w\\-_]+)+([\\w\\-\\.,@?^=%&:/~\\+#]*[\\w\\-\\@?^=%&/~\\+#])?";
-        return Pattern.matches(valid,url);
-    }
-
-    /**
      * 系统类型
      * @return 1.windows 2.其他
      */
@@ -231,8 +221,6 @@ public class PipelineUtil {
             if (!PipelineUtil.isNoNull(path)){
                 ProcessBuilder processBuilder = new ProcessBuilder("cmd.exe", "/c", order);
                 process = processBuilder.start();
-                // cmd = new String[] { "cmd.exe", "/c", " " + order };
-                // process = runtime.exec(cmd);
             }else {
                 cmd = new String[] { "cmd.exe", "/c", " " + order };
                 process = runtime.exec(cmd,null,new File(path));

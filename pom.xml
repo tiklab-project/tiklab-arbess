@@ -22,7 +22,9 @@
     </modules>
 
     <properties>
-        
+
+        <thoughtware-matflow-agent.version>1.0.0-SNAPSHOT</thoughtware-matflow-agent.version>
+
         <!--thoughtware-->
         <thoughtware-dal.version>1.0.0</thoughtware-dal.version>
         <thoughtware-core.version>1.0.0</thoughtware-core.version>

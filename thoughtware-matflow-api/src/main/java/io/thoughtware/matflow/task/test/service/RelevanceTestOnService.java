@@ -1,6 +1,7 @@
 package io.thoughtware.matflow.task.test.service;
 
 import io.thoughtware.core.page.Pagination;
+import io.thoughtware.matflow.task.test.model.TestOnRelevance;
 import io.thoughtware.toolkit.join.annotation.FindAll;
 import io.thoughtware.toolkit.join.annotation.FindList;
 import io.thoughtware.toolkit.join.annotation.FindOne;
@@ -14,7 +15,7 @@ import java.util.List;
 public interface RelevanceTestOnService {
 
 
-    void createRelevance(String pipelineId,String instanceId,String authId);
+    void createRelevance(TestOnRelevance testOnRelevance);
 
 
     /**

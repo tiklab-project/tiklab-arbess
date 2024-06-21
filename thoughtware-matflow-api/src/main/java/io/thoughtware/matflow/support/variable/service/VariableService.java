@@ -45,6 +45,11 @@ public interface VariableService {
      */
     Variable findOneVariable(String varId);
 
+    /**
+     * 获取所以变量
+     * @return 变量
+     */
+    List<Variable> findAllVariable();
 
     /**
      * 查询流水线所有变量
@@ -53,7 +58,11 @@ public interface VariableService {
      */
     List<Variable> findAllVariable(String taskId);
 
-
+    /**
+     * 条件查询变量
+     * @param query 条件
+     * @return 变量列表
+     */
     List<Variable> findVariableList(VariableQuery query);
 
     // 克隆变量

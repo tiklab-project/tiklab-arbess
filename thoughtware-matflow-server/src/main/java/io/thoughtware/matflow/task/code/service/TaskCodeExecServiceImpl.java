@@ -48,9 +48,6 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
     TasksInstanceService tasksInstanceService;
 
     @Autowired
-    VariableService variableServer;
-
-    @Autowired
     ScmService scmService;
 
     @Autowired
@@ -61,9 +58,6 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
 
     @Autowired
     AuthThirdService thirdService;
-
-    // @Autowired
-    // TaskCodeThirdService codeThirdService;
 
     @Autowired
     PipelineUtilService utilService;
@@ -101,11 +95,6 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
         TaskCode code = JSON.parseObject(object, TaskCode.class);
         code.setType(taskType);
 
-        // if (taskType.equals(PipelineFinal.TASK_CODE_XCODE)){
-        //     XcodeRepository repository = code.getRepository();
-        //     code.setCodeAddress(repository.getFullPath());
-        // }
-
         if (!PipelineUtil.isNoNull(code.getCodeAddress())){
             tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"代码源地址未配置。");
             return false;
@@ -139,7 +128,6 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
         tasksInstanceService.writeExecLog(taskId,s);
 
         try {
-
             tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+ "拉取远程代码..." );
 
             //命令执行失败
@@ -230,10 +218,10 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
                     path = list.get(3);
                    if (PipelineUtil.findSystemType() != 1){
                        logger.info("执行更改文件权限:" +" chmod 600 "+" "+path);
-                       process(serverAddress, " chmod 600 "+" "+path);
+                       PipelineUtil.process(serverAddress, " chmod 600 "+" "+path);
                    }
 
-                    Process process = process(serverAddress, gitOrder);
+                    Process process = PipelineUtil.process(serverAddress, gitOrder);
                     logger.info("执行：" + gitOrder);
                     if (PipelineUtil.isNoNull(path)){
                         try {
@@ -246,9 +234,7 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
                     return process;
                 }
             }
-            // case TASK_CODE_XCODE ->{
-            //     gitOrder = gitXcodeOrder(taskCode, fileAddress);
-            // }
+
             //第三方授权
             case TASK_CODE_GITEE ,TASK_CODE_GITHUB ,TASK_CODE_GITLAB ,TASK_CODE_XCODE->
                     gitOrder = gitThirdOrder(taskCode, fileAddress);
@@ -258,31 +244,9 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
             //错误
             default -> throw new ApplicationException("未知的任务类型");
         }
-        logger.warn("执行代码克隆命令："+ gitOrder);
+        logger.warn("执行代码克隆命令：{}", gitOrder);
         return PipelineUtil.process(serverAddress, gitOrder);
     }
-
-    /**
-     * 组装xcode git命令
-     * @param taskCode 源码信息
-     * @param fileAddress 存放位置
-     * @return 执行命令
-     * @throws URISyntaxException url格式不正确
-     * @throws MalformedURLException 不是https或者http
-     */
-    private String gitXcodeOrder(TaskCode taskCode, String fileAddress) throws MalformedURLException, URISyntaxException {
-        // String authId = taskCode.getAuthId();
-        // StringBuilder codeAddress = new StringBuilder(taskCode.getCodeAddress());
-        // AuthThird auth = thirdService.findOneAuthServer(authId);
-        // if (Objects.isNull(auth)){
-        //     return gitBranch(codeAddress, taskCode, fileAddress);
-        // }
-        //
-        // StringBuilder stringBuilder = gitUrl(auth.getUsername(), auth.getPassword(), codeAddress);
-        // return gitBranch(stringBuilder, taskCode, fileAddress);
-        return null;
-    }
-
 
     /**
      * 组装http git命令
@@ -292,8 +256,7 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
      * @throws URISyntaxException url格式不正确
      * @throws MalformedURLException 不是https或者http
      */
-    private List<String> gitUpOrder(TaskCode taskCode, String fileAddress)
-            throws URISyntaxException, MalformedURLException , ApplicationException {
+    private List<String> gitUpOrder(TaskCode taskCode, String fileAddress) throws URISyntaxException, MalformedURLException , ApplicationException {
         String authId = taskCode.getAuthId();
         Auth auth = authServer.findOneAuth(authId);
 
@@ -302,7 +265,7 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
         StringBuilder codeAddress = new StringBuilder(taskCode.getCodeAddress());
 
         //没有凭证
-        if (auth == null){
+        if (Objects.isNull(auth)){
             String s = gitBranch(codeAddress, taskCode, fileAddress);
             list.add(s);
             return list;
@@ -393,11 +356,8 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
      * @return 地址
      */
     private String gitBranch(StringBuilder url , TaskCode code, String codeDir){
-        String type = code.getType();
+
         String branch = code.getCodeBranch();
-        // if (type.equals(TASK_CODE_XCODE) && !Objects.isNull(code.getBranch())){
-        //     branch = code.getBranch().getBranchName();
-        // }
 
         //分支
         if(!PipelineUtil.isNoNull(branch)){
@@ -433,8 +393,7 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
      * @throws URISyntaxException 不是个url
      * @throws MalformedURLException 不属于http或者https
      */
-    private String gitThirdOrder(TaskCode taskCode, String fileAddress)
-            throws MalformedURLException, URISyntaxException,ApplicationException {
+    private String gitThirdOrder(TaskCode taskCode, String fileAddress) throws MalformedURLException, URISyntaxException,ApplicationException {
         String authId = taskCode.getAuthId();
         AuthThird auth = thirdService.findOneAuthServer(authId);
         StringBuilder codeAddress = new StringBuilder(taskCode.getCodeAddress());
@@ -465,10 +424,6 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
             throw new ApplicationException("无法获取授权用户信息");
         }
 
-        // String thirdToken = codeThirdService.findUserAuthThirdToken(authId, auth.getAccessToken());
-        // if (Objects.isNull(thirdToken)){
-        //     throw new ApplicationException("获取第三方Token失败。");
-        // }
         StringBuilder stringBuilder = gitUrl(userName, passWard, codeAddress);
         return gitBranch(stringBuilder, taskCode,fileAddress);
     }
@@ -498,12 +453,12 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
             if (auth.getAuthType() == 1){
                 String username = auth.getUsername();
                 String password = auth.getPassword();
-                codeAddress  = codeAddress + " --username "+ " "  +username + " --password " + " " + password + " " +codeDir;
+                codeAddress  = codeAddress + " --username "+ " "  +username + " --password " + " " + password + " " + codeDir;
             }else {
                 throw new ApplicationException("SVN暂不支持使用秘钥认证！");
             }
         }else {
-            codeAddress  = codeAddress + " " +codeDir;
+            codeAddress  = codeAddress + " " + codeDir;
         }
 
         //不同系统检出
@@ -585,7 +540,6 @@ public class TaskCodeExecServiceImpl implements TaskCodeExecService {
         map.put("fatal: ","拉取失败！");
         return map;
     }
-
 
     /**
      * 执行cmd命令

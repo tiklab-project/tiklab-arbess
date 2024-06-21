@@ -89,7 +89,7 @@ public class Pipeline {
     /**
      * @pi.name:state
      * @pi.dataType:Integer
-     * @pi.desc:运行状态 1.运行中 2.停止中,3.等待执行
+     * @pi.desc:运行状态 1.未运行 2.运行中
      * @pi.value:1
      */
     private int state;

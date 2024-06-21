@@ -43,7 +43,7 @@ public interface TasksExecService {
      * @param id 流水线实例id或阶段实例id或后置处理实例id
      * @param type 1.实例id 2.阶段id 3.后置处理实例id
      */
-    void createTaskExecInstance(Tasks task, String id, int type,String logPath);
+    String createTaskExecInstance(Tasks task, String id, int type,String logPath);
 
     /**
      * 停止指定线程

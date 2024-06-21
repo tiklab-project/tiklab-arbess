@@ -1,6 +1,10 @@
 package io.thoughtware.matflow.support.postprocess.service;
 
+import io.thoughtware.matflow.pipeline.execute.model.PipelineDetails;
+import io.thoughtware.matflow.support.postprocess.model.Postprocess;
 import io.thoughtware.matflow.task.task.model.TaskExecMessage;
+
+import java.util.List;
 
 
 /**
@@ -14,28 +18,14 @@ public interface PostprocessExecService {
      * @param pipelineId 流水线id
      * @param instanceId 流水线实例id
      */
-    void createPipelinePostInstance(String pipelineId,String instanceId);
-
-    /**
-     * 创建流水线任务后置任务实例
-     * @param taskId 任务id
-     */
-    void createTaskPostInstance(String pipelineId, String instanceId, String taskId);
-
+    List<Postprocess> createPipelinePostInstance(String pipelineId, String instanceId);
 
     /**
      * 执行流水线后置任务
-     * @param taskExecMessage 执行信息
+     * @param pipelineDetails 执行信息
      * @return 后置任务执行状态
      */
-    boolean execPipelinePost(TaskExecMessage taskExecMessage);
-
-    /**
-     * 执行任务后置任务
-     * @param taskExecMessage 流水线信息
-     * @return 后置任务执行状态
-     */
-    boolean execTaskPostTask(TaskExecMessage taskExecMessage);
+    boolean execPipelinePost(PipelineDetails pipelineDetails);
 
 
     /**

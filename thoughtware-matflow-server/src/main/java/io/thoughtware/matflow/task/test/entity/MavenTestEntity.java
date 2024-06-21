@@ -7,7 +7,6 @@ import io.thoughtware.dal.jpa.annotation.*;
 public class MavenTestEntity {
 
     @Id
-    @GeneratorValue(length = 12)
     @Column(name = "id" ,notNull = true)
     private String id;
 

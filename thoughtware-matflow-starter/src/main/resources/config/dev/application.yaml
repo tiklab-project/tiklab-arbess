@@ -5,14 +5,18 @@ APP_HOME: ${APP_HOME}
 
 application: matflow
 
-setting:
-  address: tiklab-matflow-starter/src/main/resources/settings.xml
+spring:
+  main:
+    allow-bean-definition-overriding: true
 
-spotbugs:
-  address: /embbed/spotbugs-4.8.1/bin
+matflow:
+  setting:
+    address: /Users/zcamy/Java/thoughtware-matflow-agent/thoughtware-matflow-agent-starter/src/main/resources/settings.xml
+  spotbugs:
+    address: /Users/zcamy/Java/thoughtware-matflow-agent/thoughtware-matflow-agent-starter/embbed/spotbugs-4.8.1/bin/spotbugs
+  jdk:
+    address: /Users/zcamy/Java/thoughtware-matflow-agent/thoughtware-matflow-agent-starter/embbed/jdk-16.0.2
 
-jdk:
-  address: /Users/zcamy/apply/jdk-17.0.9.jdk/Contents/Home
 
 server:
   port: 8090
@@ -28,6 +32,13 @@ DATA_HOME: ${user.home}/thoughtware/run_cache/matflow/
 
 plugin:
   path: ${DATA_HOME}/plugin
+
+ws:
+  name: local
+  server:
+    enabled: true
+  enterprise: default
+  url : 192.168.10.10:8090
 
 #dfs config
 dfs:

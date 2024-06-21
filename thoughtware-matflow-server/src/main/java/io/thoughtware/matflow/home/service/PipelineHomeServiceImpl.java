@@ -1,6 +1,7 @@
 package io.thoughtware.matflow.home.service;
 
 import com.alibaba.fastjson.JSONObject;
+import io.thoughtware.matflow.home.model.MessageDetail;
 import io.thoughtware.matflow.support.util.util.PipelineFinal;
 import io.thoughtware.eam.common.context.LoginContext;
 import io.thoughtware.matflow.pipeline.definition.model.Pipeline;
@@ -33,7 +34,6 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
 
     @Autowired
     SendMessageNoticeService dispatchNoticeService;
-
 
     @Value("${base.url:null}")
     String baseUrl;
@@ -142,9 +142,8 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
 
     }
 
-
     /**
-     * 发送消息（站内信）
+     * 发送消息（指定类型）
      * @param receiver 接收信息
      * @param map 信息
      */
@@ -179,6 +178,14 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
         String pipelineName = (String) map.get("pipelineName");
         message.setAction(pipelineName);
         dispatchNoticeService.sendMessage(message);
+    }
+
+
+    public void message(MessageDetail messageDetail){
+        String pipelineId = messageDetail.getPipelineId();
+
+
+
     }
 
     /**

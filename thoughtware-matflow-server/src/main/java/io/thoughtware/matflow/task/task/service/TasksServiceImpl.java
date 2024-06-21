@@ -2,6 +2,7 @@ package io.thoughtware.matflow.task.task.service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import io.thoughtware.matflow.setting.model.AuthThird;
 import io.thoughtware.matflow.setting.service.AuthHostService;
 import io.thoughtware.matflow.setting.service.AuthService;
 import io.thoughtware.matflow.setting.service.AuthThirdService;
@@ -15,7 +16,12 @@ import io.thoughtware.matflow.task.artifact.service.TaskArtifactService;
 import io.thoughtware.matflow.task.build.model.TaskBuild;
 import io.thoughtware.matflow.task.build.service.TaskBuildService;
 import io.thoughtware.matflow.task.code.model.TaskCode;
+import io.thoughtware.matflow.task.code.model.ThirdQuery;
+import io.thoughtware.matflow.task.code.model.ThirdUser;
 import io.thoughtware.matflow.task.code.model.XcodeRepository;
+import io.thoughtware.matflow.task.code.service.TaskCodeGitHubService;
+import io.thoughtware.matflow.task.code.service.TaskCodeGitLabService;
+import io.thoughtware.matflow.task.code.service.TaskCodeGiteeService;
 import io.thoughtware.matflow.task.code.service.TaskCodeService;
 import io.thoughtware.matflow.task.codescan.model.TaskCodeScan;
 import io.thoughtware.matflow.task.codescan.service.TaskCodeScanService;
@@ -48,6 +54,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+
+import static io.thoughtware.matflow.support.util.util.PipelineFinal.*;
 
 @Service
 @Exporter
@@ -97,6 +105,15 @@ public class TasksServiceImpl implements TasksService {
 
     @Autowired
     PostprocessDao postprocessDao;
+
+    @Autowired
+    TaskCodeGiteeService taskCodeGiteeService;
+
+    @Autowired
+    TaskCodeGitHubService taskCodeGitHubService;
+
+    @Autowired
+    TaskCodeGitLabService taskCodeGitLabService;
 
     @Autowired
     TaskPullArtifactService pullArtifactService;
@@ -316,6 +333,7 @@ public class TasksServiceImpl implements TasksService {
         String taskId = postTask.getTaskId();
         Object task = findOneDifferentTask(taskId, taskType);
         postTask.setValues(task);
+        postTask.setTask(task);
         postTask.setTaskType(taskType);
         return postTask;
     }
@@ -383,7 +401,43 @@ public class TasksServiceImpl implements TasksService {
                     if (!Objects.isNull(authId)){
                         Object auth ;
                         switch (taskType) {
-                            case PipelineFinal.TASK_CODE_GITEE, PipelineFinal.TASK_CODE_GITHUB , PipelineFinal.TASK_CODE_XCODE ->{
+                            case PipelineFinal.TASK_CODE_GITEE ->{
+                                AuthThird authThird = authServerServer.findOneAuthServer(authId);
+                                try {
+                                    ThirdQuery thirdQuery = new ThirdQuery();
+                                    thirdQuery.setAuthId(authId);
+                                    ThirdUser thirdUser = taskCodeGiteeService.findAuthUser(thirdQuery);
+                                    authThird.setUsername(thirdUser.getPath());
+                                }catch (Exception e){
+                                    logger.error("获取GitEe授权用户名失败，原因：{}",e.getMessage());
+                                }
+                                auth = authThird;
+                            }
+                            case  PipelineFinal.TASK_CODE_GITHUB  ->{
+                                AuthThird authThird = authServerServer.findOneAuthServer(authId);
+                                try {
+                                    ThirdQuery thirdQuery = new ThirdQuery();
+                                    thirdQuery.setAuthId(authId);
+                                    ThirdUser thirdUser = taskCodeGitHubService.findAuthUser(thirdQuery);
+                                    authThird.setUsername(thirdUser.getPath());
+                                }catch (Exception e){
+                                    logger.error("获取GiTHub授权用户名失败，原因：{}",e.getMessage());
+                                }
+                                auth = authThird;
+                            }
+                            case PipelineFinal.TASK_CODE_GITLAB->{
+                                AuthThird authThird = authServerServer.findOneAuthServer(authId);
+                                try {
+                                    ThirdQuery thirdQuery = new ThirdQuery();
+                                    thirdQuery.setAuthId(authId);
+                                    ThirdUser thirdUser = taskCodeGitLabService.findAuthUser(thirdQuery);
+                                    authThird.setUsername(thirdUser.getPath());
+                                }catch (Exception e){
+                                    logger.error("获取GitLab授权用户名失败，原因：{}",e.getMessage());
+                                }
+                                auth = authThird;
+                            }
+                            case  PipelineFinal.TASK_CODE_XCODE ->{
                                 auth = authServerServer.findOneAuthServer(authId);
                             }
                             default -> {
@@ -392,7 +446,7 @@ public class TasksServiceImpl implements TasksService {
                         }
                         taskCode.setAuth(auth);
                     }
-                    object =  taskCode;
+                    object = taskCode;
                 }
                 case PipelineFinal.TASK_TYPE_TEST -> {
                     TaskTest taskTest = testService.findOneTest(taskId);
@@ -482,8 +536,15 @@ public class TasksServiceImpl implements TasksService {
         if (tasks.isEmpty()){
             return Collections.emptyList();
         }
-        List<Tasks> allTaskOrTask = findAllTaskOrTask(tasks);
-        return bindTaskAuth(allTaskOrTask);
+        for (Tasks tasks1 : tasks) {
+            String taskId = tasks1.getTaskId();
+            String taskType = tasks1.getTaskType();
+            Object task = findOneDifferentTask(taskId, taskType);
+            tasks1.setValues(task);
+            tasks1.setTask(task);
+        }
+        // List<Tasks> allTaskOrTask = findAllTaskOrTask(tasks);
+        return tasks;
     }
 
     @Override
@@ -581,6 +642,7 @@ public class TasksServiceImpl implements TasksService {
         return BeanMapper.mapList(allConfigure, Tasks.class);
     }
 
+    @Override
     public void clonePostTasks(String id ,String cloneId){
 
         Tasks task = findOnePostTask(id);
@@ -593,7 +655,6 @@ public class TasksServiceImpl implements TasksService {
         // 克隆任务详情
         cloneDifferentTask(task.getTaskId(),taskCloneId,task.getTaskType());
     }
-
 
     @Override
     public void cloneTasks(String id,String cloneId,String type){
@@ -745,17 +806,28 @@ public class TasksServiceImpl implements TasksService {
                 TaskTest task = new TaskTest();
                 task.setTaskId(taskId);
                 task.setAddress(PipelineFinal.DEFAULT_CODE_ADDRESS);
+                task.setTestOrder(TEST_DEFAULT_ORDER);
                 testService.createTest(task);
             }
             case PipelineFinal.TASK_TYPE_BUILD    -> {
                 TaskBuild task = new TaskBuild();
                 task.setTaskId(taskId);
+                switch (taskType){
+                    case PipelineFinal.TASK_BUILD_MAVEN -> {
+                        task.setBuildOrder(MAVEN_DEFAULT_ORDER);
+                    }
+                    case PipelineFinal.TASK_BUILD_NODEJS -> {
+                        task.setBuildOrder(NODE_DEFAULT_ORDER);
+                    }
+                }
+                task.setBuildAddress(PipelineFinal.DEFAULT_CODE_ADDRESS);
                 buildService.createBuild(task);
             }
             case PipelineFinal.TASK_TYPE_DEPLOY   -> {
                 TaskDeploy task = new TaskDeploy();
                 task.setTaskId(taskId);
                 task.setAuthType(1);
+                task.setDeployAddress(PipelineFinal.DEFAULT_CODE_ADDRESS);
                 deployService.createDeploy(task);
             }
             case PipelineFinal.TASK_TYPE_CODESCAN -> {
@@ -962,7 +1034,7 @@ public class TasksServiceImpl implements TasksService {
     private Object findOneDifferentTask(String taskId,String taskType){
         switch (findTaskType(taskType)) {
             case PipelineFinal.TASK_TYPE_CODE     -> {
-                return codeService.findOneCode(taskId);
+                return codeService.findOneCodeConfig(taskId);
             }
             case PipelineFinal.TASK_TYPE_TEST     -> {
                 return testService.findOneTestConfig(taskId);

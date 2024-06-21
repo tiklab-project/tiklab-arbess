@@ -35,8 +35,7 @@ public interface TaskCodeService {
      * @param taskId 配置id
      * @return 任务
      */
-    TaskCode findOneCodeConfig(String taskId,String taskType);
-
+    TaskCode findOneCodeConfig(String taskId);
 
     /**
      * 删除
@@ -57,6 +56,7 @@ public interface TaskCodeService {
      */
     @FindOne
     TaskCode findOneCode(String codeId);
+
     /**
      * 查询所有信息
      * @return code信息集合

@@ -68,7 +68,7 @@ public class TasksExecServiceImpl implements TasksExecService {
     public static  Map<String, TaskInstance> taskOrTaskInstance = new HashMap<>();
 
     @Override
-    public void createTaskExecInstance(Tasks task, String instanceId, int type, String logPath){
+    public String createTaskExecInstance(Tasks task, String instanceId, int type, String logPath){
         TaskInstance instance = new TaskInstance();
         if (type == 1){
             instance.setInstanceId(instanceId);
@@ -93,6 +93,7 @@ public class TasksExecServiceImpl implements TasksExecService {
         tasksInstanceService.updateTaskInstance(instance);
         putTaskOrTaskInstance(taskInstanceId,instance);
         taskIdOrTaskInstanceId.put(task.getTaskId(),taskInstanceId);
+        return taskInstanceId;
     }
 
     @Override
@@ -101,8 +102,8 @@ public class TasksExecServiceImpl implements TasksExecService {
 
         logger.warn("执行任务：" + tasks.getTaskName());
         String taskInstanceId = findTaskInstanceId(taskId);
-        //计算时间
-        tasksInstanceService.taskRuntime(taskInstanceId);
+        // //计算时间
+        // tasksInstanceService.taskRuntime(taskInstanceId);
 
         //更改日志为运行运行中
         TaskInstance instance = findTaskInstance(taskInstanceId);
@@ -136,7 +137,7 @@ public class TasksExecServiceImpl implements TasksExecService {
         String taskId = taskExecMessage.getTasks().getTaskId();
         String taskInstanceId = findTaskInstanceId(taskId);
         //计算时间
-        tasksInstanceService.taskRuntime(taskInstanceId);
+        // tasksInstanceService.taskRuntime(taskInstanceId);
 
         String taskName = taskExecMessage.getTaskName();
         logger.info("执行任务：{}" , taskName);
@@ -173,14 +174,14 @@ public class TasksExecServiceImpl implements TasksExecService {
         String runLog = instance.getRunLog();
         PipelineFileUtil.logWriteFile(runLog,logAddress);
 
-        Integer integer = tasksInstanceService.findTaskRuntime(taskInstanceId);
-        if (!Objects.isNull(integer)){
-            instance.setRunTime(integer);
-        }
+        // Integer integer = tasksInstanceService.findTaskRuntime(taskInstanceId);
+        // if (!Objects.isNull(integer)){
+        //     instance.setRunTime(integer);
+        // }
         //更新数据库数据,移除内存中的实例数据
         tasksInstanceService.updateTaskInstance(instance);
 
-        tasksInstanceService.removeTaskRuntime(taskInstanceId);
+        // tasksInstanceService.removeTaskRuntime(taskInstanceId);
         taskIdOrTaskInstanceId.remove(taskId);
         taskOrTaskInstance.remove(taskInstanceId);
 
@@ -197,10 +198,10 @@ public class TasksExecServiceImpl implements TasksExecService {
             stopThread(taskId);
             return;
         }
-        Integer integer = tasksInstanceService.findTaskRuntime(taskInstanceId);
-        if (!Objects.isNull(integer)){
-            taskInstance.setRunTime(integer);
-        }
+        // Integer integer = tasksInstanceService.findTaskRuntime(taskInstanceId);
+        // if (!Objects.isNull(integer)){
+        //     taskInstance.setRunTime(integer);
+        // }
         taskInstance.setRunState(PipelineFinal.RUN_HALT);
         tasksInstanceService.updateTaskInstance(taskInstance);
 
@@ -209,7 +210,7 @@ public class TasksExecServiceImpl implements TasksExecService {
         tasksInstanceService.writeAllExecLog(taskId, PipelineUtil.date(4)+"任务"+task.getTaskName()+"运行终止。");
         //移除内存
 
-        tasksInstanceService.removeTaskRuntime(taskInstanceId);
+        // tasksInstanceService.removeTaskRuntime(taskInstanceId);
         stopThread(taskId);
         taskIdOrTaskInstanceId.remove(taskId);
         taskOrTaskInstance.remove(taskInstanceId);
@@ -228,10 +229,10 @@ public class TasksExecServiceImpl implements TasksExecService {
         for (TaskInstance taskInstance6 : taskInstanceList) {
             String id = taskInstance6.getId();
             taskInstance6.setRunState(PipelineFinal.RUN_HALT);
-            Integer integer = tasksInstanceService.findTaskRuntime(id);
-            if (!Objects.isNull(integer)){
-                taskInstance6.setRunTime(integer);
-            }
+            // Integer integer = tasksInstanceService.findTaskRuntime(id);
+            // if (!Objects.isNull(integer)){
+            //     taskInstance6.setRunTime(integer);
+            // }
             tasksInstanceService.updateTaskInstance(taskInstance6);
         }
     }

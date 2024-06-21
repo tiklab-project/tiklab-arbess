@@ -46,6 +46,17 @@ public class SpotbugsBugSummary {
     // xml文件报错地址
     private String xmlPath;
 
+    // xml文件内容
+    private String xmlFileContent;
+
+    public String getXmlFileContent() {
+        return xmlFileContent;
+    }
+
+    public void setXmlFileContent(String xmlFileContent) {
+        this.xmlFileContent = xmlFileContent;
+    }
+
     public String getXmlPath() {
         return xmlPath;
     }

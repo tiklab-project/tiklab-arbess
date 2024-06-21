@@ -68,7 +68,6 @@ public class PipelineUtilServiceImpl implements PipelineUtilService {
             return file2.getAbsolutePath();
         }
 
-
         List<String> filePath = PipelineFileUtil.getFilePath(new File(fileDir),new ArrayList<>());
         for (String s : filePath) {
             File file = new File(s);

@@ -23,14 +23,12 @@ public interface StageInstanceServer {
      */
     void deleteAllMainStageInstance(String instanceId);
 
-
-    List<String> findAllStageInstanceLogs(String instanceId);
-
     /**
-     * 删除阶段下的所有实例
-     * @param stageId 阶段id
+     * 查看完整日志
+     * @param instanceId 示例ID
+     * @return 日志
      */
-    void deleteAllStageInstance(String stageId);
+    List<String> findAllStageInstanceLogs(String instanceId);
 
     /**
      * 更新阶段实例内容
@@ -50,14 +48,14 @@ public interface StageInstanceServer {
      * @param instanceId 流水线运行实例id
      * @return 阶段运行实例
      */
-    List<StageInstance> findAllMainStageInstance(String instanceId);
+    List<StageInstance> findMainStageInstance(String instanceId);
 
     /**
      * 查询主阶段实例下的所有运行实例
      * @param mainStageId 主阶段id
      * @return 运行实例
      */
-    List<StageInstance> findAllOtherStageInstance(String mainStageId);
+    List<StageInstance> findOtherStageInstance(String mainStageId);
 
     /**
      * 查询阶段运行实例
@@ -66,13 +64,6 @@ public interface StageInstanceServer {
      */
     List<StageInstance> findStageExecInstance(String instanceId);
 
-    void stageRunTime(String stageInstanceId);
-
-
-    Integer findStageRunTime(String stageInstanceId);
-
-
-    void removeStageRunTime(String stageInstanceId);
 
 
     List<StageInstance> findStageInstanceList(StageInstanceQuery query);

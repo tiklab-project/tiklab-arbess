@@ -59,6 +59,17 @@ public class Stage {
     //@ApiProperty(name = "parallelName",desc="并行阶段名称")
     private String parallelName;
 
+    // 执行实例id
+    private String instanceId;
+
+    public String getInstanceId() {
+        return instanceId;
+    }
+
+    public void setInstanceId(String instanceId) {
+        this.instanceId = instanceId;
+    }
+
     public String getStageId() {
         return stageId;
     }

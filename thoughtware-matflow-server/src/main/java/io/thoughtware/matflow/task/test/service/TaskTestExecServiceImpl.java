@@ -117,7 +117,7 @@ public class TaskTestExecServiceImpl implements TaskTestExecService {
         testData.setTestPlanId(testPlan.getId());
         testData.setRepositoryId(repository.getId());
 
-        // logger.info("TestOn执行信息：" + JSONObject.toJSONString(testData));
+        logger.info("TestOn执行信息：" + JSONObject.toJSONString(testData));
         tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"执行测试执行中...");
 
         // 执行testOn
@@ -126,7 +126,7 @@ public class TaskTestExecServiceImpl implements TaskTestExecService {
         }catch (Exception e){
             TestPlanExecResult testPlanExecResult = taskTestOnService.findPlanExecResult(authId,testPlan.getId());
             String instanceId = testPlanExecResult.getTestPlanInstance().getId();
-            relevanceTestOnService.createRelevance(pipelineId,instanceId,authId);
+            // relevanceTestOnService.createRelevance(pipelineId,instanceId,authId);
             tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"testOn执行失败："+e.getMessage());
             return false;
         }
@@ -145,7 +145,6 @@ public class TaskTestExecServiceImpl implements TaskTestExecService {
             tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"系统异常，获取测试结果失败："+e.getMessage());
             return false;
         }
-
         tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"获取测试结果......");
 
         // 判断是否正在运行
@@ -166,7 +165,7 @@ public class TaskTestExecServiceImpl implements TaskTestExecService {
 
         // 创建对应的测试关系表
         try {
-            relevanceTestOnService.createRelevance(pipelineId,instanceId,authId);
+            // relevanceTestOnService.createRelevance(pipelineId,instanceId,authId);
         }catch (Exception e){
             tasksInstanceService.writeExecLog(taskId, PipelineUtil.date(4)+"获取测试结果失败："+e.getMessage());
             return false;
@@ -225,9 +224,7 @@ public class TaskTestExecServiceImpl implements TaskTestExecService {
             throw new ApplicationException(PipelineUtil.date(4)+"找不到源代码！");
         }
 
-
         String testOrder = taskTest.getTestOrder();
-
         try {
             List<String> list = PipelineUtil.execOrder(testOrder);
             for (String s : list) {

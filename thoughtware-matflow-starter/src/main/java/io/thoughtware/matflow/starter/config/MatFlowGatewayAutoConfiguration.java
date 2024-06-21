@@ -98,6 +98,8 @@ public class MatFlowGatewayAutoConfiguration {
                         "/clean/data/cleanMessageData",
                         "/message/messageItem/syncUpdateMessage",
                         "/message/messageItem/syncDeleteMessage",
+                        "/matflow/handler",
+                        "/other/handler"
                 })
                 .ignorePreUrls(new String[]{
                         "/service",
@@ -112,7 +114,7 @@ public class MatFlowGatewayAutoConfiguration {
                         "/eas",
                         "/sql",
                         "/maven/test",
-                        "/update/pipeline"
+                        "/update/pipeline",
                 })
                 .get();
     }

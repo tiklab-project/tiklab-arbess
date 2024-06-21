@@ -5,6 +5,7 @@ import io.thoughtware.matflow.setting.service.AuthThirdService;
 import io.thoughtware.matflow.support.util.util.PipelineUtil;
 import io.thoughtware.matflow.task.test.model.RelevanceTestOnQuery;
 import io.thoughtware.matflow.task.test.model.TestOnPlanInstance;
+import io.thoughtware.matflow.task.test.model.TestOnRelevance;
 import io.thoughtware.toolkit.beans.BeanMapper;
 import io.thoughtware.core.exception.ApplicationException;
 import io.thoughtware.core.page.Pagination;
@@ -35,8 +36,11 @@ public class RelevanceTestOnServiceImpl implements RelevanceTestOnService{
 
 
     @Override
-    public void createRelevance(String pipelineId, String instanceId,String authId) {
+    public void createRelevance(TestOnRelevance testOnRelevance) {
         RelevanceTestOn relevanceTestOn = new RelevanceTestOn();
+        String pipelineId = testOnRelevance.getPipelineId();
+        String instanceId = testOnRelevance.getInstanceId();
+        String authId = testOnRelevance.getAuthId();
         relevanceTestOn.setPipeline(new Pipeline(pipelineId));
         relevanceTestOn.setTestonId(instanceId);
         relevanceTestOn.setAuthId(authId);

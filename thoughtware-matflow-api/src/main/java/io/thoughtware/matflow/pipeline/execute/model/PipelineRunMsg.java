@@ -1,5 +1,6 @@
 package io.thoughtware.matflow.pipeline.execute.model;
 
+import io.thoughtware.matflow.support.agent.model.Agent;
 import io.thoughtware.matflow.pipeline.definition.model.Pipeline;
 
 public class PipelineRunMsg {
@@ -15,9 +16,29 @@ public class PipelineRunMsg {
 
     private Pipeline pipeline;
 
-    public PipelineRunMsg() {
+    // 默认执行器
+    private String agentId;
+
+    private Agent agent;
+
+    public Agent getAgent() {
+        return agent;
     }
 
+    public void setAgent(Agent agent) {
+        this.agent = agent;
+    }
+
+    public String getAgentId() {
+        return agentId;
+    }
+
+    public void setAgentId(String agentId) {
+        this.agentId = agentId;
+    }
+
+    public PipelineRunMsg() {
+    }
 
     public PipelineRunMsg(String pipelineId, String userId, Integer runWay) {
         this.pipelineId = pipelineId;

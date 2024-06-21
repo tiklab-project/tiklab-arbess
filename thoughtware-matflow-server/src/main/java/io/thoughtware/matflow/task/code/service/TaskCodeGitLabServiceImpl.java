@@ -140,7 +140,6 @@ public class TaskCodeGitLabServiceImpl implements TaskCodeGitLabService {
             String name = jsonObject.getString("name");
             String avatar = jsonObject.getString("avatar_url");
             return new ThirdUser().setId(id).setName(name).setPath(login).setHead(avatar);
-
         }catch (Exception e) {
             throw new SystemException(e);
         }

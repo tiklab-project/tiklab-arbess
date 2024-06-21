@@ -70,7 +70,7 @@ public class TaskCodeServiceImpl implements TaskCodeService {
      * @return 任务
      */
     @Override
-    public TaskCode findOneCodeConfig(String taskId,String taskType){
+    public TaskCode findOneCodeConfig(String taskId){
         TaskCodeEntity oneCodeEntity = taskCodeDao.findOneCode(taskId);
         TaskCode taskCode = BeanMapper.map(oneCodeEntity, TaskCode.class);
         String authId = taskCode.getAuthId();
@@ -78,34 +78,10 @@ public class TaskCodeServiceImpl implements TaskCodeService {
         if (Objects.isNull(authId)){
             return taskCode;
         }
-
         taskCode.setAuth(findAuth(taskCode.getAuthId()));
         if (Objects.isNull(oneCodeEntity.getXcodeId())){
             return taskCode;
         }
-
-        // String xcodeId = oneCodeEntity.getXcodeId();
-        // XcodeRepository repository = taskCodeGittokService.findRepository(authId, xcodeId);
-        // taskCode.setRepository(repository);
-        // // 查询不到仓库
-        // if (Objects.isNull(repository)){
-        //     return taskCode;
-        // }else {
-        //     taskCode.setCodeName(repository.getName());
-        // }
-        //
-        // // 查询不到分支
-        // String codeBranch = oneCodeEntity.getBranchId();
-        // if (Objects.isNull(codeBranch)){
-        //     return taskCode;
-        // }
-        // XcodeBranch branch = taskCodeGittokService.findOneBranch(authId, repository.getRpyId(), codeBranch);
-        // if (Objects.isNull(branch)){
-        //     branch = new XcodeBranch();
-        //     branch.setBranchName(PipelineFinal.TASK_CODE_DEFAULT_BRANCH);
-        //     branch.setBranchId(PipelineFinal.TASK_CODE_DEFAULT_BRANCH);
-        // }
-        // taskCode.setBranch(branch);
         return taskCode;
     }
 

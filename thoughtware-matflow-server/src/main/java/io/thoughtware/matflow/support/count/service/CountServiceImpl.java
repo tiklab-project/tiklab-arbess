@@ -8,7 +8,6 @@ import io.thoughtware.matflow.support.count.CountService;
 import io.thoughtware.matflow.support.util.util.PipelineFinal;
 import io.thoughtware.message.message.service.MessageNoticeService;
 import io.thoughtware.message.setting.service.MessageSendTypeService;
-import io.thoughtware.plugin.manager.service.PluginManagerService;
 import io.thoughtware.privilege.role.service.RoleService;
 import io.thoughtware.security.backups.service.BackupsDbService;
 import io.thoughtware.user.directory.service.UserDirService;

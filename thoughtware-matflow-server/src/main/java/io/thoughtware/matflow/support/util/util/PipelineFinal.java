@@ -107,6 +107,13 @@ public class PipelineFinal {
 
     public static final String DEFAULT_TYPE = "string";
 
+    /**
+     * 默认命令
+     */
+    public static final String TEST_DEFAULT_ORDER = "mvn test";
+    public static final String MAVEN_DEFAULT_ORDER = "mvn clean package";
+    public static final String NODE_DEFAULT_ORDER = "npm install";
+
 
     /**
      * 文件信息
@@ -114,7 +121,6 @@ public class PipelineFinal {
     public static final String FILE_TEMP_PREFIX = "temp";
     public static final String FILE_TYPE_TXT = ".txt";
     public static final String FILE_TYPE_SH = ".sh";
-
     public static final String FILE_TYPE_BAT = ".bat";
 
 

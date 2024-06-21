@@ -11,7 +11,6 @@ import io.thoughtware.licence.boot.starter.annotation.EnableLicenceServer;
 import io.thoughtware.matflow.EnableMatFlowServer;
 import io.thoughtware.messsage.boot.starter.annotation.EnableMessageServer;
 import io.thoughtware.openapi.boot.starter.annotation.EnableOpenApi;
-import io.thoughtware.plugin.starter.EnablePluginServer;
 import io.thoughtware.postgresql.EnablePostgresql;
 import io.thoughtware.privilege.boot.starter.annotation.EnablePrivilegeServer;
 import io.thoughtware.rpc.boot.starter.annotation.EnableRpc;
@@ -19,6 +18,7 @@ import io.thoughtware.security.boot.stater.annotation.EnableSecurityServer;
 import io.thoughtware.toolkit.boot.starter.annotation.EnableToolkit;
 import io.thoughtware.user.boot.starter.annotation.EnableUserClient;
 import io.thoughtware.user.boot.starter.annotation.EnableUserServer;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
@@ -32,12 +32,11 @@ import org.springframework.context.annotation.Configuration;
 //内嵌数据库
 @EnablePostgresql
 @EnableDal
-@EnableRpc
+// @EnableRpc
 @EnableGateway
 @EnableOpenApi
 @EnableDcsClient
 @EnableDcsServer
-@EnablePluginServer
 @EnableDsm
 //用户中心
 @EnableUserServer

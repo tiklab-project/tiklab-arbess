@@ -34,11 +34,6 @@
         </dependency>
         <dependency>
             <groupId>io.thoughtware</groupId>
-            <artifactId>thoughtware-plugin-spring-boot-starter</artifactId>
-            <version>${thoughtware-plugin.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.thoughtware</groupId>
             <artifactId>thoughtware-gateway-spring-boot-starter</artifactId>
             <version>${thoughtware-gateway.version}</version>
         </dependency>
@@ -102,6 +97,11 @@
             <groupId>io.thoughtware</groupId>
             <artifactId>thoughtware-dsm-spring-boot-starter</artifactId>
             <version>${thoughtware-dsm.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.thoughtware</groupId>
+            <artifactId>thoughtware-matflow-agent-server</artifactId>
+            <version>${thoughtware-matflow-agent.version}</version>
         </dependency>
     </dependencies>
 
@@ -378,7 +378,6 @@
     </profiles>
 
     <build>
-
         <plugins>
             <!--jar去掉配置文件-->
             <plugin>

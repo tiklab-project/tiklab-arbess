@@ -254,27 +254,12 @@ public class PipelineInstanceServiceImpl implements PipelineInstanceService {
         }
         Pagination<PipelineInstanceEntity> pagination = pipelineInstanceDao.findPageInstance(pipelineInstanceQuery);
         List<PipelineInstance> execInstanceList= BeanMapper.mapList(pagination.getDataList(), PipelineInstance.class);
-        List<PipelineInstance> instanceList = new ArrayList<>();
         for (PipelineInstance instance : execInstanceList) {
-            String id = instance.getInstanceId();
-            //判断内存中是否存在该实例
-            PipelineExecServiceImpl pipelineExecService = new PipelineExecServiceImpl();
-            PipelineInstance pipelineInstance = pipelineExecService.findPipelineInstance(id);
-            String time;
-            if (Objects.isNull(pipelineInstance)){
-                instanceList.add(instance);
-                time = PipelineUtil.formatDateTime(instance.getRunTime());
-                instance.setRunTimeDate(time);
-            }else {
-                Integer integer = findPipelineRunTime(id);
-                pipelineInstance.setRunTime(integer);
-                instanceList.add(pipelineInstance);
-                time = PipelineUtil.formatDateTime(pipelineInstance.getRunTime());
-                pipelineInstance.setRunTimeDate(time);
-            }
+            String time = PipelineUtil.formatDateTime(instance.getRunTime());
+            instance.setRunTimeDate(time);
         }
-        joinTemplate.joinQuery(instanceList);
-        return PaginationBuilder.build(pagination, instanceList);
+        joinTemplate.joinQuery(execInstanceList);
+        return PaginationBuilder.build(pagination, execInstanceList);
     }
 
     @Override
@@ -284,72 +269,13 @@ public class PipelineInstanceServiceImpl implements PipelineInstanceService {
         pipelineInstanceQuery.setIds(userPipeline);
         Pagination<PipelineInstanceEntity> pagination = pipelineInstanceDao.findAllPageInstance(pipelineInstanceQuery);
         List<PipelineInstance> execInstanceList = BeanMapper.mapList(pagination.getDataList(), PipelineInstance.class);
-        List<PipelineInstance> instanceList = new ArrayList<>();
         for (PipelineInstance instance : execInstanceList) {
-            PipelineExecServiceImpl pipelineExecService = new PipelineExecServiceImpl();
-            String id = instance.getInstanceId();
-            PipelineInstance pipelineInstance = pipelineExecService.findPipelineInstance(id);
-            String time;
-            if (Objects.isNull(pipelineInstance)){
-                instanceList.add(instance);
-                time = PipelineUtil.formatDateTime(instance.getRunTime());
-                instance.setRunTimeDate(time);
-            }else {
-                Integer integer = findPipelineRunTime(id);
-                pipelineInstance.setRunTime(integer);
-                time = PipelineUtil.formatDateTime(pipelineInstance.getRunTime());
-                pipelineInstance.setRunTimeDate(time);
-                instanceList.add(pipelineInstance);
-            }
+            String time = PipelineUtil.formatDateTime(instance.getRunTime());
+            instance.setRunTimeDate(time);
         }
-        joinTemplate.joinQuery(instanceList);
-        return PaginationBuilder.build(pagination,instanceList);
+        joinTemplate.joinQuery(execInstanceList);
+        return PaginationBuilder.build(pagination,execInstanceList);
     }
-
-    public ExecutorService executorService = Executors.newCachedThreadPool();
-
-    //运行时间
-    public  final Map<String,Integer> pipelineRunTime = new HashMap<>();
-
-    public void pipelineRunTime(String instanceId){
-        pipelineRunTime.put(instanceId,0);
-        executorService.submit(() -> {
-            while (true){
-                Thread.currentThread().setName(instanceId);
-                int integer = pipelineRunTime.get(instanceId);
-                try {
-                    Thread.sleep(1000);
-                    integer = integer + 1;
-                    pipelineRunTime.put(instanceId,integer);
-                }catch (RuntimeException e){
-                    throw new RuntimeException();
-                }
-            }
-        });
-    }
-
-    public Integer findPipelineRunTime(String instanceId){
-        Integer integer = pipelineRunTime.get(instanceId);
-        if (Objects.isNull(integer)){
-            return 0;
-        }
-        return integer;
-    }
-
-    public void removeInstanceRunTime(String instanceId){
-        pipelineRunTime.remove(instanceId);
-        tasksInstanceService.stopThread(instanceId);
-    }
-
-
-
-
-
-
-
-
-
-
 }
 
 

@@ -44,6 +44,17 @@ public class Tasks {
     //@ApiProperty(name="task",desc="任务",eg="@selectOne")
     private Object task;
 
+    // 执行实例id
+    private String instanceId;
+
+    public String getInstanceId() {
+        return instanceId;
+    }
+
+    public void setInstanceId(String instanceId) {
+        this.instanceId = instanceId;
+    }
+
     public Object getTask() {
         return task;
     }
