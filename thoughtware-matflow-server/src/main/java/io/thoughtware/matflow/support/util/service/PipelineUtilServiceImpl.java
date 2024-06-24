@@ -113,7 +113,7 @@ public class PipelineUtilServiceImpl implements PipelineUtilService {
         String appHome = AppHomeContext.getAppHome();
         String applyRootDir = new File(appHome).getParentFile().getParent();
 
-        return applyRootDir+"/embbed/jdk-16.0.2";
+        return appHome+"/embbed/jdk-16.0.2";
 
     }
 

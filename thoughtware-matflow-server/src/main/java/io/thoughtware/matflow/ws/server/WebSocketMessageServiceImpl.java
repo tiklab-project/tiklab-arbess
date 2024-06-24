@@ -21,7 +21,6 @@ import io.thoughtware.matflow.task.task.model.TaskInstance;
 import io.thoughtware.matflow.task.task.service.TasksInstanceService;
 import io.thoughtware.matflow.task.task.service.TasksInstanceServiceImpl;
 import io.thoughtware.matflow.task.test.model.MavenTest;
-import io.thoughtware.matflow.task.test.model.RelevanceTestOn;
 import io.thoughtware.matflow.task.test.model.TestOnRelevance;
 import io.thoughtware.matflow.task.test.service.MavenTestService;
 import io.thoughtware.matflow.task.test.service.RelevanceTestOnService;
