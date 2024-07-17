@@ -220,27 +220,7 @@ public class PipelineInstanceDao {
         if (instanceEntityList.isEmpty()){
             return Collections.emptyList();
         }
-
         return instanceEntityList;
-
-        // String sql = "SELECT pipeline_id, MAX(create_time)" +
-        //         " FROM pip_pipeline_instance" +
-        //         " where user_id = '" + userId + "'" +
-        //         " GROUP BY pipeline_id" +
-        //         " ORDER BY MAX(create_time) DESC" +
-        //         " limit " + limit ;
-        // JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
-        // List<Map<String, Object>> queryForList = jdbcTemplate.queryForList(sql);
-        // if (queryForList.isEmpty()){
-        //     return Collections.emptyList();
-        // }
-        // List<String> list = new ArrayList<>();
-        //
-        // for (Map<String, Object> stringObjectMap : queryForList) {
-        //     String id = (String)stringObjectMap.get("pipeline_id");
-        //     list.add(id);
-        // }
-        // return list;
     }
 
 
@@ -257,6 +237,20 @@ public class PipelineInstanceDao {
                 " OFFSET 0 limit 1");
         JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
         return  jdbcTemplate.query(sql, new BeanPropertyRowMapper(PipelineInstanceEntity.class));
+    }
+
+
+    /**
+     * 获取最近构建信息不包括正在运行的
+     * @param pipelineId 流水线id
+     * @param queryTime 时间 [开始时间,结束时间]
+     * @return 构建信息
+     */
+    public List<PipelineInstanceEntity> findInstanceByTime(String pipelineId,String[] queryTime){
+        String sql = "select pip_pipeline_instance.* from pip_pipeline_instance  ";
+        sql = sql.concat(" where pipeline_id = ? and run_status != 'run'  and create_time between ? and ? " );
+        JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
+        return  jdbcTemplate.query(sql, new BeanPropertyRowMapper(PipelineInstanceEntity.class),pipelineId,queryTime[0],queryTime[1]);
     }
 
 }

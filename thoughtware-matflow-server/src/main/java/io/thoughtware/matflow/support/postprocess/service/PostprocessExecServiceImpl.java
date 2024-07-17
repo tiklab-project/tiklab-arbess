@@ -167,8 +167,8 @@ public class PostprocessExecServiceImpl implements PostprocessExecService{
     public void removePostInstanceCache(String postId,boolean runState){
         String postInstanceId = findPostInstanceId(postId);
         PostprocessInstance postInstance = findPostInstance(postInstanceId);
-        Integer runTime = postInstanceService.findPostInstanceRunTime(postInstanceId);
-        postInstance.setPostTime(runTime);
+        // Integer runTime = postInstanceService.findPostInstanceRunTime(postInstanceId);
+        // postInstance.setPostTime(runTime);
         if (runState){
             postInstance.setPostState(PipelineFinal.RUN_SUCCESS);
         }else {
@@ -177,7 +177,7 @@ public class PostprocessExecServiceImpl implements PostprocessExecService{
         postInstanceService.updatePostInstance(postInstance);
         postInstanceIdOrPostInstance.remove(postInstanceId);
         postIdOrPostInstanceId.remove(postId);
-        postInstanceService.removePostInstanceRunTime(postInstanceId);
+        // postInstanceService.removePostInstanceRunTime(postInstanceId);
     }
 
     private void updatePipelineOrPostInstanceCache(String pipelineId,String postInstanceId){
@@ -194,16 +194,17 @@ public class PostprocessExecServiceImpl implements PostprocessExecService{
         return list;
     }
 
+    @Override
     public void stopTaskPostTask(String pipelineId){
         List<String> postInstanceCache = findPipelineOrPostInstanceCache(pipelineId);
         for (String s : postInstanceCache) {
-            Integer instanceRunTime = postInstanceService.findPostInstanceRunTime(s);
-            if (!Objects.equals(instanceRunTime,0)){
-                PostprocessInstance postInstance = findPostInstance(s);
-                postInstance.setPostTime(instanceRunTime);
-                postInstanceService.updatePostInstance(postInstance);
-                tasksExecService.stopThread(s);
-            }
+            // Integer instanceRunTime = postInstanceService.findPostInstanceRunTime(s);
+            // if (!Objects.equals(instanceRunTime,0)){
+            //     PostprocessInstance postInstance = findPostInstance(s);
+            //     postInstance.setPostTime(instanceRunTime);
+            //     postInstanceService.updatePostInstance(postInstance);
+            //     tasksExecService.stopThread(s);
+            // }
             postIdOrPostInstanceId.remove(s);
             postInstanceIdOrPostInstance.remove(s);
         }

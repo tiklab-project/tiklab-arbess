@@ -1,15 +1,25 @@
-package io.thoughtware.matflow.home.model;
+package io.thoughtware.matflow.task.message.model;
 
 import java.util.List;
 import java.util.Map;
 
-public class MessageDetail {
+public class TaskMessage {
 
+    /**
+     * 流水线id
+     */
     private String pipelineId;
 
-    private Map<String, Object> map;
+    /**
+     * 接收人
+     */
+    private List<String> list;
 
-    private List<String> receiver;
+
+    /**
+     * 消息内容
+     */
+    private Map<String, Object> map;
 
     public String getPipelineId() {
         return pipelineId;
@@ -19,6 +29,14 @@ public class MessageDetail {
         this.pipelineId = pipelineId;
     }
 
+    public List<String> getList() {
+        return list;
+    }
+
+    public void setList(List<String> list) {
+        this.list = list;
+    }
+
     public Map<String, Object> getMap() {
         return map;
     }
@@ -26,12 +44,7 @@ public class MessageDetail {
     public void setMap(Map<String, Object> map) {
         this.map = map;
     }
-
-    public List<String> getReceiver() {
-        return receiver;
-    }
-
-    public void setReceiver(List<String> receiver) {
-        this.receiver = receiver;
-    }
 }
+
+
+

@@ -19,13 +19,11 @@ import io.thoughtware.core.page.PaginationBuilder;
 import io.thoughtware.eam.common.context.LoginContext;
 import io.thoughtware.toolkit.join.JoinTemplate;
 import io.thoughtware.matflow.pipeline.definition.model.Pipeline;
-import io.thoughtware.matflow.pipeline.execute.service.PipelineExecServiceImpl;
 import io.thoughtware.matflow.pipeline.instance.model.PipelineInstance;
 import io.thoughtware.matflow.pipeline.instance.model.PipelineInstanceQuery;
 import io.thoughtware.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.io.File;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
@@ -58,6 +56,12 @@ public class PipelineInstanceServiceImpl implements PipelineInstanceService {
 
     @Autowired
     TaskBuildProductService taskBuildProductService;
+
+    // 任务示例ID -- 运行时间
+    public final static Map<String,Integer> runTimeMap = new HashMap<>();
+
+    //任务线程池
+    public final ExecutorService timeThreadPool = Executors.newCachedThreadPool();
 
     @Override
     public String createInstance(PipelineInstance pipelineInstance) {
@@ -100,21 +104,6 @@ public class PipelineInstanceServiceImpl implements PipelineInstanceService {
         }
         updateInstance(pipelineInstance);
         return pipelineInstance;
-    }
-
-    public PipelineInstance findPipelineExecInstance(String pipelineId){
-        List<PipelineInstance> allInstance = findPipelineAllInstance(pipelineId);
-        if (allInstance == null){
-            return null;
-        }
-        for (PipelineInstance instance : allInstance) {
-            String runStatus = instance.getRunStatus();
-            if (runStatus.equals(PipelineFinal.RUN_RUN)){
-                continue;
-            }
-            return instance;
-        }
-        return null;
     }
 
     @Override
@@ -181,6 +170,7 @@ public class PipelineInstanceServiceImpl implements PipelineInstanceService {
         return allInstance;
     }
 
+    @Override
     public List<PipelineInstance> findUserPipelineInstance(String userId,Integer limit){
         List<PipelineInstanceEntity> instanceEntityList = pipelineInstanceDao.findUserPipelineInstance(userId, limit);
         if (instanceEntityList.isEmpty()){
@@ -188,7 +178,6 @@ public class PipelineInstanceServiceImpl implements PipelineInstanceService {
         }
         return BeanMapper.mapList(instanceEntityList,PipelineInstance.class);
     }
-
 
     @Override
     public PipelineInstance findLastInstance(String pipelineId){
@@ -237,7 +226,7 @@ public class PipelineInstanceServiceImpl implements PipelineInstanceService {
         return pipelineInstance.getInstanceId();
     }
 
-
+    @Override
     public List<PipelineInstance> findPipelineInstanceList(PipelineInstanceQuery pipelineInstanceQuery){
         List<PipelineInstanceEntity> instanceList = pipelineInstanceDao.findInstanceList(pipelineInstanceQuery);
         if (instanceList == null || instanceList.isEmpty()){
@@ -255,7 +244,12 @@ public class PipelineInstanceServiceImpl implements PipelineInstanceService {
         Pagination<PipelineInstanceEntity> pagination = pipelineInstanceDao.findPageInstance(pipelineInstanceQuery);
         List<PipelineInstance> execInstanceList= BeanMapper.mapList(pagination.getDataList(), PipelineInstance.class);
         for (PipelineInstance instance : execInstanceList) {
-            String time = PipelineUtil.formatDateTime(instance.getRunTime());
+            String time;
+            if (instance.getRunStatus().equals(PipelineFinal.RUN_RUN)){
+                time = PipelineUtil.formatDateTime(findInstanceRuntime(instance.getInstanceId()));
+            } else {
+                time = PipelineUtil.formatDateTime(instance.getRunTime());
+            }
             instance.setRunTimeDate(time);
         }
         joinTemplate.joinQuery(execInstanceList);
@@ -270,12 +264,74 @@ public class PipelineInstanceServiceImpl implements PipelineInstanceService {
         Pagination<PipelineInstanceEntity> pagination = pipelineInstanceDao.findAllPageInstance(pipelineInstanceQuery);
         List<PipelineInstance> execInstanceList = BeanMapper.mapList(pagination.getDataList(), PipelineInstance.class);
         for (PipelineInstance instance : execInstanceList) {
-            String time = PipelineUtil.formatDateTime(instance.getRunTime());
+            String time;
+            if (instance.getRunStatus().equals(PipelineFinal.RUN_RUN)){
+                time = PipelineUtil.formatDateTime(findInstanceRuntime(instance.getInstanceId()));
+            } else {
+                time = PipelineUtil.formatDateTime(instance.getRunTime());
+            }
             instance.setRunTimeDate(time);
         }
         joinTemplate.joinQuery(execInstanceList);
         return PaginationBuilder.build(pagination,execInstanceList);
     }
+
+    @Override
+    public List<PipelineInstance> findInstanceByTime(String pipelineId,String[] queryTime){
+       List<PipelineInstanceEntity> instanceEntityList = pipelineInstanceDao.findInstanceByTime(pipelineId,queryTime);
+       if (instanceEntityList.isEmpty()){
+           return Collections.emptyList();
+       }
+       return BeanMapper.mapList(instanceEntityList,PipelineInstance.class);
+    }
+
+    @Override
+    public int findInstanceRuntime(String instanceId){
+        Integer i = runTimeMap.get(instanceId);
+        if (Objects.isNull(i)){
+            return 1;
+        }
+        return i;
+    }
+
+    @Override
+    public void instanceRuntime(String instanceId){
+        timeThreadPool.submit(() -> {
+            while (true){
+                Thread.currentThread().setName(instanceId);
+                int integer = findInstanceRuntime(instanceId);
+                try {
+                    Thread.sleep(1000);
+                }catch (RuntimeException e){
+                    throw new RuntimeException();
+                }
+                integer = integer +1;
+                runTimeMap.put(instanceId,integer);
+            }
+        });
+    }
+
+    @Override
+    public void stopThread(String threadName){
+        ThreadGroup currentGroup = Thread.currentThread().getThreadGroup();
+        int noThreads = currentGroup.activeCount();
+        Thread[] lstThreads = new Thread[noThreads];
+        if (Objects.equals(lstThreads.length,0)){
+            return;
+        }
+        currentGroup.enumerate(lstThreads);
+        for (int i = 0; i < noThreads; i++) {
+            String nm = lstThreads[i].getName();
+            if (!PipelineUtil.isNoNull(nm) ||!nm.equals(threadName)) {
+                continue;
+            }
+            runTimeMap.remove(threadName);
+            lstThreads[i].stop();
+        }
+    }
+
+
+
 }
 
 

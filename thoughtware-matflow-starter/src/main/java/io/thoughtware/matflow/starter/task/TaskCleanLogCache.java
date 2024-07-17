@@ -59,7 +59,7 @@ public class TaskCleanLogCache {
     JoinTemplate joinTemplate;
 
 
-    @Scheduled(cron = "0 0/100 * * * *")
+    @Scheduled(cron = "0 2 * * * *")
     public void scheduledBackups(){
 
         logger.info("The cache cleanup timing task is triggered.....");

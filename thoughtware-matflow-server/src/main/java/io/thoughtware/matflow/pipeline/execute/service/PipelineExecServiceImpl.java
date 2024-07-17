@@ -1,6 +1,7 @@
 package io.thoughtware.matflow.pipeline.execute.service;
 
 import io.thoughtware.core.exception.SystemException;
+import io.thoughtware.matflow.pipeline.instance.service.PipelineInstanceServiceImpl;
 import io.thoughtware.matflow.support.agent.model.Agent;
 import io.thoughtware.matflow.support.agent.model.AgentMessage;
 import io.thoughtware.matflow.home.service.PipelineHomeService;
@@ -23,6 +24,7 @@ import io.thoughtware.matflow.support.variable.model.Variable;
 import io.thoughtware.matflow.support.variable.service.VariableService;
 import io.thoughtware.matflow.support.version.service.PipelineVersionService;
 import io.thoughtware.matflow.task.task.service.TasksExecService;
+import io.thoughtware.matflow.task.task.service.TasksInstanceService;
 import io.thoughtware.matflow.task.task.service.TasksService;
 import io.thoughtware.core.exception.ApplicationException;
 import io.thoughtware.matflow.ws.server.SocketServerHandler;
@@ -100,6 +102,8 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
     public static final  Map<String,String> pipelineIdOrInstanceId = new HashMap<>();
 
     public static final Map<String , Agent> pipelineIdOrAgentId = new HashMap<>();
+    @Autowired
+    private PipelineInstanceServiceImpl pipelineInstanceServiceImpl;
 
     /**
      * 流水线开始运行
@@ -181,11 +185,13 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
 
         logger.info("流水线{}开始运行",pipeline.getName());
         PipelineInstance pipelineInstance = pipelineInstanceService.initializeInstance(runMsg);
+        // 添加到缓存
         String instanceId = pipelineInstance.getInstanceId();
+        pipelineInstanceService.instanceRuntime(pipelineInstance.getInstanceId());
         joinTemplate.joinQuery(pipelineInstance);
 
         // 运行实例放入内存中
-        pipelineIdOrInstanceId.put(pipelineId, pipelineInstance.getInstanceId());
+        pipelineIdOrInstanceId.put(pipelineId, instanceId);
 
         try {
             // 创建多阶段运行实例
@@ -259,10 +265,13 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
             pipelineInstanceQuery.setPipelineId(pipelineId);
             List<PipelineInstance> pipelineInstanceList = pipelineInstanceService.findPipelineInstanceList(pipelineInstanceQuery);
             for (PipelineInstance pipelineInstance : pipelineInstanceList) {
+                String instanceId = pipelineInstance.getInstanceId();
                 pipelineInstance.setRunStatus(PipelineFinal.RUN_HALT);
+                int runtime = pipelineInstanceService.findInstanceRuntime(instanceId);
+                pipelineInstance.setRunTime(runtime);
                 pipelineInstanceService.updateInstance(pipelineInstance);
             }
-            pipelineIdOrInstanceId.remove(pipelineId);
+            removeExecCache(pipelineId);
             return;
         }
 
@@ -295,6 +304,9 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
     }
 
     public void removeExecCache(String pipelineId){
+        String instanceId = pipelineIdOrInstanceId.get(pipelineId);
+        PipelineInstanceServiceImpl.runTimeMap.remove(instanceId);
+        pipelineInstanceService.stopThread(instanceId);
         pipelineIdOrInstanceId.remove(pipelineId);
     }
 

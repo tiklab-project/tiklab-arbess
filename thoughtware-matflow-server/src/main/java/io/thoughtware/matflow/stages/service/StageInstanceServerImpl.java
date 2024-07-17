@@ -156,24 +156,16 @@ public class StageInstanceServerImpl implements StageInstanceServer{
             stageInstance.setId("1");
             int i = 0;
             AtomicInteger time = new AtomicInteger();
-            label:
+
             for (TaskInstance taskInstance : list) {
+                // taskInstance.setTaskName();
                 String runState = taskInstance.getRunState();
                 switch (runState) {
-                    case PipelineFinal.RUN_ERROR:
-                        status = PipelineFinal.RUN_ERROR;
-                        break label;
-                    case PipelineFinal.RUN_RUN:
-                        status = PipelineFinal.RUN_RUN;
-                        break label;
-                    case PipelineFinal.RUN_HALT:
-                        status = PipelineFinal.RUN_HALT;
-                        break label;
-                    case PipelineFinal.RUN_WAIT:
-                        status = PipelineFinal.RUN_WAIT;
-                        break label;
-                    case PipelineFinal.RUN_SUCCESS:
-                        i++;
+                    case PipelineFinal.RUN_ERROR -> {status = PipelineFinal.RUN_ERROR;}
+                    case PipelineFinal.RUN_RUN -> {status = PipelineFinal.RUN_RUN;}
+                    case PipelineFinal.RUN_HALT ->{status = PipelineFinal.RUN_HALT;}
+                    case PipelineFinal.RUN_WAIT  ->{status = PipelineFinal.RUN_WAIT;}
+                    case PipelineFinal.RUN_SUCCESS ->{i++;}
                 }
             }
 

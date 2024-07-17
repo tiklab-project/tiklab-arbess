@@ -253,6 +253,7 @@ public class TasksInstanceServiceImpl implements TasksInstanceService {
                     instance.setRunLog(taskInstance.getRunLog());
                 }
                 instance.setRunTime(time);
+                instance.setRunState(taskInstance.getRunState());
             }
             String time = PipelineUtil.formatDateTime(instance.getRunTime());
             instance.setRunTimeDate(time);

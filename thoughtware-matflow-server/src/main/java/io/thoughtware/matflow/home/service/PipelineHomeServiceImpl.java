@@ -1,7 +1,6 @@
 package io.thoughtware.matflow.home.service;
 
 import com.alibaba.fastjson.JSONObject;
-import io.thoughtware.matflow.home.model.MessageDetail;
 import io.thoughtware.matflow.support.util.util.PipelineFinal;
 import io.thoughtware.eam.common.context.LoginContext;
 import io.thoughtware.matflow.pipeline.definition.model.Pipeline;
@@ -15,6 +14,8 @@ import io.thoughtware.security.logging.logging.model.LoggingType;
 import io.thoughtware.security.logging.logging.service.LoggingByTempService;
 import io.thoughtware.user.user.model.User;
 import io.thoughtware.user.user.service.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -39,6 +40,8 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
     String baseUrl;
 
     String appName = PipelineFinal.appName;
+
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     public final ExecutorService executorService = Executors.newCachedThreadPool();
 
@@ -135,7 +138,7 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
                     dispatchNoticeService.sendMessageNotice(dispatchNotice);
                 }
             }catch (Exception e){
-                e.printStackTrace();
+                logger.error(e.getMessage());
             };
         });
 
@@ -181,12 +184,6 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
     }
 
 
-    public void message(MessageDetail messageDetail){
-        String pipelineId = messageDetail.getPipelineId();
-
-
-
-    }
 
     /**
      * 发送短信

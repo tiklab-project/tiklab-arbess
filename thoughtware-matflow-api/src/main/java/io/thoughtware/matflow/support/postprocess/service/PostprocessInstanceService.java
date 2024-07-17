@@ -17,6 +17,15 @@ public interface PostprocessInstanceService {
      */
     String createPostInstance(PostprocessInstance instance);
 
+
+    /**
+     * 查询后置任务执行实例
+     * @param postInstanceId 实例id
+     * @return 后置任务实例
+     */
+    PostprocessInstance findPostInstance(String postInstanceId);
+
+
     /**
      * 删除实例下的所有后置处理
      * @param instanceId 实例id
@@ -49,26 +58,6 @@ public interface PostprocessInstanceService {
      * @return 后置处理集合实例
      */
     List<PostprocessInstance> findPipelinePostInstance(String instanceId);
-
-
-    /**
-     * 后置任务实例开始运行
-     * @param postInstanceId 后置任务实例id
-     */
-    void postInstanceRunTime(String postInstanceId);
-
-    /**
-     * 获取后置任务实例运行时间
-     * @param postInstanceId 后置任务实例id
-     * @return 运行时间
-     */
-    Integer findPostInstanceRunTime(String postInstanceId);
-
-    /**
-     * 移除后置任务实例
-     * @param postInstanceId 后置任务实例id
-     */
-    void removePostInstanceRunTime(String postInstanceId);
 
 
 }

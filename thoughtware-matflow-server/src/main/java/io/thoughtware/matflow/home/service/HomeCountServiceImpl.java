@@ -1,10 +1,9 @@
-package io.thoughtware.matflow.support.count.service;
+package io.thoughtware.matflow.home.service;
 
 import io.thoughtware.licence.appauth.service.ApplyAuthService;
 import io.thoughtware.licence.licence.model.Version;
 import io.thoughtware.licence.licence.service.VersionService;
 import io.thoughtware.matflow.setting.service.*;
-import io.thoughtware.matflow.support.count.CountService;
 import io.thoughtware.matflow.support.util.util.PipelineFinal;
 import io.thoughtware.message.message.service.MessageNoticeService;
 import io.thoughtware.message.setting.service.MessageSendTypeService;
@@ -21,7 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Service
-public class CountServiceImpl implements CountService {
+public class HomeCountServiceImpl implements HomeCountService {
 
 
     @Autowired
@@ -75,6 +74,7 @@ public class CountServiceImpl implements CountService {
     @Autowired
     AuthHostGroupService authHostGroupService;
 
+    @Override
     public Map<String, Object> findCount(){
 
         Map<String,Object> map = new HashMap<>();

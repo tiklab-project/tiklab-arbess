@@ -181,6 +181,9 @@ public class TriggerServiceImpl implements TriggerService {
         String object = JSON.toJSONString(trigger.getValues());
         if (taskType == 81){
             TriggerTime triggerTime = JSON.parseObject(object, TriggerTime.class);
+            if (Objects.isNull(triggerTime)){
+                return;
+            }
             triggerTime.setTriggerId(triggerId);
             timeServer.deleteAllTime(triggerId,pipelineId);
 

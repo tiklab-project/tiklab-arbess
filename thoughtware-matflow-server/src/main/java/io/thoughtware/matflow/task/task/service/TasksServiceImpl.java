@@ -205,8 +205,12 @@ public class TasksServiceImpl implements TasksService {
         }
 
         tasks.setTaskSort(sort);
-        String taskName = initDifferentTaskName(taskType);
-        tasks.setTaskName(taskName);
+        // 初始化名称
+        if (Objects.isNull(tasks.getTaskName())){
+            String taskName = initDifferentTaskName(taskType);
+            tasks.setTaskName(taskName);
+        }
+
         tasks.setCreateTime(PipelineUtil.date(1));
 
         String tasksId = createTasks(tasks);
@@ -330,8 +334,7 @@ public class TasksServiceImpl implements TasksService {
     public Tasks findOnePostTaskOrTask(String postId) {
         Tasks postTask = findOnePostTask(postId);
         String  taskType = postTask.getTaskType();
-        String taskId = postTask.getTaskId();
-        Object task = findOneDifferentTask(taskId, taskType);
+        Object task = findOneDifferentTask( postTask.getTaskId(), taskType);
         postTask.setValues(task);
         postTask.setTask(task);
         postTask.setTaskType(taskType);
@@ -1058,7 +1061,7 @@ public class TasksServiceImpl implements TasksService {
                 return messageTypeServer.findMessage(taskId);
             }
             case PipelineFinal.TASK_TYPE_SCRIPT   -> {
-                return scriptServer.findScript(taskId);
+                return scriptServer.findOneScript(taskId);
             }
            default -> throw new ApplicationException("无法更新未知的配置类型。");
         }

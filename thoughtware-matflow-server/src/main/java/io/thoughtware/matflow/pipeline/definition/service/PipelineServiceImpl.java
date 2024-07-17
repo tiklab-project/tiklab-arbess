@@ -39,6 +39,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 流水线服务
@@ -281,8 +282,6 @@ public class PipelineServiceImpl implements PipelineService {
     public Pagination<Pipeline> findUserPipelinePage(PipelineQuery query){
         String userId = query.getUserId();
 
-        List<User> userListNoQuery = userService.findUserListQuery(new UserQuery());
-
         String[] builders = authorityService.findUserPipelineIdString(userId);
         query.setIdString(builders);
         // 用户收藏的流水线
@@ -292,19 +291,21 @@ public class PipelineServiceImpl implements PipelineService {
             List<PipelineEntity> dataList = pipelineListQuery.getDataList();
             List<Pipeline> pipelineList = BeanMapper.mapList(dataList, Pipeline.class);
             List<Pipeline> list = new ArrayList<>();
+            List<String> userIdList = new ArrayList<>();
             for (Pipeline pipeline : pipelineList) {
-
-                List<User> userList = userListNoQuery.stream()
-                        .filter(user -> user.getId().equals(pipeline.getUser().getId()))
-                        .toList();
-                if (!userList.isEmpty()){
-                    pipeline.setUser(userList.get(0));
-                }
+                userIdList.add(pipeline.getUser().getId());
                 pipeline.setCollect(1);
                 Pipeline pipelineMessage = findPipelineExecMessage(pipeline);
                 list.add(pipelineMessage);
             }
-            return PaginationBuilder.build(pipelineListQuery,list);
+            // 查询用户信息
+            Map<String, User> pipelineUser = findPipelineUser(userIdList);
+
+            List<Pipeline> pipelines = list.stream()
+                    .peek(pipeline -> pipeline.setUser(pipelineUser.get(pipeline.getUser().getId())))
+                    .toList();
+
+            return PaginationBuilder.build(pipelineListQuery,pipelines);
         }
 
         // 查询用户流水线
@@ -323,6 +324,7 @@ public class PipelineServiceImpl implements PipelineService {
         List<PipelineEntity> dataList = pipelinePage.getDataList();
         List<Pipeline> pipelineList = BeanMapper.mapList(dataList, Pipeline.class);
         List<Pipeline> list = new ArrayList<>();
+        List<String> userIdList = new ArrayList<>();
         for (Pipeline pipeline : pipelineList) {
             // 判断是否收藏
             String s = map.get(pipeline.getId());
@@ -330,16 +332,16 @@ public class PipelineServiceImpl implements PipelineService {
             if (!Objects.isNull(s)){
                 pipeline.setCollect(1);
             }
-            List<User> userList = userListNoQuery.stream()
-                    .filter(user -> user.getId().equals(pipeline.getUser().getId()))
-                    .toList();
-            if (!userList.isEmpty()){
-                pipeline.setUser(userList.get(0));
-            }
+            userIdList.add(pipeline.getUser().getId());
             list.add(findPipelineExecMessage(pipeline));
         }
-        // joinTemplate.joinQuery(list);
-        return PaginationBuilder.build(pipelinePage,list);
+        Map<String, User> pipelineUser = findPipelineUser(userIdList);
+
+        List<Pipeline> pipelines = list.stream()
+                .peek(pipeline -> pipeline.setUser(pipelineUser.get(pipeline.getUser().getId())))
+                .toList();
+
+        return PaginationBuilder.build(pipelinePage,pipelines);
     }
 
     @Override
@@ -405,6 +407,7 @@ public class PipelineServiceImpl implements PipelineService {
         return list;
     }
 
+    @Override
     public String findPipelineCloneName(String pipelineId){
         Pipeline pipeline = findPipelineById(pipelineId);
 
@@ -467,7 +470,6 @@ public class PipelineServiceImpl implements PipelineService {
         variableService.cloneVariable(pipelineId,clonePipelineId);
 
     }
-
 
     @Override
     public List<Pipeline> findRecentlyPipeline(Integer number,String pipelineId){
@@ -542,7 +544,11 @@ public class PipelineServiceImpl implements PipelineService {
         followService.deletePipelineFollow(pipelineId);
     }
 
-
+    /**
+     * 添加流水线执行信息
+     * @param pipeline 流水线
+     * @return 流水线
+     */
     public Pipeline findPipelineExecMessage(Pipeline pipeline){
         PipelineInstance latelyHistory = instanceService.findLatelyInstance(pipeline.getId());
         if (!Objects.isNull(latelyHistory)){
@@ -565,6 +571,25 @@ public class PipelineServiceImpl implements PipelineService {
     }
 
 
+    /**
+     * 根据用户Id查询用户
+     * @param userIdString 用户Id
+     * @return 用户
+     */
+    public Map<String,User> findPipelineUser(List<String> userIdString){
+
+        // 使用Stream API去除重复元素
+        List<String> uniqueList = userIdString.stream()
+                .distinct()
+                .toList();
+
+        Map<String,User> map = new HashMap<>();
+        List<User> list = userService.findList(uniqueList);
+        for (User user : list) {
+            map.put(user.getId(),user);
+        }
+        return map;
+    }
 
 
 }

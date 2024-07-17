@@ -42,13 +42,6 @@ public interface PipelineInstanceService {
 
 
     /**
-     * 获取流水线正在执行的实例
-     * @param pipelineId 流水线id
-     * @return 实例
-     */
-    PipelineInstance findPipelineExecInstance(String pipelineId);
-
-    /**
      * 删除单个实例
      * @param instanceId 实例id
      */
@@ -125,6 +118,35 @@ public interface PipelineInstanceService {
      * @return 实例
      */
     Pagination<PipelineInstance> findPipelineInstance(PipelineInstanceQuery query);
+
+
+    /**
+     * 查询流水线实例
+     * @param pipelineId 流水线id
+     * @param queryTime 查询时间 [开始时间,结束时间]
+     * @return 实例
+     */
+    List<PipelineInstance> findInstanceByTime(String pipelineId,String[] queryTime);
+
+    /**
+     * 获取实例运行时间
+     * @param instanceId  实例id
+     * @return 运行时间
+     */
+    int findInstanceRuntime(String instanceId);
+
+    /**
+     * 更新实例运行时间
+     * @param instanceId 实例id
+     */
+    void instanceRuntime(String instanceId);
+
+
+    /**
+     * 停止线程执行
+     * @param threadName 线程名称
+     */
+    void stopThread(String threadName);
 
 }
 

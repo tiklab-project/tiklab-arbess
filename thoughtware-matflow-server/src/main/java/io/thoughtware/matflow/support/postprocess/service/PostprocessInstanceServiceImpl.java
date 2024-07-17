@@ -27,6 +27,12 @@ public class PostprocessInstanceServiceImpl implements PostprocessInstanceServic
         return postInstanceDao.createPostInstance(instance);
     }
 
+    @Override
+    public PostprocessInstance findPostInstance(String postInstanceId) {
+        PostprocessInstance postprocessInstance = postInstanceDao.findOnePostInstance(postInstanceId);
+        return BeanMapper.map(postprocessInstance,PostprocessInstance.class);
+    }
+
     /**
      * 删除执行实例
      * @param postInstanceId 实例id
@@ -80,53 +86,16 @@ public class PostprocessInstanceServiceImpl implements PostprocessInstanceServic
         return BeanMapper.mapList(allPostInstanceEntity,PostprocessInstance.class);
     }
 
-
     /**
      * 查询所有后置处理实例
      * @return 后置处理实例集合
      */
     private  List<PostprocessInstance> findAllPostInstance(){
         List<PostprocessInstance> allPostInstance = postInstanceDao.findAllPostInstance();
-        if (allPostInstance == null || allPostInstance.size() == 0){
+        if (allPostInstance == null || allPostInstance.isEmpty()){
             return Collections.emptyList();
         }
         return allPostInstance;
-    }
-
-
-    //运行时间
-    private final static Map<String,Integer> postInstanceRunTime = new HashMap<>();
-
-    ExecutorService threadPool = Executors.newCachedThreadPool();
-
-    public void postInstanceRunTime(String postInstanceId){
-        postInstanceRunTime.put(postInstanceId,0);
-        threadPool.submit(() -> {
-            while (true){
-                Thread.currentThread().setName(postInstanceId);
-                try {
-                    int integer = postInstanceRunTime.get(postInstanceId);
-                    Thread.sleep(1000);
-                    integer = integer +1;
-                    postInstanceRunTime.put(postInstanceId,integer);
-                }catch (RuntimeException e){
-                    throw new RuntimeException();
-                }
-
-            }
-        });
-    }
-
-    public Integer findPostInstanceRunTime(String postInstanceId){
-        Integer integer = postInstanceRunTime.get(postInstanceId);
-        if (Objects.isNull(integer)){
-            return 0;
-        }
-        return integer;
-    }
-
-    public void removePostInstanceRunTime(String postInstanceId){
-        postInstanceRunTime.remove(postInstanceId);
     }
 
 

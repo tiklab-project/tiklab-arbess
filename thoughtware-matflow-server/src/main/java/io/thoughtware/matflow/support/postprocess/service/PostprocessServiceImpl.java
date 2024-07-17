@@ -52,6 +52,7 @@ public class PostprocessServiceImpl implements PostprocessService {
         String postId = postprocessDao.createPost(postprocessEntity);
         Tasks tasks = new Tasks();
         tasks.setTaskSort(1);
+        tasks.setTaskName(postprocess.getPostName());
         tasks.setTaskType(postprocess.getTaskType());
         tasks.setPostprocessId(postId);
         tasks.setValues(postprocess.getValues());

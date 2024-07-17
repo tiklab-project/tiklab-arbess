@@ -11,12 +11,14 @@ import io.thoughtware.matflow.pipeline.instance.service.PipelineInstanceService;
 import io.thoughtware.matflow.stages.model.StageInstance;
 import io.thoughtware.matflow.stages.service.StageInstanceServer;
 import io.thoughtware.matflow.support.postprocess.model.PostprocessInstance;
+import io.thoughtware.matflow.support.postprocess.service.PostprocessInstanceService;
 import io.thoughtware.matflow.support.util.service.PipelineUtilService;
 import io.thoughtware.matflow.support.util.util.PipelineFileUtil;
 import io.thoughtware.matflow.support.util.util.PipelineFinal;
 import io.thoughtware.matflow.support.util.util.PipelineUtil;
 import io.thoughtware.matflow.task.code.service.SpotbugsScanService;
 import io.thoughtware.matflow.task.codescan.model.SpotbugsBugSummary;
+import io.thoughtware.matflow.task.message.model.TaskMessage;
 import io.thoughtware.matflow.task.task.model.TaskInstance;
 import io.thoughtware.matflow.task.task.service.TasksInstanceService;
 import io.thoughtware.matflow.task.task.service.TasksInstanceServiceImpl;
@@ -63,6 +65,9 @@ public class WebSocketMessageServiceImpl implements WebSocketMessageService {
     @Autowired
     PipelineHomeService homeService;
 
+    @Autowired
+    PostprocessInstanceService postprocessInstanceService;
+
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Override
@@ -85,6 +90,8 @@ public class WebSocketMessageServiceImpl implements WebSocketMessageService {
             codeScanTaskMessageHandle(message);
         } else if (type.contains("test_teston_exec")){
             testOnTaskMessageHandle(message);
+        }else if (type.contains("send_message")){
+            messageTaskMessageHandle(message);
         }
         return null;
     }
@@ -99,7 +106,8 @@ public class WebSocketMessageServiceImpl implements WebSocketMessageService {
         // 更新实例状态
         String instanceId = sourceInstance.getInstanceId();
         PipelineInstance instance = pipelineInstanceService.findOneInstance(instanceId);
-        instance.setRunTime(sourceInstance.getRunTime());
+        int runtime = pipelineInstanceService.findInstanceRuntime(instanceId);
+        instance.setRunTime(runtime+1);
         instance.setRunStatus(sourceInstance.getRunStatus());
         pipelineInstanceService.updateInstance(instance);
 
@@ -136,7 +144,6 @@ public class WebSocketMessageServiceImpl implements WebSocketMessageService {
         homeService.settingMessage(PipelineFinal.MES_RUN,  map);
     }
 
-
     /**
      * 阶段消息处理
      * @param message 消息内容
@@ -162,12 +169,14 @@ public class WebSocketMessageServiceImpl implements WebSocketMessageService {
         TaskInstance taskInstance = tasksInstanceService.findOneTaskInstance(id);
 
         TaskInstance mapTaskInstance = TasksInstanceServiceImpl.taskInstanceMap.get(id);
-        String runLog = mapTaskInstance.getRunLog();
-        taskInstance.setRunTime(mapTaskInstance.getRunTime());
-        taskInstance.setRunLog(runLog);
-        taskInstance.setRunState(mapTaskInstance.getRunState());
-        String logAddress = taskInstance.getLogAddress();
-        PipelineFileUtil.logWriteFile(runLog,logAddress);
+        if (!Objects.isNull(mapTaskInstance)){
+            String runLog = mapTaskInstance.getRunLog();
+            taskInstance.setRunTime(sourceTaskInstance.getRunTime());
+            taskInstance.setRunLog(runLog);
+            taskInstance.setRunState(sourceTaskInstance.getRunState());
+            String logAddress = taskInstance.getLogAddress();
+            PipelineFileUtil.logWriteFile(runLog,logAddress);
+        }
         tasksInstanceService.updateTaskInstance(taskInstance);
         TasksInstanceServiceImpl.taskInstanceMap.remove(taskInstance.getId());
     }
@@ -240,6 +249,19 @@ public class WebSocketMessageServiceImpl implements WebSocketMessageService {
     }
 
     /**
+     * 发送消息结果
+     * @param message 消息内容
+     */
+    private void messageTaskMessageHandle(Object message){
+        String jsonString = JSONObject.toJSONString(message);
+        TaskMessage taskMessage = JSONObject.parseObject(jsonString, TaskMessage.class);
+        Pipeline pipeline = pipelineService.findOnePipeline(taskMessage.getPipelineId());
+        Map<String, Object> stringObjectMap = homeService.initMap(pipeline);
+        stringObjectMap.putAll(taskMessage.getMap());
+        homeService.message(stringObjectMap,taskMessage.getList());
+    }
+
+    /**
      * 代码扫描结果
      * @param message 消息内容
      */
@@ -275,6 +297,15 @@ public class WebSocketMessageServiceImpl implements WebSocketMessageService {
     private void postMessageHandle(Object message){
         String jsonString = JSONObject.toJSONString(message);
         PostprocessInstance postprocessInstance = JSONObject.parseObject(jsonString, PostprocessInstance.class);
+        String instanceId = postprocessInstance.getInstanceId();
+
+        List<PostprocessInstance> postInstanceList = postprocessInstanceService.findPipelinePostInstance(instanceId);
+        if (postInstanceList.isEmpty()){
+            return;
+        }
+        PostprocessInstance postInstance = postInstanceList.get(0);
+        postInstance.setPostState(postprocessInstance.getPostState());
+        postprocessInstanceService.updatePostInstance(postInstance);
     }
 
 
