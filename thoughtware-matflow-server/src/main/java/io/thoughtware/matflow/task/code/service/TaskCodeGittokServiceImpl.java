@@ -75,7 +75,7 @@ public class TaskCodeGittokServiceImpl implements TaskCodeGittokService {
             return houseList;
         }catch (Throwable throwable){
             String message = throwable.getMessage();
-            logger.error(message);
+            logger.error(" 连接异常：{}", message);
             if (message.contains("timed out") ){
                 throw new ApplicationException(50001,"请求超时！");
             }
