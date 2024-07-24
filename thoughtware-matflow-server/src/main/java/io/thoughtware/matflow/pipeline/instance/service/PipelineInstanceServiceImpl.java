@@ -179,23 +179,6 @@ public class PipelineInstanceServiceImpl implements PipelineInstanceService {
         return BeanMapper.mapList(instanceEntityList,PipelineInstance.class);
     }
 
-    @Override
-    public PipelineInstance findLastInstance(String pipelineId){
-        PipelineInstanceEntity instanceEntity = pipelineInstanceDao.findLastInstance(pipelineId);
-        if (Objects.isNull(instanceEntity)){
-            return null;
-        }
-        String createTime = instanceEntity.getCreateTime();
-        Date date = PipelineUtil.StringChengeDate(createTime);
-        String dateTime = PipelineUtil.findDateTime(date, 7);
-        if (Objects.isNull(dateTime)){
-            return null;
-        }
-        PipelineInstance pipelineInstance = BeanMapper.map(instanceEntity, PipelineInstance.class);
-        joinTemplate.joinQuery(pipelineInstance);
-        return pipelineInstance;
-    }
-
 
     @Override
     public PipelineInstance findLatelyInstance(String pipelineId){
@@ -283,6 +266,15 @@ public class PipelineInstanceServiceImpl implements PipelineInstanceService {
            return Collections.emptyList();
        }
        return BeanMapper.mapList(instanceEntityList,PipelineInstance.class);
+    }
+
+    @Override
+    public List<PipelineInstance> findInstanceByTime(String[] queryTime){
+        List<PipelineInstanceEntity> instanceEntityList = pipelineInstanceDao.findInstanceByTime(queryTime);
+        if (instanceEntityList.isEmpty()){
+            return Collections.emptyList();
+        }
+        return BeanMapper.mapList(instanceEntityList,PipelineInstance.class);
     }
 
     @Override

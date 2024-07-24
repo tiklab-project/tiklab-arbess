@@ -253,6 +253,18 @@ public class PipelineInstanceDao {
         return  jdbcTemplate.query(sql, new BeanPropertyRowMapper(PipelineInstanceEntity.class),pipelineId,queryTime[0],queryTime[1]);
     }
 
+    /**
+     * 获取最近构建信息不包括正在运行的
+     * @param queryTime 时间 [开始时间,结束时间]
+     * @return 构建信息
+     */
+    public List<PipelineInstanceEntity> findInstanceByTime(String[] queryTime){
+        String sql = "select pip_pipeline_instance.* from pip_pipeline_instance  ";
+        sql = sql.concat(" where run_status != 'run'  and create_time between ? and ? " );
+        JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
+        return  jdbcTemplate.query(sql, new BeanPropertyRowMapper(PipelineInstanceEntity.class),queryTime[0],queryTime[1]);
+    }
+
 }
 
 

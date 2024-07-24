@@ -84,23 +84,36 @@ public interface PipelineInstanceService {
     List<PipelineInstance> findPipelineAllInstance(String pipelineId);
 
     /**
-     * 获取流水线最近一次的历史
-     * @param pipelineId 流水线id
-     * @return 历史实例
+     * 查询用户所有运行实例
+     * @param userId 用户id
+     * @param limit 查询数量
+     * @return 实例
      */
-    PipelineInstance findLastInstance(String pipelineId);
-
-
     List<PipelineInstance> findUserPipelineInstance(String userId,Integer limit);
 
 
+    /**
+     * 查询流水线正在运行的实例ID
+     * @param pipelineId 流水线id
+     * @return 实例id
+     */
     String findRunInstanceId(String pipelineId);
 
 
+    /**
+     * 查询流水线实例
+     * @param idList 实例id
+     * @return 实例
+     */
     @FindList
     List<PipelineInstance> findInstanceList(List<String> idList);
 
 
+    /**
+     * 查询流水线实例
+     * @param pipelineInstanceQuery 查询条件
+     * @return 实例
+     */
     List<PipelineInstance> findPipelineInstanceList(PipelineInstanceQuery pipelineInstanceQuery);
 
 
@@ -127,6 +140,14 @@ public interface PipelineInstanceService {
      * @return 实例
      */
     List<PipelineInstance> findInstanceByTime(String pipelineId,String[] queryTime);
+
+
+    /**
+     * 查询流水线实例
+     * @param queryTime 查询时间 [开始时间,结束时间]
+     * @return 实例
+     */
+    List<PipelineInstance> findInstanceByTime(String[] queryTime);
 
     /**
      * 获取实例运行时间
