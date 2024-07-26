@@ -6,7 +6,7 @@ public class PipelineRunDayCount {
 
     private String day;
 
-    List<PipelineRunTimeCount> runTimeCountList;
+    private List<PipelineRunTimeCount> runTimeCountList;
 
     public String getDay() {
         return day;

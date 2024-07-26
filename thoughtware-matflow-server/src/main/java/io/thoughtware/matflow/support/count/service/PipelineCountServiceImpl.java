@@ -1,6 +1,5 @@
 package io.thoughtware.matflow.support.count.service;
 
-import io.thoughtware.dal.jpa.annotation.Id;
 import io.thoughtware.matflow.pipeline.definition.model.Pipeline;
 import io.thoughtware.matflow.pipeline.definition.service.PipelineService;
 import io.thoughtware.matflow.pipeline.instance.model.PipelineInstance;
@@ -9,17 +8,12 @@ import io.thoughtware.matflow.pipeline.instance.service.PipelineInstanceService;
 import io.thoughtware.matflow.support.count.model.*;
 import io.thoughtware.matflow.support.util.util.PipelineFinal;
 import io.thoughtware.matflow.support.util.util.PipelineUtil;
-import io.thoughtware.security.logging.logging.model.Logging;
-import io.thoughtware.security.logging.logging.model.LoggingQuery;
-import io.thoughtware.security.logging.logging.model.LoggingType;
-import io.thoughtware.security.logging.logging.model.LoggingTypeQuery;
 import io.thoughtware.security.logging.logging.service.LoggingService;
 import io.thoughtware.security.logging.logging.service.LoggingTypeService;
 import io.thoughtware.user.user.model.User;
-import io.thoughtware.user.util.util.CodeFinal;
+import io.thoughtware.user.user.service.UserService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import java.text.DecimalFormat;
 import java.time.LocalDate;
@@ -27,12 +21,10 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Service
 public class PipelineCountServiceImpl implements PipelineCountService {
-
 
     @Autowired
     PipelineInstanceService pipelineInstanceService;
@@ -46,8 +38,8 @@ public class PipelineCountServiceImpl implements PipelineCountService {
     @Autowired
     PipelineService pipelineService;
 
-    @Value("${app.name}")
-    private String appName;
+    @Autowired
+    UserService userService;
 
     @Override
     public List<PipelineRunDayCount> findPipelineRunTimeSpan(PipelineRunCountQuery countQuery){
@@ -69,7 +61,7 @@ public class PipelineCountServiceImpl implements PipelineCountService {
 
             PipelineRunDayCount pipelineRunDayCount = new PipelineRunDayCount();
             pipelineRunDayCount.setDay(dateTime.getMonthValue() + "-" + dateTime.getDayOfMonth());
-            List<String> stageEndTimeList = findCalculateStageEndTimes(dateTime.toLocalDate());
+            List<String> stageEndTimeList = findCalculateStageEndTimes(dateTime.toLocalDate(),6);
 
             List<PipelineRunTimeCount> timeCountList = new ArrayList<>();
             for (int j = 0; j < stageEndTimeList.size() ; j++) {
@@ -103,6 +95,68 @@ public class PipelineCountServiceImpl implements PipelineCountService {
             runDayCountList.add(pipelineRunDayCount);
         }
         return runDayCountList;
+    }
+
+    @Override
+    public List<PipelineDayCount> findRunTimeSpan(PipelineRunCountQuery countQuery){
+
+        List<PipelineDayCount> dayCountList = new ArrayList<>();
+        String dayFormatted = findRecentDayFormatted(countQuery.getCountDay());
+        String dayFormat = findRecentDayFormatted(countQuery.getCountDay() - 1 );
+        String[] queryTime =  new String[]{ dayFormatted, dayFormat };
+
+        String pipelineId = countQuery.getPipelineId();
+        List<PipelineInstance> instanceList;
+        if (StringUtils.isEmpty(pipelineId)){
+            instanceList = pipelineInstanceService.findInstanceByTime(queryTime);
+        }else {
+            instanceList = pipelineInstanceService.findInstanceByTime(pipelineId, queryTime);
+        }
+
+        instanceList.sort(Comparator.comparing(PipelineInstance::getCreateTime));
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        LocalDateTime dateTime = LocalDateTime.parse(dayFormatted, formatter);
+        List<String> stageEndTimeList = findCalculateStageEndTimes(dateTime.toLocalDate(),24);
+
+        Map<Integer,PipelineTimeCount> timeCountMap = new HashMap<>();
+        for (PipelineInstance instance : instanceList) {
+            LocalDateTime parse = LocalDateTime.parse(instance.getCreateTime(),formatter);
+            int hour = parse.getHour();
+            PipelineTimeCount timeCount = timeCountMap.get(hour);
+            if (Objects.isNull(timeCount)){
+                timeCount = new PipelineTimeCount();
+            }
+            if (instance.getRunStatus().equals(PipelineFinal.RUN_SUCCESS)){
+                timeCount.setSuccessNumber(timeCount.getSuccessNumber() + 1);
+            } else if (instance.getRunStatus().equals(PipelineFinal.RUN_ERROR)){
+                timeCount.setErrNumber(timeCount.getErrNumber() + 1);
+            }else {
+                timeCount.setHaltNumber(timeCount.getHaltNumber() + 1);
+            }
+            timeCount.setAllNumber(timeCount.getAllNumber() + 1);
+            timeCountMap.put(hour,timeCount);
+        }
+
+        for (String time : stageEndTimeList) {
+            LocalDateTime parse = LocalDateTime.parse(time,formatter);
+            int hour = parse.getHour();
+            PipelineDayCount dayCount = new PipelineDayCount();
+            if (hour < 10 && hour > 0){
+                dayCount.setTime("0" + hour + ":00");
+            }else if (hour == 0) {
+                dayCount.setTime( "23:59");
+            } else  {
+                dayCount.setTime( hour + ":00");
+            }
+            PipelineTimeCount timeCount = timeCountMap.get(parse.getHour());
+            if (Objects.isNull(timeCount)){
+                timeCount = new PipelineTimeCount();
+            }
+            dayCount.setTimeCount(timeCount);
+            dayCountList.add(dayCount);
+        }
+        return dayCountList;
     }
 
     @Override
@@ -235,118 +289,154 @@ public class PipelineCountServiceImpl implements PipelineCountService {
     }
 
     @Override
-    public List<PipelineLogTypeCount> findPipelineLogTypeCount(String pipelineId) {
-        List<PipelineLogTypeCount> countList = new ArrayList<>();
-        LoggingTypeQuery loggingTypeQuery = new LoggingTypeQuery();
-        loggingTypeQuery.setBgroup(CodeFinal.findAppId(appName));
-        List<LoggingType> logTypeList = loggingTypeService.findLogTypeList(loggingTypeQuery);
-        for (LoggingType loggingType : logTypeList) {
-            PipelineLogTypeCount pipelineLogTypeCount = new PipelineLogTypeCount();
-            pipelineLogTypeCount.setLoggingType(loggingType);
-            LoggingQuery loggingQuery = new LoggingQuery();
-            loggingQuery.setBgroup(CodeFinal.findAppId(appName));
-            loggingQuery.setActionType(loggingType.getId());
-            LinkedHashMap<String,String> linkedHashMap = new LinkedHashMap<>();
-            linkedHashMap.put("pipelineId", pipelineId);
-            loggingQuery.setContent(linkedHashMap);
-            List<Logging> logList = loggingService.findLogList(loggingQuery);
-            pipelineLogTypeCount.setTypeNumber(logList.size());
-            countList.add(pipelineLogTypeCount);
+    public PipelineRunResultCount findRunResultCount(PipelineRunCountQuery countQuery) {
+
+        String dayFormatted = findRecentDayFormatted(countQuery.getCountDay());
+        String dayFormat = findRecentDayFormatted(countQuery.getCountDay() -1 );
+        String[] queryTime =  new String[]{ dayFormatted, dayFormat };
+
+        String pipelineId = countQuery.getPipelineId();
+        List<PipelineInstance> instanceList;
+        if (StringUtils.isEmpty(pipelineId)){
+            instanceList = pipelineInstanceService.findInstanceByTime(queryTime);
+        }else {
+            instanceList = pipelineInstanceService.findInstanceByTime(pipelineId, queryTime);
         }
-        countList.sort(Comparator.comparingInt(PipelineLogTypeCount::getTypeNumber).reversed());
-        return countList;
+
+        PipelineRunResultCount runResultCount = new PipelineRunResultCount();
+
+        if (instanceList.isEmpty()){
+            runResultCount.setSuccessNumber(0);
+            runResultCount.setErrorNumber(0);
+            runResultCount.setHaltNumber(0);
+            runResultCount.setAllNumber(0);
+        }else {
+            runResultCount.setAllNumber(instanceList.size());
+            List<PipelineInstance> successList = instanceList.stream()
+                    .filter(instance -> instance.getRunStatus().equals(PipelineFinal.RUN_SUCCESS))
+                    .toList();
+            List<PipelineInstance> errorList = instanceList.stream()
+                    .filter(instance -> instance.getRunStatus().equals(PipelineFinal.RUN_ERROR))
+                    .toList();
+            List<PipelineInstance> haltList = instanceList.stream()
+                    .filter(instance -> instance.getRunStatus().equals(PipelineFinal.RUN_HALT))
+                    .toList();
+
+            long count = instanceList.stream().mapToInt(PipelineInstance::getRunTime).sum();
+
+            runResultCount.setSuccessNumber(successList.size());
+            runResultCount.setErrorNumber(errorList.size());
+            runResultCount.setHaltNumber( haltList.size());
+            String time = PipelineUtil.formatDateTime(count / instanceList.size());
+            runResultCount.setExecTime(time);
+            double v = parseDouble(successList.size(), instanceList.size()) * 100;
+            runResultCount.setSuccessRate(v+"%");
+        }
+        return runResultCount;
     }
 
     @Override
-    public List<PipelineLogUserCount> findPipelineLogUserCount(String pipelineId){
-        List<PipelineLogUserCount> logUserCountList = new ArrayList<>();
-        LoggingTypeQuery loggingTypeQuery = new LoggingTypeQuery();
-        loggingTypeQuery.setBgroup(CodeFinal.findAppId(appName));
-        List<LoggingType> logTypeList = loggingTypeService.findLogTypeList(loggingTypeQuery);
-        for (LoggingType loggingType : logTypeList) {
-            PipelineLogUserCount logUserCount = new PipelineLogUserCount();
-            logUserCount.setLoggingType(loggingType);
-            LoggingQuery loggingQuery = new LoggingQuery();
-            loggingQuery.setActionType(loggingType.getId());
-            loggingQuery.setBgroup(CodeFinal.findAppId(appName));
-            LinkedHashMap<String,String> linkedHashMap = new LinkedHashMap<>();
-            linkedHashMap.put("pipelineId", pipelineId);
-            loggingQuery.setContent(linkedHashMap);
-            List<Logging> logList = loggingService.findLogList(loggingQuery);
+    public List<PipelineDayRateCount> findDayRateCount(PipelineRunCountQuery countQuery){
 
+        String dayFormatted = findRecentDayFormatted(countQuery.getCountDay());
+        String dayFormat = findRecentDayFormatted(countQuery.getCountDay() - 1 );
+        String[] queryTime =  new String[]{ dayFormatted, dayFormat };
+
+        String pipelineId = countQuery.getPipelineId();
+        List<PipelineInstance> instanceList;
+        if (StringUtils.isEmpty(pipelineId)){
+            instanceList = pipelineInstanceService.findInstanceByTime(queryTime);
+        }else {
+            instanceList = pipelineInstanceService.findInstanceByTime(pipelineId, queryTime);
+        }
+
+        List<PipelineDayRateCount> rateList = new ArrayList<>();
+
+        boolean type = countQuery.getType().equals("user");
+        if (type){
             // 获取所有用户
-            List<User> userList = logList.stream().map(Logging::getUser)
+            List<User> pipelineList = instanceList.stream().map(PipelineInstance::getUser)
                     .filter(user -> !Objects.isNull(user))
                     .toList();
 
-            // 得到不同的用户集合
-            Map<String, List<User>> userGroupMap = userList.stream()
+            // 得到不同的流水线集合
+            Map<String, List<User>> userGroupMap = pipelineList.stream()
                     .collect(Collectors.groupingBy(User::getId));
 
-            // 统计不同的用户数量
-            List<PipelineLogUserCount> userCounts = userGroupMap.values().stream()
-                    .map(users -> new PipelineLogUserCount(users.get(0), users.size()))
+            // 统计不同的流水线数量
+            List<PipelineDayRateCount> dayRateList = userGroupMap.values().stream()
+                    .map(list -> new PipelineDayRateCount(list.get(0), list.size()))
                     .toList();
 
-            logUserCount.setUserCountList(userCounts);
-            logUserCountList.add(logUserCount);
-        }
-        return logUserCountList;
-    }
+            List<PipelineDayRateCount> rateCounts = dayRateList.stream()
+                    .sorted(Comparator.comparing(PipelineDayRateCount::getAllNumber).reversed())
+                    .toList();
+            if (rateCounts.size() > 10){
+                rateCounts = rateCounts.subList(0, 10);
+            }
 
-    @Override
-    public List<PipelineLogTypeCount> findLogTypeCount() {
-        List<PipelineLogTypeCount> countList = new ArrayList<>();
-        LoggingTypeQuery loggingTypeQuery = new LoggingTypeQuery();
-        String appId = CodeFinal.findAppId(appName);
-        loggingTypeQuery.setBgroup(appId);
-        List<LoggingType> logTypeList = loggingTypeService.findLogTypeList(loggingTypeQuery);
-        for (LoggingType loggingType : logTypeList) {
-            PipelineLogTypeCount pipelineLogTypeCount = new PipelineLogTypeCount();
-            pipelineLogTypeCount.setLoggingType(loggingType);
-            LoggingQuery loggingQuery = new LoggingQuery();
-            loggingQuery.setBgroup(appId);
-            loggingQuery.setActionType(loggingType.getId());
-            List<Logging> logList = loggingService.findLogList(loggingQuery);
-            pipelineLogTypeCount.setTypeNumber(logList.size());
-            countList.add(pipelineLogTypeCount);
-        }
-        countList.sort(Comparator.comparingInt(PipelineLogTypeCount::getTypeNumber).reversed());
-        return countList;
-    }
+            for (PipelineDayRateCount pipelineDayRateCount : rateCounts) {
+                String id = pipelineDayRateCount.getUser().getId();
+                User user = userService.findUser(id);
+                pipelineDayRateCount.setUser(user);
+                List<PipelineInstance> list = instanceList.stream().filter(a -> a.getUser().getId().equals(id)).toList();
 
-    @Override
-    public List<PipelineLogUserCount> findLogUserCount(){
-        List<PipelineLogUserCount> logUserCountList = new ArrayList<>();
-        LoggingTypeQuery loggingTypeQuery = new LoggingTypeQuery();
-        loggingTypeQuery.setBgroup(CodeFinal.findAppId(appName));
-        List<LoggingType> logTypeList = loggingTypeService.findLogTypeList(loggingTypeQuery);
-        for (LoggingType loggingType : logTypeList) {
-            PipelineLogUserCount logUserCount = new PipelineLogUserCount();
-            logUserCount.setLoggingType(loggingType);
-            LoggingQuery loggingQuery = new LoggingQuery();
-            loggingQuery.setActionType(loggingType.getId());
-            loggingQuery.setBgroup(CodeFinal.findAppId(appName));
-            List<Logging> logList = loggingService.findLogList(loggingQuery);
+                long successCount = list.stream().filter(a -> a.getUser().getId().equals(id) &&
+                        a.getRunStatus().equals(PipelineFinal.RUN_SUCCESS)).count();
+
+                pipelineDayRateCount.setSuccessNumber((int) successCount);
+                double v = parseDouble(successCount, list.size()) * 100;
+
+                pipelineDayRateCount.setSuccessRate(v + "%");
+                long errorCount = list.stream().filter(a -> a.getUser().getId().equals(id) &&
+                        a.getRunStatus().equals(PipelineFinal.RUN_ERROR)).count();
+
+                pipelineDayRateCount.setErrorNumber((int) errorCount);
+                rateList.add(pipelineDayRateCount);
+            }
+
+        } else {
 
             // 获取所有用户
-            List<User> userList = logList.stream().map(Logging::getUser)
-                    .filter(user -> !Objects.isNull(user))
+            List<Pipeline> pipelineList = instanceList.stream().map(PipelineInstance::getPipeline)
+                    .filter(pipeline -> !Objects.isNull(pipeline))
                     .toList();
 
-            // 得到不同的用户集合
-            Map<String, List<User>> userGroupMap = userList.stream()
-                    .collect(Collectors.groupingBy(User::getId));
+            // 得到不同的流水线集合
+            Map<String, List<Pipeline>> pipelineGroupMap = pipelineList.stream()
+                    .collect(Collectors.groupingBy(Pipeline::getId));
 
-            // 统计不同的用户数量
-            List<PipelineLogUserCount> userCounts = userGroupMap.values().stream()
-                    .map(users -> new PipelineLogUserCount(users.get(0), users.size()))
-                    .toList();
+            // 统计不同的流水线数量
+            List<PipelineDayRateCount> dayRateList = pipelineGroupMap.values().stream()
+                    .map(list -> new PipelineDayRateCount(list.get(0), list.size())).toList();
 
-            logUserCount.setUserCountList(userCounts);
-            logUserCountList.add(logUserCount);
+            List<PipelineDayRateCount> rateCounts = dayRateList.stream()
+                    .sorted(Comparator.comparing(PipelineDayRateCount::getAllNumber).reversed()).toList();
+            if (rateCounts.size() > 10){
+                rateCounts = rateCounts.subList(0, 10);
+            }
+
+            for (PipelineDayRateCount pipelineDayRateCount : rateCounts) {
+                String id = pipelineDayRateCount.getPipeline().getId();
+                Pipeline pipeline = pipelineService.findPipelineById(id);
+                pipelineDayRateCount.setPipeline(pipeline);
+                List<PipelineInstance> list = instanceList.stream().filter(a -> a.getPipeline().getId().equals(id)).toList();
+                pipelineDayRateCount.setAllNumber(list.size());
+                long successCount = list.stream().filter(a -> a.getPipeline().getId().equals(id) && a.getRunStatus()
+                        .equals(PipelineFinal.RUN_SUCCESS)).count();
+
+                pipelineDayRateCount.setSuccessNumber((int) successCount);
+                double v = parseDouble(successCount, list.size())*100;
+                pipelineDayRateCount.setSuccessRate(v + "%");
+
+                long errorCount = list.stream().filter(a -> a.getPipeline().getId().equals(id) && a.getRunStatus()
+                        .equals(PipelineFinal.RUN_ERROR)).count();
+                pipelineDayRateCount.setErrorNumber((int) errorCount);
+                rateList.add(pipelineDayRateCount);
+            }
         }
-        return logUserCountList;
+        rateList.sort(Comparator.comparing(PipelineDayRateCount::getAllNumber).reversed());
+        return rateList;
     }
 
     @Override
@@ -403,24 +493,9 @@ public class PipelineCountServiceImpl implements PipelineCountService {
         String[] timeString = { formatted.get(formatted.size()-1),formatted.get(0)};
 
         List<PipelineInstance> pipelineInstanceList = pipelineInstanceService.findInstanceByTime(pipelineId, timeString);
-        if (!pipelineInstanceList.isEmpty()){
-            // 过滤出运行中的实例
-            List<PipelineInstance> instanceList = pipelineInstanceList.stream().filter(a -> !a.getRunStatus().equals(PipelineFinal.RUN_RUN)).toList();
-            if (!instanceList.isEmpty()){
 
-                long haltNumber = instanceList.stream().filter(a -> a.getRunStatus().equals(PipelineFinal.RUN_HALT)).count();
-                surveyResultCount.setHaltNumber(haltNumber);
-                long successNumber = instanceList.stream().filter(a -> a.getRunStatus().equals(PipelineFinal.RUN_SUCCESS)).count();
-                surveyResultCount.setSuccessNumber(successNumber);
-                long errorNumber = instanceList.stream().filter(a -> a.getRunStatus().equals(PipelineFinal.RUN_ERROR)).count();
-                surveyResultCount.setErrorNumber(errorNumber);
-                double totalRunTime = instanceList.stream()
-                        .mapToInt(PipelineInstance::getRunTime)
-                        .sum();
-                String time = PipelineUtil.formatDateTime((long) (totalRunTime/instanceList.size()));
-                surveyResultCount.setRunTime(time);
-            }
-        }
+        findPipelineSurveyResultCount(pipelineInstanceList, surveyResultCount);
+
         return surveyResultCount;
     }
 
@@ -459,32 +534,12 @@ public class PipelineCountServiceImpl implements PipelineCountService {
         String[] timeString = { formatted.get(formatted.size()-1),formatted.get(0)};
 
         List<PipelineInstance> pipelineInstanceList = pipelineInstanceService.findInstanceByTime(timeString);
-        if (!pipelineInstanceList.isEmpty()){
-            // 过滤出运行中的实例
-            List<PipelineInstance> instanceList = pipelineInstanceList.stream().filter(a -> !a.getRunStatus().equals(PipelineFinal.RUN_RUN)).toList();
-            if (!instanceList.isEmpty()){
 
-                long haltNumber = instanceList.stream().filter(a -> a.getRunStatus().equals(PipelineFinal.RUN_HALT)).count();
-                surveyResultCount.setHaltNumber(haltNumber);
-                long successNumber = instanceList.stream().filter(a -> a.getRunStatus().equals(PipelineFinal.RUN_SUCCESS)).count();
-                surveyResultCount.setSuccessNumber(successNumber);
-                long errorNumber = instanceList.stream().filter(a -> a.getRunStatus().equals(PipelineFinal.RUN_ERROR)).count();
-                surveyResultCount.setErrorNumber(errorNumber);
-                double totalRunTime = instanceList.stream()
-                        .mapToInt(PipelineInstance::getRunTime)
-                        .sum();
-                String time = PipelineUtil.formatDateTime((long) (totalRunTime/instanceList.size()));
-                surveyResultCount.setRunTime(time);
-            }
-        }
+        findPipelineSurveyResultCount(pipelineInstanceList, surveyResultCount);
+
         return surveyResultCount;
     }
 
-    /**
-     * 获取最近的天数
-     * @param days 最近几天
-     * @return 天数
-     */
     public List<String> findRecentDaysFormatted(int days) {
         List<String> recentDaysFormatted = new ArrayList<>();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd 00:00:00");
@@ -496,24 +551,54 @@ public class PipelineCountServiceImpl implements PipelineCountService {
         return recentDaysFormatted;
     }
 
+    @Override
+    public List<String> findDaysFormatted(int days) {
+        List<String> stringList = new ArrayList<>();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-dd");
+        LocalDate currentDate = LocalDate.now();
+        for (int i = 0; i < days; i++) {
+            if (i == 0){
+                stringList.add("今天");
+            } else if (i == 1) {
+                stringList.add("昨天");
+            } else if (i == 2) {
+                stringList.add("前天");
+            } else {
+                String formattedDate = currentDate.minusDays(i).format(formatter);
+                stringList.add(formattedDate);
+            }
+        }
+        return stringList;
+    }
+
     /**
-     * 拆分一天时间为6份
+     * 获取最近的天数
+     * @param days 最近几天
+     * @return 天数
+     */
+    public String findRecentDayFormatted(int days) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd 00:00:00");
+        LocalDate currentDate = LocalDate.now();
+        return currentDate.minusDays(days).format(formatter);
+    }
+
+    /**
+     * 拆分一天时间为count份
      * @param localDate 天数
      * @return 时间
      */
-    public List<String> findCalculateStageEndTimes(LocalDate localDate) {
+    public List<String> findCalculateStageEndTimes(LocalDate localDate,int count) {
         List<String> endTimeList = new ArrayList<>();
 
         LocalTime midnight = LocalTime.of(0, 0);
         LocalDateTime todayMidnight = LocalDateTime.of(localDate, midnight);
 
-        for (int i = 0; i < 6; i++) {
-            todayMidnight = todayMidnight.plusHours(4);
+        for (int i = 0; i < count; i++) {
+            todayMidnight = todayMidnight.plusHours(24/count);
 
             String formattedEndTime = todayMidnight.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
             endTimeList.add(formattedEndTime);
         }
-
         return endTimeList;
     }
 
@@ -525,8 +610,9 @@ public class PipelineCountServiceImpl implements PipelineCountService {
      */
     public List<String> findZeroPointsBetween(String beginTime, String endTime) {
 
-        LocalDateTime startDateTime = LocalDateTime.parse(beginTime, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-        LocalDateTime endDateTime = LocalDateTime.parse(endTime, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        LocalDateTime startDateTime = LocalDateTime.parse(beginTime, dateTimeFormatter);
+        LocalDateTime endDateTime = LocalDateTime.parse(endTime, dateTimeFormatter);
 
         List<String> zeroPoints = new ArrayList<>();
 
@@ -534,7 +620,7 @@ public class PipelineCountServiceImpl implements PipelineCountService {
 
         while (!currentDateTime.isAfter(endDateTime)) {
             currentDateTime = currentDateTime.plusDays(1);
-            String formattedEndTime = currentDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+            String formattedEndTime = currentDateTime.format(dateTimeFormatter);
             zeroPoints.add(formattedEndTime);
         }
 
@@ -574,7 +660,61 @@ public class PipelineCountServiceImpl implements PipelineCountService {
         DecimalFormat df = new DecimalFormat("#.00");
         String formattedNumber = df.format(number);
         return Double.parseDouble(formattedNumber);
-
     }
 
+    /**
+     * 获取日志用户数量
+     * @param pipelineInstanceList 实例列表
+     * @param surveyResultCount 实例列表
+     */
+    public void findPipelineSurveyResultCount(List<PipelineInstance> pipelineInstanceList,PipelineSurveyResultCount surveyResultCount) {
+        if (pipelineInstanceList.isEmpty()){
+            return;
+        }
+
+        // 过滤出运行中的实例
+        List<PipelineInstance> instanceList = pipelineInstanceList.stream()
+                .filter(a -> !a.getRunStatus().equals(PipelineFinal.RUN_RUN))
+                .toList();
+        if (!instanceList.isEmpty()) {
+
+            long haltNumber = instanceList.stream()
+                    .filter(a -> a.getRunStatus().equals(PipelineFinal.RUN_HALT)).count();
+
+            surveyResultCount.setHaltNumber(haltNumber);
+
+            long successNumber = instanceList.stream()
+                    .filter(a -> a.getRunStatus().equals(PipelineFinal.RUN_SUCCESS)).count();
+            surveyResultCount.setSuccessNumber(successNumber);
+
+            long errorNumber = instanceList.stream()
+                    .filter(a -> a.getRunStatus().equals(PipelineFinal.RUN_ERROR)).count();
+            surveyResultCount.setErrorNumber(errorNumber);
+
+            double totalRunTime = instanceList.stream()
+                    .mapToInt(PipelineInstance::getRunTime)
+                    .sum();
+            String time = PipelineUtil.formatDateTime((long) (totalRunTime / instanceList.size()));
+            surveyResultCount.setRunTime(time);
+        }
+    }
+
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

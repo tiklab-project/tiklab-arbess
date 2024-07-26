@@ -26,6 +26,7 @@ server:
 jdbc:
   driverClassName: org.postgresql.Driver
   url: jdbc:postgresql://172.10.1.10:5432/tiklab_matflow?stringtype=unspecified
+#  url: jdbc:postgresql://172.13.1.22:5432/matflow_ee?stringtype=unspecified
   username: postgres
   password: darth2020
 

@@ -4,8 +4,14 @@ public class PipelineRunResultCount {
 
     private String day;
 
+    // 总数
+    private Integer allNumber;
+
     // 成功次数
     private double successNumber;
+
+    // 成功率
+    private String successRate;
 
     // 失败次数
     private double errorNumber;
@@ -13,6 +19,32 @@ public class PipelineRunResultCount {
     // 暂停次数
     private double haltNumber;
 
+    // 执行时间
+    private String execTime;
+
+    public Integer getAllNumber() {
+        return allNumber;
+    }
+
+    public void setAllNumber(Integer allNumber) {
+        this.allNumber = allNumber;
+    }
+
+    public String getSuccessRate() {
+        return successRate;
+    }
+
+    public void setSuccessRate(String successRate) {
+        this.successRate = successRate;
+    }
+
+    public String getExecTime() {
+        return execTime;
+    }
+
+    public void setExecTime(String execTime) {
+        this.execTime = execTime;
+    }
 
     public String getDay() {
         return day;

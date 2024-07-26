@@ -22,6 +22,7 @@ import io.thoughtware.matflow.pipeline.definition.model.Pipeline;
 import io.thoughtware.matflow.pipeline.instance.model.PipelineInstance;
 import io.thoughtware.matflow.pipeline.instance.model.PipelineInstanceQuery;
 import io.thoughtware.rpc.annotation.Exporter;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.io.File;
@@ -179,7 +180,6 @@ public class PipelineInstanceServiceImpl implements PipelineInstanceService {
         return BeanMapper.mapList(instanceEntityList,PipelineInstance.class);
     }
 
-
     @Override
     public PipelineInstance findLatelyInstance(String pipelineId){
         List<PipelineInstanceEntity> latelySuccess = pipelineInstanceDao.findLatelyInstance(pipelineId);
@@ -221,7 +221,7 @@ public class PipelineInstanceServiceImpl implements PipelineInstanceService {
 
     @Override
     public Pagination<PipelineInstance> findPipelineInstance(PipelineInstanceQuery pipelineInstanceQuery){
-        if (pipelineInstanceQuery.getPipelineId() == null){
+        if (StringUtils.isEmpty(pipelineInstanceQuery.getPipelineId())){
             return null;
         }
         Pagination<PipelineInstanceEntity> pagination = pipelineInstanceDao.findPageInstance(pipelineInstanceQuery);

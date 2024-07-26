@@ -74,6 +74,7 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
      */
     @Override
     public void log(String logType, Map<String, Object> map){
+        logger.info("创建日志......");
         executorService.submit(() -> {
             try {
                 Logging log = new Logging();
@@ -100,11 +101,9 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
 
                 logService.createLog(log);
             }catch (Exception e){
-                e.printStackTrace();
+                logger.error("日志创建失败:{}",e.getMessage());
             }
         });
-
-
     }
 
     /**

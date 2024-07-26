@@ -203,7 +203,7 @@ public class StageServiceImpl implements StageService {
         for (Stage stage : stages) {
             //获取阶段配置及任务
             String otherId = stage.getStageId();
-            List<Tasks> allStagesConfig = tasksService.finAllStageTaskOrTask(otherId);
+            List<Tasks> allStagesConfig = tasksService.finAllStageTaskOrTaskNoAuth(otherId);
             stage.setTaskValues(allStagesConfig);
             list.add(stage);
         }

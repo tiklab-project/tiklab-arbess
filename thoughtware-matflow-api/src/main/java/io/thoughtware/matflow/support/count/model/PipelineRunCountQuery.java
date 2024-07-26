@@ -11,7 +11,6 @@ public class PipelineRunCountQuery {
     // 查询时间
     private int countDay = 0;
 
-
     // success(成功) error(失败) halt(停止) time(时间)，rate(速率)
     private String type;
 

@@ -61,9 +61,6 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
     PipelineInstanceService pipelineInstanceService;
 
     @Autowired
-    TasksService tasksService;
-
-    @Autowired
     TasksExecService tasksExecService;
 
     @Autowired
@@ -102,8 +99,7 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
     public static final  Map<String,String> pipelineIdOrInstanceId = new HashMap<>();
 
     public static final Map<String , Agent> pipelineIdOrAgentId = new HashMap<>();
-    @Autowired
-    private PipelineInstanceServiceImpl pipelineInstanceServiceImpl;
+
 
     /**
      * 流水线开始运行
@@ -298,6 +294,8 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
         List<PipelineInstance> pipelineInstanceList = pipelineInstanceService.findPipelineInstanceList(pipelineInstanceQuery);
         for (PipelineInstance pipelineInstance : pipelineInstanceList) {
             pipelineInstance.setRunStatus(PipelineFinal.RUN_HALT);
+            int runtime = pipelineInstanceService.findInstanceRuntime(pipelineInstance.getInstanceId());
+            pipelineInstance.setRunTime(runtime);
             pipelineInstanceService.updateInstance(pipelineInstance);
         }
         removeExecCache(pipelineId);

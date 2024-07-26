@@ -15,6 +15,13 @@ public interface PipelineCountService {
 
 
     /**
+     * 统计流水线最近运行时间分布
+     * @param countQuery 条件
+     * @return 运行时间分布
+     */
+    List<PipelineDayCount> findRunTimeSpan(PipelineRunCountQuery countQuery);
+
+    /**
      * 统计流水线最近运行信息
      * @param countQuery 条件
      * @return 运行信息
@@ -31,31 +38,19 @@ public interface PipelineCountService {
 
 
     /**
-     * 统计单个流水线日志类型分布
-     * @param pipelineId 流水线id
-     * @return 日志类型分布
+     * 统计流水线最近运行结果
+     * @param countQuery 条件
+     * @return 运行结果
      */
-    List<PipelineLogTypeCount> findPipelineLogTypeCount(String pipelineId);
-
-    /**
-     * 统计单个流水线日志用户分布
-     * @param pipelineId 流水线id
-     * @return 日志用户分布
-     */
-    List<PipelineLogUserCount> findPipelineLogUserCount(String pipelineId);
+    PipelineRunResultCount findRunResultCount(PipelineRunCountQuery countQuery);
 
 
     /**
-     * 统计流水线日志用户分布
-     * @return 日志用户分布
+     * 统计流水线最近运行结果 (全部，成功，失败，成功率)
+     * @param countQuery 条件
+     * @return 运行结果
      */
-    List<PipelineLogUserCount> findLogUserCount();
-
-    /**
-     * 统计流水线日志类型分布
-     * @return 日志类型分布
-     */
-    List<PipelineLogTypeCount> findLogTypeCount();
+    List<PipelineDayRateCount> findDayRateCount(PipelineRunCountQuery countQuery);
 
     /**
      * 统计流水线概况
@@ -83,5 +78,13 @@ public interface PipelineCountService {
      * @return 运行结果
      */
     PipelineSurveyResultCount findSurveyResultCount();
+
+
+    /**
+     * 获取最近的天数(yyyy-MM-dd 23:59:59)
+     * @param days 最近几天
+     * @return 天数
+     */
+    List<String> findDaysFormatted(int days);
 
 }

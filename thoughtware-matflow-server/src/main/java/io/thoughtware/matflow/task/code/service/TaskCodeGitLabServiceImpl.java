@@ -165,11 +165,11 @@ public class TaskCodeGitLabServiceImpl implements TaskCodeGitLabService {
             JSONArray projectList = JSONObject.parseArray(body);
             for (Object o : projectList) {
                 JSONObject jsonObject = JSONObject.parseObject(String.valueOf(o));
-                String id = jsonObject.getString("id");
+                String id = jsonObject.getString("commit");
                 String name = jsonObject.getString("name");
                 Boolean isDefault = jsonObject.getBoolean("default");
                 Boolean idProtected = jsonObject.getBoolean("protected");
-                ThirdBranch thirdBranch = new ThirdBranch(id, name, idProtected, isDefault);
+                ThirdBranch thirdBranch = new ThirdBranch(name, name, idProtected, isDefault);
                 branchList.add(thirdBranch);
             }
         }catch (HttpClientErrorException e) {

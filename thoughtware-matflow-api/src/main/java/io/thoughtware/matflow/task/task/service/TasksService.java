@@ -85,6 +85,13 @@ public interface TasksService {
     List<Tasks> finAllStageTaskOrTask(String stageId);
 
     /**
+     * 获取阶段任务及任务详情
+     * @param stageId 流水线
+     * @return 任务列表
+     */
+    List<Tasks> finAllStageTaskOrTaskNoAuth(String stageId);
+
+    /**
      * 查询单个任务详情
      * @param tasksId 配置id
      * @return 详情

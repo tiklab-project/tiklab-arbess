@@ -387,6 +387,11 @@ public class TasksServiceImpl implements TasksService {
         return list;
     }
 
+    /**
+     * 绑定授权信息
+     * @param tasks tasks
+     * @return tasks
+     */
     private List<Tasks> bindTaskAuth(List<Tasks> tasks){
         List<Tasks> list = new ArrayList<>();
         for (Tasks task : tasks) {
@@ -533,6 +538,149 @@ public class TasksServiceImpl implements TasksService {
         return list;
     }
 
+    private List<Tasks> addTaskAuth(List<Tasks> tasks){
+        List<Tasks> list = new ArrayList<>();
+        for (Tasks task : tasks) {
+            Object object;
+            String jsonString = JSONObject.toJSONString(task.getTask());
+            String taskType = task.getTaskType();
+            String taskId = task.getTaskId();
+            switch (findTaskType(taskType)) {
+                case PipelineFinal.TASK_TYPE_CODE -> {
+                    TaskCode taskCode = JSONObject.parseObject(jsonString, TaskCode.class);
+                    String authId = taskCode.getAuthId();
+                    if (!Objects.isNull(authId)){
+                        Object auth ;
+                        switch (taskType) {
+                            case PipelineFinal.TASK_CODE_GITEE ->{
+                                AuthThird authThird = authServerServer.findOneAuthServer(authId);
+                                try {
+                                    ThirdQuery thirdQuery = new ThirdQuery();
+                                    thirdQuery.setAuthId(authId);
+                                    ThirdUser thirdUser = taskCodeGiteeService.findAuthUser(thirdQuery);
+                                    authThird.setUsername(thirdUser.getPath());
+                                }catch (Exception e){
+                                    logger.error("获取GitEe授权用户名失败，原因：{}",e.getMessage());
+                                }
+                                auth = authThird;
+                            }
+                            case  PipelineFinal.TASK_CODE_GITHUB  ->{
+                                AuthThird authThird = authServerServer.findOneAuthServer(authId);
+                                try {
+                                    ThirdQuery thirdQuery = new ThirdQuery();
+                                    thirdQuery.setAuthId(authId);
+                                    ThirdUser thirdUser = taskCodeGitHubService.findAuthUser(thirdQuery);
+                                    authThird.setUsername(thirdUser.getPath());
+                                }catch (Exception e){
+                                    logger.error("获取GiTHub授权用户名失败，原因：{}",e.getMessage());
+                                }
+                                auth = authThird;
+                            }
+                            case PipelineFinal.TASK_CODE_GITLAB->{
+                                AuthThird authThird = authServerServer.findOneAuthServer(authId);
+                                try {
+                                    ThirdQuery thirdQuery = new ThirdQuery();
+                                    thirdQuery.setAuthId(authId);
+                                    ThirdUser thirdUser = taskCodeGitLabService.findAuthUser(thirdQuery);
+                                    authThird.setUsername(thirdUser.getPath());
+                                }catch (Exception e){
+                                    logger.error("获取GitLab授权用户名失败，原因：{}",e.getMessage());
+                                }
+                                auth = authThird;
+                            }
+                            case  PipelineFinal.TASK_CODE_XCODE ->{
+                                auth = authServerServer.findOneAuthServer(authId);
+                            }
+                            default -> {
+                                auth = authServer.findOneAuth(authId);
+                            }
+                        }
+                        taskCode.setAuth(auth);
+                    }
+                    object = taskCode;
+                }
+                case PipelineFinal.TASK_TYPE_TEST -> {
+                    TaskTest taskTest = testService.findOneTest(taskId);
+                    String authId = taskTest.getAuthId();
+                    if (taskType.equals(PipelineFinal.TASK_TEST_TESTON)){
+                        Object auth = authServerServer.findOneAuthServer(authId);
+                        taskTest.setAuth(auth);
+                    }
+                    object = taskTest;
+                }
+                case PipelineFinal.TASK_TYPE_BUILD -> {
+                    object = buildService.findOneBuild(taskId);
+                }
+                case PipelineFinal.TASK_TYPE_DEPLOY -> {
+                    TaskDeploy taskDeploy = deployService.findOneDeployConfig(taskId);
+                    String authId = taskDeploy.getAuthId();
+                    if (!Objects.isNull(authId)){
+                        Object auth = authHostService.findOneAuthHost(authId);
+                        taskDeploy.setAuth(auth);
+                    }
+                    object = taskDeploy;
+                }
+                case PipelineFinal.TASK_TYPE_CODESCAN -> {
+                    TaskCodeScan codeScanConfig = codeScanService.findOneCodeScanConfig(taskId);
+                    String authId = codeScanConfig.getAuthId();
+                    if (!Objects.isNull(authId)){
+                        Object auth = authHostService.findOneAuthHost(authId);
+                        codeScanConfig.setAuth(auth);
+                    }
+                    object = codeScanConfig;
+                }
+                case PipelineFinal.TASK_TYPE_ARTIFACT -> {
+                    TaskArtifact taskArtifact = productServer.findOneProduct(taskId);
+                    String authId = taskArtifact.getAuthId();
+                    if (!Objects.isNull(authId)){
+                        if (taskType.equals(PipelineFinal.TASK_ARTIFACT_XPACK)
+                                || taskType.equals(PipelineFinal.TASK_ARTIFACT_NEXUS) ){
+                            Object auth = authServerServer.findOneAuthServer(authId);
+                            taskArtifact.setAuth(auth);
+                        }
+                        if (taskType.equals(PipelineFinal.TASK_ARTIFACT_SSH)){
+                            Object auth = authHostService.findOneAuthHost(authId);
+                            taskArtifact.setAuth(auth);
+                        }
+                    }
+
+                    object = taskArtifact;
+                }
+                case PipelineFinal.TASK_TYPE_PULL -> {
+                    TaskPullArtifact taskArtifact = pullArtifactService.findOnePullArtifact(taskId);
+                    String authId = taskArtifact.getAuthId();
+                    if (!Objects.isNull(authId)){
+                        if (taskType.equals(PipelineFinal.TASK_ARTIFACT_XPACK)
+                                || taskType.equals(PipelineFinal.TASK_ARTIFACT_NEXUS) ){
+                            Object auth = authServerServer.findOneAuthServer(authId);
+                            taskArtifact.setAuth(auth);
+                        }
+                        if (taskType.equals(PipelineFinal.TASK_ARTIFACT_SSH)){
+                            Object auth = authHostService.findOneAuthHost(authId);
+                            taskArtifact.setAuth(auth);
+                        }
+                    }
+
+                    object = taskArtifact;
+                }
+                case PipelineFinal.TASK_TYPE_MESSAGE -> {
+                    object = messageTypeServer.findMessage(taskId);
+                }
+                case PipelineFinal.TASK_TYPE_SCRIPT -> {
+                    object = scriptServer.findScript(taskId);
+                }
+                default -> {
+                    throw new ApplicationException("无法更新未知的配置类型。");
+                }
+            }
+            task.setValues(object);
+            task.setTask(object);
+            list.add(task);
+        }
+        list.sort(Comparator.comparing(Tasks::getTaskSort));
+        return list;
+    }
+
     @Override
     public List<Tasks> finAllStageTaskOrTask(String stageId) {
         List<Tasks> tasks = finAllStageTask(stageId);
@@ -546,7 +694,25 @@ public class TasksServiceImpl implements TasksService {
             tasks1.setValues(task);
             tasks1.setTask(task);
         }
+
+        addTaskAuth(tasks);
         // List<Tasks> allTaskOrTask = findAllTaskOrTask(tasks);
+        return tasks;
+    }
+
+    @Override
+    public List<Tasks> finAllStageTaskOrTaskNoAuth(String stageId) {
+        List<Tasks> tasks = finAllStageTask(stageId);
+        if (tasks.isEmpty()){
+            return Collections.emptyList();
+        }
+        for (Tasks tasks1 : tasks) {
+            String taskId = tasks1.getTaskId();
+            String taskType = tasks1.getTaskType();
+            Object task = findOneDifferentTask(taskId, taskType);
+            tasks1.setValues(task);
+            tasks1.setTask(task);
+        }
         return tasks;
     }
 
@@ -563,7 +729,7 @@ public class TasksServiceImpl implements TasksService {
         if (type == 1){
             list = finAllPipelineTaskOrTask(id);
         }else {
-            list = finAllStageTaskOrTask(id);
+            list = finAllStageTaskOrTaskNoAuth(id);
         }
         if (list == null || list.isEmpty()){
             return null;

@@ -26,6 +26,12 @@ public class PipelineCountController {
         return Result.ok(runDayCounts);
     }
 
+    @RequestMapping(path="/findRunTimeSpan",method = RequestMethod.POST)
+    public Result<List<PipelineDayCount>> findRunTimeSpan(@RequestBody @NotNull @Valid PipelineRunCountQuery countQuery){
+        List<PipelineDayCount> runDayCounts = countService.findRunTimeSpan(countQuery);
+        return Result.ok(runDayCounts);
+    }
+
     @RequestMapping(path="/findPipelineRunCount",method = RequestMethod.POST)
     public Result<List<PipelineRunCount>> findPipelineRunCount(@RequestBody @NotNull @Valid PipelineRunCountQuery countQuery){
         List<PipelineRunCount> runDayCounts = countService.findPipelineRunCount(countQuery);
@@ -35,6 +41,18 @@ public class PipelineCountController {
     @RequestMapping(path="/findPipelineRunResultCount",method = RequestMethod.POST)
     public Result<List<PipelineRunResultCount>> findPipelineRunResultCount(@RequestBody @NotNull @Valid PipelineRunCountQuery countQuery){
         List<PipelineRunResultCount> runDayCounts = countService.findPipelineRunResultCount(countQuery);
+        return Result.ok(runDayCounts);
+    }
+
+    @RequestMapping(path="/findRunResultCount",method = RequestMethod.POST)
+    public Result<PipelineRunResultCount> findRunResultCount(@RequestBody @NotNull @Valid PipelineRunCountQuery countQuery){
+        PipelineRunResultCount runDayCounts = countService.findRunResultCount(countQuery);
+        return Result.ok(runDayCounts);
+    }
+
+    @RequestMapping(path="/findDayRateCount",method = RequestMethod.POST)
+    public Result<PipelineDayRateCount> findDayRateCount(@RequestBody @NotNull @Valid PipelineRunCountQuery countQuery){
+        List<PipelineDayRateCount> runDayCounts = countService.findDayRateCount(countQuery);
         return Result.ok(runDayCounts);
     }
 
@@ -62,31 +80,11 @@ public class PipelineCountController {
         return Result.ok(resultCount);
     }
 
-    @RequestMapping(path="/findPipelineLogTypeCount",method = RequestMethod.POST)
-    public Result<List<PipelineLogTypeCount>> findPipelineLogTypeCount(@NotNull String pipelineId){
-        List<PipelineLogTypeCount> typeCountList = countService.findPipelineLogTypeCount(pipelineId);
-        return Result.ok(typeCountList);
+    @RequestMapping(path="/findRecentDaysFormatted",method = RequestMethod.POST)
+    public Result<PipelineSurveyResultCount> findRecentDaysFormatted(@NotNull Integer day){
+        List<String> resultCount = countService.findDaysFormatted(day);
+        return Result.ok(resultCount);
     }
-
-    @RequestMapping(path="/findPipelineLogUserCount",method = RequestMethod.POST)
-    public Result<List<PipelineLogUserCount>> findPipelineLogUserCount(@NotNull String pipelineId){
-        List<PipelineLogUserCount> logUserCountList = countService.findPipelineLogUserCount(pipelineId);
-        return Result.ok(logUserCountList);
-    }
-
-    @RequestMapping(path="/findLogTypeCount",method = RequestMethod.POST)
-    public Result<List<PipelineLogTypeCount>> findLogTypeCount(){
-        List<PipelineLogTypeCount> typeCountList = countService.findLogTypeCount();
-        return Result.ok(typeCountList);
-    }
-
-    @RequestMapping(path="/findLogUserCount",method = RequestMethod.POST)
-    public Result<List<PipelineLogUserCount>> findLogUserCount(){
-        List<PipelineLogUserCount> logUserCountList = countService.findLogUserCount();
-        return Result.ok(logUserCountList);
-    }
-
-
 
 }
 
