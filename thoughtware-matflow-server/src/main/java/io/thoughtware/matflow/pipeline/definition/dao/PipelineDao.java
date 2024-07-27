@@ -14,6 +14,7 @@ import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 流水线数据访问
@@ -140,14 +141,17 @@ public class PipelineDao {
     }
 
 
-    public List<PipelineEntity> findRecentlyPipeline(String pipelineIds,Integer number){
-        StringBuilder sqlBuffer = new StringBuilder();
-        sqlBuffer.append(" SELECT * ");
-        sqlBuffer.append(" FROM pip_pipeline");
-        sqlBuffer.append(" WHERE id not in  (").append(pipelineIds).append(")");
-        sqlBuffer.append(" LIMIT ").append(number);
+    public List<PipelineEntity> findRecentlyPipeline(Object[] pipelineIds,Integer number){
+        List<Object> list = new ArrayList<>();
+
+        String ids = Arrays.stream(pipelineIds).map(id -> "'" + id + "'")
+                .collect(Collectors.joining(","));
+
+        String sqlBuffer = " SELECT *  FROM pip_pipeline WHERE id not in (?) LIMIT ?";
         JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
-        return jdbcTemplate.query(sqlBuffer.toString(),new BeanPropertyRowMapper<>(PipelineEntity.class));
+        list.add(ids);
+        list.add(number);
+        return jdbcTemplate.query(sqlBuffer,new BeanPropertyRowMapper<>(PipelineEntity.class),list.toArray() );
     }
 
 

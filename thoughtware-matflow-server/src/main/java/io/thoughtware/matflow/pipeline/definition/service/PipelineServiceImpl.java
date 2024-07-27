@@ -40,6 +40,7 @@ import java.security.SecureRandom;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * 流水线服务
@@ -347,7 +348,7 @@ public class PipelineServiceImpl implements PipelineService {
     @Override
     public List<Pipeline> findPipelineList(PipelineQuery query){
         List<PipelineEntity> pipelineEntityList = pipelineDao.findPipelineList(query);
-        if (pipelineEntityList == null){
+        if (Objects.isNull(pipelineEntityList)){
             return Collections.emptyList();
         }
         return BeanMapper.mapList(pipelineEntityList,Pipeline.class);
@@ -438,7 +439,7 @@ public class PipelineServiceImpl implements PipelineService {
 
         if (Objects.isNull(pipeline)){
             logger.error("没有查询到当前流水线信息,pipelineId:{}",pipelineId);
-            throw new ApplicationException("没有查询到当前流水线信息！");
+            throw new ApplicationException("克隆失败，没有查询到当前流水线信息！");
         }
 
         pipeline.setName(pipelineName);
@@ -474,51 +475,55 @@ public class PipelineServiceImpl implements PipelineService {
     @Override
     public List<Pipeline> findRecentlyPipeline(Integer number,String pipelineId){
 
-        List<String> userOpen = openService.findUserOpen(number + 1);
-        if (userOpen.isEmpty()){
-            List<PipelineEntity> pipelineEntityList =
-                    pipelineDao.findRecentlyPipeline("'"+pipelineId+"'",number+1);
+        int i = number + 1;
+        List<String> userOpenList = openService.findUserOpen(i);
+
+        String loginId = LoginContext.getLoginId();
+        String[] builders = authorityService.findUserPipelineIdString(loginId);
+
+        // 过滤出当前流水线
+        List<String> strings = Stream.of(builders).filter(a -> !a.equals(pipelineId)).toList();
+
+        // 最近没有打开流水线
+        if (userOpenList.isEmpty()){
+            List<PipelineEntity> pipelineEntityList = pipelineDao.findAllPipelineList(strings);
+            if (pipelineEntityList.size() > number){
+                pipelineEntityList.subList(0, number);
+            }
             List<Pipeline> pipelineList = BeanMapper.mapList(pipelineEntityList, Pipeline.class);
-            List<Pipeline> pipelines = pipelineList.subList(0, number);
             Pipeline pipeline = findPipelineById(pipelineId);
-            pipelines.add(0,pipeline);
-            return pipelines;
+            pipelineList.add(0,pipeline);
+            return pipelineList;
         }
 
         // 过滤出当前流水线
-        List<String> list = userOpen.stream().filter(s -> !s.equals(pipelineId)).toList();
+        List<String> pieplineIdList = userOpenList.stream().filter(s -> !s.equals(pipelineId))
+                .toList();
 
-        StringBuilder ids =  new StringBuilder();
-        // 查询流水线
-        List<Pipeline> pipelineList = new ArrayList<>();
-        for (String id : list) {
-            Pipeline pipeline = findPipelineById(id);
-            pipelineList.add(pipeline);
-            ids.append("'").append(id).append("',");
-        }
-        ids.append("'").append(pipelineId).append("'");
+        // 获取最近打开以及拥有权限的流水线
+        List<String> collect = strings.stream()
+                .filter(pieplineIdList::contains).distinct().toList();
 
-        // 判断是否足够当前数量
-        if (pipelineList.size() < number){
-            int size = number -pipelineList.size();
-            List<PipelineEntity> allPipeline = pipelineDao.findRecentlyPipeline(String.valueOf(ids),number+1);
-            if (allPipeline != null){
-                List<Pipeline> pipelineList1 = BeanMapper.mapList(allPipeline, Pipeline.class);
-                if (pipelineList1.size() <= size){
-                    pipelineList.addAll(pipelineList.size(),pipelineList1);
-                }else {
-                    pipelineList.addAll(pipelineList.size(),pipelineList1.subList(0, size));
-                }
+        List<String> idStrings = new ArrayList<>(collect);
+
+        // 判断是否超出数量
+        if (collect.size() >= number){
+            idStrings = idStrings.subList(0, number);
+        }else {
+            List<String> collect1 = strings.stream().filter(element -> !pieplineIdList.contains(element)).toList();
+            if (collect1.size() >= number - collect.size()){
+                idStrings.addAll(collect.size()-1,collect1.subList(0,number - collect.size()));
+            }else {
+                idStrings.addAll(collect.size()-1,collect1);
             }
         }
 
-        // 当前流水线放在最前
+        List<Pipeline> pipelineList = findAllPipelineList(idStrings);
         Pipeline pipeline = findPipelineById(pipelineId);
         pipelineList.add(0,pipeline);
 
         return pipelineList;
     }
-
 
     /**
      * 删除关联信息
@@ -569,7 +574,6 @@ public class PipelineServiceImpl implements PipelineService {
         }
         return pipeline;
     }
-
 
     /**
      * 根据用户Id查询用户

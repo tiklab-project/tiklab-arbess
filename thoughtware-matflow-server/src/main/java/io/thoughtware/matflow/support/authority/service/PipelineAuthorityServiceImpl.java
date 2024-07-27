@@ -81,26 +81,15 @@ public class PipelineAuthorityServiceImpl implements PipelineAuthorityService {
     @Override
     public String[] findUserPipelineIdString(String userId){
 
-        List<PipelineEntity> allPipeline1 = pipelineDao.findAllPipeline();
-        // 流水线为空
-        if (Objects.isNull(allPipeline1) || allPipeline1.isEmpty()){
-            return new String[]{};
-        }
-
         List<String> list = new ArrayList<>();
+
         // 查询公共的流水线
         PipelineQuery pipelineQuery = new PipelineQuery();
         pipelineQuery.setPipelinePower(1);
         List<PipelineEntity> allPipeline = pipelineDao.findPipelineList(pipelineQuery);
 
-        if (!Objects.isNull(allPipeline)){
-            for (PipelineEntity pipelineEntity : allPipeline) {
-                list.add(pipelineEntity.getId());
-            }
-        }
-        // 流水线全部都为公共的
-        if (allPipeline1.size() == allPipeline.size()){
-            return list.toArray(new String[0]);
+        if (!Objects.isNull(allPipeline) && !allPipeline.isEmpty()){
+            allPipeline.stream().peek(pipelineEntity -> list.add(pipelineEntity.getId()));
         }
 
         // 查询用户拥有的流水线
@@ -109,41 +98,31 @@ public class PipelineAuthorityServiceImpl implements PipelineAuthorityService {
         List<DmUser> allDmUser = dmUserService.findDmUserListNoQuery(dmUserQuery);
 
         if (Objects.isNull(allDmUser) || allDmUser.isEmpty()){
-            return list.toArray(new String[0]);
+            return list.toArray(String[]::new);
         }
 
-        for (DmUser dmUser : allDmUser) {
-            User user = dmUser.getUser();
-            if (Objects.isNull(user)){
-                continue;
-            }
-            list.add(dmUser.getDomainId());
-        }
+        List<String> strings1 = allDmUser.stream().map(DmUser::getDomainId).toList();
+        list.addAll(strings1);
+        List<String> strings = list.stream().distinct().toList();
 
-        return list.toArray(new String[0]);
+        return strings.toArray(String[]::new);
+
     }
 
 
-    /**
-     * 获取拥有此流水线的用户
-     * @param pipelineId 流水线id
-     * @return 用户信息
-     */
     @Override
     public List<User> findPipelineUser(String pipelineId) {
 
         DmUserQuery dmUserQuery = new DmUserQuery();
         dmUserQuery.setDomainId(pipelineId);
         List<DmUser> allDmUser =  dmUserService.findDmUserList(dmUserQuery);
-        if (allDmUser == null){
+        if (Objects.isNull(allDmUser)){
             return Collections.emptyList();
         }
 
-        List<User> userList = new ArrayList<>();
-        for (DmUser dmUser : allDmUser) {
-            userList.add(dmUser.getUser());
-        }
-        return userList;
+        return allDmUser.stream().map(DmUser::getUser)
+                .filter(user -> !Objects.isNull(user))
+                .toList();
     }
 
 

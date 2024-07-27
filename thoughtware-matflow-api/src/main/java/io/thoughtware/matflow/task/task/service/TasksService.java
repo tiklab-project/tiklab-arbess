@@ -148,6 +148,10 @@ public interface TasksService {
     void cloneTasks(String id,String cloneId,String type);
 
 
+    /**
+     * 更新任务
+     * @param tasks 任务
+     */
     void updateTasks(Tasks tasks);
 
 }

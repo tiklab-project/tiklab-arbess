@@ -14,6 +14,7 @@ import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Repository
 public class PipelineInstanceDao {
@@ -126,19 +127,14 @@ public class PipelineInstanceDao {
      * @return 历史
      */
     public Pagination<PipelineInstanceEntity> findAllPageInstance(PipelineInstanceQuery pipelineInstanceQuery){
-        String sql = "select pip_pipeline_instance.* from pip_pipeline_instance ";
-        sql = sql.concat(" where pipeline_id in ( ");
-        String ids = "";
-        String[] idList = pipelineInstanceQuery.getIds();
+        String sql = "select * from pip_pipeline_instance ";
+        sql = sql.concat(" where 1 = 1 ");
 
-        for (int i = 0; i < idList.length; i++) {
-            if (i == idList.length-1){
-                ids = ids.concat("'" + idList[i]+ "'");
-            }else {
-                ids = ids.concat("'" + idList[i]+ "',");
-            }
+        String[] idList = pipelineInstanceQuery.getIds();
+        if (!Objects.isNull(idList) && idList.length > 0){
+            String ids = Arrays.stream(idList).map(id -> "'" + id + "'").collect(Collectors.joining(","));
+            sql = sql.concat(" and pipeline_id in ( "+ids+" ) ");
         }
-        sql = sql.concat(ids+") ");
 
         if (pipelineInstanceQuery.getType() != 0){
             sql = sql.concat(" and run_way = " + pipelineInstanceQuery.getType());
@@ -161,8 +157,7 @@ public class PipelineInstanceDao {
         sql = sql.concat(" order by create_time desc " +
                 ", case 'run_status' when 'run' then 1 end");
 
-        return jpaTemplate.getJdbcTemplate().findPage(sql, null,
-                pipelineInstanceQuery.getPageParam(),
+        return jpaTemplate.getJdbcTemplate().findPage(sql, new Object[]{}, pipelineInstanceQuery.getPageParam(),
                 new BeanPropertyRowMapper<>(PipelineInstanceEntity.class));
     }
 
@@ -173,28 +168,9 @@ public class PipelineInstanceDao {
      * @return 历史集合
      */
     public List<PipelineInstanceEntity> findAllInstance(String pipelineId){
-        String sql = "select pip_pipeline_instance.* from pip_pipeline_instance  ";
-        sql = sql.concat(" where pipeline_id   = '"+pipelineId+"' ");
+        String sql = "select * from pip_pipeline_instance where pipeline_id = ? ";
         JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
-        return  jdbcTemplate.query(sql, new BeanPropertyRowMapper(PipelineInstanceEntity.class));
-    }
-
-    /**
-     * 根据流水线id最近一次的构建历史
-     * @param pipelineId 流水线id
-     * @return 最近一次的构建历史
-     */
-    public PipelineInstanceEntity findLastInstance(String pipelineId){
-        String sql = "select pip_pipeline_instance.* from pip_pipeline_instance  ";
-        sql = sql.concat(" where pipeline_id   = '" + pipelineId + "' ");
-        sql = sql.concat(" order by create_time desc ");
-        JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
-        BeanPropertyRowMapper rowMapper = new BeanPropertyRowMapper(PipelineInstanceEntity.class);
-        List<PipelineInstanceEntity> list = jdbcTemplate.query(sql, rowMapper);
-        if (list.isEmpty()){
-            return null;
-        }
-        return  list.get(0);
+        return  jdbcTemplate.query(sql, new BeanPropertyRowMapper(PipelineInstanceEntity.class),pipelineId);
     }
 
     /**

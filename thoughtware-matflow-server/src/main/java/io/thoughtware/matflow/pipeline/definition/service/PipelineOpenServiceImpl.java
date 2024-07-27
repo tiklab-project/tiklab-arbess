@@ -43,11 +43,10 @@ public class PipelineOpenServiceImpl implements PipelineOpenService {
     @Override
     public void deleteAllOpen(String pipelineId){
         List<PipelineOpen> allOpen = findAllOpenNoQuery();
-        if (allOpen == null){
+        if (allOpen.isEmpty()){
            return;
         }
         for (PipelineOpen pipelineOpen : allOpen) {
-            // joinTemplate.joinQuery(pipelineOpen);
             Pipeline pipeline = pipelineOpen.getPipeline();
             if (!pipeline.getId().equals(pipelineId)){
                continue;
@@ -58,7 +57,6 @@ public class PipelineOpenServiceImpl implements PipelineOpenService {
 
     @Override
     public void updatePipelineOpen(String pipelineId) {
-
         if (pipelineId.equals("undefined")){
             return;
         }
@@ -72,22 +70,34 @@ public class PipelineOpenServiceImpl implements PipelineOpenService {
 
     @Override
     public PipelineOpen findOneOpen(String openId) {
-        PipelineOpen pipelineOpen = BeanMapper.map(pipelineOpenDao.findOneOpen(openId), PipelineOpen.class);
+        PipelineOpenEntity openEntity = pipelineOpenDao.findOneOpen(openId);
+        PipelineOpen pipelineOpen = BeanMapper.map(openEntity, PipelineOpen.class);
         joinTemplate.joinQuery(pipelineOpen);
         return pipelineOpen;
     }
 
+    public PipelineOpen findOneOpenNoQuery(String openId) {
+        PipelineOpenEntity openEntity = pipelineOpenDao.findOneOpen(openId);
+        return BeanMapper.map(openEntity, PipelineOpen.class);
+    }
+
     @Override
     public List<PipelineOpen> findAllOpen() {
-        List<PipelineOpen> list = BeanMapper.mapList(pipelineOpenDao.findAllOpen(), PipelineOpen.class);
+        List<PipelineOpenEntity> allOpen = pipelineOpenDao.findAllOpen();
+        if (Objects.isNull(allOpen)){
+            return Collections.emptyList();
+        }
+        List<PipelineOpen> list = BeanMapper.mapList(allOpen, PipelineOpen.class);
         joinTemplate.joinQuery(list);
         return list;
     }
 
     public List<PipelineOpen> findAllOpenNoQuery() {
-        List<PipelineOpen> list = BeanMapper.mapList(pipelineOpenDao.findAllOpen(), PipelineOpen.class);
-        // joinTemplate.joinQuery(list);
-        return list;
+        List<PipelineOpenEntity> allOpen = pipelineOpenDao.findAllOpen();
+        if (Objects.isNull(allOpen)){
+            return Collections.emptyList();
+        }
+        return BeanMapper.mapList(allOpen, PipelineOpen.class);
     }
 
     @Override
