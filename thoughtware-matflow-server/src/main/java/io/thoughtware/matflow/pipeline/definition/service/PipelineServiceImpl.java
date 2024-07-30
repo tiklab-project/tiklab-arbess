@@ -324,6 +324,9 @@ public class PipelineServiceImpl implements PipelineService {
         Pagination<PipelineEntity> pipelinePage = pipelineDao.findPipelinePage(query);
         List<PipelineEntity> dataList = pipelinePage.getDataList();
         List<Pipeline> pipelineList = BeanMapper.mapList(dataList, Pipeline.class);
+        if (pipelineList.isEmpty()){
+            return PaginationBuilder.build(pipelinePage, Collections.emptyList());
+        }
         List<Pipeline> list = new ArrayList<>();
         List<String> userIdList = new ArrayList<>();
         for (Pipeline pipeline : pipelineList) {

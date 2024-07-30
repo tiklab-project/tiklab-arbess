@@ -15,21 +15,17 @@ public class PostprocessInstance {
     //@ApiProperty(name = "id",desc="id")
     private String id;
 
-
     //@ApiProperty(name = "instanceId",desc="实例id")
     private String instanceId;
 
-
     //@ApiProperty(name = "taskInstanceId",desc="任务实例id")
     private String taskInstanceId;
-
 
     //@ApiProperty(name = "postAddress",desc="日志地址")
     private String postAddress;
 
     //@ApiProperty(name = "postTime",desc="运行时间")
     private Integer postTime;
-
 
     //@ApiProperty(name = "postState",desc="运行状态")
     private String postState;

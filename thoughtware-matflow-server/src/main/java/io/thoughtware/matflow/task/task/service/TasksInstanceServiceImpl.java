@@ -201,7 +201,6 @@ public class TasksInstanceServiceImpl implements TasksInstanceService {
         for (PostprocessInstance postprocessInstance : taskPostInstance) {
             String postInstanceId = postprocessInstance.getId();
             List<TaskInstanceEntity> postInstanceEntityList = taskInstanceDao.findPostInstance(postInstanceId);
-            //任务是否在运行中
             TaskInstance instance = BeanMapper.map(postInstanceEntityList.get(0), TaskInstance.class);
             String taskInstanceId = instance.getId();
             TaskInstance taskInstance = taskInstanceMap.get(taskInstanceId);
@@ -220,6 +219,7 @@ public class TasksInstanceServiceImpl implements TasksInstanceService {
             instance.setRunTimeDate(time);
             list.add(instance);
         }
+        list.sort(Comparator.comparing(TaskInstance::getTaskSort));
         return list;
     }
 

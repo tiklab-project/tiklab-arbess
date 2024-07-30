@@ -62,12 +62,13 @@ public class PostprocessExecServiceImpl implements PostprocessExecService{
             String postInstanceId = postInstanceService.createPostInstance(postInstance);
 
             Tasks task = tasksService.findOnePostTaskOrTask(postprocess.getPostId());
+            task.setTaskSort(postprocess.getTaskSort());
             fileAddress = fileAddress + "/" +  postInstanceId;
             String taskInstanceId = tasksExecService.createTaskExecInstance(task, postInstanceId, 3, fileAddress);
             task.setInstanceId(taskInstanceId);
 
             postInstance.setTaskInstanceId(taskInstanceId);
-
+            task.setTaskSort(postprocess.getTaskSort());
             postprocess.setTask(task);
             postprocess.setValues(task);
             postprocess.setInstanceId(postInstanceId);

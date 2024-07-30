@@ -51,7 +51,7 @@ public class PostprocessServiceImpl implements PostprocessService {
         postprocessEntity.setCreateTime(PipelineUtil.date(1));
         String postId = postprocessDao.createPost(postprocessEntity);
         Tasks tasks = new Tasks();
-        tasks.setTaskSort(1);
+        tasks.setTaskSort(postprocess.getTaskSort());
         tasks.setTaskName(postprocess.getPostName());
         tasks.setTaskType(postprocess.getTaskType());
         tasks.setPostprocessId(postId);
@@ -76,6 +76,7 @@ public class PostprocessServiceImpl implements PostprocessService {
             postprocess.setTaskType(taskType);
             list.add(postprocess);
         }
+        list.sort(Comparator.comparing(Postprocess::getTaskSort));
         return list;
     }
 

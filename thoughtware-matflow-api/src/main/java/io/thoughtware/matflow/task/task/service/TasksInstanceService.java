@@ -67,6 +67,11 @@ public interface TasksInstanceService {
     TaskInstance findPostPipelineRunMessage(String instanceId);
 
 
+    /**
+     * 查询阶段下的后置任务实例
+     * @param id 后置任务阶段id
+     * @return 后置任务实例集合
+     */
     List<TaskInstance> findStagePostRunMessage(String id);
 
     /**

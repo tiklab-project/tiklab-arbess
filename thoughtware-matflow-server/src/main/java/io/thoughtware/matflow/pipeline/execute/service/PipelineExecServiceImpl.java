@@ -129,10 +129,10 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
         pipelineIdOrAgentId.put(pipelineId, agent);
 
         // 判断磁盘空间是否足够
-        // diskService.validationStorageSpace();
+        diskService.validationStorageSpace();
 
         // 资源限制
-        // resourcesService.judgeResources();
+        resourcesService.judgeResources();
 
         // 进入执行
         runMsg.setPipeline(pipeline);

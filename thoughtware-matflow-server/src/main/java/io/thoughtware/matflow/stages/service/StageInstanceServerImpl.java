@@ -154,28 +154,31 @@ public class StageInstanceServerImpl implements StageInstanceServer{
             String status = PipelineFinal.RUN_RUN;
             stageInstance.setStageName("后置处理");
             stageInstance.setId("1");
-            int i = 0;
-            AtomicInteger time = new AtomicInteger();
 
-            for (TaskInstance taskInstance : list) {
-                // taskInstance.setTaskName();
-                String runState = taskInstance.getRunState();
-                switch (runState) {
-                    case PipelineFinal.RUN_ERROR -> {status = PipelineFinal.RUN_ERROR;}
-                    case PipelineFinal.RUN_RUN -> {status = PipelineFinal.RUN_RUN;}
-                    case PipelineFinal.RUN_HALT ->{status = PipelineFinal.RUN_HALT;}
-                    case PipelineFinal.RUN_WAIT  ->{status = PipelineFinal.RUN_WAIT;}
-                    case PipelineFinal.RUN_SUCCESS ->{i++;}
-                }
+            long successCount = list.stream().filter(taskInstance -> Objects.equals(taskInstance.getRunState(), PipelineFinal.RUN_SUCCESS)).count();
+
+            long errorCount = list.stream().filter(taskInstance -> Objects.equals(taskInstance.getRunState(), PipelineFinal.RUN_ERROR)).count();
+
+            long haltCount = list.stream().filter(taskInstance -> Objects.equals(taskInstance.getRunState(), PipelineFinal.RUN_HALT)).count();
+
+            long runCount = list.stream().filter(taskInstance -> Objects.equals(taskInstance.getRunState(), PipelineFinal.RUN_RUN)).count();
+
+            if (haltCount != 0){
+                status = PipelineFinal.RUN_HALT;
+            }else if (errorCount != 0){
+                status = PipelineFinal.RUN_ERROR;
+            } else if (runCount != 0){
+                status = PipelineFinal.RUN_RUN;
+            } else {
+                status = PipelineFinal.RUN_WAIT;
             }
-
-            list.forEach(taskInstance -> {
-                time.set(time.get() + taskInstance.getRunTime());
-            });
-
-            if (i == list.size()){
+            logger.warn("后置处理状态：{},successCount：{},errorCount：{}，haltCount：{}，runCount：{}" , status,successCount,errorCount,haltCount,runCount);
+            if (successCount == list.size()){
                 status = PipelineFinal.RUN_SUCCESS;
             }
+
+            AtomicInteger time = new AtomicInteger();
+            list.forEach(taskInstance -> {time.set(time.get() + taskInstance.getRunTime());});
 
             StageInstance otherStageInstance = new StageInstance();
             otherStageInstance.setStageName("后置任务");
