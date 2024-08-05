@@ -89,7 +89,7 @@ public class PipelineAuthorityServiceImpl implements PipelineAuthorityService {
         List<PipelineEntity> allPipeline = pipelineDao.findPipelineList(pipelineQuery);
 
         if (!Objects.isNull(allPipeline) && !allPipeline.isEmpty()){
-            allPipeline.stream().peek(pipelineEntity -> list.add(pipelineEntity.getId()));
+            allPipeline.forEach(p -> list.add(p.getId()));
         }
 
         // 查询用户拥有的流水线

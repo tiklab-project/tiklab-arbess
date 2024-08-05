@@ -113,6 +113,7 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
      */
     @Override
     public void settingMessage(String templateId,Map<String, Object> map){
+        logger.info("发送消息......");
         executorService.submit(() -> {
             try {
                 String link = (String) map.get("link");
@@ -151,7 +152,7 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
      */
     @Override
     public void message(Map<String, Object> map,List<String> receiver){
-
+        logger.info("发送指定类型消息......");
         Message message = new Message();
 
         String sendWay = (String)map.get("sendWay");

@@ -98,6 +98,7 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
     //流水线id:流水线实例id
     public static final  Map<String,String> pipelineIdOrInstanceId = new HashMap<>();
 
+    //流水线id:agent
     public static final Map<String , Agent> pipelineIdOrAgentId = new HashMap<>();
 
 

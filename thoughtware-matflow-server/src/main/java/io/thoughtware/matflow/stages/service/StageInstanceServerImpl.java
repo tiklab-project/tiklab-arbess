@@ -172,7 +172,7 @@ public class StageInstanceServerImpl implements StageInstanceServer{
             } else {
                 status = PipelineFinal.RUN_WAIT;
             }
-            logger.warn("后置处理状态：{},successCount：{},errorCount：{}，haltCount：{}，runCount：{}" , status,successCount,errorCount,haltCount,runCount);
+            // logger.warn("后置处理状态：{},successCount：{},errorCount：{}，haltCount：{}，runCount：{}" , status,successCount,errorCount,haltCount,runCount);
             if (successCount == list.size()){
                 status = PipelineFinal.RUN_SUCCESS;
             }

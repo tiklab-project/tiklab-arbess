@@ -290,6 +290,9 @@ public class PipelineServiceImpl implements PipelineService {
         if (!Objects.isNull(follow) && follow == 1){
             Pagination<PipelineEntity> pipelineListQuery = pipelineDao.findPipelineListQuery(query);
             List<PipelineEntity> dataList = pipelineListQuery.getDataList();
+            if (dataList.isEmpty()){
+                return PaginationBuilder.build(pipelineListQuery, Collections.emptyList());
+            }
             List<Pipeline> pipelineList = BeanMapper.mapList(dataList, Pipeline.class);
             List<Pipeline> list = new ArrayList<>();
             List<String> userIdList = new ArrayList<>();
@@ -484,8 +487,15 @@ public class PipelineServiceImpl implements PipelineService {
         String loginId = LoginContext.getLoginId();
         String[] builders = authorityService.findUserPipelineIdString(loginId);
 
+        Pipeline pipeline = findPipelineById(pipelineId);
+
         // 过滤出当前流水线
         List<String> strings = Stream.of(builders).filter(a -> !a.equals(pipelineId)).toList();
+        if (strings.isEmpty()){
+            List<Pipeline> objects = new ArrayList<>();
+            objects.add(pipeline);
+            return objects;
+        }
 
         // 最近没有打开流水线
         if (userOpenList.isEmpty()){
@@ -494,7 +504,6 @@ public class PipelineServiceImpl implements PipelineService {
                 pipelineEntityList.subList(0, number);
             }
             List<Pipeline> pipelineList = BeanMapper.mapList(pipelineEntityList, Pipeline.class);
-            Pipeline pipeline = findPipelineById(pipelineId);
             pipelineList.add(0,pipeline);
             return pipelineList;
         }
@@ -520,9 +529,13 @@ public class PipelineServiceImpl implements PipelineService {
                 idStrings.addAll(collect.size()-1,collect1);
             }
         }
+        // if (strings.isEmpty()){
+        //     List<Pipeline> objects = new ArrayList<>();
+        //     objects.add(pipeline);
+        //     return objects;
+        // }
 
         List<Pipeline> pipelineList = findAllPipelineList(idStrings);
-        Pipeline pipeline = findPipelineById(pipelineId);
         pipelineList.add(0,pipeline);
 
         return pipelineList;
@@ -593,6 +606,9 @@ public class PipelineServiceImpl implements PipelineService {
         Map<String,User> map = new HashMap<>();
         List<User> list = userService.findList(uniqueList);
         for (User user : list) {
+            if (Objects.isNull(user)){
+                continue;
+            }
             map.put(user.getId(),user);
         }
         return map;

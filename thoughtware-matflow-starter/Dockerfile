@@ -9,13 +9,13 @@ RUN mkdir -p ${DIR_HOME}
 
 ADD target ${TEP_HOME}
 
-RUN APP_HOME="tiklab-*.tar.gz" ;  tar -xvf ${TEP_HOME}/${APP_HOME} -C ${DIR_HOME}
+RUN APP_HOME="thoughtware-*.tar.gz" ;  tar -xvf ${TEP_HOME}/${APP_HOME} -C ${DIR_HOME}
 
-RUN APP_HOME="tiklab-*" ; mv ${DIR_HOME}/${APP_HOME} ${DIR_HOME}/tiklab
+RUN APP_HOME="thoughtware-*" ; mv ${DIR_HOME}/${APP_HOME} ${DIR_HOME}/thoughtware
 
 #工作空间
 WORKDIR ${DIR_HOME}
 #暴露端口
 EXPOSE 8080
 #启动
-CMD sh tiklab/bin/startup.sh ; tail -100f tiklab/logs/app.log
+CMD sh thoughtware/bin/startup.sh ; tail -100f thoughtware/logs/app.log

@@ -105,10 +105,11 @@ public class WebSocketMessageServiceImpl implements WebSocketMessageService {
         PipelineInstance sourceInstance = JSONObject.parseObject(jsonString,PipelineInstance.class);
         // 更新实例状态
         String instanceId = sourceInstance.getInstanceId();
+        String runStatus = sourceInstance.getRunStatus();
         PipelineInstance instance = pipelineInstanceService.findOneInstance(instanceId);
         int runtime = pipelineInstanceService.findInstanceRuntime(instanceId);
         instance.setRunTime(runtime+1);
-        instance.setRunStatus(sourceInstance.getRunStatus());
+        instance.setRunStatus(runStatus);
         pipelineInstanceService.updateInstance(instance);
 
         // 设置流水线为未运行
@@ -117,26 +118,41 @@ public class WebSocketMessageServiceImpl implements WebSocketMessageService {
         pipeline.setState(1);
         pipelineService.updatePipeline(pipeline);
         PipelineExecServiceImpl.pipelineIdOrInstanceId.remove(pipelineId);
-        sendPipelineRunMessage(pipeline,instanceId,true);
+
+        sendPipelineRunMessage(pipeline,instanceId,runStatus);
 
     }
 
     // 发送消息
-    public void sendPipelineRunMessage(Pipeline pipeline,String instanceId,Boolean state){
+    public void sendPipelineRunMessage(Pipeline pipeline,String instanceId,String state){
         Map<String,Object> map = homeService.initMap(pipeline);
         map.put("instanceId",instanceId);
         map.put("link", PipelineFinal.RUN_LINK);
         PipelineInstance instance = pipelineInstanceService.findOneInstance(instanceId);
 
-        if (state){
-            map.put("message","运行成功");
-            map.put("execStatus","运行成功");
-            map.put("colour","info");
-        }else {
-            map.put("colour","warning");
-            map.put("message","运行失败");
-            map.put("execStatus","运行失败");
+        switch (state){
+            case PipelineFinal.RUN_SUCCESS ->{
+                map.put("message","运行成功");
+                map.put("execStatus","运行成功");
+                map.put("colour","info");
+            }
+            case PipelineFinal.RUN_ERROR ->{
+                map.put("colour","warning");
+                map.put("message","运行失败");
+                map.put("execStatus","运行失败");
+            }
+            case PipelineFinal.RUN_HALT ->{
+                map.put("colour","warning");
+                map.put("message","停止运程");
+                map.put("execStatus","停止运程");
+            }
+            default -> {
+                map.put("colour","info");
+                map.put("message","运行成功");
+                map.put("execStatus","运行成功");
+            }
         }
+
         String time = PipelineUtil.formatDateTime(instance.getRunTime());
         map.put("execTime",time);
         homeService.log(PipelineFinal.LOG_TYPE_RUN,  map);
