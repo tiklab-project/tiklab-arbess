@@ -3,6 +3,7 @@ package io.thoughtware.matflow.support.postprocess.service;
 import io.thoughtware.matflow.support.postprocess.model.Postprocess;
 import io.thoughtware.matflow.support.util.util.PipelineUtil;
 import io.thoughtware.matflow.task.task.model.Tasks;
+import io.thoughtware.matflow.task.task.service.TasksCloneService;
 import io.thoughtware.matflow.task.task.service.TasksService;
 import io.thoughtware.toolkit.beans.BeanMapper;
 import io.thoughtware.core.exception.ApplicationException;
@@ -23,6 +24,9 @@ public class PostprocessServiceImpl implements PostprocessService {
 
     @Autowired
     TasksService tasksService;
+
+    @Autowired
+    TasksCloneService tasksCloneService;
 
     @Override
     public String createPostTask(Postprocess postprocess) {
@@ -88,7 +92,7 @@ public class PostprocessServiceImpl implements PostprocessService {
             postprocess.setPipelineId(clonePipelineId);
             PostprocessEntity postprocessEntity = BeanMapper.map(postprocess, PostprocessEntity.class);
             String clonePostId = postprocessDao.createPost(postprocessEntity);
-            tasksService.clonePostTasks(postprocess.getPostId(),clonePostId);
+            tasksCloneService.clonePostTasks(postprocess.getPostId(),clonePostId);
         }
     }
 

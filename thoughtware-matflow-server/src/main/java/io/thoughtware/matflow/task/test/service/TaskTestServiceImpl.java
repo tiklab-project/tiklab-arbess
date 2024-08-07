@@ -10,11 +10,14 @@ import io.thoughtware.matflow.task.test.model.*;
 import io.thoughtware.toolkit.beans.BeanMapper;
 import io.thoughtware.matflow.task.test.model.*;
 import io.thoughtware.rpc.annotation.Exporter;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
+
+import static io.thoughtware.matflow.support.util.util.PipelineFinal.TASK_TEST_TESTON;
 
 /**
  * @author zcamy
@@ -36,30 +39,34 @@ public class TaskTestServiceImpl implements TaskTestService {
     TaskTestOnService taskTestOnService;
 
 
-    //创建
+
     @Override
     public String createTest(TaskTest taskTest) {
         return taskTestDao.createTest(BeanMapper.map(taskTest, TaskTestEntity.class));
     }
 
-
-    /**
-     * 根据配置id删除任务
-     * @param configId 配置id
-     */
     @Override
-    public void deleteTestConfig(String configId){
-        TaskTest oneTestConfig = findOneTest(configId);
-        deleteTest(oneTestConfig.getTaskId());
+    public Boolean testValid(String taskType,Object object){
+        TaskTest taskTest = (TaskTest) object;
+
+        if (taskType.equals(TASK_TEST_TESTON)){
+            if (Objects.isNull(taskTest.getTestSpace())|| Objects.isNull(taskTest.getTestSpace().getName())){
+                return false;
+            }
+            if (Objects.isNull(taskTest.getTestPlan())|| Objects.isNull(taskTest.getTestPlan().getName())){
+                return false;
+            }
+            boolean b  = Objects.isNull(taskTest.getApiEnv())
+                    && Objects.isNull(taskTest.getAppEnv())
+                    && Objects.isNull(taskTest.getWebEnv());
+            return !b ;
+        }
+        return !StringUtils.isEmpty(taskTest.getAddress());
     }
 
-    /**
-     * 根据配置id查询任务
-     * @param taskId 配置id
-     * @return 任务
-     */
+
     @Override
-    public TaskTest findOneTestConfig (String taskId){
+    public TaskTest findTestBuAuth (String taskId){
 
         TaskTest taskTest = findOneTest(taskId);
 
@@ -70,8 +77,6 @@ public class TaskTestServiceImpl implements TaskTestService {
         if (Objects.isNull(authId)){
             return taskTest;
         }
-        // AuthThird authServer = thirdServer.findOneAuthServer(authId);
-        // taskTest.setAuth(authServer);
 
         if (!Objects.isNull(taskTest.getApiEnv())){
             String id = taskTest.getApiEnv().getId();

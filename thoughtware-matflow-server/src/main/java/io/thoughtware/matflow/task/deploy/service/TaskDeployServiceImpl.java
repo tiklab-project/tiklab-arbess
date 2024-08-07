@@ -5,6 +5,7 @@ import io.thoughtware.matflow.setting.model.AuthHost;
 import io.thoughtware.matflow.setting.model.AuthHostGroup;
 import io.thoughtware.matflow.setting.service.AuthHostGroupService;
 import io.thoughtware.matflow.setting.service.AuthHostService;
+import io.thoughtware.matflow.support.util.util.PipelineUtil;
 import io.thoughtware.matflow.task.deploy.model.TaskDeploy;
 import io.thoughtware.toolkit.beans.BeanMapper;
 import io.thoughtware.matflow.task.deploy.dao.TaskDeployDao;
@@ -15,6 +16,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
+
+import static io.thoughtware.matflow.support.util.util.PipelineFinal.TASK_DEPLOY_DOCKER;
+import static io.thoughtware.matflow.support.util.util.PipelineFinal.TASK_DEPLOY_LINUX;
 
 /**
  * @author zcamy
@@ -32,50 +36,22 @@ public class TaskDeployServiceImpl implements TaskDeployService {
     @Autowired
     AuthHostGroupService groupService;
 
-    //创建
+
     @Override
     public String createDeploy(TaskDeploy taskDeploy) {
         return taskDeployDao.createDeploy(BeanMapper.map(taskDeploy, TaskDeployEntity.class));
     }
 
-
-    /**
-     * 根据配置id删除任务
-     * @param configId 配置id
-     */
     @Override
-    public void deleteDeployConfig(String configId){
-        TaskDeploy oneDeployConfig = findOneDeployConfig(configId);
-        deleteDeploy(oneDeployConfig.getTaskId());
+    public TaskDeploy findDeployByAuth(String authId){
+        return findOneDeploy(authId);
     }
 
-    /**
-     * 根据配置id查询任务
-     * @param configId 配置id
-     * @return 任务
-     */
-    @Override
-    public TaskDeploy findOneDeployConfig(String configId){
-        List<TaskDeploy> allDeploy = findAllDeploy();
-        if (allDeploy == null){
-            return null;
-        }
-        for (TaskDeploy taskDeploy : allDeploy) {
-            if (taskDeploy.getTaskId().equals(configId)){
-                return findOneDeploy(taskDeploy.getTaskId());
-            }
-        }
-        return null;
-    }
-    
-
-    //删除
     @Override
     public void deleteDeploy(String deployId) {
         taskDeployDao.deleteDeploy(deployId);
     }
 
-    //查询单个
     @Override
     public TaskDeploy findOneDeploy(String deployId) {
         TaskDeployEntity oneDeploy = taskDeployDao.findOneDeploy(deployId);
@@ -95,7 +71,6 @@ public class TaskDeployServiceImpl implements TaskDeployService {
         return taskDeploy;
     }
 
-    //查询所有
     @Override
     public List<TaskDeploy> findAllDeploy() {
         return BeanMapper.mapList(taskDeployDao.findAllDeploy(), TaskDeploy.class);
@@ -106,8 +81,27 @@ public class TaskDeployServiceImpl implements TaskDeployService {
         return BeanMapper.mapList(taskDeployDao.findAllCodeList(idList), TaskDeploy.class);
     }
 
+    @Override
+    public Boolean deployValid(String taskType,Object object){
+        TaskDeploy deploy =(TaskDeploy) object;;
 
-    //修改
+        if ( taskType.equals(TASK_DEPLOY_LINUX)){
+            if (deploy.getAuthType() == 1){
+                if (!PipelineUtil.isNoNull(deploy.getLocalAddress())){
+                    return false;
+                }
+                return PipelineUtil.isNoNull(deploy.getDeployAddress());
+            }
+        }
+        if ( taskType.equals(TASK_DEPLOY_DOCKER)){
+            if (!PipelineUtil.isNoNull(deploy.getDockerImage())){
+                return false;
+            }
+            return PipelineUtil.isNoNull(deploy.getDeployAddress());
+        }
+        return true;
+    }
+
     @Override
     public void updateDeploy(TaskDeploy taskDeploy) {
         int authType = taskDeploy.getAuthType();

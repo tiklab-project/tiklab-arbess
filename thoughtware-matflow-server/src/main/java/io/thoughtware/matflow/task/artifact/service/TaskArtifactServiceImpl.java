@@ -8,6 +8,7 @@ import io.thoughtware.matflow.support.util.util.PipelineFinal;
 import io.thoughtware.matflow.support.util.util.PipelineUtil;
 import io.thoughtware.matflow.task.artifact.model.TaskArtifact;
 import io.thoughtware.matflow.task.artifact.model.XpackRepository;
+import io.thoughtware.matflow.task.pullArtifact.model.TaskPullArtifact;
 import io.thoughtware.toolkit.beans.BeanMapper;
 import io.thoughtware.matflow.task.artifact.dao.TaskArtifactDao;
 import io.thoughtware.matflow.task.artifact.entity.TaskArtifactEntity;
@@ -17,6 +18,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
+
+import static io.thoughtware.matflow.support.util.util.PipelineFinal.*;
+import static io.thoughtware.matflow.support.util.util.PipelineFinal.TASK_ARTIFACT_SSH;
 
 @Service
 @Exporter
@@ -47,55 +51,89 @@ public class TaskArtifactServiceImpl implements TaskArtifactService {
     }
 
     /**
-     * 根据配置id删除任务
-     * @param configId 配置id
-     */
-    @Override
-    public void deleteProductConfig(String configId){
-        TaskArtifact oneProductConfig = findOneArtifact(configId,"");
-        deleteProduct(oneProductConfig.getTaskId());
-    }
-
-    /**
      * 根据配置id查询任务
      * @return 任务
      */
     @Override
-    public TaskArtifact findOneArtifact(String taskId,String taskType){
-        List<TaskArtifact> allProduct = findAllProduct();
-        if (allProduct == null){
+    public TaskArtifact findOneArtifactByAuth(String taskId){
+
+        TaskArtifact artifact = findOneProduct(taskId);
+        if (Objects.isNull(artifact)){
             return null;
         }
-        for (TaskArtifact taskArtifact : allProduct) {
-            if (taskArtifact.getTaskId().equals(taskId)){
-                TaskArtifact product = findOneProduct(taskArtifact.getTaskId());
-                String authId = product.getAuthId();
-                if (Objects.isNull(authId)){
-                    return product;
-                }
-                String artifactType = product.getArtifactType();
-                AuthThird authServer = thirdServer.findOneAuthServer(authId);
-                product.setAuth(authServer);
+        String authId = artifact.getAuthId();
+        if (Objects.isNull(authId)){
+            return artifact;
+        }
+        String artifactType = artifact.getArtifactType();
+        AuthThird authServer = thirdServer.findOneAuthServer(authId);
+        artifact.setAuth(authServer);
 
-                if (artifactType.equals(PipelineFinal.TASK_ARTIFACT_SSH)){
-                    AuthHost oneAuthHost = hostServer.findOneAuthHost(authId);
-                    product.setAuth(oneAuthHost);
-                }
+        if (artifactType.equals(PipelineFinal.TASK_ARTIFACT_SSH)){
+            AuthHost oneAuthHost = hostServer.findOneAuthHost(authId);
+            artifact.setAuth(oneAuthHost);
+        }
 
-                XpackRepository repository = taskArtifact.getRepository();
-                if (artifactType.equals(PipelineFinal.TASK_ARTIFACT_XPACK) && !Objects.isNull(repository)){
-                    XpackRepository xpackRepository = taskArtifactXpackService.findRepository(authId, taskArtifact.getRepository().getId());
-                    if (!Objects.isNull(xpackRepository)){
-                        product.setPutAddress(xpackRepository.getName());
-                        product.setRepository(xpackRepository);
-                    }
-                }
-                return product;
+        XpackRepository repository = artifact.getRepository();
+        if (artifactType.equals(PipelineFinal.TASK_ARTIFACT_XPACK) && !Objects.isNull(repository)){
+            XpackRepository xpackRepository = taskArtifactXpackService.findRepository(authId, artifact.getRepository().getId());
+            if (!Objects.isNull(xpackRepository)){
+                artifact.setPutAddress(xpackRepository.getName());
+                artifact.setRepository(xpackRepository);
             }
         }
-        return null;
+        return artifact;
     }
 
+
+    @Override
+    public Boolean artifactValid(String taskType,Object object){
+        TaskArtifact artifact = (TaskArtifact) object;
+        String artifactType = artifact.getArtifactType();
+
+        if (taskType.equals(TASK_ARTIFACT_DOCKER)){
+            if (artifactType.equals(TASK_ARTIFACT_NEXUS)){
+                if (!PipelineUtil.isNoNull(artifact.getDockerImage())){
+                    return false;
+                }
+            }
+            if (artifactType.equals(TASK_ARTIFACT_XPACK)){
+                if (!PipelineUtil.isNoNull(artifact.getDockerImage())){
+                    return false;
+                }
+                if (Objects.isNull(artifact.getRepository()) || !PipelineUtil.isNoNull(artifact.getRepository().getId())){
+                    return false;
+                }
+            }
+        }
+
+        if (taskType.equals(TASK_ARTIFACT_NODEJS)){
+            return true;
+        }
+        if (taskType.equals(TASK_ARTIFACT_MAVEN)){
+            if (artifactType.equals(TASK_ARTIFACT_NEXUS) || artifactType.equals(TASK_ARTIFACT_XPACK)){
+                if (!PipelineUtil.isNoNull(artifact.getArtifactId())){
+                    return false;
+                }
+                if (!PipelineUtil.isNoNull(artifact.getVersion())){
+                    return false;
+                }
+                if (!PipelineUtil.isNoNull(artifact.getGroupId())){
+                    return false;
+                }
+            }
+            if (artifactType.equals(TASK_ARTIFACT_XPACK)){
+                if (!PipelineUtil.isNoNull(artifact.getRepository().getName())){
+                    return false;
+                }
+            }
+
+            if (artifactType.equals(TASK_ARTIFACT_SSH)){
+                return PipelineUtil.isNoNull(artifact.getPutAddress());
+            }
+        }
+        return true;
+    }
 
 
     /**
@@ -119,18 +157,18 @@ public class TaskArtifactServiceImpl implements TaskArtifactService {
 
     /**
      * 查询推送制品信息
-     * @param ProductId id
+     * @param artifactId id
      * @return 信息集合
      */
     @Override
-    public TaskArtifact findOneProduct(String ProductId) {
-        TaskArtifactEntity oneProduct = productDao.findOneProduct(ProductId);
-        TaskArtifact product = BeanMapper.map(oneProduct, TaskArtifact.class);
-        if (PipelineUtil.isNoNull(product.getAuthId())){
-            Object auth = findAuth(product.getAuthId());
-            product.setAuth(auth);
-        }
-        return product;
+    public TaskArtifact findOneProduct(String artifactId) {
+        TaskArtifactEntity oneProduct = productDao.findOneProduct(artifactId);
+        return BeanMapper.map(oneProduct, TaskArtifact.class);
+        // if (PipelineUtil.isNoNull(product.getAuthId())){
+        //     Object auth = findAuth(product.getAuthId());
+        //     product.setAuth(auth);
+        // }
+        // return product;
     }
 
     /**
@@ -150,7 +188,7 @@ public class TaskArtifactServiceImpl implements TaskArtifactService {
     }
 
     private Object findAuth(String id){
-        AuthThird oneAuthServer =thirdServer.findOneAuthServer(id);
+        AuthThird oneAuthServer = thirdServer.findOneAuthServer(id);
         if (oneAuthServer != null){
             return oneAuthServer;
         }

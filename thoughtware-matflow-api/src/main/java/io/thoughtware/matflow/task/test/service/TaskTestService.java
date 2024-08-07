@@ -27,17 +27,19 @@ public interface TaskTestService {
 
 
     /**
-     * 根据配置id删除任务
-     * @param configId 配置id
-     */
-    void deleteTestConfig(String configId);
-
-    /**
      * 根据配置id查询任务
      * @param configId 配置id
      * @return 任务
      */
-    TaskTest findOneTestConfig(String configId);
+    TaskTest findTestBuAuth(String configId);
+
+    /**
+     * 测试是否有效
+     * @param taskType 任务类型
+     * @param object object
+     * @return 是否有效
+     */
+    Boolean testValid(String taskType,Object object);
 
     /**
      * 更新

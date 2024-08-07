@@ -33,18 +33,15 @@ public interface TaskCodeScanService {
     void updateCodeScan(TaskCodeScan taskCodeScan);
 
 
-    /**
-     * 根据配置id删除任务
-     * @param configId 配置id
-     */
-    void deleteCodeScanConfig(String configId);
+    Boolean codeScanValid(String taskType,Object object);
+
 
     /**
      * 根据配置id查询任务
-     * @param configId 配置id
+     * @param taskId 配置id
      * @return 任务
      */
-    TaskCodeScan findOneCodeScanConfig(String configId);
+    TaskCodeScan findCodeScanByAuth(String taskId);
 
     /**
      * 查询代码扫描信息

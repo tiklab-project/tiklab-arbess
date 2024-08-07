@@ -29,17 +29,20 @@ public interface TaskArtifactService {
 
 
     /**
-     * 根据配置id删除任务
-     * @param configId 配置id
-     */
-    void deleteProductConfig(String configId);
-
-    /**
      * 根据配置id查询任务
      * @param taskId 配置id
      * @return 任务
      */
-    TaskArtifact findOneArtifact(String taskId,String taskType);
+    TaskArtifact findOneArtifactByAuth(String taskId);
+
+
+    /**
+     * 查询流水线推送制品是否有效
+     * @param taskType 任务类型
+     * @param object object
+     * @return 是否有效
+     */
+    Boolean artifactValid(String taskType,Object object);
 
 
     /**
@@ -50,11 +53,11 @@ public interface TaskArtifactService {
 
     /**
      * 查询推送制品信息
-     * @param productId id
+     * @param artifactId id
      * @return 信息
      */
     @FindOne
-    TaskArtifact findOneProduct(String productId);
+    TaskArtifact findOneProduct(String artifactId);
 
     /**
      * 查询所有流水线推送制品

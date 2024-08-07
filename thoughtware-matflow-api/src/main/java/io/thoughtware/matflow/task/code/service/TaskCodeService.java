@@ -23,19 +23,21 @@ public interface TaskCodeService {
      */
      String createCode(TaskCode taskCode);
 
-
-    /**
-     * 根据配置id删除任务
-     * @param configId 配置id
-     */
-    void deleteTaskCode(String configId);
-
     /**
      * 根据配置id查询任务
      * @param taskId 配置id
      * @return 任务
      */
-    TaskCode findOneCodeConfig(String taskId);
+    TaskCode findCodeByAuth(String taskId);
+
+
+    /**
+     * 验证
+     * @param taskType 任务类型
+     * @param object object
+     * @return 是否验证通过
+     */
+    Boolean codeValid(String taskType,Object object);
 
     /**
      * 删除

@@ -5,6 +5,7 @@ import io.thoughtware.matflow.support.util.util.PipelineFinal;
 import io.thoughtware.matflow.support.util.util.PipelineUtil;
 import io.thoughtware.matflow.stages.dao.StageDao;
 import io.thoughtware.matflow.stages.model.Stage;
+import io.thoughtware.matflow.task.task.service.TasksCloneService;
 import io.thoughtware.toolkit.beans.BeanMapper;
 import io.thoughtware.core.exception.ApplicationException;
 import io.thoughtware.matflow.task.task.model.Tasks;
@@ -30,6 +31,9 @@ public class StageServiceImpl implements StageService {
 
     @Autowired
     TasksService tasksService;
+
+    @Autowired
+    TasksCloneService tasksCloneService;
 
     public String createStagesOrTask(Stage stage){
         String stagesId = stage.getStageId();
@@ -139,7 +143,7 @@ public class StageServiceImpl implements StageService {
                 otherStage.setParentId(cloneMainStagesId);
                 StageEntity otherStageEntity = BeanMapper.map(otherStage, StageEntity.class);
                 String cloneOtherStagesId = stageDao.createStages(otherStageEntity);
-                tasksService.cloneTasks(otherStageId,cloneOtherStagesId,"stageId");
+                tasksCloneService.cloneStageTasks(otherStageId,cloneOtherStagesId);
             }
         }
     }

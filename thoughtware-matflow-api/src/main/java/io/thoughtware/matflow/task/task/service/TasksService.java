@@ -10,7 +10,6 @@ import java.util.List;
 public interface TasksService {
 
 
-
     /**
      * 创建任务及详情
      * @param tasks 任务详情
@@ -70,12 +69,12 @@ public interface TasksService {
      */
     Tasks findOnePostTaskOrTask(String postId);
 
-    /**
-     * 获取流水线任务及任务详情
-     * @param pipelineId 流水线
-     * @return 任务列表
-     */
-    List<Tasks> finAllPipelineTaskOrTask(String pipelineId);
+    // /**
+    //  * 获取流水线任务及任务详情
+    //  * @param pipelineId 流水线
+    //  * @return 任务列表
+    //  */
+    // List<Tasks> finAllPipelineTaskOrTask(String pipelineId);
 
     /**
      * 获取阶段任务及任务详情
@@ -135,17 +134,6 @@ public interface TasksService {
 
 
     List<Tasks> findAllTasks();
-
-
-    void clonePostTasks(String id ,String cloneId);
-
-
-    /**
-     * 克隆任务
-     * @param id id
-     * @param type 类型（pipelineId -- 流水线id，stageId -- 阶段id）
-     */
-    void cloneTasks(String id,String cloneId,String type);
 
 
     /**

@@ -82,49 +82,51 @@ public class PipelineYamlServiceImpl implements PipelineYamlService {
         // 将Java对象转换为YAML字符串
         String yamlString = yaml.dump(properties);
 
-        int type = pipeline.getType();
+        return importStageYaml(yamlString,pipelineId);
 
-        if (type == 1){
-            return importTaskYaml(yamlString,pipelineId);
-        }else {
-            return importStageYaml(yamlString,pipelineId);
-        }
+        // int type = pipeline.getType();
+        //
+        // if (type == 1){
+        //     return importTaskYaml(yamlString,pipelineId);
+        // }else {
+        //     return importStageYaml(yamlString,pipelineId);
+        // }
     }
 
-    /**
-     * 导出多任务配置为Yaml格式
-     * @param yamlString yaml
-     * @param pipelineId 流水线
-     * @return Yaml格式支付串
-     */
-    private String importTaskYaml(String yamlString,String pipelineId){
-
-        DumperOptions options = new DumperOptions();
-        options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
-
-        Yaml yaml = new Yaml(options);
-        Map<String, Object> data = yaml.load(yamlString);
-
-        List<Map<String, Object>> taskList =  new ArrayList<>();
-
-        List<Tasks> tasksList = tasksService.finAllPipelineTaskOrTask(pipelineId);
-        for (Tasks tasks : tasksList) {
-            LinkedHashMap<String, Object> tasksMap = new LinkedHashMap<>();
-
-            LinkedHashMap<String, Object> taskDetails = new LinkedHashMap<>();
-
-            taskDetails.put("taskId",tasks.getTaskId());
-            taskDetails.put("taskName",tasks.getTaskName());
-            findTaskDetails(tasks.getTaskType(), tasks.getTask(), taskDetails);
-
-            tasksMap.put("task",taskDetails);
-            taskList.add(tasksMap);
-        }
-
-        Map<String, Object> pipelineMap = (Map<String, Object>) data.get("pipeline");
-        pipelineMap.put("tasks",taskList);
-        return yaml.dump(data);
-    }
+    // /**
+    //  * 导出多任务配置为Yaml格式
+    //  * @param yamlString yaml
+    //  * @param pipelineId 流水线
+    //  * @return Yaml格式支付串
+    //  */
+    // private String importTaskYaml(String yamlString,String pipelineId){
+    //
+    //     DumperOptions options = new DumperOptions();
+    //     options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
+    //
+    //     Yaml yaml = new Yaml(options);
+    //     Map<String, Object> data = yaml.load(yamlString);
+    //
+    //     List<Map<String, Object>> taskList =  new ArrayList<>();
+    //
+    //     List<Tasks> tasksList = tasksService.finAllPipelineTaskOrTask(pipelineId);
+    //     for (Tasks tasks : tasksList) {
+    //         LinkedHashMap<String, Object> tasksMap = new LinkedHashMap<>();
+    //
+    //         LinkedHashMap<String, Object> taskDetails = new LinkedHashMap<>();
+    //
+    //         taskDetails.put("taskId",tasks.getTaskId());
+    //         taskDetails.put("taskName",tasks.getTaskName());
+    //         findTaskDetails(tasks.getTaskType(), tasks.getTask(), taskDetails);
+    //
+    //         tasksMap.put("task",taskDetails);
+    //         taskList.add(tasksMap);
+    //     }
+    //
+    //     Map<String, Object> pipelineMap = (Map<String, Object>) data.get("pipeline");
+    //     pipelineMap.put("tasks",taskList);
+    //     return yaml.dump(data);
+    // }
 
     /**
      * 导出多阶段配置为Yaml格式

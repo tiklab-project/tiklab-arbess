@@ -20,27 +20,29 @@ public interface TaskDeployService {
      * @param taskDeploy deploy信息
      * @return deployId
      */
-     String createDeploy(TaskDeploy taskDeploy) ;
+    String createDeploy(TaskDeploy taskDeploy) ;
 
     /**
      * 删除
      * @param deployId deployId
      */
-     void deleteDeploy(String deployId) ;
-
+    void deleteDeploy(String deployId) ;
 
     /**
-     * 根据配置id删除任务
-     * @param configId 配置id
+     * 测试是否有效
+     * @param taskType 任务类型
+     * @param object object
+     * @return 是否有效
      */
-    void deleteDeployConfig(String configId);
+    Boolean deployValid(String taskType,Object object);
+
 
     /**
      * 根据配置id查询任务
-     * @param configId 配置id
+     * @param authId 配置id
      * @return 任务
      */
-    TaskDeploy findOneDeployConfig(String configId);
+    TaskDeploy findDeployByAuth(String authId);
 
     /**
      * 更新
@@ -61,7 +63,7 @@ public interface TaskDeployService {
      * @return deploy信息集合
      */
     @FindAll
-     List<TaskDeploy> findAllDeploy() ;
+    List<TaskDeploy> findAllDeploy() ;
 
     @FindList
     List<TaskDeploy> findAllDeployList(List<String> idList);

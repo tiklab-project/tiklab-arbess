@@ -1,5 +1,6 @@
 package io.thoughtware.matflow.setting.service;
 
+import io.thoughtware.matflow.support.util.util.PipelineFinal;
 import io.thoughtware.matflow.support.util.util.PipelineUtil;
 import io.thoughtware.toolkit.beans.BeanMapper;
 import io.thoughtware.core.page.Pagination;
@@ -15,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -93,11 +95,11 @@ public class AuthHostServiceImpl implements AuthHostService {
     public List<AuthHost> findAllAuthHostList(String type) {
         List<AuthHost> allAuthHost = findAllAuthHost();
         if (Objects.isNull(allAuthHost)){
-            return null;
+            return Collections.emptyList();
         }
 
         if (Objects.isNull(type) || type.equals("all")){
-            return allAuthHost;
+            return allAuthHost.stream().filter(authHost -> !authHost.getType().equals(PipelineFinal.TASK_DEPLOY_K8S)).toList();
         }
 
         List<AuthHost> list = new ArrayList<>();

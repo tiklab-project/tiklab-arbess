@@ -101,7 +101,6 @@ public class PipelineFinal {
     public static final String DEFAULT_ARTIFACT_DOCKER_NAME = "DEFAULT_ARTIFACT_DOCKER_NAME";
 
 
-
     // 默认源码位置
     public static final String DEFAULT_CODE_ADDRESS = "${DEFAULT_CODE_ADDRESS}";
 
@@ -114,7 +113,6 @@ public class PipelineFinal {
     public static final String MAVEN_DEFAULT_ORDER = "mvn clean package";
     public static final String NODE_DEFAULT_ORDER = "npm install";
 
-
     /**
      * 文件信息
      */
@@ -122,7 +120,6 @@ public class PipelineFinal {
     public static final String FILE_TYPE_TXT = ".txt";
     public static final String FILE_TYPE_SH = ".sh";
     public static final String FILE_TYPE_BAT = ".bat";
-
 
     /**
      * 系统任务类型
@@ -157,29 +154,24 @@ public class PipelineFinal {
     public static final String TASK_TYPE_DEPLOY = "deploy";
     public static final String TASK_DEPLOY_LINUX = "liunx";
     public static final String TASK_DEPLOY_DOCKER = "docker";
+    public static final String TASK_DEPLOY_K8S = "k8s";
 
 
     // 推送制品应用类型
     public static final String TASK_TYPE_ARTIFACT = "artifact";
-
     public static final String TASK_ARTIFACT_MAVEN = "artifact_maven";
-
     public static final String TASK_ARTIFACT_NODEJS = "artifact_nodejs";
-
     public static final String TASK_ARTIFACT_DOCKER = "artifact_docker";
 
 
+    // 制品拉取应用类型
     public static final String TASK_TYPE_PULL = "pull";
-
     public static final String TASK_PULL_MAVEN = "pull_maven";
-
     public static final String TASK_PULL_NODEJS = "pull_nodejs";
-
     public static final String TASK_PULL_DOCKER = "pull_docker";
 
-
+    // 制品推送应用方式
     public static final String TASK_ARTIFACT_XPACK = "hadess";
-
     public static final String TASK_ARTIFACT_SSH = "ssh";
     public static final String TASK_ARTIFACT_NEXUS = "nexus";
 

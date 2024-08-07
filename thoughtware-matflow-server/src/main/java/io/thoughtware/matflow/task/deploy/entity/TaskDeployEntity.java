@@ -44,6 +44,31 @@ public class TaskDeployEntity {
     @Column(name = "rule")
     private String rule;
 
+    // 命名空间
+    @Column(name = "k8s_namespace")
+    private String k8sNamespace;
+
+    // 配置文件
+    @Column(name = "k8s_json")
+    private String k8sJson;
+
+
+    public String getK8sNamespace() {
+        return k8sNamespace;
+    }
+
+    public void setK8sNamespace(String k8sNamespace) {
+        this.k8sNamespace = k8sNamespace;
+    }
+
+    public String getK8sJson() {
+        return k8sJson;
+    }
+
+    public void setK8sJson(String k8sJson) {
+        this.k8sJson = k8sJson;
+    }
+
     public String getDockerImage() {
         return dockerImage;
     }

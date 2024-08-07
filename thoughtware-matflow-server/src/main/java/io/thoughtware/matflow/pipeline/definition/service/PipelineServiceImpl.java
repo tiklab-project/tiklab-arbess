@@ -12,6 +12,7 @@ import io.thoughtware.matflow.support.util.util.PipelineFinal;
 import io.thoughtware.matflow.support.util.util.PipelineUtil;
 import io.thoughtware.matflow.support.util.service.PipelineUtilService;
 import io.thoughtware.matflow.support.variable.service.VariableService;
+import io.thoughtware.matflow.task.task.service.TasksCloneService;
 import io.thoughtware.matflow.task.task.service.TasksService;
 import io.thoughtware.message.message.model.MessageNoticePatch;
 import io.thoughtware.toolkit.beans.BeanMapper;
@@ -70,6 +71,9 @@ public class PipelineServiceImpl implements PipelineService {
 
     @Autowired
     TasksService tasksService;
+
+    @Autowired
+    TasksCloneService tasksCloneService;
 
     @Autowired
     StageService stageService;
@@ -461,7 +465,7 @@ public class PipelineServiceImpl implements PipelineService {
         int type = pipeline.getType();
         if (type == 1){
             // 多任务
-            tasksService.cloneTasks(pipelineId,clonePipelineId,"pipelineId");
+            tasksCloneService.clonePipelineTasks(pipelineId,clonePipelineId);
         }else {
             // 多阶段
             stageService.cloneStage(pipelineId, clonePipelineId);

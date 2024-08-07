@@ -7,11 +7,15 @@ import java.util.List;
 
 public interface TaskBuildProductService {
 
+
     String createBuildProduct(TaskBuildProduct taskBuildProduct);
+
 
     void updateBuildProduct(TaskBuildProduct taskBuildProduct);
 
+
     void deleteBuildProduct(String id);
+
 
     TaskBuildProduct findOneBuildProduct(String id);
 

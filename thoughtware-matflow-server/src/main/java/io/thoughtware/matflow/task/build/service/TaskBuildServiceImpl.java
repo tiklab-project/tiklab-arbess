@@ -6,11 +6,14 @@ import io.thoughtware.matflow.task.build.entity.TaskBuildEntity;
 import io.thoughtware.matflow.task.build.model.TaskBuild;
 import io.thoughtware.toolkit.beans.BeanMapper;
 import io.thoughtware.rpc.annotation.Exporter;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
+
+import static io.thoughtware.matflow.support.util.util.PipelineFinal.TASK_BUILD_DOCKER;
 
 @Service
 @Exporter
@@ -25,39 +28,29 @@ public class TaskBuildServiceImpl implements TaskBuildService {
         return taskBuildDao.createBuild(BeanMapper.map(taskBuild, TaskBuildEntity.class));
     }
 
-
-    /**
-     * 根据配置id删除任务
-     * @param configId 配置id
-     */
     @Override
-    public void deleteBuildConfig(String configId){
-        TaskBuild oneBuildConfig = findOneBuildConfig(configId);
-        deleteBuild(oneBuildConfig.getTaskId());
+    public Boolean buildValid(String taskType,Object object){
+        TaskBuild build = (TaskBuild) object;
+        if (taskType.equals(TASK_BUILD_DOCKER)){
+            return !StringUtils.isEmpty(build.getDockerFile());
+        }
+        return true;
     }
 
     /**
      * 根据配置id查询任务
-     * @param configId 配置id
+     * @param authId 配置id
      * @return 任务
      */
     @Override
-    public TaskBuild findOneBuildConfig(String configId){
-        List<TaskBuild> allBuild = findAllBuild();
-        if (allBuild == null){
-            return null;
+    public TaskBuild findBuildByAuth(String authId){
+
+        TaskBuild build = findOneBuild(authId);
+        if (Objects.isNull(build.getDockerVersion())){
+            build.setDockerVersion("latest");
         }
-        for (TaskBuild taskBuild : allBuild) {
-            if (taskBuild.getTaskId().equals(configId)){
-                if (Objects.isNull(taskBuild.getDockerVersion())){
-                    taskBuild.setDockerVersion("latest");
-                }
-                return taskBuild;
-            }
-        }
-        return null;
+        return build;
     }
-    
 
     //删除
     @Override

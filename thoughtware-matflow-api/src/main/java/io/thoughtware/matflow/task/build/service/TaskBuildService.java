@@ -33,19 +33,21 @@ public interface TaskBuildService {
      */
     void updateBuild(TaskBuild TaskBuild);
 
-
     /**
-     * 根据配置id删除任务
-     * @param configId 配置id
+     * 验证
+     * @param taskType taskType
+     * @param object object
+     * @return Boolean
      */
-    void deleteBuildConfig(String configId);
+    Boolean buildValid(String taskType,Object object);
+
 
     /**
      * 根据配置id查询任务
      * @param configId 配置id
      * @return 任务
      */
-    TaskBuild findOneBuildConfig(String configId);
+    TaskBuild findBuildByAuth(String configId);
 
 
     /**

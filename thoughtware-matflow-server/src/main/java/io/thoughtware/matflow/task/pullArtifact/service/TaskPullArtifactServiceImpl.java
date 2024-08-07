@@ -6,6 +6,7 @@ import io.thoughtware.matflow.setting.service.AuthHostService;
 import io.thoughtware.matflow.setting.service.AuthThirdService;
 import io.thoughtware.matflow.support.util.util.PipelineFinal;
 import io.thoughtware.matflow.support.util.util.PipelineUtil;
+import io.thoughtware.matflow.task.artifact.model.TaskArtifact;
 import io.thoughtware.matflow.task.pullArtifact.model.TaskPullArtifact;
 import io.thoughtware.toolkit.beans.BeanMapper;
 import io.thoughtware.matflow.task.artifact.model.XpackRepository;
@@ -17,6 +18,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Objects;
+
+import static io.thoughtware.matflow.support.util.util.PipelineFinal.*;
 
 @Service
 @Exporter
@@ -35,26 +38,74 @@ public class TaskPullArtifactServiceImpl implements TaskPullArtifactService {
     @Autowired
     private TaskArtifactXpackService taskArtifactXpackService;
 
-    /**
-     * 创建流水线推送制品
-     * @param taskPullArtifact 流水线推送制品
-     * @return 流水线推送制品id
-     */
+
     @Override
     public String createPullArtifact(TaskPullArtifact taskPullArtifact) {
         TaskPullArtifactEntity taskPullArtifactEntity = BeanMapper.map(taskPullArtifact, TaskPullArtifactEntity.class);
         return productDao.createProduct(taskPullArtifactEntity);
     }
 
-    /**
-     * 根据配置id删除任务
-     * @param configId 配置id
-     */
+
     @Override
-    public void deletePullArtifactTask(String configId){
-        TaskPullArtifact oneProductConfig = findPullArtifact(configId,"");
-        deletePullArtifact(oneProductConfig.getTaskId());
-    }
+    public Boolean pullArtifactValid(String taskType,Object object){
+        TaskPullArtifact pullArtifact = (TaskPullArtifact) object;
+        String pullType = pullArtifact.getPullType();
+
+        switch (taskType) {
+            case TASK_PULL_DOCKER -> {
+                if (pullType.equals(TASK_ARTIFACT_NEXUS)) {
+                    return PipelineUtil.isNoNull(pullArtifact.getDockerImage());
+                }
+                if (pullType.equals(TASK_ARTIFACT_XPACK)) {
+                    if (!PipelineUtil.isNoNull(pullArtifact.getDockerImage())) {
+                        return false;
+                    }
+                    return !Objects.isNull(pullArtifact.getRepository());
+                }
+                return true;
+            }
+            case TASK_PULL_NODEJS -> {
+                return true;
+            }
+            case TASK_PULL_MAVEN -> {
+                if (pullType.equals(TASK_ARTIFACT_NEXUS)) {
+                    if (!PipelineUtil.isNoNull(pullArtifact.getArtifactId())) {
+                        return false;
+                    }
+                    if (!PipelineUtil.isNoNull(pullArtifact.getVersion())) {
+                        return false;
+                    }
+                    if (!PipelineUtil.isNoNull(pullArtifact.getGroupId())) {
+                        return false;
+                    }
+                }
+                if (pullType.equals(TASK_ARTIFACT_XPACK)) {
+                    if (!PipelineUtil.isNoNull(pullArtifact.getArtifactId())) {
+                        return false;
+                    }
+                    if (!PipelineUtil.isNoNull(pullArtifact.getVersion())) {
+                        return false;
+                    }
+                    if (!PipelineUtil.isNoNull(pullArtifact.getGroupId())) {
+                        return false;
+                    }
+                    if (Objects.isNull(pullArtifact.getRepository())) {
+                        return false;
+                    }
+                }
+
+                if (pullType.equals(TASK_ARTIFACT_SSH)) {
+                    if (!PipelineUtil.isNoNull(pullArtifact.getLocalAddress())) {
+                        return false;
+                    }
+                    return PipelineUtil.isNoNull(pullArtifact.getRemoteAddress());
+                }
+                return true;
+            }
+        }
+
+        return true;
+    };
 
 
     /**
@@ -62,42 +113,37 @@ public class TaskPullArtifactServiceImpl implements TaskPullArtifactService {
      * @return 任务
      */
     @Override
-    public TaskPullArtifact findPullArtifact(String taskId,String taskType){
-        List<TaskPullArtifact> allProduct = findAllPullArtifact();
-        if (allProduct == null){
+    public TaskPullArtifact findPullArtifactByAuth(String taskId){
+
+        TaskPullArtifact artifact = findOnePullArtifact(taskId);
+        if (Objects.isNull(artifact)){
             return null;
         }
-        for (TaskPullArtifact taskPullArtifact : allProduct) {
-            if (taskPullArtifact.getTaskId().equals(taskId)){
-                TaskPullArtifact pullArtifact = findOnePullArtifact(taskPullArtifact.getTaskId());
-                String authId = pullArtifact.getAuthId();
-                if (Objects.isNull(authId)){
-                    return pullArtifact;
-                }
-                String pullType = pullArtifact.getPullType();
 
-                if (pullType.equals(PipelineFinal.TASK_ARTIFACT_SSH)){
-                    AuthHost oneAuthHost = hostServer.findOneAuthHost(authId);
-                    pullArtifact.setAuth(oneAuthHost);
-                }
+        String authId = artifact.getAuthId();
+        if (Objects.isNull(authId)){
+            return artifact;
+        }
+        String pullType = artifact.getPullType();
 
-                if (pullType.equals(PipelineFinal.TASK_ARTIFACT_NEXUS)){
-                    AuthThird authServer = thirdServer.findOneAuthServer(authId);
-                    pullArtifact.setAuth(authServer);
-                }
-                if (pullType.equals(PipelineFinal.TASK_ARTIFACT_XPACK) && !Objects.isNull(pullArtifact.getRepository())){
-                    XpackRepository xpackRepository = taskArtifactXpackService.findRepository(authId, pullArtifact.getRepository().getId());
-                    if (!Objects.isNull(xpackRepository)){
-                        pullArtifact.setRepository(xpackRepository);
-                    }
-                }
+        if (pullType.equals(PipelineFinal.TASK_ARTIFACT_SSH)){
+            AuthHost oneAuthHost = hostServer.findOneAuthHost(authId);
+            artifact.setAuth(oneAuthHost);
+        }
 
-                return pullArtifact;
+        if (pullType.equals(PipelineFinal.TASK_ARTIFACT_NEXUS)){
+            AuthThird authServer = thirdServer.findOneAuthServer(authId);
+            artifact.setAuth(authServer);
+        }
+        if (pullType.equals(PipelineFinal.TASK_ARTIFACT_XPACK) && !Objects.isNull(artifact.getRepository())){
+            XpackRepository xpackRepository = taskArtifactXpackService.findRepository(authId, artifact.getRepository().getId());
+            if (!Objects.isNull(xpackRepository)){
+                artifact.setRepository(xpackRepository);
             }
         }
-        return null;
-    }
 
+        return artifact;
+    }
 
 
     /**

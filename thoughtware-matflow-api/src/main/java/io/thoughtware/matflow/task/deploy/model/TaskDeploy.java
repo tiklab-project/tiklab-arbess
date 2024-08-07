@@ -53,6 +53,28 @@ public class TaskDeploy {
 
     private String type;
 
+    // 命名空间
+    private String k8sNamespace;
+
+    // 配置文件
+    private String k8sJson;
+
+    public String getK8sNamespace() {
+        return k8sNamespace;
+    }
+
+    public void setK8sNamespace(String k8sNamespace) {
+        this.k8sNamespace = k8sNamespace;
+    }
+
+    public String getK8sJson() {
+        return k8sJson;
+    }
+
+    public void setK8sJson(String k8sJson) {
+        this.k8sJson = k8sJson;
+    }
+
     public String getHostType() {
         return hostType;
     }

@@ -46,31 +46,13 @@ public class TaskCodeServiceImpl implements TaskCodeService {
     @Autowired
     TaskCodeGittokService xcodeService;
 
-    private static final Logger logger = LoggerFactory.getLogger(TaskCodeServiceImpl.class);
-
-    //创建
     @Override
     public String createCode(TaskCode taskCode) {
         return taskCodeDao.createCode(BeanMapper.map(taskCode, TaskCodeEntity.class));
     }
 
-    /**
-     * 根据配置id删除任务
-     * @param taskId 配置id
-     */
     @Override
-    public void deleteTaskCode(String taskId){
-        taskCodeDao.deleteCode(taskId);
-    }
-
-
-    /**
-     * 根据配置id查询任务
-     * @param taskId 配置id
-     * @return 任务
-     */
-    @Override
-    public TaskCode findOneCodeConfig(String taskId){
+    public TaskCode findCodeByAuth(String taskId){
         TaskCodeEntity oneCodeEntity = taskCodeDao.findOneCode(taskId);
         TaskCode taskCode = BeanMapper.map(oneCodeEntity, TaskCode.class);
         String authId = taskCode.getAuthId();
@@ -78,20 +60,76 @@ public class TaskCodeServiceImpl implements TaskCodeService {
         if (Objects.isNull(authId)){
             return taskCode;
         }
+
+        // Object auth ;
+        // switch (taskType) {
+        //     case TASK_CODE_GITEE ->{
+        //         AuthThird authThird = authServerServer.findOneAuthServer(authId);
+        //         try {
+        //             ThirdQuery thirdQuery = new ThirdQuery();
+        //             thirdQuery.setAuthId(authId);
+        //             ThirdUser thirdUser = taskCodeGiteeService.findAuthUser(thirdQuery);
+        //             authThird.setUsername(thirdUser.getPath());
+        //         }catch (Exception e){
+        //             logger.error("获取GitEe授权用户名失败，原因：{}",e.getMessage());
+        //         }
+        //         auth = authThird;
+        //     }
+        //     case  TASK_CODE_GITHUB  ->{
+        //         AuthThird authThird = authServerServer.findOneAuthServer(authId);
+        //         try {
+        //             ThirdQuery thirdQuery = new ThirdQuery();
+        //             thirdQuery.setAuthId(authId);
+        //             ThirdUser thirdUser = taskCodeGitHubService.findAuthUser(thirdQuery);
+        //             authThird.setUsername(thirdUser.getPath());
+        //         }catch (Exception e){
+        //             logger.error("获取GiTHub授权用户名失败，原因：{}",e.getMessage());
+        //         }
+        //         auth = authThird;
+        //     }
+        //     case TASK_CODE_GITLAB->{
+        //         AuthThird authThird = authServerServer.findOneAuthServer(authId);
+        //         try {
+        //             ThirdQuery thirdQuery = new ThirdQuery();
+        //             thirdQuery.setAuthId(authId);
+        //             ThirdUser thirdUser = taskCodeGitLabService.findAuthUser(thirdQuery);
+        //             authThird.setUsername(thirdUser.getPath());
+        //         }catch (Exception e){
+        //             logger.error("获取GitLab授权用户名失败，原因：{}",e.getMessage());
+        //         }
+        //         auth = authThird;
+        //     }
+        //     case  TASK_CODE_XCODE ->{
+        //         auth = authServerServer.findOneAuthServer(authId);
+        //     }
+        //     default -> {
+        //         auth = authServer.findOneAuth(authId);
+        //     }
+        // }
+        // taskCode.setAuth(auth);
+
         taskCode.setAuth(findAuth(taskCode.getAuthId()));
-        if (Objects.isNull(oneCodeEntity.getXcodeId())){
-            return taskCode;
-        }
         return taskCode;
     }
 
-    //删除
+    @Override
+    public Boolean codeValid(String taskType,Object object){
+        TaskCode code = (TaskCode) object;
+
+        if (taskType.equals(TASK_CODE_SVN)) {
+            String svnFile = code.getSvnFile();
+            return !StringUtils.isEmpty(svnFile);
+        } else {
+            String codeAddress = code.getCodeAddress();
+            return !StringUtils.isEmpty(codeAddress);
+        }
+    }
+
     @Override
     public void deleteCode(String codeId) {
         taskCodeDao.deleteCode(codeId);
     }
 
-    //修改
     @Override
     public void updateCode(TaskCode taskCode) {
         TaskCodeEntity oneCodeEntity = taskCodeDao.findOneCode(taskCode.getTaskId());
@@ -132,14 +170,12 @@ public class TaskCodeServiceImpl implements TaskCodeService {
         taskCodeDao.updateCode(BeanMapper.map(taskCode, TaskCodeEntity.class));
     }
 
-    //查询单个
     @Override
     public TaskCode findOneCode(String codeId) {
         TaskCodeEntity oneCodeEntity = taskCodeDao.findOneCode(codeId);
         return BeanMapper.map(oneCodeEntity, TaskCode.class);
     }
 
-    //查询所有
     @Override
     public List<TaskCode> findAllCode() {
         List<TaskCodeEntity> allCode = taskCodeDao.findAllCode();

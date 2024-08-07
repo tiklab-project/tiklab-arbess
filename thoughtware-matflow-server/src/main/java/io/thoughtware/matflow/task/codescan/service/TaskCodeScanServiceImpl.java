@@ -1,6 +1,7 @@
 package io.thoughtware.matflow.task.codescan.service;
 
 import io.thoughtware.matflow.setting.model.AuthThird;
+import io.thoughtware.matflow.setting.service.AuthHostService;
 import io.thoughtware.matflow.setting.service.AuthThirdService;
 import io.thoughtware.matflow.support.util.util.PipelineUtil;
 import io.thoughtware.toolkit.beans.BeanMapper;
@@ -9,10 +10,14 @@ import io.thoughtware.matflow.task.codescan.dao.TaskCodeScanDao;
 import io.thoughtware.matflow.task.codescan.entity.TaskCodeScanEntity;
 import io.thoughtware.matflow.task.codescan.model.TaskCodeScan;
 import io.thoughtware.rpc.annotation.Exporter;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
+
+import static io.thoughtware.matflow.support.util.util.PipelineFinal.TASK_CODESCAN_SONAR;
 
 @Service
 @Exporter
@@ -28,6 +33,9 @@ public class TaskCodeScanServiceImpl implements TaskCodeScanService {
     @Autowired
     JoinTemplate joinTemplate;
 
+    @Autowired
+    AuthHostService authHostService;
+
     /**
      * 创建流水线代码扫描
      * @param taskCodeScan 流水线代码扫描
@@ -40,24 +48,27 @@ public class TaskCodeScanServiceImpl implements TaskCodeScanService {
     }
 
 
-    /**
-     * 根据配置id删除任务
-     * @param configId 配置id
-     */
     @Override
-    public void deleteCodeScanConfig(String configId){
-        TaskCodeScan oneCodeScanConfig = findOneCodeScanConfig(configId);
-        deleteCodeScan(oneCodeScanConfig.getTaskId());
+    public Boolean codeScanValid(String taskType,Object object){
+        TaskCodeScan code = (TaskCodeScan)object;
+        if (taskType.equals(TASK_CODESCAN_SONAR)) {
+            String projectName = code.getProjectName();
+            return !StringUtils.isEmpty(projectName);
+        } else {
+            return true;
+        }
     }
 
-    /**
-     * 根据配置id查询任务
-     * @param configId 配置id
-     * @return 任务
-     */
+
     @Override
-    public TaskCodeScan findOneCodeScanConfig(String configId){
-        return findOneCodeScan(configId);
+    public TaskCodeScan findCodeScanByAuth(String taskId){
+        TaskCodeScan codeScan = findOneCodeScan(taskId);
+        String authId = codeScan.getAuthId();
+        if (!Objects.isNull(authId)){
+            Object auth = authHostService.findOneAuthHost(authId);
+            codeScan.setAuth(auth);
+        }
+        return codeScan;
     }
 
     /**

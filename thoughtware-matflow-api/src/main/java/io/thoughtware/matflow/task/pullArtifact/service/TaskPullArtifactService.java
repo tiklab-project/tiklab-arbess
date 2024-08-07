@@ -22,19 +22,20 @@ public interface TaskPullArtifactService {
      */
     void deletePullArtifact(String productId);
 
-
     /**
-     * 根据配置id删除任务
-     * @param configId 配置id
+     * 更新流水线推送制品
+     * @param taskType taskType
+     * @param object object
+     * @return Boolean
      */
-    void deletePullArtifactTask(String configId);
+    Boolean pullArtifactValid(String taskType,Object object);
 
     /**
      * 根据配置id查询任务
      * @param taskId 配置id
      * @return 任务
      */
-    TaskPullArtifact findPullArtifact(String taskId,String taskType);
+    TaskPullArtifact findPullArtifactByAuth(String taskId);
 
 
     /**

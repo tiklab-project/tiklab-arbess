@@ -38,18 +38,18 @@ public class TasksController {
         return Result.ok(taskId);
     }
 
-    /**
-     * @pi.name:查询流水线所有任务
-     * @pi.path:/tasks/finAllTask
-     * @pi.methodType:post
-     * @pi.request-type: formdata
-     * @pi.param: name=pipelineId;dataType=string;value=pipelineId;
-     */
-    @RequestMapping(path="/finAllTask",method = RequestMethod.POST)
-    public Result<List<Tasks>> finAllPipelineTaskOrTask(@NotNull String pipelineId){
-        List<Tasks> tasks = tasksService.finAllPipelineTaskOrTask(pipelineId);
-        return Result.ok(tasks);
-    }
+    // /**
+    //  * @pi.name:查询流水线所有任务
+    //  * @pi.path:/tasks/finAllTask
+    //  * @pi.methodType:post
+    //  * @pi.request-type: formdata
+    //  * @pi.param: name=pipelineId;dataType=string;value=pipelineId;
+    //  */
+    // @RequestMapping(path="/finAllTask",method = RequestMethod.POST)
+    // public Result<List<Tasks>> finAllPipelineTaskOrTask(@NotNull String pipelineId){
+    //     List<Tasks> tasks = tasksService.finAllPipelineTaskOrTask(pipelineId);
+    //     return Result.ok(tasks);
+    // }
 
     /**
      * @pi.name:更新流水线任务
