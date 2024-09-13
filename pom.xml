@@ -10,15 +10,15 @@
         <version>1.0.0</version>
     </parent>
 
-    <artifactId>thoughtware-matflow</artifactId>
+    <artifactId>thoughtware-arbess</artifactId>
     <name>${project.artifactId}</name>
     <packaging>pom</packaging>
     <version>1.0.1-SNAPSHOT</version>
 
     <modules>
-        <module>thoughtware-matflow-api</module>
-        <module>thoughtware-matflow-server</module>
-        <module>thoughtware-matflow-starter</module>
+        <module>thoughtware-arbess-api</module>
+        <module>thoughtware-arbess-server</module>
+        <module>thoughtware-arbess-starter</module>
     </modules>
 
     <properties>

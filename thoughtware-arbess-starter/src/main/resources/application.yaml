@@ -1,0 +1,106 @@
+app:
+  name: tiklab-matflow-ce
+
+APP_HOME: ${APP_HOME}
+application: matflow-ce
+
+server:
+  port: 8080
+
+spring:
+  config:
+    import: optional:classpath:/config/${env:dev}/application.yaml
+  main:
+    allow-bean-definition-overriding: true
+
+jdbc:
+  driverClassName: org.postgresql.Driver
+  url: jdbc:postgresql://localhost:6000/matflow_ce?stringtype=unspecified
+  username: postgres
+  password: darth2020
+
+#plugin config
+DATA_HOME: /opt/thoughtware/matflow
+
+plugin:
+  path: ${DATA_HOME}/plugin
+
+#dfs config
+dfs:
+  server:
+    enabled: false
+    mode: server
+    port: 4000
+    datapath: ${DATA_HOME}/files
+  client:
+    url: 127.0.0.1:4000
+    bucket: ${app.name}
+
+#dcs config
+dcs:
+  server:
+    enabled: true
+    port: 5020
+    datapath: ${DATA_HOME}/caches
+  client:
+    url: 127.0.0.1:5020
+    group: g1
+    database: dcs1
+    expire: 7200
+
+#dcs config
+dss:
+  server:
+    enabled: false
+    mode: server
+    port: 6000
+    datapath: ${DATA_HOME}/index
+  client:
+    url: 127.0.0.1:6000
+    bucket: ${app.name}
+
+postgresql:
+  embbed:
+    enable: true
+  database: matflow_ce
+  db:
+    port: 6000
+    username: postgres
+    password: darth2020
+    address: ${DATA_HOME}/postgresql
+
+datapath: ${DATA_HOME}/caches
+
+soular:
+  embbed:
+    enable: true
+
+
+backups:
+  dir: /data/matflow-ce
+  time: 0 0 2 * * ?
+
+base:
+  url: http://localhost:8080
+
+#homes
+homes:
+  address: https://192.168.10.19:8080
+
+#license
+licences:
+  path: ${APP_HOME}/licences
+
+#file
+file:
+  path: http://file.tiklab.net
+
+
+
+
+
+
+
+
+
+

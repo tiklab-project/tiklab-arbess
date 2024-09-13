@@ -12,10 +12,10 @@ logs/
 plugin/
 APP_NAME_IS_UNDEFINED/
 DATA_HOME_IS_UNDEFINED/
-thoughtware-matflow-distribution/embbed
-thoughtware-matflow-starter/embbed
-matflow-log
-thoughtware-matflow-starter/plugin
-thoughtware-matflow-starter/target
-thoughtware-matflow-starter/licences
-thoughtware-matflow-starter/src/main/resources/config/dev
+thoughtware-arbess-distribution/embbed
+thoughtware-arbess-starter/embbed
+arbess-log
+thoughtware-arbess-starter/plugin
+thoughtware-arbess-starter/target
+thoughtware-arbess-starter/licences
+thoughtware-arbess-starter/src/main/resources/config/dev
