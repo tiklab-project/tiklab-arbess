@@ -57,7 +57,7 @@ cd tiklab-arbess
 
 ### 使用示例
 1. 使用IDEA运行ArbessApplication启动。  
-2. 打开浏览器，访问 http://localhost:8090。
+2. 打开浏览器，访问 http://localhost:8090
 3. 登录信息，用户名：admin 密码：123456
 
 
@@ -66,13 +66,13 @@ cd tiklab-arbess
 
 [联系我们](https://tiklab.net/account/workOrder/add)
 
-邮箱: tiklab@126.com
+邮箱: tiklab@163.com
 
 如需了解更多信息，请访问我们的官方网站或加入我们的社区讨论：
 
 [官方网站](https://www.tiklab.net)
 
-邮箱: tiklab@126.com
+邮箱: tiklab@163.com
 
 #### 立即体验 Arbess，解锁高效的自动化构建、测试和部署流程！
 
