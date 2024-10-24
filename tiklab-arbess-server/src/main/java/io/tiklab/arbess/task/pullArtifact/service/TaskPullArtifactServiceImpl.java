@@ -1,5 +1,6 @@
 package io.tiklab.arbess.task.pullArtifact.service;
 
+import com.alibaba.fastjson.JSONObject;
 import io.tiklab.arbess.setting.model.AuthHost;
 import io.tiklab.arbess.setting.model.AuthThird;
 import io.tiklab.arbess.setting.service.AuthHostService;
@@ -46,17 +47,22 @@ public class TaskPullArtifactServiceImpl implements TaskPullArtifactService {
 
 
     @Override
-    public Boolean pullArtifactValid(String taskType,Object object){
-        TaskPullArtifact pullArtifact = (TaskPullArtifact) object;
+    public Boolean pullArtifactValid(String taskType,TaskPullArtifact pullArtifact){
         String pullType = pullArtifact.getPullType();
 
         switch (taskType) {
             case TASK_PULL_DOCKER -> {
                 if (pullType.equals(TASK_ARTIFACT_NEXUS)) {
+                    if (!PipelineUtil.isNoNull(pullArtifact.getAuthId())) {
+                        return false;
+                    }
                     return PipelineUtil.isNoNull(pullArtifact.getDockerImage());
                 }
                 if (pullType.equals(TASK_ARTIFACT_XPACK)) {
                     if (!PipelineUtil.isNoNull(pullArtifact.getDockerImage())) {
+                        return false;
+                    }
+                    if (!PipelineUtil.isNoNull(pullArtifact.getAuthId())) {
                         return false;
                     }
                     return !Objects.isNull(pullArtifact.getRepository());
@@ -68,6 +74,9 @@ public class TaskPullArtifactServiceImpl implements TaskPullArtifactService {
             }
             case TASK_PULL_MAVEN -> {
                 if (pullType.equals(TASK_ARTIFACT_NEXUS)) {
+                    if (!PipelineUtil.isNoNull(pullArtifact.getAuthId())) {
+                        return false;
+                    }
                     if (!PipelineUtil.isNoNull(pullArtifact.getArtifactId())) {
                         return false;
                     }
@@ -95,6 +104,9 @@ public class TaskPullArtifactServiceImpl implements TaskPullArtifactService {
 
                 if (pullType.equals(TASK_ARTIFACT_SSH)) {
                     if (!PipelineUtil.isNoNull(pullArtifact.getLocalAddress())) {
+                        return false;
+                    }
+                    if (!PipelineUtil.isNoNull(pullArtifact.getAuthId())) {
                         return false;
                     }
                     return PipelineUtil.isNoNull(pullArtifact.getRemoteAddress());

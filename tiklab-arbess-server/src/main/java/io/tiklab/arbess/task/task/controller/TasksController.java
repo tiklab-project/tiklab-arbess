@@ -92,19 +92,6 @@ public class TasksController {
         return Result.ok(tasksOrTask);
     }
 
-    /**
-     * @pi.name:效验流水线多任务完整性
-     * @pi.path:/tasks/validTaskMustField
-     * @pi.methodType:post
-     * @pi.request-type: formdata
-     * @pi.param: name=pipelineId;dataType=string;value=pipelineId;
-     */
-    @RequestMapping(path="/validTaskMustField",method = RequestMethod.POST)
-    public Result<List<String>> validTaskMustField(@NotNull String pipelineId){
-        List<String> list = tasksService.validTasksMustField(pipelineId, 1);
-        return Result.ok(list);
-    }
-
 
 }
 

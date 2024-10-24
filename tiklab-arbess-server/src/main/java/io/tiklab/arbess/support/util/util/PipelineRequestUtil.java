@@ -161,7 +161,7 @@ public class PipelineRequestUtil {
         Integer code = jsonObject.getInteger("code");
         if (code != 0){
             String msg = jsonObject.getString("msg");
-            throw new SystemException("错误！,Message："+msg);
+            throw new SystemException("错误！,Message：" + msg);
         }
 
         if (tClass.isAssignableFrom(String.class)){

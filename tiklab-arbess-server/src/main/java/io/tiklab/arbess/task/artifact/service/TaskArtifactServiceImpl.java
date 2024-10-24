@@ -1,5 +1,6 @@
 package io.tiklab.arbess.task.artifact.service;
 
+import com.alibaba.fastjson.JSONObject;
 import io.tiklab.arbess.setting.model.AuthHost;
 import io.tiklab.arbess.setting.model.AuthThird;
 import io.tiklab.arbess.setting.service.AuthHostService;
@@ -8,6 +9,7 @@ import io.tiklab.arbess.support.util.util.PipelineFinal;
 import io.tiklab.arbess.support.util.util.PipelineUtil;
 import io.tiklab.arbess.task.artifact.model.TaskArtifact;
 import io.tiklab.arbess.task.artifact.model.XpackRepository;
+import io.tiklab.arbess.task.pullArtifact.model.TaskPullArtifact;
 import io.tiklab.toolkit.beans.BeanMapper;
 import io.tiklab.arbess.task.artifact.dao.TaskArtifactDao;
 import io.tiklab.arbess.task.artifact.entity.TaskArtifactEntity;
@@ -86,8 +88,7 @@ public class TaskArtifactServiceImpl implements TaskArtifactService {
 
 
     @Override
-    public Boolean artifactValid(String taskType,Object object){
-        TaskArtifact artifact = (TaskArtifact) object;
+    public Boolean artifactValid(String taskType,TaskArtifact artifact){
         String artifactType = artifact.getArtifactType();
 
         if (taskType.equals(TASK_ARTIFACT_DOCKER)){
@@ -95,9 +96,15 @@ public class TaskArtifactServiceImpl implements TaskArtifactService {
                 if (!PipelineUtil.isNoNull(artifact.getDockerImage())){
                     return false;
                 }
+                if (!PipelineUtil.isNoNull(artifact.getAuthId())){
+                    return false;
+                }
             }
             if (artifactType.equals(TASK_ARTIFACT_XPACK)){
                 if (!PipelineUtil.isNoNull(artifact.getDockerImage())){
+                    return false;
+                }
+                if (!PipelineUtil.isNoNull(artifact.getAuthId())){
                     return false;
                 }
                 if (Objects.isNull(artifact.getRepository()) || !PipelineUtil.isNoNull(artifact.getRepository().getId())){
@@ -110,7 +117,10 @@ public class TaskArtifactServiceImpl implements TaskArtifactService {
             return true;
         }
         if (taskType.equals(TASK_ARTIFACT_MAVEN)){
-            if (artifactType.equals(TASK_ARTIFACT_NEXUS) || artifactType.equals(TASK_ARTIFACT_XPACK)){
+            if (artifactType.equals(TASK_ARTIFACT_NEXUS)){
+                if (!PipelineUtil.isNoNull(artifact.getAuthId())){
+                    return false;
+                }
                 if (!PipelineUtil.isNoNull(artifact.getArtifactId())){
                     return false;
                 }
@@ -122,12 +132,17 @@ public class TaskArtifactServiceImpl implements TaskArtifactService {
                 }
             }
             if (artifactType.equals(TASK_ARTIFACT_XPACK)){
+                if (!PipelineUtil.isNoNull(artifact.getAuthId())){
+                    return false;
+                }
                 if (!PipelineUtil.isNoNull(artifact.getRepository().getName())){
                     return false;
                 }
             }
-
             if (artifactType.equals(TASK_ARTIFACT_SSH)){
+                if (!PipelineUtil.isNoNull(artifact.getAuthId())){
+                    return false;
+                }
                 return PipelineUtil.isNoNull(artifact.getPutAddress());
             }
         }
@@ -163,11 +178,6 @@ public class TaskArtifactServiceImpl implements TaskArtifactService {
     public TaskArtifact findOneProduct(String artifactId) {
         TaskArtifactEntity oneProduct = productDao.findOneProduct(artifactId);
         return BeanMapper.map(oneProduct, TaskArtifact.class);
-        // if (PipelineUtil.isNoNull(product.getAuthId())){
-        //     Object auth = findAuth(product.getAuthId());
-        //     product.setAuth(auth);
-        // }
-        // return product;
     }
 
     /**

@@ -1,11 +1,13 @@
 package io.tiklab.arbess.task.deploy.service;
 
 
+import com.alibaba.fastjson.JSONObject;
 import io.tiklab.arbess.setting.model.AuthHost;
 import io.tiklab.arbess.setting.model.AuthHostGroup;
 import io.tiklab.arbess.setting.service.AuthHostGroupService;
 import io.tiklab.arbess.setting.service.AuthHostService;
 import io.tiklab.arbess.support.util.util.PipelineUtil;
+import io.tiklab.arbess.task.artifact.model.TaskArtifact;
 import io.tiklab.arbess.task.deploy.model.TaskDeploy;
 import io.tiklab.toolkit.beans.BeanMapper;
 import io.tiklab.arbess.task.deploy.dao.TaskDeployDao;
@@ -17,8 +19,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Objects;
 
-import static io.tiklab.arbess.support.util.util.PipelineFinal.TASK_DEPLOY_DOCKER;
-import static io.tiklab.arbess.support.util.util.PipelineFinal.TASK_DEPLOY_LINUX;
+import static io.tiklab.arbess.support.util.util.PipelineFinal.*;
 
 /**
  * @author zcamy
@@ -82,11 +83,13 @@ public class TaskDeployServiceImpl implements TaskDeployService {
     }
 
     @Override
-    public Boolean deployValid(String taskType,Object object){
-        TaskDeploy deploy =(TaskDeploy) object;;
+    public Boolean deployValid(String taskType,TaskDeploy deploy){
 
         if ( taskType.equals(TASK_DEPLOY_LINUX)){
             if (deploy.getAuthType() == 1){
+                if (!PipelineUtil.isNoNull(deploy.getAuthId())){
+                    return false;
+                }
                 if (!PipelineUtil.isNoNull(deploy.getLocalAddress())){
                     return false;
                 }
@@ -94,10 +97,19 @@ public class TaskDeployServiceImpl implements TaskDeployService {
             }
         }
         if ( taskType.equals(TASK_DEPLOY_DOCKER)){
+            if (!PipelineUtil.isNoNull(deploy.getAuthId())){
+                return false;
+            }
             if (!PipelineUtil.isNoNull(deploy.getDockerImage())){
                 return false;
             }
             return PipelineUtil.isNoNull(deploy.getDeployAddress());
+        }
+        if ( taskType.equals(TASK_DEPLOY_K8S)){
+            if (!PipelineUtil.isNoNull(deploy.getAuthId())){
+                return false;
+            }
+            return PipelineUtil.isNoNull(deploy.getK8sNamespace());
         }
         return true;
     }

@@ -49,10 +49,13 @@ public class TaskCodeScanServiceImpl implements TaskCodeScanService {
 
 
     @Override
-    public Boolean codeScanValid(String taskType,Object object){
-        TaskCodeScan code = (TaskCodeScan)object;
+    public Boolean codeScanValid(String taskType,TaskCodeScan taskCodeScan){
+
         if (taskType.equals(TASK_CODESCAN_SONAR)) {
-            String projectName = code.getProjectName();
+            if (StringUtils.isEmpty(taskCodeScan.getAuthId())){
+                return false;
+            }
+            String projectName = taskCodeScan.getProjectName();
             return !StringUtils.isEmpty(projectName);
         } else {
             return true;
@@ -66,6 +69,10 @@ public class TaskCodeScanServiceImpl implements TaskCodeScanService {
         String authId = codeScan.getAuthId();
         if (!Objects.isNull(authId)){
             Object auth = authHostService.findOneAuthHost(authId);
+            if (Objects.isNull(auth)){
+                auth = thirdServer.findOneAuthServer(authId);
+                codeScan.setAuth(auth);
+            }
             codeScan.setAuth(auth);
         }
         return codeScan;

@@ -4,15 +4,14 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import io.tiklab.arbess.setting.model.AuthThird;
 import io.tiklab.arbess.setting.model.HostGroup;
-import io.tiklab.arbess.setting.service.AuthHostGroupService;
-import io.tiklab.arbess.setting.service.AuthHostService;
-import io.tiklab.arbess.setting.service.AuthService;
-import io.tiklab.arbess.setting.service.AuthThirdService;
+import io.tiklab.arbess.setting.service.*;
 import io.tiklab.arbess.support.condition.service.ConditionService;
 import io.tiklab.arbess.support.util.util.PipelineUtil;
 import io.tiklab.arbess.support.variable.service.VariableService;
 import io.tiklab.arbess.task.artifact.model.TaskArtifact;
+import io.tiklab.arbess.task.artifact.model.XpackRepository;
 import io.tiklab.arbess.task.artifact.service.TaskArtifactService;
+import io.tiklab.arbess.task.artifact.service.TaskArtifactXpackService;
 import io.tiklab.arbess.task.build.model.TaskBuild;
 import io.tiklab.arbess.task.build.service.TaskBuildService;
 import io.tiklab.arbess.task.code.model.TaskCode;
@@ -46,6 +45,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static io.tiklab.arbess.support.util.util.PipelineFinal.*;
@@ -94,6 +95,9 @@ public class TasksServiceImpl implements TasksService {
     AuthHostGroupService authHostGroupService;
 
     @Autowired
+    AuthHostK8sService authHostK8sService;
+
+    @Autowired
     VariableService variableService;
 
     @Autowired
@@ -114,7 +118,9 @@ public class TasksServiceImpl implements TasksService {
     @Autowired
     TaskPullArtifactService pullArtifactService;
 
-    // private final ExecutorService executorService = Executors.newCachedThreadPool();
+    @Autowired
+    TaskArtifactXpackService taskArtifactXpackService;
+
 
     private static final Logger logger = LoggerFactory.getLogger(TasksServiceImpl.class);
     
@@ -337,8 +343,7 @@ public class TasksServiceImpl implements TasksService {
         return postTask;
     }
 
-    private List<Tasks> addTaskAuth(List<Tasks> tasks){
-        List<Tasks> list = new ArrayList<>();
+    private void addTaskAuth(List<Tasks> tasks){
         for (Tasks task : tasks) {
             Object object;
             String jsonString = JSONObject.toJSONString(task.getTask());
@@ -416,13 +421,17 @@ public class TasksServiceImpl implements TasksService {
                     if (!Objects.isNull(authId)){
                         Object auth;
                         String hostType = taskDeploy.getHostType();
-                        if ("hostGroup".equals(hostType)){
-                            List<HostGroup> groupByGroup = authHostGroupService.findOneHostGroupByGroup(authId,
-                                    taskDeploy.getStrategyNumber(), taskDeploy.getStrategyType());
-                            taskDeploy.setHostGroupList(groupByGroup);
-                            auth = authHostGroupService.findOneHostGroup(authId);
+                        if (taskType.equals(TASK_DEPLOY_K8S)){
+                            auth = authHostK8sService.findOneAuthHostK8s(authId);
                         }else {
-                            auth = authHostService.findOneAuthHost(authId);
+                            if ("hostGroup".equals(hostType)){
+                                List<HostGroup> groupByGroup = authHostGroupService.findOneHostGroupByGroup(authId,
+                                        taskDeploy.getStrategyNumber(), taskDeploy.getStrategyType());
+                                taskDeploy.setHostGroupList(groupByGroup);
+                                auth = authHostGroupService.findOneHostGroup(authId);
+                            } else {
+                                auth = authHostService.findOneAuthHost(authId);
+                            }
                         }
                         taskDeploy.setAuth(auth);
                     }
@@ -440,13 +449,20 @@ public class TasksServiceImpl implements TasksService {
                 case TASK_TYPE_ARTIFACT -> {
                     TaskArtifact taskArtifact = artifactService.findOneProduct(taskId);
                     String authId = taskArtifact.getAuthId();
+                    String artifactType = taskArtifact.getArtifactType();
                     if (!Objects.isNull(authId)){
-                        if (taskType.equals(TASK_ARTIFACT_XPACK)
-                                || taskType.equals(TASK_ARTIFACT_NEXUS) ){
+                        if (artifactType.equals(TASK_ARTIFACT_NEXUS) ){
                             Object auth = authServerServer.findOneAuthServer(authId);
                             taskArtifact.setAuth(auth);
                         }
-                        if (taskType.equals(TASK_ARTIFACT_SSH)){
+                        if (artifactType.equals(TASK_ARTIFACT_XPACK)){
+                            Object auth = authServerServer.findOneAuthServer(authId);
+                            XpackRepository repository = taskArtifact.getRepository();
+                            XpackRepository repository1 = taskArtifactXpackService.findRepository(authId, repository.getId());
+                            taskArtifact.setRepository(repository1);
+                            taskArtifact.setAuth(auth);
+                        }
+                        if (artifactType.equals(TASK_ARTIFACT_SSH)){
                             Object auth = authHostService.findOneAuthHost(authId);
                             taskArtifact.setAuth(auth);
                         }
@@ -458,9 +474,16 @@ public class TasksServiceImpl implements TasksService {
                     TaskPullArtifact taskArtifact = pullArtifactService.findOnePullArtifact(taskId);
                     String authId = taskArtifact.getAuthId();
                     if (!Objects.isNull(authId)){
-                        if (taskType.equals(TASK_ARTIFACT_XPACK)
-                                || taskType.equals(TASK_ARTIFACT_NEXUS) ){
+                        String pullType = taskArtifact.getPullType();
+                        if (pullType.equals(TASK_ARTIFACT_NEXUS) ){
                             Object auth = authServerServer.findOneAuthServer(authId);
+                            taskArtifact.setAuth(auth);
+                        }
+                        if (pullType.equals(TASK_ARTIFACT_XPACK)){
+                            Object auth = authServerServer.findOneAuthServer(authId);
+                            XpackRepository repository = taskArtifact.getRepository();
+                            XpackRepository repository1 = taskArtifactXpackService.findRepository(authId, repository.getId());
+                            taskArtifact.setRepository(repository1);
                             taskArtifact.setAuth(auth);
                         }
                         if (taskType.equals(TASK_ARTIFACT_SSH)){
@@ -483,10 +506,8 @@ public class TasksServiceImpl implements TasksService {
             }
             task.setValues(object);
             task.setTask(object);
-            list.add(task);
         }
-        list.sort(Comparator.comparing(Tasks::getTaskSort));
-        return list;
+        tasks.sort(Comparator.comparing(Tasks::getTaskSort));
     }
 
     @Override
@@ -513,9 +534,7 @@ public class TasksServiceImpl implements TasksService {
             return Collections.emptyList();
         }
         for (Tasks tasks : tasksList) {
-            String taskId = tasks.getTaskId();
-            String taskType = tasks.getTaskType();
-            Object taskDetails = findTaskDetails(taskId, taskType);
+            Object taskDetails = findTaskDetailsNoAuth(tasks.getTaskId(), tasks.getTaskType());
             tasks.setValues(taskDetails);
             tasks.setTask(taskDetails);
         }
@@ -523,16 +542,16 @@ public class TasksServiceImpl implements TasksService {
     }
 
     @Override
-    public List<String> validTasksMustField(String id , int type){
-        List<Tasks> list = finStageTaskOrTaskNoAuth(id) ;
-        if (list.isEmpty()){
+    public List<String> validTasksMustField(List<Tasks> tasksList){
+
+        if (tasksList.isEmpty()){
             return new ArrayList<>();
         }
+
         List<String> stringList = new ArrayList<>();
-        for (Tasks tasks : list) {
+        for (Tasks tasks : tasksList) {
             String taskId = tasks.getTaskId();
-            String taskType = tasks.getTaskType();
-            Boolean aBoolean = validDifferentTaskMastField(taskType, tasks.getTask());
+            Boolean aBoolean = validDifferentTaskMastField(tasks.getTaskType(), tasks.getTask());
             if (!aBoolean){
                 stringList.add(taskId);
             }
@@ -611,6 +630,9 @@ public class TasksServiceImpl implements TasksService {
                 if (!taskType.equals(TASK_CODE_SVN)){
                     task.setCodeBranch(TASK_CODE_DEFAULT_BRANCH);
                 }
+                if (taskType.equals(TASK_CODE_SVN)){
+                    task.setSvnFile("/");
+                }
                 codeService.createCode(task);
             }
             case TASK_TYPE_TEST     -> {
@@ -626,12 +648,17 @@ public class TasksServiceImpl implements TasksService {
                 switch (taskType){
                     case TASK_BUILD_MAVEN -> {
                         task.setBuildOrder(MAVEN_DEFAULT_ORDER);
+                        task.setBuildAddress(DEFAULT_CODE_ADDRESS);
                     }
                     case TASK_BUILD_NODEJS -> {
                         task.setBuildOrder(NODE_DEFAULT_ORDER);
+                        task.setBuildAddress(DEFAULT_CODE_ADDRESS);
+                    }
+                    case TASK_BUILD_DOCKER -> {
+                        task.setDockerFile(DEFAULT_CODE_ADDRESS);
+                        task.setDockerOrder(DOCKER_DEFAULT_ORDER);
                     }
                 }
-                task.setBuildAddress(DEFAULT_CODE_ADDRESS);
                 buildService.createBuild(task);
             }
             case TASK_TYPE_DEPLOY   -> {
@@ -875,21 +902,79 @@ public class TasksServiceImpl implements TasksService {
         }
     }
 
+    private Object findTaskDetailsNoAuth(String taskId,String taskType){
+        switch (findTaskType(taskType)) {
+            case TASK_TYPE_CODE     -> {
+                return codeService.findOneCode(taskId);
+            }
+            case TASK_TYPE_TEST     -> {
+                return testService.findOneTest(taskId);
+            }
+            case TASK_TYPE_BUILD    -> {
+                return buildService.findOneBuild(taskId);
+            }
+            case TASK_TYPE_DEPLOY   -> {
+                return deployService.findOneDeploy(taskId);
+            }
+            case TASK_TYPE_CODESCAN -> {
+                return codeScanService.findOneCodeScan(taskId);
+            }
+            case TASK_TYPE_ARTIFACT -> {
+                return artifactService.findOneProduct(taskId);
+            }
+            case TASK_TYPE_PULL -> {
+                return pullArtifactService.findOnePullArtifact(taskId);
+            }
+            case TASK_TYPE_MESSAGE  -> {
+                return messageTypeServer.findMessage(taskId);
+            }
+            case TASK_TYPE_SCRIPT   -> {
+                return scriptServer.findOneScript(taskId);
+            }
+           default -> throw new ApplicationException("无法更新未知的配置类型。");
+        }
+    }
+
     /**
      * 效验不同任务配置必填字段
      * @param taskType 任务类型
      * @param object 任务信息
      */
     private Boolean validDifferentTaskMastField(String taskType,Object object){
+        String jsonString = JSONObject.toJSONString(object);
         switch (findTaskType(taskType)) {
-           case TASK_TYPE_CODE     ->  { return codeService.codeValid(taskType, object); }
-           case TASK_TYPE_TEST     ->  { return testService.testValid(taskType, object); }
-           case TASK_TYPE_BUILD    -> { return buildService.buildValid(taskType, object); }
-           case TASK_TYPE_DEPLOY   -> { return deployService.deployValid(taskType, object); }
-           case TASK_TYPE_CODESCAN -> { return codeScanService.codeScanValid(taskType, object); }
-           case TASK_TYPE_ARTIFACT -> { return artifactService.artifactValid(taskType, object); }
-           case TASK_TYPE_PULL -> { return pullArtifactService.pullArtifactValid(taskType,object); }
-           default -> {return true;}
+           case TASK_TYPE_CODE     ->  {
+               TaskCode code =  JSONObject.parseObject(jsonString,TaskCode.class);
+               return codeService.codeValid(taskType, code);
+           }
+           case TASK_TYPE_TEST     ->  {
+               TaskTest code =  JSONObject.parseObject(jsonString,TaskTest.class);
+               return testService.testValid(taskType, code);
+           }
+           case TASK_TYPE_BUILD    -> {
+               TaskBuild code =  JSONObject.parseObject(jsonString,TaskBuild.class);
+               return buildService.buildValid(taskType, code);
+           }
+           case TASK_TYPE_DEPLOY   -> {
+               TaskDeploy code =  JSONObject.parseObject(jsonString,TaskDeploy.class);
+               return deployService.deployValid(taskType, code);
+           }
+           case TASK_TYPE_CODESCAN -> {
+               TaskCodeScan code =  JSONObject.parseObject(jsonString,TaskCodeScan.class);
+               return codeScanService.codeScanValid(taskType, code);
+           }
+           case TASK_TYPE_ARTIFACT -> {
+               TaskArtifact code =  JSONObject.parseObject(jsonString,TaskArtifact.class);
+               return artifactService.artifactValid(taskType, code);
+           }
+           case TASK_TYPE_PULL -> {
+               TaskPullArtifact code =  JSONObject.parseObject(jsonString,TaskPullArtifact.class);
+               return pullArtifactService.pullArtifactValid(taskType,code);
+           }
+           default -> {
+               return true;
+           }
+
         }
     }
 
@@ -928,11 +1013,7 @@ public class TasksServiceImpl implements TasksService {
         }
     }
 
-    /**
-     * 分发获取默认任务名称
-     * @param taskType 任务类型
-     * @return 任务默认名称
-     */
+    @Override
     public String initDifferentTaskName(String taskType){
         switch (taskType) {
             case TASK_CODE_GIT -> {
@@ -984,7 +1065,7 @@ public class TasksServiceImpl implements TasksService {
                 return "SonarQube";
             }
             case TASK_CODESCAN_SPOTBUGS ->{
-                return "spotBugs-Java代码扫描";
+                return "SpotBugs-Java代码扫描";
             }
             case TASK_ARTIFACT_MAVEN -> {
                 return "Maven推送";

@@ -45,14 +45,12 @@ public class TaskTestServiceImpl implements TaskTestService {
     }
 
     @Override
-    public Boolean testValid(String taskType,Object object){
-        TaskTest taskTest = (TaskTest) object;
-
+    public Boolean testValid(String taskType,TaskTest taskTest){
         if (taskType.equals(TASK_TEST_TESTON)){
-            if (Objects.isNull(taskTest.getTestSpace())|| Objects.isNull(taskTest.getTestSpace().getName())){
+            if (Objects.isNull(taskTest.getTestSpace())){
                 return false;
             }
-            if (Objects.isNull(taskTest.getTestPlan())|| Objects.isNull(taskTest.getTestPlan().getName())){
+            if (Objects.isNull(taskTest.getTestPlan())){
                 return false;
             }
             boolean b  = Objects.isNull(taskTest.getApiEnv())

@@ -201,6 +201,8 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
 
             // 流水线运行任务
             pipelineDetails.setStageList(stageList);
+
+            // 流水线后置处理
             pipelineDetails.setPostprocessList(postprocessList);
 
             // 数据路径，源码，日志保存

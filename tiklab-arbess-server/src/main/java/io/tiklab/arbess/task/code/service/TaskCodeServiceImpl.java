@@ -1,9 +1,11 @@
 package io.tiklab.arbess.task.code.service;
 
+import com.alibaba.fastjson.JSONObject;
 import io.tiklab.arbess.setting.model.AuthThird;
 import io.tiklab.arbess.setting.service.AuthService;
 import io.tiklab.arbess.setting.service.AuthThirdService;
 import io.tiklab.arbess.task.code.model.*;
+import io.tiklab.arbess.task.deploy.model.TaskDeploy;
 import io.tiklab.toolkit.beans.BeanMapper;
 import io.tiklab.arbess.task.code.dao.TaskCodeDao;
 import io.tiklab.arbess.task.code.entity.TaskCodeEntity;
@@ -59,68 +61,34 @@ public class TaskCodeServiceImpl implements TaskCodeService {
         if (Objects.isNull(authId)){
             return taskCode;
         }
-
-        // Object auth ;
-        // switch (taskType) {
-        //     case TASK_CODE_GITEE ->{
-        //         AuthThird authThird = authServerServer.findOneAuthServer(authId);
-        //         try {
-        //             ThirdQuery thirdQuery = new ThirdQuery();
-        //             thirdQuery.setAuthId(authId);
-        //             ThirdUser thirdUser = taskCodeGiteeService.findAuthUser(thirdQuery);
-        //             authThird.setUsername(thirdUser.getPath());
-        //         }catch (Exception e){
-        //             logger.error("获取GitEe授权用户名失败，原因：{}",e.getMessage());
-        //         }
-        //         auth = authThird;
-        //     }
-        //     case  TASK_CODE_GITHUB  ->{
-        //         AuthThird authThird = authServerServer.findOneAuthServer(authId);
-        //         try {
-        //             ThirdQuery thirdQuery = new ThirdQuery();
-        //             thirdQuery.setAuthId(authId);
-        //             ThirdUser thirdUser = taskCodeGitHubService.findAuthUser(thirdQuery);
-        //             authThird.setUsername(thirdUser.getPath());
-        //         }catch (Exception e){
-        //             logger.error("获取GiTHub授权用户名失败，原因：{}",e.getMessage());
-        //         }
-        //         auth = authThird;
-        //     }
-        //     case TASK_CODE_GITLAB->{
-        //         AuthThird authThird = authServerServer.findOneAuthServer(authId);
-        //         try {
-        //             ThirdQuery thirdQuery = new ThirdQuery();
-        //             thirdQuery.setAuthId(authId);
-        //             ThirdUser thirdUser = taskCodeGitLabService.findAuthUser(thirdQuery);
-        //             authThird.setUsername(thirdUser.getPath());
-        //         }catch (Exception e){
-        //             logger.error("获取GitLab授权用户名失败，原因：{}",e.getMessage());
-        //         }
-        //         auth = authThird;
-        //     }
-        //     case  TASK_CODE_XCODE ->{
-        //         auth = authServerServer.findOneAuthServer(authId);
-        //     }
-        //     default -> {
-        //         auth = authServer.findOneAuth(authId);
-        //     }
-        // }
-        // taskCode.setAuth(auth);
-
         taskCode.setAuth(findAuth(taskCode.getAuthId()));
         return taskCode;
     }
 
     @Override
-    public Boolean codeValid(String taskType,Object object){
-        TaskCode code = (TaskCode) object;
-
-        if (taskType.equals(TASK_CODE_SVN)) {
-            String svnFile = code.getSvnFile();
-            return !StringUtils.isEmpty(svnFile);
-        } else {
-            String codeAddress = code.getCodeAddress();
-            return !StringUtils.isEmpty(codeAddress);
+    public Boolean codeValid(String taskType,TaskCode code){
+        switch (taskType) {
+            case TASK_CODE_GITEE, TASK_CODE_GITLAB, TASK_CODE_GITHUB -> {
+                if (StringUtils.isEmpty(code.getHouseId())) {
+                    return false;
+                }
+                return !StringUtils.isEmpty(code.getAuthId());
+            }
+            case TASK_CODE_XCODE -> {
+                if (StringUtils.isEmpty(code.getHouseId())) {
+                    return false;
+                }
+                return !StringUtils.isEmpty(code.getAuthId());
+            }
+            case TASK_CODE_SVN -> {
+                // String svnFile = code.getSvnFile();
+                // return !StringUtils.isEmpty(svnFile);
+                return true;
+            }
+            default -> {
+                String codeAddress = code.getCodeAddress();
+                return !StringUtils.isEmpty(codeAddress);
+            }
         }
     }
 

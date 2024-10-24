@@ -34,10 +34,10 @@ public interface TaskCodeService {
     /**
      * 验证
      * @param taskType 任务类型
-     * @param object object
+     * @param code object
      * @return 是否验证通过
      */
-    Boolean codeValid(String taskType,Object object);
+    Boolean codeValid(String taskType,TaskCode code);
 
     /**
      * 删除

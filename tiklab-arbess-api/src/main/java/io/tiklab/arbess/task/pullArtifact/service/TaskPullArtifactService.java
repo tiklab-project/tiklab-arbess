@@ -25,10 +25,10 @@ public interface TaskPullArtifactService {
     /**
      * 更新流水线推送制品
      * @param taskType taskType
-     * @param object object
+     * @param taskPullArtifact object
      * @return Boolean
      */
-    Boolean pullArtifactValid(String taskType,Object object);
+    Boolean pullArtifactValid(String taskType,TaskPullArtifact taskPullArtifact);
 
     /**
      * 根据配置id查询任务

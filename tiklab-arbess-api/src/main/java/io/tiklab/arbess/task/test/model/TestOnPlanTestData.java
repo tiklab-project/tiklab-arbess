@@ -7,7 +7,7 @@ public class TestOnPlanTestData {
 
     private String repositoryId;
 
-    private String apiEnv;
+    private String apiEnvId;
 
     private String webEnv;
 
@@ -29,12 +29,12 @@ public class TestOnPlanTestData {
         this.repositoryId = repositoryId;
     }
 
-    public String getApiEnv() {
-        return apiEnv;
+    public String getApiEnvId() {
+        return apiEnvId;
     }
 
-    public void setApiEnv(String apiEnv) {
-        this.apiEnv = apiEnv;
+    public void setApiEnvId(String apiEnvId) {
+        this.apiEnvId = apiEnvId;
     }
 
     public String getWebEnv() {

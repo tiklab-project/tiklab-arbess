@@ -114,6 +114,7 @@ public class PipelineFinal {
     public static final String TEST_DEFAULT_ORDER = "mvn test";
     public static final String MAVEN_DEFAULT_ORDER = "mvn clean package";
     public static final String NODE_DEFAULT_ORDER = "npm install";
+    public static final String DOCKER_DEFAULT_ORDER = "docker image build -t default .";
 
     /**
      * 文件信息

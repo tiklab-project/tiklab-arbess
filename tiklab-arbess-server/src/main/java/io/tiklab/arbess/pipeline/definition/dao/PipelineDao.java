@@ -3,10 +3,13 @@ package io.tiklab.arbess.pipeline.definition.dao;
 import io.tiklab.core.page.Pagination;
 import io.tiklab.dal.jdbc.JdbcTemplate;
 import io.tiklab.dal.jpa.JpaTemplate;
+import io.tiklab.dal.jpa.criterial.condition.OrQueryCondition;
 import io.tiklab.dal.jpa.criterial.condition.QueryCondition;
+import io.tiklab.dal.jpa.criterial.conditionbuilder.OrQueryBuilders;
 import io.tiklab.dal.jpa.criterial.conditionbuilder.QueryBuilders;
 import io.tiklab.arbess.pipeline.definition.entity.PipelineEntity;
 import io.tiklab.arbess.pipeline.definition.model.PipelineQuery;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.stereotype.Repository;
@@ -95,15 +98,58 @@ public class PipelineDao {
         }else {
             sql = sql.concat(" id not in (" +followSql +")");
         }
-        if (!Objects.isNull(query.getPipelineName())){
-            sql = sql.concat(" and name like '%" + query.getPipelineName() +"%'");
+
+        String pipelineName = query.getPipelineName();
+        if (!Objects.isNull(pipelineName)){
+            sql = sql.concat(" and ( ");
+            sql = sql.concat(" name like '%").concat(pipelineName).concat("%'").concat(" or ");
+            sql = sql.concat(" name like '%").concat(toLowerCase(pipelineName)).concat("%'").concat(" or ");
+            sql = sql.concat(" name like '%").concat(toUpperCase(pipelineName)).concat("%'");
+            sql = sql.concat(" )");
         }
 
         return jpaTemplate.getJdbcTemplate().findPage(sql, null, query.getPageParam(),
                 new BeanPropertyRowMapper<>(PipelineEntity.class));
     }
 
+
+    // 第一个方法：将字符串中的所有字母都转换为小写
+    public static String toLowerCase(String input) {
+        if (input == null) {
+            return null;
+        }
+        StringBuilder result = new StringBuilder();
+        for (char c : input.toCharArray()) {
+            // 如果是大写字母，转换为小写
+            if (Character.isUpperCase(c)) {
+                result.append(Character.toLowerCase(c));
+            } else {
+                result.append(c);
+            }
+        }
+        return result.toString();
+    }
+
+    // 第二个方法：将字符串中的所有字母都转换为大写
+    public static String toUpperCase(String input) {
+        if (input == null) {
+            return null;
+        }
+        StringBuilder result = new StringBuilder();
+        for (char c : input.toCharArray()) {
+            // 如果是小写字母，转换为大写
+            if (Character.isLowerCase(c)) {
+                result.append(Character.toUpperCase(c));
+            } else {
+                result.append(c);
+            }
+        }
+        return result.toString();
+    }
+
+
     public List<PipelineEntity> findPipelineList(PipelineQuery query){
+        String pipelineName = query.getPipelineName();
         QueryBuilders queryBuilders = QueryBuilders.createQuery(PipelineEntity.class)
                 .eq("userId", query.getCreateUserId())
                 .eq("type", query.getPipelineType())
@@ -112,9 +158,16 @@ public class PipelineDao {
                 .eq("groupId",query.getGroupId())
                 .eq("power", query.getPipelinePower());
                 if (query.isEqName()){
-                    queryBuilders.eq("name",query.getPipelineName());
+                    queryBuilders.eq("name",pipelineName);
                 }else {
-                    queryBuilders.like("name",query.getPipelineName());
+                    if (!StringUtils.isEmpty(pipelineName)){
+                        OrQueryCondition orQueryCondition = OrQueryBuilders.instance()
+                                .like("name", pipelineName)
+                                .like("name", toLowerCase(pipelineName))
+                                .like("name", toUpperCase(pipelineName))
+                                .get();
+                        queryBuilders.or(orQueryCondition);
+                    }
                 }
         QueryCondition queryCondition = queryBuilders.in("id", query.getIdString())
                 .orders(query.getOrderParams())
@@ -123,21 +176,35 @@ public class PipelineDao {
     }
 
     public Pagination<PipelineEntity> findPipelinePage(PipelineQuery query){
-        QueryCondition queryCondition = QueryBuilders.createQuery(PipelineEntity.class)
-                .eq("userId",query.getCreateUserId())
-                .eq("type",query.getPipelineType())
-                .eq("state",query.getPipelineState())
-                .eq("power",query.getPipelinePower())
-                .eq("envId",query.getEnvId())
-                .eq("groupId",query.getGroupId())
-                .like("name",query.getPipelineName())
-                .in("id",query.getIdString())
+        QueryBuilders queryBuilders = QueryBuilders.createQuery(PipelineEntity.class)
+                .eq("userId", query.getCreateUserId())
+                .eq("type", query.getPipelineType())
+                .eq("state", query.getPipelineState())
+                .eq("power", query.getPipelinePower())
+                .eq("envId", query.getEnvId())
+                .eq("groupId", query.getGroupId())
+                .in("id", query.getIdString())
                 .pagination(query.getPageParam())
-                .orders(query.getOrderParams())
-                .get();
+                .orders(query.getOrderParams());
+        String pipelineName = query.getPipelineName();
+        if (StringUtils.isNotEmpty(pipelineName)){
+            OrQueryCondition orQueryCondition = OrQueryBuilders.instance()
+                    .like("name", pipelineName)
+                    .like("name", getLowerCase(pipelineName))
+                    .like("name", toUpperCase(pipelineName))
+                    .get();
+
+            queryBuilders = queryBuilders.or(orQueryCondition);
+        }
+
+        // queryBuilders.like("name",query.getPipelineName());
+        QueryCondition queryCondition = queryBuilders.get();
         return jpaTemplate.findPage(queryCondition, PipelineEntity.class);
     }
 
+    private static String getLowerCase(String pipelineName) {
+        return toLowerCase(pipelineName);
+    }
 
     public List<PipelineEntity> findRecentlyPipeline(Object[] pipelineIds,Integer number){
         List<Object> list = new ArrayList<>();

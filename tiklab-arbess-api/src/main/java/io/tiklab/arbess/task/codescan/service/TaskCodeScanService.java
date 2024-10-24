@@ -33,7 +33,7 @@ public interface TaskCodeScanService {
     void updateCodeScan(TaskCodeScan taskCodeScan);
 
 
-    Boolean codeScanValid(String taskType,Object object);
+    Boolean codeScanValid(String taskType,TaskCodeScan taskCodeScan);
 
 
     /**

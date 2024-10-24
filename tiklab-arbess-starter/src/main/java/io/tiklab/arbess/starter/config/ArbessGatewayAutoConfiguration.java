@@ -99,7 +99,8 @@ public class ArbessGatewayAutoConfiguration {
                         "/message/messageItem/syncUpdateMessage",
                         "/message/messageItem/syncDeleteMessage",
                         "/arbess/handler",
-                        "/other/handler"
+                        "/other/handler",
+                        "/eam/auth/valid"
                 })
                 .ignorePreUrls(new String[]{
                         "/service",

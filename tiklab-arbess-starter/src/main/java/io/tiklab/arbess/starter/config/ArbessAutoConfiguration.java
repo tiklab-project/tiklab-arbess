@@ -52,6 +52,6 @@ import org.springframework.context.annotation.Configuration;
 @EnableLicenceServer
 
 @EnableArbessServer
-@ComponentScan(value = "io.tiklab.matflow")
+@ComponentScan(value = "io.tiklab.arbess")
 public class ArbessAutoConfiguration {
 }

@@ -14,10 +14,8 @@ import io.tiklab.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * 流水线阶段服务
@@ -222,17 +220,14 @@ public class StageServiceImpl implements StageService {
     public List<Stage> findOtherStage(String stagesId){
         List<StageEntity> otherStage = stageDao.findOtherStage(stagesId);
         List<Stage> stages = BeanMapper.mapList(otherStage, Stage.class);
-        List<Stage> list = new ArrayList<>();
         for (Stage stage : stages) {
             //获取阶段配置及任务
             String otherId = stage.getStageId();
             List<Tasks> allStageTask = tasksService.finStageTaskOrTaskNoAuth(otherId);
             stage.setTaskValues(allStageTask);
-            list.add(stage);
         }
-        return list;
+        return stages;
     }
-
 
     public List<Stage> findOtherStageNoTask(String stagesId){
         List<StageEntity> otherStage = stageDao.findOtherStage(stagesId);
@@ -372,18 +367,20 @@ public class StageServiceImpl implements StageService {
         if (allStage.isEmpty()){
             return null;
         }
-        List<String> list = new ArrayList<>();
+        List<Tasks> tasksList = new ArrayList<>();
         for (Stage stage : allStage) {
             String stagesId = stage.getStageId();
             List<Stage> otherStage = findOtherStage(stagesId);
+
             for (Stage pipelineStage : otherStage) {
                 String id = pipelineStage.getStageId();
                 //获取任务详情
-                List<String> stringList = tasksService.validTasksMustField(id, 2);
-                list.addAll(stringList);
+                // List<Tasks> stagetaskList = tasksService.finStageTaskOrTaskNoAuth(id) ;
+                List<Tasks> stagetaskList = pipelineStage.getTaskValues();
+                tasksList.addAll(stagetaskList);
             }
         }
-        return list;
+        return tasksService.validTasksMustField(tasksList);
     }
 
     @Override

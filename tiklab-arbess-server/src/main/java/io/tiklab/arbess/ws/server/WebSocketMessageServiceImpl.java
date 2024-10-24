@@ -245,9 +245,16 @@ public class WebSocketMessageServiceImpl implements WebSocketMessageService {
         if (StringUtils.isEmpty(runLog)){
             return;
         }
+
         String[] split = runLog.split("\n");
-        if (split.length < 1000){
-            return;
+        if (taskInstance.getTaskSort() < 2){
+            if (split.length < 3){
+                return;
+            }
+        }else {
+            if (split.length < 15){
+                return;
+            }
         }
         String logAddress = oneTaskInstance.getLogAddress();
         logger.info("日志过长，写入文件：{}",logAddress);

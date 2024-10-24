@@ -17,10 +17,10 @@ public interface TaskArtifactXpackService {
     /**
      *
      * @param authId 认证id
-     * @param rpyName 仓库名称
+     * @param rpyId 仓库id
      * @return 仓库地址
      */
-    XpackRepository findRepository(String authId,String rpyName);
+    XpackRepository findRepository(String authId,String rpyId);
 
 
 

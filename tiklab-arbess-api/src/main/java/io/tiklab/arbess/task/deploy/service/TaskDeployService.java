@@ -31,10 +31,10 @@ public interface TaskDeployService {
     /**
      * 测试是否有效
      * @param taskType 任务类型
-     * @param object object
+     * @param taskDeploy object
      * @return 是否有效
      */
-    Boolean deployValid(String taskType,Object object);
+    Boolean deployValid(String taskType,TaskDeploy taskDeploy);
 
 
     /**

@@ -29,8 +29,7 @@ public class TaskBuildServiceImpl implements TaskBuildService {
     }
 
     @Override
-    public Boolean buildValid(String taskType,Object object){
-        TaskBuild build = (TaskBuild) object;
+    public Boolean buildValid(String taskType,TaskBuild build){
         if (taskType.equals(TASK_BUILD_DOCKER)){
             return !StringUtils.isEmpty(build.getDockerFile());
         }

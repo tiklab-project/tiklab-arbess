@@ -36,10 +36,10 @@ public interface TaskTestService {
     /**
      * 测试是否有效
      * @param taskType 任务类型
-     * @param object object
+     * @param taskTest object
      * @return 是否有效
      */
-    Boolean testValid(String taskType,Object object);
+    Boolean testValid(String taskType,TaskTest taskTest);
 
     /**
      * 更新

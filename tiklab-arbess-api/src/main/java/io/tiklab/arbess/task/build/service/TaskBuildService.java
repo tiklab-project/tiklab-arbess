@@ -36,10 +36,10 @@ public interface TaskBuildService {
     /**
      * 验证
      * @param taskType taskType
-     * @param object object
+     * @param taskBuild object
      * @return Boolean
      */
-    Boolean buildValid(String taskType,Object object);
+    Boolean buildValid(String taskType,TaskBuild taskBuild);
 
 
     /**

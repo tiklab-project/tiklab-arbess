@@ -132,11 +132,11 @@ public class TasksInstanceServiceImpl implements TasksInstanceService {
                     time = 1;
                 }
                 instance.setRunTime(time);
-                if (!StringUtils.isEmpty(instance.getRunLog())){
-                    instance.setRunLog(instance.getRunLog() + taskInstance.getRunLog());
-                }else {
-                    instance.setRunLog(taskInstance.getRunLog());
-                }
+                // if (!StringUtils.isEmpty(instance.getRunLog())){
+                //     instance.setRunLog(instance.getRunLog() + taskInstance.getRunLog());
+                // }else {
+                //     instance.setRunLog(taskInstance.getRunLog());
+                // }
                 instance.setRunState(PipelineFinal.RUN_RUN);
             }
             String logAddress = instance.getLogAddress();
@@ -253,25 +253,35 @@ public class TasksInstanceServiceImpl implements TasksInstanceService {
             instance.setDeployInstanceList(list);
 
             TaskInstance taskInstance = taskInstanceMap.get(taskInstanceId);
-            if (Objects.isNull(taskInstance)){
-                String logAddress = instance.getLogAddress();
-                String readFile = PipelineFileUtil.readFile(logAddress, 2000);
-                instance.setRunLog(readFile);
-            }else {
-                int time = taskInstance.getRunTime();
-                if (time == 0){
-                    time = 1;
-                }
-                if (StringUtils.isEmpty(taskInstance.getRunLog()) ){
-                    String logAddress = instance.getLogAddress();
-                    String readFile = PipelineFileUtil.readFile(logAddress, readLogLength);
-                    instance.setRunLog(readFile);
-                }else {
-                    instance.setRunLog(taskInstance.getRunLog());
-                }
+
+            if (!Objects.isNull(taskInstance)){
+                int time = taskInstance.getRunTime() == 0 ? 1 : taskInstance.getRunTime();
                 instance.setRunTime(time);
                 instance.setRunState(taskInstance.getRunState());
             }
+            // if (Objects.isNull(taskInstance)){
+            //     String logAddress = instance.getLogAddress();
+            //     String readFile = PipelineFileUtil.readFile(logAddress, 2000);
+            //     instance.setRunLog(readFile);
+            // }else {
+            //     int time = taskInstance.getRunTime();
+            //     if (time == 0){
+            //         time = 1;
+            //     }
+            //     if (StringUtils.isEmpty(taskInstance.getRunLog()) ){
+            //         String logAddress = instance.getLogAddress();
+            //         String readFile = PipelineFileUtil.readFile(logAddress, readLogLength);
+            //         instance.setRunLog(readFile);
+            //     }else {
+            //         instance.setRunLog(taskInstance.getRunLog());
+            //     }
+            //     instance.setRunTime(time);
+            //     instance.setRunState(taskInstance.getRunState());
+            // }
+            String logAddress = instance.getLogAddress();
+            String readFile = PipelineFileUtil.readFile(logAddress, readLogLength);
+            instance.setRunLog(readFile);
+
             String time = PipelineUtil.formatDateTime(instance.getRunTime());
             instance.setRunTimeDate(time);
             allTaskRunTime = allTaskRunTime + instance.getRunTime();

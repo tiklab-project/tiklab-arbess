@@ -83,13 +83,12 @@ public interface TasksService {
      */
     List<Tasks> finStageTaskOrTaskNoAuth(String stageId);
 
-
     /**
      * 效验配置必填字段
-     * @param id 流水线id或阶段id
+     * @param tasksList 任务
      * @return 配置id集合
      */
-    List<String> validTasksMustField(String id,int type);
+    List<String> validTasksMustField(List<Tasks> tasksList);
 
 
     /**
