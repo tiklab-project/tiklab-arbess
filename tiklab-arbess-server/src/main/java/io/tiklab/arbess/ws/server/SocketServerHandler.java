@@ -7,19 +7,21 @@ import io.tiklab.arbess.support.agent.model.AgentMessage;
 import io.tiklab.arbess.support.agent.service.AgentService;
 import io.tiklab.arbess.support.util.util.PipelineUtil;
 import io.tiklab.arbess.ws.service.WebSocketMessageService;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.*;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
+import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 public class SocketServerHandler implements WebSocketHandler {
@@ -30,12 +32,12 @@ public class SocketServerHandler implements WebSocketHandler {
     @Autowired
     AgentService agentService;
 
-
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
+    private final List<AgentMessage> dataList = new CopyOnWriteArrayList<>();
 
     // 线程安全的集合，用于存储客户端会话
     public static final Map<String, WebSocketSession> sessionMap = new HashMap<>();
-
 
     public static SocketServerHandler instance(){
         return new SocketServerHandler();
@@ -58,13 +60,30 @@ public class SocketServerHandler implements WebSocketHandler {
         String receivedString = new String(payload.array(), StandardCharsets.UTF_8);
         AgentMessage agentMessage = JSONObject.parseObject(receivedString, AgentMessage.class);
         logger.warn("接受客户端消息,消息类型：{}", agentMessage.getType());
-        // 接受消息返回逻辑
-        String s = webSocketMessageService.distributeMessage(agentMessage);
-        if (StringUtils.isEmpty(s)){
+
+        dataList.add(agentMessage);
+    }
+
+
+    @Scheduled(fixedRate = 800)
+    protected void syncMessage(){
+        if (dataList.isEmpty()){
             return;
         }
-        // 返回消息
-        session.sendMessage(new TextMessage(s));
+
+        int processedCount = 0; // 计数器
+        for (AgentMessage message : dataList) {
+            if (processedCount >= 4) { // 限制每次处理的数量为6
+                break;
+            }
+
+            // 执行处理逻辑
+            webSocketMessageService.distributeMessage(message);
+            processedCount++;
+
+            // 处理完成后删除内存中的数据
+            dataList.remove(message);
+        }
     }
 
     /**

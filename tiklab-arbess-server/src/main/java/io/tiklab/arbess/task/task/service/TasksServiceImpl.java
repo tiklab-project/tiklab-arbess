@@ -666,6 +666,7 @@ public class TasksServiceImpl implements TasksService {
                 task.setTaskId(taskId);
                 task.setAuthType(1);
                 task.setDeployAddress(DEFAULT_CODE_ADDRESS);
+                task.setLocalAddress(DEFAULT_CODE_ADDRESS);
                 deployService.createDeploy(task);
             }
             case TASK_TYPE_CODESCAN -> {

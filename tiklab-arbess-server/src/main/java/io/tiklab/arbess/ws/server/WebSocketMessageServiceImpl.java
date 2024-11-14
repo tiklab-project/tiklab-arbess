@@ -252,7 +252,7 @@ public class WebSocketMessageServiceImpl implements WebSocketMessageService {
                 return;
             }
         }else {
-            if (split.length < 15){
+            if (split.length < 30){
                 return;
             }
         }

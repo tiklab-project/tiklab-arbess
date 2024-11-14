@@ -115,7 +115,7 @@ public class RelevanceTestOnServiceImpl implements RelevanceTestOnService{
             AuthThird authThird = authThirdService.findOneAuthServer(authId);
             TestOnPlanInstance testPlanInstance = taskTestOnService.findAllTestPlanInstance(authThird.getServerId(), instanceId);
             relevanceTestOn.setStatus(1);
-            if (Objects.isNull(testPlanInstance)){
+            if (Objects.isNull(testPlanInstance) || testPlanInstance.getTestPlanName().contains("删除")){
                 relevanceTestOn.setStatus(2);
             }
             relevanceTestOn.setUrl(authThird.getServerAddress());

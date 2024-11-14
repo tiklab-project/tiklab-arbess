@@ -276,7 +276,6 @@ public class TaskTestOnServiceImpl implements TaskTestOnService {
         if (StringUtils.isEmpty(serverAddress)){
             return null;
         }
-        // String requestUrl = serverAddress + "/api/testPlanTestDispatch/exeResult";
         String requestUrl = serverAddress + "/api/testPlanInstance/findTestPlanInstance";
 
         try {
@@ -290,15 +289,7 @@ public class TaskTestOnServiceImpl implements TaskTestOnService {
                 testPlanInstance.setTestPlanName("测试计划已被删除！");
             }else {
                 testPlanInstance.setTestPlanName(testPlanInstance.getTestPlan().getName());
-                // TestOnTestPlan testPlan = findOneTestPlan(authId, instanceId);
-                // if (!Objects.isNull(testPlan)){
-                //     testPlanInstance.setTestPlanName(testPlan.getName());
-                // }else {
-                //     testPlanInstance.setTestPlanName("测试计划已被删除！");
-                // }
             }
-            // TestOnPlanInstance testPlanInstance = testPlanExecResult.getTestPlanInstance();
-            // String testPlanId = testPlanInstance.getTestPlanId();
             testPlanInstance.setUrl(serverAddress);
 
             return testPlanInstance;
