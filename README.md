@@ -298,7 +298,8 @@ cd tiklab-arbess
 
 ### 构建项目
 
-#### 配置MAVEN仓库
+**配置MAVEN仓库**
+
 配置maven的setrings.xml文件的远程仓库为一下内容
 
 ```
@@ -309,7 +310,7 @@ cd tiklab-arbess
     <mirrorOf>*</mirrorOf>
 </mirror>
 ```
-#### 构建
+**构建**
 
 - **MAC系统**：mvn clean package -P system-mac,env-dev
 - **Linux系统**：mvn clean package -P system-linux,env-dev
@@ -334,5 +335,5 @@ cd tiklab-arbess
 
 邮箱: tiklab@163.com
 
-#### 立即体验 Arbess，解锁高效的自动化构建、测试和部署流程！
+**立即体验 Arbess，解锁高效的自动化构建、测试和部署流程！**
 
