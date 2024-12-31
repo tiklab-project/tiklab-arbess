@@ -38,6 +38,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.WebSocketSession;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -123,6 +124,12 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
         // 判断同一任务是否在运行
         Pipeline pipeline = validExecPipeline(runMsg);
         String pipelineId = pipeline.getId();
+
+        List<String> strings = stageService.validStagesMustField(pipelineId);
+        if (!Objects.isNull(strings) && !strings.isEmpty()){
+            throw new ApplicationException("流水线未配置完成，请完善配置后在执行。");
+        }
+
         pipelineIdOrAgentId.put(pipelineId, agent);
 
         // 判断磁盘空间是否足够
@@ -234,6 +241,7 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
             }
 
             try {
+                logger.warn("发送流水线执行信息到客户端......");
                 SocketServerHandler.instance().sendHandleMessage(id,agentMessage);
             } catch (Exception e) {
                 throw new SystemException("客户端推送消息失败,错误信息：" + e.getMessage());

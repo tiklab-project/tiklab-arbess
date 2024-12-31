@@ -1,9 +1,18 @@
 package io.tiklab.arbess.support.count.model;
 
+/**
+ * 流水线日统计模型
+ */
 public class PipelineDayCount {
 
+    /**
+     * 日期
+     */
     private String time;
 
+    /**
+     * 流水线时间统计
+     */
     private PipelineTimeCount timeCount;
 
     public String getTime() {

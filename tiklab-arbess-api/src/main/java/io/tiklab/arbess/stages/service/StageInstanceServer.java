@@ -65,7 +65,11 @@ public interface StageInstanceServer {
     List<StageInstance> findStageExecInstance(String instanceId);
 
 
-
+    /**
+     * 查询阶段运行实例列表
+     * @param query 查询条件
+     * @return 阶段运行实例列表
+     */
     List<StageInstance> findStageInstanceList(StageInstanceQuery query);
 
 

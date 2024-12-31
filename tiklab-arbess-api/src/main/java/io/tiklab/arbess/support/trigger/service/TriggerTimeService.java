@@ -36,6 +36,11 @@ public interface TriggerTimeService {
     List<TriggerTime> findAllTriggerTime(String triggerId);
 
 
+    /**
+     * 查询cron时间列表
+     * @param cron cron表达式
+     * @return 时间列表
+     */
     List<TriggerTime> fondCronTimeList(String cron);
 
 
@@ -83,6 +88,11 @@ public interface TriggerTimeService {
     @FindAll
     List<TriggerTime> findAllTime() ;
 
+    /**
+     * 根据ID列表查询时间
+     * @param idList 时间ID列表
+     * @return 时间列表
+     */
     @FindList
     List<TriggerTime> findAllTimeList(List<String> idList);
     

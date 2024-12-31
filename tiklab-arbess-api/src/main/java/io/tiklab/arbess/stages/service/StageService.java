@@ -131,6 +131,13 @@ public interface StageService {
     @FindAll
     List<Stage> findAllStages();
 
+
+
+    /**
+     * 根据ID列表批量查询阶段
+     * @param idList 阶段ID列表
+     * @return 阶段列表
+     */
     @FindList
     List<Stage> findAllStagesList(List<String> idList);
 

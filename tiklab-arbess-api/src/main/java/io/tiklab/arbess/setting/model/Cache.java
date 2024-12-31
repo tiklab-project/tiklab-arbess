@@ -8,12 +8,13 @@ import io.tiklab.toolkit.join.annotation.Join;
 public class Cache {
 
 
+    // 主键ID
     private String id;
 
-
+    // 日志缓存
     private int logCache;
 
-
+    // 制品缓存
     private int artifactCache;
 
 

@@ -1,5 +1,8 @@
 package io.tiklab.arbess.support.version.service;
 
+/**
+ * 流水线版本服务接口
+ */
 public interface PipelineVersionService {
 
     /**

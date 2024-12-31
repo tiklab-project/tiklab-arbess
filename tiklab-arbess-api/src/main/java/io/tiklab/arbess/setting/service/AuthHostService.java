@@ -59,14 +59,25 @@ public interface AuthHostService {
     @FindAll
     List<AuthHost> findAllAuthHost();
 
-
+    /**
+     * 根据ID列表批量查询流水线主机授权
+     * @param idList 流水线主机授权ID列表
+     * @return 流水线主机授权列表
+     */
     @FindList
     List<AuthHost> findAllAuthHostList(List<String> idList);
 
-
+    /**
+     * 分页查询流水线主机授权
+     * @param hostQuery 查询条件
+     * @return 流水线主机授权分页结果
+     */
     Pagination<AuthHost> findAuthHostPage(AuthHostQuery hostQuery);
 
-
+    /**
+     * 查询流水线主机授权数量
+     * @return 流水线主机授权数量
+     */
     Integer findHostNumber();
     
 }

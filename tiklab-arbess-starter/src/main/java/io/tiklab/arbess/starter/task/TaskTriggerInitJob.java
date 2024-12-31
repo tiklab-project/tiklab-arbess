@@ -10,6 +10,7 @@ import io.tiklab.arbess.support.trigger.service.TriggerTimeService;
 import io.tiklab.arbess.support.util.util.PipelineFinal;
 import io.tiklab.arbess.support.util.util.PipelineUtil;
 import io.tiklab.core.exception.ApplicationException;
+import io.tiklab.eam.client.author.config.TiklabApplicationRunner;
 import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,12 +28,7 @@ import java.util.List;
 import java.util.Objects;
 
 @Configuration
-public class TaskTriggerInitJob implements ApplicationRunner {
-
-    @Override
-    public void run(ApplicationArguments args) throws Exception {
-        run();
-    }
+public class TaskTriggerInitJob implements TiklabApplicationRunner {
 
     private static final Logger logger = LoggerFactory.getLogger(TaskTriggerInitJob.class);
 
@@ -46,11 +42,13 @@ public class TaskTriggerInitJob implements ApplicationRunner {
     @Autowired
     TriggerTimeService triggerTimeService;
 
-    // @Override
-    public void onApplicationEvent(ContextRefreshedEvent event) {
-        run();
+
+    public void run(ApplicationArguments args) throws Exception {
+        // run();
     }
 
+
+    @Override
     public void run(){
         try {
             List<TriggerTime> triggerList = triggerTimeService.findAllTime();

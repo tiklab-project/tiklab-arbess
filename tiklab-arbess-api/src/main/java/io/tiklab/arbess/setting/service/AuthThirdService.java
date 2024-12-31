@@ -66,10 +66,18 @@ public interface AuthThirdService {
     List<AuthThird> findAllAuthServer();
 
 
+    /**
+     * 根据ID列表批量查询流水线第三方授权
+     * @param idList 流水线第三方授权ID列表
+     * @return 流水线第三方授权列表
+     */
     @FindList
     List<AuthThird> findAllAuthServerList(List<String> idList);
 
-
+    /**
+     * 查询流水线第三方授权数量
+     * @return 流水线第三方授权数量
+     */
     Integer findAuthServerNumber();
     
     

@@ -28,6 +28,7 @@ jdbc:
   driverClassName: org.postgresql.Driver
   url: jdbc:postgresql://172.10.1.10:5432/tiklab_matflow?stringtype=unspecified
 #  url: jdbc:postgresql://172.13.1.22:5432/matflow_ee?stringtype=unspecified
+#  url: jdbc:postgresql://localhost:9201/tiklab_matflow?stringtype=unspecified
   username: postgres
   password: darth2020
 
@@ -104,9 +105,19 @@ backups:
 postgresql:
   embbed:
     enable: false
-  database: tiklab_matflow
+  database: matflow_ee
   type: local
 
+
+#postgresql:
+#  embbed:
+#    enable: true
+#  database: tiklab_matflow
+#  db:
+#    port: 9201
+#    username: postgres
+#    password: darth2020
+#    address: ${DATA_HOME}/postgresql
 
 base:
   url: http://192.168.10.13:3000

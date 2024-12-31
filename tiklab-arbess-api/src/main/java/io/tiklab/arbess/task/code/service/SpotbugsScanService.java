@@ -6,20 +6,32 @@ import io.tiklab.core.page.Pagination;
 
 import java.util.List;
 
+
 /**
- * @author zcamy
+ * Spotbugs扫描服务接口
  */
 public interface SpotbugsScanService {
 
-
+    /**
+     * 创建Spotbugs
+     * @param bugSummary SpotbugsBugSummary
+     * @return SpotbugsBugSummary
+     */
     String creatSpotbugs(SpotbugsBugSummary bugSummary);
 
-
+    /**
+     * 更新Spotbugs
+     * @param bugSummary SpotbugsBugSummary
+     */
     void updateSpotbugs(SpotbugsBugSummary bugSummary);
 
-
+    /**
+     * 删除Spotbugs
+     * @param bugId spotbugsId
+     */
     void deleteSpotbugs(String bugId);
 
+    
     SpotbugsBugSummary findOneSpotbugs(String bugId);
 
 

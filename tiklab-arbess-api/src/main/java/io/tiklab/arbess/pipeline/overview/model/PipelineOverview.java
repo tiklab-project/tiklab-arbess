@@ -1,15 +1,13 @@
 package io.tiklab.arbess.pipeline.overview.model;
 
-
-
-
+import io.tiklab.core.BaseModel;
 
 /**
  * 流水线概况统计模型
  */
 
 //@ApiModel
-public class PipelineOverview {
+public class PipelineOverview extends BaseModel {
 
     //@ApiProperty(name="allNumber",desc="运行次数")
     private int allNumber;

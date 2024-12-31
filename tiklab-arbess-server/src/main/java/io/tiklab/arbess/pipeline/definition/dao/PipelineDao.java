@@ -1,8 +1,12 @@
 package io.tiklab.arbess.pipeline.definition.dao;
 
+import io.tiklab.core.exception.SystemException;
+import io.tiklab.core.order.Order;
+import io.tiklab.core.order.OrderTypeEnum;
 import io.tiklab.core.page.Pagination;
 import io.tiklab.dal.jdbc.JdbcTemplate;
 import io.tiklab.dal.jpa.JpaTemplate;
+import io.tiklab.dal.jpa.annotation.Column;
 import io.tiklab.dal.jpa.criterial.condition.OrQueryCondition;
 import io.tiklab.dal.jpa.criterial.condition.QueryCondition;
 import io.tiklab.dal.jpa.criterial.conditionbuilder.OrQueryBuilders;
@@ -10,10 +14,13 @@ import io.tiklab.dal.jpa.criterial.conditionbuilder.QueryBuilders;
 import io.tiklab.arbess.pipeline.definition.entity.PipelineEntity;
 import io.tiklab.arbess.pipeline.definition.model.PipelineQuery;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.stereotype.Repository;
 
+import java.lang.reflect.Field;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -24,6 +31,7 @@ import java.util.stream.Collectors;
 @Repository
 public class PipelineDao {
 
+    private static final Logger log = LoggerFactory.getLogger(PipelineDao.class);
     @Autowired
     JpaTemplate jpaTemplate;
 
@@ -101,11 +109,7 @@ public class PipelineDao {
 
         String pipelineName = query.getPipelineName();
         if (!Objects.isNull(pipelineName)){
-            sql = sql.concat(" and ( ");
-            sql = sql.concat(" name like '%").concat(pipelineName).concat("%'").concat(" or ");
-            sql = sql.concat(" name like '%").concat(toLowerCase(pipelineName)).concat("%'").concat(" or ");
-            sql = sql.concat(" name like '%").concat(toUpperCase(pipelineName)).concat("%'");
-            sql = sql.concat(" )");
+            sql = sql.concat(" and name ILIKE '%").concat(pipelineName).concat("%'");
         }
 
         return jpaTemplate.getJdbcTemplate().findPage(sql, null, query.getPageParam(),
@@ -113,124 +117,144 @@ public class PipelineDao {
     }
 
 
-    // 第一个方法：将字符串中的所有字母都转换为小写
-    public static String toLowerCase(String input) {
-        if (input == null) {
-            return null;
-        }
-        StringBuilder result = new StringBuilder();
-        for (char c : input.toCharArray()) {
-            // 如果是大写字母，转换为小写
-            if (Character.isUpperCase(c)) {
-                result.append(Character.toLowerCase(c));
-            } else {
-                result.append(c);
-            }
-        }
-        return result.toString();
-    }
-
-    // 第二个方法：将字符串中的所有字母都转换为大写
-    public static String toUpperCase(String input) {
-        if (input == null) {
-            return null;
-        }
-        StringBuilder result = new StringBuilder();
-        for (char c : input.toCharArray()) {
-            // 如果是小写字母，转换为大写
-            if (Character.isLowerCase(c)) {
-                result.append(Character.toUpperCase(c));
-            } else {
-                result.append(c);
-            }
-        }
-        return result.toString();
-    }
-
-
     public List<PipelineEntity> findPipelineList(PipelineQuery query){
-        String pipelineName = query.getPipelineName();
-        QueryBuilders queryBuilders = QueryBuilders.createQuery(PipelineEntity.class)
-                .eq("userId", query.getCreateUserId())
-                .eq("type", query.getPipelineType())
-                .eq("state", query.getPipelineState())
-                .eq("envId",query.getEnvId())
-                .eq("groupId",query.getGroupId())
-                .eq("power", query.getPipelinePower());
-                if (query.isEqName()){
-                    queryBuilders.eq("name",pipelineName);
-                }else {
-                    if (!StringUtils.isEmpty(pipelineName)){
-                        OrQueryCondition orQueryCondition = OrQueryBuilders.instance()
-                                .like("name", pipelineName)
-                                .like("name", toLowerCase(pipelineName))
-                                .like("name", toUpperCase(pipelineName))
-                                .get();
-                        queryBuilders.or(orQueryCondition);
-                    }
-                }
-        QueryCondition queryCondition = queryBuilders.in("id", query.getIdString())
-                .orders(query.getOrderParams())
-                .get();
-        return jpaTemplate.findList(queryCondition, PipelineEntity.class);
+        PipelineCondition condition = findQueryCondition(query);
+        return jpaTemplate.getJdbcTemplate().query(condition.getSql(), condition.getObjects(),
+                new BeanPropertyRowMapper<>(PipelineEntity.class));
     }
 
     public Pagination<PipelineEntity> findPipelinePage(PipelineQuery query){
-        QueryBuilders queryBuilders = QueryBuilders.createQuery(PipelineEntity.class)
-                .eq("userId", query.getCreateUserId())
-                .eq("type", query.getPipelineType())
-                .eq("state", query.getPipelineState())
-                .eq("power", query.getPipelinePower())
-                .eq("envId", query.getEnvId())
-                .eq("groupId", query.getGroupId())
-                .in("id", query.getIdString())
-                .pagination(query.getPageParam())
-                .orders(query.getOrderParams());
-        String pipelineName = query.getPipelineName();
-        if (StringUtils.isNotEmpty(pipelineName)){
-            OrQueryCondition orQueryCondition = OrQueryBuilders.instance()
-                    .like("name", pipelineName)
-                    .like("name", getLowerCase(pipelineName))
-                    .like("name", toUpperCase(pipelineName))
-                    .get();
+        PipelineCondition condition = findQueryCondition(query);
+                return jpaTemplate.getJdbcTemplate().findPage(condition.getSql(), condition.getObjects(),
+                        query.getPageParam(),new BeanPropertyRowMapper<>(PipelineEntity.class));
+    }
 
-            queryBuilders = queryBuilders.or(orQueryCondition);
+
+    public <T> String orderBy (List<Order> orders,Class<T> clazz, String... alias) {
+        StringBuilder sqlDesc = new StringBuilder();
+        for (int i = 0; i < orders.size(); i++) {
+            Order order = orders.get(i);
+            String key = order.getName();
+            OrderTypeEnum orderType = order.getOrderType();
+
+            String columnName = null;
+            for (Field field : clazz.getDeclaredFields()) {
+                field.setAccessible(true);
+                String name = field.getName();
+                if (name.equals(key)){
+                    Column column = field.getAnnotation(Column.class);
+                    columnName = column.name();
+                }
+            }
+            if (StringUtils.isEmpty(columnName)){
+                throw new SystemException("字段"+key+"实体字段不存在！");
+            }
+
+            if (alias.length == 0){
+                if ( i + 1 == orders.size()) {
+                    sqlDesc.append(columnName).append(" ").append(orderType);
+                } else {
+                    sqlDesc.append(columnName).append(" ").append(orderType).append(" ").append(',');
+                }
+            }else {
+                if ( i + 1 == orders.size()) {
+                    sqlDesc.append(alias[0]).append(".").append(columnName).append(" ").append(orderType);
+                } else {
+                    sqlDesc.append(alias[0]).append(".").append(columnName).append(" ").append(orderType).append(" ").append(',');
+                }
+            }
+        }
+        return sqlDesc.toString();
+    }
+
+
+    PipelineCondition findQueryCondition(PipelineQuery query) {
+
+        List<Object> params = new ArrayList<>();
+        String sql = "select pip_pipeline.* from pip_pipeline where 1=1";
+
+        if (!StringUtils.isBlank(query.getCreateUserId())){
+            sql = sql.concat(" and user_id = ?");
+            params.add(query.getCreateUserId());
         }
 
-        // queryBuilders.like("name",query.getPipelineName());
-        QueryCondition queryCondition = queryBuilders.get();
-        return jpaTemplate.findPage(queryCondition, PipelineEntity.class);
+        // if (!StringUtils.isBlank(query.getUserId())){
+        //     sql = sql.concat(" and user_id = ?");
+        //     params.add(query.getUserId());
+        // }
+
+        if (!StringUtils.isBlank(query.getPipelineName())){
+            sql = sql.concat(" and name ILIKE '%"+query.getPipelineName()+"%'");
+            // params.add(query.getPipelineName());
+        }
+
+        if (!Objects.isNull(query.getPipelineState()) && query.getPipelineState()!=0){
+            sql = sql.concat(" and state = ?");
+            params.add(query.getPipelineState());
+        }
+
+        if (!StringUtils.isBlank(query.getEnvId())){
+            sql = sql.concat(" and env_id = ?");
+            params.add(query.getEnvId());
+        }
+
+        if (!StringUtils.isBlank(query.getGroupId())){
+            sql = sql.concat(" and group_id = ?");
+            params.add(query.getGroupId());
+        }
+
+        if (!Objects.isNull(query.getPipelinePower()) && query.getPipelinePower()!=0){
+            sql = sql.concat(" and power = ?");
+            params.add(query.getPipelinePower());
+        }
+
+        if (!Objects.isNull(query.getIdString()) && query.getIdString().length !=0 ){
+            String ids = "";
+            String[] idList = query.getIdString();
+            for (int i = 0; i < idList.length; i++) {
+                if (i == idList.length-1){
+                    ids = ids.concat("'" + idList[i]+ "'");
+                }else {
+                    ids = ids.concat("'" + idList[i]+ "',");
+                }
+            }
+            sql = sql.concat(" and id in ("+ids+") ");
+        }
+
+        if (query.getOrderParams() != null && !query.getOrderParams().isEmpty()) {
+            sql += " order by " + orderBy(query.getOrderParams(), PipelineEntity.class);
+        }
+        return new PipelineCondition(sql,params.toArray());
+
     }
 
-    private static String getLowerCase(String pipelineName) {
-        return toLowerCase(pipelineName);
+}
+
+
+class PipelineCondition{
+
+    private String sql;
+
+    private Object[] objects;
+
+    public PipelineCondition(String sql, Object[] objects) {
+        this.sql = sql;
+        this.objects = objects;
     }
 
-    public List<PipelineEntity> findRecentlyPipeline(Object[] pipelineIds,Integer number){
-        List<Object> list = new ArrayList<>();
-
-        String ids = Arrays.stream(pipelineIds).map(id -> "'" + id + "'")
-                .collect(Collectors.joining(","));
-
-        String sqlBuffer = " SELECT *  FROM pip_pipeline WHERE id not in (?) LIMIT ?";
-        JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
-        list.add(ids);
-        list.add(number);
-        return jdbcTemplate.query(sqlBuffer,new BeanPropertyRowMapper<>(PipelineEntity.class),list.toArray() );
+    public String getSql() {
+        return sql;
     }
 
+    public void setSql(String sql) {
+        this.sql = sql;
+    }
 
+    public Object[] getObjects() {
+        return objects;
+    }
 
-
-
-
-
-
-
-
-
-
-
-
-
+    public void setObjects(Object[] objects) {
+        this.objects = objects;
+    }
 }

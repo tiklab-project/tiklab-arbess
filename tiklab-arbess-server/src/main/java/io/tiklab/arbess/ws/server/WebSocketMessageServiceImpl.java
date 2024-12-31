@@ -37,6 +37,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 
+import static io.tiklab.arbess.support.util.util.PipelineFinal.RUN_RUN;
+import static io.tiklab.arbess.support.util.util.PipelineFinal.RUN_SUCCESS;
+
 @Service
 public class WebSocketMessageServiceImpl implements WebSocketMessageService {
 
@@ -140,7 +143,7 @@ public class WebSocketMessageServiceImpl implements WebSocketMessageService {
         PipelineInstance instance = pipelineInstanceService.findOneInstance(instanceId);
 
         switch (state){
-            case PipelineFinal.RUN_SUCCESS ->{
+            case RUN_SUCCESS ->{
                 map.put("message","运行成功");
                 map.put("execStatus","运行成功");
                 map.put("colour","info");
@@ -180,6 +183,19 @@ public class WebSocketMessageServiceImpl implements WebSocketMessageService {
         stageInstance.setStageTime(sourceStageInstance.getStageTime());
         stageInstance.setStageState(sourceStageInstance.getStageState());
         stageInstanceServer.updateStageInstance(stageInstance);
+        //
+        // String stageState = sourceStageInstance.getStageState();
+        //
+        // if (RUN_RUN.equals(stageState)){
+        //     return;
+        // }
+        //
+        // String parentId = stageInstance.getParentId();
+        // if (!StringUtils.isEmpty(parentId)){
+        //     StageInstance parentInstance = stageInstanceServer.findOneStageInstance(parentId);
+        //     parentInstance.setStageState(sourceStageInstance.getStageState());
+        //     stageInstanceServer.updateStageInstance(parentInstance);
+        // }
     }
 
     /**

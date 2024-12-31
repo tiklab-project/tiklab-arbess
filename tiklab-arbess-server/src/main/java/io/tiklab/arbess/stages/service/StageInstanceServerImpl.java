@@ -93,6 +93,7 @@ public class StageInstanceServerImpl implements StageInstanceServer{
         if (stageInstanceList == null || stageInstanceList.isEmpty()){
             return Collections.emptyList();
         }
+        stageInstanceList.sort(Comparator.comparing(StageInstance::getStageSort));
        return stageInstanceList;
     }
 
@@ -140,9 +141,11 @@ public class StageInstanceServerImpl implements StageInstanceServer{
                 otherInstance.setRunLog(runLog.toString());
                 if (!Objects.equals(runLog.toString(),log)){
                     mainLog.append(runLog).append(log);
-                    allTime = allTime + otherInstance.getStageTime();
                 }
+                allTime = Math.max(allTime, otherInstance.getStageTime());
+
             }
+
             stageInstance.setRunLog(mainLog.toString());
             stageInstance.setStageTime(allTime);
             otherStageInstanceList.sort(Comparator.comparing(StageInstance::getStageSort));

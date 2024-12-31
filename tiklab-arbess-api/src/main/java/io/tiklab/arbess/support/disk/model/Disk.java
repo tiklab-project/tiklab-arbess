@@ -1,17 +1,38 @@
 package io.tiklab.arbess.support.disk.model;
 
+/**
+ * 磁盘模型
+ */
 public class Disk {
 
+    /**
+     * 磁盘名称
+     */
     private String name;
 
+    /**
+     * 目录大小
+     */
     private String dirSize;
 
+    /**
+     * 磁盘大小
+     */
     private String diskSize;
 
+    /**
+     * 用户大小
+     */
     private String userSize;
 
+    /**
+     * 路径
+     */
     private String path;
 
+    /**
+     * 文件路径
+     */
     private String filePath;
 
     public String getFilePath() {

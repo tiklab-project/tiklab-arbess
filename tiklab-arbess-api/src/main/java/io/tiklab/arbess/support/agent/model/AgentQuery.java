@@ -7,20 +7,44 @@ import io.tiklab.core.page.Page;
 
 import java.util.List;
 
+/**
+ * 代理查询模型
+ */
 public class AgentQuery extends BaseModel {
 
+    /**
+     * 代理名称
+     */
     private String name;
 
+    /**
+     * 代理IP
+     */
     private String ip;
 
+    /**
+     * 租户ID
+     */
     private String tenantId;
 
+    /**
+     * 代理地址
+     */
     private String address;
 
+    /**
+     * 业务类型
+     */
     private String businessType;
 
+    /**
+     * 分页参数
+     */
     private Page pageParam= new Page();
 
+    /**
+     * 排序参数
+     */
     private List<Order> orderParams = OrderBuilders.instance().desc("createTime").get();
 
 

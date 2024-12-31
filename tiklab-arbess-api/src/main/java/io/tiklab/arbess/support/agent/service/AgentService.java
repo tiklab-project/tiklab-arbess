@@ -6,6 +6,9 @@ import io.tiklab.arbess.support.agent.model.AgentQuery;
 
 import java.util.List;
 
+/**
+ * 代理服务接口
+ */
 public interface AgentService {
 
     /**

@@ -47,9 +47,17 @@ public interface ScmService {
      */
     Scm findOnePipelineScm(int type);
 
+    /**
+     * 根据ID列表批量查询环境配置
+     * @param idList 环境配置ID列表
+     * @return 环境配置列表
+     */
     List<Scm> selectPipelineScmList(List<String> idList);
 
-
+    /**
+     * 查询环境配置数量
+     * @return 环境配置数量
+     */
     Integer findScmNumber();
 
 }

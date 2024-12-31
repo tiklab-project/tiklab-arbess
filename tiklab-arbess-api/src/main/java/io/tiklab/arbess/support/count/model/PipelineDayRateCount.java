@@ -3,6 +3,9 @@ package io.tiklab.arbess.support.count.model;
 import io.tiklab.arbess.pipeline.definition.model.Pipeline;
 import io.tiklab.user.user.model.User;
 
+/**
+ * 流水线日成功率统计模型
+ */
 public class PipelineDayRateCount {
 
     // 流水线

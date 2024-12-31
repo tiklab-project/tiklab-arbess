@@ -4,6 +4,9 @@ import io.tiklab.arbess.task.artifact.model.XpackRepository;
 
 import java.util.List;
 
+/**
+ * 制品库服务接口
+ */
 public interface TaskArtifactXpackService {
 
     /**

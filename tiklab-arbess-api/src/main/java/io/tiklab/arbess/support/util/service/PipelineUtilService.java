@@ -2,6 +2,9 @@ package io.tiklab.arbess.support.util.service;
 
 import io.tiklab.core.exception.ApplicationException;
 
+/**
+ * 流水线工具服务接口
+ */
 public interface PipelineUtilService {
 
     /**

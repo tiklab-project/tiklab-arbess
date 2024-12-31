@@ -61,12 +61,25 @@ public interface TriggerService {
     void deleteTrigger(String triggerId) ;
 
 
+    /**
+     * 查询所有配置
+     * @return 配置列表
+     */
     List<Trigger> findAllTrigger();
 
-
+    /**
+     * 根据ID查询配置
+     * @param triggerId 配置ID
+     * @return 配置
+     */
     Trigger findOneTriggerById(String triggerId);
 
 
+    /**
+     * 根据ID列表查询配置
+     * @param idList 配置ID列表
+     * @return 配置列表
+     */
     List<Trigger> findAllTriggerConfigList(List<String> idList) ;
 
 }

@@ -35,11 +35,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.beans.Transient;
 import java.io.File;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.*;
 import java.util.stream.Stream;
+
+import static io.tiklab.arbess.support.util.util.PipelineFinal.*;
 
 /**
  * 流水线服务
@@ -104,15 +109,13 @@ public class PipelineServiceImpl implements PipelineService {
     private static final Logger logger = LoggerFactory.getLogger(PipelineServiceImpl.class);
 
     @Override
+    @Transactional
     public String createPipeline(Pipeline pipeline) {
-        //随机颜色
-        Random random ;
-        try {
-            random = SecureRandom.getInstanceStrong();
-        } catch (NoSuchAlgorithmException e) {
-            throw new ApplicationException(e);
-        }
-        pipeline.setColor((random.nextInt(5) + 1));
+
+        // 随机颜色
+        int randomNumber = (int)(Math.random() * 5) + 1;
+        pipeline.setColor(randomNumber);
+
         pipeline.setCreateTime(PipelineUtil.date(1));
         if (Objects.isNull(pipeline.getUser()) || StringUtils.isEmpty(pipeline.getUser().getId())){
             String loginId = LoginContext.getLoginId();
@@ -122,6 +125,7 @@ public class PipelineServiceImpl implements PipelineService {
         //创建流水线
         PipelineEntity pipelineEntity = BeanMapper.map(pipeline, PipelineEntity.class);
         pipelineEntity.setState(1);
+
         String pipelineId = pipelineDao.createPipeline(pipelineEntity);
         joinTemplate.joinQuery(pipeline);
         pipeline.setId(pipelineId);
@@ -131,12 +135,12 @@ public class PipelineServiceImpl implements PipelineService {
         String[] ints;
         switch (template) {
             case "2131" -> ints =
-                    new String[]{PipelineFinal.TASK_CODE_GIT, PipelineFinal.TASK_BUILD_MAVEN, PipelineFinal.TASK_DEPLOY_LINUX};
+                    new String[]{TASK_CODE_GIT, TASK_BUILD_MAVEN, TASK_DEPLOY_LINUX};
             case "112131" -> ints =
-                    new String[]{PipelineFinal.TASK_CODE_GIT, PipelineFinal.TASK_TEST_MAVENTEST,  PipelineFinal.TASK_BUILD_MAVEN, PipelineFinal.TASK_DEPLOY_LINUX};
+                    new String[]{TASK_CODE_GIT, TASK_TEST_MAVENTEST,  TASK_BUILD_MAVEN, TASK_DEPLOY_LINUX};
             case "2231" -> ints =
-                    new String[]{PipelineFinal.TASK_CODE_GIT,  PipelineFinal.TASK_TEST_MAVENTEST, PipelineFinal.TASK_DEPLOY_LINUX};
-            default -> ints = new String[]{PipelineFinal.TASK_CODE_GIT};
+                    new String[]{TASK_CODE_GIT,  TASK_TEST_MAVENTEST, TASK_DEPLOY_LINUX};
+            default -> ints = new String[]{TASK_CODE_GIT};
         }
         if (pipeline.getType() == 1) {
             tasksService.createTaskTemplate(pipelineId , ints);
@@ -156,7 +160,7 @@ public class PipelineServiceImpl implements PipelineService {
         messageDmNoticeService.initMessageDmNotice(messageNoticePatch);
 
         //动态与消息
-        Map<String,Object> map =homeService.initMap(pipeline);
+        Map<String,Object> map = homeService.initMap(pipeline);
         map.put("link",PipelineFinal.CREATE_LINK);
         map.put("pipelineName",pipeline.getName());
         homeService.log(PipelineFinal.LOG_TYPE_CREATE, map);
@@ -412,8 +416,6 @@ public class PipelineServiceImpl implements PipelineService {
             Date date = PipelineUtil.StringChengeDate(createTime);
             String dateTime = PipelineUtil.findDateTime(date, 3000);
             recently.setExecTime(dateTime);
-            // String formatted = PipelineUtil.formatDateTime(lastInstance.getRunTime());
-            // recently.setLastRunTime(formatted);
             recently.setColor(pipeline.getColor());
             recently.setInstanceId(lastInstance.getInstanceId());
             recently.setLastRunType(lastInstance.getRunWay());
@@ -427,7 +429,6 @@ public class PipelineServiceImpl implements PipelineService {
         Pipeline pipeline = findPipelineById(pipelineId);
 
         if (Objects.isNull(pipeline)){
-            logger.error("没有查询到当前流水线信息,pipelineId:{}",pipelineId);
             throw new ApplicationException("没有查询到当前流水线信息！");
         }
          String name = pipeline.getName() + "_copy";
@@ -452,7 +453,6 @@ public class PipelineServiceImpl implements PipelineService {
         Pipeline pipeline = findPipelineById(pipelineId);
 
         if (Objects.isNull(pipeline)){
-            logger.error("没有查询到当前流水线信息,pipelineId:{}",pipelineId);
             throw new ApplicationException("克隆失败，没有查询到当前流水线信息！");
         }
 
@@ -591,9 +591,6 @@ public class PipelineServiceImpl implements PipelineService {
             String dateTime = PipelineUtil.findDateTime(date, 1000);
             if (!Objects.isNull(dateTime)){
                 pipeline.setLastBuildTime(dateTime);
-                // pipeline.setBuildStatus(latelyHistory.getRunStatus());
-                // pipeline.setNumber(latelyHistory.getFindNumber());
-                // pipeline.setInstanceId(latelyHistory.getInstanceId());
             }
         }
         return pipeline;

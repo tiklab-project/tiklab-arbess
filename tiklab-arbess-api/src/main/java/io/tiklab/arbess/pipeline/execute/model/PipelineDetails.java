@@ -9,6 +9,10 @@ import io.tiklab.arbess.task.task.model.TaskExecMessage;
 
 import java.util.List;
 
+/**
+ * 流水线详情类
+ * 包含流水线的详细信息和相关配置
+ */
 public class PipelineDetails {
 
     // 应用数据保存地址

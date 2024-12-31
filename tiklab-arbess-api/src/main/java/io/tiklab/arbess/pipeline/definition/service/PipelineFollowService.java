@@ -36,7 +36,10 @@ public interface PipelineFollowService {
      */
     void deleteFollow(String followId);
 
-
+    /**
+     * 删除流水线相关的所有收藏
+     * @param pipelineId 流水线id
+     */
     void deletePipelineFollow(String pipelineId);
 
     /**
@@ -52,6 +55,11 @@ public interface PipelineFollowService {
      */
     List<PipelineFollow> findAllFollow();
 
+    /**
+     * 根据ID列表批量查询收藏信息
+     * @param idList 收藏ID列表
+     * @return 收藏信息列表
+     */
     List<PipelineFollow> findAllFollowList(List<String> idList);
     
 }

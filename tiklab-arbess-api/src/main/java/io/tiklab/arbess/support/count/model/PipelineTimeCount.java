@@ -1,13 +1,28 @@
 package io.tiklab.arbess.support.count.model;
 
+/**
+ * 流水线时间统计模型
+ */
 public class PipelineTimeCount {
 
+    /**
+     * 所有数量
+     */
     private Integer allNumber = 0;
 
+    /**
+     * 错误数量
+     */
     private Integer errNumber = 0;
 
+    /**
+     * 成功数量
+     */
     private Integer successNumber = 0;
 
+    /**
+     * 停止数量
+     */
     private Integer haltNumber = 0;
 
     public Integer getAllNumber() {

@@ -9,6 +9,8 @@ import io.tiklab.arbess.pipeline.definition.model.PipelineRecently;
 import io.tiklab.arbess.pipeline.definition.service.PipelineService;
 import io.tiklab.arbess.pipeline.definition.service.PipelineYamlService;
 import io.tiklab.user.user.model.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,6 +37,8 @@ import java.util.Map;
 @RestController
 @RequestMapping("/pipeline")
 public class PipelineController {
+
+    public Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
     PipelineService pipelineService;

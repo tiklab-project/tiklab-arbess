@@ -65,6 +65,11 @@ public interface TaskBuildService {
     @FindAll
     List<TaskBuild> findAllBuild();
 
+    /**
+     * 根据ID列表查询构建
+     * @param idList ID列表
+     * @return 构建列表
+     */
     @FindList
     List<TaskBuild> findAllBuildList(List<String> idList);
 }

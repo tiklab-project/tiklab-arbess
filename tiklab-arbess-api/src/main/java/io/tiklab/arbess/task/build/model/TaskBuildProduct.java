@@ -3,7 +3,9 @@ package io.tiklab.arbess.task.build.model;
 import io.tiklab.toolkit.beans.annotation.Mapper;
 import io.tiklab.toolkit.join.annotation.Join;
 
-
+/**
+ * 构建制品模型
+ */
 
 //@ApiModel
 @Join

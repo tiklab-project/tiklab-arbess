@@ -3,8 +3,14 @@ package io.tiklab.arbess.support.count.model;
 import io.tiklab.arbess.pipeline.definition.model.Pipeline;
 import io.tiklab.user.user.model.User;
 
+/**
+ * 流水线调查统计模型
+ */
 public class PipelineSurveyCount {
 
+    /**
+     * 流水线
+     */
     private Pipeline pipeline;
 
     // 负责人

@@ -2,22 +2,49 @@ package io.tiklab.arbess.task.code.model;
 
 import io.tiklab.core.BaseModel;
 
+/**
+ * 第三方仓库模型
+ */
 public class ThirdHouse extends BaseModel {
 
+    /**
+     * ID
+     */
     private String id;
 
+    /**
+     * 路径
+     */
     private String path;
 
+    /**
+     * 名称
+     */     
     private String name;
 
+    /**
+     * 路径
+     */
     private String pathWithSpace;
 
+    /**
+     * 名称
+     */
     private String nameWithSpace;
 
+    /**
+     * 仓库web地址
+     */
     private String houseWebUrl;
 
+    /**
+     * 仓库ssh地址
+     */
     private String houseSshUrl;
 
+    /**
+     * 默认分支
+     */
     private String defaultBranch;
 
     public String getId() {

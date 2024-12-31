@@ -1,13 +1,23 @@
 package io.tiklab.arbess.task.artifact.model;
 
+/**
+ * 仓库模型
+ */
 public class XpackRepository {
 
+    /**
+     * ID
+     */
     private String id;
 
-
+    /**
+     * 名称
+     */
     private String name;
 
-
+    /**
+     * 地址
+     */
     private String repositoryUrl;
 
     public String getRepositoryUrl() {

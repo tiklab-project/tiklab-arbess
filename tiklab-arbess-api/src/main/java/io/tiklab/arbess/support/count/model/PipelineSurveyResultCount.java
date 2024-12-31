@@ -1,5 +1,8 @@
 package io.tiklab.arbess.support.count.model;
 
+/**
+ * 流水线调查统计模型
+ */
 public class PipelineSurveyResultCount {
 
     // 成功数

@@ -3,6 +3,8 @@ package io.tiklab.arbess.setting.service;
 import io.tiklab.arbess.setting.model.AuthHostGroup;
 import io.tiklab.arbess.setting.model.AuthHostGroupQuery;
 import io.tiklab.arbess.setting.model.HostGroup;
+import io.tiklab.toolkit.join.annotation.FindAll;
+import io.tiklab.toolkit.join.annotation.FindOne;
 
 import java.util.List;
 
@@ -36,6 +38,7 @@ public interface AuthHostGroupService {
       * @param groupId groupId
       * @return hostGroup
       */
+     @FindOne
      AuthHostGroup findOneHostGroup(String groupId) ;
 
      /**
@@ -51,6 +54,7 @@ public interface AuthHostGroupService {
       * 查找主机组
       * @return hostGroup
       */
+     @FindAll
      List<AuthHostGroup> findAllHostGroup() ;
 
      /**

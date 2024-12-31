@@ -2,14 +2,29 @@ package io.tiklab.arbess.task.code.model;
 
 import io.tiklab.core.BaseModel;
 
+/**
+ * 第三方分支模型
+ */
 public class ThirdBranch extends BaseModel {
 
+    /**
+     * ID
+     */ 
     private String id;
 
+    /**
+     * 名称
+     */
     private String name;
 
+    /**
+     * 是否受保护
+     */
     private Boolean isProtected = false ;
 
+    /**
+     * 是否默认
+     */
     private Boolean isDefault;
 
     public ThirdBranch() {

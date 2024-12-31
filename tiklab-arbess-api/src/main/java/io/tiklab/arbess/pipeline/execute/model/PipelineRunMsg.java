@@ -3,22 +3,28 @@ package io.tiklab.arbess.pipeline.execute.model;
 import io.tiklab.arbess.support.agent.model.Agent;
 import io.tiklab.arbess.pipeline.definition.model.Pipeline;
 
+/**
+ * 流水线运行消息类
+ * 包含流水线运行所需的基本信息
+ */
 public class PipelineRunMsg {
 
+    // 流水线ID
     private String pipelineId;
 
-
+    // 用户ID
     private String userId;
 
-
+    // 运行方式
     private Integer runWay;
 
-
+    // 流水线信息
     private Pipeline pipeline;
 
     // 默认执行器
     private String agentId;
 
+    // 执行器信息
     private Agent agent;
 
     public Agent getAgent() {

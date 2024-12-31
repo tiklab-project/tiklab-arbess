@@ -1,25 +1,43 @@
 package io.tiklab.arbess.support.count.model;
 
+/**
+ * 流水线运行结果统计模型
+ */
 public class PipelineRunResultCount {
 
+    /**
+     * 日期
+     */
     private String day;
 
-    // 总数
+    /**
+     * 总数
+     */
     private Integer allNumber;
 
-    // 成功次数
+    /**
+     * 成功次数
+     */
     private double successNumber;
 
-    // 成功率
+    /**
+     * 成功率
+     */
     private String successRate;
 
-    // 失败次数
+    /**
+     * 失败次数
+     */
     private double errorNumber;
 
-    // 暂停次数
+    /**
+     * 暂停次数
+     */
     private double haltNumber;
 
-    // 执行时间
+    /**
+     * 执行时间
+     */
     private String execTime;
 
     public Integer getAllNumber() {

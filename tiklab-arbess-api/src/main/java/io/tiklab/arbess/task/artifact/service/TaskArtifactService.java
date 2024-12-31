@@ -67,6 +67,11 @@ public interface TaskArtifactService {
     List<TaskArtifact> findAllProduct();
 
 
+    /**
+     * 根据ID列表查询流水线推送制品
+     * @param idList ID列表
+     * @return 流水线推送制品列表
+     */
     @FindList
     List<TaskArtifact> findAllProductList(List<String> idList);
     

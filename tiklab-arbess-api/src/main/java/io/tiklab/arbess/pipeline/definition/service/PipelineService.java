@@ -49,6 +49,11 @@ public interface PipelineService {
     Pipeline findPipelineById(@NotNull String pipelineId);
 
 
+    /**
+     * 查询单个流水线(不进行关联查询)
+     * @param pipelineId 流水线id
+     * @return 流水线信息
+     */
     Pipeline findPipelineByIdNoQuery(String pipelineId);
 
     /**
@@ -73,6 +78,10 @@ public interface PipelineService {
     List<Pipeline> findAllPipeline();
 
 
+    /**
+     * 查询所有流水线(不进行关联查询)
+     * @return 流水线列表
+     */
     List<Pipeline> findAllPipelineNoQuery();
 
     @FindList
@@ -92,6 +101,11 @@ public interface PipelineService {
     Pagination<Pipeline> findUserPipelinePage(PipelineQuery query);
 
 
+    /**
+     * 根据查询条件获取流水线列表
+     * @param query 查询条件
+     * @return 流水线列表
+     */
     List<Pipeline> findPipelineList(PipelineQuery query);
 
 

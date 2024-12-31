@@ -18,10 +18,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.concurrent.ConcurrentLinkedDeque;
-import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 public class SocketServerHandler implements WebSocketHandler {
@@ -94,15 +91,40 @@ public class SocketServerHandler implements WebSocketHandler {
     public void sendHandleMessage(String id, AgentMessage agentMessage){
         WebSocketSession session = sessionMap.get(id);
         if (Objects.isNull(session) || !session.isOpen()) {
-            throw new SystemException("客户端推送消息失败，无法获取客户端连接,客户端信息："+id);
+            throw new SystemException("客户端推送消息失败，无法获取客户端连接, 客户端信息：" + id);
         }
-        // 接收到消息时的处理逻辑
+
+        // 将消息序列化为 JSON
         String jsonString = JSONObject.toJSONString(agentMessage);
-        logger.warn("向客户端推送消息：{}",agentMessage.getType());
+        logger.warn("向客户端推送消息：{}", agentMessage.getType());
+
         try {
-            session.sendMessage(new TextMessage(jsonString));
+            // 分块发送消息
+            sendPartialMessage(session, jsonString); // 每块大小 1024 字节
         } catch (IOException e) {
-            throw new SystemException("客户端推送消息失败,错误信息：" + e.getMessage());
+            throw new SystemException("客户端推送消息失败, 错误信息：" + e.getMessage());
+        }
+    }
+
+    public void sendPartialMessage(WebSocketSession session, String message) throws IOException {
+        int length = message.length();
+        int start = 0;
+
+        while (start < length) {
+            // 计算当前块的结束位置
+            int end = Math.min(start + 1024, length);
+
+            // 提取当前块
+            String chunk = message.substring(start, end);
+
+            // 判断是否是最后一块
+            boolean isLast = (end >= length);
+
+            // 发送当前块
+            session.sendMessage(new TextMessage(chunk, isLast));
+
+            // 更新起始位置
+            start = end;
         }
     }
 
@@ -127,7 +149,7 @@ public class SocketServerHandler implements WebSocketHandler {
 
     @Override
     public boolean supportsPartialMessages() {
-        return false;
+        return true;
     }
 
     /**

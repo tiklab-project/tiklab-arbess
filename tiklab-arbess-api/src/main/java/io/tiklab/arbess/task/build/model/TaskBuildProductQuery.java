@@ -1,7 +1,9 @@
 package io.tiklab.arbess.task.build.model;
 
 
-
+/**
+ * 构建制品查询模型
+ */
 public class TaskBuildProductQuery {
 
     //地址

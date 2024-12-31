@@ -2,19 +2,34 @@ package io.tiklab.arbess.task.code.model;
 
 import io.tiklab.core.BaseModel;
 
+/**
+ * 第三方查询模型
+ */
 public class ThirdQuery extends BaseModel {
 
+    /**
+     * 授权ID
+     */
     private String authId;
 
+    /**
+     * 仓库ID
+     */
     private String houseId;
 
-    // 查询条件
+    /**
+     * 查询条件
+     */
     private String query;
 
-    // 页数
+    /**
+     * 页数
+     */
     private Integer page = 1;
 
-    // 每页数量
+    /**
+     * 每页数量
+     */
     private Integer pageNumber = 50;
 
 

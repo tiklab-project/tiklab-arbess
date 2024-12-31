@@ -56,6 +56,11 @@ public interface PipelineOpenService {
     @FindAll
     List<PipelineOpen> findAllOpen();
 
+    /**
+     * 根据ID列表批量查询流水线打开信息
+     * @param idList 流水线ID列表
+     * @return 流水线打开信息列表
+     */
     @FindList
     List<PipelineOpen> findAllOpenList(List<String> idList);
 

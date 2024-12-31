@@ -50,17 +50,28 @@ public class TaskArtifact {
     //@ApiProperty(name="authId",desc="rule")
     private String rule;
 
+    /**
+     * 仓库ID
+     */
     @Mappings({
             @Mapping(source = "repository.id",target = "xpackId")
     })
     @JoinQuery(key = "xpackId")
     private XpackRepository repository;
 
-    //授权信息
+    /**
+     * 授权信息
+     */
     private Object auth;
 
+    /**
+     * 类型
+     */
     private String type;
 
+    /**
+     * 排序
+     */
     private int sort;
 
     private String instanceId;

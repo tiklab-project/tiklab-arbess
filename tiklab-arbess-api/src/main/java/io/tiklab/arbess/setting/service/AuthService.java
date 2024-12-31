@@ -50,11 +50,18 @@ public interface AuthService {
     @FindAll
     List<Auth> findAllAuth();
 
-
+    /**
+     * 根据ID列表批量查询流水线基本认证
+     * @param idList 流水线基本认证ID列表
+     * @return 流水线基本认证列表
+     */
     @FindList
     List<Auth> findAllAuthList(List<String> idList);
 
-
+    /**
+     * 查询流水线基本认证数量
+     * @return 流水线基本认证数量
+     */
     Integer findAuthNumber();
     
 }

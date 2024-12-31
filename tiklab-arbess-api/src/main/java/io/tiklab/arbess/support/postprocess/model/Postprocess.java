@@ -37,9 +37,14 @@ public class Postprocess {
     //@ApiProperty(name="task",desc="任务")
     private Tasks task;
 
+    /**
+     * 实例ID
+     */
     private String instanceId;
 
-    //@ApiProperty(name="taskSort",desc="任务")
+    /**
+     * 任务排序
+     */
     private int taskSort;
 
     public String getInstanceId() {

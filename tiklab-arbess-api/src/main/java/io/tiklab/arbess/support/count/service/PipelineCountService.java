@@ -5,6 +5,9 @@ import io.tiklab.arbess.support.count.model.*;
 
 import java.util.List;
 
+/**
+ * 流水线统计服务接口
+ */
 public interface PipelineCountService {
 
     /**

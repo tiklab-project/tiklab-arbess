@@ -1,8 +1,13 @@
 package io.tiklab.arbess.support.count.model;
 
+/**
+ * 流水线运行统计查询模型
+ */
 public class PipelineRunCountQuery {
 
-
+    /**
+     * 流水线ID
+     */
     private String pipelineId;
 
     // 查询时间

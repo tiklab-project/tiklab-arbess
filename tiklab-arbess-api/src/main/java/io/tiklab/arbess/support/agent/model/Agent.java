@@ -4,24 +4,51 @@ import io.tiklab.core.BaseModel;
 import io.tiklab.toolkit.beans.annotation.Mapper;
 import io.tiklab.toolkit.join.annotation.Join;
 
+/**
+ * 代理模型
+ */
 @Join
 @Mapper
 public class Agent extends BaseModel {
 
+    /**
+     * 代理ID
+     */
     private String id;
 
+    /**
+     * 代理名称
+     */
     private String name;
 
+    /**
+     * 代理IP
+     */
     private String ip;
 
+    /**
+     * 租户ID
+     */
     private String tenantId;
 
+    /**
+     * 代理地址
+     */
     private String address;
 
+    /**
+     * 业务类型
+     */
     private String businessType;
 
+    /**
+     * 创建时间
+     */
     private String createTime;
 
+    /**
+     * 是否连接
+     */
     private Boolean isConnect;
 
     public String getBusinessType() {

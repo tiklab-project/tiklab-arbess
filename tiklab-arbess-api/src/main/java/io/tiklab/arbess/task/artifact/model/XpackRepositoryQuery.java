@@ -6,6 +6,9 @@ import io.tiklab.core.page.Page;
 
 import java.util.List;
 
+/**
+ * 仓库查询模型
+ */
 public class XpackRepositoryQuery {
 
     // @ApiProperty(name = "orderParams", desc = "排序参数")

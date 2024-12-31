@@ -49,6 +49,9 @@ public class TriggerTime {
     //@ApiProperty(name="name",desc="名称")
     private String name;
 
+    /**
+     * 状态
+     */
     private String state;
 
     public String getState() {

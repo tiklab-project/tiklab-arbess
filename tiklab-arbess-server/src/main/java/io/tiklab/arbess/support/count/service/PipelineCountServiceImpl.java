@@ -438,8 +438,13 @@ public class PipelineCountServiceImpl implements PipelineCountService {
                 rateList.add(pipelineDayRateCount);
             }
         }
-        rateList.sort(Comparator.comparing(PipelineDayRateCount::getAllNumber).reversed());
-        return rateList;
+        return rateList.stream()
+                .filter(a -> !Objects.isNull(a.getPipeline()))
+                .sorted(Comparator.comparing(PipelineDayRateCount::getAllNumber).reversed())
+                .toList();
+
+        // rateList.sort(Comparator.comparing(PipelineDayRateCount::getAllNumber).reversed());
+        // return rateList;
     }
 
     @Override

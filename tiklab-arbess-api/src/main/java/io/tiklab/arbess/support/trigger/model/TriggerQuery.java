@@ -19,9 +19,14 @@ public class TriggerQuery {
     //@ApiProperty(name = "taskType",desc="类型 81:定时任务")
     private int taskType;
 
+    /**
+     * 流水线ID
+     */
     private String pipelineId;
 
-    // 状态 1--未执行 2--已执行
+    /**
+     * 状态 1--未执行 2--已执行
+     */
     private String state;
 
 

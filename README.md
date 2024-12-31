@@ -284,7 +284,7 @@ Gitee： https://gitee.com/tiklab-project/tiklab-arbess
 
 GitHub： https://github.com/tiklab-project/tiklab-arbess
 
-## 安装
+## 安装使用
 
 ### 系统要求
 - Java 16+
@@ -300,7 +300,7 @@ cd tiklab-arbess
 
 **配置MAVEN仓库**
 
-配置maven的setrings.xml文件的远程仓库为一下内容
+配置maven的setrings.xml文件的远程仓库为以下内容
 
 ```
 <mirror>
