@@ -15,7 +15,7 @@ public class ScmEntity {
 
     //1.git 2.svn 21.node 22.maven
     @Column(name = "scm_type")
-    private int scmType;
+    private String scmType;
 
     @Column(name = "create_time")
     private String createTime;
@@ -36,11 +36,11 @@ public class ScmEntity {
         this.scmId = scmId;
     }
 
-    public int getScmType() {
+    public String getScmType() {
         return scmType;
     }
 
-    public void setScmType(int scmType) {
+    public void setScmType(String scmType) {
         this.scmType = scmType;
     }
 

@@ -124,7 +124,8 @@ public class TaskTestServiceImpl implements TaskTestService {
     //查询单个
     @Override
     public TaskTest findOneTest(String testId) {
-        return BeanMapper.map(taskTestDao.findOneTest(testId), TaskTest.class);
+        TaskTestEntity oneTest = taskTestDao.findOneTest(testId);
+        return BeanMapper.map(oneTest, TaskTest.class);
     }
 
     //查询所有

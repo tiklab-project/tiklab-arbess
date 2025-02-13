@@ -1,10 +1,5 @@
 app:
-  name: tiklab-arbess
-  version: ee
-
-APP_HOME: ${APP_HOME}
-
-application: arbess
+  name: arbess
 
 spring:
   main:
@@ -12,49 +7,26 @@ spring:
   freemarker:
     checkTemplateLocation: false
 
-arbess:
-  setting:
-    address: /Users/zcamy/Java/tiklab-arbess-agent/tiklab-arbess-agent-starter/src/main/resources/settings.xml
-  spotbugs:
-    address: /Users/zcamy/Java/tiklab-arbess-agent/tiklab-arbess-agent-starter/embbed/spotbugs-4.8.1/bin/spotbugs
-  jdk:
-    address: /Users/zcamy/apply/jdk-17.0.9.jdk/Contents/Home
-
 
 server:
   port: 8090
 
+APP_HOME: ${APP_HOME}
+
+DATA_HOME: ${user.home}/tiklab/tiklab-arbess
+
+
 jdbc:
   driverClassName: org.postgresql.Driver
   url: jdbc:postgresql://172.10.1.10:5432/tiklab_matflow?stringtype=unspecified
-#  url: jdbc:postgresql://172.13.1.22:5432/matflow_ee?stringtype=unspecified
-#  url: jdbc:postgresql://localhost:9201/tiklab_matflow?stringtype=unspecified
   username: postgres
   password: darth2020
 
-#plugin config
-DATA_HOME: ${user.home}/tiklab/run_cache/matflow/
-
-plugin:
-  path: ${DATA_HOME}/plugin
-
-ws:
-  name: local
-  server:
-    enabled: true
-  enterprise: default
-  url : 127.0.0.1:8090
-
-#dfs config
-dfs:
-  server:
-    enabled: false
-    mode: server
-    port: 4000
-    datapath: ${DATA_HOME}/files
-  client:
-    url: 127.0.0.1:4000
-    bucket: ${app.name}
+postgresql:
+  embbed:
+    enable: false
+  database: tiklab-arbess
+  type: local
 
 #dcs config
 dcs:
@@ -68,71 +40,34 @@ dcs:
     database: dcs1
     expire: 7200
 
-#dcs config
-dss:
-  server:
-    enabled: false
-    mode: server
-    port: 6000
-    datapath: ${DATA_HOME}/index
-  client:
-    url: 127.0.0.1:6000
-    bucket: ${app.name}
-
-datapath: ${DATA_HOME}/caches
-
-#message:
-#  sms:
-#    enabled: true
-
 soular:
   embbed:
     enable: true
 #    enable: false
 #  address: http://192.168.10.15:8080
-#  address: http://e.tiklab.net
 #  web:
 #    address: http://192.168.10.16:3010
 
 
 backups:
-#  pgsql:
-#    dir:
-  dir: ${user.home}/tiklab/run_cache/data/matflow
+  dir: ${DATA_HOME}/backups
   time: 0 0 2 * * ?
   type: local
 
-postgresql:
-  embbed:
-    enable: false
-  database: matflow_ee
-  type: local
+ws:
+  name: local
+  server:
+    enabled: true
+  enterprise: default
+  url : 127.0.0.1:8090
 
-
-#postgresql:
-#  embbed:
-#    enable: true
-#  database: tiklab_matflow
-#  db:
-#    port: 9201
-#    username: postgres
-#    password: darth2020
-#    address: ${DATA_HOME}/postgresql
 
 base:
-  url: http://192.168.10.13:3000
-
-#homes
-homes:
-  address: https://homes.tiklab.net
+  url: http://localhost:8090
 
 #license
 licences:
-  path: ${APP_HOME}/licences
-
-#file
-file:
-  path: http://file.dev.tiklab.net
+  path: ${DATA_HOME}/licences
 
 
 

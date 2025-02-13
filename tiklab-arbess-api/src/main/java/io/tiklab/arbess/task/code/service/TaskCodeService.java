@@ -51,6 +51,9 @@ public interface TaskCodeService {
      */
      void updateCode(TaskCode taskCode);
 
+
+    void updateOneCode(TaskCode taskCode);
+
     /**
      * 查询单个信息
      * @param codeId codeId

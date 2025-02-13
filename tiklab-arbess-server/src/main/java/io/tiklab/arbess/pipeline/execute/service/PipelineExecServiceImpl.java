@@ -218,9 +218,9 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
             pipelineDetails.setSourceDir(sourceDir);
             pipelineDetails.setLogDir(logDir);
 
-            // 环境
-            List<Scm> scmList = scmService.findAllPipelineScm();
-            pipelineDetails.setScmList(scmList);
+            // // 环境
+            // List<Scm> scmList = scmService.findAllPipelineScm();
+            // pipelineDetails.setScmList(scmList);
 
             // 变量
             List<Variable> variableList = variableService.findAllVariable(pipelineId);
@@ -241,7 +241,7 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
             }
 
             try {
-                logger.warn("发送流水线执行信息到客户端......");
+                logger.info("发送流水线执行信息到客户端......");
                 SocketServerHandler.instance().sendHandleMessage(id,agentMessage);
             } catch (Exception e) {
                 throw new SystemException("客户端推送消息失败,错误信息：" + e.getMessage());
@@ -305,6 +305,7 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
             pipelineInstanceService.updateInstance(pipelineInstance);
         }
         removeExecCache(pipelineId);
+
     }
 
     public void removeExecCache(String pipelineId){

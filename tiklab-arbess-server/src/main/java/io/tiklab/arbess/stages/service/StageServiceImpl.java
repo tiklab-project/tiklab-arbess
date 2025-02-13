@@ -111,7 +111,7 @@ public class StageServiceImpl implements StageService {
             tasks.setStageId(stagesId);
             return tasksService.createTasksOrTask(tasks);
         }
-        throw new ApplicationException(50001,"未知的操作类型");
+        throw new ApplicationException(58001,"未知的操作类型");
     }
 
     @Override
@@ -158,7 +158,7 @@ public class StageServiceImpl implements StageService {
         }
         for (Stage stage : allStage) {
             if (stage.isCode()){
-                throw new ApplicationException(50001,"代码源已存在，无法再次创建。");
+                throw new ApplicationException(58001,"代码源已存在，无法再次创建。");
             }
         }
     }
@@ -367,15 +367,13 @@ public class StageServiceImpl implements StageService {
         if (allStage.isEmpty()){
             return null;
         }
+        // 查询所以任务
         List<Tasks> tasksList = new ArrayList<>();
         for (Stage stage : allStage) {
             String stagesId = stage.getStageId();
             List<Stage> otherStage = findOtherStage(stagesId);
 
             for (Stage pipelineStage : otherStage) {
-                String id = pipelineStage.getStageId();
-                //获取任务详情
-                // List<Tasks> stagetaskList = tasksService.finStageTaskOrTaskNoAuth(id) ;
                 List<Tasks> stagetaskList = pipelineStage.getTaskValues();
                 tasksList.addAll(stagetaskList);
             }

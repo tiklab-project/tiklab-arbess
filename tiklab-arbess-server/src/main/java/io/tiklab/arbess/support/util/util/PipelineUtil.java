@@ -1,6 +1,7 @@
 package io.tiklab.arbess.support.util.util;
 
 import io.tiklab.core.exception.ApplicationException;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -366,6 +367,36 @@ public class PipelineUtil {
                 }
             }
         }
+    }
+
+
+    /**
+     * 效验字段是否为空
+     * @param args 字段
+     * @return true:不为空 false:空
+     */
+    public static Boolean validNoNullFiled(Object... args){
+        if (Objects.isNull(args)){
+            return true;
+        }
+
+        List<Object> list = Arrays.stream(args).toList();
+        for (Object object : list) {
+            if (object instanceof String){
+                if (StringUtils.isEmpty((String)object)){
+                    return false;
+                }
+            } else if (object instanceof Integer){
+                if ((Integer) object == 0){
+                    return false;
+                }
+            } else {
+                if (Objects.isNull(object)){
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
 

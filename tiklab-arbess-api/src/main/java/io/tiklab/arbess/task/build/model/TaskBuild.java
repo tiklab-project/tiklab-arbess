@@ -1,8 +1,12 @@
 package io.tiklab.arbess.task.build.model;
 
 
+import io.tiklab.arbess.setting.model.Scm;
 import io.tiklab.toolkit.beans.annotation.Mapper;
+import io.tiklab.toolkit.beans.annotation.Mapping;
+import io.tiklab.toolkit.beans.annotation.Mappings;
 import io.tiklab.toolkit.join.annotation.Join;
+import io.tiklab.toolkit.join.annotation.JoinQuery;
 
 
 /**
@@ -47,6 +51,51 @@ public class TaskBuild {
     private String type;
 
     private String instanceId;
+
+    // jdk版本
+    @Mappings({
+            @Mapping(source = "toolJdk.scmId",target = "toolJdk")
+    })
+    @JoinQuery(key = "scmId")
+    private Scm toolJdk;
+
+    // maven版本
+    @Mappings({
+            @Mapping(source = "toolMaven.scmId",target = "toolMaven")
+    })
+    @JoinQuery(key = "scmId")
+    private Scm toolMaven;
+
+    // npm版本
+    @Mappings({
+            @Mapping(source = "toolNodejs.scmId",target = "toolNodejs")
+    })
+    @JoinQuery(key = "scmId")
+    private Scm toolNodejs;
+
+    public Scm getToolJdk() {
+        return toolJdk;
+    }
+
+    public void setToolJdk(Scm toolJdk) {
+        this.toolJdk = toolJdk;
+    }
+
+    public Scm getToolMaven() {
+        return toolMaven;
+    }
+
+    public void setToolMaven(Scm toolMaven) {
+        this.toolMaven = toolMaven;
+    }
+
+    public Scm getToolNodejs() {
+        return toolNodejs;
+    }
+
+    public void setToolNodejs(Scm toolNodejs) {
+        this.toolNodejs = toolNodejs;
+    }
 
     public String getInstanceId() {
         return instanceId;

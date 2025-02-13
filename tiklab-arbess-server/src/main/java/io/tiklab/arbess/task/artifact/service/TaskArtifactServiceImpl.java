@@ -14,6 +14,7 @@ import io.tiklab.toolkit.beans.BeanMapper;
 import io.tiklab.arbess.task.artifact.dao.TaskArtifactDao;
 import io.tiklab.arbess.task.artifact.entity.TaskArtifactEntity;
 import io.tiklab.rpc.annotation.Exporter;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -130,12 +131,39 @@ public class TaskArtifactServiceImpl implements TaskArtifactService {
                 if (!PipelineUtil.isNoNull(artifact.getGroupId())){
                     return false;
                 }
+                if (Objects.isNull(artifact.getToolJdk())){
+                    return false;
+                }
+                if (Objects.isNull(artifact.getToolMaven())){
+                    return false;
+                }
+                if (StringUtils.isEmpty(artifact.getFileAddress())){
+                    return false;
+                }
             }
             if (artifactType.equals(TASK_ARTIFACT_XPACK)){
                 if (!PipelineUtil.isNoNull(artifact.getAuthId())){
                     return false;
                 }
-                if (!PipelineUtil.isNoNull(artifact.getRepository().getName())){
+                if (Objects.isNull(artifact.getRepository())){
+                    return false;
+                }
+                if (Objects.isNull(artifact.getToolJdk())){
+                    return false;
+                }
+                if (Objects.isNull(artifact.getToolMaven())){
+                    return false;
+                }
+                if (StringUtils.isEmpty(artifact.getGroupId())){
+                    return false;
+                }
+                if (StringUtils.isEmpty(artifact.getArtifactId())){
+                    return false;
+                }
+                if (StringUtils.isEmpty(artifact.getVersion())){
+                    return false;
+                }
+                if (StringUtils.isEmpty(artifact.getFileAddress())){
                     return false;
                 }
             }

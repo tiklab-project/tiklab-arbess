@@ -1,8 +1,12 @@
 package io.tiklab.arbess.task.code.model;
 
 
+import io.tiklab.arbess.setting.model.Scm;
 import io.tiklab.toolkit.beans.annotation.Mapper;
+import io.tiklab.toolkit.beans.annotation.Mapping;
+import io.tiklab.toolkit.beans.annotation.Mappings;
 import io.tiklab.toolkit.join.annotation.Join;
+import io.tiklab.toolkit.join.annotation.JoinQuery;
 
 
 /**
@@ -49,6 +53,37 @@ public class TaskCode {
     private String type;
 
     private String instanceId;
+
+    // jdk版本
+    @Mappings({
+            @Mapping(source = "toolGit.scmId",target = "toolGit")
+    })
+    @JoinQuery(key = "scmId")
+    private Scm toolGit;
+
+    // maven版本
+    @Mappings({
+            @Mapping(source = "toolSvn.scmId",target = "toolSvn")
+    })
+    @JoinQuery(key = "scmId")
+    private Scm toolSvn;
+
+
+    public Scm getToolGit() {
+        return toolGit;
+    }
+
+    public void setToolGit(Scm toolGit) {
+        this.toolGit = toolGit;
+    }
+
+    public Scm getToolSvn() {
+        return toolSvn;
+    }
+
+    public void setToolSvn(Scm toolSvn) {
+        this.toolSvn = toolSvn;
+    }
 
     public String getInstanceId() {
         return instanceId;

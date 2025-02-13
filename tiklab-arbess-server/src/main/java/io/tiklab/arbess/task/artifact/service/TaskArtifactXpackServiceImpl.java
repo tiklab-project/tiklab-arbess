@@ -31,6 +31,7 @@ public class TaskArtifactXpackServiceImpl implements TaskArtifactXpackService {
     PipelineRequestUtil requestUtil;
 
 
+    @Override
     public List<XpackRepository> findAllRepository(String authId){
         AuthThird authServer = authThirdService.findOneAuthServer(authId);
 
@@ -50,7 +51,7 @@ public class TaskArtifactXpackServiceImpl implements TaskArtifactXpackService {
             String message = throwable.getMessage();
             logger.error(message);
             if (message.contains("未订阅")){
-                throw new ApplicationException("当前企业为订阅Xpack");
+                throw new ApplicationException("当前企业未订阅GitPuk!");
             }
             if (throwable instanceof ApplicationException){
                 throw new ApplicationException(message);
@@ -80,7 +81,7 @@ public class TaskArtifactXpackServiceImpl implements TaskArtifactXpackService {
                 throw new ApplicationException(message);
             }
             if (message.contains("未订阅")){
-                throw new ApplicationException("当前企业为订阅Xpack");
+                throw new ApplicationException("当前企业未订阅GitPuk!");
             }
             throw new ApplicationException("无法连接到："+serverAddress);
         }

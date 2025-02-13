@@ -1,71 +1,42 @@
 app:
-  name: tiklab-matflow
+  name: arbess
 
 APP_HOME: ${APP_HOME}
-application: matflow
 
 server:
   port: 8080
 
-jdbc:
-  driverClassName: org.postgresql.Driver
-  url: jdbc:postgresql://localhost:5432/tiklab_matflow?stringtype=unspecified
-  username: postgres
-  password: darth2020
-
-#plugin config
-DATA_HOME: /opt/tiklab/matflow
-
-plugin:
-  path: ${DATA_HOME}/plugin
-
-#dfs config
-dfs:
-  server:
-    enabled: false
-    mode: server
-    port: 4000
-    datapath: ${DATA_HOME}/files
-  client:
-    url: 127.0.0.1:4000
-    bucket: ${app.name}
-
-#dcs config
-dcs:
-  server:
-    enabled: true
-    #    enabled: false
-    port: 5020
-    datapath: ${DATA_HOME}/caches
-  client:
-    url: 127.0.0.1:5020
-    #    url: 127.0.0.1:5035
-    group: g1
-    database: dcs1
-    expire: 7200
-
-#dcs config
-dss:
-  server:
-    enabled: false
-    mode: server
-    port: 6000
-    datapath: ${DATA_HOME}/index
-  client:
-    url: 127.0.0.1:6000
-    bucket: ${app.name}
-
 postgresql:
   embbed:
     enable: true
-  database: tiklab_matflow
+  database: arbess
   db:
     port: 5432
     username: postgres
     password: darth2020
     address: ${DATA_HOME}/postgresql
 
-datapath: ${DATA_HOME}/caches
+
+jdbc:
+  driverClassName: org.postgresql.Driver
+  url: jdbc:postgresql://localhost:5432/arbess?stringtype=unspecified
+  username: postgres
+  password: darth2020
+
+#plugin config
+DATA_HOME: /opt/tiklab/arbess
+
+#dcs config
+dcs:
+  server:
+    enabled: true
+    port: 5020
+    datapath: ${DATA_HOME}/caches
+  client:
+    url: 127.0.0.1:5020
+    group: g1
+    database: dcs1
+    expire: 7200
 
 soular:
   embbed:
@@ -80,18 +51,9 @@ backups:
 base:
   url: http://matflow-ce.test.tiklab.net
 
-#homes
-homes:
-  address: https://tiklab.net
-
 #license
 licences:
   path: ${APP_HOME}/licences
-
-#file
-file:
-  path: http://file.tiklab.net
-
 
 
 

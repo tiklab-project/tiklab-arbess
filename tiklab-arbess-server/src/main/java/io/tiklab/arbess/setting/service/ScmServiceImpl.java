@@ -1,6 +1,9 @@
 package io.tiklab.arbess.setting.service;
 
 
+import io.tiklab.arbess.setting.model.ScmQuery;
+import io.tiklab.core.page.Pagination;
+import io.tiklab.core.page.PaginationBuilder;
 import io.tiklab.toolkit.beans.BeanMapper;
 import io.tiklab.arbess.setting.dao.ScmDao;
 import io.tiklab.arbess.setting.entity.ScmEntity;
@@ -8,8 +11,10 @@ import io.tiklab.arbess.setting.model.Scm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class ScmServiceImpl implements ScmService {
@@ -51,39 +56,36 @@ public class ScmServiceImpl implements ScmService {
     //查询所有
     @Override
     public List<Scm> findAllPipelineScm() {
-        List<ScmEntity> scmEntityList = scmDao.selectAllPipelineScm();
+        List<ScmEntity> scmEntityList = scmDao.findAllPipelineScm();
         scmEntityList.sort(Comparator.comparing(ScmEntity::getCreateTime));
         return BeanMapper.mapList(scmEntityList, Scm.class);
     }
 
-    /**
-     * 获取配置
-     * @param type 类型
-     * @return 配置信息
-     */
     @Override
-    public Scm findOnePipelineScm(int type) {
-        List<Scm> allScm = findAllPipelineScm();
-        if (allScm == null){
-            return null;
-        }
-
-        for (Scm scm : allScm) {
-            if (type == 2 || type == 3){
-                type = 1;
-            }
-            if (type != scm.getScmType()){
-                continue;
-            }
-            return scm;
-        }
-        return null;
-    }
-    
-    @Override
-    public List<Scm> selectPipelineScmList(List<String> idList) {
-        List<ScmEntity> scmEntityList = scmDao.selectAllPipelineScmList(idList);
+    public List<Scm> findPipelineScmList(List<String> idList) {
+        List<ScmEntity> scmEntityList = scmDao.findPipelineScmList(idList);
         return BeanMapper.mapList(scmEntityList, Scm.class);
+    }
+
+    @Override
+    public List<Scm> findPipelineScmList(ScmQuery scmQuery) {
+        List<ScmEntity> scmEntityList = scmDao.findPipelineScmList(scmQuery);
+        if (Objects.isNull(scmEntityList) || scmEntityList.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return BeanMapper.mapList(scmEntityList, Scm.class);
+    }
+
+
+    @Override
+    public Pagination<Scm> findPipelineScmPage(ScmQuery scmQuery) {
+        Pagination<ScmEntity> scmEntityPage = scmDao.findPipelineScmPage(scmQuery);
+        List<ScmEntity> scmEntityList = scmEntityPage.getDataList();
+        if (Objects.isNull(scmEntityList) || scmEntityList.isEmpty()) {
+            return PaginationBuilder.build(scmEntityPage, Collections.emptyList());
+        }
+        List<Scm> scmList = BeanMapper.mapList(scmEntityList, Scm.class);
+        return PaginationBuilder.build(scmEntityPage, scmList);
     }
 
     @Override

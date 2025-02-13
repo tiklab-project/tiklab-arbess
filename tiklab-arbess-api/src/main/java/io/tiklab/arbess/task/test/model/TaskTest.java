@@ -1,6 +1,7 @@
 package io.tiklab.arbess.task.test.model;
 
 
+import io.tiklab.arbess.setting.model.Scm;
 import io.tiklab.toolkit.beans.annotation.Mapper;
 import io.tiklab.toolkit.beans.annotation.Mapping;
 import io.tiklab.toolkit.beans.annotation.Mappings;
@@ -69,6 +70,37 @@ public class TaskTest {
     private int sort;
 
     private String instanceId;
+
+    // jdk版本
+    @Mappings({
+            @Mapping(source = "toolJdk.scmId",target = "toolJdk")
+    })
+    @JoinQuery(key = "scmId")
+    private Scm toolJdk;
+
+    // maven版本
+    @Mappings({
+            @Mapping(source = "toolMaven.scmId",target = "toolMaven")
+    })
+    @JoinQuery(key = "scmId")
+    private Scm toolMaven;
+
+
+    public Scm getToolJdk() {
+        return toolJdk;
+    }
+
+    public void setToolJdk(Scm toolJdk) {
+        this.toolJdk = toolJdk;
+    }
+
+    public Scm getToolMaven() {
+        return toolMaven;
+    }
+
+    public void setToolMaven(Scm toolMaven) {
+        this.toolMaven = toolMaven;
+    }
 
     public String getInstanceId() {
         return instanceId;

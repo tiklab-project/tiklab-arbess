@@ -1,8 +1,10 @@
 package io.tiklab.arbess.setting.controller;
 
+import io.tiklab.arbess.setting.model.ScmQuery;
 import io.tiklab.core.Result;
 import io.tiklab.arbess.setting.model.Scm;
 import io.tiklab.arbess.setting.service.ScmService;
+import io.tiklab.core.page.Pagination;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -85,6 +87,18 @@ public class ScmController {
     @RequestMapping(path="/findAllPipelineScm",method = RequestMethod.POST)
     public Result<List<Scm>> findAllPipelineScm() {
         List<Scm> allScm = scmService.findAllPipelineScm();
+        return Result.ok(allScm);
+    }
+
+    @RequestMapping(path="/findPipelineScmList",method = RequestMethod.POST)
+    public Result<List<Scm>> findPipelineScmList(@RequestBody @Valid @NotNull ScmQuery scmQuery) {
+        List<Scm> allScm = scmService.findPipelineScmList(scmQuery);
+        return Result.ok(allScm);
+    }
+
+    @RequestMapping(path="/findPipelineScmPage",method = RequestMethod.POST)
+    public Result<Pagination<Scm>> findPipelineScmPage(@RequestBody @Valid @NotNull ScmQuery scmQuery) {
+        Pagination<Scm> allScm = scmService.findPipelineScmPage(scmQuery);
         return Result.ok(allScm);
     }
 

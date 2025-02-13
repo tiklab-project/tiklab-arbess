@@ -1,11 +1,18 @@
 package io.tiklab.arbess.setting.service;
 
 import io.tiklab.arbess.setting.model.Scm;
+import io.tiklab.arbess.setting.model.ScmQuery;
+import io.tiklab.core.page.Pagination;
+import io.tiklab.toolkit.join.annotation.FindAll;
+import io.tiklab.toolkit.join.annotation.FindList;
+import io.tiklab.toolkit.join.annotation.FindOne;
+import io.tiklab.toolkit.join.annotation.JoinProvider;
 
 import java.util.List;
 /**
  * 流水线环境配置服务接口
  */
+@JoinProvider(model = Scm.class)
 public interface ScmService {
 
     /**
@@ -32,27 +39,28 @@ public interface ScmService {
      * @param scmId 环境配置id
      * @return 环境配置模型
      */
+    @FindOne
     Scm findOnePipelineScm(String scmId);
 
     /**
      * 查询所有环境配置
      * @return 环境配置模型列表
      */
+    @FindAll
     List<Scm> findAllPipelineScm();
-
-    /**
-     * 根据获取配置
-     * @param type 类型
-     * @return 配置信息
-     */
-    Scm findOnePipelineScm(int type);
 
     /**
      * 根据ID列表批量查询环境配置
      * @param idList 环境配置ID列表
      * @return 环境配置列表
      */
-    List<Scm> selectPipelineScmList(List<String> idList);
+    @FindList
+    List<Scm> findPipelineScmList(List<String> idList);
+
+
+    List<Scm> findPipelineScmList(ScmQuery scmQuery);
+
+    Pagination<Scm> findPipelineScmPage(ScmQuery scmQuery);
 
     /**
      * 查询环境配置数量

@@ -78,7 +78,7 @@ public class TaskCodeGittokServiceImpl implements TaskCodeGittokService {
             String message = throwable.getMessage();
             logger.error(" 连接异常：{}", message);
             if (message.contains("timed out") ){
-                throw new ApplicationException(50001,"请求超时！");
+                throw new ApplicationException(58001,"请求超时！");
             }
             if (message.contains("未订阅")){
                 throw new ApplicationException("当前企业未订阅gittok");

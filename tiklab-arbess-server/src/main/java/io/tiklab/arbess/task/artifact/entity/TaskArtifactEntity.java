@@ -43,6 +43,42 @@ public class TaskArtifactEntity {
     @Column(name = "docker_image",notNull = true)
     private String dockerImage;
 
+    // jdk版本
+    @Column(name = "tool_jdk" ,notNull = true)
+    private String toolJdk;
+
+    // maven版本
+    @Column(name = "tool_maven" ,notNull = true)
+    private String toolMaven;
+
+    // npm版本
+    @Column(name = "tool_nodejs" ,notNull = true)
+    private String toolNodejs;
+
+    public String getToolJdk() {
+        return toolJdk;
+    }
+
+    public void setToolJdk(String toolJdk) {
+        this.toolJdk = toolJdk;
+    }
+
+    public String getToolMaven() {
+        return toolMaven;
+    }
+
+    public void setToolMaven(String toolMaven) {
+        this.toolMaven = toolMaven;
+    }
+
+    public String getToolNodejs() {
+        return toolNodejs;
+    }
+
+    public void setToolNodejs(String toolNodejs) {
+        this.toolNodejs = toolNodejs;
+    }
+
     public String getDockerImage() {
         return dockerImage;
     }

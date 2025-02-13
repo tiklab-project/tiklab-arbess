@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import io.tiklab.arbess.setting.model.AuthThird;
 import io.tiklab.arbess.setting.model.HostGroup;
+import io.tiklab.arbess.setting.model.Scm;
 import io.tiklab.arbess.setting.service.*;
 import io.tiklab.arbess.support.condition.service.ConditionService;
 import io.tiklab.arbess.support.util.util.PipelineUtil;
@@ -41,6 +42,8 @@ import io.tiklab.core.exception.ApplicationException;
 import io.tiklab.arbess.support.postprocess.dao.PostprocessDao;
 import io.tiklab.arbess.task.task.entity.TasksEntity;
 import io.tiklab.rpc.annotation.Exporter;
+import io.tiklab.toolkit.join.JoinTemplate;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -120,6 +123,12 @@ public class TasksServiceImpl implements TasksService {
 
     @Autowired
     TaskArtifactXpackService taskArtifactXpackService;
+
+    @Autowired
+    ScmService scmService;
+
+    @Autowired
+    JoinTemplate joinTemplate;
 
 
     private static final Logger logger = LoggerFactory.getLogger(TasksServiceImpl.class);
@@ -229,7 +238,7 @@ public class TasksServiceImpl implements TasksService {
         for (Tasks task : tasks) {
             String taskType = task.getTaskType();
             if (findTaskType(taskType).equals(TASK_TYPE_CODE)){
-                throw new ApplicationException(50001,"代码源已存在");
+                throw new ApplicationException(58001,"代码源已存在");
             }
         }
     }
@@ -349,6 +358,7 @@ public class TasksServiceImpl implements TasksService {
             String jsonString = JSONObject.toJSONString(task.getTask());
             String taskType = task.getTaskType();
             String taskId = task.getTaskId();
+
             switch (findTaskType(taskType)) {
                 case TASK_TYPE_CODE -> {
                     TaskCode taskCode = JSONObject.parseObject(jsonString, TaskCode.class);
@@ -404,7 +414,8 @@ public class TasksServiceImpl implements TasksService {
                     object = taskCode;
                 }
                 case TASK_TYPE_TEST -> {
-                    TaskTest taskTest = testService.findOneTest(taskId);
+                    // TaskTest taskTest = testService.findOneTest(taskId);
+                    TaskTest taskTest = JSONObject.parseObject(jsonString, TaskTest.class);
                     String authId = taskTest.getAuthId();
                     if (taskType.equals(TASK_TEST_TESTON)){
                         Object auth = authServerServer.findOneAuthServer(authId);
@@ -413,7 +424,8 @@ public class TasksServiceImpl implements TasksService {
                     object = taskTest;
                 }
                 case TASK_TYPE_BUILD -> {
-                    object = buildService.findOneBuild(taskId);
+                    // object = buildService.findOneBuild(taskId);
+                    object = JSONObject.parseObject(jsonString, TaskBuild.class);
                 }
                 case TASK_TYPE_DEPLOY -> {
                     TaskDeploy taskDeploy = deployService.findOneDeploy(taskId);
@@ -438,7 +450,8 @@ public class TasksServiceImpl implements TasksService {
                     object = taskDeploy;
                 }
                 case TASK_TYPE_CODESCAN -> {
-                    TaskCodeScan codeScan = codeScanService.findCodeScanByAuth(taskId);
+                    // TaskCodeScan codeScan = codeScanService.findCodeScanByAuth(taskId);
+                    TaskCodeScan codeScan = JSONObject.parseObject(jsonString, TaskCodeScan.class);
                     String authId = codeScan.getAuthId();
                     if (!Objects.isNull(authId)){
                         Object auth = authHostService.findOneAuthHost(authId);
@@ -447,7 +460,8 @@ public class TasksServiceImpl implements TasksService {
                     object = codeScanService.findCodeScanByAuth(taskId);
                 }
                 case TASK_TYPE_ARTIFACT -> {
-                    TaskArtifact taskArtifact = artifactService.findOneProduct(taskId);
+                    // TaskArtifact taskArtifact = artifactService.findOneProduct(taskId);
+                    TaskArtifact taskArtifact = JSONObject.parseObject(jsonString, TaskArtifact.class);
                     String authId = taskArtifact.getAuthId();
                     String artifactType = taskArtifact.getArtifactType();
                     if (!Objects.isNull(authId)){
@@ -471,7 +485,8 @@ public class TasksServiceImpl implements TasksService {
                     object = taskArtifact;
                 }
                 case TASK_TYPE_PULL -> {
-                    TaskPullArtifact taskArtifact = pullArtifactService.findOnePullArtifact(taskId);
+                    // TaskPullArtifact taskArtifact = pullArtifactService.findOnePullArtifact(taskId);
+                    TaskPullArtifact taskArtifact = JSONObject.parseObject(jsonString, TaskPullArtifact.class);
                     String authId = taskArtifact.getAuthId();
                     if (!Objects.isNull(authId)){
                         String pullType = taskArtifact.getPullType();
@@ -873,31 +888,109 @@ public class TasksServiceImpl implements TasksService {
     private Object findTaskDetails(String taskId,String taskType){
         switch (findTaskType(taskType)) {
             case TASK_TYPE_CODE     -> {
-                return codeService.findCodeByAuth(taskId);
+                TaskCode code = codeService.findCodeByAuth(taskId);
+                if (!Objects.isNull(code.getToolGit())){
+                    Scm git = scmService.findOnePipelineScm(code.getToolGit().getScmId());
+                    code.setToolGit(git);
+                }
+                if (!Objects.isNull(code.getToolSvn())){
+                    Scm gitlab = scmService.findOnePipelineScm(code.getToolSvn().getScmId());
+                    code.setToolSvn(gitlab);
+                }
+                // joinTemplate.joinQuery(code);
+                return code;
             }
             case TASK_TYPE_TEST     -> {
-                return testService.findTestBuAuth(taskId);
+                TaskTest taskTest = testService.findTestBuAuth(taskId);
+                if (!Objects.isNull(taskTest.getToolJdk())){
+                    Scm jdk = scmService.findOnePipelineScm(taskTest.getToolJdk().getScmId());
+                    taskTest.setToolJdk(jdk);
+                }
+                if (!Objects.isNull(taskTest.getToolMaven())){
+                    Scm maven = scmService.findOnePipelineScm(taskTest.getToolMaven().getScmId());
+                    taskTest.setToolMaven(maven);
+                }
+                return taskTest;
             }
             case TASK_TYPE_BUILD    -> {
-                return buildService.findBuildByAuth(taskId);
+                TaskBuild taskBuild = buildService.findBuildByAuth(taskId);
+                if (!Objects.isNull(taskBuild.getToolMaven())){
+                    Scm maven = scmService.findOnePipelineScm(taskBuild.getToolMaven().getScmId());
+                    taskBuild.setToolMaven(maven);
+                }
+                if (!Objects.isNull(taskBuild.getToolJdk())){
+                    Scm jdk = scmService.findOnePipelineScm(taskBuild.getToolJdk().getScmId());
+                    taskBuild.setToolJdk(jdk);
+                }
+                if (!Objects.isNull(taskBuild.getToolNodejs())){
+                    Scm docker = scmService.findOnePipelineScm(taskBuild.getToolNodejs().getScmId());
+                    taskBuild.setToolNodejs(docker);
+                }
+                // joinTemplate.joinQuery(taskBuild);
+                return taskBuild;
             }
             case TASK_TYPE_DEPLOY   -> {
-                return deployService.findDeployByAuth(taskId);
+                TaskDeploy taskDeploy = deployService.findDeployByAuth(taskId);
+                joinTemplate.joinQuery(taskDeploy);
+                return taskDeploy;
             }
             case TASK_TYPE_CODESCAN -> {
-                return codeScanService.findCodeScanByAuth(taskId);
+                TaskCodeScan codeScan = codeScanService.findCodeScanByAuth(taskId);
+                // joinTemplate.joinQuery(codeScan);
+                if (!Objects.isNull(codeScan.getToolMaven())){
+                    Scm maven = scmService.findOnePipelineScm(codeScan.getToolMaven().getScmId());
+                    codeScan.setToolMaven(maven);
+                }
+                if (!Objects.isNull(codeScan.getToolJdk())){
+                    Scm jdk = scmService.findOnePipelineScm(codeScan.getToolJdk().getScmId());
+                    codeScan.setToolJdk(jdk);
+                }
+                return codeScan;
             }
             case TASK_TYPE_ARTIFACT -> {
-                return artifactService.findOneArtifactByAuth(taskId);
+                TaskArtifact taskArtifact = artifactService.findOneArtifactByAuth(taskId);
+                // joinTemplate.joinQuery(taskArtifact);
+                if (!Objects.isNull(taskArtifact.getToolMaven())){
+                    Scm maven = scmService.findOnePipelineScm(taskArtifact.getToolMaven().getScmId());
+                    taskArtifact.setToolMaven(maven);
+                }
+                if (!Objects.isNull(taskArtifact.getToolJdk())){
+                    Scm jdk = scmService.findOnePipelineScm(taskArtifact.getToolJdk().getScmId());
+                    taskArtifact.setToolJdk(jdk);
+                }
+                if (!Objects.isNull(taskArtifact.getToolNodejs())){
+                    Scm docker = scmService.findOnePipelineScm(taskArtifact.getToolNodejs().getScmId());
+                    taskArtifact.setToolNodejs(docker);
+                }
+                return taskArtifact;
+
             }
             case TASK_TYPE_PULL -> {
-                return pullArtifactService.findPullArtifactByAuth(taskId);
+                TaskPullArtifact pullArtifact = pullArtifactService.findPullArtifactByAuth(taskId);
+                // joinTemplate.joinQuery(pullArtifact);
+                if (!Objects.isNull(pullArtifact.getToolMaven())){
+                    Scm maven = scmService.findOnePipelineScm(pullArtifact.getToolMaven().getScmId());
+                    pullArtifact.setToolMaven(maven);
+                }
+                if (!Objects.isNull(pullArtifact.getToolJdk())){
+                    Scm jdk = scmService.findOnePipelineScm(pullArtifact.getToolJdk().getScmId());
+                    pullArtifact.setToolJdk(jdk);
+                }
+                if (!Objects.isNull(pullArtifact.getToolNodejs())){
+                    Scm docker = scmService.findOnePipelineScm(pullArtifact.getToolNodejs().getScmId());
+                    pullArtifact.setToolNodejs(docker);
+                }
+                return pullArtifact;
             }
             case TASK_TYPE_MESSAGE  -> {
-                return messageTypeServer.findMessage(taskId);
+                TaskMessageType messageType = messageTypeServer.findMessage(taskId);
+                joinTemplate.joinQuery(messageType);
+                return messageType;
             }
             case TASK_TYPE_SCRIPT   -> {
-                return scriptServer.findOneScript(taskId);
+                TaskScript taskScript = scriptServer.findOneScript(taskId);
+                joinTemplate.joinQuery(taskScript);
+                return taskScript;
             }
            default -> throw new ApplicationException("无法更新未知的配置类型。");
         }
@@ -946,31 +1039,153 @@ public class TasksServiceImpl implements TasksService {
         switch (findTaskType(taskType)) {
            case TASK_TYPE_CODE     ->  {
                TaskCode code =  JSONObject.parseObject(jsonString,TaskCode.class);
-               return codeService.codeValid(taskType, code);
+               switch (taskType) {
+                   case TASK_CODE_GITEE, TASK_CODE_GITLAB, TASK_CODE_GITHUB, TASK_CODE_XCODE -> {
+                      return PipelineUtil.validNoNullFiled(code.getHouseId(),code.getAuthId(),code.getToolGit());
+                   }
+                   case TASK_CODE_SVN -> {
+                       return PipelineUtil.validNoNullFiled(code.getToolSvn(),code.getCodeAddress());
+                   }
+                   default -> {
+                       return PipelineUtil.validNoNullFiled(code.getCodeAddress(),code.getToolGit());
+                   }
+               }
            }
            case TASK_TYPE_TEST     ->  {
                TaskTest code =  JSONObject.parseObject(jsonString,TaskTest.class);
-               return testService.testValid(taskType, code);
+               if (taskType.equals(TASK_TEST_TESTON)){
+                   Boolean b1 = PipelineUtil.validNoNullFiled(code.getTestSpace(), code.getTestPlan());
+                   if (!b1){
+                       return false;
+                   }
+                   boolean b  = Objects.isNull(code.getApiEnv())
+                           && Objects.isNull(code.getAppEnv());
+                   return !b ;
+               }else {
+                   return PipelineUtil.validNoNullFiled(code.getToolJdk(), code.getToolMaven());
+               }
            }
            case TASK_TYPE_BUILD    -> {
                TaskBuild code =  JSONObject.parseObject(jsonString,TaskBuild.class);
-               return buildService.buildValid(taskType, code);
+               switch (taskType) {
+                   case TASK_BUILD_MAVEN -> {
+                       return PipelineUtil.validNoNullFiled(code.getToolMaven(),code.getToolJdk());
+                   }
+                   case TASK_BUILD_NODEJS -> {
+                       return PipelineUtil.validNoNullFiled(code.getToolNodejs());
+                   }
+                   case TASK_BUILD_DOCKER -> {
+                       return PipelineUtil.validNoNullFiled(code.getDockerFile(),code.getDockerOrder());
+                   }
+                   default -> {
+                       return true;
+                   }
+               }
            }
            case TASK_TYPE_DEPLOY   -> {
                TaskDeploy code =  JSONObject.parseObject(jsonString,TaskDeploy.class);
-               return deployService.deployValid(taskType, code);
+
+               switch (taskType) {
+                   case TASK_DEPLOY_LINUX  -> {
+                       if (code.getAuthType() == 1){
+                           return PipelineUtil.validNoNullFiled(code.getAuthId(),code.getDeployAddress(),code.getLocalAddress());
+                       }
+                       return true;
+                   }
+                   case TASK_DEPLOY_DOCKER -> {
+                       return PipelineUtil.validNoNullFiled(code.getAuthId(),code.getDockerImage(),code.getDeployAddress());
+                   }
+                   case TASK_DEPLOY_K8S -> {
+                       return PipelineUtil.validNoNullFiled(code.getAuthId(),code.getK8sNamespace());
+                   }
+                   default -> {
+                       return true;
+                   }
+               }
            }
            case TASK_TYPE_CODESCAN -> {
                TaskCodeScan code =  JSONObject.parseObject(jsonString,TaskCodeScan.class);
-               return codeScanService.codeScanValid(taskType, code);
+               if (taskType.equals(TASK_CODESCAN_SONAR)) {
+                   return PipelineUtil.validNoNullFiled(code.getAuthId(),code.getProjectName());
+               } else {
+                   return PipelineUtil.validNoNullFiled(code.getToolJdk(),code.getToolMaven(),code.getScanPath());
+               }
            }
            case TASK_TYPE_ARTIFACT -> {
                TaskArtifact code =  JSONObject.parseObject(jsonString,TaskArtifact.class);
-               return artifactService.artifactValid(taskType, code);
+               String artifactType = code.getArtifactType();
+               if (taskType.equals(TASK_ARTIFACT_DOCKER)){
+                   if (artifactType.equals(TASK_ARTIFACT_NEXUS)){
+                       return PipelineUtil.validNoNullFiled(code.getDockerImage(),code.getAuthId());
+                   }
+                   if (artifactType.equals(TASK_ARTIFACT_XPACK)){
+                       return PipelineUtil.validNoNullFiled(code.getDockerImage(),code.getAuthId(),code.getRepository());
+                   }
+               }
+
+               if (taskType.equals(TASK_ARTIFACT_NODEJS)){
+                   return true;
+               }
+               if (taskType.equals(TASK_ARTIFACT_MAVEN)){
+                   switch (artifactType) {
+                       case TASK_ARTIFACT_NEXUS -> {
+                           return PipelineUtil.validNoNullFiled(code.getAuthId(), code.getArtifactId(), code.getVersion()
+                                   , code.getGroupId(), code.getToolJdk(), code.getToolMaven(), code.getFileAddress());
+                       }
+                       case TASK_ARTIFACT_XPACK -> {
+                           return PipelineUtil.validNoNullFiled(code.getAuthId(), code.getArtifactId(), code.getVersion()
+                                   , code.getGroupId(), code.getToolJdk(), code.getToolMaven(), code.getFileAddress(), code.getRepository());
+                       }
+                       case TASK_ARTIFACT_SSH -> {
+                           return PipelineUtil.validNoNullFiled(code.getAuthId(), code.getPutAddress(),code.getFileAddress());
+                       }
+                       default -> {
+                           return true;
+                       }
+                   }
+               }
+
+               return true;
            }
            case TASK_TYPE_PULL -> {
                TaskPullArtifact code =  JSONObject.parseObject(jsonString,TaskPullArtifact.class);
-               return pullArtifactService.pullArtifactValid(taskType,code);
+               String pullType = code.getPullType();
+               switch (taskType) {
+                   case TASK_PULL_DOCKER -> {
+                       if (pullType.equals(TASK_ARTIFACT_NEXUS)) {
+                           return PipelineUtil.validNoNullFiled(code.getDockerImage(),code.getAuthId());
+                       }
+                       if (pullType.equals(TASK_ARTIFACT_XPACK)) {
+                           return PipelineUtil.validNoNullFiled(code.getDockerImage(),code.getAuthId(),code.getRepository());
+                       }
+                       return true;
+                   }
+                   case TASK_PULL_NODEJS -> {
+                       return true;
+                   }
+                   case TASK_PULL_MAVEN -> {
+                       switch (pullType) {
+                           case TASK_ARTIFACT_NEXUS -> {
+                               return PipelineUtil.validNoNullFiled(code.getAuthId(), code.getArtifactId(), code.getVersion()
+                                       , code.getGroupId(), code.getToolJdk(), code.getToolMaven());
+                           }
+                           case TASK_ARTIFACT_XPACK -> {
+                               return PipelineUtil.validNoNullFiled(code.getAuthId(), code.getArtifactId(), code.getVersion()
+                                       , code.getGroupId(), code.getToolJdk(), code.getToolMaven(), code.getRepository());
+                           }
+                           case TASK_ARTIFACT_SSH -> {
+                               return PipelineUtil.validNoNullFiled(code.getAuthId(),code.getLocalAddress(),code.getRemoteAddress());
+                           }
+                           default -> {
+                               return true;
+                           }
+                       }
+                   }
+                   default -> {
+                       return true;
+                   }
+               }
+
            }
            default -> {
                return true;
@@ -995,7 +1210,7 @@ public class TasksServiceImpl implements TasksService {
             case TASK_DEPLOY_LINUX , TASK_DEPLOY_DOCKER ,TASK_DEPLOY_K8S->{
                 return TASK_TYPE_DEPLOY;
             }
-            case TASK_ARTIFACT_MAVEN, TASK_ARTIFACT_DOCKER, TASK_ARTIFACT_NODEJS ->{
+            case TASK_ARTIFACT_MAVEN, TASK_ARTIFACT_DOCKER, TASK_ARTIFACT_NODEJS,TASK_ARTIFACT_XPACK ->{
                 return TASK_TYPE_ARTIFACT;
             }
             case  TASK_CODESCAN_SONAR , TASK_CODESCAN_SPOTBUGS ->{

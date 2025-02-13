@@ -39,6 +39,28 @@ public class TaskCodeEntity {
     @Column(name = "house_id",notNull = true)
     private String houseId;
 
+    @Column(name = "tool_git",notNull = true)
+    private String toolGit;
+
+    @Column(name = "tool_svn",notNull = true)
+    private String toolSvn;
+
+    public String getToolSvn() {
+        return toolSvn;
+    }
+
+    public void setToolSvn(String toolSvn) {
+        this.toolSvn = toolSvn;
+    }
+
+    public String getToolGit() {
+        return toolGit;
+    }
+
+    public void setToolGit(String toolGit) {
+        this.toolGit = toolGit;
+    }
+
     public String getHouseId() {
         return houseId;
     }

@@ -137,6 +137,10 @@ public class TaskCodeServiceImpl implements TaskCodeService {
         taskCodeDao.updateCode(BeanMapper.map(taskCode, TaskCodeEntity.class));
     }
 
+    public void updateOneCode(TaskCode taskCode){
+        taskCodeDao.updateCode(BeanMapper.map(taskCode, TaskCodeEntity.class));
+    }
+
     @Override
     public TaskCode findOneCode(String codeId) {
         TaskCodeEntity oneCodeEntity = taskCodeDao.findOneCode(codeId);

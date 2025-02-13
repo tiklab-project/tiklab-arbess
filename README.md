@@ -1,5 +1,5 @@
 <h1 align="center" style="border-bottom: none">
-    <a href="https://arbess.tiklab.net/" target="_blank"><img alt="Arbess" src="https://image.tiklab.net/img/homes/g1/1e38ad72325ab017"></a><br>Arbess
+    <a href="https://arbess.tiklab.net/" target="_blank"><img alt="Arbess" src="tiklab-arbess-starter/src/main/resources/readme/arbess.png"></a><br>Arbess
 </h1>
 
 # Arbess - 开源的持续集成/持续交付 (CI/CD) 工具
@@ -17,14 +17,14 @@ Arbess 是一款强大的开源 CI/CD 工具，旨在帮助开发团队高效管
 
 支持创建并行或串行任务，使得用户可以根据具体需求灵活选择任务执行方式，从而优化流水线的效率和响应速度。
 
-![img](https://community.tiklab.net/api/image/9dd0a79a3ae2d640)
+![img](https://image.tiklab.net/img/g1/homes/9dd0a79a3ae2d640)
 
 
 - 支持配置触发设置
 
 ​     提供灵活的触发配置选项，包括 定时触发 和 周期触发，便于自动化任务的精准调度。
 
-![img](https://community.tiklab.net/api/image/487c4c8d21413fb4)
+![img](https://image.tiklab.net/img/g1/homes/487c4c8d21413fb4)
 
 - 配置变量
 
@@ -32,13 +32,13 @@ Arbess 是一款强大的开源 CI/CD 工具，旨在帮助开发团队高效管
 
 ﻿
 
-![img](https://community.tiklab.net/api/image/8d96b75c794d805c)
+![img](https://image.tiklab.net/img/g1/homes/8d96b75c794d805c)
 
 - 配置后置处理
 
 ​     提供强大的后置处理功能，允许用户在任务执行完成后进行消息通知和自定义脚本处理。
 
-![img](https://community.tiklab.net/api/image/b60e35ab990fb8af)
+![img](https://image.tiklab.net/img/g1/homes/b60e35ab990fb8af)
 
 ### 任务管理
 
@@ -158,7 +158,7 @@ Arbess 是一款强大的开源 CI/CD 工具，旨在帮助开发团队高效管
 
 
 
-![img](https://community.tiklab.net/api/image/bff9e9c02d699bc1)
+![img](https://image.tiklab.net/img/g1/homes/bff9e9c02d699bc1)
 
 - 查看历史
 
@@ -166,13 +166,13 @@ Arbess 是一款强大的开源 CI/CD 工具，旨在帮助开发团队高效管
 
 ﻿
 
-![img](https://community.tiklab.net/api/image/75c340ac524d83f5)
+![img](https://image.tiklab.net/img/g1/homes/75c340ac524d83f5)
 
 - 查看运行状态
 
 让用户可以随时查看流水线中每个任务的运行信息，任务时间，运行方式，执行人，以及任务的最终运行结果等关键数据，能帮助团队快速识别问题并进行调整，确保整体流程的顺利进行。
 
-![img](https://community.tiklab.net/api/image/f7913832ec315007)
+![img](https://image.tiklab.net/img/g1/homes/f7913832ec315007)
 
 - 查看日志详情
 
@@ -180,7 +180,7 @@ Arbess 是一款强大的开源 CI/CD 工具，旨在帮助开发团队高效管
 
 ﻿
 
-![img](https://community.tiklab.net/api/image/3a16ad52f5afbab9)
+![img](https://image.tiklab.net/img/g1/homes/3a16ad52f5afbab9)
 
 ### 测试报告
 
@@ -190,20 +190,20 @@ Arbess 是一款强大的开源 CI/CD 工具，旨在帮助开发团队高效管
 
 集成代码质量分析工具，对代码进行全面扫描，识别潜在问题和优化空间，可以检测出潜在的漏洞、编码规范的偏差和性能瓶颈等问题。
 
-![img](https://community.tiklab.net/api/image/f084c360c066f46f)
+![img](https://image.tiklab.net/img/g1/homes/f084c360c066f46f)
 
 - 单元测试
 
 支持查看每个单元测试的详细信息，包括测试用例的执行结果、具体用例的执行信息，成功，失败，错误的用例等，帮助开发者精确定位问题。
 
 
-![img](https://community.tiklab.net/api/image/8ed56de84885338c)
+![img](https://image.tiklab.net/img/g1/homes/8ed56de84885338c)
 
 - 自动化测试
 
 集成 TestHubo 自动化测试平台，实现多维度的测试覆盖。TestHubo 支持功能测试、性能测试等多种类型等。
 
-![img](https://community.tiklab.net/api/image/936cc9bac26997b4)
+![img](https://image.tiklab.net/img/g1/homes/936cc9bac26997b4)
 
 ### 统计分析
 
@@ -213,13 +213,13 @@ Arbess支持流水线运行统计以及结果统计查看，方便管理者查�
 
 可以从多个方面查看流水线的运行统计信息，如时间段，平均执行时长等，同时支持查看近7天，25天，30天，90天的统计信息。
 
-![img](https://community.tiklab.net/api/image/850aa1f71e1b908b)
+![img](https://image.tiklab.net/img/g1/homes/850aa1f71e1b908b)
 
 - 结果统计
 
 可以从多个维度查看流水线的结果统计信息，如结果数量，结果概率等，同时支持查看近7天，25天，30天，90天的统计信息。
 
-![img](https://community.tiklab.net/api/image/e10c87efe8cd55ac)
+![img](https://image.tiklab.net/img/g1/homes/e10c87efe8cd55ac)
 
 ## 产品优势
 通过简单的优势来了解Arbess，快速了解其独特之处和应用价值。

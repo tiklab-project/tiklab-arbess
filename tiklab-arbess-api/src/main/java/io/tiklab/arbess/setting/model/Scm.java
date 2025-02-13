@@ -1,6 +1,7 @@
 package io.tiklab.arbess.setting.model;
 
 
+import io.tiklab.core.BaseModel;
 import io.tiklab.toolkit.beans.annotation.Mapper;
 import io.tiklab.toolkit.join.annotation.Join;
 
@@ -12,13 +13,13 @@ import io.tiklab.toolkit.join.annotation.Join;
 //@ApiModel
 @Join
 @Mapper
-public class Scm {
+public class Scm extends BaseModel {
 
     //@ApiProperty(name = "scmId",desc = "id")
     private String scmId;
 
     //@ApiProperty(name = "scmType",desc = "类型")
-    private int scmType;
+    private String scmType;
 
     //@ApiProperty(name = "scmName",desc = "名称")
     private String scmName;
@@ -37,11 +38,11 @@ public class Scm {
         this.scmId = scmId;
     }
 
-    public int getScmType() {
+    public String getScmType() {
         return scmType;
     }
 
-    public void setScmType(int scmType) {
+    public void setScmType(String scmType) {
         this.scmType = scmType;
     }
 

@@ -1,8 +1,7 @@
 app:
-  name: tiklab-matflow-ce
+  name: arbess
 
 APP_HOME: ${APP_HOME}
-application: matflow-ce
 
 server:
   port: 8080
@@ -13,28 +12,24 @@ spring:
   main:
     allow-bean-definition-overriding: true
 
+postgresql:
+  embbed:
+    enable: true
+  database: arbess
+  db:
+    port: 6000
+    username: postgres
+    password: darth2020
+    address: ${DATA_HOME}/postgresql
+
 jdbc:
   driverClassName: org.postgresql.Driver
-  url: jdbc:postgresql://localhost:6000/matflow_ce?stringtype=unspecified
+  url: jdbc:postgresql://localhost:6000/arbess?stringtype=unspecified
   username: postgres
   password: darth2020
 
 #plugin config
-DATA_HOME: /opt/tiklab/matflow
-
-plugin:
-  path: ${DATA_HOME}/plugin
-
-#dfs config
-dfs:
-  server:
-    enabled: false
-    mode: server
-    port: 4000
-    datapath: ${DATA_HOME}/files
-  client:
-    url: 127.0.0.1:4000
-    bucket: ${app.name}
+DATA_HOME: /opt/tiklab/arbess
 
 #dcs config
 dcs:
@@ -48,33 +43,9 @@ dcs:
     database: dcs1
     expire: 7200
 
-#dcs config
-dss:
-  server:
-    enabled: false
-    mode: server
-    port: 6000
-    datapath: ${DATA_HOME}/index
-  client:
-    url: 127.0.0.1:6000
-    bucket: ${app.name}
-
-postgresql:
-  embbed:
-    enable: true
-  database: matflow_ce
-  db:
-    port: 6000
-    username: postgres
-    password: darth2020
-    address: ${DATA_HOME}/postgresql
-
-datapath: ${DATA_HOME}/caches
-
 soular:
   embbed:
     enable: true
-
 
 backups:
   dir: /data/matflow-ce
@@ -83,18 +54,9 @@ backups:
 base:
   url: http://localhost:8080
 
-#homes
-homes:
-  address: https://192.168.10.19:8080
-
 #license
 licences:
   path: ${APP_HOME}/licences
-
-#file
-file:
-  path: http://file.tiklab.net
-
 
 
 

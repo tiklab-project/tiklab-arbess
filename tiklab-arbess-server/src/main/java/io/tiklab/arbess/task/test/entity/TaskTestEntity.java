@@ -36,6 +36,29 @@ public class TaskTestEntity {
     @Column(name = "auth_id")
     private String authId;
 
+    // jdk版本
+    @Column(name = "tool_jdk")
+    private String toolJdk;
+
+    // maven版本
+    @Column(name = "tool_maven")
+    private String toolMaven;
+
+    public String getToolJdk() {
+        return toolJdk;
+    }
+
+    public void setToolJdk(String toolJdk) {
+        this.toolJdk = toolJdk;
+    }
+
+    public String getToolMaven() {
+        return toolMaven;
+    }
+
+    public void setToolMaven(String toolMaven) {
+        this.toolMaven = toolMaven;
+    }
 
     public String getAuthId() {
         return authId;

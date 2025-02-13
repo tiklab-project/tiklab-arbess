@@ -113,6 +113,11 @@ public interface TasksService {
     Tasks findOneTasksOrTask(String tasksId);
 
 
+    /**
+     * 划分任务类型
+     * @param taskType 任务类型
+     * @return 任务类型
+     */
     String findTaskType(String taskType);
 
 

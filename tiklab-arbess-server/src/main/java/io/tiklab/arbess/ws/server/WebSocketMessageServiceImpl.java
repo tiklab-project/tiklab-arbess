@@ -183,19 +183,6 @@ public class WebSocketMessageServiceImpl implements WebSocketMessageService {
         stageInstance.setStageTime(sourceStageInstance.getStageTime());
         stageInstance.setStageState(sourceStageInstance.getStageState());
         stageInstanceServer.updateStageInstance(stageInstance);
-        //
-        // String stageState = sourceStageInstance.getStageState();
-        //
-        // if (RUN_RUN.equals(stageState)){
-        //     return;
-        // }
-        //
-        // String parentId = stageInstance.getParentId();
-        // if (!StringUtils.isEmpty(parentId)){
-        //     StageInstance parentInstance = stageInstanceServer.findOneStageInstance(parentId);
-        //     parentInstance.setStageState(sourceStageInstance.getStageState());
-        //     stageInstanceServer.updateStageInstance(parentInstance);
-        // }
     }
 
     /**
@@ -273,7 +260,7 @@ public class WebSocketMessageServiceImpl implements WebSocketMessageService {
             }
         }
         String logAddress = oneTaskInstance.getLogAddress();
-        logger.info("日志过长，写入文件：{}",logAddress);
+        logger.info("the log is too long, write to file：{}",logAddress);
 
         PipelineFileUtil.logWriteFile(runLog,logAddress);
 

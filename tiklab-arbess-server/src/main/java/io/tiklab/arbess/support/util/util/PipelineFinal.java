@@ -127,6 +127,13 @@ public class PipelineFinal {
     /**
      * 系统任务类型
      */
+    public static final String TASK_TOOL_TYPE_JDK = "jdk";
+    public static final String TASK_TOOL_TYPE_MAVEN = "maven";
+    public static final String TASK_TOOL_TYPE_GIT = "git";
+    public static final String TASK_TOOL_TYPE_SVN = "svn";
+    public static final String TASK_TOOL_TYPE_NODEJS = "nodejs";
+    public static final String TASK_TOOL_TYPE_NPM = "npm";
+
 
     // 源码应用类型
     public static final String TASK_TYPE_CODE = "code";

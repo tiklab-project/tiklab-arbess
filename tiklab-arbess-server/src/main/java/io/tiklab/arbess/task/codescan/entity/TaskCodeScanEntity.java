@@ -40,6 +40,29 @@ public class TaskCodeScanEntity {
     @Column(name = "err_grade" ,notNull = true)
     private String errGrade;
 
+    // jdk版本
+    @Column(name = "tool_jdk" ,notNull = true)
+    private String toolJdk;
+
+    // maven版本
+    @Column(name = "tool_maven" ,notNull = true)
+    private String toolMaven;
+
+    public String getToolJdk() {
+        return toolJdk;
+    }
+
+    public void setToolJdk(String toolJdk) {
+        this.toolJdk = toolJdk;
+    }
+
+    public String getToolMaven() {
+        return toolMaven;
+    }
+
+    public void setToolMaven(String toolMaven) {
+        this.toolMaven = toolMaven;
+    }
 
     public String getScanGrade() {
         return scanGrade;

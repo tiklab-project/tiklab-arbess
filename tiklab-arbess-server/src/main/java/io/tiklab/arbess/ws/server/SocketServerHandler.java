@@ -56,7 +56,7 @@ public class SocketServerHandler implements WebSocketHandler {
         ByteBuffer payload = binaryMessage.getPayload();
         String receivedString = new String(payload.array(), StandardCharsets.UTF_8);
         AgentMessage agentMessage = JSONObject.parseObject(receivedString, AgentMessage.class);
-        logger.warn("接受客户端消息,消息类型：{}", agentMessage.getType());
+        logger.info("accept client messages,message type：{}", agentMessage.getType());
 
         dataList.add(agentMessage);
     }
@@ -96,7 +96,7 @@ public class SocketServerHandler implements WebSocketHandler {
 
         // 将消息序列化为 JSON
         String jsonString = JSONObject.toJSONString(agentMessage);
-        logger.warn("向客户端推送消息：{}", agentMessage.getType());
+        logger.info("push messages to the client：{}", agentMessage.getType());
 
         try {
             // 分块发送消息
