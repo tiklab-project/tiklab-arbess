@@ -23,7 +23,7 @@ public class PipelineOverviewController {
 
     /**
      * @pi.name:查询流水线最近执行状态
-     * @pi.path:/overview/pipelineCensus
+     * @pi.url:/overview/pipelineCensus
      * @pi.methodType:post
      * @pi.request-type: formdata
      * @pi.param: name=pipelineId;dataType=string;value=流水线id;

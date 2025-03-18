@@ -26,7 +26,7 @@ public class PipelineFollowController {
 
     /**
      * @pi.name:更新流水线收藏
-     * @pi.path:/follow/updateFollow
+     * @pi.url:/follow/updateFollow
      * @pi.methodType:post
      * @pi.request-type:json
      * @pi.param: model=pipelineFollow

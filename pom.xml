@@ -42,6 +42,7 @@
         <tiklab-user.version>1.0.2</tiklab-user.version>
         <tiklab-message.version>1.0.2</tiklab-message.version>
         <tiklab-security.version>1.0.2</tiklab-security.version>
+        <tiklab-security-extension.version>1.0.2</tiklab-security-extension.version>
         <tiklab-todotask.version>1.0.2</tiklab-todotask.version>
         <tiklab-licence.version>1.0.2</tiklab-licence.version>
         <tiklab-privilege.version>1.0.2</tiklab-privilege.version>

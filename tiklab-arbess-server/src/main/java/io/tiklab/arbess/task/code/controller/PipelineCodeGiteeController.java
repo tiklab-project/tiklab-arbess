@@ -29,7 +29,7 @@ public class PipelineCodeGiteeController {
 
     /**
      * @pi.name:获取xcode所有仓库
-     * @pi.path:/code/third/gitee/findStoreHouseList
+     * @pi.url:/code/third/gitee/findStoreHouseList
      * @pi.methodType:post
      * @pi.request-type: formdata
      * @pi.param: name=authId;dataType=string;value=authId;
@@ -45,7 +45,7 @@ public class PipelineCodeGiteeController {
 
     /**
      * @pi.name:获取仓库分支信息
-     * @pi.path:/code/third/gitee/findHouseBranchList
+     * @pi.url:/code/third/gitee/findHouseBranchList
      * @pi.methodType:post
      * @pi.request-type: formdata
      * @pi.param: name=authId;dataType=string;value=authId;

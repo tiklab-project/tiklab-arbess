@@ -27,7 +27,7 @@ public class AuthController {
 
     /**
      * @pi.name:创建流水线基本认证
-     * @pi.path:/auth/createAuth
+     * @pi.url:/auth/createAuth
      * @pi.methodType:post
      * @pi.request-type:json
      * @pi.param: model=auth
@@ -40,7 +40,7 @@ public class AuthController {
 
     /**
      * @pi.name:删除流水线基本认证
-     * @pi.path:/auth/deleteAuth
+     * @pi.url:/auth/deleteAuth
      * @pi.methodType:post
      * @pi.request-type: formdata
      * @pi.param: name=authId;dataType=string;value=认证id;
@@ -53,7 +53,7 @@ public class AuthController {
 
     /**
      * @pi.name:跟新流水线基本认证
-     * @pi.path:/auth/createAuth
+     * @pi.url:/auth/createAuth
      * @pi.methodType:post
      * @pi.request-type:json
      * @pi.param: model=auth
@@ -66,7 +66,7 @@ public class AuthController {
 
     /**
      * @pi.name:查询流水线基本认证
-     * @pi.path:/auth/findOneAuth
+     * @pi.url:/auth/findOneAuth
      * @pi.methodType:post
      * @pi.request-type: formdata
      * @pi.param: name=authId;dataType=string;value=authId;
@@ -79,7 +79,7 @@ public class AuthController {
 
     /**
      * @pi.name:查询所有认证信息
-     * @pi.path:/auth/findAllAuth
+     * @pi.url:/auth/findAllAuth
      * @pi.methodType:post
      * @pi.request-type:none
      */

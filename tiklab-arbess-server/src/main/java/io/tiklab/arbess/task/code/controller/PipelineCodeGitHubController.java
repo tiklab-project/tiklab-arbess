@@ -29,7 +29,7 @@ public class PipelineCodeGitHubController {
 
     /**
      * @pi.name:获取xcode所有仓库
-     * @pi.path:/code/third/github/findStoreHouseList
+     * @pi.url:/code/third/github/findStoreHouseList
      * @pi.methodType:post
      * @pi.request-type: formdata
      * @pi.param: name=authId;dataType=string;value=authId;
@@ -45,7 +45,7 @@ public class PipelineCodeGitHubController {
 
     /**
      * @pi.name:获取仓库分支信息
-     * @pi.path:/code/third/github/findHouseBranchList
+     * @pi.url:/code/third/github/findHouseBranchList
      * @pi.methodType:post
      * @pi.request-type: formdata
      * @pi.param: name=authId;dataType=string;value=authId;

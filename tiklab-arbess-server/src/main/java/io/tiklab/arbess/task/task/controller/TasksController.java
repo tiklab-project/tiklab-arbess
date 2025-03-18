@@ -27,7 +27,7 @@ public class TasksController {
 
     /**
      * @pi.name:创建流水线任务
-     * @pi.path:/tasks/createTask
+     * @pi.url:/tasks/createTask
      * @pi.methodType:post
      * @pi.request-type:json
      * @pi.param: model=tasks
@@ -41,7 +41,7 @@ public class TasksController {
 
     /**
      * @pi.name:更新流水线任务
-     * @pi.path:/tasks/updateTask
+     * @pi.url:/tasks/updateTask
      * @pi.methodType:post
      * @pi.request-type:json
      * @pi.param: model=tasks
@@ -54,7 +54,7 @@ public class TasksController {
 
     /**
      * @pi.name:更新任务名称
-     * @pi.path:/tasks/updateTaskName
+     * @pi.url:/tasks/updateTaskName
      * @pi.methodType:post
      * @pi.request-type:json
      * @pi.param: model=tasks
@@ -68,7 +68,7 @@ public class TasksController {
 
     /**
      * @pi.name:删除任务
-     * @pi.path:/tasks/deleteTask
+     * @pi.url:/tasks/deleteTask
      * @pi.methodType:post
      * @pi.request-type: formdata
      * @pi.param: name=taskId;dataType=string;value=taskId;
@@ -81,7 +81,7 @@ public class TasksController {
 
     /**
      * @pi.name:查询任务及任务详情
-     * @pi.path:/tasks/findOneTasksOrTask
+     * @pi.url:/tasks/findOneTasksOrTask
      * @pi.methodType:post
      * @pi.request-type: formdata
      * @pi.param: name=taskId;dataType=string;value=taskId;

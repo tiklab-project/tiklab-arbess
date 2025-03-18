@@ -30,7 +30,7 @@ public class MavenTestController {
 
     /**
      * @pi.name:条件查询流水线测试信息执行实例
-     * @pi.path:/maven/test/findMavenTestList
+     * @pi.url:/maven/test/findMavenTestList
      * @pi.methodType:post
      * @pi.request-type:json
      * @pi.param: model=testQuery
@@ -45,7 +45,7 @@ public class MavenTestController {
 
     /**
      * @pi.name:分页查询流水线测试信息执行实例
-     * @pi.path:/maven/test/findMavenTestPage
+     * @pi.url:/maven/test/findMavenTestPage
      * @pi.methodType:post
      * @pi.request-type:json
      * @pi.param: model=testQuery
@@ -61,7 +61,7 @@ public class MavenTestController {
 
     /**
      * @pi.name:删除测试信息执行实例
-     * @pi.path:/maven/test/deleteMavenTest
+     * @pi.url:/maven/test/deleteMavenTest
      * @pi.methodType:post
      * @pi.request-type: formdata
      * @pi.param: name=testId;dataType=string;value=testId;

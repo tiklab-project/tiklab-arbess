@@ -29,7 +29,7 @@ public class PipelineCodeGittokController {
 
     /**
      * @pi.name:获取xcode所有仓库
-     * @pi.path:/xcodeAuthorize/findAllRepository
+     * @pi.url:/xcodeAuthorize/findAllRepository
      * @pi.methodType:post
      * @pi.request-type: formdata
      * @pi.param: name=authId;dataType=string;value=authId;
@@ -45,7 +45,7 @@ public class PipelineCodeGittokController {
 
     /**
      * @pi.name:获取仓库分支信息
-     * @pi.path:/xcodeAuthorize/findAllBranch
+     * @pi.url:/xcodeAuthorize/findAllBranch
      * @pi.methodType:post
      * @pi.request-type: formdata
      * @pi.param: name=authId;dataType=string;value=authId;

@@ -16,6 +16,9 @@ import io.tiklab.arbess.support.util.service.PipelineUtilService;
 import io.tiklab.arbess.support.util.util.PipelineFileUtil;
 import io.tiklab.arbess.support.util.util.PipelineFinal;
 import io.tiklab.arbess.support.util.util.PipelineUtil;
+import io.tiklab.arbess.task.build.model.TaskBuildProduct;
+import io.tiklab.arbess.task.build.service.TaskBuildProductService;
+import io.tiklab.arbess.task.build.service.TaskBuildProductServiceImpl;
 import io.tiklab.arbess.task.code.service.SpotbugsScanService;
 import io.tiklab.arbess.task.codescan.model.SpotbugsBugSummary;
 import io.tiklab.arbess.task.deploy.model.TaskDeployInstance;
@@ -76,6 +79,9 @@ public class WebSocketMessageServiceImpl implements WebSocketMessageService {
     @Autowired
     TaskDeployInstanceServiceImpl deployInstanceService;
 
+    @Autowired
+    TaskBuildProductService taskBuildProductService;
+
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Override
@@ -104,6 +110,8 @@ public class WebSocketMessageServiceImpl implements WebSocketMessageService {
             testOnTaskMessageHandle(message);
         }else if (type.contains("send_message")){
             messageTaskMessageHandle(message);
+        }else if (type.contains("save_pipeline_instance")){
+            messageSavePipelineInstanceHandle(message);
         }
         return null;
     }
@@ -294,6 +302,17 @@ public class WebSocketMessageServiceImpl implements WebSocketMessageService {
         Map<String, Object> stringObjectMap = homeService.initMap(pipeline);
         stringObjectMap.putAll(taskMessage.getMap());
         homeService.message(stringObjectMap,taskMessage.getList());
+    }
+
+
+    /**
+     * 发送消息结果
+     * @param message 消息内容
+     */
+    private void messageSavePipelineInstanceHandle(Object message){
+        String jsonString = JSONObject.toJSONString(message);
+        TaskBuildProduct taskBuildProduct = JSONObject.parseObject(jsonString, TaskBuildProduct.class);
+        taskBuildProductService.createBuildProduct(taskBuildProduct);
     }
 
     /**

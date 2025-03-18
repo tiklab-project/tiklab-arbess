@@ -23,7 +23,7 @@ public class PipelineArtifactXpackController {
 
     /**
      * @pi.name:查询Xpack所有制品库信息
-     * @pi.path:/xpackAuthorize/findAllRepository
+     * @pi.url:/xpackAuthorize/findAllRepository
      * @pi.methodType:post
      * @pi.request-type: formdata
      * @pi.param:name=authId;dataType=string;value=authId;

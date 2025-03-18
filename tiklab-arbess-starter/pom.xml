@@ -69,7 +69,12 @@
         </dependency>
         <dependency>
             <groupId>io.tiklab</groupId>
-            <artifactId>tiklab-install-starter</artifactId>
+            <artifactId>tiklab-install-server</artifactId>
+            <version>${tiklab-install.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.tiklab</groupId>
+            <artifactId>tiklab-install-client</artifactId>
             <version>${tiklab-install.version}</version>
         </dependency>
 

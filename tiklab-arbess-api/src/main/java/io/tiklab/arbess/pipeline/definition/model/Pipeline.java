@@ -177,7 +177,22 @@ public class Pipeline {
     private String lastBuildTime;
 
 
+    /**
+     * @pi.name:isExec
+     * @pi.dataType:boolean
+     * @pi.desc:是否可以执行
+     * @pi.value:true
+     */
+    private Boolean isExec;
 
+
+    public Boolean getExec() {
+        return isExec;
+    }
+
+    public void setExec(Boolean exec) {
+        isExec = exec;
+    }
 
     public Pipeline() {
     }

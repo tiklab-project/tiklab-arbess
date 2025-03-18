@@ -25,7 +25,7 @@ public class ConditionController {
 
     /**
      * @pi.name:创建条件
-     * @pi.path:/pipelineCond/createCond
+     * @pi.url:/pipelineCond/createCond
      * @pi.methodType:post
      * @pi.request-type:json
      * @pi.param: model=condition
@@ -38,7 +38,7 @@ public class ConditionController {
 
     /**
      * @pi.name:更新条件
-     * @pi.path:/pipelineCond/updateCond
+     * @pi.url:/pipelineCond/updateCond
      * @pi.methodType:post
      * @pi.request-type:json
      * @pi.param: model=condition
@@ -51,7 +51,7 @@ public class ConditionController {
 
     /**
      * @pi.name:删除条件
-     * @pi.path:/pipelineCond/deleteCond
+     * @pi.url:/pipelineCond/deleteCond
      * @pi.methodType:post
      * @pi.request-type: formdata
      * @pi.param: name=condId;dataType=string;value=condId;
@@ -64,7 +64,7 @@ public class ConditionController {
 
     /**
      * @pi.name:查询任务条件
-     * @pi.path:/pipelineCond/findAllTaskCond
+     * @pi.url:/pipelineCond/findAllTaskCond
      * @pi.methodType:post
      * @pi.request-type: formdata
      * @pi.param: name=taskId;dataType=string;value=taskId;

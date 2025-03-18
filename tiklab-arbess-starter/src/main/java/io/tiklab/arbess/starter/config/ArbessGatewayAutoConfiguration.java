@@ -117,6 +117,7 @@ public class ArbessGatewayAutoConfiguration {
                         "/sql",
                         "/maven/test",
                         "/update/pipeline",
+                        "/state/apply/findApply"
                 })
                 .get();
     }

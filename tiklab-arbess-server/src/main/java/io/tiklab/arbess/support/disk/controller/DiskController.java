@@ -22,7 +22,7 @@ public class DiskController {
 
     /**
      * @pi.name:查询流水线存储空间
-     * @pi.path:/disk/findDiskList
+     * @pi.url:/disk/findDiskList
      * @pi.methodType:post
      * @pi.request-type:none
      */
@@ -34,7 +34,7 @@ public class DiskController {
 
     /**
      * @pi.name:清理储存空间
-     * @pi.path:/disk/cleanDisk
+     * @pi.url:/disk/cleanDisk
      * @pi.methodType:post
      * @pi.request-type: formdata
      * @pi.param: name=taskId;dataType=string;value=fileList;

@@ -24,7 +24,7 @@ public class TasksInstanceController {
 
     /**
      * @pi.name:查询流水线多任务实例
-     * @pi.path:/taskInstance/findTaskInstance
+     * @pi.url:/taskInstance/findTaskInstance
      * @pi.methodType:post
      * @pi.request-type: formdata
      * @pi.param: name=instanceId;dataType=string;value=实例id;
@@ -39,7 +39,7 @@ public class TasksInstanceController {
 
     /**
      * @pi.name:查询流水线任务实例日志
-     * @pi.path:/taskInstance/findAllInstanceLogs
+     * @pi.url:/taskInstance/findAllInstanceLogs
      * @pi.methodType:post
      * @pi.request-type: formdata
      * @pi.param: name=instanceId;dataType=string;value=实例id;

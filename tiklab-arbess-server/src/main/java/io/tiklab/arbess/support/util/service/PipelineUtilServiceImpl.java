@@ -25,13 +25,14 @@ public class PipelineUtilServiceImpl implements PipelineUtilService {
     @Override
     public String instanceAddress(int type) {
         if (Objects.isNull(dataHome) || "null".equals(dataHome)){
-            dataHome = "/opt/tiklab/matflow";
+            dataHome = "/opt/tiklab/tiklab-arbess";
         }
-        if (type == 1){
-            return dataHome + PipelineFinal.MATFLOW_WORKSPACE;
-        }else {
-            return dataHome + PipelineFinal.MATFLOW_LOGS;
-        }
+
+        return switch (type) {
+            case 0 -> dataHome + PipelineFinal.MATFLOW_INSTABCE;
+            case 1 -> dataHome + PipelineFinal.MATFLOW_WORKSPACE;
+            default -> dataHome + PipelineFinal.MATFLOW_LOGS;
+        };
     }
 
     @Override

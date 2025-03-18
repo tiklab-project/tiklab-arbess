@@ -47,7 +47,7 @@ public class ArbessDsmAutoConfiguration {
                 "pip-maven-test_1.0.0",
                 "pip-setting-envorgroup_1.0.0",
                 "pip-trigger_1.0.0",
-                "pip-setting-cache_1.0.0"
+                "pip-setting-cache_1.0.0",
         });
         dsmConfig.newVersion("1.0.1", new String[]{
                 "pip-project_1.0.1",
@@ -77,7 +77,8 @@ public class ArbessDsmAutoConfiguration {
                 "privilege_1.0.4",
         });
         dsmConfig.newVersion("1.0.5", new String[]{
-                "message_1.0.5"
+                "message_1.0.5",
+                "apply-auth_1.0.5"
         });
         dsmConfig.newVersion("1.0.6", new String[]{
                 "message_1.0.6",
@@ -93,7 +94,8 @@ public class ArbessDsmAutoConfiguration {
         });
         dsmConfig.newVersion("1.1.0", new String[]{
                 "user_1.1.0",
-                "pip-task_1.1.0"
+                "pip-task_1.1.0",
+                "pip-privilege_1.1.0"
         });
         return dsmConfig;
     }

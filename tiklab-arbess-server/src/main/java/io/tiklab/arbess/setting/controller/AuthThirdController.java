@@ -27,7 +27,7 @@ public class AuthThirdController {
 
     /**
      * @pi.name:创建第三方认证信息
-     * @pi.path:/authServer/createAuthServer
+     * @pi.url:/authServer/createAuthServer
      * @pi.methodType:post
      * @pi.request-type:json
      * @pi.param: model=authThird
@@ -40,7 +40,7 @@ public class AuthThirdController {
 
     /**
      * @pi.name:删除第三方认证信息
-     * @pi.path:/authServer/deleteAuthServer
+     * @pi.url:/authServer/deleteAuthServer
      * @pi.methodType:post
      * @pi.request-type: formdata
      * @pi.param: name=serverId;dataType=string;value=serverId;
@@ -53,7 +53,7 @@ public class AuthThirdController {
 
     /**
      * @pi.name:更新第三方认证信息
-     * @pi.path:/authServer/updateAuthServer
+     * @pi.url:/authServer/updateAuthServer
      * @pi.methodType:post
      * @pi.request-type:json
      * @pi.param: model=authThird
@@ -66,7 +66,7 @@ public class AuthThirdController {
 
     /**
      * @pi.name:查询第三方认证信息
-     * @pi.path:/authServer/findOneAuthServer
+     * @pi.url:/authServer/findOneAuthServer
      * @pi.methodType:post
      * @pi.request-type: formdata
      * @pi.param: name=serverId;dataType=string;value=serverId;
@@ -79,7 +79,7 @@ public class AuthThirdController {
 
     /**
      * @pi.name:查询所有第三方认证信息
-     * @pi.path:/authServer/findAllAuthServer
+     * @pi.url:/authServer/findAllAuthServer
      * @pi.methodType:post
      * @pi.request-type:none
      */
@@ -91,7 +91,7 @@ public class AuthThirdController {
 
     /**
      * @pi.name:条件查询第三方认证信息
-     * @pi.path:/authServer/findAuthServerList
+     * @pi.url:/authServer/findAuthServerList
      * @pi.methodType:post
      * @pi.request-type: json
      * @pi.param: model=thirdQuery;

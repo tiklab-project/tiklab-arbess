@@ -5,6 +5,7 @@ import io.tiklab.arbess.stages.model.Stage;
 import io.tiklab.arbess.support.agent.model.Agent;
 import io.tiklab.arbess.support.postprocess.model.Postprocess;
 import io.tiklab.arbess.support.variable.model.Variable;
+import io.tiklab.arbess.task.build.model.TaskBuildProduct;
 import io.tiklab.arbess.task.task.model.TaskExecMessage;
 
 import java.util.List;
@@ -54,6 +55,16 @@ public class PipelineDetails {
     private List<Postprocess> postprocessList;
 
     private TaskExecMessage taskExecMessage;
+
+    private TaskBuildProduct taskBuildProduct;
+
+    public TaskBuildProduct getTaskBuildProduct() {
+        return taskBuildProduct;
+    }
+
+    public void setTaskBuildProduct(TaskBuildProduct taskBuildProduct) {
+        this.taskBuildProduct = taskBuildProduct;
+    }
 
     public TaskExecMessage getTaskExecMessage() {
         return taskExecMessage;

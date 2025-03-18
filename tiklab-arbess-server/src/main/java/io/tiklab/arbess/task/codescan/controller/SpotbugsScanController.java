@@ -31,7 +31,7 @@ public class SpotbugsScanController {
 
     /**
      * @pi.name:条件查询代码扫描结果
-     * @pi.path:/spotbugsScan/findScanBugsList
+     * @pi.url:/spotbugsScan/findScanBugsList
      * @pi.methodType:post
      * @pi.request-type:json
      * @pi.param: model=spotbugsBugQuery
@@ -45,7 +45,7 @@ public class SpotbugsScanController {
 
     /**
      * @pi.name:分页查询代码扫描结果
-     * @pi.path:/spotbugsScan/findSpotbugsPage
+     * @pi.url:/spotbugsScan/findSpotbugsPage
      * @pi.methodType:post
      * @pi.request-type:json
      * @pi.param: model=spotbugsBugQuery
@@ -60,7 +60,7 @@ public class SpotbugsScanController {
 
     /**
      * @pi.name:查询代码扫描详情
-     * @pi.path:/spotbugsScan/findBugs
+     * @pi.url:/spotbugsScan/findBugs
      * @pi.methodType:post
      * @pi.request-type: formdata
      * @pi.param: name=xmlPath;dataType=string;value=xmlPath;
@@ -75,7 +75,7 @@ public class SpotbugsScanController {
 
     /**
      * @pi.name:删除代码扫描结果
-     * @pi.path:/spotbugsScan/deleteSpotbugs
+     * @pi.url:/spotbugsScan/deleteSpotbugs
      * @pi.methodType:post
      * @pi.request-type: formdata
      * @pi.param: name=bugId;dataType=string;value=bugId;

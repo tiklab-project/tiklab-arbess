@@ -1,5 +1,6 @@
 package io.tiklab.arbess.pipeline.instance.service;
 
+import io.tiklab.arbess.home.service.PipelineHomeService;
 import io.tiklab.arbess.pipeline.execute.model.PipelineRunMsg;
 import io.tiklab.arbess.pipeline.instance.dao.PipelineInstanceDao;
 import io.tiklab.arbess.pipeline.instance.entity.PipelineInstanceEntity;
@@ -30,6 +31,8 @@ import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import static io.tiklab.arbess.support.util.util.PipelineFinal.PIPELINE_RUN_KEY;
+
 /**
  * 流水线实例服务
  */
@@ -57,6 +60,9 @@ public class PipelineInstanceServiceImpl implements PipelineInstanceService {
 
     @Autowired
     TaskBuildProductService taskBuildProductService;
+
+    @Autowired
+    PipelineHomeService homeService;
 
     // 任务示例ID -- 运行时间
     public final static Map<String,Integer> runTimeMap = new HashMap<>();
@@ -233,6 +239,9 @@ public class PipelineInstanceServiceImpl implements PipelineInstanceService {
             } else {
                 time = PipelineUtil.formatDateTime(instance.getRunTime());
             }
+            String id = instance.getPipeline().getId();
+            Boolean permissions = homeService.findPermissions(id, PIPELINE_RUN_KEY);
+            instance.setExec(permissions);
             instance.setRunTimeDate(time);
         }
         joinTemplate.joinQuery(execInstanceList);
@@ -254,6 +263,9 @@ public class PipelineInstanceServiceImpl implements PipelineInstanceService {
                 time = PipelineUtil.formatDateTime(instance.getRunTime());
             }
             instance.setRunTimeDate(time);
+            String id = instance.getPipeline().getId();
+            Boolean permissions = homeService.findPermissions(id, PIPELINE_RUN_KEY);
+            instance.setExec(permissions);
         }
         joinTemplate.joinQuery(execInstanceList);
         return PaginationBuilder.build(pagination,execInstanceList);

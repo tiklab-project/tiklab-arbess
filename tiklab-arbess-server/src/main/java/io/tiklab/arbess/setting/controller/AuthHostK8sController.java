@@ -29,7 +29,7 @@ public class AuthHostK8sController {
 
     /**
      * @pi.name:创建k8s认证信息
-     * @pi.path:/authHostK8s/createAuthHostK8s
+     * @pi.url:/authHostK8s/createAuthHostK8s
      * @pi.methodType:post
      * @pi.request-type:json
      * @pi.param: model=authHostK8s
@@ -42,7 +42,7 @@ public class AuthHostK8sController {
 
     /**
      * @pi.name:删除k8s认证信息
-     * @pi.path:/authHostK8s/deleteAuthHostK8s
+     * @pi.url:/authHostK8s/deleteAuthHostK8s
      * @pi.methodType:post
      * @pi.request-type: formdata
      * @pi.param: name=hostId;dataType=string;value=hostId;
@@ -55,7 +55,7 @@ public class AuthHostK8sController {
 
     /**
      * @pi.name:更新k8s认证信息
-     * @pi.path:/authHostK8s/updateAuthHostK8s
+     * @pi.url:/authHostK8s/updateAuthHostK8s
      * @pi.methodType:post
      * @pi.request-type: json
      * @pi.param: model=authHostK8s
@@ -68,7 +68,7 @@ public class AuthHostK8sController {
 
     /**
      * @pi.name:查询单个k8s认证信息
-     * @pi.path:/authHostK8s/findAuthHostK8s
+     * @pi.url:/authHostK8s/findAuthHostK8s
      * @pi.methodType:post
      * @pi.request-type:formdata
      * @pi.param: name=hostId;dataType=string;value=hostId;
@@ -81,7 +81,7 @@ public class AuthHostK8sController {
 
     /**
      * @pi.name:查询k8s认证信息
-     * @pi.path:/authHostK8s/findAllAuthHostK8sList
+     * @pi.url:/authHostK8s/findAllAuthHostK8sList
      * @pi.methodType:post
      * @pi.request-type:formdata
      * @pi.param:name=type;dataType=string;value=aliyun;
@@ -94,7 +94,7 @@ public class AuthHostK8sController {
 
     /**
      * @pi.name:分页查询k8s认证信息
-     * @pi.path:/authHostK8s/findAuthHostK8sPage
+     * @pi.url:/authHostK8s/findAuthHostK8sPage
      * @pi.methodType:post
      * @pi.request-type:json
      * @pi.param:model=hostQuery;

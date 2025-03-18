@@ -17,7 +17,9 @@ import javax.validation.constraints.NotNull;
 /**
  * @pi.protocol: http
  * @pi.groupName: 流水线执行控制器
+ * @pi.url:/exec
  */
+
 @RestController
 @RequestMapping("/exec")
 public class PipelineExecController {
@@ -27,10 +29,10 @@ public class PipelineExecController {
 
     /**
      * @pi.name:执行流水线
-     * @pi.path:/exec/start
+     * @pi.url:/start
      * @pi.methodType:post
      * @pi.request-type: json
-     * @pi.param: model=runMsg;
+     * @pi.param: model=io.tiklab.arbess.pipeline.execute.model.PipelineRunMsg;
      */
     @RequestMapping(path="/start",method = RequestMethod.POST)
     public Result<PipelineInstance> start(@RequestBody @Valid @NotNull PipelineRunMsg runMsg){
@@ -40,6 +42,27 @@ public class PipelineExecController {
     }
 
 
+    /**
+     * @pi.name:执行流水线
+     * @pi.url:/rollBackStart
+     * @pi.methodType:post
+     * @pi.request-type: json
+     * @pi.param: model=io.tiklab.arbess.pipeline.execute.model.PipelineRunMsg;
+     */
+    @RequestMapping(path="/rollBackStart",method = RequestMethod.POST)
+    public Result<PipelineInstance> rollBackStart(@RequestBody @Valid @NotNull PipelineRunMsg runMsg){
+        runMsg.setRunWay(3);
+        PipelineInstance start = pipelineExecService.rollBackStart(runMsg);
+        return Result.ok(start);
+    }
+
+    /**
+     * @pi.name:停止流水线执行
+     * @pi.url:/keepOn
+     * @pi.methodType:post
+     * @pi.request-type: formdata
+     * @pi.param: name=pipelineId;dataType=string;value=pipelineId;desc=流水线id
+     */
     @RequestMapping(path="/keepOn",method = RequestMethod.POST)
     public Result<Void> keepOn(@NotNull String pipelineId){
         pipelineExecService.keepOn(pipelineId);
@@ -48,10 +71,10 @@ public class PipelineExecController {
 
     /**
      * @pi.name:停止流水线执行
-     * @pi.path:/exec/stop
+     * @pi.url:/stop
      * @pi.methodType:post
      * @pi.request-type: formdata
-     * @pi.param: name=pipelineId;dataType=string;value=流水线id;
+     * @pi.param: name=pipelineId;dataType=string;value=pipelineId;desc=流水线id
      */
     @RequestMapping(path="/stop",method = RequestMethod.POST)
     public Result<Void> stop(@NotNull String pipelineId) {

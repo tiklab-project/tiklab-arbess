@@ -29,7 +29,7 @@ public class RelevanceTestOnController {
 
     /**
      * @pi.name:查询流水线测试信息执行实例
-     * @pi.path:/testOnRelevance/findAllRelevance
+     * @pi.url:/testOnRelevance/findAllRelevance
      * @pi.methodType:post
      * @pi.request-type: formdata
      * @pi.param: name=pipelineId;dataType=string;value=流水线Id
@@ -44,7 +44,7 @@ public class RelevanceTestOnController {
 
     /**
      * @pi.name:分页查询流水线测试信息执行实例
-     * @pi.path:/testOnRelevance/findAllRelevancePage
+     * @pi.url:/testOnRelevance/findAllRelevancePage
      * @pi.methodType:post
      * @pi.request-type:json
      * @pi.param: model=relevanceTestOnQuery
@@ -60,7 +60,7 @@ public class RelevanceTestOnController {
 
     /**
      * @pi.name:删除测试信息执行实例
-     * @pi.path:/testOnRelevance/deleteRelevance
+     * @pi.url:/testOnRelevance/deleteRelevance
      * @pi.methodType:post
      * @pi.request-type: formdata
      * @pi.param: name=relevanceId;dataType=string;value=relevanceId;

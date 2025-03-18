@@ -29,7 +29,7 @@ public class AuthHostController {
 
     /**
      * @pi.name:创建主机认证信息
-     * @pi.path:/authHost/createAuthHost
+     * @pi.url:/authHost/createAuthHost
      * @pi.methodType:post
      * @pi.request-type:json
      * @pi.param: model=authHost
@@ -42,7 +42,7 @@ public class AuthHostController {
 
     /**
      * @pi.name:删除主机认证信息
-     * @pi.path:/authHost/deleteAuthHost
+     * @pi.url:/authHost/deleteAuthHost
      * @pi.methodType:post
      * @pi.request-type: formdata
      * @pi.param: name=hostId;dataType=string;value=hostId;
@@ -55,7 +55,7 @@ public class AuthHostController {
 
     /**
      * @pi.name:更新主机认证信息
-     * @pi.path:/authHost/updateAuthHost
+     * @pi.url:/authHost/updateAuthHost
      * @pi.methodType:post
      * @pi.request-type: json
      * @pi.param: model=authHost
@@ -68,7 +68,7 @@ public class AuthHostController {
 
     /**
      * @pi.name:查询单个主机认证信息
-     * @pi.path:/authHost/findAuthHost
+     * @pi.url:/authHost/findAuthHost
      * @pi.methodType:post
      * @pi.request-type:formdata
      * @pi.param: name=hostId;dataType=string;value=hostId;
@@ -81,7 +81,7 @@ public class AuthHostController {
 
     /**
      * @pi.name:查询主机认证信息
-     * @pi.path:/authHost/findAllAuthHostList
+     * @pi.url:/authHost/findAllAuthHostList
      * @pi.methodType:post
      * @pi.request-type:formdata
      * @pi.param:name=type;dataType=string;value=aliyun;
@@ -94,7 +94,7 @@ public class AuthHostController {
 
     /**
      * @pi.name:分页查询主机认证信息
-     * @pi.path:/authHost/findAuthHostPage
+     * @pi.url:/authHost/findAuthHostPage
      * @pi.methodType:post
      * @pi.request-type:json
      * @pi.param:model=hostQuery;

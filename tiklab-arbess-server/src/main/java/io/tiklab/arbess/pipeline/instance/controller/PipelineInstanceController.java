@@ -27,7 +27,7 @@ public class PipelineInstanceController {
 
     /**
      * @pi.name:删除流水线执行实例
-     * @pi.path:/instance/deleteInstance
+     * @pi.url:/instance/deleteInstance
      * @pi.methodType:post
      * @pi.request-type: formdata
      * @pi.param: name=instanceId;dataType=string;value=实例id;
@@ -40,21 +40,20 @@ public class PipelineInstanceController {
 
     /**
      * @pi.name:查询流水线实例
-     * @pi.path:/follow/findPipelineInstance
+     * @pi.url:/follow/findPipelineInstance
      * @pi.methodType:post
      * @pi.request-type:json
      * @pi.param: model=query
      */
     @RequestMapping(path="/findPipelineInstance",method = RequestMethod.POST)
-    public Result<Pagination<PipelineInstance>> findPipelineInstance(
-            @RequestBody @NotNull @Valid  PipelineInstanceQuery query){
+    public Result<Pagination<PipelineInstance>> findPipelineInstance(@RequestBody @NotNull @Valid  PipelineInstanceQuery query){
         Pagination<PipelineInstance> list = instanceService.findPipelineInstance(query);
         return Result.ok(list);
     }
 
     /**
      * @pi.name:查询用户流水线实例
-     * @pi.path:/follow/findUserInstance
+     * @pi.url:/follow/findUserInstance
      * @pi.methodType:post
      * @pi.request-type:json
      * @pi.param: model=query
@@ -68,7 +67,7 @@ public class PipelineInstanceController {
 
     /**
      * @pi.name:查询单个流水线实例
-     * @pi.path:/instance/findOneInstance
+     * @pi.url:/instance/findOneInstance
      * @pi.methodType:post
      * @pi.request-type: formdata
      * @pi.param: name=instanceId;dataType=string;value=实例id;

@@ -22,7 +22,7 @@ public class SystemMassageController {
 
     /**
      * @pi.name:获取系统信息
-     * @pi.path:/systemMassage/getSystemMassage
+     * @pi.url:/systemMassage/getSystemMassage
      * @pi.methodType:post
      * @pi.request-type:none
      */

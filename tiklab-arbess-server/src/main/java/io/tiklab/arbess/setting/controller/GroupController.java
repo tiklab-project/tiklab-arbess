@@ -30,7 +30,7 @@ public class GroupController {
 
     /**
      * @pi.name:创建流水线组
-     * @pi.path:/group/createGroup
+     * @pi.url:/group/createGroup
      * @pi.methodType:post
      * @pi.request-type: json
      * @pi.param: model=group;
@@ -44,7 +44,7 @@ public class GroupController {
 
     /**
      * @pi.name:删除流水线组
-     * @pi.path:/group/deleteGroup
+     * @pi.url:/group/deleteGroup
      * @pi.methodType:post
      * @pi.request-type: formdata
      * @pi.param: name=groupId;dataType=string;value=流水线组id;
@@ -57,7 +57,7 @@ public class GroupController {
 
     /**
      * @pi.name:更新流水线组
-     * @pi.path:/group/updateGroup
+     * @pi.url:/group/updateGroup
      * @pi.methodType:post
      * @pi.request-type: json
      * @pi.param: model=group;
@@ -70,7 +70,7 @@ public class GroupController {
 
     /**
      * @pi.name:分页查询流水线组
-     * @pi.path:/group/findGroupPage
+     * @pi.url:/group/findGroupPage
      * @pi.methodType:post
      * @pi.request-type: json
      * @pi.param: model=group;
@@ -83,7 +83,7 @@ public class GroupController {
 
     /**
      * @pi.name:多条件查询流水线组
-     * @pi.path:/group/findGroupList
+     * @pi.url:/group/findGroupList
      * @pi.methodType:post
      * @pi.request-type: json
      * @pi.param: model=group;

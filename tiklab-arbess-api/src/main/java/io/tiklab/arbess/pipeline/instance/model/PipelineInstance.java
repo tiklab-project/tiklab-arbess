@@ -59,6 +59,15 @@ public class PipelineInstance {
     //@ApiProperty(name="runTimeDate",desc ="日志文件")
     private String logPath;
 
+    private Boolean exec;
+
+    public Boolean getExec() {
+        return exec;
+    }
+
+    public void setExec(Boolean exec) {
+        this.exec = exec;
+    }
 
     public PipelineInstance() {
     }

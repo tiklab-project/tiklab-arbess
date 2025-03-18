@@ -22,7 +22,7 @@ public class TaskMessageController {
 
     /**
      * @pi.name:查询消息发送方式
-     * @pi.path:/taskMessage/findMessageSendType
+     * @pi.url:/taskMessage/findMessageSendType
      * @pi.methodType:post
      * @pi.request-type:none
      */

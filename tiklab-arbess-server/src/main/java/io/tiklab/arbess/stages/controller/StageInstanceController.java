@@ -24,7 +24,7 @@ public class StageInstanceController {
 
     /**
      * @pi.name:查询流水线多阶段运行信息
-     * @pi.path:/stageInstance/findStageInstance
+     * @pi.url:/stageInstance/findStageInstance
      * @pi.methodType:post
      * @pi.request-type: formdata
      * @pi.param: name=instanceId;dataType=string;value=instanceId;

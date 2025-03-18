@@ -1,5 +1,9 @@
 package io.tiklab.arbess.pipeline.execute.service;
 
+import io.tiklab.arbess.home.service.PipelineHomeService;
+import io.tiklab.arbess.task.build.model.TaskBuildProduct;
+import io.tiklab.arbess.task.build.model.TaskBuildProductQuery;
+import io.tiklab.arbess.task.build.service.TaskBuildProductService;
 import io.tiklab.core.exception.SystemException;
 import io.tiklab.arbess.pipeline.instance.service.PipelineInstanceServiceImpl;
 import io.tiklab.arbess.support.agent.model.Agent;
@@ -38,8 +42,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.WebSocketSession;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.*;
+
+import static io.tiklab.arbess.support.util.util.PipelineFinal.PIPELINE_RUN_KEY;
 
 /**
  * 流水线运行服务
@@ -90,6 +97,12 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
     @Autowired
     AgentService agentService;
 
+    @Autowired
+    PipelineHomeService homeService;
+
+    @Autowired
+    TaskBuildProductService taskBuildProductService;
+
     public final Logger logger = LoggerFactory.getLogger(PipelineExecServiceImpl.class);
 
     //流水线id:流水线实例id
@@ -106,6 +119,12 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
      */
     @Override
     public PipelineInstance start(PipelineRunMsg runMsg) {
+
+        Boolean permissions = homeService.findPermissions(runMsg.getPipelineId(), PIPELINE_RUN_KEY);
+        if (!permissions) {
+            throw new ApplicationException("您没有权限执行该流水线,请联系管理员授权!");
+        }
+
         Agent agent;
         if (StringUtils.isEmpty(runMsg.getAgentId())){
             agent = agentService.findDefaultAgent();
@@ -142,6 +161,52 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
         runMsg.setPipeline(pipeline);
         runMsg.setAgent(agent);
         return beginExecPipeline(runMsg);
+    }
+
+    @Override
+    public PipelineInstance rollBackStart(PipelineRunMsg runMsg) {
+
+        Boolean permissions = homeService.findPermissions(runMsg.getPipelineId(), PIPELINE_RUN_KEY);
+        if (!permissions) {
+            throw new ApplicationException("您没有权限执行该流水线,请联系管理员授权!");
+        }
+
+        Agent agent;
+        if (StringUtils.isEmpty(runMsg.getAgentId())){
+            agent = agentService.findDefaultAgent();
+        }else {
+            agent = agentService.findAgent(runMsg.getAgentId());
+        }
+        if (Objects.isNull(agent)){
+            throw new ApplicationException("无法获取到流水线执行Agent！");
+        }
+
+        WebSocketSession session = SocketServerHandler.sessionMap.get(agent.getAddress());
+        if (Objects.isNull(session)){
+            throw new ApplicationException("流水线Agent断开连接，无法执行。");
+        }
+
+        // 判断同一任务是否在运行
+        Pipeline pipeline = validExecPipeline(runMsg);
+        String pipelineId = pipeline.getId();
+
+        List<String> strings = stageService.validStagesMustField(pipelineId);
+        if (!Objects.isNull(strings) && !strings.isEmpty()){
+            throw new ApplicationException("流水线未配置完成，请完善配置后在执行。");
+        }
+
+        pipelineIdOrAgentId.put(pipelineId, agent);
+
+        // 判断磁盘空间是否足够
+        diskService.validationStorageSpace();
+
+        // 资源限制
+        resourcesService.judgeResources();
+
+        // 进入执行
+        runMsg.setPipeline(pipeline);
+        runMsg.setAgent(agent);
+        return rollBackBeginExecPipeline(runMsg);
     }
 
     /**
@@ -188,7 +253,6 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
         String instanceId = pipelineInstance.getInstanceId();
         pipelineInstanceService.instanceRuntime(pipelineInstance.getInstanceId());
         joinTemplate.joinQuery(pipelineInstance);
-
         // 运行实例放入内存中
         pipelineIdOrInstanceId.put(pipelineId, instanceId);
 
@@ -218,9 +282,95 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
             pipelineDetails.setSourceDir(sourceDir);
             pipelineDetails.setLogDir(logDir);
 
-            // // 环境
-            // List<Scm> scmList = scmService.findAllPipelineScm();
-            // pipelineDetails.setScmList(scmList);
+            // 变量
+            List<Variable> variableList = variableService.findAllVariable(pipelineId);
+            pipelineDetails.setVariableList(variableList);
+
+            AgentMessage agentMessage = new AgentMessage();
+            agentMessage.setType("exec");
+            agentMessage.setMessage(pipelineDetails);
+            agentMessage.setPipelineId(pipelineId);
+
+            Agent agent = pipelineDetails.getAgent();
+
+            String id = agent.getAddress();
+
+            WebSocketSession session = SocketServerHandler.sessionMap.get(id);
+            if (Objects.isNull(session)) {
+                throw new SystemException("客户端推送消息失败，无法获取客户端连接,客户端信息："+id);
+            }
+
+            try {
+                logger.info("发送流水线执行信息到客户端......");
+                SocketServerHandler.instance().sendHandleMessage(id,agentMessage);
+            } catch (Exception e) {
+                throw new SystemException("客户端推送消息失败,错误信息：" + e.getMessage());
+            }
+        }catch (Exception e){
+            logger.error("流水线执行出错了：{}",e.getMessage() );
+            stop(pipelineId);
+        }
+        return pipelineInstance;
+    }
+
+    /**
+     * 执行回滚流水线
+     * @param runMsg 流水线信息
+     * @return 流水线实例
+     */
+    public PipelineInstance rollBackBeginExecPipeline(PipelineRunMsg runMsg){
+        String pipelineId = runMsg.getPipelineId();
+
+        String rollBackInstanceId = runMsg.getInstanceId();
+        TaskBuildProductQuery productQuery = new TaskBuildProductQuery();
+        productQuery.setInstanceId(rollBackInstanceId);
+        List<TaskBuildProduct> buildProductList = taskBuildProductService.findBuildProductList(productQuery);
+        if (buildProductList.isEmpty()){
+            throw new ApplicationException("无法获取到部署文件，回滚失败!");
+        }
+
+        Pipeline pipeline = pipelineService.findPipelineById(pipelineId);
+        pipeline.setState(2);
+        pipelineService.updatePipeline(pipeline);
+        runMsg.setPipeline(pipeline);
+
+        TaskBuildProduct taskBuildProduct = buildProductList.get(0);
+
+        logger.info("流水线{}开始运行",pipeline.getName());
+        PipelineInstance pipelineInstance = pipelineInstanceService.initializeInstance(runMsg);
+        // 添加到缓存
+        String instanceId = pipelineInstance.getInstanceId();
+        pipelineInstanceService.instanceRuntime(pipelineInstance.getInstanceId());
+        joinTemplate.joinQuery(pipelineInstance);
+
+        // 运行实例放入内存中
+        pipelineIdOrInstanceId.put(pipelineId, instanceId);
+
+        try {
+            // 创建多阶段运行实例
+            List<Stage> stageList = stageExecService.createRollBackStageExecInstance(pipelineId, instanceId);
+
+            List<Postprocess> postprocessList = postExecService.createPipelinePostInstance(pipelineId, instanceId);
+            PipelineDetails pipelineDetails = new PipelineDetails();
+            pipelineDetails.setTaskBuildProduct(taskBuildProduct);
+
+            // 流水线基本运行信息
+            pipelineDetails.setPipelineId(pipelineId);
+            pipelineDetails.setInstanceId(instanceId);
+            pipelineDetails.setRunWay(runMsg.getRunWay());
+            pipelineDetails.setAgent(runMsg.getAgent());
+
+            // 流水线运行任务
+            pipelineDetails.setStageList(stageList);
+
+            // 流水线后置处理
+            pipelineDetails.setPostprocessList(postprocessList);
+
+            // 数据路径，源码，日志保存
+            String sourceDir = utilService.findPipelineDefaultAddress(pipelineId,1);
+            String logDir = utilService.findPipelineDefaultAddress(pipelineId,2);
+            pipelineDetails.setSourceDir(sourceDir);
+            pipelineDetails.setLogDir(logDir);
 
             // 变量
             List<Variable> variableList = variableService.findAllVariable(pipelineId);

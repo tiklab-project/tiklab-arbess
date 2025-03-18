@@ -24,7 +24,7 @@ public class PipelineOpenController {
 
     /**
      * @pi.name:查询最近打开
-     * @pi.path:/open/findAllOpen
+     * @pi.url:/open/findAllOpen
      * @pi.methodType:post
      * @pi.request-type: formdata
      * @pi.param: name=number;dataType=int;value=查询数据量;
@@ -39,7 +39,7 @@ public class PipelineOpenController {
 
     /**
      * @pi.name:更新最近打开
-     * @pi.path:/open/updateOpen
+     * @pi.url:/open/updateOpen
      * @pi.methodType:post
      * @pi.request-type: formdata
      * @pi.param: name=pipelineId;dataType=string;value=流水线id;

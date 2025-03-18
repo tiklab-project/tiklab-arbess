@@ -28,7 +28,7 @@ public class AuthHostGroupController {
 
     /**
      * @pi.name:创建主机组认证信息
-     * @pi.path:/authHostGroup/createAuthHostGroup
+     * @pi.url:/authHostGroup/createAuthHostGroup
      * @pi.methodType:post
      * @pi.request-type:json
      * @pi.param:model=hostGroup
@@ -41,7 +41,7 @@ public class AuthHostGroupController {
 
     /**
      * @pi.name:删除主机组认证信息
-     * @pi.path:/authHostGroup/deleteAuthHostGroup
+     * @pi.url:/authHostGroup/deleteAuthHostGroup
      * @pi.methodType:post
      * @pi.request-type: formdata
      * @pi.param:name=groupId;dataType=string;value=groupId;
@@ -54,7 +54,7 @@ public class AuthHostGroupController {
 
     /**
      * @pi.name:更新主机组认证信息
-     * @pi.path:/authHostGroup/updateAuthHostGroup
+     * @pi.url:/authHostGroup/updateAuthHostGroup
      * @pi.methodType:post
      * @pi.request-type:json
      * @pi.param:model=hostGroup
@@ -67,7 +67,7 @@ public class AuthHostGroupController {
 
     /**
      * @pi.name:查询主机组认证信息
-     * @pi.path:/authHostGroup/findAuthHostGroup
+     * @pi.url:/authHostGroup/findAuthHostGroup
      * @pi.methodType:post
      * @pi.request-type:formdata
      * @pi.param:name=groupId;dataType=string;value=groupId;
@@ -80,7 +80,7 @@ public class AuthHostGroupController {
 
     /**
      * @pi.name:条件查询主机组认证信息
-     * @pi.path:/authHostGroup/findAllAuthHostGroupList
+     * @pi.url:/authHostGroup/findAllAuthHostGroupList
      * @pi.methodType:post
      * @pi.request-type:json
      * @pi.param:model=groupQuery

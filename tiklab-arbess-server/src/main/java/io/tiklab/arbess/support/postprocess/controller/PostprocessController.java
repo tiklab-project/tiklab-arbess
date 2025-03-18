@@ -26,7 +26,7 @@ public class PostprocessController {
 
     /**
      * @pi.name:创建流水线后置配置
-     * @pi.path:/postprocess/createPost
+     * @pi.url:/postprocess/createPost
      * @pi.methodType:post
      * @pi.request-type:json
      * @pi.param: model=postprocess
@@ -39,7 +39,7 @@ public class PostprocessController {
 
     /**
      * @pi.name:更新流水线后置配置
-     * @pi.path:/postprocess/createPost
+     * @pi.url:/postprocess/createPost
      * @pi.methodType:post
      * @pi.request-type:json
      * @pi.param: model=postprocess
@@ -52,7 +52,7 @@ public class PostprocessController {
 
     /**
      * @pi.name:查询流水线后置配置信息
-     * @pi.path:/postprocess/findPipelinePost
+     * @pi.url:/postprocess/findPipelinePost
      * @pi.methodType:post
      * @pi.request-type: formdata
      * @pi.param: name=pipelineId;dataType=string;value=pipelineId;
@@ -65,7 +65,7 @@ public class PostprocessController {
 
     /**
      * @pi.name:查询流水线任务后置配置信息
-     * @pi.path:/postprocess/findTaskPost
+     * @pi.url:/postprocess/findTaskPost
      * @pi.methodType:post
      * @pi.request-type: formdata
      * @pi.param: name=taskId;dataType=string;value=taskId;
@@ -78,7 +78,7 @@ public class PostprocessController {
 
     /**
      * @pi.name:删除流水线任务后置配置信息
-     * @pi.path:/postprocess/deletePost
+     * @pi.url:/postprocess/deletePost
      * @pi.methodType:post
      * @pi.request-type: formdata
      * @pi.param: name=postId;dataType=string;value=postId;
@@ -91,7 +91,7 @@ public class PostprocessController {
 
     /**
      * @pi.name:查询后置配置信息
-     * @pi.path:/postprocess/findOnePost
+     * @pi.url:/postprocess/findOnePost
      * @pi.methodType:post
      * @pi.request-type: formdata
      * @pi.param: name=postId;dataType=string;value=postId;

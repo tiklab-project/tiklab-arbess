@@ -48,6 +48,12 @@ public interface PipelineHomeService {
     Map<String,Object> initMap(Pipeline pipeline);
 
 
-
+    /**
+     * 查询权限
+     * @param domainId 项目域 id
+     * @param permission 权限编码
+     * @return 权限
+     */
+    Boolean findPermissions(String domainId,String permission);
 
 }

@@ -41,6 +41,7 @@ import java.beans.Transient;
 import java.io.File;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Stream;
 
@@ -131,7 +132,7 @@ public class PipelineServiceImpl implements PipelineService {
         pipeline.setId(pipelineId);
 
         //创建对应流水线模板
-        String template = pipeline.getTemplate();
+        String template = StringUtils.isEmpty(pipeline.getTemplate()) ? "00" : pipeline.getTemplate();
         String[] ints;
         switch (template) {
             case "2131" -> ints =
@@ -307,6 +308,7 @@ public class PipelineServiceImpl implements PipelineService {
             }
             List<Pipeline> pipelineList = BeanMapper.mapList(dataList, Pipeline.class);
             List<Pipeline> list = new ArrayList<>();
+
             List<String> userIdList = new ArrayList<>();
             for (Pipeline pipeline : pipelineList) {
                 userIdList.add(pipeline.getUser().getId());
@@ -314,11 +316,14 @@ public class PipelineServiceImpl implements PipelineService {
                 Pipeline pipelineMessage = findPipelineExecMessage(pipeline);
                 list.add(pipelineMessage);
             }
+
+
             // 查询用户信息
             Map<String, User> pipelineUser = findPipelineUser(userIdList);
 
             List<Pipeline> pipelines = list.stream()
                     .peek(pipeline -> pipeline.setUser(pipelineUser.get(pipeline.getUser().getId())))
+                    .peek(pipeline -> pipeline.setExec(homeService.findPermissions(pipeline.getId(),PIPELINE_RUN_KEY)))
                     .toList();
 
             return PaginationBuilder.build(pipelineListQuery,pipelines);
@@ -327,6 +332,8 @@ public class PipelineServiceImpl implements PipelineService {
         // 查询用户流水线
         PipelineFollowQuery followQuery = new PipelineFollowQuery();
         followQuery.setUserId(userId);
+
+        // 是否收藏
         List<PipelineFollow> followPipeline = followService.findFollowQueryList(followQuery);
         Map<String,String> map = new HashMap<>();
         for (PipelineFollow pipelineFollow : followPipeline) {
@@ -336,6 +343,7 @@ public class PipelineServiceImpl implements PipelineService {
             }
             map.put(pipeline.getId(),pipeline.getId());
         }
+
         Pagination<PipelineEntity> pipelinePage = pipelineDao.findPipelinePage(query);
         List<PipelineEntity> dataList = pipelinePage.getDataList();
         List<Pipeline> pipelineList = BeanMapper.mapList(dataList, Pipeline.class);
@@ -343,6 +351,8 @@ public class PipelineServiceImpl implements PipelineService {
             return PaginationBuilder.build(pipelinePage, Collections.emptyList());
         }
         List<Pipeline> list = new ArrayList<>();
+
+        // 查询用户
         List<String> userIdList = new ArrayList<>();
         for (Pipeline pipeline : pipelineList) {
             // 判断是否收藏
@@ -356,8 +366,10 @@ public class PipelineServiceImpl implements PipelineService {
         }
         Map<String, User> pipelineUser = findPipelineUser(userIdList);
 
+        // 是否执行
         List<Pipeline> pipelines = list.stream()
                 .peek(pipeline -> pipeline.setUser(pipelineUser.get(pipeline.getUser().getId())))
+                .peek(pipeline -> pipeline.setExec(homeService.findPermissions(pipeline.getId(),PIPELINE_RUN_KEY)))
                 .toList();
 
         return PaginationBuilder.build(pipelinePage,pipelines);

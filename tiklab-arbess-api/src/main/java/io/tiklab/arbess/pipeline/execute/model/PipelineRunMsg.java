@@ -27,6 +27,17 @@ public class PipelineRunMsg {
     // 执行器信息
     private Agent agent;
 
+    // 实例id
+    private String instanceId;
+
+    public String getInstanceId() {
+        return instanceId;
+    }
+
+    public void setInstanceId(String instanceId) {
+        this.instanceId = instanceId;
+    }
+
     public Agent getAgent() {
         return agent;
     }

@@ -25,7 +25,7 @@ public class ResourcesController {
 
     /**
      * @pi.name:查询所有资源配置信息
-     * @pi.path:/resources/findAllResources
+     * @pi.url:/resources/findAllResources
      * @pi.methodType:post
      * @pi.request-type:none
      */
@@ -37,7 +37,7 @@ public class ResourcesController {
 
     /**
      * @pi.name:查询可用资源配置信息
-     * @pi.path:/resources/findResourcesList
+     * @pi.url:/resources/findResourcesList
      * @pi.methodType:post
      * @pi.request-type:none
      */

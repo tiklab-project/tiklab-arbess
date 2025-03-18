@@ -12,12 +12,17 @@ public class PipelineFinal {
       */
     public static final String DEFAULT = "default";
 
+    // 流水线运行权限 Key
+    public static final String PIPELINE_RUN_KEY = "pipeline_task_run";
+
     /**
      * 流水线文件系统
      */
     public static final String MATFLOW_WORKSPACE = "/source";
 
     public static final String MATFLOW_LOGS = "/artifact";
+
+    public static final String MATFLOW_INSTABCE = "/instance";
 
 
     /**

@@ -7,6 +7,7 @@ import io.tiklab.dsm.boot.starter.annotation.EnableDsm;
 import io.tiklab.eam.boot.starter.annotation.EnableEamClient;
 import io.tiklab.eam.boot.starter.annotation.EnableEamServer;
 import io.tiklab.gateway.boot.starter.annotation.EnableGateway;
+import io.tiklab.install.EnableInstallService;
 import io.tiklab.licence.boot.starter.annotation.EnableLicenceServer;
 import io.tiklab.arbess.EnableArbessServer;
 import io.tiklab.messsage.boot.starter.annotation.EnableMessageServer;
@@ -29,6 +30,7 @@ import org.springframework.context.annotation.Configuration;
 @EnableToolkit
 //内嵌数据库
 @EnablePostgresql
+@EnableInstallService
 @EnableDal
 // @EnableRpc
 @EnableGateway

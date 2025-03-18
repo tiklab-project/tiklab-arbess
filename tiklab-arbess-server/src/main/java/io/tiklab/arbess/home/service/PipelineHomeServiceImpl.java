@@ -9,6 +9,8 @@ import io.tiklab.message.message.model.MessageReceiver;
 import io.tiklab.message.message.model.SendMessageNotice;
 import io.tiklab.message.message.service.SendMessageNoticeService;
 import io.tiklab.message.setting.model.MessageType;
+import io.tiklab.privilege.permission.modal.DomainPermissionsQuery;
+import io.tiklab.privilege.permission.service.PermissionService;
 import io.tiklab.security.logging.logging.model.Logging;
 import io.tiklab.security.logging.logging.model.LoggingType;
 import io.tiklab.security.logging.logging.service.LoggingByTempService;
@@ -29,6 +31,9 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
 
     @Autowired
     UserService userService;
+
+    @Autowired
+    PermissionService permissionService;
 
     @Autowired
     LoggingByTempService logService;
@@ -184,7 +189,6 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
     }
 
 
-
     /**
      * 发送短信
      * @param map 短信内容
@@ -194,8 +198,14 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
 
     }
 
-
-
+    @Override
+    public Boolean findPermissions(String domainId,String permission){
+        DomainPermissionsQuery permissionsQuery = new DomainPermissionsQuery();
+        permissionsQuery.setDomainId(domainId);
+        permissionsQuery.setUserId(LoginContext.getLoginId());
+        Set<String> permissions = permissionService.findDomainPermissions(permissionsQuery);
+        return permissions.contains(permission);
+    }
 
 }
 

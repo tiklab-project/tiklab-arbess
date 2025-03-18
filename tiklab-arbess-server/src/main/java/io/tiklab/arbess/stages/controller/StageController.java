@@ -26,7 +26,7 @@ public class StageController {
 
     /**
      * @pi.name:创建流水线阶段及任务
-     * @pi.path:/stage/createStage
+     * @pi.url:/stage/createStage
      * @pi.methodType:post
      * @pi.request-type:json
      * @pi.param: model=stage
@@ -39,7 +39,7 @@ public class StageController {
 
     /**
      * @pi.name:查询流水线阶段信息
-     * @pi.path:/stage/finAllStage
+     * @pi.url:/stage/finAllStage
      * @pi.methodType:post
      * @pi.request-type: formdata
      * @pi.param: name=pipelineId;dataType=string;value=pipelineId;
@@ -52,7 +52,7 @@ public class StageController {
 
     /**
      * @pi.name:更新流水线阶段任务
-     * @pi.path:/stage/createStage
+     * @pi.url:/stage/createStage
      * @pi.methodType:post
      * @pi.request-type:json
      * @pi.param: model=stage
@@ -65,7 +65,7 @@ public class StageController {
 
     /**
      * @pi.name:更新流水线阶段名称
-     * @pi.path:/stage/updateStageName
+     * @pi.url:/stage/updateStageName
      * @pi.methodType:post
      * @pi.request-type:json
      * @pi.param: model=stage
@@ -78,7 +78,7 @@ public class StageController {
 
     /**
      * @pi.name:删除流水线阶段及任务
-     * @pi.path:/stage/deleteStage
+     * @pi.url:/stage/deleteStage
      * @pi.methodType:post
      * @pi.request-type: formdata
      * @pi.param: name=taskId;dataType=string;value=taskId;
@@ -91,7 +91,7 @@ public class StageController {
 
     /**
      * @pi.name:效验流水线各个配置阶段完整性
-     * @pi.path:/stage/validStagesMustField
+     * @pi.url:/stage/validStagesMustField
      * @pi.methodType:post
      * @pi.request-type: formdata
      * @pi.param: name=pipelineId;dataType=string;value=流水线Id;

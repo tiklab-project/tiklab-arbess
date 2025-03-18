@@ -26,7 +26,7 @@ public class TaskTestOnController {
 
     /**
      * @pi.name:查询所有测试仓库
-     * @pi.path:/testOnAuthorize/findAllRepository
+     * @pi.url:/testOnAuthorize/findAllRepository
      * @pi.methodType:post
      * @pi.request-type: formdata
      * @pi.param: name=authId;dataType=string;value=authId;
@@ -41,7 +41,7 @@ public class TaskTestOnController {
 
     /**
      * @pi.name:查询测试信息环境
-     * @pi.path:/testOnAuthorize/findAllEnv
+     * @pi.url:/testOnAuthorize/findAllEnv
      * @pi.methodType:post
      * @pi.request-type: formdata
      * @pi.param: name=authId;dataType=string;value=authId;
@@ -58,7 +58,7 @@ public class TaskTestOnController {
 
     /**
      * @pi.name:获取测试计划需要的环境
-     * @pi.path:/testOnAuthorize/findAllEnv
+     * @pi.url:/testOnAuthorize/findAllEnv
      * @pi.methodType:post
      * @pi.request-type: formdata
      * @pi.param: name=authId;dataType=string;value=authId;
@@ -75,7 +75,7 @@ public class TaskTestOnController {
 
     /**
      * @pi.name:查询测试信息测试计划
-     * @pi.path:/testOnAuthorize/findAllTestPlan
+     * @pi.url:/testOnAuthorize/findAllTestPlan
      * @pi.methodType:post
      * @pi.request-type: formdata
      * @pi.param: name=authId;dataType=string;value=authId;

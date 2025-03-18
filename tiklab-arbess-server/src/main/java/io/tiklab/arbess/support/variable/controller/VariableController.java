@@ -26,7 +26,7 @@ public class VariableController {
 
     /**
      * @pi.name:创建流水线变量
-     * @pi.path:/pipelineVariable/createVariable
+     * @pi.url:/pipelineVariable/createVariable
      * @pi.methodType:post
      * @pi.request-type:json
      * @pi.param: model=variable
@@ -39,7 +39,7 @@ public class VariableController {
 
     /**
      * @pi.name:删除流水线变量
-     * @pi.path:/pipelineVariable/deleteVariable
+     * @pi.url:/pipelineVariable/deleteVariable
      * @pi.methodType:post
      * @pi.request-type: formdata
      * @pi.param: name=varId;dataType=string;value=varId;
@@ -52,7 +52,7 @@ public class VariableController {
 
     /**
      * @pi.name:更新流水线变量
-     * @pi.path:/pipelineVariable/createVariable
+     * @pi.url:/pipelineVariable/createVariable
      * @pi.methodType:post
      * @pi.request-type:json
      * @pi.param: model=variable
@@ -65,7 +65,7 @@ public class VariableController {
 
     /**
      * @pi.name:查询流水线任务变量
-     * @pi.path:/pipelineVariable/findAllVariable
+     * @pi.url:/pipelineVariable/findAllVariable
      * @pi.methodType:post
      * @pi.request-type: formdata
      * @pi.param: name=taskId;dataType=string;value=任务id;

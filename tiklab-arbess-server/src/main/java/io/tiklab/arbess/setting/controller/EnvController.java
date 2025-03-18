@@ -30,7 +30,7 @@ public class EnvController {
 
     /**
      * @pi.name:创建流水线环境
-     * @pi.path:/env/createEnv
+     * @pi.url:/env/createEnv
      * @pi.methodType:post
      * @pi.request-type: json
      * @pi.param:  model=env;
@@ -43,7 +43,7 @@ public class EnvController {
 
     /**
      * @pi.name:删除流水线环境
-     * @pi.path:/env/deleteEnv
+     * @pi.url:/env/deleteEnv
      * @pi.methodType:post
      * @pi.request-type: formdata
      * @pi.param: name=envId;dataType=string;value=环境id;
@@ -56,7 +56,7 @@ public class EnvController {
 
     /**
      * @pi.name:创建流水线环境
-     * @pi.path:/env/updateEnv
+     * @pi.url:/env/updateEnv
      * @pi.methodType:post
      * @pi.request-type: json
      * @pi.param:  model=env;
@@ -70,7 +70,7 @@ public class EnvController {
 
     /**
      * @pi.name:条件查询流水线环境
-     * @pi.path:/env/findEnvPage
+     * @pi.url:/env/findEnvPage
      * @pi.methodType:post
      * @pi.request-type: json
      * @pi.param:model=envQuery;
@@ -83,7 +83,7 @@ public class EnvController {
 
     /**
      * @pi.name:分页查询流水线环境
-     * @pi.path:/env/findEnvList
+     * @pi.url:/env/findEnvList
      * @pi.methodType:post
      * @pi.request-type: json
      * @pi.param:model=envQuery;

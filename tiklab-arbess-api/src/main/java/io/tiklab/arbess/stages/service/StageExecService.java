@@ -20,6 +20,14 @@ public interface StageExecService {
 
 
     /**
+     * 创建回滚运行实例
+     * @param pipelineId 流水线id
+     * @param instanceId 流水线实例id
+     */
+    List<Stage> createRollBackStageExecInstance(String pipelineId,String instanceId);
+
+
+    /**
      * 运行流水线阶段
      * @param pipelineDetails 流水线执行详情
      * @return 阶段运行状态
