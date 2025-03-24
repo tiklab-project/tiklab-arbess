@@ -101,7 +101,8 @@ public class ArbessGatewayAutoConfiguration {
                         "/arbess/handler",
                         "/other/handler",
                         "/eam/auth/valid",
-                        "/init/install/findStatus"
+                        "/init/install/findStatus",
+                        "/openapi/doc"
                 })
                 .ignorePreUrls(new String[]{
                         "/service",
@@ -117,7 +118,7 @@ public class ArbessGatewayAutoConfiguration {
                         "/sql",
                         "/maven/test",
                         "/update/pipeline",
-                        "/state/apply/findApply"
+                        "/state/apply/findApply",
                 })
                 .get();
     }

@@ -38,8 +38,8 @@ public class StageInstanceController {
     }
 
     @RequestMapping(path="/findAllStageInstanceLogs",method = RequestMethod.POST)
-    // @ApiMethod(name = "findAllLog",desc = "查询日志")
-    // @ApiParam(name = "instanceId",desc = "流水线实例id",required = true)
+    // //@ApiMethod(name = "findAllLog",desc = "查询日志")
+    // //@ApiParam(name = "instanceId",desc = "流水线实例id",required = true)
     public Result<List<String>> findAllStageInstanceLogs(@NotNull String instanceId){
 
         List<String> allLog = stageInstanceServer.findAllStageInstanceLogs(instanceId);

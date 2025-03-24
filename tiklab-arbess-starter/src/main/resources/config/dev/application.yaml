@@ -27,6 +27,7 @@ DATA_HOME: ${user.home}/tiklab/tiklab-arbess
 jdbc:
   driverClassName: org.postgresql.Driver
   url: jdbc:postgresql://172.10.1.10:5432/tiklab_matflow?stringtype=unspecified
+#  url: jdbc:postgresql://172.10.1.10:5432/tiklab_arbess?stringtype=unspecified
   username: postgres
   password: darth2020
 
@@ -35,6 +36,10 @@ postgresql:
     enable: false
   database: tiklab-arbess
   type: local
+
+postin:
+  scan:
+    package: io.tiklab.arbess
 
 #dcs config
 dcs:
@@ -54,6 +59,7 @@ soular:
 #    enable: false
 #  address: http://192.168.10.15:8080
 #  web:
+#    address: http://192.168.10.15:8080
 #    address: http://192.168.10.16:3010
 
 

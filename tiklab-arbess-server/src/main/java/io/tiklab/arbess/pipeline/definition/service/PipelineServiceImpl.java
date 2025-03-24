@@ -16,6 +16,8 @@ import io.tiklab.arbess.support.variable.service.VariableService;
 import io.tiklab.arbess.task.task.service.TasksCloneService;
 import io.tiklab.arbess.task.task.service.TasksService;
 import io.tiklab.message.message.model.MessageNoticePatch;
+import io.tiklab.privilege.dmRole.model.DmRolePatch;
+import io.tiklab.privilege.dmRole.service.DmRoleService;
 import io.tiklab.toolkit.beans.BeanMapper;
 import io.tiklab.core.exception.ApplicationException;
 import io.tiklab.core.page.Pagination;
@@ -105,6 +107,9 @@ public class PipelineServiceImpl implements PipelineService {
 
     @Autowired
     MessageDmNoticeService messageDmNoticeService;
+
+    @Autowired
+    DmRoleService dmRoleService;
 
 
     private static final Logger logger = LoggerFactory.getLogger(PipelineServiceImpl.class);
@@ -256,7 +261,21 @@ public class PipelineServiceImpl implements PipelineService {
     @Override
     public Pipeline findPipelineNoQuery(String pipelineId){
         PipelineEntity pipelineEntity = pipelineDao.findPipelineById(pipelineId);
-        return BeanMapper.map(pipelineEntity, Pipeline.class);
+        User user = userService.findOne(pipelineEntity.getUserId());
+        Pipeline pipeline = BeanMapper.map(pipelineEntity, Pipeline.class);
+        pipeline.setUser(user);
+        return pipeline;
+    }
+
+    @Override
+    public void updatePipelineRootUser(DmRolePatch dmRolePatch){
+        dmRoleService.updateDomainRootUser(dmRolePatch);
+
+        String userId = dmRolePatch.getUserId();
+        Pipeline pipeline = findPipelineById(dmRolePatch.getDomainId());
+        pipeline.setUser(new User(userId));
+        PipelineEntity pipelineEntity = BeanMapper.map(pipeline, PipelineEntity.class);
+        pipelineDao.updatePipeline(pipelineEntity);
     }
 
     //查询所有

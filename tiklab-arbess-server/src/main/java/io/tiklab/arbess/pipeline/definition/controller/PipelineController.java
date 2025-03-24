@@ -8,6 +8,10 @@ import io.tiklab.arbess.pipeline.definition.model.PipelineQuery;
 import io.tiklab.arbess.pipeline.definition.model.PipelineRecently;
 import io.tiklab.arbess.pipeline.definition.service.PipelineService;
 import io.tiklab.arbess.pipeline.definition.service.PipelineYamlService;
+import io.tiklab.postin.annotation.Api;
+import io.tiklab.postin.annotation.ApiMethod;
+import io.tiklab.postin.annotation.ApiParam;
+import io.tiklab.privilege.dmRole.model.DmRolePatch;
 import io.tiklab.user.user.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +41,7 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping("/pipeline")
+@Api(name = "PipelineController",desc = "流水线管理")
 public class PipelineController {
 
     public Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -55,6 +60,8 @@ public class PipelineController {
      * @pi.param: model=io.tiklab.arbess.pipeline.definition.model.pipeline
      */
     @RequestMapping(path="/createPipeline",method = RequestMethod.POST)
+    //@ApiMethod(name = "createPipeline",desc = "创建流水线")
+    //@ApiParam(name = "pipeline",desc = "流水线",required = true)
     public Result<String> createPipeline(@RequestBody @NotNull @Valid Pipeline pipeline){
 
         String pipelineId = pipelineService.createPipeline(pipeline);
@@ -69,6 +76,7 @@ public class PipelineController {
      * @pi.request-type:none
      */
     @RequestMapping(path="/findAllPipeline",method = RequestMethod.POST)
+    //@ApiMethod(name = "findAllPipeline",desc = "查询所有流水线")
     public Result<List<Pipeline>> findAllPipeline(){
 
         List<Pipeline> selectAllPipeline = pipelineService.findAllPipeline();
@@ -84,6 +92,8 @@ public class PipelineController {
      * @pi.param: name=pipelineId;dataType=string;value=流水线id;
      */
     @RequestMapping(path="/deletePipeline",method = RequestMethod.POST)
+    //@ApiMethod(name = "deletePipeline",desc = "删除流水线")
+    //@ApiParam(name = "pipelineId",desc = "流水线id",required = true)
     public Result<Void> deletePipeline(@NotNull String pipelineId){
 
         pipelineService.deletePipeline(pipelineId);
@@ -99,6 +109,8 @@ public class PipelineController {
      * @pi.param: name=pipelineId;dataType=string;value=流水线id;
      */
     @RequestMapping(path="/findOnePipeline",method = RequestMethod.POST)
+    //@ApiMethod(name = "findOnePipeline",desc = "根据id查询流水线")
+    //@ApiParam(name = "pipelineId",desc = "流水线id",required = true)
     public Result<Pipeline> findOnePipeline(@NotNull String pipelineId){
 
         Pipeline pipeline = pipelineService.findOnePipeline(pipelineId);
@@ -107,11 +119,23 @@ public class PipelineController {
     }
 
     @RequestMapping(path="/findPipelineNoQuery",method = RequestMethod.POST)
+    //@ApiMethod(name = "findPipelineNoQuery",desc = "根据id查询流水线,不查询管理模型")
+    //@ApiParam(name = "pipelineId",desc = "流水线id",required = true)
     public Result<Pipeline> findPipelineNoQuery(@NotNull String pipelineId){
 
         Pipeline pipeline = pipelineService.findPipelineNoQuery(pipelineId);
 
         return Result.ok(pipeline);
+    }
+
+    @RequestMapping(path="/updatePipelineRootUser",method = RequestMethod.POST)
+    //@ApiMethod(name = "updatePipelineRootUser",desc = "更新流水线负责人")
+    //@ApiParam(name = "dmRolePatch",desc = "流水线负责人信息",required = true)
+    public Result<Void> updatePipelineRootUser(@RequestBody @NotNull @Valid DmRolePatch dmRolePatch){
+
+        pipelineService.updatePipelineRootUser(dmRolePatch);
+
+        return Result.ok();
     }
 
     /**
@@ -122,6 +146,8 @@ public class PipelineController {
      * @pi.param:model=pipeline
      */
     @RequestMapping(path="/updatePipeline",method = RequestMethod.POST)
+    //@ApiMethod(name = "updatePipeline",desc = "更新流水线信息")
+    //@ApiParam(name = "pipeline",desc = "流水线",required = true)
     public Result<Void> updatePipeline(@RequestBody @NotNull @Valid Pipeline pipeline){
 
          pipelineService.updatePipeline(pipeline);
@@ -138,7 +164,9 @@ public class PipelineController {
      * @pi.param: model=query
      */
     @RequestMapping(path="/findUserPipelinePage",method = RequestMethod.POST)
-    public Result< Pagination<Pipeline>> findUserPipelinePage(@RequestBody @NotNull @Valid PipelineQuery query){
+    //@ApiMethod(name = "findUserPipelinePage",desc = "分页查询用户流水线")
+    //@ApiParam(name = "query",desc = "流水线查询条件",required = true)
+    public Result<Pagination<Pipeline>> findUserPipelinePage(@RequestBody @NotNull @Valid PipelineQuery query){
 
         Pagination<Pipeline> userPipeline = pipelineService.findUserPipelinePage(query);
 
@@ -152,7 +180,9 @@ public class PipelineController {
      * @pi.request-type:none
      */
     @RequestMapping(path="/findUserPipeline",method = RequestMethod.POST)
-    public Result< List<Pipeline>> findAllUserPipeline(@RequestBody @NotNull @Valid PipelineQuery query){
+    //@ApiMethod(name = "findUserPipeline",desc = "查询用户流水线")
+    //@ApiParam(name = "query",desc = "流水线查询条件",required = true)
+    public Result<List<Pipeline>> findAllUserPipeline(@RequestBody @NotNull @Valid PipelineQuery query){
         List<Pipeline> userPipeline = pipelineService.findUserPipeline(query);
 
         return Result.ok(userPipeline);
@@ -166,6 +196,8 @@ public class PipelineController {
      * @pi.param: name=pipelineId;dataType=string;value=流水线id;
      */
     @RequestMapping(path="/findPipelineUser",method = RequestMethod.POST)
+    //@ApiMethod(name = "findUserPipeline",desc = "查询流水线用户")
+    //@ApiParam(name = "pipelineId",desc = "流水线id",required = true)
     public Result<List<User>> findPipelineUser(@NotNull String pipelineId){
 
         List<User>  dmUser = pipelineService.findPipelineUser(pipelineId);

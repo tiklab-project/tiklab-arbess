@@ -3,6 +3,7 @@ package io.tiklab.arbess.pipeline.definition.service;
 
 import io.tiklab.arbess.pipeline.definition.model.PipelineQuery;
 import io.tiklab.core.page.Pagination;
+import io.tiklab.privilege.dmRole.model.DmRolePatch;
 import io.tiklab.toolkit.join.annotation.FindAll;
 import io.tiklab.toolkit.join.annotation.FindList;
 import io.tiklab.toolkit.join.annotation.FindOne;
@@ -69,6 +70,13 @@ public interface PipelineService {
      * @return 流水线
      */
     Pipeline findPipelineNoQuery(String pipelineId);
+
+
+    /**
+     * 更新流水线负责人
+     * @param dmRolePatch 负责人信息
+     */
+    void updatePipelineRootUser(DmRolePatch dmRolePatch);
 
     /**
      * 查询所有流水线

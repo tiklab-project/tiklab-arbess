@@ -13,6 +13,7 @@ import io.tiklab.arbess.EnableArbessServer;
 import io.tiklab.messsage.boot.starter.annotation.EnableMessageServer;
 import io.tiklab.openapi.boot.starter.annotation.EnableOpenApi;
 import io.tiklab.postgresql.EnablePostgresql;
+import io.tiklab.postin.client.EnablePostInClient;
 import io.tiklab.privilege.boot.starter.annotation.EnablePrivilegeServer;
 import io.tiklab.security.boot.stater.annotation.EnableSecurityServer;
 import io.tiklab.toolkit.boot.starter.annotation.EnableToolkit;
@@ -52,6 +53,9 @@ import org.springframework.context.annotation.Configuration;
 //权限中心
 @EnablePrivilegeServer
 @EnableLicenceServer
+
+// postin
+@EnablePostInClient
 
 @EnableArbessServer
 @ComponentScan(value = "io.tiklab.arbess")
