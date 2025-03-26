@@ -9,8 +9,8 @@ spring:
 
 arbess:
   setting:
-#    address: /Users/zcamy/Java/tiklab-arbess-agent/tiklab-arbess-agent-starter/src/main/resources/settings.xml
-    address: D:\Java\tiklab-arbess-agent\tiklab-arbess-agent-starter\src\main\resources\settings.xml
+    address: /Users/zcamy/Java/tiklab-arbess-agent/tiklab-arbess-agent-starter/src/main/resources/settings.xml
+#    address: D:\Java\tiklab-arbess-agent\tiklab-arbess-agent-starter\src\main\resources\settings.xml
   spotbugs:
     address: /Users/zcamy/Java/tiklab-arbess-agent/tiklab-arbess-agent-starter/embbed/spotbugs-4.8.1/bin/spotbugs
   jdk:

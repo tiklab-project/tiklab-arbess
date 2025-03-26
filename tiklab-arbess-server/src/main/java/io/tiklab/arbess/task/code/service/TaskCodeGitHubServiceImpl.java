@@ -85,7 +85,8 @@ public class TaskCodeGitHubServiceImpl implements TaskCodeGitHubService {
                         .setDefaultBranch(defaultBranch);
                 houseList.add(thirdHouse);
             }
-        }catch (Exception e) {
+        }catch (HttpClientErrorException e) {
+            findGitlabErrorRequest(e.getRawStatusCode());
             throw new SystemException(e);
         }
         return houseList;
@@ -150,8 +151,8 @@ public class TaskCodeGitHubServiceImpl implements TaskCodeGitHubService {
             String avatar = jsonObject.getString("avatar_url");
             return new ThirdUser().setId(id).setName(name).setPath(login).setHead(avatar);
 
-        }catch (Exception e) {
-
+        }catch (HttpClientErrorException e) {
+            findGitlabErrorRequest(e.getRawStatusCode());
             throw new SystemException(e);
         }
     }
@@ -193,8 +194,8 @@ public class TaskCodeGitHubServiceImpl implements TaskCodeGitHubService {
 
     private void findGitlabErrorRequest(int code){
         switch (code){
-            case 401 -> { throw new ApplicationException("AccessToken无效或已过期 ！");}
-            case 403 -> { throw new ApplicationException("AccessToken权限不足！");}
+            case 401 -> { throw new ApplicationException("令牌无效或已过期 ！");}
+            case 403 -> { throw new ApplicationException("令牌权限不足！");}
             case 404 -> { throw new ApplicationException("请求失败，接口不存在！");}
             case 405 -> { throw new ApplicationException("不支持该请求！");}
             case 429 -> { throw new ApplicationException("请求次数过多！");}

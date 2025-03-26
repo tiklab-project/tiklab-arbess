@@ -91,6 +91,11 @@
             <artifactId>tiklab-postin-client</artifactId>
             <version>${tiklab-postin.version}</version>
         </dependency>
+        <dependency>
+            <groupId>io.tiklab</groupId>
+            <artifactId>tiklab-arbess-agent-server</artifactId>
+            <version>${tiklab-matflow-agent.version}</version>
+        </dependency>
     </dependencies>
 
     <build>
