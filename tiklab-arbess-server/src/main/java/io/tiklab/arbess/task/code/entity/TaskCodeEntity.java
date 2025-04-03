@@ -45,6 +45,55 @@ public class TaskCodeEntity {
     @Column(name = "tool_svn",notNull = true)
     private String toolSvn;
 
+    // 认证类型
+    @Column(name = "auth_type",notNull = true)
+    private String authType;
+
+    // 用户名
+    @Column(name = "username",notNull = true)
+    private String username;
+
+    // 密码
+    @Column(name = "password",notNull = true)
+    private String password;
+
+    // 私钥
+    @Column(name = "pri_key",notNull = true)
+    private String priKey;
+
+
+    public String getAuthType() {
+        return authType;
+    }
+
+    public void setAuthType(String authType) {
+        this.authType = authType;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getPriKey() {
+        return priKey;
+    }
+
+    public void setPriKey(String priKey) {
+        this.priKey = priKey;
+    }
+
     public String getToolSvn() {
         return toolSvn;
     }

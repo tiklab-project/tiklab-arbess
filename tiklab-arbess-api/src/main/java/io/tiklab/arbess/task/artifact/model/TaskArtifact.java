@@ -20,12 +20,6 @@ public class TaskArtifact {
     //@ApiProperty(name = "taskId",desc = "id")
     private String taskId;
 
-    //@ApiProperty(name = "groupId",desc = "groupId")
-    private String groupId;
-
-    //@ApiProperty(name = "artifactId",desc = "artifactId")
-    private String artifactId;
-
     //@ApiProperty(name = "artifactType",desc = "推送类型")
     private String artifactType;
 
@@ -52,15 +46,6 @@ public class TaskArtifact {
     private String rule;
 
     /**
-     * 仓库ID
-     */
-    @Mappings({
-            @Mapping(source = "repository.id",target = "xpackId")
-    })
-    @JoinQuery(key = "xpackId")
-    private XpackRepository repository;
-
-    /**
      * 授权信息
      */
     private Object auth;
@@ -76,51 +61,6 @@ public class TaskArtifact {
     private int sort;
 
     private String instanceId;
-
-    // jdk版本
-    @Mappings({
-            @Mapping(source = "toolJdk.scmId",target = "toolJdk")
-    })
-    @JoinQuery(key = "scmId")
-    private Scm toolJdk;
-
-    // maven版本
-    @Mappings({
-            @Mapping(source = "toolMaven.scmId",target = "toolMaven")
-    })
-    @JoinQuery(key = "scmId")
-    private Scm toolMaven;
-
-    // npm版本
-    @Mappings({
-            @Mapping(source = "toolNodejs.scmId",target = "toolNodejs")
-    })
-    @JoinQuery(key = "scmId")
-    private Scm toolNodejs;
-
-    public Scm getToolJdk() {
-        return toolJdk;
-    }
-
-    public void setToolJdk(Scm toolJdk) {
-        this.toolJdk = toolJdk;
-    }
-
-    public Scm getToolMaven() {
-        return toolMaven;
-    }
-
-    public void setToolMaven(Scm toolMaven) {
-        this.toolMaven = toolMaven;
-    }
-
-    public Scm getToolNodejs() {
-        return toolNodejs;
-    }
-
-    public void setToolNodejs(Scm toolNodejs) {
-        this.toolNodejs = toolNodejs;
-    }
 
     public String getInstanceId() {
         return instanceId;
@@ -157,13 +97,6 @@ public class TaskArtifact {
         return this;
     }
 
-    public XpackRepository getRepository() {
-        return repository;
-    }
-
-    public void setRepository(XpackRepository repository) {
-        this.repository = repository;
-    }
 
     public String getTaskId() {
         return taskId;
@@ -171,22 +104,6 @@ public class TaskArtifact {
 
     public void setTaskId(String taskId) {
         this.taskId = taskId;
-    }
-
-    public String getGroupId() {
-        return groupId;
-    }
-
-    public void setGroupId(String groupId) {
-        this.groupId = groupId;
-    }
-
-    public String getArtifactId() {
-        return artifactId;
-    }
-
-    public void setArtifactId(String artifactId) {
-        this.artifactId = artifactId;
     }
 
     public String getVersion() {

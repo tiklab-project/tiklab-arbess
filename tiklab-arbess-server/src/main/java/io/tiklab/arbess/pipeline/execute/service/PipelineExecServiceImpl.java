@@ -307,6 +307,7 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
                 throw new SystemException("客户端推送消息失败,错误信息：" + e.getMessage());
             }
         }catch (Exception e){
+            e.printStackTrace();
             logger.error("流水线执行出错了：{}",e.getMessage() );
             stop(pipelineId);
         }

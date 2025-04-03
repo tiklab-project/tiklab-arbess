@@ -21,8 +21,6 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Objects;
 
-import static io.tiklab.arbess.support.util.util.PipelineFinal.*;
-import static io.tiklab.arbess.support.util.util.PipelineFinal.TASK_ARTIFACT_SSH;
 
 @Service
 @Exporter
@@ -37,9 +35,6 @@ public class TaskArtifactServiceImpl implements TaskArtifactService {
 
     @Autowired
     private AuthHostService hostServer;
-
-    @Autowired
-    private TaskArtifactXpackService taskArtifactXpackService;
 
     /**
      * 创建流水线推送制品
@@ -71,112 +66,12 @@ public class TaskArtifactServiceImpl implements TaskArtifactService {
         AuthThird authServer = thirdServer.findOneAuthServer(authId);
         artifact.setAuth(authServer);
 
-        if (artifactType.equals(PipelineFinal.TASK_ARTIFACT_SSH)){
+        if (artifactType.equals(PipelineFinal.TASK_UPLOAD_SSH)){
             AuthHost oneAuthHost = hostServer.findOneAuthHost(authId);
             artifact.setAuth(oneAuthHost);
         }
-
-        XpackRepository repository = artifact.getRepository();
-        if (artifactType.equals(PipelineFinal.TASK_ARTIFACT_XPACK) && !Objects.isNull(repository)){
-            XpackRepository xpackRepository = taskArtifactXpackService.findRepository(authId, artifact.getRepository().getId());
-            if (!Objects.isNull(xpackRepository)){
-                artifact.setPutAddress(xpackRepository.getName());
-                artifact.setRepository(xpackRepository);
-            }
-        }
         return artifact;
     }
-
-
-    @Override
-    public Boolean artifactValid(String taskType,TaskArtifact artifact){
-        String artifactType = artifact.getArtifactType();
-
-        if (taskType.equals(TASK_ARTIFACT_DOCKER)){
-            if (artifactType.equals(TASK_ARTIFACT_NEXUS)){
-                if (!PipelineUtil.isNoNull(artifact.getDockerImage())){
-                    return false;
-                }
-                if (!PipelineUtil.isNoNull(artifact.getAuthId())){
-                    return false;
-                }
-            }
-            if (artifactType.equals(TASK_ARTIFACT_XPACK)){
-                if (!PipelineUtil.isNoNull(artifact.getDockerImage())){
-                    return false;
-                }
-                if (!PipelineUtil.isNoNull(artifact.getAuthId())){
-                    return false;
-                }
-                if (Objects.isNull(artifact.getRepository()) || !PipelineUtil.isNoNull(artifact.getRepository().getId())){
-                    return false;
-                }
-            }
-        }
-
-        if (taskType.equals(TASK_ARTIFACT_NODEJS)){
-            return true;
-        }
-        if (taskType.equals(TASK_ARTIFACT_MAVEN)){
-            if (artifactType.equals(TASK_ARTIFACT_NEXUS)){
-                if (!PipelineUtil.isNoNull(artifact.getAuthId())){
-                    return false;
-                }
-                if (!PipelineUtil.isNoNull(artifact.getArtifactId())){
-                    return false;
-                }
-                if (!PipelineUtil.isNoNull(artifact.getVersion())){
-                    return false;
-                }
-                if (!PipelineUtil.isNoNull(artifact.getGroupId())){
-                    return false;
-                }
-                if (Objects.isNull(artifact.getToolJdk())){
-                    return false;
-                }
-                if (Objects.isNull(artifact.getToolMaven())){
-                    return false;
-                }
-                if (StringUtils.isEmpty(artifact.getFileAddress())){
-                    return false;
-                }
-            }
-            if (artifactType.equals(TASK_ARTIFACT_XPACK)){
-                if (!PipelineUtil.isNoNull(artifact.getAuthId())){
-                    return false;
-                }
-                if (Objects.isNull(artifact.getRepository())){
-                    return false;
-                }
-                if (Objects.isNull(artifact.getToolJdk())){
-                    return false;
-                }
-                if (Objects.isNull(artifact.getToolMaven())){
-                    return false;
-                }
-                if (StringUtils.isEmpty(artifact.getGroupId())){
-                    return false;
-                }
-                if (StringUtils.isEmpty(artifact.getArtifactId())){
-                    return false;
-                }
-                if (StringUtils.isEmpty(artifact.getVersion())){
-                    return false;
-                }
-                if (StringUtils.isEmpty(artifact.getFileAddress())){
-                    return false;
-                }
-            }
-            if (artifactType.equals(TASK_ARTIFACT_SSH)){
-                if (!PipelineUtil.isNoNull(artifact.getAuthId())){
-                    return false;
-                }
-                return PipelineUtil.isNoNull(artifact.getPutAddress());
-            }
-        }
-        return true;
-    }
-
 
     /**
      * 删除流水线推送制品

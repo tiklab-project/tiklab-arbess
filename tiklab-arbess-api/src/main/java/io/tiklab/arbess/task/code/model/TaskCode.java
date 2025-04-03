@@ -2,6 +2,7 @@ package io.tiklab.arbess.task.code.model;
 
 
 import io.tiklab.arbess.setting.model.Scm;
+import io.tiklab.core.BaseModel;
 import io.tiklab.toolkit.beans.annotation.Mapper;
 import io.tiklab.toolkit.beans.annotation.Mapping;
 import io.tiklab.toolkit.beans.annotation.Mappings;
@@ -15,7 +16,7 @@ import io.tiklab.toolkit.join.annotation.JoinQuery;
 //@ApiModel
 @Join
 @Mapper
-public class TaskCode {
+public class TaskCode extends BaseModel {
 
     //@ApiProperty(name = "taskId",desc = "id")
     private String taskId;
@@ -52,21 +53,35 @@ public class TaskCode {
     //代码类型
     private String type;
 
+    // 实例Id
     private String instanceId;
 
-    // jdk版本
+    // Git版本
     @Mappings({
             @Mapping(source = "toolGit.scmId",target = "toolGit")
     })
     @JoinQuery(key = "scmId")
     private Scm toolGit;
 
-    // maven版本
+    // svn版本
     @Mappings({
             @Mapping(source = "toolSvn.scmId",target = "toolSvn")
     })
     @JoinQuery(key = "scmId")
     private Scm toolSvn;
+
+
+    // 认证类型
+    private String authType;
+
+    // 用户名
+    private String username;
+
+    // 密码
+    private String password;
+
+    // 私钥
+    private String priKey;
 
 
     public Scm getToolGit() {
@@ -181,5 +196,37 @@ public class TaskCode {
     public TaskCode setType(String type) {
         this.type = type;
         return this;
+    }
+
+    public String getAuthType() {
+        return authType;
+    }
+
+    public void setAuthType(String authType) {
+        this.authType = authType;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getPriKey() {
+        return priKey;
+    }
+
+    public void setPriKey(String priKey) {
+        this.priKey = priKey;
     }
 }

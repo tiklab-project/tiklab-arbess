@@ -55,6 +55,7 @@ public class StageExecServiceImpl implements  StageExecService {
             String stageInstanceId = initStageInstance(mainStage, instanceId, true,mainAddress);
             mainStage.setInstanceId(stageInstanceId);
             List<Stage> otherStage = stageService.findOtherStage(stageId);
+
             //获取阶段下的并行任务
             for (Stage stage : otherStage) {
                 String id = stage.getStageId();

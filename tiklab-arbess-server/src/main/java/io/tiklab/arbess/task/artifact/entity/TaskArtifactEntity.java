@@ -10,29 +10,17 @@ public class TaskArtifactEntity {
     @Column(name = "task_id" ,notNull = true)
     private String taskId;
 
-    @Column(name = "group_id")
-    private String groupId;
-
     @Column(name = "artifact_type")
     private String artifactType;
 
-    @Column(name = "artifact_id")
-    private String artifactId;
-
     @Column(name = "version")
     private String version;
-
-    @Column(name = "file_type")
-    private String fileType;
 
     @Column(name = "file_address")
     private String fileAddress;
 
     @Column(name = "put_address")
     private String putAddress;
-
-    @Column(name = "xpack_id")
-    private String xpackId;
 
     @Column(name = "auth_id")
     private String authId;
@@ -43,41 +31,6 @@ public class TaskArtifactEntity {
     @Column(name = "docker_image",notNull = true)
     private String dockerImage;
 
-    // jdk版本
-    @Column(name = "tool_jdk" ,notNull = true)
-    private String toolJdk;
-
-    // maven版本
-    @Column(name = "tool_maven" ,notNull = true)
-    private String toolMaven;
-
-    // npm版本
-    @Column(name = "tool_nodejs" ,notNull = true)
-    private String toolNodejs;
-
-    public String getToolJdk() {
-        return toolJdk;
-    }
-
-    public void setToolJdk(String toolJdk) {
-        this.toolJdk = toolJdk;
-    }
-
-    public String getToolMaven() {
-        return toolMaven;
-    }
-
-    public void setToolMaven(String toolMaven) {
-        this.toolMaven = toolMaven;
-    }
-
-    public String getToolNodejs() {
-        return toolNodejs;
-    }
-
-    public void setToolNodejs(String toolNodejs) {
-        this.toolNodejs = toolNodejs;
-    }
 
     public String getDockerImage() {
         return dockerImage;
@@ -115,39 +68,12 @@ public class TaskArtifactEntity {
         return this;
     }
 
-    public String getGroupId() {
-        return groupId;
-    }
-
-    public TaskArtifactEntity setGroupId(String groupId) {
-        this.groupId = groupId;
-        return this;
-    }
-
-    public String getArtifactId() {
-        return artifactId;
-    }
-
-    public TaskArtifactEntity setArtifactId(String artifactId) {
-        this.artifactId = artifactId;
-        return this;
-    }
-
     public String getVersion() {
         return version;
     }
 
     public TaskArtifactEntity setVersion(String version) {
         this.version = version;
-        return this;
-    }
-
-    public String getFileType() {
-        return fileType;
-    }
-
-    public TaskArtifactEntity setFileType(String fileType) {
-        this.fileType = fileType;
         return this;
     }
 
@@ -166,15 +92,6 @@ public class TaskArtifactEntity {
 
     public TaskArtifactEntity setPutAddress(String putAddress) {
         this.putAddress = putAddress;
-        return this;
-    }
-
-    public String getXpackId() {
-        return xpackId;
-    }
-
-    public TaskArtifactEntity setXpackId(String xpackId) {
-        this.xpackId = xpackId;
         return this;
     }
 

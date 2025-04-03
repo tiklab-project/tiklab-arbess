@@ -315,8 +315,11 @@ public class PipelineServiceImpl implements PipelineService {
     public Pagination<Pipeline> findUserPipelinePage(PipelineQuery query){
         String userId = query.getUserId();
 
-        String[] builders = authorityService.findUserPipelineIdString(userId);
-        query.setIdString(builders);
+        if (Objects.isNull(query.getIdString()) || query.getIdString().length==0){
+            String[] builders = authorityService.findUserPipelineIdString(userId);
+            query.setIdString(builders);
+        }
+
         // 用户收藏的流水线
         Integer follow = query.getPipelineFollow();
         if (!Objects.isNull(follow) && follow == 1){

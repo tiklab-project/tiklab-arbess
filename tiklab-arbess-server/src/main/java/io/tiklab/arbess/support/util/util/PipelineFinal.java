@@ -144,6 +144,7 @@ public class PipelineFinal {
     public static final String TASK_TYPE_CODE = "code";
     public static final String TASK_CODE_GIT = "git";
     public static final String TASK_CODE_GITLAB = "gitlab";
+    public static final String TASK_CODE_PRI_GITLAB = "pri_gitlab";
     public static final String TASK_CODE_GITHUB = "github";
     public static final String TASK_CODE_GITEE = "gitee";
     public static final String TASK_CODE_SVN = "svn";
@@ -172,23 +173,21 @@ public class PipelineFinal {
     public static final String TASK_DEPLOY_K8S = "k8s";
 
 
-    // 推送制品应用类型
-    public static final String TASK_TYPE_ARTIFACT = "artifact";
-    public static final String TASK_ARTIFACT_MAVEN = "artifact_maven";
-    public static final String TASK_ARTIFACT_NODEJS = "artifact_nodejs";
-    public static final String TASK_ARTIFACT_DOCKER = "artifact_docker";
+    // 上传类型
+    public static final String TASK_TYPE_UPLOAD = "upload";
+    public static final String TASK_UPLOAD_HADESS = "upload_hadess";
+    public static final String TASK_UPLOAD_SSH = "upload_ssh";
+    public static final String TASK_UPLOAD_NEXUS = "upload_nexus";
+    public static final String TASK_UPLOAD_DOCKER = "upload_docker";
 
 
-    // 制品拉取应用类型
-    public static final String TASK_TYPE_PULL = "pull";
-    public static final String TASK_PULL_MAVEN = "pull_maven";
-    public static final String TASK_PULL_NODEJS = "pull_nodejs";
-    public static final String TASK_PULL_DOCKER = "pull_docker";
+    // 下载类型
+    public static final String TASK_TYPE_DOWNLOAD = "download";
+    public static final String TASK_DOWNLOAD_HADESS = "download_hadess";
+    public static final String TASK_DOWNLOAD_SSH = "download_ssh";
+    public static final String TASK_DOWNLOAD_NEXUS = "download_nexus";
+    public static final String TASK_DOWNLOAD_DOCKER = "download_docker";
 
-    // 制品推送应用方式
-    public static final String TASK_ARTIFACT_XPACK = "hadess";
-    public static final String TASK_ARTIFACT_SSH = "ssh";
-    public static final String TASK_ARTIFACT_NEXUS = "nexus";
 
     // 代码扫描应用类型
     public static final String TASK_TYPE_CODESCAN = "codescan";
@@ -202,6 +201,9 @@ public class PipelineFinal {
     // 脚本应用类型
     public static final String TASK_TYPE_SCRIPT = "script";
     public static final String TASK_SCRIPT_SHELL = "shell";
+    public static final String TASK_SCRIPT_SH = "sh";
+    public static final String TASK_SCRIPT_BASH = "bash";
+    public static final String TASK_SCRIPT_CMD = "cmd";
     public static final String TASK_SCRIPT_BAT = "bat";
 
 
@@ -220,7 +222,9 @@ public class PipelineFinal {
     public static final  Integer DEFAULT_CLEAN_CACHE_DAY = 7;
 
 
-
+    public static final String AUTH_NONE = "none";
+    public static final String AUTH_USER_PASS = "userPass";
+    public static final String AUTH_PRI_KEY = "prikey";
 
 
 

@@ -178,11 +178,6 @@ public class PipelineDao {
             params.add(query.getCreateUserId());
         }
 
-        // if (!StringUtils.isBlank(query.getUserId())){
-        //     sql = sql.concat(" and user_id = ?");
-        //     params.add(query.getUserId());
-        // }
-
         if (!StringUtils.isBlank(query.getPipelineName())){
             sql = sql.concat(" and name ILIKE '%"+query.getPipelineName()+"%'");
             // params.add(query.getPipelineName());

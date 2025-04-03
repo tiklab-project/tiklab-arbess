@@ -120,11 +120,11 @@ public class TaskCleanLogCache {
         }
 
         for (TaskBuildProduct taskBuildProduct : buildProductList) {
-            String key = taskBuildProduct.getKey();
-            if (key.equals(PipelineFinal.DEFAULT_ARTIFACT_ADDRESS)){
-                String value = taskBuildProduct.getValue();
-                FileUtils.deleteQuietly(new File(value));
+            String value = taskBuildProduct.getValue();
+            if (StringUtils.isEmpty(value)){
+                continue;
             }
+            FileUtils.deleteQuietly(new File(value));
             String id = taskBuildProduct.getId();
             taskBuildProductService.deleteBuildProduct(id);
         }

@@ -36,21 +36,6 @@ public class TaskPullArtifact {
     //@ApiProperty(name = "version",desc = "version")
     private String version;
 
-    //@ApiProperty(name = "groupId",desc = "groupId")
-    private String groupId;
-
-    //@ApiProperty(name = "artifactId",desc = "artifactId")
-    private String artifactId;
-
-    //@ApiProperty(name = "transitive",desc = "是否拉取关联依赖")
-    private Boolean transitive;
-
-    @Mappings({
-            @Mapping(source = "repository.id",target = "xpackId")
-    })
-    @JoinQuery(key = "xpackId")
-    private XpackRepository repository;
-
     //授权信息
     private Object auth;
 
@@ -60,50 +45,27 @@ public class TaskPullArtifact {
 
     private String instanceId;
 
-    // jdk版本
-    @Mappings({
-            @Mapping(source = "toolJdk.scmId",target = "toolJdk")
-    })
-    @JoinQuery(key = "scmId")
-    private Scm toolJdk;
+    private String artifactName;
 
-    // maven版本
-    @Mappings({
-            @Mapping(source = "toolMaven.scmId",target = "toolMaven")
-    })
-    @JoinQuery(key = "scmId")
-    private Scm toolMaven;
+    private String artifactType;
 
-    // npm版本
-    @Mappings({
-            @Mapping(source = "toolNodejs.scmId",target = "toolMaven")
-    })
-    @JoinQuery(key = "scmId")
-    private Scm toolNodejs;
-
-    public Scm getToolJdk() {
-        return toolJdk;
+    public String getArtifactType() {
+        return artifactType;
     }
 
-    public void setToolJdk(Scm toolJdk) {
-        this.toolJdk = toolJdk;
+    public void setArtifactType(String artifactType) {
+        this.artifactType = artifactType;
     }
 
-    public Scm getToolMaven() {
-        return toolMaven;
+    public String getArtifactName() {
+        return artifactName;
     }
 
-    public void setToolMaven(Scm toolMaven) {
-        this.toolMaven = toolMaven;
+    public void setArtifactName(String artifactName) {
+        this.artifactName = artifactName;
     }
 
-    public Scm getToolNodejs() {
-        return toolNodejs;
-    }
 
-    public void setToolNodejs(Scm toolNodejs) {
-        this.toolNodejs = toolNodejs;
-    }
 
     public String getInstanceId() {
         return instanceId;
@@ -113,14 +75,6 @@ public class TaskPullArtifact {
         this.instanceId = instanceId;
     }
 
-    public XpackRepository getRepository() {
-        return repository;
-    }
-
-    public TaskPullArtifact setRepository(XpackRepository repository) {
-        this.repository = repository;
-        return this;
-    }
 
     public String getVersion() {
         return version;
@@ -128,33 +82,6 @@ public class TaskPullArtifact {
 
     public TaskPullArtifact setVersion(String version) {
         this.version = version;
-        return this;
-    }
-
-    public String getGroupId() {
-        return groupId;
-    }
-
-    public TaskPullArtifact setGroupId(String groupId) {
-        this.groupId = groupId;
-        return this;
-    }
-
-    public String getArtifactId() {
-        return artifactId;
-    }
-
-    public TaskPullArtifact setArtifactId(String artifactId) {
-        this.artifactId = artifactId;
-        return this;
-    }
-
-    public Boolean getTransitive() {
-        return transitive;
-    }
-
-    public TaskPullArtifact setTransitive(Boolean transitive) {
-        this.transitive = transitive;
         return this;
     }
 

@@ -23,14 +23,6 @@ public interface TaskPullArtifactService {
     void deletePullArtifact(String productId);
 
     /**
-     * 更新流水线推送制品
-     * @param taskType taskType
-     * @param taskPullArtifact object
-     * @return Boolean
-     */
-    Boolean pullArtifactValid(String taskType,TaskPullArtifact taskPullArtifact);
-
-    /**
      * 根据配置id查询任务
      * @param taskId 配置id
      * @return 任务

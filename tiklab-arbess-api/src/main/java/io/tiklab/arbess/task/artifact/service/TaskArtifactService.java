@@ -37,15 +37,6 @@ public interface TaskArtifactService {
 
 
     /**
-     * 查询流水线推送制品是否有效
-     * @param taskType 任务类型
-     * @param taskArtifact object
-     * @return 是否有效
-     */
-    Boolean artifactValid(String taskType,TaskArtifact taskArtifact);
-
-
-    /**
      * 更新推送制品信息
      * @param taskArtifact 信息
      */

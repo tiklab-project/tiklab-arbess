@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import io.tiklab.arbess.setting.model.AuthThird;
 import io.tiklab.arbess.setting.service.AuthService;
 import io.tiklab.arbess.setting.service.AuthThirdService;
+import io.tiklab.arbess.support.util.util.PipelineFinal;
 import io.tiklab.arbess.task.code.model.*;
 import io.tiklab.arbess.task.deploy.model.TaskDeploy;
 import io.tiklab.toolkit.beans.BeanMapper;
@@ -45,6 +46,9 @@ public class TaskCodeServiceImpl implements TaskCodeService {
     TaskCodeGitLabService gitLabService;
 
     @Autowired
+    TaskCodePriGitLabService priGitLabService;
+
+    @Autowired
     TaskCodeGittokService xcodeService;
 
     @Override
@@ -68,7 +72,7 @@ public class TaskCodeServiceImpl implements TaskCodeService {
     @Override
     public Boolean codeValid(String taskType,TaskCode code){
         switch (taskType) {
-            case TASK_CODE_GITEE, TASK_CODE_GITLAB, TASK_CODE_GITHUB -> {
+            case TASK_CODE_GITEE, TASK_CODE_GITLAB, TASK_CODE_GITHUB,TASK_CODE_PRI_GITLAB -> {
                 if (StringUtils.isEmpty(code.getHouseId())) {
                     return false;
                 }
@@ -119,6 +123,9 @@ public class TaskCodeServiceImpl implements TaskCodeService {
                 case TASK_CODE_GITLAB -> {
                     storeHouse = gitLabService.findStoreHouse(thirdQuery);
                 }
+                case TASK_CODE_PRI_GITLAB -> {
+                    storeHouse = priGitLabService.findStoreHouse(thirdQuery);
+                }
                 case TASK_CODE_XCODE -> {
                     storeHouse = xcodeService.findStoreHouse(thirdQuery);
                 }
@@ -134,9 +141,24 @@ public class TaskCodeServiceImpl implements TaskCodeService {
             taskCode.setCodeAddress(taskCode.getCodeName());
         }
 
-        taskCodeDao.updateCode(BeanMapper.map(taskCode, TaskCodeEntity.class));
+        String authType = taskCode.getAuthType();
+        if (!StringUtils.isEmpty(authType)){
+            if (authType.equals(AUTH_NONE)){
+                taskCode.setUsername("");
+                taskCode.setPassword("");
+                taskCode.setPriKey("");
+            }else if (authType.equals(AUTH_USER_PASS)){
+                taskCode.setPriKey("");
+            }else {
+                taskCode.setUsername("");
+                taskCode.setPassword("");
+            }
+        }
+        TaskCodeEntity taskCodeEntity = BeanMapper.map(taskCode, TaskCodeEntity.class);
+        taskCodeDao.updateCode(taskCodeEntity);
     }
 
+    @Override
     public void updateOneCode(TaskCode taskCode){
         taskCodeDao.updateCode(BeanMapper.map(taskCode, TaskCodeEntity.class));
     }

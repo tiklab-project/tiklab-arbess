@@ -1,6 +1,7 @@
 package io.tiklab.arbess.task.task.service;
 
 import io.tiklab.arbess.task.task.model.Tasks;
+import io.tiklab.toolkit.join.annotation.FindList;
 
 import java.util.List;
 
@@ -99,6 +100,12 @@ public interface TasksService {
     void createTaskTemplate(String pipelineId,String[] template);
 
     /**
+     * 删除任务
+     * @param tasksId 任务id
+     */
+    void deleteTasks(String tasksId);
+
+    /**
      * 查询单个任务
      * @param tasksId 任务id
      * @return 任务
@@ -126,6 +133,8 @@ public interface TasksService {
 
     List<Tasks> findAllTasks();
 
+    @FindList
+    List<Tasks> findTasksList(List<String> idList);
 
     /**
      * 更新任务

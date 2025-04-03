@@ -83,173 +83,176 @@ public class TaskInitTaskScm implements TiklabApplicationRunner {
     public void initTasks(){
 
         List<Tasks> allTasks = tasksService.findAllTasks();
+        try {
+            List<Tasks> noCodeList = allTasks.stream()
+                    .filter(tasks -> !tasksService.findTaskType(tasks.getTaskType()).equals(PipelineFinal.TASK_TYPE_CODE))
+                    .toList();
 
-        List<Tasks> noCodeList = allTasks.stream()
-                .filter(tasks -> !tasksService.findTaskType(tasks.getTaskType()).equals(PipelineFinal.TASK_TYPE_CODE))
-                .toList();
+            List<Tasks> codeList = allTasks.stream()
+                    .filter(tasks -> tasksService.findTaskType(tasks.getTaskType()).equals(PipelineFinal.TASK_TYPE_CODE))
+                    .toList();
 
-        List<Tasks> codeList = allTasks.stream()
-                .filter(tasks -> tasksService.findTaskType(tasks.getTaskType()).equals(PipelineFinal.TASK_TYPE_CODE))
-                .toList();
+            if (!codeList.isEmpty()){
+                for (Tasks tasks : codeList) {
+                    String taskId = tasks.getTaskId();
+                    TaskCode code = codeService.findOneCode(taskId);
+                    Scm gitScm = scmAddress.get(TASK_TOOL_TYPE_GIT);
+                    Scm svnScm = scmAddress.get(TASK_TOOL_TYPE_SVN);
+                    code.setType(tasks.getTaskType());
+                    if (Objects.isNull(code.getToolGit()) && !Objects.isNull(gitScm)){
+                        code.setToolGit(gitScm);
+                        codeService.updateOneCode(code);
+                    }
+                    if (Objects.isNull(code.getToolSvn()) && !Objects.isNull(svnScm)){
+                        code.setToolSvn(svnScm);
+                        codeService.updateOneCode(code);
+                    }
+                }
+            }
 
-        if (!codeList.isEmpty()){
-            for (Tasks tasks : codeList) {
+            List<Tasks> codeScanList = noCodeList.stream()
+                    .filter(tasks -> tasksService.findTaskType(tasks.getTaskType()).equals(PipelineFinal.TASK_TYPE_CODESCAN))
+                    .toList();
+
+            for (Tasks tasks : codeScanList) {
                 String taskId = tasks.getTaskId();
-                TaskCode code = codeService.findOneCode(taskId);
-                Scm gitScm = scmAddress.get(TASK_TOOL_TYPE_GIT);
-                Scm svnScm = scmAddress.get(TASK_TOOL_TYPE_SVN);
-                code.setType(tasks.getTaskType());
-                if (Objects.isNull(code.getToolGit()) && !Objects.isNull(gitScm)){
-                    code.setToolGit(gitScm);
-                    codeService.updateOneCode(code);
-                }
-                if (Objects.isNull(code.getToolSvn()) && !Objects.isNull(svnScm)){
-                    code.setToolSvn(svnScm);
-                    codeService.updateOneCode(code);
-                }
-            }
-        }
-
-        List<Tasks> codeScanList = noCodeList.stream()
-                .filter(tasks -> tasksService.findTaskType(tasks.getTaskType()).equals(PipelineFinal.TASK_TYPE_CODESCAN))
-                .toList();
-
-        for (Tasks tasks : codeScanList) {
-            String taskId = tasks.getTaskId();
-            TaskCodeScan codeScan = codeScanService.findOneCodeScan(taskId);
-            if (Objects.isNull(codeScan.getToolJdk())){
-                Scm scm = scmAddress.get(TASK_TOOL_TYPE_JDK);
-                if (!Objects.isNull(scm)){
-                    codeScan.setToolJdk(scm);
-                    codeScanService.updateCodeScan(codeScan);
-                }
-            }
-            if (Objects.isNull(codeScan.getToolMaven())){
-                Scm scm = scmAddress.get(TASK_TOOL_TYPE_MAVEN);
-                if (!Objects.isNull(scm)){
-                    codeScan.setToolMaven(scm);
-                    codeScanService.updateCodeScan(codeScan);
-                }
-            }
-        }
-
-
-        List<Tasks> testList = noCodeList.stream()
-                .filter(tasks -> tasksService.findTaskType(tasks.getTaskType()).equals(PipelineFinal.TASK_TYPE_TEST))
-                .toList();
-        for (Tasks tasks : testList) {
-            String taskId = tasks.getTaskId();
-            TaskTest taskTest = testService.findOneTest(taskId);
-            if (Objects.isNull(taskTest.getToolJdk())){
-                Scm scm = scmAddress.get(TASK_TOOL_TYPE_JDK);
-                if (!Objects.isNull(scm)){
-                    taskTest.setToolJdk(scm);
-                    testService.updateTest(taskTest);
-                }
-            }
-            if (Objects.isNull(taskTest.getToolMaven())){
-                Scm scm = scmAddress.get(TASK_TOOL_TYPE_MAVEN);
-                if (!Objects.isNull(scm)){
-                    taskTest.setToolMaven(scm);
-                    testService.updateTest(taskTest);
-                }
-            }
-
-        }
-
-        List<Tasks> buildList = noCodeList.stream()
-                .filter(tasks -> tasksService.findTaskType(tasks.getTaskType()).equals(PipelineFinal.TASK_TYPE_BUILD))
-                .toList();
-        for (Tasks tasks : buildList) {
-            String taskId = tasks.getTaskId();
-            TaskBuild build = buildService.findOneBuild(taskId);
-            if (Objects.isNull(build.getToolJdk())){
-                Scm scm = scmAddress.get(TASK_TOOL_TYPE_JDK);
-                if (!Objects.isNull(scm)){
-                    build.setToolJdk(scm);
-                    buildService.updateBuild(build);
-                }
-            }
-            if (Objects.isNull(build.getToolMaven())){
-                Scm scm = scmAddress.get(TASK_TOOL_TYPE_MAVEN);
-                if (!Objects.isNull(scm)){
-                    build.setToolMaven(scm);
-                    buildService.updateBuild(build);
-                }
-            }
-            if (Objects.isNull(build.getToolNodejs())){
-                Scm scm = scmAddress.get(TASK_TOOL_TYPE_NODEJS);
-                if (!Objects.isNull(scm)){
-                    build.setToolNodejs(scm);
-                    buildService.updateBuild(build);
-                }
-            }
-
-        }
-
-
-        List<Tasks> artifactList = noCodeList.stream()
-                .filter(tasks -> tasksService.findTaskType(tasks.getTaskType()).equals(PipelineFinal.TASK_TYPE_ARTIFACT))
-                .toList();
-        for (Tasks tasks : artifactList) {
-            String taskId = tasks.getTaskId();
-            TaskArtifact artifact = artifactService.findOneProduct(taskId);
-            if (Objects.isNull(artifact.getToolJdk())){
-                Scm scm = scmAddress.get(TASK_TOOL_TYPE_JDK);
-                if (!Objects.isNull(scm)){
-                    artifact.setToolJdk(scm);
-                    artifactService.updateProduct(artifact);
-                }
-            }
-            if (Objects.isNull(artifact.getToolMaven())){
-                Scm scm = scmAddress.get(TASK_TOOL_TYPE_MAVEN);
-                if (!Objects.isNull(scm)){
-                    artifact.setToolMaven(scm);
-                    artifactService.updateProduct(artifact);
-                }
-            }
-            if (Objects.isNull(artifact.getToolNodejs())){
-                Scm scm = scmAddress.get(TASK_TOOL_TYPE_NODEJS);
-                if (!Objects.isNull(scm)){
-                    artifact.setToolNodejs(scm);
-                    artifactService.updateProduct(artifact);
-                }
-            }
-
-        }
-
-
-        List<Tasks> pullArtifactList = noCodeList.stream()
-                .filter(tasks -> tasksService.findTaskType(tasks.getTaskType()).equals(PipelineFinal.TASK_TYPE_PULL))
-                .toList();
-        if (!pullArtifactList.isEmpty()){
-            for (Tasks tasks : pullArtifactList) {
-                String taskId = tasks.getTaskId();
-                TaskPullArtifact artifact = pullArtifactService.findOnePullArtifact(taskId);
-                if (Objects.isNull(artifact.getToolJdk())){
+                TaskCodeScan codeScan = codeScanService.findOneCodeScan(taskId);
+                if (Objects.isNull(codeScan.getToolJdk())){
                     Scm scm = scmAddress.get(TASK_TOOL_TYPE_JDK);
                     if (!Objects.isNull(scm)){
-                        artifact.setToolJdk(scm);
-                        pullArtifactService.updatePullArtifact(artifact);
+                        codeScan.setToolJdk(scm);
+                        codeScanService.updateCodeScan(codeScan);
                     }
                 }
-                if (Objects.isNull(artifact.getToolMaven())){
+                if (Objects.isNull(codeScan.getToolMaven())){
                     Scm scm = scmAddress.get(TASK_TOOL_TYPE_MAVEN);
                     if (!Objects.isNull(scm)){
-                        artifact.setToolMaven(scm);
-                        pullArtifactService.updatePullArtifact(artifact);
+                        codeScan.setToolMaven(scm);
+                        codeScanService.updateCodeScan(codeScan);
                     }
                 }
-                if (Objects.isNull(artifact.getToolNodejs())){
-                    Scm scm = scmAddress.get(TASK_TOOL_TYPE_NODEJS);
+            }
+
+
+            List<Tasks> testList = noCodeList.stream()
+                    .filter(tasks -> tasksService.findTaskType(tasks.getTaskType()).equals(PipelineFinal.TASK_TYPE_TEST))
+                    .toList();
+            for (Tasks tasks : testList) {
+                String taskId = tasks.getTaskId();
+                TaskTest taskTest = testService.findOneTest(taskId);
+                if (Objects.isNull(taskTest.getToolJdk())){
+                    Scm scm = scmAddress.get(TASK_TOOL_TYPE_JDK);
                     if (!Objects.isNull(scm)){
-                        artifact.setToolNodejs(scm);
-                        pullArtifactService.updatePullArtifact(artifact);
+                        taskTest.setToolJdk(scm);
+                        testService.updateTest(taskTest);
+                    }
+                }
+                if (Objects.isNull(taskTest.getToolMaven())){
+                    Scm scm = scmAddress.get(TASK_TOOL_TYPE_MAVEN);
+                    if (!Objects.isNull(scm)){
+                        taskTest.setToolMaven(scm);
+                        testService.updateTest(taskTest);
                     }
                 }
 
             }
+
+            List<Tasks> buildList = noCodeList.stream()
+                    .filter(tasks -> tasksService.findTaskType(tasks.getTaskType()).equals(PipelineFinal.TASK_TYPE_BUILD))
+                    .toList();
+            for (Tasks tasks : buildList) {
+                String taskId = tasks.getTaskId();
+                TaskBuild build = buildService.findOneBuild(taskId);
+                if (Objects.isNull(build.getToolJdk())){
+                    Scm scm = scmAddress.get(TASK_TOOL_TYPE_JDK);
+                    if (!Objects.isNull(scm)){
+                        build.setToolJdk(scm);
+                        buildService.updateBuild(build);
+                    }
+                }
+                if (Objects.isNull(build.getToolMaven())){
+                    Scm scm = scmAddress.get(TASK_TOOL_TYPE_MAVEN);
+                    if (!Objects.isNull(scm)){
+                        build.setToolMaven(scm);
+                        buildService.updateBuild(build);
+                    }
+                }
+                if (Objects.isNull(build.getToolNodejs())){
+                    Scm scm = scmAddress.get(TASK_TOOL_TYPE_NODEJS);
+                    if (!Objects.isNull(scm)){
+                        build.setToolNodejs(scm);
+                        buildService.updateBuild(build);
+                    }
+                }
+
+            }
+        }catch (Exception e){
+            logger.warn(e.getMessage());
         }
+
+
+        // List<Tasks> artifactList = noCodeList.stream()
+        //         .filter(tasks -> tasksService.findTaskType(tasks.getTaskType()).equals(TASK_TYPE_UPLOAD))
+        //         .toList();
+        // for (Tasks tasks : artifactList) {
+        //     String taskId = tasks.getTaskId();
+        //     TaskArtifact artifact = artifactService.findOneProduct(taskId);
+        //     if (Objects.isNull(artifact.getToolJdk())){
+        //         Scm scm = scmAddress.get(TASK_TOOL_TYPE_JDK);
+        //         if (!Objects.isNull(scm)){
+        //             artifact.setToolJdk(scm);
+        //             artifactService.updateProduct(artifact);
+        //         }
+        //     }
+        //     if (Objects.isNull(artifact.getToolMaven())){
+        //         Scm scm = scmAddress.get(TASK_TOOL_TYPE_MAVEN);
+        //         if (!Objects.isNull(scm)){
+        //             artifact.setToolMaven(scm);
+        //             artifactService.updateProduct(artifact);
+        //         }
+        //     }
+        //     if (Objects.isNull(artifact.getToolNodejs())){
+        //         Scm scm = scmAddress.get(TASK_TOOL_TYPE_NODEJS);
+        //         if (!Objects.isNull(scm)){
+        //             artifact.setToolNodejs(scm);
+        //             artifactService.updateProduct(artifact);
+        //         }
+        //     }
+        //
+        // }
+        //
+        //
+        // List<Tasks> pullArtifactList = noCodeList.stream()
+        //         .filter(tasks -> tasksService.findTaskType(tasks.getTaskType()).equals(TASK_TYPE_DOWNLOAD))
+        //         .toList();
+        // if (!pullArtifactList.isEmpty()){
+        //     for (Tasks tasks : pullArtifactList) {
+        //         String taskId = tasks.getTaskId();
+        //         TaskPullArtifact artifact = pullArtifactService.findOnePullArtifact(taskId);
+        //         if (Objects.isNull(artifact.getToolJdk())){
+        //             Scm scm = scmAddress.get(TASK_TOOL_TYPE_JDK);
+        //             if (!Objects.isNull(scm)){
+        //                 artifact.setToolJdk(scm);
+        //                 pullArtifactService.updatePullArtifact(artifact);
+        //             }
+        //         }
+        //         if (Objects.isNull(artifact.getToolMaven())){
+        //             Scm scm = scmAddress.get(TASK_TOOL_TYPE_MAVEN);
+        //             if (!Objects.isNull(scm)){
+        //                 artifact.setToolMaven(scm);
+        //                 pullArtifactService.updatePullArtifact(artifact);
+        //             }
+        //         }
+        //         if (Objects.isNull(artifact.getToolNodejs())){
+        //             Scm scm = scmAddress.get(TASK_TOOL_TYPE_NODEJS);
+        //             if (!Objects.isNull(scm)){
+        //                 artifact.setToolNodejs(scm);
+        //                 pullArtifactService.updatePullArtifact(artifact);
+        //             }
+        //         }
+        //
+        //     }
+        // }
 
 
     }

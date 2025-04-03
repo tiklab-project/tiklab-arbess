@@ -7,9 +7,7 @@ import io.tiklab.arbess.setting.service.AuthService;
 import io.tiklab.arbess.setting.service.AuthThirdService;
 import io.tiklab.arbess.stages.model.Stage;
 import io.tiklab.arbess.stages.service.StageService;
-import io.tiklab.arbess.support.util.util.PipelineFinal;
 import io.tiklab.arbess.task.artifact.model.TaskArtifact;
-import io.tiklab.arbess.task.artifact.service.TaskArtifactXpackService;
 import io.tiklab.arbess.task.build.model.TaskBuild;
 import io.tiklab.arbess.task.code.model.TaskCode;
 import io.tiklab.arbess.task.code.service.TaskCodeGittokService;
@@ -30,6 +28,8 @@ import org.yaml.snakeyaml.Yaml;
 
 import java.util.*;
 
+import static io.tiklab.arbess.support.util.util.PipelineFinal.*;
+
 @Service
 public class PipelineYamlServiceImpl implements PipelineYamlService {
 
@@ -47,9 +47,6 @@ public class PipelineYamlServiceImpl implements PipelineYamlService {
 
     @Autowired
     TaskCodeGittokService taskCodeGittokService;
-
-    @Autowired
-    TaskArtifactXpackService taskArtifactXpackService;
 
     @Autowired
     AuthService authService;
@@ -84,49 +81,7 @@ public class PipelineYamlServiceImpl implements PipelineYamlService {
 
         return importStageYaml(yamlString,pipelineId);
 
-        // int type = pipeline.getType();
-        //
-        // if (type == 1){
-        //     return importTaskYaml(yamlString,pipelineId);
-        // }else {
-        //     return importStageYaml(yamlString,pipelineId);
-        // }
     }
-
-    // /**
-    //  * 导出多任务配置为Yaml格式
-    //  * @param yamlString yaml
-    //  * @param pipelineId 流水线
-    //  * @return Yaml格式支付串
-    //  */
-    // private String importTaskYaml(String yamlString,String pipelineId){
-    //
-    //     DumperOptions options = new DumperOptions();
-    //     options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
-    //
-    //     Yaml yaml = new Yaml(options);
-    //     Map<String, Object> data = yaml.load(yamlString);
-    //
-    //     List<Map<String, Object>> taskList =  new ArrayList<>();
-    //
-    //     List<Tasks> tasksList = tasksService.finAllPipelineTaskOrTask(pipelineId);
-    //     for (Tasks tasks : tasksList) {
-    //         LinkedHashMap<String, Object> tasksMap = new LinkedHashMap<>();
-    //
-    //         LinkedHashMap<String, Object> taskDetails = new LinkedHashMap<>();
-    //
-    //         taskDetails.put("taskId",tasks.getTaskId());
-    //         taskDetails.put("taskName",tasks.getTaskName());
-    //         findTaskDetails(tasks.getTaskType(), tasks.getTask(), taskDetails);
-    //
-    //         tasksMap.put("task",taskDetails);
-    //         taskList.add(tasksMap);
-    //     }
-    //
-    //     Map<String, Object> pipelineMap = (Map<String, Object>) data.get("pipeline");
-    //     pipelineMap.put("tasks",taskList);
-    //     return yaml.dump(data);
-    // }
 
     /**
      * 导出多阶段配置为Yaml格式
@@ -199,23 +154,23 @@ public class PipelineYamlServiceImpl implements PipelineYamlService {
             return null;
         }
         switch (taskType){
-            case PipelineFinal.TASK_CODE_GIT , PipelineFinal.TASK_CODE_GITEE , PipelineFinal.TASK_CODE_GITHUB ,
-                    PipelineFinal.TASK_CODE_GITLAB, PipelineFinal.TASK_CODE_XCODE, PipelineFinal.TASK_CODE_SVN ->{
+            case TASK_CODE_GIT , TASK_CODE_GITEE , TASK_CODE_GITHUB ,
+                    TASK_CODE_GITLAB, TASK_CODE_XCODE, TASK_CODE_SVN ->{
                 return taskCodeDetails(taskType,object,taskDetails);
             }
-            case PipelineFinal.TASK_BUILD_MAVEN, PipelineFinal.TASK_BUILD_NODEJS ->{
+            case TASK_BUILD_MAVEN, TASK_BUILD_NODEJS ->{
                 return taskBuildDetails(taskType,object,taskDetails);
             }
-            case PipelineFinal.TASK_TEST_MAVENTEST, PipelineFinal.TASK_TEST_TESTON  ->{
+            case TASK_TEST_MAVENTEST, TASK_TEST_TESTON  ->{
                 return taskTestDetails(taskType,object,taskDetails);
             }
-            case PipelineFinal.TASK_DEPLOY_LINUX , PipelineFinal.TASK_DEPLOY_DOCKER ->{
+            case TASK_DEPLOY_LINUX , TASK_DEPLOY_DOCKER ->{
                 return taskDeployDetails(taskType,object,taskDetails);
             }
-            case PipelineFinal.TASK_ARTIFACT_NEXUS , PipelineFinal.TASK_ARTIFACT_SSH , PipelineFinal.TASK_ARTIFACT_XPACK ->{
+            case TASK_UPLOAD_HADESS, TASK_UPLOAD_SSH ,TASK_UPLOAD_NEXUS ->{
                 return taskArtifactDetails(taskType,object,taskDetails);
             }
-            case  PipelineFinal.TASK_CODESCAN_SONAR ->{
+            case  TASK_CODESCAN_SONAR ->{
                 return taskCodeScanDetails(taskType,object,taskDetails);
             }
         }
@@ -230,14 +185,14 @@ public class PipelineYamlServiceImpl implements PipelineYamlService {
         if (!Objects.isNull(taskCode.getAuthId())){
             taskDetailsMap.put("authId",taskCode.getAuthId());
         }
-        if (!taskType.equals(PipelineFinal.TASK_CODE_SVN)){
+        if (!taskType.equals(TASK_CODE_SVN)){
             if (!Objects.isNull(taskCode.getCodeName())){
                 taskDetailsMap.put("url",taskCode.getCodeName());
             }
             if (!Objects.isNull(taskCode.getCodeBranch())){
                 taskDetailsMap.put("branch",taskCode.getCodeBranch());
             }else {
-                taskDetailsMap.put("branch", PipelineFinal.TASK_CODE_DEFAULT_BRANCH);
+                taskDetailsMap.put("branch", TASK_CODE_DEFAULT_BRANCH);
             }
         }else {
             if (!Objects.isNull(taskCode.getCodeName())){
@@ -250,7 +205,7 @@ public class PipelineYamlServiceImpl implements PipelineYamlService {
         }
 
         // switch (taskType){
-        //     case PipelineFinal.TASK_CODE_GIT, PipelineFinal.TASK_CODE_GITLAB ->{
+        //     case TASK_CODE_GIT, TASK_CODE_GITLAB ->{
         //         if (!Objects.isNull(taskCode.getAuthId())){
         //             taskDetailsMap.put("authId",taskCode.getAuthId());
         //         }
@@ -261,10 +216,10 @@ public class PipelineYamlServiceImpl implements PipelineYamlService {
         //         if (!Objects.isNull(taskCode.getCodeBranch())){
         //             taskDetailsMap.put("branch",taskCode.getCodeBranch());
         //         }else {
-        //             taskDetailsMap.put("branch", PipelineFinal.TASK_CODE_DEFAULT_BRANCH);
+        //             taskDetailsMap.put("branch", TASK_CODE_DEFAULT_BRANCH);
         //         }
         //     }
-        //     case PipelineFinal.TASK_CODE_GITEE, PipelineFinal.TASK_CODE_GITHUB ->{
+        //     case TASK_CODE_GITEE, TASK_CODE_GITHUB ->{
         //         if (!Objects.isNull(taskCode.getAuthId())){
         //             taskDetailsMap.put("authId",taskCode.getAuthId());
         //         }
@@ -286,10 +241,10 @@ public class PipelineYamlServiceImpl implements PipelineYamlService {
         //         if (!Objects.isNull(taskCode.getCodeBranch())){
         //             taskDetailsMap.put("branch",taskCode.getCodeBranch());
         //         }else {
-        //             taskDetailsMap.put("branch", PipelineFinal.TASK_CODE_DEFAULT_BRANCH);
+        //             taskDetailsMap.put("branch", TASK_CODE_DEFAULT_BRANCH);
         //         }
         //     }
-        //     case PipelineFinal.TASK_CODE_XCODE ->{
+        //     case TASK_CODE_XCODE ->{
         //         String authId = taskCode.getAuthId();
         //         if (!Objects.isNull(authId)){
         //             taskDetailsMap.put("authId",taskCode.getAuthId());
@@ -305,7 +260,7 @@ public class PipelineYamlServiceImpl implements PipelineYamlService {
         //                 taskDetailsMap.put("repository_name",thirdHouse.getName());
         //             }
         //         }
-        //         taskDetailsMap.put("branch", PipelineFinal.TASK_CODE_DEFAULT_BRANCH);
+        //         taskDetailsMap.put("branch", TASK_CODE_DEFAULT_BRANCH);
         //         if (!Objects.isNull(taskCode.getBranch())){
         //             String branchId = taskCode.getBranch().getBranchId();
         //             String authId1 = (String) taskDetailsMap.get("authId");
@@ -316,10 +271,10 @@ public class PipelineYamlServiceImpl implements PipelineYamlService {
         //                 taskDetailsMap.put("branch_name",xcodeBranch.getBranchName());
         //             }
         //         }else {
-        //             taskDetailsMap.put("branch", PipelineFinal.TASK_CODE_DEFAULT_BRANCH);
+        //             taskDetailsMap.put("branch", TASK_CODE_DEFAULT_BRANCH);
         //         }
         //     }
-        //     case PipelineFinal.TASK_CODE_SVN ->{
+        //     case TASK_CODE_SVN ->{
         //         if (!Objects.isNull(taskCode.getAuthId())){
         //             taskDetailsMap.put("authId",taskCode.getAuthId());
         //         }
@@ -342,7 +297,7 @@ public class PipelineYamlServiceImpl implements PipelineYamlService {
         TaskCodeScan taskCodeScan = JSONObject.parseObject(string, TaskCodeScan.class);
 
         switch (taskType){
-            case PipelineFinal.TASK_CODESCAN_SONAR ->{
+            case TASK_CODESCAN_SONAR ->{
                 if (!Objects.isNull(taskCodeScan.getAuthId())){
                     taskDetailsMap.put("authId",taskCodeScan.getAuthId());
                 }
@@ -361,7 +316,7 @@ public class PipelineYamlServiceImpl implements PipelineYamlService {
         TaskTest taskTest = JSONObject.parseObject(string, TaskTest.class);
 
         switch (taskType){
-            case PipelineFinal.TASK_TEST_MAVENTEST ->{
+            case TASK_TEST_MAVENTEST ->{
                 if (!Objects.isNull(taskTest.getTestOrder())){
                     taskDetailsMap.put("test_order",taskTest.getTestOrder());
                 }
@@ -369,7 +324,7 @@ public class PipelineYamlServiceImpl implements PipelineYamlService {
                     taskDetailsMap.put("pom_address",taskTest.getAddress());
                 }
             }
-            case PipelineFinal.TASK_TEST_TESTON ->{
+            case TASK_TEST_TESTON ->{
 
                 if (!Objects.isNull(taskTest.getAuthId())){
                     taskDetailsMap.put("authId",taskTest.getAuthId());
@@ -403,7 +358,7 @@ public class PipelineYamlServiceImpl implements PipelineYamlService {
         TaskBuild taskBuilder = JSONObject.parseObject(string, TaskBuild.class);
 
         switch (taskType){
-            case PipelineFinal.TASK_BUILD_MAVEN ->{
+            case TASK_BUILD_MAVEN ->{
                 if (!Objects.isNull(taskBuilder.getBuildOrder())){
                     taskDetailsMap.put("mvn_order",taskBuilder.getBuildOrder());
                 }
@@ -414,7 +369,7 @@ public class PipelineYamlServiceImpl implements PipelineYamlService {
                     taskDetailsMap.put("artifact_role",taskBuilder.getProductRule());
                 }
             }
-            case PipelineFinal.TASK_BUILD_NODEJS ->{
+            case TASK_BUILD_NODEJS ->{
                 if (!Objects.isNull(taskBuilder.getBuildOrder())){
                     taskDetailsMap.put("npm_order",taskBuilder.getBuildOrder());
                 }
@@ -436,7 +391,7 @@ public class PipelineYamlServiceImpl implements PipelineYamlService {
         TaskDeploy taskDeploy = JSONObject.parseObject(string, TaskDeploy.class);
 
         switch (taskType){
-            case PipelineFinal.TASK_DEPLOY_LINUX ->{
+            case TASK_DEPLOY_LINUX ->{
                 if (taskDeploy.getAuthType() != 0){
                     taskDetailsMap.put("deploy_type",taskDeploy.getAuthType());
                 }
@@ -453,7 +408,7 @@ public class PipelineYamlServiceImpl implements PipelineYamlService {
                     taskDetailsMap.put("deploy_order",taskDeploy.getDeployOrder());
                 }
             }
-            case PipelineFinal.TASK_DEPLOY_DOCKER->{
+            case TASK_DEPLOY_DOCKER->{
                 if (!Objects.isNull(taskDeploy.getAuthId())){
                     taskDetailsMap.put("authId",taskDeploy.getAuthId());
                 }
@@ -480,79 +435,7 @@ public class PipelineYamlServiceImpl implements PipelineYamlService {
         String artifactType = taskArtifact.getArtifactType();
         taskDetailsMap.put("artifact_type",artifactType);
         switch (taskType){
-            case PipelineFinal.TASK_ARTIFACT_MAVEN ->{
-                switch (artifactType){
-                    case PipelineFinal.TASK_ARTIFACT_NEXUS ->{
-                        if (!Objects.isNull(taskArtifact.getArtifactId())){
-                            taskDetailsMap.put("artifact_id",taskArtifact.getArtifactId());
-                        }
-                        if (!Objects.isNull(taskArtifact.getAuthId())){
-                            taskDetailsMap.put("auth_id",taskArtifact.getAuthId());
-                        }
-                        if (!Objects.isNull(taskArtifact.getGroupId())){
-                            taskDetailsMap.put("group_id",taskArtifact.getGroupId());
-                        }
-                        if (!Objects.isNull(taskArtifact.getVersion())){
-                            taskDetailsMap.put("version",taskArtifact.getVersion());
-                        }
-                        if (!Objects.isNull(taskArtifact.getFileAddress())){
-                            taskDetailsMap.put("file_address",taskArtifact.getFileAddress());
-                        }
-                        if (!Objects.isNull(taskArtifact.getRule())){
-                            taskDetailsMap.put("rule",taskArtifact.getRule());
-                        }
-                    }
-                    case PipelineFinal.TASK_ARTIFACT_SSH ->{
-                        if (!Objects.isNull(taskArtifact.getAuthId())){
-                            taskDetailsMap.put("auth_id",taskArtifact.getAuthId());
-                        }
-                        if (!Objects.isNull(taskArtifact.getPutAddress())){
-                            taskDetailsMap.put("remote_address",taskArtifact.getPutAddress());
-                        }
-                        if (!Objects.isNull(taskArtifact.getFileAddress())){
-                            taskDetailsMap.put("fileAddress",taskArtifact.getFileAddress());
-                        }
-                        if (!Objects.isNull(taskArtifact.getFileAddress())){
-                            taskDetailsMap.put("put_address",taskArtifact.getPutAddress());
-                        }
-                        if (!Objects.isNull(taskArtifact.getRule())){
-                            taskDetailsMap.put("rule",taskArtifact.getRule());
-                        }
-                    }
-                    case PipelineFinal.TASK_ARTIFACT_XPACK ->{
-                        if (!Objects.isNull(taskArtifact.getArtifactId())){
-                            taskDetailsMap.put("artifactId",taskArtifact.getArtifactId());
-                        }
-                        if (!Objects.isNull(taskArtifact.getAuthId())){
-                            taskDetailsMap.put("authId",taskArtifact.getAuthId());
-                        }
-                        if (!Objects.isNull(taskArtifact.getGroupId())){
-                            taskDetailsMap.put("groupId",taskArtifact.getGroupId());
-                        }
-                        if (!Objects.isNull(taskArtifact.getVersion())){
-                            taskDetailsMap.put("version",taskArtifact.getVersion());
-                        }
-                        if (!Objects.isNull(taskArtifact.getRepository())){
-                            taskDetailsMap.put("repository_id",taskArtifact.getRepository().getId());
-                        }
-                    }
-                }
-            }
-            case PipelineFinal.TASK_ARTIFACT_NODEJS ->{
 
-            }
-            case PipelineFinal.TASK_ARTIFACT_DOCKER ->{
-                switch (artifactType){
-                    case PipelineFinal.TASK_ARTIFACT_NEXUS ->{
-                        if (!Objects.isNull(taskArtifact.getDockerImage())){
-                            taskDetailsMap.put("image",taskArtifact.getDockerImage());
-                        }
-                        if (!Objects.isNull(taskArtifact.getAuthId())){
-                            taskDetailsMap.put("authId",taskArtifact.getAuthId());
-                        }
-                    }
-                }
-            }
         }
         return taskDetailsMap;
     }
@@ -565,79 +448,7 @@ public class PipelineYamlServiceImpl implements PipelineYamlService {
         String artifactType = taskArtifact.getArtifactType();
         taskDetailsMap.put("artifact_type",artifactType);
         switch (taskType){
-            case PipelineFinal.TASK_PULL_MAVEN ->{
-                switch (artifactType){
-                    case PipelineFinal.TASK_ARTIFACT_NEXUS ->{
-                        if (!Objects.isNull(taskArtifact.getArtifactId())){
-                            taskDetailsMap.put("artifact_id",taskArtifact.getArtifactId());
-                        }
-                        if (!Objects.isNull(taskArtifact.getAuthId())){
-                            taskDetailsMap.put("auth_id",taskArtifact.getAuthId());
-                        }
-                        if (!Objects.isNull(taskArtifact.getGroupId())){
-                            taskDetailsMap.put("group_id",taskArtifact.getGroupId());
-                        }
-                        if (!Objects.isNull(taskArtifact.getVersion())){
-                            taskDetailsMap.put("version",taskArtifact.getVersion());
-                        }
-                        if (!Objects.isNull(taskArtifact.getFileAddress())){
-                            taskDetailsMap.put("file_address",taskArtifact.getFileAddress());
-                        }
-                        if (!Objects.isNull(taskArtifact.getRule())){
-                            taskDetailsMap.put("rule",taskArtifact.getRule());
-                        }
-                    }
-                    case PipelineFinal.TASK_ARTIFACT_SSH ->{
-                        if (!Objects.isNull(taskArtifact.getAuthId())){
-                            taskDetailsMap.put("auth_id",taskArtifact.getAuthId());
-                        }
-                        if (!Objects.isNull(taskArtifact.getPutAddress())){
-                            taskDetailsMap.put("remote_address",taskArtifact.getPutAddress());
-                        }
-                        if (!Objects.isNull(taskArtifact.getFileAddress())){
-                            taskDetailsMap.put("fileAddress",taskArtifact.getFileAddress());
-                        }
-                        if (!Objects.isNull(taskArtifact.getFileAddress())){
-                            taskDetailsMap.put("put_address",taskArtifact.getPutAddress());
-                        }
-                        if (!Objects.isNull(taskArtifact.getRule())){
-                            taskDetailsMap.put("rule",taskArtifact.getRule());
-                        }
-                    }
-                    case PipelineFinal.TASK_ARTIFACT_XPACK ->{
-                        if (!Objects.isNull(taskArtifact.getArtifactId())){
-                            taskDetailsMap.put("artifactId",taskArtifact.getArtifactId());
-                        }
-                        if (!Objects.isNull(taskArtifact.getAuthId())){
-                            taskDetailsMap.put("authId",taskArtifact.getAuthId());
-                        }
-                        if (!Objects.isNull(taskArtifact.getGroupId())){
-                            taskDetailsMap.put("groupId",taskArtifact.getGroupId());
-                        }
-                        if (!Objects.isNull(taskArtifact.getVersion())){
-                            taskDetailsMap.put("version",taskArtifact.getVersion());
-                        }
-                        if (!Objects.isNull(taskArtifact.getRepository())){
-                            taskDetailsMap.put("repository_id",taskArtifact.getRepository().getId());
-                        }
-                    }
-                }
-            }
-            case PipelineFinal.TASK_PULL_NODEJS ->{
 
-            }
-            case PipelineFinal.TASK_PULL_DOCKER ->{
-                switch (artifactType){
-                    case PipelineFinal.TASK_ARTIFACT_NEXUS ->{
-                        if (!Objects.isNull(taskArtifact.getDockerImage())){
-                            taskDetailsMap.put("image",taskArtifact.getDockerImage());
-                        }
-                        if (!Objects.isNull(taskArtifact.getAuthId())){
-                            taskDetailsMap.put("authId",taskArtifact.getAuthId());
-                        }
-                    }
-                }
-            }
         }
         return taskDetailsMap;
     }

@@ -26,8 +26,6 @@ ALTER TABLE pip_task_pull_artifact ADD COLUMN tool_jdk VARCHAR(255);
 ALTER TABLE pip_task_pull_artifact ADD COLUMN tool_maven VARCHAR(255);
 ALTER TABLE pip_task_pull_artifact ADD COLUMN tool_nodejs VARCHAR(255);
 
-
-
 alter table pip_setting_scm alter column scm_type  type VARCHAR(32);
 
 

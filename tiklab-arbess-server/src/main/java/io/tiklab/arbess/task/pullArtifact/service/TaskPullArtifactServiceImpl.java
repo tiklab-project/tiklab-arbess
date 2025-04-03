@@ -9,8 +9,6 @@ import io.tiklab.arbess.support.util.util.PipelineFinal;
 import io.tiklab.arbess.support.util.util.PipelineUtil;
 import io.tiklab.arbess.task.pullArtifact.model.TaskPullArtifact;
 import io.tiklab.toolkit.beans.BeanMapper;
-import io.tiklab.arbess.task.artifact.model.XpackRepository;
-import io.tiklab.arbess.task.artifact.service.TaskArtifactXpackService;
 import io.tiklab.arbess.task.pullArtifact.dao.TaskPullArtifactDao;
 import io.tiklab.arbess.task.pullArtifact.entity.TaskPullArtifactEntity;
 import io.tiklab.rpc.annotation.Exporter;
@@ -35,88 +33,11 @@ public class TaskPullArtifactServiceImpl implements TaskPullArtifactService {
     @Autowired
     private AuthHostService hostServer;
 
-    @Autowired
-    private TaskArtifactXpackService taskArtifactXpackService;
-
-
     @Override
     public String createPullArtifact(TaskPullArtifact taskPullArtifact) {
         TaskPullArtifactEntity taskPullArtifactEntity = BeanMapper.map(taskPullArtifact, TaskPullArtifactEntity.class);
         return productDao.createProduct(taskPullArtifactEntity);
     }
-
-
-    @Override
-    public Boolean pullArtifactValid(String taskType,TaskPullArtifact pullArtifact){
-        String pullType = pullArtifact.getPullType();
-
-        switch (taskType) {
-            case TASK_PULL_DOCKER -> {
-                if (pullType.equals(TASK_ARTIFACT_NEXUS)) {
-                    if (!PipelineUtil.isNoNull(pullArtifact.getAuthId())) {
-                        return false;
-                    }
-                    return PipelineUtil.isNoNull(pullArtifact.getDockerImage());
-                }
-                if (pullType.equals(TASK_ARTIFACT_XPACK)) {
-                    if (!PipelineUtil.isNoNull(pullArtifact.getDockerImage())) {
-                        return false;
-                    }
-                    if (!PipelineUtil.isNoNull(pullArtifact.getAuthId())) {
-                        return false;
-                    }
-                    return !Objects.isNull(pullArtifact.getRepository());
-                }
-                return true;
-            }
-            case TASK_PULL_NODEJS -> {
-                return true;
-            }
-            case TASK_PULL_MAVEN -> {
-                if (pullType.equals(TASK_ARTIFACT_NEXUS)) {
-                    if (!PipelineUtil.isNoNull(pullArtifact.getAuthId())) {
-                        return false;
-                    }
-                    if (!PipelineUtil.isNoNull(pullArtifact.getArtifactId())) {
-                        return false;
-                    }
-                    if (!PipelineUtil.isNoNull(pullArtifact.getVersion())) {
-                        return false;
-                    }
-                    if (!PipelineUtil.isNoNull(pullArtifact.getGroupId())) {
-                        return false;
-                    }
-                }
-                if (pullType.equals(TASK_ARTIFACT_XPACK)) {
-                    if (!PipelineUtil.isNoNull(pullArtifact.getArtifactId())) {
-                        return false;
-                    }
-                    if (!PipelineUtil.isNoNull(pullArtifact.getVersion())) {
-                        return false;
-                    }
-                    if (!PipelineUtil.isNoNull(pullArtifact.getGroupId())) {
-                        return false;
-                    }
-                    if (Objects.isNull(pullArtifact.getRepository())) {
-                        return false;
-                    }
-                }
-
-                if (pullType.equals(TASK_ARTIFACT_SSH)) {
-                    if (!PipelineUtil.isNoNull(pullArtifact.getLocalAddress())) {
-                        return false;
-                    }
-                    if (!PipelineUtil.isNoNull(pullArtifact.getAuthId())) {
-                        return false;
-                    }
-                    return PipelineUtil.isNoNull(pullArtifact.getRemoteAddress());
-                }
-                return true;
-            }
-        }
-
-        return true;
-    };
 
 
     /**
@@ -137,20 +58,18 @@ public class TaskPullArtifactServiceImpl implements TaskPullArtifactService {
         }
         String pullType = artifact.getPullType();
 
-        if (pullType.equals(PipelineFinal.TASK_ARTIFACT_SSH)){
+        if (pullType.equals(PipelineFinal.TASK_UPLOAD_SSH)){
             AuthHost oneAuthHost = hostServer.findOneAuthHost(authId);
             artifact.setAuth(oneAuthHost);
         }
 
-        if (pullType.equals(PipelineFinal.TASK_ARTIFACT_NEXUS)){
+        if (pullType.equals(PipelineFinal.TASK_UPLOAD_NEXUS)){
             AuthThird authServer = thirdServer.findOneAuthServer(authId);
             artifact.setAuth(authServer);
         }
-        if (pullType.equals(PipelineFinal.TASK_ARTIFACT_XPACK) && !Objects.isNull(artifact.getRepository())){
-            XpackRepository xpackRepository = taskArtifactXpackService.findRepository(authId, artifact.getRepository().getId());
-            if (!Objects.isNull(xpackRepository)){
-                artifact.setRepository(xpackRepository);
-            }
+        if (pullType.equals(TASK_UPLOAD_HADESS)){
+            AuthThird authServer = thirdServer.findOneAuthServer(authId);
+            artifact.setAuth(authServer);
         }
 
         return artifact;

@@ -3,6 +3,8 @@ package io.tiklab.arbess.pipeline.definition.model;
 
 import io.tiklab.arbess.setting.model.Env;
 import io.tiklab.arbess.setting.model.Group;
+import io.tiklab.postin.annotation.ApiParam;
+import io.tiklab.postin.annotation.ApiProperty;
 import io.tiklab.toolkit.beans.annotation.Mapper;
 import io.tiklab.toolkit.beans.annotation.Mapping;
 import io.tiklab.toolkit.beans.annotation.Mappings;
@@ -29,6 +31,7 @@ public class Pipeline {
      * @pi.desc:流水线id
      * @pi.value:11111
      */
+    @ApiProperty(name = "pipelineId",desc = "流水线id")
     private String id;
 
     /**
@@ -37,6 +40,7 @@ public class Pipeline {
      * @pi.desc:流水线名称
      * @pi.value:name
      */
+    @ApiProperty(name = "name",desc = "流水线名称")
     private String name;
 
     /**
@@ -47,6 +51,7 @@ public class Pipeline {
             @Mapping(source = "user.id",target = "userId")
     })
     @JoinQuery(key = "id")
+    @ApiProperty(name = "user",desc = "流水线用户")
     private User user;
 
 
@@ -58,6 +63,7 @@ public class Pipeline {
             @Mapping(source = "env.id",target = "envId")
     })
     @JoinQuery(key = "id")
+    @ApiProperty(name = "env",desc = "流水线环境")
     private Env env;
 
     /**
@@ -68,6 +74,7 @@ public class Pipeline {
             @Mapping(source = "group.id",target = "groupId")
     })
     @JoinQuery(key = "id")
+    @ApiProperty(name = "group",desc = "流水线组")
     private Group group;
 
     /**
@@ -76,6 +83,7 @@ public class Pipeline {
      * @pi.desc:流水线创建时间
      * @pi.value:createTime
      */
+    @ApiProperty(name = "createTime",desc = "流水线创建时间")
     private String createTime;
 
     /**
@@ -92,6 +100,7 @@ public class Pipeline {
      * @pi.desc:运行状态 1.未运行 2.运行中
      * @pi.value:1
      */
+    @ApiProperty(name = "state",desc = "运行状态 1.未运行 2.运行中")
     private int state;
 
     /**
@@ -100,6 +109,7 @@ public class Pipeline {
      * @pi.desc:项目作用域 1.全局 2.项目
      * @pi.value:1
      */
+    @ApiProperty(name = "power",desc = "1.全局 2.项目")
     private int power;
 
     /**
@@ -124,6 +134,7 @@ public class Pipeline {
      * @pi.desc:收藏 0.未收藏 1.收藏
      * @pi.value:2
      */
+    @ApiProperty(name = "collect",desc = "收藏 0.未收藏 1.收藏")
     private int collect;
 
     /**

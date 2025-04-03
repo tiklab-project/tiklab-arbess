@@ -3,6 +3,7 @@ package io.tiklab.arbess.pipeline.definition.model;
 import io.tiklab.core.order.Order;
 import io.tiklab.core.order.OrderBuilders;
 import io.tiklab.core.page.Page;
+import io.tiklab.postin.annotation.ApiProperty;
 
 
 import java.util.List;
@@ -15,32 +16,35 @@ import java.util.List;
 public class PipelineQuery {
 
     //@ApiProperty(name ="userId",desc = "用户")
+    @ApiProperty(name = "userId",desc = "用户Id")
     private String userId;
 
     // 创建人
+    @ApiProperty(name = "createUserId",desc = "创建人")
     private String createUserId;
 
-    //@ApiProperty(name ="pipelineName",desc = "流水线名称")
+    @ApiProperty(name = "pipelineName",desc = "流水线名称")
     private String pipelineName;
-
 
     /**
      *  流水线状态 1.运行中 2.未运行,3.等待执行
      */
+    @ApiProperty(name = "pipelineState",desc = "流水线状态 1.运行中 2.未运行,3.等待执行")
     private Integer pipelineState;
 
     /**
      *  流水线类型 1.多任务 2.多阶段
      */
+    @ApiProperty(name = "pipelineType",desc = "流水线类型 1.多任务 2.多阶段")
     private Integer pipelineType;
 
-    //@ApiProperty(name ="pipelinePower",desc = "流水线权限")
+    @ApiProperty(name ="pipelinePower",desc = "流水线权限")
     private Integer pipelinePower;
 
-    //@ApiProperty(name ="pipelineFollow",desc = "收藏, 1.收藏 0.未收藏")
+    @ApiProperty(name ="pipelineFollow",desc = "收藏, 1.收藏 0.未收藏")
     private Integer pipelineFollow;
 
-    //@ApiProperty(name ="idString",desc = "流水线id数组")
+    @ApiProperty(name ="idString",desc = "流水线id数组")
     private String[] idString;
 
     private boolean eqName;
@@ -52,11 +56,10 @@ public class PipelineQuery {
     private String groupId;
 
 
-    //@ApiProperty(name ="pageParam",desc = "分页参数")
+    @ApiProperty(name ="pageParam",desc = "分页参数")
     private Page pageParam= new Page();
 
-    //@ApiProperty(name ="orderParams",desc = "排序参数")
-    // private List<Order> orderParams = OrderBuilders.instance().desc("createTime").get();
+    @ApiProperty(name ="orderParams",desc = "排序参数")
     private List<Order> orderParams = OrderBuilders.instance().desc("name").get();
 
 

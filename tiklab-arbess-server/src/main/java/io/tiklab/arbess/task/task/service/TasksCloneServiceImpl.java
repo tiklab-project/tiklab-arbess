@@ -221,12 +221,12 @@ public class TasksCloneServiceImpl implements TasksCloneService {
                 task.setTaskId(cloneTaskId);
                 codeScanService.createCodeScan(task);
             }
-            case PipelineFinal.TASK_TYPE_ARTIFACT -> {
+            case PipelineFinal.TASK_TYPE_UPLOAD -> {
                 TaskArtifact task = productServer.findOneProduct(taskId);
                 task.setTaskId(cloneTaskId);
                 productServer.createProduct(task);
             }
-            case PipelineFinal.TASK_TYPE_PULL -> {
+            case PipelineFinal.TASK_TYPE_DOWNLOAD -> {
                 TaskPullArtifact task = pullArtifactService.findOnePullArtifact(taskId);
                 task.setTaskId(cloneTaskId);
                 pullArtifactService.createPullArtifact(task);

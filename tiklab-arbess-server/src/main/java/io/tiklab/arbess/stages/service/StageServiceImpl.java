@@ -14,7 +14,6 @@ import io.tiklab.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -33,6 +32,7 @@ public class StageServiceImpl implements StageService {
     @Autowired
     TasksCloneService tasksCloneService;
 
+    @Override
     public String createStagesOrTask(Stage stage){
         String stagesId = stage.getStageId();
         String pipelineId = stage.getPipelineId();
@@ -291,7 +291,6 @@ public class StageServiceImpl implements StageService {
     public void deleteStagesOrTask(String taskId){
         //获取需要删除的任务信息
         Tasks taskTasks = tasksService.findOneTasks(taskId);
-        //删除任务
         tasksService.deleteTasksOrTask(taskId);
 
         //阶段信息

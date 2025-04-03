@@ -43,6 +43,11 @@
             <artifactId>tiklab-eam-api</artifactId>
             <version>${tiklab-eam.version}</version>
         </dependency>
+        <dependency>
+            <groupId>io.tiklab</groupId>
+            <artifactId>tiklab-postin-annotation</artifactId>
+            <version>${tiklab-postin.version}</version>
+        </dependency>
 
     </dependencies>
 
