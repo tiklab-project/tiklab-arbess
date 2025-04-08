@@ -45,6 +45,17 @@ public class TaskBuildEntity {
     @Column(name = "tool_nodejs" ,notNull = true)
     private String toolNodejs;
 
+    @Column(name = "tool_go" ,notNull = true)
+    private String toolGo;
+
+    public String getToolGo() {
+        return toolGo;
+    }
+
+    public void setToolGo(String toolGo) {
+        this.toolGo = toolGo;
+    }
+
     public String getToolJdk() {
         return toolJdk;
     }

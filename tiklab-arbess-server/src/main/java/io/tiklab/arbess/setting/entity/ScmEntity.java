@@ -13,7 +13,6 @@ public class ScmEntity {
     @Column(name = "scm_id")
     private String scmId;
 
-    //1.git 2.svn 21.node 22.maven
     @Column(name = "scm_type")
     private String scmType;
 
@@ -27,6 +26,30 @@ public class ScmEntity {
     //地址
     @Column(name = "scm_address")
     private String scmAddress;
+
+    // 添加类型
+    @Column(name = "add_type")
+    private String addType;
+
+    // 包地址
+    @Column(name = "pkg_address")
+    private String pkgAddress;
+
+    public String getPkgAddress() {
+        return pkgAddress;
+    }
+
+    public void setPkgAddress(String pkgAddress) {
+        this.pkgAddress = pkgAddress;
+    }
+
+    public String getAddType() {
+        return addType;
+    }
+
+    public void setAddType(String addType) {
+        this.addType = addType;
+    }
 
     public String getScmId() {
         return scmId;

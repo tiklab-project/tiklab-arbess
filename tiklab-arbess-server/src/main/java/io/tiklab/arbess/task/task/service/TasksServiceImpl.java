@@ -680,6 +680,10 @@ public class TasksServiceImpl implements TasksService {
                         task.setDockerFile(DEFAULT_CODE_ADDRESS);
                         task.setDockerOrder(DOCKER_DEFAULT_ORDER);
                     }
+                    case TASK_BUILD_GO -> {
+                        task.setBuildAddress(DEFAULT_CODE_ADDRESS);
+                        task.setBuildOrder(GO_DEFAULT_ORDER);
+                    }
                 }
                 buildService.createBuild(task);
             }
@@ -912,7 +916,6 @@ public class TasksServiceImpl implements TasksService {
                     Scm gitlab = scmService.findOnePipelineScm(code.getToolSvn().getScmId());
                     code.setToolSvn(gitlab);
                 }
-                // joinTemplate.joinQuery(code);
                 return code;
             }
             case TASK_TYPE_TEST     -> {
@@ -941,7 +944,10 @@ public class TasksServiceImpl implements TasksService {
                     Scm docker = scmService.findOnePipelineScm(taskBuild.getToolNodejs().getScmId());
                     taskBuild.setToolNodejs(docker);
                 }
-                // joinTemplate.joinQuery(taskBuild);
+                if (!Objects.isNull(taskBuild.getToolGo())){
+                    Scm docker = scmService.findOnePipelineScm(taskBuild.getToolGo().getScmId());
+                    taskBuild.setToolGo(docker);
+                }
                 return taskBuild;
             }
             case TASK_TYPE_DEPLOY   -> {
@@ -1088,6 +1094,9 @@ public class TasksServiceImpl implements TasksService {
                    case TASK_BUILD_DOCKER -> {
                        return PipelineUtil.validNoNullFiled(code.getDockerFile(),code.getDockerOrder());
                    }
+                   case TASK_BUILD_GO -> {
+                       return PipelineUtil.validNoNullFiled(code.getToolGo(),code.getBuildOrder());
+                   }
                    default -> {
                        return true;
                    }
@@ -1125,20 +1134,17 @@ public class TasksServiceImpl implements TasksService {
            case TASK_TYPE_UPLOAD -> {
                TaskArtifact code =  JSONObject.parseObject(jsonString,TaskArtifact.class);
                String artifactType = code.getArtifactType();
-               if (artifactType.equals(TASK_UPLOAD_NEXUS)){
-                   return PipelineUtil.validNoNullFiled(code.getDockerImage(),code.getAuthId());
-               }
-               if (artifactType.equals(TASK_UPLOAD_HADESS)){
-                   return PipelineUtil.validNoNullFiled(code.getFileAddress(),code.getAuthId(),code.getVersion());
-               }
-               if (artifactType.equals(TASK_UPLOAD_SSH)){
-                   return PipelineUtil.validNoNullFiled(code.getFileAddress(),code.getAuthId(),code.getPutAddress());
-               }
-               return true;
+               return switch (artifactType) {
+                   case TASK_UPLOAD_NEXUS -> PipelineUtil.validNoNullFiled(code.getDockerImage(), code.getAuthId());
+                   case TASK_UPLOAD_HADESS ->
+                           PipelineUtil.validNoNullFiled(code.getFileAddress(), code.getAuthId(), code.getVersion());
+                   case TASK_UPLOAD_SSH ->
+                           PipelineUtil.validNoNullFiled(code.getFileAddress(), code.getAuthId(), code.getPutAddress());
+                   default -> true;
+               };
            }
            case TASK_TYPE_DOWNLOAD -> {
                TaskPullArtifact code =  JSONObject.parseObject(jsonString,TaskPullArtifact.class);
-               String pullType = code.getPullType();
                switch (taskType) {
                    case TASK_DOWNLOAD_HADESS -> {
                        return PipelineUtil.validNoNullFiled(code.getArtifactName(),code.getArtifactType(),
@@ -1151,7 +1157,6 @@ public class TasksServiceImpl implements TasksService {
                        return true;
                    }
                }
-
            }
            default -> {
                return true;
@@ -1167,7 +1172,7 @@ public class TasksServiceImpl implements TasksService {
                     TASK_CODE_GITLAB, TASK_CODE_XCODE, TASK_CODE_SVN,TASK_CODE_PRI_GITLAB ->{
                 return TASK_TYPE_CODE;
             }
-            case TASK_BUILD_MAVEN, TASK_BUILD_NODEJS, TASK_BUILD_DOCKER ->{
+            case TASK_BUILD_MAVEN, TASK_BUILD_NODEJS, TASK_BUILD_DOCKER,TASK_BUILD_GO ->{
                 return TASK_TYPE_BUILD;
             }
             case TASK_TEST_MAVENTEST, TASK_TEST_TESTON  ->{
@@ -1233,6 +1238,9 @@ public class TasksServiceImpl implements TasksService {
             }
             case TASK_BUILD_NODEJS -> {
                 return "Node.Js构建";
+            }
+            case TASK_BUILD_GO -> {
+                return "Go构建";
             }
             case TASK_DEPLOY_LINUX -> {
                 return "主机部署";

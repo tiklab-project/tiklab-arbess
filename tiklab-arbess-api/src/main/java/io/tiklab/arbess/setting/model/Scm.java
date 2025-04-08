@@ -30,6 +30,29 @@ public class Scm extends BaseModel {
     //@ApiProperty(name = "scmAddress",desc = "地址")
     private String scmAddress;
 
+
+    // 添加类型
+    private String addType;
+
+    // 包地址
+    private String pkgAddress;
+
+    public String getPkgAddress() {
+        return pkgAddress;
+    }
+
+    public void setPkgAddress(String pkgAddress) {
+        this.pkgAddress = pkgAddress;
+    }
+
+    public String getAddType() {
+        return addType;
+    }
+
+    public void setAddType(String addType) {
+        this.addType = addType;
+    }
+
     public String getScmId() {
         return scmId;
     }

@@ -24,6 +24,8 @@ public class PipelineFinal {
 
     public static final String MATFLOW_INSTABCE = "/instance";
 
+    public static final String ARBESS_SCM = "/attachment";
+
 
     /**
      * 流水线运行状态
@@ -118,6 +120,7 @@ public class PipelineFinal {
      */
     public static final String TEST_DEFAULT_ORDER = "mvn test";
     public static final String MAVEN_DEFAULT_ORDER = "mvn clean package";
+    public static final String GO_DEFAULT_ORDER = "go build -o bin/myapp";
     public static final String NODE_DEFAULT_ORDER = "npm install";
     public static final String DOCKER_DEFAULT_ORDER = "docker image build -t default .";
 
@@ -158,6 +161,7 @@ public class PipelineFinal {
     public static final String TASK_BUILD_NODEJS = "nodejs";
 
     public static final String TASK_BUILD_DOCKER = "build_docker";
+    public static final String TASK_BUILD_GO = "build_go";
 
 
     // 测试应用类型

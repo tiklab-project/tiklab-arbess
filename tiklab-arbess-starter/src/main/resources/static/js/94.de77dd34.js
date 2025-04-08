@@ -1,1 +1,0 @@
-(window.webpackJsonp=window.webpackJsonp||[]).push([[94],{1228:function(n,t,e){"use strict";e.r(t);e(0);var o=e(126);t.default=function(n){var t=n.route;return Object(o.a)(t.routes)}}}]);

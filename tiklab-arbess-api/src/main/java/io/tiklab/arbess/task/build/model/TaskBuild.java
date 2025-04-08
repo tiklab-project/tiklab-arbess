@@ -73,6 +73,20 @@ public class TaskBuild {
     @JoinQuery(key = "scmId")
     private Scm toolNodejs;
 
+    @Mappings({
+            @Mapping(source = "toolGo.scmId",target = "toolGo")
+    })
+    @JoinQuery(key = "scmId")
+    private Scm toolGo;
+
+    public Scm getToolGo() {
+        return toolGo;
+    }
+
+    public void setToolGo(Scm toolGo) {
+        this.toolGo = toolGo;
+    }
+
     public Scm getToolJdk() {
         return toolJdk;
     }
