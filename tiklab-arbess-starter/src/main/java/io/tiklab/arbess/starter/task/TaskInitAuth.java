@@ -58,7 +58,10 @@ public class TaskInitAuth implements TiklabApplicationRunner {
 
     @Override
     public void run() {
+        logger.info("The update auth.....");
         updatePipelineAuth();
+        logger.info("The update auth end.");
+
     }
 
 

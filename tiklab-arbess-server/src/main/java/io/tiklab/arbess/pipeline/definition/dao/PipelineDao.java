@@ -214,6 +214,12 @@ public class PipelineDao {
                 }
             }
             sql = sql.concat(" and id in ("+ids+") ");
+
+            // String ids = Arrays.stream(query.getIdString())
+            //         .map(id -> "'" + id + "'")
+            //         .collect(Collectors.joining(","));
+            // sql = sql.concat(" and id in (" + ids + ") ");
+
         }
 
         if (query.getOrderParams() != null && !query.getOrderParams().isEmpty()) {

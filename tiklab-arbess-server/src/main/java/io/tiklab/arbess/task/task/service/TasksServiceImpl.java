@@ -655,6 +655,7 @@ public class TasksServiceImpl implements TasksService {
                 if (taskType.equals(TASK_CODE_SVN)){
                     task.setSvnFile("/");
                 }
+                task.setAuthType(AUTH_NONE);
                 codeService.createCode(task);
             }
             case TASK_TYPE_TEST     -> {
@@ -988,7 +989,12 @@ public class TasksServiceImpl implements TasksService {
         }
     }
 
-
+    /**
+     * 查询任务详情(不包含认证信息)
+     * @param taskId 任务Id
+     * @param taskType 任务类型
+     * @return 任务详情
+     */
     private Object findTaskDetailsNoAuth(String taskId,String taskType){
         switch (findTaskType(taskType)) {
             case TASK_TYPE_CODE     -> {
@@ -1037,7 +1043,12 @@ public class TasksServiceImpl implements TasksService {
                       return PipelineUtil.validNoNullFiled(code.getHouseId(),code.getAuthId(),code.getToolGit());
                    }
                    case TASK_CODE_GIT -> {
-                       switch (code.getAuthType()) {
+                       String authType = code.getAuthType();
+                       if (StringUtils.isEmpty(authType) || authType.equals(AUTH_NONE)){
+                           return PipelineUtil.validNoNullFiled(code.getCodeAddress(),code.getCodeBranch());
+                       }
+
+                       switch (authType) {
                            case AUTH_USER_PASS -> {
                                return PipelineUtil.validNoNullFiled(code.getCodeAddress(), code.getToolGit(), code.getUsername(), code.getPassword());
                            }
@@ -1222,7 +1233,7 @@ public class TasksServiceImpl implements TasksService {
                 return "自建GitLab";
             }
             case TASK_CODE_SVN -> {
-                return "Svn";
+                return "SVN";
             }
             case TASK_TEST_MAVENTEST -> {
                 return "Maven单元测试";
@@ -1270,7 +1281,7 @@ public class TasksServiceImpl implements TasksService {
                 return "Hadess下载";
             }
             case TASK_DOWNLOAD_SSH ->{
-                return "Ssh下载";
+                return "SSH下载";
             }
             case TASK_DOWNLOAD_DOCKER ->{
                 return "Docker拉取";
