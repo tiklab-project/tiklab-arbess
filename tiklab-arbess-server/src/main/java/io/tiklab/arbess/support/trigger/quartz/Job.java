@@ -14,6 +14,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import static io.tiklab.arbess.support.util.util.PipelineFinal.APPROVE;
+import static io.tiklab.arbess.support.util.util.PipelineFinal.DEFAULT;
+
 @Component
 @Scope("singleton")
 public class Job {
@@ -56,6 +59,7 @@ public class Job {
             jobDataMap.put("triggerId",triggerId);
             jobDataMap.put("pipelineId",pipelineId);
             jobDataMap.put("cron",cron);
+            jobDataMap.put("type",DEFAULT);
             jobDataMap.put("weekTime",map.get("weekTime"));
             jobBuilder.setJobData(jobDataMap);
 
@@ -66,6 +70,51 @@ public class Job {
         }
 
         String triggerName = pipelineId + "_" + cron + "_" + triggerId;
+
+        // 添加触发器
+        addTrigger(scheduler,jobDetail,group,triggerName,cron,isNewTrigger);
+
+    }
+
+    public void addJob(String group, String pipelineId, Class jobClass, String cron,String triggerId,String approveId) throws SchedulerException {
+        Map<String, String> map = CronUtils.cronWeek(cron);
+        String weekTime = map.get("weekTime");
+        Date date = PipelineUtil.StringChengeDate(weekTime);
+        if (date.getTime() <= new Date().getTime()){
+            logger.warn("定时任务时间已过，跳过添加：{}，执行流水线id：{}，执行时间：{}，cron：{}",group,pipelineId, weekTime,cron);
+            return;
+        }
+
+        logger.warn("添加定时任务，定时任务组：{}，执行流水线id：{}，执行时间：{}，cron：{}",group,pipelineId, weekTime,cron);
+
+        // 任务名，任务组，任务执行类
+        Scheduler scheduler = schedulerFactory.getScheduler();
+
+        boolean isNewTrigger = false;
+
+        JobKey jobKey = JobKey.jobKey(group);
+        JobDetail jobDetail = scheduler.getJobDetail(jobKey);
+
+        if (Objects.isNull(jobDetail)){
+            JobBuilder jobBuilder = JobBuilder.newJob(jobClass);
+            //添加pipelineId执行信息
+            JobDataMap jobDataMap = new JobDataMap();
+            jobDataMap.put("group",group);
+            jobDataMap.put("triggerId",triggerId);
+            jobDataMap.put("pipelineId",pipelineId);
+            jobDataMap.put("cron",cron);
+            jobDataMap.put("type",APPROVE);
+            jobDataMap.put("approveId",approveId);
+            jobDataMap.put("weekTime",map.get("weekTime"));
+            jobBuilder.setJobData(jobDataMap);
+
+            jobDetail = jobBuilder.withIdentity(group).build();
+
+            isNewTrigger = true;
+
+        }
+
+        String triggerName = approveId + "_" + cron;
 
         // 添加触发器
         addTrigger(scheduler,jobDetail,group,triggerName,cron,isNewTrigger);

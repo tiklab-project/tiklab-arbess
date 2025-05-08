@@ -2,7 +2,13 @@ package io.tiklab.arbess.ws.server;
 
 import com.alibaba.fastjson.JSONObject;
 import io.tiklab.arbess.home.service.PipelineHomeService;
+import io.tiklab.arbess.pipeline.execute.model.PipelineQueue;
+import io.tiklab.arbess.pipeline.execute.model.PipelineQueueQuery;
+import io.tiklab.arbess.pipeline.execute.model.PipelineRunMsg;
+import io.tiklab.arbess.pipeline.execute.service.PipelineExecService;
 import io.tiklab.arbess.pipeline.execute.service.PipelineExecServiceImpl;
+import io.tiklab.arbess.pipeline.execute.service.PipelineQueueService;
+import io.tiklab.arbess.pipeline.instance.model.PipelineInstanceQuery;
 import io.tiklab.arbess.support.agent.model.AgentMessage;
 import io.tiklab.arbess.pipeline.definition.model.Pipeline;
 import io.tiklab.arbess.pipeline.definition.service.PipelineService;
@@ -10,6 +16,9 @@ import io.tiklab.arbess.pipeline.instance.model.PipelineInstance;
 import io.tiklab.arbess.pipeline.instance.service.PipelineInstanceService;
 import io.tiklab.arbess.stages.model.StageInstance;
 import io.tiklab.arbess.stages.service.StageInstanceServer;
+import io.tiklab.arbess.support.approve.model.ApprovePipeline;
+import io.tiklab.arbess.support.approve.service.ApprovePipelineService;
+import io.tiklab.arbess.support.approve.service.ApproveService;
 import io.tiklab.arbess.support.postprocess.model.PostprocessInstance;
 import io.tiklab.arbess.support.postprocess.service.PostprocessInstanceService;
 import io.tiklab.arbess.support.util.service.PipelineUtilService;
@@ -38,10 +47,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 
-import static io.tiklab.arbess.support.util.util.PipelineFinal.RUN_RUN;
-import static io.tiklab.arbess.support.util.util.PipelineFinal.RUN_SUCCESS;
+import static io.tiklab.arbess.support.util.util.PipelineFinal.*;
 
 @Service
 public class WebSocketMessageServiceImpl implements WebSocketMessageService {
@@ -81,6 +90,18 @@ public class WebSocketMessageServiceImpl implements WebSocketMessageService {
 
     @Autowired
     TaskBuildProductService taskBuildProductService;
+
+    @Autowired
+    PipelineQueueService queueService;
+
+    @Autowired
+    PipelineExecService execService;
+
+    @Autowired(required = false)
+    ApprovePipelineService approvePipelineService;
+
+    @Autowired(required = false)
+    ApproveService approveService;
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -141,6 +162,68 @@ public class WebSocketMessageServiceImpl implements WebSocketMessageService {
 
         sendPipelineRunMessage(pipeline,instanceId,runStatus);
 
+        // 更新审批状态
+        if (!Objects.isNull(approvePipelineService)){
+            ApprovePipeline approvePipeline = approvePipelineService.findApproveByInstance(instanceId);
+            if (!Objects.isNull(approvePipeline)){
+                String approveId = approvePipeline.getApproveId();
+                if (runStatus.equals(RUN_SUCCESS)){
+                    approvePipeline.setStatus(runStatus);
+                    approvePipelineService.updateApprovePipeline(approvePipeline);
+                }else {
+                    approvePipeline.setStatus(runStatus);
+                    approvePipelineService.updateApprovePipeline(approvePipeline);
+                    // 运行失败，更新其他状态
+                    approvePipelineService.updateApproveInstance(approveId);
+                }
+                approveService.updateApprovePipeline(approvePipeline);
+            }
+        }
+
+
+        // 运行待运行的流水线
+        PipelineInstanceQuery instanceQuery = new PipelineInstanceQuery();
+        instanceQuery.setState(RUN_WAIT);
+        List<PipelineInstance> pipelineInstanceList = pipelineInstanceService.findPipelineInstanceList(instanceQuery);
+
+        if (Objects.isNull(pipelineInstanceList) || pipelineInstanceList.isEmpty()){
+            return;
+        }
+
+        logger.warn("存在待运行的流水线，数量：{}",pipelineInstanceList.size());
+        PipelineInstance pipelineInstance = pipelineInstanceList.get(0);
+        String format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+        pipelineInstance.setCreateTime(format);
+        pipelineInstance.setRunStatus(RUN_RUN);
+        pipelineInstanceService.updateInstance(pipelineInstance);
+
+        String userId = pipelineInstance.getUser().getId();
+        String id = pipelineInstance.getPipeline().getId();
+
+        PipelineRunMsg pipelineRunMsg = new PipelineRunMsg(id, userId, 1);
+        pipelineRunMsg.setInstanceId(pipelineInstance.getInstanceId());
+        pipelineRunMsg.setTriggerType(APPROVE);
+        if (!Objects.isNull(approvePipelineService)){
+            ApprovePipeline approvePipeline = approvePipelineService.findApproveByInstance(pipelineInstance.getInstanceId());
+            if (!Objects.isNull(approvePipeline)){
+                approvePipeline.setStatus(RUN_RUN);
+                approvePipelineService.updateApprovePipeline(approvePipeline);
+            }
+        }
+
+        // 运行流水线
+        try {
+            execService.start(pipelineRunMsg);
+        }catch (Exception e){
+            e.printStackTrace();
+            if (!Objects.isNull(approvePipelineService)){
+                ApprovePipeline approvePipeline = approvePipelineService.findApproveByInstance(pipelineInstance.getInstanceId());
+                if (!Objects.isNull(approvePipeline)){
+                    approvePipeline.setStatus(RUN_ERROR);
+                    approveService.updateApprovePipeline(approvePipeline);
+                }
+            }
+        }
     }
 
     // 发送消息
@@ -156,12 +239,12 @@ public class WebSocketMessageServiceImpl implements WebSocketMessageService {
                 map.put("execStatus","运行成功");
                 map.put("colour","info");
             }
-            case PipelineFinal.RUN_ERROR ->{
+            case RUN_ERROR ->{
                 map.put("colour","warning");
                 map.put("message","运行失败");
                 map.put("execStatus","运行失败");
             }
-            case PipelineFinal.RUN_HALT ->{
+            case RUN_HALT ->{
                 map.put("colour","warning");
                 map.put("message","停止运程");
                 map.put("execStatus","停止运程");
@@ -303,7 +386,6 @@ public class WebSocketMessageServiceImpl implements WebSocketMessageService {
         stringObjectMap.putAll(taskMessage.getMap());
         homeService.message(stringObjectMap,taskMessage.getList());
     }
-
 
     /**
      * 发送消息结果

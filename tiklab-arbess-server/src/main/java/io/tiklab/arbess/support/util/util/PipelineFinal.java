@@ -30,7 +30,6 @@ public class PipelineFinal {
     /**
      * 流水线运行状态
      */
-    //流水线运行状态
     public static final String RUN_SUCCESS = "success";
 
     public static final String RUN_ERROR = "error";
@@ -42,6 +41,30 @@ public class PipelineFinal {
     public static final String RUN_RUN = "run";
 
     public static final String RUN_SUSPEND = "suspend";
+
+    /**
+     * 审批状态
+     */
+
+    public static final String APPROVE = "approve";
+
+    public static final String APPROVE_CANCEL = "cancel";
+
+    public static final String APPROVE_WAIT = "wait";
+
+    public static final String APPROVE_PENDING = "pending";
+
+    public static final String APPROVE_PASS = "pass";
+
+    public static final String APPROVE_REJECT = "reject";
+
+    public static final String APPROVE_WAIT_RUN = "wail-run";
+
+    public static final String APPROVE_RUN = "run";
+
+    public static final String APPROVE_COMPLETE = "complete";
+
+    public static final String APPROVE_ERROR = "error";
 
 
     /**

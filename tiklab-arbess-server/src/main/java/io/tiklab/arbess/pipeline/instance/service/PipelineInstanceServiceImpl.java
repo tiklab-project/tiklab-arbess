@@ -99,6 +99,9 @@ public class PipelineInstanceServiceImpl implements PipelineInstanceService {
         String userId = runMsg.getUserId();
         PipelineInstance pipelineInstance = new PipelineInstance(date,runMsg.getRunWay(),userId,pipelineId);
         pipelineInstance.setRunStatus(PipelineFinal.RUN_RUN);
+        if (!StringUtils.isEmpty(runMsg.getRunStatus())){
+            pipelineInstance.setRunStatus(runMsg.getRunStatus());
+        }
         String instanceId = createInstance(pipelineInstance);
         pipelineInstance.setInstanceId(instanceId);
 

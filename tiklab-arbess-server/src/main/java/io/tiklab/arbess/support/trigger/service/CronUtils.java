@@ -173,7 +173,33 @@ public class CronUtils {
     }
 
 
+    /**
+     * 将时间字符串（yyyy-MM-dd HH:mm:ss）转换为 Quartz Cron 表达式
+     * @param data 目标时间字符串
+     * @return Cron 表达式，例如 "0 30 10 6 5 ? 2025"
+     * @throws ParseException 如果解析失败
+     */
+    public static String toCron(String data){
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            Date date = sdf.parse(data);
 
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(date);
+
+            int second = calendar.get(Calendar.SECOND);
+            int minute = calendar.get(Calendar.MINUTE);
+            int hour = calendar.get(Calendar.HOUR_OF_DAY);
+            int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
+            int month = calendar.get(Calendar.MONTH) + 1; // 注意：月份从 0 开始
+            int year = calendar.get(Calendar.YEAR);
+
+            // Quartz Cron 格式: 秒 分 时 日 月 星期 年（星期位用 ? 占位）
+            return String.format("%d %d %d %d %d ? %d", second, minute, hour, dayOfMonth, month, year);
+        }catch (Exception e){
+            throw new ApplicationException("时间格式转换错误，错误时间：" + data);
+        }
+    }
 
 }
 

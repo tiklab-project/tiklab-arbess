@@ -3,6 +3,8 @@ package io.tiklab.arbess.pipeline.execute.model;
 import io.tiklab.arbess.support.agent.model.Agent;
 import io.tiklab.arbess.pipeline.definition.model.Pipeline;
 
+import javax.validation.groups.Default;
+
 /**
  * 流水线运行消息类
  * 包含流水线运行所需的基本信息
@@ -29,6 +31,28 @@ public class PipelineRunMsg {
 
     // 实例id
     private String instanceId;
+
+    // 运行状态
+    private String runStatus;
+
+    // 触发类型
+    private String triggerType = "default";
+
+    public String getTriggerType() {
+        return triggerType;
+    }
+
+    public void setTriggerType(String triggerType) {
+        this.triggerType = triggerType;
+    }
+
+    public String getRunStatus() {
+        return runStatus;
+    }
+
+    public void setRunStatus(String runStatus) {
+        this.runStatus = runStatus;
+    }
 
     public String getInstanceId() {
         return instanceId;

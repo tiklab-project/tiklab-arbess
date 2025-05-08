@@ -84,13 +84,17 @@ public class ScmFileController {
                 destFile.delete();
 
                 String order =" chmod -R 755 "+ destDir.getAbsolutePath() + "/" + s;
-                logger.info("scm exec order : {}",order);
-                PipelineUtil.process(DATA_HOME, order);
+                try {
+                    logger.info("scm exec order : {}",order);
+                    PipelineUtil.process(DATA_HOME, order);
+                }catch (Exception e){
+                    logger.error("添加权限失败：{}",e.getMessage());
+                }
 
                 // String tarGzBaseName = getTarGzBaseName(destDir.getAbsolutePath()+"/"+s);
                 return Result.ok(path);
             } catch (Exception e) {
-                throw new ApplicationException("解压失败！");
+                throw new ApplicationException("解压失败:" + e.getMessage());
             }
         } catch (IOException e) {
             throw new SystemException(e);

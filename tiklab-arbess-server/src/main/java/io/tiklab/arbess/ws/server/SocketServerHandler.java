@@ -101,6 +101,9 @@ public class SocketServerHandler implements WebSocketHandler {
         try {
             // 分块发送消息
             sendPartialMessage(session, jsonString); // 每块大小 1024 字节
+
+            // session.sendMessage(new TextMessage(jsonString));
+
         } catch (IOException e) {
             throw new SystemException("客户端推送消息失败, 错误信息：" + e.getMessage());
         }
