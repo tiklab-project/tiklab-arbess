@@ -45,6 +45,7 @@ public class AgentDao {
                 .eq("ip", agentQuery.getIp())
                 .eq("tenantId", agentQuery.getTenantId())
                 .eq("businessType", agentQuery.getBusinessType())
+                .eq("displayType", agentQuery.getDisplayType())
                 .like("name", agentQuery.getName())
                 .orders(agentQuery.getOrderParams())
                 .get();
@@ -57,6 +58,7 @@ public class AgentDao {
                 .eq("ip", agentQuery.getIp())
                 .eq("tenantId", agentQuery.getTenantId())
                 .eq("businessType", agentQuery.getBusinessType())
+                .eq("displayType", agentQuery.getDisplayType())
                 .like("name", agentQuery.getName())
                 .orders(agentQuery.getOrderParams())
                 .pagination(agentQuery.getPageParam())

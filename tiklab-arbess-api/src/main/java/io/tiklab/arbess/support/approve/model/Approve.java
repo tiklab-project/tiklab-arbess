@@ -34,6 +34,8 @@ public class Approve {
 
     private String corn;
 
+    private String userIds;
+
     // 流水线id列表
     private List<String> pipelineIdList;
 
@@ -56,8 +58,18 @@ public class Approve {
      * run：运行中
      * cancel：取消
      * complete：完成
+     * error：运行失败
+     * draft：草稿
      */
     private String status;
+
+    public String getUserIds() {
+        return userIds;
+    }
+
+    public void setUserIds(String userIds) {
+        this.userIds = userIds;
+    }
 
     public String getCorn() {
         return corn;

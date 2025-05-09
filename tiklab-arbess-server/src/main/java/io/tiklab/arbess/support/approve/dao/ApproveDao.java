@@ -46,19 +46,27 @@ public class ApproveDao {
     }
 
     public List<ApproveEntity> findApproveList(ApproveQuery approveQuery) {
-        QueryCondition queryCondition = QueryBuilders.createQuery(ApproveEntity.class)
+        QueryBuilders builders = QueryBuilders.createQuery(ApproveEntity.class)
                 .eq("status", approveQuery.getStatus())
-                .eq("userId", approveQuery.getUserId())
-                .orders(approveQuery.getOrderParams())
+                .eq("userId", approveQuery.getUserId());
+
+        if (!StringUtils.isEmpty(approveQuery.getLoginId())){
+            builders = builders.like("userIds", approveQuery.getLoginId());
+        }
+        QueryCondition queryCondition = builders.orders(approveQuery.getOrderParams())
                 .get();
         return jpaTemplate.findList(queryCondition,ApproveEntity.class);
     }
 
     public Pagination<ApproveEntity> findApprovePage(ApproveQuery approveQuery) {
-        QueryCondition queryCondition = QueryBuilders.createQuery(ApproveEntity.class)
+        QueryBuilders builders = QueryBuilders.createQuery(ApproveEntity.class)
                 .eq("status", approveQuery.getStatus())
-                .eq("userId", approveQuery.getUserId())
-                .orders(approveQuery.getOrderParams())
+                .eq("userId", approveQuery.getUserId());
+
+        if (!StringUtils.isEmpty(approveQuery.getLoginId())){
+            builders = builders.like("userIds", approveQuery.getLoginId());
+        }
+        QueryCondition queryCondition = builders.orders(approveQuery.getOrderParams())
                 .pagination(approveQuery.getPageParam())
                 .get();
         return jpaTemplate.findPage(queryCondition,ApproveEntity.class);

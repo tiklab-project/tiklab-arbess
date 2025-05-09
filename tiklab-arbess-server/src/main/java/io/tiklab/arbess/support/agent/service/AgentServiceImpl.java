@@ -32,14 +32,29 @@ public class AgentServiceImpl implements AgentService {
         List<Agent> agentList = findAgentList(agentQuery);
         if (agentList.isEmpty()) {
             // 如果不存在连接，设置为默认
+            agent.setDisplayType("no");
             List<AgentEntity> agentList1 = agentDao.findAgentList();
             if (Objects.isNull(agentList1) || agentList1.isEmpty()){
                 agent.setBusinessType(DEFAULT);
+                agent.setDisplayType("yes");
             }
             createAgent(agent);
         }else {
-            Agent agent1 = agentList.get(0);
-            agent1.setCreateTime(PipelineUtil.date(1));
+            agent.setId(agentList.get(0).getId());
+            agent.setCreateTime(PipelineUtil.date(1));
+            updateAgent(agent);
+        }
+    }
+
+    @Override
+    public void updateAgentStatus(AgentQuery agentQuery) {
+        List<String> agentIdList = agentQuery.getAgentIdList();
+        if (agentIdList.isEmpty()){
+            return;
+        }
+        for (String agentId : agentIdList) {
+            Agent agent1 = findAgent(agentId);
+            agent1.setDisplayType("yes");
             updateAgent(agent1);
         }
     }
@@ -59,6 +74,7 @@ public class AgentServiceImpl implements AgentService {
         agentDao.updateAgent(agentEntity);
     }
 
+    @Override
     public Agent findDefaultAgent(){
         AgentQuery agentQuery = new AgentQuery();
         agentQuery.setBusinessType(DEFAULT);
@@ -68,7 +84,6 @@ public class AgentServiceImpl implements AgentService {
         }
         return agentList.get(0);
     }
-
 
     @Override
     public void updateDefaultAgent(String id) {

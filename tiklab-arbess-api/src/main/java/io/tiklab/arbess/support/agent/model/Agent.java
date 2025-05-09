@@ -4,6 +4,8 @@ import io.tiklab.core.BaseModel;
 import io.tiklab.toolkit.beans.annotation.Mapper;
 import io.tiklab.toolkit.join.annotation.Join;
 
+import java.util.List;
+
 /**
  * 代理模型
  */
@@ -50,6 +52,19 @@ public class Agent extends BaseModel {
      * 是否连接
      */
     private Boolean isConnect;
+
+    /**
+     * 类型
+     */
+    private String displayType;
+
+    public String getDisplayType() {
+        return displayType;
+    }
+
+    public void setDisplayType(String displayType) {
+        this.displayType = displayType;
+    }
 
     public String getBusinessType() {
         return businessType;

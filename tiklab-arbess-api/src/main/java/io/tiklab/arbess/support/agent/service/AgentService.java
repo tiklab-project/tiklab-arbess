@@ -18,6 +18,12 @@ public interface AgentService {
     void initAgent(Agent agent) ;
 
     /**
+     * 更新agent状态
+     * @param agentQuery 状态信息
+     */
+    void updateAgentStatus(AgentQuery agentQuery);
+
+    /**
      * 创建环境
      * @param agent 环境信息
      * @return ID

@@ -29,6 +29,17 @@ public class AgentEntity {
     @Column(name = "business_type")
     private String businessType;
 
+    @Column(name = "display_type")
+    private String displayType;
+
+    public String getDisplayType() {
+        return displayType;
+    }
+
+    public void setDisplayType(String displayType) {
+        this.displayType = displayType;
+    }
+
     public String getBusinessType() {
         return businessType;
     }

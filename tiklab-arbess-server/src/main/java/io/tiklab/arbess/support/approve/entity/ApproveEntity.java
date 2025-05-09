@@ -28,6 +28,17 @@ public class ApproveEntity {
     @Column(name = "user_id")
     private String userId;
 
+    @Column(name = "user_ids")
+    private String userIds;
+
+    public String getUserIds() {
+        return userIds;
+    }
+
+    public void setUserIds(String userIds) {
+        this.userIds = userIds;
+    }
+
     public String getUserId() {
         return userId;
     }

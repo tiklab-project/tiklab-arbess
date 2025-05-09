@@ -61,7 +61,6 @@ public class SocketServerHandler implements WebSocketHandler {
         dataList.add(agentMessage);
     }
 
-
     @Scheduled(fixedRate = 800)
     protected void syncMessage(){
         if (dataList.isEmpty()){

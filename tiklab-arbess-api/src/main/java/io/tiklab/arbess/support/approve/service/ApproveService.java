@@ -34,6 +34,13 @@ public interface ApproveService {
 
 
     /**
+     * 更新审批
+     * @param approve 审批信息
+     */
+    void update(Approve approve);
+
+
+    /**
      * 撤销审批
      * @param id 审批ID
      */
@@ -52,6 +59,11 @@ public interface ApproveService {
      */
     void approve(ApproveUser approveUser);
 
+    /**
+     * 执行审批
+     * @param approveId 审批ID
+     */
+    void execApprove(String approveId);
 
     /**
      * 更新流水线审批执行信息

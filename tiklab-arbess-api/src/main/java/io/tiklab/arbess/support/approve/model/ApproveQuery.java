@@ -24,12 +24,22 @@ public class ApproveQuery {
     // 用户ID
     private String userId;
 
+    //
+    private String loginId;
+
     // 分页参数
     private Page pageParam= new Page();
 
     // 排序参数
     private List<Order> orderParams = OrderBuilders.instance().desc("createTime").get();
 
+    public String getLoginId() {
+        return loginId;
+    }
+
+    public void setLoginId(String loginId) {
+        this.loginId = loginId;
+    }
 
     public Page getPageParam() {
         return pageParam;

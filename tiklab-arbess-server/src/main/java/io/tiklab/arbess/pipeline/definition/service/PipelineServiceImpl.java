@@ -2,7 +2,6 @@ package io.tiklab.arbess.pipeline.definition.service;
 
 import io.tiklab.arbess.home.service.PipelineHomeService;
 import io.tiklab.arbess.pipeline.definition.model.*;
-import io.tiklab.arbess.pipeline.definition.model.*;
 import io.tiklab.arbess.stages.service.StageService;
 import io.tiklab.arbess.support.authority.service.PipelineAuthorityService;
 import io.tiklab.arbess.support.condition.service.ConditionService;
@@ -11,7 +10,7 @@ import io.tiklab.arbess.support.trigger.service.TriggerService;
 import io.tiklab.arbess.support.util.util.PipelineFileUtil;
 import io.tiklab.arbess.support.util.util.PipelineFinal;
 import io.tiklab.arbess.support.util.util.PipelineUtil;
-import io.tiklab.arbess.support.util.service.PipelineUtilService;
+import io.tiklab.arbess.agent.support.util.service.PipelineUtilService;
 import io.tiklab.arbess.support.variable.service.VariableService;
 import io.tiklab.arbess.task.task.service.TasksCloneService;
 import io.tiklab.arbess.task.task.service.TasksService;
@@ -39,11 +38,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.beans.Transient;
 import java.io.File;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Stream;
 

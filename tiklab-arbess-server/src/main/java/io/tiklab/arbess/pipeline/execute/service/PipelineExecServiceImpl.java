@@ -1,7 +1,6 @@
 package io.tiklab.arbess.pipeline.execute.service;
 
 import io.tiklab.arbess.home.service.PipelineHomeService;
-import io.tiklab.arbess.pipeline.execute.model.PipelineQueue;
 import io.tiklab.arbess.setting.model.Resources;
 import io.tiklab.arbess.task.build.model.TaskBuildProduct;
 import io.tiklab.arbess.task.build.model.TaskBuildProductQuery;
@@ -22,7 +21,7 @@ import io.tiklab.arbess.support.disk.service.DiskService;
 import io.tiklab.arbess.support.postprocess.model.Postprocess;
 import io.tiklab.arbess.support.postprocess.service.PostprocessExecService;
 import io.tiklab.arbess.support.util.util.PipelineFinal;
-import io.tiklab.arbess.support.util.service.PipelineUtilService;
+import io.tiklab.arbess.agent.support.util.service.PipelineUtilService;
 import io.tiklab.arbess.support.variable.model.Variable;
 import io.tiklab.arbess.support.variable.service.VariableService;
 import io.tiklab.arbess.support.version.service.PipelineVersionService;

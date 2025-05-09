@@ -5,6 +5,7 @@ create table pip_approve (
     user_id varchar(32) ,
     create_time varchar(32) ,
     exec_time varchar(64) ,
+    user_ids text ,
     corn varchar(64) ,
     status varchar(32)
 );

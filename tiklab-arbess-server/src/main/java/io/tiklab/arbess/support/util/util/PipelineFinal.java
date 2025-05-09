@@ -66,6 +66,8 @@ public class PipelineFinal {
 
     public static final String APPROVE_ERROR = "error";
 
+    public static final String APPROVE_DRAFT = "draft";
+
 
     /**
      * 系统编码

@@ -3,7 +3,7 @@ package io.tiklab.arbess.support.postprocess.service;
 import io.tiklab.arbess.support.postprocess.model.Postprocess;
 import io.tiklab.arbess.support.postprocess.model.PostprocessInstance;
 import io.tiklab.arbess.support.util.util.PipelineFinal;
-import io.tiklab.arbess.support.util.service.PipelineUtilService;
+import io.tiklab.arbess.agent.support.util.service.PipelineUtilService;
 import io.tiklab.arbess.task.task.model.Tasks;
 import io.tiklab.arbess.task.task.service.TasksExecService;
 import io.tiklab.arbess.task.task.service.TasksService;

@@ -56,5 +56,13 @@ public class AgentController {
     }
 
 
+    @RequestMapping(path="/updateAgentStatus",method = RequestMethod.POST)
+    public Result<Void> updateAgentStatus( @RequestBody @NotNull @Valid AgentQuery agentQuery){
+
+        agentService.updateAgentStatus(agentQuery);
+
+        return Result.ok();
+    }
+
 
 }

@@ -7,7 +7,7 @@ import io.tiklab.core.exception.SystemException;
 import io.tiklab.arbess.pipeline.definition.service.PipelineService;
 import io.tiklab.arbess.pipeline.instance.service.PipelineInstanceService;
 import io.tiklab.arbess.support.disk.model.Disk;
-import io.tiklab.arbess.support.util.service.PipelineUtilService;
+import io.tiklab.arbess.agent.support.util.service.PipelineUtilService;
 import io.tiklab.arbess.task.build.service.TaskBuildProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

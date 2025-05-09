@@ -1,7 +1,7 @@
 package io.tiklab.arbess.setting.service;
 
 import io.tiklab.arbess.setting.model.ResourcesDetails;
-import io.tiklab.arbess.support.util.service.PipelineUtilService;
+import io.tiklab.arbess.agent.support.util.service.PipelineUtilService;
 import io.tiklab.arbess.support.util.util.PipelineFileUtil;
 import io.tiklab.arbess.support.util.util.PipelineUtil;
 import io.tiklab.arbess.support.util.util.Time;

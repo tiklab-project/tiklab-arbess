@@ -59,7 +59,7 @@ public  class RunJob implements org.quartz.Job {
         RunJob.pipelineInstanceService = pipelineInstanceService;
     }
 
-    @Autowired
+    @Autowired(required = false)
     public void setApproveService(ApproveService approveService) {
         RunJob.approveService = approveService;
     }

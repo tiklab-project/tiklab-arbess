@@ -38,6 +38,11 @@ public class AgentQuery extends BaseModel {
     private String businessType;
 
     /**
+     * 类型
+     */
+    private String displayType;
+
+    /**
      * 分页参数
      */
     private Page pageParam= new Page();
@@ -47,6 +52,24 @@ public class AgentQuery extends BaseModel {
      */
     private List<Order> orderParams = OrderBuilders.instance().desc("createTime").get();
 
+
+    private List<String> agentIdList;
+
+    public List<String> getAgentIdList() {
+        return agentIdList;
+    }
+
+    public void setAgentIdList(List<String> agentIdList) {
+        this.agentIdList = agentIdList;
+    }
+
+    public String getDisplayType() {
+        return displayType;
+    }
+
+    public void setDisplayType(String displayType) {
+        this.displayType = displayType;
+    }
 
     public String getBusinessType() {
         return businessType;
