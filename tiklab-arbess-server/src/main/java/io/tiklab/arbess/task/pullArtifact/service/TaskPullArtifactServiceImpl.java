@@ -1,10 +1,9 @@
 package io.tiklab.arbess.task.pullArtifact.service;
 
-import com.alibaba.fastjson.JSONObject;
-import io.tiklab.arbess.setting.model.AuthHost;
-import io.tiklab.arbess.setting.model.AuthThird;
-import io.tiklab.arbess.setting.service.AuthHostService;
-import io.tiklab.arbess.setting.service.AuthThirdService;
+import io.tiklab.arbess.setting.host.model.AuthHost;
+import io.tiklab.arbess.setting.third.model.AuthThird;
+import io.tiklab.arbess.setting.host.service.AuthHostService;
+import io.tiklab.arbess.setting.third.service.AuthThirdService;
 import io.tiklab.arbess.support.util.util.PipelineFinal;
 import io.tiklab.arbess.support.util.util.PipelineUtil;
 import io.tiklab.arbess.task.pullArtifact.model.TaskPullArtifact;

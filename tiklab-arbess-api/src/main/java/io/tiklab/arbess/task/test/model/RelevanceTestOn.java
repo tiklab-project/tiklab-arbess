@@ -36,6 +36,16 @@ public class RelevanceTestOn {
 
     private String url;
 
+    private String testPlanId;
+
+    public String getTestPlanId() {
+        return testPlanId;
+    }
+
+    public void setTestPlanId(String testPlanId) {
+        this.testPlanId = testPlanId;
+    }
+
     public String getAuthId() {
         return authId;
     }

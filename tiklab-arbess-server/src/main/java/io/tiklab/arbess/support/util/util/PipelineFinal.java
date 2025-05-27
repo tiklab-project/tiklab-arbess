@@ -26,6 +26,8 @@ public class PipelineFinal {
 
     public static final String ARBESS_SCM = "/attachment";
 
+    public static final String ARBESS_OTHER = "/other";
+
 
     /**
      * 流水线运行状态
@@ -41,6 +43,8 @@ public class PipelineFinal {
     public static final String RUN_RUN = "run";
 
     public static final String RUN_SUSPEND = "suspend";
+
+    public static final String RUN_TIMEOUT = "timeout";
 
     /**
      * 审批状态
@@ -200,6 +204,10 @@ public class PipelineFinal {
     public static final String TASK_DEPLOY_LINUX = "liunx";
     public static final String TASK_DEPLOY_DOCKER = "docker";
     public static final String TASK_DEPLOY_K8S = "k8s";
+    public static final String TASK_DEPLOY_K8S_TYPE_FILE = "file";
+    public static final String TASK_DEPLOY_K8S_TYPE_TXT = "txt";
+    public static final String TASK_DEPLOY_STRATEGY_ONE = "one";
+    public static final String TASK_DEPLOY_STRATEGY_ALL = "all";
 
 
     // 上传类型

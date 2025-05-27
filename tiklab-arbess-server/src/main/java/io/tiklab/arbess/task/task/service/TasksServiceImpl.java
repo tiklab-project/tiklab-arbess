@@ -2,10 +2,16 @@ package io.tiklab.arbess.task.task.service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import io.tiklab.arbess.setting.model.AuthThird;
-import io.tiklab.arbess.setting.model.HostGroup;
-import io.tiklab.arbess.setting.model.Scm;
-import io.tiklab.arbess.setting.service.*;
+import io.tiklab.arbess.setting.hostgroup.service.AuthHostGroupService;
+import io.tiklab.arbess.setting.k8s.model.Kubectl;
+import io.tiklab.arbess.setting.k8s.service.KubectlService;
+import io.tiklab.arbess.setting.host.service.AuthHostService;
+import io.tiklab.arbess.setting.auth.service.AuthService;
+import io.tiklab.arbess.setting.third.model.AuthThird;
+import io.tiklab.arbess.setting.hostgroup.model.HostGroup;
+import io.tiklab.arbess.setting.third.service.AuthThirdService;
+import io.tiklab.arbess.setting.tool.model.Scm;
+import io.tiklab.arbess.setting.tool.service.ScmService;
 import io.tiklab.arbess.support.condition.service.ConditionService;
 import io.tiklab.arbess.support.util.util.PipelineUtil;
 import io.tiklab.arbess.support.variable.service.VariableService;
@@ -31,6 +37,9 @@ import io.tiklab.arbess.task.task.dao.TasksDao;
 import io.tiklab.arbess.task.task.model.Tasks;
 import io.tiklab.arbess.task.task.model.TasksQuery;
 import io.tiklab.arbess.task.test.model.TaskTest;
+import io.tiklab.arbess.task.test.model.TestHuboEnv;
+import io.tiklab.arbess.task.test.model.TestHuboRpy;
+import io.tiklab.arbess.task.test.model.TestHuboTestPlan;
 import io.tiklab.arbess.task.test.service.TaskTestService;
 import io.tiklab.toolkit.beans.BeanMapper;
 import io.tiklab.core.exception.ApplicationException;
@@ -44,7 +53,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static io.tiklab.arbess.support.util.util.PipelineFinal.*;
@@ -93,7 +101,7 @@ public class TasksServiceImpl implements TasksService {
     AuthHostGroupService authHostGroupService;
 
     @Autowired
-    AuthHostK8sService authHostK8sService;
+    KubectlService kubectlService;
 
     @Autowired
     VariableService variableService;
@@ -440,17 +448,16 @@ public class TasksServiceImpl implements TasksService {
                     if (!Objects.isNull(authId)){
                         Object auth;
                         String hostType = taskDeploy.getHostType();
-                        if (taskType.equals(TASK_DEPLOY_K8S)){
-                            auth = authHostK8sService.findOneAuthHostK8s(authId);
-                        }else {
-                            if ("hostGroup".equals(hostType)){
-                                List<HostGroup> groupByGroup = authHostGroupService.findOneHostGroupByGroup(authId,
-                                        taskDeploy.getStrategyNumber(), taskDeploy.getStrategyType());
-                                taskDeploy.setHostGroupList(groupByGroup);
-                                auth = authHostGroupService.findOneHostGroup(authId);
-                            } else {
-                                auth = authHostService.findOneAuthHost(authId);
-                            }
+                        if ("hostGroup".equals(hostType)){
+                            List<HostGroup> groupByGroup = authHostGroupService.findOneHostGroupByGroup(authId,
+                                    taskDeploy.getStrategyNumber(), taskDeploy.getStrategyType());
+                            taskDeploy.setHostGroupList(groupByGroup);
+                            auth = authHostGroupService.findOneHostGroup(authId);
+                        } else {
+                            auth = authHostService.findOneAuthHost(authId);
+                        }
+                        if (taskType.equals(TASK_DEPLOY_K8S) && !StringUtils.isEmpty(taskDeploy.getAuthId()) ) {
+                            auth = kubectlService.findOneKubectl(taskDeploy.getAuthId());
                         }
                         taskDeploy.setAuth(auth);
                     }
@@ -694,6 +701,9 @@ public class TasksServiceImpl implements TasksService {
                 task.setAuthType(1);
                 task.setDeployAddress(DEFAULT_CODE_ADDRESS);
                 task.setLocalAddress(DEFAULT_CODE_ADDRESS);
+                task.setK8sAddress(DEFAULT_CODE_ADDRESS);
+                task.setStrategyType(TASK_DEPLOY_STRATEGY_ONE);
+                task.setKubeConfType(TASK_DEPLOY_K8S_TYPE_FILE);
                 deployService.createDeploy(task);
             }
             case TASK_TYPE_CODESCAN -> {
@@ -702,10 +712,10 @@ public class TasksServiceImpl implements TasksService {
                 if (taskType.equals(TASK_CODESCAN_SPOTBUGS)){
                     task.setOpenAssert(false);
                     task.setOpenDebug(false);
-                    task.setScanPath(DEFAULT_CODE_ADDRESS);
                     task.setErrGrade(DEFAULT);
                     task.setScanGrade(DEFAULT);
                 }
+                task.setScanPath(DEFAULT_CODE_ADDRESS);
                 codeScanService.createCodeScan(task);
             }
             case TASK_TYPE_UPLOAD -> {
@@ -795,11 +805,27 @@ public class TasksServiceImpl implements TasksService {
                 TaskTest taskTest = JSON.parseObject(object, TaskTest.class);
                 TaskTest oneTestConfig = testService.findOneTest(taskId);
                 String id;
-                if (oneTestConfig == null){
+                if (Objects.isNull(oneTestConfig)){
                     id = testService.createTest(new TaskTest());
                 }else {
                     id = oneTestConfig.getTaskId();
                 }
+
+                if (!StringUtils.isEmpty(taskTest.getAuthId())){
+                    taskTest.setTestEnv(new TestHuboEnv(" "));
+                    taskTest.setTestPlan(new TestHuboTestPlan(" "));
+                    taskTest.setTestSpace(new TestHuboRpy(" "));
+                }
+
+                if(!Objects.isNull(taskTest.getTestPlan())){
+                    taskTest.setTestEnv(new TestHuboEnv(" "));
+                }
+
+                if(!Objects.isNull(taskTest.getTestSpace())){
+                    taskTest.setTestEnv(new TestHuboEnv(" "));
+                    taskTest.setTestPlan(new TestHuboTestPlan(" "));
+                }
+
                 taskTest.setTaskId(id);
                 testService.updateTest(taskTest);
             }
@@ -807,7 +833,7 @@ public class TasksServiceImpl implements TasksService {
                 TaskBuild taskBuild = JSON.parseObject(object, TaskBuild.class);
                 TaskBuild oneBuildConfig = buildService.findOneBuild(taskId);
                 String id;
-                if (oneBuildConfig == null){
+                if (Objects.isNull(oneBuildConfig)){
                     id = buildService.createBuild(new TaskBuild());
                 }else {
                     id = oneBuildConfig.getTaskId();
@@ -1086,8 +1112,7 @@ public class TasksServiceImpl implements TasksService {
                    if (!b1){
                        return false;
                    }
-                   boolean b  = Objects.isNull(code.getApiEnv())
-                           && Objects.isNull(code.getAppEnv());
+                   boolean b  = Objects.isNull(code.getTestEnv());
                    return !b ;
                }else {
                    return PipelineUtil.validNoNullFiled(code.getToolJdk(), code.getToolMaven());
@@ -1158,8 +1183,8 @@ public class TasksServiceImpl implements TasksService {
                TaskPullArtifact code =  JSONObject.parseObject(jsonString,TaskPullArtifact.class);
                switch (taskType) {
                    case TASK_DOWNLOAD_HADESS -> {
-                       return PipelineUtil.validNoNullFiled(code.getArtifactName(),code.getArtifactType(),
-                               code.getAuthId(),code.getVersion(),code.getLocalAddress());
+                       return PipelineUtil.validNoNullFiled(code.getArtifactName(), code.getAuthId(),
+                               code.getVersion(),code.getLocalAddress());
                    }
                    case TASK_DOWNLOAD_SSH -> {
                        return PipelineUtil.validNoNullFiled(code.getAuthId(),code.getRemoteAddress(),code.getLocalAddress());
@@ -1266,7 +1291,7 @@ public class TasksServiceImpl implements TasksService {
                 return "SonarQube";
             }
             case TASK_CODESCAN_SPOTBUGS ->{
-                return "SpotBugs-Java代码扫描";
+                return "Java代码扫描";
             }
             case TASK_UPLOAD_HADESS -> {
                 return "Hadess上传";

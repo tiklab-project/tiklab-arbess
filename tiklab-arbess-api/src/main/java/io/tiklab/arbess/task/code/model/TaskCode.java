@@ -1,7 +1,7 @@
 package io.tiklab.arbess.task.code.model;
 
 
-import io.tiklab.arbess.setting.model.Scm;
+import io.tiklab.arbess.setting.tool.model.Scm;
 import io.tiklab.core.BaseModel;
 import io.tiklab.toolkit.beans.annotation.Mapper;
 import io.tiklab.toolkit.beans.annotation.Mapping;

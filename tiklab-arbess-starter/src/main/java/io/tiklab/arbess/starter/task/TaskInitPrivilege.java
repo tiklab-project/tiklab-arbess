@@ -46,7 +46,7 @@ public class TaskInitPrivilege implements TiklabApplicationRunner {
     @Override
     public void run() {
         logger.info("The update privilege.....");
-        findDomainRole();
+        // findDomainRole();
         logger.info("The update privilege end.");
     }
 

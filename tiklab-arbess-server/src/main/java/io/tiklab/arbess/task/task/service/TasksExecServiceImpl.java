@@ -1,7 +1,7 @@
 package io.tiklab.arbess.task.task.service;
 
 import com.alibaba.fastjson.JSON;
-import io.tiklab.arbess.setting.model.HostGroup;
+import io.tiklab.arbess.setting.hostgroup.model.HostGroup;
 import io.tiklab.arbess.support.util.util.PipelineFileUtil;
 import io.tiklab.arbess.support.util.util.PipelineFinal;
 import io.tiklab.arbess.task.deploy.model.TaskDeploy;

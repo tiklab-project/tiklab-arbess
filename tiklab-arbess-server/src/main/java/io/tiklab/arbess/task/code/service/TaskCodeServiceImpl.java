@@ -1,12 +1,8 @@
 package io.tiklab.arbess.task.code.service;
 
-import com.alibaba.fastjson.JSONObject;
-import io.tiklab.arbess.setting.model.AuthThird;
-import io.tiklab.arbess.setting.service.AuthService;
-import io.tiklab.arbess.setting.service.AuthThirdService;
-import io.tiklab.arbess.support.util.util.PipelineFinal;
-import io.tiklab.arbess.task.code.model.*;
-import io.tiklab.arbess.task.deploy.model.TaskDeploy;
+import io.tiklab.arbess.setting.third.model.AuthThird;
+import io.tiklab.arbess.setting.auth.service.AuthService;
+import io.tiklab.arbess.setting.third.service.AuthThirdService;
 import io.tiklab.toolkit.beans.BeanMapper;
 import io.tiklab.arbess.task.code.dao.TaskCodeDao;
 import io.tiklab.arbess.task.code.entity.TaskCodeEntity;

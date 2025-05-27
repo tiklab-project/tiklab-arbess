@@ -32,6 +32,8 @@ import java.util.stream.Collectors;
 public class PipelineDao {
 
     private static final Logger log = LoggerFactory.getLogger(PipelineDao.class);
+
+
     @Autowired
     JpaTemplate jpaTemplate;
 
@@ -124,9 +126,23 @@ public class PipelineDao {
     }
 
     public Pagination<PipelineEntity> findPipelinePage(PipelineQuery query){
-        PipelineCondition condition = findQueryCondition(query);
-                return jpaTemplate.getJdbcTemplate().findPage(condition.getSql(), condition.getObjects(),
-                        query.getPageParam(),new BeanPropertyRowMapper<>(PipelineEntity.class));
+
+        QueryCondition queryCondition = QueryBuilders.createQuery(PipelineEntity.class)
+                .eq("userId", query.getUserId())
+                .eq("envId", query.getEnvId())
+                .eq("groupId", query.getGroupId())
+                .eq("state", query.getPipelineState())
+                .eq("power", query.getPipelinePower())
+                .in("id", query.getIdString())
+                .like("name", query.getPipelineName(), false)
+                .orders(query.getOrderParams())
+                .pagination(query.getPageParam())
+                .get();
+        return jpaTemplate.findPage(queryCondition,PipelineEntity.class);
+
+        // PipelineCondition condition = findQueryCondition(query);
+        //         return jpaTemplate.getJdbcTemplate().findPage(condition.getSql(), condition.getObjects(),
+        //                 query.getPageParam(),new BeanPropertyRowMapper<>(PipelineEntity.class));
     }
 
 
@@ -214,12 +230,6 @@ public class PipelineDao {
                 }
             }
             sql = sql.concat(" and id in ("+ids+") ");
-
-            // String ids = Arrays.stream(query.getIdString())
-            //         .map(id -> "'" + id + "'")
-            //         .collect(Collectors.joining(","));
-            // sql = sql.concat(" and id in (" + ids + ") ");
-
         }
 
         if (query.getOrderParams() != null && !query.getOrderParams().isEmpty()) {

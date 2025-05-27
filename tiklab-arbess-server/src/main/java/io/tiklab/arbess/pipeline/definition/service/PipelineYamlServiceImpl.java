@@ -2,9 +2,9 @@ package io.tiklab.arbess.pipeline.definition.service;
 
 
 import com.alibaba.fastjson.JSONObject;
-import io.tiklab.arbess.setting.service.AuthHostService;
-import io.tiklab.arbess.setting.service.AuthService;
-import io.tiklab.arbess.setting.service.AuthThirdService;
+import io.tiklab.arbess.setting.host.service.AuthHostService;
+import io.tiklab.arbess.setting.auth.service.AuthService;
+import io.tiklab.arbess.setting.third.service.AuthThirdService;
 import io.tiklab.arbess.stages.model.Stage;
 import io.tiklab.arbess.stages.service.StageService;
 import io.tiklab.arbess.task.artifact.model.TaskArtifact;
@@ -330,15 +330,8 @@ public class PipelineYamlServiceImpl implements PipelineYamlService {
                     taskDetailsMap.put("authId",taskTest.getAuthId());
                 }
 
-                if (!Objects.isNull(taskTest.getWebEnv())){
-                    taskDetailsMap.put("webEnv",taskTest.getWebEnv().getId());
-                }
-
-                if (!Objects.isNull(taskTest.getApiEnv())){
-                    taskDetailsMap.put("apiEnv",taskTest.getApiEnv().getId());
-                }
-                if (!Objects.isNull(taskTest.getAppEnv())){
-                    taskDetailsMap.put("appEnv",taskTest.getAppEnv().getId());
+                if (!Objects.isNull(taskTest.getTestEnv())){
+                    taskDetailsMap.put("env",taskTest.getTestEnv().getId());
                 }
                 if (!Objects.isNull(taskTest.getTestPlan())){
                     taskDetailsMap.put("testPlan",taskTest.getTestPlan().getId());

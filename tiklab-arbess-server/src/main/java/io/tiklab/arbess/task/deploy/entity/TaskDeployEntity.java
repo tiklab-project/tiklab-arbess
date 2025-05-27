@@ -52,6 +52,9 @@ public class TaskDeployEntity {
     @Column(name = "k8s_json")
     private String k8sJson;
 
+    @Column(name = "k8s_address")
+    private String k8sAddress;
+
     // 策略类型
     @Column(name = "strategy_type")
     private String strategyType;
@@ -59,6 +62,25 @@ public class TaskDeployEntity {
     // 策略数量
     @Column(name = "strategy_number")
     private Integer strategyNumber;
+
+    @Column(name = "kube_conf_type")
+    public String kubeConfType;
+
+    public String getKubeConfType() {
+        return kubeConfType;
+    }
+
+    public void setKubeConfType(String kubeConfType) {
+        this.kubeConfType = kubeConfType;
+    }
+
+    public String getK8sAddress() {
+        return k8sAddress;
+    }
+
+    public void setK8sAddress(String k8sAddress) {
+        this.k8sAddress = k8sAddress;
+    }
 
     public String getStrategyType() {
         return strategyType;

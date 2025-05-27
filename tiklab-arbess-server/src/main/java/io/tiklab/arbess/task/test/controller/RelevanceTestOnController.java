@@ -28,32 +28,16 @@ public class RelevanceTestOnController {
     RelevanceTestOnService relevanceTestOnService;
 
     /**
-     * @pi.name:查询流水线测试信息执行实例
-     * @pi.url:/testOnRelevance/findAllRelevance
-     * @pi.methodType:post
-     * @pi.request-type: formdata
-     * @pi.param: name=pipelineId;dataType=string;value=流水线Id
-     */
-    @RequestMapping(path="/findAllRelevance",method = RequestMethod.POST)
-    public Result< List<RelevanceTestOn>> findAllRelevance(@NotNull String pipelineId){
-
-        List<RelevanceTestOn> allRelevance = relevanceTestOnService.findAllRelevance(pipelineId);
-
-        return Result.ok(allRelevance);
-    }
-
-    /**
      * @pi.name:分页查询流水线测试信息执行实例
      * @pi.url:/testOnRelevance/findAllRelevancePage
      * @pi.methodType:post
      * @pi.request-type:json
      * @pi.param: model=relevanceTestOnQuery
      */
-    @RequestMapping(path="/findAllRelevancePage",method = RequestMethod.POST)
-    public Result<Pagination<RelevanceTestOn>> findAllRelevance(
-            @RequestBody @Valid @NotNull RelevanceTestOnQuery relevanceTestOnQuery){
+    @RequestMapping(path="/findRelevancePage",method = RequestMethod.POST)
+    public Result<Pagination<RelevanceTestOn>> findRelevancePage(@RequestBody @Valid @NotNull RelevanceTestOnQuery relevanceTestOnQuery){
 
-        Pagination<RelevanceTestOn> allRelevance = relevanceTestOnService.findAllRelevancePage(relevanceTestOnQuery);
+        Pagination<RelevanceTestOn> allRelevance = relevanceTestOnService.findRelevancePage(relevanceTestOnQuery);
 
         return Result.ok(allRelevance);
     }

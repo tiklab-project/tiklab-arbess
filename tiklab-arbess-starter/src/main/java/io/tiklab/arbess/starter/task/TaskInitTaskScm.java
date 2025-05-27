@@ -1,8 +1,8 @@
 package io.tiklab.arbess.starter.task;
 
-import io.tiklab.arbess.setting.model.Scm;
-import io.tiklab.arbess.setting.model.ScmQuery;
-import io.tiklab.arbess.setting.service.ScmService;
+import io.tiklab.arbess.setting.tool.model.Scm;
+import io.tiklab.arbess.setting.tool.model.ScmQuery;
+import io.tiklab.arbess.setting.tool.service.ScmService;
 import io.tiklab.arbess.agent.support.util.service.PipelineUtilService;
 import io.tiklab.arbess.support.util.util.PipelineFinal;
 import io.tiklab.arbess.task.artifact.service.TaskArtifactService;

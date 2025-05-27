@@ -1,6 +1,6 @@
 package io.tiklab.arbess.starter.config;
 
-import io.tiklab.dsm.config.model.DsmConfig;
+import io.tiklab.dsm.model.DsmConfig;
 import io.tiklab.dsm.support.DsmConfigBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -99,13 +99,23 @@ public class ArbessDsmAutoConfiguration {
         dsmConfig.newVersion("1.0.23", new String[]{
                 "pip-project_1.0.23",
         });
+        dsmConfig.newVersion("1.0.24", new String[]{
+                "pip-project_1.0.24",
+        });
+        dsmConfig.newVersion("1.0.25", new String[]{
+                "pip-project_1.0.25",
+        });
+        dsmConfig.newVersion("1.0.26", new String[]{
+                "pip-project_1.0.26",
+        });
         dsmConfig.newVersion("1.1.0", new String[]{
                 "user_1.1.0",
                 "pip-task_1.1.0",
                 "pip-privilege_1.1.0"
         });
         dsmConfig.newVersion("1.1.1", new String[]{
-                "pip-task_1.1.1"
+                "pip-task_1.1.1",
+                "pip-privilege_1.1.1"
         });
         dsmConfig.newVersion("1.1.2", new String[]{
                 "pip-task_1.1.2"

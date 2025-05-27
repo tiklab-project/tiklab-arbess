@@ -12,7 +12,7 @@ import io.tiklab.dal.jpa.annotation.*;
 public class TaskCodeScanEntity {
 
     @Id
-    @Column(name = "task_id" ,notNull = true)
+    @Column(name = "task_id" )
     private String taskId;
 
     @Column(name = "project_name")
@@ -33,20 +33,43 @@ public class TaskCodeScanEntity {
     private String scanPath;
 
     // 扫描等级 min--最小，default--默认，max--最大
-    @Column(name = "scan_grade" ,notNull = true)
+    @Column(name = "scan_grade" )
     private String scanGrade;
 
     // 扫描错误级别 default--默认 max--最大
-    @Column(name = "err_grade" ,notNull = true)
+    @Column(name = "err_grade" )
     private String errGrade;
 
+    // 扫描类型
+    @Column(name = "code_type")
+    private String codeType;
+
     // jdk版本
-    @Column(name = "tool_jdk" ,notNull = true)
+    @Column(name = "tool_jdk" )
     private String toolJdk;
 
     // maven版本
-    @Column(name = "tool_maven" ,notNull = true)
+    @Column(name = "tool_maven" )
     private String toolMaven;
+
+    @Column(name = "tool_sonar" )
+    private String toolSonar;
+
+    public String getCodeType() {
+        return codeType;
+    }
+
+    public void setCodeType(String codeType) {
+        this.codeType = codeType;
+    }
+
+    public String getToolSonar() {
+        return toolSonar;
+    }
+
+    public void setToolSonar(String toolSonar) {
+        this.toolSonar = toolSonar;
+    }
 
     public String getToolJdk() {
         return toolJdk;

@@ -2,7 +2,7 @@ package io.tiklab.arbess.task.test.service;
 
 
 import io.tiklab.arbess.task.test.model.*;
-import io.tiklab.arbess.task.test.model.*;
+import io.tiklab.core.page.Pagination;
 
 import java.util.List;
 
@@ -14,7 +14,21 @@ public interface TaskTestOnService {
      * @param rpyId 仓库id
      * @return 仓库
      */
-    TestOnRepository findOneRepository(String authId, String rpyId);
+    TestHuboRpy findRepository(String authId, String rpyId);
+
+    /**
+     * 获取TestHubo仓库
+     * @param rpyQuery 认证id
+     * @return 仓库
+     */
+    List<TestHuboRpy> findRepositoryList(TestHuboRpyQuery  rpyQuery);
+
+    /**
+     * 获取TestHubo仓库
+     * @param rpyQuery 认证id
+     * @return 仓库
+     */
+    Pagination<TestHuboRpy> findRepositoryPage(TestHuboRpyQuery  rpyQuery);
 
 
     /**
@@ -23,65 +37,40 @@ public interface TaskTestOnService {
      * @param planId 测试计划id
      * @return 测试计划
      */
-    TestOnTestPlan findOneTestPlan(String authId, String planId);
-
-
-    /**
-     * 获取test仓库
-     * @param authId 认证id
-     * @return 仓库
-     */
-    List<TestOnRepository> findAllRepository(String authId);
-
+    TestHuboTestPlan findTestPlan(String authId, String planId);
 
     /**
      * 获取teston测试计划
-     * @param authId 认证id
-     * @param rpyId 仓库id
      * @return 测试计划
      */
-    List<TestOnTestPlan> findAllTestPlan(String authId, String rpyId);
+    List<TestHuboTestPlan> findTestPlanList(TestHuboTestPlanQuery testPlanQuery);
 
     /**
-     * 获取测试计划环境
-     * @param authId 认证id
-     * @param rpyId 仓库id
-     * @param env 环境
+     * 获取teston测试计划
+     * @return 测试计划
+     */
+    Pagination<TestHuboTestPlan> findTestPlanPage(TestHuboTestPlanQuery testPlanQuery);
+
+
+    /**
+     * 获取测试计划环境列表
      * @return 环境信息
      */
-    List<Object> findAllEnv(String authId,String rpyId,String env);
+    TestHuboEnv findEnv(String authId, String envId);
 
     /**
-     * 获取测试集合执行需要的环境
-     * @param authId teston环境地址
-     * @param testPlanId 测试计划ID
-     * @return 需要的环境
+     * 获取测试计划环境列表
+     * @param envQuery 查询条件
+     * @return 环境信息
      */
-    List<String> findTestPlanEnv(String authId,String testPlanId);
+    List<TestHuboEnv> findEnvList(TestHuboEnvQuery envQuery);
 
     /**
-     * 获取api环境地址
-     * @param authId teston环境地址
-     * @param id id
-     * @return api环境
+     * 获取测试计划环境分页
+     * @param envQuery 查询条件
+     * @return 环境信息
      */
-    TestOnApiEnv findOneTestOnApiEnv(String authId, String id);
-
-    /**
-     * 获取app环境地址
-     * @param authId teston环境地址
-     * @param id id
-     * @return app环境
-     */
-    TestOnAppEnv findOneTestOnAppEnv(String authId, String id);
-
-    /**
-     * 获取web环境地址
-     * @param authId teston环境地址
-     * @param id id
-     * @return web环境
-     */
-    TestOnWebEnv findOneTestOnWebEnv(String authId, String id);
+    Pagination<TestHuboEnv> findEnvPage(TestHuboEnvQuery envQuery);
 
 
     /**
@@ -90,15 +79,6 @@ public interface TaskTestOnService {
      * @param testPlanTestData 执行信息
      */
     String execTestPlan(String authId, TestOnPlanTestData testPlanTestData);
-
-
-    /**
-     * 获取测试结果详情
-     * @param authId 认证id
-     * @return 测试结果
-     */
-    List<TestOnPlanCaseInstance> findTestPlanExecResult(String authId, String instanceId);
-
 
     /**
      * 获取测试结果
@@ -113,7 +93,7 @@ public interface TaskTestOnService {
      * @param instanceId 实例id
      * @return 测试计划详情
      */
-    TestOnPlanInstance findAllTestPlanInstance(String authId, String instanceId);
+    TestOnPlanInstance findTestPlanInstance(String authId, String instanceId);
 
 
 

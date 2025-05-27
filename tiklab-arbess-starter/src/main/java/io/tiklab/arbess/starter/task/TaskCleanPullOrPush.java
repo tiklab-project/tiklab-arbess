@@ -1,7 +1,7 @@
 package io.tiklab.arbess.starter.task;
 
 
-import io.tiklab.arbess.setting.service.AuthService;
+import io.tiklab.arbess.setting.auth.service.AuthService;
 import io.tiklab.arbess.stages.model.Stage;
 import io.tiklab.arbess.stages.service.StageService;
 import io.tiklab.arbess.support.util.util.PipelineFinal;

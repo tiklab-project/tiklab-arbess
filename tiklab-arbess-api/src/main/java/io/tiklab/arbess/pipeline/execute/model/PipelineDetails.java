@@ -1,6 +1,6 @@
 package io.tiklab.arbess.pipeline.execute.model;
 
-import io.tiklab.arbess.setting.model.Scm;
+import io.tiklab.arbess.setting.tool.model.Scm;
 import io.tiklab.arbess.stages.model.Stage;
 import io.tiklab.arbess.support.agent.model.Agent;
 import io.tiklab.arbess.support.postprocess.model.Postprocess;

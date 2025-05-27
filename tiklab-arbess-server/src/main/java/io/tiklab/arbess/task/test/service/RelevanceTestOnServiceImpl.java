@@ -1,7 +1,7 @@
 package io.tiklab.arbess.task.test.service;
 
-import io.tiklab.arbess.setting.model.AuthThird;
-import io.tiklab.arbess.setting.service.AuthThirdService;
+import io.tiklab.arbess.setting.third.model.AuthThird;
+import io.tiklab.arbess.setting.third.service.AuthThirdService;
 import io.tiklab.arbess.support.util.util.PipelineUtil;
 import io.tiklab.arbess.task.test.model.RelevanceTestOnQuery;
 import io.tiklab.arbess.task.test.model.TestOnPlanInstance;
@@ -44,6 +44,7 @@ public class RelevanceTestOnServiceImpl implements RelevanceTestOnService{
         relevanceTestOn.setPipeline(new Pipeline(pipelineId));
         relevanceTestOn.setTestonId(instanceId);
         relevanceTestOn.setAuthId(authId);
+        relevanceTestOn.setTestPlanId(testOnRelevance.getTestPlanId());
         relevanceTestOn.setCreateTime(PipelineUtil.date(1));
         String relevance = createRelevance(relevanceTestOn);
         if (Objects.isNull(relevance)){
@@ -77,16 +78,16 @@ public class RelevanceTestOnServiceImpl implements RelevanceTestOnService{
     public List<RelevanceTestOn> findAllRelevance(String pipelineId) {
         List<RelevanceTestOnEntity> allRelevance = relevanceTestOnDao.findAllRelevance(pipelineId);
 
-        if (allRelevance == null || allRelevance.isEmpty()){
+        if (Objects.isNull(allRelevance) || allRelevance.isEmpty()){
             return Collections.emptyList();
         }
         List<RelevanceTestOn> relevanceTestOns = BeanMapper.mapList(allRelevance, RelevanceTestOn.class);
 
-        return findAllRelevance(relevanceTestOns);
+        return findRelevanceList(relevanceTestOns);
     }
 
     @Override
-    public Pagination<RelevanceTestOn> findAllRelevancePage(RelevanceTestOnQuery relevanceTestOnQuery){
+    public Pagination<RelevanceTestOn> findRelevancePage(RelevanceTestOnQuery relevanceTestOnQuery){
         Pagination<RelevanceTestOnEntity> allRelevancePage = relevanceTestOnDao.findAllRelevancePage(relevanceTestOnQuery);
         List<RelevanceTestOnEntity> dataList = allRelevancePage.getDataList();
 
@@ -95,30 +96,32 @@ public class RelevanceTestOnServiceImpl implements RelevanceTestOnService{
             return PaginationBuilder.build(allRelevancePage,list);
         }
         List<RelevanceTestOn> testOnList = BeanMapper.mapList(dataList, RelevanceTestOn.class);
-        List<RelevanceTestOn> allRelevance = findAllRelevance(testOnList);
+        List<RelevanceTestOn> allRelevance = findRelevanceList(testOnList);
         return PaginationBuilder.build(allRelevancePage,allRelevance);
     }
 
 
-    private  List<RelevanceTestOn> findAllRelevance(List<RelevanceTestOn> relevanceTestOnList){
+    private  List<RelevanceTestOn> findRelevanceList(List<RelevanceTestOn> relevanceTestOnList){
 
         List<RelevanceTestOn> list = new ArrayList<>();
 
         for (RelevanceTestOn relevanceTestOn : relevanceTestOnList) {
-            String instanceId = relevanceTestOn.getTestonId();
+            String testonId = relevanceTestOn.getTestonId();
             String authId = relevanceTestOn.getAuthId();
 
             if (Objects.isNull(authId)){
-                deleteRelevance(relevanceTestOn.getAuthId());
+                deleteRelevance(relevanceTestOn.getRelevanceId());
                 continue;
             }
             AuthThird authThird = authThirdService.findOneAuthServer(authId);
-            TestOnPlanInstance testPlanInstance = taskTestOnService.findAllTestPlanInstance(authThird.getServerId(), instanceId);
+            TestOnPlanInstance testPlanInstance = taskTestOnService.findTestPlanInstance(authThird.getServerId(), testonId);
             relevanceTestOn.setStatus(1);
             if (Objects.isNull(testPlanInstance) || testPlanInstance.getTestPlanName().contains("删除")){
                 relevanceTestOn.setStatus(2);
             }
-            relevanceTestOn.setUrl(authThird.getServerAddress());
+            // http://e.testhubo.tiklab.net/#/plan/63967635d1d8/instanceInfo
+            String url = String.format("%s/#/plan/%s/instanceInfo", authThird.getServerAddress(),relevanceTestOn.getTestPlanId());
+            relevanceTestOn.setUrl(url);
 
             Date date = PipelineUtil.StringChengeDate(relevanceTestOn.getCreateTime());
             String dateTime = PipelineUtil.findDateTime(date, 0);

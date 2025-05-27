@@ -8,6 +8,16 @@ public class TestOnRelevance {
 
     private String authId;
 
+    private String testPlanId;
+
+    public String getTestPlanId() {
+        return testPlanId;
+    }
+
+    public void setTestPlanId(String testPlanId) {
+        this.testPlanId = testPlanId;
+    }
+
     public TestOnRelevance() {
     }
 

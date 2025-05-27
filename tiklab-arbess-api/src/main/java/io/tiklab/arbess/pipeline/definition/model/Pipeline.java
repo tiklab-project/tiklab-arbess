@@ -1,9 +1,8 @@
 package io.tiklab.arbess.pipeline.definition.model;
 
 
-import io.tiklab.arbess.setting.model.Env;
-import io.tiklab.arbess.setting.model.Group;
-import io.tiklab.postin.annotation.ApiParam;
+import io.tiklab.arbess.setting.env.model.Env;
+import io.tiklab.arbess.setting.group.model.Group;
 import io.tiklab.postin.annotation.ApiProperty;
 import io.tiklab.toolkit.beans.annotation.Mapper;
 import io.tiklab.toolkit.beans.annotation.Mapping;

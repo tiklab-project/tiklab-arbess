@@ -7,6 +7,8 @@ import io.tiklab.arbess.pipeline.execute.service.PipelineExecService;
 import io.tiklab.arbess.pipeline.execute.service.PipelineExecServiceImpl;
 import io.tiklab.arbess.pipeline.execute.service.PipelineQueueService;
 import io.tiklab.arbess.pipeline.instance.model.PipelineInstanceQuery;
+import io.tiklab.arbess.pipeline.instance.service.PipelineInstanceServiceImpl;
+import io.tiklab.arbess.support.agent.model.Agent;
 import io.tiklab.arbess.support.agent.model.AgentMessage;
 import io.tiklab.arbess.pipeline.definition.model.Pipeline;
 import io.tiklab.arbess.pipeline.definition.service.PipelineService;
@@ -26,7 +28,9 @@ import io.tiklab.arbess.support.util.util.PipelineUtil;
 import io.tiklab.arbess.task.build.model.TaskBuildProduct;
 import io.tiklab.arbess.task.build.service.TaskBuildProductService;
 import io.tiklab.arbess.task.code.service.SpotbugsScanService;
+import io.tiklab.arbess.task.codescan.model.SonarQubeScan;
 import io.tiklab.arbess.task.codescan.model.SpotbugsBugSummary;
+import io.tiklab.arbess.task.codescan.service.SonarQubeScanService;
 import io.tiklab.arbess.task.deploy.model.TaskDeployInstance;
 import io.tiklab.arbess.task.deploy.service.TaskDeployInstanceServiceImpl;
 import io.tiklab.arbess.task.message.model.TaskMessage;
@@ -42,6 +46,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
@@ -100,6 +105,12 @@ public class WebSocketMessageServiceImpl implements WebSocketMessageService {
     @Autowired(required = false)
     ApproveService approveService;
 
+    @Autowired
+    SonarQubeScanService sonarQubeScanService;
+
+    @Value("${arbess.task.timeout:300}")
+    private Integer taskTimeout;
+
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Override
@@ -130,6 +141,8 @@ public class WebSocketMessageServiceImpl implements WebSocketMessageService {
             messageTaskMessageHandle(message);
         }else if (type.contains("save_pipeline_instance")){
             messageSavePipelineInstanceHandle(message);
+        }else if (type.contains("sonar_scan_result")){
+            sonarQubeTaskMessageHandle(message);
         }
         return null;
     }
@@ -283,7 +296,6 @@ public class WebSocketMessageServiceImpl implements WebSocketMessageService {
         TaskInstance sourceTaskInstance = JSONObject.parseObject(jsonString,TaskInstance.class);
         String id = sourceTaskInstance.getId();
         TaskInstance taskInstance = tasksInstanceService.findOneTaskInstance(id);
-
         TaskInstance mapTaskInstance = TasksInstanceServiceImpl.taskInstanceMap.get(id);
         if (!Objects.isNull(mapTaskInstance)){
             String runLog = mapTaskInstance.getRunLog();
@@ -305,6 +317,55 @@ public class WebSocketMessageServiceImpl implements WebSocketMessageService {
         String jsonString = JSONObject.toJSONString(message);
         TaskInstance sourceTaskInstance = JSONObject.parseObject(jsonString,TaskInstance.class);
         String id = sourceTaskInstance.getId();
+
+        int runTime = sourceTaskInstance.getRunTime();
+        if  (runTime > taskTimeout){
+            AgentMessage agentMessage = new AgentMessage();
+            agentMessage.setType("timeout");
+
+            try {
+                TaskInstance oneTaskInstance = tasksInstanceService.findOneTaskInstance(id);
+                String stagesId = oneTaskInstance.getStagesId();
+                StageInstance oneStageInstance = stageInstanceServer.findOneStageInstance(stagesId);
+                oneStageInstance.setStageState(RUN_TIMEOUT);
+                StageInstance stageInstance = null;
+                String instanceId;
+                if (StringUtils.isEmpty(oneStageInstance.getParentId())){
+                    instanceId = oneStageInstance.getInstanceId();
+                }else {
+                    stageInstance = stageInstanceServer.findOneStageInstance(oneStageInstance.getParentId());
+                    instanceId = stageInstance.getInstanceId();
+                }
+                PipelineInstance instance = pipelineInstanceService.findOneInstance(instanceId);
+                instance.setRunStatus(RUN_TIMEOUT);
+                int runtime = pipelineInstanceService.findInstanceRuntime(instanceId);
+                instance.setRunTime(runtime);
+
+                String pipelineId = instance.getPipeline().getId();
+
+                if (!StringUtils.isEmpty(pipelineId)){
+                    agentMessage.setMessage(pipelineId);
+                    agentMessage.setPipelineId(pipelineId);
+                    Agent agent = PipelineExecServiceImpl.pipelineIdOrAgentId.get(pipelineId);
+                    SocketServerHandler.instance().sendHandleMessage(agent.getAddress(),agentMessage);
+
+                    Pipeline pipeline = pipelineService.findPipelineById(pipelineId);
+                    pipeline.setState(1);
+                    pipelineService.updatePipeline(pipeline);
+
+                    pipelineInstanceService.updateInstance(instance);
+                    stageInstanceServer.updateStageInstance(oneStageInstance);
+                    if (!Objects.isNull(stageInstance)){
+                        stageInstanceServer.updateStageInstance(stageInstance);
+                    }
+                    removeExecCache(pipelineId);
+                }
+            }catch (Exception e){
+                e.printStackTrace();
+                logger.error("获取流水线信息失败!");
+            }
+        }
+
         TaskInstance taskInstance = TasksInstanceServiceImpl.taskInstanceMap.get(id);
         if (!Objects.isNull(taskInstance)){
             if (!StringUtils.isEmpty(sourceTaskInstance.getRunLog())){
@@ -315,6 +376,13 @@ public class WebSocketMessageServiceImpl implements WebSocketMessageService {
         }
         updateTaskInstance(sourceTaskInstance);
         TasksInstanceServiceImpl.taskInstanceMap.put(sourceTaskInstance.getId(), sourceTaskInstance);
+    }
+
+    public void removeExecCache(String pipelineId){
+        String instanceId = PipelineExecServiceImpl.pipelineIdOrInstanceId.get(pipelineId);
+        PipelineInstanceServiceImpl.runTimeMap.remove(instanceId);
+        pipelineInstanceService.stopThread(instanceId);
+        PipelineExecServiceImpl.pipelineIdOrInstanceId.remove(pipelineId);
     }
 
     /**
@@ -393,6 +461,17 @@ public class WebSocketMessageServiceImpl implements WebSocketMessageService {
         TaskBuildProduct taskBuildProduct = JSONObject.parseObject(jsonString, TaskBuildProduct.class);
         taskBuildProductService.createBuildProduct(taskBuildProduct);
     }
+
+    /**
+     * 发送消息结果
+     * @param message 消息内容
+     */
+    private void sonarQubeTaskMessageHandle(Object message){
+        String jsonString = JSONObject.toJSONString(message);
+        SonarQubeScan sonarQubeScan = JSONObject.parseObject(jsonString, SonarQubeScan.class);
+        sonarQubeScanService.creatSonarQubeScan(sonarQubeScan);
+    }
+
 
     /**
      * 发送消息结果

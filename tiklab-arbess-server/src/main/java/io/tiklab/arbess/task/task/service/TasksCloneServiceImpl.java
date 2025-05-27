@@ -1,9 +1,9 @@
 package io.tiklab.arbess.task.task.service;
 
 import io.tiklab.core.exception.ApplicationException;
-import io.tiklab.arbess.setting.service.AuthHostService;
-import io.tiklab.arbess.setting.service.AuthService;
-import io.tiklab.arbess.setting.service.AuthThirdService;
+import io.tiklab.arbess.setting.host.service.AuthHostService;
+import io.tiklab.arbess.setting.auth.service.AuthService;
+import io.tiklab.arbess.setting.third.service.AuthThirdService;
 import io.tiklab.arbess.support.condition.service.ConditionService;
 import io.tiklab.arbess.support.postprocess.dao.PostprocessDao;
 import io.tiklab.arbess.support.postprocess.entity.PostprocessEntity;

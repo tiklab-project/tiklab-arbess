@@ -8,7 +8,6 @@ import io.tiklab.toolkit.join.annotation.Join;
  */
 @Join
 @Mapper(targetName = "io.tiklab.arbess.task.codescan.entity.SpotbugsScanEntity")
-// @Mapper
 public class SpotbugsBugSummary {
 
     // id

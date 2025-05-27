@@ -14,6 +14,9 @@ public class RelevanceTestOnEntity {
     @Column(name = "teston_id" ,notNull = true)
     private String testonId;
 
+    @Column(name = "test_plan_id" ,notNull = true)
+    private String testPlanId;
+
     @Column(name = "pipeline_id" ,notNull = true)
     private String pipelineId;
 
@@ -22,6 +25,14 @@ public class RelevanceTestOnEntity {
 
     @Column(name = "create_time" ,notNull = true)
     private String createTime;
+
+    public String getTestPlanId() {
+        return testPlanId;
+    }
+
+    public void setTestPlanId(String testPlanId) {
+        this.testPlanId = testPlanId;
+    }
 
     public String getAuthId() {
         return authId;

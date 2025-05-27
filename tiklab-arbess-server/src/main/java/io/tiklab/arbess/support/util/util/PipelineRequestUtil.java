@@ -7,7 +7,10 @@ import io.tiklab.core.exception.SystemException;
 import io.tiklab.core.page.Pagination;
 import io.tiklab.core.page.PaginationBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.http.*;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
@@ -17,15 +20,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-@Component
+@Configuration
 public class PipelineRequestUtil {
-
-    @Autowired
-    RestTemplate restTemplate;
 
     @Autowired
     PipelineRequestUtil requestUtil;
 
+    @Autowired
+    RestTemplate restTemplate;
 
     /**
      * 发起Post请求

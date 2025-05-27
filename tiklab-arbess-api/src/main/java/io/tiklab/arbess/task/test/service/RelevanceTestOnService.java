@@ -51,7 +51,7 @@ public interface RelevanceTestOnService {
      * @param relevanceTestOnQuery 条件
      * @return 关联关系
      */
-    Pagination<RelevanceTestOn> findAllRelevancePage(RelevanceTestOnQuery relevanceTestOnQuery);
+    Pagination<RelevanceTestOn> findRelevancePage(RelevanceTestOnQuery relevanceTestOnQuery);
 
 
     /**

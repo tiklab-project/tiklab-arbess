@@ -1,7 +1,7 @@
 package io.tiklab.arbess.pipeline.execute.service;
 
 import io.tiklab.arbess.home.service.PipelineHomeService;
-import io.tiklab.arbess.setting.model.Resources;
+import io.tiklab.arbess.setting.other.model.Resources;
 import io.tiklab.arbess.task.build.model.TaskBuildProduct;
 import io.tiklab.arbess.task.build.model.TaskBuildProductQuery;
 import io.tiklab.arbess.task.build.service.TaskBuildProductService;
@@ -11,8 +11,8 @@ import io.tiklab.arbess.support.agent.model.Agent;
 import io.tiklab.arbess.support.agent.model.AgentMessage;
 import io.tiklab.arbess.pipeline.execute.model.PipelineDetails;
 import io.tiklab.arbess.pipeline.execute.model.PipelineRunMsg;
-import io.tiklab.arbess.setting.service.ResourcesService;
-import io.tiklab.arbess.setting.service.ScmService;
+import io.tiklab.arbess.setting.other.service.ResourcesService;
+import io.tiklab.arbess.setting.tool.service.ScmService;
 import io.tiklab.arbess.stages.model.Stage;
 import io.tiklab.arbess.stages.service.StageExecService;
 import io.tiklab.arbess.stages.service.StageService;

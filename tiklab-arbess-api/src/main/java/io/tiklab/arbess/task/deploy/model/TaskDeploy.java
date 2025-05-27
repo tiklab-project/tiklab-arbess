@@ -1,6 +1,6 @@
 package io.tiklab.arbess.task.deploy.model;
 
-import io.tiklab.arbess.setting.model.HostGroup;
+import io.tiklab.arbess.setting.hostgroup.model.HostGroup;
 import io.tiklab.toolkit.beans.annotation.Mapper;
 import io.tiklab.toolkit.join.annotation.Join;
 
@@ -62,6 +62,11 @@ public class TaskDeploy {
     // 配置文件
     private String k8sJson;
 
+    // k8s配置文件地址
+    private String k8sAddress;
+
+    public String kubeConfType;
+
     // 策略类型
     private String strategyType;
 
@@ -72,6 +77,22 @@ public class TaskDeploy {
 
     //
     private List<HostGroup> hostGroupList;
+
+    public String getKubeConfType() {
+        return kubeConfType;
+    }
+
+    public void setKubeConfType(String kubeConfType) {
+        this.kubeConfType = kubeConfType;
+    }
+
+    public String getK8sAddress() {
+        return k8sAddress;
+    }
+
+    public void setK8sAddress(String k8sAddress) {
+        this.k8sAddress = k8sAddress;
+    }
 
     public List<HostGroup> getHostGroupList() {
         return hostGroupList;

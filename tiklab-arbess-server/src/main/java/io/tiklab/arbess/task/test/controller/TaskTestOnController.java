@@ -1,14 +1,17 @@
 package io.tiklab.arbess.task.test.controller;
 
-import io.tiklab.arbess.task.test.model.TestOnRepository;
-import io.tiklab.arbess.task.test.model.TestOnTestPlan;
+import io.tiklab.arbess.task.test.model.*;
 import io.tiklab.arbess.task.test.service.TaskTestOnService;
 import io.tiklab.core.Result;
+import io.tiklab.core.page.Pagination;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
@@ -18,7 +21,7 @@ import java.util.List;
  */
 
 @RestController
-@RequestMapping("/testOnAuthorize")
+@RequestMapping("/testHubo/message")
 public class TaskTestOnController {
 
     @Autowired
@@ -31,30 +34,23 @@ public class TaskTestOnController {
      * @pi.request-type: formdata
      * @pi.param: name=authId;dataType=string;value=authId;
      */
-    @RequestMapping(path="/findAllRepository",method = RequestMethod.POST)
-    public Result<List<TestOnRepository>> findAllRepository(@NotNull String authId){
+    @RequestMapping(path="/findRepositoryList",method = RequestMethod.POST)
+    public Result<List<TestHuboRpy>> findRepositoryList( @RequestBody @Valid @NotNull TestHuboRpyQuery rpyQuery){
 
-        List<TestOnRepository> allRepository = taskTestOnService.findAllRepository(authId);
+        List<TestHuboRpy> allRepository = taskTestOnService.findRepositoryList(rpyQuery);
 
         return Result.ok(allRepository);
     }
 
-    /**
-     * @pi.name:查询测试信息环境
-     * @pi.url:/testOnAuthorize/findAllEnv
-     * @pi.methodType:post
-     * @pi.request-type: formdata
-     * @pi.param: name=authId;dataType=string;value=authId;
-     * @pi.param: name=rpyId;dataType=string;value=rpyId;
-     * @pi.param: name=env;dataType=string;value=env;
-     */
-    @RequestMapping(path="/findAllEnv",method = RequestMethod.POST)
-    public Result<List<Object>> findAllBranch(@NotNull String authId,String rpyId,String env){
 
-        List<Object> allEnv = taskTestOnService.findAllEnv(authId, rpyId,env);
+    @RequestMapping(path="/findRepositoryPage",method = RequestMethod.POST)
+    public Result<Pagination<TestHuboRpy>> findRepositoryPage( @RequestBody @Valid @NotNull TestHuboRpyQuery rpyQuery){
 
-        return Result.ok(allEnv);
+        Pagination<TestHuboRpy> allRepository = taskTestOnService.findRepositoryPage(rpyQuery);
+
+        return Result.ok(allRepository);
     }
+
 
     /**
      * @pi.name:获取测试计划需要的环境
@@ -64,10 +60,19 @@ public class TaskTestOnController {
      * @pi.param: name=authId;dataType=string;value=authId;
      * @pi.param: name=testPlanId;dataType=string;value=testPlanId
      */
-    @RequestMapping(path="/findTestPlanEnv",method = RequestMethod.POST)
-    public Result<List<String>> findTestPlanEnv(@NotNull String authId,@NotNull String testPlanId){
+    @RequestMapping(path="/findEnvList",method = RequestMethod.POST)
+    public Result<List<TestHuboEnv>> findEnvList(@RequestBody @Valid @NotNull TestHuboEnvQuery  envQuery){
 
-        List<String> planEnv = taskTestOnService.findTestPlanEnv(authId, testPlanId);
+        List<TestHuboEnv> planEnv = taskTestOnService.findEnvList(envQuery);
+
+        return Result.ok(planEnv);
+    }
+
+
+    @RequestMapping(path="/findEnvPage",method = RequestMethod.POST)
+    public Result<Pagination<TestHuboEnv>> findEnvPage(@RequestBody @Valid @NotNull TestHuboEnvQuery  envQuery){
+
+        Pagination<TestHuboEnv> planEnv = taskTestOnService.findEnvPage(envQuery);
 
         return Result.ok(planEnv);
     }
@@ -81,10 +86,19 @@ public class TaskTestOnController {
      * @pi.param: name=authId;dataType=string;value=authId;
      * @pi.param: name=rpyId;dataType=string;value=rpyId;
      */
-    @RequestMapping(path="/findAllTestPlan",method = RequestMethod.POST)
-    public Result<List<TestOnTestPlan>> findAllBranch(@NotNull String authId, String rpyId){
+    @RequestMapping(path="/findTestPlanList",method = RequestMethod.POST)
+    public Result<List<TestHuboTestPlan>> findTestPlanList(@RequestBody @Valid @NotNull TestHuboTestPlanQuery testPlanQuery){
 
-        List<TestOnTestPlan> allTestPlan = taskTestOnService.findAllTestPlan(authId, rpyId);
+        List<TestHuboTestPlan> allTestPlan = taskTestOnService.findTestPlanList(testPlanQuery);
+
+        return Result.ok(allTestPlan);
+    }
+
+
+    @RequestMapping(path="/findTestPlanPage",method = RequestMethod.POST)
+    public Result<List<TestHuboTestPlan>> findTestPlanPage(@RequestBody @Valid @NotNull TestHuboTestPlanQuery testPlanQuery){
+
+        Pagination<TestHuboTestPlan> allTestPlan = taskTestOnService.findTestPlanPage(testPlanQuery);
 
         return Result.ok(allTestPlan);
     }

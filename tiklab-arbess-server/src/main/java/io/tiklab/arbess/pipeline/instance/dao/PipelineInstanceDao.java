@@ -1,6 +1,7 @@
 package io.tiklab.arbess.pipeline.instance.dao;
 
 
+import io.tiklab.arbess.support.util.util.DataBaseVersionUtil;
 import io.tiklab.arbess.support.util.util.PipelineUtil;
 import io.tiklab.core.page.Pagination;
 import io.tiklab.dal.jdbc.JdbcTemplate;
@@ -207,10 +208,18 @@ public class PipelineInstanceDao {
      */
     public List<PipelineInstanceEntity> findLatelyInstance(String pipelineId){
         String sql = "select pip_pipeline_instance.* from pip_pipeline_instance  ";
-        sql = sql.concat(" where pipeline_id = '"+pipelineId+"' " +
-                " and run_status != 'run'"+
-                " order by create_time desc" +
-                " OFFSET 0 limit 1");
+
+        if (DataBaseVersionUtil.isMysql()){
+            sql = sql.concat(" where pipeline_id = '"+pipelineId+"' " +
+                    " and run_status != 'run'"+
+                    " order by create_time desc" +
+                    " LIMIT 1 OFFSET 0");
+        }else {
+            sql = sql.concat(" where pipeline_id = '"+pipelineId+"' " +
+                    " and run_status != 'run'"+
+                    " order by create_time desc" +
+                    " limit 1 OFFSET 0");
+        }
         JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
         return  jdbcTemplate.query(sql, new BeanPropertyRowMapper(PipelineInstanceEntity.class));
     }

@@ -29,5 +29,17 @@ public class TaskInitAgent implements TiklabApplicationRunner {
         webSocketClient.initWebSocketConnect();
         logger.info("The init agent end.");
 
+        new Thread(
+                () -> {
+                    try {
+                        Thread.sleep(5000);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                    logger.info("Enable automatic connection .....");
+                    WebSocketClient.beginConnect = true;
+                }
+        ).start();
+
     }
 }

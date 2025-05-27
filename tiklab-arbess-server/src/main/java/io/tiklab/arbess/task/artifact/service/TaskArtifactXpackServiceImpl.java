@@ -1,7 +1,7 @@
 package io.tiklab.arbess.task.artifact.service;
 
-import io.tiklab.arbess.setting.model.AuthThird;
-import io.tiklab.arbess.setting.service.AuthThirdService;
+import io.tiklab.arbess.setting.third.model.AuthThird;
+import io.tiklab.arbess.setting.third.service.AuthThirdService;
 import io.tiklab.arbess.support.util.util.PipelineRequestUtil;
 import io.tiklab.arbess.task.artifact.model.XpackRepository;
 import io.tiklab.core.exception.ApplicationException;

@@ -1,13 +1,13 @@
 package io.tiklab.arbess.task.deploy.service;
 
 
-import com.alibaba.fastjson.JSONObject;
-import io.tiklab.arbess.setting.model.AuthHost;
-import io.tiklab.arbess.setting.model.AuthHostGroup;
-import io.tiklab.arbess.setting.service.AuthHostGroupService;
-import io.tiklab.arbess.setting.service.AuthHostService;
+import io.tiklab.arbess.setting.host.model.AuthHost;
+import io.tiklab.arbess.setting.hostgroup.model.AuthHostGroup;
+import io.tiklab.arbess.setting.hostgroup.service.AuthHostGroupService;
+import io.tiklab.arbess.setting.host.service.AuthHostService;
+import io.tiklab.arbess.setting.k8s.model.Kubectl;
+import io.tiklab.arbess.setting.k8s.service.KubectlService;
 import io.tiklab.arbess.support.util.util.PipelineUtil;
-import io.tiklab.arbess.task.artifact.model.TaskArtifact;
 import io.tiklab.arbess.task.deploy.model.TaskDeploy;
 import io.tiklab.toolkit.beans.BeanMapper;
 import io.tiklab.arbess.task.deploy.dao.TaskDeployDao;
@@ -37,6 +37,9 @@ public class TaskDeployServiceImpl implements TaskDeployService {
     @Autowired
     AuthHostGroupService groupService;
 
+    @Autowired
+    KubectlService kubectlService;
+
 
     @Override
     public String createDeploy(TaskDeploy taskDeploy) {
@@ -63,11 +66,11 @@ public class TaskDeployServiceImpl implements TaskDeployService {
             if (!Objects.isNull(authHost)){
                 taskDeploy.setHostType("host");
                 taskDeploy.setAuth(authHost);
-                return taskDeploy;
+            }else {
+                AuthHostGroup hostGroup = groupService.findOneHostGroup(authId);
+                taskDeploy.setHostType("hostGroup");
+                taskDeploy.setAuth(hostGroup);
             }
-            AuthHostGroup hostGroup = groupService.findOneHostGroup(authId);
-            taskDeploy.setHostType("hostGroup");
-            taskDeploy.setAuth(hostGroup);
         }
         return taskDeploy;
     }

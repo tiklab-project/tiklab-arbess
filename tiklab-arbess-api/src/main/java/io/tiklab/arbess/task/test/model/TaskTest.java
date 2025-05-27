@@ -1,7 +1,7 @@
 package io.tiklab.arbess.task.test.model;
 
 
-import io.tiklab.arbess.setting.model.Scm;
+import io.tiklab.arbess.setting.tool.model.Scm;
 import io.tiklab.toolkit.beans.annotation.Mapper;
 import io.tiklab.toolkit.beans.annotation.Mapping;
 import io.tiklab.toolkit.beans.annotation.Mappings;
@@ -32,31 +32,19 @@ public class TaskTest {
             @Mapping(source = "testSpace.id",target = "testSpace")
     })
     @JoinQuery(key = "testSpace")
-    private TestOnRepository testSpace;
+    private TestHuboRpy testSpace;
 
     @Mappings({
             @Mapping(source = "testPlan.id",target = "testPlan")
     })
     @JoinQuery(key = "testPlan")
-    private TestOnTestPlan testPlan;
+    private TestHuboTestPlan testPlan;
 
     @Mappings({
-            @Mapping(source = "apiEnv.id",target = "apiEnv")
+            @Mapping(source = "testEnv.id",target = "testEnv")
     })
-    @JoinQuery(key = "apiEnv")
-    private TestOnApiEnv apiEnv;
-
-    @Mappings({
-            @Mapping(source = "appEnv.id",target = "appEnv")
-    })
-    @JoinQuery(key = "appEnv")
-    private TestOnAppEnv appEnv;
-
-    @Mappings({
-            @Mapping(source = "webEnv.id",target = "webEnv")
-    })
-    @JoinQuery(key = "webEnv")
-    private TestOnWebEnv webEnv;
+    @JoinQuery(key = "testEnv")
+    private TestHuboEnv testEnv;
 
     //@ApiProperty(name = "authId",desc="认证id")
     private String authId;
@@ -131,45 +119,21 @@ public class TaskTest {
     }
 
 
-    public TestOnRepository getTestSpace() {
+    public TestHuboRpy getTestSpace() {
         return testSpace;
     }
 
-    public void setTestSpace(TestOnRepository testSpace) {
+    public void setTestSpace(TestHuboRpy testSpace) {
         this.testSpace = testSpace;
     }
 
 
-    public TestOnTestPlan getTestPlan() {
+    public TestHuboTestPlan getTestPlan() {
         return testPlan;
     }
 
-    public void setTestPlan(TestOnTestPlan testPlan) {
+    public void setTestPlan(TestHuboTestPlan testPlan) {
         this.testPlan = testPlan;
-    }
-
-    public TestOnApiEnv getApiEnv() {
-        return apiEnv;
-    }
-
-    public void setApiEnv(TestOnApiEnv apiEnv) {
-        this.apiEnv = apiEnv;
-    }
-
-    public TestOnAppEnv getAppEnv() {
-        return appEnv;
-    }
-
-    public void setAppEnv(TestOnAppEnv appEnv) {
-        this.appEnv = appEnv;
-    }
-
-    public TestOnWebEnv getWebEnv() {
-        return webEnv;
-    }
-
-    public void setWebEnv(TestOnWebEnv webEnv) {
-        this.webEnv = webEnv;
     }
 
     public void setTaskId(String taskId) {
@@ -206,5 +170,13 @@ public class TaskTest {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public TestHuboEnv getTestEnv() {
+        return testEnv;
+    }
+
+    public void setTestEnv(TestHuboEnv testEnv) {
+        this.testEnv = testEnv;
     }
 }

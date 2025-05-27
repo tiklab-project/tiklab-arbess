@@ -1,15 +1,14 @@
 package io.tiklab.arbess.starter.task;
 
 import io.tiklab.arbess.pipeline.definition.model.Pipeline;
-import io.tiklab.arbess.setting.model.Cache;
-import io.tiklab.arbess.setting.service.CacheService;
+import io.tiklab.arbess.setting.other.model.Cache;
+import io.tiklab.arbess.setting.other.service.CacheService;
 import io.tiklab.arbess.stages.model.StageInstance;
 import io.tiklab.arbess.stages.model.StageInstanceQuery;
 import io.tiklab.arbess.stages.service.StageInstanceServer;
 import io.tiklab.arbess.support.postprocess.model.PostprocessInstance;
 import io.tiklab.arbess.support.postprocess.service.PostprocessInstanceService;
 import io.tiklab.arbess.support.util.util.PipelineFileUtil;
-import io.tiklab.arbess.support.util.util.PipelineFinal;
 import io.tiklab.arbess.support.util.util.PipelineUtil;
 import io.tiklab.toolkit.join.JoinTemplate;
 import io.tiklab.arbess.pipeline.instance.model.PipelineInstance;

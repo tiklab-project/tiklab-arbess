@@ -24,6 +24,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.*;
 
+import static io.tiklab.arbess.support.util.util.PipelineFinal.*;
+
 /**
  * 任务执行实例服务接口
  */
@@ -117,7 +119,7 @@ public class TasksInstanceServiceImpl implements TasksInstanceService {
 
         // 没有正在运行的任务时查询所有日志
         TaskInstance taskInstance1 = allInstance.get(allInstance.size() - 1);
-        if (!taskInstance1.getRunState().equals(PipelineFinal.RUN_RUN)){
+        if (!taskInstance1.getRunState().equals(RUN_RUN)){
             readLogLength = 0;
         }
 
@@ -137,7 +139,7 @@ public class TasksInstanceServiceImpl implements TasksInstanceService {
                 // }else {
                 //     instance.setRunLog(taskInstance.getRunLog());
                 // }
-                instance.setRunState(PipelineFinal.RUN_RUN);
+                instance.setRunState(RUN_RUN);
             }
             String logAddress = instance.getLogAddress();
             String readFile = PipelineFileUtil.readFile(logAddress, readLogLength);
@@ -185,7 +187,7 @@ public class TasksInstanceServiceImpl implements TasksInstanceService {
         String runState = taskInstances4.getRunState();
         if (Objects.equals(runTime,0) &&
                 !Objects.isNull(runState) &&
-                !Objects.equals(runState,PipelineFinal.RUN_RUN) &&
+                !Objects.equals(runState, RUN_RUN) &&
                 !Objects.equals(runState,PipelineFinal.RUN_HALT)){
             runTime = 1;
         }
@@ -259,27 +261,14 @@ public class TasksInstanceServiceImpl implements TasksInstanceService {
                 instance.setRunTime(time);
                 instance.setRunState(taskInstance.getRunState());
             }
-            // if (Objects.isNull(taskInstance)){
-            //     String logAddress = instance.getLogAddress();
-            //     String readFile = PipelineFileUtil.readFile(logAddress, 2000);
-            //     instance.setRunLog(readFile);
-            // }else {
-            //     int time = taskInstance.getRunTime();
-            //     if (time == 0){
-            //         time = 1;
-            //     }
-            //     if (StringUtils.isEmpty(taskInstance.getRunLog()) ){
-            //         String logAddress = instance.getLogAddress();
-            //         String readFile = PipelineFileUtil.readFile(logAddress, readLogLength);
-            //         instance.setRunLog(readFile);
-            //     }else {
-            //         instance.setRunLog(taskInstance.getRunLog());
-            //     }
-            //     instance.setRunTime(time);
-            //     instance.setRunState(taskInstance.getRunState());
-            // }
             String logAddress = instance.getLogAddress();
-            String readFile = PipelineFileUtil.readFile(logAddress, readLogLength);
+            String readFile ;
+            String runState = instance.getRunState();
+            if (!runState.equals(RUN_RUN) && !runState.equals(RUN_WAIT)){
+                readFile = PipelineFileUtil.readFile(logAddress, 0);
+            }else {
+                readFile = PipelineFileUtil.readFile(logAddress, readLogLength);
+            }
             instance.setRunLog(readFile);
 
             String time = PipelineUtil.formatDateTime(instance.getRunTime());

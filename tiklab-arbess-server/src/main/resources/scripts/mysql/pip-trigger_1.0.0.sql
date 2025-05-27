@@ -1,0 +1,2 @@
+ALTER TABLE pip_trigger
+    ADD COLUMN state VARCHAR(64) DEFAULT '1';

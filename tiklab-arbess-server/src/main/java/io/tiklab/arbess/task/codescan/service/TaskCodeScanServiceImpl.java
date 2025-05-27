@@ -1,8 +1,8 @@
 package io.tiklab.arbess.task.codescan.service;
 
-import io.tiklab.arbess.setting.model.AuthThird;
-import io.tiklab.arbess.setting.service.AuthHostService;
-import io.tiklab.arbess.setting.service.AuthThirdService;
+import io.tiklab.arbess.setting.third.model.AuthThird;
+import io.tiklab.arbess.setting.host.service.AuthHostService;
+import io.tiklab.arbess.setting.third.service.AuthThirdService;
 import io.tiklab.arbess.support.util.util.PipelineUtil;
 import io.tiklab.toolkit.beans.BeanMapper;
 import io.tiklab.toolkit.join.JoinTemplate;

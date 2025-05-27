@@ -139,49 +139,25 @@ public class StageInstanceServerImpl implements StageInstanceServer{
                 });
                 otherInstance.setStageTime(stageRunTime.get());
                 otherInstance.setRunLog(runLog.toString());
+                otherInstance.setStageState(findTaskInstanceStatus(allTaskInstance));
                 if (!Objects.equals(runLog.toString(),log)){
                     mainLog.append(runLog).append(log);
                 }
                 allTime = Math.max(allTime, otherInstance.getStageTime());
-
             }
 
             stageInstance.setRunLog(mainLog.toString());
             stageInstance.setStageTime(allTime);
             otherStageInstanceList.sort(Comparator.comparing(StageInstance::getStageSort));
+            stageInstance.setStageState(findStageInstanceStatus(otherStageInstanceList));
             stageInstance.setStageInstanceList(otherStageInstanceList);
         }
         List<TaskInstance> list = tasksInstanceService.findStagePostRunMessage(instanceId);
         StageInstance stageInstance = new StageInstance();
         if (!Objects.equals(list.size(),0)){
-            String status;
+            String status = findTaskInstanceStatus(list);
             stageInstance.setStageName("后置处理");
             stageInstance.setId("1");
-
-            long successCount = list.stream().filter(taskInstance -> Objects.equals(taskInstance.getRunState(), PipelineFinal.RUN_SUCCESS)).count();
-
-            long errorCount = list.stream().filter(taskInstance -> Objects.equals(taskInstance.getRunState(), PipelineFinal.RUN_ERROR)).count();
-
-            long haltCount = list.stream().filter(taskInstance -> Objects.equals(taskInstance.getRunState(), PipelineFinal.RUN_HALT)).count();
-
-            long runCount = list.stream().filter(taskInstance -> Objects.equals(taskInstance.getRunState(), PipelineFinal.RUN_RUN)).count();
-
-            long suspendCount = list.stream().filter(taskInstance -> Objects.equals(taskInstance.getRunState(), PipelineFinal.RUN_SUSPEND)).count();
-
-            if (haltCount != 0){
-                status = PipelineFinal.RUN_HALT;
-            }else if (errorCount != 0){
-                status = PipelineFinal.RUN_ERROR;
-            } else if (runCount != 0){
-                status = PipelineFinal.RUN_RUN;
-            }else if (suspendCount != 0){
-                status = PipelineFinal.RUN_SUSPEND;
-            } else {
-                status = PipelineFinal.RUN_WAIT;
-            }
-            if (successCount == list.size()){
-                status = PipelineFinal.RUN_SUCCESS;
-            }
 
             AtomicInteger time = new AtomicInteger();
             list.forEach(taskInstance -> {time.set(time.get() + taskInstance.getRunTime());});
@@ -204,6 +180,73 @@ public class StageInstanceServerImpl implements StageInstanceServer{
             stageInstanceList.sort(Comparator.comparing(StageInstance::getStageSort));
         }
         return stageInstanceList;
+    }
+
+    private String findTaskInstanceStatus(List<TaskInstance> list){
+        String status;
+
+        long successCount = list.stream().filter(taskInstance -> Objects.equals(taskInstance.getRunState(), PipelineFinal.RUN_SUCCESS)).count();
+
+        long timeoutCount = list.stream().filter(taskInstance -> Objects.equals(taskInstance.getRunState(), PipelineFinal.RUN_TIMEOUT)).count();
+
+        long errorCount = list.stream().filter(taskInstance -> Objects.equals(taskInstance.getRunState(), PipelineFinal.RUN_ERROR)).count();
+
+        long haltCount = list.stream().filter(taskInstance -> Objects.equals(taskInstance.getRunState(), PipelineFinal.RUN_HALT)).count();
+
+        long runCount = list.stream().filter(taskInstance -> Objects.equals(taskInstance.getRunState(), PipelineFinal.RUN_RUN)).count();
+
+        long suspendCount = list.stream().filter(taskInstance -> Objects.equals(taskInstance.getRunState(), PipelineFinal.RUN_SUSPEND)).count();
+
+        if (haltCount != 0){
+            status = PipelineFinal.RUN_HALT;
+        }else if (timeoutCount != 0){
+            status = PipelineFinal.RUN_TIMEOUT;
+        } else if (errorCount != 0){
+            status = PipelineFinal.RUN_ERROR;
+        } else if (runCount != 0){
+            status = PipelineFinal.RUN_RUN;
+        } else if (suspendCount != 0){
+            status = PipelineFinal.RUN_SUSPEND;
+        } else {
+            status = PipelineFinal.RUN_WAIT;
+        }
+        if (successCount == list.size()){
+            status = PipelineFinal.RUN_SUCCESS;
+        }
+        return status;
+    }
+    private String findStageInstanceStatus(List<StageInstance> list){
+        String status;
+
+        long successCount = list.stream().filter(taskInstance -> Objects.equals(taskInstance.getStageState(), PipelineFinal.RUN_SUCCESS)).count();
+
+        long errorCount = list.stream().filter(taskInstance -> Objects.equals(taskInstance.getStageState(), PipelineFinal.RUN_ERROR)).count();
+
+        long timeoutCount = list.stream().filter(taskInstance -> Objects.equals(taskInstance.getStageState(), PipelineFinal.RUN_TIMEOUT)).count();
+
+        long haltCount = list.stream().filter(taskInstance -> Objects.equals(taskInstance.getStageState(), PipelineFinal.RUN_HALT)).count();
+
+        long runCount = list.stream().filter(taskInstance -> Objects.equals(taskInstance.getStageState(), PipelineFinal.RUN_RUN)).count();
+
+        long suspendCount = list.stream().filter(taskInstance -> Objects.equals(taskInstance.getStageState(), PipelineFinal.RUN_SUSPEND)).count();
+
+        if (haltCount != 0){
+            status = PipelineFinal.RUN_HALT;
+        }else if (timeoutCount != 0){
+            status = PipelineFinal.RUN_TIMEOUT;
+        }else if (errorCount != 0){
+            status = PipelineFinal.RUN_ERROR;
+        } else if (runCount != 0){
+            status = PipelineFinal.RUN_RUN;
+        }else if (suspendCount != 0){
+            status = PipelineFinal.RUN_SUSPEND;
+        } else {
+            status = PipelineFinal.RUN_WAIT;
+        }
+        if (successCount == list.size()){
+            status = PipelineFinal.RUN_SUCCESS;
+        }
+        return status;
     }
 
 

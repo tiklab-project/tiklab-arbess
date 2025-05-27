@@ -1,6 +1,6 @@
 package io.tiklab.arbess.task.deploy.model;
 
-import io.tiklab.arbess.setting.model.AuthHost;
+import io.tiklab.arbess.setting.host.model.AuthHost;
 
 import java.util.List;
 

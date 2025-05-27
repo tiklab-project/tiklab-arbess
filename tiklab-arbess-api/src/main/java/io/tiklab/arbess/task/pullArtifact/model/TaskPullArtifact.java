@@ -1,13 +1,7 @@
 package io.tiklab.arbess.task.pullArtifact.model;
 
-import io.tiklab.arbess.setting.model.Scm;
 import io.tiklab.toolkit.beans.annotation.Mapper;
-import io.tiklab.toolkit.beans.annotation.Mapping;
-import io.tiklab.toolkit.beans.annotation.Mappings;
 import io.tiklab.toolkit.join.annotation.Join;
-import io.tiklab.toolkit.join.annotation.JoinQuery;
-import io.tiklab.arbess.task.artifact.model.XpackRepository;
-
 
 
 //@ApiModel

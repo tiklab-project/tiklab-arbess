@@ -2,8 +2,8 @@ package io.tiklab.arbess.task.code.service;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import io.tiklab.arbess.setting.model.AuthThird;
-import io.tiklab.arbess.setting.service.AuthThirdService;
+import io.tiklab.arbess.setting.third.model.AuthThird;
+import io.tiklab.arbess.setting.third.service.AuthThirdService;
 import io.tiklab.arbess.task.code.model.ThirdBranch;
 import io.tiklab.arbess.task.code.model.ThirdHouse;
 import io.tiklab.arbess.task.code.model.ThirdQuery;

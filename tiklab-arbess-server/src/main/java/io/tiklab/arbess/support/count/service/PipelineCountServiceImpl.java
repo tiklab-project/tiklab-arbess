@@ -397,7 +397,10 @@ public class PipelineCountServiceImpl implements PipelineCountService {
                 pipelineDayRateCount.setErrorNumber((int) errorCount);
                 rateList.add(pipelineDayRateCount);
             }
-
+            return rateList.stream()
+                    .filter(a -> !Objects.isNull(a.getUser()))
+                    .sorted(Comparator.comparing(PipelineDayRateCount::getAllNumber).reversed())
+                    .toList();
         } else {
 
             // 获取所有用户
@@ -437,14 +440,12 @@ public class PipelineCountServiceImpl implements PipelineCountService {
                 pipelineDayRateCount.setErrorNumber((int) errorCount);
                 rateList.add(pipelineDayRateCount);
             }
+            return rateList.stream()
+                    .filter(a -> !Objects.isNull(a.getPipeline()))
+                    .sorted(Comparator.comparing(PipelineDayRateCount::getAllNumber).reversed())
+                    .toList();
         }
-        return rateList.stream()
-                .filter(a -> !Objects.isNull(a.getPipeline()))
-                .sorted(Comparator.comparing(PipelineDayRateCount::getAllNumber).reversed())
-                .toList();
 
-        // rateList.sort(Comparator.comparing(PipelineDayRateCount::getAllNumber).reversed());
-        // return rateList;
     }
 
     @Override

@@ -566,12 +566,6 @@ public class PipelineServiceImpl implements PipelineService {
                 idStrings.addAll(collect.size()-1,collect1);
             }
         }
-        // if (strings.isEmpty()){
-        //     List<Pipeline> objects = new ArrayList<>();
-        //     objects.add(pipeline);
-        //     return objects;
-        // }
-
         List<Pipeline> pipelineList = findAllPipelineList(idStrings);
         pipelineList.add(0,pipeline);
 

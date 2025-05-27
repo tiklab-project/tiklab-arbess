@@ -24,14 +24,8 @@ public class TaskTestEntity {
     @Column(name = "test_plan")
     private String testPlan;
 
-    @Column(name = "api_env")
-    private String apiEnv;
-
-    @Column(name = "app_env")
-    private String appEnv;
-
-    @Column(name = "web_env")
-    private String webEnv;
+    @Column(name = "test_env")
+    private String testEnv;
 
     @Column(name = "auth_id")
     private String authId;
@@ -60,36 +54,20 @@ public class TaskTestEntity {
         this.toolMaven = toolMaven;
     }
 
+    public String getTestEnv() {
+        return testEnv;
+    }
+
+    public void setTestEnv(String testEnv) {
+        this.testEnv = testEnv;
+    }
+
     public String getAuthId() {
         return authId;
     }
 
     public void setAuthId(String authId) {
         this.authId = authId;
-    }
-
-    public String getApiEnv() {
-        return apiEnv;
-    }
-
-    public void setApiEnv(String apiEnv) {
-        this.apiEnv = apiEnv;
-    }
-
-    public String getAppEnv() {
-        return appEnv;
-    }
-
-    public void setAppEnv(String appEnv) {
-        this.appEnv = appEnv;
-    }
-
-    public String getWebEnv() {
-        return webEnv;
-    }
-
-    public void setWebEnv(String webEnv) {
-        this.webEnv = webEnv;
     }
 
     public String getTestSpace() {

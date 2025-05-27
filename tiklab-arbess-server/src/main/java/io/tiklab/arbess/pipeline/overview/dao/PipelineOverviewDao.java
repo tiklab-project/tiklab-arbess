@@ -2,6 +2,7 @@ package io.tiklab.arbess.pipeline.overview.dao;
 
 import io.tiklab.dal.jdbc.JdbcTemplate;
 import io.tiklab.dal.jpa.JpaTemplate;
+import io.tiklab.user.util.util.DatabaseVersionUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -36,7 +37,12 @@ public class PipelineOverviewDao {
 
 
     public Integer findPipelineRunTime(String pipelineId){
-        String sql = "select SUM (run_time) AS total from pip_pipeline_instance  ";
+        String sql ;
+        if (DatabaseVersionUtil.isMysql()){
+            sql = "select SUM(run_time) AS total from pip_pipeline_instance  ";
+        }else {
+            sql = "select SUM (run_time) AS total from pip_pipeline_instance  ";
+        }
         sql = sql.concat(" where pipeline_id = '" + pipelineId + "' ");
         JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
         List<Integer> list = jdbcTemplate.queryForList(sql, Integer.class);

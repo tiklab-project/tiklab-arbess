@@ -13,7 +13,7 @@ public class TestOnPlanInstance {
     //@ApiProperty(name = "testPlanId", desc = "所属计划")
     private String testPlanId;
 
-    private TestOnTestPlan testPlan;
+    private TestHuboTestPlan testPlan;
 
     //@ApiProperty(name = "repositoryId", desc = "所属仓库")
     private String repositoryId;
@@ -50,11 +50,11 @@ public class TestOnPlanInstance {
 
     private String url;
 
-    public TestOnTestPlan getTestPlan() {
+    public TestHuboTestPlan getTestPlan() {
         return testPlan;
     }
 
-    public void setTestPlan(TestOnTestPlan testPlan) {
+    public void setTestPlan(TestHuboTestPlan testPlan) {
         this.testPlan = testPlan;
     }
 

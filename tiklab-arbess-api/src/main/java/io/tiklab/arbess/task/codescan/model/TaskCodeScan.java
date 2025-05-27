@@ -1,6 +1,6 @@
 package io.tiklab.arbess.task.codescan.model;
 
-import io.tiklab.arbess.setting.model.Scm;
+import io.tiklab.arbess.setting.tool.model.Scm;
 import io.tiklab.toolkit.beans.annotation.Mapper;
 import io.tiklab.toolkit.beans.annotation.Mapping;
 import io.tiklab.toolkit.beans.annotation.Mappings;
@@ -26,6 +26,8 @@ public class TaskCodeScan {
     //@ApiProperty(name="authName",desc="授权id")
     private String authId;
 
+    // 代码语言类型
+    private String codeType;
 
     // 是否开启断言
     private Boolean openAssert;
@@ -65,6 +67,28 @@ public class TaskCodeScan {
     @JoinQuery(key = "scmId")
     private Scm toolMaven;
 
+    // maven版本
+    @Mappings({
+            @Mapping(source = "toolSonar.scmId",target = "toolSonar")
+    })
+    @JoinQuery(key = "scmId")
+    private Scm toolSonar;
+
+    public String getCodeType() {
+        return codeType;
+    }
+
+    public void setCodeType(String codeType) {
+        this.codeType = codeType;
+    }
+
+    public Scm getToolSonar() {
+        return toolSonar;
+    }
+
+    public void setToolSonar(Scm toolSonar) {
+        this.toolSonar = toolSonar;
+    }
 
     public Scm getToolJdk() {
         return toolJdk;

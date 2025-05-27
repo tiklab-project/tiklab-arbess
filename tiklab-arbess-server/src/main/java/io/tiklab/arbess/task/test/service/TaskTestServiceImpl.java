@@ -1,14 +1,13 @@
 package io.tiklab.arbess.task.test.service;
 
 
-import io.tiklab.arbess.setting.service.AuthHostService;
-import io.tiklab.arbess.setting.service.AuthThirdService;
+import io.tiklab.arbess.setting.host.service.AuthHostService;
+import io.tiklab.arbess.setting.third.service.AuthThirdService;
 import io.tiklab.arbess.task.test.dao.TaskTestDao;
 import io.tiklab.arbess.task.test.entity.TaskTestEntity;
 import io.tiklab.arbess.task.test.model.*;
 import io.tiklab.toolkit.beans.BeanMapper;
 import io.tiklab.rpc.annotation.Exporter;
-import io.tiklab.arbess.task.test.model.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -53,9 +52,7 @@ public class TaskTestServiceImpl implements TaskTestService {
             if (Objects.isNull(taskTest.getTestPlan())){
                 return false;
             }
-            boolean b  = Objects.isNull(taskTest.getApiEnv())
-                    && Objects.isNull(taskTest.getAppEnv())
-                    && Objects.isNull(taskTest.getWebEnv());
+            boolean b  = Objects.isNull(taskTest.getTestEnv());
             return !b ;
         }
         return !StringUtils.isEmpty(taskTest.getAddress());
@@ -75,34 +72,27 @@ public class TaskTestServiceImpl implements TaskTestService {
             return taskTest;
         }
 
-        if (!Objects.isNull(taskTest.getApiEnv())){
-            String id = taskTest.getApiEnv().getId();
-            TestOnApiEnv apiEnv = taskTestOnService.findOneTestOnApiEnv(authId,id);
-            taskTest.setApiEnv(apiEnv);
+        try {
+            if (!Objects.isNull(taskTest.getTestEnv())){
+                String id = taskTest.getTestEnv().getId();
+                TestHuboEnv env = taskTestOnService.findEnv(authId,id);
+                taskTest.setTestEnv(env);
+            }
+
+            if (!Objects.isNull(taskTest.getTestSpace())){
+                String id = taskTest.getTestSpace().getId();
+                TestHuboRpy repository = taskTestOnService.findRepository(authId,id);
+                taskTest.setTestSpace(repository);
+            }
+            if (!Objects.isNull(taskTest.getTestPlan())){
+                String id = taskTest.getTestPlan().getId();
+                TestHuboTestPlan testPlan = taskTestOnService.findTestPlan(authId,id);
+                taskTest.setTestPlan(testPlan);
+            }
+        }catch(Exception e){
+            e.printStackTrace();
         }
 
-        if (!Objects.isNull(taskTest.getAppEnv())){
-            String id = taskTest.getAppEnv().getId();
-            TestOnAppEnv apiEnv = taskTestOnService.findOneTestOnAppEnv(authId,id);
-            taskTest.setAppEnv(apiEnv);
-        }
-
-        if (!Objects.isNull(taskTest.getWebEnv())){
-            String id = taskTest.getWebEnv().getId();
-            TestOnWebEnv webEnv = taskTestOnService.findOneTestOnWebEnv(authId,id);
-            taskTest.setWebEnv(webEnv);
-        }
-
-        if (!Objects.isNull(taskTest.getTestSpace())){
-            String id = taskTest.getTestSpace().getId();
-            TestOnRepository repository = taskTestOnService.findOneRepository(authId,id);
-            taskTest.setTestSpace(repository);
-        }
-        if (!Objects.isNull(taskTest.getTestPlan())){
-            String id = taskTest.getTestPlan().getId();
-            TestOnTestPlan testPlan = taskTestOnService.findOneTestPlan(authId,id);
-            taskTest.setTestPlan(testPlan);
-        }
         return taskTest;
     }
     

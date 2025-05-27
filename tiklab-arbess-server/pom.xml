@@ -96,6 +96,12 @@
             <artifactId>tiklab-arbess-agent-server</artifactId>
             <version>${tiklab-matflow-agent.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>io.tiklab</groupId>
+            <artifactId>tiklab-testhubo-api</artifactId>
+            <version>${tiklab-testhubo.version}</version>
+        </dependency>
     </dependencies>
 
     <build>
