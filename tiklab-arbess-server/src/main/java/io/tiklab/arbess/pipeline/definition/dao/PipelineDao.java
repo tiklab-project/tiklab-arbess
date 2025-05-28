@@ -128,7 +128,7 @@ public class PipelineDao {
     public Pagination<PipelineEntity> findPipelinePage(PipelineQuery query){
 
         QueryCondition queryCondition = QueryBuilders.createQuery(PipelineEntity.class)
-                .eq("userId", query.getUserId())
+                .eq("userId", query.getCreateUserId())
                 .eq("envId", query.getEnvId())
                 .eq("groupId", query.getGroupId())
                 .eq("state", query.getPipelineState())
