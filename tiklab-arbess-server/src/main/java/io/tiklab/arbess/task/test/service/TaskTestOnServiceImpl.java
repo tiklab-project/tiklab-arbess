@@ -1,15 +1,11 @@
 package io.tiklab.arbess.task.test.service;
 
-import io.tiklab.arbess.agent.util.PipelineRpc;
 import io.tiklab.arbess.setting.third.model.AuthThird;
 import io.tiklab.arbess.setting.third.service.AuthThirdService;
 import io.tiklab.arbess.support.util.util.PipelineRequestUtil;
 import io.tiklab.arbess.task.test.model.*;
 import io.tiklab.core.exception.ApplicationException;
 import io.tiklab.core.page.Pagination;
-import io.tiklab.testhubo.repository.model.Repository;
-import io.tiklab.testhubo.repository.model.RepositoryQuery;
-import io.tiklab.testhubo.repository.service.RepositoryService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
