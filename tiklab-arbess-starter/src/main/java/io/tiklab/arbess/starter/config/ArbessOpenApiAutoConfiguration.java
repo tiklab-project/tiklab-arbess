@@ -7,6 +7,7 @@ import io.tiklab.openapi.router.config.RouterConfigBuilder;
 import io.tiklab.user.util.util.CodeUtilService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -15,6 +16,9 @@ public class ArbessOpenApiAutoConfiguration {
 
     @Autowired
     CodeUtilService codeUtilService;
+
+    @Value("${server.port}")
+    private String serverPort;
 
     //路由
     @Bean("routerForOpenApi")
@@ -25,13 +29,20 @@ public class ArbessOpenApiAutoConfiguration {
     //路由配置
     @Bean("routerConfigForOpenApi")
     RouterConfig routerConfig(){
-        String[] s =  new String[]{};
+        String[] s =  new String[]{
+                "/pipeline/findAllPipeline",
+                "/pipeline/createPipeline",
+                "/pipeline/deletePipeline",
+                "/pipeline/findOnePipeline",
+                "/pipeline/findPipelineNoQuery",
+                "/pipeline/findUserPipelinePage",
+                "/pipeline/findPipelineUser",
+                "/pipeline/findUserPipeline",
+        };
 
-         if (codeUtilService.findEmbedEnable()){
-             s = new String[]{};
-         }
         return RouterConfigBuilder.instance()
                 .preRoute(s, codeUtilService.findEmbedAddress())
+                .route(s, "http://127.0.0.1:"+serverPort)
                 .get();
     }
 }

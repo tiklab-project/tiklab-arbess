@@ -13,6 +13,7 @@ import io.tiklab.arbess.setting.third.service.AuthThirdService;
 import io.tiklab.arbess.setting.tool.model.Scm;
 import io.tiklab.arbess.setting.tool.service.ScmService;
 import io.tiklab.arbess.support.condition.service.ConditionService;
+import io.tiklab.arbess.support.util.util.PipelineFinal;
 import io.tiklab.arbess.support.util.util.PipelineUtil;
 import io.tiklab.arbess.support.variable.service.VariableService;
 import io.tiklab.arbess.task.artifact.model.TaskArtifact;
@@ -790,6 +791,15 @@ public class TasksServiceImpl implements TasksService {
                 TaskCode taskCode = JSONObject.parseObject(object, TaskCode.class);
                 TaskCode oneCodeConfig = codeService.findOneCode(taskId);
                 String id;
+
+                if (!StringUtils.isEmpty(taskCode.getAuthId()) && !taskCode.getAuthId().equals(oneCodeConfig.getAuthId())){
+                    if (!taskType.equals(TASK_CODE_GIT)){
+                        // taskCode.setCodeBranch(" ")  ;
+                        taskCode.setCodeAddress(" ");
+                        taskCode.setCodeName(" ");
+                    }
+                }
+
                 if (Objects.isNull(oneCodeConfig)){
                     TaskCode code = new TaskCode();
                     code.setAuthType(AUTH_NONE);
@@ -797,6 +807,7 @@ public class TasksServiceImpl implements TasksService {
                 }else {
                     id = oneCodeConfig.getTaskId();
                 }
+
                 taskCode.setTaskId(id);
                 taskCode.setType(taskType);
                 codeService.updateCode(taskCode);
@@ -1066,7 +1077,8 @@ public class TasksServiceImpl implements TasksService {
                TaskCode code =  JSONObject.parseObject(jsonString,TaskCode.class);
                switch (taskType) {
                    case TASK_CODE_GITEE, TASK_CODE_GITLAB, TASK_CODE_GITHUB, TASK_CODE_XCODE,TASK_CODE_PRI_GITLAB -> {
-                      return PipelineUtil.validNoNullFiled(code.getHouseId(),code.getAuthId(),code.getToolGit());
+                      return PipelineUtil.validNoNullFiled(code.getHouseId(),code.getCodeName(),code.getCodeBranch()
+                              , code.getAuthId(),code.getToolGit());
                    }
                    case TASK_CODE_GIT -> {
                        String authType = code.getAuthType();
@@ -1161,8 +1173,41 @@ public class TasksServiceImpl implements TasksService {
            }
            case TASK_TYPE_CODESCAN -> {
                TaskCodeScan code =  JSONObject.parseObject(jsonString,TaskCodeScan.class);
+               if (taskType.equals(TASK_CODESCAN_SOURCEFARE)){
+                   String codeType = code.getCodeType();
+                   switch (codeType) {
+                       case TASK_CODESCAN_SONAR_JAVA -> {
+                           return PipelineUtil.validNoNullFiled(code.getToolJdk(),code.getToolMaven(),code.getScanPath(),code.getProjectName());
+                       }
+                       case TASK_CODESCAN_SONAR_GO -> {
+                           return PipelineUtil.validNoNullFiled(code.getScanPath(),code.getToolGo(),code.getProjectName());
+                       }
+                       case TASK_CODESCAN_SONAR_OTHER -> {
+                           return PipelineUtil.validNoNullFiled(code.getScanPath(),code.getToolSonar(),code.getProjectName());
+                       }
+                       case TASK_CODESCAN_SONAR_JAVASCRIPT -> {
+                           return PipelineUtil.validNoNullFiled(code.getScanPath(),code.getToolNodejs(),code.getProjectName());
+                       }
+                       default -> {
+                           return true;
+                       }
+                   }
+
+               }
+
                if (taskType.equals(TASK_CODESCAN_SONAR)) {
-                   return PipelineUtil.validNoNullFiled(code.getAuthId(),code.getProjectName());
+                   String codeType = code.getCodeType();
+                   switch (codeType) {
+                       case TASK_CODESCAN_SONAR_JAVA -> {
+                           return PipelineUtil.validNoNullFiled(code.getToolJdk(),code.getToolMaven(),code.getScanPath(),code.getProjectName());
+                       }
+                       case TASK_CODESCAN_SONAR_OTHER -> {
+                           return PipelineUtil.validNoNullFiled(code.getScanPath(),code.getToolSonar(),code.getProjectName());
+                       }
+                       default -> {
+                           return true;
+                       }
+                   }
                } else {
                    return PipelineUtil.validNoNullFiled(code.getToolJdk(),code.getToolMaven(),code.getScanPath());
                }
@@ -1220,7 +1265,7 @@ public class TasksServiceImpl implements TasksService {
             case TASK_UPLOAD_SSH, TASK_UPLOAD_DOCKER,TASK_UPLOAD_HADESS ->{
                 return TASK_TYPE_UPLOAD;
             }
-            case  TASK_CODESCAN_SONAR , TASK_CODESCAN_SPOTBUGS ->{
+            case  TASK_CODESCAN_SONAR,TASK_CODESCAN_SOURCEFARE , TASK_CODESCAN_SPOTBUGS ->{
                 return TASK_TYPE_CODESCAN;
             }
             case  TASK_MESSAGE_MSG ->{
@@ -1322,6 +1367,9 @@ public class TasksServiceImpl implements TasksService {
             }
             case TASK_TYPE_SCRIPT -> {
                 return "执行脚本";
+            }
+            case TASK_CODESCAN_SOURCEFARE -> {
+                return "SourceFare代码扫描";
             }
             default -> {
                 return taskType;

@@ -2,6 +2,7 @@ package io.tiklab.arbess.task.code.service;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import io.tiklab.arbess.agent.util.PipelineUtil;
 import io.tiklab.core.exception.SystemException;
 import io.tiklab.arbess.setting.third.model.AuthThird;
 import io.tiklab.arbess.setting.third.service.AuthThirdService;
@@ -53,6 +54,7 @@ public class TaskCodeGittokServiceImpl implements TaskCodeGittokService {
             String password = authServer.getPassword();
 
             HttpHeaders headers = requestUtil.initHeaders(MediaType.APPLICATION_JSON, new HashMap<>());
+            headers.add("accessToken",PipelineUtil.findTiklabToken());
             MultiValueMap<String, Object> valueMap = new LinkedMultiValueMap<>();
             valueMap.add("account",username);
             valueMap.add("password",password);
@@ -97,6 +99,8 @@ public class TaskCodeGittokServiceImpl implements TaskCodeGittokService {
         String  serverAddress = authServer.getServerAddress();
         try {
             HttpHeaders headers = requestUtil.initHeaders(MediaType.APPLICATION_JSON, new HashMap<>());
+            headers.add("accessToken",PipelineUtil.findTiklabToken());
+
             MultiValueMap<String, Object> valueMap = new LinkedMultiValueMap<>();
             valueMap.add("rpyId",houseId);
             String requestUrl = serverAddress+"/api/branch/findAllBranch";
@@ -138,6 +142,7 @@ public class TaskCodeGittokServiceImpl implements TaskCodeGittokService {
         String  serverAddress = authServer.getServerAddress();
 
         HttpHeaders headers = requestUtil.initHeaders(MediaType.APPLICATION_JSON, new HashMap<>());
+        headers.add("accessToken",PipelineUtil.findTiklabToken());
         MultiValueMap<String, Object> valueMap = new LinkedMultiValueMap<>();
         valueMap.add("rpyId",rpyId);
         valueMap.add("commitId",branchId);
@@ -167,6 +172,7 @@ public class TaskCodeGittokServiceImpl implements TaskCodeGittokService {
         String  serverAddress = authServer.getServerAddress();
         try {
             HttpHeaders headers = requestUtil.initHeaders(MediaType.APPLICATION_JSON, new HashMap<>());
+            headers.add("accessToken",PipelineUtil.findTiklabToken());
             MultiValueMap<String, Object> valueMap = new LinkedMultiValueMap<>();
             valueMap.add("id",houseId);
             String requestUrl = serverAddress+"/api/rpy/findRepository";

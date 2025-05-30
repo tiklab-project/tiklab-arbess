@@ -1,5 +1,6 @@
 package io.tiklab.arbess.task.test.service;
 
+import io.tiklab.arbess.agent.util.PipelineUtil;
 import io.tiklab.arbess.setting.third.model.AuthThird;
 import io.tiklab.arbess.setting.third.service.AuthThirdService;
 import io.tiklab.arbess.support.util.util.PipelineRequestUtil;
@@ -44,18 +45,10 @@ public class TaskTestOnServiceImpl implements TaskTestOnService {
         if (StringUtils.isEmpty(serverAddress)){
             return null;
         }
-        // PipelineRpc pipelineRpc = PipelineRpc.instance();
-
-        // String replace = serverAddress.replace("http://", "");
-        // RepositoryService repositoryService = pipelineRpc.findServiceRpc(RepositoryService.class, replace);
-        // RepositoryQuery repositoryQuery = new RepositoryQuery();
-        //
-        // List<Repository> repositoryList = repositoryService.findRepositoryList(repositoryQuery);
-        //
         String requestUrl = serverAddress + "/api/repository/findAllRepository";
         try {
             HttpHeaders headers = requestUtil.initHeaders(MediaType.APPLICATION_JSON, null);
-            // MultiValueMap<String, String> paramMap = new LinkedMultiValueMap<>();
+            headers.add("accessToken", PipelineUtil.findTiklabToken());
             return requestUtil.requestPostList(headers, requestUrl, rpyQuery, TestHuboRpy.class);
 
         }catch (Throwable throwable){
@@ -80,6 +73,7 @@ public class TaskTestOnServiceImpl implements TaskTestOnService {
         String requestUrl = serverAddress + "/api/repository/findAllRepository";
         try {
             HttpHeaders headers = requestUtil.initHeaders(MediaType.APPLICATION_JSON, null);
+            headers.add("accessToken",PipelineUtil.findTiklabToken());
             // MultiValueMap<String, String> paramMap = new LinkedMultiValueMap<>();
             return requestUtil.requestPostPage(headers, requestUrl, rpyQuery, TestHuboRpy.class);
 
@@ -104,6 +98,7 @@ public class TaskTestOnServiceImpl implements TaskTestOnService {
 
         try {
             HttpHeaders headers = requestUtil.initHeaders(MediaType.APPLICATION_JSON, null);
+            headers.add("accessToken",PipelineUtil.findTiklabToken());
             MultiValueMap<String, Object> paramMap = new LinkedMultiValueMap<>();
             paramMap.add("id",rpyId);
             return requestUtil.requestPost(headers, requestUrl, paramMap, TestHuboRpy.class);
@@ -126,6 +121,7 @@ public class TaskTestOnServiceImpl implements TaskTestOnService {
         String requestUrl = serverAddress + "/api/testPlan/findTestPlan";
         try {
             HttpHeaders headers = requestUtil.initHeaders(MediaType.APPLICATION_JSON, null);
+            headers.add("accessToken",PipelineUtil.findTiklabToken());
             MultiValueMap<String, Object> paramMap = new LinkedMultiValueMap<>();
             paramMap.add("id",planId);
             return requestUtil.requestPost(headers, requestUrl, paramMap, TestHuboTestPlan.class);
@@ -155,7 +151,7 @@ public class TaskTestOnServiceImpl implements TaskTestOnService {
 
         try {
             HttpHeaders headers = requestUtil.initHeaders(MediaType.APPLICATION_JSON, null);
-
+            headers.add("accessToken",PipelineUtil.findTiklabToken());
             return requestUtil.requestPostList(headers, requestUrl, testPlanQuery, TestHuboTestPlan.class);
 
         }catch (Throwable throwable){
@@ -182,7 +178,7 @@ public class TaskTestOnServiceImpl implements TaskTestOnService {
 
         try {
             HttpHeaders headers = requestUtil.initHeaders(MediaType.APPLICATION_JSON, null);
-
+            headers.add("accessToken",PipelineUtil.findTiklabToken());
             return requestUtil.requestPostPage(headers, requestUrl, testPlanQuery, TestHuboTestPlan.class);
 
         }catch (Throwable throwable){
@@ -208,6 +204,7 @@ public class TaskTestOnServiceImpl implements TaskTestOnService {
         String requestUrl = serverAddress + "/api/commonEnv/findCommonEnv";
         try {
             HttpHeaders headers = requestUtil.initHeaders(MediaType.APPLICATION_JSON, null);
+            headers.add("accessToken",PipelineUtil.findTiklabToken());
             MultiValueMap<String, Object> paramMap = new LinkedMultiValueMap<>();
             paramMap.add("id",envId);
             return requestUtil.requestPost(headers, requestUrl, paramMap, TestHuboEnv.class);
@@ -233,6 +230,7 @@ public class TaskTestOnServiceImpl implements TaskTestOnService {
         String requestUrl = serverAddress + "/api/commonEnv/findCommonEnvList";
         try {
             HttpHeaders headers = requestUtil.initHeaders(MediaType.APPLICATION_JSON, null);
+            headers.add("accessToken",PipelineUtil.findTiklabToken());
             return requestUtil.requestPostList(headers, requestUrl, envQuery, TestHuboEnv.class);
         } catch (Throwable throwable){
             String message = throwable.getMessage();
@@ -254,6 +252,7 @@ public class TaskTestOnServiceImpl implements TaskTestOnService {
         String requestUrl = serverAddress + "/api/commonEnv/findCommonEnvList";
         try {
             HttpHeaders headers = requestUtil.initHeaders(MediaType.APPLICATION_JSON, null);
+            headers.add("accessToken",PipelineUtil.findTiklabToken());
             return requestUtil.requestPostPage(headers, requestUrl, envQuery, TestHuboEnv.class);
         } catch (Throwable throwable){
             String message = throwable.getMessage();
@@ -278,7 +277,7 @@ public class TaskTestOnServiceImpl implements TaskTestOnService {
         try {
 
             HttpHeaders headers = requestUtil.initHeaders(MediaType.APPLICATION_JSON, null);
-
+            headers.add("accessToken",PipelineUtil.findTiklabToken());
             return requestUtil.requestPost(headers, requestUrl, testPlanTestData, String.class);
 
         }catch (Throwable throwable){
@@ -301,6 +300,7 @@ public class TaskTestOnServiceImpl implements TaskTestOnService {
 
         try {
             HttpHeaders headers = requestUtil.initHeaders(MediaType.APPLICATION_JSON, null);
+            headers.add("accessToken",PipelineUtil.findTiklabToken());
             MultiValueMap<String, Object> paramMap = new LinkedMultiValueMap<>();
             paramMap.add("testPlanId",testPlanId);
             return requestUtil.requestPost(headers, requestUrl, paramMap, TestPlanExecResult.class);
@@ -326,6 +326,7 @@ public class TaskTestOnServiceImpl implements TaskTestOnService {
 
         try {
             HttpHeaders headers = requestUtil.initHeaders(MediaType.APPLICATION_JSON, null);
+            headers.add("accessToken",PipelineUtil.findTiklabToken());
             MultiValueMap<String, Object> paramMap = new LinkedMultiValueMap<>();
             paramMap.add("id",instanceId);
             TestOnPlanInstance testPlanInstance = requestUtil.requestPost(headers, requestUrl, paramMap, TestOnPlanInstance.class);

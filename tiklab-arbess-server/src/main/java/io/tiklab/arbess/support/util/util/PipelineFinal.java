@@ -226,6 +226,12 @@ public class PipelineFinal {
     public static final String TASK_DOWNLOAD_DOCKER = "download_docker";
 
 
+    public static final String TASK_CODESCAN_SONAR_JAVA = "java";
+    public static final String TASK_CODESCAN_SONAR_OTHER = "other";
+    public static final String TASK_CODESCAN_SONAR_JAVASCRIPT = "javascript";
+    public static final String TASK_CODESCAN_SONAR_GO = "go";
+
+
     // 代码扫描应用类型
     public static final String TASK_TYPE_CODESCAN = "codescan";
     public static final String TASK_CODESCAN_SONAR = "sonar";

@@ -29,8 +29,10 @@ import io.tiklab.arbess.task.build.model.TaskBuildProduct;
 import io.tiklab.arbess.task.build.service.TaskBuildProductService;
 import io.tiklab.arbess.task.code.service.SpotbugsScanService;
 import io.tiklab.arbess.task.codescan.model.SonarQubeScan;
+import io.tiklab.arbess.task.codescan.model.SourceFareScan;
 import io.tiklab.arbess.task.codescan.model.SpotbugsBugSummary;
 import io.tiklab.arbess.task.codescan.service.SonarQubeScanService;
+import io.tiklab.arbess.task.codescan.service.SourceFareScanService;
 import io.tiklab.arbess.task.deploy.model.TaskDeployInstance;
 import io.tiklab.arbess.task.deploy.service.TaskDeployInstanceServiceImpl;
 import io.tiklab.arbess.task.message.model.TaskMessage;
@@ -108,6 +110,9 @@ public class WebSocketMessageServiceImpl implements WebSocketMessageService {
     @Autowired
     SonarQubeScanService sonarQubeScanService;
 
+    @Autowired
+    SourceFareScanService sourceFareScanService;
+
     @Value("${arbess.task.timeout:300}")
     private Integer taskTimeout;
 
@@ -143,6 +148,8 @@ public class WebSocketMessageServiceImpl implements WebSocketMessageService {
             messageSavePipelineInstanceHandle(message);
         }else if (type.contains("sonar_scan_result")){
             sonarQubeTaskMessageHandle(message);
+        }else if (type.contains("source_fare_scan_result")){
+            sourcefareTaskMessageHandle(message);
         }
         return null;
     }
@@ -472,6 +479,15 @@ public class WebSocketMessageServiceImpl implements WebSocketMessageService {
         sonarQubeScanService.creatSonarQubeScan(sonarQubeScan);
     }
 
+    /**
+     * 发送消息结果
+     * @param message 消息内容
+     */
+    private void sourcefareTaskMessageHandle(Object message){
+        String jsonString = JSONObject.toJSONString(message);
+        SourceFareScan sourceFareScan = JSONObject.parseObject(jsonString, SourceFareScan.class);
+        sourceFareScanService.creatSourceFareScan(sourceFareScan);
+    }
 
     /**
      * 发送消息结果

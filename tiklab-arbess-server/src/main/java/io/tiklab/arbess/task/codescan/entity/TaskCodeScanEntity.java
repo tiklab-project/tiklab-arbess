@@ -55,6 +55,41 @@ public class TaskCodeScanEntity {
     @Column(name = "tool_sonar" )
     private String toolSonar;
 
+    @Column(name = "tool_source_fare" )
+    private String toolSourceFare;
+
+    // jdk版本
+    @Column(name = "tool_node" )
+    private String toolNodejs;
+
+    // maven版本
+    @Column(name = "tool_go" )
+    private String toolGo;
+
+    public String getToolNodejs() {
+        return toolNodejs;
+    }
+
+    public void setToolNodejs(String toolNodejs) {
+        this.toolNodejs = toolNodejs;
+    }
+
+    public String getToolGo() {
+        return toolGo;
+    }
+
+    public void setToolGo(String toolGo) {
+        this.toolGo = toolGo;
+    }
+
+    public String getToolSourceFare() {
+        return toolSourceFare;
+    }
+
+    public void setToolSourceFare(String toolSourceFare) {
+        this.toolSourceFare = toolSourceFare;
+    }
+
     public String getCodeType() {
         return codeType;
     }

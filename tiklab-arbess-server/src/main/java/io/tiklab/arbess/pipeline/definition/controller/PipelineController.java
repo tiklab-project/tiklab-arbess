@@ -41,7 +41,7 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping("/pipeline")
-@Api(name = "PipelineController",desc = "流水线管理")
+@Api(name = "流水线控制器",desc = "流水线管理")
 public class PipelineController {
 
     public Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -60,8 +60,8 @@ public class PipelineController {
      * @pi.param: model=io.tiklab.arbess.pipeline.definition.model.pipeline
      */
     @RequestMapping(path="/createPipeline",method = RequestMethod.POST)
-    @ApiMethod(name = "createPipeline",desc = "创建流水线")
-    @ApiParam(name = "pipeline",desc = "流水线",required = true)
+    @ApiMethod(name = "创建流水线",desc = "创建流水线")
+    @ApiParam(name = "pipeline",desc = "流水线信息",required = true)
     public Result<String> createPipeline(@RequestBody @NotNull @Valid Pipeline pipeline){
 
         String pipelineId = pipelineService.createPipeline(pipeline);
@@ -76,7 +76,7 @@ public class PipelineController {
      * @pi.request-type:none
      */
     @RequestMapping(path="/findAllPipeline",method = RequestMethod.POST)
-    @ApiMethod(name = "findAllPipeline",desc = "查询所有流水线")
+    @ApiMethod(name = "查询所有流水线",desc = "查询所有流水线")
     public Result<List<Pipeline>> findAllPipeline(){
 
         List<Pipeline> selectAllPipeline = pipelineService.findAllPipeline();
@@ -92,7 +92,7 @@ public class PipelineController {
      * @pi.param: name=pipelineId;dataType=string;value=流水线id;
      */
     @RequestMapping(path="/deletePipeline",method = RequestMethod.POST)
-    @ApiMethod(name = "deletePipeline",desc = "删除流水线")
+    @ApiMethod(name = "删除流水线",desc = "删除流水线")
     @ApiParam(name = "pipelineId",desc = "流水线id",required = true)
     public Result<Void> deletePipeline(@NotNull String pipelineId){
 
@@ -109,7 +109,7 @@ public class PipelineController {
      * @pi.param: name=pipelineId;dataType=string;value=流水线id;
      */
     @RequestMapping(path="/findOnePipeline",method = RequestMethod.POST)
-    @ApiMethod(name = "findOnePipeline",desc = "根据id查询流水线")
+    @ApiMethod(name = "根据id查询流水线",desc = "根据id查询流水线")
     @ApiParam(name = "pipelineId",desc = "流水线id",required = true)
     public Result<Pipeline> findOnePipeline(@NotNull String pipelineId){
 
@@ -119,7 +119,7 @@ public class PipelineController {
     }
 
     @RequestMapping(path="/findPipelineNoQuery",method = RequestMethod.POST)
-    @ApiMethod(name = "findPipelineNoQuery",desc = "根据id查询流水线,不查询管理模型")
+    @ApiMethod(name = "根据id查询流水线,不查询关联模型",desc = "根据id查询流水线,不查询关联模型")
     @ApiParam(name = "pipelineId",desc = "流水线id",required = true)
     public Result<Pipeline> findPipelineNoQuery(@NotNull String pipelineId){
 
@@ -164,7 +164,7 @@ public class PipelineController {
      * @pi.param: model=query
      */
     @RequestMapping(path="/findUserPipelinePage",method = RequestMethod.POST)
-    @ApiMethod(name = "findUserPipelinePage",desc = "分页查询用户流水线")
+    @ApiMethod(name = "分页查询用户流水线",desc = "分页查询用户流水线")
     @ApiParam(name = "query",desc = "流水线查询条件",required = true)
     public Result<Pagination<Pipeline>> findUserPipelinePage(@RequestBody @NotNull @Valid PipelineQuery query){
 
@@ -180,7 +180,7 @@ public class PipelineController {
      * @pi.request-type:none
      */
     @RequestMapping(path="/findUserPipeline",method = RequestMethod.POST)
-    @ApiMethod(name = "findUserPipeline",desc = "查询用户流水线")
+    @ApiMethod(name = "查询用户流水线",desc = "查询用户流水线")
     @ApiParam(name = "query",desc = "流水线查询条件",required = true)
     public Result<List<Pipeline>> findAllUserPipeline(@RequestBody @NotNull @Valid PipelineQuery query){
         List<Pipeline> userPipeline = pipelineService.findUserPipeline(query);
@@ -196,7 +196,7 @@ public class PipelineController {
      * @pi.param: name=pipelineId;dataType=string;value=流水线id;
      */
     @RequestMapping(path="/findPipelineUser",method = RequestMethod.POST)
-    @ApiMethod(name = "findPipelineUser",desc = "查询流水线用户")
+    @ApiMethod(name = "查询流水线用户",desc = "查询流水线用户")
     @ApiParam(name = "pipelineId",desc = "流水线id",required = true)
     public Result<List<User>> findPipelineUser(@NotNull String pipelineId){
 

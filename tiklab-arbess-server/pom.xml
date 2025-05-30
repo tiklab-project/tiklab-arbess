@@ -97,11 +97,11 @@
             <version>${tiklab-matflow-agent.version}</version>
         </dependency>
 
-<!--        <dependency>-->
-<!--            <groupId>io.tiklab</groupId>-->
-<!--            <artifactId>tiklab-testhubo-api</artifactId>-->
-<!--            <version>${tiklab-testhubo.version}</version>-->
-<!--        </dependency>-->
+        <dependency>
+            <groupId>io.tiklab</groupId>
+            <artifactId>tiklab-sourcefare-api</artifactId>
+            <version>${tiklab-testhubo.version}</version>
+        </dependency>
     </dependencies>
 
     <build>

@@ -74,6 +74,50 @@ public class TaskCodeScan {
     @JoinQuery(key = "scmId")
     private Scm toolSonar;
 
+
+    @Mappings({
+            @Mapping(source = "toolSourceFare.scmId",target = "toolSourceFare")
+    })
+    @JoinQuery(key = "scmId")
+    private Scm toolSourceFare;
+
+    @Mappings({
+            @Mapping(source = "toolNodejs.scmId",target = "toolNodejs")
+    })
+    @JoinQuery(key = "scmId")
+    private Scm toolNodejs;
+
+    @Mappings({
+            @Mapping(source = "toolGo.scmId",target = "toolGo")
+    })
+    @JoinQuery(key = "scmId")
+    private Scm toolGo;
+
+
+    public Scm getToolGo() {
+        return toolGo;
+    }
+
+    public void setToolGo(Scm toolGo) {
+        this.toolGo = toolGo;
+    }
+
+    public Scm getToolSourceFare() {
+        return toolSourceFare;
+    }
+
+    public void setToolSourceFare(Scm toolSourceFare) {
+        this.toolSourceFare = toolSourceFare;
+    }
+
+    public Scm getToolNodejs() {
+        return toolNodejs;
+    }
+
+    public void setToolNodejs(Scm toolNodejs) {
+        this.toolNodejs = toolNodejs;
+    }
+
     public String getCodeType() {
         return codeType;
     }

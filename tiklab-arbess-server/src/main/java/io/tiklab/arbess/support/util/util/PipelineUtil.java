@@ -382,8 +382,8 @@ public class PipelineUtil {
 
         List<Object> list = Arrays.stream(args).toList();
         for (Object object : list) {
-            if (object instanceof String){
-                if (StringUtils.isEmpty((String)object)){
+            if (object instanceof String s){
+                if (StringUtils.isBlank(s)){
                     return false;
                 }
             } else if (object instanceof Integer){
@@ -417,6 +417,9 @@ public class PipelineUtil {
     }
 
 
+    public static String findTiklabToken() {
+        return Base64.getEncoder().encodeToString("tiklab".getBytes());
+    }
 
 
 }

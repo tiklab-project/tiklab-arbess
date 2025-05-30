@@ -49,6 +49,7 @@
         <tiklab-eam.version>1.0.2</tiklab-eam.version>
         <tiklab-postin.version>1.0.2</tiklab-postin.version>
         <tiklab-testhubo.version>1.0.2</tiklab-testhubo.version>
+        <tiklab-sourcefare.version>1.0.2</tiklab-sourcefare.version>
 
         <tiklab-postgresql.version>1.0.2</tiklab-postgresql.version>
         <tiklab-jdk.version>1.0.2</tiklab-jdk.version>
