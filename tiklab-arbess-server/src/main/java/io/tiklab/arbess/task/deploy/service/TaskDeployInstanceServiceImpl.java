@@ -8,10 +8,7 @@ import io.tiklab.toolkit.beans.BeanMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Service
 public class TaskDeployInstanceServiceImpl implements TaskDeployInstanceService {
@@ -48,7 +45,7 @@ public class TaskDeployInstanceServiceImpl implements TaskDeployInstanceService 
     public List<TaskDeployInstance> findAllDeployInstanceList(TaskDeployInstanceQuery deployInstanceQuery) {
         List<TaskDeployInstanceEntity> deployInstanceEntities = deployInstanceDao.findTaskDeployInstanceList(deployInstanceQuery);
         if (Objects.isNull(deployInstanceEntities) || deployInstanceEntities.isEmpty()){
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
         List<TaskDeployInstance> taskDeployInstances = BeanMapper.mapList(deployInstanceEntities, TaskDeployInstance.class);
         taskDeployInstances.sort(Comparator.comparing(TaskDeployInstance::getSort));
@@ -59,7 +56,7 @@ public class TaskDeployInstanceServiceImpl implements TaskDeployInstanceService 
     public List<TaskDeployInstance> findAllDeployInstanceList() {
         List<TaskDeployInstanceEntity> deployInstanceEntities = deployInstanceDao.findAllTaskDeployInstance();
         if (Objects.isNull(deployInstanceEntities) || deployInstanceEntities.isEmpty()){
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
         List<TaskDeployInstance> taskDeployInstances = BeanMapper.mapList(deployInstanceEntities, TaskDeployInstance.class);
         taskDeployInstances.sort(Comparator.comparing(TaskDeployInstance::getSort));

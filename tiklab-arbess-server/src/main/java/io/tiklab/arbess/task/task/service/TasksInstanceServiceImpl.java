@@ -23,6 +23,7 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static io.tiklab.arbess.support.util.util.PipelineFinal.*;
 
@@ -67,7 +68,7 @@ public class TasksInstanceServiceImpl implements TasksInstanceService {
     public List<String> findAllInstanceLogs(String instanceId){
         List<TaskInstance> allInstanceInstance = findAllInstanceInstance(instanceId);
         if (allInstanceInstance.isEmpty()){
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
         List<String> list = new ArrayList<>();
         for (TaskInstance taskInstance : allInstanceInstance) {
@@ -113,7 +114,7 @@ public class TasksInstanceServiceImpl implements TasksInstanceService {
         List<TaskInstanceEntity> pipelineInstance = taskInstanceDao.findPipelineInstance(instanceId);
         List<TaskInstance> allInstance = BeanMapper.mapList(pipelineInstance, TaskInstance.class);
         if (Objects.isNull(allInstance) || allInstance.isEmpty()){
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
         allInstance.sort(Comparator.comparing(TaskInstance::getTaskSort));
 
@@ -234,7 +235,7 @@ public class TasksInstanceServiceImpl implements TasksInstanceService {
         List<TaskInstanceEntity> pipelineInstance = taskInstanceDao.findStageInstance(stageId);
         List<TaskInstance> allInstance = BeanMapper.mapList(pipelineInstance, TaskInstance.class);
         if (Objects.isNull(allInstance) || allInstance.isEmpty()){
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
 
         int allTaskRunTime = 0;
@@ -251,7 +252,7 @@ public class TasksInstanceServiceImpl implements TasksInstanceService {
                 }
                 String s = PipelineUtil.formatDateTime(Long.parseLong(runTime));
                 deployInstance.setRunTime(s);
-            }).toList();
+            }).collect(Collectors.toList());
             instance.setDeployInstanceList(list);
 
             TaskInstance taskInstance = taskInstanceMap.get(taskInstanceId);
@@ -440,7 +441,7 @@ public class TasksInstanceServiceImpl implements TasksInstanceService {
     public List<TaskInstance> findTaskInstanceList(TaskInstanceQuery query){
         List<TaskInstanceEntity> pipelineInstanceList = taskInstanceDao.findTaskInstanceList(query);
         if (pipelineInstanceList == null || pipelineInstanceList.isEmpty()){
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
         return BeanMapper.mapList(pipelineInstanceList,TaskInstance.class);
     }

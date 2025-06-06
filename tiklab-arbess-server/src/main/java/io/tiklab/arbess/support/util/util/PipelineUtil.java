@@ -7,11 +7,14 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 效验地址，文件操作
@@ -252,7 +255,7 @@ public class PipelineUtil {
      */
     public static List<String> execOrder(String order){
         if (!isNoNull(order)){
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
         String[] split = order.split("\n");
         List<String> list = new ArrayList<>();
@@ -380,7 +383,7 @@ public class PipelineUtil {
             return true;
         }
 
-        List<Object> list = Arrays.stream(args).toList();
+        List<Object> list = Arrays.stream(args).collect(Collectors.toList());
         for (Object object : list) {
             if (object instanceof String s){
                 if (StringUtils.isBlank(s)){
@@ -419,6 +422,30 @@ public class PipelineUtil {
 
     public static String findTiklabToken() {
         return Base64.getEncoder().encodeToString("tiklab".getBytes());
+    }
+
+
+    public static String findLocalIp() {
+        try {
+            Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+            while (interfaces.hasMoreElements()) {
+                NetworkInterface iface = interfaces.nextElement();
+                // 过滤回环接口和未激活的接口
+                if (iface.isLoopback() || !iface.isUp()) continue;
+
+                Enumeration<InetAddress> addresses = iface.getInetAddresses();
+                while (addresses.hasMoreElements()) {
+                    InetAddress addr = addresses.nextElement();
+                    // 过滤 IPv6 和回环地址
+                    if (!addr.isLoopbackAddress() && !addr.getHostAddress().contains(":")) {
+                        return addr.getHostAddress();
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "127.0.0.1";
     }
 
 

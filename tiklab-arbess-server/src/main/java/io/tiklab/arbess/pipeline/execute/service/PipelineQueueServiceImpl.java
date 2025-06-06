@@ -12,10 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Service
 public class PipelineQueueServiceImpl implements PipelineQueueService {
@@ -65,7 +62,7 @@ public class PipelineQueueServiceImpl implements PipelineQueueService {
     public List<PipelineQueue> findPipelineQueueList(PipelineQueueQuery pipelineQueueQuery) {
         List<PipelineQueueEntity> pipelineQueueEntityList = pipelineQueueDao.findPipelineQueueList(pipelineQueueQuery);
         if (Objects.isNull(pipelineQueueEntityList) || pipelineQueueEntityList.isEmpty()){
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
         List<PipelineQueue> pipelineQueueList = BeanMapper.mapList(pipelineQueueEntityList, PipelineQueue.class);
         return pipelineQueueList;
@@ -75,7 +72,7 @@ public class PipelineQueueServiceImpl implements PipelineQueueService {
     public List<PipelineQueue> findAllPipelineQueue() {
         List<PipelineQueueEntity> pipelineQueueEntityList = pipelineQueueDao.findPipelineQueueList();
         if (Objects.isNull(pipelineQueueEntityList) || pipelineQueueEntityList.isEmpty()){
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
         List<PipelineQueue> pipelineQueueList = BeanMapper.mapList(pipelineQueueEntityList, PipelineQueue.class);
         return pipelineQueueList;
@@ -86,7 +83,7 @@ public class PipelineQueueServiceImpl implements PipelineQueueService {
         Pagination<PipelineQueueEntity> pipelineQueueEntityPagination = pipelineQueueDao.findPipelineQueuePage(pipelineQueueQuery);
         List<PipelineQueueEntity> dataList = pipelineQueueEntityPagination.getDataList();
         if (Objects.isNull(dataList) || dataList.isEmpty()){
-            return PaginationBuilder.build(pipelineQueueEntityPagination,Collections.emptyList());
+            return PaginationBuilder.build(pipelineQueueEntityPagination,new ArrayList<>());
         }
         List<PipelineQueue> pipelineQueueList = BeanMapper.mapList(dataList, PipelineQueue.class);
         return PaginationBuilder.build(pipelineQueueEntityPagination,pipelineQueueList);

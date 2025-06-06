@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 public class PipelineAuthorityServiceImpl implements PipelineAuthorityService {
@@ -56,7 +57,7 @@ public class PipelineAuthorityServiceImpl implements PipelineAuthorityService {
             // 判断系统管理员是否在其中
             List<PatchUser> list = userList.stream()
                     .filter(patchUser -> patchUser.getUserId().equals(id))
-                    .toList();
+                    .collect(Collectors.toList());
             if (list.isEmpty()){
                 PatchUser patchUser = new PatchUser(id);
                 userList.add(patchUser);
@@ -94,9 +95,13 @@ public class PipelineAuthorityServiceImpl implements PipelineAuthorityService {
             return list.toArray(String[]::new);
         }
 
-        List<String> strings1 = allDmUser.stream().map(DmUser::getDomainId).toList();
+        List<String> strings1 = allDmUser.stream().map(DmUser::getDomainId)
+                .collect(Collectors.toList());
+
         list.addAll(strings1);
-        List<String> strings = list.stream().distinct().toList();
+
+        List<String> strings = list.stream().distinct()
+                .collect(Collectors.toList());
 
         return strings.toArray(String[]::new);
 
@@ -110,12 +115,12 @@ public class PipelineAuthorityServiceImpl implements PipelineAuthorityService {
         dmUserQuery.setDomainId(pipelineId);
         List<DmUser> allDmUser =  dmUserService.findDmUserList(dmUserQuery);
         if (Objects.isNull(allDmUser)){
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
 
         return allDmUser.stream().map(DmUser::getUser)
                 .filter(user -> !Objects.isNull(user))
-                .toList();
+                .collect(Collectors.toList());
     }
 
 

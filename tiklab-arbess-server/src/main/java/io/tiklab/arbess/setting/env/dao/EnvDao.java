@@ -12,10 +12,8 @@ import io.tiklab.dal.jpa.criterial.condition.QueryCondition;
 import io.tiklab.dal.jpa.criterial.conditionbuilder.QueryBuilders;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+
+import java.util.*;
 
 @Repository
 public class EnvDao {
@@ -49,7 +47,7 @@ public class EnvDao {
     public List<Env> findAllEnv() {
         List<EnvEntity> scanEntityList = jpaTemplate.findAll(EnvEntity.class);
         if (scanEntityList == null || scanEntityList.isEmpty()){
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
         return BeanMapper.mapList(scanEntityList,Env.class);
     }
@@ -64,7 +62,7 @@ public class EnvDao {
         List<EnvEntity> scanEntityList = jpaTemplate.findList(queryCondition, EnvEntity.class);
 
         if (scanEntityList == null || scanEntityList.isEmpty()){
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
         return BeanMapper.mapList(scanEntityList,Env.class);
     }
@@ -81,7 +79,7 @@ public class EnvDao {
         Pagination<EnvEntity> entityPage = jpaTemplate.findPage(queryCondition, EnvEntity.class);
         List<EnvEntity> dataList = entityPage.getDataList();
         if (dataList == null || dataList.isEmpty()){
-            return PaginationBuilder.build(entityPage,Collections.emptyList());
+            return PaginationBuilder.build(entityPage,new ArrayList<>());
         }
         List<Env> envs = BeanMapper.mapList(dataList, Env.class);
         return PaginationBuilder.build(entityPage,envs);

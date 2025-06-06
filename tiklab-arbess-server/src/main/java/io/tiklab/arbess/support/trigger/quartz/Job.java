@@ -1,5 +1,6 @@
 package io.tiklab.arbess.support.trigger.quartz;
 
+import io.tiklab.arbess.support.trigger.model.TriggerJob;
 import io.tiklab.arbess.support.trigger.service.CronUtils;
 import io.tiklab.arbess.support.util.util.PipelineUtil;
 import org.quartz.*;
@@ -28,11 +29,18 @@ public class Job {
     private Scheduler scheduler = null;
 
     /**
-     * @param jobClass  执行不同的任务
-     * @param cron   时间设置，参考quartz说明文档
+     * @param job  执行不同的任务
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    public void addJob(String group, String pipelineId, Class jobClass, String cron,String triggerId) throws SchedulerException {
+    public void addJob(TriggerJob job) throws SchedulerException {
+
+        String cron = job.getCron();
+        String group = job.getGroup();
+        String pipelineId = job.getPipelineId();
+        Class jobClass = job.getJobClass();
+        String triggerId = job.getTriggerId();
+
+
         Map<String, String> map = CronUtils.cronWeek(cron);
         String weekTime = map.get("weekTime");
         Date date = PipelineUtil.StringChengeDate(weekTime);
@@ -41,8 +49,6 @@ public class Job {
             return;
         }
 
-        logger.warn("添加定时任务，定时任务组：{}，执行流水线id：{}，执行时间：{}，cron：{}",group,pipelineId, weekTime,cron);
-
         // 任务名，任务组，任务执行类
         Scheduler scheduler = schedulerFactory.getScheduler();
 
@@ -50,7 +56,6 @@ public class Job {
 
         JobKey jobKey = JobKey.jobKey(group);
         JobDetail jobDetail = scheduler.getJobDetail(jobKey);
-
         if (Objects.isNull(jobDetail)){
             JobBuilder jobBuilder = JobBuilder.newJob(jobClass);
             //添加pipelineId执行信息
@@ -70,6 +75,8 @@ public class Job {
         }
 
         String triggerName = pipelineId + "_" + cron + "_" + triggerId;
+
+        logger.warn("添加定时任务，triggerName：{}，执行流水线id：{}，执行时间：{}，cron：{}",triggerName,pipelineId, weekTime,cron);
 
         // 添加触发器
         addTrigger(scheduler,jobDetail,group,triggerName,cron,isNewTrigger);
@@ -224,11 +231,8 @@ public class Job {
 
 
     public void removeJob(String group,String triggerName){
-        // String triggerName = pipelineId + "_" + cron;
         try {
             Scheduler scheduler = schedulerFactory.getScheduler();
-            // JobKey jobKey = JobKey.jobKey(group);
-
             TriggerKey triggerKey = TriggerKey.triggerKey(triggerName,group);
             scheduler.pauseTrigger(triggerKey);// 停止触发器
             scheduler.unscheduleJob(triggerKey);// 移除触发器

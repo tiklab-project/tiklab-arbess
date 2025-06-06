@@ -16,9 +16,6 @@ import java.util.List;
 
 public class VariableQuery {
 
-    //@ApiProperty(name="taskType",desc="类型 1.字符串 2.单选")
-    private int taskType;
-
     //@ApiProperty(name="type",desc="类型 1.全局 2.项目")
     private int type;
 
@@ -42,15 +39,6 @@ public class VariableQuery {
 
     //@ApiProperty(name ="orderParams",desc = "排序参数")
     private List<Order> orderParams = OrderBuilders.instance().desc("varKey").get();
-
-
-    public int getTaskType() {
-        return taskType;
-    }
-
-    public void setTaskType(int taskType) {
-        this.taskType = taskType;
-    }
 
     public int getType() {
         return type;

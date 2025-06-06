@@ -14,6 +14,7 @@ import io.tiklab.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -93,7 +94,7 @@ public class AuthHostServiceImpl implements AuthHostService {
     public List<AuthHost> findAllAuthHost() {
         List<AuthHostEntity> allAuthHostEntity = authHostDao.findAllAuthHost();
         if (Objects.isNull(allAuthHostEntity)){
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
         List<AuthHost> authHosts = BeanMapper.mapList(allAuthHostEntity, AuthHost.class);
         joinTemplate.joinQuery(authHosts);
@@ -112,7 +113,7 @@ public class AuthHostServiceImpl implements AuthHostService {
 
         List<AuthHostEntity> authHostEntityList = authHostDao.findAuthHostList(hostQuery);
         if (Objects.isNull(authHostEntityList) || authHostEntityList.isEmpty()){
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
 
         List<AuthHost> authHosts = BeanMapper.mapList(authHostEntityList, AuthHost.class);
@@ -129,7 +130,7 @@ public class AuthHostServiceImpl implements AuthHostService {
 
         List<AuthHostEntity> dataList = allAuthHostPage.getDataList();
         if (Objects.isNull(dataList) || dataList.isEmpty()){
-            return PaginationBuilder.build(allAuthHostPage,Collections.emptyList());
+            return PaginationBuilder.build(allAuthHostPage,new ArrayList<>());
         }
 
         List<AuthHost> authHosts = BeanMapper.mapList(dataList, AuthHost.class);

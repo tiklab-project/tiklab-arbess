@@ -10,10 +10,7 @@ import io.tiklab.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 @Exporter
@@ -50,7 +47,7 @@ public class TaskBuildProductServiceImpl implements TaskBuildProductService {
     public List<TaskBuildProduct> findAllBuildProduct() {
         List<TaskBuildProductEntity> allBuildProduct = taskBuildProductDao.findAllBuildProduct();
         if (allBuildProduct == null || allBuildProduct.isEmpty()){
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
         return BeanMapper.mapList(allBuildProduct, TaskBuildProduct.class);
     }
@@ -59,7 +56,7 @@ public class TaskBuildProductServiceImpl implements TaskBuildProductService {
     public List<TaskBuildProduct> findBuildProductList(TaskBuildProductQuery taskBuildProductQuery) {
         List<TaskBuildProductEntity> allBuildProduct = taskBuildProductDao.findBuildProductList(taskBuildProductQuery);
         if (allBuildProduct == null || allBuildProduct.isEmpty()){
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
         return BeanMapper.mapList(allBuildProduct, TaskBuildProduct.class);
     }

@@ -84,7 +84,7 @@ public class AuthThirdDao {
 
         List<AuthThirdEntity> entityList = jpaTemplate.findList(queryCondition, AuthThirdEntity.class);
         if (Objects.isNull(entityList) || entityList.isEmpty()){
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
         return entityList;
     }

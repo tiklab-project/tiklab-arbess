@@ -7,11 +7,8 @@ import io.tiklab.arbess.pipeline.instance.model.PipelineInstance;
 import io.tiklab.arbess.pipeline.instance.service.PipelineInstanceService;
 import io.tiklab.arbess.support.approve.model.ApprovePipeline;
 import io.tiklab.arbess.support.approve.model.ApprovePipelineQuery;
-import io.tiklab.arbess.support.approve.model.ApproveUser;
-import io.tiklab.arbess.support.approve.model.ApproveUserQuery;
 import io.tiklab.arbess.support.approve.service.ApprovePipelineService;
 import io.tiklab.arbess.support.approve.service.ApproveService;
-import io.tiklab.arbess.support.approve.service.ApproveUserService;
 import io.tiklab.eam.common.context.LoginContext;
 import io.tiklab.arbess.support.trigger.service.TriggerService;
 import org.quartz.JobDataMap;
@@ -82,13 +79,13 @@ public  class RunJob implements org.quartz.Job {
         String weekTime = (String)map.get("weekTime");
         String approveId = (String)map.get("approveId");
         String type = (String)map.get("type");
-        String cron = (String)map.get("cron");
 
         String triggerName = jobExecutionContext.getTrigger().getKey().getName();
 
         logger.warn("定时任务触发，组：{}，流水线：{} 时间：{}，",group,pipelineId,weekTime);
 
         String loginId = LoginContext.getLoginId();
+        // 审批
         if (type.equals(APPROVE)){
             if (!Objects.isNull(approvePipelineService)){
                 ApprovePipelineQuery approvePipelineQuery = new ApprovePipelineQuery();
@@ -129,6 +126,7 @@ public  class RunJob implements org.quartz.Job {
             PipelineRunMsg pipelineRunMsg = new PipelineRunMsg(pipelineId,loginId,2);
 
             execService.start(pipelineRunMsg);
+
             triggerService.updateTrigger(triggerName.split("_")[2]);
         }
         logger.warn("组：{}，流水线：{}，类型：{},定时任务触发完成",group,pipelineId,type);

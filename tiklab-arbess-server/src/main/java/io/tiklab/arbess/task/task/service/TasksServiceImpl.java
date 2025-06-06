@@ -3,7 +3,6 @@ package io.tiklab.arbess.task.task.service;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import io.tiklab.arbess.setting.hostgroup.service.AuthHostGroupService;
-import io.tiklab.arbess.setting.k8s.model.Kubectl;
 import io.tiklab.arbess.setting.k8s.service.KubectlService;
 import io.tiklab.arbess.setting.host.service.AuthHostService;
 import io.tiklab.arbess.setting.auth.service.AuthService;
@@ -13,7 +12,6 @@ import io.tiklab.arbess.setting.third.service.AuthThirdService;
 import io.tiklab.arbess.setting.tool.model.Scm;
 import io.tiklab.arbess.setting.tool.service.ScmService;
 import io.tiklab.arbess.support.condition.service.ConditionService;
-import io.tiklab.arbess.support.util.util.PipelineFinal;
 import io.tiklab.arbess.support.util.util.PipelineUtil;
 import io.tiklab.arbess.support.variable.service.VariableService;
 import io.tiklab.arbess.task.artifact.model.TaskArtifact;
@@ -28,8 +26,8 @@ import io.tiklab.arbess.task.codescan.model.TaskCodeScan;
 import io.tiklab.arbess.task.codescan.service.TaskCodeScanService;
 import io.tiklab.arbess.task.deploy.model.TaskDeploy;
 import io.tiklab.arbess.task.deploy.service.TaskDeployService;
-import io.tiklab.arbess.task.message.model.TaskMessageType;
-import io.tiklab.arbess.task.message.service.TaskMessageTypeService;
+import io.tiklab.arbess.support.message.model.TaskMessageType;
+import io.tiklab.arbess.support.message.service.TaskMessageTypeService;
 import io.tiklab.arbess.task.pullArtifact.model.TaskPullArtifact;
 import io.tiklab.arbess.task.pullArtifact.service.TaskPullArtifactService;
 import io.tiklab.arbess.task.script.model.TaskScript;
@@ -55,6 +53,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static io.tiklab.arbess.support.util.util.PipelineFinal.*;
 
@@ -518,9 +517,9 @@ public class TasksServiceImpl implements TasksService {
 
                     object = taskArtifact;
                 }
-                case TASK_TYPE_MESSAGE -> {
-                    object = messageTypeServer.findMessage(taskId);
-                }
+                // case TASK_TYPE_MESSAGE -> {
+                //     // object = messageTypeServer.findMessage(taskId);
+                // }
                 case TASK_TYPE_SCRIPT -> {
                     object = scriptServer.findScript(taskId);
                 }
@@ -538,7 +537,7 @@ public class TasksServiceImpl implements TasksService {
     public List<Tasks> finStageTaskOrTask(String stageId) {
         List<Tasks> tasks = finAllStageTask(stageId);
         if (tasks.isEmpty()){
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
         for (Tasks task : tasks) {
             String taskId = task.getTaskId();
@@ -555,7 +554,7 @@ public class TasksServiceImpl implements TasksService {
     public List<Tasks> finStageTaskOrTaskNoAuth(String stageId) {
         List<Tasks> tasksList = finAllStageTask(stageId);
         if (tasksList.isEmpty()){
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
         for (Tasks tasks : tasksList) {
             Object taskDetails = findTaskDetailsNoAuth(tasks.getTaskId(), tasks.getTaskType());
@@ -643,7 +642,7 @@ public class TasksServiceImpl implements TasksService {
         List<TasksEntity> allConfigure = tasksDao.findAllConfigureList(idList);
         List<TasksEntity> entityList = allConfigure.stream()
                 .filter(tasksEntity -> !Objects.isNull(tasksEntity))
-                .toList();
+                .collect(Collectors.toList());
         return BeanMapper.mapList(entityList, Tasks.class);
     }
 
@@ -732,13 +731,13 @@ public class TasksServiceImpl implements TasksService {
                 pullArtifactService.createPullArtifact(task);
             }
             case TASK_TYPE_MESSAGE -> {
-                String object = JSON.toJSONString(values);
-                TaskMessageType task = JSON.parseObject(object, TaskMessageType.class);
-                if (task == null){
-                    task = new TaskMessageType();
-                }
-                task.setTaskId(taskId);
-                messageTypeServer.createMessage(task);
+                // String object = JSON.toJSONString(values);
+                // TaskMessageType task = JSON.parseObject(object, TaskMessageType.class);
+                // if (task == null){
+                //     task = new TaskMessageType();
+                // }
+                // task.setTaskId(taskId);
+                // messageTypeServer.createMessage(task);
             }
             case TASK_TYPE_SCRIPT   -> {
                 String object = JSON.toJSONString(values);
@@ -772,7 +771,7 @@ public class TasksServiceImpl implements TasksService {
             case TASK_TYPE_CODESCAN -> codeScanService.deleteCodeScan(taskId);
             case TASK_TYPE_UPLOAD -> artifactService.deleteProduct(taskId);
             case TASK_TYPE_DOWNLOAD     -> pullArtifactService.deletePullArtifact(taskId);
-            case TASK_TYPE_MESSAGE  -> messageTypeServer.deleteAllMessage(taskId);
+            // case TASK_TYPE_MESSAGE  -> messageTypeServer.deleteAllMessage(taskId);
             case TASK_TYPE_SCRIPT   -> scriptServer.deleteScript(taskId);
             default -> throw new ApplicationException("无法删除未知的配置类型"+taskType);
         }
@@ -918,12 +917,12 @@ public class TasksServiceImpl implements TasksService {
                     pullArtifactService.updatePullArtifact(taskArtifact);
                 }
             }
-            case TASK_TYPE_MESSAGE  -> {
-                messageTypeServer.deleteAllMessage(taskId);
-                TaskMessageType task = JSON.parseObject(object, TaskMessageType.class);
-                task.setTaskId(taskId);
-                messageTypeServer.createMessage(task);
-            }
+            // case TASK_TYPE_MESSAGE  -> {
+            //     messageTypeServer.deleteAllMessage(taskId);
+            //     TaskMessageType task = JSON.parseObject(object, TaskMessageType.class);
+            //     task.setTaskId(taskId);
+            //     messageTypeServer.createMessage(task);
+            // }
             case TASK_TYPE_SCRIPT   -> {
                 TaskScript task = JSON.parseObject(object, TaskScript.class);
                 task.setTaskId(taskId);
@@ -1012,11 +1011,11 @@ public class TasksServiceImpl implements TasksService {
             case TASK_TYPE_DOWNLOAD -> {
                 return pullArtifactService.findPullArtifactByAuth(taskId);
             }
-            case TASK_TYPE_MESSAGE  -> {
-                TaskMessageType messageType = messageTypeServer.findMessage(taskId);
-                joinTemplate.joinQuery(messageType);
-                return messageType;
-            }
+            // case TASK_TYPE_MESSAGE  -> {
+            //     TaskMessageType messageType = messageTypeServer.findMessage(taskId);
+            //     joinTemplate.joinQuery(messageType);
+            //     return messageType;
+            // }
             case TASK_TYPE_SCRIPT   -> {
                 TaskScript taskScript = scriptServer.findOneScript(taskId);
                 joinTemplate.joinQuery(taskScript);
@@ -1055,9 +1054,9 @@ public class TasksServiceImpl implements TasksService {
             case TASK_TYPE_DOWNLOAD -> {
                 return pullArtifactService.findOnePullArtifact(taskId);
             }
-            case TASK_TYPE_MESSAGE  -> {
-                return messageTypeServer.findMessage(taskId);
-            }
+            // case TASK_TYPE_MESSAGE  -> {
+            //     return messageTypeServer.findMessage(taskId);
+            // }
             case TASK_TYPE_SCRIPT   -> {
                 return scriptServer.findOneScript(taskId);
             }

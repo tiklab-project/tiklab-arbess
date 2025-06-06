@@ -61,6 +61,16 @@ public class PipelineInstance {
 
     private Boolean exec;
 
+    private String runLog;
+
+    public String getRunLog() {
+        return runLog;
+    }
+
+    public void setRunLog(String runLog) {
+        this.runLog = runLog;
+    }
+
     public Boolean getExec() {
         return exec;
     }

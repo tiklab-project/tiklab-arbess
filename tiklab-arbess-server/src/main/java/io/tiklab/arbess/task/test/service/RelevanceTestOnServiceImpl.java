@@ -79,7 +79,7 @@ public class RelevanceTestOnServiceImpl implements RelevanceTestOnService{
         List<RelevanceTestOnEntity> allRelevance = relevanceTestOnDao.findAllRelevance(pipelineId);
 
         if (Objects.isNull(allRelevance) || allRelevance.isEmpty()){
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
         List<RelevanceTestOn> relevanceTestOns = BeanMapper.mapList(allRelevance, RelevanceTestOn.class);
 
@@ -145,7 +145,7 @@ public class RelevanceTestOnServiceImpl implements RelevanceTestOnService{
         List<RelevanceTestOnEntity> allRelevanceTestOn = relevanceTestOnDao.findAllRelevanceTestOn();
 
         if (allRelevanceTestOn == null || allRelevanceTestOn.isEmpty()){
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
         return  BeanMapper.mapList(allRelevanceTestOn,RelevanceTestOn.class);
     }

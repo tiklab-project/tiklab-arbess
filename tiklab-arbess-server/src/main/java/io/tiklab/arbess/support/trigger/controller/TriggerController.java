@@ -18,7 +18,7 @@ import java.util.List;
  * @pi.groupName: 流水线触发器控制器
  */
 @RestController
-@RequestMapping("/trigger")
+@RequestMapping("/pipeline/trigger")
 public class TriggerController {
 
     @Autowired
@@ -50,6 +50,13 @@ public class TriggerController {
         return Result.ok();
     }
 
+
+    @RequestMapping(path="/findPipelineTrigger",method = RequestMethod.POST)
+    public Result<Trigger> findPipelineTrigger( @NotNull @Valid String pipelineId){
+        Trigger trigger = triggerServer.findPipelineTrigger(pipelineId);
+        return Result.ok(trigger);
+    }
+
     /**
      * @pi.name:删除流水线触发器信息
      * @pi.url:/trigger/finAllStage
@@ -62,21 +69,6 @@ public class TriggerController {
         triggerServer.deleteTrigger(triggerId);
         return Result.ok();
     }
-
-
-    /**
-     * @pi.name:条件查询流水线触发器信息
-     * @pi.url:/trigger/findAllTrigger
-     * @pi.methodType:post
-     * @pi.request-type:json
-     * @pi.param: model=triggerQuery
-     */
-    @RequestMapping(path="/findAllTrigger",method = RequestMethod.POST)
-    public Result<List<Object>> findAllTrigger(@RequestBody @Valid@NotNull TriggerQuery triggerQuery) {
-        List<Object> list = triggerServer.findAllTrigger(triggerQuery);
-        return Result.ok(list);
-    }
-
 
 
 

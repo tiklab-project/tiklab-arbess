@@ -195,7 +195,7 @@ public class PipelineInstanceDao {
         JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
         List<PipelineInstanceEntity> instanceEntityList = jdbcTemplate.query(sql, new BeanPropertyRowMapper(PipelineInstanceEntity.class));
         if (instanceEntityList.isEmpty()){
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
         return instanceEntityList;
     }
@@ -243,9 +243,12 @@ public class PipelineInstanceDao {
      * @param queryTime 时间 [开始时间,结束时间]
      * @return 构建信息
      */
-    public List<PipelineInstanceEntity> findInstanceByTime(String[] queryTime){
-        String sql = "select pip_pipeline_instance.* from pip_pipeline_instance  ";
+    public List<PipelineInstanceEntity> findInstanceByTime(String[] queryTime,String[] pipelineIdList){
+        String sql = "select pip_pipeline_instance.* from pip_pipeline_instance";
         sql = sql.concat(" where run_status != 'run'  and create_time between ? and ? " );
+        String join = String.join("','", pipelineIdList);
+
+        sql = sql.concat(" and pipeline_id in ('" +join+"')");
         JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
         return  jdbcTemplate.query(sql, new BeanPropertyRowMapper(PipelineInstanceEntity.class),queryTime[0],queryTime[1]);
     }

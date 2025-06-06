@@ -26,6 +26,16 @@ public class TriggerTimeEntity {
     @Column(name = "trigger_id")
     private String triggerId;
 
+    @Column(name = "exec_status")
+    private String execStatus;
+
+    public String getExecStatus() {
+        return execStatus;
+    }
+
+    public void setExecStatus(String execStatus) {
+        this.execStatus = execStatus;
+    }
 
     public String getTimeId() {
         return timeId;

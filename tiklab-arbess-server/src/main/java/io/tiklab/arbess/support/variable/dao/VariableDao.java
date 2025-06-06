@@ -2,6 +2,7 @@ package io.tiklab.arbess.support.variable.dao;
 
 import io.tiklab.arbess.support.variable.model.Variable;
 import io.tiklab.arbess.support.variable.model.VariableQuery;
+import io.tiklab.core.page.Pagination;
 import io.tiklab.toolkit.beans.BeanMapper;
 import io.tiklab.dal.jpa.JpaTemplate;
 import io.tiklab.dal.jpa.criterial.condition.QueryCondition;
@@ -69,13 +70,10 @@ public class VariableDao {
     public List<VariableEntity> findVariableList(VariableQuery query){
         QueryBuilders queryBuilders = QueryBuilders.createQuery(VariableEntity.class)
                 .eq("taskId",query.getTaskId())
+                .eq("pipelineId",query.getPipelineId())
                 .eq("varKey",query.getVarKey())
                 .eq("varValue",query.getVarValue());
-        if (query.getTaskType() != 0){
-            queryBuilders.eq("taskType", query.getTaskType());
-        }
-
-        if ( query.getType() != 0){
+        if (query.getType() != 0){
             queryBuilders.eq("type",  query.getType());
         }
         QueryCondition queryCondition = queryBuilders
@@ -84,6 +82,23 @@ public class VariableDao {
         return jpaTemplate.findList(queryCondition, VariableEntity.class);
     }
 
+
+    public Pagination<VariableEntity> findVariablePage(VariableQuery query){
+        QueryBuilders queryBuilders = QueryBuilders.createQuery(VariableEntity.class)
+                .eq("taskId",query.getTaskId())
+                .eq("pipelineId",query.getPipelineId())
+                .eq("varKey",query.getVarKey())
+                .eq("varValue",query.getVarValue());
+
+        if (query.getType() != 0){
+            queryBuilders.eq("type",  query.getType());
+        }
+        QueryCondition queryCondition = queryBuilders
+                .pagination(query.getPageParam())
+                .orders(query.getOrderParams())
+                .get();
+        return jpaTemplate.findPage(queryCondition, VariableEntity.class);
+    }
 
 }
 

@@ -105,7 +105,7 @@ public class PipelineOpenDao {
         JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
         List<Map<String, Object>> queryForList = jdbcTemplate.queryForList(sql);
         if (queryForList.isEmpty()){
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
         List<String> list = new ArrayList<>();
 
@@ -130,7 +130,7 @@ public class PipelineOpenDao {
         JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
         List<Map<String, Object>> queryForList = jdbcTemplate.queryForList(sqlBuffer.toString());
         if (queryForList.isEmpty()){
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
         List<String> list = new ArrayList<>();
 

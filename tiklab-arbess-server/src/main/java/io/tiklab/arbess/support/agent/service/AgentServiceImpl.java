@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.WebSocketSession;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -114,7 +115,7 @@ public class AgentServiceImpl implements AgentService {
     public List<Agent> findAgentList(AgentQuery agentQuery) {
         List<AgentEntity> agentEntityList = agentDao.findAgentList(agentQuery);
         if (Objects.isNull(agentEntityList) || agentEntityList.isEmpty()) {
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
         List<Agent> agentList = BeanMapper.mapList(agentEntityList, Agent.class);
         for (Agent agent : agentList) {
@@ -128,7 +129,7 @@ public class AgentServiceImpl implements AgentService {
         Pagination<AgentEntity> agentEntityPage = agentDao.findAgentPage(agentQuery);
         List<AgentEntity> agentEntityList = agentEntityPage.getDataList();
         if (Objects.isNull(agentEntityList) || agentEntityList.isEmpty()) {
-            return PaginationBuilder.build(agentEntityPage,Collections.emptyList());
+            return PaginationBuilder.build(agentEntityPage,new ArrayList<>());
         }
         List<Agent> agentList = BeanMapper.mapList(agentEntityList, Agent.class);
         for (Agent agent : agentList) {

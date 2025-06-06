@@ -92,7 +92,7 @@ public class ConditionServiceImpl implements ConditionService {
     public List<Condition> findAllTaskCond(String taskId){
         List<Condition> allCond = conditionDao.findAllCond();
         if (allCond.isEmpty()){
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
         List<Condition> list = new ArrayList<>();
         for (Condition condition : allCond) {

@@ -17,6 +17,7 @@ import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * SpotbugsXml文件解析
@@ -116,7 +117,7 @@ public class SpotbugsXmlConfig {
 
                             List<SpotbugsBugInstance> scanBugsList = findScanBugs(xmlPath);
                             List<SpotbugsBugInstance> bugInstanceList = scanBugsList.stream()
-                                    .filter(a -> !Objects.equals(a.getBugClass().getClassname(), replace)).toList();
+                                    .filter(a -> !Objects.equals(a.getBugClass().getClassname(), replace)).collect(Collectors.toList());
 
                             SpotbugsBugFileStats spotbugsBugFileStats = new SpotbugsBugFileStats()
                                     .setPath(path)
@@ -189,7 +190,7 @@ public class SpotbugsXmlConfig {
 
                                 List<SpotbugsBugInstance> scanBugsList = findScanBugs(xmlPath);
                                 List<SpotbugsBugInstance> bugInstanceList = scanBugsList.stream()
-                                        .filter(a -> !Objects.equals(a.getBugClass().getClassname(), aClass)).toList();
+                                        .filter(a -> !Objects.equals(a.getBugClass().getClassname(), aClass)).collect(Collectors.toList());
 
                                 SpotbugsBugClassStats spotbugsBugClassStats = new SpotbugsBugClassStats()
                                         // .setBugNumber(scanBugsList.size())
@@ -295,7 +296,7 @@ public class SpotbugsXmlConfig {
                     list.add(spotbugsBugInstance);
                 }
             }
-            return list.stream().sorted(Comparator.comparing(SpotbugsBugInstance::getBugPriority)).toList();
+            return list.stream().sorted(Comparator.comparing(SpotbugsBugInstance::getBugPriority)).collect(Collectors.toList());
 
         } catch (Exception e) {
             throw new SystemException("解析Xml文件失败，path:"+xmlPath+" ，message："+e.getMessage());

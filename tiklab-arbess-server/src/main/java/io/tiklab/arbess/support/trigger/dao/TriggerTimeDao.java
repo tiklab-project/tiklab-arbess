@@ -1,11 +1,18 @@
 package io.tiklab.arbess.support.trigger.dao;
 
 import io.tiklab.arbess.support.trigger.entity.TriggerTimeEntity;
+import io.tiklab.arbess.support.trigger.model.TriggerTimeQuery;
+import io.tiklab.core.page.Pagination;
 import io.tiklab.dal.jpa.JpaTemplate;
+import io.tiklab.dal.jpa.criterial.condition.QueryCondition;
+import io.tiklab.dal.jpa.criterial.conditionbuilder.QueryBuilders;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 @Repository
 public class TriggerTimeDao {
@@ -56,7 +63,38 @@ public class TriggerTimeDao {
     }
 
 
-    public List<TriggerTimeEntity> findAllTimeList(List<String> idList){
+    public List<TriggerTimeEntity> findTriggerTimeList(List<String> idList){
         return jpaTemplate.findList(TriggerTimeEntity.class,idList);
     }
+
+
+    public List<TriggerTimeEntity> findTriggerTimeList(TriggerTimeQuery query){
+        QueryCondition queryCondition = QueryBuilders.createQuery(TriggerTimeEntity.class)
+                .eq("execStatus", query.getExecStatus())
+                .eq("taskType", query.getTaskType())
+                .eq("triggerId", query.getTriggerId())
+                .eq("corn", query.getCorn())
+                .orders(query.getOrderParams())
+                .get();
+        List<TriggerTimeEntity> timeEntityList = jpaTemplate.findList(queryCondition, TriggerTimeEntity.class);
+        if (Objects.isNull(timeEntityList) || timeEntityList.isEmpty()){
+            return new ArrayList<>();
+        }
+        return timeEntityList;
+    }
+
+
+    public Pagination<TriggerTimeEntity> findTriggerTimePage(TriggerTimeQuery query){
+        QueryCondition queryCondition = QueryBuilders.createQuery(TriggerTimeEntity.class)
+                .eq("execStatus", query.getExecStatus())
+                .eq("taskType", query.getTaskType())
+                .eq("triggerId", query.getTriggerId())
+                .eq("corn", query.getCorn())
+                .orders(query.getOrderParams())
+                .pagination(query.getPageParam())
+                .get();
+        return jpaTemplate.findPage(queryCondition, TriggerTimeEntity.class);
+    }
+
+
 }

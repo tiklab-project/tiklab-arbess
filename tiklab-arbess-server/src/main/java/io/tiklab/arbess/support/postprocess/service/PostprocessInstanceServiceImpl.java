@@ -70,7 +70,7 @@ public class PostprocessInstanceServiceImpl implements PostprocessInstanceServic
     public List<PostprocessInstance> findTaskPostInstance(String taskInstanceId) {
         List<PostprocessInstanceEntity> allPostInstanceEntity = postInstanceDao.findTaskPostInstance(taskInstanceId);
         if (allPostInstanceEntity.isEmpty()){
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
         return BeanMapper.mapList(allPostInstanceEntity,PostprocessInstance.class);
     }
@@ -79,7 +79,7 @@ public class PostprocessInstanceServiceImpl implements PostprocessInstanceServic
     public List<PostprocessInstance> findPipelinePostInstance(String instanceId) {
         List<PostprocessInstanceEntity> allPostInstanceEntity = postInstanceDao.findPipelinePostInstance(instanceId);
         if (allPostInstanceEntity.isEmpty()){
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
         return BeanMapper.mapList(allPostInstanceEntity,PostprocessInstance.class);
     }
@@ -91,7 +91,7 @@ public class PostprocessInstanceServiceImpl implements PostprocessInstanceServic
     private  List<PostprocessInstance> findAllPostInstance(){
         List<PostprocessInstance> allPostInstance = postInstanceDao.findAllPostInstance();
         if (allPostInstance == null || allPostInstance.isEmpty()){
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
         return allPostInstance;
     }

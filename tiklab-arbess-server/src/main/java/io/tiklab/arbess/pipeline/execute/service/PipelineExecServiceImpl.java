@@ -2,6 +2,11 @@ package io.tiklab.arbess.pipeline.execute.service;
 
 import io.tiklab.arbess.home.service.PipelineHomeService;
 import io.tiklab.arbess.setting.other.model.Resources;
+import io.tiklab.arbess.support.message.model.TaskMessage;
+import io.tiklab.arbess.support.message.model.TaskMessageQuery;
+import io.tiklab.arbess.support.message.service.TaskMessageService;
+import io.tiklab.arbess.support.message.service.TaskMessageTypeService;
+import io.tiklab.arbess.support.variable.model.VariableQuery;
 import io.tiklab.arbess.task.build.model.TaskBuildProduct;
 import io.tiklab.arbess.task.build.model.TaskBuildProductQuery;
 import io.tiklab.arbess.task.build.service.TaskBuildProductService;
@@ -104,6 +109,9 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
     @Autowired
     PipelineQueueService queueService;
 
+    @Autowired
+    TaskMessageService taskMessageService;
+
     public final Logger logger = LoggerFactory.getLogger(PipelineExecServiceImpl.class);
 
     //流水线id:流水线实例id
@@ -124,7 +132,7 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
         // 判断磁盘空间是否足够
         diskService.validationStorageSpace();
 
-         if (runMsg.getRunWay() != 2 && !runMsg.getTriggerType().equals(APPROVE)){
+         if (runMsg.getRunWay() == 1 && !runMsg.getTriggerType().equals(APPROVE)){
              // 是否拥有权限
              Boolean permissions = homeService.findPermissions(runMsg.getPipelineId(), PIPELINE_RUN_KEY);
              if (!permissions) {
@@ -279,11 +287,12 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
             // 创建多阶段运行实例
             List<Stage> stageList = stageExecService.createStageExecInstance(pipelineId, instanceId);
 
-            List<Postprocess> postprocessList = postExecService.createPipelinePostInstance(pipelineId, instanceId);
+            // List<Postprocess> postprocessList = postExecService.createPipelinePostInstance(pipelineId, instanceId);
 
             PipelineDetails pipelineDetails = new PipelineDetails();
 
             // 流水线基本运行信息
+            pipelineDetails.setPipeline(pipeline);
             pipelineDetails.setPipelineId(pipelineId);
             pipelineDetails.setInstanceId(instanceId);
             pipelineDetails.setRunWay(runMsg.getRunWay());
@@ -293,7 +302,7 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
             pipelineDetails.setStageList(stageList);
 
             // 流水线后置处理
-            pipelineDetails.setPostprocessList(postprocessList);
+            // pipelineDetails.setPostprocessList(postprocessList);
 
             // 数据路径，源码，日志保存
             String sourceDir = utilService.findPipelineDefaultAddress(pipelineId,1);
@@ -302,8 +311,16 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
             pipelineDetails.setLogDir(logDir);
 
             // 变量
-            List<Variable> variableList = variableService.findAllVariable(pipelineId);
+            VariableQuery variableQuery = new VariableQuery();
+            variableQuery.setPipelineId(pipelineId);
+            List<Variable> variableList = variableService.findVariableList(variableQuery);
             pipelineDetails.setVariableList(variableList);
+
+            // 消息
+            TaskMessageQuery taskMessageQuery = new TaskMessageQuery();
+            taskMessageQuery.setPipelineId(pipelineId);
+            List<TaskMessage> taskMessageList = taskMessageService.findTaskMessageList(taskMessageQuery);
+            pipelineDetails.setTaskMessageList(taskMessageList);
 
             AgentMessage agentMessage = new AgentMessage();
             agentMessage.setType("exec");
@@ -362,7 +379,7 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
             // 创建多阶段运行实例
             List<Stage> stageList = stageExecService.createRollBackStageExecInstance(pipelineId, instanceId);
 
-            List<Postprocess> postprocessList = postExecService.createPipelinePostInstance(pipelineId, instanceId);
+            // List<Postprocess> postprocessList = postExecService.createPipelinePostInstance(pipelineId, instanceId);
             PipelineDetails pipelineDetails = new PipelineDetails();
             TaskBuildProduct taskBuildProduct = buildProductList.get(0);
             pipelineDetails.setTaskBuildProduct(taskBuildProduct);
@@ -376,8 +393,8 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
             // 流水线运行任务
             pipelineDetails.setStageList(stageList);
 
-            // 流水线后置处理
-            pipelineDetails.setPostprocessList(postprocessList);
+            // // 流水线后置处理
+            // pipelineDetails.setPostprocessList(postprocessList);
 
             // 数据路径，源码，日志保存
             String sourceDir = utilService.findPipelineDefaultAddress(pipelineId,1);
@@ -386,8 +403,16 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
             pipelineDetails.setLogDir(logDir);
 
             // 变量
-            List<Variable> variableList = variableService.findAllVariable(pipelineId);
+            VariableQuery variableQuery = new VariableQuery();
+            variableQuery.setPipelineId(pipelineId);
+            List<Variable> variableList = variableService.findVariableList(variableQuery);
             pipelineDetails.setVariableList(variableList);
+
+            // 消息
+            TaskMessageQuery taskMessageQuery = new TaskMessageQuery();
+            taskMessageQuery.setPipelineId(pipelineId);
+            List<TaskMessage> taskMessageList = taskMessageService.findTaskMessageList(taskMessageQuery);
+            pipelineDetails.setTaskMessageList(taskMessageList);
 
             AgentMessage agentMessage = new AgentMessage();
             agentMessage.setType("exec");

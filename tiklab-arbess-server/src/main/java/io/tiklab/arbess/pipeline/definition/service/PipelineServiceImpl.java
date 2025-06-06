@@ -40,6 +40,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static io.tiklab.arbess.support.util.util.PipelineFinal.*;
@@ -301,7 +302,7 @@ public class PipelineServiceImpl implements PipelineService {
         query.setIdString(builder);
         List<Pipeline> userPipeline = findPipelineList(query);
         if (Objects.isNull(userPipeline)){
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
         return userPipeline;
     }
@@ -321,7 +322,7 @@ public class PipelineServiceImpl implements PipelineService {
             Pagination<PipelineEntity> pipelineListQuery = pipelineDao.findPipelineListQuery(query);
             List<PipelineEntity> dataList = pipelineListQuery.getDataList();
             if (dataList.isEmpty()){
-                return PaginationBuilder.build(pipelineListQuery, Collections.emptyList());
+                return PaginationBuilder.build(pipelineListQuery, new ArrayList<>());
             }
             List<Pipeline> pipelineList = BeanMapper.mapList(dataList, Pipeline.class);
             List<Pipeline> list = new ArrayList<>();
@@ -341,7 +342,7 @@ public class PipelineServiceImpl implements PipelineService {
             List<Pipeline> pipelines = list.stream()
                     .peek(pipeline -> pipeline.setUser(pipelineUser.get(pipeline.getUser().getId())))
                     .peek(pipeline -> pipeline.setExec(homeService.findPermissions(pipeline.getId(),PIPELINE_RUN_KEY)))
-                    .toList();
+                    .collect(Collectors.toList());
 
             return PaginationBuilder.build(pipelineListQuery,pipelines);
         }
@@ -365,7 +366,7 @@ public class PipelineServiceImpl implements PipelineService {
         List<PipelineEntity> dataList = pipelinePage.getDataList();
         List<Pipeline> pipelineList = BeanMapper.mapList(dataList, Pipeline.class);
         if (pipelineList.isEmpty()){
-            return PaginationBuilder.build(pipelinePage, Collections.emptyList());
+            return PaginationBuilder.build(pipelinePage, new ArrayList<>());
         }
         List<Pipeline> list = new ArrayList<>();
 
@@ -387,7 +388,7 @@ public class PipelineServiceImpl implements PipelineService {
         List<Pipeline> pipelines = list.stream()
                 .peek(pipeline -> pipeline.setUser(pipelineUser.get(pipeline.getUser().getId())))
                 .peek(pipeline -> pipeline.setExec(homeService.findPermissions(pipeline.getId(),PIPELINE_RUN_KEY)))
-                .toList();
+                .collect(Collectors.toList());
 
         return PaginationBuilder.build(pipelinePage,pipelines);
     }
@@ -396,7 +397,7 @@ public class PipelineServiceImpl implements PipelineService {
     public List<Pipeline> findPipelineList(PipelineQuery query){
         List<PipelineEntity> pipelineEntityList = pipelineDao.findPipelineList(query);
         if (Objects.isNull(pipelineEntityList)){
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
         return BeanMapper.mapList(pipelineEntityList,Pipeline.class);
     }
@@ -412,16 +413,16 @@ public class PipelineServiceImpl implements PipelineService {
         // 筛选出用户拥有的流水线的历史
         String[] userPipeline = authorityService.findUserPipelineIdString(userId);
         if (userPipeline.length == 0){
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
 
         List<PipelineInstance> instanceList = instanceService.findUserPipelineInstance(userId,number);
         if (instanceList.isEmpty()){
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
 
         List<PipelineInstance> pipelineInstanceList = new ArrayList<>();
-        List<String> pipelineIdList = Arrays.stream(userPipeline).toList();
+        List<String> pipelineIdList = Arrays.stream(userPipeline).collect(Collectors.toList());
         for (PipelineInstance instance : instanceList) {
             String id = instance.getPipeline().getId();
             boolean containsElement = pipelineIdList.contains(id);
@@ -508,7 +509,7 @@ public class PipelineServiceImpl implements PipelineService {
         postprocessService.clonePostTask(pipelineId,clonePipelineId);
 
         // 克隆触发器
-        triggerService.cloneTrigger(pipelineId,clonePipelineId);
+        // triggerService.cloneTrigger(pipelineId,clonePipelineId);
 
         // 克隆流水线变量
         variableService.cloneVariable(pipelineId,clonePipelineId);
@@ -527,7 +528,7 @@ public class PipelineServiceImpl implements PipelineService {
         Pipeline pipeline = findPipelineNoQuery(pipelineId);
 
         // 过滤出当前流水线
-        List<String> strings = Stream.of(builders).filter(a -> !a.equals(pipelineId)).toList();
+        List<String> strings = Stream.of(builders).filter(a -> !a.equals(pipelineId)).collect(Collectors.toList());
         if (strings.isEmpty()){
             List<Pipeline> objects = new ArrayList<>();
             objects.add(pipeline);
@@ -547,11 +548,11 @@ public class PipelineServiceImpl implements PipelineService {
 
         // 过滤出当前流水线
         List<String> pieplineIdList = userOpenList.stream().filter(s -> !s.equals(pipelineId))
-                .toList();
+                .collect(Collectors.toList());
 
         // 获取最近打开以及拥有权限的流水线
         List<String> collect = strings.stream()
-                .filter(pieplineIdList::contains).distinct().toList();
+                .filter(pieplineIdList::contains).distinct().collect(Collectors.toList());
 
         List<String> idStrings = new ArrayList<>(collect);
 
@@ -559,7 +560,7 @@ public class PipelineServiceImpl implements PipelineService {
         if (collect.size() >= number){
             idStrings = idStrings.subList(0, number);
         }else {
-            List<String> collect1 = strings.stream().filter(element -> !pieplineIdList.contains(element)).toList();
+            List<String> collect1 = strings.stream().filter(element -> !pieplineIdList.contains(element)).collect(Collectors.toList());
             if (collect1.size() >= number - collect.size()){
                 idStrings.addAll(collect.size()-1,collect1.subList(0,number - collect.size()));
             }else {
@@ -629,7 +630,7 @@ public class PipelineServiceImpl implements PipelineService {
         // 使用Stream API去除重复元素
         List<String> uniqueList = userIdString.stream()
                 .distinct()
-                .toList();
+                .collect(Collectors.toList());
 
         Map<String,User> map = new HashMap<>();
 

@@ -12,6 +12,7 @@ import io.tiklab.toolkit.beans.BeanMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -44,7 +45,7 @@ public class SonarQubeScanDao {
     public List<SonarQubeScanEntity> findAllSonarQubeScan() {
         List<SonarQubeScanEntity> scanEntityList = jpaTemplate.findAll(SonarQubeScanEntity.class);
         if (scanEntityList == null || scanEntityList.isEmpty()){
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
         return scanEntityList;
     }
@@ -58,7 +59,7 @@ public class SonarQubeScanDao {
         List<SonarQubeScanEntity> scanEntityList = jpaTemplate.findList(queryCondition, SonarQubeScanEntity.class);
 
         if (scanEntityList == null || scanEntityList.isEmpty()){
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
         return scanEntityList;
     }
@@ -67,7 +68,7 @@ public class SonarQubeScanDao {
         List<SonarQubeScanEntity> scanEntityList = jpaTemplate.findList(idList, SonarQubeScanEntity.class);
 
         if (scanEntityList == null || scanEntityList.isEmpty()){
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
         return scanEntityList;
     }
@@ -81,7 +82,7 @@ public class SonarQubeScanDao {
         Pagination<SonarQubeScanEntity> scanEntityPagination = jpaTemplate.findPage(queryCondition, SonarQubeScanEntity.class);
         List<SonarQubeScanEntity> dataList = scanEntityPagination.getDataList();
         if (Objects.isNull(dataList) || dataList.isEmpty()){
-            return PaginationBuilder.build(scanEntityPagination,Collections.emptyList());
+            return PaginationBuilder.build(scanEntityPagination,new ArrayList<>());
         }
 
         return PaginationBuilder.build(scanEntityPagination,dataList);

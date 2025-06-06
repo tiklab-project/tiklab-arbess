@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -101,7 +102,7 @@ public class KubectlServiceImpl implements KubectlService {
     public List<Kubectl> findAllKubectl() {
         List<KubectlEntity> kubectlEntityList = kubectlDao.findAllKubectl();
         if (Objects.isNull(kubectlEntityList)){
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
         List<Kubectl> kubectlList = BeanMapper.mapList(kubectlEntityList, Kubectl.class);
         for (Kubectl kubectl : kubectlList) {
@@ -120,7 +121,7 @@ public class KubectlServiceImpl implements KubectlService {
     public List<Kubectl> findKubectlList(KubectlQuery hostQuery) {
         List<KubectlEntity> kubectlEntityList = kubectlDao.findKubectlList(hostQuery);
         if (Objects.isNull(kubectlEntityList) || kubectlEntityList.isEmpty()){
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
         List<Kubectl> kubectlList = BeanMapper.mapList(kubectlEntityList, Kubectl.class);
         for (Kubectl kubectl : kubectlList) {

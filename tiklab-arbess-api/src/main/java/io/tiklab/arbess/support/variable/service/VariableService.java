@@ -2,6 +2,7 @@ package io.tiklab.arbess.support.variable.service;
 
 import io.tiklab.arbess.support.variable.model.Variable;
 import io.tiklab.arbess.support.variable.model.VariableQuery;
+import io.tiklab.core.page.Pagination;
 
 import java.util.List;
 /**
@@ -52,18 +53,15 @@ public interface VariableService {
     List<Variable> findAllVariable();
 
     /**
-     * 查询流水线所有变量
-     * @param taskId 任务id
-     * @return 变量
-     */
-    List<Variable> findAllVariable(String taskId);
-
-    /**
      * 条件查询变量
      * @param query 条件
      * @return 变量列表
      */
     List<Variable> findVariableList(VariableQuery query);
+
+
+    Pagination<Variable> findVariablePage(VariableQuery query);
+
 
     // 克隆变量
     void cloneVariable(String id,String cloneId);

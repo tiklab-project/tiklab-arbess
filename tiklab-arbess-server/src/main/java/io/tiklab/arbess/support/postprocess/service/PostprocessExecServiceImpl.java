@@ -49,7 +49,7 @@ public class PostprocessExecServiceImpl implements PostprocessExecService{
         String fileAddress = utilService.findPipelineDefaultAddress(pipelineId,2) + instanceId;
         List<Postprocess> postprocessList = postprocessService.findAllPipelinePostTask(pipelineId);
         if (postprocessList.isEmpty()){
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
         for (Postprocess postprocess : postprocessList) {
 

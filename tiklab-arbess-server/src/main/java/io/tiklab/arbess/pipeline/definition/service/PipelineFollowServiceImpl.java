@@ -13,6 +13,7 @@ import io.tiklab.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -62,7 +63,7 @@ public class PipelineFollowServiceImpl implements PipelineFollowService {
         List<PipelineFollowEntity> list =
                 pipelineFollowDao.findFollowQueryList(followQuery);
         if (list == null || list.isEmpty()){
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
         return BeanMapper.mapList(list, PipelineFollow.class);
     }

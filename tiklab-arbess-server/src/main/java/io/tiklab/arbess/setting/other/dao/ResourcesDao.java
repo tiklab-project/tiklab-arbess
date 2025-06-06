@@ -9,6 +9,7 @@ import io.tiklab.arbess.setting.other.model.Resources;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -57,7 +58,7 @@ public class ResourcesDao {
     public List<Resources> findAllResources(){
         List<ResourcesEntity> resourcesEntityList = jpaTemplate.findAll(ResourcesEntity.class);
         if (resourcesEntityList == null || resourcesEntityList.isEmpty()){
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
         return BeanMapper.mapList(resourcesEntityList, Resources.class);
     }

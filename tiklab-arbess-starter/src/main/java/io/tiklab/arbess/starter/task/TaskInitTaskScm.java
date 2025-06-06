@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static io.tiklab.arbess.support.util.util.PipelineFinal.*;
 
@@ -84,11 +85,11 @@ public class TaskInitTaskScm implements TiklabApplicationRunner {
         try {
             List<Tasks> noCodeList = allTasks.stream()
                     .filter(tasks -> !tasksService.findTaskType(tasks.getTaskType()).equals(PipelineFinal.TASK_TYPE_CODE))
-                    .toList();
+                    .collect(Collectors.toList());
 
             List<Tasks> codeList = allTasks.stream()
                     .filter(tasks -> tasksService.findTaskType(tasks.getTaskType()).equals(PipelineFinal.TASK_TYPE_CODE))
-                    .toList();
+                    .collect(Collectors.toList());
 
             if (!codeList.isEmpty()){
                 for (Tasks tasks : codeList) {
@@ -110,7 +111,7 @@ public class TaskInitTaskScm implements TiklabApplicationRunner {
 
             List<Tasks> codeScanList = noCodeList.stream()
                     .filter(tasks -> tasksService.findTaskType(tasks.getTaskType()).equals(PipelineFinal.TASK_TYPE_CODESCAN))
-                    .toList();
+                    .collect(Collectors.toList());
 
             for (Tasks tasks : codeScanList) {
                 String taskId = tasks.getTaskId();
@@ -134,7 +135,7 @@ public class TaskInitTaskScm implements TiklabApplicationRunner {
 
             List<Tasks> testList = noCodeList.stream()
                     .filter(tasks -> tasksService.findTaskType(tasks.getTaskType()).equals(PipelineFinal.TASK_TYPE_TEST))
-                    .toList();
+                    .collect(Collectors.toList());
             for (Tasks tasks : testList) {
                 String taskId = tasks.getTaskId();
                 TaskTest taskTest = testService.findOneTest(taskId);
@@ -157,7 +158,7 @@ public class TaskInitTaskScm implements TiklabApplicationRunner {
 
             List<Tasks> buildList = noCodeList.stream()
                     .filter(tasks -> tasksService.findTaskType(tasks.getTaskType()).equals(PipelineFinal.TASK_TYPE_BUILD))
-                    .toList();
+                    .collect(Collectors.toList());
             for (Tasks tasks : buildList) {
                 String taskId = tasks.getTaskId();
                 TaskBuild build = buildService.findOneBuild(taskId);
@@ -191,7 +192,7 @@ public class TaskInitTaskScm implements TiklabApplicationRunner {
 
         // List<Tasks> artifactList = noCodeList.stream()
         //         .filter(tasks -> tasksService.findTaskType(tasks.getTaskType()).equals(TASK_TYPE_UPLOAD))
-        //         .toList();
+        //         .collect(Collectors.toList());
         // for (Tasks tasks : artifactList) {
         //     String taskId = tasks.getTaskId();
         //     TaskArtifact artifact = artifactService.findOneProduct(taskId);
@@ -222,7 +223,7 @@ public class TaskInitTaskScm implements TiklabApplicationRunner {
         //
         // List<Tasks> pullArtifactList = noCodeList.stream()
         //         .filter(tasks -> tasksService.findTaskType(tasks.getTaskType()).equals(TASK_TYPE_DOWNLOAD))
-        //         .toList();
+        //         .collect(Collectors.toList());
         // if (!pullArtifactList.isEmpty()){
         //     for (Tasks tasks : pullArtifactList) {
         //         String taskId = tasks.getTaskId();
@@ -281,22 +282,22 @@ public class TaskInitTaskScm implements TiklabApplicationRunner {
 
         List<Scm> allScm = scmService.findAllPipelineScm();
 
-        List<Scm> nodeJsList = allScm.stream().filter(scm -> scm.getScmType().equals(TASK_TOOL_TYPE_NODEJS)).toList();
+        List<Scm> nodeJsList = allScm.stream().filter(scm -> scm.getScmType().equals(TASK_TOOL_TYPE_NODEJS)).collect(Collectors.toList());
         if ( !nodeJsList.isEmpty()){
             scmAddress.put(PipelineFinal.TASK_TOOL_TYPE_NODEJS,nodeJsList.get(0));
         }
 
-        List<Scm> mavenList = allScm.stream().filter(scm -> scm.getScmType().equals(TASK_TOOL_TYPE_MAVEN)).toList();
+        List<Scm> mavenList = allScm.stream().filter(scm -> scm.getScmType().equals(TASK_TOOL_TYPE_MAVEN)).collect(Collectors.toList());
         if ( !mavenList.isEmpty()){
             scmAddress.put(PipelineFinal.TASK_TOOL_TYPE_MAVEN,mavenList.get(0));
         }
 
-        List<Scm> gitList = allScm.stream().filter(scm -> scm.getScmType().equals(TASK_TOOL_TYPE_GIT)).toList();
+        List<Scm> gitList = allScm.stream().filter(scm -> scm.getScmType().equals(TASK_TOOL_TYPE_GIT)).collect(Collectors.toList());
         if ( !gitList.isEmpty()){
             scmAddress.put(PipelineFinal.TASK_TOOL_TYPE_GIT,gitList.get(0));
         }
 
-        List<Scm> svnList = allScm.stream().filter(scm -> scm.getScmType().equals(TASK_TOOL_TYPE_SVN)).toList();
+        List<Scm> svnList = allScm.stream().filter(scm -> scm.getScmType().equals(TASK_TOOL_TYPE_SVN)).collect(Collectors.toList());
         if ( !svnList.isEmpty()){
             scmAddress.put(PipelineFinal.TASK_TOOL_TYPE_SVN,svnList.get(0));
         }

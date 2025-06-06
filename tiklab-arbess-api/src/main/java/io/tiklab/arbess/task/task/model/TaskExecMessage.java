@@ -1,6 +1,10 @@
 package io.tiklab.arbess.task.task.model;
 
 import io.tiklab.arbess.pipeline.definition.model.Pipeline;
+import io.tiklab.arbess.support.message.model.TaskMessage;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -11,22 +15,39 @@ public class TaskExecMessage {
     //@ApiProperty(name = "pipeline",desc = "流水线信息")
     private Pipeline pipeline;
 
-    //@ApiProperty(name = "tasks",desc = "任务信息")
-    private Tasks tasks;
-
-    //@ApiProperty(name = "taskName",desc = "需要执行任务的名称")
-    private String taskName;
-
-    //@ApiProperty(name = "taskId",desc = "需要执行任务的Id")
-    private String taskId;
-
     //@ApiProperty(name = "execState",desc = "执行任务的状态")
     private boolean execState;
 
     //@ApiProperty(name = "execPipeline",desc = "是任务还是流水线")
     private boolean execPipeline;
 
+    // 任务名称
+    private String taskName;
+
     private String pipelineId;
+
+    private String instanceId;
+
+    public String getInstanceId() {
+        return instanceId;
+    }
+
+    public TaskExecMessage setInstanceId(String instanceId) {
+        this.instanceId = instanceId;
+        return this;
+    }
+
+    // 消息配置
+    private List<TaskMessage> messageList = new ArrayList<>();
+
+    public List<TaskMessage> getMessageList() {
+        return messageList;
+    }
+
+    public TaskExecMessage setMessageList(List<TaskMessage> messageList) {
+        this.messageList = messageList;
+        return this;
+    }
 
     public String getPipelineId() {
         return pipelineId;
@@ -44,43 +65,12 @@ public class TaskExecMessage {
         this.execState = execState;
     }
 
-    public TaskExecMessage(Pipeline pipeline, String taskName, String taskId, boolean execState) {
-        this.pipeline = pipeline;
-        this.taskName = taskName;
-        this.taskId = taskId;
-        this.execState = execState;
-    }
-
-    public TaskExecMessage(Pipeline pipeline, Tasks tasks, String taskName, boolean execState, boolean execPipeline) {
-        this.pipeline = pipeline;
-        this.tasks = tasks;
-        this.taskName = taskName;
-        this.execState = execState;
-        this.execPipeline = execPipeline;
-    }
-
-    public String getTaskId() {
-        return taskId;
-    }
-
-    public void setTaskId(String taskId) {
-        this.taskId = taskId;
-    }
-
     public Pipeline getPipeline() {
         return pipeline;
     }
 
     public void setPipeline(Pipeline pipeline) {
         this.pipeline = pipeline;
-    }
-
-    public Tasks getTasks() {
-        return tasks;
-    }
-
-    public void setTasks(Tasks tasks) {
-        this.tasks = tasks;
     }
 
     public String getTaskName() {

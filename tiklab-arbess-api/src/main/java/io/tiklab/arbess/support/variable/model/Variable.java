@@ -24,7 +24,7 @@ public class Variable extends BaseModel {
     private String varType;
 
     //@ApiProperty(name="type",desc="类型 1.全局 2.项目")
-    private int type;
+    private Integer type;
 
     //@ApiProperty(name="taskId",desc="任务id")
     private String taskId;
@@ -84,12 +84,14 @@ public class Variable extends BaseModel {
         return this;
     }
 
-    public int getType() {
+
+    public Integer getType() {
         return type;
     }
 
-    public void setType(int type) {
+    public Variable setType(Integer type) {
         this.type = type;
+        return this;
     }
 
     public String getTaskId() {

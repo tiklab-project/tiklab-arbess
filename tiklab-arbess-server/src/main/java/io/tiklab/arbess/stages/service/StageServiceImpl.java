@@ -168,7 +168,7 @@ public class StageServiceImpl implements StageService {
         //获取流水线主节点
         List<Stage> stageMainStage = findAllMainStage(pipelineId);
         if (stageMainStage.isEmpty()){
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
         List<Stage> list = new ArrayList<>();
         for (Stage stage : stageMainStage) {
@@ -187,7 +187,7 @@ public class StageServiceImpl implements StageService {
         //获取流水线主节点
         List<Stage> stageMainStage = findAllMainStage(pipelineId);
         if (stageMainStage.isEmpty()){
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
         List<Stage> list = new ArrayList<>();
         for (Stage stage : stageMainStage) {
@@ -273,7 +273,7 @@ public class StageServiceImpl implements StageService {
     private List<Stage> findAllPipelineStages(String pipelineId){
         List<Stage> allStages = findAllStages();
         if (allStages == null || allStages.isEmpty()){
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
         List<Stage> list = new ArrayList<>();
         for (Stage stage : allStages) {

@@ -62,20 +62,12 @@ dcs:
     database: dcs1
     expire: 7200
 
-soular:
-  embbed:
-#    enable: true
-    enable: false
-  address: http://192.168.10.15:8080
-#  web:
-#    address: http://192.168.10.15:8080
-#    address: http://192.168.10.16:3010
-
 auth:
   type: soularss
   soular:
     address: http://192.168.10.15:8080
-
+    web:
+      address: http://192.168.10.16:3010
 
 backups:
   dir: ${DATA_HOME}/backups

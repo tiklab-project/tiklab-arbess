@@ -1,7 +1,12 @@
 package io.tiklab.arbess.support.trigger.model;
 
+import io.tiklab.core.order.Order;
+import io.tiklab.core.order.OrderBuilders;
+import io.tiklab.core.page.Page;
 import io.tiklab.toolkit.beans.annotation.Mapper;
 import io.tiklab.toolkit.join.annotation.Join;
+
+import java.util.List;
 
 
 /**
@@ -16,9 +21,6 @@ public class TriggerQuery {
     //@ApiProperty(name = "name",desc="名称")
     private String name;
 
-    //@ApiProperty(name = "taskType",desc="类型 81:定时任务")
-    private int taskType;
-
     /**
      * 流水线ID
      */
@@ -27,7 +29,11 @@ public class TriggerQuery {
     /**
      * 状态 1--未执行 2--已执行
      */
-    private String state;
+    private Integer state;
+
+    private Page pageParam= new Page();
+
+    private List<Order> orderParams = OrderBuilders.instance().desc("id").get();
 
 
     public String getName() {
@@ -39,12 +45,13 @@ public class TriggerQuery {
         return this;
     }
 
-    public int getTaskType() {
-        return taskType;
+
+    public Integer getState() {
+        return state;
     }
 
-    public TriggerQuery setTaskType(int taskType) {
-        this.taskType = taskType;
+    public TriggerQuery setState(Integer state) {
+        this.state = state;
         return this;
     }
 
@@ -57,12 +64,20 @@ public class TriggerQuery {
         return this;
     }
 
-    public String getState() {
-        return state;
+    public Page getPageParam() {
+        return pageParam;
     }
 
-    public TriggerQuery setState(String state) {
-        this.state = state;
-        return this;
+    public void setPageParam(Page pageParam) {
+        this.pageParam = pageParam;
+    }
+
+    public List<Order> getOrderParams() {
+        return orderParams;
+    }
+
+    public void setOrderParams(List<Order> orderParams) {
+        this.orderParams = orderParams;
     }
 }
+

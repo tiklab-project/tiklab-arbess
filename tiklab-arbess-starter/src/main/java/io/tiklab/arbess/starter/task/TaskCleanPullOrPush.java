@@ -20,6 +20,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class TaskCleanPullOrPush implements TiklabApplicationRunner {
@@ -61,7 +62,7 @@ public class TaskCleanPullOrPush implements TiklabApplicationRunner {
                 .filter(pullArtifact -> !pullArtifact.getPullType().equals(PipelineFinal.TASK_DOWNLOAD_HADESS))
                 .filter(pullArtifact -> !pullArtifact.getPullType().equals(PipelineFinal.TASK_DOWNLOAD_NEXUS))
                 .map(TaskPullArtifact::getTaskId)
-                .toList();
+                .collect(Collectors.toList());
 
         List<String> taskIdList = new ArrayList<>(pullArtifactTaskIdList);
 
@@ -72,7 +73,7 @@ public class TaskCleanPullOrPush implements TiklabApplicationRunner {
                 .filter(artifact -> !artifact.getArtifactType().equals(PipelineFinal.TASK_UPLOAD_HADESS))
                 .filter(artifact -> !artifact.getArtifactType().equals(PipelineFinal.TASK_UPLOAD_NEXUS))
                 .map(TaskArtifact::getTaskId)
-                .toList();
+                .collect(Collectors.toList());
         taskIdList.addAll(artifactTaskIdList);
 
         if (taskIdList.isEmpty()){
@@ -100,13 +101,13 @@ public class TaskCleanPullOrPush implements TiklabApplicationRunner {
 
         List<String> otherStageIdList = tasksList.stream().map(Tasks::getStageId)
                 .filter(stageId -> !StringUtils.isEmpty(stageId))
-                .toList();
+                .collect(Collectors.toList());
 
         List<Stage> otherStageList = stageService.findAllStagesList(otherStageIdList);
 
         List<String> list = otherStageList.stream().map(Stage::getParentId)
                 .filter(stageParentId -> !StringUtils.isEmpty(stageParentId))
-                .toList();
+                .collect(Collectors.toList());
 
         List<Stage> rootList = stageService.findAllStagesList(list);
 

@@ -69,7 +69,7 @@ public class PostprocessServiceImpl implements PostprocessService {
         List<PostprocessEntity> allPostEntity = postprocessDao.findPipelinePost(pipelineId);
         List<Postprocess> postprocessList = BeanMapper.mapList(allPostEntity, Postprocess.class);
         if (postprocessList.isEmpty()){
-           return Collections.emptyList();
+           return new ArrayList<>();
         }
         List<Postprocess> list = new ArrayList<>();
         for (Postprocess postprocess : postprocessList) {
@@ -101,7 +101,7 @@ public class PostprocessServiceImpl implements PostprocessService {
         List<PostprocessEntity> allPostEntity = postprocessDao.findTaskPost(taskId);
         List<Postprocess> postprocessList = BeanMapper.mapList(allPostEntity, Postprocess.class);
         if (postprocessList.isEmpty()){
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
         List<Postprocess> list = new ArrayList<>();
         for (Postprocess postprocess : postprocessList) {
@@ -128,7 +128,7 @@ public class PostprocessServiceImpl implements PostprocessService {
     public List<Postprocess> findAllPost(String taskId) {
         List<Postprocess> allPostprocess = findAllPost();
         if (allPostprocess == null){
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
         List<Postprocess> list = new ArrayList<>();
         for (Postprocess postprocess : allPostprocess) {

@@ -8,6 +8,7 @@ import io.tiklab.arbess.support.trigger.model.TriggerQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -59,11 +60,11 @@ public class TriggerDao {
     public List<TriggerEntity> findTriggerList(TriggerQuery triggerQuery){
         QueryCondition queryCondition = QueryBuilders.createQuery(TriggerEntity.class)
                 .eq("pipelineId", triggerQuery.getPipelineId())
-                .eq("state", triggerQuery.getState())
+                .eq("status", triggerQuery.getState())
                 .get();
         List<TriggerEntity> triggerEntities = jpaTemplate.findList(queryCondition, TriggerEntity.class);
         if (triggerEntities == null || triggerEntities.isEmpty()){
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
         return  triggerEntities;
     }
@@ -77,7 +78,7 @@ public class TriggerDao {
     }
 
 
-    public List<TriggerEntity> findAllTriggerList(List<String> idList){
+    public List<TriggerEntity> findTriggerList(List<String> idList){
         return jpaTemplate.findList(TriggerEntity.class,idList);
     }
 

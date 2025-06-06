@@ -1,34 +1,27 @@
 package io.tiklab.arbess.starter.config;
 
-import io.tiklab.openapi.router.Router;
-import io.tiklab.openapi.router.RouterBuilder;
-import io.tiklab.openapi.router.config.RouterConfig;
-import io.tiklab.openapi.router.config.RouterConfigBuilder;
-import io.tiklab.user.util.util.CodeUtilService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
+import io.tiklab.gateway.config.RouterConfig;
+import io.tiklab.gateway.config.RouterConfigBuilder;
+import io.tiklab.openapi.config.AllowConfig;
+import io.tiklab.openapi.config.AllowConfigBuilder;
+import io.tiklab.openapi.config.OpenApiConfig;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class ArbessOpenApiAutoConfiguration {
 
-    @Autowired
-    CodeUtilService codeUtilService;
+    @Bean
+    OpenApiConfig openApiConfig(AllowConfig allowConfig){
+        OpenApiConfig openApiConfig = new OpenApiConfig();
+        openApiConfig.setAllowConfig(allowConfig);
 
-    @Value("${server.port}")
-    private String serverPort;
-
-    //路由
-    @Bean("routerForOpenApi")
-    Router router(@Qualifier("routerConfigForOpenApi") RouterConfig routerConfig){
-        return RouterBuilder.newRouter(routerConfig);
+        return openApiConfig;
     }
 
-    //路由配置
-    @Bean("routerConfigForOpenApi")
-    RouterConfig routerConfig(){
+    //开放许可配置
+    @Bean
+    AllowConfig allowConfig(){
         String[] s =  new String[]{
                 "/pipeline/findAllPipeline",
                 "/pipeline/createPipeline",
@@ -39,10 +32,10 @@ public class ArbessOpenApiAutoConfiguration {
                 "/pipeline/findPipelineUser",
                 "/pipeline/findUserPipeline",
         };
-
-        return RouterConfigBuilder.instance()
-                .preRoute(s, codeUtilService.findEmbedAddress())
-                .route(s, "http://127.0.0.1:"+serverPort)
+        return AllowConfigBuilder.instance()
+                .allowUrls(s)
                 .get();
     }
+
+
 }

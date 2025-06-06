@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Component
 public class TaskCleanPost implements TiklabApplicationRunner {
@@ -43,7 +44,7 @@ public class TaskCleanPost implements TiklabApplicationRunner {
         List<Postprocess> list = pipelinePostTask.stream()
                 .filter(postprocess -> !Objects.isNull(postprocess))
                 .filter(postprocess -> postprocess.getTaskType().equals(PipelineFinal.TASK_TYPE_SCRIPT))
-                .toList();
+                .collect(Collectors.toList());
 
         for (Postprocess postprocess : list) {
             postprocessService.deletePostTask(postprocess.getPostId());

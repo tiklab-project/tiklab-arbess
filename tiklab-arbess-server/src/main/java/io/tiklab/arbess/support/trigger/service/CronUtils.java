@@ -2,6 +2,7 @@ package io.tiklab.arbess.support.trigger.service;
 
 import io.tiklab.core.exception.ApplicationException;
 import io.tiklab.arbess.support.util.util.PipelineUtil;
+import io.tiklab.core.exception.SystemException;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -60,6 +61,13 @@ public class CronUtils {
         String[] s = cron.split(" ");
         // 0 27 16 1 4 ? 2023
         return s[6] + "-" + s[4]+ "-" + s[3] +" "+ s[2] + ":"+ s[1] +":00";
+    }
+
+
+    public static String weekDayTime(String cron){
+        String[] s = cron.split(" ");
+        // 0 27 16 1 4 ? 2023
+        return s[2] + ":"+ s[1];
     }
 
     public static String weekCron(String date,int timeDay){
@@ -174,8 +182,8 @@ public class CronUtils {
 
 
     /**
-     * 将时间字符串（yyyy-MM-dd HH:mm:ss）转换为 Quartz Cron 表达式
-     * @param data 目标时间字符串
+     * 将时间字符串转换为 Quartz Cron 表达式
+     * @param data 目标时间字符串 yyyy-MM-dd HH:mm:ss
      * @return Cron 表达式，例如 "0 30 10 6 5 ? 2025"
      * @throws ParseException 如果解析失败
      */
@@ -199,6 +207,31 @@ public class CronUtils {
         }catch (Exception e){
             throw new ApplicationException("时间格式转换错误，错误时间：" + data);
         }
+    }
+
+
+    /**
+     * 获取day天后的corn表达式
+     * @param cron cron表达式
+     */
+    public static String toCron(String cron,int day) {
+       try {
+
+           String timeStr = weekTime(cron);
+
+           SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+           Date date = sdf.parse(timeStr);
+
+           Calendar calendar = Calendar.getInstance();
+           calendar.setTime(date);
+           calendar.add(Calendar.DAY_OF_MONTH, day);
+
+           String format = sdf.format(calendar.getTime());
+           return toCron(format);
+       }catch (Exception e){
+           e.printStackTrace();
+           throw new SystemException("时间格式转换错误，错误时间：" + cron);
+       }
     }
 
 }

@@ -91,7 +91,7 @@ public class StageInstanceServerImpl implements StageInstanceServer{
         stageInstanceQuery.setInstanceId(instanceId);
         List<StageInstance> stageInstanceList = findStageInstanceList(stageInstanceQuery);
         if (stageInstanceList == null || stageInstanceList.isEmpty()){
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
         stageInstanceList.sort(Comparator.comparing(StageInstance::getStageSort));
        return stageInstanceList;
@@ -104,7 +104,7 @@ public class StageInstanceServerImpl implements StageInstanceServer{
         stageInstanceQuery.setParentId(mainStageId);
         List<StageInstance> stageInstanceList = findStageInstanceList(stageInstanceQuery);
         if (stageInstanceList == null || stageInstanceList.isEmpty()){
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
         return stageInstanceList;
     }
@@ -263,7 +263,7 @@ public class StageInstanceServerImpl implements StageInstanceServer{
     public List<StageInstance> findStageInstanceList(StageInstanceQuery query){
         List<StageInstanceEntity> stageInstanceList = stageInstanceDao.findStageInstanceList(query);
         if (stageInstanceList == null || stageInstanceList.isEmpty()){
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
         return BeanMapper.mapList(stageInstanceList,StageInstance.class);
     }

@@ -13,10 +13,7 @@ import io.tiklab.dal.jpa.criterial.conditionbuilder.QueryBuilders;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Repository
 public class GroupDao {
@@ -50,7 +47,7 @@ public class GroupDao {
     public List<Group> findAllGroup() {
         List<GroupEntity> scanEntityList = jpaTemplate.findAll(GroupEntity.class);
         if (scanEntityList == null || scanEntityList.isEmpty()){
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
         return BeanMapper.mapList(scanEntityList,Group.class);
     }
@@ -65,7 +62,7 @@ public class GroupDao {
         List<GroupEntity> scanEntityList = jpaTemplate.findList(queryCondition, GroupEntity.class);
 
         if (scanEntityList == null || scanEntityList.isEmpty()){
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
         return BeanMapper.mapList(scanEntityList,Group.class);
     }
@@ -82,7 +79,7 @@ public class GroupDao {
         Pagination<GroupEntity> entityPage = jpaTemplate.findPage(queryCondition, GroupEntity.class);
         List<GroupEntity> dataList = entityPage.getDataList();
         if (dataList == null || dataList.isEmpty()){
-            return PaginationBuilder.build(entityPage,Collections.emptyList());
+            return PaginationBuilder.build(entityPage,new ArrayList<>());
         }
         List<Group> groups = BeanMapper.mapList(dataList, Group.class);
         return PaginationBuilder.build(entityPage,groups);

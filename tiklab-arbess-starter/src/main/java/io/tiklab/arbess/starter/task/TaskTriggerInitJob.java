@@ -1,7 +1,6 @@
 package io.tiklab.arbess.starter.task;
 
-import io.tiklab.arbess.support.trigger.model.Trigger;
-import io.tiklab.arbess.support.trigger.model.TriggerTime;
+import io.tiklab.arbess.support.trigger.model.*;
 import io.tiklab.arbess.support.trigger.quartz.Job;
 import io.tiklab.arbess.support.trigger.quartz.RunJob;
 import io.tiklab.arbess.support.trigger.service.CronUtils;
@@ -21,11 +20,14 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.scheduling.annotation.Scheduled;
 
+import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+
+import static io.tiklab.arbess.support.util.util.PipelineFinal.DEFAULT;
 
 @Configuration
 public class TaskTriggerInitJob implements TiklabApplicationRunner {
@@ -43,105 +45,51 @@ public class TaskTriggerInitJob implements TiklabApplicationRunner {
     TriggerTimeService triggerTimeService;
 
 
-    public void run(ApplicationArguments args) throws Exception {
-        // run();
+    @Override
+    public void run(){
+        logger.info(" load scheduled tasks......");
+        addTriggerJob();
+        logger.info(" timed task loading completed!");
     }
 
 
-    @Override
-    public void run(){
+    public void addTriggerJob(){
         try {
-            List<TriggerTime> triggerList = triggerTimeService.findAllTime();
-            if (Objects.isNull(triggerList) || triggerList.isEmpty()){
-                return;
-            }
-            logger.info("Load scheduled tasks......");
-            for (TriggerTime triggerTime : triggerList) {
-                String timeId = triggerTime.getTimeId();
-                String triggerId = triggerTime.getTriggerId();
-                String time = CronUtils.weekTime(triggerTime.getCron());
-                Date date = PipelineUtil.StringChengeDate(time);
-                if (date.getTime() < new Date().getTime()){
-                    continue;
-                }
-                Trigger trigger = triggerServer.findOneTriggerById(triggerId);
-                String pipelineId = trigger.getPipeline().getId();
+            TriggerQuery triggerQuery = new TriggerQuery();
+            triggerQuery.setState(1);
+            List<Trigger> triggerList = triggerServer.findTriggerList(triggerQuery);
+
+            for (Trigger trigger : triggerList) {
+
+                String cron = trigger.getCron();
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                 try {
-                    job.addJob(PipelineFinal.DEFAULT,pipelineId, RunJob.class,triggerTime.getCron(),triggerId);
+                    Date inputTime = sdf.parse(CronUtils.weekTime(cron));
+                    boolean after = inputTime.after(new Date());
+                    if (!after){
+                        continue;
+                    }
+                } catch (Exception e) {
+                    logger.error("corn转换时间失败：{}",cron);
+                    return;
+                }
+
+                TriggerJob triggerJob = new TriggerJob()
+                        .setTriggerId(trigger.getId())
+                        .setCron(cron)
+                        .setJobClass( RunJob.class)
+                        .setPipelineId(trigger.getPipelineId())
+                        .setGroup(DEFAULT);
+                try {
+                    job.addJob(triggerJob);
                 } catch (SchedulerException e) {
                     throw new ApplicationException(e);
                 }
             }
-            logger.info("Timed task loading completed!");
         }catch (Exception e) {
-            logger.error(" Timed task loading  error : " + e.getMessage());
+            e.printStackTrace();
+            logger.error("timed task loading  error : {}", e.getMessage());
         }
     }
-
-    @Scheduled(cron = "0 01 00 ? * 2")
-    // @Bean
-    public void refreshTrigger() {
-        List<TriggerTime> triggerTimeList = triggerTimeService.findAllTime();
-        if (triggerTimeList.isEmpty()){
-            return;
-        }
-
-        List<TriggerTime> timeList = triggerTimeList.stream()
-                .filter(triggerTime -> triggerTime.getTaskType() != 1).toList();
-
-        for (TriggerTime triggerTime : timeList) {
-            String cron = triggerTime.getCron();
-
-            String triggerId = triggerTime.getTriggerId();
-            Trigger trigger = triggerServer.findOneTriggerById(triggerId);
-            String id = trigger.getPipeline().getId();
-
-            String[] split = cron.split(" ");
-
-            int[] ints = {
-                    Integer.parseInt(split[6]),
-                    Integer.parseInt(split[4]),
-                    Integer.parseInt(split[3]),
-                    Integer.parseInt(split[2]),
-                    Integer.parseInt(split[1])
-            };
-
-            // 指定时间
-            LocalDateTime specifiedDateTime = LocalDateTime.of(ints[0],ints[1], ints[2], ints[3], ints[4], 0);
-
-            Instant instant = specifiedDateTime.atZone(java.time.ZoneId.systemDefault()).toInstant();
-            long timestamp = instant.toEpochMilli();
-
-            if (timestamp > new Date().getTime()){
-                continue;
-            }
-
-            // 获取指定时间的7天后
-            LocalDateTime dateTime = specifiedDateTime.plusDays(7);
-
-            int year = dateTime.getYear();
-            int month = dateTime.getMonthValue();
-            int day = dateTime.getDayOfMonth();
-            int hour = ints[3];
-            int minute = ints[4];
-            String newCron = "00 " + minute + " " + hour + " " + day + " " + month + " ? " + year;
-
-            triggerTime.setCron(newCron);
-            triggerTimeService.updateTime(triggerTime);
-
-            triggerServer.updateTrigger(trigger.setState("1"));
-
-            try {
-                job.addJob(PipelineFinal.DEFAULT,id, RunJob.class,newCron,triggerId);
-            } catch (SchedulerException e) {
-                throw new ApplicationException(e);
-            }
-        }
-
-    }
-
-
-
-
 
 }

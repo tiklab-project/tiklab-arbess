@@ -12,6 +12,7 @@ import io.tiklab.arbess.task.codescan.entity.SpotbugsScanEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -53,7 +54,7 @@ public class SpotbugsScanDao {
     public List<SpotbugsBugSummary> findAllSpotbugs() {
         List<SpotbugsScanEntity> scanEntityList = jpaTemplate.findAll(SpotbugsScanEntity.class);
         if (scanEntityList == null || scanEntityList.isEmpty()){
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
         return BeanMapper.mapList(scanEntityList,SpotbugsBugSummary.class);
     }
@@ -67,7 +68,7 @@ public class SpotbugsScanDao {
         List<SpotbugsScanEntity> scanEntityList = jpaTemplate.findList(queryCondition, SpotbugsScanEntity.class);
 
         if (scanEntityList == null || scanEntityList.isEmpty()){
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
         return BeanMapper.mapList(scanEntityList,SpotbugsBugSummary.class);
     }
@@ -81,7 +82,7 @@ public class SpotbugsScanDao {
         Pagination<SpotbugsScanEntity> scanEntityPagination = jpaTemplate.findPage(queryCondition, SpotbugsScanEntity.class);
         List<SpotbugsScanEntity> dataList = scanEntityPagination.getDataList();
         if (Objects.isNull(dataList) || dataList.isEmpty()){
-            return PaginationBuilder.build(scanEntityPagination,Collections.emptyList());
+            return PaginationBuilder.build(scanEntityPagination,new ArrayList<>());
         }
 
         List<SpotbugsBugSummary> summaryList = BeanMapper.mapList(dataList, SpotbugsBugSummary.class);

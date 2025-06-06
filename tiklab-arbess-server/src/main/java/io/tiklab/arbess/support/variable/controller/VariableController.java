@@ -1,8 +1,10 @@
 package io.tiklab.arbess.support.variable.controller;
 
 import io.tiklab.arbess.support.variable.model.Variable;
+import io.tiklab.arbess.support.variable.model.VariableQuery;
 import io.tiklab.arbess.support.variable.service.VariableService;
 import io.tiklab.core.Result;
+import io.tiklab.core.page.Pagination;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,7 +20,7 @@ import java.util.List;
  * @pi.groupName: 流水线变量控制器
  */
 @RestController
-@RequestMapping("/pipelineVariable")
+@RequestMapping("/pipeline/variable")
 public class VariableController {
 
     @Autowired
@@ -63,19 +65,17 @@ public class VariableController {
         return Result.ok();
     }
 
-    /**
-     * @pi.name:查询流水线任务变量
-     * @pi.url:/pipelineVariable/findAllVariable
-     * @pi.methodType:post
-     * @pi.request-type: formdata
-     * @pi.param: name=taskId;dataType=string;value=任务id;
-     */
-    @RequestMapping(path="/findAllVariable",method = RequestMethod.POST)
-    public Result<List<Variable>> findAllVariable(@NotNull String taskId){
-        List<Variable> allVariable = variableServer.findAllVariable(taskId);
+    @RequestMapping(path="/findVariableList",method = RequestMethod.POST)
+    public Result<List<Variable>> findVariableList( @RequestBody @Valid @NotNull VariableQuery variableQuery){
+        List<Variable> allVariable = variableServer.findVariableList(variableQuery);
         return Result.ok(allVariable);
     }
 
+    @RequestMapping(path="/findVariablePage",method = RequestMethod.POST)
+    public Result<Pagination<Variable>> findVariablePage( @RequestBody @Valid @NotNull VariableQuery variableQuery){
+        Pagination<Variable> allVariable = variableServer.findVariablePage(variableQuery);
+        return Result.ok(allVariable);
+    }
 
 
 }

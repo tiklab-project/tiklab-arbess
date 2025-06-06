@@ -14,11 +14,6 @@ public class TaskInitAgent implements TiklabApplicationRunner {
 
     @Autowired
     WebSocketClient webSocketClient;
-//
-//     @Override
-//     public void run(ApplicationArguments args) throws Exception {
-//         // webSocketClient.initWebSocketConnect();
-//     }
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -36,7 +31,7 @@ public class TaskInitAgent implements TiklabApplicationRunner {
                     } catch (InterruptedException e) {
                         throw new RuntimeException(e);
                     }
-                    logger.info("Enable automatic connection .....");
+                    logger.info("enable automatic connection .....");
                     WebSocketClient.beginConnect = true;
                 }
         ).start();

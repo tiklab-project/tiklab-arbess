@@ -85,7 +85,7 @@ public class PipelineOpenServiceImpl implements PipelineOpenService {
     public List<PipelineOpen> findAllOpen() {
         List<PipelineOpenEntity> allOpen = pipelineOpenDao.findAllOpen();
         if (Objects.isNull(allOpen)){
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
         List<PipelineOpen> list = BeanMapper.mapList(allOpen, PipelineOpen.class);
         joinTemplate.joinQuery(list);
@@ -95,7 +95,7 @@ public class PipelineOpenServiceImpl implements PipelineOpenService {
     public List<PipelineOpen> findAllOpenNoQuery() {
         List<PipelineOpenEntity> allOpen = pipelineOpenDao.findAllOpen();
         if (Objects.isNull(allOpen)){
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
         return BeanMapper.mapList(allOpen, PipelineOpen.class);
     }
@@ -126,7 +126,7 @@ public class PipelineOpenServiceImpl implements PipelineOpenService {
         String userId = LoginContext.getLoginId();
         String[] userPipeline = authorityService.findUserPipelineIdString(userId);
         if (userPipeline.length == 0){
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
 
         StringBuilder builder = new StringBuilder();
@@ -139,7 +139,7 @@ public class PipelineOpenServiceImpl implements PipelineOpenService {
 
         List<String> pipelineIds = pipelineOpenDao.findUserOpen(userId, number,builder.toString());
         if (pipelineIds.isEmpty()){
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
         return pipelineIds;
     }
@@ -157,7 +157,7 @@ public class PipelineOpenServiceImpl implements PipelineOpenService {
 
         List<String> pipelineIds = findUserOpen(number);
         if (pipelineIds.isEmpty()){
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
 
         List<PipelineOpen> openList = new ArrayList<>();

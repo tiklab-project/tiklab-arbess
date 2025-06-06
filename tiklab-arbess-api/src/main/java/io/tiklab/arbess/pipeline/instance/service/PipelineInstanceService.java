@@ -147,7 +147,7 @@ public interface PipelineInstanceService {
      * @param queryTime 查询时间 [开始时间,结束时间]
      * @return 实例
      */
-    List<PipelineInstance> findInstanceByTime(String[] queryTime);
+    List<PipelineInstance> findInstanceByTime(String[] queryTime,String[] pipelineIdList);
 
     /**
      * 获取实例运行时间

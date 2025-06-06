@@ -35,7 +35,7 @@ import io.tiklab.arbess.task.codescan.service.SonarQubeScanService;
 import io.tiklab.arbess.task.codescan.service.SourceFareScanService;
 import io.tiklab.arbess.task.deploy.model.TaskDeployInstance;
 import io.tiklab.arbess.task.deploy.service.TaskDeployInstanceServiceImpl;
-import io.tiklab.arbess.task.message.model.TaskMessage;
+import io.tiklab.arbess.support.message.model.TaskMessageSendDetail;
 import io.tiklab.arbess.task.task.model.TaskInstance;
 import io.tiklab.arbess.task.task.service.TasksInstanceService;
 import io.tiklab.arbess.task.task.service.TasksInstanceServiceImpl;
@@ -374,11 +374,22 @@ public class WebSocketMessageServiceImpl implements WebSocketMessageService {
         }
 
         TaskInstance taskInstance = TasksInstanceServiceImpl.taskInstanceMap.get(id);
+        String runLog = sourceTaskInstance.getRunLog();
         if (!Objects.isNull(taskInstance)){
-            if (!StringUtils.isEmpty(sourceTaskInstance.getRunLog())){
-                sourceTaskInstance.setRunLog(taskInstance.getRunLog()+"\n"+sourceTaskInstance.getRunLog());
+            if (!StringUtils.isEmpty(runLog)){
+                sourceTaskInstance.setRunLog(taskInstance.getRunLog()+"\n"+runLog);
             }else {
                 sourceTaskInstance.setRunLog(taskInstance.getRunLog());
+            }
+        }else {
+            PipelineInstance instance = pipelineInstanceService.findOneInstance(id);
+            if (!Objects.isNull(instance)){
+                if (!StringUtils.isEmpty(instance.getRunLog())){
+                    instance.setRunLog(instance.getRunLog()+"\n"+runLog);
+                }else {
+                    instance.setRunLog(runLog);
+                }
+                pipelineInstanceService.updateInstance(instance);
             }
         }
         updateTaskInstance(sourceTaskInstance);
@@ -452,11 +463,11 @@ public class WebSocketMessageServiceImpl implements WebSocketMessageService {
      */
     private void messageTaskMessageHandle(Object message){
         String jsonString = JSONObject.toJSONString(message);
-        TaskMessage taskMessage = JSONObject.parseObject(jsonString, TaskMessage.class);
-        Pipeline pipeline = pipelineService.findOnePipeline(taskMessage.getPipelineId());
+        TaskMessageSendDetail taskMessageSendDetail = JSONObject.parseObject(jsonString, TaskMessageSendDetail.class);
+        Pipeline pipeline = pipelineService.findOnePipeline(taskMessageSendDetail.getPipelineId());
         Map<String, Object> stringObjectMap = homeService.initMap(pipeline);
-        stringObjectMap.putAll(taskMessage.getMap());
-        homeService.message(stringObjectMap,taskMessage.getList());
+        stringObjectMap.putAll(taskMessageSendDetail.getMap());
+        homeService.message(stringObjectMap, taskMessageSendDetail.getList());
     }
 
     /**

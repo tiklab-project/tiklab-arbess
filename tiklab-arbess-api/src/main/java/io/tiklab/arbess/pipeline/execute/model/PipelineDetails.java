@@ -1,8 +1,10 @@
 package io.tiklab.arbess.pipeline.execute.model;
 
+import io.tiklab.arbess.pipeline.definition.model.Pipeline;
 import io.tiklab.arbess.setting.tool.model.Scm;
 import io.tiklab.arbess.stages.model.Stage;
 import io.tiklab.arbess.support.agent.model.Agent;
+import io.tiklab.arbess.support.message.model.TaskMessage;
 import io.tiklab.arbess.support.postprocess.model.Postprocess;
 import io.tiklab.arbess.support.variable.model.Variable;
 import io.tiklab.arbess.task.build.model.TaskBuildProduct;
@@ -54,9 +56,29 @@ public class PipelineDetails {
     // 后置处理
     private List<Postprocess> postprocessList;
 
-    private TaskExecMessage taskExecMessage;
+    // 流水线
+    private Pipeline pipeline;
 
     private TaskBuildProduct taskBuildProduct;
+
+    // 任务消息
+    private List<TaskMessage> taskMessageList;
+
+    public List<TaskMessage> getTaskMessageList() {
+        return taskMessageList;
+    }
+
+    public Pipeline getPipeline() {
+        return pipeline;
+    }
+
+    public void setPipeline(Pipeline pipeline) {
+        this.pipeline = pipeline;
+    }
+
+    public void setTaskMessageList(List<TaskMessage> taskMessageList) {
+        this.taskMessageList = taskMessageList;
+    }
 
     public TaskBuildProduct getTaskBuildProduct() {
         return taskBuildProduct;
@@ -66,13 +88,13 @@ public class PipelineDetails {
         this.taskBuildProduct = taskBuildProduct;
     }
 
-    public TaskExecMessage getTaskExecMessage() {
-        return taskExecMessage;
-    }
-
-    public void setTaskExecMessage(TaskExecMessage taskExecMessage) {
-        this.taskExecMessage = taskExecMessage;
-    }
+    // public TaskExecMessage getTaskExecMessage() {
+    //     return taskExecMessage;
+    // }
+    //
+    // public void setTaskExecMessage(TaskExecMessage taskExecMessage) {
+    //     this.taskExecMessage = taskExecMessage;
+    // }
 
     public Agent getAgent() {
         return agent;

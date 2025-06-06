@@ -92,7 +92,7 @@ public class AuthThirdServiceImpl implements AuthThirdService {
 
         List<AuthThirdEntity> dataList = authThirdEntityPage.getDataList();
         if (Objects.isNull(dataList)){
-            return PaginationBuilder.build(authThirdEntityPage,Collections.emptyList());
+            return PaginationBuilder.build(authThirdEntityPage,new ArrayList<>());
         }
         List<AuthThird> authThirds = BeanMapper.mapList(dataList, AuthThird.class);
         joinTemplate.joinQuery(authThirds);
@@ -107,7 +107,7 @@ public class AuthThirdServiceImpl implements AuthThirdService {
     public List<AuthThird> findAllAuthServer() {
         List<AuthThirdEntity> allAuthServer = authServerDao.findAllAuthServer();
         if (Objects.isNull(allAuthServer)){
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
         List<AuthThird> authThirds = BeanMapper.mapList(allAuthServer, AuthThird.class);
         joinTemplate.joinQuery(authThirds);

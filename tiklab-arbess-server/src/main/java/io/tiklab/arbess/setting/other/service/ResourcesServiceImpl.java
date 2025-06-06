@@ -104,7 +104,7 @@ public class ResourcesServiceImpl implements ResourcesService {
     public List<Resources> findAllResources(){
         List<Resources> allResources = resourcesDao.findAllResources();
         if (allResources == null || allResources.isEmpty()){
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
         return resourcesDao.findAllResources();
     }

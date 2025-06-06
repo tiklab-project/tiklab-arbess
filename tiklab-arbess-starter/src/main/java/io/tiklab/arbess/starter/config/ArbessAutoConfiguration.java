@@ -40,7 +40,7 @@ import org.springframework.context.annotation.Configuration;
 @EnableDcsClient
 @EnableDcsServer
 @EnableDsm
-// @EnableRpc
+@EnableRpc
 //用户中心
 @EnableUserServer
 @EnableUserClient

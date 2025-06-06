@@ -60,7 +60,7 @@ public class CacheServiceImpl implements CacheService {
     public List<Cache> findAllCathe(){
         List<CacheEntity> cacheEntityList = cacheDao.findAllCathe();
         if (Objects.isNull(cacheEntityList)){
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
         List<Cache> caches = BeanMapper.mapList(cacheEntityList, Cache.class);
         Cache cache = caches.get(0);

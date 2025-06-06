@@ -12,6 +12,7 @@ import io.tiklab.dal.jpa.criterial.conditionbuilder.QueryBuilders;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -49,7 +50,7 @@ public class MavenTestDao {
     public List<MavenTest> findAllMavenTest() {
         List<MavenTestEntity> testEntityList = jpaTemplate.findAll(MavenTestEntity.class);
         if (testEntityList == null || testEntityList.isEmpty()){
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
         return BeanMapper.mapList(testEntityList,MavenTest.class);
     }
@@ -64,7 +65,7 @@ public class MavenTestDao {
         List<MavenTestEntity> mavenTestEntityList = jpaTemplate.findList(queryCondition, MavenTestEntity.class);
 
         if (Objects.isNull(mavenTestEntityList) || mavenTestEntityList.isEmpty()){
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
 
         return BeanMapper.mapList(mavenTestEntityList,MavenTest.class);
@@ -87,7 +88,7 @@ public class MavenTestDao {
         List<MavenTestEntity> dataList = mavenTestEntityPage.getDataList();
 
         if (Objects.isNull(dataList) || dataList.isEmpty()){
-            return PaginationBuilder.build(mavenTestEntityPage,Collections.emptyList());
+            return PaginationBuilder.build(mavenTestEntityPage,new ArrayList<>());
         }
         List<MavenTest> mavenTestList = BeanMapper.mapList(dataList, MavenTest.class);
 

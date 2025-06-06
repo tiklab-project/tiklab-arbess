@@ -22,6 +22,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component
 public class TaskInitPrivilege implements TiklabApplicationRunner {
@@ -56,7 +57,7 @@ public class TaskInitPrivilege implements TiklabApplicationRunner {
         String[] privilegeList = new String[]{"66660f6c591d","77770f6c591d","88880f6c591d"};
 
         List<Pipeline> allPipeline = pipelineService.findAllPipeline();
-        List<String> PipleineIdList = allPipeline.stream().map(Pipeline::getId).toList();
+        List<String> PipleineIdList = allPipeline.stream().map(Pipeline::getId).collect(Collectors.toList());
 
         for (String pipelineId : PipleineIdList) {
             DmRoleQuery dmRoleQuery = new DmRoleQuery();
@@ -91,7 +92,7 @@ public class TaskInitPrivilege implements TiklabApplicationRunner {
                 List<RoleFunction> list = roleFunctionList.stream()
                         .filter(a -> !Objects.isNull(a.getFunction()))
                         .filter(a -> a.getFunction().getId().equals(s))
-                        .toList();
+                        .collect(Collectors.toList());
                 if (!list.isEmpty()){
                     continue;
                 }

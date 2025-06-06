@@ -10,6 +10,7 @@ import io.tiklab.dal.jpa.criterial.conditionbuilder.QueryBuilders;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -42,7 +43,7 @@ public class SourceFareScanDao {
     public List<SourceFareScanEntity> findAllSourceFareScan() {
         List<SourceFareScanEntity> scanEntityList = jpaTemplate.findAll(SourceFareScanEntity.class);
         if (scanEntityList == null || scanEntityList.isEmpty()){
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
         return scanEntityList;
     }
@@ -56,7 +57,7 @@ public class SourceFareScanDao {
         List<SourceFareScanEntity> scanEntityList = jpaTemplate.findList(queryCondition, SourceFareScanEntity.class);
 
         if (scanEntityList == null || scanEntityList.isEmpty()){
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
         return scanEntityList;
     }
@@ -65,7 +66,7 @@ public class SourceFareScanDao {
         List<SourceFareScanEntity> scanEntityList = jpaTemplate.findList(idList, SourceFareScanEntity.class);
 
         if (scanEntityList == null || scanEntityList.isEmpty()){
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
         return scanEntityList;
     }
@@ -79,7 +80,7 @@ public class SourceFareScanDao {
         Pagination<SourceFareScanEntity> scanEntityPagination = jpaTemplate.findPage(queryCondition, SourceFareScanEntity.class);
         List<SourceFareScanEntity> dataList = scanEntityPagination.getDataList();
         if (Objects.isNull(dataList) || dataList.isEmpty()){
-            return PaginationBuilder.build(scanEntityPagination,Collections.emptyList());
+            return PaginationBuilder.build(scanEntityPagination,new ArrayList<>());
         }
 
         return PaginationBuilder.build(scanEntityPagination,dataList);

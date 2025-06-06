@@ -109,6 +109,9 @@ public class ArbessDsmAutoConfiguration {
         dsmConfig.newVersion("1.0.26", new String[]{
                 "pip-project_1.0.26",
         });
+        dsmConfig.newVersion("1.0.27", new String[]{
+                "pip-project_1.0.27",
+        });
         dsmConfig.newVersion("1.1.0", new String[]{
                 "user_1.1.0",
                 "pip-task_1.1.0",

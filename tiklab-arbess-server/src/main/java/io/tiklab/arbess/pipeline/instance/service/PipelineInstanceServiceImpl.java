@@ -146,7 +146,16 @@ public class PipelineInstanceServiceImpl implements PipelineInstanceService {
 
     @Override
     public void updateInstance(PipelineInstance pipelineInstance) {
-        pipelineInstanceDao.updateInstance(BeanMapper.map(pipelineInstance, PipelineInstanceEntity.class));
+
+        String runLog = pipelineInstance.getRunLog();
+        if (StringUtils.isEmpty(runLog)){
+            PipelineInstance instanceNoQuery = findOneInstanceNoQuery(pipelineInstance.getInstanceId());
+            if (!StringUtils.isEmpty(instanceNoQuery.getRunLog()) && StringUtils.isEmpty(pipelineInstance.getRunLog())){
+                pipelineInstance.setRunLog(instanceNoQuery.getRunLog());
+            }
+        }
+        PipelineInstanceEntity instance = BeanMapper.map(pipelineInstance, PipelineInstanceEntity.class);
+        pipelineInstanceDao.updateInstance(instance);
     }
 
     @Override
@@ -173,7 +182,7 @@ public class PipelineInstanceServiceImpl implements PipelineInstanceService {
     public List<PipelineInstance> findPipelineAllInstance(String pipelineId) {
         List<PipelineInstanceEntity> list = pipelineInstanceDao.findAllInstance(pipelineId);
         if (Objects.isNull(list)){
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
         List<PipelineInstance> allInstance = BeanMapper.mapList(list, PipelineInstance.class);
         allInstance.sort(Comparator.comparing(PipelineInstance::getCreateTime,Comparator.reverseOrder()));
@@ -184,7 +193,7 @@ public class PipelineInstanceServiceImpl implements PipelineInstanceService {
     public List<PipelineInstance> findUserPipelineInstance(String userId,Integer limit){
         List<PipelineInstanceEntity> instanceEntityList = pipelineInstanceDao.findUserPipelineInstance(userId, limit);
         if (instanceEntityList.isEmpty()){
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
         return BeanMapper.mapList(instanceEntityList,PipelineInstance.class);
     }
@@ -222,7 +231,7 @@ public class PipelineInstanceServiceImpl implements PipelineInstanceService {
     public List<PipelineInstance> findPipelineInstanceList(PipelineInstanceQuery pipelineInstanceQuery){
         List<PipelineInstanceEntity> instanceList = pipelineInstanceDao.findInstanceList(pipelineInstanceQuery);
         if (instanceList == null || instanceList.isEmpty()){
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
         return BeanMapper.mapList(instanceList,PipelineInstance.class);
 
@@ -278,16 +287,16 @@ public class PipelineInstanceServiceImpl implements PipelineInstanceService {
     public List<PipelineInstance> findInstanceByTime(String pipelineId,String[] queryTime){
        List<PipelineInstanceEntity> instanceEntityList = pipelineInstanceDao.findInstanceByTime(pipelineId,queryTime);
        if (instanceEntityList.isEmpty()){
-           return Collections.emptyList();
+           return new ArrayList<>();
        }
        return BeanMapper.mapList(instanceEntityList,PipelineInstance.class);
     }
 
     @Override
-    public List<PipelineInstance> findInstanceByTime(String[] queryTime){
-        List<PipelineInstanceEntity> instanceEntityList = pipelineInstanceDao.findInstanceByTime(queryTime);
+    public List<PipelineInstance> findInstanceByTime(String[] queryTime,String[] pipelineIdList){
+        List<PipelineInstanceEntity> instanceEntityList = pipelineInstanceDao.findInstanceByTime(queryTime,pipelineIdList);
         if (instanceEntityList.isEmpty()){
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
         return BeanMapper.mapList(instanceEntityList,PipelineInstance.class);
     }

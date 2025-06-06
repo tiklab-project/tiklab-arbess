@@ -48,3 +48,6 @@ create table pip_task_code_scan_sourcefare (
     notice_trouble int,
     suggest_trouble int
 );
+
+ALTER TABLE pip_task_pull_artifact
+ALTER COLUMN remote_address TYPE VARCHAR(255);

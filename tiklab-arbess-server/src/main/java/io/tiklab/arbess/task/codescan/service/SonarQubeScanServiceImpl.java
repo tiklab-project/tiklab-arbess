@@ -11,10 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Service
 public class SonarQubeScanServiceImpl implements SonarQubeScanService {
@@ -55,7 +52,7 @@ public class SonarQubeScanServiceImpl implements SonarQubeScanService {
     public List<SonarQubeScan> findAllSonarQubeScan() {
         List<SonarQubeScanEntity> scanEntityList = sonarQubeScanDao.findAllSonarQubeScan();
         if (scanEntityList == null || scanEntityList.isEmpty()){
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
         return BeanMapper.mapList(scanEntityList,SonarQubeScan.class);
     }
@@ -66,7 +63,7 @@ public class SonarQubeScanServiceImpl implements SonarQubeScanService {
         List<SonarQubeScanEntity> scanEntityList = sonarQubeScanDao.findSonarQubeScanList(scanQuery);
 
         if (scanEntityList == null || scanEntityList.isEmpty()){
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
         return BeanMapper.mapList(scanEntityList,SonarQubeScan.class);
     }
@@ -76,7 +73,7 @@ public class SonarQubeScanServiceImpl implements SonarQubeScanService {
         List<SonarQubeScanEntity> scanEntityList = sonarQubeScanDao.findSonarQubeScanList(idList);
 
         if (scanEntityList == null || scanEntityList.isEmpty()){
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
         return BeanMapper.mapList(scanEntityList,SonarQubeScan.class);
     }
@@ -86,7 +83,7 @@ public class SonarQubeScanServiceImpl implements SonarQubeScanService {
         Pagination<SonarQubeScanEntity> scanEntityPagination = sonarQubeScanDao.findSonarQubeScanPage(scanQuery);
         List<SonarQubeScanEntity> dataList = scanEntityPagination.getDataList();
         if (Objects.isNull(dataList) || dataList.isEmpty()){
-            return PaginationBuilder.build(scanEntityPagination,Collections.emptyList());
+            return PaginationBuilder.build(scanEntityPagination,new ArrayList<>());
         }
 
         List<SonarQubeScan> summaryList = BeanMapper.mapList(dataList, SonarQubeScan.class);

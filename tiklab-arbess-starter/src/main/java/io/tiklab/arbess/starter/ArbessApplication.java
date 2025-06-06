@@ -1,7 +1,7 @@
 package io.tiklab.arbess.starter;
 
 import io.tiklab.arbess.starter.annotation.EnableArbess;
-import io.tiklab.core.property.PropertyAndYamlSourceFactory;
+import io.tiklab.toolkit.property.PropertyAndYamlSourceFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;

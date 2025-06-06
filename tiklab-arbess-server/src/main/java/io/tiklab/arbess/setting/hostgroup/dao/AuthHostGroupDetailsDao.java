@@ -9,6 +9,7 @@ import io.tiklab.dal.jpa.criterial.conditionbuilder.QueryBuilders;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -48,7 +49,7 @@ public class AuthHostGroupDetailsDao {
     public List<AuthHostGroupDetails> findAllHostGroupDetails() {
         List<AuthHostGroupDetailsEntity> scanEntityList = jpaTemplate.findAll(AuthHostGroupDetailsEntity.class);
         if (scanEntityList == null || scanEntityList.isEmpty()){
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
         return BeanMapper.mapList(scanEntityList,AuthHostGroupDetails.class);
     }
@@ -62,7 +63,7 @@ public class AuthHostGroupDetailsDao {
         List<AuthHostGroupDetailsEntity> scanEntityList = jpaTemplate.findList(queryCondition, AuthHostGroupDetailsEntity.class);
 
         if (scanEntityList == null || scanEntityList.isEmpty()){
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
         return BeanMapper.mapList(scanEntityList,AuthHostGroupDetails.class);
     }

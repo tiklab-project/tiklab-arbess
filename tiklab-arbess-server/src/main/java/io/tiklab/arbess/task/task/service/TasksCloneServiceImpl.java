@@ -23,8 +23,7 @@ import io.tiklab.arbess.task.codescan.model.TaskCodeScan;
 import io.tiklab.arbess.task.codescan.service.TaskCodeScanService;
 import io.tiklab.arbess.task.deploy.model.TaskDeploy;
 import io.tiklab.arbess.task.deploy.service.TaskDeployService;
-import io.tiklab.arbess.task.message.model.TaskMessageType;
-import io.tiklab.arbess.task.message.service.TaskMessageTypeService;
+import io.tiklab.arbess.support.message.service.TaskMessageTypeService;
 import io.tiklab.arbess.task.pullArtifact.model.TaskPullArtifact;
 import io.tiklab.arbess.task.pullArtifact.service.TaskPullArtifactService;
 import io.tiklab.arbess.task.script.model.TaskScript;
@@ -231,11 +230,11 @@ public class TasksCloneServiceImpl implements TasksCloneService {
                 task.setTaskId(cloneTaskId);
                 pullArtifactService.createPullArtifact(task);
             }
-            case PipelineFinal.TASK_TYPE_MESSAGE -> {
-                TaskMessageType task = messageTypeServer.findMessage(taskId);
-                task.setTaskId(cloneTaskId);
-                messageTypeServer.createMessage(task);
-            }
+            // case PipelineFinal.TASK_TYPE_MESSAGE -> {
+            //     TaskMessageType task = messageTypeServer.findMessage(taskId);
+            //     task.setTaskId(cloneTaskId);
+            //     messageTypeServer.createMessage(task);
+            // }
             case PipelineFinal.TASK_TYPE_SCRIPT   -> {
                 TaskScript task = scriptServer.findScript(taskId);
                 task.setTaskId(cloneTaskId);

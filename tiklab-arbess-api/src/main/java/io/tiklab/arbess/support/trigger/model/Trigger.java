@@ -1,5 +1,6 @@
 package io.tiklab.arbess.support.trigger.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.tiklab.arbess.pipeline.definition.model.Pipeline;
 import io.tiklab.toolkit.beans.annotation.Mapper;
 import io.tiklab.toolkit.beans.annotation.Mapping;
@@ -7,6 +8,7 @@ import io.tiklab.toolkit.beans.annotation.Mappings;
 import io.tiklab.toolkit.join.annotation.Join;
 import io.tiklab.toolkit.join.annotation.JoinQuery;
 
+import java.sql.Timestamp;
 
 
 /**
@@ -17,98 +19,99 @@ import io.tiklab.toolkit.join.annotation.JoinQuery;
 @Mapper
 public class Trigger {
 
-    //@ApiProperty(name = "triggerId",desc="id")
-    private String triggerId;
+    private String id;
 
-    //@ApiProperty(name = "name",desc="名称")
-    private String name;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Timestamp createTime;
 
-    //@ApiProperty(name = "taskType",desc="类型 81:定时任务")
-    private int taskType;
+    // 流水线id
+    private String pipelineId;
 
-    //@ApiProperty(name = "createTime",desc="创建时间")
-    private String createTime;
+    // 执行类型 1 定时 2 周期
+    private Integer  execType;
 
-    //流水线
-    //@ApiProperty(name="pipeline",desc="流水线id",eg="@selectOne")
-    @Mappings({
-            @Mapping(source = "pipeline.id",target = "pipelineId")
-    })
-    @JoinQuery(key = "id")
-    private Pipeline pipeline;
+    // 触发表达式
+    private String cron;
 
+    // 周几 1~7
+    private Integer weekTime;
 
-    //@ApiProperty(name="taskSort",desc="顺序")
-    private int taskSort;
+    // 具体时间 10:00
+    private String data;
 
-    //@ApiProperty(name="values",desc="更改的数据")
-    private Object values;
+    // 状态 1 开启 2 未开启
+    private Integer status;
 
-    // 状态 1--未执行 2--已执行
-    private String state;
-
-    public String getState() {
-        return state;
+    public Integer getExecType() {
+        return execType;
     }
 
-    public Trigger setState(String state) {
-        this.state = state;
+    public Trigger setExecType(Integer execType) {
+        this.execType = execType;
         return this;
     }
 
-    public String getTriggerId() {
-        return triggerId;
+
+    public Integer getStatus() {
+        return status;
     }
 
-    public void setTriggerId(String triggerId) {
-        this.triggerId = triggerId;
+    public Trigger setStatus(Integer status) {
+        this.status = status;
+        return this;
     }
 
-    public String getName() {
-        return name;
+    public String getId() {
+        return id;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public Trigger setId(String id) {
+        this.id = id;
+        return this;
     }
 
-    public int getTaskType() {
-        return taskType;
-    }
-
-    public void setTaskType(int taskType) {
-        this.taskType = taskType;
-    }
-
-    public String getCreateTime() {
+    public Timestamp getCreateTime() {
         return createTime;
     }
 
-    public void setCreateTime(String createTime) {
+    public Trigger setCreateTime(Timestamp createTime) {
         this.createTime = createTime;
+        return this;
     }
 
-    public Pipeline getPipeline() {
-        return pipeline;
+    public String getPipelineId() {
+        return pipelineId;
     }
 
-    public void setPipeline(Pipeline pipeline) {
-        this.pipeline = pipeline;
+    public Trigger setPipelineId(String pipelineId) {
+        this.pipelineId = pipelineId;
+        return this;
     }
 
-    public int getTaskSort() {
-        return taskSort;
+    public String getCron() {
+        return cron;
     }
 
-    public void setTaskSort(int taskSort) {
-        this.taskSort = taskSort;
+    public Trigger setCron(String cron) {
+        this.cron = cron;
+        return this;
     }
 
-    public Object getValues() {
-        return values;
+    public Integer getWeekTime() {
+        return weekTime;
     }
 
-    public void setValues(Object values) {
-        this.values = values;
+    public Trigger setWeekTime(Integer weekTime) {
+        this.weekTime = weekTime;
+        return this;
+    }
+
+    public String getData() {
+        return data;
+    }
+
+    public Trigger setData(String data) {
+        this.data = data;
+        return this;
     }
 }

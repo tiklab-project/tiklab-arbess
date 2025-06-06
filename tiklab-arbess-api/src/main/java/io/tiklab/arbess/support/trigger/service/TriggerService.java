@@ -18,27 +18,25 @@ public interface TriggerService {
      String createTrigger(Trigger trigger);
 
     /**
-     * 查询所有配置
-     * @param triggerQuery 流水线id
+     * 更新定时任务
+     * @param triggerId 定时id
      * @return 配置列表
      */
-    List<Object> findAllTrigger(TriggerQuery triggerQuery);
+    void updateTrigger(String triggerId);
 
 
+    /**
+     * 克隆定时任务
+     * @param pipelineId 流水线id
+     * @param clonePipelineId 克隆流水线id
+     */
     void cloneTrigger(String pipelineId,String clonePipelineId);
 
     /**
-     * 删除流水线所有定时任务
+     * 删除流水线定时任务
      * @param pipelineId 流水线id
      */
-    void deleteAllTrigger(String pipelineId);
-
-
-    /**
-     * 更新单个定时任务
-     * @param pipelineId 定时任务id
-     */
-    void updateTrigger(String triggerId);
+    void deletePipelineTrigger(String pipelineId);
 
     /**
      * 更新配置信息
@@ -48,11 +46,17 @@ public interface TriggerService {
 
     /**
      * 根据流水线id查询触发器配置
+     * @param pipelineId 流水线id
+     * @return 配置
+     */
+    Trigger findPipelineTrigger(String pipelineId);
+
+    /**
+     * 根据流水线id查询触发器配置
      * @param triggerQuery 流水线id
      * @return 配置
      */
      List<Trigger> findTriggerList(TriggerQuery triggerQuery) ;
-
 
     /**
      * 删除单个定时任务
@@ -74,13 +78,12 @@ public interface TriggerService {
      */
     Trigger findOneTriggerById(String triggerId);
 
-
     /**
      * 根据ID列表查询配置
      * @param idList 配置ID列表
      * @return 配置列表
      */
-    List<Trigger> findAllTriggerConfigList(List<String> idList) ;
+    List<Trigger> findTriggerList(List<String> idList) ;
 
 }
 

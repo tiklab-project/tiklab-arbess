@@ -7,6 +7,7 @@ import io.tiklab.arbess.support.condition.entity.ConditionEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -39,7 +40,7 @@ public class ConditionDao {
         List<ConditionEntity> conditionEntities = jpaTemplate.findAll(ConditionEntity.class);
         List<Condition> conditionList = BeanMapper.mapList(conditionEntities, Condition.class);
         if (conditionList == null ){
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
         return conditionList;
     };

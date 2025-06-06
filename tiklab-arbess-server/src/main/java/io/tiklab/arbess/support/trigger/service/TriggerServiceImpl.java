@@ -1,20 +1,24 @@
 package io.tiklab.arbess.support.trigger.service;
 
-import com.alibaba.fastjson.JSON;
 import io.tiklab.arbess.support.trigger.dao.TriggerDao;
 import io.tiklab.arbess.support.trigger.entity.TriggerEntity;
+import io.tiklab.arbess.support.trigger.model.*;
+import io.tiklab.arbess.support.trigger.quartz.Job;
+import io.tiklab.arbess.support.trigger.quartz.RunJob;
+import io.tiklab.core.exception.ApplicationException;
 import io.tiklab.toolkit.beans.BeanMapper;
 import io.tiklab.toolkit.join.JoinTemplate;
-import io.tiklab.arbess.pipeline.definition.model.Pipeline;
-import io.tiklab.arbess.support.trigger.model.TriggerQuery;
-import io.tiklab.arbess.support.trigger.model.TriggerTime;
-import io.tiklab.arbess.support.trigger.model.Trigger;
-import io.tiklab.arbess.support.util.util.PipelineUtil;
 import io.tiklab.rpc.annotation.Exporter;
+import org.quartz.SchedulerException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
 import java.util.*;
+
+import static io.tiklab.arbess.support.util.util.PipelineFinal.DEFAULT;
 
 @Service
 @Exporter
@@ -25,10 +29,11 @@ public class TriggerServiceImpl implements TriggerService {
 
     @Autowired
     JoinTemplate joinTemplate;
-    
-    @Autowired
-    TriggerTimeService timeServer;
 
+    @Autowired
+    Job manager;
+
+    private final Logger logger = LoggerFactory.getLogger(TriggerServiceImpl.class);
 
     /**
      * 创建配置及任务
@@ -37,188 +42,137 @@ public class TriggerServiceImpl implements TriggerService {
      */
     @Override
     public String createTrigger(Trigger trigger) {
-        trigger.setCreateTime(PipelineUtil.date(1));
-        String triggerId = createTriggerConfig(trigger);
-        int taskType = trigger.getTaskType();
-        String pipelineId = trigger.getPipeline().getId();
-        if (taskType == 81){
-            String object = JSON.toJSONString(trigger.getValues());
-            TriggerTime triggerTime = JSON.parseObject(object, TriggerTime.class);
-            List<Integer> timeList = triggerTime.getTimeList();
-            for (Integer integer : timeList) {
-                triggerTime.setDayTime(integer);
-                triggerTime.setTriggerId(triggerId);
-                timeServer.createTriggerTime(triggerTime,pipelineId);
-            }
+        trigger.setCreateTime(new Timestamp(System.currentTimeMillis()));
+        String cron = CronUtils.weekCron(trigger.getData(), trigger.getWeekTime());
+        trigger.setCron(cron);
+
+        TriggerEntity triggerEntity = BeanMapper.map(trigger, TriggerEntity.class);
+        String triggerId = triggerDao.createTrigger(triggerEntity);
+
+        if (trigger.getStatus() == 2){
+            return triggerId;
+        }
+
+        TriggerJob triggerJob = new TriggerJob()
+                .setTriggerId(triggerId)
+                .setCron(cron)
+                .setJobClass(RunJob.class)
+                .setPipelineId(trigger.getPipelineId())
+                .setGroup(DEFAULT);
+        try {
+            manager.addJob(triggerJob);
+        } catch (SchedulerException e) {
+            e.printStackTrace();
+            throw new ApplicationException(50001,"当前时间已经添加过，无需重复添加。");
         }
         return triggerId;
-    }
-
-    @Override
-    public List<Object> findAllTrigger(TriggerQuery triggerQuery){
-        List<Trigger> triggerList = findTriggerList(triggerQuery);
-        if (triggerList.isEmpty()){
-            return Collections.emptyList();
-        }
-        List<TriggerTime> triggerTimeList = new ArrayList<>();
-        for (Trigger trigger : triggerList) {
-            String triggerId = trigger.getTriggerId();
-            TriggerTime triggerTime = timeServer.findTriggerTime(triggerId);
-            if (triggerTime == null){
-                deleteTrigger(trigger.getTriggerId());
-                continue;
-            }
-            int taskType = trigger.getTaskType();
-            triggerTime.setType(taskType);
-            triggerTime.setState(trigger.getState());
-            triggerTimeList.add(triggerTime);
-        }
-
-        triggerTimeList.sort(Comparator.comparing(TriggerTime::getWeekTime));
-
-        return new ArrayList<>(triggerTimeList);
     }
 
     @Override
     public void cloneTrigger(String pipelineId,String clonePipelineId){
         TriggerQuery triggerQuery = new TriggerQuery();
         triggerQuery.setPipelineId(pipelineId);
-        List<Trigger> allTrigger = findTriggerList(triggerQuery);
-        if (allTrigger.isEmpty()){
-            return;
+        List<Trigger> triggerList = findTriggerList(triggerQuery);
+        for (Trigger trigger : triggerList) {
+            trigger.setPipelineId(clonePipelineId);
+            createTrigger(trigger);
         }
-        for (Trigger trigger : allTrigger) {
-            String triggerId = trigger.getTriggerId();
-            trigger.setPipeline(new Pipeline(clonePipelineId));
-            TriggerEntity triggerEntity = BeanMapper.map(trigger, TriggerEntity.class);
-            String triggerEntityId = triggerDao.createTrigger(triggerEntity);
-
-            TriggerTime triggerTime = timeServer.findTriggerTime(triggerId);
-            List<Integer> timeList = triggerTime.getTimeList();
-            for (Integer integer : timeList) {
-                triggerTime.setDayTime(integer);
-                triggerTime.setTriggerId(triggerEntityId);
-                timeServer.createTriggerTime(triggerTime,clonePipelineId);
-            }
-        }
-
     }
 
-    /**
-     * 删除流水线所有定时任务
-     * @param pipelineId 流水线id
-     */
     @Override
-    public void deleteAllTrigger(String pipelineId){
+    public void deletePipelineTrigger(String pipelineId){
         TriggerQuery triggerQuery = new TriggerQuery();
         triggerQuery.setPipelineId(pipelineId);
-        List<Trigger> allTriggerConfig = findTriggerList(triggerQuery);
-        if ( allTriggerConfig.isEmpty()){
-            return;
-        }
-        for (Trigger trigger : allTriggerConfig) {
-            String triggerId = trigger.getTriggerId();
-            deleteTrigger(triggerId);
-            timeServer.deleteAllTime(triggerId,pipelineId);
+        List<Trigger> triggerList = findTriggerList(triggerQuery);
+        for (Trigger trigger : triggerList) {
+            deleteTrigger(trigger.getId());
         }
     }
-
-    /**
-     * 更新定时任务
-     */
-    @Override
-    public void updateTrigger(String triggerId){
-
-        // List<TriggerTime> triggerTimeList = timeServer.fondCronTimeList(cron);
-        // if (triggerTimeList.isEmpty()){
-        //     return;
-        // }
-        // List<TriggerTime> timeList = triggerTimeList.stream()
-        //         .filter(triggerTime -> {
-        //     String triggerId = triggerTime.getTriggerId();
-        //     Trigger trigger = findOneTriggerById(triggerId);
-        //     String id = trigger.getPipeline().getId();
-        //     return id.equals(pipelineId);
-        // }).toList();
-        //
-        // if (timeList.isEmpty()){
-        //     return;
-        // }
-
-        // String triggerId = timeList.get(0).getTriggerId();
-
-        boolean b = true;
-        List<TriggerTime> allTriggerTime = timeServer.findAllTriggerTime(triggerId);
-        for (TriggerTime time : allTriggerTime) {
-            String weekTime = CronUtils.weekTime(time.getCron());
-            Date date = PipelineUtil.StringChengeDate(weekTime);
-
-            if (date.getTime() < new Date().getTime()){
-                continue;
-            }
-            b = false;
-        }
-        if (b){
-            Trigger trigger = findOneTriggerById(triggerId);
-            System.out.println("更新状态："+trigger.getState() + " 更新ID：" + trigger.getTriggerId());
-            TriggerEntity triggerEntity = BeanMapper.map(trigger.setState("2"), TriggerEntity.class);
-            triggerDao.updateTrigger(triggerEntity);
-        }
-    }
-
 
     @Override
     public void updateTrigger(Trigger trigger){
-        String triggerId = trigger.getTriggerId();
-        if (triggerId == null){
-            triggerId = createTrigger(trigger);
+        String triggerId = trigger.getId();
+        Trigger oldTrigger = findOneTriggerById(triggerId);
+        String pipelineId = oldTrigger.getPipelineId();
+        String oldCron = oldTrigger.getCron();
+        String triggerName = pipelineId + "_" + oldCron + "_" + triggerId;
+        manager.removeJob(DEFAULT,triggerName);
+
+        if (trigger.getStatus() == 2){
+            triggerDao.updateTrigger(BeanMapper.map(trigger, TriggerEntity.class));
+            return;
         }
-        trigger.setTriggerId(triggerId);
 
-        int taskType = trigger.getTaskType();
-        Pipeline pipeline = trigger.getPipeline();
-        String pipelineId = pipeline.getId();
-        String object = JSON.toJSONString(trigger.getValues());
-        if (taskType == 81){
-            TriggerTime triggerTime = JSON.parseObject(object, TriggerTime.class);
-            if (Objects.isNull(triggerTime)){
-                return;
-            }
-            triggerTime.setTriggerId(triggerId);
-            timeServer.deleteAllTime(triggerId,pipelineId);
-
-            List<Integer> timeList = triggerTime.getTimeList();
-            for (Integer integer : timeList) {
-                triggerTime.setDayTime(integer);
-                timeServer.createTriggerTime(triggerTime,pipelineId);
-            }
-
+        String newCron = CronUtils.weekCron(trigger.getData(), trigger.getWeekTime());
+        TriggerJob triggerJob = new TriggerJob()
+                .setCron(newCron)
+                .setTriggerId(triggerId)
+                .setJobClass(RunJob.class)
+                .setPipelineId(trigger.getPipelineId())
+                .setGroup(DEFAULT);
+        try {
+            manager.addJob(triggerJob);
+        } catch (SchedulerException e) {
+            e.printStackTrace();
+            throw new ApplicationException(50001,"当前时间已经添加过，无需重复添加。");
         }
+        trigger.setCron(newCron);
+
+        triggerDao.updateTrigger(BeanMapper.map(trigger, TriggerEntity.class));
     }
 
-    /**
-     * 根据流水线id查询触发器配置
-     * @param triggerQuery 条件
-     * @return 配置
-     */
+    @Override
+    public Trigger findPipelineTrigger(String pipelineId){
+        TriggerQuery triggerQuery = new TriggerQuery();
+        triggerQuery.setPipelineId(pipelineId);
+        List<Trigger> triggerList = findTriggerList(triggerQuery);
+        if (triggerList.isEmpty()){
+            Trigger trigger = new Trigger();
+            trigger.setPipelineId(pipelineId);
+            trigger.setExecType(1);
+            trigger.setWeekTime(1);
+            trigger.setData("02:00");
+            trigger.setStatus(2);
+            createTrigger(trigger);
+        }
+        return triggerList.get(0);
+    }
+
+    @Override
+    public void updateTrigger(String triggerId){
+        Trigger trigger = findOneTriggerById(triggerId);
+        if (trigger.getExecType() == 1){
+            return;
+        }
+
+        String cron = CronUtils.toCron(trigger.getCron(), 7);
+        trigger.setCron(cron);
+        TriggerJob triggerJob = new TriggerJob()
+                .setJobClass(RunJob.class)
+                .setCron(cron)
+                .setTriggerId(triggerId)
+                .setPipelineId(trigger.getPipelineId())
+                .setGroup(DEFAULT);
+        try {
+            manager.addJob(triggerJob);
+        } catch (SchedulerException e) {
+            e.printStackTrace();
+            throw new ApplicationException(50001,"当前时间已经添加过，无需重复添加。");
+        }
+
+        triggerDao.updateTrigger(BeanMapper.map(trigger, TriggerEntity.class));
+    }
+
     @Override
     public List<Trigger> findTriggerList(TriggerQuery triggerQuery) {
         List<TriggerEntity> triggerEntityList = triggerDao.findTriggerList(triggerQuery);
-
-        if ( triggerEntityList.isEmpty()){
-            return Collections.emptyList();
+        if (triggerEntityList.isEmpty()){
+            return new ArrayList<>();
         }
-
         return BeanMapper.mapList(triggerEntityList, Trigger.class);
     }
 
-    //创建
-    public String createTriggerConfig(Trigger trigger){
-        TriggerEntity configEntity = BeanMapper.map(trigger, TriggerEntity.class);
-        return triggerDao.createTrigger(configEntity);
-    }
-
-    
+    @Override
     public Trigger findOneTriggerById(String triggerId) {
         TriggerEntity triggerConfigEntity = triggerDao.findOneTrigger(triggerId);
         Trigger trigger = BeanMapper.map(triggerConfigEntity, Trigger.class);
@@ -228,20 +182,18 @@ public class TriggerServiceImpl implements TriggerService {
     
     @Override
     public void deleteTrigger(String triggerId) {
-        Trigger trigger = findOneTriggerById(triggerId);
-        String pipelineId = trigger.getPipeline().getId();
-        timeServer.deleteAllTime(triggerId,pipelineId);
         triggerDao.deleteTrigger(triggerId);
     }
 
-
     public List<Trigger> findAllTrigger() {
-        return BeanMapper.mapList(triggerDao.findAllTrigger(), Trigger.class);
+        List<TriggerEntity> allTrigger = triggerDao.findAllTrigger();
+        return BeanMapper.mapList(allTrigger, Trigger.class);
     }
 
     @Override
-    public List<Trigger> findAllTriggerConfigList(List<String> idList) {
-        return BeanMapper.mapList(triggerDao.findAllTriggerList(idList), Trigger.class);
+    public List<Trigger> findTriggerList(List<String> idList) {
+        List<TriggerEntity> triggerList = triggerDao.findTriggerList(idList);
+        return BeanMapper.mapList(triggerList, Trigger.class);
     }
 
 }

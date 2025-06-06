@@ -7,6 +7,21 @@ import io.tiklab.arbess.setting.host.service.AuthHostService;
 import io.tiklab.arbess.setting.auth.service.AuthService;
 import io.tiklab.arbess.setting.third.service.AuthThirdService;
 import io.tiklab.arbess.setting.tool.service.ScmService;
+import io.tiklab.arbess.support.condition.service.ConditionService;
+import io.tiklab.arbess.support.message.model.TaskMessage;
+import io.tiklab.arbess.support.message.model.TaskMessageQuery;
+import io.tiklab.arbess.support.message.service.TaskMessageService;
+import io.tiklab.arbess.support.postprocess.model.Postprocess;
+import io.tiklab.arbess.support.postprocess.service.PostprocessService;
+import io.tiklab.arbess.support.trigger.model.Trigger;
+import io.tiklab.arbess.support.trigger.model.TriggerQuery;
+import io.tiklab.arbess.support.trigger.service.TriggerService;
+import io.tiklab.arbess.support.variable.model.Variable;
+import io.tiklab.arbess.support.variable.model.VariableQuery;
+import io.tiklab.arbess.support.variable.service.VariableService;
+import io.tiklab.arbess.support.webHook.model.WebHook;
+import io.tiklab.arbess.support.webHook.model.WebHookQuery;
+import io.tiklab.arbess.support.webHook.service.PipelineWebHookServer;
 import io.tiklab.licence.appauth.service.ApplyAuthService;
 import io.tiklab.licence.licence.model.Version;
 import io.tiklab.licence.licence.service.VersionService;
@@ -23,6 +38,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -80,6 +96,19 @@ public class HomeCountServiceImpl implements HomeCountService {
     @Autowired
     AuthHostGroupService authHostGroupService;
 
+
+    @Autowired
+    PipelineWebHookServer webHookServer;
+
+    @Autowired
+    TriggerService triggerService;
+
+    @Autowired
+    VariableService variableService;
+
+    @Autowired
+    TaskMessageService taskMessageService;
+
     @Override
     public Map<String, Object> findCount(){
 
@@ -135,6 +164,46 @@ public class HomeCountServiceImpl implements HomeCountService {
 
         Integer hostGroupNumber = authHostGroupService.findHostGroupNumber();
         map.put("hostGroupNumber",hostGroupNumber);
+
+        return map;
+    }
+
+
+    @Override
+    public Map<String,Object> findPipelineCount(String pipelineId){
+        VariableQuery variableQuery = new VariableQuery();
+        variableQuery.setPipelineId(pipelineId);
+        variableQuery.setType(1);
+        List<Variable> variableList = variableService.findVariableList(variableQuery);
+
+        TaskMessageQuery taskMessageQuery = new TaskMessageQuery();
+        taskMessageQuery.setPipelineId(pipelineId);
+        taskMessageQuery.setType(1);
+        List<TaskMessage> taskMessageList = taskMessageService.findTaskMessageList(taskMessageQuery);
+
+        Map<String,Object> map = new HashMap<>();
+        map.put("massageNumber",taskMessageList.size());
+        map.put("variableNumber",variableList.size());
+
+        return map;
+    }
+
+    public Map<String,Object> findTaskCount(String pipelineId,String taskId){
+        VariableQuery variableQuery = new VariableQuery();
+        variableQuery.setPipelineId(pipelineId);
+        variableQuery.setType(2);
+        variableQuery.setTaskId(taskId);
+        List<Variable> variableList = variableService.findVariableList(variableQuery);
+
+        TaskMessageQuery taskMessageQuery = new TaskMessageQuery();
+        taskMessageQuery.setPipelineId(pipelineId);
+        taskMessageQuery.setType(2);
+        variableQuery.setTaskId(taskId);
+        List<TaskMessage> taskMessageList = taskMessageService.findTaskMessageList(taskMessageQuery);
+
+        Map<String,Object> map = new HashMap<>();
+        map.put("massageNumber",taskMessageList.size());
+        map.put("variableNumber",variableList.size());
 
         return map;
     }

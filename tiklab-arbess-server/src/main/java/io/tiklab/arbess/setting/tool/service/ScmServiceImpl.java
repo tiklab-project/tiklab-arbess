@@ -21,10 +21,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 import static io.tiklab.arbess.agent.util.PipelineFinal.*;
 
@@ -112,7 +109,7 @@ public class ScmServiceImpl implements ScmService {
     public List<Scm> findPipelineScmList(ScmQuery scmQuery) {
         List<ScmEntity> scmEntityList = scmDao.findPipelineScmList(scmQuery);
         if (Objects.isNull(scmEntityList) || scmEntityList.isEmpty()) {
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
         return BeanMapper.mapList(scmEntityList, Scm.class);
     }
@@ -123,7 +120,7 @@ public class ScmServiceImpl implements ScmService {
         Pagination<ScmEntity> scmEntityPage = scmDao.findPipelineScmPage(scmQuery);
         List<ScmEntity> scmEntityList = scmEntityPage.getDataList();
         if (Objects.isNull(scmEntityList) || scmEntityList.isEmpty()) {
-            return PaginationBuilder.build(scmEntityPage, Collections.emptyList());
+            return PaginationBuilder.build(scmEntityPage, new ArrayList<>());
         }
         List<Scm> scmList = BeanMapper.mapList(scmEntityList, Scm.class);
 

@@ -1,12 +1,17 @@
 package io.tiklab.arbess.support.trigger.service;
 
 import io.tiklab.arbess.support.trigger.model.TriggerTime;
+import io.tiklab.arbess.support.trigger.model.TriggerTimeQuery;
+import io.tiklab.core.page.Pagination;
 import io.tiklab.toolkit.join.annotation.FindAll;
 import io.tiklab.toolkit.join.annotation.FindList;
 import io.tiklab.toolkit.join.annotation.FindOne;
 import io.tiklab.toolkit.join.annotation.JoinProvider;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+
 /**
  * 流水线触发器时间服务接口
  */
@@ -21,57 +26,29 @@ public interface TriggerTimeService {
 
 
     /**
-     * 根据配置id查询消息类型
-     * @param triggerId 配置id
-     * @return 消息
+     * 定时任务执行后更新时间
+     * @param timeId timeId
      */
-    TriggerTime findTriggerTime(String triggerId);
-
+    void updateExecTriggerTime(String timeId,String pipelineId);
 
     /**
-     * 根据配置查询所有任务
-     * @param triggerId 配置id
-     * @return 任务集合
-     */
-    List<TriggerTime> findAllTriggerTime(String triggerId);
-
-
-    /**
-     * 查询cron时间列表
-     * @param cron cron表达式
-     * @return 时间列表
-     */
-    List<TriggerTime> fondCronTimeList(String cron);
-
-
-    /**
-     * 根据配置获取所有时间
-     * @param configId 配置id
-     * @return 时间集合
-     */
-    List<Integer> findAllDataConfig(String configId);
-
-    /**
-     * 删除当前配置下的的所有任务
+     * 一次流水线定时任务以及加载的队列
      * @param triggerId 配置id
      */
-    void deleteAllTime(String triggerId,String pipelineId);
+    void removeTriggerTime(String triggerId,String pipelineId);
 
-
-    /**
-     * 周期任务更新执行时间
-     * @param timeId 任务id
-     */
-    Boolean deleteCronTime(String pipelineId,String timeId);
 
     /**
      * 删除
      * @param timeId timeId
      */
-    void deleteTime(String timeId) ;
+    void deleteTriggerTime(String timeId) ;
 
-
-    void updateTime(TriggerTime triggerTime);
+    /**
+     * 更新时间信息
+     * @param triggerTime time信息
+     */
+    void updateTriggerTime(TriggerTime triggerTime);
 
     /**
      * 查询单个信息
@@ -79,14 +56,14 @@ public interface TriggerTimeService {
      * @return time信息
      */
     @FindOne
-    TriggerTime findOneTime(String timeId) ;
+    TriggerTime findTriggerTime(String timeId) ;
 
     /**
      * 查询所有信息
      * @return time信息集合
      */
     @FindAll
-    List<TriggerTime> findAllTime() ;
+    List<TriggerTime> findAllTriggerTime() ;
 
     /**
      * 根据ID列表查询时间
@@ -94,7 +71,23 @@ public interface TriggerTimeService {
      * @return 时间列表
      */
     @FindList
-    List<TriggerTime> findAllTimeList(List<String> idList);
-    
-    
+    List<TriggerTime> findTriggerTimeList(List<String> idList);
+
+    /**
+     * 根据查询条件查询时间
+     * @param query 查询条件
+     * @return 时间列表
+     */
+    List<TriggerTime> findTriggerTimeList(TriggerTimeQuery query);
+
+
+    /**
+     * 分页查询时间
+     * @param query 查询条件
+     * @return 时间列表
+     */
+    Pagination<TriggerTime> findTriggerTimePage(TriggerTimeQuery query);
+
+
+
 }

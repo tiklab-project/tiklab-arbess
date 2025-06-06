@@ -43,24 +43,14 @@ public class TriggerTime {
 
     private Integer dayTime;
 
-    //@ApiProperty(name="type",desc="类型")
-    private int type;
+    private String execStatus;
 
-    //@ApiProperty(name="name",desc="名称")
-    private String name;
-
-    /**
-     * 状态
-     */
-    private String state;
-
-    public String getState() {
-        return state;
+    public String getExecStatus() {
+        return execStatus;
     }
 
-    public TriggerTime setState(String state) {
-        this.state = state;
-        return this;
+    public void setExecStatus(String execStatus) {
+        this.execStatus = execStatus;
     }
 
     public Integer getDayTime() {
@@ -69,14 +59,6 @@ public class TriggerTime {
 
     public void setDayTime(Integer dayTime) {
         this.dayTime = dayTime;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public String getTimeId() {
@@ -125,14 +107,6 @@ public class TriggerTime {
 
     public void setTriggerId(String triggerId) {
         this.triggerId = triggerId;
-    }
-
-    public int getType() {
-        return type;
-    }
-
-    public void setType(int type) {
-        this.type = type;
     }
 
     public String getCron() {

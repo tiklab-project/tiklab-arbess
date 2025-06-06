@@ -11,10 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Service
 public class SourceFareScanServiceImpl implements SourceFareScanService {
@@ -55,7 +52,7 @@ public class SourceFareScanServiceImpl implements SourceFareScanService {
     public List<SourceFareScan> findAllSourceFareScan() {
         List<SourceFareScanEntity> scanEntityList = sourceFareScanDao.findAllSourceFareScan();
         if (scanEntityList == null || scanEntityList.isEmpty()){
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
         return BeanMapper.mapList(scanEntityList,SourceFareScan.class);
     }
@@ -66,7 +63,7 @@ public class SourceFareScanServiceImpl implements SourceFareScanService {
         List<SourceFareScanEntity> scanEntityList = sourceFareScanDao.findSourceFareScanList(scanQuery);
 
         if (scanEntityList == null || scanEntityList.isEmpty()){
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
         return BeanMapper.mapList(scanEntityList,SourceFareScan.class);
     }
@@ -76,7 +73,7 @@ public class SourceFareScanServiceImpl implements SourceFareScanService {
         List<SourceFareScanEntity> scanEntityList = sourceFareScanDao.findSourceFareScanList(idList);
 
         if (scanEntityList == null || scanEntityList.isEmpty()){
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
         return BeanMapper.mapList(scanEntityList,SourceFareScan.class);
     }
@@ -86,7 +83,7 @@ public class SourceFareScanServiceImpl implements SourceFareScanService {
         Pagination<SourceFareScanEntity> scanEntityPagination = sourceFareScanDao.findSourceFareScanPage(scanQuery);
         List<SourceFareScanEntity> dataList = scanEntityPagination.getDataList();
         if (Objects.isNull(dataList) || dataList.isEmpty()){
-            return PaginationBuilder.build(scanEntityPagination,Collections.emptyList());
+            return PaginationBuilder.build(scanEntityPagination,new ArrayList<>());
         }
 
         List<SourceFareScan> summaryList = BeanMapper.mapList(dataList, SourceFareScan.class);

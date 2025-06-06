@@ -10,10 +10,8 @@ import io.tiklab.dal.jpa.criterial.conditionbuilder.QueryBuilders;
 import io.tiklab.arbess.setting.hostgroup.model.AuthHostGroupQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+
+import java.util.*;
 
 /**
  * @author zcamy
@@ -50,7 +48,7 @@ public class AuthHostGroupDao {
     public List<AuthHostGroup> findAllHostGroup() {
         List<AuthHostGroupEntity> scanEntityList = jpaTemplate.findAll(AuthHostGroupEntity.class);
         if (scanEntityList == null || scanEntityList.isEmpty()){
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
         return BeanMapper.mapList(scanEntityList,AuthHostGroup.class);
     }
@@ -65,7 +63,7 @@ public class AuthHostGroupDao {
         List<AuthHostGroupEntity> scanEntityList = jpaTemplate.findList(queryCondition, AuthHostGroupEntity.class);
 
         if (scanEntityList == null || scanEntityList.isEmpty()){
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
         return BeanMapper.mapList(scanEntityList,AuthHostGroup.class);
     }

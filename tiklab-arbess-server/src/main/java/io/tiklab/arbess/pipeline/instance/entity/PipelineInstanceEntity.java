@@ -45,6 +45,17 @@ public class PipelineInstanceEntity {
     @Column(name = "find_number", notNull = true)
     private int findNumber;
 
+    //运行日志
+    @Column(name = "run_log")
+    private String runLog;
+
+    public String getRunLog() {
+        return runLog;
+    }
+
+    public void setRunLog(String runLog) {
+        this.runLog = runLog;
+    }
 
     public String getInstanceId() {
         return instanceId;

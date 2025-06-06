@@ -3,6 +3,8 @@ package io.tiklab.arbess.support.variable.service;
 import io.tiklab.arbess.support.util.util.PipelineUtil;
 import io.tiklab.arbess.support.variable.model.Variable;
 import io.tiklab.arbess.support.variable.model.VariableQuery;
+import io.tiklab.core.page.Pagination;
+import io.tiklab.core.page.PaginationBuilder;
 import io.tiklab.toolkit.beans.BeanMapper;
 import io.tiklab.arbess.support.variable.dao.VariableDao;
 import io.tiklab.arbess.support.variable.entity.VariableEntity;
@@ -19,19 +21,14 @@ public class VariableServiceImpl implements VariableService {
     VariableDao variableDao;
 
 
+    @Override
     public String replaceVariable(String pipelineId,String taskId,String order){
         Map<String , String > map = new HashMap<>();
-        //替换全局变量
-        List<Variable> allVariable = findAllVariable(pipelineId);
-        if (!allVariable.isEmpty()){
-            for (Variable variable : allVariable) {
-                String varKey = variable.getVarKey();
-                String varValue = variable.getVarValue();
-                map.put(varKey,varValue);
-            }
-        }
+
         //替换局部变量
-        List<Variable> variableList = findAllVariable(taskId);
+        VariableQuery variableQuery = new VariableQuery();
+        variableQuery.setTaskId(taskId);
+        List<Variable> variableList = findVariableList(variableQuery);
         if (!variableList.isEmpty()){
             for (Variable variable : variableList) {
                 String varValue = variable.getVarValue();
@@ -40,115 +37,75 @@ public class VariableServiceImpl implements VariableService {
             }
         }
 
+        //替换全局变量
+        variableQuery.setTaskId(null);
+        variableQuery.setPipelineId(pipelineId);
+        List<Variable> allVariable = findVariableList(variableQuery);
+        if (!allVariable.isEmpty()){
+            for (Variable variable : allVariable) {
+                String varKey = variable.getVarKey();
+                String varValue = variable.getVarValue();
+                map.put(varKey,varValue);
+            }
+        }
         StrSubstitutor substitutor = new StrSubstitutor(map);
         return substitutor.replace(order);
     }
 
     @Override
     public String createVariable(Variable variable) {
-        String taskType = variable.getVarType();
         variable.setCreateTime(PipelineUtil.date(1));
-        if (taskType.equals("single")){
-            String values = updateValues(variable.getValueList());
-            variable.setVarValues(values);
-        }
         return  variableDao.createVariable(variable);
     }
 
-    private String updateValues(List<String> list ){
-        StringBuilder values = new StringBuilder();
-        for (String s : list) {
-            if (!PipelineUtil.isNoNull(values.toString())){
-                values = new StringBuilder(s);
-            }else {
-                values.append(",").append(s);
-            }
-        }
-        return values.toString();
-    }
-
-    /**
-     * 删除变量
-     * @param varId 变量id
-     */
     @Override
     public void deleteVariable(String varId) {
         variableDao.deleteVariable(varId);
     }
 
-    /**
-     * 更新变量
-     * @param variable 变量信息
-     */
     @Override
     public void updateVariable(Variable variable) {
-        String taskType = variable.getVarType();
-        if (taskType.equals("single")){
-            String values = updateValues(variable.getValueList());
-            variable.setVarValues(values);
-        }
         variableDao.updateVariable(variable);
     }
 
-    /**
-     * 查询单个变量
-     * @param varId 变量id
-     * @return 变量信息
-     */
     @Override
     public Variable findOneVariable(String varId) {
         return variableDao.findOneVariable(varId);
     }
 
-    /**
-     * 查询所有变量
-     * @return 变量集合
-     */
+
+    @Override
     public List<Variable> findAllVariable() {
         List<Variable> allVariable = variableDao.findAllVariable();
         if (allVariable == null || allVariable.isEmpty()){
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
         return allVariable;
-    }
-
-    /**
-     * 查询流水线所有变量
-     * @param taskId 流水线id
-     * @return 变量
-     */
-    @Override
-    public List<Variable> findAllVariable(String taskId) {
-        List<Variable> allVariable = findAllVariable();
-        if (allVariable.isEmpty()){
-            return Collections.emptyList();
-        }
-        List<Variable> list = new ArrayList<>();
-        for (Variable variable : allVariable) {
-            String id = variable.getTaskId();
-            if (id == null ||!id.equals(taskId)){
-                continue;
-            }
-            if (variable.getVarType().equals("single")){
-                String values = variable.getVarValues();
-                String[] split = values.split(",");
-                List<String> stringList = new ArrayList<>(List.of(split));
-                variable.setValueList(stringList);
-            }
-            list.add(variable);
-        }
-        list.sort(Comparator.comparing(Variable::getCreateTime).reversed());
-        return list;
     }
 
     @Override
     public List<Variable> findVariableList(VariableQuery query){
         List<VariableEntity> variableList = variableDao.findVariableList(query);
         if (variableList == null || variableList.isEmpty()){
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
         return BeanMapper.mapList(variableList, Variable.class);
     }
+
+
+    @Override
+    public Pagination<Variable> findVariablePage(VariableQuery query){
+        Pagination<VariableEntity> variablePage = variableDao.findVariablePage(query);
+
+        List<VariableEntity> dataList = variablePage.getDataList();
+
+        if (dataList == null || dataList.isEmpty()){
+            return PaginationBuilder.build(variablePage, new ArrayList<>());
+        }
+        List<Variable> variables = BeanMapper.mapList(dataList, Variable.class);
+        return PaginationBuilder.build(variablePage,variables);
+    }
+
 
     @Override
     public void cloneVariable(String id,String cloneId){
