@@ -33,6 +33,18 @@ public class PipelineCountController {
         return Result.ok(runDayCounts);
     }
 
+    @RequestMapping(path="/findRunResultSpan",method = RequestMethod.POST)
+    public Result<List<PipelineDayResultCount>> findRunResultSpan(@RequestBody @NotNull @Valid PipelineRunCountQuery countQuery){
+        List<PipelineDayResultCount> runDayCounts = countService.findRunResultSpan(countQuery);
+        return Result.ok(runDayCounts);
+    }
+
+    @RequestMapping(path="/findRunNumberSpan",method = RequestMethod.POST)
+    public Result<List<PipelineDayResultCount>> findRunNumberSpan(@RequestBody @NotNull @Valid PipelineRunCountQuery countQuery){
+        PipelineDayNumberCount runDayCounts = countService.findRunNumberSpan(countQuery);
+        return Result.ok(runDayCounts);
+    }
+
     @RequestMapping(path="/findPipelineRunCount",method = RequestMethod.POST)
     public Result<List<PipelineRunCount>> findPipelineRunCount(@RequestBody @NotNull @Valid PipelineRunCountQuery countQuery){
         List<PipelineRunCount> runDayCounts = countService.findPipelineRunCount(countQuery);

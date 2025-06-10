@@ -26,15 +26,9 @@ public class PipelineQuery {
     @ApiProperty(name = "pipelineName",desc = "流水线名称")
     private String pipelineName;
 
-    /**
-     *  流水线状态 1.运行中 2.未运行,3.等待执行
-     */
     @ApiProperty(name = "pipelineState",desc = "流水线状态 1.运行中 2.未运行,3.等待执行")
     private Integer pipelineState;
 
-    /**
-     *  流水线类型 1.多任务 2.多阶段
-     */
     @ApiProperty(name = "pipelineType",desc = "流水线类型 1.多任务 2.多阶段")
     private Integer pipelineType;
 
@@ -49,12 +43,11 @@ public class PipelineQuery {
 
     private boolean eqName;
 
-    // 环境
+    @ApiProperty(name ="envId",desc = "应用Id")
     private String envId;
 
-    // 分组
+    @ApiProperty(name ="groupId",desc = "分组Id")
     private String groupId;
-
 
     @ApiProperty(name ="pageParam",desc = "分页参数")
     private Page pageParam= new Page();
@@ -62,6 +55,27 @@ public class PipelineQuery {
     @ApiProperty(name ="orderParams",desc = "排序参数")
     private List<Order> orderParams = OrderBuilders.instance().desc("name").get();
 
+    @ApiProperty(name ="username",desc = "用户名")
+    private String username;
+
+    @ApiProperty(name ="password",desc = "密码")
+    private String password;
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
 
     public String getCreateUserId() {
         return createUserId;

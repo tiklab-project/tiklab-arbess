@@ -49,7 +49,7 @@ INSERT INTO pip_task (task_id, create_time, stage_id, task_name, pipeline_id, ta
 
 -- 初始化任务详情
 INSERT INTO pip_task_code (task_id, code_name, code_address, code_branch, svn_file, auth_id, xcode_id, branch_id, house_id) VALUES
-  ('6c622862e172', 'https://gitee.com/tiklab-project/tiklab-arbess.git', 'https://gitee.com/tiklab-project/tiklab-arbess.git', 'master', NULL, NULL, NULL, NULL, NULL);
+  ('6c622862e172', 'https://gitee.com/tiklab-kanassProject/tiklab-arbess.git', 'https://gitee.com/tiklab-kanassProject/tiklab-arbess.git', 'master', NULL, NULL, NULL, NULL, NULL);
 
 INSERT INTO pip_task_code_scan (task_id, type, auth_id, project_name, open_assert, open_debug, scan_path, err_grade, scan_grade) VALUES
   ('d725c5e8214f', NULL, NULL, NULL, 'false', 'false', '${DEFAULT_CODE_ADDRESS}', 'default', 'default');

@@ -133,7 +133,9 @@ public class TriggerServiceImpl implements TriggerService {
             trigger.setWeekTime(1);
             trigger.setData("02:00");
             trigger.setStatus(2);
-            createTrigger(trigger);
+            String triggerId = createTrigger(trigger);
+            trigger.setId(triggerId);
+            return trigger;
         }
         return triggerList.get(0);
     }

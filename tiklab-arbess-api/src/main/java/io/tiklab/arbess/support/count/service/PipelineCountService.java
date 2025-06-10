@@ -25,6 +25,22 @@ public interface PipelineCountService {
      */
     List<PipelineDayCount> findRunTimeSpan(PipelineRunCountQuery countQuery);
 
+
+    /**
+     * 统计流水线最近运行次数统计
+     * @param countQuery 条件
+     * @return 运行次数统计
+     */
+    List<PipelineDayResultCount> findRunResultSpan(PipelineRunCountQuery countQuery);
+
+
+    /**
+     * 统计流水线最近运行次数
+     * @param countQuery 条件
+     * @return 运行次数
+     */
+    PipelineDayNumberCount findRunNumberSpan(PipelineRunCountQuery countQuery);
+
     /**
      * 统计流水线最近运行信息
      * @param countQuery 条件

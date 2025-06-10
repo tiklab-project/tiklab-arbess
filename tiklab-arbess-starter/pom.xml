@@ -439,8 +439,8 @@
                     <resources>
                         <resource>
                             <targetPath>./</targetPath>
-                            <directory>${project.build.directory}</directory>
-                            <include>${project.build.finalName}-distribution.tar.gz</include>
+                            <directory>${kanassProject.build.directory}</directory>
+                            <include>${kanassProject.build.finalName}-distribution.tar.gz</include>
                         </resource>
                     </resources>
                 </configuration>

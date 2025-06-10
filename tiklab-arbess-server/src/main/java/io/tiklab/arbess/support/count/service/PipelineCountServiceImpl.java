@@ -1,6 +1,8 @@
 package io.tiklab.arbess.support.count.service;
 
+import com.alibaba.fastjson.JSONObject;
 import io.tiklab.arbess.pipeline.definition.model.Pipeline;
+import io.tiklab.arbess.pipeline.definition.model.PipelineQuery;
 import io.tiklab.arbess.pipeline.definition.service.PipelineService;
 import io.tiklab.arbess.pipeline.instance.model.PipelineInstance;
 import io.tiklab.arbess.pipeline.instance.model.PipelineInstanceQuery;
@@ -10,9 +12,11 @@ import io.tiklab.arbess.support.count.model.*;
 import io.tiklab.arbess.support.count.model.*;
 import io.tiklab.arbess.support.util.util.PipelineFinal;
 import io.tiklab.arbess.support.util.util.PipelineUtil;
+import io.tiklab.core.page.Pagination;
 import io.tiklab.eam.common.context.LoginContext;
 import io.tiklab.security.logging.logging.service.LoggingService;
 import io.tiklab.security.logging.logging.service.LoggingTypeService;
+import io.tiklab.toolkit.join.JoinTemplate;
 import io.tiklab.user.user.model.User;
 import io.tiklab.user.user.service.UserService;
 import org.apache.commons.lang3.StringUtils;
@@ -46,6 +50,9 @@ public class PipelineCountServiceImpl implements PipelineCountService {
 
     @Autowired
     PipelineAuthorityService authorityService;
+
+    @Autowired
+    JoinTemplate joinTemplate;
 
     @Override
     public List<PipelineRunDayCount> findPipelineRunTimeSpan(PipelineRunCountQuery countQuery){
@@ -164,6 +171,104 @@ public class PipelineCountServiceImpl implements PipelineCountService {
             dayCountList.add(dayCount);
         }
         return dayCountList;
+    }
+
+    @Override
+    public List<PipelineDayResultCount> findRunResultSpan(PipelineRunCountQuery countQuery){
+
+        List<PipelineDayResultCount> dayCountList = new ArrayList<>();
+        String dayFormatted = findRecentDayFormatted(countQuery.getCountDay());
+        String dayFormat = findRecentDayFormatted(countQuery.getCountDay() - 1 );
+        String[] queryTime =  new String[]{ dayFormatted, dayFormat };
+
+        String pipelineId = countQuery.getPipelineId();
+        List<PipelineInstance> instanceList;
+        if (StringUtils.isEmpty(pipelineId)){
+            String[] builder = authorityService.findUserPipelineIdString(LoginContext.getLoginId());
+            instanceList = pipelineInstanceService.findInstanceByTime(queryTime,builder);
+        }else {
+            instanceList = pipelineInstanceService.findInstanceByTime(pipelineId, queryTime);
+        }
+
+        instanceList.sort(Comparator.comparing(PipelineInstance::getCreateTime));
+
+        if (instanceList.isEmpty()){
+            String[] builder = authorityService.findUserPipelineIdString(LoginContext.getLoginId());
+            PipelineQuery pipelineQuery = new PipelineQuery();
+            pipelineQuery.setIdString(builder);
+            Pagination<Pipeline> userPipelinePage = pipelineService.findUserPipelinePage(pipelineQuery);
+            List<Pipeline> dataList = userPipelinePage.getDataList();
+            if (dataList.isEmpty()){
+                Pipeline pipeline = new Pipeline();
+                pipeline.setId("-1");
+                pipeline.setName("示例项目");
+                PipelineDayResultCount pipelineDayResultCount = new PipelineDayResultCount();
+                pipelineDayResultCount.setPipeline(pipeline);
+                pipelineDayResultCount.setNumber(0);
+                dayCountList.add(pipelineDayResultCount);
+                return dayCountList;
+            }
+
+            dataList.forEach(pipeline -> {
+                PipelineDayResultCount pipelineDayResultCount = new PipelineDayResultCount();
+                pipelineDayResultCount.setPipeline(pipeline);
+                pipelineDayResultCount.setNumber(0);
+                dayCountList.add(pipelineDayResultCount);
+            });
+            return dayCountList;
+        }
+        joinTemplate.joinQuery(instanceList);
+        Map<String, Long> pipelineIdCountMap = instanceList.stream()
+                .collect(Collectors.groupingBy(
+                        instance -> instance.getPipeline().getId(),
+                        Collectors.counting()
+                ));
+
+        for (String pipelineIds : pipelineIdCountMap.keySet()) {
+            PipelineDayResultCount pipelineDayResultCount = new PipelineDayResultCount();
+            Pipeline pipeline = pipelineService.findPipelineNoQuery(pipelineIds);
+            pipelineDayResultCount.setPipeline(pipeline);
+            pipelineDayResultCount.setNumber(Math.toIntExact(pipelineIdCountMap.get(pipelineIds)));
+            dayCountList.add(pipelineDayResultCount);
+        }
+        dayCountList.sort(Comparator.comparing(PipelineDayResultCount::getNumber).reversed());
+        return dayCountList;
+    }
+
+
+    @Override
+    public PipelineDayNumberCount findRunNumberSpan(PipelineRunCountQuery countQuery){
+
+        PipelineDayNumberCount numberCount = new PipelineDayNumberCount();
+
+        String dayFormatted = findRecentDayFormatted(countQuery.getCountDay());
+        String dayFormat = findRecentDayFormatted(countQuery.getCountDay() - 1 );
+        String[] queryTime =  new String[]{ dayFormatted, dayFormat };
+
+        String pipelineId = countQuery.getPipelineId();
+        List<PipelineInstance> instanceList;
+        if (StringUtils.isEmpty(pipelineId)){
+            String[] builder = authorityService.findUserPipelineIdString(LoginContext.getLoginId());
+            instanceList = pipelineInstanceService.findInstanceByTime(queryTime,builder);
+        }else {
+            instanceList = pipelineInstanceService.findInstanceByTime(pipelineId, queryTime);
+        }
+
+        if (instanceList.isEmpty()){
+            return numberCount;
+        }
+        instanceList.sort(Comparator.comparing(PipelineInstance::getCreateTime));
+
+        long success = instanceList.stream().filter(instance -> instance.getRunStatus().equals("success")).count();
+        long error = instanceList.stream().filter(instance -> instance.getRunStatus().equals("error")).count();
+        long halt = instanceList.stream().filter(instance -> instance.getRunStatus().equals("halt")).count();
+
+        numberCount.setAllNumber(Math.toIntExact(success + error + halt));
+        numberCount.setSuccessNumber(Math.toIntExact(success));
+        numberCount.setErrorNumber(Math.toIntExact(error));
+        numberCount.setHaltNumber(Math.toIntExact(halt));
+
+        return numberCount;
     }
 
     @Override

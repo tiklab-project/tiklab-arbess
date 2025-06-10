@@ -110,6 +110,13 @@ public interface PipelineService {
 
 
     /**
+     * 根据用户查询流水线信息 (需要流水线用户名密码)
+     * @param query 查询条件
+     * @return 流水线信息
+     */
+    Pagination<Pipeline> findUserPipelinePageByUser(PipelineQuery query);
+
+    /**
      * 根据查询条件获取流水线列表
      * @param query 查询条件
      * @return 流水线列表

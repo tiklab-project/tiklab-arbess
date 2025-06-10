@@ -173,6 +173,24 @@ public class PipelineController {
         return Result.ok(userPipeline);
     }
 
+
+    /**
+     * @pi.name:根据用户名密码分页查询流水线
+     * @pi.url:/findUserPipelinePage
+     * @pi.methodType:post
+     * @pi.request-type:json
+     * @pi.param: model=query
+     */
+    @RequestMapping(path="/findUserPipelinePageByUser",method = RequestMethod.POST)
+    @ApiMethod(name = "分页查询用户流水线",desc = "分页查询用户流水线")
+    @ApiParam(name = "query",desc = "流水线查询条件",required = true)
+    public Result<Pagination<Pipeline>> findUserPipelinePageByUser(@RequestBody @NotNull @Valid PipelineQuery query){
+
+        Pagination<Pipeline> userPipeline = pipelineService.findUserPipelinePageByUser(query);
+
+        return Result.ok(userPipeline);
+    }
+
     /**
      * @pi.name:查询用户流水线
      * @pi.url:/findUserPipeline
@@ -182,7 +200,7 @@ public class PipelineController {
     @RequestMapping(path="/findUserPipeline",method = RequestMethod.POST)
     @ApiMethod(name = "查询用户流水线",desc = "查询用户流水线")
     @ApiParam(name = "query",desc = "流水线查询条件",required = true)
-    public Result<List<Pipeline>> findAllUserPipeline(@RequestBody @NotNull @Valid PipelineQuery query){
+    public Result<List<Pipeline>> findUserPipeline(@RequestBody @NotNull @Valid PipelineQuery query){
         List<Pipeline> userPipeline = pipelineService.findUserPipeline(query);
 
         return Result.ok(userPipeline);

@@ -393,6 +393,22 @@ public class PipelineServiceImpl implements PipelineService {
         return PaginationBuilder.build(pipelinePage,pipelines);
     }
 
+
+    @Override
+    public Pagination<Pipeline> findUserPipelinePageByUser(PipelineQuery query){
+        String username = query.getUsername();
+        if (StringUtils.isEmpty(username)){
+            throw new ApplicationException("用户名不能为空！");
+        }
+        String password = query.getPassword();
+        User user = userService.findUserByUsernameByPassWard(username, password);
+        if (Objects.isNull(user)){
+            throw new ApplicationException("用户名或密码错误！");
+        }
+        query.setUserId(user.getId());
+        return findUserPipelinePage(query);
+    }
+
     @Override
     public List<Pipeline> findPipelineList(PipelineQuery query){
         List<PipelineEntity> pipelineEntityList = pipelineDao.findPipelineList(query);
@@ -506,7 +522,7 @@ public class PipelineServiceImpl implements PipelineService {
         }
 
         // 克隆后置任务
-        postprocessService.clonePostTask(pipelineId,clonePipelineId);
+        // postprocessService.clonePostTask(pipelineId,clonePipelineId);
 
         // 克隆触发器
         // triggerService.cloneTrigger(pipelineId,clonePipelineId);

@@ -1,5 +1,8 @@
 package io.tiklab.arbess.stages.service;
 
+import io.tiklab.arbess.pipeline.instance.dao.PipelineInstanceDao;
+import io.tiklab.arbess.pipeline.instance.entity.PipelineInstanceEntity;
+import io.tiklab.arbess.pipeline.instance.model.PipelineInstance;
 import io.tiklab.arbess.stages.entity.StageInstanceEntity;
 import io.tiklab.arbess.stages.model.StageInstance;
 import io.tiklab.arbess.stages.model.StageInstanceQuery;
@@ -9,6 +12,7 @@ import io.tiklab.toolkit.beans.BeanMapper;
 import io.tiklab.arbess.stages.dao.StageInstanceDao;
 import io.tiklab.arbess.task.task.model.TaskInstance;
 import io.tiklab.arbess.task.task.service.TasksInstanceService;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +32,9 @@ public class StageInstanceServerImpl implements StageInstanceServer{
 
     @Autowired
     TasksInstanceService tasksInstanceService;
+
+    @Autowired
+    PipelineInstanceDao pipelineInstanceDao;
 
     private static final Logger logger = LoggerFactory.getLogger(StageInstanceServerImpl.class);
 
@@ -152,33 +159,49 @@ public class StageInstanceServerImpl implements StageInstanceServer{
             stageInstance.setStageState(findStageInstanceStatus(otherStageInstanceList));
             stageInstance.setStageInstanceList(otherStageInstanceList);
         }
-        List<TaskInstance> list = tasksInstanceService.findStagePostRunMessage(instanceId);
-        StageInstance stageInstance = new StageInstance();
-        if (!Objects.equals(list.size(),0)){
-            String status = findTaskInstanceStatus(list);
-            stageInstance.setStageName("后置处理");
-            stageInstance.setId("1");
+        // List<TaskInstance> list = tasksInstanceService.findStagePostRunMessage(instanceId);
+        // StageInstance stageInstance = new StageInstance();
+        // if (!Objects.equals(list.size(),0)){
+        //     String status = findTaskInstanceStatus(list);
+        //     stageInstance.setStageName("后置处理");
+        //     stageInstance.setId("1");
+        //
+        //     AtomicInteger time = new AtomicInteger();
+        //     list.forEach(taskInstance -> {time.set(time.get() + taskInstance.getRunTime());});
+        //
+        //     StageInstance otherStageInstance = new StageInstance();
+        //     otherStageInstance.setStageName("后置任务");
+        //     otherStageInstance.setId("11111");
+        //     otherStageInstance.setStageState(status);
+        //     otherStageInstance.setStageTime(time.get());
+        //     otherStageInstance.setTaskInstanceList(list);
+        //
+        //     List<StageInstance> stageInstancesList = new ArrayList<>();
+        //     stageInstancesList.add(otherStageInstance);
+        //
+        //     stageInstance.setStageState(status);
+        //     stageInstance.setStageTime(time.get());
+        //     stageInstance.setStageInstanceList(stageInstancesList);
+        //     stageInstanceList.add(stageInstanceList.size(),stageInstance);
+        // }else {
+        //     stageInstanceList.sort(Comparator.comparing(StageInstance::getStageSort));
+        // }
 
-            AtomicInteger time = new AtomicInteger();
-            list.forEach(taskInstance -> {time.set(time.get() + taskInstance.getRunTime());});
 
-            StageInstance otherStageInstance = new StageInstance();
-            otherStageInstance.setStageName("后置任务");
-            otherStageInstance.setId("11111");
-            otherStageInstance.setStageState(status);
-            otherStageInstance.setStageTime(time.get());
-            otherStageInstance.setTaskInstanceList(list);
+        stageInstanceList.sort(Comparator.comparing(StageInstance::getStageSort));
 
-            List<StageInstance> stageInstancesList = new ArrayList<>();
-            stageInstancesList.add(otherStageInstance);
-
-            stageInstance.setStageState(status);
-            stageInstance.setStageTime(time.get());
-            stageInstance.setStageInstanceList(stageInstancesList);
-            stageInstanceList.add(stageInstanceList.size(),stageInstance);
-        }else {
-            stageInstanceList.sort(Comparator.comparing(StageInstance::getStageSort));
+        StageInstance stageInstance = stageInstanceList.get(stageInstanceList.size() - 1);
+        PipelineInstanceEntity instance = pipelineInstanceDao.findOneInstance(stageInstance.getInstanceId());
+        if (Objects.isNull(instance) || StringUtils.isEmpty(instance.getRunLog())){
+            return stageInstanceList;
         }
+
+        List<StageInstance> otherStageInstanceList = stageInstance.getStageInstanceList();
+        StageInstance otherStageInstance = otherStageInstanceList.get(otherStageInstanceList.size() - 1);
+        List<TaskInstance> taskInstanceList = otherStageInstance.getTaskInstanceList();
+        TaskInstance taskInstance = taskInstanceList.get(taskInstanceList.size() - 1);
+        taskInstance.setRunLog(taskInstance.getRunLog()+"\n\n" + instance.getRunLog());
+
         return stageInstanceList;
     }
 

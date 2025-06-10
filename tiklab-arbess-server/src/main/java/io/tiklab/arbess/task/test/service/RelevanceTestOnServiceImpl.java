@@ -119,8 +119,10 @@ public class RelevanceTestOnServiceImpl implements RelevanceTestOnService{
             if (Objects.isNull(testPlanInstance) || testPlanInstance.getTestPlanName().contains("删除")){
                 relevanceTestOn.setStatus(2);
             }
-            // http://e.testhubo.tiklab.net/#/plan/63967635d1d8/instanceInfo
-            String url = String.format("%s/#/plan/%s/instanceInfo", authThird.getServerAddress(),relevanceTestOn.getTestPlanId());
+            // http://192.168.10.13:3000/#/plan/068f6da04eed/instanceInfo/76f147886cb8
+
+            String id = testPlanInstance.getId();
+            String url = String.format("%s/#/plan/%s/instanceInfo/%s", authThird.getServerAddress(),relevanceTestOn.getTestPlanId(),id);
             relevanceTestOn.setUrl(url);
 
             Date date = PipelineUtil.StringChengeDate(relevanceTestOn.getCreateTime());

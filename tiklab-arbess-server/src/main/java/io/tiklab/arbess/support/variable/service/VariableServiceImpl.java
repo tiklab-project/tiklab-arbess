@@ -110,10 +110,11 @@ public class VariableServiceImpl implements VariableService {
     @Override
     public void cloneVariable(String id,String cloneId){
         VariableQuery variableQuery = new VariableQuery();
-        variableQuery.setTaskId(id);
+        variableQuery.setPipelineId(id);
+        variableQuery.setType(1);
         List<Variable> variableList = findVariableList(variableQuery);
         for (Variable variable : variableList) {
-            variable.setTaskId(cloneId);
+            variable.setPipelineId(cloneId);
             createVariable(variable);
         }
     }
