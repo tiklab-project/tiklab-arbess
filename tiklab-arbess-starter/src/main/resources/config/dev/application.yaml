@@ -1,30 +1,10 @@
 app:
   name: arbess
 
-spring:
-  main:
-    allow-bean-definition-overriding: true
-  freemarker:
-    checkTemplateLocation: false
-
-arbess:
-  setting:
-#    address: /Users/zcamy/Java/tiklab-arbess-agent/tiklab-arbess-agent-starter/src/main/resources/settings.xml
-    address: D:\Java\tiklab-arbess-agent\tiklab-arbess-agent-starter\src\main\resources\settings.xml
-  spotbugs:
-    address: /Users/zcamy/Java/tiklab-arbess-agent/tiklab-arbess-agent-starter/embbed/spotbugs-4.8.1/bin/spotbugs
-  jdk:
-    address: /Users/zcamy/apply/jdk-17.0.9.jdk/Contents/Home
-  task:
-    timeout: 300
-
 server:
   port: 8090
 
-APP_HOME: ${APP_HOME}
-
 DATA_HOME: ${user.home}/tiklab/tiklab-arbess
-
 
 jdbc:
   driverClassName: org.postgresql.Driver
@@ -44,12 +24,6 @@ postgresql:
   database: tiklab-arbess
   type: local
 
-postin:
-  scan:
-    package: io.tiklab.arbess
-
-
-
 #dcs config
 dcs:
   server:
@@ -63,16 +37,19 @@ dcs:
     expire: 7200
 
 auth:
-  type: soularss
+  type: local
   soular:
     address: http://192.168.10.15:8080
     web:
       address: http://192.168.10.16:3010
 
-backups:
-  dir: ${DATA_HOME}/backups
-  time: 0 0 2 * * ?
-  type: local
+arbess:
+  task:
+    timeout: 300
+
+#backups:
+#  dir: ${DATA_HOME}/backups
+#  time: 0 0 2 * * ?
 
 ws:
   name: local
@@ -82,13 +59,8 @@ ws:
   url : 127.0.0.1:8090
 
 
-base:
+external:
   url: http://localhost:8090
-
-#license
-licences:
-  path: ${DATA_HOME}/licences
-
 
 
 

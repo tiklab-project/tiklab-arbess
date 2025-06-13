@@ -1,6 +1,6 @@
 package io.tiklab.arbess.starter.task;
 
-import io.tiklab.eam.client.author.config.TiklabApplicationRunner;
+import io.tiklab.install.runner.TiklabApplicationRunner;
 import io.tiklab.privilege.dmRole.model.DmRole;
 import io.tiklab.privilege.dmRole.model.DmRoleQuery;
 import io.tiklab.privilege.dmRole.service.DmRoleService;

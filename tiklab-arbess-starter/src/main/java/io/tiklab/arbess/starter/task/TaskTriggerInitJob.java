@@ -6,26 +6,17 @@ import io.tiklab.arbess.support.trigger.quartz.RunJob;
 import io.tiklab.arbess.support.trigger.service.CronUtils;
 import io.tiklab.arbess.support.trigger.service.TriggerService;
 import io.tiklab.arbess.support.trigger.service.TriggerTimeService;
-import io.tiklab.arbess.support.util.util.PipelineFinal;
-import io.tiklab.arbess.support.util.util.PipelineUtil;
 import io.tiklab.core.exception.ApplicationException;
-import io.tiklab.eam.client.author.config.TiklabApplicationRunner;
+import io.tiklab.install.runner.TiklabApplicationRunner;
 import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.ApplicationArguments;
-import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.event.ContextRefreshedEvent;
-import org.springframework.scheduling.annotation.Scheduled;
 
 import java.text.SimpleDateFormat;
-import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 
 import static io.tiklab.arbess.support.util.util.PipelineFinal.DEFAULT;
 

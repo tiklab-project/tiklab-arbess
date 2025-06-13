@@ -1,16 +1,16 @@
+app:
+  name: arbess
 
 server:
   port: 8080
 
-app:
-  name: arbess
-
-APP_HOME: ${APP_HOME}
+external:
+  url: http://e.arbess.tiklab.net
 
 postgresql:
   embbed:
     enable: true
-  database: arbess
+  database: tiklab_arbess
   db:
     port: 5432
     username: postgres
@@ -19,12 +19,12 @@ postgresql:
 
 jdbc:
   driverClassName: org.postgresql.Driver
-  url: jdbc:postgresql://localhost:5432/arbess?stringtype=unspecified
+  url: jdbc:postgresql://localhost:5432/tiklab_arbess?stringtype=unspecified
   username: postgres
   password: darth2020
 
-#plugin config
-DATA_HOME: /opt/tiklab/arbess
+#DATA_HOME config
+DATA_HOME: /opt/tiklab/tiklab-arbess
 
 #dcs config
 dcs:
@@ -38,25 +38,10 @@ dcs:
     database: dcs1
     expire: 7200
 
-
-
-soular:
-  embbed:
-    enable: true
-  address: http://e.darth.tiklab.net
-
-backups:
-  dir: /data/matflow
-  time: 0 0 2 * * ?
-
-base:
-  url: http://e.matflow.tiklab.net
-
-#license
-licences:
-  path: ${APP_HOME}/licences
-
-
+auth:
+  type: local
+  soular:
+    address: http://e.soular.tiklab.net
 
 
 

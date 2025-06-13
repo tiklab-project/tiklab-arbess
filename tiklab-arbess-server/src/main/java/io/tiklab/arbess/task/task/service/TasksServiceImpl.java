@@ -1368,7 +1368,7 @@ public class TasksServiceImpl implements TasksService {
                 return "执行脚本";
             }
             case TASK_CODESCAN_SOURCEFARE -> {
-                return "SourceFare代码扫描";
+                return "SourceFare";
             }
             default -> {
                 return taskType;

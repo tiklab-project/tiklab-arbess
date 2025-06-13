@@ -43,20 +43,12 @@ dcs:
     database: dcs1
     expire: 7200
 
-soular:
-  embbed:
-    enable: true
-
-backups:
-  dir: /data/matflow-ce
-  time: 0 0 2 * * ?
-
-base:
+auth:
+  type: local
+  soular:
+    address: http://e.soular.tiklab.net
+external:
   url: http://localhost:8080
-
-#license
-licences:
-  path: ${APP_HOME}/licences
 
 
 

@@ -1,11 +1,11 @@
+app:
+  name: arbess
 
 server:
   port: 8080
 
-app:
-  name: arbess
-
-APP_HOME: ${APP_HOME}
+external:
+  url: http://arbess-ce.demo.tiklab.net
 
 postgresql:
   embbed:
@@ -37,22 +37,11 @@ dcs:
     url: 127.0.0.1:5000
     bucket: ${app.name}
 
-soular:
-  embbed:
-    enable: false
-  address: http://eas-ce.demo.tiklab.net
+auth:
+  type: soualr
+  soular:
+    address: http://soular-ce.demo.tiklab.net
 
-
-backups:
-  dir: /data/matflow-ee
-  time: 0 0 2 * * ?
-
-base:
-  url: http://matflow-ce.demo.tiklab.net
-
-#license
-licences:
-  path: ${APP_HOME}/licences
 
 
 

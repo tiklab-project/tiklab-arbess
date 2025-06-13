@@ -10,7 +10,7 @@ import io.tiklab.arbess.task.code.dao.TaskCodeDao;
 import io.tiklab.arbess.task.code.entity.TaskCodeEntity;
 import io.tiklab.arbess.task.code.service.TaskCodeService;
 import io.tiklab.arbess.task.task.service.TasksService;
-import io.tiklab.eam.client.author.config.TiklabApplicationRunner;
+import io.tiklab.install.runner.TiklabApplicationRunner;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

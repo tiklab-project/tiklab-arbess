@@ -3,7 +3,7 @@ package io.tiklab.arbess.starter.task;
 import io.tiklab.arbess.support.util.util.PipelineFinal;
 import io.tiklab.arbess.task.deploy.model.TaskDeploy;
 import io.tiklab.arbess.task.deploy.service.TaskDeployService;
-import io.tiklab.eam.client.author.config.TiklabApplicationRunner;
+import io.tiklab.install.runner.TiklabApplicationRunner;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

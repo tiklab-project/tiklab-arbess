@@ -11,7 +11,7 @@ import io.tiklab.arbess.task.pullArtifact.model.TaskPullArtifact;
 import io.tiklab.arbess.task.pullArtifact.service.TaskPullArtifactService;
 import io.tiklab.arbess.task.task.model.Tasks;
 import io.tiklab.arbess.task.task.service.TasksService;
-import io.tiklab.eam.client.author.config.TiklabApplicationRunner;
+import io.tiklab.install.runner.TiklabApplicationRunner;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

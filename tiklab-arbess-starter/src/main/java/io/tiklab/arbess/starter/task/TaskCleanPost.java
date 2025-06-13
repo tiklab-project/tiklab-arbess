@@ -5,7 +5,7 @@ import io.tiklab.arbess.support.postprocess.model.Postprocess;
 import io.tiklab.arbess.support.postprocess.service.PostprocessService;
 import io.tiklab.arbess.support.util.util.PipelineFinal;
 import io.tiklab.arbess.task.task.service.TasksService;
-import io.tiklab.eam.client.author.config.TiklabApplicationRunner;
+import io.tiklab.install.runner.TiklabApplicationRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -7,34 +7,18 @@ import io.tiklab.arbess.support.message.service.TaskMessageService;
 import io.tiklab.arbess.support.message.service.TaskMessageTypeService;
 import io.tiklab.arbess.support.postprocess.model.Postprocess;
 import io.tiklab.arbess.support.postprocess.service.PostprocessService;
-import io.tiklab.arbess.support.trigger.model.Trigger;
-import io.tiklab.arbess.support.trigger.model.TriggerJob;
-import io.tiklab.arbess.support.trigger.model.TriggerQuery;
-import io.tiklab.arbess.support.trigger.quartz.Job;
-import io.tiklab.arbess.support.trigger.quartz.RunJob;
-import io.tiklab.arbess.support.trigger.service.CronUtils;
-import io.tiklab.arbess.support.trigger.service.TriggerService;
-import io.tiklab.arbess.support.trigger.service.TriggerTimeService;
-import io.tiklab.arbess.support.variable.controller.VariableController;
 import io.tiklab.arbess.task.task.model.Tasks;
 import io.tiklab.arbess.task.task.service.TasksService;
-import io.tiklab.core.exception.ApplicationException;
-import io.tiklab.eam.client.author.config.TiklabApplicationRunner;
-import io.tiklab.todotask.todo.service.TaskService;
+import io.tiklab.install.runner.TiklabApplicationRunner;
 import org.apache.commons.lang3.StringUtils;
-import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 
 import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
-
-import static io.tiklab.arbess.support.util.util.PipelineFinal.DEFAULT;
 
 @Configuration
 public class TaskPipelineMessage implements TiklabApplicationRunner {

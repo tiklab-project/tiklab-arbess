@@ -41,7 +41,7 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
     @Autowired
     SendMessageNoticeService dispatchNoticeService;
 
-    @Value("${base.url:null}")
+    @Value("${external.url:null}")
     String baseUrl;
 
     String appName = PipelineFinal.appName;

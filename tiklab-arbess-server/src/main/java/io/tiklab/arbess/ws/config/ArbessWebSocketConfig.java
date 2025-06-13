@@ -16,7 +16,7 @@ import java.util.Map;
 
 @Configuration
 @EnableWebSocket
-public class MatflowWebSocketConfig implements WebSocketConfigurer {
+public class ArbessWebSocketConfig implements WebSocketConfigurer {
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
@@ -37,7 +37,7 @@ public class MatflowWebSocketConfig implements WebSocketConfigurer {
     }
 
     @Bean
-    public ServletServerContainerFactoryBean createWebSocketContainer() {
+    public ServletServerContainerFactoryBean createArbessWebSocketContainer() {
         ServletServerContainerFactoryBean container = new ServletServerContainerFactoryBean();
         container.setMaxTextMessageBufferSize(5120 * 5120); // 设置文本消息缓冲区大小
         container.setMaxBinaryMessageBufferSize(5120 * 5120); // 设置二进制消息缓冲区大小

@@ -17,7 +17,7 @@ import io.tiklab.arbess.task.task.model.Tasks;
 import io.tiklab.arbess.task.task.service.TasksService;
 import io.tiklab.arbess.task.test.model.TaskTest;
 import io.tiklab.arbess.task.test.service.TaskTestService;
-import io.tiklab.eam.client.author.config.TiklabApplicationRunner;
+import io.tiklab.install.runner.TiklabApplicationRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
