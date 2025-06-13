@@ -47,10 +47,6 @@ arbess:
   task:
     timeout: 300
 
-#backups:
-#  dir: ${DATA_HOME}/backups
-#  time: 0 0 2 * * ?
-
 ws:
   name: local
   server:
