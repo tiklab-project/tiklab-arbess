@@ -36,6 +36,9 @@ public interface TaskMessageService {
     TaskMessage findTaskMessage(String id);
 
 
+    TaskMessage findTaskMessageNoQuery(String id);
+
+
     /**
      * 查询所有任务消息
      * @return 任务消息列表

@@ -6,9 +6,9 @@ import io.tiklab.toolkit.beans.annotation.Mapper;
 import io.tiklab.toolkit.beans.annotation.Mapping;
 import io.tiklab.toolkit.beans.annotation.Mappings;
 import io.tiklab.toolkit.join.annotation.Join;
-import io.tiklab.toolkit.join.annotation.JoinQuery;
 
 
+import io.tiklab.toolkit.join.annotation.JoinField;
 import io.tiklab.user.user.model.User;
 
 import java.util.List;
@@ -35,7 +35,7 @@ public class PipelineInstance {
     @Mappings({
             @Mapping(source = "user.id",target = "userId")
     })
-    @JoinQuery(key = "id")
+    @JoinField(key = "id")
     private User user;
 
     //@ApiProperty(name="runStatus",desc="运行状态 1.失败 10.成功 20:停止")
@@ -47,7 +47,7 @@ public class PipelineInstance {
     @Mappings({
             @Mapping(source = "pipeline.id",target = "pipelineId")
     })
-    @JoinQuery(key = "id")
+    @JoinField(key = "id")
     private Pipeline pipeline;
 
     //@ApiProperty(name="findNumber",desc="构建次数")

@@ -10,7 +10,6 @@ import io.tiklab.arbess.support.webHook.model.WebHookQuery;
 import io.tiklab.core.page.Pagination;
 import io.tiklab.core.page.PaginationBuilder;
 import io.tiklab.toolkit.beans.BeanMapper;
-import org.postgresql.shaded.com.ongres.scram.common.bouncycastle.base64.Base64Encoder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;

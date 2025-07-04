@@ -7,7 +7,7 @@ import io.tiklab.toolkit.beans.annotation.Mapper;
 import io.tiklab.toolkit.beans.annotation.Mapping;
 import io.tiklab.toolkit.beans.annotation.Mappings;
 import io.tiklab.toolkit.join.annotation.Join;
-import io.tiklab.toolkit.join.annotation.JoinQuery;
+import io.tiklab.toolkit.join.annotation.JoinField;
 
 
 /**
@@ -60,14 +60,14 @@ public class TaskCode extends BaseModel {
     @Mappings({
             @Mapping(source = "toolGit.scmId",target = "toolGit")
     })
-    @JoinQuery(key = "scmId")
+    @JoinField(key = "scmId")
     private Scm toolGit;
 
     // svn版本
     @Mappings({
             @Mapping(source = "toolSvn.scmId",target = "toolSvn")
     })
-    @JoinQuery(key = "scmId")
+    @JoinField(key = "scmId")
     private Scm toolSvn;
 
 

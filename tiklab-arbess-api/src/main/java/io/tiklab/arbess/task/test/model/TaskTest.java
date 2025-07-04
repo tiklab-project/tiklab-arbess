@@ -6,8 +6,7 @@ import io.tiklab.toolkit.beans.annotation.Mapper;
 import io.tiklab.toolkit.beans.annotation.Mapping;
 import io.tiklab.toolkit.beans.annotation.Mappings;
 import io.tiklab.toolkit.join.annotation.Join;
-import io.tiklab.toolkit.join.annotation.JoinQuery;
-
+import io.tiklab.toolkit.join.annotation.JoinField;
 
 
 /**
@@ -31,19 +30,19 @@ public class TaskTest {
     @Mappings({
             @Mapping(source = "testSpace.id",target = "testSpace")
     })
-    @JoinQuery(key = "testSpace")
+    @JoinField(key = "testSpace")
     private TestHuboRpy testSpace;
 
     @Mappings({
             @Mapping(source = "testPlan.id",target = "testPlan")
     })
-    @JoinQuery(key = "testPlan")
+    @JoinField(key = "testPlan")
     private TestHuboTestPlan testPlan;
 
     @Mappings({
             @Mapping(source = "testEnv.id",target = "testEnv")
     })
-    @JoinQuery(key = "testEnv")
+    @JoinField(key = "testEnv")
     private TestHuboEnv testEnv;
 
     //@ApiProperty(name = "authId",desc="认证id")
@@ -63,14 +62,14 @@ public class TaskTest {
     @Mappings({
             @Mapping(source = "toolJdk.scmId",target = "toolJdk")
     })
-    @JoinQuery(key = "scmId")
+    @JoinField(key = "scmId")
     private Scm toolJdk;
 
     // maven版本
     @Mappings({
             @Mapping(source = "toolMaven.scmId",target = "toolMaven")
     })
-    @JoinQuery(key = "scmId")
+    @JoinField(key = "scmId")
     private Scm toolMaven;
 
 

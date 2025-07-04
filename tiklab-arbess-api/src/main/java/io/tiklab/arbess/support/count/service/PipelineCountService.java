@@ -107,4 +107,11 @@ public interface PipelineCountService {
      */
     List<String> findDaysFormatted(int days);
 
+    /**
+     * 获取流水线运行结果统计
+     * @param pipelineId 流水线id
+     * @return 运行结果
+     */
+    PipelineInstanceCount findPipelineInstanceCount(String pipelineId);
+
 }

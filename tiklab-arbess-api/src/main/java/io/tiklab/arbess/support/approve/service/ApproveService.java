@@ -1,10 +1,7 @@
 package io.tiklab.arbess.support.approve.service;
 
 
-import io.tiklab.arbess.support.approve.model.Approve;
-import io.tiklab.arbess.support.approve.model.ApprovePipeline;
-import io.tiklab.arbess.support.approve.model.ApproveQuery;
-import io.tiklab.arbess.support.approve.model.ApproveUser;
+import io.tiklab.arbess.support.approve.model.*;
 import io.tiklab.core.page.Pagination;
 import io.tiklab.toolkit.join.annotation.FindAll;
 import io.tiklab.toolkit.join.annotation.FindList;
@@ -31,6 +28,13 @@ public interface ApproveService {
      * @param approve 审批信息
      */
     void updateApprove(Approve approve);
+
+
+    /**
+     * 更新审批状态
+     * @param approveStatus 审批
+     */
+    void updateApproveStatus(ApproveStatus approveStatus);
 
 
     /**
@@ -61,9 +65,9 @@ public interface ApproveService {
 
     /**
      * 执行审批
-     * @param approveId 审批ID
+     * @param approveUser 审批ID
      */
-    void execApprove(String approveId);
+    void execApprove(ApproveUser approveUser);
 
     /**
      * 更新流水线审批执行信息

@@ -26,6 +26,17 @@ public class ApprovePipelineEntity {
     @Column(name = "instance_id")
     private String instanceId;
 
+    @Column(name = "exec_status")
+    private Integer execStatus;
+
+    public Integer getExecStatus() {
+        return execStatus;
+    }
+
+    public void setExecStatus(Integer execStatus) {
+        this.execStatus = execStatus;
+    }
+
     public String getInstanceId() {
         return instanceId;
     }

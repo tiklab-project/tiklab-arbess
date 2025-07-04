@@ -14,10 +14,6 @@ import java.util.List;
 @JoinProvider(model = RelevanceTestOn.class)
 public interface RelevanceTestOnService {
 
-
-    void createRelevance(TestOnRelevance testOnRelevance);
-
-
     /**
      * 创建
      * @param relevanceTestOn 关联关系
@@ -52,6 +48,14 @@ public interface RelevanceTestOnService {
      * @return 关联关系
      */
     Pagination<RelevanceTestOn> findRelevancePage(RelevanceTestOnQuery relevanceTestOnQuery);
+
+
+    /**
+     * 获取流水线关联的testOn关系
+     * @param relevanceTestOnQuery 条件
+     * @return 关联关系
+     */
+    List<RelevanceTestOn> findRelevanceList(RelevanceTestOnQuery relevanceTestOnQuery);
 
 
     /**

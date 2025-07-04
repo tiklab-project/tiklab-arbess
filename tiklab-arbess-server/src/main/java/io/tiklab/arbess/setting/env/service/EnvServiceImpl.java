@@ -40,7 +40,7 @@ public class EnvServiceImpl implements EnvService {
     @Override
     public Env findOneEnv(String envId) {
         Env env = envDao.findOneEnv(envId);
-        joinTemplate.joinQuery(env);
+        joinTemplate.joinQuery(env,new String[]{"user"});
         return env;
     }
 
@@ -52,7 +52,7 @@ public class EnvServiceImpl implements EnvService {
     @Override
     public List<Env> findEnvList(EnvQuery envQuery) {
         List<Env> envList = envDao.findEnvList(envQuery);
-        joinTemplate.joinQuery(envList);
+        joinTemplate.joinQuery(envList,new String[]{"user"});
         return envList;
     }
 
@@ -60,7 +60,7 @@ public class EnvServiceImpl implements EnvService {
     public Pagination<Env> findEnvPage(EnvQuery envQuery) {
         Pagination<Env> envPage = envDao.findEnvPage(envQuery);
         List<Env> dataList = envPage.getDataList();
-        joinTemplate.joinQuery(dataList);
+        joinTemplate.joinQuery(dataList ,new String[]{"user"});
         return PaginationBuilder.build(envPage,dataList);
     }
 

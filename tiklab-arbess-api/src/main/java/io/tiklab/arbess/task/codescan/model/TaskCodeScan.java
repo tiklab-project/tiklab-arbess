@@ -5,7 +5,7 @@ import io.tiklab.toolkit.beans.annotation.Mapper;
 import io.tiklab.toolkit.beans.annotation.Mapping;
 import io.tiklab.toolkit.beans.annotation.Mappings;
 import io.tiklab.toolkit.join.annotation.Join;
-import io.tiklab.toolkit.join.annotation.JoinQuery;
+import io.tiklab.toolkit.join.annotation.JoinField;
 
 
 /**
@@ -57,40 +57,40 @@ public class TaskCodeScan {
     @Mappings({
             @Mapping(source = "toolJdk.scmId",target = "toolJdk")
     })
-    @JoinQuery(key = "scmId")
+    @JoinField(key = "scmId")
     private Scm toolJdk;
 
     // maven版本
     @Mappings({
             @Mapping(source = "toolMaven.scmId",target = "toolMaven")
     })
-    @JoinQuery(key = "scmId")
+    @JoinField(key = "scmId")
     private Scm toolMaven;
 
     // maven版本
     @Mappings({
             @Mapping(source = "toolSonar.scmId",target = "toolSonar")
     })
-    @JoinQuery(key = "scmId")
+    @JoinField(key = "scmId")
     private Scm toolSonar;
 
 
     @Mappings({
             @Mapping(source = "toolSourceFare.scmId",target = "toolSourceFare")
     })
-    @JoinQuery(key = "scmId")
+    @JoinField(key = "scmId")
     private Scm toolSourceFare;
 
     @Mappings({
             @Mapping(source = "toolNodejs.scmId",target = "toolNodejs")
     })
-    @JoinQuery(key = "scmId")
+    @JoinField(key = "scmId")
     private Scm toolNodejs;
 
     @Mappings({
             @Mapping(source = "toolGo.scmId",target = "toolGo")
     })
-    @JoinQuery(key = "scmId")
+    @JoinField(key = "scmId")
     private Scm toolGo;
 
 

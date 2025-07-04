@@ -40,7 +40,7 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public Group findOneGroup(String groupId) {
         Group group = groupDao.findOneGroup(groupId);
-        joinTemplate.joinQuery(group);
+        joinTemplate.joinQuery(group,new String[]{"user"});
         return group;
     }
 
@@ -52,7 +52,7 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public List<Group> findGroupList(GroupQuery groupQuery) {
         List<Group> groupList = groupDao.findGroupList(groupQuery);
-        joinTemplate.joinQuery(groupList);
+        joinTemplate.joinQuery(groupList,new String[]{"user"});
         return groupList;
     }
 
@@ -60,14 +60,14 @@ public class GroupServiceImpl implements GroupService {
     public Pagination<Group> findGroupPage(GroupQuery groupQuery) {
         Pagination<Group> groupPage = groupDao.findGroupPage(groupQuery);
         List<Group> dataList = groupPage.getDataList();
-        joinTemplate.joinQuery(dataList);
+        joinTemplate.joinQuery(dataList,new String[]{"user"});
         return PaginationBuilder.build(groupPage,dataList);
     }
 
     @Override
     public List<Group> findAllGroupList(List<String> idList) {
         List<Group> groupList = groupDao.findAllGroupList(idList);
-        joinTemplate.joinQuery(groupList);
+        joinTemplate.joinQuery(groupList,new String[]{"user"});
         return groupList;
     }
 

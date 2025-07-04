@@ -36,24 +36,8 @@ public class RelevanceTestOnServiceImpl implements RelevanceTestOnService{
 
 
     @Override
-    public void createRelevance(TestOnRelevance testOnRelevance) {
-        RelevanceTestOn relevanceTestOn = new RelevanceTestOn();
-        String pipelineId = testOnRelevance.getPipelineId();
-        String instanceId = testOnRelevance.getInstanceId();
-        String authId = testOnRelevance.getAuthId();
-        relevanceTestOn.setPipeline(new Pipeline(pipelineId));
-        relevanceTestOn.setTestonId(instanceId);
-        relevanceTestOn.setAuthId(authId);
-        relevanceTestOn.setTestPlanId(testOnRelevance.getTestPlanId());
-        relevanceTestOn.setCreateTime(PipelineUtil.date(1));
-        String relevance = createRelevance(relevanceTestOn);
-        if (Objects.isNull(relevance)){
-            throw new ApplicationException("创建TestOn关联关系失败！");
-        }
-    }
-
-    @Override
     public String createRelevance(RelevanceTestOn relevanceTestOn) {
+        relevanceTestOn.setCreateTime(PipelineUtil.date(1));
         RelevanceTestOnEntity testOnEntity = BeanMapper.map(relevanceTestOn, RelevanceTestOnEntity.class);
         return relevanceTestOnDao.createRelevanceTestOn(testOnEntity);
     }
@@ -88,7 +72,7 @@ public class RelevanceTestOnServiceImpl implements RelevanceTestOnService{
 
     @Override
     public Pagination<RelevanceTestOn> findRelevancePage(RelevanceTestOnQuery relevanceTestOnQuery){
-        Pagination<RelevanceTestOnEntity> allRelevancePage = relevanceTestOnDao.findAllRelevancePage(relevanceTestOnQuery);
+        Pagination<RelevanceTestOnEntity> allRelevancePage = relevanceTestOnDao.findRelevancePage(relevanceTestOnQuery);
         List<RelevanceTestOnEntity> dataList = allRelevancePage.getDataList();
 
         List<RelevanceTestOn> list = new ArrayList<>();
@@ -98,6 +82,17 @@ public class RelevanceTestOnServiceImpl implements RelevanceTestOnService{
         List<RelevanceTestOn> testOnList = BeanMapper.mapList(dataList, RelevanceTestOn.class);
         List<RelevanceTestOn> allRelevance = findRelevanceList(testOnList);
         return PaginationBuilder.build(allRelevancePage,allRelevance);
+    }
+
+    @Override
+    public List<RelevanceTestOn> findRelevanceList(RelevanceTestOnQuery relevanceTestOnQuery){
+        List<RelevanceTestOnEntity> relevanceList = relevanceTestOnDao.findRelevanceList(relevanceTestOnQuery);
+
+        if (relevanceList == null || relevanceList.isEmpty()){
+            return new ArrayList<>();
+        }
+        List<RelevanceTestOn> testOnList = BeanMapper.mapList(relevanceList, RelevanceTestOn.class);
+        return findRelevanceList(testOnList);
     }
 
 
@@ -114,14 +109,10 @@ public class RelevanceTestOnServiceImpl implements RelevanceTestOnService{
                 continue;
             }
             AuthThird authThird = authThirdService.findOneAuthServer(authId);
-            TestOnPlanInstance testPlanInstance = taskTestOnService.findTestPlanInstance(authThird.getServerId(), testonId);
+            // TestOnPlanInstance testPlanInstance = taskTestOnService.findTestPlanInstance(authThird.getServerId(), testonId);
             relevanceTestOn.setStatus(1);
-            if (Objects.isNull(testPlanInstance) || testPlanInstance.getTestPlanName().contains("删除")){
-                relevanceTestOn.setStatus(2);
-            }
-            // http://192.168.10.13:3000/#/plan/068f6da04eed/instanceInfo/76f147886cb8
 
-            String id = testPlanInstance.getId();
+            String id = relevanceTestOn.getTestonId();
             String url = String.format("%s/#/plan/%s/instanceInfo/%s", authThird.getServerAddress(),relevanceTestOn.getTestPlanId(),id);
             relevanceTestOn.setUrl(url);
 
@@ -129,7 +120,22 @@ public class RelevanceTestOnServiceImpl implements RelevanceTestOnService{
             String dateTime = PipelineUtil.findDateTime(date, 0);
             relevanceTestOn.setTime(dateTime);
 
-            relevanceTestOn.setObject(testPlanInstance);
+            // relevanceTestOn.setObject(testPlanInstance);
+
+            // if (Objects.isNull(testPlanInstance) || testPlanInstance.getTestPlanName().contains("删除")){
+            //     relevanceTestOn.setStatus(2);
+            // }else{
+            //     // http://192.168.10.13:3000/#/plan/068f6da04eed/instanceInfo/76f147886cb8
+            //     String id = testPlanInstance.getId();
+            //     String url = String.format("%s/#/plan/%s/instanceInfo/%s", authThird.getServerAddress(),relevanceTestOn.getTestPlanId(),id);
+            //     relevanceTestOn.setUrl(url);
+            //
+            //     Date date = PipelineUtil.StringChengeDate(relevanceTestOn.getCreateTime());
+            //     String dateTime = PipelineUtil.findDateTime(date, 0);
+            //     relevanceTestOn.setTime(dateTime);
+            //
+            //     relevanceTestOn.setObject(testPlanInstance);
+            // }
             list.add(relevanceTestOn);
         }
         list.sort(Comparator.comparing(RelevanceTestOn::getCreateTime).reversed());

@@ -47,6 +47,17 @@ public class ScmServiceImpl implements ScmService {
         return scmDao.createPipelineScm(scmEntity);
     }
 
+    public String createPipelineScmNoValid(Scm scm) {
+
+        // String scmType = scm.getScmType();
+        // String scmAddress = scm.getScmAddress();
+
+        // PipelineUtil.validFile(scmAddress, scmType);
+
+        ScmEntity scmEntity = BeanMapper.map(scm, ScmEntity.class);
+        return scmDao.createPipelineScm(scmEntity);
+    }
+
     //删除
     @Override
     public void deletePipelineScm(String pathId) {

@@ -9,6 +9,7 @@ import io.tiklab.arbess.support.postprocess.model.Postprocess;
 import io.tiklab.arbess.support.variable.model.Variable;
 import io.tiklab.arbess.task.build.model.TaskBuildProduct;
 import io.tiklab.arbess.task.task.model.TaskExecMessage;
+import io.tiklab.user.user.model.User;
 
 import java.util.List;
 
@@ -63,6 +64,26 @@ public class PipelineDetails {
 
     // 任务消息
     private List<TaskMessage> taskMessageList;
+
+    private User execUser;
+
+    private Integer execType;
+
+    public Integer getExecType() {
+        return execType;
+    }
+
+    public void setExecType(Integer execType) {
+        this.execType = execType;
+    }
+
+    public User getExecUser() {
+        return execUser;
+    }
+
+    public void setExecUser(User execUser) {
+        this.execUser = execUser;
+    }
 
     public List<TaskMessage> getTaskMessageList() {
         return taskMessageList;

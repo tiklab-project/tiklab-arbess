@@ -74,7 +74,14 @@ public class AuthThirdServiceImpl implements AuthThirdService {
     public AuthThird findOneAuthServer(String authServerId) {
         AuthThirdEntity oneAuthServer = authServerDao.findOneAuthServer(authServerId);
         AuthThird authThird = BeanMapper.map(oneAuthServer, AuthThird.class);
-        joinTemplate.joinQuery(authThird);
+        joinTemplate.joinQuery(authThird,new String[]{"user"});
+        return authThird;
+    }
+
+    @Override
+    public AuthThird findOneAuthServerNoQuery(String authServerId) {
+        AuthThirdEntity oneAuthServer = authServerDao.findOneAuthServer(authServerId);
+        AuthThird authThird = BeanMapper.map(oneAuthServer, AuthThird.class);
         return authThird;
     }
 
@@ -82,7 +89,7 @@ public class AuthThirdServiceImpl implements AuthThirdService {
     public List<AuthThird> findAuthServerList(AuthThirdQuery thirdQuery){
         List<AuthThirdEntity> authThirdEntityList = authServerDao.findAuthServerList(thirdQuery);
         List<AuthThird> authThirds = BeanMapper.mapList(authThirdEntityList, AuthThird.class);
-        joinTemplate.joinQuery(authThirds);
+        joinTemplate.joinQuery(authThirds,new String[]{"user"});
         return authThirds;
     }
 
@@ -95,7 +102,7 @@ public class AuthThirdServiceImpl implements AuthThirdService {
             return PaginationBuilder.build(authThirdEntityPage,new ArrayList<>());
         }
         List<AuthThird> authThirds = BeanMapper.mapList(dataList, AuthThird.class);
-        joinTemplate.joinQuery(authThirds);
+        joinTemplate.joinQuery(authThirds,new String[]{"user"});
         return PaginationBuilder.build(authThirdEntityPage,authThirds);
     }
 
@@ -110,7 +117,7 @@ public class AuthThirdServiceImpl implements AuthThirdService {
             return new ArrayList<>();
         }
         List<AuthThird> authThirds = BeanMapper.mapList(allAuthServer, AuthThird.class);
-        joinTemplate.joinQuery(authThirds);
+        joinTemplate.joinQuery(authThirds,new String[]{"user"});
         return authThirds;
     }
 

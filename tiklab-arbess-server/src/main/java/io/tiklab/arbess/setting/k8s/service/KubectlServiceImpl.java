@@ -148,7 +148,7 @@ public class KubectlServiceImpl implements KubectlService {
 
     public void findKubectlDetails(Kubectl kubectl) {
 
-        joinTemplate.joinQuery(kubectl);
+        joinTemplate.joinQuery(kubectl,new String[]{"toolKubectl","user"});
 
         String kubeConfig = kubectl.getKubeAddress();
         String scmAddress = kubectl.getToolKubectl().getScmAddress();

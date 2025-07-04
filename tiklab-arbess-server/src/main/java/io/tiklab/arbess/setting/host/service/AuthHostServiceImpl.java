@@ -82,7 +82,7 @@ public class AuthHostServiceImpl implements AuthHostService {
     public AuthHost findOneAuthHost(String authHostId) {
         AuthHostEntity oneAuthHost = authHostDao.findOneAuthHost(authHostId);
         AuthHost authHost = BeanMapper.map(oneAuthHost, AuthHost.class);
-        joinTemplate.joinQuery(authHost);
+        joinTemplate.joinQuery(authHost,new String[]{"user"});
         return authHost;
     }
 
@@ -97,7 +97,7 @@ public class AuthHostServiceImpl implements AuthHostService {
             return new ArrayList<>();
         }
         List<AuthHost> authHosts = BeanMapper.mapList(allAuthHostEntity, AuthHost.class);
-        joinTemplate.joinQuery(authHosts);
+        joinTemplate.joinQuery(authHosts,new String[]{"user"});
         return authHosts;
     }
 
@@ -117,7 +117,7 @@ public class AuthHostServiceImpl implements AuthHostService {
         }
 
         List<AuthHost> authHosts = BeanMapper.mapList(authHostEntityList, AuthHost.class);
-        joinTemplate.joinQuery(authHosts);
+        joinTemplate.joinQuery(authHosts,new String[]{"user"});
 
         return authHosts;
     }
@@ -134,7 +134,7 @@ public class AuthHostServiceImpl implements AuthHostService {
         }
 
         List<AuthHost> authHosts = BeanMapper.mapList(dataList, AuthHost.class);
-        joinTemplate.joinQuery(authHosts);
+        joinTemplate.joinQuery(authHosts,new String[]{"user"});
 
         return PaginationBuilder.build(allAuthHostPage,authHosts);
     }

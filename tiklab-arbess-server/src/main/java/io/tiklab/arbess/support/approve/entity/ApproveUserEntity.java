@@ -26,6 +26,17 @@ public class ApproveUserEntity {
     @Column(name = "message")
     private String message;
 
+    @Column(name = "pipeline_id")
+    private String pipelineId;
+
+    public String getPipelineId() {
+        return pipelineId;
+    }
+
+    public void setPipelineId(String pipelineId) {
+        this.pipelineId = pipelineId;
+    }
+
     public String getMessage() {
         return message;
     }

@@ -146,6 +146,13 @@ public class TaskMessageServiceImpl implements TaskMessageService {
         return taskMessage;
     }
 
+    public TaskMessage findTaskMessageNoQuery(String id) {
+        TaskMessageEntity messageEntity = messageDao.findTaskMessage(id);
+        TaskMessage taskMessage = BeanMapper.map(messageEntity, TaskMessage.class);
+        queryMessageDetailNoQuery(taskMessage);
+        return taskMessage;
+    }
+
     @Override
     public List<TaskMessage> findAllTaskMessage() {
         List<TaskMessageEntity> messageEntityList = messageDao.findAllTaskMessage();
@@ -224,7 +231,26 @@ public class TaskMessageServiceImpl implements TaskMessageService {
         TaskMessageUserQuery userQuery = new TaskMessageUserQuery();
         userQuery.setMessageId(messageId);
         List<TaskMessageUser> userList = messageUserService.findMessageUserList(userQuery);
-        joinTemplate.joinQuery(userList);
+        joinTemplate.joinQuery(userList,new String[]{"user"});
+        message.setUserList(userList);
+
+    }
+
+    public void queryMessageDetailNoQuery(TaskMessage message){
+        if (Objects.isNull(message)){
+            return;
+        }
+
+        String messageId = message.getId();
+
+        TaskMessageTypeQuery typeQuery = new TaskMessageTypeQuery();
+        typeQuery.setMessageId(messageId);
+        List<TaskMessageType> typeList = messageTypeService.findMessageTypeList(typeQuery);
+        message.setTypeList(typeList);
+
+        TaskMessageUserQuery userQuery = new TaskMessageUserQuery();
+        userQuery.setMessageId(messageId);
+        List<TaskMessageUser> userList = messageUserService.findMessageUserList(userQuery);
         message.setUserList(userList);
 
     }

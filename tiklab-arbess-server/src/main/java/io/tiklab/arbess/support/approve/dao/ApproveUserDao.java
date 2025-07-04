@@ -44,6 +44,7 @@ public class ApproveUserDao {
                 .eq("status", approveUserQuery.getStatus())
                 .eq("userId", approveUserQuery.getUserId())
                 .eq("approveId", approveUserQuery.getApproveId())
+                .eq("pipelineId", approveUserQuery.getPipelineId())
                 .orders(approveUserQuery.getOrderParams())
                 .get();
         return jpaTemplate.findList(queryCondition,ApproveUserEntity.class);
@@ -54,6 +55,7 @@ public class ApproveUserDao {
                 .eq("status", approveUserQuery.getStatus())
                 .eq("userId", approveUserQuery.getUserId())
                 .eq("approveId", approveUserQuery.getApproveId())
+                .eq("pipelineId", approveUserQuery.getPipelineId())
                 .orders(approveUserQuery.getOrderParams())
                 .pagination(approveUserQuery.getPageParam())
                 .get();

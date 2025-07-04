@@ -51,6 +51,9 @@ public interface TaskCodeScanService {
     @FindOne
     TaskCodeScan findOneCodeScan(String codeScanId);
 
+
+    TaskCodeScan findOneCodeScanNoQuery(String codeScanId);
+
     /**
      * 查询所有流水线代码扫描
      * @return 流水线代码扫描列表

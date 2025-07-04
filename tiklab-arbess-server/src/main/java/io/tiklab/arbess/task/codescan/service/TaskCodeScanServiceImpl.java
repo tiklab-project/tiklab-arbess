@@ -110,7 +110,19 @@ public class TaskCodeScanServiceImpl implements TaskCodeScanService {
             AuthThird authServer = thirdServer.findOneAuthServer(codeScan.getAuthId());
             codeScan.setAuth(authServer);
         }
-        joinTemplate.joinQuery(codeScan);
+        joinTemplate.joinQuery(codeScan,new String[]{"toolJdk","toolMaven","toolSonar","toolSourceFare","toolNodejs","toolGo"});
+        return codeScan;
+    }
+
+    @Override
+    public TaskCodeScan findOneCodeScanNoQuery(String codeScanId) {
+        TaskCodeScanEntity oneCodeScan = codeScanDao.findOneCodeScan(codeScanId);
+        TaskCodeScan codeScan = BeanMapper.map(oneCodeScan, TaskCodeScan.class);
+        if (PipelineUtil.isNoNull(codeScan.getAuthId())){
+            AuthThird authServer = thirdServer.findOneAuthServerNoQuery(codeScan.getAuthId());
+            codeScan.setAuth(authServer);
+        }
+        joinTemplate.joinQuery(codeScan,new String[]{"toolJdk","toolMaven","toolSonar","toolSourceFare","toolNodejs","toolGo"});
         return codeScan;
     }
 
@@ -128,7 +140,7 @@ public class TaskCodeScanServiceImpl implements TaskCodeScanService {
     public List<TaskCodeScan> findAllCodeScanList(List<String> idList) {
         List<TaskCodeScanEntity> allCodeScanList = codeScanDao.findAllCodeScanList(idList);
         List<TaskCodeScan> taskCodeScans = BeanMapper.mapList(allCodeScanList, TaskCodeScan.class);
-        joinTemplate.joinQuery(taskCodeScans);
+        joinTemplate.joinQuery(taskCodeScans,new String[]{"toolJdk","toolMaven","toolSonar","toolSourceFare","toolNodejs","toolGo"});
         return taskCodeScans;
     }
 

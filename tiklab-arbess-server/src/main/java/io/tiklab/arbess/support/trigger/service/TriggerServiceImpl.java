@@ -28,9 +28,6 @@ public class TriggerServiceImpl implements TriggerService {
     TriggerDao triggerDao;
 
     @Autowired
-    JoinTemplate joinTemplate;
-
-    @Autowired
     Job manager;
 
     private final Logger logger = LoggerFactory.getLogger(TriggerServiceImpl.class);
@@ -178,7 +175,6 @@ public class TriggerServiceImpl implements TriggerService {
     public Trigger findOneTriggerById(String triggerId) {
         TriggerEntity triggerConfigEntity = triggerDao.findOneTrigger(triggerId);
         Trigger trigger = BeanMapper.map(triggerConfigEntity, Trigger.class);
-        joinTemplate.joinQuery(trigger);
         return trigger;
     }
     

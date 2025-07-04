@@ -38,7 +38,7 @@ public class AuthHostGroupDetailsServiceImpl implements AuthHostGroupDetailsServ
     @Override
     public AuthHostGroupDetails findOneHostGroupDetails(String groupDetailsId) {
         AuthHostGroupDetails  authHostGroupDetails = authHostGroupDetailsDao.findOneHostGroupDetails(groupDetailsId);
-        joinTemplate.joinQuery(authHostGroupDetails);
+        joinTemplate.joinQuery(authHostGroupDetails,new String[]{"authHost"});
         return authHostGroupDetails;
     }
 
@@ -50,7 +50,7 @@ public class AuthHostGroupDetailsServiceImpl implements AuthHostGroupDetailsServ
     @Override
     public List<AuthHostGroupDetails> findHostGroupDetailsList(String groupId) {
         List<AuthHostGroupDetails> hostGroupDetailsList =  authHostGroupDetailsDao.findHostGroupDetailsList(groupId);
-        joinTemplate.joinQuery(hostGroupDetailsList);
+        joinTemplate.joinQuery(hostGroupDetailsList,new String[]{"authHost"});
         return hostGroupDetailsList;
     }
     

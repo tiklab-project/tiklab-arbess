@@ -81,6 +81,12 @@ public class PipelineCountController {
         return Result.ok(resultCount);
     }
 
+    @RequestMapping(path="/findPipelineInstanceCount",method = RequestMethod.POST)
+    public Result<PipelineInstanceCount> findPipelineInstanceCount(@NotNull @Valid String pipelineId){
+        PipelineInstanceCount resultCount = countService.findPipelineInstanceCount(pipelineId);
+        return Result.ok(resultCount);
+    }
+
     @RequestMapping(path="/findSurveyCount",method = RequestMethod.POST)
     public Result<PipelineSurveyCount> findSurveyCount(){
         PipelineSurveyCount surveyCount = countService.findSurveyCount();

@@ -8,10 +8,11 @@ import io.tiklab.toolkit.beans.annotation.Mapper;
 import io.tiklab.toolkit.beans.annotation.Mapping;
 import io.tiklab.toolkit.beans.annotation.Mappings;
 import io.tiklab.toolkit.join.annotation.Join;
-import io.tiklab.toolkit.join.annotation.JoinQuery;
+
 
 
 import io.tiklab.privilege.role.model.PatchUser;
+import io.tiklab.toolkit.join.annotation.JoinField;
 import io.tiklab.user.user.model.User;
 
 import java.util.List;
@@ -49,7 +50,7 @@ public class Pipeline {
     @Mappings({
             @Mapping(source = "user.id",target = "userId")
     })
-    @JoinQuery(key = "id")
+    @JoinField(key = "id")
     @ApiProperty(name = "user",desc = "流水线用户")
     private User user;
 
@@ -61,7 +62,7 @@ public class Pipeline {
     @Mappings({
             @Mapping(source = "env.id",target = "envId")
     })
-    @JoinQuery(key = "id")
+    @JoinField(key = "id")
     @ApiProperty(name = "env",desc = "流水线环境")
     private Env env;
 
@@ -72,7 +73,7 @@ public class Pipeline {
     @Mappings({
             @Mapping(source = "group.id",target = "groupId")
     })
-    @JoinQuery(key = "id")
+    @JoinField(key = "id")
     @ApiProperty(name = "group",desc = "流水线组")
     private Group group;
 

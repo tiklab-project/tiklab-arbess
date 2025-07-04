@@ -44,6 +44,7 @@ public class ApprovePipelineDao {
                 .eq("status", approvePipelineQuery.getStatus())
                 .eq("pipelineId", approvePipelineQuery.getPipelineId())
                 .eq("approveId", approvePipelineQuery.getApproveId())
+                .eq("execStatus", approvePipelineQuery.getExecStatus())
                 .eq("instanceId", approvePipelineQuery.getInstanceId())
                 .orders(approvePipelineQuery.getOrderParams())
                 .get();
@@ -55,6 +56,7 @@ public class ApprovePipelineDao {
                 .eq("status", approvePipelineQuery.getStatus())
                 .eq("pipelineId", approvePipelineQuery.getPipelineId())
                 .eq("approveId", approvePipelineQuery.getApproveId())
+                .eq("execStatus", approvePipelineQuery.getExecStatus())
                 .eq("instanceId", approvePipelineQuery.getInstanceId())
                 .orders(approvePipelineQuery.getOrderParams())
                 .pagination(approvePipelineQuery.getPageParam())

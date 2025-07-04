@@ -4,9 +4,9 @@ import io.tiklab.toolkit.beans.annotation.Mapper;
 import io.tiklab.toolkit.beans.annotation.Mapping;
 import io.tiklab.toolkit.beans.annotation.Mappings;
 import io.tiklab.toolkit.join.annotation.Join;
-import io.tiklab.toolkit.join.annotation.JoinQuery;
 
 
+import io.tiklab.toolkit.join.annotation.JoinField;
 import io.tiklab.user.user.model.User;
 
 /**
@@ -39,7 +39,7 @@ public class AuthHost {
      * @pi.desc:认证类型 1.用户名密码 2. 通用认证
      * @pi.value: 1
      */
-    private Integer authType;
+    private Integer authType = 1;
 
     /**
      * @pi.name:name
@@ -63,7 +63,7 @@ public class AuthHost {
      * @pi.desc:端口号
      * @pi.value:8080
      */
-    private Integer port;
+    private Integer port = 0;
 
     /**
      * @pi.name:createTime
@@ -104,7 +104,7 @@ public class AuthHost {
     @Mappings({
             @Mapping(source = "user.id",target = "userId")
     })
-    @JoinQuery(key = "id")
+    @JoinField(key = "id")
     private User user;
 
     /**

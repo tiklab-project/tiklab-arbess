@@ -26,7 +26,7 @@ public class WebHookEntity {
     @Column(name = "url")
     private String url;
 
-    @Column(name = "key")
+    @Column(name = "wkey")
     private String key;
 
     @Column(name = "status")

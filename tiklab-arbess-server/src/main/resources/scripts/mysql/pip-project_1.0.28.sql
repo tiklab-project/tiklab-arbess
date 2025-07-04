@@ -1,0 +1,1 @@
+ALTER TABLE pip_trigger_webhook CHANGE `key` wkey VARCHAR(255);

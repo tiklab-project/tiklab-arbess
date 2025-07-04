@@ -5,7 +5,8 @@ import io.tiklab.toolkit.beans.annotation.Mapper;
 import io.tiklab.toolkit.beans.annotation.Mapping;
 import io.tiklab.toolkit.beans.annotation.Mappings;
 import io.tiklab.toolkit.join.annotation.Join;
-import io.tiklab.toolkit.join.annotation.JoinQuery;
+import io.tiklab.toolkit.join.annotation.JoinField;
+
 
 /**
  * 主机组与主机的关联关系
@@ -25,7 +26,7 @@ public class AuthHostGroupDetails {
     @Mappings({
             @Mapping(source = "authHost.hostId",target = "hostId")
     })
-    @JoinQuery(key = "hostId")
+    @JoinField(key = "hostId")
     private AuthHost authHost;
 
 

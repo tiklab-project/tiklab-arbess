@@ -58,7 +58,7 @@ public class AuthServiceImpl implements AuthService {
     public Auth findOneAuth(String authId) {
         AuthEntity oneAuth = authDao.findOneAuth(authId);
         Auth auth = BeanMapper.map(oneAuth, Auth.class);
-        joinTemplate.joinQuery(auth);
+        joinTemplate.joinQuery(auth,new String[]{"user"});
         return auth;
     }
 
@@ -69,7 +69,7 @@ public class AuthServiceImpl implements AuthService {
             return null;
         }
         List<Auth> auths = BeanMapper.mapList(allAuthEntity, Auth.class);
-        joinTemplate.joinQuery(auths);
+        joinTemplate.joinQuery(auths,new String[]{"user"});
         return auths;
     }
 

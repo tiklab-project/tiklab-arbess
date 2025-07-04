@@ -88,14 +88,14 @@ public class AuthHostGroupServiceImpl implements AuthHostGroupService {
         }
         List<AuthHostGroupDetails> hostGroupDetailsList = groupDetailsService.findHostGroupDetailsList(groupId);
         oneHostGroup.setDetailsList(hostGroupDetailsList);
-        joinTemplate.joinQuery(oneHostGroup);
+        joinTemplate.joinQuery(oneHostGroup,new String[]{"user"});
         return oneHostGroup;
     }
 
     @Override
     public List<HostGroup> findOneHostGroupByGroup(String groupId, Integer strategyNumber, String strategyType) {
         List<AuthHostGroupDetails> detailsList = groupDetailsService.findHostGroupDetailsList(groupId);
-        joinTemplate.joinQuery(detailsList);
+        joinTemplate.joinQuery(detailsList,new String[]{"user"});
 
         strategyNumber = 1;
 
@@ -133,7 +133,7 @@ public class AuthHostGroupServiceImpl implements AuthHostGroupService {
             List<AuthHostGroupDetails> hostGroupDetailsList = groupDetailsService.findHostGroupDetailsList(groupId);
             authHostGroup.setDetailsList(hostGroupDetailsList);
         }
-        joinTemplate.joinQuery(hostGroupList);
+        joinTemplate.joinQuery(hostGroupList,new String[]{"user"});
         return hostGroupList;
     }
 

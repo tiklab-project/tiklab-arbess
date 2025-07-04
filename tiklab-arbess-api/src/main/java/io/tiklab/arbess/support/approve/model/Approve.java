@@ -4,7 +4,8 @@ import io.tiklab.toolkit.beans.annotation.Mapper;
 import io.tiklab.toolkit.beans.annotation.Mapping;
 import io.tiklab.toolkit.beans.annotation.Mappings;
 import io.tiklab.toolkit.join.annotation.Join;
-import io.tiklab.toolkit.join.annotation.JoinQuery;
+
+import io.tiklab.toolkit.join.annotation.JoinField;
 import io.tiklab.user.user.model.User;
 
 import java.util.List;
@@ -29,7 +30,7 @@ public class Approve {
     @Mappings({
             @Mapping(source = "user.id",target = "userId")
     })
-    @JoinQuery(key = "id")
+    @JoinField(key = "id")
     private User user;
 
     private String corn;
@@ -50,18 +51,37 @@ public class Approve {
 
     /**
      * 审批状态
+     * draft：草稿
      * wait：等待审批
      * pending：评审中
-     * pass：审批通过
-     * reject：审批不通过
-     * wait-run：审批通过-等待运行
+     * wait-run：等待运行
      * run：运行中
      * cancel：取消
      * complete：完成
-     * error：运行失败
-     * draft：草稿
      */
     private String status;
+
+    // 所有评审数量
+    private Integer allApproveNumber;
+
+    // 已评审数量
+    private Integer alreadyApproveNumber;
+
+    public Integer getAllApproveNumber() {
+        return allApproveNumber;
+    }
+
+    public void setAllApproveNumber(Integer allApproveNumber) {
+        this.allApproveNumber = allApproveNumber;
+    }
+
+    public Integer getAlreadyApproveNumber() {
+        return alreadyApproveNumber;
+    }
+
+    public void setAlreadyApproveNumber(Integer alreadyApproveNumber) {
+        this.alreadyApproveNumber = alreadyApproveNumber;
+    }
 
     public String getUserIds() {
         return userIds;

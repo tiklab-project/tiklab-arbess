@@ -517,9 +517,6 @@ public class TasksServiceImpl implements TasksService {
 
                     object = taskArtifact;
                 }
-                // case TASK_TYPE_MESSAGE -> {
-                //     // object = messageTypeServer.findMessage(taskId);
-                // }
                 case TASK_TYPE_SCRIPT -> {
                     object = scriptServer.findScript(taskId);
                 }
@@ -692,6 +689,14 @@ public class TasksServiceImpl implements TasksService {
                         task.setBuildAddress(DEFAULT_CODE_ADDRESS);
                         task.setBuildOrder(GO_DEFAULT_ORDER);
                     }
+                    case TASK_BUILD_PYTHON -> {
+                        task.setBuildAddress(DEFAULT_CODE_ADDRESS);
+                        task.setBuildOrder(PYTHON_DEFAULT_ORDER);
+                    }
+                    case TASK_BUILD_PHP -> {
+                        task.setBuildAddress(DEFAULT_CODE_ADDRESS);
+                        task.setBuildOrder(PHP_DEFAULT_ORDER);
+                    }
                 }
                 buildService.createBuild(task);
             }
@@ -730,15 +735,6 @@ public class TasksServiceImpl implements TasksService {
                 task.setPullType(taskType);
                 pullArtifactService.createPullArtifact(task);
             }
-            case TASK_TYPE_MESSAGE -> {
-                // String object = JSON.toJSONString(values);
-                // TaskMessageType task = JSON.parseObject(object, TaskMessageType.class);
-                // if (task == null){
-                //     task = new TaskMessageType();
-                // }
-                // task.setTaskId(taskId);
-                // messageTypeServer.createMessage(task);
-            }
             case TASK_TYPE_SCRIPT   -> {
                 String object = JSON.toJSONString(values);
                 TaskScript task = JSON.parseObject(object, TaskScript.class);
@@ -771,7 +767,6 @@ public class TasksServiceImpl implements TasksService {
             case TASK_TYPE_CODESCAN -> codeScanService.deleteCodeScan(taskId);
             case TASK_TYPE_UPLOAD -> artifactService.deleteProduct(taskId);
             case TASK_TYPE_DOWNLOAD     -> pullArtifactService.deletePullArtifact(taskId);
-            // case TASK_TYPE_MESSAGE  -> messageTypeServer.deleteAllMessage(taskId);
             case TASK_TYPE_SCRIPT   -> scriptServer.deleteScript(taskId);
             default -> throw new ApplicationException("无法删除未知的配置类型"+taskType);
         }
@@ -917,12 +912,6 @@ public class TasksServiceImpl implements TasksService {
                     pullArtifactService.updatePullArtifact(taskArtifact);
                 }
             }
-            // case TASK_TYPE_MESSAGE  -> {
-            //     messageTypeServer.deleteAllMessage(taskId);
-            //     TaskMessageType task = JSON.parseObject(object, TaskMessageType.class);
-            //     task.setTaskId(taskId);
-            //     messageTypeServer.createMessage(task);
-            // }
             case TASK_TYPE_SCRIPT   -> {
                 TaskScript task = JSON.parseObject(object, TaskScript.class);
                 task.setTaskId(taskId);
@@ -988,13 +977,10 @@ public class TasksServiceImpl implements TasksService {
                 return taskBuild;
             }
             case TASK_TYPE_DEPLOY   -> {
-                TaskDeploy taskDeploy = deployService.findDeployByAuth(taskId);
-                joinTemplate.joinQuery(taskDeploy);
-                return taskDeploy;
+                return deployService.findDeployByAuth(taskId);
             }
             case TASK_TYPE_CODESCAN -> {
                 TaskCodeScan codeScan = codeScanService.findCodeScanByAuth(taskId);
-                // joinTemplate.joinQuery(codeScan);
                 if (!Objects.isNull(codeScan.getToolMaven())){
                     Scm maven = scmService.findOnePipelineScm(codeScan.getToolMaven().getScmId());
                     codeScan.setToolMaven(maven);
@@ -1011,15 +997,8 @@ public class TasksServiceImpl implements TasksService {
             case TASK_TYPE_DOWNLOAD -> {
                 return pullArtifactService.findPullArtifactByAuth(taskId);
             }
-            // case TASK_TYPE_MESSAGE  -> {
-            //     TaskMessageType messageType = messageTypeServer.findMessage(taskId);
-            //     joinTemplate.joinQuery(messageType);
-            //     return messageType;
-            // }
             case TASK_TYPE_SCRIPT   -> {
-                TaskScript taskScript = scriptServer.findOneScript(taskId);
-                joinTemplate.joinQuery(taskScript);
-                return taskScript;
+                return scriptServer.findOneScript(taskId);
             }
            default -> throw new ApplicationException("无法更新未知的配置类型。");
         }
@@ -1054,9 +1033,6 @@ public class TasksServiceImpl implements TasksService {
             case TASK_TYPE_DOWNLOAD -> {
                 return pullArtifactService.findOnePullArtifact(taskId);
             }
-            // case TASK_TYPE_MESSAGE  -> {
-            //     return messageTypeServer.findMessage(taskId);
-            // }
             case TASK_TYPE_SCRIPT   -> {
                 return scriptServer.findOneScript(taskId);
             }
@@ -1143,6 +1119,9 @@ public class TasksServiceImpl implements TasksService {
                    }
                    case TASK_BUILD_GO -> {
                        return PipelineUtil.validNoNullFiled(code.getToolGo(),code.getBuildOrder());
+                   }
+                   case TASK_BUILD_PHP, TASK_BUILD_PYTHON -> {
+                       return PipelineUtil.validNoNullFiled(code.getBuildOrder());
                    }
                    default -> {
                        return true;
@@ -1252,7 +1231,7 @@ public class TasksServiceImpl implements TasksService {
                     TASK_CODE_GITLAB, TASK_CODE_XCODE, TASK_CODE_SVN,TASK_CODE_PRI_GITLAB ->{
                 return TASK_TYPE_CODE;
             }
-            case TASK_BUILD_MAVEN, TASK_BUILD_NODEJS, TASK_BUILD_DOCKER,TASK_BUILD_GO ->{
+            case TASK_BUILD_MAVEN, TASK_BUILD_NODEJS, TASK_BUILD_DOCKER,TASK_BUILD_GO,TASK_BUILD_PHP,TASK_BUILD_PYTHON ->{
                 return TASK_TYPE_BUILD;
             }
             case TASK_TEST_MAVENTEST, TASK_TEST_TESTON  ->{
@@ -1312,6 +1291,12 @@ public class TasksServiceImpl implements TasksService {
             }
             case TASK_BUILD_MAVEN -> {
                 return "Maven构建";
+            }
+            case TASK_BUILD_PYTHON -> {
+                return "Python构建";
+            }
+            case TASK_BUILD_PHP -> {
+                return "PHP构建";
             }
             case TASK_BUILD_DOCKER -> {
                 return "Docker构建";

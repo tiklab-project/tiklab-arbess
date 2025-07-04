@@ -52,7 +52,7 @@ public class RelevanceTestOnDao {
      * @param relevanceTestOnQuery 查询条件
      * @return 关联关系
      */
-    public Pagination<RelevanceTestOnEntity> findAllRelevancePage(RelevanceTestOnQuery relevanceTestOnQuery){
+    public Pagination<RelevanceTestOnEntity> findRelevancePage(RelevanceTestOnQuery relevanceTestOnQuery){
         QueryBuilders builders = QueryBuilders.createQuery(RelevanceTestOnEntity.class);
 
         QueryCondition queryCondition = builders.eq("pipelineId", relevanceTestOnQuery.getPipelineId())
@@ -60,6 +60,21 @@ public class RelevanceTestOnDao {
                 .orders(relevanceTestOnQuery.getOrderParams())
                 .get();
         return jpaTemplate.findPage(queryCondition, RelevanceTestOnEntity.class);
+    }
+
+    /**
+     * 获取流水线的关联关系
+     * @param relevanceTestOnQuery 查询条件
+     * @return 关联关系
+     */
+    public List<RelevanceTestOnEntity> findRelevanceList(RelevanceTestOnQuery relevanceTestOnQuery){
+        QueryBuilders builders = QueryBuilders.createQuery(RelevanceTestOnEntity.class);
+
+        QueryCondition queryCondition = builders.eq("pipelineId", relevanceTestOnQuery.getPipelineId())
+                .pagination(relevanceTestOnQuery.getPageParam())
+                .orders(relevanceTestOnQuery.getOrderParams())
+                .get();
+        return jpaTemplate.findList(queryCondition, RelevanceTestOnEntity.class);
     }
 
     /**

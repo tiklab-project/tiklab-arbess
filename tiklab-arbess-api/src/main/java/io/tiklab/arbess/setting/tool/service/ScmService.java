@@ -22,6 +22,9 @@ public interface ScmService {
      */
     String createPipelineScm(Scm scm);
 
+
+    String createPipelineScmNoValid(Scm scm);
+
     /**
      * 删除环境配置
      * @param scmId 配置id

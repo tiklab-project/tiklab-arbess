@@ -20,12 +20,21 @@ public class ApprovePipelineQuery {
 
     private String instanceId;
 
+    private Integer execStatus;
+
     // 分页参数
     private Page pageParam= new Page();
 
     // 排序参数
     private List<Order> orderParams = OrderBuilders.instance().desc("createTime").get();
 
+    public Integer getExecStatus() {
+        return execStatus;
+    }
+
+    public void setExecStatus(Integer execStatus) {
+        this.execStatus = execStatus;
+    }
 
     public String getInstanceId() {
         return instanceId;

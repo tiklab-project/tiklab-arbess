@@ -162,14 +162,13 @@ public class PipelineInstanceServiceImpl implements PipelineInstanceService {
     public PipelineInstance findOneInstance(String instanceId) {
         PipelineInstanceEntity pipelineInstanceEntity = pipelineInstanceDao.findOneInstance(instanceId);
         PipelineInstance instance = BeanMapper.map(pipelineInstanceEntity, PipelineInstance.class);
-        joinTemplate.joinQuery(instance);
+        joinTemplate.joinQuery(instance,new String[]{"pipeline","user"});
         return instance;
     }
 
     public PipelineInstance findOneInstanceNoQuery(String instanceId) {
         PipelineInstanceEntity pipelineInstanceEntity = pipelineInstanceDao.findOneInstance(instanceId);
         return BeanMapper.map(pipelineInstanceEntity, PipelineInstance.class);
-        // joinTemplate.joinQuery(instance);
     }
 
     @Override
@@ -252,11 +251,11 @@ public class PipelineInstanceServiceImpl implements PipelineInstanceService {
                 time = PipelineUtil.formatDateTime(instance.getRunTime());
             }
             String id = instance.getPipeline().getId();
-            Boolean permissions = homeService.findPermissions(id, PIPELINE_RUN_KEY);
-            instance.setExec(permissions);
+            // Boolean permissions = homeService.findPermissions(id, PIPELINE_RUN_KEY);
+            instance.setExec(true);
             instance.setRunTimeDate(time);
         }
-        joinTemplate.joinQuery(execInstanceList);
+        joinTemplate.joinQuery(execInstanceList,new String[]{"pipeline","user"});
         return PaginationBuilder.build(pagination, execInstanceList);
     }
 
@@ -276,10 +275,10 @@ public class PipelineInstanceServiceImpl implements PipelineInstanceService {
             }
             instance.setRunTimeDate(time);
             String id = instance.getPipeline().getId();
-            Boolean permissions = homeService.findPermissions(id, PIPELINE_RUN_KEY);
-            instance.setExec(permissions);
+            // Boolean permissions = homeService.findPermissions(id, PIPELINE_RUN_KEY);
+            instance.setExec(true);
         }
-        joinTemplate.joinQuery(execInstanceList);
+        joinTemplate.joinQuery(execInstanceList,new String[]{"pipeline","user"});
         return PaginationBuilder.build(pagination,execInstanceList);
     }
 

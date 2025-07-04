@@ -120,9 +120,21 @@ public class PipelineDao {
 
 
     public List<PipelineEntity> findPipelineList(PipelineQuery query){
-        PipelineCondition condition = findQueryCondition(query);
-        return jpaTemplate.getJdbcTemplate().query(condition.getSql(), condition.getObjects(),
-                new BeanPropertyRowMapper<>(PipelineEntity.class));
+        // PipelineCondition condition = findQueryCondition(query);
+        // return jpaTemplate.getJdbcTemplate().query(condition.getSql(), condition.getObjects(),
+        //         new BeanPropertyRowMapper<>(PipelineEntity.class));
+        QueryCondition queryCondition = QueryBuilders.createQuery(PipelineEntity.class)
+                .eq("userId", query.getCreateUserId())
+                .eq("envId", query.getEnvId())
+                .eq("groupId", query.getGroupId())
+                .eq("state", query.getPipelineState())
+                .eq("power", query.getPipelinePower())
+                .in("id", query.getIdString())
+                .like("name", query.getPipelineName(), false)
+                .orders(query.getOrderParams())
+                .get();
+       return jpaTemplate.findList(queryCondition, PipelineEntity.class);
+
     }
 
     public Pagination<PipelineEntity> findPipelinePage(PipelineQuery query){
@@ -139,10 +151,6 @@ public class PipelineDao {
                 .pagination(query.getPageParam())
                 .get();
         return jpaTemplate.findPage(queryCondition,PipelineEntity.class);
-
-        // PipelineCondition condition = findQueryCondition(query);
-        //         return jpaTemplate.getJdbcTemplate().findPage(condition.getSql(), condition.getObjects(),
-        //                 query.getPageParam(),new BeanPropertyRowMapper<>(PipelineEntity.class));
     }
 
 
@@ -196,7 +204,6 @@ public class PipelineDao {
 
         if (!StringUtils.isBlank(query.getPipelineName())){
             sql = sql.concat(" and name ILIKE '%"+query.getPipelineName()+"%'");
-            // params.add(query.getPipelineName());
         }
 
         if (!Objects.isNull(query.getPipelineState()) && query.getPipelineState()!=0){

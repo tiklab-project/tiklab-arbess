@@ -150,6 +150,8 @@ public class PipelineFinal {
     public static final String TEST_DEFAULT_ORDER = "mvn test";
     public static final String MAVEN_DEFAULT_ORDER = "mvn clean package";
     public static final String GO_DEFAULT_ORDER = "go build -o bin/myapp";
+    public static final String PYTHON_DEFAULT_ORDER = "python install .";
+    public static final String PHP_DEFAULT_ORDER = "composer install";
     public static final String NODE_DEFAULT_ORDER = "npm install";
     public static final String DOCKER_DEFAULT_ORDER = "docker image build -t default .";
 
@@ -187,6 +189,8 @@ public class PipelineFinal {
     // 构建应用类型
     public static final String TASK_TYPE_BUILD = "build";
     public static final String TASK_BUILD_MAVEN = "maven";
+    public static final String TASK_BUILD_PYTHON = "build_python";
+    public static final String TASK_BUILD_PHP = "build_php";
     public static final String TASK_BUILD_NODEJS = "nodejs";
 
     public static final String TASK_BUILD_DOCKER = "build_docker";

@@ -217,7 +217,7 @@ public class PipelineCountServiceImpl implements PipelineCountService {
             });
             return dayCountList;
         }
-        joinTemplate.joinQuery(instanceList);
+        joinTemplate.joinQuery(instanceList,new String[]{"user","pipeline"});
         Map<String, Long> pipelineIdCountMap = instanceList.stream()
                 .collect(Collectors.groupingBy(
                         instance -> instance.getPipeline().getId(),
@@ -703,6 +703,31 @@ public class PipelineCountServiceImpl implements PipelineCountService {
             }
         }
         return stringList;
+    }
+
+
+    @Override
+    public PipelineInstanceCount findPipelineInstanceCount(String pipelineId){
+
+        PipelineInstanceCount pipelineInstanceCount = new PipelineInstanceCount();
+
+        List<PipelineInstance> pipelineAllInstance = pipelineInstanceService.findPipelineAllInstance(pipelineId);
+        pipelineAllInstance.forEach(pipelineInstance -> {
+            String runStatus = pipelineInstance.getRunStatus();
+            switch (runStatus){
+                case PipelineFinal.RUN_SUCCESS ->{
+                    pipelineInstanceCount.setSuccessNumber(pipelineInstanceCount.getSuccessNumber()+1);
+                }
+                case PipelineFinal.RUN_ERROR ->{
+                    pipelineInstanceCount.setErrorNumber(pipelineInstanceCount.getErrorNumber()+1);
+                }
+                case PipelineFinal.RUN_HALT ->{
+                    pipelineInstanceCount.setHaltNumber(pipelineInstanceCount.getHaltNumber()+1);
+                }
+            }
+        });
+        pipelineInstanceCount.setAllNumber(pipelineAllInstance.size());
+        return pipelineInstanceCount;
     }
 
     /**

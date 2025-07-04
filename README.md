@@ -280,9 +280,9 @@ Arbess提供了开源的源码，可以在Gitee,GitHub上面直接下载，使�
 
 开源地址：
 
-Gitee： https://gitee.com/tiklab-kanassProject/tiklab-arbess
+Gitee： https://gitee.com/tiklab-project/tiklab-arbess
 
-GitHub： https://github.com/tiklab-kanassProject/tiklab-arbess
+GitHub： https://github.com/tiklab-project/tiklab-arbess
 
 ## 安装使用
 
@@ -292,7 +292,7 @@ GitHub： https://github.com/tiklab-kanassProject/tiklab-arbess
 
 ### 克隆仓库
 ```bash
-git clone https://github.com/tiklab-kanassProject/tiklab-arbess.git
+git clone https://github.com/tiklab-project/tiklab-arbess.git
 cd tiklab-arbess
 ```
 

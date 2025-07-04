@@ -40,6 +40,7 @@ import io.tiklab.arbess.task.task.model.TaskInstance;
 import io.tiklab.arbess.task.task.service.TasksInstanceService;
 import io.tiklab.arbess.task.task.service.TasksInstanceServiceImpl;
 import io.tiklab.arbess.task.test.model.MavenTest;
+import io.tiklab.arbess.task.test.model.RelevanceTestOn;
 import io.tiklab.arbess.task.test.model.TestOnRelevance;
 import io.tiklab.arbess.task.test.service.MavenTestService;
 import io.tiklab.arbess.task.test.service.RelevanceTestOnService;
@@ -546,8 +547,8 @@ public class WebSocketMessageServiceImpl implements WebSocketMessageService {
      */
     private void testOnTaskMessageHandle(Object message){
         String jsonString = JSONObject.toJSONString(message);
-        TestOnRelevance testOnRelevance = JSONObject.parseObject(jsonString, TestOnRelevance.class);
-        relevanceTestOnService.createRelevance(testOnRelevance);
+        RelevanceTestOn relevanceTestOn = JSONObject.parseObject(jsonString, RelevanceTestOn.class);
+        relevanceTestOnService.createRelevance(relevanceTestOn);
     }
 
     /**

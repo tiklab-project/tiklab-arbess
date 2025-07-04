@@ -129,7 +129,7 @@ public class PipelineServiceImpl implements PipelineService {
         pipelineEntity.setState(1);
 
         String pipelineId = pipelineDao.createPipeline(pipelineEntity);
-        joinTemplate.joinQuery(pipeline);
+        joinTemplate.joinQuery(pipeline,new String[]{"env","user","group"});
         pipeline.setId(pipelineId);
 
         //创建对应流水线模板
@@ -174,7 +174,6 @@ public class PipelineServiceImpl implements PipelineService {
     @Override
     public void deletePipeline(String pipelineId) {
         Pipeline pipeline = findPipelineById(pipelineId);
-        // joinTemplate.joinQuery(pipeline);
         //删除关联信息
         pipelineDao.deletePipeline(pipelineId); //删除流水线
 
@@ -204,7 +203,7 @@ public class PipelineServiceImpl implements PipelineService {
     public void updatePipeline(Pipeline pipeline) {
         //更新名称
         Pipeline flow = findPipelineById(pipeline.getId());
-        joinTemplate.joinQuery(flow);
+        joinTemplate.joinQuery(flow,new String[]{"env","user","group"});
         //判断名称是否改变
         if (!pipeline.getName().equals(flow.getName())){
             Map<String,Object> map = homeService.initMap(pipeline);
@@ -239,7 +238,7 @@ public class PipelineServiceImpl implements PipelineService {
     public Pipeline findPipelineById(String pipelineId) {
         PipelineEntity pipelineEntity = pipelineDao.findPipelineById(pipelineId);
         Pipeline pipeline = BeanMapper.map(pipelineEntity, Pipeline.class);
-        joinTemplate.joinQuery(pipeline);
+        joinTemplate.joinQuery(pipeline,new String[]{"env","user","group"});
         return pipeline;
     }
 
@@ -278,7 +277,7 @@ public class PipelineServiceImpl implements PipelineService {
     @Override
     public List<Pipeline> findAllPipeline() {
         List<Pipeline> list = BeanMapper.mapList(pipelineDao.findAllPipeline(), Pipeline.class);
-        joinTemplate.joinQuery(list);
+        joinTemplate.joinQuery(list,new String[]{"env","user","group"});
         return list;
     }
 
@@ -286,7 +285,7 @@ public class PipelineServiceImpl implements PipelineService {
     @Override
     public List<Pipeline> findAllPipelineNoQuery() {
         List<Pipeline> list = BeanMapper.mapList(pipelineDao.findAllPipeline(), Pipeline.class);
-        joinTemplate.joinQuery(list);
+        joinTemplate.joinQuery(list,new String[]{"env","user","group"});
         return list;
     }
 
@@ -341,7 +340,8 @@ public class PipelineServiceImpl implements PipelineService {
 
             List<Pipeline> pipelines = list.stream()
                     .peek(pipeline -> pipeline.setUser(pipelineUser.get(pipeline.getUser().getId())))
-                    .peek(pipeline -> pipeline.setExec(homeService.findPermissions(pipeline.getId(),PIPELINE_RUN_KEY)))
+                    // .peek(pipeline -> pipeline.setExec(homeService.findPermissions(pipeline.getId(),PIPELINE_RUN_KEY)))
+                    .peek(pipeline -> pipeline.setExec(true))
                     .collect(Collectors.toList());
 
             return PaginationBuilder.build(pipelineListQuery,pipelines);
@@ -387,7 +387,8 @@ public class PipelineServiceImpl implements PipelineService {
         // 是否执行
         List<Pipeline> pipelines = list.stream()
                 .peek(pipeline -> pipeline.setUser(pipelineUser.get(pipeline.getUser().getId())))
-                .peek(pipeline -> pipeline.setExec(homeService.findPermissions(pipeline.getId(),PIPELINE_RUN_KEY)))
+                // .peek(pipeline -> pipeline.setExec(homeService.findPermissions(pipeline.getId(),PIPELINE_RUN_KEY)))
+                .peek(pipeline -> pipeline.setExec(true))
                 .collect(Collectors.toList());
 
         return PaginationBuilder.build(pipelinePage,pipelines);
@@ -571,6 +572,17 @@ public class PipelineServiceImpl implements PipelineService {
                 .filter(pieplineIdList::contains).distinct().collect(Collectors.toList());
 
         List<String> idStrings = new ArrayList<>(collect);
+
+        if (collect.isEmpty()){
+            List<PipelineEntity> pipelineEntityList = pipelineDao.findAllPipelineList(strings);
+            if (pipelineEntityList.size() > number){
+                pipelineEntityList.subList(0, number);
+            }
+            List<Pipeline> pipelineList = BeanMapper.mapList(pipelineEntityList, Pipeline.class);
+            pipelineList.add(0,pipeline);
+            return pipelineList;
+        }
+
 
         // 判断是否超出数量
         if (collect.size() >= number){

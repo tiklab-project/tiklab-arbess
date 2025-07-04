@@ -44,6 +44,9 @@ public interface AuthThirdService {
     @FindOne
     AuthThird findOneAuthServer(String authServerId);
 
+
+    AuthThird findOneAuthServerNoQuery(String authServerId);
+
     /**
      * 查询流水线第三方授权
      * @param thirdQuery 查询条件

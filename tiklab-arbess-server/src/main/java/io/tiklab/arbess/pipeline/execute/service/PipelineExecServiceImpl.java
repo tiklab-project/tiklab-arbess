@@ -279,7 +279,7 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
 
         // 添加到缓存
         pipelineInstanceService.instanceRuntime(pipelineInstance.getInstanceId());
-        joinTemplate.joinQuery(pipelineInstance);
+        joinTemplate.joinQuery(pipelineInstance,new String[]{"pipeline","user"});
         // 运行实例放入内存中
         pipelineIdOrInstanceId.put(pipelineId, instanceId);
 
@@ -297,6 +297,8 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
             pipelineDetails.setInstanceId(instanceId);
             pipelineDetails.setRunWay(runMsg.getRunWay());
             pipelineDetails.setAgent(runMsg.getAgent());
+            pipelineDetails.setExecUser(pipelineInstance.getUser());
+            pipelineDetails.setExecType(pipelineInstance.getRunWay());
 
             // 流水线运行任务
             pipelineDetails.setStageList(stageList);
@@ -370,7 +372,7 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
         }
 
         pipelineInstanceService.instanceRuntime(pipelineInstance.getInstanceId());
-        joinTemplate.joinQuery(pipelineInstance);
+        joinTemplate.joinQuery(pipelineInstance,new String[]{"pipeline","user"});
 
         // 运行实例放入内存中
         pipelineIdOrInstanceId.put(pipelineId, instanceId);

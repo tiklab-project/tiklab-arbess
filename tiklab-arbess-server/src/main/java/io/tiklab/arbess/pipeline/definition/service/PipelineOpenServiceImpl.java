@@ -72,7 +72,7 @@ public class PipelineOpenServiceImpl implements PipelineOpenService {
     public PipelineOpen findOneOpen(String openId) {
         PipelineOpenEntity openEntity = pipelineOpenDao.findOneOpen(openId);
         PipelineOpen pipelineOpen = BeanMapper.map(openEntity, PipelineOpen.class);
-        joinTemplate.joinQuery(pipelineOpen);
+        joinTemplate.joinQuery(pipelineOpen,new String[]{"pipeline"});
         return pipelineOpen;
     }
 
@@ -88,7 +88,7 @@ public class PipelineOpenServiceImpl implements PipelineOpenService {
             return new ArrayList<>();
         }
         List<PipelineOpen> list = BeanMapper.mapList(allOpen, PipelineOpen.class);
-        joinTemplate.joinQuery(list);
+        joinTemplate.joinQuery(list,new String[]{"pipeline"});
         return list;
     }
 

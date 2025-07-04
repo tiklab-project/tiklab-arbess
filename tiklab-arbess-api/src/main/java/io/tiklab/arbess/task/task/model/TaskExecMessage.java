@@ -2,6 +2,7 @@ package io.tiklab.arbess.task.task.model;
 
 import io.tiklab.arbess.pipeline.definition.model.Pipeline;
 import io.tiklab.arbess.support.message.model.TaskMessage;
+import io.tiklab.user.user.model.User;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +28,16 @@ public class TaskExecMessage {
     private String pipelineId;
 
     private String instanceId;
+
+    private User execUser;
+
+    public User getExecUser() {
+        return execUser;
+    }
+
+    public void setExecUser(User execUser) {
+        this.execUser = execUser;
+    }
 
     public String getInstanceId() {
         return instanceId;

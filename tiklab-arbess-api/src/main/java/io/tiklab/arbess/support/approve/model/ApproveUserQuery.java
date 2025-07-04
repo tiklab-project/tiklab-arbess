@@ -18,12 +18,21 @@ public class ApproveUserQuery {
 
     private String approveId;
 
+    private String pipelineId;
+
     // 分页参数
     private Page pageParam= new Page();
 
     // 排序参数
     private List<Order> orderParams = OrderBuilders.instance().desc("createTime").get();
 
+    public String getPipelineId() {
+        return pipelineId;
+    }
+
+    public void setPipelineId(String pipelineId) {
+        this.pipelineId = pipelineId;
+    }
 
     public String getApproveId() {
         return approveId;

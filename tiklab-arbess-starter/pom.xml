@@ -106,31 +106,25 @@
     </dependencies>
 
     <profiles>
-        <!--linux-->
+
+        <!--linux-centos-->
         <profile>
-            <id>system-linux</id>
+            <id>system-linux-centos</id>
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
             <dependencies>
                 <dependency>
                     <groupId>io.tiklab</groupId>
-                    <artifactId>tiklab-jdk-linux</artifactId>
+                    <artifactId>tiklab-jdk-linux-${systemBuildType}</artifactId>
                     <version>${tiklab-jdk.version}</version>
                     <type>zip</type>
                     <scope>provided</scope>
                 </dependency>
                 <dependency>
                     <groupId>io.tiklab</groupId>
-                    <artifactId>tiklab-postgresql-linux</artifactId>
+                    <artifactId>tiklab-postgresql-linux-${systemBuildType}-centos</artifactId>
                     <version>${tiklab-postgresql.version}</version>
-                    <type>zip</type>
-                    <scope>provided</scope>
-                </dependency>
-                <dependency>
-                    <groupId>io.tiklab</groupId>
-                    <artifactId>tiklab-spotbugs</artifactId>
-                    <version>${tiklab-spotbugs.version}</version>
                     <type>zip</type>
                     <scope>provided</scope>
                 </dependency>
@@ -156,22 +150,207 @@
                                     <artifactItems>
                                         <artifactItem>
                                             <groupId>io.tiklab</groupId>
-                                            <artifactId>tiklab-postgresql-linux</artifactId>
+                                            <artifactId>tiklab-postgresql-linux-${systemBuildType}-centos</artifactId>
                                             <version>${tiklab-postgresql.version}</version>
                                             <type>zip</type>
                                             <outputDirectory>embbed</outputDirectory>
                                         </artifactItem>
                                         <artifactItem>
                                             <groupId>io.tiklab</groupId>
-                                            <artifactId>tiklab-jdk-linux</artifactId>
+                                            <artifactId>tiklab-jdk-linux-${systemBuildType}</artifactId>
                                             <version>${tiklab-jdk.version}</version>
+                                            <type>zip</type>
+                                            <outputDirectory>embbed</outputDirectory>
+                                        </artifactItem>
+                                    </artifactItems>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <!--linux-ubuntu-->
+        <profile>
+            <id>system-linux-ubuntu</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>io.tiklab</groupId>
+                    <artifactId>tiklab-jdk-linux-${systemBuildType}</artifactId>
+                    <version>${tiklab-jdk.version}</version>
+                    <type>zip</type>
+                    <scope>provided</scope>
+                </dependency>
+                <dependency>
+                    <groupId>io.tiklab</groupId>
+                    <artifactId>tiklab-postgresql-linux-${systemBuildType}-ubuntu</artifactId>
+                    <version>${tiklab-postgresql.version}</version>
+                    <type>zip</type>
+                    <scope>provided</scope>
+                </dependency>
+            </dependencies>
+            <properties>
+                <assembly>linux</assembly>
+                <systemType>linux</systemType>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <version>2.8</version>
+                        <executions>
+                            <execution>
+                                <id>unpack</id>
+                                <phase>compile</phase>
+                                <goals>
+                                    <goal>unpack</goal>
+                                </goals>
+                                <configuration>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>io.tiklab</groupId>
+                                            <artifactId>tiklab-postgresql-linux-${systemBuildType}-ubuntu</artifactId>
+                                            <version>${tiklab-postgresql.version}</version>
                                             <type>zip</type>
                                             <outputDirectory>embbed</outputDirectory>
                                         </artifactItem>
                                         <artifactItem>
                                             <groupId>io.tiklab</groupId>
-                                            <artifactId>tiklab-spotbugs</artifactId>
-                                            <version>${tiklab-spotbugs.version}</version>
+                                            <artifactId>tiklab-jdk-linux-${systemBuildType}</artifactId>
+                                            <version>${tiklab-jdk.version}</version>
+                                            <type>zip</type>
+                                            <outputDirectory>embbed</outputDirectory>
+                                        </artifactItem>
+                                    </artifactItems>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <!--linux-docker-amd-->
+        <profile>
+            <id>system-docker-amd</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>io.tiklab</groupId>
+                    <artifactId>tiklab-jdk-linux-amd</artifactId>
+                    <version>${tiklab-jdk.version}</version>
+                    <type>zip</type>
+                    <scope>provided</scope>
+                </dependency>
+                <dependency>
+                    <groupId>io.tiklab</groupId>
+                    <artifactId>tiklab-postgresql-linux-amd-centos</artifactId>
+                    <version>${tiklab-postgresql.version}</version>
+                    <type>zip</type>
+                    <scope>provided</scope>
+                </dependency>
+            </dependencies>
+            <properties>
+                <assembly>linux</assembly>
+                <systemType>docker</systemType>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <version>2.8</version>
+                        <executions>
+                            <execution>
+                                <id>unpack</id>
+                                <phase>compile</phase>
+                                <goals>
+                                    <goal>unpack</goal>
+                                </goals>
+                                <configuration>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>io.tiklab</groupId>
+                                            <artifactId>tiklab-postgresql-linux-amd-centos</artifactId>
+                                            <version>${tiklab-postgresql.version}</version>
+                                            <type>zip</type>
+                                            <outputDirectory>embbed</outputDirectory>
+                                        </artifactItem>
+                                        <artifactItem>
+                                            <groupId>io.tiklab</groupId>
+                                            <artifactId>tiklab-jdk-linux-amd</artifactId>
+                                            <version>${tiklab-jdk.version}</version>
+                                            <type>zip</type>
+                                            <outputDirectory>embbed</outputDirectory>
+                                        </artifactItem>
+                                    </artifactItems>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <!--linux-docker-arm-->
+        <profile>
+            <id>system-docker-arm</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>io.tiklab</groupId>
+                    <artifactId>tiklab-jdk-linux-arm</artifactId>
+                    <version>${tiklab-jdk.version}</version>
+                    <type>zip</type>
+                    <scope>provided</scope>
+                </dependency>
+                <dependency>
+                    <groupId>io.tiklab</groupId>
+                    <artifactId>tiklab-postgresql-linux-arm-ubuntu</artifactId>
+                    <version>${tiklab-postgresql.version}</version>
+                    <type>zip</type>
+                    <scope>provided</scope>
+                </dependency>
+            </dependencies>
+            <properties>
+                <assembly>linux</assembly>
+                <systemType>docker</systemType>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <version>2.8</version>
+                        <executions>
+                            <execution>
+                                <id>unpack</id>
+                                <phase>compile</phase>
+                                <goals>
+                                    <goal>unpack</goal>
+                                </goals>
+                                <configuration>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>io.tiklab</groupId>
+                                            <artifactId>tiklab-postgresql-linux-arm-ubuntu</artifactId>
+                                            <version>${tiklab-postgresql.version}</version>
+                                            <type>zip</type>
+                                            <outputDirectory>embbed</outputDirectory>
+                                        </artifactItem>
+                                        <artifactItem>
+                                            <groupId>io.tiklab</groupId>
+                                            <artifactId>tiklab-jdk-linux-arm</artifactId>
+                                            <version>${tiklab-jdk.version}</version>
                                             <type>zip</type>
                                             <outputDirectory>embbed</outputDirectory>
                                         </artifactItem>
@@ -199,13 +378,6 @@
                     <groupId>io.tiklab</groupId>
                     <artifactId>tiklab-postgresql-windows</artifactId>
                     <version>${tiklab-postgresql.version}</version>
-                    <type>zip</type>
-                    <scope>provided</scope>
-                </dependency>
-                <dependency>
-                    <groupId>io.tiklab</groupId>
-                    <artifactId>tiklab-spotbugs</artifactId>
-                    <version>${tiklab-spotbugs.version}</version>
                     <type>zip</type>
                     <scope>provided</scope>
                 </dependency>
@@ -243,13 +415,6 @@
                                             <type>zip</type>
                                             <outputDirectory>embbed</outputDirectory>
                                         </artifactItem>
-                                        <artifactItem>
-                                            <groupId>io.tiklab</groupId>
-                                            <artifactId>tiklab-spotbugs</artifactId>
-                                            <version>${tiklab-spotbugs.version}</version>
-                                            <type>zip</type>
-                                            <outputDirectory>embbed</outputDirectory>
-                                        </artifactItem>
                                     </artifactItems>
                                 </configuration>
                             </execution>
@@ -278,13 +443,6 @@
                     <groupId>io.tiklab</groupId>
                     <artifactId>tiklab-postgresql-mac</artifactId>
                     <version>${tiklab-postgresql.version}</version>
-                    <type>zip</type>
-                    <scope>provided</scope>
-                </dependency>
-                <dependency>
-                    <groupId>io.tiklab</groupId>
-                    <artifactId>tiklab-spotbugs</artifactId>
-                    <version>${tiklab-spotbugs.version}</version>
                     <type>zip</type>
                     <scope>provided</scope>
                 </dependency>
@@ -318,13 +476,6 @@
                                             <type>zip</type>
                                             <outputDirectory>embbed</outputDirectory>
                                         </artifactItem>
-                                        <artifactItem>
-                                            <groupId>io.tiklab</groupId>
-                                            <artifactId>tiklab-spotbugs</artifactId>
-                                            <version>${tiklab-spotbugs.version}</version>
-                                            <type>zip</type>
-                                            <outputDirectory>embbed</outputDirectory>
-                                        </artifactItem>
                                     </artifactItems>
                                 </configuration>
                             </execution>
@@ -352,20 +503,40 @@
 
         <!--release-->
         <profile>
-            <id>env-release</id>
+            <id>env-release-linux</id>
             <properties>
-                <yaml-type>/</yaml-type>
+                <yaml-type>/config/release/linux</yaml-type>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>env-release-mac</id>
+            <properties>
+                <yaml-type>/config/release/mac</yaml-type>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>env-release-windows</id>
+            <properties>
+                <yaml-type>/config/release/windows</yaml-type>
             </properties>
         </profile>
 
         <!--demo-->
         <profile>
-            <id>env-demo</id>
+            <id>env-demo-ce</id>
             <properties>
-                <yaml-type>/config/demo</yaml-type>
+                <yaml-type>/config/demo/ce</yaml-type>
             </properties>
         </profile>
 
+        <profile>
+            <id>env-demo-ee</id>
+            <properties>
+                <yaml-type>/config/demo/ee</yaml-type>
+            </properties>
+        </profile>
         <!--demo-->
         <profile>
             <id>env-prd</id>
@@ -374,6 +545,22 @@
             </properties>
         </profile>
 
+        <profile>
+            <id>system-build-type-arm</id>
+            <properties>
+                <systemBuildType>arm</systemBuildType>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>system-build-type-amd</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <systemBuildType>amd</systemBuildType>
+            </properties>
+        </profile>
 
     </profiles>
 
@@ -439,8 +626,8 @@
                     <resources>
                         <resource>
                             <targetPath>./</targetPath>
-                            <directory>${kanassProject.build.directory}</directory>
-                            <include>${kanassProject.build.finalName}-distribution.tar.gz</include>
+                            <directory>${project.build.directory}</directory>
+                            <include>${project.build.finalName}.tar.gz</include>
                         </resource>
                     </resources>
                 </configuration>

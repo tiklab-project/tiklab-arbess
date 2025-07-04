@@ -46,11 +46,11 @@ public interface ApproveUserService {
 
     /**
      * 查询流水线审批用户
-     * @param userId  用户id
-     * @param approveId 审批id
+     * @param approveId  用户id
+     * @param pipelineId 流水线id
      * @return 审批用户
      */
-    ApproveUser findApproveUser(String userId, String approveId);
+    ApproveUser findApproveUser(String approveId, String pipelineId);
 
     /**
      * 条件查询环流水线审批用户
