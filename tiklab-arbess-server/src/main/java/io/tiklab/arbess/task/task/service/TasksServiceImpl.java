@@ -697,6 +697,10 @@ public class TasksServiceImpl implements TasksService {
                         task.setBuildAddress(DEFAULT_CODE_ADDRESS);
                         task.setBuildOrder(PHP_DEFAULT_ORDER);
                     }
+                    case TASK_BUILD_NET_CORE -> {
+                        task.setBuildAddress(DEFAULT_CODE_ADDRESS);
+                        task.setBuildOrder(NET_CORE_DEFAULT_ORDER);
+                    }
                 }
                 buildService.createBuild(task);
             }
@@ -1231,7 +1235,8 @@ public class TasksServiceImpl implements TasksService {
                     TASK_CODE_GITLAB, TASK_CODE_XCODE, TASK_CODE_SVN,TASK_CODE_PRI_GITLAB ->{
                 return TASK_TYPE_CODE;
             }
-            case TASK_BUILD_MAVEN, TASK_BUILD_NODEJS, TASK_BUILD_DOCKER,TASK_BUILD_GO,TASK_BUILD_PHP,TASK_BUILD_PYTHON ->{
+            case TASK_BUILD_MAVEN, TASK_BUILD_NODEJS, TASK_BUILD_DOCKER,TASK_BUILD_GO
+            ,TASK_BUILD_PHP,TASK_BUILD_PYTHON,TASK_BUILD_NET_CORE ->{
                 return TASK_TYPE_BUILD;
             }
             case TASK_TEST_MAVENTEST, TASK_TEST_TESTON  ->{
@@ -1306,6 +1311,9 @@ public class TasksServiceImpl implements TasksService {
             }
             case TASK_BUILD_GO -> {
                 return "Go构建";
+            }
+            case TASK_BUILD_NET_CORE -> {
+                return ".Net Core构建";
             }
             case TASK_DEPLOY_LINUX -> {
                 return "主机部署";

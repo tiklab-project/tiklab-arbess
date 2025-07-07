@@ -102,6 +102,16 @@
             <artifactId>tiklab-sourcefare-api</artifactId>
             <version>${tiklab-testhubo.version}</version>
         </dependency>
+        <dependency>
+            <groupId>io.tiklab</groupId>
+            <artifactId>tiklab-install-api</artifactId>
+            <version>${tiklab-install.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.tiklab</groupId>
+            <artifactId>tiklab-dsm-core</artifactId>
+            <version>${tiklab-dsm.version}</version>
+        </dependency>
     </dependencies>
 
     <build>

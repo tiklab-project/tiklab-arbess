@@ -20,9 +20,6 @@ public class SourceFareScan {
     // 创建时间
     private String createTime;
 
-    // 计划ID
-    private String planId;
-
     // 项目ID
     private String projectId;
 
@@ -79,14 +76,6 @@ public class SourceFareScan {
 
     public void setCreateTime(String createTime) {
         this.createTime = createTime;
-    }
-
-    public String getPlanId() {
-        return planId;
-    }
-
-    public void setPlanId(String planId) {
-        this.planId = planId;
     }
 
     public String getProjectId() {

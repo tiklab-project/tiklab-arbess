@@ -1,8 +1,8 @@
 package io.tiklab.arbess.starter.config;
 
+import io.tiklab.arbess.support.util.task.TaskUpdate;
 import io.tiklab.dsm.model.DsmConfig;
 import io.tiklab.dsm.model.DsmVersion;
-import io.tiklab.dsm.support.DsmConfigBuilder;
 import io.tiklab.dsm.support.DsmVersionBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -109,6 +109,13 @@ public class ArbessDsmAutoConfiguration {
                 .get();
 
         versionList.add(dsmVersion13);
+
+        DsmVersion message_109 = DsmVersionBuilder.instance()
+                .version("message_1.0.9")
+                .db(new String[]{
+                        "message_1.0.9",
+                }).get();
+        versionList.add(message_109);
 
         return versionList;
     }

@@ -15,14 +15,6 @@ import org.springframework.context.annotation.Configuration;
 public class ArbessGatewayAutoConfiguration {
 
     @Bean
-    AuthorHandler authorHandler(Authenticator authenticator, IgnoreConfig ignoreConfig){
-        DefaultAuthorHandler authorHandler = new DefaultAuthorHandler();
-        authorHandler.setAuthenticator(authenticator);
-        authorHandler.setIgnoreConfig(ignoreConfig);
-        return authorHandler;
-    }
-
-    @Bean
     GatewayConfig gatewayConfig(IgnoreConfig ignoreConfig){
         GatewayConfig gatewayConfig = new GatewayConfig();
         gatewayConfig.setIgnoreConfig(ignoreConfig);
@@ -86,7 +78,8 @@ public class ArbessGatewayAutoConfiguration {
                         "/other/handler",
                         "/eam/auth/valid",
                         "/init/install/findStatus",
-                        "/openapi/doc"
+                        "/openapi/doc",
+                        "/scm/file/upload"
                 })
                 .ignorePreUrls(new String[]{
                         "/service",
