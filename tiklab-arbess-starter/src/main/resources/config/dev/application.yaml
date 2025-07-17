@@ -14,9 +14,17 @@ jdbc:
 
 #jdbc:
 #  driverClassName: com.mysql.cj.jdbc.Driver
-#  url: jdbc:mysql://172.10.1.10:3306/tiklab_arbess_linux_test?characterEncoding=utf8&useSSL=false
+#  url: jdbc:mysql://172.10.1.10:3306/tiklab_arbess?characterEncoding=utf8&useSSL=false
 #  username: root
 #  password: darth2020
+
+#spring:
+#  main:
+#    log-startup-info: true  # 启动时打印 Bean 注入信息（默认就是 true）
+#
+#logging:
+#  level:
+#    org.springframework.beans.factory.support.DefaultListableBeanFactory: DEBUG
 
 postgresql:
   embbed:

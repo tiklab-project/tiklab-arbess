@@ -15,6 +15,7 @@ import io.tiklab.user.user.model.User;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 流水线服务接口
@@ -71,6 +72,13 @@ public interface PipelineService {
      */
     Pipeline findPipelineNoQuery(String pipelineId);
 
+
+    /**
+     * 获取流水线信息
+     * @param pipelineId 流水线id
+     * @return 流水线
+     */
+    Pipeline findPipelineAndQuery(String pipelineId);
 
     /**
      * 更新流水线负责人
@@ -160,6 +168,14 @@ public interface PipelineService {
      * @return 流水线
      */
     List<Pipeline> findRecentlyPipeline(Integer number,String pipelineId);
+
+
+    /**
+     * 获取用户流水线数量信息
+     * @param query 用户id
+     * @return 流水线数量信息
+     */
+    Map<String,Integer> findPipelineCount(PipelineQuery query);
 
 }
 

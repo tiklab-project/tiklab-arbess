@@ -102,6 +102,7 @@ public class PipelineFollowDao {
         QueryCondition queryCondition = QueryBuilders.createQuery(PipelineFollowEntity.class)
                 .eq("userId", followQuery.getUserId())
                 .eq("pipelineId", followQuery.getPipelineId())
+                .in("pipelineId", followQuery.getPipelineIds())
                 .orders(followQuery.getOrderParams())
                 .get();
         return jpaTemplate.findList(queryCondition, PipelineFollowEntity.class);

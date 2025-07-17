@@ -60,8 +60,7 @@ public class PipelineFollowServiceImpl implements PipelineFollowService {
 
     @Override
     public List<PipelineFollow> findFollowQueryList(PipelineFollowQuery followQuery){
-        List<PipelineFollowEntity> list =
-                pipelineFollowDao.findFollowQueryList(followQuery);
+        List<PipelineFollowEntity> list = pipelineFollowDao.findFollowQueryList(followQuery);
         if (list == null || list.isEmpty()){
             return new ArrayList<>();
         }
@@ -74,6 +73,7 @@ public class PipelineFollowServiceImpl implements PipelineFollowService {
     }
 
 
+    @Override
     public void deletePipelineFollow(String pipelineId){
         PipelineFollowQuery followQuery = new PipelineFollowQuery();
         followQuery.setPipelineId(pipelineId);

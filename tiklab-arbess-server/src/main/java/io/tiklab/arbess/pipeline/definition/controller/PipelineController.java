@@ -128,6 +128,14 @@ public class PipelineController {
         return Result.ok(pipeline);
     }
 
+    @RequestMapping(path="/findPipelineAndQuery",method = RequestMethod.POST)
+    public Result<Pipeline> findPipelineAndQuery(@NotNull String pipelineId){
+
+        Pipeline pipeline = pipelineService.findPipelineAndQuery(pipelineId);
+
+        return Result.ok(pipeline);
+    }
+
     @RequestMapping(path="/updatePipelineRootUser",method = RequestMethod.POST)
     // @ApiMethod(name = "updatePipelineRootUser",desc = "更新流水线负责人")
     // @ApiParam(name = "dmRolePatch",desc = "流水线负责人信息",required = true)
@@ -284,6 +292,15 @@ public class PipelineController {
     public Result<String> findRecentlyPipeline(@NotNull Integer number,@NotNull String pipelineId){
 
         List<Pipeline> pipelineList = pipelineService.findRecentlyPipeline(number,pipelineId);
+
+        return Result.ok(pipelineList);
+    }
+
+
+    @RequestMapping(path="/findPipelineCount",method = RequestMethod.POST)
+    public Result<String> findPipelineCount(@RequestBody @NotNull @Valid PipelineQuery query){
+
+        Map<String,Integer> pipelineList = pipelineService.findPipelineCount(query);
 
         return Result.ok(pipelineList);
     }

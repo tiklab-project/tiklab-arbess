@@ -117,6 +117,13 @@ public class ArbessDsmAutoConfiguration {
                 }).get();
         versionList.add(message_109);
 
+        DsmVersion agentRole = DsmVersionBuilder.instance()
+                .version("pip-agent-role_1.0.0")
+                .db(new String[]{
+                        "pip-agent-role_1.0.0",
+                }).get();
+        versionList.add(agentRole);
+
         return versionList;
     }
 

@@ -64,5 +64,13 @@ public class AgentController {
         return Result.ok();
     }
 
+    @RequestMapping(path="/updateAgent",method = RequestMethod.POST)
+    public Result<Void> updateAgent( @RequestBody @NotNull @Valid Agent agent){
+
+        agentService.updateAgent(agent);
+
+        return Result.ok();
+    }
+
 
 }

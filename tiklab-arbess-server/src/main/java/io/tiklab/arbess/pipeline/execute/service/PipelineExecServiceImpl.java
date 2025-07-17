@@ -68,9 +68,6 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
     PipelineInstanceService pipelineInstanceService;
 
     @Autowired
-    TasksExecService tasksExecService;
-
-    @Autowired
     StageExecService stageExecService;
 
     @Autowired
@@ -107,9 +104,6 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
     TaskBuildProductService taskBuildProductService;
 
     @Autowired
-    PipelineQueueService queueService;
-
-    @Autowired
     TaskMessageService taskMessageService;
 
     public final Logger logger = LoggerFactory.getLogger(PipelineExecServiceImpl.class);
@@ -143,7 +137,7 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
         String pipelineId = runMsg.getPipelineId();
 
         // agent是否连接
-        Agent agent = judgeAgent(runMsg.getAgentId());
+        Agent agent = judgeAgent();
         pipelineIdOrAgentId.put(pipelineId, agent);
         runMsg.setAgent(agent);
 
@@ -180,12 +174,8 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
             throw new ApplicationException("您没有权限执行该流水线,请联系管理员授权!");
         }
 
-        Agent agent;
-        if (StringUtils.isEmpty(runMsg.getAgentId())){
-            agent = agentService.findDefaultAgent();
-        }else {
-            agent = agentService.findAgent(runMsg.getAgentId());
-        }
+        Agent agent = judgeAgent();
+
         if (Objects.isNull(agent)){
             throw new ApplicationException("无法获取到流水线执行Agent！");
         }
@@ -222,7 +212,6 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
     /**
      * 放入正在执行的流水线缓存中
      * @param pipelineId 流水线id
-     * @return 流水线信息
      */
     public void validExecPipeline(String pipelineId){
         // String pipelineId = runMsg.getPipelineId();
@@ -514,14 +503,9 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
     /**
      * 判断Agent
      */
-    public Agent judgeAgent(String agentId){
+    public Agent judgeAgent(){
 
-        Agent agent;
-        if (StringUtils.isEmpty(agentId)){
-            agent = agentService.findDefaultAgent();
-        }else {
-            agent = agentService.findAgent(agentId);
-        }
+        Agent agent = agentService.findDefaultAgent();
         if (Objects.isNull(agent)){
             throw new ApplicationException("无法获取到流水线执行Agent！");
         }
@@ -530,6 +514,7 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
         if (Objects.isNull(session)){
             throw new ApplicationException("流水线Agent断开连接，无法执行。");
         }
+        logger.warn("默认分配的Agent：{},{}",agent.getName(),agent.getAddress());
         return agent;
     }
 

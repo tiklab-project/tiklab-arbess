@@ -1,5 +1,7 @@
 package io.tiklab.arbess.pipeline.definition.dao;
 
+import io.tiklab.arbess.pipeline.definition.entity.PipelineFollowEntity;
+import io.tiklab.arbess.pipeline.definition.model.PipelineFollow;
 import io.tiklab.core.exception.SystemException;
 import io.tiklab.core.order.Order;
 import io.tiklab.core.order.OrderTypeEnum;
@@ -85,44 +87,25 @@ public class PipelineDao {
     }
 
     // 关联查询，查询出收藏的
-    public Pagination<PipelineEntity> findPipelineListQuery(PipelineQuery query){
-        String sql = "select pip_pipeline.* from pip_pipeline ";
-        sql = sql.concat(" where id in ( ");
-        String ids = "";
-        String[] idList = query.getIdString();
+    public Pagination<PipelineEntity> findPipelinePageByFollow(PipelineQuery query){
+        QueryCondition queryCondition = QueryBuilders.createQuery(PipelineEntity.class,"pip")
+                .leftJoin(PipelineFollowEntity.class, "pif", "pip.id=pif.pipelineId")
+                .eq("pip.userId", query.getCreateUserId())
+                .eq("pif.userId", query.getUserId())
+                .eq("pip.envId", query.getEnvId())
+                .eq("pip.groupId", query.getGroupId())
+                .eq("pip.state", query.getPipelineState())
+                .eq("pip.power", query.getPipelinePower())
+                .in("pip.id", query.getIdString())
+                .like("pip.name", query.getPipelineName(), false)
+                .orders(query.getOrderParams())
+                .pagination(query.getPageParam())
+                .get();
 
-        for (int i = 0; i < idList.length; i++) {
-            if (i == idList.length-1){
-                ids = ids.concat("'" + idList[i]+ "'");
-            }else {
-                ids = ids.concat("'" + idList[i]+ "',");
-            }
-        }
-
-        sql = sql.concat(ids+") and ");
-
-        Integer follow = query.getPipelineFollow();
-        String followSql=  "select pip_other_follow.pipeline_id from pip_other_follow where user_id = '"+query.getUserId()+"'";
-        if (follow == 1){
-            sql = sql.concat(" id in  (" +followSql +")");
-        }else {
-            sql = sql.concat(" id not in (" +followSql +")");
-        }
-
-        String pipelineName = query.getPipelineName();
-        if (!Objects.isNull(pipelineName)){
-            sql = sql.concat(" and name ILIKE '%").concat(pipelineName).concat("%'");
-        }
-
-        return jpaTemplate.getJdbcTemplate().findPage(sql, null, query.getPageParam(),
-                new BeanPropertyRowMapper<>(PipelineEntity.class));
+        return jpaTemplate.findPage(queryCondition,PipelineEntity.class);
     }
 
-
     public List<PipelineEntity> findPipelineList(PipelineQuery query){
-        // PipelineCondition condition = findQueryCondition(query);
-        // return jpaTemplate.getJdbcTemplate().query(condition.getSql(), condition.getObjects(),
-        //         new BeanPropertyRowMapper<>(PipelineEntity.class));
         QueryCondition queryCondition = QueryBuilders.createQuery(PipelineEntity.class)
                 .eq("userId", query.getCreateUserId())
                 .eq("envId", query.getEnvId())
@@ -191,88 +174,5 @@ public class PipelineDao {
         return sqlDesc.toString();
     }
 
-
-    PipelineCondition findQueryCondition(PipelineQuery query) {
-
-        List<Object> params = new ArrayList<>();
-        String sql = "select pip_pipeline.* from pip_pipeline where 1=1";
-
-        if (!StringUtils.isBlank(query.getCreateUserId())){
-            sql = sql.concat(" and user_id = ?");
-            params.add(query.getCreateUserId());
-        }
-
-        if (!StringUtils.isBlank(query.getPipelineName())){
-            sql = sql.concat(" and name ILIKE '%"+query.getPipelineName()+"%'");
-        }
-
-        if (!Objects.isNull(query.getPipelineState()) && query.getPipelineState()!=0){
-            sql = sql.concat(" and state = ?");
-            params.add(query.getPipelineState());
-        }
-
-        if (!StringUtils.isBlank(query.getEnvId())){
-            sql = sql.concat(" and env_id = ?");
-            params.add(query.getEnvId());
-        }
-
-        if (!StringUtils.isBlank(query.getGroupId())){
-            sql = sql.concat(" and group_id = ?");
-            params.add(query.getGroupId());
-        }
-
-        if (!Objects.isNull(query.getPipelinePower()) && query.getPipelinePower()!=0){
-            sql = sql.concat(" and power = ?");
-            params.add(query.getPipelinePower());
-        }
-
-        if (!Objects.isNull(query.getIdString()) && query.getIdString().length !=0 ){
-            String ids = "";
-            String[] idList = query.getIdString();
-            for (int i = 0; i < idList.length; i++) {
-                if (i == idList.length-1){
-                    ids = ids.concat("'" + idList[i]+ "'");
-                }else {
-                    ids = ids.concat("'" + idList[i]+ "',");
-                }
-            }
-            sql = sql.concat(" and id in ("+ids+") ");
-        }
-
-        if (query.getOrderParams() != null && !query.getOrderParams().isEmpty()) {
-            sql += " order by " + orderBy(query.getOrderParams(), PipelineEntity.class);
-        }
-        return new PipelineCondition(sql,params.toArray());
-
-    }
-
 }
 
-
-class PipelineCondition{
-
-    private String sql;
-
-    private Object[] objects;
-
-    public PipelineCondition(String sql, Object[] objects) {
-        this.sql = sql;
-        this.objects = objects;
-    }
-
-    public String getSql() {
-        return sql;
-    }
-
-    public void setSql(String sql) {
-        this.sql = sql;
-    }
-
-    public Object[] getObjects() {
-        return objects;
-    }
-
-    public void setObjects(Object[] objects) {
-        this.objects = objects;
-    }
-}

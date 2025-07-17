@@ -90,16 +90,7 @@ public class PipelineServiceImpl implements PipelineService {
     PipelineOpenService openService;
 
     @Autowired
-    PostprocessService postprocessService;
-
-    @Autowired
-    TriggerService triggerService;
-
-    @Autowired
     VariableService variableService;
-
-    @Autowired
-    ConditionService conditionService;
 
     @Autowired
     MessageDmNoticeService messageDmNoticeService;
@@ -263,6 +254,24 @@ public class PipelineServiceImpl implements PipelineService {
     }
 
     @Override
+    public Pipeline findPipelineAndQuery(String pipelineId){
+        PipelineEntity pipelineEntity = pipelineDao.findPipelineById(pipelineId);
+        // User user = userService.findOne(pipelineEntity.getUserId());
+        Pipeline pipeline = BeanMapper.map(pipelineEntity, Pipeline.class);
+        // pipeline.setUser(user);
+        String loginId = LoginContext.getLoginId();
+        PipelineFollowQuery pipelineFollowQuery = new PipelineFollowQuery();
+        pipelineFollowQuery.setPipelineId(pipelineId);
+        pipelineFollowQuery.setUserId(loginId);
+        List<PipelineFollow> followQueryList = followService.findFollowQueryList(pipelineFollowQuery);
+        if (!followQueryList.isEmpty()){
+            pipeline.setCollect(1);
+        }
+        joinTemplate.joinQuery(pipeline,new String[]{"env","user","group"});
+        return pipeline;
+    }
+
+    @Override
     public void updatePipelineRootUser(DmRolePatch dmRolePatch){
         dmRoleService.updateDomainRootUser(dmRolePatch);
 
@@ -318,7 +327,7 @@ public class PipelineServiceImpl implements PipelineService {
         // 用户收藏的流水线
         Integer follow = query.getPipelineFollow();
         if (!Objects.isNull(follow) && follow == 1){
-            Pagination<PipelineEntity> pipelineListQuery = pipelineDao.findPipelineListQuery(query);
+            Pagination<PipelineEntity> pipelineListQuery = pipelineDao.findPipelinePageByFollow(query);
             List<PipelineEntity> dataList = pipelineListQuery.getDataList();
             if (dataList.isEmpty()){
                 return PaginationBuilder.build(pipelineListQuery, new ArrayList<>());
@@ -334,13 +343,11 @@ public class PipelineServiceImpl implements PipelineService {
                 list.add(pipelineMessage);
             }
 
-
             // 查询用户信息
             Map<String, User> pipelineUser = findPipelineUser(userIdList);
 
             List<Pipeline> pipelines = list.stream()
                     .peek(pipeline -> pipeline.setUser(pipelineUser.get(pipeline.getUser().getId())))
-                    // .peek(pipeline -> pipeline.setExec(homeService.findPermissions(pipeline.getId(),PIPELINE_RUN_KEY)))
                     .peek(pipeline -> pipeline.setExec(true))
                     .collect(Collectors.toList());
 
@@ -387,13 +394,42 @@ public class PipelineServiceImpl implements PipelineService {
         // 是否执行
         List<Pipeline> pipelines = list.stream()
                 .peek(pipeline -> pipeline.setUser(pipelineUser.get(pipeline.getUser().getId())))
-                // .peek(pipeline -> pipeline.setExec(homeService.findPermissions(pipeline.getId(),PIPELINE_RUN_KEY)))
                 .peek(pipeline -> pipeline.setExec(true))
                 .collect(Collectors.toList());
 
         return PaginationBuilder.build(pipelinePage,pipelines);
     }
 
+    @Override
+    public Map<String,Integer> findPipelineCount(PipelineQuery query){
+
+        String userId = query.getUserId();
+        String[] builders = authorityService.findUserPipelineIdString(userId);
+        query.setIdString(builders);
+
+        List<PipelineEntity> pipelineList = pipelineDao.findPipelineList(query);
+
+        Map<String,Integer> map = new HashMap<>();
+
+        long userPipelineNumber = pipelineList.stream().filter(pipelineEntity -> pipelineEntity.getUserId().equals(userId)).count();
+        map.put("userPipelineNumber", (int) userPipelineNumber);
+
+        map.put("pipelineNumber",pipelineList.size());
+
+        List<String> strings = pipelineList.stream().map(PipelineEntity::getId).collect(Collectors.toList());
+
+        if (strings.isEmpty()){
+            return map;
+        }
+
+        PipelineFollowQuery pipelineFollowQuery = new PipelineFollowQuery();
+        pipelineFollowQuery.setPipelineIds(strings.toArray(String[]::new));
+        pipelineFollowQuery.setUserId(userId);
+        List<PipelineFollow> followQueryList = followService.findFollowQueryList(pipelineFollowQuery);
+        map.put("userFollowNumber",followQueryList.size());
+
+        return map;
+    }
 
     @Override
     public Pagination<Pipeline> findUserPipelinePageByUser(PipelineQuery query){

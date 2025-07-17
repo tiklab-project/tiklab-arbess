@@ -1,5 +1,7 @@
 package io.tiklab.arbess.support.agent.service;
 
+import io.tiklab.arbess.pipeline.execute.service.PipelineExecServiceImpl;
+import io.tiklab.arbess.support.agent.model.AgentRole;
 import io.tiklab.core.page.Pagination;
 import io.tiklab.core.page.PaginationBuilder;
 import io.tiklab.arbess.support.agent.dao.AgentDao;
@@ -13,10 +15,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.WebSocketSession;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 import static io.tiklab.arbess.support.util.util.PipelineFinal.DEFAULT;
 
@@ -25,6 +26,9 @@ public class AgentServiceImpl implements AgentService {
 
     @Autowired
     AgentDao agentDao;
+
+    @Autowired
+    AgentRoleService agentRoleService;
 
     @Override
     public void initAgent(Agent agent) {
@@ -77,21 +81,71 @@ public class AgentServiceImpl implements AgentService {
 
     @Override
     public Agent findDefaultAgent(){
+
+        int execType = 1;
+        AgentRole agentRole = agentRoleService.findAgentRole(DEFAULT);
+        if (!Objects.isNull(agentRole)){
+            execType = agentRole.getType();
+        }
+
+        // 正在使用的agent
+        Map<String, Agent> agentMap = PipelineExecServiceImpl.pipelineIdOrAgentId;
+        List<Agent> usrAgentList = new ArrayList<>();
+        agentMap.forEach((k,v) -> usrAgentList.add(v));
+
+        // 类型 1.随机，2.轮询，3.优先空闲
         AgentQuery agentQuery = new AgentQuery();
-        agentQuery.setBusinessType(DEFAULT);
+        agentQuery.setDisplayType("yes");
         List<Agent> agentList = findAgentList(agentQuery);
+        agentList = agentList.stream()
+                .filter(agent -> agent.getConnect())
+                .collect(Collectors.toList());
+
         if (agentList.isEmpty()){
             return null;
         }
-        return agentList.get(0);
+        Set<String> usrAgentIds = usrAgentList.stream()
+                .map(Agent::getId)
+                .collect(Collectors.toSet());
+
+        List<Agent> resultAgentList = agentList.stream()
+                .filter(agent -> !usrAgentIds.contains(agent.getId()))
+                .collect(Collectors.toList());
+
+        switch (execType){
+            // 2.轮询
+            case 2 -> {
+                if (resultAgentList.isEmpty()){
+                    return agentList.get(0);
+                }
+                return resultAgentList.get(0);
+            }
+            // 3.优先空闲
+            case 3 -> {
+                // 不选择空闲默认随机选
+                if (resultAgentList.isEmpty()){
+                    Random random = new Random();
+                    int randomIndex = random.nextInt(agentList.size());
+                    return agentList.get(randomIndex);
+                }
+                return resultAgentList.get(0);
+            }
+            default -> {
+                Random random = new Random();
+                int randomIndex = random.nextInt(agentList.size());
+                return agentList.get(randomIndex);
+            }
+        }
     }
 
     @Override
     public void updateDefaultAgent(String id) {
         Agent agent = findAgent(id);
-
-        Agent agent1 = findDefaultAgent();
-        if (!Objects.isNull(agent1)){
+        AgentQuery agentQuery = new AgentQuery();
+        agentQuery.setBusinessType(DEFAULT);
+        List<Agent> agentList = findAgentList(agentQuery);
+        if (!agentList.isEmpty()){
+            Agent agent1 = agentList.get(0);
             agent1.setBusinessType("local");
             updateAgent(agent1);
         }

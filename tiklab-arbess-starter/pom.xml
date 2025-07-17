@@ -632,7 +632,6 @@
                     </resources>
                 </configuration>
             </plugin>
-
             <!--clean-->
             <plugin>
                 <artifactId>maven-clean-plugin</artifactId>

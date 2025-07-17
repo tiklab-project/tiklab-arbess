@@ -45,6 +45,8 @@ import io.tiklab.arbess.task.test.model.TestOnRelevance;
 import io.tiklab.arbess.task.test.service.MavenTestService;
 import io.tiklab.arbess.task.test.service.RelevanceTestOnService;
 import io.tiklab.arbess.ws.service.WebSocketMessageService;
+import io.tiklab.message.message.model.Message;
+import io.tiklab.message.message.service.SendMessageNoticeService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -97,9 +99,6 @@ public class WebSocketMessageServiceImpl implements WebSocketMessageService {
     TaskBuildProductService taskBuildProductService;
 
     @Autowired
-    PipelineQueueService queueService;
-
-    @Autowired
     PipelineExecService execService;
 
     @Autowired(required = false)
@@ -117,6 +116,9 @@ public class WebSocketMessageServiceImpl implements WebSocketMessageService {
     @Value("${arbess.task.timeout:300}")
     private Integer taskTimeout;
 
+    @Autowired
+    SendMessageNoticeService dispatchNoticeService;
+
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Override
@@ -127,6 +129,8 @@ public class WebSocketMessageServiceImpl implements WebSocketMessageService {
             messageTaskDeployInstanceLogHandle( message);
         }else if (type.contains("deploy_end_instance_log")){
             messageTaskDeployInstanceLogHandle(message);
+        }else if (type.contains("task_run_end_message")){
+            taskRunMessage(message);
         }else if (type.contains("log")){
             logMessageHandle(message);
         }else if (type.contains("pipeline_run")){
@@ -514,12 +518,10 @@ public class WebSocketMessageServiceImpl implements WebSocketMessageService {
         deployInstanceService.updateDeployInstance(sourceDeployInstance);
     }
 
-    private void messageTaskDeployInstanceLogEndHandle(Object message){
+    private void taskRunMessage(Object message){
         String jsonString = JSONObject.toJSONString(message);
-        TaskDeployInstance deployInstance = JSONObject.parseObject(jsonString, TaskDeployInstance.class);
-        TaskDeployInstance sourceDeployInstance = deployInstanceService.findDeployInstance(deployInstance.getId());
-        sourceDeployInstance.setRunStatus(deployInstance.getRunStatus());
-        deployInstanceService.updateDeployInstance(sourceDeployInstance);
+        Message messages = JSONObject.parseObject(jsonString, Message.class);
+        dispatchNoticeService.sendMessage(messages);
     }
 
     /**

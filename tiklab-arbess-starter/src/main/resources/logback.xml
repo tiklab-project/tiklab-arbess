@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
+
+    <!-- 禁用 logback 启动日志输出 -->
+    <statusListener class="ch.qos.logback.core.status.NopStatusListener" />
+
     <contextListener class="io.tiklab.toolkit.logging.LoggingContextListener" />
 
     <property name="LOG_PATH" value="${APP_HOME}/logs" />
