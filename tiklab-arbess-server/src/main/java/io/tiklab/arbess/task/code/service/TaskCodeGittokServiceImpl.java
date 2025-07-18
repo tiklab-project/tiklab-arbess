@@ -8,7 +8,6 @@ import io.tiklab.arbess.setting.third.model.AuthThird;
 import io.tiklab.arbess.setting.third.service.AuthThirdService;
 import io.tiklab.arbess.support.util.util.PipelineRequestUtil;
 import io.tiklab.core.exception.ApplicationException;
-import io.tiklab.user.user.service.UserService;
 import io.tiklab.arbess.task.code.model.ThirdBranch;
 import io.tiklab.arbess.task.code.model.ThirdHouse;
 import io.tiklab.arbess.task.code.model.ThirdQuery;
@@ -33,10 +32,6 @@ public class TaskCodeGittokServiceImpl implements TaskCodeGittokService {
 
     @Autowired
     PipelineRequestUtil requestUtil;
-
-    @Autowired
-    UserService userService;
-
 
     @Override
     public List<ThirdHouse> findStoreHouseList(ThirdQuery thirdQuery){

@@ -15,7 +15,7 @@ import io.tiklab.security.logging.logging.model.Logging;
 import io.tiklab.security.logging.logging.model.LoggingType;
 import io.tiklab.security.logging.logging.service.LoggingByTempService;
 import io.tiklab.user.user.model.User;
-import io.tiklab.user.user.service.UserService;
+import io.tiklab.user.user.service.UserProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +30,7 @@ import java.util.concurrent.Executors;
 public class PipelineHomeServiceImpl implements PipelineHomeService {
 
     @Autowired
-    UserService userService;
+    UserProcessor userService;
 
     @Autowired
     PermissionService permissionService;

@@ -32,7 +32,7 @@ import io.tiklab.privilege.role.service.RoleService;
 import io.tiklab.security.backups.service.BackupsDbService;
 import io.tiklab.user.directory.service.UserDirService;
 import io.tiklab.user.orga.service.OrgaService;
-import io.tiklab.user.user.service.UserService;
+import io.tiklab.user.user.service.UserProcessor;
 import io.tiklab.user.usergroup.service.UserGroupService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -46,7 +46,7 @@ public class HomeCountServiceImpl implements HomeCountService {
 
 
     @Autowired
-    UserService userService;
+    UserProcessor userService;
 
     @Autowired
     OrgaService orgaService;
@@ -191,15 +191,15 @@ public class HomeCountServiceImpl implements HomeCountService {
     @Override
     public Map<String,Object> findTaskCount(String pipelineId,String taskId){
         VariableQuery variableQuery = new VariableQuery();
-        variableQuery.setPipelineId(pipelineId);
+        // variableQuery.setPipelineId(pipelineId);
         variableQuery.setType(2);
         variableQuery.setTaskId(taskId);
         List<Variable> variableList = variableService.findVariableList(variableQuery);
 
         TaskMessageQuery taskMessageQuery = new TaskMessageQuery();
-        taskMessageQuery.setPipelineId(pipelineId);
+        // taskMessageQuery.setPipelineId(pipelineId);
         taskMessageQuery.setType(2);
-        variableQuery.setTaskId(taskId);
+        taskMessageQuery.setTaskId(taskId);
         List<TaskMessage> taskMessageList = taskMessageService.findTaskMessageList(taskMessageQuery);
 
         Map<String,Object> map = new HashMap<>();

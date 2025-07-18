@@ -35,9 +35,26 @@ public interface TaskMessageService {
      */
     TaskMessage findTaskMessage(String id);
 
-
+    /**
+     * 查询任务消息
+     * @param id 任务消息ID
+     * @return 任务消息
+     */
     TaskMessage findTaskMessageNoQuery(String id);
 
+    /**
+     * 克隆流水线消息
+     * @param id 流水线消息ID
+     * @param cloneId 克隆流水线ID
+     */
+    void cloneMessage(String id,String cloneId);
+
+    /**
+     * 克隆流水线消息
+     * @param id 任务消息ID
+     * @param cloneId 任务流水线ID
+     */
+    void cloneTaskMessage(String id,String cloneId);
 
     /**
      * 查询所有任务消息

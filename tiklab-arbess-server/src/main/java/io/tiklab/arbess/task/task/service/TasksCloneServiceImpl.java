@@ -1,5 +1,6 @@
 package io.tiklab.arbess.task.task.service;
 
+import io.tiklab.arbess.support.message.service.TaskMessageService;
 import io.tiklab.core.exception.ApplicationException;
 import io.tiklab.arbess.setting.host.service.AuthHostService;
 import io.tiklab.arbess.setting.auth.service.AuthService;
@@ -36,6 +37,7 @@ import io.tiklab.arbess.task.test.service.TaskTestService;
 import io.tiklab.toolkit.beans.BeanMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -89,19 +91,13 @@ public class TasksCloneServiceImpl implements TasksCloneService {
     PostprocessDao postprocessDao;
 
     @Autowired
-    TaskCodeGiteeService taskCodeGiteeService;
-
-    @Autowired
-    TaskCodeGitHubService taskCodeGitHubService;
-
-    @Autowired
-    TaskCodeGitLabService taskCodeGitLabService;
-
-    @Autowired
     TaskPullArtifactService pullArtifactService;
 
     @Autowired
     TasksService tasksService;
+
+    @Autowired
+    TaskMessageService messageService;
 
 
     @Override
@@ -140,20 +136,14 @@ public class TasksCloneServiceImpl implements TasksCloneService {
             // 克隆任务条件
             conditionService.cloneCond(taskId,taskCloneId);
 
-            // 克隆任务后置处理
-            PostprocessQuery postprocessQuery = new PostprocessQuery();
-            postprocessQuery.setTaskId(taskId);
-            List<PostprocessEntity> postTaskList = postprocessDao.findPostTaskList(postprocessQuery);
-            for (PostprocessEntity postprocessEntity : postTaskList) {
-                String postProcessId = postprocessEntity.getPostId();
-                postprocessEntity.setTaskId(taskCloneId);
-                String clonePostProcessId = postprocessDao.createPost(postprocessEntity);
-                clonePostTasks(postProcessId,clonePostProcessId);
-            }
+            // 克隆任务消息
+            messageService.cloneMessage(taskId,taskCloneId);
+
         }
     }
 
     @Override
+    @Transactional
     public void cloneStageTasks(String id ,String cloneId){
 
         List<Tasks> tasks = tasksService.finAllStageTask(id);
@@ -167,24 +157,13 @@ public class TasksCloneServiceImpl implements TasksCloneService {
             String taskCloneId = tasksDao.createConfigure(tasksEntity);
 
             // 克隆任务详情
-            cloneDifferentTask(task.getTaskId(),taskCloneId,task.getTaskType());
+            cloneDifferentTask(taskId,taskCloneId,task.getTaskType());
 
             // 克隆任务变量
-            variableService.cloneVariable(task.getTaskId(),taskCloneId);
-
-            // 克隆任务条件
-            conditionService.cloneCond(task.getTaskId(),taskCloneId);
+            variableService.cloneTaskVariable(taskId,taskCloneId);
 
             // 克隆任务后置处理
-            PostprocessQuery postprocessQuery = new PostprocessQuery();
-            postprocessQuery.setTaskId(taskId);
-            List<PostprocessEntity> postTaskList = postprocessDao.findPostTaskList(postprocessQuery);
-            for (PostprocessEntity postprocessEntity : postTaskList) {
-                String postProcessId = postprocessEntity.getPostId();
-                postprocessEntity.setTaskId(taskCloneId);
-                String clonePostProcessId = postprocessDao.createPost(postprocessEntity);
-                clonePostTasks(postProcessId,clonePostProcessId);
-            }
+            messageService.cloneTaskMessage(taskId,taskCloneId);
         }
     }
 
@@ -230,11 +209,6 @@ public class TasksCloneServiceImpl implements TasksCloneService {
                 task.setTaskId(cloneTaskId);
                 pullArtifactService.createPullArtifact(task);
             }
-            // case PipelineFinal.TASK_TYPE_MESSAGE -> {
-            //     TaskMessageType task = messageTypeServer.findMessage(taskId);
-            //     task.setTaskId(cloneTaskId);
-            //     messageTypeServer.createMessage(task);
-            // }
             case PipelineFinal.TASK_TYPE_SCRIPT   -> {
                 TaskScript task = scriptServer.findScript(taskId);
                 task.setTaskId(cloneTaskId);

@@ -18,7 +18,7 @@ import io.tiklab.security.logging.logging.service.LoggingService;
 import io.tiklab.security.logging.logging.service.LoggingTypeService;
 import io.tiklab.toolkit.join.JoinTemplate;
 import io.tiklab.user.user.model.User;
-import io.tiklab.user.user.service.UserService;
+import io.tiklab.user.user.service.UserProcessor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -46,7 +46,7 @@ public class PipelineCountServiceImpl implements PipelineCountService {
     PipelineService pipelineService;
 
     @Autowired
-    UserService userService;
+    UserProcessor userService;
 
     @Autowired
     PipelineAuthorityService authorityService;

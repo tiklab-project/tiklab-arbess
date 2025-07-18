@@ -45,7 +45,7 @@ dcs:
     expire: 7200
 
 auth:
-  type: lcoal
+  type: local
   soular:
     address: http://192.168.10.15:8080
     web:

@@ -4,9 +4,7 @@ import io.tiklab.arbess.home.service.PipelineHomeService;
 import io.tiklab.arbess.pipeline.definition.model.*;
 import io.tiklab.arbess.stages.service.StageService;
 import io.tiklab.arbess.support.authority.service.PipelineAuthorityService;
-import io.tiklab.arbess.support.condition.service.ConditionService;
-import io.tiklab.arbess.support.postprocess.service.PostprocessService;
-import io.tiklab.arbess.support.trigger.service.TriggerService;
+import io.tiklab.arbess.support.message.service.TaskMessageService;
 import io.tiklab.arbess.support.util.util.PipelineFileUtil;
 import io.tiklab.arbess.support.util.util.PipelineFinal;
 import io.tiklab.arbess.support.util.util.PipelineUtil;
@@ -30,7 +28,7 @@ import io.tiklab.arbess.pipeline.instance.service.PipelineInstanceService;
 import io.tiklab.message.message.service.MessageDmNoticeService;
 import io.tiklab.rpc.annotation.Exporter;
 import io.tiklab.user.user.model.User;
-import io.tiklab.user.user.service.UserService;
+import io.tiklab.user.user.service.UserProcessor;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,7 +55,7 @@ public class PipelineServiceImpl implements PipelineService {
     JoinTemplate joinTemplate;
 
     @Autowired
-    UserService userService;
+    UserProcessor userService;
 
     @Autowired
     PipelineDao pipelineDao;
@@ -97,6 +95,9 @@ public class PipelineServiceImpl implements PipelineService {
 
     @Autowired
     DmRoleService dmRoleService;
+
+    @Autowired
+    TaskMessageService messageService;
 
 
     private static final Logger logger = LoggerFactory.getLogger(PipelineServiceImpl.class);
@@ -548,24 +549,17 @@ public class PipelineServiceImpl implements PipelineService {
         // 克隆流水线成员以及权限信息
         authorityService.cloneDomainRole(pipelineId,clonePipelineId);
 
-        // 克隆任务
-        int type = pipeline.getType();
-        if (type == 1){
-            // 多任务
-            tasksCloneService.clonePipelineTasks(pipelineId,clonePipelineId);
-        }else {
-            // 多阶段
-            stageService.cloneStage(pipelineId, clonePipelineId);
-        }
-
-        // 克隆后置任务
-        // postprocessService.clonePostTask(pipelineId,clonePipelineId);
+        // 多阶段
+        stageService.cloneStage(pipelineId, clonePipelineId);
 
         // 克隆触发器
         // triggerService.cloneTrigger(pipelineId,clonePipelineId);
 
         // 克隆流水线变量
         variableService.cloneVariable(pipelineId,clonePipelineId);
+
+        // 克隆消息
+        messageService.cloneMessage(pipelineId,clonePipelineId);
 
     }
 

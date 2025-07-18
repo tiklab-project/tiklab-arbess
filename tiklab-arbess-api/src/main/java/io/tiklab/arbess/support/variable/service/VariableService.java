@@ -66,4 +66,7 @@ public interface VariableService {
     // 克隆变量
     void cloneVariable(String id,String cloneId);
 
+    // 克隆任务变量
+    void cloneTaskVariable(String id,String cloneId);
+
 }

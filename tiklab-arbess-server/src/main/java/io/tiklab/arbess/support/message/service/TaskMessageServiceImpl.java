@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -73,6 +74,7 @@ public class TaskMessageServiceImpl implements TaskMessageService {
             }
         }
 
+        message.setCreateTime(new Timestamp(System.currentTimeMillis()));
         TaskMessageEntity messageEntity = BeanMapper.map(message, TaskMessageEntity.class);
         messageEntity.setId(messageId);
         return messageDao.createTaskMessage(messageEntity);
@@ -146,11 +148,40 @@ public class TaskMessageServiceImpl implements TaskMessageService {
         return taskMessage;
     }
 
+    @Override
     public TaskMessage findTaskMessageNoQuery(String id) {
         TaskMessageEntity messageEntity = messageDao.findTaskMessage(id);
         TaskMessage taskMessage = BeanMapper.map(messageEntity, TaskMessage.class);
         queryMessageDetailNoQuery(taskMessage);
         return taskMessage;
+    }
+
+
+    @Override
+    public void cloneMessage(String id,String cloneId){
+        TaskMessageQuery taskMessageQuery = new TaskMessageQuery();
+        taskMessageQuery.setPipelineId(id);
+        taskMessageQuery.setType(1);
+        List<TaskMessage> taskMessageList = findTaskMessageList(taskMessageQuery);
+        for (TaskMessage taskMessage : taskMessageList) {
+            taskMessage.setPipelineId(cloneId);
+            taskMessage.setId(null);
+            createTaskMessage(taskMessage);
+        }
+    }
+
+    @Override
+    public void cloneTaskMessage(String id,String cloneId){
+        TaskMessageQuery taskMessageQuery = new TaskMessageQuery();
+        taskMessageQuery.setTaskId(id);
+        taskMessageQuery.setType(2);
+        List<TaskMessage> taskMessageList = findTaskMessageList(taskMessageQuery);
+        for (TaskMessage taskMessage : taskMessageList) {
+            taskMessage.setPipelineId(" ");
+            taskMessage.setTaskId(cloneId);
+            taskMessage.setId(null);
+            createTaskMessage(taskMessage);
+        }
     }
 
     @Override
