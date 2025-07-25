@@ -1,6 +1,7 @@
 package io.tiklab.arbess.pipeline.execute.controller;
 
 
+import io.tiklab.arbess.pipeline.execute.model.PipelineKeepOn;
 import io.tiklab.arbess.pipeline.execute.model.PipelineRunMsg;
 import io.tiklab.arbess.pipeline.execute.service.PipelineExecService;
 import io.tiklab.core.Result;
@@ -57,15 +58,15 @@ public class PipelineExecController {
     }
 
     /**
-     * @pi.name:停止流水线执行
+     * @pi.name:流水线继续执行
      * @pi.url:/keepOn
      * @pi.methodType:post
      * @pi.request-type: formdata
-     * @pi.param: name=pipelineId;dataType=string;value=pipelineId;desc=流水线id
+     * @pi.param: model=io.tiklab.arbess.pipeline.execute.model.PipelineKeepOn;
      */
     @RequestMapping(path="/keepOn",method = RequestMethod.POST)
-    public Result<Void> keepOn(@NotNull String pipelineId){
-        pipelineExecService.keepOn(pipelineId);
+    public Result<Void> keepOn(@RequestBody @Valid @NotNull PipelineKeepOn keepOn){
+        pipelineExecService.keepOn(keepOn);
         return Result.ok();
     }
 

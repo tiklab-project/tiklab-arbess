@@ -36,11 +36,22 @@ public class PipelineInstanceQuery {
 
     private String number;
 
+    // 执行人
+    private String execUserId;
+
     //@ApiProperty(name ="pageParam",desc = "分页参数")
     private Page pageParam= new Page();
 
     //@ApiProperty(name ="orderParams",desc = "排序参数")
     private List<Order> orderParams = OrderBuilders.instance().desc("createTime").get();
+
+    public String getExecUserId() {
+        return execUserId;
+    }
+
+    public void setExecUserId(String execUserId) {
+        this.execUserId = execUserId;
+    }
 
     public List<Pipeline> getPipelineList() {
         return pipelineList;

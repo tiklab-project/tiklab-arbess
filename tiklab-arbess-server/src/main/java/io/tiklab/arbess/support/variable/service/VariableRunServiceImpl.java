@@ -1,58 +1,110 @@
 package io.tiklab.arbess.support.variable.service;
 
-import io.tiklab.arbess.support.variable.model.ExecVariable;
-import io.tiklab.arbess.support.variable.model.Variable;
-import io.tiklab.arbess.support.variable.model.VariableQuery;
+import io.tiklab.arbess.support.variable.model.*;
+import io.tiklab.core.page.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class VariableRunServiceImpl implements VariableRunService {
 
-
-    // 流水线id  变量名 ，变量值
-    private final Map<String,List<ExecVariable>> variableMap = new HashMap<>();
-
     @Autowired
     VariableService variableService;
 
+    @Autowired
+    SystemVariableService systemVariableService;
+
 
     @Override
-    public void initPipelineVariable(String pipelineId,String taskId){
+    public List<ExecVariable> findPipelineVariable(String pipelineId){
+
+        Map<String, ExecVariable> systemVariableMap = findSystemVariableMap();
+        Map<String, ExecVariable> pipelineVariableMap = findPipelineVariableMap(pipelineId);
+
+        systemVariableMap.putAll(pipelineVariableMap);
+
+        return systemVariableMap.entrySet().stream()
+                .map(entry -> entry.getValue())
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ExecVariable> findTaskVariable(String pipelineId,String taskId){
+
+        Map<String, ExecVariable> systemVariableMap = findSystemVariableMap();
+        Map<String, ExecVariable> pipelineVariableMap = findPipelineVariableMap(pipelineId);
+        Map<String, ExecVariable> taskVariableMap = findTaskVariableMap(taskId);
+
+        systemVariableMap.putAll(pipelineVariableMap);
+        systemVariableMap.putAll(taskVariableMap);
+
+        return systemVariableMap.entrySet().stream()
+                .map(entry -> entry.getValue())
+                .collect(Collectors.toList());
+        }
+
+
+    /**
+     * 查询系统变量
+     * @return 系统变量
+     */
+    private Map<String,ExecVariable> findSystemVariableMap(){
+        Map<String,ExecVariable> execVariableMap = new HashMap<>();
+        SystemVariableQuery systemVariableQuery = new SystemVariableQuery();
+        systemVariableQuery.setType(2);
+        List<SystemVariable> systemVariableList = systemVariableService.findSystemVariableList(systemVariableQuery);
+        if (!systemVariableList.isEmpty()){
+            for (SystemVariable systemVariable : systemVariableList) {
+                String varKey = systemVariable.getVarKey();
+                String value = systemVariable.getVarValue();
+                execVariableMap.put(varKey,new ExecVariable(varKey,value));
+            }
+        }
+        return execVariableMap;
+    }
+
+    /**
+     * 查询流水线变量
+     * @param pipelineId 流水线ID
+     * @return 流水线变量
+     */
+    private Map<String,ExecVariable> findPipelineVariableMap(String pipelineId){
+        Map<String,ExecVariable> execVariableMap = new HashMap<>();
+        VariableQuery variableQuery = new VariableQuery();
+        variableQuery.setPipelineId(pipelineId);
+        List<Variable> variableList = variableService.findVariableList(variableQuery);
+        if (!variableList.isEmpty()){
+            for (Variable variable : variableList) {
+                String varKey = variable.getVarKey();
+                String value = variable.getVarValue();
+                execVariableMap.put(varKey,new ExecVariable(varKey,value));
+            }
+        }
+        return execVariableMap;
+    }
+
+    /**
+     * 查询任务变量
+     * @param taskId 任务ID
+     * @return 任务变量
+     */
+    private Map<String,ExecVariable> findTaskVariableMap(String taskId){
+        Map<String,ExecVariable> execVariableMap = new HashMap<>();
         VariableQuery variableQuery = new VariableQuery();
         variableQuery.setTaskId(taskId);
         List<Variable> variableList = variableService.findVariableList(variableQuery);
-        if (variableList.isEmpty()){
-            return;
+        if (!variableList.isEmpty()){
+            for (Variable variable : variableList) {
+                String varKey = variable.getVarKey();
+                String value = variable.getVarValue();
+                execVariableMap.put(varKey,new ExecVariable(varKey,value));
+            }
         }
-
-        // 添加到缓存中
-        for (Variable variable : variableList) {
-            ExecVariable execVariable = new ExecVariable();
-            execVariable.setVarType(variable.getVarType());
-            execVariable.setVarKey(variable.getVarKey());
-            execVariable.setVarValue(variable.getVarValue());
-            execVariable.setPipelineId(pipelineId);
-
-            addExecVariable(execVariable);
-        }
+        return execVariableMap;
     }
-
-    @Override
-    public void addExecVariable(ExecVariable variable){
-        String pipelineId = variable.getPipelineId();
-        List<ExecVariable> list = variableMap.get(pipelineId);
-        if (Objects.isNull(list) || list.isEmpty()){
-            list = new ArrayList<>();
-        }
-        list.add(variable);
-        variableMap.put(pipelineId,list);
-    }
-
-
-
 
 
 

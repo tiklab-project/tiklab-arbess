@@ -18,6 +18,8 @@ import io.tiklab.arbess.task.artifact.model.TaskArtifact;
 import io.tiklab.arbess.task.artifact.service.TaskArtifactService;
 import io.tiklab.arbess.task.build.model.TaskBuild;
 import io.tiklab.arbess.task.build.service.TaskBuildService;
+import io.tiklab.arbess.task.checkpoint.model.TaskCheckPoint;
+import io.tiklab.arbess.task.checkpoint.service.TaskCheckPointService;
 import io.tiklab.arbess.task.code.model.TaskCode;
 import io.tiklab.arbess.task.code.model.ThirdQuery;
 import io.tiklab.arbess.task.code.model.ThirdUser;
@@ -46,6 +48,8 @@ import io.tiklab.arbess.support.postprocess.dao.PostprocessDao;
 import io.tiklab.arbess.task.task.entity.TasksEntity;
 import io.tiklab.rpc.annotation.Exporter;
 import io.tiklab.toolkit.join.JoinTemplate;
+import io.tiklab.user.user.model.User;
+import io.tiklab.user.user.service.UserProcessor;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -83,9 +87,6 @@ public class TasksServiceImpl implements TasksService {
     TaskArtifactService artifactService;
 
     @Autowired
-    TaskMessageTypeService messageTypeServer;
-
-    @Autowired
     TaskScriptService scriptServer;
 
     @Autowired
@@ -102,15 +103,6 @@ public class TasksServiceImpl implements TasksService {
 
     @Autowired
     KubectlService kubectlService;
-
-    @Autowired
-    VariableService variableService;
-
-    @Autowired
-    ConditionService conditionService;
-
-    @Autowired
-    PostprocessDao postprocessDao;
 
     @Autowired
     TaskCodeGiteeService taskCodeGiteeService;
@@ -131,8 +123,7 @@ public class TasksServiceImpl implements TasksService {
     ScmService scmService;
 
     @Autowired
-    JoinTemplate joinTemplate;
-
+    TaskCheckPointService taskCheckPointService;
 
     private static final Logger logger = LoggerFactory.getLogger(TasksServiceImpl.class);
     
@@ -353,181 +344,6 @@ public class TasksServiceImpl implements TasksService {
         postTask.setTask(task);
         postTask.setTaskType(taskType);
         return postTask;
-    }
-
-    private void addTaskAuth(List<Tasks> tasks){
-        for (Tasks task : tasks) {
-            Object object;
-            String jsonString = JSONObject.toJSONString(task.getTask());
-            String taskType = task.getTaskType();
-            String taskId = task.getTaskId();
-
-            switch (findTaskType(taskType)) {
-                case TASK_TYPE_CODE -> {
-                    TaskCode taskCode = JSONObject.parseObject(jsonString, TaskCode.class);
-                    String authId = taskCode.getAuthId();
-                    if (!Objects.isNull(authId)){
-                        Object auth ;
-                        switch (taskType) {
-                            case TASK_CODE_GITEE ->{
-                                AuthThird authThird = authServerServer.findOneAuthServer(authId);
-                                try {
-                                    ThirdQuery thirdQuery = new ThirdQuery();
-                                    thirdQuery.setAuthId(authId);
-                                    ThirdUser thirdUser = taskCodeGiteeService.findAuthUser(thirdQuery);
-                                    authThird.setUsername(thirdUser.getPath());
-                                }catch (Exception e){
-                                    logger.error("获取GitEe授权用户名失败，原因：{}",e.getMessage());
-                                }
-                                auth = authThird;
-                            }
-                            case  TASK_CODE_GITHUB  ->{
-                                AuthThird authThird = authServerServer.findOneAuthServer(authId);
-                                try {
-                                    ThirdQuery thirdQuery = new ThirdQuery();
-                                    thirdQuery.setAuthId(authId);
-                                    ThirdUser thirdUser = taskCodeGitHubService.findAuthUser(thirdQuery);
-                                    authThird.setUsername(thirdUser.getPath());
-                                }catch (Exception e){
-                                    logger.error("获取GiTHub授权用户名失败，原因：{}",e.getMessage());
-                                }
-                                auth = authThird;
-                            }
-                            case TASK_CODE_GITLAB->{
-                                AuthThird authThird = authServerServer.findOneAuthServer(authId);
-                                try {
-                                    ThirdQuery thirdQuery = new ThirdQuery();
-                                    thirdQuery.setAuthId(authId);
-                                    ThirdUser thirdUser = taskCodeGitLabService.findAuthUser(thirdQuery);
-                                    authThird.setUsername(thirdUser.getPath());
-                                }catch (Exception e){
-                                    logger.error("获取GitLab授权用户名失败，原因：{}",e.getMessage());
-                                }
-                                auth = authThird;
-                            }
-                            case TASK_CODE_PRI_GITLAB->{
-                                AuthThird authThird = authServerServer.findOneAuthServer(authId);
-                                try {
-                                    ThirdQuery thirdQuery = new ThirdQuery();
-                                    thirdQuery.setAuthId(authId);
-                                    ThirdUser thirdUser = taskCodePriGitLabService.findAuthUser(thirdQuery);
-                                    authThird.setUsername(thirdUser.getPath());
-                                }catch (Exception e){
-                                    logger.error("获取自建GitLab授权用户名失败，原因：{}",e.getMessage());
-                                }
-                                auth = authThird;
-                            }
-                            case  TASK_CODE_XCODE ->{
-                                auth = authServerServer.findOneAuthServer(authId);
-                            }
-                            default -> {
-                                auth = authServer.findOneAuth(authId);
-                            }
-                        }
-                        taskCode.setAuth(auth);
-                    }
-                    object = taskCode;
-                }
-                case TASK_TYPE_TEST -> {
-                    // TaskTest taskTest = testService.findOneTest(taskId);
-                    TaskTest taskTest = JSONObject.parseObject(jsonString, TaskTest.class);
-                    String authId = taskTest.getAuthId();
-                    if (taskType.equals(TASK_TEST_TESTON)){
-                        Object auth = authServerServer.findOneAuthServer(authId);
-                        taskTest.setAuth(auth);
-                    }
-                    object = taskTest;
-                }
-                case TASK_TYPE_BUILD -> {
-                    // object = buildService.findOneBuild(taskId);
-                    object = JSONObject.parseObject(jsonString, TaskBuild.class);
-                }
-                case TASK_TYPE_DEPLOY -> {
-                    TaskDeploy taskDeploy = deployService.findOneDeploy(taskId);
-                    String authId = taskDeploy.getAuthId();
-                    if (!Objects.isNull(authId)){
-                        Object auth;
-                        String hostType = taskDeploy.getHostType();
-                        if ("hostGroup".equals(hostType)){
-                            List<HostGroup> groupByGroup = authHostGroupService.findOneHostGroupByGroup(authId,
-                                    taskDeploy.getStrategyNumber(), taskDeploy.getStrategyType());
-                            taskDeploy.setHostGroupList(groupByGroup);
-                            auth = authHostGroupService.findOneHostGroup(authId);
-                        } else {
-                            auth = authHostService.findOneAuthHost(authId);
-                        }
-                        if (taskType.equals(TASK_DEPLOY_K8S) && !StringUtils.isEmpty(taskDeploy.getAuthId()) ) {
-                            auth = kubectlService.findOneKubectl(taskDeploy.getAuthId());
-                        }
-                        taskDeploy.setAuth(auth);
-                    }
-                    object = taskDeploy;
-                }
-                case TASK_TYPE_CODESCAN -> {
-                    // TaskCodeScan codeScan = codeScanService.findCodeScanByAuth(taskId);
-                    TaskCodeScan codeScan = JSONObject.parseObject(jsonString, TaskCodeScan.class);
-                    String authId = codeScan.getAuthId();
-                    if (!Objects.isNull(authId)){
-                        Object auth = authHostService.findOneAuthHost(authId);
-                        codeScan.setAuth(auth);
-                    }
-                    object = codeScanService.findCodeScanByAuth(taskId);
-                }
-                case TASK_TYPE_UPLOAD -> {
-                    // TaskArtifact taskArtifact = artifactService.findOneProduct(taskId);
-                    TaskArtifact taskArtifact = JSONObject.parseObject(jsonString, TaskArtifact.class);
-                    String authId = taskArtifact.getAuthId();
-                    String artifactType = taskArtifact.getArtifactType();
-                    if (!Objects.isNull(authId)){
-                        if (artifactType.equals(TASK_UPLOAD_NEXUS) ){
-                            Object auth = authServerServer.findOneAuthServer(authId);
-                            taskArtifact.setAuth(auth);
-                        }
-                        if (artifactType.equals(TASK_UPLOAD_HADESS)){
-                            Object auth = authServerServer.findOneAuthServer(authId);
-                            taskArtifact.setAuth(auth);
-                        }
-                        if (artifactType.equals(TASK_UPLOAD_SSH)){
-                            Object auth = authHostService.findOneAuthHost(authId);
-                            taskArtifact.setAuth(auth);
-                        }
-                    }
-
-                    object = taskArtifact;
-                }
-                case TASK_TYPE_DOWNLOAD -> {
-                    // TaskPullArtifact taskArtifact = pullArtifactService.findOnePullArtifact(taskId);
-                    TaskPullArtifact taskArtifact = JSONObject.parseObject(jsonString, TaskPullArtifact.class);
-                    String authId = taskArtifact.getAuthId();
-                    if (!Objects.isNull(authId)){
-                        String pullType = taskArtifact.getPullType();
-                        if (pullType.equals(TASK_UPLOAD_NEXUS) ){
-                            Object auth = authServerServer.findOneAuthServer(authId);
-                            taskArtifact.setAuth(auth);
-                        }
-                        if (pullType.equals(TASK_UPLOAD_HADESS)){
-                            Object auth = authServerServer.findOneAuthServer(authId);
-                            taskArtifact.setAuth(auth);
-                        }
-                        if (taskType.equals(TASK_UPLOAD_SSH)){
-                            Object auth = authHostService.findOneAuthHost(authId);
-                            taskArtifact.setAuth(auth);
-                        }
-                    }
-
-                    object = taskArtifact;
-                }
-                case TASK_TYPE_SCRIPT -> {
-                    object = scriptServer.findScript(taskId);
-                }
-                default -> {
-                    throw new ApplicationException("无法更新未知的配置类型。");
-                }
-            }
-            task.setValues(object);
-            task.setTask(object);
-        }
-        tasks.sort(Comparator.comparing(Tasks::getTaskSort));
     }
 
     @Override
@@ -753,6 +569,12 @@ public class TasksServiceImpl implements TasksService {
                 task.setTaskId(taskId);
                 scriptServer.createScript(task);
             }
+            case TASK_TYPE_TOOL ->{
+                TaskCheckPoint task = new TaskCheckPoint();
+                task.setWailTime(0);
+                task.setTaskId(taskId);
+                taskCheckPointService.createCheckPoint(task);
+            }
            default -> throw new ApplicationException("无法更新未知的配置类型:"+taskType);
         }
     }
@@ -772,6 +594,7 @@ public class TasksServiceImpl implements TasksService {
             case TASK_TYPE_UPLOAD -> artifactService.deleteProduct(taskId);
             case TASK_TYPE_DOWNLOAD     -> pullArtifactService.deletePullArtifact(taskId);
             case TASK_TYPE_SCRIPT   -> scriptServer.deleteScript(taskId);
+            case TASK_TYPE_TOOL -> taskCheckPointService.deleteCheckPoint(taskId);
             default -> throw new ApplicationException("无法删除未知的配置类型"+taskType);
         }
     }
@@ -924,6 +747,11 @@ public class TasksServiceImpl implements TasksService {
                 }
                 scriptServer.updateScript(task);
             }
+            case TASK_TYPE_TOOL -> {
+                TaskCheckPoint task = JSON.parseObject(object, TaskCheckPoint.class);
+                task.setTaskId(taskId);
+                taskCheckPointService.updateCheckPoint(task);
+            }
             default ->  throw new ApplicationException("无法更新未知的配置类型。");
         }
     }
@@ -1004,6 +832,17 @@ public class TasksServiceImpl implements TasksService {
             case TASK_TYPE_SCRIPT   -> {
                 return scriptServer.findOneScript(taskId);
             }
+            case TASK_TYPE_TOOL -> {
+                TaskCheckPoint checkPoint = taskCheckPointService.findCheckPoint(taskId);
+                String inspectIds = checkPoint.getInspectIds();
+                if (!StringUtils.isEmpty(inspectIds)){
+                    List<String> strings = Arrays.stream(inspectIds.split(",")).distinct().collect(Collectors.toList());
+                    checkPoint.setInspectIdList(strings);
+                }else {
+                    checkPoint.setInspectIdList(new ArrayList<>());
+                }
+                return checkPoint;
+            }
            default -> throw new ApplicationException("无法更新未知的配置类型。");
         }
     }
@@ -1040,8 +879,193 @@ public class TasksServiceImpl implements TasksService {
             case TASK_TYPE_SCRIPT   -> {
                 return scriptServer.findOneScript(taskId);
             }
+            case TASK_TYPE_TOOL -> {
+                return taskCheckPointService.findCheckPoint(taskId);
+            }
            default -> throw new ApplicationException("无法更新未知的配置类型。");
         }
+    }
+
+    /**
+     * 添加任务认证信息
+     * @param tasks 任务
+     */
+    private void addTaskAuth(List<Tasks> tasks){
+        for (Tasks task : tasks) {
+            Object object;
+            String jsonString = JSONObject.toJSONString(task.getTask());
+            String taskType = task.getTaskType();
+            String taskId = task.getTaskId();
+
+            switch (findTaskType(taskType)) {
+                case TASK_TYPE_CODE -> {
+                    TaskCode taskCode = JSONObject.parseObject(jsonString, TaskCode.class);
+                    String authId = taskCode.getAuthId();
+                    if (!Objects.isNull(authId)){
+                        Object auth ;
+                        switch (taskType) {
+                            case TASK_CODE_GITEE ->{
+                                AuthThird authThird = authServerServer.findOneAuthServer(authId);
+                                try {
+                                    ThirdQuery thirdQuery = new ThirdQuery();
+                                    thirdQuery.setAuthId(authId);
+                                    ThirdUser thirdUser = taskCodeGiteeService.findAuthUser(thirdQuery);
+                                    authThird.setUsername(thirdUser.getPath());
+                                }catch (Exception e){
+                                    logger.error("获取GitEe授权用户名失败，原因：{}",e.getMessage());
+                                }
+                                auth = authThird;
+                            }
+                            case  TASK_CODE_GITHUB  ->{
+                                AuthThird authThird = authServerServer.findOneAuthServer(authId);
+                                try {
+                                    ThirdQuery thirdQuery = new ThirdQuery();
+                                    thirdQuery.setAuthId(authId);
+                                    ThirdUser thirdUser = taskCodeGitHubService.findAuthUser(thirdQuery);
+                                    authThird.setUsername(thirdUser.getPath());
+                                }catch (Exception e){
+                                    logger.error("获取GiTHub授权用户名失败，原因：{}",e.getMessage());
+                                }
+                                auth = authThird;
+                            }
+                            case TASK_CODE_GITLAB->{
+                                AuthThird authThird = authServerServer.findOneAuthServer(authId);
+                                try {
+                                    ThirdQuery thirdQuery = new ThirdQuery();
+                                    thirdQuery.setAuthId(authId);
+                                    ThirdUser thirdUser = taskCodeGitLabService.findAuthUser(thirdQuery);
+                                    authThird.setUsername(thirdUser.getPath());
+                                }catch (Exception e){
+                                    logger.error("获取GitLab授权用户名失败，原因：{}",e.getMessage());
+                                }
+                                auth = authThird;
+                            }
+                            case TASK_CODE_PRI_GITLAB->{
+                                AuthThird authThird = authServerServer.findOneAuthServer(authId);
+                                try {
+                                    ThirdQuery thirdQuery = new ThirdQuery();
+                                    thirdQuery.setAuthId(authId);
+                                    ThirdUser thirdUser = taskCodePriGitLabService.findAuthUser(thirdQuery);
+                                    authThird.setUsername(thirdUser.getPath());
+                                }catch (Exception e){
+                                    logger.error("获取自建GitLab授权用户名失败，原因：{}",e.getMessage());
+                                }
+                                auth = authThird;
+                            }
+                            case  TASK_CODE_XCODE ->{
+                                auth = authServerServer.findOneAuthServer(authId);
+                            }
+                            default -> {
+                                auth = authServer.findOneAuth(authId);
+                            }
+                        }
+                        taskCode.setAuth(auth);
+                    }
+                    object = taskCode;
+                }
+                case TASK_TYPE_TEST -> {
+                    // TaskTest taskTest = testService.findOneTest(taskId);
+                    TaskTest taskTest = JSONObject.parseObject(jsonString, TaskTest.class);
+                    String authId = taskTest.getAuthId();
+                    if (taskType.equals(TASK_TEST_TESTON)){
+                        Object auth = authServerServer.findOneAuthServer(authId);
+                        taskTest.setAuth(auth);
+                    }
+                    object = taskTest;
+                }
+                case TASK_TYPE_BUILD -> {
+                    // object = buildService.findOneBuild(taskId);
+                    object = JSONObject.parseObject(jsonString, TaskBuild.class);
+                }
+                case TASK_TYPE_DEPLOY -> {
+                    TaskDeploy taskDeploy = deployService.findOneDeploy(taskId);
+                    String authId = taskDeploy.getAuthId();
+                    if (!Objects.isNull(authId)){
+                        Object auth;
+                        String hostType = taskDeploy.getHostType();
+                        if ("hostGroup".equals(hostType)){
+                            List<HostGroup> groupByGroup = authHostGroupService.findOneHostGroupByGroup(authId,
+                                    taskDeploy.getStrategyNumber(), taskDeploy.getStrategyType());
+                            taskDeploy.setHostGroupList(groupByGroup);
+                            auth = authHostGroupService.findOneHostGroup(authId);
+                        } else {
+                            auth = authHostService.findOneAuthHost(authId);
+                        }
+                        if (taskType.equals(TASK_DEPLOY_K8S) && !StringUtils.isEmpty(taskDeploy.getAuthId()) ) {
+                            auth = kubectlService.findOneKubectl(taskDeploy.getAuthId());
+                        }
+                        taskDeploy.setAuth(auth);
+                    }
+                    object = taskDeploy;
+                }
+                case TASK_TYPE_CODESCAN -> {
+                    // TaskCodeScan codeScan = codeScanService.findCodeScanByAuth(taskId);
+                    TaskCodeScan codeScan = JSONObject.parseObject(jsonString, TaskCodeScan.class);
+                    String authId = codeScan.getAuthId();
+                    if (!Objects.isNull(authId)){
+                        Object auth = authHostService.findOneAuthHost(authId);
+                        codeScan.setAuth(auth);
+                    }
+                    object = codeScanService.findCodeScanByAuth(taskId);
+                }
+                case TASK_TYPE_UPLOAD -> {
+                    // TaskArtifact taskArtifact = artifactService.findOneProduct(taskId);
+                    TaskArtifact taskArtifact = JSONObject.parseObject(jsonString, TaskArtifact.class);
+                    String authId = taskArtifact.getAuthId();
+                    String artifactType = taskArtifact.getArtifactType();
+                    if (!Objects.isNull(authId)){
+                        if (artifactType.equals(TASK_UPLOAD_NEXUS) ){
+                            Object auth = authServerServer.findOneAuthServer(authId);
+                            taskArtifact.setAuth(auth);
+                        }
+                        if (artifactType.equals(TASK_UPLOAD_HADESS)){
+                            Object auth = authServerServer.findOneAuthServer(authId);
+                            taskArtifact.setAuth(auth);
+                        }
+                        if (artifactType.equals(TASK_UPLOAD_SSH)){
+                            Object auth = authHostService.findOneAuthHost(authId);
+                            taskArtifact.setAuth(auth);
+                        }
+                    }
+
+                    object = taskArtifact;
+                }
+                case TASK_TYPE_DOWNLOAD -> {
+                    // TaskPullArtifact taskArtifact = pullArtifactService.findOnePullArtifact(taskId);
+                    TaskPullArtifact taskArtifact = JSONObject.parseObject(jsonString, TaskPullArtifact.class);
+                    String authId = taskArtifact.getAuthId();
+                    if (!Objects.isNull(authId)){
+                        String pullType = taskArtifact.getPullType();
+                        if (pullType.equals(TASK_UPLOAD_NEXUS) ){
+                            Object auth = authServerServer.findOneAuthServer(authId);
+                            taskArtifact.setAuth(auth);
+                        }
+                        if (pullType.equals(TASK_UPLOAD_HADESS)){
+                            Object auth = authServerServer.findOneAuthServer(authId);
+                            taskArtifact.setAuth(auth);
+                        }
+                        if (taskType.equals(TASK_UPLOAD_SSH)){
+                            Object auth = authHostService.findOneAuthHost(authId);
+                            taskArtifact.setAuth(auth);
+                        }
+                    }
+
+                    object = taskArtifact;
+                }
+                case TASK_TYPE_SCRIPT -> {
+                    object = scriptServer.findScript(taskId);
+                }
+                case TASK_TYPE_TOOL -> {
+                    object = taskCheckPointService.findCheckPoint(taskId);
+                }
+                default -> {
+                    throw new ApplicationException("无法更新未知的配置类型。");
+                }
+            }
+            task.setValues(object);
+            task.setTask(object);
+        }
+        tasks.sort(Comparator.comparing(Tasks::getTaskSort));
     }
 
     /**
@@ -1221,6 +1245,11 @@ public class TasksServiceImpl implements TasksService {
                    }
                }
            }
+           case TASK_TYPE_TOOL -> {
+               TaskCheckPoint code =  JSONObject.parseObject(jsonString, TaskCheckPoint.class);
+
+               return PipelineUtil.validNoNullFiled(code.getInspectIds());
+           }
            default -> {
                return true;
            }
@@ -1256,6 +1285,9 @@ public class TasksServiceImpl implements TasksService {
             }
             case TASK_TYPE_SCRIPT, TASK_SCRIPT_BAT , TASK_SCRIPT_SHELL ->{
                 return TASK_TYPE_SCRIPT;
+            }
+            case TASK_CHECK_POINT ->{
+                return TASK_TYPE_TOOL;
             }
             case TASK_DOWNLOAD_HADESS , TASK_DOWNLOAD_DOCKER, TASK_DOWNLOAD_SSH ->{
                 return TASK_TYPE_DOWNLOAD;
@@ -1362,6 +1394,9 @@ public class TasksServiceImpl implements TasksService {
             }
             case TASK_CODESCAN_SOURCEFARE -> {
                 return "SourceFare";
+            }
+            case TASK_CHECK_POINT -> {
+                return "人工卡点";
             }
             default -> {
                 return taskType;

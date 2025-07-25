@@ -61,15 +61,15 @@ public class SocketServerHandler implements WebSocketHandler {
         dataList.add(agentMessage);
     }
 
-    @Scheduled(fixedRate = 800)
-    protected void syncMessage(){
+    @Scheduled(fixedRate = 1000)
+    public void syncMessage(){
         if (dataList.isEmpty()){
             return;
         }
 
         int processedCount = 0; // 计数器
         for (AgentMessage message : dataList) {
-            if (processedCount >= 4) { // 限制每次处理的数量为6
+            if (processedCount >= 4) { // 限制每次处理的数量为4
                 break;
             }
 

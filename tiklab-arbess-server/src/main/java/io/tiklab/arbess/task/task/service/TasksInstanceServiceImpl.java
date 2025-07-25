@@ -276,6 +276,7 @@ public class TasksInstanceServiceImpl implements TasksInstanceService {
             instance.setRunTimeDate(time);
             allTaskRunTime = allTaskRunTime + instance.getRunTime();
         }
+        allInstance.sort(Comparator.comparing(TaskInstance::getTaskSort));
         return allInstance;
     }
 

@@ -13,6 +13,7 @@ import io.tiklab.toolkit.join.annotation.JoinProvider;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 流水线实例服务接口
@@ -76,14 +77,6 @@ public interface PipelineInstanceService {
     List<PipelineInstance> findAllInstance();
 
     /**
-     * 根据流水线id查询所有实例信息
-     * @param pipelineId 流水线id
-     * @return 实例信息
-     */
-    @FindAll
-    List<PipelineInstance> findPipelineAllInstance(String pipelineId);
-
-    /**
      * 查询用户所有运行实例
      * @param userId 用户id
      * @param limit 查询数量
@@ -118,6 +111,14 @@ public interface PipelineInstanceService {
 
 
     /**
+     * 查询流水线实例数量
+     * @param pipelineInstanceQuery 查询条件
+     * @return  数量
+     */
+    Map<String,Integer> findPipelineInstanceCount(PipelineInstanceQuery pipelineInstanceQuery);
+
+
+    /**
      * 查询用户所有实例分页
      * @param pipelineInstanceQuery 实例
      * @return 实例
@@ -148,26 +149,6 @@ public interface PipelineInstanceService {
      * @return 实例
      */
     List<PipelineInstance> findInstanceByTime(String[] queryTime,String[] pipelineIdList);
-
-    /**
-     * 获取实例运行时间
-     * @param instanceId  实例id
-     * @return 运行时间
-     */
-    int findInstanceRuntime(String instanceId);
-
-    /**
-     * 更新实例运行时间
-     * @param instanceId 实例id
-     */
-    void instanceRuntime(String instanceId);
-
-
-    /**
-     * 停止线程执行
-     * @param threadName 线程名称
-     */
-    void stopThread(String threadName);
 
 }
 

@@ -6,6 +6,8 @@ import io.tiklab.arbess.stages.model.Stage;
 import io.tiklab.arbess.stages.model.StageInstance;
 import io.tiklab.arbess.support.util.util.PipelineFinal;
 import io.tiklab.arbess.agent.support.util.service.PipelineUtilService;
+import io.tiklab.arbess.support.variable.model.ExecVariable;
+import io.tiklab.arbess.support.variable.service.VariableRunService;
 import io.tiklab.arbess.task.deploy.model.TaskDeploy;
 import io.tiklab.arbess.task.task.model.Tasks;
 import io.tiklab.arbess.task.task.service.TasksExecService;
@@ -41,6 +43,9 @@ public class StageExecServiceImpl implements  StageExecService {
     @Autowired
     PipelineUtilService utilService;
 
+    @Autowired
+    VariableRunService variableRunService;
+
     private final Logger logger = LoggerFactory.getLogger(StageExecServiceImpl.class);
 
     @Override
@@ -64,6 +69,8 @@ public class StageExecServiceImpl implements  StageExecService {
                 String otherAddress = mainAddress + "/"+otherStageInstanceId;
                 //获取串行任务
                 for (Tasks task : tasks) {
+                    List<ExecVariable> taskVariable = variableRunService.findTaskVariable(pipelineId,task.getTaskId());
+                    task.setTaskVariable(taskVariable);
                     String taskInstanceId = tasksExecService.createTaskExecInstance(task, otherStageInstanceId, 2, otherAddress);
                     tasksExecService.createDeployInstance(task, taskInstanceId);
                     task.setInstanceId(taskInstanceId);
@@ -100,6 +107,9 @@ public class StageExecServiceImpl implements  StageExecService {
                 List<Tasks> tasks = tasksService.finStageTaskOrTask(stage.getStageId());
                 //获取串行任务
                 for (Tasks task : tasks) {
+
+                    List<ExecVariable> taskVariable = variableRunService.findTaskVariable(pipelineId,task.getTaskId());
+                    task.setTaskVariable(taskVariable);
                     String taskType = task.getTaskType();
                     if (!taskType.equals(PipelineFinal.TASK_DEPLOY_LINUX)){
                         continue;
@@ -155,6 +165,7 @@ public class StageExecServiceImpl implements  StageExecService {
         return mainRollBackStageList;
     }
 
+
     /**
      * 初始化阶段运行实例
      * @param stage 阶段信息
@@ -178,32 +189,6 @@ public class StageExecServiceImpl implements  StageExecService {
         stageInstance.setId(stageInstanceId);
         return stageInstanceId;
     }
-
-    @Override
-    public boolean execStageTask(PipelineDetails pipelineDetails) {
-
-        // AgentMessage agentMessage = new AgentMessage();
-        // agentMessage.setType("exec");
-        // agentMessage.setMessage(pipelineDetails);
-        // agentMessage.setPipelineId(pipelineDetails.getPipelineId());
-        //
-        // Agent agent = pipelineDetails.getAgent();
-        //
-        // String id = agent.getAddress();
-        //
-        // WebSocketSession session = SocketServerHandler.sessionMap.get(id);
-        // if (Objects.isNull(session)) {
-        //     throw new SystemException("客户端推送消息失败，无法获取客户端连接,客户端信息："+id);
-        // }
-        //
-        // try {
-        //     SocketServerHandler.instance().sendHandleMessage(id,agentMessage);
-        // } catch (Exception e) {
-        //     throw new SystemException("客户端推送消息失败,错误信息：" + e.getMessage());
-        // }
-        return true;
-    }
-
 
 
 

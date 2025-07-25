@@ -10,6 +10,7 @@ import io.tiklab.dal.jpa.criterial.condition.QueryCondition;
 import io.tiklab.dal.jpa.criterial.conditionbuilder.QueryBuilders;
 import io.tiklab.arbess.pipeline.instance.entity.PipelineInstanceEntity;
 import io.tiklab.arbess.pipeline.instance.model.PipelineInstanceQuery;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.stereotype.Repository;
@@ -86,6 +87,7 @@ public class PipelineInstanceDao {
                 .eq("pipelineId", pipelineInstanceQuery.getPipelineId())
                 .eq("runStatus", pipelineInstanceQuery.getState())
                 .eq("userId", pipelineInstanceQuery.getUserId())
+                .eq("userId", pipelineInstanceQuery.getExecUserId())
                 .like("findNumber",pipelineInstanceQuery.getNumber());
 
             if (pipelineInstanceQuery.getType() != 0){
@@ -107,6 +109,8 @@ public class PipelineInstanceDao {
                 .eq("pipelineId", pipelineInstanceQuery.getPipelineId())
                 .eq("runStatus", pipelineInstanceQuery.getState())
                 .eq("userId", pipelineInstanceQuery.getUserId())
+                .eq("userId", pipelineInstanceQuery.getExecUserId())
+                .in("pipelineId",pipelineInstanceQuery.getIds())
                 .like("findNumber",pipelineInstanceQuery.getNumber());
 
         if (pipelineInstanceQuery.getType() != 0){
@@ -148,6 +152,11 @@ public class PipelineInstanceDao {
         if (PipelineUtil.isNoNull(pipelineInstanceQuery.getPipelineId())){
             sql = sql.concat(" and pipeline_id = '" + pipelineInstanceQuery.getPipelineId()+ "'");
         }
+
+        if (PipelineUtil.isNoNull(pipelineInstanceQuery.getExecUserId())){
+            sql = sql.concat(" and user_id = '" + pipelineInstanceQuery.getExecUserId()+ "'");
+        }
+
         if (!Objects.isNull(pipelineInstanceQuery.getNumber())){
             String number = pipelineInstanceQuery.getNumber();
             sql = sql.concat(" and ( find_number like '%" + number+ "%' " +
@@ -162,17 +171,6 @@ public class PipelineInstanceDao {
                 new BeanPropertyRowMapper<>(PipelineInstanceEntity.class));
     }
 
-
-    /**
-     * 根据流水线id查询所有历史
-     * @param pipelineId 流水线id
-     * @return 历史集合
-     */
-    public List<PipelineInstanceEntity> findAllInstance(String pipelineId){
-        String sql = "select * from pip_pipeline_instance where pipeline_id = ? ";
-        JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
-        return  jdbcTemplate.query(sql, new BeanPropertyRowMapper(PipelineInstanceEntity.class),pipelineId);
-    }
 
     /**
      * 最近运行的流水线进行时间排序，并分组
@@ -233,9 +231,15 @@ public class PipelineInstanceDao {
      */
     public List<PipelineInstanceEntity> findInstanceByTime(String pipelineId,String[] queryTime){
         String sql = "select pip_pipeline_instance.* from pip_pipeline_instance  ";
-        sql = sql.concat(" where pipeline_id = ? and run_status != 'run'  and create_time between ? and ? " );
-        JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
-        return  jdbcTemplate.query(sql, new BeanPropertyRowMapper(PipelineInstanceEntity.class),pipelineId,queryTime[0],queryTime[1]);
+        if (StringUtils.isEmpty(pipelineId)){
+            sql = sql.concat(" where run_status != 'run'  and create_time between ? and ? " );
+            JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
+            return  jdbcTemplate.query(sql, new BeanPropertyRowMapper(PipelineInstanceEntity.class),queryTime[0],queryTime[1]);
+        }else {
+            sql = sql.concat(" where pipeline_id = ? and run_status != 'run'  and create_time between ? and ? " );
+            JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
+            return  jdbcTemplate.query(sql, new BeanPropertyRowMapper(PipelineInstanceEntity.class),pipelineId,queryTime[0],queryTime[1]);
+        }
     }
 
     /**

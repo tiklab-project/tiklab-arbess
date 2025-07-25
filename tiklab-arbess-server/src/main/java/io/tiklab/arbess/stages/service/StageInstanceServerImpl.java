@@ -159,35 +159,6 @@ public class StageInstanceServerImpl implements StageInstanceServer{
             stageInstance.setStageState(findStageInstanceStatus(otherStageInstanceList));
             stageInstance.setStageInstanceList(otherStageInstanceList);
         }
-        // List<TaskInstance> list = tasksInstanceService.findStagePostRunMessage(instanceId);
-        // StageInstance stageInstance = new StageInstance();
-        // if (!Objects.equals(list.size(),0)){
-        //     String status = findTaskInstanceStatus(list);
-        //     stageInstance.setStageName("后置处理");
-        //     stageInstance.setId("1");
-        //
-        //     AtomicInteger time = new AtomicInteger();
-        //     list.forEach(taskInstance -> {time.set(time.get() + taskInstance.getRunTime());});
-        //
-        //     StageInstance otherStageInstance = new StageInstance();
-        //     otherStageInstance.setStageName("后置任务");
-        //     otherStageInstance.setId("11111");
-        //     otherStageInstance.setStageState(status);
-        //     otherStageInstance.setStageTime(time.get());
-        //     otherStageInstance.setTaskInstanceList(list);
-        //
-        //     List<StageInstance> stageInstancesList = new ArrayList<>();
-        //     stageInstancesList.add(otherStageInstance);
-        //
-        //     stageInstance.setStageState(status);
-        //     stageInstance.setStageTime(time.get());
-        //     stageInstance.setStageInstanceList(stageInstancesList);
-        //     stageInstanceList.add(stageInstanceList.size(),stageInstance);
-        // }else {
-        //     stageInstanceList.sort(Comparator.comparing(StageInstance::getStageSort));
-        // }
-
-
         stageInstanceList.sort(Comparator.comparing(StageInstance::getStageSort));
 
         StageInstance stageInstance = stageInstanceList.get(stageInstanceList.size() - 1);

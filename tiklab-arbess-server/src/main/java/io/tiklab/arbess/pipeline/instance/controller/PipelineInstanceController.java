@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.util.Map;
 
 /**
  * @pi.protocol: http
@@ -59,9 +60,15 @@ public class PipelineInstanceController {
      * @pi.param: model=query
      */
     @RequestMapping(path="/findUserInstance",method = RequestMethod.POST)
-    public Result<Pagination<PipelineInstance>>  findUserInstance (
-            @RequestBody @Valid @NotNull PipelineInstanceQuery query){
+    public Result<Pagination<PipelineInstance>>  findUserInstance (@RequestBody @Valid @NotNull PipelineInstanceQuery query){
         Pagination<PipelineInstance> userAllInstance = instanceService.findUserInstance(query);
+        return Result.ok(userAllInstance);
+    }
+
+
+    @RequestMapping(path="/findPipelineInstanceCount",method = RequestMethod.POST)
+    public Result<Map<String,Integer>>  findPipelineInstanceCount ( @RequestBody @Valid @NotNull PipelineInstanceQuery query){
+        Map<String,Integer> userAllInstance = instanceService.findPipelineInstanceCount(query);
         return Result.ok(userAllInstance);
     }
 

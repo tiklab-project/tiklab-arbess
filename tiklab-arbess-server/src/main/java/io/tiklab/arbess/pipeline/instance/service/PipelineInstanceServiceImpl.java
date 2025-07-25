@@ -1,5 +1,6 @@
 package io.tiklab.arbess.pipeline.instance.service;
 
+import io.tiklab.arbess.agent.util.PipelineCache;
 import io.tiklab.arbess.home.service.PipelineHomeService;
 import io.tiklab.arbess.pipeline.execute.model.PipelineRunMsg;
 import io.tiklab.arbess.pipeline.instance.dao.PipelineInstanceDao;
@@ -25,11 +26,13 @@ import io.tiklab.arbess.pipeline.instance.model.PipelineInstanceQuery;
 import io.tiklab.rpc.annotation.Exporter;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import java.io.File;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static io.tiklab.arbess.support.util.util.PipelineFinal.PIPELINE_RUN_KEY;
 
@@ -77,7 +80,9 @@ public class PipelineInstanceServiceImpl implements PipelineInstanceService {
 
     @Override
     public void deleteAllInstance(String pipelineId) {
-        List<PipelineInstance> allInstance = findPipelineAllInstance(pipelineId);
+        PipelineInstanceQuery pipelineInstanceQuery = new PipelineInstanceQuery();
+        pipelineInstanceQuery.setPipelineId(pipelineId);
+        List<PipelineInstance> allInstance = findPipelineInstanceList(pipelineInstanceQuery);
         if (Objects.isNull(allInstance)){
             return;
         }
@@ -177,16 +182,6 @@ public class PipelineInstanceServiceImpl implements PipelineInstanceService {
         return BeanMapper.mapList(pipelineInstanceEntityList, PipelineInstance.class);
     }
 
-    @Override
-    public List<PipelineInstance> findPipelineAllInstance(String pipelineId) {
-        List<PipelineInstanceEntity> list = pipelineInstanceDao.findAllInstance(pipelineId);
-        if (Objects.isNull(list)){
-            return new ArrayList<>();
-        }
-        List<PipelineInstance> allInstance = BeanMapper.mapList(list, PipelineInstance.class);
-        allInstance.sort(Comparator.comparing(PipelineInstance::getCreateTime,Comparator.reverseOrder()));
-        return allInstance;
-    }
 
     @Override
     public List<PipelineInstance> findUserPipelineInstance(String userId,Integer limit){
@@ -233,7 +228,33 @@ public class PipelineInstanceServiceImpl implements PipelineInstanceService {
             return new ArrayList<>();
         }
         return BeanMapper.mapList(instanceList,PipelineInstance.class);
+    }
 
+
+    @Override
+    public Map<String,Integer> findPipelineInstanceCount(PipelineInstanceQuery pipelineInstanceQuery){
+
+        String userId = pipelineInstanceQuery.getUserId();
+        String[] builders = authorityService.findUserPipelineIdString(userId);
+        pipelineInstanceQuery.setIds(builders);
+
+        pipelineInstanceQuery.setUserId(null);
+        List<PipelineInstanceEntity> instanceList = pipelineInstanceDao.findInstanceList(pipelineInstanceQuery);
+
+        Map<String,Integer> map = new HashMap<>();
+        map.put("allNumber",instanceList.size());
+
+        long execNumber = instanceList.stream()
+                .filter(instance -> !StringUtils.isEmpty(instance.getUserId()))
+                .filter(instance -> instance.getUserId().equals(userId))
+                .count();
+        map.put("execNumber",(int)execNumber);
+
+        long runNumber = instanceList.stream()
+                .filter(instance -> instance.getRunStatus().equals(PipelineFinal.RUN_RUN))
+                .count();
+        map.put("runNumber",(int)runNumber);
+        return map;
     }
 
     @Override
@@ -246,7 +267,8 @@ public class PipelineInstanceServiceImpl implements PipelineInstanceService {
         for (PipelineInstance instance : execInstanceList) {
             String time;
             if (instance.getRunStatus().equals(PipelineFinal.RUN_RUN)){
-                time = PipelineUtil.formatDateTime(findInstanceRuntime(instance.getInstanceId()));
+                Integer runtime = PipelineCache.findRuntime(instance.getInstanceId());
+                time = PipelineUtil.formatDateTime(runtime);
             } else {
                 time = PipelineUtil.formatDateTime(instance.getRunTime());
             }
@@ -269,12 +291,13 @@ public class PipelineInstanceServiceImpl implements PipelineInstanceService {
         for (PipelineInstance instance : execInstanceList) {
             String time;
             if (instance.getRunStatus().equals(PipelineFinal.RUN_RUN)){
-                time = PipelineUtil.formatDateTime(findInstanceRuntime(instance.getInstanceId()));
+                Integer runtime = PipelineCache.findRuntime(instance.getInstanceId());
+                time = PipelineUtil.formatDateTime(runtime);
             } else {
                 time = PipelineUtil.formatDateTime(instance.getRunTime());
             }
             instance.setRunTimeDate(time);
-            String id = instance.getPipeline().getId();
+            // String id = instance.getPipeline().getId();
             // Boolean permissions = homeService.findPermissions(id, PIPELINE_RUN_KEY);
             instance.setExec(true);
         }
@@ -299,52 +322,6 @@ public class PipelineInstanceServiceImpl implements PipelineInstanceService {
         }
         return BeanMapper.mapList(instanceEntityList,PipelineInstance.class);
     }
-
-    @Override
-    public int findInstanceRuntime(String instanceId){
-        Integer i = runTimeMap.get(instanceId);
-        if (Objects.isNull(i)){
-            return 1;
-        }
-        return i;
-    }
-
-    @Override
-    public void instanceRuntime(String instanceId){
-        timeThreadPool.submit(() -> {
-            while (true){
-                Thread.currentThread().setName(instanceId);
-                int integer = findInstanceRuntime(instanceId);
-                try {
-                    Thread.sleep(1000);
-                }catch (RuntimeException e){
-                    throw new RuntimeException();
-                }
-                integer = integer +1;
-                runTimeMap.put(instanceId,integer);
-            }
-        });
-    }
-
-    @Override
-    public void stopThread(String threadName){
-        ThreadGroup currentGroup = Thread.currentThread().getThreadGroup();
-        int noThreads = currentGroup.activeCount();
-        Thread[] lstThreads = new Thread[noThreads];
-        if (Objects.equals(lstThreads.length,0)){
-            return;
-        }
-        currentGroup.enumerate(lstThreads);
-        for (int i = 0; i < noThreads; i++) {
-            String nm = lstThreads[i].getName();
-            if (!PipelineUtil.isNoNull(nm) ||!nm.equals(threadName)) {
-                continue;
-            }
-            runTimeMap.remove(threadName);
-            lstThreads[i].stop();
-        }
-    }
-
 
 
 }

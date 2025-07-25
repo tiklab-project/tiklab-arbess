@@ -1,5 +1,6 @@
 package io.tiklab.arbess.support.count.service;
 
+import io.tiklab.arbess.pipeline.instance.model.PipelineInstanceQuery;
 import io.tiklab.arbess.support.count.model.*;
 import io.tiklab.arbess.support.count.model.*;
 
@@ -109,9 +110,9 @@ public interface PipelineCountService {
 
     /**
      * 获取流水线运行结果统计
-     * @param pipelineId 流水线id
+     * @param query 流水线id
      * @return 运行结果
      */
-    PipelineInstanceCount findPipelineInstanceCount(String pipelineId);
+    PipelineInstanceCount findPipelineInstanceCount(PipelineInstanceQuery query);
 
 }

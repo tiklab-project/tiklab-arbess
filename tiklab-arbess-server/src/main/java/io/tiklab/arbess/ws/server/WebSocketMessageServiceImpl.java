@@ -1,6 +1,7 @@
 package io.tiklab.arbess.ws.server;
 
 import com.alibaba.fastjson.JSONObject;
+import io.tiklab.arbess.agent.util.PipelineCache;
 import io.tiklab.arbess.home.service.PipelineHomeService;
 import io.tiklab.arbess.pipeline.execute.model.PipelineRunMsg;
 import io.tiklab.arbess.pipeline.execute.service.PipelineExecService;
@@ -37,8 +38,11 @@ import io.tiklab.arbess.task.deploy.model.TaskDeployInstance;
 import io.tiklab.arbess.task.deploy.service.TaskDeployInstanceServiceImpl;
 import io.tiklab.arbess.support.message.model.TaskMessageSendDetail;
 import io.tiklab.arbess.task.task.model.TaskInstance;
+import io.tiklab.arbess.task.task.model.Tasks;
 import io.tiklab.arbess.task.task.service.TasksInstanceService;
 import io.tiklab.arbess.task.task.service.TasksInstanceServiceImpl;
+import io.tiklab.arbess.task.task.service.TasksService;
+import io.tiklab.arbess.task.task.service.TasksServiceImpl;
 import io.tiklab.arbess.task.test.model.MavenTest;
 import io.tiklab.arbess.task.test.model.RelevanceTestOn;
 import io.tiklab.arbess.task.test.model.TestOnRelevance;
@@ -119,6 +123,10 @@ public class WebSocketMessageServiceImpl implements WebSocketMessageService {
     @Autowired
     SendMessageNoticeService dispatchNoticeService;
 
+    @Autowired
+    TasksService tasksService;
+
+
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Override
@@ -129,6 +137,8 @@ public class WebSocketMessageServiceImpl implements WebSocketMessageService {
             messageTaskDeployInstanceLogHandle( message);
         }else if (type.contains("deploy_end_instance_log")){
             messageTaskDeployInstanceLogHandle(message);
+        }else if (type.contains("task_checkpoint_timeout")){
+            taskCheckpointTimeoutHandle(message);
         }else if (type.contains("task_run_end_message")){
             taskRunMessage(message);
         }else if (type.contains("log")){
@@ -170,7 +180,7 @@ public class WebSocketMessageServiceImpl implements WebSocketMessageService {
         String instanceId = sourceInstance.getInstanceId();
         String runStatus = sourceInstance.getRunStatus();
         PipelineInstance instance = pipelineInstanceService.findOneInstance(instanceId);
-        int runtime = pipelineInstanceService.findInstanceRuntime(instanceId);
+        int runtime = PipelineCache.findRuntime(instanceId);
         instance.setRunTime(runtime+1);
         instance.setRunStatus(runStatus);
         pipelineInstanceService.updateInstance(instance);
@@ -299,6 +309,15 @@ public class WebSocketMessageServiceImpl implements WebSocketMessageService {
     }
 
     /**
+     * 超时回调
+     * @param message 超时
+     */
+    private void taskCheckpointTimeoutHandle(Object message){
+        String taskInstanceId = (String)message;
+        execService.execTimeout(taskInstanceId);
+    }
+
+    /**
      * 任务消息处理
      * @param message 消息内容
      */
@@ -331,13 +350,18 @@ public class WebSocketMessageServiceImpl implements WebSocketMessageService {
         String id = sourceTaskInstance.getId();
 
         int runTime = sourceTaskInstance.getRunTime();
-        if  (runTime > taskTimeout){
+        TaskInstance instanceTask = tasksInstanceService.findOneTaskInstance(id);
+
+        String taskId = instanceTask.getTaskId();
+        Tasks tasks = tasksService.findOneTasks(taskId);
+
+        if  (runTime > taskTimeout && !TASK_CHECK_POINT.equals(tasks.getTaskType()) ){
             AgentMessage agentMessage = new AgentMessage();
             agentMessage.setType("timeout");
 
             try {
-                TaskInstance oneTaskInstance = tasksInstanceService.findOneTaskInstance(id);
-                String stagesId = oneTaskInstance.getStagesId();
+                // TaskInstance oneTaskInstance = tasksInstanceService.findOneTaskInstance(id);
+                String stagesId = instanceTask.getStagesId();
                 StageInstance oneStageInstance = stageInstanceServer.findOneStageInstance(stagesId);
                 oneStageInstance.setStageState(RUN_TIMEOUT);
                 StageInstance stageInstance = null;
@@ -350,7 +374,7 @@ public class WebSocketMessageServiceImpl implements WebSocketMessageService {
                 }
                 PipelineInstance instance = pipelineInstanceService.findOneInstance(instanceId);
                 instance.setRunStatus(RUN_TIMEOUT);
-                int runtime = pipelineInstanceService.findInstanceRuntime(instanceId);
+                int runtime = PipelineCache.findRuntime(instanceId);
                 instance.setRunTime(runtime);
 
                 String pipelineId = instance.getPipeline().getId();
@@ -404,7 +428,6 @@ public class WebSocketMessageServiceImpl implements WebSocketMessageService {
     public void removeExecCache(String pipelineId){
         String instanceId = PipelineExecServiceImpl.pipelineIdOrInstanceId.get(pipelineId);
         PipelineInstanceServiceImpl.runTimeMap.remove(instanceId);
-        pipelineInstanceService.stopThread(instanceId);
         PipelineExecServiceImpl.pipelineIdOrInstanceId.remove(pipelineId);
     }
 

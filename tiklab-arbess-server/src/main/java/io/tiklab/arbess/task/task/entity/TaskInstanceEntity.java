@@ -2,6 +2,8 @@ package io.tiklab.arbess.task.task.entity;
 
 import io.tiklab.dal.jpa.annotation.*;
 
+import java.sql.Timestamp;
+
 /**
  * 流水线日志
  */
@@ -18,6 +20,9 @@ public class TaskInstanceEntity {
 
     @Column(name = "instance_id")
     private String instanceId;
+
+    @Column(name = "create_time")
+    private Timestamp createTime;
 
     //运行类型
     @Column(name = "task_type")
@@ -49,6 +54,25 @@ public class TaskInstanceEntity {
     @Column(name = "postprocess_id")
     private String postprocessId;
 
+    // 任务ID
+    @Column(name = "task_id")
+    private String taskId;
+
+    public Timestamp getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Timestamp createTime) {
+        this.createTime = createTime;
+    }
+
+    public String getTaskId() {
+        return taskId;
+    }
+
+    public void setTaskId(String taskId) {
+        this.taskId = taskId;
+    }
 
     public String getPostprocessId() {
         return postprocessId;

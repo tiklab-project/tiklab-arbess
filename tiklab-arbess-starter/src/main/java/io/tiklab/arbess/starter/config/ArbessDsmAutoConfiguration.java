@@ -1,6 +1,6 @@
 package io.tiklab.arbess.starter.config;
 
-import io.tiklab.arbess.support.util.task.TaskUpdate;
+import io.tiklab.arbess.support.util.task.service.TaskUpdate;
 import io.tiklab.dsm.model.DsmConfig;
 import io.tiklab.dsm.model.DsmVersion;
 import io.tiklab.dsm.support.DsmVersionBuilder;
@@ -123,6 +123,13 @@ public class ArbessDsmAutoConfiguration {
                         "pip-agent-role_1.0.0",
                 }).get();
         versionList.add(agentRole);
+
+        DsmVersion checkPoint = DsmVersionBuilder.instance()
+                .version("pip-task-check-point_1.0.0")
+                .db(new String[]{
+                        "pip-task-check-point_1.0.0",
+                }).get();
+        versionList.add(checkPoint);
 
         return versionList;
     }

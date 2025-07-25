@@ -6,6 +6,7 @@ import io.tiklab.arbess.stages.model.Stage;
 import io.tiklab.arbess.support.agent.model.Agent;
 import io.tiklab.arbess.support.message.model.TaskMessage;
 import io.tiklab.arbess.support.postprocess.model.Postprocess;
+import io.tiklab.arbess.support.variable.model.ExecVariable;
 import io.tiklab.arbess.support.variable.model.Variable;
 import io.tiklab.arbess.task.build.model.TaskBuildProduct;
 import io.tiklab.arbess.task.task.model.TaskExecMessage;
@@ -51,8 +52,11 @@ public class PipelineDetails {
     // 环境
     private List<Scm>  scmList;
 
-    // 变量
-    private List<Variable> variableList;
+    // // 变量
+    // private List<Variable> variableList;
+
+    // 流水线变量
+    private List<ExecVariable> pipelineVariable;
 
     // 后置处理
     private List<Postprocess> postprocessList;
@@ -68,6 +72,8 @@ public class PipelineDetails {
     private User execUser;
 
     private Integer execType;
+
+
 
     public Integer getExecType() {
         return execType;
@@ -205,12 +211,12 @@ public class PipelineDetails {
         this.scmList = scmList;
     }
 
-    public List<Variable> getVariableList() {
-        return variableList;
+    public List<ExecVariable> getPipelineVariable() {
+        return pipelineVariable;
     }
 
-    public void setVariableList(List<Variable> variableList) {
-        this.variableList = variableList;
+    public void setPipelineVariable(List<ExecVariable> pipelineVariable) {
+        this.pipelineVariable = pipelineVariable;
     }
 
     public List<Postprocess> getPostprocessList() {

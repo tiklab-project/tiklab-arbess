@@ -256,6 +256,10 @@ public class PipelineFinal {
     public static final String TASK_SCRIPT_CMD = "cmd";
     public static final String TASK_SCRIPT_BAT = "bat";
 
+    // 人工卡点
+    public static final String TASK_TYPE_TOOL = "tool";
+    public static final String TASK_CHECK_POINT = "checkpoint";
+
 
     //触发器
     public static final String TRIGGER_SCHEDULED = "scheduled";

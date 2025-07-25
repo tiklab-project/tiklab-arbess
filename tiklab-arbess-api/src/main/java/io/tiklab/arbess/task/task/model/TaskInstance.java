@@ -1,10 +1,12 @@
 package io.tiklab.arbess.task.task.model;
 
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.tiklab.arbess.task.deploy.model.TaskDeployInstance;
 import io.tiklab.toolkit.beans.annotation.Mapper;
 import io.tiklab.toolkit.join.annotation.Join;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 
@@ -47,6 +49,9 @@ public class TaskInstance {
     //@ApiProperty(name="stageId",desc="阶段id")
     private String stagesId;
 
+    //@ApiProperty(name="taskId",desc="任务id")
+    private String taskId;
+
     //@ApiProperty(name="postprocessId",desc="后置任务id")
     private String postprocessId;
 
@@ -55,6 +60,25 @@ public class TaskInstance {
 
     // 部署实例日志
     private List<TaskDeployInstance> deployInstanceList;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Timestamp createTime;
+
+    public Timestamp getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Timestamp createTime) {
+        this.createTime = createTime;
+    }
+
+    public String getTaskId() {
+        return taskId;
+    }
+
+    public void setTaskId(String taskId) {
+        this.taskId = taskId;
+    }
 
     public List<TaskDeployInstance> getDeployInstanceList() {
         return deployInstanceList;

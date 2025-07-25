@@ -1,5 +1,6 @@
 package io.tiklab.arbess.support.count.controller;
 
+import io.tiklab.arbess.pipeline.instance.model.PipelineInstanceQuery;
 import io.tiklab.core.Result;
 import io.tiklab.arbess.support.count.model.*;
 import io.tiklab.arbess.support.count.model.*;
@@ -82,8 +83,8 @@ public class PipelineCountController {
     }
 
     @RequestMapping(path="/findPipelineInstanceCount",method = RequestMethod.POST)
-    public Result<PipelineInstanceCount> findPipelineInstanceCount(@NotNull @Valid String pipelineId){
-        PipelineInstanceCount resultCount = countService.findPipelineInstanceCount(pipelineId);
+    public Result<PipelineInstanceCount> findPipelineInstanceCount(@RequestBody @NotNull @Valid PipelineInstanceQuery query){
+        PipelineInstanceCount resultCount = countService.findPipelineInstanceCount(query);
         return Result.ok(resultCount);
     }
 

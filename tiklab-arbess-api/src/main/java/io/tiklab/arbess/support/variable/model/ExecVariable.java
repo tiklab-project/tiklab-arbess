@@ -3,55 +3,35 @@ package io.tiklab.arbess.support.variable.model;
 /**
  * 流水线条件模型
  */
-//@ApiModel
 public class ExecVariable {
 
-    //@ApiProperty(name="varType",desc="类型 str.字符串 single.单选")
-    private String varType;
-
-    //@ApiProperty(name = "varKey",desc="名称")
+    // key
     private String varKey;
 
-    //@ApiProperty(name = "varValue",desc="默认值")
-    private Object varValue;
+    // value
+    private String varValue;
 
-    //@ApiProperty(name = "pipelineId",desc="默认值")
-    private String pipelineId;
-
-
-    public String getVarType() {
-        return varType;
+    public ExecVariable() {
     }
 
-    public ExecVariable setVarType(String varType) {
-        this.varType = varType;
-        return this;
+    public ExecVariable(String varKey, String varValue) {
+        this.varKey = varKey;
+        this.varValue = varValue;
     }
 
     public String getVarKey() {
         return varKey;
     }
 
-    public ExecVariable setVarKey(String varKey) {
+    public void setVarKey(String varKey) {
         this.varKey = varKey;
-        return this;
     }
 
-    public Object getVarValue() {
+    public String getVarValue() {
         return varValue;
     }
 
-    public ExecVariable setVarValue(Object varValue) {
+    public void setVarValue(String varValue) {
         this.varValue = varValue;
-        return this;
-    }
-
-    public String getPipelineId() {
-        return pipelineId;
-    }
-
-    public ExecVariable setPipelineId(String pipelineId) {
-        this.pipelineId = pipelineId;
-        return this;
     }
 }

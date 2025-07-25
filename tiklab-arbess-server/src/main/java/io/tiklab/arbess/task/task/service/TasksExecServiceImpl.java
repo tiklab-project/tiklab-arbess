@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
 import java.util.*;
 
 @Service
@@ -49,6 +50,8 @@ public class TasksExecServiceImpl implements TasksExecService {
         instance.setTaskName(task.getTaskName());
         instance.setTaskType(task.getTaskType());
         instance.setTaskSort(task.getTaskSort());
+        instance.setTaskId(task.getTaskId());
+        instance.setCreateTime(new Timestamp(System.currentTimeMillis()));
 
         String taskInstanceId = tasksInstanceService.createTaskInstance(instance);
         instance.setId(taskInstanceId);

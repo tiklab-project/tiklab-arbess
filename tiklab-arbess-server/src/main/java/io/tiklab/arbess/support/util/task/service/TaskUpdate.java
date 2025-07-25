@@ -1,4 +1,4 @@
-package io.tiklab.arbess.support.util.task;
+package io.tiklab.arbess.support.util.task.service;
 
 import io.tiklab.arbess.agent.support.util.service.PipelineUtilService;
 import io.tiklab.arbess.pipeline.definition.service.PipelineService;
@@ -48,7 +48,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 import java.util.*;
@@ -56,7 +56,7 @@ import java.util.stream.Collectors;
 
 import static io.tiklab.arbess.support.util.util.PipelineFinal.*;
 
-@Component
+@Service
 public class TaskUpdate implements DsmProcessTask {
 
 
@@ -131,45 +131,48 @@ public class TaskUpdate implements DsmProcessTask {
 
     @Override
     public void execute() {
+        try {
+            logger.info("task load tasks......");
 
-        logger.info("task load tasks......");
+            logger.info("task load init privilege tasks......");
+            cleanPrivilege();
+            logger.info("task load init privilege success!");
 
-        logger.info("task load init privilege tasks......");
-        cleanPrivilege();
-        logger.info("task load init privilege success!");
+            logger.info("task update pipeline variable......");
+            updateVariable();
+            logger.info("task update pipeline variable completed!");
 
-        logger.info("task update pipeline variable......");
-        updateVariable();
-        logger.info("task update pipeline variable completed!");
+            logger.info("task update pipeline message......");
+            updateMessage();
+            logger.info("task update pipeline message completed!");
 
-        logger.info("task update pipeline message......");
-        updateMessage();
-        logger.info("task update pipeline message completed!");
+            logger.info("task update code auth.....");
+            updatePipelineAuth();
+            logger.info("task update code auth end.");
 
-        logger.info("task update code auth.....");
-        updatePipelineAuth();
-        logger.info("task update code auth end.");
+            logger.info("task  cache post.....");
+            deletePost();
+            logger.info("task  cache post end.");
 
-        logger.info("task  cache post.....");
-        deletePost();
-        logger.info("task  cache post end.");
+            logger.info("task load scm tasks......");
+            scmAddress();
 
-        logger.info("task load scm tasks......");
-        scmAddress();
+            initTasks();
+            logger.info("task load scm success!");
 
-        initTasks();
-        logger.info("task load scm success!");
+            logger.info("task update deploy strategy type......");
+            updateTaskDeploy();
+            logger.info("task update deploy strategy type success!");
 
-        logger.info("task update deploy strategy type......");
-        updateTaskDeploy();
-        logger.info("task update deploy strategy type success!");
-
-        logger.info("task cache pull.....");
-        deletePullOrPush();
-        logger.info("task cache pull end.");
+            logger.info("task cache pull.....");
+            deletePullOrPush();
+            logger.info("task cache pull end.");
 
 
-        logger.info("task load complete.");
+            logger.info("task load complete.");
+        }catch (Exception e){
+            logger.error("task load error:",e);
+        }
     }
 
     public void cleanPrivilege(){

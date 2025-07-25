@@ -1,5 +1,6 @@
 package io.tiklab.arbess.pipeline.execute.service;
 
+import io.tiklab.arbess.pipeline.execute.model.PipelineKeepOn;
 import io.tiklab.arbess.pipeline.execute.model.PipelineRunMsg;
 import io.tiklab.arbess.pipeline.instance.model.PipelineInstance;
 
@@ -30,9 +31,16 @@ public interface PipelineExecService {
 
     /**
      * 保持运行
-     * @param pipelineId 流水线id
+     * @param keepOn 流水线id
      */
-    void keepOn(String pipelineId);
+    void keepOn(PipelineKeepOn keepOn);
+
+
+    /**
+     * 任务超时
+     * @param taskInstanceId 任务实例id
+     */
+    void execTimeout(String taskInstanceId);
 
 
 

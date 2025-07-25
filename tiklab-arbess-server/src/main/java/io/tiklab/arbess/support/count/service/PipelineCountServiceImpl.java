@@ -22,6 +22,9 @@ import io.tiklab.user.user.service.UserProcessor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -503,8 +506,11 @@ public class PipelineCountServiceImpl implements PipelineCountService {
                         a.getRunStatus().equals(PipelineFinal.RUN_SUCCESS)).count();
 
                 pipelineDayRateCount.setSuccessNumber((int) successCount);
-                double v = parseDouble(successCount, list.size()) * 100;
 
+                double v = BigDecimal.valueOf(successCount)
+                        .multiply(BigDecimal.valueOf(100))
+                        .divide(BigDecimal.valueOf(list.size()), 2, RoundingMode.HALF_UP)
+                        .doubleValue();
                 pipelineDayRateCount.setSuccessRate(v + "%");
                 long errorCount = list.stream().filter(a -> a.getUser().getId().equals(id) &&
                         a.getRunStatus().equals(PipelineFinal.RUN_ERROR)).count();
@@ -553,7 +559,11 @@ public class PipelineCountServiceImpl implements PipelineCountService {
                         .count();
 
                 pipelineDayRateCount.setSuccessNumber((int) successCount);
-                double v = parseDouble(successCount, list.size())*100;
+
+                double v = BigDecimal.valueOf(successCount)
+                        .multiply(BigDecimal.valueOf(100))
+                        .divide(BigDecimal.valueOf(list.size()), 2, RoundingMode.HALF_UP)
+                        .doubleValue();
                 pipelineDayRateCount.setSuccessRate(v + "%");
 
                 long errorCount = list.stream()
@@ -707,11 +717,11 @@ public class PipelineCountServiceImpl implements PipelineCountService {
 
 
     @Override
-    public PipelineInstanceCount findPipelineInstanceCount(String pipelineId){
+    public PipelineInstanceCount findPipelineInstanceCount(PipelineInstanceQuery query){
 
         PipelineInstanceCount pipelineInstanceCount = new PipelineInstanceCount();
 
-        List<PipelineInstance> pipelineAllInstance = pipelineInstanceService.findPipelineAllInstance(pipelineId);
+        List<PipelineInstance> pipelineAllInstance = pipelineInstanceService.findPipelineInstanceList(query);
         pipelineAllInstance.forEach(pipelineInstance -> {
             String runStatus = pipelineInstance.getRunStatus();
             switch (runStatus){
@@ -814,11 +824,14 @@ public class PipelineCountServiceImpl implements PipelineCountService {
      * @param value2 value2
      * @return 保留两位小数点
      */
-    public double parseDouble(double value1, double value2) {
-        double number = value1 / value2;
-        DecimalFormat df = new DecimalFormat("#.00");
-        String formattedNumber = df.format(number);
-        return Double.parseDouble(formattedNumber);
+    public static double parseDouble(double value1, double value2) {
+        if (value2 == 0) {
+            return 0;
+        }
+
+        BigDecimal result = BigDecimal.valueOf(value1)
+                .divide(BigDecimal.valueOf(value2), 2, RoundingMode.HALF_UP);
+        return result.doubleValue();
     }
 
     /**

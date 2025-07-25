@@ -1,8 +1,10 @@
 package io.tiklab.arbess.task.task.model;
 
+import io.tiklab.arbess.support.variable.model.ExecVariable;
 import io.tiklab.toolkit.beans.annotation.Mapper;
 import io.tiklab.toolkit.join.annotation.Join;
 
+import java.util.List;
 
 
 /**
@@ -46,6 +48,17 @@ public class Tasks {
 
     // 执行实例id
     private String instanceId;
+
+    //流水线变量
+    private List<ExecVariable> taskVariable;
+
+    public List<ExecVariable> getTaskVariable() {
+        return taskVariable;
+    }
+
+    public void setTaskVariable(List<ExecVariable> taskVariable) {
+        this.taskVariable = taskVariable;
+    }
 
     public String getInstanceId() {
         return instanceId;
