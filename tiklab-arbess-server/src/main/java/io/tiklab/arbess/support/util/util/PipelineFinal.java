@@ -259,10 +259,18 @@ public class PipelineFinal {
     // 人工卡点
     public static final String TASK_TYPE_TOOL = "tool";
     public static final String TASK_CHECK_POINT = "checkpoint";
+    public static final String TASK_HOST_ORDER = "host_order";
 
+
+    public static final String TASK_TYPE_STRATEGY = "strategy";
+
+    public static final String TASK_TYPE_HOST_STRATEGY = "host_strategy";
 
     //触发器
     public static final String TRIGGER_SCHEDULED = "scheduled";
+
+    // 主机蓝绿部署
+    public static final String HOST_BLUE_GREEN = "host_blue_green";
 
 
     public static final String SIZE_TYPE_MB = "MB";

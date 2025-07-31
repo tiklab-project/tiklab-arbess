@@ -1,6 +1,7 @@
 package io.tiklab.arbess.stages.service;
 
 
+import io.tiklab.arbess.stages.model.StageGroup;
 import io.tiklab.toolkit.join.annotation.FindAll;
 import io.tiklab.toolkit.join.annotation.FindList;
 import io.tiklab.toolkit.join.annotation.FindOne;
@@ -21,6 +22,14 @@ public interface StageService {
      * @return 阶段id
      */
     String createStagesOrTask(Stage stage);
+
+
+    /**
+     * 创建阶段组及关联任务
+     * @param stageGroup 阶段信息
+     * @return 阶段id
+     */
+    void createStagesGroupOrTask(StageGroup stageGroup);
 
 
     /**

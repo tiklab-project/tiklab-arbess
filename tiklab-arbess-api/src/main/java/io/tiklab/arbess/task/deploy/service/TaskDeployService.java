@@ -29,15 +29,6 @@ public interface TaskDeployService {
     void deleteDeploy(String deployId) ;
 
     /**
-     * 测试是否有效
-     * @param taskType 任务类型
-     * @param taskDeploy object
-     * @return 是否有效
-     */
-    Boolean deployValid(String taskType,TaskDeploy taskDeploy);
-
-
-    /**
      * 根据配置id查询任务
      * @param authId 配置id
      * @return 任务

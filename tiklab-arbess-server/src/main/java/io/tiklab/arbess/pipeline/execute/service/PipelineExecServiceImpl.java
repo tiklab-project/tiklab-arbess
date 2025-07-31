@@ -1,7 +1,5 @@
 package io.tiklab.arbess.pipeline.execute.service;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import io.tiklab.arbess.agent.util.PipelineCache;
 import io.tiklab.arbess.home.service.PipelineHomeService;
 import io.tiklab.arbess.pipeline.execute.model.PipelineKeepOn;
@@ -11,21 +9,19 @@ import io.tiklab.arbess.stages.service.StageInstanceServer;
 import io.tiklab.arbess.support.message.model.TaskMessage;
 import io.tiklab.arbess.support.message.model.TaskMessageQuery;
 import io.tiklab.arbess.support.message.service.TaskMessageService;
-import io.tiklab.arbess.support.message.service.TaskMessageTypeService;
 import io.tiklab.arbess.support.util.model.KeepOn;
+import io.tiklab.arbess.support.util.util.PipelineTimeCache;
 import io.tiklab.arbess.support.variable.model.ExecVariable;
-import io.tiklab.arbess.support.variable.model.VariableQuery;
 import io.tiklab.arbess.support.variable.service.VariableRunService;
 import io.tiklab.arbess.task.build.model.TaskBuildProduct;
 import io.tiklab.arbess.task.build.model.TaskBuildProductQuery;
 import io.tiklab.arbess.task.build.service.TaskBuildProductService;
-import io.tiklab.arbess.task.checkpoint.model.TaskCheckPoint;
-import io.tiklab.arbess.task.checkpoint.service.TaskCheckPointService;
+import io.tiklab.arbess.task.tool.model.TaskCheckPoint;
+import io.tiklab.arbess.task.tool.service.TaskCheckPointService;
 import io.tiklab.arbess.task.task.model.TaskInstance;
 import io.tiklab.arbess.task.task.model.Tasks;
 import io.tiklab.arbess.task.task.service.TasksInstanceService;
 import io.tiklab.arbess.task.task.service.TasksService;
-import io.tiklab.arbess.task.task.service.TasksServiceImpl;
 import io.tiklab.core.exception.SystemException;
 import io.tiklab.arbess.pipeline.instance.service.PipelineInstanceServiceImpl;
 import io.tiklab.arbess.support.agent.model.Agent;
@@ -39,17 +35,12 @@ import io.tiklab.arbess.stages.service.StageExecService;
 import io.tiklab.arbess.stages.service.StageService;
 import io.tiklab.arbess.support.agent.service.AgentService;
 import io.tiklab.arbess.support.disk.service.DiskService;
-import io.tiklab.arbess.support.postprocess.model.Postprocess;
 import io.tiklab.arbess.support.postprocess.service.PostprocessExecService;
 import io.tiklab.arbess.support.util.util.PipelineFinal;
 import io.tiklab.arbess.agent.support.util.service.PipelineUtilService;
-import io.tiklab.arbess.support.variable.model.Variable;
-import io.tiklab.arbess.support.variable.service.VariableService;
 import io.tiklab.arbess.support.version.service.PipelineVersionService;
-import io.tiklab.arbess.task.task.service.TasksExecService;
 import io.tiklab.core.exception.ApplicationException;
 import io.tiklab.arbess.ws.server.SocketServerHandler;
-import io.tiklab.todotask.todo.model.Task;
 import io.tiklab.toolkit.join.JoinTemplate;
 import io.tiklab.arbess.pipeline.definition.model.Pipeline;
 import io.tiklab.arbess.pipeline.definition.service.PipelineService;
@@ -63,10 +54,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.WebSocketSession;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static io.tiklab.arbess.support.util.util.PipelineFinal.*;
 
@@ -301,7 +294,6 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
         }
 
         // 添加到缓存
-        PipelineCache.addRunTime(pipelineInstance.getInstanceId());
         joinTemplate.joinQuery(pipelineInstance,new String[]{"pipeline","user"});
         // 运行实例放入内存中
         pipelineIdOrInstanceId.put(pipelineId, instanceId);
@@ -349,6 +341,8 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
             // 发送消息
             sendMessage(runMsg.getAgent(),agentMessage);
 
+            PipelineTimeCache.addRunTime(pipelineInstance.getInstanceId());
+
         }catch (Exception e){
             e.printStackTrace();
             logger.error("流水线执行出错了：{}",e.getMessage() );
@@ -388,7 +382,6 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
             instanceId = pipelineInstance.getInstanceId();
         }
 
-        PipelineCache.addRunTime(pipelineInstance.getInstanceId());
         joinTemplate.joinQuery(pipelineInstance,new String[]{"pipeline","user"});
 
         // 运行实例放入内存中
@@ -433,6 +426,9 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
             agentMessage.setPipelineId(pipelineId);
 
             sendMessage(pipelineDetails.getAgent(),agentMessage);
+
+            PipelineTimeCache.addRunTime(pipelineInstance.getInstanceId());
+
         }catch (Exception e){
             logger.error("流水线执行出错了：{}",e.getMessage() );
             stop(pipelineId);
@@ -456,7 +452,7 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
             for (PipelineInstance pipelineInstance : pipelineInstanceList) {
                 String instanceId = pipelineInstance.getInstanceId();
                 pipelineInstance.setRunStatus(PipelineFinal.RUN_HALT);
-                int runtime = PipelineCache.findRuntime(instanceId);
+                int runtime = PipelineTimeCache.findRuntime(instanceId);
                 pipelineInstance.setRunTime(runtime);
                 pipelineInstanceService.updateInstance(pipelineInstance);
             }
@@ -487,7 +483,7 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
         List<PipelineInstance> pipelineInstanceList = pipelineInstanceService.findPipelineInstanceList(pipelineInstanceQuery);
         for (PipelineInstance pipelineInstance : pipelineInstanceList) {
             pipelineInstance.setRunStatus(PipelineFinal.RUN_HALT);
-            int runtime = PipelineCache.findRuntime(pipelineInstance.getInstanceId());
+            int runtime = PipelineTimeCache.findRuntime(pipelineInstance.getInstanceId());
             pipelineInstance.setRunTime(runtime);
             pipelineInstanceService.updateInstance(pipelineInstance);
         }
@@ -495,10 +491,10 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
 
     }
 
-    public void removeExecCache(String pipelineId){
+    private void removeExecCache(String pipelineId){
         String instanceId = pipelineIdOrInstanceId.get(pipelineId);
         PipelineInstanceServiceImpl.runTimeMap.remove(instanceId);
-        PipelineCache.removeRuntime(instanceId);
+        PipelineTimeCache.removeRuntime(instanceId);
         pipelineIdOrInstanceId.remove(pipelineId);
     }
 
@@ -559,11 +555,11 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
     /**
      * 判断Agent
      */
-    public Agent judgeAgent(){
+    private Agent judgeAgent(){
 
         Agent agent = agentService.findDefaultAgent();
         if (Objects.isNull(agent)){
-            throw new ApplicationException("无法获取到流水线执行Agent！");
+            throw new ApplicationException("无法获取到已连接的执行Agent！");
         }
 
         WebSocketSession session = SocketServerHandler.sessionMap.get(agent.getAddress());
@@ -577,7 +573,7 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
     /**
      * 发送消息
      */
-    public void sendMessage(Agent agent, AgentMessage agentMessage){
+    private void sendMessage(Agent agent, AgentMessage agentMessage){
 
         String id = agent.getAddress();
 
@@ -642,6 +638,25 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
             e.printStackTrace();
         }
     }
+
+    @Override
+    public void clean(String pipelineId) {
+        Agent agent = judgeAgent();
+        String defaultAddress = utilService.findPipelineDefaultAddress(pipelineId, 1);
+        AgentMessage agentMessage = new AgentMessage();
+        agentMessage.setType("clean");
+        agentMessage.setMessage(defaultAddress);
+        agentMessage.setPipelineId(pipelineId);
+        SocketServerHandler.instance().sendHandleMessage(agent.getAddress(),agentMessage);
+    }
+
+
+    @Scheduled(fixedRate = 1000)
+    protected void countTaskRunTime(){
+        Map<String, AtomicInteger> runtimeMap = PipelineTimeCache.findRuntime();
+        runtimeMap.keySet().forEach(PipelineTimeCache::updateRuntime);
+    }
+
 
 }
 

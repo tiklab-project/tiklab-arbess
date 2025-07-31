@@ -43,6 +43,11 @@ public interface PipelineExecService {
     void execTimeout(String taskInstanceId);
 
 
+    /**
+     * 清理流水线缓存
+     * @param pipelineId 流水线ID
+     */
+    void clean(String pipelineId);
 
 
 }

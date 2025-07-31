@@ -85,6 +85,14 @@ public class PipelineExecController {
 
 
 
+    @RequestMapping(path="/clean",method = RequestMethod.POST)
+    public Result<Void> clean(@NotNull String pipelineId) {
+        pipelineExecService.clean(pipelineId);
+        return Result.ok();
+    }
+
+
+
 }
 
 

@@ -25,6 +25,7 @@ import io.tiklab.arbess.support.postprocess.service.PostprocessInstanceService;
 import io.tiklab.arbess.agent.support.util.service.PipelineUtilService;
 import io.tiklab.arbess.support.util.util.PipelineFileUtil;
 import io.tiklab.arbess.support.util.util.PipelineFinal;
+import io.tiklab.arbess.support.util.util.PipelineTimeCache;
 import io.tiklab.arbess.support.util.util.PipelineUtil;
 import io.tiklab.arbess.task.build.model.TaskBuildProduct;
 import io.tiklab.arbess.task.build.service.TaskBuildProductService;
@@ -180,10 +181,15 @@ public class WebSocketMessageServiceImpl implements WebSocketMessageService {
         String instanceId = sourceInstance.getInstanceId();
         String runStatus = sourceInstance.getRunStatus();
         PipelineInstance instance = pipelineInstanceService.findOneInstance(instanceId);
-        int runtime = PipelineCache.findRuntime(instanceId);
-        instance.setRunTime(runtime+1);
+        int runtime = PipelineTimeCache.findRuntime(instanceId);
+        if (runtime > 4){
+            runtime = runtime -2;
+        }
+        instance.setRunTime(runtime);
         instance.setRunStatus(runStatus);
         pipelineInstanceService.updateInstance(instance);
+
+        PipelineTimeCache.removeRuntime(instanceId);
 
         // 设置流水线为未运行
         String pipelineId = instance.getPipeline().getId();
@@ -192,7 +198,7 @@ public class WebSocketMessageServiceImpl implements WebSocketMessageService {
         pipelineService.updatePipeline(pipeline);
         PipelineExecServiceImpl.pipelineIdOrInstanceId.remove(pipelineId);
 
-        sendPipelineRunMessage(pipeline,instanceId,runStatus);
+        // sendPipelineRunMessage(pipeline,instanceId,runStatus);
 
         // 更新审批状态
         if (!Objects.isNull(approvePipelineService)){

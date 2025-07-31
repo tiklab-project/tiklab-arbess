@@ -11,15 +11,15 @@ import io.tiklab.arbess.setting.hostgroup.model.HostGroup;
 import io.tiklab.arbess.setting.third.service.AuthThirdService;
 import io.tiklab.arbess.setting.tool.model.Scm;
 import io.tiklab.arbess.setting.tool.service.ScmService;
-import io.tiklab.arbess.support.condition.service.ConditionService;
 import io.tiklab.arbess.support.util.util.PipelineUtil;
-import io.tiklab.arbess.support.variable.service.VariableService;
 import io.tiklab.arbess.task.artifact.model.TaskArtifact;
 import io.tiklab.arbess.task.artifact.service.TaskArtifactService;
 import io.tiklab.arbess.task.build.model.TaskBuild;
 import io.tiklab.arbess.task.build.service.TaskBuildService;
-import io.tiklab.arbess.task.checkpoint.model.TaskCheckPoint;
-import io.tiklab.arbess.task.checkpoint.service.TaskCheckPointService;
+import io.tiklab.arbess.task.strategy.model.TaskHostStrategy;
+import io.tiklab.arbess.task.strategy.service.TaskHostStrategyService;
+import io.tiklab.arbess.task.tool.model.TaskCheckPoint;
+import io.tiklab.arbess.task.tool.service.TaskCheckPointService;
 import io.tiklab.arbess.task.code.model.TaskCode;
 import io.tiklab.arbess.task.code.model.ThirdQuery;
 import io.tiklab.arbess.task.code.model.ThirdUser;
@@ -28,12 +28,10 @@ import io.tiklab.arbess.task.codescan.model.TaskCodeScan;
 import io.tiklab.arbess.task.codescan.service.TaskCodeScanService;
 import io.tiklab.arbess.task.deploy.model.TaskDeploy;
 import io.tiklab.arbess.task.deploy.service.TaskDeployService;
-import io.tiklab.arbess.support.message.model.TaskMessageType;
-import io.tiklab.arbess.support.message.service.TaskMessageTypeService;
 import io.tiklab.arbess.task.pullArtifact.model.TaskPullArtifact;
 import io.tiklab.arbess.task.pullArtifact.service.TaskPullArtifactService;
-import io.tiklab.arbess.task.script.model.TaskScript;
-import io.tiklab.arbess.task.script.service.TaskScriptService;
+import io.tiklab.arbess.task.tool.model.TaskScript;
+import io.tiklab.arbess.task.tool.service.TaskScriptService;
 import io.tiklab.arbess.task.task.dao.TasksDao;
 import io.tiklab.arbess.task.task.model.Tasks;
 import io.tiklab.arbess.task.task.model.TasksQuery;
@@ -42,14 +40,12 @@ import io.tiklab.arbess.task.test.model.TestHuboEnv;
 import io.tiklab.arbess.task.test.model.TestHuboRpy;
 import io.tiklab.arbess.task.test.model.TestHuboTestPlan;
 import io.tiklab.arbess.task.test.service.TaskTestService;
+import io.tiklab.arbess.task.tool.model.TaskHostOrder;
+import io.tiklab.arbess.task.tool.service.TaskHostOrderService;
 import io.tiklab.toolkit.beans.BeanMapper;
 import io.tiklab.core.exception.ApplicationException;
-import io.tiklab.arbess.support.postprocess.dao.PostprocessDao;
 import io.tiklab.arbess.task.task.entity.TasksEntity;
 import io.tiklab.rpc.annotation.Exporter;
-import io.tiklab.toolkit.join.JoinTemplate;
-import io.tiklab.user.user.model.User;
-import io.tiklab.user.user.service.UserProcessor;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -124,6 +120,12 @@ public class TasksServiceImpl implements TasksService {
 
     @Autowired
     TaskCheckPointService taskCheckPointService;
+
+    @Autowired
+    TaskHostOrderService taskHostOrderService;
+
+    @Autowired
+    TaskHostStrategyService strategyService;
 
     private static final Logger logger = LoggerFactory.getLogger(TasksServiceImpl.class);
     
@@ -370,7 +372,7 @@ public class TasksServiceImpl implements TasksService {
             return new ArrayList<>();
         }
         for (Tasks tasks : tasksList) {
-            Object taskDetails = findTaskDetailsNoAuth(tasks.getTaskId(), tasks.getTaskType());
+            Object taskDetails = findTaskDetails(tasks.getTaskId(), tasks.getTaskType());
             tasks.setValues(taskDetails);
             tasks.setTask(taskDetails);
         }
@@ -570,10 +572,26 @@ public class TasksServiceImpl implements TasksService {
                 scriptServer.createScript(task);
             }
             case TASK_TYPE_TOOL ->{
-                TaskCheckPoint task = new TaskCheckPoint();
-                task.setWailTime(0);
-                task.setTaskId(taskId);
-                taskCheckPointService.createCheckPoint(task);
+                switch (taskType) {
+                    case TASK_CHECK_POINT -> {
+                        TaskCheckPoint task = new TaskCheckPoint();
+                        task.setWailTime(0);
+                        task.setTaskId(taskId);
+                        taskCheckPointService.createCheckPoint(task);
+                    }
+                    case TASK_HOST_ORDER -> {
+                        TaskHostOrder taskHostOrder = new TaskHostOrder();
+                        taskHostOrder.setTaskId(taskId);
+                        taskHostOrderService.createHostOrder(taskHostOrder);
+                    }
+                }
+            }
+            case TASK_TYPE_STRATEGY ->{
+                TaskHostStrategy strategy = new TaskHostStrategy();
+                strategy.setStrategyType(1);
+                strategy.setOrderType(1);
+                strategy.setTaskId(taskId);
+                strategyService.createStrategy(strategy);
             }
            default -> throw new ApplicationException("无法更新未知的配置类型:"+taskType);
         }
@@ -594,7 +612,19 @@ public class TasksServiceImpl implements TasksService {
             case TASK_TYPE_UPLOAD -> artifactService.deleteProduct(taskId);
             case TASK_TYPE_DOWNLOAD     -> pullArtifactService.deletePullArtifact(taskId);
             case TASK_TYPE_SCRIPT   -> scriptServer.deleteScript(taskId);
-            case TASK_TYPE_TOOL -> taskCheckPointService.deleteCheckPoint(taskId);
+            case TASK_TYPE_TOOL -> {
+                switch (taskType) {
+                    case TASK_CHECK_POINT -> {
+                        taskCheckPointService.deleteCheckPoint(taskId);
+                    }
+                    case TASK_HOST_ORDER -> {
+                        taskHostOrderService.deleteHostOrder(taskId);
+                    }
+                }
+            }
+            case TASK_TYPE_STRATEGY ->{
+                strategyService.deleteStrategy(taskId);
+            }
             default -> throw new ApplicationException("无法删除未知的配置类型"+taskType);
         }
     }
@@ -748,9 +778,34 @@ public class TasksServiceImpl implements TasksService {
                 scriptServer.updateScript(task);
             }
             case TASK_TYPE_TOOL -> {
-                TaskCheckPoint task = JSON.parseObject(object, TaskCheckPoint.class);
+                switch (taskType) {
+                    case TASK_CHECK_POINT -> {
+                        TaskCheckPoint task = JSON.parseObject(object, TaskCheckPoint.class);
+                        task.setTaskId(taskId);
+                        taskCheckPointService.updateCheckPoint(task);
+                    }
+                    case TASK_HOST_ORDER -> {
+                        TaskHostOrder task = JSON.parseObject(object, TaskHostOrder.class);
+                        task.setTaskId(taskId);
+                        taskHostOrderService.updateHostOrder(task);
+                    }
+
+                    default -> throw new ApplicationException("无法更新未知的配置类型。");
+                }
+
+            }
+            case TASK_TYPE_STRATEGY ->{
+                TaskHostStrategy task = JSON.parseObject(object, TaskHostStrategy.class);
                 task.setTaskId(taskId);
-                taskCheckPointService.updateCheckPoint(task);
+                Integer strategyType = task.getStrategyType();
+                if (!Objects.isNull(strategyType)){
+                    task.setInspectIds("");
+                    task.setOrder("");
+                    task.setOrderType(1);
+                    task.setWailTime(0);
+                }
+
+                strategyService.updateStrategy(task);
             }
             default ->  throw new ApplicationException("无法更新未知的配置类型。");
         }
@@ -833,15 +888,33 @@ public class TasksServiceImpl implements TasksService {
                 return scriptServer.findOneScript(taskId);
             }
             case TASK_TYPE_TOOL -> {
-                TaskCheckPoint checkPoint = taskCheckPointService.findCheckPoint(taskId);
-                String inspectIds = checkPoint.getInspectIds();
+                switch (taskType) {
+                    case TASK_CHECK_POINT -> {
+                        TaskCheckPoint checkPoint = taskCheckPointService.findCheckPoint(taskId);
+                        String inspectIds = checkPoint.getInspectIds();
+                        if (!StringUtils.isEmpty(inspectIds)){
+                            List<String> strings = Arrays.stream(inspectIds.split(",")).distinct().collect(Collectors.toList());
+                            checkPoint.setInspectIdList(strings);
+                        }else {
+                            checkPoint.setInspectIdList(new ArrayList<>());
+                        }
+                        return checkPoint;
+                    }
+                    case TASK_HOST_ORDER -> {
+                        return taskHostOrderService.findHostOrder(taskId);
+                    }
+
+                    default -> throw new ApplicationException("无法查询未知的配置类型。");
+                }
+            }
+            case TASK_TYPE_STRATEGY ->{
+                TaskHostStrategy strategy = strategyService.findStrategy(taskId);
+                String inspectIds = strategy.getInspectIds();
                 if (!StringUtils.isEmpty(inspectIds)){
                     List<String> strings = Arrays.stream(inspectIds.split(",")).distinct().collect(Collectors.toList());
-                    checkPoint.setInspectIdList(strings);
-                }else {
-                    checkPoint.setInspectIdList(new ArrayList<>());
+                    strategy.setInspectIdList(strings);
                 }
-                return checkPoint;
+                return strategy;
             }
            default -> throw new ApplicationException("无法更新未知的配置类型。");
         }
@@ -853,38 +926,49 @@ public class TasksServiceImpl implements TasksService {
      * @param taskType 任务类型
      * @return 任务详情
      */
-    private Object findTaskDetailsNoAuth(String taskId,String taskType){
-        switch (findTaskType(taskType)) {
-            case TASK_TYPE_CODE     -> {
-                return codeService.findOneCode(taskId);
-            }
-            case TASK_TYPE_TEST     -> {
-                return testService.findOneTest(taskId);
-            }
-            case TASK_TYPE_BUILD    -> {
-                return buildService.findOneBuild(taskId);
-            }
-            case TASK_TYPE_DEPLOY   -> {
-                return deployService.findOneDeploy(taskId);
-            }
-            case TASK_TYPE_CODESCAN -> {
-                return codeScanService.findOneCodeScan(taskId);
-            }
-            case TASK_TYPE_UPLOAD -> {
-                return artifactService.findOneProduct(taskId);
-            }
-            case TASK_TYPE_DOWNLOAD -> {
-                return pullArtifactService.findOnePullArtifact(taskId);
-            }
-            case TASK_TYPE_SCRIPT   -> {
-                return scriptServer.findOneScript(taskId);
-            }
-            case TASK_TYPE_TOOL -> {
-                return taskCheckPointService.findCheckPoint(taskId);
-            }
-           default -> throw new ApplicationException("无法更新未知的配置类型。");
-        }
-    }
+    // private Object findTaskDetailsNoAuth(String taskId,String taskType){
+    //     switch (findTaskType(taskType)) {
+    //         case TASK_TYPE_CODE     -> {
+    //             return codeService.findOneCode(taskId);
+    //         }
+    //         case TASK_TYPE_TEST     -> {
+    //             return testService.findOneTest(taskId);
+    //         }
+    //         case TASK_TYPE_BUILD    -> {
+    //             return buildService.findOneBuild(taskId);
+    //         }
+    //         case TASK_TYPE_DEPLOY   -> {
+    //             return deployService.findOneDeploy(taskId);
+    //         }
+    //         case TASK_TYPE_CODESCAN -> {
+    //             return codeScanService.findOneCodeScan(taskId);
+    //         }
+    //         case TASK_TYPE_UPLOAD -> {
+    //             return artifactService.findOneProduct(taskId);
+    //         }
+    //         case TASK_TYPE_DOWNLOAD -> {
+    //             return pullArtifactService.findOnePullArtifact(taskId);
+    //         }
+    //         case TASK_TYPE_SCRIPT   -> {
+    //             return scriptServer.findOneScript(taskId);
+    //         }
+    //         case TASK_TYPE_TOOL -> {
+    //             switch (taskType) {
+    //                 case TASK_CHECK_POINT -> {
+    //                     return taskCheckPointService.findCheckPoint(taskId);
+    //                 }
+    //                 case TASK_HOST_ORDER -> {
+    //                     return taskHostOrderService.findHostOrder(taskId);
+    //                 }
+    //                 default -> throw new ApplicationException("无法更新未知的配置类型。");
+    //             }
+    //         }
+    //         case TASK_TYPE_STRATEGY ->{
+    //             return strategyService.findStrategy(taskId);
+    //         }
+    //        default -> throw new ApplicationException("无法更新未知的配置类型。");
+    //     }
+    // }
 
     /**
      * 添加任务认证信息
@@ -1049,14 +1133,32 @@ public class TasksServiceImpl implements TasksService {
                             taskArtifact.setAuth(auth);
                         }
                     }
-
                     object = taskArtifact;
                 }
                 case TASK_TYPE_SCRIPT -> {
                     object = scriptServer.findScript(taskId);
                 }
                 case TASK_TYPE_TOOL -> {
-                    object = taskCheckPointService.findCheckPoint(taskId);
+                    switch (taskType) {
+                        case TASK_CHECK_POINT -> {
+                            object = taskCheckPointService.findCheckPoint(taskId);
+                        }
+                        case TASK_HOST_ORDER -> {
+                            TaskHostOrder taskHostOrder = taskHostOrderService.findHostOrder(taskId);
+                            String authId = taskHostOrder.getAuthId();
+                            if (!Objects.isNull(authId)){
+                                Object auth = authHostService.findOneAuthHost(authId);;
+                                taskHostOrder.setAuth(auth);
+                            }
+                            object = taskHostOrder;
+                        }
+                        default -> {
+                            object = null;
+                        }
+                    }
+                }
+                case TASK_TYPE_STRATEGY ->{
+                    object = JSONObject.parseObject(jsonString, TaskHostStrategy.class);
                 }
                 default -> {
                     throw new ApplicationException("无法更新未知的配置类型。");
@@ -1170,7 +1272,7 @@ public class TasksServiceImpl implements TasksService {
                        return PipelineUtil.validNoNullFiled(code.getAuthId(),code.getDockerImage(),code.getDeployAddress());
                    }
                    case TASK_DEPLOY_K8S -> {
-                       return PipelineUtil.validNoNullFiled(code.getAuthId(),code.getK8sNamespace());
+                       return PipelineUtil.validNoNullFiled(code.getAuthId());
                    }
                    default -> {
                        return true;
@@ -1246,10 +1348,30 @@ public class TasksServiceImpl implements TasksService {
                }
            }
            case TASK_TYPE_TOOL -> {
-               TaskCheckPoint code =  JSONObject.parseObject(jsonString, TaskCheckPoint.class);
+               switch (taskType) {
+                   case TASK_CHECK_POINT -> {
+                       TaskCheckPoint code =  JSONObject.parseObject(jsonString, TaskCheckPoint.class);
 
-               return PipelineUtil.validNoNullFiled(code.getInspectIds());
+                       return PipelineUtil.validNoNullFiled(code.getInspectIds());
+                   }
+                   case TASK_HOST_ORDER -> {
+                       TaskHostOrder code =  JSONObject.parseObject(jsonString, TaskHostOrder.class);
+                       return PipelineUtil.validNoNullFiled(code.getAuthId());
+                   }
+                   default -> {
+                       return true;
+                   }
+               }
            }
+           case TASK_TYPE_STRATEGY ->{
+               TaskHostStrategy code =  JSONObject.parseObject(jsonString, TaskHostStrategy.class);
+               Integer strategyType = code.getStrategyType();
+               if (strategyType == 1){
+                   return true;
+               }else {
+                   return PipelineUtil.validNoNullFiled(code.getInspectIds());
+               }
+            }
            default -> {
                return true;
            }
@@ -1286,11 +1408,14 @@ public class TasksServiceImpl implements TasksService {
             case TASK_TYPE_SCRIPT, TASK_SCRIPT_BAT , TASK_SCRIPT_SHELL ->{
                 return TASK_TYPE_SCRIPT;
             }
-            case TASK_CHECK_POINT ->{
+            case TASK_CHECK_POINT,TASK_HOST_ORDER ->{
                 return TASK_TYPE_TOOL;
             }
             case TASK_DOWNLOAD_HADESS , TASK_DOWNLOAD_DOCKER, TASK_DOWNLOAD_SSH ->{
                 return TASK_TYPE_DOWNLOAD;
+            }
+            case TASK_TYPE_HOST_STRATEGY ->{
+                return TASK_TYPE_STRATEGY;
             }
             default ->  throw new ApplicationException("无法更新未知的配置类型:"+taskType);
         }
@@ -1397,6 +1522,12 @@ public class TasksServiceImpl implements TasksService {
             }
             case TASK_CHECK_POINT -> {
                 return "人工卡点";
+            }
+            case TASK_HOST_ORDER -> {
+                return "主机命令";
+            }
+            case TASK_TYPE_HOST_STRATEGY -> {
+                return "主机部署策略";
             }
             default -> {
                 return taskType;

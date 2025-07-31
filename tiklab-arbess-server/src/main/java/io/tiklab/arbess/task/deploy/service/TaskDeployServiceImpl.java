@@ -37,10 +37,6 @@ public class TaskDeployServiceImpl implements TaskDeployService {
     @Autowired
     AuthHostGroupService groupService;
 
-    @Autowired
-    KubectlService kubectlService;
-
-
     @Override
     public String createDeploy(TaskDeploy taskDeploy) {
         return taskDeployDao.createDeploy(BeanMapper.map(taskDeploy, TaskDeployEntity.class));
@@ -83,38 +79,6 @@ public class TaskDeployServiceImpl implements TaskDeployService {
     @Override
     public List<TaskDeploy> findAllDeployList(List<String> idList) {
         return BeanMapper.mapList(taskDeployDao.findAllCodeList(idList), TaskDeploy.class);
-    }
-
-    @Override
-    public Boolean deployValid(String taskType,TaskDeploy deploy){
-
-        if ( taskType.equals(TASK_DEPLOY_LINUX)){
-            if (deploy.getAuthType() == 1){
-                if (!PipelineUtil.isNoNull(deploy.getAuthId())){
-                    return false;
-                }
-                if (!PipelineUtil.isNoNull(deploy.getLocalAddress())){
-                    return false;
-                }
-                return PipelineUtil.isNoNull(deploy.getDeployAddress());
-            }
-        }
-        if ( taskType.equals(TASK_DEPLOY_DOCKER)){
-            if (!PipelineUtil.isNoNull(deploy.getAuthId())){
-                return false;
-            }
-            if (!PipelineUtil.isNoNull(deploy.getDockerImage())){
-                return false;
-            }
-            return PipelineUtil.isNoNull(deploy.getDeployAddress());
-        }
-        if ( taskType.equals(TASK_DEPLOY_K8S)){
-            if (!PipelineUtil.isNoNull(deploy.getAuthId())){
-                return false;
-            }
-            return PipelineUtil.isNoNull(deploy.getK8sNamespace());
-        }
-        return true;
     }
 
     @Override

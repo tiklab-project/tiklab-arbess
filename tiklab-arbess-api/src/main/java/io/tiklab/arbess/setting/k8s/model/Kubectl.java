@@ -46,6 +46,7 @@ public class Kubectl {
     private String kubeAddress;
 
     private Boolean isConnect = false;
+
     private KubectlVersion k8sVersion ;
 
     private List<KubectlNode> allNodes = new ArrayList<>() ;

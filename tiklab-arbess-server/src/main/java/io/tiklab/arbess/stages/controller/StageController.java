@@ -1,6 +1,7 @@
 package io.tiklab.arbess.stages.controller;
 
 import io.tiklab.arbess.stages.model.Stage;
+import io.tiklab.arbess.stages.model.StageGroup;
 import io.tiklab.arbess.stages.service.StageService;
 import io.tiklab.core.Result;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +36,13 @@ public class StageController {
     public Result<String> createStagesOrTask(@RequestBody @Valid @NotNull Stage stage){
         String taskId = stageService.createStagesOrTask(stage);
         return Result.ok(taskId);
+    }
+
+
+    @RequestMapping(path="/createStagesGroupOrTask",method = RequestMethod.POST)
+    public Result<Void> createStagesGroupOrTask(@RequestBody @Valid @NotNull StageGroup stageGroup){
+        stageService.createStagesGroupOrTask(stageGroup);
+        return Result.ok();
     }
 
     /**

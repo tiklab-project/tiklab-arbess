@@ -47,6 +47,9 @@ public class Stage {
     //@ApiProperty(name = "taskType",desc="任务类型")
     private String taskType;
 
+    // 任务名称
+    private String taskName;
+
     //@ApiProperty(name = "taskId",desc="任务id")
     private String taskId;
 
@@ -61,6 +64,14 @@ public class Stage {
 
     // 执行实例id
     private String instanceId;
+
+    public String getTaskName() {
+        return taskName;
+    }
+
+    public void setTaskName(String taskName) {
+        this.taskName = taskName;
+    }
 
     public String getInstanceId() {
         return instanceId;

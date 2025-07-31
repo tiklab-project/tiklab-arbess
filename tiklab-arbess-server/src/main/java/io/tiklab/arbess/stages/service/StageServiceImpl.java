@@ -1,6 +1,7 @@
 package io.tiklab.arbess.stages.service;
 
 import io.tiklab.arbess.stages.entity.StageEntity;
+import io.tiklab.arbess.stages.model.StageGroup;
 import io.tiklab.arbess.support.util.util.PipelineFinal;
 import io.tiklab.arbess.support.util.util.PipelineUtil;
 import io.tiklab.arbess.stages.dao.StageDao;
@@ -13,8 +14,11 @@ import io.tiklab.arbess.task.task.service.TasksService;
 import io.tiklab.rpc.annotation.Exporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+
+import static io.tiklab.arbess.support.util.util.PipelineFinal.*;
 
 /**
  * 流水线阶段服务
@@ -68,7 +72,7 @@ public class StageServiceImpl implements StageService {
             stages.setStageName("源码");
             stagesId = createStages(stages);
             tasks.setStageId(stagesId);
-
+            tasks.setTaskName(stage.getTaskName());
             return tasksService.createTasksOrTask(tasks);
         }
 
@@ -88,6 +92,7 @@ public class StageServiceImpl implements StageService {
             stages.setStageName("并行阶段-"+initStage+"-" + 1);
             stagesId = createStages(stages);
             tasks.setStageId(stagesId);
+            tasks.setTaskName(stage.getTaskName());
             return tasksService.createTasksOrTask(tasks);
         }
 
@@ -101,6 +106,7 @@ public class StageServiceImpl implements StageService {
             stages.setStageName("并行阶段-"+oneStages.getStageSort()+"-"+(otherStage.size()+1));
             stagesId = createStages(stages);
             tasks.setStageId(stagesId);
+            tasks.setTaskName(stage.getTaskName());
             return tasksService.createTasksOrTask(tasks);
         }
 
@@ -109,9 +115,62 @@ public class StageServiceImpl implements StageService {
         if (sort != 0){
             tasks.setTaskSort(sort);
             tasks.setStageId(stagesId);
+            tasks.setTaskName(stage.getTaskName());
             return tasksService.createTasksOrTask(tasks);
         }
         throw new ApplicationException(58001,"未知的操作类型");
+    }
+
+
+    @Transactional
+    @Override
+    public void createStagesGroupOrTask(StageGroup stageGroup){
+
+        String pipelineId = stageGroup.getPipelineId();
+        // List<Stage> allMainStage = findAllMainStage(pipelineId);
+        int stageSort = stageGroup.getStageSort();
+
+        Stage mainStage = new Stage();
+        //创建主节点
+        int initStage = initStage(pipelineId, stageSort);
+        mainStage.setStageSort(initStage);
+        mainStage.setPipelineId(pipelineId);
+
+        if (stageGroup.getStageType().equals(HOST_BLUE_GREEN)){
+            mainStage.setStageName("主机蓝绿部署");
+        }else {
+            mainStage.setStageName("阶段-" + initStage);
+        }
+        String mainStageId = createStages(mainStage);
+
+        //创建从节点
+        Stage otherStage = new Stage();
+        otherStage.setParentId(mainStageId);
+        otherStage.setStageSort(1);
+        otherStage.setStageName("并行阶段-"+initStage+"-" + 1);
+        String otherStageId = createStages(otherStage);
+
+        List<String> taskTypeList = stageGroup.getTaskTypeList();
+        for (int i = 0; i < taskTypeList.size(); i++) {
+            String taskType = taskTypeList.get(i);
+            String taskName = null;
+            if (taskType.equals(TASK_DEPLOY_LINUX) ||
+                    taskType.equals(TASK_DEPLOY_DOCKER) || taskType.equals(TASK_DEPLOY_K8S)){
+                taskName = "部署蓝环境";
+            }
+            if (taskType.equals(TASK_TYPE_HOST_STRATEGY)){
+                taskName = "流量切换";
+            }
+            if (taskType.equals(TASK_TYPE_HOST_STRATEGY) && i == taskTypeList.size()-1){
+                taskName = "下线";
+            }
+            Tasks tasks = new Tasks();
+            tasks.setTaskType(taskType);
+            tasks.setTaskSort(i+1);
+            tasks.setStageId(otherStageId);
+            tasks.setTaskName(taskName);
+            tasksService.createTasksOrTask(tasks);
+        }
     }
 
     @Override

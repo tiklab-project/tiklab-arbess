@@ -150,11 +150,16 @@ public class KubectlServiceImpl implements KubectlService {
 
         joinTemplate.joinQuery(kubectl,new String[]{"toolKubectl","user"});
 
-        String kubeConfig = kubectl.getKubeAddress();
+        String kubeAddress = kubectl.getKubeAddress();
         String scmAddress = kubectl.getToolKubectl().getScmAddress();
 
+        File file = new File(kubeAddress);
+        if (!file.exists() || !file.isFile()) {
+            PipelineFileUtil.createFile(kubeAddress);
+            PipelineFileUtil.logWriteFile(kubectl.getKubeConfig(), kubeAddress);
+        }
         try {
-            KubectlConfig kubectlConfig = KubectlConfig.instance( kubeConfig,scmAddress);
+            KubectlConfig kubectlConfig = KubectlConfig.instance(kubeAddress,scmAddress);
 
             KubectlVersion k8sVersion = kubectlConfig.findK8sVersion();
             List<KubectlNode> allNodes = kubectlConfig.findAllNodes();

@@ -131,6 +131,13 @@ public class ArbessDsmAutoConfiguration {
                 }).get();
         versionList.add(checkPoint);
 
+        DsmVersion sql130 = DsmVersionBuilder.instance()
+                .version("pip-project_1.0.30")
+                .db(new String[]{
+                        "pip-project_1.0.30",
+                }).get();
+        versionList.add(sql130);
+
         return versionList;
     }
 
