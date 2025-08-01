@@ -39,7 +39,9 @@ public class ArbessGatewayAutoConfiguration {
                         ".ftl",
                         ".map",
                         ".gz",
-                        "svg"
+                        "svg",
+                        "docx",
+                        "xlsx"
                 })
                 .ignoreUrls(new String[]{
                         "/",

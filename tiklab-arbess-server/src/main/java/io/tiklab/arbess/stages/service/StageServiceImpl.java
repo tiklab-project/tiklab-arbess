@@ -138,7 +138,9 @@ public class StageServiceImpl implements StageService {
 
         if (stageGroup.getStageType().equals(HOST_BLUE_GREEN)){
             mainStage.setStageName("主机蓝绿部署");
-        }else {
+        } else if (stageGroup.getStageType().equals(DOCKER_BLUE_GREEN)){
+            mainStage.setStageName("Docker蓝绿部署");
+        } else {
             mainStage.setStageName("阶段-" + initStage);
         }
         String mainStageId = createStages(mainStage);

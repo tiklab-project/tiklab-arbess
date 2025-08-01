@@ -271,6 +271,7 @@ public class PipelineFinal {
 
     // 主机蓝绿部署
     public static final String HOST_BLUE_GREEN = "host_blue_green";
+    public static final String DOCKER_BLUE_GREEN = "docker_blue_green";
 
 
     public static final String SIZE_TYPE_MB = "MB";
