@@ -1,15 +1,18 @@
 package io.tiklab.arbess.pipeline.definition.controller;
 
 import io.tiklab.arbess.pipeline.definition.model.PipelineOpen;
+import io.tiklab.arbess.pipeline.definition.model.PipelineOpenQuery;
 import io.tiklab.arbess.pipeline.definition.service.PipelineOpenService;
 import io.tiklab.core.Result;
+import io.tiklab.core.page.Pagination;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import java.util.List;
 
 /**
  * @pi.protocol: http
@@ -22,19 +25,13 @@ public class PipelineOpenController {
     @Autowired
     PipelineOpenService openService;
 
-    /**
-     * @pi.name:查询最近打开
-     * @pi.url:/open/findAllOpen
-     * @pi.methodType:post
-     * @pi.request-type: formdata
-     * @pi.param: name=number;dataType=int;value=查询数据量;
-     */
-    @RequestMapping(path="/findAllOpen",method = RequestMethod.POST)
-    public Result<List<PipelineOpen>> findAllOpen(@NotNull int number){
 
-        List<PipelineOpen> openList = openService.findUserAllOpen(number);
+    @RequestMapping(path="/findOpenPage",method = RequestMethod.POST)
+    public Result<Pagination<PipelineOpen>> findOpenPage(@RequestBody @Valid @NotNull PipelineOpenQuery query){
 
-        return Result.ok(openList);
+        Pagination<PipelineOpen> openPage = openService.findOpenPage(query);
+
+        return Result.ok(openPage);
     }
 
     /**

@@ -1,7 +1,5 @@
 package io.tiklab.arbess.starter.config;
 
-import io.tiklab.gateway.config.RouterConfig;
-import io.tiklab.gateway.config.RouterConfigBuilder;
 import io.tiklab.openapi.config.AllowConfig;
 import io.tiklab.openapi.config.AllowConfigBuilder;
 import io.tiklab.openapi.config.OpenApiConfig;
@@ -31,6 +29,8 @@ public class ArbessOpenApiAutoConfiguration {
                 "/pipeline/findUserPipelinePage",
                 "/pipeline/findPipelineUser",
                 "/pipeline/findUserPipeline",
+                "/instance/findPipelineInstance",
+                "/instance/artifact/findBuildProductList"
         };
         return AllowConfigBuilder.instance()
                 .allowUrls(s)

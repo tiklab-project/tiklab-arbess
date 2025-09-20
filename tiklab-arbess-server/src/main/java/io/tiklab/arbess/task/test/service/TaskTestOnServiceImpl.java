@@ -45,7 +45,7 @@ public class TaskTestOnServiceImpl implements TaskTestOnService {
         if (StringUtils.isEmpty(serverAddress)){
             return null;
         }
-        String requestUrl = serverAddress + "/api/repository/findAllRepository";
+        String requestUrl = serverAddress + "/api/workspace/findAllWorkspace";
         try {
             HttpHeaders headers = requestUtil.initHeaders(MediaType.APPLICATION_JSON, null);
             headers.add("accessToken", PipelineUtil.findTiklabToken());
@@ -94,7 +94,7 @@ public class TaskTestOnServiceImpl implements TaskTestOnService {
     @Override
     public TestHuboRpy findRepository(String authId, String rpyId){
         String serverAddress = findServerAddress(authId);
-        String requestUrl = serverAddress + "/api/repository/findRepository";
+        String requestUrl = serverAddress + "/api/workspace/findWorkspace";
 
         try {
             HttpHeaders headers = requestUtil.initHeaders(MediaType.APPLICATION_JSON, null);
@@ -201,7 +201,7 @@ public class TaskTestOnServiceImpl implements TaskTestOnService {
             return null;
         }
 
-        String requestUrl = serverAddress + "/api/commonEnv/findCommonEnv";
+        String requestUrl = serverAddress + "/api/environment/findEnvironment";
         try {
             HttpHeaders headers = requestUtil.initHeaders(MediaType.APPLICATION_JSON, null);
             headers.add("accessToken",PipelineUtil.findTiklabToken());
@@ -227,7 +227,7 @@ public class TaskTestOnServiceImpl implements TaskTestOnService {
             return null;
         }
 
-        String requestUrl = serverAddress + "/api/commonEnv/findCommonEnvList";
+        String requestUrl = serverAddress + "/api/environment/findEnvironmentList";
         try {
             HttpHeaders headers = requestUtil.initHeaders(MediaType.APPLICATION_JSON, null);
             headers.add("accessToken",PipelineUtil.findTiklabToken());
@@ -249,7 +249,7 @@ public class TaskTestOnServiceImpl implements TaskTestOnService {
             return null;
         }
 
-        String requestUrl = serverAddress + "/api/commonEnv/findCommonEnvList";
+        String requestUrl = serverAddress + "/api/environment/findEnvironmentList";
         try {
             HttpHeaders headers = requestUtil.initHeaders(MediaType.APPLICATION_JSON, null);
             headers.add("accessToken",PipelineUtil.findTiklabToken());

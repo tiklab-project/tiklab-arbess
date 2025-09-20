@@ -12,6 +12,7 @@ jdbc:
   username: postgres
   password: darth2020
 
+
 #jdbc:
 #  driverClassName: com.mysql.cj.jdbc.Driver
 #  url: jdbc:mysql://172.10.1.10:3306/tiklab_arbess?characterEncoding=utf8&useSSL=false
@@ -53,7 +54,7 @@ auth:
 
 arbess:
   task:
-    timeout: 300
+    timeout: 3000
 
 ws:
   name: local

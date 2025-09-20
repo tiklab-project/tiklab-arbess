@@ -10,22 +10,20 @@ import io.tiklab.arbess.task.deploy.model.TaskDeployInstance;
 import io.tiklab.arbess.task.deploy.model.TaskDeployInstanceQuery;
 import io.tiklab.arbess.task.deploy.service.TaskDeployInstanceService;
 import io.tiklab.arbess.task.task.dao.TaskInstanceDao;
+import io.tiklab.arbess.task.task.entity.TaskInstanceEntity;
 import io.tiklab.arbess.task.task.model.TaskInstance;
 import io.tiklab.arbess.task.task.model.TaskInstanceQuery;
-import io.tiklab.toolkit.beans.BeanMapper;
-import io.tiklab.arbess.task.task.entity.TaskInstanceEntity;
 import io.tiklab.rpc.annotation.Exporter;
+import io.tiklab.toolkit.beans.BeanMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static io.tiklab.arbess.support.util.util.PipelineFinal.*;
+import static io.tiklab.arbess.support.util.util.PipelineFinal.RUN_RUN;
+import static io.tiklab.arbess.support.util.util.PipelineFinal.RUN_WAIT;
 
 /**
  * 任务执行实例服务接口
@@ -280,143 +278,6 @@ public class TasksInstanceServiceImpl implements TasksInstanceService {
         return allInstance;
     }
 
-
-    @Override
-    public boolean readCommandExecResult(Process process , String enCode, Map<String,String> error,String taskId) {
-        boolean state = true;
-        //指定编码
-        if (!PipelineUtil.isNoNull(enCode)){
-            int systemType = PipelineUtil.findSystemType();
-            if (systemType == 1){
-                enCode = PipelineFinal.GBK;
-            }else {
-                enCode = PipelineFinal.UTF_8;
-            }
-        }
-
-        //转换流
-        InputStream inputStream = process.getInputStream();
-        InputStream errInputStream = process.getErrorStream();
-
-        InputStreamReader inputStreamReader ;
-        BufferedReader bufferedReader ;
-        if (inputStream == null){
-            inputStreamReader = PipelineUtil.encode(errInputStream, enCode);
-        }else {
-            inputStreamReader = PipelineUtil.encode(inputStream, enCode);
-        }
-
-        String s;
-        bufferedReader = new BufferedReader(inputStreamReader);
-
-        try {
-
-            //读取执行信息
-            while ((s = bufferedReader.readLine()) != null) {
-                String s1 = validStatus(s, error);
-                if (!Objects.isNull(s1)){
-                    state = false ;
-                    writeExecLog(taskId,  s1);
-                }
-                writeExecLog(taskId,  s);
-
-            }
-
-            //读取err执行信息
-            inputStreamReader = PipelineUtil.encode(errInputStream, enCode);
-            bufferedReader = new BufferedReader(inputStreamReader);
-
-            while ((s = bufferedReader.readLine()) != null) {
-                String s1 = validStatus(s, error);
-                if (!Objects.isNull(s1)){
-                    state = false ;
-                    writeExecLog(taskId,  s1);
-                }
-                writeExecLog(taskId,  s);
-            }
-
-            // 关闭
-            inputStreamReader.close();
-            bufferedReader.close();
-
-        } catch (Exception e){
-            writeExecLog(taskId,  e.getMessage());
-            state = false;
-        }
-        process.destroy();
-        return state;
-    }
-
-    /**
-     * 效验日志状态
-     * @param s 日志
-     * @param errors 错误状态
-     * @return null 正确  other：错误
-     */
-    public String validStatus(String s,Map<String,String> errors){
-
-        for (Map.Entry<String, String> errorString : errors.entrySet()) {
-            String key = errorString.getKey();
-            if (!s.contains(key)){
-                continue;
-            }
-            return errorString.getValue();
-        }
-
-        return null;
-    }
-
-    @Override
-    public void writeExecLog(String taskId, String execLog){
-        if(!PipelineUtil.isNoNull(execLog)){
-            return;
-        }
-        TasksExecServiceImpl tasksExecService = new TasksExecServiceImpl();
-        String taskInstanceId = tasksExecService.findTaskInstanceId(taskId);
-        TaskInstance taskInstance2 = tasksExecService.findTaskInstance(taskInstanceId);
-        if (Objects.isNull(taskInstance2)){
-            return;
-        }
-
-        String execInstance = taskInstance2.getRunLog();
-
-        if (!PipelineUtil.isNoNull(execInstance)){
-            taskInstance2.setRunLog(execLog);
-        }else {
-            taskInstance2.setRunLog(execInstance +"\n"+ execLog);
-        }
-
-        //长度过长写入文件中
-        String runInstance = taskInstance2.getRunLog();
-        if (runInstance.length() > 9000){
-            String logAddress = taskInstance2.getLogAddress();
-            PipelineFileUtil.logWriteFile(runInstance,logAddress);
-            taskInstance2.setRunLog(null);
-        }
-        tasksExecService.putTaskOrTaskInstance(taskInstanceId, taskInstance2);
-    }
-
-    @Override
-    public void writeAllExecLog(String taskId, String execLog){
-        if(!PipelineUtil.isNoNull(execLog)){
-            return;
-        }
-        TasksExecServiceImpl tasksExecService = new TasksExecServiceImpl();
-        String taskInstanceId = tasksExecService.findTaskInstanceId(taskId);
-        TaskInstance taskInstance1 = tasksExecService.findTaskInstance(taskInstanceId);
-        String execInstance = taskInstance1.getRunLog();
-
-        if (!PipelineUtil.isNoNull(execInstance)){
-            taskInstance1.setRunLog(execLog);
-        }else {
-            taskInstance1.setRunLog(execInstance +"\n"+ execLog);
-        }
-
-        //长度过长写入文件中
-        String runInstance = taskInstance1.getRunLog();
-        String logAddress = taskInstance1.getLogAddress();
-        PipelineFileUtil.logWriteFile(runInstance,logAddress);
-    }
 
     /**
      * 删除任务执行实例

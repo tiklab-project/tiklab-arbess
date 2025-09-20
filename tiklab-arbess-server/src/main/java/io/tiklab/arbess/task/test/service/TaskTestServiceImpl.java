@@ -5,9 +5,12 @@ import io.tiklab.arbess.setting.host.service.AuthHostService;
 import io.tiklab.arbess.setting.third.service.AuthThirdService;
 import io.tiklab.arbess.task.test.dao.TaskTestDao;
 import io.tiklab.arbess.task.test.entity.TaskTestEntity;
-import io.tiklab.arbess.task.test.model.*;
-import io.tiklab.toolkit.beans.BeanMapper;
+import io.tiklab.arbess.task.test.model.TaskTest;
+import io.tiklab.arbess.task.test.model.TestHuboEnv;
+import io.tiklab.arbess.task.test.model.TestHuboRpy;
+import io.tiklab.arbess.task.test.model.TestHuboTestPlan;
 import io.tiklab.rpc.annotation.Exporter;
+import io.tiklab.toolkit.beans.BeanMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -60,7 +63,7 @@ public class TaskTestServiceImpl implements TaskTestService {
 
 
     @Override
-    public TaskTest findTestBuAuth (String taskId){
+    public TaskTest findTestBuAuth(String taskId){
 
         TaskTest taskTest = findOneTest(taskId);
 
@@ -73,21 +76,34 @@ public class TaskTestServiceImpl implements TaskTestService {
         }
 
         try {
-            if (!Objects.isNull(taskTest.getTestEnv())){
-                String id = taskTest.getTestEnv().getId();
-                TestHuboEnv env = taskTestOnService.findEnv(authId,id);
-                taskTest.setTestEnv(env);
-            }
-
             if (!Objects.isNull(taskTest.getTestSpace())){
                 String id = taskTest.getTestSpace().getId();
-                TestHuboRpy repository = taskTestOnService.findRepository(authId,id);
-                taskTest.setTestSpace(repository);
+                if (id.equals(" ")){
+                    taskTest.setTestEnv(null);
+                }else {
+                    TestHuboRpy repository = taskTestOnService.findRepository(authId,id);
+                    taskTest.setTestSpace(repository);
+                }
             }
+
             if (!Objects.isNull(taskTest.getTestPlan())){
                 String id = taskTest.getTestPlan().getId();
-                TestHuboTestPlan testPlan = taskTestOnService.findTestPlan(authId,id);
-                taskTest.setTestPlan(testPlan);
+                if (id.equals(" ")){
+                    taskTest.setTestEnv(null);
+                }else{
+                    TestHuboTestPlan testPlan = taskTestOnService.findTestPlan(authId,id);
+                    taskTest.setTestPlan(testPlan);
+                }
+            }
+
+            if (!Objects.isNull(taskTest.getTestEnv())){
+                String id = taskTest.getTestEnv().getId();
+                if (id.equals(" ")){
+                    taskTest.setTestEnv(null);
+                }else{
+                    TestHuboEnv env = taskTestOnService.findEnv(authId,id);
+                    taskTest.setTestEnv(env);
+                }
             }
         }catch(Exception e){
             e.printStackTrace();

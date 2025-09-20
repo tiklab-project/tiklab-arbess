@@ -3,17 +3,13 @@ package io.tiklab.arbess.task.test.service;
 import io.tiklab.arbess.setting.third.model.AuthThird;
 import io.tiklab.arbess.setting.third.service.AuthThirdService;
 import io.tiklab.arbess.support.util.util.PipelineUtil;
-import io.tiklab.arbess.task.test.model.RelevanceTestOnQuery;
-import io.tiklab.arbess.task.test.model.TestOnPlanInstance;
-import io.tiklab.arbess.task.test.model.TestOnRelevance;
-import io.tiklab.toolkit.beans.BeanMapper;
-import io.tiklab.core.exception.ApplicationException;
-import io.tiklab.core.page.Pagination;
-import io.tiklab.core.page.PaginationBuilder;
-import io.tiklab.arbess.pipeline.definition.model.Pipeline;
 import io.tiklab.arbess.task.test.dao.RelevanceTestOnDao;
 import io.tiklab.arbess.task.test.entity.RelevanceTestOnEntity;
 import io.tiklab.arbess.task.test.model.RelevanceTestOn;
+import io.tiklab.arbess.task.test.model.RelevanceTestOnQuery;
+import io.tiklab.core.page.Pagination;
+import io.tiklab.core.page.PaginationBuilder;
+import io.tiklab.toolkit.beans.BeanMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -109,33 +105,21 @@ public class RelevanceTestOnServiceImpl implements RelevanceTestOnService{
                 continue;
             }
             AuthThird authThird = authThirdService.findOneAuthServer(authId);
-            // TestOnPlanInstance testPlanInstance = taskTestOnService.findTestPlanInstance(authThird.getServerId(), testonId);
+            if (Objects.isNull(authThird)){
+                relevanceTestOn.setStatus(2);
+                list.add(relevanceTestOn);
+                continue;
+            }
             relevanceTestOn.setStatus(1);
 
-            String id = relevanceTestOn.getTestonId();
-            String url = String.format("%s/#/plan/%s/instanceInfo/%s", authThird.getServerAddress(),relevanceTestOn.getTestPlanId(),id);
+            // /workspace/plan/:testPlanId/instance/:instanceId
+            String url = String.format("%s/#/workspace/plan/%s/instance/%s", authThird.getServerAddress(),relevanceTestOn.getTestPlanId(),relevanceTestOn.getTestonId());
             relevanceTestOn.setUrl(url);
 
             Date date = PipelineUtil.StringChengeDate(relevanceTestOn.getCreateTime());
             String dateTime = PipelineUtil.findDateTime(date, 0);
             relevanceTestOn.setTime(dateTime);
 
-            // relevanceTestOn.setObject(testPlanInstance);
-
-            // if (Objects.isNull(testPlanInstance) || testPlanInstance.getTestPlanName().contains("删除")){
-            //     relevanceTestOn.setStatus(2);
-            // }else{
-            //     // http://192.168.10.13:3000/#/plan/068f6da04eed/instanceInfo/76f147886cb8
-            //     String id = testPlanInstance.getId();
-            //     String url = String.format("%s/#/plan/%s/instanceInfo/%s", authThird.getServerAddress(),relevanceTestOn.getTestPlanId(),id);
-            //     relevanceTestOn.setUrl(url);
-            //
-            //     Date date = PipelineUtil.StringChengeDate(relevanceTestOn.getCreateTime());
-            //     String dateTime = PipelineUtil.findDateTime(date, 0);
-            //     relevanceTestOn.setTime(dateTime);
-            //
-            //     relevanceTestOn.setObject(testPlanInstance);
-            // }
             list.add(relevanceTestOn);
         }
         list.sort(Comparator.comparing(RelevanceTestOn::getCreateTime).reversed());

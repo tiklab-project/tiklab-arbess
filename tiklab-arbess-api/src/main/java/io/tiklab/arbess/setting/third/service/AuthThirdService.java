@@ -10,6 +10,7 @@ import io.tiklab.toolkit.join.annotation.JoinProvider;
 import io.tiklab.arbess.setting.third.model.AuthThird;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 流水线第三方认证服务接口
@@ -82,6 +83,12 @@ public interface AuthThirdService {
      * @return 流水线第三方授权数量
      */
     Integer findAuthServerNumber();
+
+    /**
+     * 查询流水线第三方授权数量
+     * @return 流水线第三方授权数量
+     */
+    List<Map<String, Object>> findAuthServerByTypeGroup();
     
     
 }

@@ -88,6 +88,7 @@ public class PipelineInstanceDao {
                 .eq("runStatus", pipelineInstanceQuery.getState())
                 .eq("userId", pipelineInstanceQuery.getUserId())
                 .eq("userId", pipelineInstanceQuery.getExecUserId())
+                .in("runStatus", pipelineInstanceQuery.getStatusList())
                 .like("findNumber",pipelineInstanceQuery.getNumber());
 
             if (pipelineInstanceQuery.getType() != 0){
@@ -111,6 +112,7 @@ public class PipelineInstanceDao {
                 .eq("userId", pipelineInstanceQuery.getUserId())
                 .eq("userId", pipelineInstanceQuery.getExecUserId())
                 .in("pipelineId",pipelineInstanceQuery.getIds())
+                .in("runStatus", pipelineInstanceQuery.getStatusList())
                 .like("findNumber",pipelineInstanceQuery.getNumber());
 
         if (pipelineInstanceQuery.getType() != 0){
@@ -164,8 +166,8 @@ public class PipelineInstanceDao {
         }
 
         //正在运行的流水线排在第一
-        sql = sql.concat(" order by create_time desc " +
-                ", case 'run_status' when 'run' then 1 end");
+        // sql = sql.concat(" order by create_time desc , case 'run_status' when 'run' then 1 end");
+        sql = sql.concat(" order by create_time desc");
 
         return jpaTemplate.getJdbcTemplate().findPage(sql, new Object[]{}, pipelineInstanceQuery.getPageParam(),
                 new BeanPropertyRowMapper<>(PipelineInstanceEntity.class));

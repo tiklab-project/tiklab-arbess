@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @pi.protocol: http
@@ -99,6 +100,12 @@ public class ScmController {
     @RequestMapping(path="/findPipelineScmPage",method = RequestMethod.POST)
     public Result<Pagination<Scm>> findPipelineScmPage(@RequestBody @Valid @NotNull ScmQuery scmQuery) {
         Pagination<Scm> allScm = scmService.findPipelineScmPage(scmQuery);
+        return Result.ok(allScm);
+    }
+
+    @RequestMapping(path="/findScmByTypeGroup",method = RequestMethod.POST)
+    public Result<List<Map<String, Object>>> findScmByTypeGroup() {
+        List<Map<String, Object>> allScm = scmService.findScmByTypeGroup();
         return Result.ok(allScm);
     }
 

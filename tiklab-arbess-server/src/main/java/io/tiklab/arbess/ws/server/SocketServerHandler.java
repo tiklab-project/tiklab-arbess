@@ -1,12 +1,15 @@
 package io.tiklab.arbess.ws.server;
 
 import com.alibaba.fastjson.JSONObject;
-import io.tiklab.core.exception.SystemException;
+import io.tiklab.arbess.agent.ws.config.FileChunkMessage;
 import io.tiklab.arbess.support.agent.model.Agent;
 import io.tiklab.arbess.support.agent.model.AgentMessage;
 import io.tiklab.arbess.support.agent.service.AgentService;
 import io.tiklab.arbess.support.util.util.PipelineUtil;
+import io.tiklab.arbess.task.build.controller.FileTransferManager;
+import io.tiklab.arbess.task.build.controller.FileTransferSession;
 import io.tiklab.arbess.ws.service.WebSocketMessageService;
+import io.tiklab.core.exception.SystemException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +21,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.*;
 
 @Service
 public class SocketServerHandler implements WebSocketHandler {
@@ -31,7 +34,10 @@ public class SocketServerHandler implements WebSocketHandler {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    private final List<AgentMessage> dataList = new CopyOnWriteArrayList<>();
+    // private final List<AgentMessage> dataList = new CopyOnWriteArrayList<>();
+
+    private final Queue<AgentMessage> dataList = new ConcurrentLinkedQueue<>();
+
 
     // 线程安全的集合，用于存储客户端会话
     public static final Map<String, WebSocketSession> sessionMap = new HashMap<>();
@@ -57,28 +63,65 @@ public class SocketServerHandler implements WebSocketHandler {
         String receivedString = new String(payload.array(), StandardCharsets.UTF_8);
         AgentMessage agentMessage = JSONObject.parseObject(receivedString, AgentMessage.class);
         logger.info("accept client messages,message type：{}", agentMessage.getType());
-
-        dataList.add(agentMessage);
+        String type = agentMessage.getType();
+        if (type.equals("file")) {// 解析内部消息
+            saveFile(agentMessage);
+        } else {
+            dataList.add(agentMessage);
+        }
     }
 
-    @Scheduled(fixedRate = 1000)
-    public void syncMessage(){
-        if (dataList.isEmpty()){
+    @Scheduled(fixedDelay = 900)
+    public void syncMessage() {
+        try {
+            int batchSize = Math.min(3, dataList.size());
+            for (int i = 0; i < batchSize; i++) {
+                AgentMessage message = dataList.poll();
+                if (message == null) break;
+                webSocketMessageService.distributeMessage(message);
+            }
+        }catch (Exception e) {
+            logger.error("同步消息失败", e);
+        }
+    }
+
+    private void saveFile(AgentMessage agentMessage){
+        Object inner = agentMessage.getMessage();
+        if (inner == null) {
+            logger.warn("file 消息为空，忽略");
             return;
         }
 
-        int processedCount = 0; // 计数器
-        for (AgentMessage message : dataList) {
-            if (processedCount >= 4) { // 限制每次处理的数量为4
-                break;
+        // 反序列化为 FileChunkMessage
+        FileChunkMessage fileChunkMsg = JSONObject.parseObject(inner.toString(), FileChunkMessage.class);
+
+        String sessionId = fileChunkMsg.getSessionId();
+        FileTransferSession fileSession = FileTransferManager.get(sessionId);
+        if (fileSession == null) {
+            logger.warn("未找到 sessionId={} 的下载会话", sessionId);
+            return;
+        }
+        switch (fileChunkMsg.getType()) {
+            case "chunk" -> {
+                byte[] bytes = Base64.getDecoder().decode(fileChunkMsg.getData());
+                try {
+                    fileSession.write(bytes);
+                } catch (IOException e) {
+                    logger.error("写入文件分片失败", e);
+                    fileSession.error(e);
+                }
             }
-
-            // 执行处理逻辑
-            webSocketMessageService.distributeMessage(message);
-            processedCount++;
-
-            // 处理完成后删除内存中的数据
-            dataList.remove(message);
+            case "complete" -> {
+                fileSession.complete();
+                FileTransferManager.remove(sessionId);
+                logger.info("文件传输完成, sessionId={}", sessionId);
+            }
+            case "error" -> {
+                fileSession.error(new RuntimeException(fileChunkMsg.getMessage()));
+                FileTransferManager.remove(sessionId);
+                logger.error("文件传输失败, sessionId={}, 错误={}", sessionId, fileChunkMsg.getMessage());
+            }
+            default -> logger.warn("未知的 file 消息类型: {}", fileChunkMsg.getType());
         }
     }
 
@@ -100,9 +143,6 @@ public class SocketServerHandler implements WebSocketHandler {
         try {
             // 分块发送消息
             sendPartialMessage(session, jsonString); // 每块大小 1024 字节
-
-            // session.sendMessage(new TextMessage(jsonString));
-
         } catch (IOException e) {
             throw new SystemException("客户端推送消息失败, 错误信息：" + e.getMessage());
         }
@@ -110,23 +150,14 @@ public class SocketServerHandler implements WebSocketHandler {
 
     public void sendPartialMessage(WebSocketSession session, String message) throws IOException {
         int length = message.length();
-        int start = 0;
+        int chunkSize = 1024;
 
-        while (start < length) {
-            // 计算当前块的结束位置
-            int end = Math.min(start + 1024, length);
-
-            // 提取当前块
+        for (int start = 0; start < length; start += chunkSize) {
+            int end = Math.min(start + chunkSize, length);
             String chunk = message.substring(start, end);
 
-            // 判断是否是最后一块
             boolean isLast = (end >= length);
-
-            // 发送当前块
             session.sendMessage(new TextMessage(chunk, isLast));
-
-            // 更新起始位置
-            start = end;
         }
     }
 

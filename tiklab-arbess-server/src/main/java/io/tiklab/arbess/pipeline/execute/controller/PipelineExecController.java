@@ -6,6 +6,7 @@ import io.tiklab.arbess.pipeline.execute.model.PipelineRunMsg;
 import io.tiklab.arbess.pipeline.execute.service.PipelineExecService;
 import io.tiklab.core.Result;
 import io.tiklab.arbess.pipeline.instance.model.PipelineInstance;
+import io.tiklab.eam.common.context.LoginContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,7 +21,6 @@ import javax.validation.constraints.NotNull;
  * @pi.groupName: 流水线执行控制器
  * @pi.url:/exec
  */
-
 @RestController
 @RequestMapping("/exec")
 public class PipelineExecController {
@@ -43,6 +43,15 @@ public class PipelineExecController {
     }
 
 
+    @RequestMapping(path="/validExecPipeline",method = RequestMethod.POST)
+    public Result<Void> validExecPipeline(@RequestBody @Valid @NotNull PipelineRunMsg runMsg){
+        runMsg.setRunWay(1);
+       pipelineExecService.validExecPipeline(runMsg);
+        return Result.ok();
+    }
+
+
+
     /**
      * @pi.name:执行流水线
      * @pi.url:/rollBackStart
@@ -53,6 +62,7 @@ public class PipelineExecController {
     @RequestMapping(path="/rollBackStart",method = RequestMethod.POST)
     public Result<PipelineInstance> rollBackStart(@RequestBody @Valid @NotNull PipelineRunMsg runMsg){
         runMsg.setRunWay(3);
+        runMsg.setUserId(LoginContext.getLoginId());
         PipelineInstance start = pipelineExecService.rollBackStart(runMsg);
         return Result.ok(start);
     }

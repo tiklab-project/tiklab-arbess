@@ -47,6 +47,9 @@ public class TaskCodeServiceImpl implements TaskCodeService {
     @Autowired
     TaskCodeGittokService xcodeService;
 
+    @Autowired
+    TaskCodePriGiteaService priGiteaService;
+
     @Override
     public String createCode(TaskCode taskCode) {
         return taskCodeDao.createCode(BeanMapper.map(taskCode, TaskCodeEntity.class));
@@ -124,6 +127,9 @@ public class TaskCodeServiceImpl implements TaskCodeService {
                 }
                 case TASK_CODE_XCODE -> {
                     storeHouse = xcodeService.findStoreHouse(thirdQuery);
+                }
+                case TASK_CODE_GITEA -> {
+                    storeHouse = priGiteaService.findStoreHouse(thirdQuery);
                 }
                 default -> {
                 }

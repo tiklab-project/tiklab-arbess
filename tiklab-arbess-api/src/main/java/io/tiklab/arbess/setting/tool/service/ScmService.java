@@ -9,6 +9,8 @@ import io.tiklab.toolkit.join.annotation.FindOne;
 import io.tiklab.toolkit.join.annotation.JoinProvider;
 
 import java.util.List;
+import java.util.Map;
+
 /**
  * 流水线环境配置服务接口
  */
@@ -70,5 +72,11 @@ public interface ScmService {
      * @return 环境配置数量
      */
     Integer findScmNumber();
+
+    /**
+     * 查询环境配置类型分组
+     * @return 环境配置类型分组
+     */
+    List<Map<String, Object>> findScmByTypeGroup();
 
 }

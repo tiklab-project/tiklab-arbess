@@ -24,6 +24,15 @@ public interface PipelineExecService {
     PipelineInstance rollBackStart(PipelineRunMsg runMsg);
 
     /**
+     * 验证流水线运行
+     * @param runMsg 流水线id
+     */
+    void validExecPipeline(PipelineRunMsg runMsg);
+
+
+    void validWailExecPipeline(PipelineRunMsg runMsg);
+
+    /**
      * 停止流水线运行
      * @param pipelineId 流水线id
      */
@@ -34,6 +43,12 @@ public interface PipelineExecService {
      * @param keepOn 流水线id
      */
     void keepOn(PipelineKeepOn keepOn);
+
+
+    /**
+     *  运行等待中的流水线
+     */
+    void runWailPipeline();
 
 
     /**

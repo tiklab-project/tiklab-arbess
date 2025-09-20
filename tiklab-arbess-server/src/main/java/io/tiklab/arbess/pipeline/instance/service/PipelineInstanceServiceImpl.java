@@ -1,40 +1,35 @@
 package io.tiklab.arbess.pipeline.instance.service;
 
+import io.tiklab.arbess.agent.support.util.service.PipelineUtilService;
 import io.tiklab.arbess.agent.util.PipelineCache;
-import io.tiklab.arbess.home.service.PipelineHomeService;
+import io.tiklab.arbess.pipeline.definition.model.Pipeline;
 import io.tiklab.arbess.pipeline.execute.model.PipelineRunMsg;
 import io.tiklab.arbess.pipeline.instance.dao.PipelineInstanceDao;
 import io.tiklab.arbess.pipeline.instance.entity.PipelineInstanceEntity;
+import io.tiklab.arbess.pipeline.instance.model.PipelineInstance;
+import io.tiklab.arbess.pipeline.instance.model.PipelineInstanceQuery;
 import io.tiklab.arbess.stages.service.StageInstanceServer;
+import io.tiklab.arbess.stages.service.StageService;
 import io.tiklab.arbess.support.authority.service.PipelineAuthorityService;
 import io.tiklab.arbess.support.util.util.PipelineFileUtil;
 import io.tiklab.arbess.support.util.util.PipelineFinal;
 import io.tiklab.arbess.support.util.util.PipelineUtil;
-import io.tiklab.arbess.agent.support.util.service.PipelineUtilService;
 import io.tiklab.arbess.task.build.model.TaskBuildProduct;
 import io.tiklab.arbess.task.build.model.TaskBuildProductQuery;
 import io.tiklab.arbess.task.build.service.TaskBuildProductService;
 import io.tiklab.arbess.task.task.service.TasksInstanceService;
-import io.tiklab.toolkit.beans.BeanMapper;
 import io.tiklab.core.page.Pagination;
 import io.tiklab.core.page.PaginationBuilder;
 import io.tiklab.eam.common.context.LoginContext;
-import io.tiklab.toolkit.join.JoinTemplate;
-import io.tiklab.arbess.pipeline.definition.model.Pipeline;
-import io.tiklab.arbess.pipeline.instance.model.PipelineInstance;
-import io.tiklab.arbess.pipeline.instance.model.PipelineInstanceQuery;
 import io.tiklab.rpc.annotation.Exporter;
+import io.tiklab.toolkit.beans.BeanMapper;
+import io.tiklab.toolkit.join.JoinTemplate;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+
 import java.io.File;
 import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import static io.tiklab.arbess.support.util.util.PipelineFinal.PIPELINE_RUN_KEY;
 
 /**
  * 流水线实例服务
@@ -65,13 +60,11 @@ public class PipelineInstanceServiceImpl implements PipelineInstanceService {
     TaskBuildProductService taskBuildProductService;
 
     @Autowired
-    PipelineHomeService homeService;
+    StageService stageService;
+
 
     // 任务示例ID -- 运行时间
     public final static Map<String,Integer> runTimeMap = new HashMap<>();
-
-    //任务线程池
-    public final ExecutorService timeThreadPool = Executors.newCachedThreadPool();
 
     @Override
     public String createInstance(PipelineInstance pipelineInstance) {
@@ -152,13 +145,13 @@ public class PipelineInstanceServiceImpl implements PipelineInstanceService {
     @Override
     public void updateInstance(PipelineInstance pipelineInstance) {
 
-        String runLog = pipelineInstance.getRunLog();
-        if (StringUtils.isEmpty(runLog)){
-            PipelineInstance instanceNoQuery = findOneInstanceNoQuery(pipelineInstance.getInstanceId());
-            if (!StringUtils.isEmpty(instanceNoQuery.getRunLog()) && StringUtils.isEmpty(pipelineInstance.getRunLog())){
-                pipelineInstance.setRunLog(instanceNoQuery.getRunLog());
-            }
-        }
+        // String runLog = pipelineInstance.getRunLog();
+        // if (StringUtils.isEmpty(runLog)){
+        //     PipelineInstance instanceNoQuery = findOneInstanceNoQuery(pipelineInstance.getInstanceId());
+        //     if (!StringUtils.isEmpty(instanceNoQuery.getRunLog()) && StringUtils.isEmpty(pipelineInstance.getRunLog())){
+        //         pipelineInstance.setRunLog(instanceNoQuery.getRunLog());
+        //     }
+        // }
         PipelineInstanceEntity instance = BeanMapper.map(pipelineInstance, PipelineInstanceEntity.class);
         pipelineInstanceDao.updateInstance(instance);
     }
@@ -264,20 +257,8 @@ public class PipelineInstanceServiceImpl implements PipelineInstanceService {
         }
         Pagination<PipelineInstanceEntity> pagination = pipelineInstanceDao.findPageInstance(pipelineInstanceQuery);
         List<PipelineInstance> execInstanceList= BeanMapper.mapList(pagination.getDataList(), PipelineInstance.class);
-        for (PipelineInstance instance : execInstanceList) {
-            String time;
-            if (instance.getRunStatus().equals(PipelineFinal.RUN_RUN)){
-                Integer runtime = PipelineCache.findRuntime(instance.getInstanceId());
-                time = PipelineUtil.formatDateTime(runtime);
-            } else {
-                time = PipelineUtil.formatDateTime(instance.getRunTime());
-            }
-            String id = instance.getPipeline().getId();
-            // Boolean permissions = homeService.findPermissions(id, PIPELINE_RUN_KEY);
-            instance.setExec(true);
-            instance.setRunTimeDate(time);
-        }
         joinTemplate.joinQuery(execInstanceList,new String[]{"pipeline","user"});
+        queryPipelineInstance(execInstanceList);
         return PaginationBuilder.build(pagination, execInstanceList);
     }
 
@@ -288,7 +269,14 @@ public class PipelineInstanceServiceImpl implements PipelineInstanceService {
         pipelineInstanceQuery.setIds(userPipeline);
         Pagination<PipelineInstanceEntity> pagination = pipelineInstanceDao.findAllPageInstance(pipelineInstanceQuery);
         List<PipelineInstance> execInstanceList = BeanMapper.mapList(pagination.getDataList(), PipelineInstance.class);
-        for (PipelineInstance instance : execInstanceList) {
+        joinTemplate.joinQuery(execInstanceList,new String[]{"pipeline","user"});
+        queryPipelineInstance(execInstanceList);
+        return PaginationBuilder.build(pagination,execInstanceList);
+    }
+
+    public void queryPipelineInstance(List<PipelineInstance> execInstanceList){
+        execInstanceList.parallelStream().forEach(instance -> {
+        // execInstanceList.forEach(instance -> {
             String time;
             if (instance.getRunStatus().equals(PipelineFinal.RUN_RUN)){
                 Integer runtime = PipelineCache.findRuntime(instance.getInstanceId());
@@ -297,13 +285,27 @@ public class PipelineInstanceServiceImpl implements PipelineInstanceService {
                 time = PipelineUtil.formatDateTime(instance.getRunTime());
             }
             instance.setRunTimeDate(time);
-            // String id = instance.getPipeline().getId();
-            // Boolean permissions = homeService.findPermissions(id, PIPELINE_RUN_KEY);
-            instance.setExec(true);
-        }
-        joinTemplate.joinQuery(execInstanceList,new String[]{"pipeline","user"});
-        return PaginationBuilder.build(pagination,execInstanceList);
+
+            Pipeline pipeline = instance.getPipeline();
+            String pipelineId = pipeline.getId();
+
+            List<String> strings = stageService.validStagesMustField(pipelineId);
+            // List<Stage> allMainStage = stageService.findAllMainStage(pipelineId);
+            //
+            if(strings.isEmpty()  && pipeline.getState() == 1 ){
+                instance.setExec(true);
+            }
+
+            instance.setRollbackExec(false);
+            TaskBuildProductQuery productQuery = new TaskBuildProductQuery();
+            productQuery.setInstanceId(instance.getInstanceId());
+            List<TaskBuildProduct> buildProductList = taskBuildProductService.findBuildProductList(productQuery);
+            if (!buildProductList.isEmpty()){
+                instance.setRollbackExec(true);
+            }
+        });
     }
+
 
     @Override
     public List<PipelineInstance> findInstanceByTime(String pipelineId,String[] queryTime){

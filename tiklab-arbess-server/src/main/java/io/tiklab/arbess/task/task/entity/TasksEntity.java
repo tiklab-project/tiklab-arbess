@@ -42,6 +42,18 @@ public class TasksEntity {
     @Column(name = "task_sort",notNull = true)
     private int taskSort;
 
+    //字段状态
+    @Column(name = "field_status")
+    private Integer fieldStatus;
+
+    public Integer getFieldStatus() {
+        return fieldStatus;
+    }
+
+    public void setFieldStatus(Integer fieldStatus) {
+        this.fieldStatus = fieldStatus;
+    }
+
     public String getTaskName() {
         return taskName;
     }

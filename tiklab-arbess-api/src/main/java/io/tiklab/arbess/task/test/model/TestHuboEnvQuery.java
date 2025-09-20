@@ -10,7 +10,7 @@ public class TestHuboEnvQuery {
 
     private String authId;
 
-    private String repositoryId;
+    private String workspaceId;
 
     //@ApiProperty(name ="pageParam",desc = "分页参数")
     private Page pageParam = new Page();
@@ -26,12 +26,12 @@ public class TestHuboEnvQuery {
         this.authId = authId;
     }
 
-    public String getRepositoryId() {
-        return repositoryId;
+    public String getWorkspaceId() {
+        return workspaceId;
     }
 
-    public void setRepositoryId(String repositoryId) {
-        this.repositoryId = repositoryId;
+    public void setWorkspaceId(String workspaceId) {
+        this.workspaceId = workspaceId;
     }
 
     public Page getPageParam() {

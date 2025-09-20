@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.nio.charset.Charset;
@@ -426,24 +427,50 @@ public class PipelineUtil {
 
 
     public static String findLocalIp() {
+        List<String> ips = new ArrayList<>();
         try {
             Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
             while (interfaces.hasMoreElements()) {
                 NetworkInterface iface = interfaces.nextElement();
-                // 过滤回环接口和未激活的接口
-                if (iface.isLoopback() || !iface.isUp()) continue;
+                if (iface.isLoopback() || !iface.isUp() || iface.isVirtual()) continue;
 
                 Enumeration<InetAddress> addresses = iface.getInetAddresses();
                 while (addresses.hasMoreElements()) {
                     InetAddress addr = addresses.nextElement();
-                    // 过滤 IPv6 和回环地址
-                    if (!addr.isLoopbackAddress() && !addr.getHostAddress().contains(":")) {
-                        return addr.getHostAddress();
+                    if (addr instanceof Inet4Address && !addr.isLoopbackAddress()) {
+                        ips.add(addr.getHostAddress());
                     }
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
+        }
+
+        // 按优先级选择
+        for (String ip : ips) {
+            if (ip.startsWith("192.168.")) {
+                return ip;
+            }
+        }
+        for (String ip : ips) {
+            // 172.16.0.0 - 172.31.255.255 属于内网
+            if (ip.startsWith("172.")) {
+                String[] parts = ip.split("\\.");
+                if (parts.length > 1) {
+                    int second = Integer.parseInt(parts[1]);
+                    if (second >= 16 && second <= 31) {
+                        return ip;
+                    }
+                }
+            }
+        }
+        for (String ip : ips) {
+            if (ip.startsWith("10.")) {
+                return ip;
+            }
+        }
+        if (!ips.isEmpty()) {
+            return ips.get(0); // 兜底返回第一个非回环 IPv4
         }
         return "127.0.0.1";
     }

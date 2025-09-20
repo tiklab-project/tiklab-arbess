@@ -16,7 +16,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import static io.tiklab.arbess.support.util.util.PipelineFinal.FILE_TEMP_PREFIX;
 
@@ -139,15 +143,10 @@ public class PipelineFileUtil {
         if (file.exists()) {
             return;
         }
-        int i = 0;
-        boolean b = false;
         if (!file.exists()) {
-            while (!b && i <= 10) {
-                b = file.mkdirs();
-                i++;
-            }
+            file.mkdirs();
         }
-        if (i >= 10) {
+        if (!file.exists()) {
             throw new ApplicationException("项目工作目录创建失败。");
         }
     }
@@ -181,17 +180,54 @@ public class PipelineFileUtil {
      * @param path 文件地址
      * @throws ApplicationException 写入失败
      */
-    public static void logWriteFile(String str, String path) throws ApplicationException {
-        if (StringUtils.isEmpty(str)){
+    // public static void logWriteFile(String str, String path) throws ApplicationException {
+    //     if (StringUtils.isEmpty(str)){
+    //         return;
+    //     }
+    //     try (FileWriter writer = new FileWriter(path, StandardCharsets.UTF_8,true)) {
+    //         writer.write(str);
+    //         writer.flush();
+    //     } catch (Exception e) {
+    //         throw new ApplicationException("文件写入失败," + e.getMessage());
+    //     }
+    // }
+
+
+    private static final Map<String, BlockingQueue<String>> fileQueues = new ConcurrentHashMap<>();
+
+
+    private static final Map<String, Thread> writerThreads = new ConcurrentHashMap<>();
+
+    public static void logWriteFile(String str, String path) {
+        if (StringUtils.isEmpty(str)) {
             return;
         }
-        try (FileWriter writer = new FileWriter(path, StandardCharsets.UTF_8,true)) {
-            writer.write(str);
-            writer.flush();
-        } catch (Exception e) {
-            throw new ApplicationException("文件写入失败," + e.getMessage());
-        }
+
+        // 获取队列
+        BlockingQueue<String> queue = fileQueues.computeIfAbsent(path, k -> new LinkedBlockingQueue<>());
+
+        // 启动写线程（只会启动一次）
+        writerThreads.computeIfAbsent(path, k -> {
+            Thread t = new Thread(() -> {
+                try (FileWriter writer = new FileWriter(path, StandardCharsets.UTF_8, true)) {
+                    while (true) {
+                        String log = queue.take(); // 阻塞直到有数据
+                        writer.write(log);
+                        writer.flush();
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }, "log-writer-" + path);
+            t.setDaemon(true);
+            t.start();
+            return t;
+        });
+
+        // 放入队列
+        queue.offer(str);
     }
+
 
     /**
      * 读取文件后100行内容 0读取全部
@@ -258,8 +294,8 @@ public class PipelineFileUtil {
         if (!folder.exists()) {
             folder.mkdirs();
         }
-        while (folder.getParentFile() != null) {
-            folder = folder.getParentFile();
+        for (File parent; (parent = folder.getParentFile()) != null;) {
+            folder = parent;
         }
         String rootPath = folder.getPath();
         File root = new File(rootPath);

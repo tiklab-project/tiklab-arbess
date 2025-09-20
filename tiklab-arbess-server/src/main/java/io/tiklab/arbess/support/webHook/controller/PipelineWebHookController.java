@@ -23,7 +23,7 @@ public class PipelineWebHookController {
     @Autowired
     PipelineWebHookServer webHookServer;
 
-    @RequestMapping(path="/*",method = RequestMethod.GET)
+    @RequestMapping(path="/*",method = RequestMethod.POST)
     public Result<String> execWebHook(HttpServletRequest request,HttpServletRequest response){
         String requestURI = request.getRequestURI();
         String key = requestURI.replace("/pipeline/webhook/", "");

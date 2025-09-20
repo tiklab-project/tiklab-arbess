@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @pi.protocol: http
@@ -105,6 +106,12 @@ public class AuthThirdController {
     @RequestMapping(path="/findAuthServerPage",method = RequestMethod.POST)
     public Result<Pagination<AuthThird>> findAuthServerPage(@RequestBody @Valid @NotNull AuthThirdQuery thirdQuery) {
         Pagination<AuthThird> allAuthThird = authServerService.findAuthServerPage(thirdQuery);
+        return Result.ok(allAuthThird);
+    }
+
+    @RequestMapping(path="/findAuthServerByTypeGroup",method = RequestMethod.POST)
+    public Result<Pagination<AuthThird>> findAuthServerByTypeGroup() {
+        List<Map<String,Object>> allAuthThird = authServerService.findAuthServerByTypeGroup();
         return Result.ok(allAuthThird);
     }
 

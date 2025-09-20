@@ -2,6 +2,8 @@ package io.tiklab.arbess.pipeline.definition.entity;
 
 import io.tiklab.dal.jpa.annotation.*;
 
+import java.sql.Timestamp;
+
 /**
  * 流水线最近打开实体
  */
@@ -26,6 +28,17 @@ public class PipelineOpenEntity {
 
     @Column(name = "create_time")
     private String createTime;
+
+    @Column(name = "update_time")
+    private Timestamp updateTime;
+
+    public Timestamp getUpdateTime() {
+        return updateTime;
+    }
+
+    public void setUpdateTime(Timestamp updateTime) {
+        this.updateTime = updateTime;
+    }
 
     public String getOpenId() {
         return openId;

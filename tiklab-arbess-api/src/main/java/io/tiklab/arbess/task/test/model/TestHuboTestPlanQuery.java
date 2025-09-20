@@ -9,7 +9,7 @@ import java.util.List;
 public class TestHuboTestPlanQuery {
 
     // @ApiProperty(name = "repositoryId", desc = "空间id")
-    private String repositoryId;
+    private String workspaceId;
 
     // @ApiProperty(name = "name", desc = "测试计划名字，模糊匹配")
     private String name;
@@ -51,12 +51,12 @@ public class TestHuboTestPlanQuery {
         this.pageParam = pageParam;
     }
 
-    public String getRepositoryId() {
-        return repositoryId;
+    public String getWorkspaceId() {
+        return workspaceId;
     }
 
-    public void setRepositoryId(String repositoryId) {
-        this.repositoryId = repositoryId;
+    public void setWorkspaceId(String workspaceId) {
+        this.workspaceId = workspaceId;
     }
 
     public String getName() {

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.tiklab.arbess.setting.k8s.model.KubectlNode;
 import io.tiklab.arbess.setting.k8s.model.KubectlVersion;
+import io.tiklab.arbess.support.util.util.PipelineUtil;
 import io.tiklab.core.exception.ApplicationException;
 import org.yaml.snakeyaml.Yaml;
 
@@ -48,7 +49,13 @@ public class KubectlConfig {
     // 执行 kubectl 命令的通用方法
     private String runKubectlCommand(String... args) throws IOException, InterruptedException {
         List<String> command = new ArrayList<>();
-        command.add("./kubectl");
+
+        int systemType = PipelineUtil.findSystemType();
+        if (systemType == 1){
+            command.add(".\\kubectl.exe");
+        }else{
+            command.add("./kubectl");
+        }
         command.add("--kubeconfig=" + kubeConfigPath);
         command.addAll(Arrays.asList(args));
 
@@ -123,7 +130,8 @@ public class KubectlConfig {
             String configOutput = new BufferedReader(new InputStreamReader(configProcess.getInputStream()))
                     .lines().collect(Collectors.joining("\n"));
 
-            Pattern serverPatternAddr = Pattern.compile("server:\\s*(https?://\\S+)");
+            Pattern serverPatternAddr = Pattern.compile("^\\s*server:\\s*(https?://\\S+)", Pattern.MULTILINE);
+
             Matcher serverMatcherAddr = serverPatternAddr.matcher(configOutput);
             if (serverMatcherAddr.find()) {
                 kubectlVersion.setServerAddress(serverMatcherAddr.group(1));

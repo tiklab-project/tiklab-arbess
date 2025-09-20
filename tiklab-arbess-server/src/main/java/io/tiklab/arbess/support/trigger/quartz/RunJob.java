@@ -111,6 +111,7 @@ public  class RunJob implements org.quartz.Job {
                         // 运行
                         approvePipeline.setStatus(RUN_RUN);
                         try {
+                            execService.validWailExecPipeline(runMsg);
                             execService.start(runMsg);
                         }catch (Exception e){
                             e.printStackTrace();
@@ -125,6 +126,7 @@ public  class RunJob implements org.quartz.Job {
 
             PipelineRunMsg pipelineRunMsg = new PipelineRunMsg(pipelineId,loginId,2);
 
+            execService.validWailExecPipeline(pipelineRunMsg);
             execService.start(pipelineRunMsg);
 
             triggerService.updateTrigger(triggerName.split("_")[2]);

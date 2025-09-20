@@ -132,5 +132,10 @@ public class AuthThirdServiceImpl implements AuthThirdService {
         return authServerDao.findAuthServerNumber();
     }
 
+    @Override
+    public List<Map<String, Object>> findAuthServerByTypeGroup(){
+        return authServerDao.findAuthServerByTypeGroup();
+    }
+
 
 }

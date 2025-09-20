@@ -1,5 +1,7 @@
 package io.tiklab.arbess.starter.config;
 
+import io.tiklab.arbess.support.util.task.service.AddTaskField;
+import io.tiklab.arbess.support.util.task.service.InitAuthority;
 import io.tiklab.arbess.support.util.task.service.TaskUpdate;
 import io.tiklab.dsm.model.DsmConfig;
 import io.tiklab.dsm.model.DsmVersion;
@@ -20,6 +22,12 @@ public class ArbessDsmAutoConfiguration {
 
     @Autowired
     TaskUpdate taskUpdate;
+
+    @Autowired
+    InitAuthority authority;
+
+    @Autowired
+    AddTaskField addTaskField;
 
     @Bean
     DsmConfig dsmConfig(){
@@ -137,6 +145,67 @@ public class ArbessDsmAutoConfiguration {
                         "pip-project_1.0.30",
                 }).get();
         versionList.add(sql130);
+
+        DsmVersion sql131 = DsmVersionBuilder.instance()
+                .version("privilege-gorup_1.0.0")
+                .db(new String[]{
+                        "privilege-gorup_1.0.0",
+                }).get();
+        versionList.add(sql131);
+
+        DsmVersion sql132 = DsmVersionBuilder.instance()
+                .version("pip-new-pri-1.0.0p123")
+                .db(new String[]{
+                        "pip-new-pri-1.0.0",
+                }).get();
+        versionList.add(sql132);
+
+        DsmVersion sql134 = DsmVersionBuilder.instance()
+                .version("pip-init-message")
+                .db(new String[]{
+                        "pip-init-message"
+                })
+                .get();
+        versionList.add(sql134);
+
+        DsmVersion sql140 = DsmVersionBuilder.instance()
+                .version("message_2.0.0")
+                .db(new String[]{
+                        "message_2.0.0"
+                })
+                .get();
+        versionList.add(sql140);
+
+        DsmVersion sql135 = DsmVersionBuilder.instance()
+                .version("pip-task-add-field-1.0.0")
+                .task(addTaskField)
+                .db(new String[]{
+                        "pip-task-add-field-1.0.0"
+                })
+                .get();
+        versionList.add(sql135);
+
+        DsmVersion sql136 = DsmVersionBuilder.instance()
+                .version("pip-product-update_1.0.0")
+                .db(new String[]{
+                        "pip-product-update_1.0.0"
+                })
+                .get();
+        versionList.add(sql136);
+
+        DsmVersion sql137 = DsmVersionBuilder.instance()
+                .version("pip_2.0.0")
+                .db(new String[]{
+                        "pip_2.0.0"
+                })
+                .get();
+        versionList.add(sql137);
+
+        DsmVersion sql133 = DsmVersionBuilder.instance()
+                .version("pip-authority")
+                .task(authority)
+                .get();
+        versionList.add(sql133);
 
         return versionList;
     }

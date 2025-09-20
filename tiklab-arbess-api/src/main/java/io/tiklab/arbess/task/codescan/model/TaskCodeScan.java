@@ -53,6 +53,14 @@ public class TaskCodeScan {
 
     private String instanceId;
 
+    private String scanType;
+
+    // 扫描项目id
+    private String scanProjectId;
+
+    // 扫描项目名称
+    private String scanProjectName;
+
     // jdk版本
     @Mappings({
             @Mapping(source = "toolJdk.scmId",target = "toolJdk")
@@ -93,6 +101,32 @@ public class TaskCodeScan {
     @JoinField(key = "scmId")
     private Scm toolGo;
 
+    public String getScanProjectId() {
+        return scanProjectId;
+    }
+
+    public TaskCodeScan setScanProjectId(String scanProjectId) {
+        this.scanProjectId = scanProjectId;
+        return this;
+    }
+
+    public String getScanProjectName() {
+        return scanProjectName;
+    }
+
+    public TaskCodeScan setScanProjectName(String scanProjectName) {
+        this.scanProjectName = scanProjectName;
+        return this;
+    }
+
+    public String getScanType() {
+        return scanType;
+    }
+
+    public TaskCodeScan setScanType(String scanType) {
+        this.scanType = scanType;
+        return this;
+    }
 
     public Scm getToolGo() {
         return toolGo;

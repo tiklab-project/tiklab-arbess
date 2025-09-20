@@ -23,6 +23,19 @@ public class AgentMessage {
      */
     private String tenantId;
 
+    /**
+     * 会话ID
+     */
+    private String sessionId;
+
+    public String getSessionId() {
+        return sessionId;
+    }
+
+    public void setSessionId(String sessionId) {
+        this.sessionId = sessionId;
+    }
+
     public String getTenantId() {
         return tenantId;
     }

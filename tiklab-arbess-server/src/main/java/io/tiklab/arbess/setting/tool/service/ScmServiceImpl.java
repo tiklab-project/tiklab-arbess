@@ -1,18 +1,17 @@
 package io.tiklab.arbess.setting.tool.service;
 
 
-import io.tiklab.arbess.agent.util.PipelineFinal;
 import io.tiklab.arbess.agent.util.PipelineUtil;
 import io.tiklab.arbess.setting.k8s.config.KubectlConfig;
 import io.tiklab.arbess.setting.k8s.model.KubectlVersion;
+import io.tiklab.arbess.setting.tool.dao.ScmDao;
+import io.tiklab.arbess.setting.tool.entity.ScmEntity;
+import io.tiklab.arbess.setting.tool.model.Scm;
 import io.tiklab.arbess.setting.tool.model.ScmQuery;
 import io.tiklab.core.exception.ApplicationException;
 import io.tiklab.core.page.Pagination;
 import io.tiklab.core.page.PaginationBuilder;
 import io.tiklab.toolkit.beans.BeanMapper;
-import io.tiklab.arbess.setting.tool.dao.ScmDao;
-import io.tiklab.arbess.setting.tool.entity.ScmEntity;
-import io.tiklab.arbess.setting.tool.model.Scm;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -155,5 +154,10 @@ public class ScmServiceImpl implements ScmService {
     public Integer findScmNumber() {
         return scmDao.findScmNumber();
     }
-    
+
+    @Override
+    public List<Map<String, Object>> findScmByTypeGroup(){
+        return scmDao.findScmByTypeGroup();
+    }
+
 }

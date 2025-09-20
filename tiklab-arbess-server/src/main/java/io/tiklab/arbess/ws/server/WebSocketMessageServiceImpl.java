@@ -1,28 +1,28 @@
 package io.tiklab.arbess.ws.server;
 
 import com.alibaba.fastjson.JSONObject;
+import io.tiklab.arbess.agent.support.util.service.PipelineUtilService;
 import io.tiklab.arbess.agent.util.PipelineCache;
 import io.tiklab.arbess.home.service.PipelineHomeService;
+import io.tiklab.arbess.pipeline.definition.model.Pipeline;
+import io.tiklab.arbess.pipeline.definition.service.PipelineService;
 import io.tiklab.arbess.pipeline.execute.model.PipelineRunMsg;
 import io.tiklab.arbess.pipeline.execute.service.PipelineExecService;
 import io.tiklab.arbess.pipeline.execute.service.PipelineExecServiceImpl;
-import io.tiklab.arbess.pipeline.execute.service.PipelineQueueService;
-import io.tiklab.arbess.pipeline.instance.model.PipelineInstanceQuery;
-import io.tiklab.arbess.pipeline.instance.service.PipelineInstanceServiceImpl;
-import io.tiklab.arbess.support.agent.model.Agent;
-import io.tiklab.arbess.support.agent.model.AgentMessage;
-import io.tiklab.arbess.pipeline.definition.model.Pipeline;
-import io.tiklab.arbess.pipeline.definition.service.PipelineService;
 import io.tiklab.arbess.pipeline.instance.model.PipelineInstance;
+import io.tiklab.arbess.pipeline.instance.model.PipelineInstanceQuery;
 import io.tiklab.arbess.pipeline.instance.service.PipelineInstanceService;
+import io.tiklab.arbess.pipeline.instance.service.PipelineInstanceServiceImpl;
 import io.tiklab.arbess.stages.model.StageInstance;
 import io.tiklab.arbess.stages.service.StageInstanceServer;
+import io.tiklab.arbess.support.agent.model.Agent;
+import io.tiklab.arbess.support.agent.model.AgentMessage;
 import io.tiklab.arbess.support.approve.model.ApprovePipeline;
 import io.tiklab.arbess.support.approve.service.ApprovePipelineService;
 import io.tiklab.arbess.support.approve.service.ApproveService;
+import io.tiklab.arbess.support.message.model.TaskMessageSendDetail;
 import io.tiklab.arbess.support.postprocess.model.PostprocessInstance;
 import io.tiklab.arbess.support.postprocess.service.PostprocessInstanceService;
-import io.tiklab.arbess.agent.support.util.service.PipelineUtilService;
 import io.tiklab.arbess.support.util.util.PipelineFileUtil;
 import io.tiklab.arbess.support.util.util.PipelineFinal;
 import io.tiklab.arbess.support.util.util.PipelineTimeCache;
@@ -37,16 +37,13 @@ import io.tiklab.arbess.task.codescan.service.SonarQubeScanService;
 import io.tiklab.arbess.task.codescan.service.SourceFareScanService;
 import io.tiklab.arbess.task.deploy.model.TaskDeployInstance;
 import io.tiklab.arbess.task.deploy.service.TaskDeployInstanceServiceImpl;
-import io.tiklab.arbess.support.message.model.TaskMessageSendDetail;
 import io.tiklab.arbess.task.task.model.TaskInstance;
 import io.tiklab.arbess.task.task.model.Tasks;
 import io.tiklab.arbess.task.task.service.TasksInstanceService;
 import io.tiklab.arbess.task.task.service.TasksInstanceServiceImpl;
 import io.tiklab.arbess.task.task.service.TasksService;
-import io.tiklab.arbess.task.task.service.TasksServiceImpl;
 import io.tiklab.arbess.task.test.model.MavenTest;
 import io.tiklab.arbess.task.test.model.RelevanceTestOn;
-import io.tiklab.arbess.task.test.model.TestOnRelevance;
 import io.tiklab.arbess.task.test.service.MavenTestService;
 import io.tiklab.arbess.task.test.service.RelevanceTestOnService;
 import io.tiklab.arbess.ws.service.WebSocketMessageService;
@@ -127,6 +124,9 @@ public class WebSocketMessageServiceImpl implements WebSocketMessageService {
     @Autowired
     TasksService tasksService;
 
+    @Value("${DATA_HOME}")
+    private String dataHome;
+
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -142,6 +142,10 @@ public class WebSocketMessageServiceImpl implements WebSocketMessageService {
             taskCheckpointTimeoutHandle(message);
         }else if (type.contains("task_run_end_message")){
             taskRunMessage(message);
+        }else if (type.contains("exec_log")){
+            execLogMessageHandle(message);
+        }else if (type.contains("exec_time")){
+            execLogMessageHandle(message);
         }else if (type.contains("log")){
             logMessageHandle(message);
         }else if (type.contains("pipeline_run")){
@@ -198,6 +202,8 @@ public class WebSocketMessageServiceImpl implements WebSocketMessageService {
         pipelineService.updatePipeline(pipeline);
         PipelineExecServiceImpl.pipelineIdOrInstanceId.remove(pipelineId);
 
+        PipelineExecServiceImpl.pipelineIdOrAgentId.remove(pipelineId);
+
         // sendPipelineRunMessage(pipeline,instanceId,runStatus);
 
         // 更新审批状态
@@ -227,6 +233,8 @@ public class WebSocketMessageServiceImpl implements WebSocketMessageService {
         if (Objects.isNull(pipelineInstanceList) || pipelineInstanceList.isEmpty()){
             return;
         }
+        pipelineInstanceList.sort(Comparator.comparing(PipelineInstance::getCreateTime));
+
 
         logger.warn("存在待运行的流水线，数量：{}",pipelineInstanceList.size());
         PipelineInstance pipelineInstance = pipelineInstanceList.get(0);
@@ -251,6 +259,7 @@ public class WebSocketMessageServiceImpl implements WebSocketMessageService {
 
         // 运行流水线
         try {
+            execService.validWailExecPipeline(pipelineRunMsg);
             execService.start(pipelineRunMsg);
         }catch (Exception e){
             e.printStackTrace();
@@ -366,7 +375,6 @@ public class WebSocketMessageServiceImpl implements WebSocketMessageService {
             agentMessage.setType("timeout");
 
             try {
-                // TaskInstance oneTaskInstance = tasksInstanceService.findOneTaskInstance(id);
                 String stagesId = instanceTask.getStagesId();
                 StageInstance oneStageInstance = stageInstanceServer.findOneStageInstance(stagesId);
                 oneStageInstance.setStageState(RUN_TIMEOUT);
@@ -431,6 +439,154 @@ public class WebSocketMessageServiceImpl implements WebSocketMessageService {
         TasksInstanceServiceImpl.taskInstanceMap.put(sourceTaskInstance.getId(), sourceTaskInstance);
     }
 
+    private void execLogMessageHandle(Object message){
+        String jsonString = JSONObject.toJSONString(message);
+        TaskInstance sourceTaskInstance = JSONObject.parseObject(jsonString,TaskInstance.class);
+        String id = sourceTaskInstance.getId();
+
+        int runTime = sourceTaskInstance.getRunTime();
+        TaskInstance instanceTask = tasksInstanceService.findOneTaskInstance(id);
+
+        String taskId = instanceTask.getTaskId();
+        Tasks tasks = tasksService.findOneTasks(taskId);
+
+        if  (runTime > taskTimeout && !TASK_CHECK_POINT.equals(tasks.getTaskType()) ){
+            AgentMessage agentMessage = new AgentMessage();
+            agentMessage.setType("timeout");
+
+            try {
+                String stagesId = instanceTask.getStagesId();
+                StageInstance oneStageInstance = stageInstanceServer.findOneStageInstance(stagesId);
+                oneStageInstance.setStageState(RUN_TIMEOUT);
+                StageInstance stageInstance = null;
+                String instanceId;
+                if (StringUtils.isEmpty(oneStageInstance.getParentId())){
+                    instanceId = oneStageInstance.getInstanceId();
+                }else {
+                    stageInstance = stageInstanceServer.findOneStageInstance(oneStageInstance.getParentId());
+                    instanceId = stageInstance.getInstanceId();
+                }
+                PipelineInstance instance = pipelineInstanceService.findOneInstance(instanceId);
+                instance.setRunStatus(RUN_TIMEOUT);
+                int runtime = PipelineCache.findRuntime(instanceId);
+                instance.setRunTime(runtime);
+
+                String pipelineId = instance.getPipeline().getId();
+
+                if (!StringUtils.isEmpty(pipelineId)){
+                    agentMessage.setMessage(pipelineId);
+                    agentMessage.setPipelineId(pipelineId);
+                    Agent agent = PipelineExecServiceImpl.pipelineIdOrAgentId.get(pipelineId);
+                    SocketServerHandler.instance().sendHandleMessage(agent.getAddress(),agentMessage);
+
+                    Pipeline pipeline = pipelineService.findPipelineById(pipelineId);
+                    pipeline.setState(1);
+                    pipelineService.updatePipeline(pipeline);
+
+                    pipelineInstanceService.updateInstance(instance);
+                    stageInstanceServer.updateStageInstance(oneStageInstance);
+                    if (!Objects.isNull(stageInstance)){
+                        stageInstanceServer.updateStageInstance(stageInstance);
+                    }
+                    removeExecCache(pipelineId);
+                }
+            }catch (Exception e){
+                e.printStackTrace();
+                logger.error("获取流水线信息失败!");
+            }
+        }
+
+        TaskInstance taskInstance = TasksInstanceServiceImpl.taskInstanceMap.get(id);
+        String runLog = sourceTaskInstance.getRunLog();
+        if (!Objects.isNull(taskInstance)){
+            if (!StringUtils.isEmpty(runLog)){
+                sourceTaskInstance.setRunLog(taskInstance.getRunLog()+"\n"+runLog);
+            }else {
+                sourceTaskInstance.setRunLog(taskInstance.getRunLog());
+            }
+        }else {
+            PipelineInstance instance = pipelineInstanceService.findOneInstance(id);
+            if (!Objects.isNull(instance)){
+                if (!StringUtils.isEmpty(instance.getRunLog())){
+                    instance.setRunLog(instance.getRunLog()+"\n"+runLog);
+                }else {
+                    instance.setRunLog(runLog);
+                }
+                pipelineInstanceService.updateInstance(instance);
+            }
+        }
+        updateTaskInstance(sourceTaskInstance);
+        TasksInstanceServiceImpl.taskInstanceMap.put(sourceTaskInstance.getId(), sourceTaskInstance);
+    }
+
+
+    private void execTimeMessageHandle(Object message){
+        String jsonString = JSONObject.toJSONString(message);
+        TaskInstance sourceTaskInstance = JSONObject.parseObject(jsonString,TaskInstance.class);
+        String id = sourceTaskInstance.getId();
+
+        int runTime = sourceTaskInstance.getRunTime();
+        TaskInstance instanceTask = tasksInstanceService.findOneTaskInstance(id);
+
+        String taskId = instanceTask.getTaskId();
+        Tasks tasks = tasksService.findOneTasks(taskId);
+
+        // 处理审批，或者超时
+        if  (runTime > taskTimeout && !TASK_CHECK_POINT.equals(tasks.getTaskType()) ){
+            AgentMessage agentMessage = new AgentMessage();
+            agentMessage.setType("timeout");
+
+            try {
+                String stagesId = instanceTask.getStagesId();
+                StageInstance oneStageInstance = stageInstanceServer.findOneStageInstance(stagesId);
+                oneStageInstance.setStageState(RUN_TIMEOUT);
+                StageInstance stageInstance = null;
+                String instanceId;
+                if (StringUtils.isEmpty(oneStageInstance.getParentId())){
+                    instanceId = oneStageInstance.getInstanceId();
+                }else {
+                    stageInstance = stageInstanceServer.findOneStageInstance(oneStageInstance.getParentId());
+                    instanceId = stageInstance.getInstanceId();
+                }
+                PipelineInstance instance = pipelineInstanceService.findOneInstance(instanceId);
+                instance.setRunStatus(RUN_TIMEOUT);
+                int runtime = PipelineCache.findRuntime(instanceId);
+                instance.setRunTime(runtime);
+
+                String pipelineId = instance.getPipeline().getId();
+
+                if (!StringUtils.isEmpty(pipelineId)){
+                    agentMessage.setMessage(pipelineId);
+                    agentMessage.setPipelineId(pipelineId);
+                    Agent agent = PipelineExecServiceImpl.pipelineIdOrAgentId.get(pipelineId);
+                    SocketServerHandler.instance().sendHandleMessage(agent.getAddress(),agentMessage);
+
+                    Pipeline pipeline = pipelineService.findPipelineById(pipelineId);
+                    pipeline.setState(1);
+                    pipelineService.updatePipeline(pipeline);
+
+                    pipelineInstanceService.updateInstance(instance);
+                    stageInstanceServer.updateStageInstance(oneStageInstance);
+                    if (!Objects.isNull(stageInstance)){
+                        stageInstanceServer.updateStageInstance(stageInstance);
+                    }
+                    removeExecCache(pipelineId);
+                }
+            }catch (Exception e){
+                e.printStackTrace();
+                logger.error("获取流水线信息失败!");
+            }
+        }
+
+        TaskInstance taskInstance = TasksInstanceServiceImpl.taskInstanceMap.get(id);
+
+        if (Objects.isNull(taskInstance)){
+            return;
+        }
+        updateTaskInstance(sourceTaskInstance);
+        TasksInstanceServiceImpl.taskInstanceMap.put(sourceTaskInstance.getId(), sourceTaskInstance);
+    }
+
     public void removeExecCache(String pipelineId){
         String instanceId = PipelineExecServiceImpl.pipelineIdOrInstanceId.get(pipelineId);
         PipelineInstanceServiceImpl.runTimeMap.remove(instanceId);
@@ -463,7 +619,7 @@ public class WebSocketMessageServiceImpl implements WebSocketMessageService {
                 return;
             }
         }else {
-            if (split.length < 30){
+            if (split.length < 50){
                 return;
             }
         }
@@ -511,6 +667,14 @@ public class WebSocketMessageServiceImpl implements WebSocketMessageService {
     private void messageSavePipelineInstanceHandle(Object message){
         String jsonString = JSONObject.toJSONString(message);
         TaskBuildProduct taskBuildProduct = JSONObject.parseObject(jsonString, TaskBuildProduct.class);
+        String value = taskBuildProduct.getValue();
+        taskBuildProduct.setValue(value.replace(dataHome,"${DATA_HOME}"));
+
+        String pipelineId = taskBuildProduct.getPipelineId();
+        Agent agent = PipelineExecServiceImpl.pipelineIdOrAgentId.get(pipelineId);
+        if (!Objects.isNull(agent)){
+            taskBuildProduct.setAgentId(agent.getAddress());
+        }
         taskBuildProductService.createBuildProduct(taskBuildProduct);
     }
 

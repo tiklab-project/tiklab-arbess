@@ -4,7 +4,7 @@ public class TestHuboRpy {
 
     private String id;
 
-    private String name;
+    private String workspaceName;
 
     public TestHuboRpy() {
     }
@@ -21,11 +21,12 @@ public class TestHuboRpy {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+
+    public String getWorkspaceName() {
+        return workspaceName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setWorkspaceName(String workspaceName) {
+        this.workspaceName = workspaceName;
     }
 }

@@ -1,15 +1,11 @@
 package io.tiklab.arbess.pipeline.definition.model;
 
 
-import io.tiklab.toolkit.beans.annotation.Mapper;
-import io.tiklab.toolkit.beans.annotation.Mapping;
-import io.tiklab.toolkit.beans.annotation.Mappings;
 import io.tiklab.core.order.Order;
 import io.tiklab.core.order.OrderBuilders;
 import io.tiklab.core.page.Page;
+import io.tiklab.toolkit.beans.annotation.Mapper;
 import io.tiklab.toolkit.join.annotation.Join;
-
-
 
 import java.util.List;
 
@@ -21,14 +17,6 @@ import java.util.List;
 @Join
 @Mapper
 public class PipelineOpenQuery {
-
-    /**
-     * @pi.name:openId
-     * @pi.dataType:string
-     * @pi.desc:id
-     * @pi.value:openId
-     */
-    private String openId;
 
     /**
      * @pi.name:userId
@@ -45,18 +33,20 @@ public class PipelineOpenQuery {
      */
     private String pipelineId;
 
+    // 流水线ID列表
+    private String[] pipelineIds;
+
 
     private Page pageParam= new Page();
 
-    private List<Order> orderParams = OrderBuilders.instance().desc("createTime").get();
+    private List<Order> orderParams = OrderBuilders.instance().desc("updateTime").get();
 
-
-    public String getOpenId() {
-        return openId;
+    public String[] getPipelineIds() {
+        return pipelineIds;
     }
 
-    public void setOpenId(String openId) {
-        this.openId = openId;
+    public void setPipelineIds(String[] pipelineIds) {
+        this.pipelineIds = pipelineIds;
     }
 
     public String getUserId() {

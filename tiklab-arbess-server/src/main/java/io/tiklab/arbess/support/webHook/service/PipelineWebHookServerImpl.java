@@ -14,7 +14,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.security.SecureRandom;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 @Service
 public class PipelineWebHookServerImpl implements PipelineWebHookServer {
@@ -28,6 +31,11 @@ public class PipelineWebHookServerImpl implements PipelineWebHookServer {
 
     @Value("${server.port:8090}")
     private String port;
+
+
+    private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    private static final int LENGTH = 18;
+    private static final SecureRandom random = new SecureRandom();
 
     @Override
     public void execWebHook(String key) {
@@ -43,24 +51,21 @@ public class PipelineWebHookServerImpl implements PipelineWebHookServer {
         }
 
         String pipelineId = webHook.getPipelineId();
-        PipelineRunMsg pipelineRunMsg = new PipelineRunMsg(pipelineId,"111111",4);
+        PipelineRunMsg pipelineRunMsg = new PipelineRunMsg(pipelineId,"webhook",4);
         // 执行流水线
+
+        execService.validWailExecPipeline(pipelineRunMsg);
         execService.start(pipelineRunMsg);
     }
 
     @Override
     public String createWebHook(WebHook webHook) {
-        String name = webHook.getName() + System.currentTimeMillis();
 
-        String s = Base64.getEncoder().encodeToString(name.getBytes());
-
-        String key = s.length() > 12 ? s.substring(0,12) : s;
+        String key = generate();
 
         webHook.setKey(key);
 
-        String localIp = PipelineUtil.findLocalIp();
-
-        String url = "http://" + localIp + ":" + port + "/pipeline/webhook/" + key;
+        String url =  "/pipeline/webhook/" + key;
 
         webHook.setUrl(url);
         if (Objects.isNull(webHook.getStatus())){
@@ -79,6 +84,8 @@ public class PipelineWebHookServerImpl implements PipelineWebHookServer {
     @Override
     public void updateWebHook(WebHook webHook) {
         WebHookEntity webHookEntity = BeanMapper.map(webHook, WebHookEntity.class);
+        String url =  "/pipeline/webhook/" + webHook.getKey();
+        webHookEntity.setUrl(url);
         pipelineWebHookDao.updateWebHook(webHookEntity);
     }
 
@@ -98,7 +105,11 @@ public class PipelineWebHookServerImpl implements PipelineWebHookServer {
             WebHook webHook = webHookList.get(0);
             webHookId = webHook.getId();
         }
-        return findWebHook(webHookId);
+        WebHook webHook = findWebHook(webHookId);
+        String localIp = PipelineUtil.findLocalIp();
+        String url = "http://" + localIp + ":" + port + webHook.getUrl();
+        webHook.setUrl(url);
+        return webHook;
     }
 
     @Override
@@ -144,5 +155,14 @@ public class PipelineWebHookServerImpl implements PipelineWebHookServer {
         }
         List<WebHook> webHooks = BeanMapper.mapList(dataList, WebHook.class);
         return PaginationBuilder.build(webHookEntityPagination,webHooks);
+    }
+
+    public static String generate() {
+        StringBuilder sb = new StringBuilder(LENGTH);
+        for (int i = 0; i < LENGTH; i++) {
+            int index = random.nextInt(CHARACTERS.length());
+            sb.append(CHARACTERS.charAt(index));
+        }
+        return sb.toString();
     }
 }

@@ -21,6 +21,9 @@ public class TaskCodeScanEntity {
     @Column(name = "auth_id")
     private String authId;
 
+    @Column(name = "scan_type")
+    private String scanType;
+
     // 是否开启断言
     @Column(name = "open_assert")
     private String openAssert;
@@ -65,6 +68,41 @@ public class TaskCodeScanEntity {
     // maven版本
     @Column(name = "tool_go" )
     private String toolGo;
+
+    // 扫描项目id
+    @Column(name = "scan_project_id")
+    private String scanProjectId;
+
+    // 扫描项目名称
+    @Column(name = "scan_project_name")
+    private String scanProjectName;
+
+    public String getScanProjectId() {
+        return scanProjectId;
+    }
+
+    public TaskCodeScanEntity setScanProjectId(String scanProjectId) {
+        this.scanProjectId = scanProjectId;
+        return this;
+    }
+
+    public String getScanProjectName() {
+        return scanProjectName;
+    }
+
+    public TaskCodeScanEntity setScanProjectName(String scanProjectName) {
+        this.scanProjectName = scanProjectName;
+        return this;
+    }
+
+    public String getScanType() {
+        return scanType;
+    }
+
+    public TaskCodeScanEntity setScanType(String scanType) {
+        this.scanType = scanType;
+        return this;
+    }
 
     public String getToolNodejs() {
         return toolNodejs;

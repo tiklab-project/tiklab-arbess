@@ -1,11 +1,9 @@
 package io.tiklab.arbess.support.util.util;
 
-import io.tiklab.arbess.support.util.model.KeepOn;
-import io.tiklab.arbess.task.task.model.TaskInstance;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
@@ -18,7 +16,7 @@ public class PipelineTimeCache {
     /**
      * 任务运行时间记录
      */
-    private final static Map<String, AtomicInteger> runTimeMap = new HashMap<>();
+    private final static Map<String, AtomicInteger> runTimeMap = new ConcurrentHashMap<>();
 
     public static void addRunTime(String taskInstanceId){
         runTimeMap.put(taskInstanceId, new AtomicInteger(1));
@@ -41,6 +39,9 @@ public class PipelineTimeCache {
     }
 
     public static void removeRuntime(String taskInstanceId){
+        if (StringUtils.isEmpty(taskInstanceId)){
+            return;
+        }
         runTimeMap.remove(taskInstanceId);
     }
 

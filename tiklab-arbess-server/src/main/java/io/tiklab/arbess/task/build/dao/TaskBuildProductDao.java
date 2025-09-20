@@ -61,8 +61,8 @@ public class TaskBuildProductDao {
     public List<TaskBuildProductEntity> findBuildProductList(TaskBuildProductQuery taskBuildProductQuery){
         QueryCondition queryCondition = QueryBuilders.createQuery(TaskBuildProductEntity.class)
                 .eq("instanceId", taskBuildProductQuery.getInstanceId())
-                .eq("type", taskBuildProductQuery.getType())
-                .eq("key", taskBuildProductQuery.getKey())
+                .eq("pipelineId", taskBuildProductQuery.getPipelineId())
+                .eq("agentAddress", taskBuildProductQuery.getAgentAddress())
                 .get();
         return jpaTemplate.findList(queryCondition, TaskBuildProductEntity.class);
     }

@@ -7,9 +7,12 @@ import io.tiklab.arbess.task.build.model.TaskBuildProduct;
 import io.tiklab.arbess.task.build.model.TaskBuildProductQuery;
 import io.tiklab.toolkit.beans.BeanMapper;
 import io.tiklab.rpc.annotation.Exporter;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
 import java.util.*;
 
 @Service
@@ -19,10 +22,16 @@ public class TaskBuildProductServiceImpl implements TaskBuildProductService {
     @Autowired
     TaskBuildProductDao taskBuildProductDao;
 
+    @Value("${DATA_HOME}")
+    private String dataHome;
+
+    @Value("${external.url}")
+    private String externalUrl;
 
     @Override
     public String createBuildProduct(TaskBuildProduct taskBuildProduct) {
         TaskBuildProductEntity taskBuildProductEntity = BeanMapper.map(taskBuildProduct, TaskBuildProductEntity.class);
+        taskBuildProductEntity.setCreateTime(new Timestamp(System.currentTimeMillis()));
         return taskBuildProductDao.createBuildProduct(taskBuildProductEntity);
     }
 
@@ -58,7 +67,19 @@ public class TaskBuildProductServiceImpl implements TaskBuildProductService {
         if (allBuildProduct == null || allBuildProduct.isEmpty()){
             return new ArrayList<>();
         }
-        return BeanMapper.mapList(allBuildProduct, TaskBuildProduct.class);
+        List<TaskBuildProduct> taskBuildProductList = BeanMapper.mapList(allBuildProduct, TaskBuildProduct.class);
+        for (TaskBuildProduct product : taskBuildProductList) {
+            String value = product.getValue();
+            if (!StringUtils.isEmpty(value)){
+                value = value.replace("${DATA_HOME}", dataHome);
+            }
+            product.setValue(value);
+
+            String downloadUrl =externalUrl+"/instance/artifact/download/"+product.getInstanceId();
+            product.setDownloadUrl(downloadUrl);
+        }
+
+        return taskBuildProductList;
     }
 
 

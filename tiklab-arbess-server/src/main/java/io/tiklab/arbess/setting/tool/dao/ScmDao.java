@@ -104,4 +104,10 @@ public class ScmDao {
         return ((Long) map.get("number")).intValue();
     }
 
+
+    public List<Map<String, Object>> findScmByTypeGroup() {
+        String sql = "SELECT scm_type, COUNT(*) AS number FROM pip_setting_scm GROUP BY scm_type";
+        return jpaTemplate.getNamedParameterJdbcTemplate().queryForList(sql, new HashMap<>());
+    }
+
 }

@@ -181,3 +181,6 @@ update pcs_mec_message_template set content = '任务<span style=color: #5d70ea>
 UPDATE pcs_prc_function SET code = 'version' WHERE id = '64bdf62686a4';
 
 DELETE FROM pcs_prc_function WHERE id = 'f79c084575fa';
+
+DELETE FROM pcs_prc_role
+WHERE id IN ('3f22e1a0ff00', 'f51b3e9cdf10', 'ae28429ef243', 'bf699ba68c87');

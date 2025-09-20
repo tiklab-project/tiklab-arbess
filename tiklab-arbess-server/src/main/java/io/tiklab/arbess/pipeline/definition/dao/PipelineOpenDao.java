@@ -141,34 +141,11 @@ public class PipelineOpenDao {
         return list;
     }
 
-
-    public List<PipelineOpenEntity> findExpirePipelineOpen(String time){
-        String sql = "SELECT * FROM pip_other_open" +
-                " WHERE create_time < '" + time + "'";
-        JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
-        return  jdbcTemplate.query(sql, new BeanPropertyRowMapper(PipelineOpenEntity.class));
-    }
-
-
-
-    public String findUserLastOpenPipeline(String userId,String pipelineId){
-        String sql = "SELECT create_time FROM pip_other_open " +
-                " WHERE \"user_id\" = '" + userId +
-                "' and  pipeline_id = '" +pipelineId +
-                "' ORDER BY create_time desc";
-        JdbcTemplate jdbcTemplate = jpaTemplate.getJdbcTemplate();
-        List<String> list = jdbcTemplate.queryForList(sql, String.class);
-        if (list.isEmpty()){
-            return null;
-        }
-        return  list.get(0);
-    }
-
-
     public List<PipelineOpenEntity> findPipelineOpenList(PipelineOpenQuery query){
         QueryCondition builders = QueryBuilders.createQuery(PipelineOpenEntity.class)
                 .eq("userId",query.getUserId())
                 .eq("pipelineId",query.getPipelineId())
+                .in("pipelineId",query.getPipelineIds())
                 .orders(query.getOrderParams())
                 .get();
         return jpaTemplate.findList(builders, PipelineOpenEntity.class);
@@ -179,6 +156,7 @@ public class PipelineOpenDao {
         QueryCondition queryCondition = QueryBuilders.createQuery(PipelineOpenEntity.class)
                 .eq("userId",query.getUserId())
                 .eq("pipelineId",query.getPipelineId())
+                .in("pipelineId",query.getPipelineIds())
                 .orders(query.getOrderParams())
                 .pagination(query.getPageParam())
                 .orders(query.getOrderParams())

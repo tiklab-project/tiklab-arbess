@@ -31,9 +31,6 @@ public class Tasks {
     //@ApiProperty(name="taskName",desc="顺序")
     private String taskName;
 
-    //@ApiProperty(name="values",desc="任务")
-    private Object values;
-
     //@ApiProperty(name="pipeline",desc="流水线id",eg="@selectOne")
     private String pipelineId;
 
@@ -51,6 +48,17 @@ public class Tasks {
 
     //流水线变量
     private List<ExecVariable> taskVariable;
+
+    //字段状态 1.待完善 2.已完善
+    private Integer fieldStatus;
+
+    public Integer getFieldStatus() {
+        return fieldStatus;
+    }
+
+    public void setFieldStatus(Integer fieldStatus) {
+        this.fieldStatus = fieldStatus;
+    }
 
     public List<ExecVariable> getTaskVariable() {
         return taskVariable;
@@ -116,13 +124,13 @@ public class Tasks {
         this.stageId = stageId;
     }
 
-    public Object getValues() {
-        return values;
-    }
-
-    public void setValues(Object values) {
-        this.values = values;
-    }
+    // public Object getValues() {
+    //     return values;
+    // }
+    //
+    // public void setValues(Object values) {
+    //     this.values = values;
+    // }
 
     public String getTaskType() {
         return taskType;

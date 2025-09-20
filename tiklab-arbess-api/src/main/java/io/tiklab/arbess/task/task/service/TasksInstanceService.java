@@ -1,13 +1,12 @@
 package io.tiklab.arbess.task.task.service;
 
+import io.tiklab.arbess.task.task.model.TaskInstance;
+import io.tiklab.arbess.task.task.model.TaskInstanceQuery;
 import io.tiklab.toolkit.join.annotation.FindAll;
 import io.tiklab.toolkit.join.annotation.FindList;
 import io.tiklab.toolkit.join.annotation.JoinProvider;
-import io.tiklab.arbess.task.task.model.TaskInstance;
-import io.tiklab.arbess.task.task.model.TaskInstanceQuery;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * 任务执行实例服务接口
@@ -80,29 +79,6 @@ public interface TasksInstanceService {
      * @return 任务运行实例集合
      */
     List<TaskInstance> findAllStageInstance(String stageId);
-
-    /**
-     * 添加任务执行日志
-     * @param taskId 任务id
-     * @param log 日志
-     */
-    void writeExecLog(String taskId, String log);
-
-
-    void writeAllExecLog(String taskId, String execLog);
-
-    /**
-     * 获取Command执行结果
-     * @param process Command执行实例
-     * @param enCode Command编码
-     * @param error Command错误编码
-     * @param taskId 任务id
-     * @return 执行结果 true:执行完成 false:执行失败
-     */
-    boolean readCommandExecResult(Process process , String enCode, Map<String,String> error,String taskId);
-
-
-    String validStatus(String s,Map<String,String> errors);
 
     /**
      * 查询所有任务日志

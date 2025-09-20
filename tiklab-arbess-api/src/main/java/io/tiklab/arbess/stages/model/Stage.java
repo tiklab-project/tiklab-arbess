@@ -65,6 +65,17 @@ public class Stage {
     // 执行实例id
     private String instanceId;
 
+    // 主阶段ID
+    private String mainStageId;
+
+    public String getMainStageId() {
+        return mainStageId;
+    }
+
+    public void setMainStageId(String mainStageId) {
+        this.mainStageId = mainStageId;
+    }
+
     public String getTaskName() {
         return taskName;
     }

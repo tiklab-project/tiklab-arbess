@@ -89,19 +89,6 @@ public class PostprocessController {
         return Result.ok();
     }
 
-    /**
-     * @pi.name:查询后置配置信息
-     * @pi.url:/postprocess/findOnePost
-     * @pi.methodType:post
-     * @pi.request-type: formdata
-     * @pi.param: name=postId;dataType=string;value=postId;
-     */
-    @RequestMapping(path="/findOnePost",method = RequestMethod.POST)
-    public Result<Postprocess> findOnePostOrTask(@NotNull String postId) {
-        Postprocess postOrTask = postServer.findOnePostOrTask(postId);
-        return Result.ok(postOrTask);
-    }
-
 
 
 }

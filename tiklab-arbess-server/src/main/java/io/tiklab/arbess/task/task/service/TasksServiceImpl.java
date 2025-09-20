@@ -2,12 +2,12 @@ package io.tiklab.arbess.task.task.service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import io.tiklab.arbess.setting.auth.service.AuthService;
+import io.tiklab.arbess.setting.host.service.AuthHostService;
+import io.tiklab.arbess.setting.hostgroup.model.HostGroup;
 import io.tiklab.arbess.setting.hostgroup.service.AuthHostGroupService;
 import io.tiklab.arbess.setting.k8s.service.KubectlService;
-import io.tiklab.arbess.setting.host.service.AuthHostService;
-import io.tiklab.arbess.setting.auth.service.AuthService;
 import io.tiklab.arbess.setting.third.model.AuthThird;
-import io.tiklab.arbess.setting.hostgroup.model.HostGroup;
 import io.tiklab.arbess.setting.third.service.AuthThirdService;
 import io.tiklab.arbess.setting.tool.model.Scm;
 import io.tiklab.arbess.setting.tool.service.ScmService;
@@ -16,10 +16,6 @@ import io.tiklab.arbess.task.artifact.model.TaskArtifact;
 import io.tiklab.arbess.task.artifact.service.TaskArtifactService;
 import io.tiklab.arbess.task.build.model.TaskBuild;
 import io.tiklab.arbess.task.build.service.TaskBuildService;
-import io.tiklab.arbess.task.strategy.model.TaskHostStrategy;
-import io.tiklab.arbess.task.strategy.service.TaskHostStrategyService;
-import io.tiklab.arbess.task.tool.model.TaskCheckPoint;
-import io.tiklab.arbess.task.tool.service.TaskCheckPointService;
 import io.tiklab.arbess.task.code.model.TaskCode;
 import io.tiklab.arbess.task.code.model.ThirdQuery;
 import io.tiklab.arbess.task.code.model.ThirdUser;
@@ -30,9 +26,10 @@ import io.tiklab.arbess.task.deploy.model.TaskDeploy;
 import io.tiklab.arbess.task.deploy.service.TaskDeployService;
 import io.tiklab.arbess.task.pullArtifact.model.TaskPullArtifact;
 import io.tiklab.arbess.task.pullArtifact.service.TaskPullArtifactService;
-import io.tiklab.arbess.task.tool.model.TaskScript;
-import io.tiklab.arbess.task.tool.service.TaskScriptService;
+import io.tiklab.arbess.task.strategy.model.TaskHostStrategy;
+import io.tiklab.arbess.task.strategy.service.TaskHostStrategyService;
 import io.tiklab.arbess.task.task.dao.TasksDao;
+import io.tiklab.arbess.task.task.entity.TasksEntity;
 import io.tiklab.arbess.task.task.model.Tasks;
 import io.tiklab.arbess.task.task.model.TasksQuery;
 import io.tiklab.arbess.task.test.model.TaskTest;
@@ -40,12 +37,15 @@ import io.tiklab.arbess.task.test.model.TestHuboEnv;
 import io.tiklab.arbess.task.test.model.TestHuboRpy;
 import io.tiklab.arbess.task.test.model.TestHuboTestPlan;
 import io.tiklab.arbess.task.test.service.TaskTestService;
+import io.tiklab.arbess.task.tool.model.TaskCheckPoint;
 import io.tiklab.arbess.task.tool.model.TaskHostOrder;
+import io.tiklab.arbess.task.tool.model.TaskScript;
+import io.tiklab.arbess.task.tool.service.TaskCheckPointService;
 import io.tiklab.arbess.task.tool.service.TaskHostOrderService;
-import io.tiklab.toolkit.beans.BeanMapper;
+import io.tiklab.arbess.task.tool.service.TaskScriptService;
 import io.tiklab.core.exception.ApplicationException;
-import io.tiklab.arbess.task.task.entity.TasksEntity;
 import io.tiklab.rpc.annotation.Exporter;
+import io.tiklab.toolkit.beans.BeanMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -110,6 +110,9 @@ public class TasksServiceImpl implements TasksService {
     TaskCodeGitLabService taskCodeGitLabService;
 
     @Autowired
+    TaskCodePriGiteaService taskCodePriGiteaService;
+
+    @Autowired
     TaskCodePriGitLabService taskCodePriGitLabService;
 
     @Autowired
@@ -144,14 +147,14 @@ public class TasksServiceImpl implements TasksService {
             list = finAllPipelineTask(id);
         }
         if (type == 2){
-            list = finAllStageTask(id);
+            list = findStageTask(id);
         }
-        if (type == 3){
-            Tasks postTask = findOnePostTask(id);
-            if (postTask!= null){
-                list.add(postTask);
-            }
-        }
+        // if (type == 3){
+        //     Tasks postTask = findOnePostTask(id);
+        //     if (postTask!= null){
+        //         list.add(postTask);
+        //     }
+        // }
 
         if (list.isEmpty()){
             return 1;
@@ -222,7 +225,13 @@ public class TasksServiceImpl implements TasksService {
 
         String tasksId = createTasks(tasks);
         //创建任务
-        createDifferentTask(tasksId,taskType,tasks.getValues());
+        createDifferentTask(tasksId,taskType,tasks.getTask());
+
+        // 更新字段状态
+        if (Objects.isNull(tasks.getFieldStatus())){
+            updateTasksMustField(tasksId);
+        }
+
         return tasksId;
     }
 
@@ -242,11 +251,23 @@ public class TasksServiceImpl implements TasksService {
     @Override
     public void updateTasksTask(Tasks tasks) {
         String taskId = tasks.getTaskId();
-        Object values = tasks.getValues();
         Tasks task = findOneTasks(taskId);
         String taskType = task.getTaskType();
         //更新任务字段值
-        updateDifferentTask(taskId,taskType,values);
+        updateDifferentTask(taskId,taskType,tasks.getTask());
+    }
+
+    @Override
+    public void updateTasksMustField(String taskId){
+        Tasks task = findOneTasks(taskId);
+        String taskType = task.getTaskType();
+        Object taskDetails = findTaskDetails(taskId, taskType);
+        Boolean aBoolean = validTaskMastField(taskType, taskDetails);
+        task.setFieldStatus(1);
+        if (aBoolean){
+            task.setFieldStatus(2);
+        }
+        updateTasks(task);
     }
 
     @Override
@@ -267,7 +288,7 @@ public class TasksServiceImpl implements TasksService {
 
         List<Tasks> list = new ArrayList<>();
         if (tasks.getStageId() != null){
-            list = finAllStageTask(tasks.getStageId());
+            list = findStageTask(tasks.getStageId());
         }
         if (tasks.getPipelineId() != null){
             list = finAllPipelineTask(tasks.getPipelineId());
@@ -294,7 +315,7 @@ public class TasksServiceImpl implements TasksService {
         if (type == 1){
             list = finAllPipelineTask(id);
         }else {
-            list = finAllStageTask(id);
+            list = findStageTask(id);
         }
 
         if (list.isEmpty()){
@@ -318,7 +339,7 @@ public class TasksServiceImpl implements TasksService {
     }
     
     @Override
-    public List<Tasks> finAllStageTask(String stageId) {
+    public List<Tasks> findStageTask(String stageId) {
         TasksQuery tasksQuery = new TasksQuery();
         tasksQuery.setStageId(stageId);
         List<TasksEntity> tasksEntityList = tasksDao.findTaskList(tasksQuery);
@@ -326,31 +347,8 @@ public class TasksServiceImpl implements TasksService {
     }
 
     @Override
-    public Tasks findOnePostTask(String postId) {
-        TasksQuery tasksQuery = new TasksQuery();
-        tasksQuery.setPostprocessId(postId);
-        List<TasksEntity> tasksEntityList = tasksDao.findTaskList(tasksQuery);
-        List<Tasks> tasksList = BeanMapper.mapList(tasksEntityList, Tasks.class);
-        if (tasksList.isEmpty()){
-            return null;
-        }
-        return tasksList.get(0);
-    }
-
-    @Override
-    public Tasks findOnePostTaskOrTask(String postId) {
-        Tasks postTask = findOnePostTask(postId);
-        String taskType = postTask.getTaskType();
-        Object task = findTaskDetails( postTask.getTaskId(), taskType);
-        postTask.setValues(task);
-        postTask.setTask(task);
-        postTask.setTaskType(taskType);
-        return postTask;
-    }
-
-    @Override
-    public List<Tasks> finStageTaskOrTask(String stageId) {
-        List<Tasks> tasks = finAllStageTask(stageId);
+    public List<Tasks> findStageTaskOrTask(String stageId) {
+        List<Tasks> tasks = findStageTask(stageId);
         if (tasks.isEmpty()){
             return new ArrayList<>();
         }
@@ -358,7 +356,6 @@ public class TasksServiceImpl implements TasksService {
             String taskId = task.getTaskId();
             String taskType = task.getTaskType();
             Object taskDetails = findTaskDetails(taskId, taskType);
-            task.setValues(taskDetails);
             task.setTask(taskDetails);
         }
         addTaskAuth(tasks);
@@ -367,34 +364,41 @@ public class TasksServiceImpl implements TasksService {
 
     @Override
     public List<Tasks> finStageTaskOrTaskNoAuth(String stageId) {
-        List<Tasks> tasksList = finAllStageTask(stageId);
+        List<Tasks> tasksList = findStageTask(stageId);
         if (tasksList.isEmpty()){
             return new ArrayList<>();
         }
         for (Tasks tasks : tasksList) {
             Object taskDetails = findTaskDetails(tasks.getTaskId(), tasks.getTaskType());
-            tasks.setValues(taskDetails);
             tasks.setTask(taskDetails);
         }
         return tasksList;
     }
 
     @Override
-    public List<String> validTasksMustField(List<Tasks> tasksList){
+    public List<Tasks> findTaskList(String pipelineId) {
 
-        if (tasksList.isEmpty()){
-            return new ArrayList<>();
-        }
+        List<TasksEntity> taskList = tasksDao.findTaskList(pipelineId);
 
-        List<String> stringList = new ArrayList<>();
+        List<Tasks> tasksList = BeanMapper.mapList(taskList, Tasks.class);
+        // for (Tasks tasks : tasksList) {
+        //     Object taskDetails = findTaskDetails(tasks.getTaskId(), tasks.getTaskType());
+        //     tasks.setTask(taskDetails);
+        // }
+        return tasksList;
+    }
+
+    @Override
+    public List<Tasks> findTaskListByDetails(String pipelineId) {
+
+        List<TasksEntity> taskList = tasksDao.findTaskList(pipelineId);
+
+        List<Tasks> tasksList = BeanMapper.mapList(taskList, Tasks.class);
         for (Tasks tasks : tasksList) {
-            String taskId = tasks.getTaskId();
-            Boolean aBoolean = validDifferentTaskMastField(tasks.getTaskType(), tasks.getTask());
-            if (!aBoolean){
-                stringList.add(taskId);
-            }
+            Object taskDetails = findTaskDetails(tasks.getTaskId(), tasks.getTaskType());
+            tasks.setTask(taskDetails);
         }
-        return stringList;
+        return tasksList;
     }
 
     @Override
@@ -441,7 +445,6 @@ public class TasksServiceImpl implements TasksService {
     public Tasks findOneTasksOrTask(String tasksId){
         Tasks tasks = findOneTasks(tasksId);
         Object task = findTaskDetails(tasksId, tasks.getTaskType());
-        tasks.setValues(task);
         tasks.setTask(task);
         return tasks;
     }
@@ -519,6 +522,14 @@ public class TasksServiceImpl implements TasksService {
                         task.setBuildAddress(DEFAULT_CODE_ADDRESS);
                         task.setBuildOrder(NET_CORE_DEFAULT_ORDER);
                     }
+                    case TASK_BUILD_GRADLE -> {
+                        task.setBuildAddress(DEFAULT_CODE_ADDRESS);
+                        task.setBuildOrder(GRADLE_DEFAULT_ORDER);
+                    }
+                    case TASK_BUILD_C_ADD -> {
+                        task.setBuildAddress(DEFAULT_CODE_ADDRESS);
+                        task.setBuildOrder(C_ADD_DEFAULT_ORDER);
+                    }
                 }
                 buildService.createBuild(task);
             }
@@ -541,6 +552,9 @@ public class TasksServiceImpl implements TasksService {
                     task.setOpenDebug(false);
                     task.setErrGrade(DEFAULT);
                     task.setScanGrade(DEFAULT);
+                }
+                if (taskType.equals(TASK_CODESCAN_SOURCEFARE)){
+                    task.setScanType("client");
                 }
                 task.setScanPath(DEFAULT_CODE_ADDRESS);
                 codeScanService.createCodeScan(task);
@@ -645,7 +659,6 @@ public class TasksServiceImpl implements TasksService {
 
                 if (!StringUtils.isEmpty(taskCode.getAuthId()) && !taskCode.getAuthId().equals(oneCodeConfig.getAuthId())){
                     if (!taskType.equals(TASK_CODE_GIT)){
-                        // taskCode.setCodeBranch(" ")  ;
                         taskCode.setCodeAddress(" ");
                         taskCode.setCodeName(" ");
                     }
@@ -841,6 +854,7 @@ public class TasksServiceImpl implements TasksService {
                     Scm maven = scmService.findOnePipelineScm(taskTest.getToolMaven().getScmId());
                     taskTest.setToolMaven(maven);
                 }
+
                 return taskTest;
             }
             case TASK_TYPE_BUILD    -> {
@@ -875,6 +889,14 @@ public class TasksServiceImpl implements TasksService {
                 if (!Objects.isNull(codeScan.getToolJdk())){
                     Scm jdk = scmService.findOnePipelineScm(codeScan.getToolJdk().getScmId());
                     codeScan.setToolJdk(jdk);
+                }
+                if (!Objects.isNull(codeScan.getToolNodejs())){
+                    Scm jdk = scmService.findOnePipelineScm(codeScan.getToolNodejs().getScmId());
+                    codeScan.setToolNodejs(jdk);
+                }
+                if (!Objects.isNull(codeScan.getToolSourceFare())){
+                    Scm jdk = scmService.findOnePipelineScm(codeScan.getToolSourceFare().getScmId());
+                    codeScan.setToolSourceFare(jdk);
                 }
                 return codeScan;
             }
@@ -919,56 +941,6 @@ public class TasksServiceImpl implements TasksService {
            default -> throw new ApplicationException("无法更新未知的配置类型。");
         }
     }
-
-    /**
-     * 查询任务详情(不包含认证信息)
-     * @param taskId 任务Id
-     * @param taskType 任务类型
-     * @return 任务详情
-     */
-    // private Object findTaskDetailsNoAuth(String taskId,String taskType){
-    //     switch (findTaskType(taskType)) {
-    //         case TASK_TYPE_CODE     -> {
-    //             return codeService.findOneCode(taskId);
-    //         }
-    //         case TASK_TYPE_TEST     -> {
-    //             return testService.findOneTest(taskId);
-    //         }
-    //         case TASK_TYPE_BUILD    -> {
-    //             return buildService.findOneBuild(taskId);
-    //         }
-    //         case TASK_TYPE_DEPLOY   -> {
-    //             return deployService.findOneDeploy(taskId);
-    //         }
-    //         case TASK_TYPE_CODESCAN -> {
-    //             return codeScanService.findOneCodeScan(taskId);
-    //         }
-    //         case TASK_TYPE_UPLOAD -> {
-    //             return artifactService.findOneProduct(taskId);
-    //         }
-    //         case TASK_TYPE_DOWNLOAD -> {
-    //             return pullArtifactService.findOnePullArtifact(taskId);
-    //         }
-    //         case TASK_TYPE_SCRIPT   -> {
-    //             return scriptServer.findOneScript(taskId);
-    //         }
-    //         case TASK_TYPE_TOOL -> {
-    //             switch (taskType) {
-    //                 case TASK_CHECK_POINT -> {
-    //                     return taskCheckPointService.findCheckPoint(taskId);
-    //                 }
-    //                 case TASK_HOST_ORDER -> {
-    //                     return taskHostOrderService.findHostOrder(taskId);
-    //                 }
-    //                 default -> throw new ApplicationException("无法更新未知的配置类型。");
-    //             }
-    //         }
-    //         case TASK_TYPE_STRATEGY ->{
-    //             return strategyService.findStrategy(taskId);
-    //         }
-    //        default -> throw new ApplicationException("无法更新未知的配置类型。");
-    //     }
-    // }
 
     /**
      * 添加任务认证信息
@@ -1024,6 +996,18 @@ public class TasksServiceImpl implements TasksService {
                                 }
                                 auth = authThird;
                             }
+                            case TASK_CODE_GITEA ->{
+                                AuthThird authThird = authServerServer.findOneAuthServer(authId);
+                                try {
+                                    ThirdQuery thirdQuery = new ThirdQuery();
+                                    thirdQuery.setAuthId(authId);
+                                    ThirdUser thirdUser = taskCodePriGiteaService.findAuthUser(thirdQuery);
+                                    authThird.setUsername(thirdUser.getPath());
+                                }catch (Exception e){
+                                    logger.error("获取Gitea授权用户名失败，原因：{}",e.getMessage());
+                                }
+                                auth = authThird;
+                            }
                             case TASK_CODE_PRI_GITLAB->{
                                 AuthThird authThird = authServerServer.findOneAuthServer(authId);
                                 try {
@@ -1048,10 +1032,9 @@ public class TasksServiceImpl implements TasksService {
                     object = taskCode;
                 }
                 case TASK_TYPE_TEST -> {
-                    // TaskTest taskTest = testService.findOneTest(taskId);
                     TaskTest taskTest = JSONObject.parseObject(jsonString, TaskTest.class);
                     String authId = taskTest.getAuthId();
-                    if (taskType.equals(TASK_TEST_TESTON)){
+                    if (taskType.equals(TASK_TEST_TESTON)|| taskType.equals(TASK_TEST_POSTIN)){
                         Object auth = authServerServer.findOneAuthServer(authId);
                         taskTest.setAuth(auth);
                     }
@@ -1164,31 +1147,27 @@ public class TasksServiceImpl implements TasksService {
                     throw new ApplicationException("无法更新未知的配置类型。");
                 }
             }
-            task.setValues(object);
+            // task.setValues(object);
             task.setTask(object);
         }
         tasks.sort(Comparator.comparing(Tasks::getTaskSort));
     }
 
-    /**
-     * 效验不同任务配置必填字段
-     * @param taskType 任务类型
-     * @param object 任务信息
-     */
-    private Boolean validDifferentTaskMastField(String taskType,Object object){
+    @Override
+    public Boolean validTaskMastField(String taskType,Object object){
         String jsonString = JSONObject.toJSONString(object);
         switch (findTaskType(taskType)) {
            case TASK_TYPE_CODE     ->  {
                TaskCode code =  JSONObject.parseObject(jsonString,TaskCode.class);
                switch (taskType) {
-                   case TASK_CODE_GITEE, TASK_CODE_GITLAB, TASK_CODE_GITHUB, TASK_CODE_XCODE,TASK_CODE_PRI_GITLAB -> {
+                   case TASK_CODE_GITEE, TASK_CODE_GITLAB, TASK_CODE_GITHUB, TASK_CODE_XCODE,TASK_CODE_PRI_GITLAB,TASK_CODE_GITEA -> {
                       return PipelineUtil.validNoNullFiled(code.getHouseId(),code.getCodeName(),code.getCodeBranch()
                               , code.getAuthId(),code.getToolGit());
                    }
                    case TASK_CODE_GIT -> {
                        String authType = code.getAuthType();
                        if (StringUtils.isEmpty(authType) || authType.equals(AUTH_NONE)){
-                           return PipelineUtil.validNoNullFiled(code.getCodeAddress(),code.getCodeBranch());
+                           return PipelineUtil.validNoNullFiled(code.getCodeAddress(),code.getCodeBranch(),code.getToolGit());
                        }
 
                        switch (authType) {
@@ -1224,7 +1203,7 @@ public class TasksServiceImpl implements TasksService {
            }
            case TASK_TYPE_TEST     ->  {
                TaskTest code =  JSONObject.parseObject(jsonString,TaskTest.class);
-               if (taskType.equals(TASK_TEST_TESTON)){
+               if (taskType.equals(TASK_TEST_TESTON) ||  taskType.equals(TASK_TEST_POSTIN)){
                    Boolean b1 = PipelineUtil.validNoNullFiled(code.getTestSpace(), code.getTestPlan());
                    if (!b1){
                        return false;
@@ -1375,7 +1354,6 @@ public class TasksServiceImpl implements TasksService {
            default -> {
                return true;
            }
-
         }
     }
 
@@ -1383,14 +1361,14 @@ public class TasksServiceImpl implements TasksService {
     public String findTaskType(String taskType){
         switch (taskType){
             case TASK_CODE_GIT , TASK_CODE_GITEE , TASK_CODE_GITHUB ,
-                    TASK_CODE_GITLAB, TASK_CODE_XCODE, TASK_CODE_SVN,TASK_CODE_PRI_GITLAB ->{
+                    TASK_CODE_GITLAB, TASK_CODE_XCODE, TASK_CODE_SVN,TASK_CODE_PRI_GITLAB,TASK_CODE_GITEA ->{
                 return TASK_TYPE_CODE;
             }
             case TASK_BUILD_MAVEN, TASK_BUILD_NODEJS, TASK_BUILD_DOCKER,TASK_BUILD_GO
-            ,TASK_BUILD_PHP,TASK_BUILD_PYTHON,TASK_BUILD_NET_CORE ->{
+            ,TASK_BUILD_PHP,TASK_BUILD_PYTHON,TASK_BUILD_NET_CORE,TASK_BUILD_GRADLE,TASK_BUILD_C_ADD ->{
                 return TASK_TYPE_BUILD;
             }
-            case TASK_TEST_MAVENTEST, TASK_TEST_TESTON  ->{
+            case TASK_TEST_MAVENTEST, TASK_TEST_TESTON,TASK_TEST_POSTIN  ->{
                 return TASK_TYPE_TEST;
             }
             case TASK_DEPLOY_LINUX , TASK_DEPLOY_DOCKER ,TASK_DEPLOY_K8S->{
@@ -1439,6 +1417,9 @@ public class TasksServiceImpl implements TasksService {
             case TASK_CODE_GITLAB -> {
                 return "GitLab";
             }
+            case TASK_CODE_GITEA -> {
+                return "Gitea";
+            }
             case TASK_CODE_PRI_GITLAB -> {
                 return "自建GitLab";
             }
@@ -1450,6 +1431,9 @@ public class TasksServiceImpl implements TasksService {
             }
             case TASK_TEST_TESTON -> {
                 return "TestHubo";
+            }
+            case TASK_TEST_POSTIN -> {
+                return "PostIn";
             }
             case TASK_BUILD_MAVEN -> {
                 return "Maven构建";
@@ -1471,6 +1455,12 @@ public class TasksServiceImpl implements TasksService {
             }
             case TASK_BUILD_NET_CORE -> {
                 return ".Net Core构建";
+            }
+            case TASK_BUILD_GRADLE -> {
+                return "Gradle构建";
+            }
+            case TASK_BUILD_C_ADD -> {
+                return "C++构建";
             }
             case TASK_DEPLOY_LINUX -> {
                 return "主机部署";

@@ -59,7 +59,7 @@ public class PostprocessServiceImpl implements PostprocessService {
         tasks.setTaskName(postprocess.getPostName());
         tasks.setTaskType(postprocess.getTaskType());
         tasks.setPostprocessId(postId);
-        tasks.setValues(postprocess.getValues());
+        // tasks.setValues(postprocess.getValues());
         tasksService.createTasksOrTask(tasks);
         return postId;
     }
@@ -74,10 +74,10 @@ public class PostprocessServiceImpl implements PostprocessService {
         List<Postprocess> list = new ArrayList<>();
         for (Postprocess postprocess : postprocessList) {
             String postprocessId = postprocess.getPostId();
-            Tasks tasks = tasksService.findOnePostTaskOrTask(postprocessId);
-            postprocess.setTask(tasks);
-            String taskType = tasks.getTaskType();
-            postprocess.setTaskType(taskType);
+            // Tasks tasks = tasksService.findOnePostTaskOrTask(postprocessId);
+            // postprocess.setTask(tasks);
+            // String taskType = tasks.getTaskType();
+            // postprocess.setTaskType(taskType);
             list.add(postprocess);
         }
         list.sort(Comparator.comparing(Postprocess::getTaskSort));
@@ -106,10 +106,10 @@ public class PostprocessServiceImpl implements PostprocessService {
         List<Postprocess> list = new ArrayList<>();
         for (Postprocess postprocess : postprocessList) {
             String id = postprocess.getPostId();
-            Tasks tasks = tasksService.findOnePostTaskOrTask(id);
-            String taskType = tasks.getTaskType();
-            postprocess.setTaskType(taskType);
-            postprocess.setTask(tasks);
+            // Tasks tasks = tasksService.findOnePostTaskOrTask(id);
+            // String taskType = tasks.getTaskType();
+            // postprocess.setTaskType(taskType);
+            // postprocess.setTask(tasks);
             list.add(postprocess);
         }
         postprocessList.sort(Comparator.comparing(Postprocess::getCreateTime).reversed());
@@ -118,9 +118,9 @@ public class PostprocessServiceImpl implements PostprocessService {
 
     @Override
     public void deletePostTask(String postprocessId) {
-        Tasks postTask = tasksService.findOnePostTask(postprocessId);
-        String taskId = postTask.getTaskId();
-        tasksService.deleteTasksOrTask(taskId);
+        // Tasks postTask = tasksService.findOnePostTask(postprocessId);
+        // String taskId = postTask.getTaskId();
+        // tasksService.deleteTasksOrTask(taskId);
         postprocessDao.deletePost(postprocessId);
     }
 
@@ -149,14 +149,15 @@ public class PostprocessServiceImpl implements PostprocessService {
         onePost.setPostName(postprocess.getPostName());
         postprocessDao.updatePost(BeanMapper.map(onePost,PostprocessEntity.class));
 
-        Tasks task = tasksService.findOnePostTask(postprocessId);
-        Object values = postprocess.getValues();
-        task.setTask(values);
-        task.setValues(values);
-        task.setTaskType(postprocess.getTaskType());
-        tasksService.updateTasksTask(task);
+        // Tasks task = tasksService.findOnePostTask(postprocessId);
+        // Object values = postprocess.getValues();
+        // task.setTask(values);
+        // task.setValues(values);
+        // task.setTaskType(postprocess.getTaskType());
+        // tasksService.updateTasksTask(task);
     }
 
+    @Override
     public void updatePost(Postprocess postprocess){
         postprocessDao.updatePost(BeanMapper.map(postprocess,PostprocessEntity.class));
     }
@@ -165,9 +166,9 @@ public class PostprocessServiceImpl implements PostprocessService {
     public Postprocess findOnePostOrTask(String postprocessId) {
         Postprocess postprocess = findOnePost(postprocessId);
         String id = postprocess.getPostId();
-        Tasks taskOrTask = tasksService.findOnePostTaskOrTask(id);
-        postprocess.setTask(taskOrTask);
-        postprocess.setTaskType(taskOrTask.getTaskType());
+        // Tasks taskOrTask = tasksService.findOnePostTaskOrTask(id);
+        // postprocess.setTask(taskOrTask);
+        // postprocess.setTaskType(taskOrTask.getTaskType());
         return postprocess;
     }
 

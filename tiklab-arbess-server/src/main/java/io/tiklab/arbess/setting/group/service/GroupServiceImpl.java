@@ -67,7 +67,7 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public List<Group> findAllGroupList(List<String> idList) {
         List<Group> groupList = groupDao.findAllGroupList(idList);
-        joinTemplate.joinQuery(groupList,new String[]{"user"});
+        // joinTemplate.joinQuery(groupList,new String[]{"user"});
         return groupList;
     }
 

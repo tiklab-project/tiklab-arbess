@@ -305,6 +305,11 @@ public class PipelineController {
         return Result.ok(pipelineList);
     }
 
+    @RequestMapping(path="/findPipelineMustField",method = RequestMethod.POST)
+    public List<String> findPipelineMustField(@NotNull String pipelineId){
+        return pipelineService.findPipelineMustField(pipelineId);
+    }
+
 
     /**
      * @pi.name:流水线导出为Yaml格式

@@ -2,23 +2,25 @@ package io.tiklab.arbess.stages.service;
 
 import io.tiklab.arbess.pipeline.instance.dao.PipelineInstanceDao;
 import io.tiklab.arbess.pipeline.instance.entity.PipelineInstanceEntity;
-import io.tiklab.arbess.pipeline.instance.model.PipelineInstance;
+import io.tiklab.arbess.stages.dao.StageInstanceDao;
 import io.tiklab.arbess.stages.entity.StageInstanceEntity;
 import io.tiklab.arbess.stages.model.StageInstance;
 import io.tiklab.arbess.stages.model.StageInstanceQuery;
 import io.tiklab.arbess.support.util.util.PipelineFileUtil;
 import io.tiklab.arbess.support.util.util.PipelineFinal;
-import io.tiklab.toolkit.beans.BeanMapper;
-import io.tiklab.arbess.stages.dao.StageInstanceDao;
 import io.tiklab.arbess.task.task.model.TaskInstance;
 import io.tiklab.arbess.task.task.service.TasksInstanceService;
+import io.tiklab.toolkit.beans.BeanMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -79,10 +81,31 @@ public class StageInstanceServerImpl implements StageInstanceServer{
         return list;
     }
 
+
+    @Override
+    public void updateStageInstanceOrTask(String instanceId){
+        List<StageInstance> allStageInstance = findMainStageInstance(instanceId);
+
+        allStageInstance.forEach(stageInstance -> {
+            List<StageInstance> allOtherStageInstance = findOtherStageInstance(stageInstance.getId());
+            allOtherStageInstance.forEach(si -> {
+                List<TaskInstance> allTaskInstance = tasksInstanceService.findAllStageInstance(si.getId());
+                allTaskInstance.forEach(taskInstance -> {
+                    taskInstance.setRunState(PipelineFinal.RUN_HALT);
+                    tasksInstanceService.updateTaskInstance(taskInstance);
+                });
+                si.setStageState(PipelineFinal.RUN_HALT);
+                updateStageInstance(si);
+            });
+            stageInstance.setStageState(PipelineFinal.RUN_HALT);
+            updateStageInstance(stageInstance);
+        });
+
+    }
+
     @Override
     public void updateStageInstance(StageInstance stageInstance) {
-        StageInstanceEntity instanceEntity =
-                BeanMapper.map(stageInstance, StageInstanceEntity.class);
+        StageInstanceEntity instanceEntity = BeanMapper.map(stageInstance, StageInstanceEntity.class);
         stageInstanceDao.updateStagesInstance(instanceEntity);
     }
 
@@ -120,15 +143,18 @@ public class StageInstanceServerImpl implements StageInstanceServer{
     public List<StageInstance> findStageExecInstance(String instanceId){
 
         List<StageInstance> stageInstanceList = findMainStageInstance(instanceId);
+
+        if (Objects.isNull(stageInstanceList) || stageInstanceList.isEmpty()){
+            return new ArrayList<>();
+        }
+
         // 主阶段实例
         for (StageInstance stageInstance : stageInstanceList) {
-            StringBuilder mainLog = new StringBuilder();
             int allTime = 0;
             String stageInstanceId = stageInstance.getId();
 
             // 从阶段实例
             List<StageInstance> otherStageInstanceList = findOtherStageInstance(stageInstanceId);
-            String log = "\n";
             //并行阶段执行实例
             for (StageInstance otherInstance : otherStageInstanceList) {
                 String otherStageInstanceId = otherInstance.getId();
@@ -137,23 +163,15 @@ public class StageInstanceServerImpl implements StageInstanceServer{
                 List<TaskInstance> allTaskInstance = tasksInstanceService.findAllStageInstance(otherStageInstanceId);
                 otherInstance.setTaskInstanceList(allTaskInstance);
 
-                // 阶段日志,时间
-                StringBuilder runLog = new StringBuilder();
+                // 阶段时间
                 AtomicInteger stageRunTime = new AtomicInteger();
                 allTaskInstance.forEach(taskInstance -> {
-                    runLog.append(taskInstance.getRunLog());
                     stageRunTime.set(stageRunTime.get() + taskInstance.getRunTime());
                 });
                 otherInstance.setStageTime(stageRunTime.get());
-                otherInstance.setRunLog(runLog.toString());
                 otherInstance.setStageState(findTaskInstanceStatus(allTaskInstance));
-                if (!Objects.equals(runLog.toString(),log)){
-                    mainLog.append(runLog).append(log);
-                }
                 allTime = Math.max(allTime, otherInstance.getStageTime());
             }
-
-            stageInstance.setRunLog(mainLog.toString());
             stageInstance.setStageTime(allTime);
             otherStageInstanceList.sort(Comparator.comparing(StageInstance::getStageSort));
             stageInstance.setStageState(findStageInstanceStatus(otherStageInstanceList));
@@ -171,7 +189,7 @@ public class StageInstanceServerImpl implements StageInstanceServer{
         StageInstance otherStageInstance = otherStageInstanceList.get(otherStageInstanceList.size() - 1);
         List<TaskInstance> taskInstanceList = otherStageInstance.getTaskInstanceList();
         TaskInstance taskInstance = taskInstanceList.get(taskInstanceList.size() - 1);
-        taskInstance.setRunLog(taskInstance.getRunLog()+"\n\n" + instance.getRunLog());
+        taskInstance.setRunLog(taskInstance.getRunLog()+"\n" + instance.getRunLog());
 
         return stageInstanceList;
     }

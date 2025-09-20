@@ -5,7 +5,7 @@ import io.tiklab.arbess.pipeline.definition.model.Pipeline;
 import io.tiklab.core.order.Order;
 import io.tiklab.core.order.OrderBuilders;
 import io.tiklab.core.page.Page;
-
+import io.tiklab.postin.annotation.ApiProperty;
 
 import java.util.List;
 
@@ -16,34 +16,46 @@ import java.util.List;
 //@ApiModel
 public class PipelineInstanceQuery {
 
-    //@ApiProperty(name ="pipelineId",desc = "流水线id")
+    @ApiProperty(name ="pipelineId",desc = "流水线id")
     private String pipelineId;
 
-    //@ApiProperty(name ="state",desc = "状态")
+    @ApiProperty(name ="state",desc = "状态")
     private String state;
 
-    //@ApiProperty(name ="userId",desc = "用户id")
+    @ApiProperty(name ="statusList",desc = "状态列表")
+    private String[] statusList;
+
+    @ApiProperty(name ="userId",desc = "用户id")
     private String userId;
 
-    //@ApiProperty(name ="type",desc = "类型")
+    @ApiProperty(name ="type",desc = "类型")
     private int type;
 
-    //@ApiProperty(name ="pipelineList",desc = "用户流水线")
+    @ApiProperty(name ="pipelineList",desc = "用户流水线列表")
     private List<Pipeline> pipelineList;
 
-    //@ApiProperty(name ="ids",desc = "用户流水线")
+    @ApiProperty(name ="ids",desc = "流水线Id列表")
     private String[] ids;
 
+    @ApiProperty(name ="number",desc = "流水线编号")
     private String number;
 
-    // 执行人
+    @ApiProperty(name ="execUserId",desc = "执行人")
     private String execUserId;
 
-    //@ApiProperty(name ="pageParam",desc = "分页参数")
+    @ApiProperty(name ="pageParam",desc = "分页参数")
     private Page pageParam= new Page();
 
-    //@ApiProperty(name ="orderParams",desc = "排序参数")
+    @ApiProperty(name ="orderParams",desc = "排序参数")
     private List<Order> orderParams = OrderBuilders.instance().desc("createTime").get();
+
+    public String[] getStatusList() {
+        return statusList;
+    }
+
+    public void setStatusList(String[] statusList) {
+        this.statusList = statusList;
+    }
 
     public String getExecUserId() {
         return execUserId;

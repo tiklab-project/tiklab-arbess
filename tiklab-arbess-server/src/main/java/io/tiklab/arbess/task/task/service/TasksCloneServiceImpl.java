@@ -1,11 +1,11 @@
 package io.tiklab.arbess.task.task.service;
 
-import io.tiklab.arbess.support.message.service.TaskMessageService;
-import io.tiklab.core.exception.ApplicationException;
-import io.tiklab.arbess.setting.host.service.AuthHostService;
 import io.tiklab.arbess.setting.auth.service.AuthService;
+import io.tiklab.arbess.setting.host.service.AuthHostService;
 import io.tiklab.arbess.setting.third.service.AuthThirdService;
 import io.tiklab.arbess.support.condition.service.ConditionService;
+import io.tiklab.arbess.support.message.service.TaskMessageService;
+import io.tiklab.arbess.support.message.service.TaskMessageTypeService;
 import io.tiklab.arbess.support.postprocess.dao.PostprocessDao;
 import io.tiklab.arbess.support.util.util.PipelineFinal;
 import io.tiklab.arbess.support.variable.service.VariableService;
@@ -19,20 +19,19 @@ import io.tiklab.arbess.task.codescan.model.TaskCodeScan;
 import io.tiklab.arbess.task.codescan.service.TaskCodeScanService;
 import io.tiklab.arbess.task.deploy.model.TaskDeploy;
 import io.tiklab.arbess.task.deploy.service.TaskDeployService;
-import io.tiklab.arbess.support.message.service.TaskMessageTypeService;
 import io.tiklab.arbess.task.pullArtifact.model.TaskPullArtifact;
 import io.tiklab.arbess.task.pullArtifact.service.TaskPullArtifactService;
-import io.tiklab.arbess.task.tool.model.TaskScript;
-import io.tiklab.arbess.task.tool.service.TaskScriptService;
 import io.tiklab.arbess.task.task.dao.TasksDao;
 import io.tiklab.arbess.task.task.entity.TasksEntity;
 import io.tiklab.arbess.task.task.model.Tasks;
 import io.tiklab.arbess.task.test.model.TaskTest;
 import io.tiklab.arbess.task.test.service.TaskTestService;
+import io.tiklab.arbess.task.tool.model.TaskScript;
+import io.tiklab.arbess.task.tool.service.TaskScriptService;
+import io.tiklab.core.exception.ApplicationException;
 import io.tiklab.toolkit.beans.BeanMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -98,15 +97,15 @@ public class TasksCloneServiceImpl implements TasksCloneService {
     @Override
     public void clonePostTasks(String id ,String cloneId){
 
-        Tasks task = tasksService.findOnePostTask(id);
+        // Tasks task = tasksService.findOnePostTask(id);
 
         // 克隆任务
-        TasksEntity tasksEntity = BeanMapper.map(task, TasksEntity.class);
-        tasksEntity.setPostprocessId(cloneId);
-        String taskCloneId = tasksDao.createConfigure(tasksEntity);
-
+        // TasksEntity tasksEntity = BeanMapper.map(task, TasksEntity.class);
+        // tasksEntity.setPostprocessId(cloneId);
+        // String taskCloneId = tasksDao.createConfigure(tasksEntity);
+        //
         // 克隆任务详情
-        cloneDifferentTask(task.getTaskId(),taskCloneId,task.getTaskType());
+        // cloneDifferentTask(task.getTaskId(),taskCloneId,task.getTaskType());
     }
 
     @Override
@@ -138,10 +137,9 @@ public class TasksCloneServiceImpl implements TasksCloneService {
     }
 
     @Override
-    @Transactional
     public void cloneStageTasks(String id ,String cloneId){
 
-        List<Tasks> tasks = tasksService.finAllStageTask(id);
+        List<Tasks> tasks = tasksService.findStageTask(id);
         for (Tasks task : tasks) {
 
             String taskId = task.getTaskId();

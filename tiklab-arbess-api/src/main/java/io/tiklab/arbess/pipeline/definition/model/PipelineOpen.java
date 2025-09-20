@@ -1,13 +1,15 @@
 package io.tiklab.arbess.pipeline.definition.model;
 
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import io.tiklab.arbess.pipeline.overview.model.PipelineOverview;
 import io.tiklab.toolkit.beans.annotation.Mapper;
 import io.tiklab.toolkit.beans.annotation.Mapping;
 import io.tiklab.toolkit.beans.annotation.Mappings;
 import io.tiklab.toolkit.join.annotation.Join;
-
-import io.tiklab.arbess.pipeline.overview.model.PipelineOverview;
 import io.tiklab.toolkit.join.annotation.JoinField;
+
+import java.sql.Timestamp;
 
 
 /**
@@ -47,14 +49,6 @@ public class PipelineOpen {
     private Pipeline pipeline;
 
     /**
-     * @pi.name:number
-     * @pi.dataType:Integer
-     * @pi.desc:数量
-     * @pi.value:2
-     */
-    private int number;
-
-    /**
      * @pi.name:createTime
      * @pi.dataType:string
      * @pi.desc:创建时间
@@ -66,8 +60,19 @@ public class PipelineOpen {
      * @pi.model:pipelineOverview
      * @pi.desc:流水线执行统计信息
      */
-    private PipelineOverview pipelineOverview;
+    private PipelineOverview execStatus;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Timestamp updateTime;
+
+
+    public Timestamp getUpdateTime() {
+        return updateTime;
+    }
+
+    public void setUpdateTime(Timestamp updateTime) {
+        this.updateTime = updateTime;
+    }
 
     public String getOpenId() {
         return openId;
@@ -93,20 +98,12 @@ public class PipelineOpen {
         this.pipeline = pipeline;
     }
 
-    public int getNumber() {
-        return number;
+    public PipelineOverview getExecStatus() {
+        return execStatus;
     }
 
-    public void setNumber(int number) {
-        this.number = number;
-    }
-
-    public PipelineOverview getPipelineExecState() {
-        return pipelineOverview;
-    }
-
-    public void setPipelineExecState(PipelineOverview pipelineOverview) {
-        this.pipelineOverview = pipelineOverview;
+    public void setExecStatus(PipelineOverview execStatus) {
+        this.execStatus = execStatus;
     }
 
     public String getCreateTime() {

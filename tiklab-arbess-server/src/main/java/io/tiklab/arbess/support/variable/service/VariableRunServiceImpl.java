@@ -1,11 +1,12 @@
 package io.tiklab.arbess.support.variable.service;
 
 import io.tiklab.arbess.support.variable.model.*;
-import io.tiklab.core.page.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,7 +28,7 @@ public class VariableRunServiceImpl implements VariableRunService {
         systemVariableMap.putAll(pipelineVariableMap);
 
         return systemVariableMap.entrySet().stream()
-                .map(entry -> entry.getValue())
+                .map(Map.Entry::getValue)
                 .collect(Collectors.toList());
     }
 

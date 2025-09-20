@@ -1,10 +1,9 @@
 package io.tiklab.arbess.support.postprocess.service;
 
+import io.tiklab.arbess.agent.support.util.service.PipelineUtilService;
 import io.tiklab.arbess.support.postprocess.model.Postprocess;
 import io.tiklab.arbess.support.postprocess.model.PostprocessInstance;
 import io.tiklab.arbess.support.util.util.PipelineFinal;
-import io.tiklab.arbess.agent.support.util.service.PipelineUtilService;
-import io.tiklab.arbess.task.task.model.Tasks;
 import io.tiklab.arbess.task.task.service.TasksExecService;
 import io.tiklab.arbess.task.task.service.TasksService;
 import org.slf4j.Logger;
@@ -58,16 +57,16 @@ public class PostprocessExecServiceImpl implements PostprocessExecService{
             postInstance.setPostState(PipelineFinal.RUN_HALT);
             String postInstanceId = postInstanceService.createPostInstance(postInstance);
 
-            Tasks task = tasksService.findOnePostTaskOrTask(postprocess.getPostId());
-            task.setTaskSort(postprocess.getTaskSort());
+            // Tasks task = tasksService.findOnePostTaskOrTask(postprocess.getPostId());
+            // task.setTaskSort(postprocess.getTaskSort());
             fileAddress = fileAddress + "/" +  postInstanceId;
-            String taskInstanceId = tasksExecService.createTaskExecInstance(task, postInstanceId, 3, fileAddress);
-            task.setInstanceId(taskInstanceId);
-
-            postInstance.setTaskInstanceId(taskInstanceId);
-            task.setTaskSort(postprocess.getTaskSort());
-            postprocess.setTask(task);
-            postprocess.setValues(task);
+            // String taskInstanceId = tasksExecService.createTaskExecInstance(task, postInstanceId, 3, fileAddress);
+            // task.setInstanceId(taskInstanceId);
+            //
+            // postInstance.setTaskInstanceId(taskInstanceId);
+            // task.setTaskSort(postprocess.getTaskSort());
+            // postprocess.setTask(task);
+            // postprocess.setValues(task);
             postprocess.setInstanceId(postInstanceId);
         }
         return postprocessList;

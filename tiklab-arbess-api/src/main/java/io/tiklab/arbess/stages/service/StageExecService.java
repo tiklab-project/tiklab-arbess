@@ -1,6 +1,5 @@
 package io.tiklab.arbess.stages.service;
 
-import io.tiklab.arbess.pipeline.execute.model.PipelineDetails;
 import io.tiklab.arbess.stages.model.Stage;
 
 import java.util.List;
@@ -17,6 +16,13 @@ public interface StageExecService {
      * @param instanceId 流水线实例id
      */
     List<Stage> createStageExecInstance(String pipelineId , String instanceId);
+
+    /**
+     * 创建阶段运行实例
+     * @param pipelineId 流水线id
+     * @param instanceId 流水线实例id
+     */
+    List<Stage> createWailStageExecInstance(String pipelineId , String instanceId);
 
 
     /**

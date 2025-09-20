@@ -3,9 +3,11 @@ package io.tiklab.arbess.stages.dao;
 import io.tiklab.arbess.stages.entity.StageEntity;
 import io.tiklab.core.order.Order;
 import io.tiklab.core.order.OrderBuilders;
+import io.tiklab.core.utils.UuidGenerator;
 import io.tiklab.dal.jpa.JpaTemplate;
 import io.tiklab.dal.jpa.criterial.condition.QueryCondition;
 import io.tiklab.dal.jpa.criterial.conditionbuilder.QueryBuilders;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -23,6 +25,9 @@ public class StageDao {
      * @return 阶段id
      */
     public String createStages(StageEntity stageEntity){
+        if (StringUtils.isEmpty(stageEntity.getStageId())){
+            stageEntity.setStageId(UuidGenerator.getRandomIdByUUID(12));
+        }
         return jpaTemplate.save(stageEntity,String.class);
     }
 

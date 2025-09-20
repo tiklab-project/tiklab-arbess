@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import java.util.List;
 
 /**
  * @pi.protocol: http
@@ -49,6 +48,13 @@ public class TasksController {
     @RequestMapping(path="/updateTask",method = RequestMethod.POST)
     public Result<Void> updateTasksTask(@RequestBody @Valid @NotNull Tasks tasks){
         tasksService.updateTasksTask(tasks);
+        return Result.ok();
+    }
+
+
+    @RequestMapping(path="/updateTasksMustField",method = RequestMethod.POST)
+    public Result<Void> updateTasksMustField( @NotNull String taskId){
+        tasksService.updateTasksMustField(taskId);
         return Result.ok();
     }
 

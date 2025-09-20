@@ -1,6 +1,7 @@
 package io.tiklab.arbess.stages.service;
 
 
+import io.tiklab.arbess.pipeline.definition.model.PipelineTemplate;
 import io.tiklab.arbess.stages.model.StageGroup;
 import io.tiklab.toolkit.join.annotation.FindAll;
 import io.tiklab.toolkit.join.annotation.FindList;
@@ -35,9 +36,9 @@ public interface StageService {
     /**
      * 创建阶段模板
      * @param pipelineId 流水线id
-     * @param template 模板
+     * @param templateList 模板
      */
-    void createStageTemplate(String pipelineId,String[] template);
+    void createStageTemplate(String pipelineId,List<PipelineTemplate> templateList);
 
 
     /**
@@ -91,6 +92,13 @@ public interface StageService {
      * @return 从节点列表
      */
     List<Stage> findOtherStage(String stagesId);
+
+    /**
+     * 根据根节点查询从节点
+     * @param stagesId 根节点id
+     * @return 从节点列表
+     */
+    List<Stage> findOtherStageNoQuery(String stagesId);
 
     /**
      * 更新阶段任务

@@ -13,7 +13,7 @@ public class PipelineFinal {
     public static final String DEFAULT = "default";
 
     // 流水线运行权限 Key
-    public static final String PIPELINE_RUN_KEY = "pipeline_task_run";
+    public static final String PIPELINE_RUN_KEY = "pip_design_run";
 
     /**
      * 流水线文件系统
@@ -153,6 +153,8 @@ public class PipelineFinal {
     public static final String PYTHON_DEFAULT_ORDER = "python install .";
     public static final String PHP_DEFAULT_ORDER = "composer install";
     public static final String NET_CORE_DEFAULT_ORDER = "dotnet publish -c Release -o out";
+    public static final String GRADLE_DEFAULT_ORDER = "gradle build ";
+    public static final String C_ADD_DEFAULT_ORDER = "g++ -c main.cpp \ng++ main.o -o main ";
     public static final String NODE_DEFAULT_ORDER = "npm install";
     public static final String DOCKER_DEFAULT_ORDER = "docker image build -t default .";
 
@@ -184,6 +186,8 @@ public class PipelineFinal {
     public static final String TASK_CODE_GITEE = "gitee";
     public static final String TASK_CODE_SVN = "svn";
     public static final String TASK_CODE_XCODE = "gitpuk";
+    public static final String TASK_CODE_GITEA = "code_gitea";
+
     public static final String TASK_CODE_DEFAULT_BRANCH = "master";
 
 
@@ -197,12 +201,15 @@ public class PipelineFinal {
 
     public static final String TASK_BUILD_DOCKER = "build_docker";
     public static final String TASK_BUILD_GO = "build_go";
+    public static final String TASK_BUILD_GRADLE = "build_gradle";
+    public static final String TASK_BUILD_C_ADD = "build_c_add";
 
 
     // 测试应用类型
     public static final String TASK_TYPE_TEST = "test";
     public static final String TASK_TEST_MAVENTEST = "maventest";
     public static final String TASK_TEST_TESTON = "testhubo";
+    public static final String TASK_TEST_POSTIN = "test_postin";
 
 
     // 部署应用类型

@@ -65,10 +65,25 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
         User user = userService.findOne(userId);
         map.put("pipelineId", pipeline.getId());
         map.put("pipelineName", pipeline.getName());
-        map.put("userName", user.getName());
-        if (user.getNickname() != null){
-            map.put("userName", user.getNickname());
+        String userName= user.getNickname() == null ? user.getName() : user.getNickname();
+        map.put("userName", userName);
+        return map;
+    }
+
+
+    public HashMap<String,Object> initMap(Pipeline pipeline,String userId){
+        HashMap<String,Object> map = new HashMap<>();
+        User user = userService.findOne(userId);
+        if (Objects.isNull(user)){
+            return null;
         }
+        User pipUser = pipeline.getUser();
+        map.put("pipId", pipeline.getId());
+        map.put("pipName", pipeline.getName());
+        String userName= user.getNickname() == null ? user.getName() : user.getNickname();
+        String pipUserName= pipUser.getNickname() == null ? pipUser.getName() : pipUser.getNickname();
+        map.put("pipeUserName", pipUserName);
+        map.put("userName", userName);
         return map;
     }
 
@@ -131,13 +146,15 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
                 dispatchNotice.setSiteData(jsonString);
                 dispatchNotice.setQywechatData(jsonString);
                 dispatchNotice.setBaseUrl(baseUrl);
-                String pipelineName = (String) map.get("pipelineName");
                 dispatchNotice.setLink(link);
-                dispatchNotice.setAction(pipelineName);
+                dispatchNotice.setAction((String) map.get("pipelineName"));
                 dispatchNotice.setSendId(LoginContext.getLoginId());
-                if (!Objects.isNull(map.get("dmMessage")) && (Boolean)map.get("dmMessage")){
-                    String pipelineId = (String) map.get("pipelineId");
-                    dispatchNotice.setDomainId(pipelineId);
+                String pipelineId = (String) map.get("pipelineId");
+                dispatchNotice.setDomainId(pipelineId);
+
+                Object dmMessage = map.get("dmMessage");
+
+                if (!Objects.isNull(dmMessage) && (Boolean)dmMessage){
                     dispatchNoticeService.sendDmMessageNotice(dispatchNotice);
                 }else {
                     dispatchNoticeService.sendMessageNotice(dispatchNotice);

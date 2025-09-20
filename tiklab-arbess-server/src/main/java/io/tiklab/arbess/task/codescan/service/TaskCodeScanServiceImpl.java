@@ -106,10 +106,10 @@ public class TaskCodeScanServiceImpl implements TaskCodeScanService {
     public TaskCodeScan findOneCodeScan(String codeScanId) {
         TaskCodeScanEntity oneCodeScan = codeScanDao.findOneCodeScan(codeScanId);
         TaskCodeScan codeScan = BeanMapper.map(oneCodeScan, TaskCodeScan.class);
-        if (PipelineUtil.isNoNull(codeScan.getAuthId())){
-            AuthThird authServer = thirdServer.findOneAuthServer(codeScan.getAuthId());
-            codeScan.setAuth(authServer);
-        }
+        // if (PipelineUtil.isNoNull(codeScan.getAuthId())){
+        //     AuthThird authServer = thirdServer.findOneAuthServer(codeScan.getAuthId());
+        //     codeScan.setAuth(authServer);
+        // }
         joinTemplate.joinQuery(codeScan,new String[]{"toolJdk","toolMaven","toolSonar","toolSourceFare","toolNodejs","toolGo"});
         return codeScan;
     }

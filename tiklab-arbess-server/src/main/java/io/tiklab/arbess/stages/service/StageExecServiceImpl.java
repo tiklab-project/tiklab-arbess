@@ -1,11 +1,10 @@
 package io.tiklab.arbess.stages.service;
 
 import com.alibaba.fastjson.JSON;
-import io.tiklab.arbess.pipeline.execute.model.PipelineDetails;
+import io.tiklab.arbess.agent.support.util.service.PipelineUtilService;
 import io.tiklab.arbess.stages.model.Stage;
 import io.tiklab.arbess.stages.model.StageInstance;
 import io.tiklab.arbess.support.util.util.PipelineFinal;
-import io.tiklab.arbess.agent.support.util.service.PipelineUtilService;
 import io.tiklab.arbess.support.variable.model.ExecVariable;
 import io.tiklab.arbess.support.variable.service.VariableRunService;
 import io.tiklab.arbess.task.deploy.model.TaskDeploy;
@@ -51,33 +50,75 @@ public class StageExecServiceImpl implements  StageExecService {
     @Override
     public List<Stage> createStageExecInstance(String pipelineId,String instanceId) {
         String fileAddress = utilService.findPipelineDefaultAddress(pipelineId,2) + instanceId;
-        List<Stage> allMainStage = stageService.findAllStagesOrTask(pipelineId);
+        List<Stage> allMainStage = stageService.findAllMainStage(pipelineId);
+
+        for (int i = 0; i < allMainStage.size(); i++) {
+            Stage mainStage = allMainStage.get(i);
+            //创建主阶段日志
+            String stageId = mainStage.getStageId();
+            String mainAddress = fileAddress + "/" + stageId;
+            String stageInstanceId;
+            stageInstanceId = initStageInstance(mainStage, instanceId, true,mainAddress,i == 0);
+            mainStage.setInstanceId(stageInstanceId);
+            List<Stage> otherStageList = stageService.findOtherStageNoQuery(stageId);
+            for (int j = 0; j < otherStageList.size(); j++) {
+                Stage stage = otherStageList.get(j);
+                String id = stage.getStageId();
+                String otherStageInstanceId = initStageInstance(stage, stageInstanceId, false,fileAddress,i == 0 && j == 0);
+                stage.setInstanceId(otherStageInstanceId);
+                List<Tasks> tasksList = tasksService.findStageTaskOrTask(id);
+                String otherAddress = mainAddress + "/"+otherStageInstanceId;
+
+                for (int k = 0; k < tasksList.size(); k++) {
+                    Tasks task = tasksList.get(k);
+                    List<ExecVariable> taskVariable = variableRunService.findTaskVariable(pipelineId,task.getTaskId());
+                    task.setTaskVariable(taskVariable);
+                    boolean isFirst = i == 0 && j == 0 && k == 0;
+                    String taskInstanceId = tasksExecService.createTaskExecInstance(task, otherStageInstanceId, 2, otherAddress,isFirst);
+                    if (task.getTaskType().equals(PipelineFinal.TASK_DEPLOY_LINUX)){
+                        tasksExecService.createDeployInstance(task, taskInstanceId);
+                    }
+                    task.setInstanceId(taskInstanceId);
+                }
+                stage.setTaskValues(tasksList);
+            }
+            mainStage.setStageList(otherStageList);
+        }
+        return allMainStage;
+    }
+
+    @Override
+    public List<Stage> createWailStageExecInstance(String pipelineId,String instanceId) {
+        String fileAddress = utilService.findPipelineDefaultAddress(pipelineId,2) + instanceId;
+        List<Stage> allMainStage = stageService.findAllMainStage(pipelineId);
+
         for (Stage mainStage : allMainStage) {
             //创建主阶段日志
             String stageId = mainStage.getStageId();
             String mainAddress = fileAddress + "/" + stageId;
-            String stageInstanceId = initStageInstance(mainStage, instanceId, true,mainAddress);
+            String stageInstanceId;
+            stageInstanceId = initStageInstance(mainStage, instanceId, true, mainAddress);
             mainStage.setInstanceId(stageInstanceId);
-            List<Stage> otherStage = stageService.findOtherStage(stageId);
-
-            //获取阶段下的并行任务
-            for (Stage stage : otherStage) {
+            List<Stage> otherStageList = stageService.findOtherStageNoQuery(stageId);
+            for (Stage stage : otherStageList) {
                 String id = stage.getStageId();
-                String otherStageInstanceId = initStageInstance(stage, stageInstanceId, false,fileAddress);
+                String otherStageInstanceId = initStageInstance(stage, stageInstanceId, false, fileAddress);
                 stage.setInstanceId(otherStageInstanceId);
-                List<Tasks> tasks = tasksService.finStageTaskOrTask(id);
-                String otherAddress = mainAddress + "/"+otherStageInstanceId;
-                //获取串行任务
-                for (Tasks task : tasks) {
-                    List<ExecVariable> taskVariable = variableRunService.findTaskVariable(pipelineId,task.getTaskId());
+                List<Tasks> tasksList = tasksService.findStageTaskOrTask(id);
+                String otherAddress = mainAddress + "/" + otherStageInstanceId;
+
+                for (Tasks task : tasksList) {
+                    List<ExecVariable> taskVariable = variableRunService.findTaskVariable(pipelineId, task.getTaskId());
                     task.setTaskVariable(taskVariable);
                     String taskInstanceId = tasksExecService.createTaskExecInstance(task, otherStageInstanceId, 2, otherAddress);
-                    tasksExecService.createDeployInstance(task, taskInstanceId);
+                    if (task.getTaskType().equals(PipelineFinal.TASK_DEPLOY_LINUX)) {
+                        tasksExecService.createDeployInstance(task, taskInstanceId);
+                    }
                     task.setInstanceId(taskInstanceId);
                 }
-                stage.setTaskValues(tasks);
+                stage.setTaskValues(tasksList);
             }
-            mainStage.setStageList(otherStage);
+            mainStage.setStageList(otherStageList);
         }
         return allMainStage;
     }
@@ -104,7 +145,7 @@ public class StageExecServiceImpl implements  StageExecService {
             List<Stage> otherStageList = stageService.findOtherStage(stageId);
             //获取阶段下的并行任务
             for (Stage stage : otherStageList) {
-                List<Tasks> tasks = tasksService.finStageTaskOrTask(stage.getStageId());
+                List<Tasks> tasks = tasksService.findStageTaskOrTask(stage.getStageId());
                 //获取串行任务
                 for (Tasks task : tasks) {
 
@@ -114,7 +155,7 @@ public class StageExecServiceImpl implements  StageExecService {
                     if (!taskType.equals(PipelineFinal.TASK_DEPLOY_LINUX)){
                         continue;
                     }
-                    String object = JSON.toJSONString(task.getValues());
+                    String object = JSON.toJSONString(task.getTask());
                     TaskDeploy taskDeploy = JSON.parseObject(object, TaskDeploy.class);
                     if (taskDeploy.getAuthType() != 1){
                         continue;
@@ -191,6 +232,25 @@ public class StageExecServiceImpl implements  StageExecService {
     }
 
 
+    private String initStageInstance(Stage stage , String id,boolean isMain,String stagePath,Boolean isFirst){
+        StageInstance stageInstance = new StageInstance();
+        if (isMain){
+            stageInstance.setInstanceId(id);
+        }else {
+            stageInstance.setParentId(id);
+        }
+        stageInstance.setStageName(stage.getStageName());
+        stageInstance.setStageAddress(stagePath);
+        stageInstance.setStageSort(stage.getStageSort());
+        if (isFirst){
+            stageInstance.setStageState(PipelineFinal.RUN_RUN);
+        }else {
+            stageInstance.setStageState(PipelineFinal.RUN_WAIT);
+        }
+        String stageInstanceId = stageInstanceServer.createStageInstance(stageInstance);
+        stageInstance.setId(stageInstanceId);
+        return stageInstanceId;
+    }
 
 
 

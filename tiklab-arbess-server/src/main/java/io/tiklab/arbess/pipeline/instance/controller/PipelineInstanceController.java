@@ -5,6 +5,9 @@ import io.tiklab.core.page.Pagination;
 import io.tiklab.arbess.pipeline.instance.model.PipelineInstance;
 import io.tiklab.arbess.pipeline.instance.model.PipelineInstanceQuery;
 import io.tiklab.arbess.pipeline.instance.service.PipelineInstanceService;
+import io.tiklab.postin.annotation.Api;
+import io.tiklab.postin.annotation.ApiMethod;
+import io.tiklab.postin.annotation.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,6 +24,7 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping("/instance")
+@Api(name = "流水线实例控制器",desc = "流水线实例管理")
 public class PipelineInstanceController {
 
     @Autowired
@@ -41,11 +45,13 @@ public class PipelineInstanceController {
 
     /**
      * @pi.name:查询流水线实例
-     * @pi.url:/follow/findPipelineInstance
+     * @pi.url:/instance/findPipelineInstance
      * @pi.methodType:post
      * @pi.request-type:json
-     * @pi.param: model=query
+     * @pi.param:  model=   io.tiklab.arbess.pipeline.instance.model.PipelineInstanceQuery
      */
+    @ApiMethod(name = "查询流水线实例",desc = "查询流水线实例")
+    @ApiParam(name = "query",desc = "流水线实例查询",required = true)
     @RequestMapping(path="/findPipelineInstance",method = RequestMethod.POST)
     public Result<Pagination<PipelineInstance>> findPipelineInstance(@RequestBody @NotNull @Valid  PipelineInstanceQuery query){
         Pagination<PipelineInstance> list = instanceService.findPipelineInstance(query);

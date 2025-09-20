@@ -1,65 +1,68 @@
 package io.tiklab.arbess.pipeline.execute.service;
 
+import io.tiklab.arbess.agent.support.util.service.PipelineUtilService;
 import io.tiklab.arbess.agent.util.PipelineCache;
 import io.tiklab.arbess.home.service.PipelineHomeService;
+import io.tiklab.arbess.pipeline.definition.model.Pipeline;
+import io.tiklab.arbess.pipeline.definition.service.PipelineService;
+import io.tiklab.arbess.pipeline.execute.model.PipelineDetails;
 import io.tiklab.arbess.pipeline.execute.model.PipelineKeepOn;
+import io.tiklab.arbess.pipeline.execute.model.PipelineRunMsg;
+import io.tiklab.arbess.pipeline.instance.model.PipelineInstance;
+import io.tiklab.arbess.pipeline.instance.model.PipelineInstanceQuery;
+import io.tiklab.arbess.pipeline.instance.service.PipelineInstanceService;
+import io.tiklab.arbess.pipeline.instance.service.PipelineInstanceServiceImpl;
 import io.tiklab.arbess.setting.other.model.Resources;
+import io.tiklab.arbess.setting.other.service.ResourcesService;
+import io.tiklab.arbess.setting.tool.service.ScmService;
+import io.tiklab.arbess.stages.model.Stage;
 import io.tiklab.arbess.stages.model.StageInstance;
+import io.tiklab.arbess.stages.service.StageExecService;
 import io.tiklab.arbess.stages.service.StageInstanceServer;
+import io.tiklab.arbess.stages.service.StageService;
+import io.tiklab.arbess.support.agent.model.Agent;
+import io.tiklab.arbess.support.agent.model.AgentMessage;
+import io.tiklab.arbess.support.agent.service.AgentService;
+import io.tiklab.arbess.support.disk.service.DiskService;
 import io.tiklab.arbess.support.message.model.TaskMessage;
 import io.tiklab.arbess.support.message.model.TaskMessageQuery;
 import io.tiklab.arbess.support.message.service.TaskMessageService;
+import io.tiklab.arbess.support.postprocess.service.PostprocessExecService;
 import io.tiklab.arbess.support.util.model.KeepOn;
+import io.tiklab.arbess.support.util.util.PipelineFinal;
 import io.tiklab.arbess.support.util.util.PipelineTimeCache;
 import io.tiklab.arbess.support.variable.model.ExecVariable;
 import io.tiklab.arbess.support.variable.service.VariableRunService;
+import io.tiklab.arbess.support.version.service.PipelineVersionService;
 import io.tiklab.arbess.task.build.model.TaskBuildProduct;
 import io.tiklab.arbess.task.build.model.TaskBuildProductQuery;
 import io.tiklab.arbess.task.build.service.TaskBuildProductService;
-import io.tiklab.arbess.task.tool.model.TaskCheckPoint;
-import io.tiklab.arbess.task.tool.service.TaskCheckPointService;
 import io.tiklab.arbess.task.task.model.TaskInstance;
 import io.tiklab.arbess.task.task.model.Tasks;
 import io.tiklab.arbess.task.task.service.TasksInstanceService;
 import io.tiklab.arbess.task.task.service.TasksService;
-import io.tiklab.core.exception.SystemException;
-import io.tiklab.arbess.pipeline.instance.service.PipelineInstanceServiceImpl;
-import io.tiklab.arbess.support.agent.model.Agent;
-import io.tiklab.arbess.support.agent.model.AgentMessage;
-import io.tiklab.arbess.pipeline.execute.model.PipelineDetails;
-import io.tiklab.arbess.pipeline.execute.model.PipelineRunMsg;
-import io.tiklab.arbess.setting.other.service.ResourcesService;
-import io.tiklab.arbess.setting.tool.service.ScmService;
-import io.tiklab.arbess.stages.model.Stage;
-import io.tiklab.arbess.stages.service.StageExecService;
-import io.tiklab.arbess.stages.service.StageService;
-import io.tiklab.arbess.support.agent.service.AgentService;
-import io.tiklab.arbess.support.disk.service.DiskService;
-import io.tiklab.arbess.support.postprocess.service.PostprocessExecService;
-import io.tiklab.arbess.support.util.util.PipelineFinal;
-import io.tiklab.arbess.agent.support.util.service.PipelineUtilService;
-import io.tiklab.arbess.support.version.service.PipelineVersionService;
-import io.tiklab.core.exception.ApplicationException;
+import io.tiklab.arbess.task.tool.model.TaskCheckPoint;
+import io.tiklab.arbess.task.tool.service.TaskCheckPointService;
 import io.tiklab.arbess.ws.server.SocketServerHandler;
-import io.tiklab.toolkit.join.JoinTemplate;
-import io.tiklab.arbess.pipeline.definition.model.Pipeline;
-import io.tiklab.arbess.pipeline.definition.service.PipelineService;
-import io.tiklab.arbess.pipeline.instance.model.PipelineInstance;
-import io.tiklab.arbess.pipeline.instance.model.PipelineInstanceQuery;
-import io.tiklab.arbess.pipeline.instance.service.PipelineInstanceService;
+import io.tiklab.core.exception.ApplicationException;
+import io.tiklab.core.exception.SystemException;
 import io.tiklab.rpc.annotation.Exporter;
+import io.tiklab.toolkit.join.JoinTemplate;
 import io.tiklab.user.user.model.User;
 import io.tiklab.user.user.service.UserProcessor;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.WebSocketSession;
 
-import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static io.tiklab.arbess.support.util.util.PipelineFinal.*;
 
@@ -136,128 +139,40 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
     public final Logger logger = LoggerFactory.getLogger(PipelineExecServiceImpl.class);
 
     //流水线id:流水线实例id
-    public static final  Map<String,String> pipelineIdOrInstanceId = new HashMap<>();
+    public static final  Map<String,String> pipelineIdOrInstanceId = new ConcurrentHashMap<>();
 
     //流水线id:agent
-    public static final Map<String , Agent> pipelineIdOrAgentId = new HashMap<>();
+    public static final Map<String , Agent> pipelineIdOrAgentId = new ConcurrentHashMap<>();
 
 
-    /**
-     * 流水线开始运行
-     * @param runMsg 流水线id
-     * @return 是否正在运行
-     */
-    @Override
-    public PipelineInstance start(PipelineRunMsg runMsg) {
+    public static final Map<String , List<Stage>> wailInstanceIdOrStageList = new ConcurrentHashMap<>();
 
-        // 判断磁盘空间是否足够
-        diskService.validationStorageSpace();
-
-         if (runMsg.getRunWay() == 1 && !runMsg.getTriggerType().equals(APPROVE)){
-             // 是否拥有权限
-             Boolean permissions = homeService.findPermissions(runMsg.getPipelineId(), PIPELINE_RUN_KEY);
-             if (!permissions) {
-                 throw new ApplicationException("您没有权限执行该流水线,请联系管理员授权!");
-             }
-         }
-
-        String pipelineId = runMsg.getPipelineId();
-
-        // agent是否连接
-        Agent agent = judgeAgent();
-        pipelineIdOrAgentId.put(pipelineId, agent);
-        runMsg.setAgent(agent);
-
-        // 流水线信息
-        Pipeline pipeline = pipelineService.findPipelineById(pipelineId);
-        runMsg.setPipeline(pipeline);
-
-        // 是否可以执行
-        try {
-            validExecPipeline(pipelineId);
-        }catch (ApplicationException e){
-            int errorCode = e.getErrorCode();
-            if (errorCode != 2100){
-                throw new ApplicationException(e.getMessage());
-            }
-            logger.warn("并行任务已达上限，添加到待运行列表。");
-
-            if (!StringUtils.isEmpty(runMsg.getInstanceId())){
-                return null;
-            }
-            runMsg.setRunStatus(RUN_WAIT);
-            return pipelineInstanceService.initializeInstance(runMsg);
-        }
-
-        // 进入执行
-        return beginExecPipeline(runMsg);
-    }
 
     @Override
-    public PipelineInstance rollBackStart(PipelineRunMsg runMsg) {
+    public void validExecPipeline(PipelineRunMsg runMsg) {
 
-        Boolean permissions = homeService.findPermissions(runMsg.getPipelineId(), PIPELINE_RUN_KEY);
-        if (!permissions) {
-            throw new ApplicationException("您没有权限执行该流水线,请联系管理员授权!");
-        }
-
-        Agent agent = judgeAgent();
-
-        if (Objects.isNull(agent)){
-            throw new ApplicationException("无法获取到流水线执行Agent！");
-        }
-
-        WebSocketSession session = SocketServerHandler.sessionMap.get(agent.getAddress());
-        if (Objects.isNull(session)){
-            throw new ApplicationException("流水线Agent断开连接，无法执行。");
-        }
-
-        // 判断同一任务是否在运行
         String pipelineId = runMsg.getPipelineId();
-        Pipeline pipeline = pipelineService.findPipelineById(pipelineId);
-        runMsg.setPipeline(pipeline);
+        Agent agent1 = pipelineIdOrAgentId.get(pipelineId);
 
-        List<String> strings = stageService.validStagesMustField(pipelineId);
-        if (!Objects.isNull(strings) && !strings.isEmpty()){
-            throw new ApplicationException("流水线未配置完成，请完善配置后在执行。");
+        Pipeline pipeline = pipelineService.findPipelineByIdNoQuery(pipelineId);
+
+        if (pipeline.getState() == 2){
+            throw new ApplicationException("流水线正在运行中！");
         }
 
-        pipelineIdOrAgentId.put(pipelineId, agent);
-
-        // 判断磁盘空间是否足够
-        diskService.validationStorageSpace();
-
-        // 资源限制
-        resourcesService.judgeResources();
-
-        // 进入执行
-        runMsg.setPipeline(pipeline);
-        runMsg.setAgent(agent);
-        return rollBackBeginExecPipeline(runMsg);
-    }
-
-    /**
-     * 放入正在执行的流水线缓存中
-     * @param pipelineId 流水线id
-     */
-    public void validExecPipeline(String pipelineId){
-        // String pipelineId = runMsg.getPipelineId();
-
-        List<String> strings = stageService.validStagesMustField(pipelineId);
-        if (!Objects.isNull(strings) && !strings.isEmpty()){
-            throw new ApplicationException("流水线未配置完成，请完善配置后在执行。");
+        if (pipeline.getState() == 3){
+            throw new ApplicationException("该流水线已在待执行列表中!");
         }
 
         List<Stage> allMainStage = stageService.findAllMainStage(pipelineId);
         if (allMainStage.isEmpty()){
-            throw new ApplicationException(2000,"当前流水线不存在可构建任务！");
+            throw new ApplicationException("当前流水线没有任务！");
         }
+
+        // 判断磁盘空间是否足够
+        diskService.validationStorageSpace();
 
         Resources resources = resourcesService.findResourcesList();
-
-        if (resources.getResidueCcyNumber() == 0 ){
-            throw new ApplicationException(2100,"并行任务已满，等待执行！");
-        }
 
         double cacheNumber = resources.getResidueCacheNumber();
         if (cacheNumber == 0 ){
@@ -268,6 +183,101 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
         if (sceNumber == 0 ){
             throw new ApplicationException(2000,"可使用的构建时长已用完，无法执行！");
         }
+
+        if (resources.getResidueCcyNumber() == 0 ){
+
+            logger.warn("并行任务已达上限，添加到待运行列表。");
+            runMsg.setRunStatus(RUN_WAIT);
+            PipelineInstance pipelineInstance = pipelineInstanceService.initializeInstance(runMsg);
+
+            List<Stage> wailStageList = stageExecService.createWailStageExecInstance(pipelineId, pipelineInstance.getInstanceId());
+
+            wailInstanceIdOrStageList.put(pipelineInstance.getInstanceId(),wailStageList);
+
+            pipeline.setState(3);
+            pipelineService.updatePipeline(pipeline);
+
+            throw new ApplicationException("并行任务已达上限，添加到待运行列表。");
+        }
+
+        Agent agent = judgeAgent();
+        pipelineIdOrAgentId.put(pipelineId, agent);
+    }
+
+
+    @Override
+    public void validWailExecPipeline(PipelineRunMsg runMsg) {
+
+        String pipelineId = runMsg.getPipelineId();
+
+        Pipeline pipeline = pipelineService.findPipelineByIdNoQuery(pipelineId);
+
+        List<Stage> allMainStage = stageService.findAllMainStage(pipelineId);
+        if (allMainStage.isEmpty()){
+            throw new ApplicationException("当前流水线没有任务！");
+        }
+
+        // 判断磁盘空间是否足够
+        diskService.validationStorageSpace();
+
+        Resources resources = resourcesService.findResourcesList();
+
+        double cacheNumber = resources.getResidueCacheNumber();
+        if (cacheNumber == 0 ){
+            throw new ApplicationException(2000,"可使用的缓存已用完，无法执行！");
+        }
+
+        int sceNumber = resources.getResidueSceNumber();
+        if (sceNumber == 0 ){
+            throw new ApplicationException(2000,"可使用的构建时长已用完，无法执行！");
+        }
+
+        Agent agent = judgeAgent();
+        pipelineIdOrAgentId.put(pipelineId, agent);
+    }
+
+
+    @Override
+    public PipelineInstance start(PipelineRunMsg runMsg) {
+
+        String pipelineId = runMsg.getPipelineId();
+
+        Agent agent = pipelineIdOrAgentId.get(pipelineId);
+        if (Objects.isNull(agent) || !agent.getConnect()){
+            throw new ApplicationException("无法获取Agent或者Agent断开连接，无法执行。");
+        }
+        runMsg.setAgent(agent);
+
+        // 流水线信息
+        Pipeline pipeline = pipelineService.findPipelineByIdNoQuery(pipelineId);
+        runMsg.setPipeline(pipeline);
+
+        // 进入执行
+        return beginExecPipeline(runMsg);
+    }
+
+    @Override
+    public PipelineInstance rollBackStart(PipelineRunMsg runMsg) {
+
+        validExecPipeline(runMsg);
+
+        String pipelineId = runMsg.getPipelineId();
+
+        Agent agent = pipelineIdOrAgentId.get(pipelineId);
+
+        WebSocketSession session = SocketServerHandler.sessionMap.get(agent.getAddress());
+        if (Objects.isNull(session)){
+            throw new ApplicationException("流水线Agent断开连接，无法执行。");
+        }
+
+        // 判断同一任务是否在运行
+        Pipeline pipeline = pipelineService.findPipelineById(pipelineId);
+        runMsg.setPipeline(pipeline);
+
+        // 进入执行
+        runMsg.setPipeline(pipeline);
+        runMsg.setAgent(agent);
+        return rollBackBeginExecPipeline(runMsg);
     }
 
     /**
@@ -278,31 +288,36 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
     public PipelineInstance beginExecPipeline(PipelineRunMsg runMsg){
 
         String pipelineId = runMsg.getPipelineId();
-        Pipeline pipeline = runMsg.getPipeline();
-        logger.info("流水线{}开始运行",pipeline.getName());
+
         // 更新流水线为运行中
+        Pipeline pipeline = runMsg.getPipeline();
         pipeline.setState(2);
-        pipelineService.updatePipeline(pipeline);
+        pipelineService.updatePipelineNoQuery(pipeline);
+
+        logger.info("流水线{}开始运行",pipeline.getName());
 
         PipelineInstance pipelineInstance;
         String instanceId = runMsg.getInstanceId();
         if (StringUtils.isEmpty(instanceId)){
             pipelineInstance = pipelineInstanceService.initializeInstance(runMsg);
             instanceId = pipelineInstance.getInstanceId();
+            joinTemplate.joinQuery(pipelineInstance,new String[]{"user"});
         }else {
             pipelineInstance = pipelineInstanceService.findOneInstance(instanceId);
         }
 
         // 添加到缓存
-        joinTemplate.joinQuery(pipelineInstance,new String[]{"pipeline","user"});
+        pipelineInstance.setPipeline(pipeline);
+
         // 运行实例放入内存中
         pipelineIdOrInstanceId.put(pipelineId, instanceId);
 
         try {
-            // 创建多阶段运行实例
-            List<Stage> stageList = stageExecService.createStageExecInstance(pipelineId, instanceId);
 
-            // List<Postprocess> postprocessList = postExecService.createPipelinePostInstance(pipelineId, instanceId);
+            List<Stage> stageList = wailInstanceIdOrStageList.get(instanceId);
+            if (Objects.isNull(stageList)){
+                stageList = stageExecService.createStageExecInstance(pipelineId, instanceId);
+            }
 
             PipelineDetails pipelineDetails = new PipelineDetails();
 
@@ -345,7 +360,7 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
 
         }catch (Exception e){
             e.printStackTrace();
-            logger.error("流水线执行出错了：{}",e.getMessage() );
+            logger.error("流水线执行出错了：{}",e.getMessage());
             stop(pipelineId);
         }
         return pipelineInstance;
@@ -373,16 +388,21 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
         pipelineService.updatePipeline(pipeline);
 
         // 获取回滚实例信息
-        PipelineInstance pipelineInstance;
-        String instanceId = runMsg.getInstanceId();
-        if (!StringUtils.isEmpty(instanceId)){
-            pipelineInstance = pipelineInstanceService.findOneInstance(instanceId);
-        }else {
-            pipelineInstance = pipelineInstanceService.initializeInstance(runMsg);
-            instanceId = pipelineInstance.getInstanceId();
-        }
+        // PipelineInstance pipelineInstance;
+        // String instanceId = runMsg.getInstanceId();
+        // if (!StringUtils.isEmpty(instanceId)){
+        //     pipelineInstance = pipelineInstanceService.findOneInstance(instanceId);
+        // }else {
+        //     pipelineInstance = pipelineInstanceService.initializeInstance(runMsg);
+        //     instanceId = pipelineInstance.getInstanceId();
+        // }
+
+        PipelineInstance  pipelineInstance = pipelineInstanceService.initializeInstance(runMsg);
+        String instanceId = pipelineInstance.getInstanceId();
 
         joinTemplate.joinQuery(pipelineInstance,new String[]{"pipeline","user"});
+
+        pipelineInstance.setPipeline(pipeline);
 
         // 运行实例放入内存中
         pipelineIdOrInstanceId.put(pipelineId, instanceId);
@@ -391,13 +411,13 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
             // 创建多阶段运行实例
             List<Stage> stageList = stageExecService.createRollBackStageExecInstance(pipelineId, instanceId);
 
-            // List<Postprocess> postprocessList = postExecService.createPipelinePostInstance(pipelineId, instanceId);
             PipelineDetails pipelineDetails = new PipelineDetails();
             TaskBuildProduct taskBuildProduct = buildProductList.get(0);
             pipelineDetails.setTaskBuildProduct(taskBuildProduct);
 
             // 流水线基本运行信息
             pipelineDetails.setPipelineId(pipelineId);
+            pipelineDetails.setPipeline(pipeline);
             pipelineDetails.setInstanceId(instanceId);
             pipelineDetails.setRunWay(runMsg.getRunWay());
             pipelineDetails.setAgent(runMsg.getAgent());
@@ -438,47 +458,41 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
 
     @Override
     public void stop(String pipelineId){
-        Pipeline pipeline = pipelineService.findPipelineById(pipelineId);
+        Pipeline pipeline = pipelineService.findPipelineAndQuery(pipelineId);
 
-        Agent agent = pipelineIdOrAgentId.get(pipelineId);
-        if (Objects.isNull(agent)){
+        // 等待运行更改
+        if (pipeline.getState() == 3){
             pipeline.setState(1);
             pipelineService.updatePipeline(pipeline);
 
             PipelineInstanceQuery pipelineInstanceQuery = new PipelineInstanceQuery();
-            pipelineInstanceQuery.setState(PipelineFinal.RUN_RUN);
             pipelineInstanceQuery.setPipelineId(pipelineId);
+            pipelineInstanceQuery.setState(RUN_WAIT);
             List<PipelineInstance> pipelineInstanceList = pipelineInstanceService.findPipelineInstanceList(pipelineInstanceQuery);
             for (PipelineInstance pipelineInstance : pipelineInstanceList) {
-                String instanceId = pipelineInstance.getInstanceId();
                 pipelineInstance.setRunStatus(PipelineFinal.RUN_HALT);
-                int runtime = PipelineTimeCache.findRuntime(instanceId);
-                pipelineInstance.setRunTime(runtime);
                 pipelineInstanceService.updateInstance(pipelineInstance);
+                stageInstanceServer.updateStageInstanceOrTask(pipelineInstance.getInstanceId());
             }
-            removeExecCache(pipelineId);
             return;
         }
 
-        try {
-            AgentMessage agentMessage = new AgentMessage();
-            agentMessage.setType("stop");
-            agentMessage.setMessage(pipelineId);
-            agentMessage.setPipelineId(pipelineId);
-            SocketServerHandler.instance().sendHandleMessage(agent.getAddress(),agentMessage);
-        }catch (Exception e){
-            logger.error(e.getMessage());
+        Agent agent = pipelineIdOrAgentId.get(pipelineId);
+
+        // 无法连接到agent是
+        if (!Objects.isNull(agent)){
+            try {
+                AgentMessage agentMessage = new AgentMessage();
+                agentMessage.setType("stop");
+                agentMessage.setMessage(pipelineId);
+                agentMessage.setPipelineId(pipelineId);
+                SocketServerHandler.instance().sendHandleMessage(agent.getAddress(),agentMessage);
+            }catch (Exception e){
+                logger.error(e.getMessage());
+            }
         }
-
-        // 添加资源配置
-        // resourcesService.instanceResources(integer);
-
-        // 更新流水线状态
-        pipeline.setState(1);
-        pipelineService.updatePipeline(pipeline);
-
         PipelineInstanceQuery pipelineInstanceQuery = new PipelineInstanceQuery();
-        pipelineInstanceQuery.setState(PipelineFinal.RUN_RUN);
+        pipelineInstanceQuery.setState(RUN_RUN);
         pipelineInstanceQuery.setPipelineId(pipelineId);
         List<PipelineInstance> pipelineInstanceList = pipelineInstanceService.findPipelineInstanceList(pipelineInstanceQuery);
         for (PipelineInstance pipelineInstance : pipelineInstanceList) {
@@ -486,8 +500,20 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
             int runtime = PipelineTimeCache.findRuntime(pipelineInstance.getInstanceId());
             pipelineInstance.setRunTime(runtime);
             pipelineInstanceService.updateInstance(pipelineInstance);
+
+            // 添加资源配置
+            resourcesService.instanceResources(runtime);
         }
+        // 更新流水线状态
+        pipeline.setState(1);
+        pipelineService.updatePipeline(pipeline);
+
+        // 清除缓存
+        pipelineIdOrAgentId.remove(pipelineId);
         removeExecCache(pipelineId);
+
+
+        runWailPipeline();
 
     }
 
@@ -496,6 +522,7 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
         PipelineInstanceServiceImpl.runTimeMap.remove(instanceId);
         PipelineTimeCache.removeRuntime(instanceId);
         pipelineIdOrInstanceId.remove(pipelineId);
+        pipelineIdOrAgentId.remove(pipelineId);
     }
 
     @Override
@@ -550,6 +577,44 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
         if (keepOn.getStatus() == 2){
             stop(pipelineId);
         }
+    }
+
+    @Override
+    public void runWailPipeline(){
+
+        // PipelineQuery query = new PipelineQuery();
+        // query.setPipelineState(3);
+        // List<Pipeline> pipelineList = pipelineService.findPipelineList(query);
+
+        PipelineInstanceQuery instanceQuery = new PipelineInstanceQuery();
+        instanceQuery.setState(RUN_WAIT);
+        List<PipelineInstance> instanceList = pipelineInstanceService.findPipelineInstanceList(instanceQuery);
+
+        if (Objects.isNull(instanceList) || instanceList.isEmpty()){
+            return;
+        }
+
+        logger.warn("存在待运行的流水线，数量：{}",instanceList.size());
+        PipelineInstance pipelineInstance = instanceList.get(0);
+        String format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+        pipelineInstance.setCreateTime(format);
+        pipelineInstance.setRunStatus(RUN_RUN);
+        pipelineInstanceService.updateInstance(pipelineInstance);
+
+        String userId = pipelineInstance.getUser().getId();
+        String id = pipelineInstance.getPipeline().getId();
+
+        PipelineRunMsg pipelineRunMsg = new PipelineRunMsg(id, userId, 1);
+        pipelineRunMsg.setInstanceId(pipelineInstance.getInstanceId());
+
+        // 运行流水线
+        try {
+            validWailExecPipeline(pipelineRunMsg);
+            start(pipelineRunMsg);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
     }
 
     /**
@@ -649,14 +714,6 @@ public class PipelineExecServiceImpl implements PipelineExecService  {
         agentMessage.setPipelineId(pipelineId);
         SocketServerHandler.instance().sendHandleMessage(agent.getAddress(),agentMessage);
     }
-
-
-    @Scheduled(fixedRate = 1000)
-    protected void countTaskRunTime(){
-        Map<String, AtomicInteger> runtimeMap = PipelineTimeCache.findRuntime();
-        runtimeMap.keySet().forEach(PipelineTimeCache::updateRuntime);
-    }
-
 
 }
 

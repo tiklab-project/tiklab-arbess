@@ -1,5 +1,6 @@
 package io.tiklab.arbess.stages.service;
 
+import io.tiklab.arbess.pipeline.definition.model.PipelineTemplate;
 import io.tiklab.arbess.stages.entity.StageEntity;
 import io.tiklab.arbess.stages.model.StageGroup;
 import io.tiklab.arbess.support.util.util.PipelineFinal;
@@ -7,6 +8,7 @@ import io.tiklab.arbess.support.util.util.PipelineUtil;
 import io.tiklab.arbess.stages.dao.StageDao;
 import io.tiklab.arbess.stages.model.Stage;
 import io.tiklab.arbess.task.task.service.TasksCloneService;
+import io.tiklab.core.utils.UuidGenerator;
 import io.tiklab.toolkit.beans.BeanMapper;
 import io.tiklab.core.exception.ApplicationException;
 import io.tiklab.arbess.task.task.model.Tasks;
@@ -38,7 +40,9 @@ public class StageServiceImpl implements StageService {
 
     @Override
     public String createStagesOrTask(Stage stage){
+
         String stagesId = stage.getStageId();
+
         String pipelineId = stage.getPipelineId();
 
         String taskType = stage.getTaskType();
@@ -83,6 +87,7 @@ public class StageServiceImpl implements StageService {
             stage.setStageSort(initStage);
             stage.setPipelineId(pipelineId);
             stage.setStageName("阶段-" + initStage);
+            stage.setStageId(stage.getMainStageId());
             String id = createStages(stage);
 
             //创建从节点
@@ -98,7 +103,7 @@ public class StageServiceImpl implements StageService {
 
         //并行任务
         if (PipelineUtil.isNoNull(stagesId) && stageSort == 0){
-            List<Stage> otherStage = findOtherStage(stagesId);
+            List<Stage> otherStage = findOtherStageNoQuery(stagesId);
             Stage oneStages = findOneStages(stagesId);
             Stage stages = new Stage();
             stages.setParentId(stagesId);
@@ -156,17 +161,21 @@ public class StageServiceImpl implements StageService {
         for (int i = 0; i < taskTypeList.size(); i++) {
             String taskType = taskTypeList.get(i);
             String taskName = null;
+            Tasks tasks = new Tasks();
             if (taskType.equals(TASK_DEPLOY_LINUX) ||
                     taskType.equals(TASK_DEPLOY_DOCKER) || taskType.equals(TASK_DEPLOY_K8S)){
                 taskName = "部署蓝环境";
+                tasks.setFieldStatus(1);
             }
             if (taskType.equals(TASK_TYPE_HOST_STRATEGY)){
                 taskName = "流量切换";
+                tasks.setFieldStatus(2);
             }
             if (taskType.equals(TASK_TYPE_HOST_STRATEGY) && i == taskTypeList.size()-1){
                 taskName = "下线";
+                tasks.setFieldStatus(2);
             }
-            Tasks tasks = new Tasks();
+
             tasks.setTaskType(taskType);
             tasks.setTaskSort(i+1);
             tasks.setStageId(otherStageId);
@@ -176,14 +185,27 @@ public class StageServiceImpl implements StageService {
     }
 
     @Override
-    public void createStageTemplate(String pipelineId,String[] template){
+    public void createStageTemplate(String pipelineId, List<PipelineTemplate> templateList){
         int j = 1;
-        for (String i : template) {
-            Stage stage = new Stage();
-            stage.setPipelineId(pipelineId);
-            stage.setStageSort(j);
-            stage.setTaskType(i);
-            createStagesOrTask(stage);
+        for (PipelineTemplate template : templateList) {
+            List<String> types = template.getTypes();
+            if (Objects.isNull(types) || types.isEmpty()){
+                continue;
+            }
+            String mainStageId = UuidGenerator.getRandomIdByUUID(12);
+            for (int i = 0; i < types.size(); i++) {
+                String type = types.get(i);
+                Stage stage = new Stage();
+                stage.setPipelineId(pipelineId);
+                stage.setTaskType(type);
+                if (i == 0){
+                    stage.setMainStageId(mainStageId);
+                    stage.setStageSort(j);
+                }else {
+                    stage.setStageId(mainStageId);
+                }
+                createStagesOrTask(stage);
+            }
             j++;
         }
     }
@@ -192,17 +214,20 @@ public class StageServiceImpl implements StageService {
     public void cloneStage(String pipelineId,String clonePipelineId){
         List<Stage> allMainStage = findAllMainStage(pipelineId);
         for (Stage stage : allMainStage) {
-            String stageId = stage.getStageId();
             StageEntity cloneStageEntity = BeanMapper.map(stage, StageEntity.class);
             cloneStageEntity.setPipelineId(clonePipelineId);
-            String cloneMainStagesId = stageDao.createStages(cloneStageEntity);
-            List<Stage> otherStageList = findOtherStage(stageId);
+            String mainStageId = UuidGenerator.getRandomIdByUUID(12);
+            cloneStageEntity.setStageId(mainStageId);
+            stageDao.createStages(cloneStageEntity);
+            List<Stage> otherStageList = findOtherStage(stage.getStageId());
             for (Stage otherStage : otherStageList) {
-                String otherStageId = otherStage.getStageId();
-                otherStage.setParentId(cloneMainStagesId);
+
                 StageEntity otherStageEntity = BeanMapper.map(otherStage, StageEntity.class);
-                String cloneOtherStagesId = stageDao.createStages(otherStageEntity);
-                tasksCloneService.cloneStageTasks(otherStageId,cloneOtherStagesId);
+                String otherStageId = UuidGenerator.getRandomIdByUUID(12);
+                otherStageEntity.setParentId(mainStageId);
+                otherStageEntity.setStageId(otherStageId);
+                stageDao.createStages(otherStageEntity);
+                tasksCloneService.cloneStageTasks(otherStage.getStageId(),otherStageId);
             }
         }
     }
@@ -254,7 +279,7 @@ public class StageServiceImpl implements StageService {
         for (Stage stage : stageMainStage) {
             String stagesId = stage.getStageId();
             //获取从节点
-            List<Stage> allStageStage = findOtherStageNoTask(stagesId);
+            List<Stage> allStageStage = findOtherStageNoTaskDetails(stagesId);
             stage.setStageList(allStageStage);
             list.add(stage);
         }
@@ -290,14 +315,20 @@ public class StageServiceImpl implements StageService {
         return stages;
     }
 
-    public List<Stage> findOtherStageNoTask(String stagesId){
+    @Override
+    public List<Stage> findOtherStageNoQuery(String stagesId){
+        List<StageEntity> otherStage = stageDao.findOtherStage(stagesId);
+        return BeanMapper.mapList(otherStage, Stage.class);
+    }
+
+    public List<Stage> findOtherStageNoTaskDetails(String stagesId){
         List<StageEntity> otherStage = stageDao.findOtherStage(stagesId);
         List<Stage> stages = BeanMapper.mapList(otherStage, Stage.class);
         List<Stage> list = new ArrayList<>();
         for (Stage stage : stages) {
             //获取阶段配置及任务
             String otherId = stage.getStageId();
-            List<Tasks> allStageTask = tasksService.finAllStageTask(otherId);
+            List<Tasks> allStageTask = tasksService.findStageTask(otherId);
             stage.setTaskValues(allStageTask);
             list.add(stage);
         }
@@ -358,41 +389,50 @@ public class StageServiceImpl implements StageService {
         String taskStagesId = taskTasks.getStageId();
         Stage stages = findOneStages(taskStagesId);
 
-        List<Tasks> tasks = tasksService.finAllStageTask(taskStagesId);
+        List<Tasks> tasksList = tasksService.findStageTask(taskStagesId);
+
         //该阶段不存在其他任务
-        if (tasks == null || tasks.isEmpty()){
-            deleteStages(taskStagesId);
-            //主阶段id
-            String mainStageId = stages.getParentId();
-            List<Stage> otherStage = findOtherStage(mainStageId);
-            //判断是否存在从节点，不存在删除主节点
-            if (otherStage == null || otherStage.isEmpty()){
-                Stage mainStage = findOneStages(mainStageId);
-                deleteStages(mainStageId);
-                String pipelineId = mainStage.getPipelineId();
-                //更新其他主节点顺序
-                List<Stage> allMainStage = findAllMainStage(pipelineId);
-                if (allMainStage == null || allMainStage.isEmpty()){
-                    return;
-                }
-                for (Stage stage : allMainStage) {
-                    int sort = mainStage.getStageSort();
-                    int stageSort = stage.getStageSort();
-                    if (sort > stageSort){
-                        continue;
-                    }
-                    stage.setStageSort(stageSort - 1 );
-                    updateStages(stage);
-                }
+        if (!Objects.isNull(tasksList) && !tasksList.isEmpty()){
+            if (tasksList.size() > 1){
                 return;
             }
-            //存在则更新从节点顺序
-            for (Stage stage : otherStage) {
-                int sort = stage.getStageSort();
-                if (stages.getStageSort() < sort){
-                    stage.setStageSort(sort - 1 );
-                    updateStages(stage);
+            Tasks tasks = tasksList.get(0);
+            if (!tasks.getTaskId().equals(taskId)){
+                return;
+            }
+        }
+
+        deleteStages(taskStagesId);
+        //主阶段id
+        String mainStageId = stages.getParentId();
+        List<Stage> otherStage = findOtherStage(mainStageId);
+        //判断是否存在从节点，不存在删除主节点
+        if (otherStage == null || otherStage.isEmpty()){
+            Stage mainStage = findOneStages(mainStageId);
+            deleteStages(mainStageId);
+            String pipelineId = mainStage.getPipelineId();
+            //更新其他主节点顺序
+            List<Stage> allMainStage = findAllMainStage(pipelineId);
+            if (allMainStage == null || allMainStage.isEmpty()){
+                return;
+            }
+            for (Stage stage : allMainStage) {
+                int sort = mainStage.getStageSort();
+                int stageSort = stage.getStageSort();
+                if (sort > stageSort){
+                    continue;
                 }
+                stage.setStageSort(stageSort - 1 );
+                updateStages(stage);
+            }
+            return;
+        }
+        //存在则更新从节点顺序
+        for (Stage stage : otherStage) {
+            int sort = stage.getStageSort();
+            if (stages.getStageSort() < sort){
+                stage.setStageSort(sort - 1 );
+                updateStages(stage);
             }
         }
     }
@@ -404,7 +444,6 @@ public class StageServiceImpl implements StageService {
         Tasks tasks = new Tasks();
         tasks.setTaskId(taskId);
         tasks.setTask(values);
-        tasks.setValues(values);
         tasksService.updateTasksTask(tasks);
     }
 
@@ -423,22 +462,14 @@ public class StageServiceImpl implements StageService {
 
     @Override
     public List<String> validStagesMustField(String pipelineId){
-        List<Stage> allStage = findAllMainStage(pipelineId);
-        if (allStage.isEmpty()){
-            return null;
-        }
-        // 查询所以任务
-        List<Tasks> tasksList = new ArrayList<>();
-        for (Stage stage : allStage) {
-            String stagesId = stage.getStageId();
-            List<Stage> otherStage = findOtherStage(stagesId);
-
-            for (Stage pipelineStage : otherStage) {
-                List<Tasks> stagetaskList = pipelineStage.getTaskValues();
-                tasksList.addAll(stagetaskList);
-            }
-        }
-        return tasksService.validTasksMustField(tasksList);
+        List<Tasks> tasksList = tasksService.findTaskList(pipelineId);
+        List<String> list = new ArrayList<>();
+        tasksList.forEach(tasks -> {
+            Integer fieldStatus = tasks.getFieldStatus();
+            if (fieldStatus == 2){ return; }
+            list.add(tasks.getTaskId());
+        });
+        return list;
     }
 
     @Override

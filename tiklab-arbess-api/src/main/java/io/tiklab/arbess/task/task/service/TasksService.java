@@ -25,6 +25,12 @@ public interface TasksService {
     void updateTasksTask(Tasks tasks);
 
     /**
+     * 更新必填字段状态
+     * @param taskId 任务id
+     */
+    void updateTasksMustField(String taskId);
+
+    /**
      * 更新任务名称
      * @param tasks 任务id
      */
@@ -54,28 +60,14 @@ public interface TasksService {
      * @param stageId 阶段id
      * @return 任务列表
      */
-    List<Tasks> finAllStageTask(String stageId);
-
-    /**
-     * 获取后置任务
-     * @param postId 阶段id
-     * @return 任务列表
-     */
-    Tasks findOnePostTask(String postId);
-
-    /**
-     * 获取后置任务及任务详情
-     * @param postId 阶段id
-     * @return 任务列表
-     */
-    Tasks findOnePostTaskOrTask(String postId);
+    List<Tasks> findStageTask(String stageId);
 
     /**
      * 获取阶段任务及任务详情
      * @param stageId 流水线
      * @return 任务列表
      */
-    List<Tasks> finStageTaskOrTask(String stageId);
+    List<Tasks> findStageTaskOrTask(String stageId);
 
     /**
      * 获取阶段任务及任务详情
@@ -85,12 +77,18 @@ public interface TasksService {
     List<Tasks> finStageTaskOrTaskNoAuth(String stageId);
 
     /**
-     * 效验配置必填字段
-     * @param tasksList 任务
-     * @return 配置id集合
+     * 获取阶段任务及任务详情（返回所有任务）
+     * @param pipelineId 流水线id列表
+     * @return 任务列表
      */
-    List<String> validTasksMustField(List<Tasks> tasksList);
+    List<Tasks> findTaskList(String pipelineId);
 
+    /**
+     * 获取阶段任务及任务详情
+     * @param pipelineId 流水线id列表
+     * @return 任务列表
+     */
+    List<Tasks> findTaskListByDetails(String pipelineId);
 
     /**
      * 创建任务模板
@@ -141,6 +139,14 @@ public interface TasksService {
      * @param tasks 任务
      */
     void updateTasks(Tasks tasks);
+
+    /**
+     * 效验任务必填字段
+     * @param taskType 任务类型
+     * @param object 任务
+     * @return 验证结果
+     */
+    Boolean validTaskMastField(String taskType,Object object);
 
 }
 

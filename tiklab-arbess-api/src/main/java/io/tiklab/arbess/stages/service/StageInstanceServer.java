@@ -32,6 +32,12 @@ public interface StageInstanceServer {
 
     /**
      * 更新阶段实例内容
+     * @param instanceId 阶段运行实例id
+     */
+    void updateStageInstanceOrTask(String instanceId);
+
+    /**
+     * 更新阶段实例内容
      * @param stageInstance 实例模型
      */
     void updateStageInstance(StageInstance stageInstance);

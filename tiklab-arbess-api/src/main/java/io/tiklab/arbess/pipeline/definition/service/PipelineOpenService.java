@@ -2,6 +2,8 @@ package io.tiklab.arbess.pipeline.definition.service;
 
 
 import io.tiklab.arbess.pipeline.definition.model.PipelineOpen;
+import io.tiklab.arbess.pipeline.definition.model.PipelineOpenQuery;
+import io.tiklab.core.page.Pagination;
 import io.tiklab.toolkit.join.annotation.FindAll;
 import io.tiklab.toolkit.join.annotation.FindList;
 import io.tiklab.toolkit.join.annotation.FindOne;
@@ -15,19 +17,6 @@ import java.util.List;
 @JoinProvider(model = PipelineOpen.class)
 public interface PipelineOpenService {
 
-    /**
-     * 查询用户最近打开流水线(详细信息)
-     * @param number 查询数量
-     * @return 最近打开的流水线
-     */
-    List<PipelineOpen> findUserAllOpen(int number);
-
-    /**
-     * 查询用户最近打开流水线
-     * @param number 查询数量
-     * @return 最近打开的流水线
-     */
-    List<String> findUserOpen(int number);
 
     /**
      * 删除流水线收藏
@@ -57,11 +46,46 @@ public interface PipelineOpenService {
     List<PipelineOpen> findAllOpen();
 
     /**
+     * 根据查询条件查询流水线打开信息
+     * @param query 查询条件
+     * @return 流水线打开信息集合
+     */
+    List<PipelineOpen> findOpenByQuery(PipelineOpenQuery query);
+
+    /**
      * 根据ID列表批量查询流水线打开信息
      * @param idList 流水线ID列表
      * @return 流水线打开信息列表
      */
     @FindList
-    List<PipelineOpen> findAllOpenList(List<String> idList);
+    List<PipelineOpen> findOpenList(List<String> idList);
+
+    /**
+     * 根据查询条件批量查询流水线打开信息
+     * @param query 查询条件
+     * @return 流水线打开信息列表
+     */
+    List<PipelineOpen> findOpenList(PipelineOpenQuery query);
+
+    /**
+     * 分页查询流水线打开信息
+     * @param query 查询条件
+     * @return 流水线打开信息分页
+     */
+    Pagination<PipelineOpen> findOpenPage(PipelineOpenQuery query);
+
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+

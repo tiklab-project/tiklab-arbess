@@ -1,13 +1,8 @@
 package io.tiklab.arbess.starter.config;
 
-import io.tiklab.eam.author.Authenticator;
-import io.tiklab.eam.client.author.handler.DefaultAuthorHandler;
 import io.tiklab.gateway.config.GatewayConfig;
 import io.tiklab.gateway.config.IgnoreConfig;
 import io.tiklab.gateway.config.IgnoreConfigBuilder;
-import io.tiklab.gateway.handler.author.AuthorHandler;
-import io.tiklab.user.util.util.CodeUtilService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -81,7 +76,8 @@ public class ArbessGatewayAutoConfiguration {
                         "/eam/auth/valid",
                         "/init/install/findStatus",
                         "/openapi/doc",
-                        "/scm/file/upload"
+                        "/scm/file/upload",
+                        "/instance/artifact/download"
                 })
                 .ignorePreUrls(new String[]{
                         "/service",
@@ -98,7 +94,8 @@ public class ArbessGatewayAutoConfiguration {
                         "/maven/test",
                         "/update/pipeline",
                         "/state/apply/findApply",
-                        "/pipeline/webhook/"
+                        "/pipeline/webhook/",
+                        "/instance/artifact/download/"
                 })
                 .get();
     }

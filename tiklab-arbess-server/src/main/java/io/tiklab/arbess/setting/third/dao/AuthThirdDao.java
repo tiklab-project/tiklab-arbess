@@ -120,5 +120,10 @@ public class AuthThirdDao {
         Map<String, Object> map = jpaTemplate.getNamedParameterJdbcTemplate().queryForMap(sql, new HashMap<>());
         return ((Long) map.get("number")).intValue();
     }
+
+    public List<Map<String, Object>> findAuthServerByTypeGroup() {
+        String sql = "SELECT type, COUNT(*) AS number FROM pip_auth_server GROUP BY type";
+        return jpaTemplate.getNamedParameterJdbcTemplate().queryForList(sql, new HashMap<>());
+    }
     
 }

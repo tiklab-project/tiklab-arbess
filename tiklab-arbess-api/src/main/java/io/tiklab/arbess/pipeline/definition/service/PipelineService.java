@@ -42,6 +42,13 @@ public interface PipelineService {
      */
     void updatePipeline(@NotNull @Valid Pipeline pipeline);
 
+
+    /**
+     * 更新流水线
+     * @param pipeline 更新后流水线信息
+     */
+    void updatePipelineNoQuery(Pipeline pipeline);
+
     /**
      * 查询单个流水线
      * @param pipelineId 流水线id
@@ -92,6 +99,14 @@ public interface PipelineService {
      */
     @FindAll
     List<Pipeline> findAllPipeline();
+
+
+    /**
+     * 获取流水线必须字段
+     * @param pipelineId 流水线id
+     * @return 流水线必须字段
+     */
+    List<String> findPipelineMustField(@NotNull String pipelineId);
 
 
     /**

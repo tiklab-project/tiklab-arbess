@@ -5,7 +5,7 @@ public class TestOnPlanTestData {
 
     private String testPlanId;
 
-    private String repositoryId;
+    private String workspaceId;
 
     private String apiEnvId;
 
@@ -21,12 +21,12 @@ public class TestOnPlanTestData {
         this.testPlanId = testPlanId;
     }
 
-    public String getRepositoryId() {
-        return repositoryId;
+    public String getWorkspaceId() {
+        return workspaceId;
     }
 
-    public void setRepositoryId(String repositoryId) {
-        this.repositoryId = repositoryId;
+    public void setWorkspaceId(String workspaceId) {
+        this.workspaceId = workspaceId;
     }
 
     public String getApiEnvId() {

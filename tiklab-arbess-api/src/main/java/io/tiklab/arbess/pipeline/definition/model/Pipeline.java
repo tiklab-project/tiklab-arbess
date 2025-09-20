@@ -121,12 +121,12 @@ public class Pipeline {
     private int color;
 
     /**
-     * @pi.name:template
-     * @pi.dataType:string
+     * @pi.name:templateList
+     * @pi.dataType:java.util.List<>
      * @pi.desc:流水线模板
-     * @pi.value:template
+     * @pi.value:[]
      */
-    private String template;
+    private List<PipelineTemplate> templateList;
 
     /**
      * @pi.name:collect
@@ -196,6 +196,13 @@ public class Pipeline {
      */
     private Boolean isExec;
 
+    public List<PipelineTemplate> getTemplateList() {
+        return templateList;
+    }
+
+    public void setTemplateList(List<PipelineTemplate> templateList) {
+        this.templateList = templateList;
+    }
 
     public Boolean getExec() {
         return isExec;
@@ -300,14 +307,6 @@ public class Pipeline {
 
     public void setColor(int color) {
         this.color = color;
-    }
-
-    public String getTemplate() {
-        return template;
-    }
-
-    public void setTemplate(String template) {
-        this.template = template;
     }
 
     public List<PatchUser> getUserList() {
