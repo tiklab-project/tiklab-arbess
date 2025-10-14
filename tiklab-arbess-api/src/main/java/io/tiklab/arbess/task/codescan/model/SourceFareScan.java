@@ -1,7 +1,6 @@
 package io.tiklab.arbess.task.codescan.model;
 
 
-import io.tiklab.postin.annotation.ApiProperty;
 import io.tiklab.toolkit.beans.annotation.Mapper;
 import io.tiklab.toolkit.join.annotation.Join;
 
@@ -35,8 +34,19 @@ public class SourceFareScan {
     // 提示问题
     private Integer suggestTrouble;
 
+    // 错误问题
+    private Integer errorTrouble;
+
     private String url;
 
+    public Integer getErrorTrouble() {
+        return errorTrouble;
+    }
+
+    public SourceFareScan setErrorTrouble(Integer errorTrouble) {
+        this.errorTrouble = errorTrouble;
+        return this;
+    }
 
     public String getUrl() {
         return url;

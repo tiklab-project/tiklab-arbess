@@ -13,10 +13,10 @@ import io.tiklab.core.exception.SystemException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.*;
 
+import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
@@ -34,10 +34,15 @@ public class SocketServerHandler implements WebSocketHandler {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    // private final List<AgentMessage> dataList = new CopyOnWriteArrayList<>();
-
     private final Queue<AgentMessage> dataList = new ConcurrentLinkedQueue<>();
 
+    // 多线程消费队列
+    private final ExecutorService consumerExecutor = Executors.newFixedThreadPool(
+            Runtime.getRuntime().availableProcessors()  // 可根据实际需求调整线程数
+    );
+
+    // 定时调度线程池，用于轮询队列
+    private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
     // 线程安全的集合，用于存储客户端会话
     public static final Map<String, WebSocketSession> sessionMap = new HashMap<>();
@@ -51,7 +56,14 @@ public class SocketServerHandler implements WebSocketHandler {
         // 连接建立时的处理逻辑
         Agent agent = connentAgent(String.valueOf(session.getUri()));
         sessionMap.put(agent.getAddress(),session);
-        agentService.initAgent(agent);
+        try {
+            agentService.initAgent(agent);
+        }catch (Exception e){
+            logger.error("初始化Agent失败", e);
+            sessionMap.remove(agent.getAddress(),session);
+            // throw new SystemException("初始化Agent失败："+e.getMessage());
+            return;
+        }
         logger.info("客户端建立连接,{}", agent.getAddress());
     }
 
@@ -61,29 +73,98 @@ public class SocketServerHandler implements WebSocketHandler {
         BinaryMessage binaryMessage = (BinaryMessage) message;
         ByteBuffer payload = binaryMessage.getPayload();
         String receivedString = new String(payload.array(), StandardCharsets.UTF_8);
-        AgentMessage agentMessage = JSONObject.parseObject(receivedString, AgentMessage.class);
-        logger.info("accept client messages,message type：{}", agentMessage.getType());
+
+        AgentMessage agentMessage;
+        try {
+            agentMessage = JSONObject.parseObject(receivedString, AgentMessage.class);
+            if (agentMessage == null) {
+                logger.warn("Parsed AgentMessage is null, ignoring.");
+                return;
+            }
+        } catch (Exception e) {
+            logger.error("Failed to parse AgentMessage from payload: {}", receivedString, e);
+            return;
+        }
+        // AgentMessage agentMessage = JSONObject.parseObject(receivedString, AgentMessage.class);
+        logger.info("accept client messages,message type：{} , message:{}", agentMessage.getType(),message);
         String type = agentMessage.getType();
         if (type.equals("file")) {// 解析内部消息
+            logger.info("file message......");
             saveFile(agentMessage);
         } else {
-            dataList.add(agentMessage);
+            try {
+                // 每次入队前都创建新的对象，防止外部修改
+                AgentMessage msgCopy = new AgentMessage();
+                msgCopy.setType(agentMessage.getType());
+                msgCopy.setMessage(agentMessage.getMessage());
+                msgCopy.setPipelineId(agentMessage.getPipelineId()); // 根据实际字段复制
+                msgCopy.setTenantId(agentMessage.getTenantId()); // 根据实际字段复制
+                msgCopy.setSessionId(agentMessage.getSessionId()); // 根据实际字段复制
+
+                dataList.add(msgCopy);
+            }catch (Exception e){
+                logger.error("Failed to add message to queue: {}", agentMessage, e);
+            }
         }
     }
 
-    @Scheduled(fixedDelay = 900)
-    public void syncMessage() {
-        try {
-            int batchSize = Math.min(3, dataList.size());
-            for (int i = 0; i < batchSize; i++) {
-                AgentMessage message = dataList.poll();
-                if (message == null) break;
-                webSocketMessageService.distributeMessage(message);
+
+    @PostConstruct
+    public void initConsumer() {
+        // 每 100ms 检查一次队列
+        scheduler.scheduleWithFixedDelay(() -> {
+            try {
+                AgentMessage message;
+                while ((message = dataList.poll()) != null) {
+                    processMessageWithTimeout(message, 3); // 单条消息 3 秒超时
+                }
+            } catch (Exception e) {
+                logger.error("队列消费异常", e);
             }
-        }catch (Exception e) {
-            logger.error("同步消息失败", e);
+        }, 0, 100, TimeUnit.MILLISECONDS);
+    }
+
+    private void processMessageWithTimeout(AgentMessage message, int timeoutSeconds) {
+        Future<?> future = consumerExecutor.submit(() -> {
+            try {
+                webSocketMessageService.distributeMessage(message);
+            } catch (Exception e) {
+                logger.error("处理消息失败: {}", message, e);
+            }
+        });
+
+        try {
+            future.get(timeoutSeconds, TimeUnit.SECONDS);
+        } catch (TimeoutException e) {
+            logger.warn("消息处理超时，丢弃消息: {}", message);
+            future.cancel(true); // 尝试取消任务
+        } catch (Exception e) {
+            logger.error("处理消息异常: {}", message, e);
         }
     }
+
+    // @Scheduled(fixedDelay = 200)
+    // public void syncMessage() {
+    //     ExecutorService executor = Executors.newSingleThreadExecutor();
+    //     try {
+    //         Future<?> future = executor.submit(() -> {
+    //             AgentMessage message = dataList.poll();
+    //             if (message != null) {
+    //                 webSocketMessageService.distributeMessage(message);
+    //             }
+    //         });
+    //
+    //         // 设置超时 3 秒，如果超时则放弃
+    //         future.get(3, TimeUnit.SECONDS);
+    //
+    //     } catch (TimeoutException e) {
+    //         logger.warn("syncMessage 执行超时，放弃当前更新信息....");
+    //     } catch (Exception e) {
+    //         logger.error("同步消息失败", e);
+    //     } finally {
+    //         executor.shutdown();
+    //     }
+    // }
 
     private void saveFile(AgentMessage agentMessage){
         Object inner = agentMessage.getMessage();

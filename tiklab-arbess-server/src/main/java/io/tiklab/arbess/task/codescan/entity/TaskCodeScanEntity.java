@@ -47,6 +47,9 @@ public class TaskCodeScanEntity {
     @Column(name = "code_type")
     private String codeType;
 
+    @Column(name = "scan_coverage")
+    private Integer scanCoverage;
+
     // jdk版本
     @Column(name = "tool_jdk" )
     private String toolJdk;
@@ -76,6 +79,29 @@ public class TaskCodeScanEntity {
     // 扫描项目名称
     @Column(name = "scan_project_name")
     private String scanProjectName;
+
+    // 其他环境
+    @Column(name = "tool_other")
+    private String toolOther;
+
+
+    public Integer getScanCoverage() {
+        return scanCoverage;
+    }
+
+    public TaskCodeScanEntity setScanCoverage(Integer scanCoverage) {
+        this.scanCoverage = scanCoverage;
+        return this;
+    }
+
+    public String getToolOther() {
+        return toolOther;
+    }
+
+    public TaskCodeScanEntity setToolOther(String toolOther) {
+        this.toolOther = toolOther;
+        return this;
+    }
 
     public String getScanProjectId() {
         return scanProjectId;

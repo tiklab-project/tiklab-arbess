@@ -178,7 +178,6 @@ public class ArbessDsmAutoConfiguration {
 
         DsmVersion sql135 = DsmVersionBuilder.instance()
                 .version("pip-task-add-field-1.0.0")
-                .task(addTaskField)
                 .db(new String[]{
                         "pip-task-add-field-1.0.0"
                 })
@@ -200,6 +199,21 @@ public class ArbessDsmAutoConfiguration {
                 })
                 .get();
         versionList.add(sql137);
+
+        DsmVersion sql138 = DsmVersionBuilder.instance()
+                .version("pip_2.0.1")
+                .db(new String[]{
+                        "pip_2.0.1"
+                })
+                .get();
+        versionList.add(sql138);
+
+
+        DsmVersion sql106 = DsmVersionBuilder.instance()
+                .version("pip-task-add-field-1.0.0")
+                .task(addTaskField)
+                .get();
+        versionList.add(sql106);
 
         DsmVersion sql133 = DsmVersionBuilder.instance()
                 .version("pip-authority")

@@ -29,7 +29,7 @@ public class TaskInitAgent implements TiklabApplicationRunner {
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
-                logger.info("enable automatic connection .....");
+                // logger.info("start auto connect.....");
                 WebSocketClient.beginConnect = true;
             }
         ).start();

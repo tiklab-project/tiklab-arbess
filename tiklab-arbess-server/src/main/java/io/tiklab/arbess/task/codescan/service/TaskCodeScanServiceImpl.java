@@ -1,15 +1,15 @@
 package io.tiklab.arbess.task.codescan.service;
 
-import io.tiklab.arbess.setting.third.model.AuthThird;
 import io.tiklab.arbess.setting.host.service.AuthHostService;
+import io.tiklab.arbess.setting.third.model.AuthThird;
 import io.tiklab.arbess.setting.third.service.AuthThirdService;
 import io.tiklab.arbess.support.util.util.PipelineUtil;
-import io.tiklab.toolkit.beans.BeanMapper;
-import io.tiklab.toolkit.join.JoinTemplate;
 import io.tiklab.arbess.task.codescan.dao.TaskCodeScanDao;
 import io.tiklab.arbess.task.codescan.entity.TaskCodeScanEntity;
 import io.tiklab.arbess.task.codescan.model.TaskCodeScan;
 import io.tiklab.rpc.annotation.Exporter;
+import io.tiklab.toolkit.beans.BeanMapper;
+import io.tiklab.toolkit.join.JoinTemplate;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -93,7 +93,11 @@ public class TaskCodeScanServiceImpl implements TaskCodeScanService {
      */
     @Override
     public void updateCodeScan(TaskCodeScan taskCodeScan) {
+
         TaskCodeScanEntity codeScanEntity = BeanMapper.map(taskCodeScan, TaskCodeScanEntity.class);
+        if (!StringUtils.isEmpty(taskCodeScan.getCodeType())){
+            codeScanEntity.setToolOther("");
+        }
         codeScanDao.updateCodeScan(codeScanEntity);
     }
 

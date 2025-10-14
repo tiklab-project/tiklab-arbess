@@ -45,8 +45,22 @@ public class TaskBuildEntity {
     @Column(name = "tool_nodejs" ,notNull = true)
     private String toolNodejs;
 
+    // go环境
     @Column(name = "tool_go" ,notNull = true)
     private String toolGo;
+
+    // 其他环境
+    @Column(name = "tool_other")
+    private String toolOther;
+
+    public String getToolOther() {
+        return toolOther;
+    }
+
+    public TaskBuildEntity setToolOther(String toolOther) {
+        this.toolOther = toolOther;
+        return this;
+    }
 
     public String getToolGo() {
         return toolGo;

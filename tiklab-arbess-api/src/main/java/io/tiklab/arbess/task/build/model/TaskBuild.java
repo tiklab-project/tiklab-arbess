@@ -79,6 +79,21 @@ public class TaskBuild {
     @JoinField(key = "scmId")
     private Scm toolGo;
 
+    @Mappings({
+            @Mapping(source = "toolOther.scmId",target = "toolOther")
+    })
+    @JoinField(key = "scmId")
+    private Scm toolOther;
+
+    public Scm getToolOther() {
+        return toolOther;
+    }
+
+    public TaskBuild setToolOther(Scm toolOther) {
+        this.toolOther = toolOther;
+        return this;
+    }
+
     public Scm getToolGo() {
         return toolGo;
     }

@@ -1,0 +1,1 @@
+ALTER TABLE pip_trigger_webhook RENAME COLUMN key TO wkey;

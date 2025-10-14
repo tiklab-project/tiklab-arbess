@@ -46,9 +46,22 @@ public class SourceFareScanEntity {
     @Column(name = "notice_trouble")
     private Integer noticeTrouble;
 
-    // suggestTrouble
+    // 提示问题
     @Column(name = "suggest_trouble")
     private Integer suggestTrouble;
+
+    // 错误问题
+    @Column(name = "error_trouble")
+    private Integer errorTrouble;
+
+    public Integer getErrorTrouble() {
+        return errorTrouble;
+    }
+
+    public SourceFareScanEntity setErrorTrouble(Integer errorTrouble) {
+        this.errorTrouble = errorTrouble;
+        return this;
+    }
 
     public String getUrl() {
         return url;

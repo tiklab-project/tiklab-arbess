@@ -61,6 +61,9 @@ public class TaskCodeScan {
     // 扫描项目名称
     private String scanProjectName;
 
+    // 扫描代码覆盖率
+    private Integer scanCoverage;
+
     // jdk版本
     @Mappings({
             @Mapping(source = "toolJdk.scmId",target = "toolJdk")
@@ -100,6 +103,30 @@ public class TaskCodeScan {
     })
     @JoinField(key = "scmId")
     private Scm toolGo;
+
+    @Mappings({
+            @Mapping(source = "toolOther.scmId",target = "toolOther")
+    })
+    @JoinField(key = "scmId")
+    private Scm toolOther;
+
+    public Integer getScanCoverage() {
+        return scanCoverage;
+    }
+
+    public TaskCodeScan setScanCoverage(Integer scanCoverage) {
+        this.scanCoverage = scanCoverage;
+        return this;
+    }
+
+    public Scm getToolOther() {
+        return toolOther;
+    }
+
+    public TaskCodeScan setToolOther(Scm toolOther) {
+        this.toolOther = toolOther;
+        return this;
+    }
 
     public String getScanProjectId() {
         return scanProjectId;

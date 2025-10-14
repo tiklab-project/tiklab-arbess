@@ -1,0 +1,1 @@
+ALTER TABLE pip_task_relevance_teston ADD COLUMN auth_id VARCHAR(64);

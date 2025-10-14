@@ -150,7 +150,7 @@ public class PipelineFinal {
     public static final String TEST_DEFAULT_ORDER = "mvn test";
     public static final String MAVEN_DEFAULT_ORDER = "mvn clean package";
     public static final String GO_DEFAULT_ORDER = "go build -o bin/myapp";
-    public static final String PYTHON_DEFAULT_ORDER = "python install .";
+    public static final String PYTHON_DEFAULT_ORDER = "pip3 install .";
     public static final String PHP_DEFAULT_ORDER = "composer install";
     public static final String NET_CORE_DEFAULT_ORDER = "dotnet publish -c Release -o out";
     public static final String GRADLE_DEFAULT_ORDER = "gradle build ";

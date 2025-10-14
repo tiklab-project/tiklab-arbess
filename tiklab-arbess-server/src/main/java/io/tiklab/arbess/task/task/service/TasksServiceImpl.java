@@ -1229,11 +1229,8 @@ public class TasksServiceImpl implements TasksService {
                    case TASK_BUILD_GO -> {
                        return PipelineUtil.validNoNullFiled(code.getToolGo(),code.getBuildOrder());
                    }
-                   case TASK_BUILD_PHP, TASK_BUILD_PYTHON -> {
-                       return PipelineUtil.validNoNullFiled(code.getBuildOrder());
-                   }
                    default -> {
-                       return true;
+                       return PipelineUtil.validNoNullFiled(code.getBuildOrder(),code.getToolOther());
                    }
                }
            }
@@ -1261,22 +1258,28 @@ public class TasksServiceImpl implements TasksService {
            case TASK_TYPE_CODESCAN -> {
                TaskCodeScan code =  JSONObject.parseObject(jsonString,TaskCodeScan.class);
                if (taskType.equals(TASK_CODESCAN_SOURCEFARE)){
+
+                   String scanType = code.getScanType();
+                   if (scanType.equals("server")){
+                       return PipelineUtil.validNoNullFiled(code.getAuthId(),code.getScanProjectId());
+                   }
+
                    String codeType = code.getCodeType();
+
+                   Boolean b = PipelineUtil.validNoNullFiled(code.getScanPath(), code.getToolSourceFare(), code.getScanProjectName(),code.getAuthId());
+
                    switch (codeType) {
                        case TASK_CODESCAN_SONAR_JAVA -> {
-                           return PipelineUtil.validNoNullFiled(code.getToolJdk(),code.getToolMaven(),code.getScanPath(),code.getProjectName());
+                           return b && PipelineUtil.validNoNullFiled(code.getToolJdk(),code.getToolMaven());
                        }
                        case TASK_CODESCAN_SONAR_GO -> {
-                           return PipelineUtil.validNoNullFiled(code.getScanPath(),code.getToolGo(),code.getProjectName());
-                       }
-                       case TASK_CODESCAN_SONAR_OTHER -> {
-                           return PipelineUtil.validNoNullFiled(code.getScanPath(),code.getToolSonar(),code.getProjectName());
+                           return b && PipelineUtil.validNoNullFiled(code.getToolGo());
                        }
                        case TASK_CODESCAN_SONAR_JAVASCRIPT -> {
-                           return PipelineUtil.validNoNullFiled(code.getScanPath(),code.getToolNodejs(),code.getProjectName());
+                           return b && PipelineUtil.validNoNullFiled(code.getToolNodejs());
                        }
                        default -> {
-                           return true;
+                           return b && PipelineUtil.validNoNullFiled(code.getToolOther());
                        }
                    }
 

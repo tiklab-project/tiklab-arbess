@@ -82,7 +82,7 @@ public class InitAuthority implements DsmProcessTask {
             "message","message_update_send_way","message_update_plan_status","message_update_plan_send_way","message_plan_user_add","message_plan_delete",
             "openapi","openapi_add","openapi_delete","openapi_find",
             "backups_and_recover","backups_update_status","backups_create","recover_create",
-            "log",
+            "log","log_find",
             "ip_whitelist","ip_whitelist_white","ip_whitelist_black",
             "licence","licence_import",
             "apply_limits","apply_limits_add_user","apply_limits_delete_user","apply_limits_open_user","apply_limits_close_user",
@@ -122,8 +122,8 @@ public class InitAuthority implements DsmProcessTask {
             // "custom_logo",
 
             // 流水线权限
-            "pipeline",
-            "pipeline_history",
+            "pipeline","pipeline_create","pipeline_run","pipeline_update","pipeline_delete",
+            "pipeline_history","pipeline_history_delete","pipeline_history_run",
             "pipeline_release",
             // "pipeline_statistics",
             // "pipeline_application",
@@ -157,8 +157,9 @@ public class InitAuthority implements DsmProcessTask {
     };
 
     private final String[] domainFunctionIds = new String[]{
-            "pip_design",
-            "pip_history",
+            "pip_design","pip_design_run","pip_design_update",
+            "pip_history","pip_history_delete","pip_history_run",
+            "pip_setting","pip_setting_update",
     };
 
 

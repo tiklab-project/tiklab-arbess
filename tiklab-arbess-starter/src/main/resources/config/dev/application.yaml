@@ -19,14 +19,6 @@ jdbc:
 #  username: root
 #  password: darth2020
 
-#spring:
-#  main:
-#    log-startup-info: true  # 启动时打印 Bean 注入信息（默认就是 true）
-#
-#logging:
-#  level:
-#    org.springframework.beans.factory.support.DefaultListableBeanFactory: DEBUG
-
 postgresql:
   embbed:
     enable: false
@@ -43,10 +35,11 @@ dcs:
     url: 127.0.0.1:5020
     group: g1
     database: dcs1
-    expire: 7200
 
 auth:
+#  expire: 3
   type: local
+#  type: soular
   soular:
     address: http://192.168.10.15:8080
     web:

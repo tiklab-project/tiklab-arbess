@@ -1,10 +1,13 @@
 package io.tiklab.arbess.setting.tool.controller;
 
-import io.tiklab.arbess.setting.tool.model.ScmQuery;
-import io.tiklab.core.Result;
+import io.tiklab.arbess.setting.tool.config.EnvDetector;
 import io.tiklab.arbess.setting.tool.model.Scm;
+import io.tiklab.arbess.setting.tool.model.ScmQuery;
+import io.tiklab.arbess.setting.tool.model.ToolInfo;
 import io.tiklab.arbess.setting.tool.service.ScmService;
+import io.tiklab.core.Result;
 import io.tiklab.core.page.Pagination;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 
@@ -107,6 +111,16 @@ public class ScmController {
     public Result<List<Map<String, Object>>> findScmByTypeGroup() {
         List<Map<String, Object>> allScm = scmService.findScmByTypeGroup();
         return Result.ok(allScm);
+    }
+
+    @RequestMapping(path="/findEnvInfo",method = RequestMethod.POST)
+    public Result<ToolInfo> findEnvInfo( @NotNull String type) {
+        EnvDetector envDetector = EnvDetector.findInstance();
+        ToolInfo toolInfo = envDetector.findEnv(type);
+        if (!StringUtils.isEmpty(toolInfo.getPath())){
+            toolInfo.setPath(new File(toolInfo.getPath()).getParent());
+        }
+        return Result.ok(toolInfo);
     }
 
 }
