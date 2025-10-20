@@ -330,7 +330,6 @@ public class PipelineServiceImpl implements PipelineService {
             List<String> userIdList = new ArrayList<>();
 
             pipelineList.parallelStream().forEach(pipeline -> {
-            // pipelineList.forEach(pipeline -> {
                 userIdList.add(pipeline.getUser().getId());
                 pipeline.setCollect(1);
                 Pipeline pipelineMessage = findPipelineExecMessage(pipeline);
@@ -343,6 +342,9 @@ public class PipelineServiceImpl implements PipelineService {
             List<Pipeline> pipelines = list.stream()
                     .peek(pipeline -> pipeline.setUser(pipelineUser.get(pipeline.getUser().getId())))
                     .collect(Collectors.toList());
+
+            findPipelinePermissions(pipelines,userId);
+
             pipelines.sort(Comparator.comparing(Pipeline::getCreateTime).reversed());
             return PaginationBuilder.build(pipelineListQuery,pipelines);
         }
@@ -390,6 +392,8 @@ public class PipelineServiceImpl implements PipelineService {
         List<Pipeline> pipelines = list.stream()
                 .peek(pipeline -> pipeline.setUser(pipelineUser.get(pipeline.getUser().getId())))
                 .collect(Collectors.toList());
+
+        findPipelinePermissions(pipelines,userId);
 
         pipelines.sort(Comparator.comparing(Pipeline::getCreateTime).reversed());
         return PaginationBuilder.build(pipelinePage,pipelines);
@@ -548,9 +552,6 @@ public class PipelineServiceImpl implements PipelineService {
         // 多阶段
         stageService.cloneStage(pipelineId, clonePipelineId);
 
-        // 克隆触发器
-        // triggerService.cloneTrigger(pipelineId,clonePipelineId);
-
         // 克隆流水线变量
         variableService.cloneVariable(pipelineId,clonePipelineId);
 
@@ -627,6 +628,9 @@ public class PipelineServiceImpl implements PipelineService {
         followService.deletePipelineFollow(pipelineId);
     }
 
+
+
+
     /**
      * 添加流水线执行信息
      * @param pipeline 流水线
@@ -655,13 +659,26 @@ public class PipelineServiceImpl implements PipelineService {
         String pipelineId = pipeline.getId();
         pipeline.setExec(false);
         List<String> strings = stageService.validStagesMustField(pipelineId);
-        // List<Stage> allMainStage = stageService.findAllMainStage(pipelineId);
-
         if(strings.isEmpty() && pipeline.getState() != 2 && wail){
             pipeline.setExec(true);
         }
-
         return pipeline;
+    }
+
+
+    public void findPipelinePermissions(List<Pipeline> pipelines,String userId){
+        List<String> stringList = pipelines.stream().map(Pipeline::getId).collect(Collectors.toList());
+        Map<String, Set<String>> listPermissions = homeService.findDomainListPermissions(userId, stringList);
+
+        pipelines.forEach(pipeline -> {
+            PipelinePermissions pipelinePermissions = new PipelinePermissions();
+            Set<String> strings = listPermissions.get(pipeline.getId());
+            if (!Objects.isNull(strings)){
+                String join = String.join(",", strings);
+                pipelinePermissions.addPipelinePermission(pipelinePermissions,join);
+            }
+            pipeline.setPermissions(pipelinePermissions);
+        });
     }
 
     /**

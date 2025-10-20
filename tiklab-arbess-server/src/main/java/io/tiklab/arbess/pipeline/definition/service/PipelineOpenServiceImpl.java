@@ -131,12 +131,18 @@ public class PipelineOpenServiceImpl implements PipelineOpenService {
         List<PipelineOpenEntity> dataList = pipelineOpenPage.getDataList();
         List<PipelineOpen> openList = BeanMapper.mapList(dataList, PipelineOpen.class);
         joinTemplate.joinQuery(openList,new String[]{"pipeline"});
+        List<PipelineOpen> list = new ArrayList<>();
         for (PipelineOpen pipelineOpen : openList) {
-            String pipelineId = pipelineOpen.getPipeline().getId();
+            Pipeline pipeline = pipelineOpen.getPipeline();
+            String pipelineId = pipeline.getId();
+            if (StringUtils.isEmpty(pipeline.getName())){
+                continue;
+            }
             PipelineOverview pipelineOverview = overviewService.pipelineOverview(pipelineId);
             pipelineOpen.setExecStatus(pipelineOverview);
+            list.add(pipelineOpen);
         }
-        return PaginationBuilder.build(pipelineOpenPage,openList);
+        return PaginationBuilder.build(pipelineOpenPage,list);
     }
 
     //更新最近打开

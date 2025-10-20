@@ -2,6 +2,7 @@ package io.tiklab.arbess.starter.config;
 
 import io.tiklab.arbess.support.util.task.service.AddTaskField;
 import io.tiklab.arbess.support.util.task.service.InitAuthority;
+import io.tiklab.arbess.support.util.task.service.InitAuthorityTwo;
 import io.tiklab.arbess.support.util.task.service.TaskUpdate;
 import io.tiklab.dsm.model.DsmConfig;
 import io.tiklab.dsm.model.DsmVersion;
@@ -25,6 +26,9 @@ public class ArbessDsmAutoConfiguration {
 
     @Autowired
     InitAuthority authority;
+
+    @Autowired
+    InitAuthorityTwo authorityTwo;
 
     @Autowired
     AddTaskField addTaskField;
@@ -208,6 +212,20 @@ public class ArbessDsmAutoConfiguration {
                 .get();
         versionList.add(sql138);
 
+        DsmVersion sql139 = DsmVersionBuilder.instance()
+                .version("pip_2.0.2")
+                .db(new String[]{
+                        "pip_2.0.2"
+                })
+                .get();
+        versionList.add(sql139);
+
+        DsmVersion sql_102 = DsmVersionBuilder.instance()
+                .version("licence_2.0.0")
+                .db(new String[]{
+                        "licence_2.0.0",
+                }).get();
+        versionList.add(sql_102);
 
         DsmVersion sql106 = DsmVersionBuilder.instance()
                 .version("pip-task-add-field-1.0.0")
@@ -220,6 +238,12 @@ public class ArbessDsmAutoConfiguration {
                 .task(authority)
                 .get();
         versionList.add(sql133);
+
+        DsmVersion sql129 = DsmVersionBuilder.instance()
+                .version("pip-authorityTwo")
+                .task(authorityTwo)
+                .get();
+        versionList.add(sql129);
 
         return versionList;
     }

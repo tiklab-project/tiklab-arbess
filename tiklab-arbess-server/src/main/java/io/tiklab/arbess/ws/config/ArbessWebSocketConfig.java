@@ -1,6 +1,7 @@
 package io.tiklab.arbess.ws.config;
 
 import io.tiklab.arbess.ws.server.SocketServerHandler;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.server.ServerHttpRequest;
@@ -18,9 +19,12 @@ import java.util.Map;
 @EnableWebSocket
 public class ArbessWebSocketConfig implements WebSocketConfigurer {
 
+    @Autowired
+    SocketServerHandler socketHandler;
+
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(socketHandler(), "/arbess/handler")
+        registry.addHandler(socketHandler, "/arbess/handler")
                 .addInterceptors()
                 .setHandshakeHandler(new DefaultHandshakeHandler() {
                     @Override
@@ -31,7 +35,7 @@ public class ArbessWebSocketConfig implements WebSocketConfigurer {
                 .setAllowedOrigins("*");
     }
 
-    @Bean
+    // @Bean
     public SocketServerHandler socketHandler() {
         return new SocketServerHandler();
     }

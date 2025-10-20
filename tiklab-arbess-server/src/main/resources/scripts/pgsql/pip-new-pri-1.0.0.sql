@@ -71,7 +71,7 @@ INSERT INTO pcs_prc_function (id, name, code, parent_function_id, sort, type) VA
 INSERT INTO pcs_prc_function (id, name, code, parent_function_id, sort, type) VALUES ('permission_role_delete', '删除角色', 'permission_role_delete', 'permission',2, '1');
 INSERT INTO pcs_prc_function (id, name, code, parent_function_id, sort, type) VALUES ('permission_role_update', '修改角色信息', 'permission_role_update', 'permission',3, '1');
 INSERT INTO pcs_prc_function (id, name, code, parent_function_id, sort, type) VALUES ('permission_role_user_add', '添加角色成员', 'permission_role_user_add', 'permission',3, '1');
-INSERT INTO pcs_prc_function (id, name, code, parent_function_id, sort, type) VALUES ('permission_role_user_delete', '删除角色信息', 'permission_role_user_delete', 'permission',3, '1');
+INSERT INTO pcs_prc_function (id, name, code, parent_function_id, sort, type) VALUES ('permission_role_user_delete', '删除角色成员', 'permission_role_user_delete', 'permission',3, '1');
 INSERT INTO pcs_prc_function (id, name, code, parent_function_id, sort, type) VALUES ('permission_role_permission_update', '编辑角色权限', 'permission_role_permission_update', 'permission',3, '1');
 INSERT INTO pcs_prc_function (id, name, code, parent_function_id, sort, type) VALUES ('permission_role_update_default', '修改默认角色', 'permission_role_update_default', 'permission',4, '1');
 

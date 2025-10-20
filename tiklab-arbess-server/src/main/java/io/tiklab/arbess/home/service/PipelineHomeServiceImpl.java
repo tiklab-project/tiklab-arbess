@@ -1,9 +1,9 @@
 package io.tiklab.arbess.home.service;
 
 import com.alibaba.fastjson.JSONObject;
+import io.tiklab.arbess.pipeline.definition.model.Pipeline;
 import io.tiklab.arbess.support.util.util.PipelineFinal;
 import io.tiklab.eam.common.context.LoginContext;
-import io.tiklab.arbess.pipeline.definition.model.Pipeline;
 import io.tiklab.message.message.model.Message;
 import io.tiklab.message.message.model.MessageReceiver;
 import io.tiklab.message.message.model.SendMessageNotice;
@@ -223,6 +223,30 @@ public class PipelineHomeServiceImpl implements PipelineHomeService {
         Set<String> permissions = permissionService.findDomainPermissions(permissionsQuery);
         return permissions.contains(permission);
     }
+
+
+    @Override
+    public Set<String> findPermission(String domainId, String userId){
+        return permissionService.findDomainPermissions(domainId,userId);
+    }
+
+    @Override
+    public Map<String,Set<String>> findDomainListPermissions(String userId,List<String> domainIdList){
+        return permissionService.findDomainListPermissions(userId,domainIdList);
+    }
+
+
+    // @Override
+    // public List<String> findPermissionList(String domainId,List<String> findPermissions){
+    //     DomainPermissionsQuery permissionsQuery = new DomainPermissionsQuery();
+    //     permissionsQuery.setDomainId(domainId);
+    //     permissionsQuery.setUserId(LoginContext.getLoginId());
+    //     Set<String> permissions = permissionService.findDomainPermissions(permissionsQuery);
+    //
+    //     return findPermissions.stream()
+    //             .filter(permissions::contains)
+    //             .collect(Collectors.toList());
+    // }
 
 }
 

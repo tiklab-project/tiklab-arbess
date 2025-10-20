@@ -196,6 +196,20 @@ public class Pipeline {
      */
     private Boolean isExec;
 
+    /**
+     * @pi.model:PipelinePermissions
+     * @pi.desc:流水线权限
+     */
+    private PipelinePermissions permissions;
+
+    public PipelinePermissions getPermissions() {
+        return permissions;
+    }
+
+    public void setPermissions(PipelinePermissions permissions) {
+        this.permissions = permissions;
+    }
+
     public List<PipelineTemplate> getTemplateList() {
         return templateList;
     }

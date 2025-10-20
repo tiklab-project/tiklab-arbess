@@ -2,11 +2,13 @@ package io.tiklab.arbess.pipeline.instance.service;
 
 import io.tiklab.arbess.agent.support.util.service.PipelineUtilService;
 import io.tiklab.arbess.agent.util.PipelineCache;
+import io.tiklab.arbess.home.service.PipelineHomeService;
 import io.tiklab.arbess.pipeline.definition.model.Pipeline;
 import io.tiklab.arbess.pipeline.execute.model.PipelineRunMsg;
 import io.tiklab.arbess.pipeline.instance.dao.PipelineInstanceDao;
 import io.tiklab.arbess.pipeline.instance.entity.PipelineInstanceEntity;
 import io.tiklab.arbess.pipeline.instance.model.PipelineInstance;
+import io.tiklab.arbess.pipeline.instance.model.PipelineInstancePermissions;
 import io.tiklab.arbess.pipeline.instance.model.PipelineInstanceQuery;
 import io.tiklab.arbess.stages.service.StageInstanceServer;
 import io.tiklab.arbess.stages.service.StageService;
@@ -30,6 +32,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 流水线实例服务
@@ -43,6 +46,9 @@ public class PipelineInstanceServiceImpl implements PipelineInstanceService {
 
     @Autowired
     PipelineAuthorityService authorityService;
+
+    @Autowired
+    PipelineHomeService homeService;
 
     @Autowired
     TasksInstanceService tasksInstanceService;
@@ -275,8 +281,14 @@ public class PipelineInstanceServiceImpl implements PipelineInstanceService {
     }
 
     public void queryPipelineInstance(List<PipelineInstance> execInstanceList){
+
+        List<String> pipIdList = execInstanceList.stream()
+                .map(instance -> instance.getPipeline().getId()).collect(Collectors.toList());
+
+        String loginId = LoginContext.getLoginId();
+        Map<String, Set<String>> stringSetMap = homeService.findDomainListPermissions(loginId, pipIdList);
+
         execInstanceList.parallelStream().forEach(instance -> {
-        // execInstanceList.forEach(instance -> {
             String time;
             if (instance.getRunStatus().equals(PipelineFinal.RUN_RUN)){
                 Integer runtime = PipelineCache.findRuntime(instance.getInstanceId());
@@ -290,8 +302,6 @@ public class PipelineInstanceServiceImpl implements PipelineInstanceService {
             String pipelineId = pipeline.getId();
 
             List<String> strings = stageService.validStagesMustField(pipelineId);
-            // List<Stage> allMainStage = stageService.findAllMainStage(pipelineId);
-            //
             if(strings.isEmpty()  && pipeline.getState() == 1 ){
                 instance.setExec(true);
             }
@@ -303,7 +313,17 @@ public class PipelineInstanceServiceImpl implements PipelineInstanceService {
             if (!buildProductList.isEmpty()){
                 instance.setRollbackExec(true);
             }
+
+            PipelineInstancePermissions permissions = new PipelineInstancePermissions();
+            Set<String> stringSet = stringSetMap.get(pipeline.getId());
+            if (!Objects.isNull(stringSet)){
+                String join = String.join(",", stringSet);
+                permissions.addPipelinePermission(permissions,join);
+            }
+            instance.setInstancePermissions(permissions);
         });
+
+
     }
 
 

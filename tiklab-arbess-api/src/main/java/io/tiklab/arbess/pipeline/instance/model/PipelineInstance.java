@@ -65,6 +65,16 @@ public class PipelineInstance {
 
     private String runLog;
 
+    private PipelineInstancePermissions instancePermissions;
+
+    public PipelineInstancePermissions getInstancePermissions() {
+        return instancePermissions;
+    }
+
+    public void setInstancePermissions(PipelineInstancePermissions instancePermissions) {
+        this.instancePermissions = instancePermissions;
+    }
+
     public Boolean getRollbackExec() {
         return rollbackExec;
     }

@@ -4,6 +4,7 @@ import io.tiklab.arbess.pipeline.definition.model.Pipeline;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * 流水线首页服务接口
@@ -55,5 +56,12 @@ public interface PipelineHomeService {
      * @return 权限
      */
     Boolean findPermissions(String domainId,String permission);
+
+
+
+    Set<String> findPermission(String domainId, String userId);
+
+
+    Map<String,Set<String>> findDomainListPermissions(String userId,List<String> domainIdList);
 
 }
