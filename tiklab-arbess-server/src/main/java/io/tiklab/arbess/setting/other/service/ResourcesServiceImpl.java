@@ -149,9 +149,10 @@ public class ResourcesServiceImpl implements ResourcesService {
         resources.setResidueCcyNumber(Math.max(i, 0));
 
         // 磁盘数（社区版不限制磁盘大小）
-        double size = Double.parseDouble(String.format("%.2f",notVipCacheNTime - getSize()));
+        double sizeCache = getSize();
+        double size = Double.parseDouble(String.format("%.2f",notVipCacheNTime - sizeCache));
         resources.setResidueCacheNumber(size);
-        double parsed = Double.parseDouble(String.format("%.2f", getSize()));
+        double parsed = Double.parseDouble(String.format("%.2f", sizeCache));
         resources.setUseCacheNumber(parsed);
 
         resources.setResidueSceNumber(-1);
